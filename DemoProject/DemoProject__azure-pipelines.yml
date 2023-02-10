@@ -1,0 +1,52 @@
+# ASP.NET Core (.NET Framework)
+# Build and test ASP.NET Core projects targeting the full .NET Framework.
+# Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+# SPDX-FileCopyrightText: 2023 Siemens AG
+# SPDX-License-Identifier: MIT
+
+resources:
+  repositories:
+  - repository: Demo_Project  # identifier (A-Z, a-z, 0-9, and underscore)
+    type: git  # see the following "Type" topic
+    ref: development  # ref name to use; defaults to 'refs/heads/master'
+    name: DemoProject\NPMProject  # repository name (format depends on `type`)
+jobs:
+- job:
+  timeoutInMinutes: 120
+  pool:
+    name: $(agentpool)
+
+  steps:
+  
+  - task: CmdLine@2
+    displayName: 'Clearing-Package Identifier'
+    inputs:
+      script: |
+        $(Build.SourcesDirectory)\Continuous-Clearing\out\net6.0\PackageIdentifier.exe --packageFilePath "$(Build.SourcesDirectory)\DemoProject\NPMProject" --bomFolderPath "$(Build.SourcesDirectory)\DemoProject\NPMProject" --sw360Token <SW360AUTHTOKEN)>  --projectType <ProjectType> --sw360Url <sw360Url> --sW360AuthTokenType Bearer --artifactoryuploadApiKey <JFROGARTIFACTORYTOKEN>) --JfrogApi <JfrogUrl>
+      workingDirectory: 'DemoProject\NPMProject'
+      failOnStderr: true
+
+  - task: CmdLine@2
+    displayName: 'Clearing-SW360 Package Creator'
+    inputs:
+      script: |
+        $(Build.SourcesDirectory)\Continuous-Clearing\out\net6.0\SW360PackageCreator.exe  --bomFilePath "$(Build.SourcesDirectory)\DemoProject\NPMProject\$(SW360PROJNAME)_Bom.cdx.json"  --sw360Token <sw360token> --sW360ProjectID <ProjectId> --sW360AuthTokenType Bearer --fossologyUrl <FossURL>
+      workingDirectory: 'DemoProject\NPMProject'
+      failOnStderr: true
+
+  - task: CopyFiles@2
+    displayName: 'Prepare artifact stage'
+    inputs:
+      SourceFolder: '$(Build.SourcesDirectory)\DemoProject\NPMProject'
+      Contents: |
+        *.json
+        SW360ProjectInfo.xml
+      TargetFolder: '$(build.artifactstagingdirectory)\DemoProject\NPMProject\BOM'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish artifacts'
+    inputs:
+      PathtoPublish: '$(build.artifactstagingdirectory)'
+      ArtifactName: 'drop'
+      publishLocation: 'Container'

@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net6.0</TargetFramework>
+		<AssemblyName>PackageIdentifier</AssemblyName>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<WarningLevel>4</WarningLevel>
+		<PlatformTarget></PlatformTarget>
+		<OutputPath>..\..\out</OutputPath>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<OutputPath>..\..\out</OutputPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\UsageDoc\CLIUsage.txt">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="log4net" Version="2.0.9" />
+		<PackageReference Include="Microsoft.CodeCoverage" Version="17.1.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\LCT.Common\LCT.Common.csproj" />
+		<ProjectReference Include="..\LCT.Facade\LCT.Facade.csproj" />
+		<ProjectReference Include="..\LCT.Services\LCT.Services.csproj" />
+	</ItemGroup>
+</Project>

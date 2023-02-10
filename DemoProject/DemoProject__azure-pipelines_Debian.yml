@@ -1,0 +1,92 @@
+# ASP.NET Core (.NET Framework)
+# Build and test ASP.NET Core projects targeting the full .NET Framework.
+# Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+# SPDX-FileCopyrightText: 2023 Siemens AG
+# SPDX-License-Identifier: MIT
+
+resources:
+variables:
+- name: DockerRepository
+  value: 'reponame'
+- name: DockerImageName
+  value: 'buster-20210621-slim'
+- name: DockerContainerName
+  value: 'containername'
+- name: debpackagefilepath
+  value: 'D:\DebianClearing\InFolder'
+- name: debpackageOutfilepath
+  value: 'D:\DebianClearing\OutFolder'
+
+
+stages:
+    steps:
+    - task: 6d15af64-176c-496d-b583-fd2ae21d4df4@1
+      inputs:
+        repository: self
+        clean: true
+  
+    - task: Docker@2
+      displayName: docker login
+      inputs:
+        containerRegistry: 'docker-phoebe'
+        command: 'login'
+    - task: CmdLine@2
+      displayName: debian instance run for json creation
+      inputs:
+        script: |
+          echo "debian docker instance"
+          echo "stop debian docker instance"
+          docker stop $(DockerContainerName)
+          echo "remove debian docker instance"
+          docker rm $(DockerContainerName)
+          echo "pull debian docker instance"
+          docker pull %DOCKERARTIFACTORY%/$(DockerRepository):$(DockerImageName)
+          echo "save debian docker instance"
+          docker save %DOCKERARTIFACTORY%/$(DockerRepository):$(DockerImageName) -o $(debpackagefilepath)\buster20210621slim.tar
+          echo "run debian docker instance"
+          docker run --name $(DockerContainerName) --memory=3g --rm -v /D/DebianClearing/InFolder:/tmp/InputImages -v /D/DebianClearing/OutFolder:/tmp/OutputFiles ca/debian_package_extractor:latest ./syft packages /tmp/InputImages/buster20210621slim.tar -o cyclonedx-json --file "/tmp/OutputFiles/output.json"
+      env:
+        DOCKERARTIFACTORY: $(DOCKERARTIFACTORY)
+
+
+    - task: CopyFiles@2
+      displayName: 'copy appsettings json'
+      inputs:
+        SourceFolder: '$(Build.SourcesDirectory)'
+        Contents: 'appSettings*.json'
+        TargetFolder: '$(Build.SourcesDirectory)\Continuous-Clearing\out\net6.0'
+        OverWrite: true
+        
+    - task: CmdLine@2
+      enabled: true
+      displayName: 'PackageIdentifier'
+      inputs:
+        script: |
+          $(Build.SourcesDirectory)\Continuous-Clearing\out\net6.0\PackageIdentifier.exe  --packageFilePath "<debpackageOutfilepath>" --bomFolderPath "$(Build.SourcesDirectory)\GridEdge" --sw360Token <SW360AUTHTOKEN> --sW360ProjectID <projectid> --sW360AuthTokenType Bearer --artifactoryuploadApiKey <JFRogApitoken> --projectType DEBIAN
+        workingDirectory: $(Build.SourcesDirectory)
+      continueOnError: true
+    - task: CmdLine@2
+      enabled: true
+      displayName: 'component creator'
+      inputs:
+        script: |
+          $(Build.SourcesDirectory)\Continuous-Clearing\out\net6.0\SW360PackageCreator.exe  --bomFilePath "$(Build.SourcesDirectory)\GridEdge\$(SW360PROJNAME)_Bom.cdx.json" --sw360Token <SW360AUTHTOKEN> --sW360ProjectID <ProjectId> --sW360AuthTokenType Bearer --fossologyUrl <FossURL>
+        workingDirectory: $(Build.SourcesDirectory)
+      continueOnError: true
+
+    - task: Docker@2
+      displayName: docker logout
+      inputs:
+        containerRegistry: 'docker-phoebe'
+        command: 'logout'
+ 
+    - task: PublishBuildArtifacts@1
+      enabled: false
+      displayName: 'publish artifacts'
+      inputs:
+        PathtoPublish: '$(build.artifactstagingdirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
+
+

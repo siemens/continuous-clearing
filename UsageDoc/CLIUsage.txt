@@ -1,0 +1,14 @@
+Usage:
+   [flags]
+   [command]
+
+Examples:
+  dotnet PackageIdentifier.dll --settingsfilepath /etc/CATool/appSettings.json                     Creates Bom file by identifying packages in input
+
+Available Commands:
+  dotnet PackageIdentifier.dll --settingsfilepath /etc/CATool/appSettings.json                     Creates Bom file by identifying packages in input
+  dotnet SW360PackageCreator.dll --settingsfilepath /etc/CATool/appSettings.json                   Creates Components and Release in SW360
+  dotnet ArtifactoryUploader.dll --settingsfilepath /etc/CATool/appSettings.json                   Uploads source package to JFrog Artifactory
+
+Flags:
+      --settingsfilepath           Path of application config file

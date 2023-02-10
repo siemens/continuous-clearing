@@ -1,0 +1,22 @@
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2023 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+
+using Newtonsoft.Json;
+
+namespace LCT.APICommunications.Model.Foss
+{
+  /// <summary>
+  /// AttachCreatedBy model class
+  /// </summary>
+  public class AttachCreatedBy
+  {
+    [JsonProperty("name")]
+    public string Name { get; set; }
+
+    [JsonProperty("_links")]
+    public Links Links { get; set; }
+  }
+}

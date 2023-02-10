@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+
+		<IsPackable>false</IsPackable>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<OutputPath>..\..\out</OutputPath>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<OutputPath>..\..\out</OutputPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Remove="Source\**" />
+		<Compile Remove="Target\**" />
+		<EmbeddedResource Remove="Source\**" />
+		<EmbeddedResource Remove="Target\**" />
+		<None Remove="Source\**" />
+		<None Remove="Target\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="NUnit" Version="3.12.0" />
+		<PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\LCT.Common\LCT.Common.csproj" />
+	</ItemGroup>
+
+</Project>

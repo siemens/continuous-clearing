@@ -1,0 +1,324 @@
+// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2023 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+
+// --------------------------------------------------------------------------------------------------------------------
+{
+  "BomFormat": "CycloneDX",
+  "SpecVersion": 4,
+  "SpecVersionString": "1.4",
+  "SerialNumber": null,
+  "Version": null,
+  "Metadata": {
+    "Tools": [
+      {
+        "Vendor": "Siemens AG",
+        "Name": "Clearing Automation Tool",
+        "Version": "1.0.20",
+        "Hashes": null
+      }
+    ],
+    "Authors": null,
+    "Component": null,
+    "Manufacture": null,
+    "Supplier": null
+  },
+  "Components": [
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:nuget/Newtonsoft.Json@12.0.3",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "Newtonsoft.Json",
+      "Version": "12.0.3",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:nuget/Newtonsoft.Json@12.0.3",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "NUGET"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "NEW_CLEARING"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/34201329a2af45d99e8cd6f86657dca7"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": "/repo/?mod=view-license&upload="
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:nuget/System.Buffers@4.5.1",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "System.Buffers",
+      "Version": "4.5.1",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:nuget/System.Buffers@4.5.1",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "NUGET"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "NEW_CLEARING"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/d1642e8c7d664ab7ae0e910ce7a605ea"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": "/repo/?mod=view-license&upload="
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:nuget/System.Memory@4.5.4",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "System.Memory",
+      "Version": "4.5.4",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:nuget/System.Memory@4.5.4",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "NUGET"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "NEW_CLEARING"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/25e5614b3fbf4be1b21100ce58065ea7"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": "/repo/?mod=view-license&upload="
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:nuget/System.Numerics.Vectors@4.5.0",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "System.Numerics.Vectors",
+      "Version": "4.5.0",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:nuget/System.Numerics.Vectors@4.5.0",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "NUGET"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "NEW_CLEARING"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/63ec13218a3549e19782bc9e87cbd0ef"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": "/repo/?mod=view-license&upload="
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:nuget/System.Threading.Tasks.Extensions@4.5.4",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "System.Threading.Tasks.Extensions",
+      "Version": "4.5.4",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:nuget/System.Threading.Tasks.Extensions@4.5.4",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "NUGET"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "NEW_CLEARING"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/bbdadb799786479599613f62d5131e73"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": "/repo/?mod=view-license&upload="
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:nuget/System.ValueTuple@4.5.0",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "System.ValueTuple",
+      "Version": "4.5.0",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:nuget/System.ValueTuple@4.5.0",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "NUGET"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "NEW_CLEARING"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/e43ef15620004144a5b2341166a04fd4"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": "/repo/?mod=view-license&upload="
+        }
+      ],
+      "Evidence": null
+    }
+  ],
+  "Compositions": null
+}

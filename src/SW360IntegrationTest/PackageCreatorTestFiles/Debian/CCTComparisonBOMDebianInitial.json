@@ -1,0 +1,226 @@
+// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2023 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+
+// --------------------------------------------------------------------------------------------------------------------
+{
+  "BomFormat": "CycloneDX",
+  "SpecVersion": 4,
+  "SpecVersionString": "1.4",
+  "SerialNumber": null,
+  "Version": null,
+  "Metadata": {
+    "Tools": [
+      {
+        "Vendor": "Siemens AG",
+        "Name": "Clearing Automation Tool",
+        "Version": "1.0.20",
+        "Hashes": null
+      }
+    ],
+    "Authors": null,
+    "Component": null,
+    "Manufacture": null,
+    "Supplier": null
+  },
+  "Components": [
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:deb/debian/adduser@3.118?arch=source",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "adduser",
+      "Version": "3.118.debian",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:deb/debian/adduser@3.118?arch=source",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "DEBIAN"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "NEW_CLEARING"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/0731248762fb4b67bb4818c85116ec2a"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": "/repo/?mod=view-license&upload="
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:deb/debian/apt@1.8.2.3?arch=source",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "apt",
+      "Version": "1.8.2.3.debian",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:deb/debian/apt@1.8.2.3?arch=source",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "DEBIAN"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "NEW_CLEARING"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/2f99d9f0bab84a169ef64e2c72f9afd4"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": "/repo/?mod=view-license&upload="
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:deb/debian/base-files@10.3%2Bdeb10u10?arch=source",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "base-files",
+      "Version": "10.3+deb10u10.debian",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:deb/debian/base-files@10.3%2Bdeb10u10?arch=source",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "DEBIAN"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "NEW_CLEARING"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/61326c123d044da9a151e37ff567b648"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": "/repo/?mod=view-license&upload="
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:deb/debian/base-passwd@3.5.46?arch=source",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "base-passwd",
+      "Version": "3.5.46.debian",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:deb/debian/base-passwd@3.5.46?arch=source",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "DEBIAN"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "NEW_CLEARING"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/26ee87b2278047d081468d4116d48db1"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": "/repo/?mod=view-license&upload="
+        }
+      ],
+      "Evidence": null
+    }
+  ],
+  "Compositions": null
+}

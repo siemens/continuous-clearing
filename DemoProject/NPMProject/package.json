@@ -1,0 +1,25 @@
+{
+  "name": "ssep",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "gettext": "0.0.8",
+    "requirejs": "^2.3.5",
+    "charts": "1.0.2"
+  },
+  "devDependencies": {},
+  "postcss": {
+    "plugins": {
+      "autoprefixer": {}
+    }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions"
+  ]
+}

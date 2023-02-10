@@ -1,0 +1,84 @@
+# ASP.NET Core (.NET Framework)
+# Build and test ASP.NET Core projects targeting the full .NET Framework.
+# Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+# SPDX-FileCopyrightText: 2023 Siemens AG
+# SPDX-License-Identifier: MIT
+
+resources:
+  repositories:
+  - repository: Demo_Project  # identifier (A-Z, a-z, 0-9, and underscore)
+    type: git  # see the following "Type" topic
+    ref: development  # ref name to use; defaults to 'refs/heads/master'
+    name: DemoProject\NPMProject  # repository name (format depends on `type`)
+jobs:
+- job:
+  timeoutInMinutes: 120
+  pool:
+    name: $(agentpool)
+
+  steps:
+  - checkout: self  # identifier for your repository resource
+    clean: true  # if true, execute `execute git clean -ffdx && git reset --hard HEAD` before fetching
+  
+ 
+  - task: CmdLine@2
+    displayName: 'BOM NPM'
+    inputs:
+       script: |
+            $(Build.SourcesDirectory)\tools\LicenseClearingTool\tools\PackageIdentifier.exe --packageFilePath "$(Build.SourcesDirectory)\FrontEnd" --bomFolderPath "$(Build.SourcesDirectory)" --sw360Token <SW360AUTHTOKEN> --sW360ProjectID <sW360ProjectID> --sW360AuthTokenType Bearer --artifactoryApiKey <ARTIFACTORY__API_KEY> --sw360url <sw360url> --projectType NPM --settingsfilepath $(Build.SourcesDirectory)\appSettings.json
+            IF (%ERRORLEVEL% EQU 0) OR (%ERRORLEVEL% EQU 2) (
+               exit 0
+               )
+    workingDirectory: '$(Build.SourcesDirectory)'
+    failOnStderr: true 
+     
+  - task: CmdLine@2
+    displayName: 'BOM NuGet'
+    inputs:
+    script: |
+            $(Build.SourcesDirectory)\tools\LicenseClearingTool\tools\PackageIdentifier.exe --packageFilePath "$(Build.SourcesDirectory)\Backend" --bomfilePath "$(Build.SourcesDirectory)\$(sW360ProjectName)_Bom.cdx.json" --bomFolderPath "$(Build.SourcesDirectory)" --sw360Token <SW360AUTHTOKEN> --sW360ProjectID <sW360ProjectID> --sW360AuthTokenType Bearer --artifactoryApiKey <ARTIFACTORY__API_KEY> --sw360url <sw360url> --projectType NUGET --settingsfilepath $(Build.SourcesDirectory)\appSettings.json --fossologyUrl <FossURL>
+            IF (%ERRORLEVEL% EQU 0) OR (%ERRORLEVEL% EQU 2) (
+               exit 0
+               )
+    workingDirectory: '$(Build.SourcesDirectory)'
+    failOnStderr: true 
+
+
+  - task: CmdLine@2
+    displayName: 'SW360Package Creator'
+    inputs:
+        script: |
+            $(Build.SourcesDirectory)\tools\LicenseClearingTool\tools\SW360PackageCreator.exe --bomFilePath "$(Build.SourcesDirectory)\$(sW360ProjectName)_Bom.cdx.json" --sw360Token <SW360AUTHTOKEN> --sW360ProjectName <sW360ProjectName>) --sW360ProjectID $(sW360ProjectID) --sW360AuthTokenType Bearer --sw360url $(sw360url) --settingsfilepath $(Build.SourcesDirectory)\appSettings.json --fossologyUrl $(FossUrl)
+                IF (%ERRORLEVEL% EQU 0) OR (%ERRORLEVEL% EQU 2) (
+                    exit 0
+                    )
+
+    workingDirectory: '$(Build.SourcesDirectory)'
+    failOnStderr: true
+    
+          
+  - task: CmdLine@2
+    displayName: 'Artifactory uploader'
+    inputs:
+         script: |
+            $(Build.SourcesDirectory)\tools\LicenseClearingTool\tools\ArtifactoryUploader.exe --bomFilePath "$(Build.SourcesDirectory)\$(sW360ProjectName)_Bom.cdx.json" --artifactoryuploaduser $(ARTIFACTORY__USER) --artifactoryuploadapikey $(ARTIFACTORY__API_KEY) --jfrognpmdestreponame $(JFrogNPMRepoName) --settingsfilepath $(Build.SourcesDirectory)\appSettings.json
+    workingDirectory: '$(Build.SourcesDirectory)'
+    failOnStderr: true
+
+
+  - task: CopyFiles@2
+    displayName: 'Prepare artifact stage'
+    inputs:
+      SourceFolder: '$(Build.SourcesDirectory)\DemoProject\NPMProject'
+      Contents: |
+        *.json
+        SW360ProjectInfo.xml
+      TargetFolder: '$(build.artifactstagingdirectory)\DemoProject\NPMProject\BOM'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish artifacts'
+    inputs:
+      PathtoPublish: '$(build.artifactstagingdirectory)'
+      ArtifactName: 'drop'
+      publishLocation: 'Container'

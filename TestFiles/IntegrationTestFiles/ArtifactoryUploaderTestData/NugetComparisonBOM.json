@@ -1,0 +1,114 @@
+{
+  "BomFormat": "CycloneDX",
+  "SpecVersion": 4,
+  "SpecVersionString": "1.4",
+  "SerialNumber": null,
+  "Version": null,
+  "Metadata": {
+    "Tools": [
+      {
+        "Vendor": "Siemens AG",
+        "Name": "Clearing Automation Tool",
+        "Version": "1.0.20",
+        "Hashes": null
+      }
+    ],
+    "Authors": null,
+    "Component": null,
+    "Manufacture": null,
+    "Supplier": null
+  },
+  "Components": [
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:nuget/AutoMapper@10.1.1",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "AutoMapper",
+      "Version": "10.1.1",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:nuget/AutoMapper@10.1.1",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal",
+          "Value": "false"
+        },
+        {
+          "Name": "ArtifactoryRepoName",
+          "Value": "siparty-release-nuget-egll"
+        },
+        {
+          "Name": "ProjectType",
+          "Value": "NUGET"
+        },
+        {
+          "Name": "ApprovedStatus",
+          "Value": "APPROVED"
+        },
+        {
+          "Name": "ReleaseLink",
+          "Value": "http://localhost:8090/resource/api/releases/48fe0619e8f64cc3a5c1563bf15e6240"
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:nuget/BouncyCastle@1.8.1",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "BouncyCastle",
+      "Version": "1.8.1",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:nuget/BouncyCastle@1.8.1",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal",
+          "Value": "false"
+        },
+        {
+          "Name": "ArtifactoryRepoName",
+          "Value": "siparty-release-nuget-egll"
+        },
+        {
+          "Name": "ProjectType",
+          "Value": "NUGET"
+        },
+        {
+          "Name": "ApprovedStatus",
+          "Value": "Not Available"
+        },
+        {
+          "Name": "ReleaseLink",
+          "Value": "http://localhost:8090/resource/api/releases/eb5f54a94a544138a86bc423d66a4bb1"
+        }
+      ],
+      "Evidence": null
+    }
+  ],
+  "Compositions": null
+}

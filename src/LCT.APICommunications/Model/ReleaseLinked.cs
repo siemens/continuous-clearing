@@ -1,0 +1,23 @@
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2023 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+
+// -------------------------------------------------------------------------------------------------------------------- 
+
+namespace LCT.APICommunications.Model
+{
+    /// <summary>
+    /// The ReleasesLinked info class
+    /// </summary>
+    public class ReleaseLinked
+    {
+        public string Name { get; set; } = string.Empty;
+
+        public string Version { get; set; } = string.Empty;
+
+        public string ReleaseId { get; set; } = string.Empty;
+
+        public string Comment { get; set; } = string.Empty;
+    }
+}

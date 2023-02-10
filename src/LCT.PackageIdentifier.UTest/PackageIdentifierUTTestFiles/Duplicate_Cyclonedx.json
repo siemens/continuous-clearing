@@ -1,0 +1,286 @@
+// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2023 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+
+// --------------------------------------------------------------------------------------------------------------------
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.3",
+  "serialNumber": "urn:uuid:f2c40abc-7c61-45f2-8a65-70d3c89b4623",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2022-02-23T09:46:53Z",
+    "tools": [
+      {
+        "vendor": "anchore",
+        "name": "syft",
+        "version": "0.38.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "f8e285590963f51a",
+      "type": "container",
+      "name": "/tmp/Inputimages/Buster_amd64.tar",
+      "version": "sha256:b75774030c2c10178aad29230221cad47aa607c72895aa4af389b3f1f01f71f4"
+    }
+  },
+  "components": [
+    {
+      "type": "library",
+      "publisher": "LaMont Jones \u003clamont@debian.org\u003e",
+      "name": "util-linux",
+      "version": "2.33.1-0.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-2-Clause"
+          }
+        },
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        },
+        {
+          "license": {
+            "id": "BSD-4-Clause"
+          }
+        },
+        {
+          "license": {
+            "id": "GPL-2.0"
+          }
+        },
+        {
+          "license": {
+            "id": "GPL-2.0+"
+          }
+        },
+        {
+          "license": {
+            "id": "GPL-3.0"
+          }
+        },
+        {
+          "license": {
+            "id": "GPL-3.0+"
+          }
+        },
+        {
+          "license": {
+            "id": "LGPL-2.0"
+          }
+        },
+        {
+          "license": {
+            "id": "LGPL-2.0+"
+          }
+        },
+        {
+          "license": {
+            "id": "LGPL-2.1"
+          }
+        },
+        {
+          "license": {
+            "id": "LGPL-2.1+"
+          }
+        },
+        {
+          "license": {
+            "id": "LGPL-3.0"
+          }
+        },
+        {
+          "license": {
+            "id": "LGPL-3.0+"
+          }
+        },
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "cpe": "cpe:2.3:a:util-linux:util-linux:2.33.1-0.1:*:*:*:*:*:*:*",
+      "purl": "pkg:deb/debian/util-linux@2.33.1-0.1?arch=amd64\u0026distro=debian-10",
+      "properties": [
+        {
+          "name": "foundBy",
+          "value": "dpkgdb-cataloger"
+        },
+        {
+          "name": "type",
+          "value": "deb"
+        },
+        {
+          "name": "metadataType",
+          "value": "DpkgMetadata"
+        },
+        {
+          "name": "path",
+          "value": "/var/lib/dpkg/status"
+        },
+        {
+          "name": "layerID",
+          "value": "sha256:764055ebc9a7a290b64d17cf9ea550f1099c202d83795aa967428ebdf335c9f7"
+        },
+        {
+          "name": "path",
+          "value": "/var/lib/dpkg/info/util-linux.md5sums"
+        },
+        {
+          "name": "layerID",
+          "value": "sha256:764055ebc9a7a290b64d17cf9ea550f1099c202d83795aa967428ebdf335c9f7"
+        },
+        {
+          "name": "path",
+          "value": "/var/lib/dpkg/info/util-linux.conffiles"
+        },
+        {
+          "name": "layerID",
+          "value": "sha256:764055ebc9a7a290b64d17cf9ea550f1099c202d83795aa967428ebdf335c9f7"
+        },
+        {
+          "name": "path",
+          "value": "/usr/share/doc/util-linux/copyright"
+        },
+        {
+          "name": "layerID",
+          "value": "sha256:764055ebc9a7a290b64d17cf9ea550f1099c202d83795aa967428ebdf335c9f7"
+        },
+        {
+          "name": "installedSize",
+          "value": "4327"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "publisher": "LaMont Jones \u003clamont@debian.org\u003e",
+      "name": "libblkid1",
+      "version": "2.33.1-0.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-2-Clause"
+          }
+        },
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        },
+        {
+          "license": {
+            "id": "BSD-4-Clause"
+          }
+        },
+        {
+          "license": {
+            "id": "GPL-2.0"
+          }
+        },
+        {
+          "license": {
+            "id": "GPL-2.0+"
+          }
+        },
+        {
+          "license": {
+            "id": "GPL-3.0"
+          }
+        },
+        {
+          "license": {
+            "id": "GPL-3.0+"
+          }
+        },
+        {
+          "license": {
+            "id": "LGPL-2.0"
+          }
+        },
+        {
+          "license": {
+            "id": "LGPL-2.0+"
+          }
+        },
+        {
+          "license": {
+            "id": "LGPL-2.1"
+          }
+        },
+        {
+          "license": {
+            "id": "LGPL-2.1+"
+          }
+        },
+        {
+          "license": {
+            "id": "LGPL-3.0"
+          }
+        },
+        {
+          "license": {
+            "id": "LGPL-3.0+"
+          }
+        },
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "cpe": "cpe:2.3:a:libblkid1:libblkid1:2.33.1-0.1:*:*:*:*:*:*:*",
+      "purl": "pkg:deb/debian/libblkid1@2.33.1-0.1?arch=amd64\u0026upstream=util-linux\u0026distro=debian-10",
+      "properties": [
+        {
+          "name": "foundBy",
+          "value": "dpkgdb-cataloger"
+        },
+        {
+          "name": "type",
+          "value": "deb"
+        },
+        {
+          "name": "metadataType",
+          "value": "DpkgMetadata"
+        },
+        {
+          "name": "path",
+          "value": "/var/lib/dpkg/status"
+        },
+        {
+          "name": "layerID",
+          "value": "sha256:764055ebc9a7a290b64d17cf9ea550f1099c202d83795aa967428ebdf335c9f7"
+        },
+        {
+          "name": "path",
+          "value": "/var/lib/dpkg/info/libblkid1:amd64.md5sums"
+        },
+        {
+          "name": "layerID",
+          "value": "sha256:764055ebc9a7a290b64d17cf9ea550f1099c202d83795aa967428ebdf335c9f7"
+        },
+        {
+          "name": "path",
+          "value": "/usr/share/doc/libblkid1/copyright"
+        },
+        {
+          "name": "layerID",
+          "value": "sha256:764055ebc9a7a290b64d17cf9ea550f1099c202d83795aa967428ebdf335c9f7"
+        },
+        {
+          "name": "source",
+          "value": "util-linux"
+        },
+        {
+          "name": "installedSize",
+          "value": "428"
+        }
+      ]
+    }
+  ]
+}

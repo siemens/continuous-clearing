@@ -1,0 +1,20 @@
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2023 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+
+namespace LCT.APICommunications.Model.Foss
+{
+  /// <summary>
+  /// The fossology upload package params model
+  /// </summary>
+  public class UploadParams
+  {
+    public string FolderId { get; set; }
+
+    public string UploadDescription { get; set; }
+
+    public string Public { get; set; }
+  }
+}

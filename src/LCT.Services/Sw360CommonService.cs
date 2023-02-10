@@ -1,0 +1,346 @@
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2023 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+
+// -------------------------------------------------------------------------------------------------------------------- 
+
+using LCT.APICommunications.Model;
+using LCT.Common;
+using LCT.Common.Constants;
+using LCT.Facade.Interfaces;
+using LCT.Services.Interface;
+using log4net;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Reflection;
+using System.Threading.Tasks;
+
+namespace LCT.Services
+{
+    /// <summary>
+    /// The class SW360CommonService provides the common services
+    /// </summary>
+    public class SW360CommonService : ISW360CommonService
+    {
+
+        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private readonly ISW360ApicommunicationFacade m_SW360ApiCommunicationFacade;
+        private readonly List<string> externalIdKeyList = new List<string>() { "?package-url=", "?purl.id=" };
+
+        #region constructor
+
+        /// <summary>
+        /// constructor for the class SW360CommonService
+        /// </summary>
+        /// <param name="sw360ApiCommunicationFacade"></param>
+        public SW360CommonService(ISW360ApicommunicationFacade sw360ApiCommunicationFacade)
+        {
+            m_SW360ApiCommunicationFacade = sw360ApiCommunicationFacade;
+        }
+
+        #endregion
+
+
+        /// <summary>
+        /// Gets the componet data by component external id
+        /// </summary>
+        /// <param name="componentName">componentName</param>
+        /// <param name="componentExternalId">componentExternalId</param>
+        /// <param name="isComponentExist">isComponentExist</param>
+        /// <returns>Sw360Components</returns>
+        public async Task<ComponentStatus> GetComponentDataByExternalId(string componentName, string componentExternalId)
+        {
+            Logger.Debug($"GetComponentDataByExternalId(): Component Name - {componentName}");
+            string externalIdUriString = Uri.EscapeDataString(componentExternalId);
+            ComponentStatus sw360components = new ComponentStatus();
+            sw360components.isComponentExist = false;
+
+            try
+            {
+                foreach (string externalIdKey in externalIdKeyList)
+                {
+                    var sw360ComponentsList = await GetCompListFromExternalIDCombinations(externalIdUriString, externalIdKey);
+                    if (sw360ComponentsList.Count == 0 && externalIdUriString.Contains(Dataconstant.DebianPackage))
+                    {
+                        string NewExternalIdUriString = Uri.EscapeDataString(componentExternalId.Replace("?arch=source", ""));
+                        sw360ComponentsList = await GetCompListFromExternalIDCombinations(NewExternalIdUriString, externalIdKey);
+                    }
+
+                    if (sw360ComponentsList.Count > 0)
+                    {
+                        sw360components = GetComponentExistStatus(componentName, externalIdKey, sw360ComponentsList);
+
+                        if (sw360components.isComponentExist)
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                sw360components.isComponentExist = false;
+                Logger.Error($"GetComponentDataByExternalId():", ex);
+            }
+            catch (AggregateException ex)
+            {
+                sw360components.isComponentExist = false;
+                Logger.Error($"GetComponentDataByExternalId():", ex);
+            }
+
+            return sw360components;
+        }
+
+        private async Task<IList<Sw360Components>> GetCompListFromExternalIDCombinations(string externalIdUriString, string externalIdKey)
+        {
+            HttpResponseMessage httpResponseComponent = await m_SW360ApiCommunicationFacade.GetComponentByExternalId(externalIdUriString, externalIdKey);
+            var responseContent = httpResponseComponent?.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
+            var componentsModel = JsonConvert.DeserializeObject<ComponentsModel>(responseContent);
+            return componentsModel?.Embedded?.Sw360components ?? new List<Sw360Components>();
+        }
+
+        /// <summary>
+        /// Gets the release data by release external id
+        /// </summary>
+        /// <param name="releaseName">releaseName</param>
+        /// <param name="releaseVersion">releaseVersion</param>
+        /// <param name="releaseExternalId">releaseExternalId</param>
+        /// <param name="isReleaseExist">isReleaseExist</param>
+        /// <returns>Sw360Releases</returns>
+        public async Task<Releasestatus> GetReleaseDataByExternalId(string releaseName, string releaseVersion, string releaseExternalId)
+        {
+            Logger.Debug($"GetReleaseDataByExternalId(): Release name - {releaseName}@{releaseVersion}");
+            string externalIdUriString = Uri.EscapeDataString(releaseExternalId);
+            Releasestatus releasestatus = new Releasestatus();
+
+            releasestatus.isReleaseExist = false;
+
+            try
+            {
+                foreach (string externalIdKey in externalIdKeyList)
+                {
+                    HttpResponseMessage httpResponseComponent = await m_SW360ApiCommunicationFacade.GetReleaseByExternalId(externalIdUriString, externalIdKey);
+                    var responseContent = httpResponseComponent?.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
+                    var componentsRelease = JsonConvert.DeserializeObject<ComponentsRelease>(responseContent);
+                    var sw360releasesdata = componentsRelease?.Embedded?.Sw360Releases ?? new List<Sw360Releases>();
+
+                    if (sw360releasesdata.Count > 0)
+                    {
+                        Releasestatus releaseStatus = GetReleaseExistStatus(releaseName, externalIdKey, sw360releasesdata);
+                        if (releaseStatus.isReleaseExist)
+                        {
+                            releasestatus.sw360Releases = releaseStatus.sw360Releases;
+                            releasestatus.isReleaseExist = releaseStatus.isReleaseExist;
+                            break;
+                        }
+                    }
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                releasestatus.isReleaseExist = false;
+                Logger.Error($"GetReleaseDataByExternalId():", ex);
+            }
+            catch (AggregateException ex)
+            {
+                Logger.Error($"GetReleaseDataByExternalId():", ex);
+            }
+
+            return releasestatus;
+        }
+
+        /// <summary>
+        /// Gets the ReleaseId By using the ComponentId & version
+        /// </summary>
+        /// <param name="componentId">componentId</param>
+        /// <param name="componentVersion">componentVersion</param>
+        /// <returns>string</returns>
+        public async Task<string> GetReleaseIdByComponentId(string componentId, string componentVersion)
+        {
+            string releaseId = string.Empty;
+            try
+            {
+                string releaseResponseBody = await m_SW360ApiCommunicationFacade.GetReleaseOfComponentById(componentId);
+                var responseData = JsonConvert.DeserializeObject<ReleaseIdOfComponent>(releaseResponseBody);
+                var listofSw360Releases = responseData?.Embedded?.Sw360Releases ?? new List<Sw360Releases>();
+                for (int i = 0; i < listofSw360Releases.Count; i++)
+                {
+                    if (listofSw360Releases[i].Version?.ToLowerInvariant() == componentVersion.ToLowerInvariant())
+                    {
+                        string urlofreleaseid = listofSw360Releases[i]?.Links?.Self?.Href ?? string.Empty;
+                        releaseId = CommonHelper.GetSubstringOfLastOccurance(urlofreleaseid, "/");
+                    }
+                }
+            }
+            catch (HttpRequestException e)
+            {
+                Logger.Error("GetReleaseIdByComponentId():", e);
+                Environment.ExitCode = -1;
+            }
+            catch (AggregateException e)
+            {
+                Logger.Error("GetReleaseIdByComponentId():", e);
+                Environment.ExitCode = -1;
+            }
+
+            return releaseId;
+        }
+
+        #region PrivateMethods
+
+        private static Releasestatus GetReleaseExistStatus(
+            string name, string externlaIdKey, IList<Sw360Releases> sw360releasesdata)
+        {
+            Dictionary<int, Sw360Releases> releaseCollection = new Dictionary<int, Sw360Releases>();
+
+            foreach (var release in sw360releasesdata)
+            {
+                string packageUrl = string.Empty;
+                packageUrl = GetPackageUrlValue(externlaIdKey, release, packageUrl);
+                try
+                {
+                    var purlids = JsonConvert.DeserializeObject<List<string>>(packageUrl);
+
+                    if (releaseCollection.ContainsKey(purlids.Count) && releaseCollection[purlids.Count].Name.ToLower().Equals(name.ToLower()))
+                    {
+                        // Do nothing
+                    }
+                    else if (releaseCollection.ContainsKey(purlids.Count))
+                    {
+                        releaseCollection[1] = release;
+                    }
+                    else
+                    {
+                        releaseCollection.Add(purlids.Count, release);
+                    }
+                }
+                catch (JsonReaderException)
+                {
+                    UpdateCollection(name, ref releaseCollection, release);
+                }
+            }
+            Releasestatus releasestatus = new Releasestatus();
+
+            releasestatus.sw360Releases = releaseCollection[releaseCollection.Keys.Max()];
+            releasestatus.isReleaseExist = !string.IsNullOrEmpty(releasestatus.sw360Releases?.ExternalIds?.Package_Url) || !string.IsNullOrEmpty(releasestatus.sw360Releases?.ExternalIds?.Purl_Id);
+
+            return releasestatus;
+        }
+
+
+        private static ComponentStatus GetComponentExistStatus(string name, string externlaIdKey, IList<Sw360Components> sw360components)
+        {
+            Dictionary<int, Sw360Components> componentCollection = new Dictionary<int, Sw360Components>();
+
+            foreach (var componentsData in sw360components)
+            {
+                string packageUrl = string.Empty;
+                packageUrl = GetPackageUrlValue(externlaIdKey, componentsData, packageUrl);
+                try
+                {
+                    var purlids = JsonConvert.DeserializeObject<List<string>>(packageUrl);
+
+                    if (componentCollection.ContainsKey(purlids.Count) && componentCollection[purlids.Count].Name.ToLower().Equals(name.ToLower()))
+                    {
+                        // Do nothing
+                    }
+                    else if (componentCollection.ContainsKey(purlids.Count))
+                    {
+                        componentCollection[1] = componentsData;
+                    }
+                    else
+                    {
+                        componentCollection.Add(purlids.Count, componentsData);
+                    }
+                }
+                catch (JsonReaderException)
+                {
+                    UpdateCollection(name, ref componentCollection, componentsData);
+                }
+            }
+            ComponentStatus component = new ComponentStatus();
+
+            component.Sw360components = componentCollection[componentCollection.Keys.Max()];
+            component.isComponentExist = !string.IsNullOrEmpty(component.Sw360components?.ExternalIds?.Package_Url) || !string.IsNullOrEmpty(component.Sw360components?.ExternalIds?.Purl_Id);
+            return component;
+
+        }
+
+
+        private static string GetPackageUrlValue(string externlaIdKey, Sw360Releases release, string packageUrl)
+        {
+            if (externlaIdKey.Contains("purl"))
+            {
+                packageUrl = release.ExternalIds?.Purl_Id;
+            }
+
+            else if (externlaIdKey.Contains("package"))
+            {
+                packageUrl = release.ExternalIds?.Package_Url;
+            }
+            else
+            {
+                // do nothing
+            }
+
+            return packageUrl;
+        }
+
+        private static string GetPackageUrlValue(string externlaIdKey, Sw360Components components, string packageUrl)
+        {
+            if (externlaIdKey.Contains("purl"))
+            {
+                packageUrl = components.ExternalIds?.Purl_Id;
+            }
+
+            else if (externlaIdKey.Contains("package"))
+            {
+                packageUrl = components.ExternalIds?.Package_Url;
+            }
+            else
+            {
+                // do nothing
+            }
+
+            return packageUrl;
+        }
+
+        private static void UpdateCollection(string name, ref Dictionary<int, Sw360Components> componentCollection, Sw360Components components)
+        {
+            if (componentCollection.ContainsKey(1) && componentCollection[1].Name.ToLower().Equals(name.ToLower()))
+            {
+                // Do nothing
+            }
+            else if (componentCollection.ContainsKey(1))
+            {
+                componentCollection[1] = components;
+            }
+            else
+            {
+                componentCollection.Add(1, components);
+            }
+        }
+
+        private static void UpdateCollection(string name, ref Dictionary<int, Sw360Releases> releaseCollection, Sw360Releases release)
+        {
+            if (releaseCollection.ContainsKey(1) && releaseCollection[1].Name.ToLower().Equals(name.ToLower()))
+            {
+                // Do nothing
+            }
+            else if (releaseCollection.ContainsKey(1))
+            {
+                releaseCollection[1] = release;
+            }
+            else
+            {
+                releaseCollection.Add(1, release);
+            }
+        }
+
+        #endregion
+    }
+}

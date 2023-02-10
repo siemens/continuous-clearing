@@ -1,0 +1,814 @@
+// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2023 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+
+// --------------------------------------------------------------------------------------------------------------------
+{
+  "BomFormat": "CycloneDX",
+  "SpecVersion": 4,
+  "SpecVersionString": "1.4",
+  "SerialNumber": null,
+  "Version": null,
+  "Metadata": {
+    "Tools": [
+      {
+        "Vendor": "Siemens AG",
+        "Name": "Clearing Automation Tool",
+        "Version": "1.0.20",
+        "Hashes": null
+      }
+    ],
+    "Authors": null,
+    "Component": null,
+    "Manufacture": null,
+    "Supplier": null
+  },
+  "Components": [
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:npm/%40angular/common@9.1.12",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": "@angular",
+      "Name": "common",
+      "Version": "9.1.12",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:npm/%40angular/common@9.1.12",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "NPM"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "NEW_CLEARING"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/02c633b1fbf049d896b680bc86ae0f95"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": "/repo/?mod=view-license&upload="
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:npm/tslib@2.3.0",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "tslib",
+      "Version": "2.3.0",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:npm/tslib@2.3.0",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "NPM"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "NEW_CLEARING"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/3cff2fe0923744ee8bdf9fb15ac8859e"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": "/repo/?mod=view-license&upload="
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:npm/%40angular/compiler@10.1.6",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": "@angular",
+      "Name": "compiler",
+      "Version": "10.1.6",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:npm/%40angular/compiler@10.1.6",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "NPM"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "NEW_CLEARING"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/3008804d033d4271a7b7e2c83401b85c"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": "/repo/?mod=view-license&upload="
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:npm/%40angular/core@9.1.12",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": "@angular",
+      "Name": "core",
+      "Version": "9.1.12",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:npm/%40angular/core@9.1.12",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "NPM"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "NEW_CLEARING"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/5aeaa301610b420fa025dd30848e920e"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": "/repo/?mod=view-license&upload="
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:npm/%40angular/forms@9.1.12",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": "@angular",
+      "Name": "forms",
+      "Version": "9.1.12",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:npm/%40angular/forms@9.1.12",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "NPM"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "NEW_CLEARING"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/170e741726aa4f5e969c24ef9efd4302"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": "/repo/?mod=view-license&upload="
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:npm/%40angular/platform-browser@9.1.12",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": "@angular",
+      "Name": "platform-browser",
+      "Version": "9.1.12",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:npm/%40angular/platform-browser@9.1.12",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "NPM"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "NEW_CLEARING"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/55ee207218674104b1af9f338f0cd841"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": "/repo/?mod=view-license&upload="
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:npm/%40angular/platform-browser-dynamic@9.1.12",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": "@angular",
+      "Name": "platform-browser-dynamic",
+      "Version": "9.1.12",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:npm/%40angular/platform-browser-dynamic@9.1.12",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "NPM"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "NEW_CLEARING"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/e0fbabd21790406aa37270bc13e5c32c"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": "/repo/?mod=view-license&upload="
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:npm/%40angular/router@9.1.12",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": "@angular",
+      "Name": "router",
+      "Version": "9.1.12",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:npm/%40angular/router@9.1.12",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "NPM"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "NEW_CLEARING"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/5f4823b49cfd40e09b54dac7a88abd99"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": "/repo/?mod=view-license&upload="
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:npm/axios@0.19.0",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "axios",
+      "Version": "0.19.0",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:npm/axios@0.19.0",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "NPM"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "NEW_CLEARING"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/ee913501b41240268a1b75fe823449ba"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": "/repo/?mod=view-license&upload="
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:npm/debug@3.1.0",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "debug",
+      "Version": "3.1.0",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:npm/debug@3.1.0",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "NPM"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "NEW_CLEARING"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/6415695b926c4916ae705066ea01176f"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": "/repo/?mod=view-license&upload="
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:npm/follow-redirects@1.5.10",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "follow-redirects",
+      "Version": "1.5.10",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:npm/follow-redirects@1.5.10",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "NPM"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "NEW_CLEARING"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/0b9ad27abfa74e38aacab325361fda3e"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": "/repo/?mod=view-license&upload="
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:npm/is-buffer@2.0.4",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "is-buffer",
+      "Version": "2.0.4",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:npm/is-buffer@2.0.4",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "NPM"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "NEW_CLEARING"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/51a9afac653e4a3586043ca69b9ef6dd"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": "/repo/?mod=view-license&upload="
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:npm/ms@2.0.0",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "ms",
+      "Version": "2.0.0",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:npm/ms@2.0.0",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "NPM"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "NEW_CLEARING"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/935f38e2d20647caae3b91ba7a26c5c2"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": "/repo/?mod=view-license&upload="
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:npm/rxjs@6.5.5",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "rxjs",
+      "Version": "6.5.5",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:npm/rxjs@6.5.5",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "NPM"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "NEW_CLEARING"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/fcbab7f69acb4242b2450cb340436ac8"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": "/repo/?mod=view-license&upload="
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:npm/tslib@1.13.0",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "tslib",
+      "Version": "1.13.0",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:npm/tslib@1.13.0",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "NPM"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "NEW_CLEARING"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/e26e743d1f4247a2996774175debf714"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": "/repo/?mod=view-license&upload="
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:npm/zone.js@0.10.3",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "zone.js",
+      "Version": "0.10.3",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:npm/zone.js@0.10.3",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "NPM"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "NEW_CLEARING"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/5841c6f3c1d64604b334c4dcdd736432"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": "/repo/?mod=view-license&upload="
+        }
+      ],
+      "Evidence": null
+    }
+  ],
+  "Compositions": null
+}

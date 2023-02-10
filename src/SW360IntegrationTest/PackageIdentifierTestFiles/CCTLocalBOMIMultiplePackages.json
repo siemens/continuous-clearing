@@ -1,0 +1,170 @@
+// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2023 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+
+// --------------------------------------------------------------------------------------------------------------------
+[
+  {
+    "name": "@angular/animations",
+    "version": "9.1.12",
+    "componentExternalId": "pkg:npm/%40angular/animations",
+    "releaseExternalId": "pkg:npm/%40angular/animations@9.1.12",
+    "packageUrl": "https://testserver/artifactory/api/npm/energy-dev-npm/@angular/animations/-/animations-9.1.12.tgz",
+    "sourceUrl": "Component Source Url not Found!",
+    "downloadUrl": "Component Download Url not Found!"
+  },
+  {
+    "name": "@angular/common",
+    "version": "9.1.12",
+    "componentExternalId": "pkg:npm/%40angular/common",
+    "releaseExternalId": "pkg:npm/%40angular/common@9.1.12",
+    "packageUrl": "https://testserver/artifactory/api/npm/energy-dev-npm/@angular/common/-/common-9.1.12.tgz",
+    "sourceUrl": "Component Source Url not Found!",
+    "downloadUrl": "Component Download Url not Found!"
+  },
+  {
+    "name": "@angular/compiler",
+    "version": "9.1.12",
+    "componentExternalId": "pkg:npm/%40angular/compiler",
+    "releaseExternalId": "pkg:npm/%40angular/compiler@9.1.12",
+    "packageUrl": "https://testserver/artifactory/api/npm/energy-dev-npm/@angular/compiler/-/compiler-9.1.12.tgz",
+    "sourceUrl": "Component Source Url not Found!",
+    "downloadUrl": "Component Download Url not Found!"
+  },
+  {
+    "name": "@angular/core",
+    "version": "9.1.12",
+    "componentExternalId": "pkg:npm/%40angular/core",
+    "releaseExternalId": "pkg:npm/%40angular/core@9.1.12",
+    "packageUrl": "https://testserver/artifactory/api/npm/energy-dev-npm/@angular/core/-/core-9.1.12.tgz",
+    "sourceUrl": "Component Source Url not Found!",
+    "downloadUrl": "Component Download Url not Found!"
+  },
+  {
+    "name": "@angular/forms",
+    "version": "9.1.12",
+    "componentExternalId": "pkg:npm/%40angular/forms",
+    "releaseExternalId": "pkg:npm/%40angular/forms@9.1.12",
+    "packageUrl": "https://testserver/artifactory/api/npm/energy-dev-npm/@angular/forms/-/forms-9.1.12.tgz",
+    "sourceUrl": "Component Source Url not Found!",
+    "downloadUrl": "Component Download Url not Found!"
+  },
+  {
+    "name": "@angular/platform-browser",
+    "version": "9.1.12",
+    "componentExternalId": "pkg:npm/%40angular/platform-browser",
+    "releaseExternalId": "pkg:npm/%40angular/platform-browser@9.1.12",
+    "packageUrl": "https://testserver/artifactory/api/npm/energy-dev-npm/@angular/platform-browser/-/platform-browser-9.1.12.tgz",
+    "sourceUrl": "Component Source Url not Found!",
+    "downloadUrl": "Component Download Url not Found!"
+  },
+  {
+    "name": "@angular/platform-browser-dynamic",
+    "version": "9.1.12",
+    "componentExternalId": "pkg:npm/%40angular/platform-browser-dynamic",
+    "releaseExternalId": "pkg:npm/%40angular/platform-browser-dynamic@9.1.12",
+    "packageUrl": "https://testserver/artifactory/api/npm/energy-dev-npm/@angular/platform-browser-dynamic/-/platform-browser-dynamic-9.1.12.tgz",
+    "sourceUrl": "Component Source Url not Found!",
+    "downloadUrl": "Component Download Url not Found!"
+  },
+  {
+    "name": "@angular/router",
+    "version": "9.1.12",
+    "componentExternalId": "pkg:npm/%40angular/router",
+    "releaseExternalId": "pkg:npm/%40angular/router@9.1.12",
+    "packageUrl": "https://testserver/artifactory/api/npm/energy-dev-npm/@angular/router/-/router-9.1.12.tgz",
+    "sourceUrl": "Component Source Url not Found!",
+    "downloadUrl": "Component Download Url not Found!"
+  },
+  {
+    "name": "rxjs",
+    "version": "6.5.5",
+    "componentExternalId": "pkg:npm/rxjs",
+    "releaseExternalId": "pkg:npm/rxjs@6.5.5",
+    "packageUrl": "https://testserver/artifactory/api/npm/energy-dev-npm/rxjs/-/rxjs-6.5.5.tgz",
+    "sourceUrl": "Component Source Url not Found!",
+    "downloadUrl": "Component Download Url not Found!"
+  },
+  {
+    "name": "tslib",
+    "version": "1.13.0",
+    "componentExternalId": "pkg:npm/tslib",
+    "releaseExternalId": "pkg:npm/tslib@1.13.0",
+    "packageUrl": "https://testserver/artifactory/api/npm/energy-dev-npm/tslib-1.13.0.tgz",
+    "sourceUrl": "Component Source Url not Found!",
+    "downloadUrl": "Component Download Url not Found!"
+  },
+  {
+    "name": "zone.js",
+    "version": "0.10.3",
+    "componentExternalId": "pkg:npm/zone.js",
+    "releaseExternalId": "pkg:npm/zone.js@0.10.3",
+    "packageUrl": "https://testserver/artifactory/api/npm/energy-dev-npm/zone.js/-/zone.js-0.10.3.tgz",
+    "sourceUrl": "Component Source Url not Found!",
+    "downloadUrl": "Component Download Url not Found!"
+  },
+  {
+    "name": "tslib",
+    "version": "2.3.0",
+    "componentExternalId": "pkg:npm/tslib",
+    "releaseExternalId": "pkg:npm/tslib@2.3.0",
+    "packageUrl": "https://testserver/artifactory/api/npm/energy-dev-npm/tslib/-/tslib-2.3.0.tgz",
+    "sourceUrl": "Component Source Url not Found!",
+    "downloadUrl": "Component Download Url not Found!"
+  },
+  {
+    "name": "@angular/compiler",
+    "version": "10.1.6",
+    "componentExternalId": "pkg:npm/%40angular/compiler",
+    "releaseExternalId": "pkg:npm/%40angular/compiler@10.1.6",
+    "packageUrl": "https://testserver/artifactory/api/npm/energy-dev-npm/@angular/compiler/-/compiler-10.1.6.tgz",
+    "sourceUrl": "Component Source Url not Found!",
+    "downloadUrl": "Component Download Url not Found!"
+  },
+  {
+    "name": "axios",
+    "version": "0.19.0",
+    "componentExternalId": "pkg:npm/axios",
+    "releaseExternalId": "pkg:npm/axios@0.19.0",
+    "packageUrl": "https://testserver/artifactory/api/npm/energy-dev-npm/axios/-/axios-0.19.0.tgz",
+    "sourceUrl": "Component Source Url not Found!",
+    "downloadUrl": "Component Download Url not Found!"
+  },
+  {
+    "name": "debug",
+    "version": "3.1.0",
+    "componentExternalId": "pkg:npm/debug",
+    "releaseExternalId": "pkg:npm/debug@3.1.0",
+    "packageUrl": "https://testserver/artifactory/api/npm/energy-dev-npm/debug/-/debug-3.1.0.tgz",
+    "sourceUrl": "Component Source Url not Found!",
+    "downloadUrl": "Component Download Url not Found!"
+  },
+  {
+    "name": "follow-redirects",
+    "version": "1.5.10",
+    "componentExternalId": "pkg:npm/follow-redirects",
+    "releaseExternalId": "pkg:npm/follow-redirects@1.5.10",
+    "packageUrl": "https://testserver/artifactory/api/npm/energy-dev-npm/follow-redirects/-/follow-redirects-1.5.10.tgz",
+    "sourceUrl": "Component Source Url not Found!",
+    "downloadUrl": "Component Download Url not Found!"
+  },
+  {
+    "name": "is-buffer",
+    "version": "2.0.4",
+    "componentExternalId": "pkg:npm/is-buffer",
+    "releaseExternalId": "pkg:npm/is-buffer@2.0.4",
+    "packageUrl": "https://testserver/artifactory/api/npm/energy-dev-npm/is-buffer/-/is-buffer-2.0.4.tgz",
+    "sourceUrl": "Component Source Url not Found!",
+    "downloadUrl": "Component Download Url not Found!"
+  },
+  {
+    "name": "ms",
+    "version": "2.0.0",
+    "componentExternalId": "pkg:npm/ms",
+    "releaseExternalId": "pkg:npm/ms@2.0.0",
+    "packageUrl": "https://testserver/artifactory/api/npm/energy-dev-npm/ms/-/ms-2.0.0.tgz",
+    "sourceUrl": "Component Source Url not Found!",
+    "downloadUrl": "Component Download Url not Found!"
+  }
+]

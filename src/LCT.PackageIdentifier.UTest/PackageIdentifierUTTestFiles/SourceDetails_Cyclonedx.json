@@ -1,0 +1,95 @@
+// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2023 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+
+// --------------------------------------------------------------------------------------------------------------------
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.3",
+  "serialNumber": "urn:uuid:f2c40abc-7c61-45f2-8a65-70d3c89b4623",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2022-02-23T09:46:53Z",
+    "tools": [
+      {
+        "vendor": "anchore",
+        "name": "syft",
+        "version": "0.38.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "f8e285590963f51a",
+      "type": "container",
+      "name": "/tmp/Inputimages/Buster_amd64.tar",
+      "version": "sha256:b75774030c2c10178aad29230221cad47aa607c72895aa4af389b3f1f01f71f4"
+    }
+  },
+  "components": [
+    {
+      "type": "library",
+      "publisher": "Debian Adduser Developers \u003cadduser@packages.debian.org\u003e",
+      "name": "adduser",
+      "version": "3.118",
+      "licenses": [
+        {
+          "license": {
+            "id": "GPL-2.0"
+          }
+        }
+      ],
+      "cpe": "cpe:2.3:a:adduser:adduser:3.118:*:*:*:*:*:*:*",
+      "purl": "pkg:deb/debian/adduser@3.118?arch=all\u0026distro=debian-10",
+      "properties": [
+        {
+          "name": "foundBy",
+          "value": "dpkgdb-cataloger"
+        },
+        {
+          "name": "type",
+          "value": "deb"
+        },
+        {
+          "name": "metadataType",
+          "value": "DpkgMetadata"
+        },
+        {
+          "name": "path",
+          "value": "/var/lib/dpkg/status"
+        },
+        {
+          "name": "layerID",
+          "value": "sha256:764055ebc9a7a290b64d17cf9ea550f1099c202d83795aa967428ebdf335c9f7"
+        },
+        {
+          "name": "path",
+          "value": "/var/lib/dpkg/info/adduser.md5sums"
+        },
+        {
+          "name": "layerID",
+          "value": "sha256:764055ebc9a7a290b64d17cf9ea550f1099c202d83795aa967428ebdf335c9f7"
+        },
+        {
+          "name": "path",
+          "value": "/var/lib/dpkg/info/adduser.conffiles"
+        },
+        {
+          "name": "layerID",
+          "value": "sha256:764055ebc9a7a290b64d17cf9ea550f1099c202d83795aa967428ebdf335c9f7"
+        },
+        {
+          "name": "path",
+          "value": "/usr/share/doc/adduser/copyright"
+        },
+        {
+          "name": "layerID",
+          "value": "sha256:764055ebc9a7a290b64d17cf9ea550f1099c202d83795aa967428ebdf335c9f7"
+        },
+        {
+          "name": "installedSize",
+          "value": "849"
+        }
+      ]
+    }
+  ]
+}

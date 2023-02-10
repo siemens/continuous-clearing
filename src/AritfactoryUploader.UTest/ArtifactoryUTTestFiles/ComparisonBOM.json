@@ -1,0 +1,129 @@
+// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2023 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+
+// --------------------------------------------------------------------------------------------------------------------
+{
+  "BomFormat": "CycloneDX",
+  "SpecVersion": 4,
+  "SpecVersionString": "1.4",
+  "SerialNumber": null,
+  "Version": null,
+  "Metadata": {
+    "Tools": [
+      {
+        "Vendor": "Siemens AG",
+        "Name": "Clearing Automation Tool",
+        "Version": "1.0.20",
+        "Hashes": null
+      }
+    ],
+    "Authors": null,
+    "Component": null,
+    "Manufacture": null,
+    "Supplier": null
+  },
+  "Componen": [
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:npm/requirejs@2.3.5",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "requirejs",
+      "Version": "2.3.5",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:npm/requirejs@2.3.5",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal",
+          "Value": "false"
+        },
+        {
+          "Name": "ArtifactoryRepoName",
+          "Value": "siparty-release-npm-egll"
+        },
+        {
+          "Name": "ProjectType",
+          "Value": "NPM"
+        },
+        {
+          "Name": "ApprovedStatus",
+          "Value": "APPROVED"
+        },
+        {
+          "Name": "ReleaseLink",
+          "Value": "http://localhost:8090/resource/api/releases/887ae944b0864857807e1c8fe58ad767"
+        },
+        {
+          "Name": "FossologyURL",
+          "Value": "http://localhost:8081/repo/?mod=view-license&upload="
+        },
+        "Evidence",
+        :,
+        null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:npm/requirejs@2.3.6",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "requirejs",
+      "Version": "2.3.6",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:npm/requirejs@2.3.6",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal",
+          "Value": "false"
+        },
+        {
+          "Name": "ArtifactoryRepoName",
+          "Value": "siparty-release-npm-egll"
+        },
+        {
+          "Name": "ProjectType",
+          "Value": "NPM"
+        },
+        {
+          "Name": "ApprovedStatus",
+          "Value": "APPROVED"
+        },
+        {
+          "Name": "ReleaseLink",
+          "Value": "http://localhost:8090/resource/api/releases/ce7d8171244047de94df1fd4dd2083b7"
+        },
+        {
+          "Name": "FossologyURL",
+          "Value": "http://localhost:8081/repo/?mod=view-license&upload="
+        }
+      ],
+      "Evidence": null
+    }
+  ],
+  "Compositions": null
+}
