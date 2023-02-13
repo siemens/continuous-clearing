@@ -321,12 +321,12 @@ Upload attachment manually for [Debian](/UsageDoc/Manual-attachment-Debian-Overv
 # Feedback
 Please add your feedbacks below
 
-[Give feedback](https://code.siemens.com/em-dg/oss/continuous-clearing/-/issues)
+[Give feedback](https://github.com/siemens/continuous-clearing/issues)
 # Bug or Enhancements
 
 For reporting any bug or enhancement please follow below link
 
-[Issues](https://code.siemens.com/em-dg/oss/continuous-clearing/-/issues)
+[Issues](https://github.com/siemens/continuous-clearing/issues)
 
 
 # Glossary of Terms
