@@ -6,6 +6,8 @@ manual effort of creating SW360 and FOSSology workflows.
 
 This tool has been  logically split into 3 different executables that enable it to be used as separate modules as per the user's requirement.
 
+**_Note: CA Tool internally uses [Syft](https://github.com/anchore/syft) for component detection for debian type projects._**
+
 # Prerequisite
  
  -  Docker latest version
