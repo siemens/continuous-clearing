@@ -1,28 +1,69 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+name: Build & Test
 
-name: .NET
-
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
+on: [push, pull_request]
+  
 jobs:
   build:
 
-    runs-on: ubuntu-latest
-
+    runs-on: windows-latest
+  
+    defaults:
+      run:
+        working-directory: ./src
+        
+        
     steps:
-    - uses: actions/checkout@v3
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
+    - name: Checkout
+      uses: actions/checkout@v2
       with:
-        dotnet-version: 6.0.x
-    - name: Restore dependencies
-      run: dotnet restore
+        fetch-depth: 0
+      
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.2
+    
+    - name: Restore Packages
+      run: dotnet restore LicenseClearingTool.sln 
+      
     - name: Build
-      run: dotnet build --no-restore
+      run: msbuild -m -t:Rebuild -p:Configuration=Release -bl:continous-clearing.binlog -noconlog LicenseClearingTool.sln
+    
+    - name: Archive Build Log
+      uses: actions/upload-artifact@v2
+      if: ${{ success() || failure() }}
+      with:
+        name: Compile_Solution_log
+        path: |
+          src/*.binlog
+          
+    - name: Create zip
+      id: packageBuildResults
+      run: |
+        $sourceFolder = Join-Path $env:GITHUB_WORKSPACE "out" | Join-Path -ChildPath "*"
+        $outFolder = Join-Path $env:GITHUB_WORKSPACE "out" | Join-Path -ChildPath "LicenseClearingTool" 
+        New-Item -ItemType Directory -Force -Path $outFolder
+        $fileName = "LicenseClearingTool.zip"
+        Write-Host "Filename: '$fileName'"
+        Write-Host "sourceFolder: '$sourceFolder'"
+        Write-Host "Outfolder: '$outFolder'"
+        dir
+        $outPath = Join-Path $outFolder $fileName
+        Compress-Archive -DestinationPath $outPath -Path $sourceFolder -CompressionLevel Optimal
+      
+    - name: Archive Build Result
+      uses: actions/upload-artifact@v2
+      with:
+        name: LicenseClearingTool
+        path: |
+           out/LicenseClearingTool
+           
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: |
+        $TestProjects = Get-ChildItem -Path *.UTest.csproj -Recurse
+        foreach ($Project in $TestProjects) 
+        {                 
+                Write-Host $Project.DirectoryName
+                $TestProject = $Project.DirectoryName
+                Push-Location $Project.PSParentPath
+                dotnet test --no-build --configuration Release
+        }
+      
