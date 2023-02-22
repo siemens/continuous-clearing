@@ -25,10 +25,10 @@ jobs:
         dir        
         ./Scripts/json_update.ps1 -JsonFile 'TestUtilities\appSettingsSW360IntegrationTest.json' 
       env:
-        SW360HOST: ${{env.SW360HOST}}
-        SW360APPPORT: ${{env.SW360APPPORT}}
-        FOSSYHOST: ${{env.FOSSYHOST}}
-        FOSSYAPPPORT: ${{env.FOSSYAPPPORT}}
+        SW360HOST: ${{ secrets.SW360HOST }}
+        SW360APPPORT: ${{ secrets.SW360APPPORT }}
+        FOSSYHOST: ${{ secrets.FOSSYHOST }}
+        FOSSYAPPPORT: ${{ secrets.FOSSYAPPPORT }}
       
     
     - name: update appsettingsUnitTest.json
