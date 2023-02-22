@@ -84,7 +84,9 @@ jobs:
            
     - name: Test
       run: |
-        $TestProjects = Get-ChildItem -Path *.UTest.csproj -Recurse
+        $TestProjects = Get-ChildItem -Path *test*.csproj -Recurse -exclude TestUtilities.csproj,UnitTestUtilities.csproj
+        Write-Host "**************************The test projects considered for execution: $TestProjects   ******************************"
+        Write-Host "********************************************************************************************************************"
         foreach ($Project in $TestProjects) 
         {                 
                 Write-Host $Project.DirectoryName
