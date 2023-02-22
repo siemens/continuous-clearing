@@ -29,10 +29,20 @@ jobs:
         SW360APPPORT: ${{ secrets.SW360APPPORT }}
         FOSSYHOST: ${{ secrets.FOSSYHOST }}
         FOSSYAPPPORT: ${{ secrets.FOSSYAPPPORT }}
+        USEREMAIL: ${{ secrets.USEREMAIL }}
+        ARTIFACTORYAPIKEY: ${{ secrets.ARTIFACTORYAPIKEY }}
+        JFROGURL: ${{ secrets.JFROGURL }}
+        SW360AUTHKEY: ${{ secrets.SW360AUTHTOKEN }}
       
     
     - name: update appsettingsUnitTest.json
-      run: .\Scripts\json_update_ut.ps1 -JsonFile 'src\UnitTestUtilities\appsettingsUnitTest.json' 
+      run: ./Scripts/json_update_ut.ps1 -JsonFile 'UnitTestUtilities\appsettingsUnitTest.json' 
+      env:
+        SW360HOST: ${{ secrets.SW360HOST }}
+        SW360APPPORT: ${{ secrets.SW360APPPORT }}
+        FOSSYHOST: ${{ secrets.FOSSYHOST }}
+        FOSSYAPPPORT: ${{ secrets.FOSSYAPPPORT }}
+        JFROGURL: ${{ secrets.JFROGURL }}
         
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
