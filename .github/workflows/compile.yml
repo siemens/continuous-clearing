@@ -17,7 +17,17 @@ jobs:
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-      
+    
+    - name: update appSettingsSW360IntegrationTest.json
+      shell: pwsh
+      run: |
+        .\Scripts\json_update.ps1 -JsonFile 'src\TestUtilities\appSettingsSW360IntegrationTest.json' 
+    
+    - name: update appsettingsUnitTest.json
+      shell: pwsh
+      run: |
+        .\Scripts\json_update_ut.ps1 -JsonFile 'src\UnitTestUtilities\appsettingsUnitTest.json' 
+        
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
     
@@ -66,4 +76,15 @@ jobs:
                 Push-Location $Project.PSParentPath
                 dotnet test --no-build --configuration Release
         }
-      
+    - name: Build
+      shell: pwsh
+      run: |
+        .\Scripts\json_update.ps1 -JsonFile 'src\TestUtilities\appSettingsSW360IntegrationTest.json' 
+    
+    - name: Build
+      shell: pwsh
+      run: |
+        .\Scripts\json_update_ut.ps1 -JsonFile 'src\UnitTestUtilities\appsettingsUnitTest.json' 
+ 
+        
+        
