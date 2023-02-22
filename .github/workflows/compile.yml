@@ -24,7 +24,7 @@ jobs:
         Write-Host "'$WF'"
         Write-Host '$WF'
         dir        
-        #$WF/json_update.ps1 -JsonFile 'src\TestUtilities\appSettingsSW360IntegrationTest.json' 
+        ./Scripts/json_update.ps1 -JsonFile 'TestUtilities\appSettingsSW360IntegrationTest.json' 
     
     - name: update appsettingsUnitTest.json
       run: .\Scripts\json_update_ut.ps1 -JsonFile 'src\UnitTestUtilities\appsettingsUnitTest.json' 
