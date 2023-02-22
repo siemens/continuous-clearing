@@ -19,12 +19,11 @@ jobs:
         fetch-depth: 0
     
     - name: update appSettingsSW360IntegrationTest.json
-      shell: pwsh
       run: |
         .\Scripts\json_update.ps1 -JsonFile 'src\TestUtilities\appSettingsSW360IntegrationTest.json' 
     
     - name: update appsettingsUnitTest.json
-      shell: pwsh
+      shell: powershell
       run: |
         .\Scripts\json_update_ut.ps1 -JsonFile 'src\UnitTestUtilities\appsettingsUnitTest.json' 
         
