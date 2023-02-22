@@ -22,9 +22,14 @@ jobs:
       run: |
         $WF = Join-Path $env:GITHUB_WORKSPACE "Scripts"
         Write-Host "'$WF'"
-        Write-Host '$WF'
         dir        
         ./Scripts/json_update.ps1 -JsonFile 'TestUtilities\appSettingsSW360IntegrationTest.json' 
+      env:
+        SW360HOST: ${{env.SW360HOST}}
+        SW360APPPORT: ${{env.SW360APPPORT}}
+        FOSSYHOST: ${{env.FOSSYHOST}}
+        FOSSYAPPPORT: ${{env.FOSSYAPPPORT}}
+      
     
     - name: update appsettingsUnitTest.json
       run: .\Scripts\json_update_ut.ps1 -JsonFile 'src\UnitTestUtilities\appsettingsUnitTest.json' 
