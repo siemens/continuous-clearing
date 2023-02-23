@@ -86,7 +86,9 @@ namespace LCT.SW360PackageCreator
         public async Task<string> GetSourceUrlForNugetPackage(string componentName, string componenVersion)
         {
             Logger.Debug($"URLHelper.GetSourceUrlForNugetPackage():Start");
-            string nuspecURL = $"{CommonAppSettings.SourceURLNugetApi}{componentName}/{componenVersion}/{componentName}.nuspec";
+            string name = componentName.ToLowerInvariant();
+            string version = componenVersion.ToLowerInvariant();
+            string nuspecURL = $"{CommonAppSettings.SourceURLNugetApi}{name}/{version}/{name}.nuspec";
             var sourceURL = await GetSourceURLFromNuspecFile(nuspecURL, componentName);
             return sourceURL;
         }
