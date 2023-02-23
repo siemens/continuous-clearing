@@ -94,5 +94,6 @@ jobs:
                 Push-Location $Project.PSParentPath
                 dotnet test --no-build --configuration Release
         }
+        #end
  
         
