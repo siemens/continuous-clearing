@@ -106,5 +106,13 @@ jobs:
                 dotnet test --no-build --configuration Release
         }
 
- 
+    - name: Create Nuget Packages    
+      run: |
+        nuget pack CA.nuspec  
         
+    - name: Archive NuGet Packages
+      uses: actions/upload-artifact@v2
+      with:
+        name: nuget-LicenseClearingTool
+        path: |
+          src/LicenseClearingTool.1.0.0.nupkg   
