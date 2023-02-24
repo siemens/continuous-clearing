@@ -15,8 +15,8 @@ if (Test-Path "$nugetconfig")
 
 New-Item -ItemType File -Force -Path "$nugetconfig"
 
-Write-Host "The energy dev nuget URL is      : $energydevnuget"
-Write-Host "The energy dev nuget egll  URL is: $energydevnugetegll"
+Write-Host "The energy dev nuget URL is       : $energydevnuget"
+Write-Host "The energy dev nuget egll  URL is : $energydevnugetegll"
 
 Write-Host "Write base config"
 
