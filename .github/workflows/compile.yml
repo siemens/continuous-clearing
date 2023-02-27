@@ -121,4 +121,4 @@ jobs:
           LicenseClearingTool.1.0.0.nupkg   
           
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag LicenseClearingTool:$(date +%s)
+      run: docker build . --file Dockerfile --tag LicenseClearingTool_1
