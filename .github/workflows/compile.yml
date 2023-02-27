@@ -16,8 +16,23 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
       with:
-        fetch-depth: 0
+        fetch-depth: 0   
+      
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.2
     
+    - name: Build
+      run: msbuild -m -t:Rebuild -p:Configuration=Release -bl:continous-clearing.binlog -noconlog src\LicenseClearingTool.sln
+    
+    - name: Archive Build Log
+      uses: actions/upload-artifact@v2
+      if: ${{ success() || failure() }}
+      with:
+        name: Compile_Solution_log
+        path: |
+          src/*.binlog
+          *.binlog
+
     - name: update appSettingsSW360IntegrationTest.json
       run: |
         $WF = Join-Path $env:GITHUB_WORKSPACE "Scripts"
@@ -34,7 +49,6 @@ jobs:
         JFROGURL: ${{ secrets.JFROGURL }}
         SW360AUTHKEY: ${{ secrets.SW360AUTHTOKEN }}
       
-    
     - name: update appsettingsUnitTest.json
       run: ./Scripts/json_update_ut.ps1 -JsonFile 'src\UnitTestUtilities\appsettingsUnitTest.json' 
       env:
@@ -43,25 +57,6 @@ jobs:
         FOSSYHOST: ${{ secrets.FOSSYHOST }}
         FOSSYAPPPORT: ${{ secrets.FOSSYAPPPORT }}
         JFROGURL: ${{ secrets.JFROGURL }}
-        
-    - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v1.0.2
-    
-    - name: Restore Packages
-      run: dotnet restore src\LicenseClearingTool.sln 
-      
-    - name: Build
-      run: msbuild -m -t:Rebuild -p:Configuration=Release -bl:continous-clearing.binlog -noconlog src\LicenseClearingTool.sln
-    
-    - name: Archive Build Log
-      uses: actions/upload-artifact@v2
-      if: ${{ success() || failure() }}
-      with:
-        name: Compile_Solution_log
-        path: |
-          src/*.binlog
-          *.binlog
-          
     - name: Create zip
       id: packageBuildResults
       run: |
@@ -76,13 +71,6 @@ jobs:
         $outPath = Join-Path $outFolder $fileName
         Compress-Archive -DestinationPath $outPath -Path $sourceFolder -CompressionLevel Optimal
       
-    - name: Archive Build Result
-      uses: actions/upload-artifact@v2
-      with:
-        name: LicenseClearingTool
-        path: |
-           out/LicenseClearingTool
-     
     - name: SW3360 Instance refresh
       if: ${{ false }}  # disable for now
       run: |
@@ -109,6 +97,13 @@ jobs:
                 dotnet test --no-build --configuration Release
         }
 
+    - name: Archive Build Result
+      uses: actions/upload-artifact@v2
+      with:
+        name: LicenseClearingTool
+        path: |
+           out/LicenseClearingTool
+           
     - name: Create Nuget Packages    
       run: |
         nuget pack CA.nuspec  
@@ -123,4 +118,4 @@ jobs:
     - name: Build the Docker image
       run: |
         docker build . --file Dockerfile --tag licenseclearingtool:2702
-        docker build --help
+
