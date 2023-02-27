@@ -21,6 +21,9 @@ jobs:
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
     
+    - name: Restore Packages
+      run: dotnet restore src\LicenseClearingTool.sln 
+    
     - name: Build
       run: msbuild -m -t:Rebuild -p:Configuration=Release -bl:continous-clearing.binlog -noconlog src\LicenseClearingTool.sln
     
