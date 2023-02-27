@@ -9,7 +9,7 @@ jobs:
   
     defaults:
       run:
-        working-directory: ./src
+        working-directory: .
         
         
     steps:
@@ -23,7 +23,7 @@ jobs:
         $WF = Join-Path $env:GITHUB_WORKSPACE "Scripts"
         Write-Host "'$WF'"
         dir        
-        ./Scripts/json_update.ps1 -JsonFile 'TestUtilities\appSettingsSW360IntegrationTest.json' 
+        ./Scripts/json_update.ps1 -JsonFile 'src\TestUtilities\appSettingsSW360IntegrationTest.json' 
       env:
         SW360HOST: ${{ secrets.SW360HOST }}
         SW360APPPORT: ${{ secrets.SW360APPPORT }}
@@ -36,7 +36,7 @@ jobs:
       
     
     - name: update appsettingsUnitTest.json
-      run: ./Scripts/json_update_ut.ps1 -JsonFile 'UnitTestUtilities\appsettingsUnitTest.json' 
+      run: ./Scripts/json_update_ut.ps1 -JsonFile 'src\UnitTestUtilities\appsettingsUnitTest.json' 
       env:
         SW360HOST: ${{ secrets.SW360HOST }}
         SW360APPPORT: ${{ secrets.SW360APPPORT }}
@@ -48,10 +48,10 @@ jobs:
       uses: microsoft/setup-msbuild@v1.0.2
     
     - name: Restore Packages
-      run: dotnet restore LicenseClearingTool.sln 
+      run: dotnet restore src\LicenseClearingTool.sln 
       
     - name: Build
-      run: msbuild -m -t:Rebuild -p:Configuration=Release -bl:continous-clearing.binlog -noconlog LicenseClearingTool.sln
+      run: msbuild -m -t:Rebuild -p:Configuration=Release -bl:continous-clearing.binlog -noconlog src\LicenseClearingTool.sln
     
     - name: Archive Build Log
       uses: actions/upload-artifact@v2
@@ -60,6 +60,7 @@ jobs:
         name: Compile_Solution_log
         path: |
           src/*.binlog
+          *.binlog
           
     - name: Create zip
       id: packageBuildResults
@@ -117,4 +118,4 @@ jobs:
       with:
         name: nuget-LicenseClearingTool
         path: |
-          src/LicenseClearingTool.1.0.0.nupkg   
+          LicenseClearingTool.1.0.0.nupkg   
