@@ -138,7 +138,7 @@ jobs:
       with:
         name: nuget-LicenseClearingTool
         path: |
-          LicenseClearingTool.$($env:GitVersion_SemVer).nupkg
+          *.nupkg
           
     - name: Build the Docker image
       run: |
@@ -152,7 +152,7 @@ jobs:
       with:
         name: docker-LicenseClearingTool
         path: |
-          LicenseClearingTool-$($env:GitVersion_SemVer).tar
+          *.tar
           
   release:
     if: github.ref == 'refs/heads/main'
