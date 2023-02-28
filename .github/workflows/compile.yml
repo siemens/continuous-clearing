@@ -126,13 +126,20 @@ jobs:
     - name: Build the Docker image
       run: |
         docker build . --file Dockerfile --tag ${env:DOCKERTESTDEVARTIFACTORY}/energy-dev/clearing-automation/siemens_licenseclearingtool:GH-LicenseClearingTool-1.0.0
+        docker save ${env:DOCKERTESTDEVARTIFACTORY}/energy-dev/clearing-automation/siemens_licenseclearingtool:GH-LicenseClearingTool-1.0.0 -o LicenseClearingTool-1.0.0.tar
       env:        
          DOCKERTESTDEVARTIFACTORY: ${{ secrets.DOCKERTESTDEVARTIFACTORY }}
 
-
+    - name: Archive docker image
+      uses: actions/upload-artifact@v2
+      with:
+        name: docker-LicenseClearingTool
+        path: |
+          LicenseClearingTool-1.0.0.tar
+          
   release:
-    #if: github.ref == 'refs/heads/main'
-    if: github.ref == 'refs/heads/Pipeline_creation'
+    if: github.ref == 'refs/heads/main'
+    #if: github.ref == 'refs/heads/Pipeline_creation'
     runs-on: self-hosted
     needs: build
   
