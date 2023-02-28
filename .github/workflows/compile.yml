@@ -110,7 +110,8 @@ jobs:
         path: |
            out/LicenseClearingTool
            
-    - name: Create Nuget Packages    
+    - name: Create Nuget Packages 
+      id: createNupkg
       run: |
         nuget pack CA.nuspec  
         Write-Host "::set-output name=nupkg-LicenseClearingTool::LicenseClearingTool-1.0.0"
@@ -124,7 +125,10 @@ jobs:
           
     - name: Build the Docker image
       run: |
-        docker build . --file Dockerfile --tag licenseclearingtool:2702
+        docker build . --file Dockerfile --tag ${env:DOCKERTESTDEVARTIFACTORY}/energy-dev/clearing-automation/siemens_licenseclearingtool:GH-LicenseClearingTool-1.0.0
+      env:        
+         DOCKERTESTDEVARTIFACTORY: ${{ secrets.DOCKERTESTDEVARTIFACTORY }}
+
 
   release:
     #if: github.ref == 'refs/heads/main'
