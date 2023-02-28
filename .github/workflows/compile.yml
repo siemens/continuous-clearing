@@ -120,7 +120,7 @@ jobs:
       with:
         name: nuget-LicenseClearingTool
         path: |
-          working-directory: .
+          LicenseClearingTool.1.0.0.nupkg
           
     - name: Build the Docker image
       run: |
