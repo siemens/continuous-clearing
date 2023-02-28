@@ -59,6 +59,7 @@ docker run --rm -it /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDirecto
  --artifactoryuploaduser     Jfrog User Email
  --jfrognpmdestreponame      The destination folder name for the NPM package to be copied to         
  --jfrognugetdestreponame    The destination folder name for the NUGET package to be copied to
+ --jfrogmavendestreponame    The destination folder name for the MAVEN package to be copied to
  --artifactoryuploadapikey   Jfrog User Auth Token.  Make sure to pass this in a secure way so that critical credentials are not exposed.
  --timeout                   SW360 response timeout value 
  ```

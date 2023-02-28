@@ -21,5 +21,6 @@ namespace LCT.Common.Model
         public List<string> ExcludedComponents { get; set; }
         public string[] JfrogNpmRepoList { get; set; }
         public string[] JfrogNugetRepoList { get; set; }
+        public string[] JfrogMavenRepoList { get; set; }
     }
 }

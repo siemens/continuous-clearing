@@ -161,7 +161,7 @@ namespace NUnitTestProject1
                 SW360URL = "http://localhost:8081/"
             };
             sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(fossTriggerStatus);
-            var ComponentCreator = new ComponentCreator();
+           
 
             //Act
             await ComponentCreator.TriggerFossologyProcess(item, sw360CreatorServiceMock.Object, appSettings);
@@ -188,7 +188,7 @@ namespace NUnitTestProject1
                 SW360URL = "http://localhost:8081/"
             };
             sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>())).ThrowsAsync(new AggregateException());
-            var ComponentCreator = new ComponentCreator();
+            
 
             //Act
             string value = await ComponentCreator.TriggerFossologyProcess(item, sw360CreatorServiceMock.Object, appSettings);

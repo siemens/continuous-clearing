@@ -8,30 +8,32 @@ using Newtonsoft.Json;
 
 namespace LCT.APICommunications.Model.Foss
 {
-  /// <summary>
-  /// Multiple upload component model
-  /// </summary>
-  public class MultipleUploadComponentModel
-  {
-    [JsonProperty("folderid")]
-    public string Folderid { get; set; }
+    /// <summary>
+    /// Multiple upload component model
+    /// </summary>
 
-    [JsonProperty("foldername")]
-    public string Foldername { get; set; }
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    public class MultipleUploadComponentModel
+    {
+        [JsonProperty("folderid")]
+        public string Folderid { get; set; }
 
-    [JsonProperty("id")]
-    public string UploadId { get; set; }
+        [JsonProperty("foldername")]
+        public string Foldername { get; set; }
 
-    [JsonProperty("description")]
-    public string Description { get; set; }
+        [JsonProperty("id")]
+        public string UploadId { get; set; }
 
-    [JsonProperty("uploadname")]
-    public string Uploadname { get; set; }
+        [JsonProperty("description")]
+        public string Description { get; set; }
 
-    [JsonProperty("uploaddate")]
-    public string Uploaddate { get; set; }
+        [JsonProperty("uploadname")]
+        public string Uploadname { get; set; }
 
-    [JsonProperty("filesize")]
-    public string Filesize { get; set; }
-  }
+        [JsonProperty("uploaddate")]
+        public string Uploaddate { get; set; }
+
+        [JsonProperty("filesize")]
+        public string Filesize { get; set; }
+    }
 }

@@ -11,6 +11,8 @@ namespace LCT.APICommunications.Model.Foss
     /// <summary>
     /// Fossology Jobs model
     /// </summary>
+
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class FossologyJobs
     {
         [JsonProperty("analysis")]

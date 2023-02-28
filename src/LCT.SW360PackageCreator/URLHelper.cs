@@ -86,10 +86,14 @@ namespace LCT.SW360PackageCreator
         public async Task<string> GetSourceUrlForNugetPackage(string componentName, string componenVersion)
         {
             Logger.Debug($"URLHelper.GetSourceUrlForNugetPackage():Start");
-            string nuspecURL = $"{CommonAppSettings.SourceURLNugetApi}{componentName}/{componenVersion}/{componentName}.nuspec";
+            string name = componentName.ToLowerInvariant();
+            string version = componenVersion.ToLowerInvariant();
+            string nuspecURL = $"{CommonAppSettings.SourceURLNugetApi}{name}/{version}/{name}.nuspec";
             var sourceURL = await GetSourceURLFromNuspecFile(nuspecURL, componentName);
             return sourceURL;
         }
+
+   
 
         /// <summary>
         /// Gets the Source URL for NPM Package
@@ -172,7 +176,9 @@ namespace LCT.SW360PackageCreator
             }
             catch (HttpRequestException ex)
             {
-                Logger.Debug($"GetSourceURLFromNuspecFile():", ex);
+                Logger.Warn($"Identification of SRC url failed for {componentName}, " +
+            $"Exclude if it is an internal component or manually update the SRC url");
+                Logger.Debug($"GetSourceURLFromNuspecFile()", ex);
             }
             return GithubUrl;
         }

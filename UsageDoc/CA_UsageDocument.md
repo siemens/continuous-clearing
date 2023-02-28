@@ -7,7 +7,6 @@
 
 * [Clearing Automation tool workflow diagram](#clearing-automation-tool-workflow-diagram)
 
-
 * [Prerequisite](#prerequisite)
 
 * [Package Installation](#package-installation) 
@@ -22,15 +21,20 @@
 
   * [Artifactory Uploader](#artifactory-uploader)
   
- * [Clearing Automation Tool Execution Test Mode](#clearing-automation-tool-execution-test-mode)
+* [Clearing Automation Tool Execution Test Mode](#clearing-automation-tool-execution-test-mode)
 
- * [How to handle multiple project types in same project](#how-to-handle-multiple-project-types-in-same-project)
+* [How to handle multiple project types in same project](#how-to-handle-multiple-project-types-in-same-project)
 
 * [Troubleshoot](#troubleshoot)
+
 * [Manual Update](#manual-update)
+
 * [Feedback](#feedback)
+
 * [Bug or Enhancements](#bug-or-enhancements)
+
 * [Glossary of Terms](#glossary-of-terms)
+
 * [References](#references)
 
   * [Image References](#image-references)
@@ -41,19 +45,19 @@
 <!--te-->
 # Introduction
 
-The Clearing Automation Tool (CA-Tool) helps the Project Manager/Developer to automate the sw360 clearing process of 3rd party components. This tool scans and identifies the third-party components used in a NPM, NUGET and Debian projects and makes an entry in SW360, if it is not present. CA-Tool links the components to the respective project and creates job for code scan in FOSSology.
+The Clearing Automation Tool (CA-Tool) helps the Project Manager/Developer to automate the sw360 clearing process of 3rd party components. This tool scans and identifies the third-party components used in a NPM, NUGET,MAVEN and Debian projects and makes an entry in SW360, if it is not present. CA-Tool links the components to the respective project and creates job for code scan in FOSSology.
 
 CA-Tool reduces the effort in creating components in SW360 and identifying the matching source codes from the public repository. Tool eliminates the manual error while creating component and identifying correct version of source code from public repository. CA-Tool harmonize the creation of 3P components in SW360 by filling necessary information.
 # Clearing Automation tool workflow diagram
 
 - Package Identifier
-   - [NPM/NUGET](../doc/usagedocimg/packageIdentifiernpmnuget.PNG)
+   - [NPM/NUGET/MAVEN](../doc/usagedocimg/packageIdentifiernpmnuget.PNG)
    - [Debian](../doc/usagedocimg/packageIdentifierdebian.PNG)
 - SW360 Package Creator
-  - [NPM/NUGET](../doc/usagedocimg/packageCreatirnpmnuget.PNG)
+  - [NPM/NUGET/MAVEN](../doc/usagedocimg/packageCreatirnpmnuget.PNG)
   - [Debian](../doc/usagedocimg/packagecreatordebian.PNG)
 - Artifactory Uploader
-  - [NPM/NUGET](../doc/usagedocimg/artifactoryuploader.PNG)
+  - [NPM/NUGET/MAVEN](../doc/usagedocimg/artifactoryuploader.PNG)
 # Prerequisite
 
 1. Install Docker (Latest stable version).
@@ -143,6 +147,12 @@ CA-Tool reduces the effort in creating components in SW360 and identifying the m
           * .Net core/.Net standard type project's input file repository should contain **package.lock.json** file. If not present do a `dotnet restore --use-lock-file`.
           
           * .Net Framework projects, input file repository should contain a **packages.config** file.
+
+      - **Project Type :** **Maven**
+      
+          * [Apache Maven](https://dlcdn.apache.org/maven/maven-3/3.9.0/binaries/apache-maven-3.9.0-bin.zip) has to be installed in the build machine and added in the `PATH` variable.
+
+          * Input file repository should contain **pom.xml** file.
           
       - **Project Type :**  **Debian** 
       
@@ -183,6 +193,7 @@ CA-Tool reduces the effort in creating components in SW360 and identifying the m
   "JFrogApi": "<Insert JFrogApi>",
   "JfrogNugetDestRepoName": "JfrogNugetDestRepo Name",
   "JfrogNpmDestRepoName": "JfrogNpmDestRepo Name",
+  "JfrogMavenDestRepoName": "JfrogMavenDestRepo Name",
   "PackageFilePath": "/mnt/Input",
   "BomFolderPath": "/mnt/Output",
   "BomFilePath":"/mnt/Output/<SW360 Project Name>_Bom.cdx.json",
@@ -209,6 +220,15 @@ CA-Tool reduces the effort in creating components in SW360 and identifying the m
     "Include": [ "pack*.config", "p*.lock.json" ],
     "Exclude": [],
     "JfrogNugetRepoList": [
+      "<Repo1>",
+      "<Repo2>"
+    ],
+    "ExcludedComponents": []
+  },
+  "Maven": {
+    "Include": [ "pom.xml" ],
+    "Exclude": [],
+    "JfrogMavenRepoList": [
       "<Repo1>",
       "<Repo2>"
     ],
@@ -244,7 +264,8 @@ Description for the settings in `appSettings.json` file
 | 16    | --artifactoryuploaduser              | Jfrog User Email                              | Yes                                                       |
 | 17  | --jfrognpmdestreponame         | The destination folder name for the NPM package to be copied to                  | Yes                                                    |
 | 18    | --jfrognugetdestreponame         | The destination folder name for the Nuget package to be copied to                  | Yes                                                    |
-| 19    | --timeout          | SW360 response timeout value                  | No                                                       |                                                |
+| 19    | --jfrogmavendestreponame         | The destination folder name for the Maven package to be copied to                  | Yes                                                    |
+| 20   | --timeout          | SW360 response timeout value                  | No                                                       |                                                |
 
   #### Exclude  Component or Folders :
   In order to exclude any components ,it can be configured in the  "appSettings.json" by providing the package name and version as specified above in the *_ExcludedComponents_* field.
@@ -321,12 +342,12 @@ Upload attachment manually for [Debian](/UsageDoc/Manual-attachment-Debian-Overv
 # Feedback
 Please add your feedbacks below
 
-[Give feedback](https://github.com/siemens/continuous-clearing/issues)
+[Give feedback](https://code.siemens.com/em-dg/oss/continuous-clearing/-/issues)
 # Bug or Enhancements
 
 For reporting any bug or enhancement please follow below link
 
-[Issues](https://github.com/siemens/continuous-clearing/issues)
+[Issues](https://code.siemens.com/em-dg/oss/continuous-clearing/-/issues)
 
 
 # Glossary of Terms

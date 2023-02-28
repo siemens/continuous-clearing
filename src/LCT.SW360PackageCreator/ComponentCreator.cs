@@ -23,6 +23,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -76,12 +77,15 @@ namespace LCT.SW360PackageCreator
                 {
                     componentsData.DownloadUrl = Dataconstant.DownloadUrlNotFound;
                     componentsData.Name = GetPackageName(item);
+                    componentsData.Group = item.Group;
                     componentsData.Version = item.Version;
                     componentsData.ComponentExternalId = item.Purl.Substring(0, item.Purl.IndexOf('@'));
                     componentsData.ReleaseExternalId = item.Purl;
 
                     Components component = await GetSourceUrl(componentsData.Name, componentsData.Version, componentsData.ProjectType);
                     componentsData.SourceUrl = component.SourceUrl;
+
+
                     if (componentsData.ProjectType.ToUpperInvariant() == "DEBIAN")
                     {
                         componentsData = component;
@@ -155,13 +159,13 @@ namespace LCT.SW360PackageCreator
 
         private static string GetPackageName(Component item)
         {
-            if (string.IsNullOrEmpty(item.Group))
+            if (!string.IsNullOrEmpty(item.Group) && !item.Purl.Contains(Dataconstant.MavenPackage))
             {
-                return item.Name;
+                return $"{item.Group}/{item.Name}";
             }
             else
             {
-                return $"{item.Group}/{item.Name}";
+                return item.Name;
             }
         }
 
@@ -242,8 +246,10 @@ namespace LCT.SW360PackageCreator
 
             try
             {
+
                 foreach (ComparisonBomData item in componentsToBoms)
                 {
+
                     await CreateComponentAndRealease(creatorHelper, sw360CreatorService, item, sw360Url, appSettings);
                 }
             }
@@ -277,6 +283,8 @@ namespace LCT.SW360PackageCreator
         private async Task CreateComponentAndReleaseWhenNotAvailable(ComparisonBomData item,
             ISw360CreatorService sw360CreatorService, ICreatorHelper creatorHelper, CommonAppSettings appSettings)
         {
+       
+      
             if (item.ComponentStatus == Dataconstant.NotAvailable && item.ReleaseStatus == Dataconstant.NotAvailable)
             {
                 Logger.Logger.Log(null, Level.Notice, $"Creating the Component & Release : Name - {item.Name} , version - {item.Version}", null);
@@ -288,6 +296,9 @@ namespace LCT.SW360PackageCreator
                     UpdatedCompareBomData.Add(item);
                     return;
                 }
+
+
+                //till here
 
                 ComponentCreateStatus createdStatus = await sw360CreatorService.CreateComponentBasesOFswComaprisonBOM(item, attachmentUrlList);
                 item.IsComponentCreated = GetCreatedStatus(createdStatus.IsCreated);

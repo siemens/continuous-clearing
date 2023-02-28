@@ -11,6 +11,8 @@ namespace LCT.APICommunications.Model.Foss
     /// <summary>
     /// Then File upload hash code model
     /// </summary>
+
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class FileUploadHash
     {
         [JsonProperty("sha1")]

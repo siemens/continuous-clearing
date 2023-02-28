@@ -62,6 +62,9 @@
     <None Update="PackageIdentifierUTTestFiles\Duplicate_Cyclonedx.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="PackageIdentifierUTTestFiles\POM.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="PackageIdentifierUTTestFiles\SourceDetails_Cyclonedx.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

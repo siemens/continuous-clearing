@@ -9,9 +9,10 @@ using Newtonsoft.Json;
 
 namespace LCT.APICommunications.Model.Foss
 {
+
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class CheckFossologyProcess
     {
-
         [JsonProperty("fossologyProcessInfo")]
         public FossologyProcessInfo fossologyProcessInfo { get; set; }
 

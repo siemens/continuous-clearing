@@ -45,7 +45,7 @@ namespace LCT.Common
                 foreach (var component in ComponentList)
                 {
                     string name = component.Name;
-                    if (!string.IsNullOrEmpty(component.Group))
+                    if (!string.IsNullOrEmpty(component.Group)&&(component.Group!=component.Name))
                     {
                         name = $"{component.Group}/{component.Name}";
                     }
