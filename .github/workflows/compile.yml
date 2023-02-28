@@ -10,7 +10,9 @@ jobs:
     defaults:
       run:
         working-directory: .
-        
+    outputs:
+      LicenseClearingTool: ${{ steps.packageBuildResults.outputs.LicenseClearingTool }}  
+      LicenseClearingTool.1.0.0: ${{ steps.createNupkg.outputs.LicenseClearingTool.1.0.0 }}
         
     steps:
     - name: Checkout
@@ -60,7 +62,8 @@ jobs:
         FOSSYHOST: ${{ secrets.FOSSYHOST }}
         FOSSYAPPPORT: ${{ secrets.FOSSYAPPPORT }}
         JFROGURL: ${{ secrets.JFROGURL }}
-    - name: Create zip
+    
+    - name: Archive zip
       id: packageBuildResults
       run: |
         $sourceFolder = Join-Path $env:GITHUB_WORKSPACE "out" | Join-Path -ChildPath "*"
@@ -100,7 +103,7 @@ jobs:
                 dotnet test --no-build --configuration Release
         }
 
-    - name: Archive Build Result
+    - name: Archive Build Output
       uses: actions/upload-artifact@v2
       with:
         name: LicenseClearingTool
@@ -122,3 +125,59 @@ jobs:
       run: |
         docker build . --file Dockerfile --tag licenseclearingtool:2702
 
+  release:
+    #if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/Pipeline_creation'
+    runs-on: self-hosted
+    needs: build
+    defaults:
+      run: 
+        shell: pwsh
+    steps:
+      - name: Download Build Output
+        uses: actions/download-artifact@v2
+        with:
+          name: LicenseClearingTool
+
+      - name: Download NuGet Package
+        uses: actions/download-artifact@v2
+        with:
+          name: nuget-LicenseClearingTool
+      
+      - name: Debug
+        run: |
+          tree
+      
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          #tag_name: ${{ needs.build.outputs.semver }}
+          tag_name: v1.0.0
+          release_name: Release v1.0.0
+          body: |
+            ${{ github.event.head_commit.message }}
+          draft: true
+          prerelease: true   
+          
+      - name: Upload Zip
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: ./${{ needs.build.outputs.LicenseClearingTool }}
+          asset_name: ${{ needs.build.outputs.LicenseClearingTool }}
+          asset_content_type: application/zip
+          
+      - name: Upload Nupkg
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: ./${{ needs.build.outputs.LicenseClearingTool.1.0.0 }}
+          asset_name: ${{ needs.build.outputs.LicenseClearingTool.1.0.0 }}
+          asset_content_type: application/zip
