@@ -119,8 +119,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: nuget-LicenseClearingTool
-        path: |
-          LicenseClearingTool-1.0.0.nupkg   
+        
           
     - name: Build the Docker image
       run: |
