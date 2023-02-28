@@ -12,7 +12,7 @@ jobs:
         working-directory: .
     outputs:
       LicenseClearingTool: ${{ steps.packageBuildResults.outputs.LicenseClearingTool }}  
-      LicenseClearingTool-1.0.0: ${{ steps.createNupkg.outputs.LicenseClearingTool-1.0.0 }}
+      nupkg-LicenseClearingTool: ${{ steps.createNupkg.outputs.nupkg-LicenseClearingTool }}
         
     steps:
     - name: Checkout
@@ -113,6 +113,7 @@ jobs:
     - name: Create Nuget Packages    
       run: |
         nuget pack CA.nuspec  
+        Write-Host "::set-output name=nupkg-binary-fileName::LicenseClearingTool-1.0.0"
         
     - name: Archive NuGet Packages
       uses: actions/upload-artifact@v2
@@ -178,6 +179,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: ./${{ needs.build.outputs.LicenseClearingTool-1.0.0 }}
-          asset_name: ${{ needs.build.outputs.LicenseClearingTool-1.0.0 }}
+          asset_path: ./${{ needs.build.outputs.nupkg-LicenseClearingTool }}
+          asset_name: ${{ needs.build.outputs.nupkg-LicenseClearingTool }}
           asset_content_type: application/zip
