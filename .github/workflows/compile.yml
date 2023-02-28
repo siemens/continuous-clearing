@@ -119,7 +119,8 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: nuget-LicenseClearingTool
-        
+        path: |
+          $env:GITHUB_WORKSPACE
           
     - name: Build the Docker image
       run: |
