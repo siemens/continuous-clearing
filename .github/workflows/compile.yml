@@ -131,9 +131,7 @@ jobs:
     if: github.ref == 'refs/heads/Pipeline_creation'
     runs-on: self-hosted
     needs: build
-    defaults:
-      run: 
-        shell: pwsh
+  
     steps:
       - name: Download Build Output
         uses: actions/download-artifact@v2
