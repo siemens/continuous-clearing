@@ -73,7 +73,7 @@ jobs:
         Write-Host "Filename: '$fileName'"
         Write-Host "sourceFolder: '$sourceFolder'"
         Write-Host "Outfolder: '$outFolder'"
-        dir
+        Write-Host "::set-output name=LicenseClearingTool::$($fileName)"
         $outPath = Join-Path $outFolder $fileName
         Compress-Archive -DestinationPath $outPath -Path $sourceFolder -CompressionLevel Optimal
       
