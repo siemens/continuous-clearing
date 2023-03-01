@@ -15,17 +15,29 @@ This tool has been  logically split into 3 different executables that enable it 
 
  # Usage
  
-#### Package Installation 
+##### Build Natively
 
- In order to consume the CA docker image directly, follow the steps below:
-
- 1. Clone the repo to your local machine 
- 2. Build the source code
- 3. Create an image using the command below
+ 1. Clone the repo to your local machine.
+ 2. Build the source code.
+ 3. Create an image using the command below.
 
     ` docker build -t sw30clearingautomationtool -f Dockerfile .` 
+	
+##### Docker Image Installation
 
- ### Execution via terminal
+ 1. Login to Docker Hub.
+
+ ```bash
+ docker login <url to dockerhub>
+ ```
+ 
+ 2. Install CA-Tool Docker image using the following command.
+  
+ ```bash
+ docker pull <Url Of Docker Image>
+ ```
+
+ #### Execution via terminal
 
 The Clearing Automation Tool has 3 dll 's.
 
