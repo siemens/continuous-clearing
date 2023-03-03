@@ -18,7 +18,7 @@ else
 	write-host "The sw360 URL is $sw360urlobj"
 	$fossyurlobj = -join ("http://", "${env:FOSSYHOST}", ":", "${env:FOSSYAPPPORT}")
 	write-host "The fossology URL is $fossyurlobj"
-	$jfrogurlobj = -join ("https://", "${env:JFROGHOST}")
+	$jfrogurlobj = -join ("${env:JFROGURL}")
 	write-host "The Jfrog URL is $jfrogurlobj"
 }
 
