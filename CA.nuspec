@@ -37,7 +37,7 @@
     <file src="out\net6.0\JsonSchema.Net.dll" target="tools"/>
     <file src="out\net6.0\LCT.APICommunications.dll" target="tools"/>
     <file src="out\net6.0\LCT.APICommunications.pdb" target="tools"/>
-	<file src="out\net6.0\LCT.APICommunications.deps.json" target="tools"/>
+    <file src="out\net6.0\LCT.APICommunications.deps.json" target="tools"/>
     <file src="out\net6.0\LCT.Common.deps.json" target="tools"/>
     <file src="out\net6.0\LCT.Common.dll" target="tools"/>
     <file src="out\net6.0\LCT.Common.pdb" target="tools"/>
