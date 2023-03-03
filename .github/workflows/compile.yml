@@ -94,8 +94,7 @@ jobs:
         $outPath = Join-Path $outFolder $fileName
         Compress-Archive -DestinationPath $outPath -Path $sourceFolder -CompressionLevel Optimal
       
-    - name: SW3360 Instance refresh
-      if: ${{ false }}  # disable for now
+    - name: SW3360 Instance refresh      
       run: |
         docker exec -dt sw360confctnr1 service postgresql stop
         docker stop sw360confctnr1
@@ -106,8 +105,7 @@ jobs:
          SW360APPPORT: ${{ secrets.SW360APPPORT }}
          DOCKERDEVARTIFACTORY: ${{ secrets.DOCKERDEVARTIFACTORY }}
          
-    - name: Test
-      if: ${{ false }}  # disable for now
+    - name: Test      
       run: |
         $TestProjects = Get-ChildItem -Path *test*.csproj -Recurse -exclude TestUtilities.csproj,UnitTestUtilities.csproj
         Write-Host "**************************The test projects considered for execution: $TestProjects   ******************************"
@@ -179,7 +177,7 @@ jobs:
         id: create_release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
         with:
           #tag_name: ${{ needs.build.outputs.semver }}
           tag_name: ${{ needs.build.outputs.semver }}
@@ -194,7 +192,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          upload_url: ${{ steps.create_release.outputs.upload_url }} 
           asset_path: ./${{ needs.build.outputs.LicenseClearingTool }}
           asset_name: ${{ needs.build.outputs.LicenseClearingTool }}
           asset_content_type: application/zip
@@ -204,7 +202,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          upload_url: ${{ steps.create_release.outputs.upload_url }} 
           asset_path: ./${{ needs.build.outputs.nupkg-LicenseClearingTool }}
           asset_name: ${{ needs.build.outputs.nupkg-LicenseClearingTool }}
           asset_content_type: application/zip
