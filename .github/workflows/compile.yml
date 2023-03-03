@@ -56,11 +56,7 @@ jobs:
           *.binlog
 
     - name: update appSettingsSW360IntegrationTest.json
-      run: |
-        $WF = Join-Path $env:GITHUB_WORKSPACE "Scripts"
-        Write-Host "'$WF'"
-        dir        
-        ./Scripts/json_update.ps1 -JsonFile 'src\TestUtilities\appSettingsSW360IntegrationTest.json' 
+      run: ./Scripts/json_update.ps1 -JsonFile 'src\TestUtilities\appSettingsSW360IntegrationTest.json' 
       env:
         SW360HOST: ${{ secrets.SW360HOST }}
         SW360APPPORT: ${{ secrets.SW360APPPORT }}
@@ -80,7 +76,7 @@ jobs:
         FOSSYAPPPORT: ${{ secrets.FOSSYAPPPORT }}
         JFROGURL: ${{ secrets.JFROGURL }}
     
-    - name: Archive zip
+    - name: Create zip
       id: packageBuildResults
       run: |
         $sourceFolder = Join-Path $env:GITHUB_WORKSPACE "out" | Join-Path -ChildPath "*"
