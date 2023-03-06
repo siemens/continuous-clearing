@@ -136,10 +136,9 @@ jobs:
           
     - name: Build the Docker image
       run: |
-        docker build . --file Dockerfile --tag ${env:DOCKERTESTDEVARTIFACTORY}/energy-dev/clearing-automation/siemens_licenseclearingtool:GH-LicenseClearingTool-$($env:GitVersion_SemVer)
-        docker save ${env:DOCKERTESTDEVARTIFACTORY}/energy-dev/clearing-automation/siemens_licenseclearingtool:GH-LicenseClearingTool-$($env:GitVersion_SemVer) -o LicenseClearingTool-$($env:GitVersion_SemVer).tar
-      env:        
-         DOCKERTESTDEVARTIFACTORY: ${{ secrets.DOCKERTESTDEVARTIFACTORY }}
+        docker build . --file Dockerfile --tag siemens_licenseclearingtool:LicenseClearingTool-$($env:GitVersion_SemVer)
+        docker save siemens_licenseclearingtool:LicenseClearingTool-$($env:GitVersion_SemVer) -o LicenseClearingTool-$($env:GitVersion_SemVer).tar
+      
 
     - name: Archive docker image
       uses: actions/upload-artifact@v2
@@ -149,8 +148,8 @@ jobs:
           *.tar
           
   release:
-    #if: github.ref == 'refs/heads/main'
-    if: github.ref == 'refs/heads/Pipeline_creation'
+    if: github.ref == 'refs/heads/main'
+    #if: github.ref == 'refs/heads/Pipeline_creation'
     runs-on: self-hosted
     needs: build
   
