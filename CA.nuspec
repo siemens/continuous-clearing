@@ -4,10 +4,10 @@
 <package >
   <metadata>
     <id>LicenseClearingTool</id>
-    <version>3.0.0</version>
+    <version>1.0.0</version>
     <authors>Vijayalakshmi Periyasamy</authors>
     <owners>Siemens AG</owners>
-    <projectUrl>CA_Project_RepoLink</projectUrl>
+    <projectUrl>https://github.com/siemens/continuous-clearing</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>
       The License clearing tool helps the Project Manager/Developer, to reduce the manual effort and enable the faster license clearing process,

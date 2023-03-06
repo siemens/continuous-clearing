@@ -175,8 +175,8 @@ namespace LCT.PackageIdentifier
             List<Component> componentNotForBOM = new List<Component>();
             UploadArgs uploadArgs;
             string releaseName = component.Name;
-            string componentname = releaseName;
             HttpResponseMessage responseBody;
+
             JfrogApicommunication jfrogApicommunication = new NpmJfrogApiCommunication(appSettings.JFrogApi, repo, artifactoryUpload);
             //Setting the upload Arguments
             uploadArgs = SetUploadArguments(component, ref releaseName);
@@ -191,21 +191,9 @@ namespace LCT.PackageIdentifier
 
             //when package is found in jfrog
             if (responseBody.StatusCode == HttpStatusCode.OK)
-            {
-                if (!string.IsNullOrEmpty(component.Group))
-                {
-                    componentname = $"{component.Group}/{component.Name}";
-                }
-                string hashcode = BomHelper.GetHashCodeUsingNpmView(componentname, component.Version);
-                string jfrogresponse = await responseBody.Content.ReadAsStringAsync();
-                JfrogInfo jfrogInfo = JsonConvert.DeserializeObject<JfrogInfo>(jfrogresponse);
-
-                string shaJfrog = jfrogInfo?.Checksum?.Sha1;
-                if (hashcode == shaJfrog)
-                {
-                    componentNotForBOM.Add(component);
-
-                }
+            {         
+                componentNotForBOM.Add(component);
+                
             }
             //Incase of invalid token
             if (responseBody.StatusCode == HttpStatusCode.Forbidden)
