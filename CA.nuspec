@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--SPDX-FileCopyrightText: 2023 Siemens AG
-    SPDX-License-Identifier: MIT-->
+    SPDX-License-Identifier: MIT--> 
 <package >
   <metadata>
     <id>LicenseClearingTool</id>
