@@ -148,8 +148,8 @@ jobs:
           *.tar
           
   release:
-    if: github.ref == 'refs/heads/main'
-    #if: github.ref == 'refs/heads/Pipeline_creation'
+    #if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/Pipeline_creation'
     runs-on: self-hosted
     needs: build
   
