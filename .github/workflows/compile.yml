@@ -179,7 +179,7 @@ jobs:
           body: |
             ${{ github.event.head_commit.message }}
           draft: true
-          prerelease: true   
+          prerelease: false   
           
       - name: Upload Zip
         uses: actions/upload-release-asset@v1
