@@ -31,6 +31,6 @@ jobs:
           
       - name: Publish to NuGet.org
         run: |
-          dotnet nuget push "*.nupkg" --api-key $env:PAT_GITHUB --source "github"
+          dotnet nuget push "*.nupkg" --api-key $env:PAT_GITHUB --source "https://nuget.pkg.github.com/siemens/index.json"
         env:
           PAT_GITHUB: ${{ secrets.PAT_GITHUB }}
