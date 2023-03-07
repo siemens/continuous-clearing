@@ -33,7 +33,6 @@ namespace LCT.PackageIdentifier
             Bom bom = new();
 
             string depFilePath = "";
-
             int totalComponentsIdentified = 0;
             List<string> configFiles = new();
 
@@ -83,6 +82,7 @@ namespace LCT.PackageIdentifier
 
             string[] lines = File.ReadAllLines(depFilePath);
             int noOfExcludedComponents = 0;
+            int totalComponenstinInputFile = 0;
             foreach (string line in lines)
             {
                 Component component = new();
@@ -90,34 +90,37 @@ namespace LCT.PackageIdentifier
 
                 if (trimmedLine != string.Empty && trimmedLine != "none" && trimmedLine != "The following files have been resolved:")
                 {
+                    totalComponenstinInputFile++;
                     //Example entry: org.mockito:mockito-core:jar:1.10.19:compile
                     string[] parts = trimmedLine.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
+                    MavenPackage package;
+                    string scope = "";
+                    bool isDevelopmentComponent;
 
                     if (parts.Length == 5)
                     {
-                        MavenPackage package = new()
+                        package = new()
                         {
                             ID = parts[1],
                             Version = parts[3],
                             GroupID = parts[0].Replace('.', '/')
-
                         };
+                        scope = parts[4];
                         component.Name = package.ID;
                         component.Version = package.Version;
                         component.Group = package.GroupID;
                         component.BomRef = $"pkg:maven/{component.Name}@{component.Version}";
                         component.Purl = $"pkg:maven/{component.Name}@{component.Version}";
-
                     }
                     else if (parts.Length == 6)
                     {
-                        MavenPackage package = new()
+                        package = new()
                         {
                             ID = parts[1],
                             Version = $"{parts[4]}-{parts[3]}",
                             GroupID = parts[0].Replace('.', '/')
-
                         };
+                        scope = parts[4];
                         component.Name = package.ID;
                         component.Version = package.Version;
                         component.Group = package.GroupID;
@@ -125,17 +128,20 @@ namespace LCT.PackageIdentifier
                         component.Purl = $"pkg:maven/{component.Name}@{component.Version}";
                     }
 
+                    isDevelopmentComponent = GetDevDependentScopeList(appSettings, scope);
 
-                    if (!component.Version.Contains("win"))
+                    if (!component.Version.Contains("win") && !isDevelopmentComponent)
                     {
                         foundPackages.Add(component);
                     }
-
+                    if (isDevelopmentComponent)
+                    {
+                        BomCreator.bomKpiData.DevDependentComponents++;
+                    }
                 }
 
-
             }
-            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = foundPackages.Count;
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = totalComponenstinInputFile;
             if (appSettings.Maven.ExcludedComponents != null)
             {
                 foundPackages = CommonHelper.RemoveExcludedComponents(foundPackages, appSettings.Maven.ExcludedComponents, ref noOfExcludedComponents);
@@ -309,6 +315,11 @@ namespace LCT.PackageIdentifier
             List<Component> componentNotForBOM = await processor.CheckInternalComponentsInJfrogArtifactory(appSettings, artifactoryUpload, component, repo);
             return componentNotForBOM;
 
+        }
+
+        private static bool GetDevDependentScopeList(CommonAppSettings appSettings, string scope)
+        {
+            return appSettings.Maven.DevDependentScopeList.Contains(scope);
         }
 
     }
