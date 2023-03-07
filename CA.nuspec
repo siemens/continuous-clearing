@@ -4,7 +4,7 @@
 <package >
   <metadata>
     <id>LicenseClearingTool</id>
-    <version>1.0.0</version>
+    <version>3.0.0</version>
     <authors>Vijayalakshmi Periyasamy</authors>
     <owners>Siemens AG</owners>
     <projectUrl>https://github.com/siemens/continuous-clearing</projectUrl>
