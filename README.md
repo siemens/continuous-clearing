@@ -1,3 +1,10 @@
+![Build & Test](https://github.com/siemens/continuous-clearing/workflows/Build%20&%20Test/badge.svg?branch=Pipeline_creation)
+
+
+
+
+
+
 # Introduction 
 
 The Clearing Automation Tool scans and collects the 3rd party OSS components used in a NPM/NuGet/Debian project and uploads it to SW360 and Fossology by accepting respective project ID for license clearing. 
