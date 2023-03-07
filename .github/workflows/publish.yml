@@ -16,7 +16,7 @@ on:
         - debug
 jobs:
   publish:
-    runs-on: windows-latest
+    runs-on: self-hosted
     
     steps:
       - name: Download NuGet Packages from Release
