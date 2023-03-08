@@ -31,6 +31,14 @@ This tool has been  logically split into 3 different executables that enable it 
  3. Create an image using the command below
 
     ` docker build -t sw30clearingautomationtool -f Dockerfile .` 
+    
+ In order to consume CA as nuget package, follow the steps below:
+ 
+ 1. Clone the repo to your local machine 
+ 2. Build the source code
+ 3. Create a nuget package by running the command given below in the repo where CA.nuspec is present.
+    
+       `nuget pack CA.nuspec`
 
  ### Execution via terminal
 
