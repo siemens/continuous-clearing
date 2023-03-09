@@ -22,9 +22,11 @@ This tool has been  logically split into 3 different executables that enable it 
 
  # Usage
  
-#### Package Installation 
+### Consuming the Released Packages
 
- In order to consume the CA docker image directly, follow the steps below:
+Docker image or the CA Nuget package can be directly downloaded and used in your pipelines for faster clearing process.
+
+### Building the Source and generating CA Docker Image
 
  1. Clone the repo to your local machine 
  2. Build the source code
@@ -32,7 +34,7 @@ This tool has been  logically split into 3 different executables that enable it 
 
     ` docker build -t sw30clearingautomationtool -f Dockerfile .` 
     
- In order to consume CA as nuget package, follow the steps below:
+### Building the Source and generating CA Nuget Package
  
  1. Clone the repo to your local machine 
  2. Build the source code
@@ -49,6 +51,7 @@ Execute them in the following order to achieve the complete License clearing pro
  
  1. **Package Identifier** - This executable takes `package-lock.json` or a `cycloneDX BOM` as input and provides a CycloneDX BOM file as output. For each of the component the availability in jfrog artifactory is identified and added in the BOM file.
  
+ ##### For Docker Image 
 ```text
 docker run --rm -it /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool sw30clearingautomationtool dotnet PackageIdentifier.dll --settingsfilepath /etc/CATool/appSetting.json
  ```
@@ -56,6 +59,12 @@ docker run --rm -it /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDirecto
  * Output (i.e.,/path/to/OutputDirectory -> resulted files will be stored here) 
  * Log (i.e., /path/to/logDirectory -> logs will be stored here) 
  * Configuration (i.e., /path/to/ConfigDirectory -> place to keep the Config files i.e **appSetting.json**) 
+
+##### For Nuget Package
+
+```text
+PackageIdentifier.exe --packagefilepath <project directory path> --bomfolderpath <folder path to create BOM file> --sw360token <SW360 Auth token> --sw360projectid <projectfromsw360> --sW360authtokentype Bearer --artifactoryapikey <Jfrog Auth Token> --sw360url <sw360 Url>
+```
 
 **Argument List** : Below is the list of settings can be made in **appSetting.json** file.
  ```bash
@@ -80,14 +89,29 @@ docker run --rm -it /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDirecto
  
  2. **SW360 Package Creator** - This executable expects the `CycloneDX BOM` as the input, creates the missing components/releases in SW360 and links all the components to the respective project in SW360 portal and triggers the fossology upload.
  
+ ##### For Docker Image
+ 
  ```text
  docker run --rm -it /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool sw30clearingautomationtool dotnet SW360PackageCreator.dll --settingsfilepath /etc/CATool/appSetting.json
 ```
+
+##### For Nuget Package
+
+```text
+SW360PackageCreator.exe --bomfilepath <CycloneDXBom file path> --sw360token <SW360 Auth token> --sw360projectid <sw360Project id> --sw360authtokentype Bearer --sw360url <sw360 url> --fossologyUrl <fossology Url >
+```
+
  3. **Artifactory Uploader** - This executable takes `CycloneDX BOM` which is updated by the ` SW360PackageCreator.dll` as input and uploads the components that are already cleared (clearing state - "Report approved") to the SIPARTY release repo in Jfrog Artifactory.
+ 
+  ##### For Docker Image
  ```text
   docker run --rm -it /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool sw30clearingautomationtool dotnet ArtifactoryUploader.dll --settingsfilepath /etc/CATool/appSetting.json
   ```
+##### For Nuget Package
 
+```text
+ArtifactoryUploader.exe --bomfilepath <cyclonedx bom file path which is the result of Package Creator> --artifactoryuploaduser <user email> --artifactoryuploadapikey <Jfrog token> --jfrognpmdestreponame <npm destination repo name> --Jfrogapi <Siemens Jfrog artifactory url>
+```
 
 Detailed insight on configuration and execution is provided in [Usage Doc](UsageDoc/CA_UsageDocument.md).
 
