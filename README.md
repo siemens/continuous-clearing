@@ -1,4 +1,6 @@
-![Build & Test](https://github.com/siemens/continuous-clearing/workflows/Build%20&%20Test/badge.svg?branch=Pipeline_creation)
+![Build & Test](https://github.com/siemens/continuous-clearing/workflows/Build%20&%20Test/badge.svg?branch=main)
+![Build & Test](https://github.com/siemens/continuous-clearing/workflows/Docker-publish/badge.svg?branch=main)
+![Build & Test](https://github.com/siemens/continuous-clearing/workflows/Publish%20Pacakges/badge.svg?branch=main)
 
 
 
