@@ -121,5 +121,6 @@ See  [CONTRIBUTING.md](CONTRIBUTING.md).
 
 # License
 
-Code and documentation under MIT License
+Code and documentation under [MIT License](LICENSE.md)
+
 Copyright 2023 Siemens AG
