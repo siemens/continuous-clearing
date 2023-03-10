@@ -155,7 +155,7 @@ jobs:
           *.tar
           
   release:
-    if: github.ref == 'refs/heads/nuget-publish'    
+    if: github.ref == 'refs/heads/main'    
     runs-on: self-hosted
     needs: build
   
