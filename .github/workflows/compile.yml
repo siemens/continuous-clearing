@@ -38,10 +38,10 @@ jobs:
     - name: get SemVer       
       id: gitversion
       run: |
-        echo "SemVer: $($env:GitVersion_SemVer)" 
-        Write-Host "::set-output name=semver::$($env:GitVersion_SemVer)"        
-        $fileName = "dummy-$($env:GitVersion_SemVer)"
-        echo "SemVerMMP: $($env:GitVersion_MajorMinorPatch)"
+        echo "SemVer: v$($env:GitVersion_SemVer)" 
+        Write-Host "::set-output name=semver::v$($env:GitVersion_SemVer)"        
+        $fileName = "dummy-v$($env:GitVersion_SemVer)"
+        echo "SemVerMMP: v$($env:GitVersion_MajorMinorPatch)"
         Write-Host "Filename: '$fileName'" 
         
     - name: Add msbuild to PATH
@@ -89,7 +89,7 @@ jobs:
         $sourceFolder = Join-Path $env:GITHUB_WORKSPACE "out" | Join-Path -ChildPath "*"
         $outFolder = Join-Path $env:GITHUB_WORKSPACE "out" | Join-Path -ChildPath "LicenseClearingTool" 
         New-Item -ItemType Directory -Force -Path $outFolder
-        $fileName = "LicenseClearingTool-$($env:GitVersion_SemVer).zip"
+        $fileName = "LicenseClearingTool-v$($env:GitVersion_SemVer).zip"
         Write-Host "Filename: '$fileName'"
         Write-Host "sourceFolder: '$sourceFolder'"
         Write-Host "Outfolder: '$outFolder'"
@@ -131,8 +131,8 @@ jobs:
     - name: Create Nuget Packages 
       id: createNupkg
       run: |
-        nuget pack CA.nuspec -Version $($env:GitVersion_SemVer)
-        Write-Host "::set-output name=nupkg-LicenseClearingTool::LicenseClearingTool.$($env:GitVersion_SemVer).nupkg"
+        nuget pack CA.nuspec -Version v$($env:GitVersion_SemVer)
+        Write-Host "::set-output name=nupkg-LicenseClearingTool::LicenseClearingTool.v$($env:GitVersion_SemVer).nupkg"
         
     - name: Archive NuGet Packages
       uses: actions/upload-artifact@v2
@@ -143,8 +143,8 @@ jobs:
           
     - name: Build the Docker image
       run: |
-        docker build . --file Dockerfile --tag siemens_licenseclearingtool:LicenseClearingTool-$($env:GitVersion_SemVer)
-        docker save siemens_licenseclearingtool:LicenseClearingTool-$($env:GitVersion_SemVer) -o LicenseClearingTool-$($env:GitVersion_SemVer).tar
+        docker build . --file Dockerfile --tag siemens_licenseclearingtool:LicenseClearingTool-v$($env:GitVersion_SemVer)
+        docker save siemens_licenseclearingtool:LicenseClearingTool-v$($env:GitVersion_SemVer) -o LicenseClearingTool-v$($env:GitVersion_SemVer).tar
       
 
     - name: Archive docker image
