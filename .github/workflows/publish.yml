@@ -21,6 +21,7 @@ jobs:
           
       - name: Publish to NuGet.org
         run: |
-          dotnet nuget push "*.nupkg" --api-key $env:PAT_GITHUB --source "https://nuget.pkg.github.com/siemens/index.json"
+          #nuget push "*.nupkg" --api-key $env:PAT_GITHUB --source "https://github.com/siemens/continuous-clearing.git"
+          nuget push "*.nupkg" -source "https://github.com/siemens/continuous-clearing.git"
         env:
           PAT_GITHUB: ${{ secrets.PAT_GITHUB }}
