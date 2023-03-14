@@ -6,7 +6,7 @@
     <id>LicenseClearingTool</id>
     <version>3.0.0</version>
     <authors>continuous-clearing contributors</authors>
-    <owners>siemens</owners>
+    <owners></owners>
     <projectUrl>https://github.com/siemens/continuous-clearing</projectUrl>
     <repository type="git" url="https://github.com/siemens/continuous-clearing.git" />
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -15,6 +15,7 @@
       by automatically identifying the third party oss components used in their project(i.e., npm, nuget and Debian type) and it creates them in the sw360 and fossology
       for clearing license
     </description>
+	<license type="expression">MIT</license>
     <releaseNotes></releaseNotes>
     <copyright>Copyright 2023</copyright>
     <tags>ClearingTool SW360 OSS ClearingSoftware Continuous-Clearing NPM NUGET DEBIAN</tags>
