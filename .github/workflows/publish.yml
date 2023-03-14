@@ -15,7 +15,7 @@ jobs:
             $prefix = "refs/tags/"
             $name = $($env:GITHUB_REF).Substring($prefix.Length)
             Write-Host "name: '$name'"
-            gh release download $name --repo siemens/continuous-clearing --pattern '*.nupkg'
+            gh release download $name --repo siemens/continuous-clearing --pattern '*.nupkg' --clobber
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
