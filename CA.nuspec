@@ -8,7 +8,7 @@
     <authors>continuous-clearing contributors</authors>
     <owners>siemens</owners>
     <projectUrl>https://github.com/siemens/continuous-clearing</projectUrl>
-    <RepositoryUrl>https://github.com/siemens/continuous-clearing</RepositoryUrl>
+    <repositoryUrl>https://github.com/siemens/continuous-clearing</repositoryUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>
       The License clearing tool helps the Project Manager/Developer, to reduce the manual effort and enable the faster license clearing process,
