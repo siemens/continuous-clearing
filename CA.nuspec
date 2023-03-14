@@ -19,6 +19,7 @@
     <copyright>Copyright 2023</copyright>
     <tags>ClearingTool SW360 OSS ClearingSoftware Continuous-Clearing NPM NUGET DEBIAN</tags>
   </metadata>
+   
 
   <files>
     <file src="DemoProject\**\*.*" target="demoproject"/>
