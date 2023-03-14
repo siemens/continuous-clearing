@@ -21,6 +21,9 @@ jobs:
           
       - name: Publish to github packages
         run: |
-          nuget push "*.nupkg" --api-key $env:PAT_GITHUB --source "https://nuget.pkg.github.com/siemens/index.json"          
+          dotnet nuget add source --username ${{ secrets.USERNAME }} --password ${{ secrets.PAT_GITHUB }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/SIEMENS/index.json"
+          dotnet nuget push "*.nupkg" --api-key $env:PAT_GITHUB --source "https://nuget.pkg.github.com/SIEMENS/index.json"
         env:
-          PAT_GITHUB: ${{ secrets.PAT_GITHUB }}
+         USERNAME: ${{ secrets.USERNAME }}
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+         PAT_GITHUB: ${{ secrets.PAT_GITHUB }}
