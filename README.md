@@ -16,32 +16,29 @@ manual effort of creating SW360 and FOSSology workflows.
 This tool has been  logically split into 3 different executables that enable it to be used as separate modules as per the user's requirement.
 
 **_Note: CA Tool internally uses [Syft](https://github.com/anchore/syft) for component detection for debian type projects._**
-
-# Prerequisite
  
- -  Docker latest version
-  
+## Package Installation 
 
- # Usage
+ ### Install from GitHub Release (Official)
+#### Use container image
+
+```bash
+docker pull ghcr.io/siemens/continuous-clearing:latest
+ ```
+
+#### Download Binary
+-  Download the file form [GitHub Releases](https://github.com/siemens/continuous-clearing/releases)
+
+ ## Execution via terminal
  
-#### Package Installation 
-
- In order to consume the CA docker image directly, follow the steps below:
-
- 1. Clone the repo to your local machine 
- 2. Build the source code
- 3. Create an image using the command below
-
-    ` docker build -t sw30clearingautomationtool -f Dockerfile .` 
-
- ### Execution via terminal
-
-The Clearing Automation Tool has 3 dll 's.
-
-Execute them in the following order to achieve the complete License clearing process.
-
+ The Clearing Automation Tool has 3 executables.
  
- 1. **Package Identifier** - This executable takes `package-lock.json` or a `cycloneDX BOM` as input and provides a CycloneDX BOM file as output. For each of the component the availability in jfrog artifactory is identified and added in the BOM file.
+<details>
+<summary>run as containirize application</summary>
+ 
+ Execute them in the following order to achieve the complete License clearing process.
+
+1. **Package Identifier** - This executable takes `package-lock.json` or a `cycloneDX BOM` as input and provides a CycloneDX BOM file as output. For each of the component the availability in jfrog artifactory is identified and added in the BOM file.
  
 ```text
 docker run --rm -it /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool sw30clearingautomationtool dotnet PackageIdentifier.dll --settingsfilepath /etc/CATool/appSetting.json
@@ -50,27 +47,6 @@ docker run --rm -it /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDirecto
  * Output (i.e.,/path/to/OutputDirectory -> resulted files will be stored here) 
  * Log (i.e., /path/to/logDirectory -> logs will be stored here) 
  * Configuration (i.e., /path/to/ConfigDirectory -> place to keep the Config files i.e **appSetting.json**) 
-
-**Argument List** : Below is the list of settings can be made in **appSetting.json** file.
- ```bash
- --packagefilepath           Path to the package-lock.json file or to the directory where the project is present in case we have multiple package-lock.json files.
- --cycloneDxbomfilePath      Path to the cycloneDx BOM file. This should not be used along with the package file path.Please note to give only one type of input at a time.
- --bomfolderpath             Path to keep the generated boms
- --sw360token                SW360 Auth Token. Make sure to pass this in a secure way so that critical credentials are not exposed.
- --sw360projectname          Name of the project created in SW360. _Note: Project name is case sensitive and should be same as it is in SW360, else execution will be aborted
- --projecttype               Type of the package
- --removedevdependency       Make this field to "true" , if Dev dependencies needs to be excluded from clearing
- --sw360url                  SW360 URL
- --sw360authtokentype        SW360 Auth Token Type.
- --bomfilepath               The file path of the *_comparisonBom.json file   
- --fossologyUrl 	            Fossology URL
- --EnableFossTrigger	    True (Default)      
- --artifactoryuploaduser     Jfrog User Email
- --jfrognpmdestreponame      The destination folder name for the NPM package to be copied to         
- --jfrognugetdestreponame    The destination folder name for the NUGET package to be copied to
- --artifactoryuploadapikey   Jfrog User Auth Token.  Make sure to pass this in a secure way so that critical credentials are not exposed.
- --timeout                   SW360 response timeout value 
- ```
  
  2. **SW360 Package Creator** - This executable expects the `CycloneDX BOM` as the input, creates the missing components/releases in SW360 and links all the components to the respective project in SW360 portal and triggers the fossology upload.
  
@@ -81,7 +57,30 @@ docker run --rm -it /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDirecto
  ```text
   docker run --rm -it /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool sw30clearingautomationtool dotnet ArtifactoryUploader.dll --settingsfilepath /etc/CATool/appSetting.json
   ```
+</details>
 
+<details>
+<summary>run as dotnet application</summary>
+ 
+ Extact the downloaded nupkg package , move to ** tools ** folder and execute the below commands in order,
+
+ 1. **Package Identifier** - This executable takes `package-lock.json` as input and provides a CycloneDX BOM file as output. For each of the component the availability in jfrog artifactory is identified and added in the BOM file.
+ 
+```text
+  PackageIdentifier.exe --settingsfilepath /<Config_Path>/appSetting.json
+ ```
+ 
+ 2. **SW360 Package Creator** - This executable expects the `CycloneDX BOM` as the input, creates the missing components/releases in SW360 and links all the components to the respective project in SW360 portal and triggers the fossology upload.
+ 
+ ```text
+  SW360PackageCreator.exe --settingsfilepath /<Config_Path>/appSetting.json
+```
+ 3. **Artifactory Uploader** - This executable takes `CycloneDX BOM` which is updated by the ` SW360PackageCreator.dll` as input and uploads the components that are already cleared (clearing state - "Report approved") to the SIPARTY release repo in Jfrog Artifactory.
+ ```text
+   ArtifactoryUploader.exe --settingsfilepath /<Config_Path>/appSetting.json
+  ```
+
+</details>
 
 Detailed insight on configuration and execution is provided in [Usage Doc](UsageDoc/CA_UsageDocument.md).
 
