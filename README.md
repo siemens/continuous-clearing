@@ -62,7 +62,7 @@ docker run --rm -it /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDirecto
 <details>
 <summary>run as dotnet application</summary>
  
- Extact the downloaded nupkg package , move to ** tools ** folder and execute the below commands in order,
+ Extact the downloaded nupkg package , move to tools folder and execute the below commands in order,
 
  1. **Package Identifier** - This executable takes `package-lock.json` as input and provides a CycloneDX BOM file as output. For each of the component the availability in jfrog artifactory is identified and added in the BOM file.
  
@@ -82,7 +82,10 @@ docker run --rm -it /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDirecto
 
 </details>
 
+
 Detailed insight on configuration and execution is provided in [Usage Doc](UsageDoc/CA_UsageDocument.md).
+ 
+ **_Note: ArtifactoryUploader is not applicable for Debian clearing._**
 
 # Development
 
@@ -105,7 +108,7 @@ These instructions will get the project up and running on your local machine for
 dotnet build --configuration Release
  ```
  
-#### Deployment
+#### Creating package
 
 Execute the following command inside the project's root directory where the `Dockerfile` is present to make an image :
 
