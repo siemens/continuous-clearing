@@ -27,7 +27,7 @@ docker pull ghcr.io/siemens/continuous-clearing:latest
  ```
 
 #### Download Binary
--  Download the file form [GitHub Releases](https://github.com/siemens/continuous-clearing/releases)
+-  Download the .nupkg file from [GitHub Releases](https://github.com/siemens/continuous-clearing/releases)
 
  ## Execution via terminal
  
