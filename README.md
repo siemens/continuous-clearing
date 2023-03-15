@@ -110,13 +110,22 @@ These instructions will get the project up and running on your local machine for
 dotnet build --configuration Release
  ```
  
-#### Creating package
+#### Creating Docker image
 
-Execute the following command inside the project's root directory where the `Dockerfile` is present to make an image :
+Execute the following command inside the project's root directory where the `Dockerfile` is present to create an image :
 
 ```bash
 docker build -t <DockerImageName> -f Dockerfile .
  ```
+ 
+ #### Creating dotnet package
+
+Execute the following command inside the project's root directory :
+
+```bash
+nuget pack CA.nuspec
+ ```
+ 
 # Contribute
 
 Improvements are always welcome! Feel free to log a bug, write a suggestion or
