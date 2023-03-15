@@ -33,8 +33,10 @@ docker pull ghcr.io/siemens/continuous-clearing:latest
  
  The Clearing Automation Tool has 3 executables.
  
+you can run CATool as container or with binaries,
+ 
 <details>
-<summary>run as containirize application</summary>
+<summary>run as container</summary>
  
  Execute them in the following order to achieve the complete License clearing process.
 
@@ -60,7 +62,7 @@ docker run --rm -it /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDirecto
 </details>
 
 <details>
-<summary>run as dotnet application</summary>
+<summary>run as binaries</summary>
  
  Extact the downloaded nupkg package , move to tools folder and execute the below commands in order,
 
