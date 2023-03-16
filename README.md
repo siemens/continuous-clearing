@@ -117,7 +117,7 @@ Execute the following command inside the project's root directory where the `Doc
 ```bash
 docker build -t <DockerImageName> -f Dockerfile .
  ```
- ![](https://github.com/siemens/continuous-clearing/blob/ReleaseDraft/doc/gifs/DockerBuild.gif)
+ ![](doc/gifs/DockerBuild.gif)
  
  #### Creating dotnet package
 
@@ -126,7 +126,7 @@ Execute the following command inside the project's root directory :
 ```bash
 nuget pack CA.nuspec
  ```
- ![](https://github.com/siemens/continuous-clearing/blob/ReleaseDraft/doc/gifs/NugetBuild.gif)
+ ![](doc/gifs/NugetBuild.gif)
  
 # Contribute
 
