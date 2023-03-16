@@ -23,12 +23,12 @@ This tool has been  logically split into 3 different executables that enable it 
 #### Use container image
 
 ```bash
-docker pull ghcr.io/siemens/continuous-clearing:v3.0.21-nuget-publish.22
+docker pull ghcr.io/siemens/continuous-clearing:v3.0.21
  ```
 
 #### Use dotnet pacakge
 ```bash
-dotnet add package continuous-clearing --version 3.0.21-nuget-publish.22
+dotnet add package continuous-clearing --version 3.0.21
  ```
  ## Execution via terminal
  
