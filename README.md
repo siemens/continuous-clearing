@@ -23,12 +23,13 @@ This tool has been  logically split into 3 different executables that enable it 
 #### Use container image
 
 ```bash
-docker pull ghcr.io/siemens/continuous-clearing:latest
+docker pull ghcr.io/siemens/continuous-clearing:v3.0.21-nuget-publish.22
  ```
 
-#### Download Binary
--  Download the .nupkg file from [GitHub Releases](https://github.com/siemens/continuous-clearing/releases)
-
+#### Use dotnet pacakge
+```bash
+dotnet add package continuous-clearing --version 3.0.21-nuget-publish.22
+ ```
  ## Execution via terminal
  
  The Clearing Automation Tool has 3 executables.
