@@ -17,24 +17,24 @@ This tool has been  logically split into 3 different executables that enable it 
 
 **_Note: CA Tool internally uses [Syft](https://github.com/anchore/syft) for component detection for debian type projects._**
  
-## Package Installation 
+# Package Installation 
 
  ### Install from GitHub Release (Official)
 #### Use container image
 
 ```bash
-docker pull ghcr.io/siemens/continuous-clearing:v3.0.21
+docker pull ghcr.io/siemens/continuous-clearing:v3.0.0
  ```
 
-#### Use dotnet pacakge
-```bash
-dotnet add package continuous-clearing --version 3.0.21
- ```
- ## Execution via terminal
+#### Use Binary
+
+Download the .nupkg file from [GitHub Releases](https://github.com/siemens/continuous-clearing/releases)
+
+ # Execution via terminal
  
  The Clearing Automation Tool has 3 executables.
  
-you can run CATool as container or with binaries,
+you can run CATool as container or as a dotnet package,
  
 <details>
 <summary>Run as container</summary>
@@ -63,9 +63,9 @@ docker run --rm -it /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDirecto
 </details>
 
 <details>
-<summary>Run as binaries</summary>
+<summary>Run as dotnet package</summary>
  
- Extact the downloaded nupkg package , move to tools folder and execute the below commands in order,
+ Extract the downloaded .nupkg package , execute the following commands inside the tools folder.
 
  1. **Package Identifier** - This executable takes `package-lock.json` as input and provides a CycloneDX BOM file as output. For each of the component the availability in jfrog artifactory is identified and added in the BOM file.
  
@@ -120,7 +120,7 @@ docker build -t <DockerImageName> -f Dockerfile .
  ```
  ![](doc/gifs/DockerBuild.gif)
  
- #### Creating dotnet package
+ #### Creating Dotnet package
 
 Execute the following command inside the project's root directory :
 
