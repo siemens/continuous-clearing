@@ -143,16 +143,15 @@ CA-Tool reduces the effort in creating components in SW360 and identifying the m
           *  Create `InputImage` directory for keeping `tar` images and `InputDirectory` for resulted file storing .
 
           *  Run the command given below by replacing the place holder values (i.e., path to input image directory, path to input directory and file name of the Debian image to be cleared) with actual values.
-
+            
+              **Example**:   `docker run --rm -v <path/to/InputImageDirectory>:/tmp/InputImages -v <path/to/InputDirectory>:/tmp/OutputFiles clearingautomationtool ./syft packages /tmp/InputImages/<fileNameofthedebianImageTobeCleared.tar> -o cyclonedx-json --file "/tmp/OutputFiles/output.json"`
            
-          **Example**:   `docker run --rm -v <path/to/InputImageDirectory>:/tmp/InputImages -v <path/to/InputDirectory>:/tmp/OutputFiles clearingautomationtool ./syft packages /tmp/InputImages/<fileNameofthedebianImageTobeCleared.tar> -o cyclonedx-json --file "/tmp/OutputFiles/output.json"`
            
+             After successful execution, `output.json` (_CycloneDX.json_) file will be created in specified directory
            
-          After successful execution, `output.json` (_CycloneDX.json_) file will be created in specified directory
+             ![image.png](../doc/usagedocimg/output.PNG)
            
-          ![image.png](../doc/usagedocimg/output.PNG)
-           
-          Resulted `output.json` file will be having the list of installed packages  and the same file will be used as  an input to `CA- Bom creator` as an argument(`--packagefilepath`). The remaining process is same as other project types.
+             Resulted `output.json` file will be having the list of installed packages  and the same file will be used as  an input to `CA- Bom creator` as an argument(`--packagefilepath`). The remaining process is same as other project types.
 
 
 ### **Configuring the CA Tool**
