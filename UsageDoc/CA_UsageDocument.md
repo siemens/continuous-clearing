@@ -97,11 +97,7 @@ CA-Tool reduces the effort in creating components in SW360 and identifying the m
 
  ### Nuget package
   
-   Download the [.nupkg](https://github.com/siemens/continuous-clearing/releases) file from GitHub releases.
-
-   
-
-  **Note**: You can install particular CA Tool version from [GitHub Releases](https://github.com/siemens/continuous-clearing/releases/)  
+   Download the [.nupkg](https://github.com/siemens/continuous-clearing/releases) file from GitHub releases. 
 
 
 # Demo project after consuming the package 
@@ -330,7 +326,7 @@ argument list.
     
     **Example** : `docker run --rm -it -v /D/Projects/Output:/mnt/Output -v /D/Projects/DockerLog:/var/log -v /D/Projects/CAConfig:/etc/CATool clearingautomationtool dotnet ArtifactoryUploader.dll --settingsfilepath /etc/CATool/appSettings.json --mode test`
 
-..or,
+or,
 
    **Example** : `ArtifactoryUploader.exe --settingsfilepath /<PathToConfig>/appSettings.json --mode test`
 
