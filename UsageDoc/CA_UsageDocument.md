@@ -19,7 +19,7 @@
 
   * [Prerequisite for execution](#prerequisite-for-ca-tool-execution) 
 
-  * [Configuring](#configuring-the-ca-tool)
+  * [Configuration](#configuring-the-ca-tool)
 
   * [Execution](#ca-tool-execution)
   
