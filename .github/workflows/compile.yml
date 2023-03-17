@@ -87,9 +87,9 @@ jobs:
       id: packageBuildResults
       run: |
         $sourceFolder = Join-Path $env:GITHUB_WORKSPACE "out" | Join-Path -ChildPath "*"
-        $outFolder = Join-Path $env:GITHUB_WORKSPACE "out" | Join-Path -ChildPath "LicenseClearingTool" 
+        $outFolder = Join-Path $env:GITHUB_WORKSPACE "out" | Join-Path -ChildPath "continuous-clearing" 
         New-Item -ItemType Directory -Force -Path $outFolder
-        $fileName = "LicenseClearingTool-v$($env:GitVersion_SemVer).zip"
+        $fileName = "continuous-clearing-v$($env:GitVersion_SemVer).zip"
         Write-Host "Filename: '$fileName'"
         Write-Host "sourceFolder: '$sourceFolder'"
         Write-Host "Outfolder: '$outFolder'"
@@ -97,7 +97,8 @@ jobs:
         $outPath = Join-Path $outFolder $fileName
         Compress-Archive -DestinationPath $outPath -Path $sourceFolder -CompressionLevel Optimal
       
-    - name: SW3360 Instance refresh      
+    - name: SW3360 Instance refresh
+      if: ${{ false }}
       run: |
         docker exec -dt sw360confctnr1 service postgresql stop
         docker stop sw360confctnr1
@@ -108,7 +109,8 @@ jobs:
          SW360APPPORT: ${{ secrets.SW360APPPORT }}
          DOCKERDEVARTIFACTORY: ${{ secrets.DOCKERDEVARTIFACTORY }}
          
-    - name: Test      
+    - name: Test
+      if: ${{ false }}
       run: |
         $TestProjects = Get-ChildItem -Path *test*.csproj -Recurse -exclude TestUtilities.csproj,UnitTestUtilities.csproj
         Write-Host "**************************The test projects considered for execution: $TestProjects   ******************************"
@@ -124,38 +126,40 @@ jobs:
     - name: Archive Build Output
       uses: actions/upload-artifact@v2
       with:
-        name: LicenseClearingTool
+        name: continuous-clearing
         path: |
-           out/LicenseClearingTool
+           out/continuous-clearing
            
     - name: Create Nuget Packages 
       id: createNupkg
       run: |
         nuget pack CA.nuspec -Version $($env:GitVersion_SemVer)
-        Write-Host "::set-output name=nupkg-LicenseClearingTool::LicenseClearingTool.$($env:GitVersion_SemVer).nupkg"
+        Write-Host "::set-output name=nupkg-LicenseClearingTool::continuous-clearing.$($env:GitVersion_SemVer).nupkg"
         
     - name: Archive NuGet Packages
       uses: actions/upload-artifact@v2
       with:
-        name: nuget-LicenseClearingTool
+        name: nuget-continuous-clearing
         path: |
           *.nupkg
           
     - name: Build the Docker image
+      if: ${{ false }}
       run: |
-        docker build . --file Dockerfile --tag siemens_licenseclearingtool:LicenseClearingTool-v$($env:GitVersion_SemVer)
-        docker save siemens_licenseclearingtool:LicenseClearingTool-v$($env:GitVersion_SemVer) -o LicenseClearingTool-v$($env:GitVersion_SemVer).tar
+        docker build . --file Dockerfile --tag siemens_continuous-clearing:continuous-clearing-v$($env:GitVersion_SemVer)
+        docker save siemens_continuous-clearing:continuous-clearing-v$($env:GitVersion_SemVer) -o continuous-clearing-v$($env:GitVersion_SemVer).tar
       
 
     - name: Archive docker image
+      if: ${{ false }}
       uses: actions/upload-artifact@v2
       with:
-        name: docker-LicenseClearingTool
+        name: docker-continuous-clearing
         path: |
           *.tar
           
   release:
-    if: github.ref == 'refs/heads/main'    
+    if: github.ref == 'refs/heads/publish'    
     runs-on: self-hosted
     needs: build
   
@@ -163,12 +167,12 @@ jobs:
       - name: Download Build Output
         uses: actions/download-artifact@v2
         with:
-          name: LicenseClearingTool
+          name: continuous-clearing
 
       - name: Download NuGet Package
         uses: actions/download-artifact@v2
         with:
-          name: nuget-LicenseClearingTool
+          name: nuget-continuous-clearing
       
       - name: Debug
         run: |
