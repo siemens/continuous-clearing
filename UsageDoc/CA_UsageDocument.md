@@ -15,11 +15,13 @@
 
 * [Clearing Automation Tool Execution](#clearing-automation-tool-execution)
 
-  * [Package Identifier](#package-identifier) 
+  * [Overview](#overview)
 
-  * [SW360 Package Creator](#sw360-package-creator)
+  * [Prerequisite for execution](#prerequisite-for-ca-tool-execution) 
 
-  * [Artifactory Uploader](#artifactory-uploader)
+  * [Configuring](#configuring-the-ca-tool)
+
+  * [Execution](#ca-tool-execution)
   
  * [Clearing Automation Tool Execution Test Mode](#clearing-automation-tool-execution-test-mode)
 
@@ -27,7 +29,6 @@
 
 * [Troubleshoot](#troubleshoot)
 * [Manual Update](#manual-update)
-* [Feedback](#feedback)
 * [Bug or Enhancements](#bug-or-enhancements)
 * [Glossary of Terms](#glossary-of-terms)
 * [References](#references)
@@ -105,8 +106,9 @@ CA-Tool reduces the effort in creating components in SW360 and identifying the m
 
 # Clearing Automation Tool Execution
 
-1. **The Clearing Automation Tool has 3 dll &#39;s.**
+ ### Overview
 
+    The Clearing Automation Tool has 3 dll &#39;s.
     Execute them in the following order to achieve the complete License clearing process.
     
    > **1. Package Identifier**
@@ -120,7 +122,7 @@ CA-Tool reduces the effort in creating components in SW360 and identifying the m
    >**3. Artifactory Uploader**
       - Processes the CycloneDXBOM file(i.e., the output of the SW360PackageCreator) and uploads the already cleared components(clearing state-Report approved) to the siparty release repo in Jfrog Artifactory.The components in the states other than "Report approved" will be handled by the clearing experts via the Clearing Automation Dashboard.
 
-2. **Prerequisite for CA Tool execution** 
+### **Prerequisite for CA Tool execution** 
 
    - Input files according to project type
 
@@ -151,7 +153,7 @@ CA-Tool reduces the effort in creating components in SW360 and identifying the m
            Resulted `output.json` file will be having the list of installed packages  and the same file will be used as  an input to `CA- Bom creator` as an argument(`--packagefilepath`). The remaining process is same as other project types.
 
 
-3. **Configuring the CA Tool**
+### **Configuring the CA Tool**
 
    Copy the below content and create new `appSettings.json` file in `CAConfig` directory.
 
@@ -246,7 +248,7 @@ Description for the settings in `appSettings.json` file
   In order to **Exclude specific folders** from the execution, It can be specified under the **Exclude section** of that specific **package type**.
 
 
-# CA Tool Execution
+### **CA Tool Execution** 
 
 CA Tool can be executed as container or as binaries,
 
