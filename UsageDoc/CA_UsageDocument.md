@@ -357,16 +357,11 @@ Incase your project has both NPM/Nuget components it can be handled by merely ru
 # Manual Update
 Upload attachment manually for [Debian](/UsageDoc/Manual-attachment-Debian-Overview.md) type.
 
-# Feedback
-Please add your feedbacks below
 
-[Give feedback](https://github.com/siemens/continuous-clearing/issues)
 # Bug or Enhancements
 
-For reporting any bug or enhancement please follow below link
-
-[Issues](https://github.com/siemens/continuous-clearing/issues)
-
+For reporting any bug or enhancement and for your feedbacks click [here](https://github.com/siemens/continuous-clearing/issues)
+ 
 
 # Glossary of Terms
 
