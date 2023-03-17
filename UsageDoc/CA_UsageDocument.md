@@ -7,20 +7,21 @@
 
 * [Clearing Automation tool workflow diagram](#clearing-automation-tool-workflow-diagram)
 
-
 * [Prerequisite](#prerequisite)
 
-* [Package Installation](#package-installation) 
+* [Package Installation](#installation) 
 
 * [Demo Project](#demo-project-after-consuming-the-package)
 
 * [Clearing Automation Tool Execution](#clearing-automation-tool-execution)
 
-  * [Package Identifier](#package-identifier) 
+  * [Overview](#overview)
 
-  * [SW360 Package Creator](#sw360-package-creator)
+  * [Prerequisite for execution](#prerequisite-for-ca-tool-execution) 
 
-  * [Artifactory Uploader](#artifactory-uploader)
+  * [Configuration](#configuring-the-ca-tool)
+
+  * [Execution](#ca-tool-execution)
   
  * [Clearing Automation Tool Execution Test Mode](#clearing-automation-tool-execution-test-mode)
 
@@ -28,7 +29,6 @@
 
 * [Troubleshoot](#troubleshoot)
 * [Manual Update](#manual-update)
-* [Feedback](#feedback)
 * [Bug or Enhancements](#bug-or-enhancements)
 * [Glossary of Terms](#glossary-of-terms)
 * [References](#references)
@@ -56,11 +56,10 @@ CA-Tool reduces the effort in creating components in SW360 and identifying the m
   - [NPM/NUGET](../doc/usagedocimg/artifactoryuploader.PNG)
 # Prerequisite
 
-1. Install Docker (Latest stable version).
-2. **Make an entry for your project in SW360** for license clearance and is **should be in Active state** while running CA tool
+1. **Make an entry for your project in SW360** for license clearance and is **should be in Active state** while running CA tool
 
 
-4. **Access request :**
+2. **Access request :**
 
    Get SW360 REST API Authentication token
 
@@ -92,14 +91,14 @@ CA-Tool reduces the effort in creating components in SW360 and identifying the m
    
    ![folderpic](../doc/usagedocimg/piplinepic.PNG)
 
-# Package Installation
-   *  Open CMD/PowerShell to execute below command for getting latest CA Docker image,
-         
-        `docker pull <CA_DockerImageName>`
+# Installation   
+  ### Use container image 
 
-   * Use `docker images` command to verify the image is loaded properly.
+    docker pull ghcr.io/siemens/continuous-clearing:latest
 
-  **Note**: You can explore and install particular CA Tool version [here](https://hub.docker.com/)  
+ ### Nuget package
+  
+   Download the [.nupkg](https://github.com/siemens/continuous-clearing/releases) file from GitHub releases. 
 
 
 # Demo project after consuming the package 
@@ -107,12 +106,13 @@ CA-Tool reduces the effort in creating components in SW360 and identifying the m
 
 # Clearing Automation Tool Execution
 
-1. **The Clearing Automation Tool has 3 dll &#39;s.**
-
-    Execute them in the following order to achieve the complete License clearing process.
+ ### Overview
+ 
+ The Clearing Automation Tool has 3 dll &#39;s, Execute them in the following order to achieve the complete License clearing process.
+ 
     
    > **1. Package Identifier**
-      - Processes the input file and generates CycloneDX BOM file. The input file can be package file or a cycloneDx BOM file generated using the standard tool. If there are multiple input files, it can be processed by just passing the path to the directory in the argument.
+      - Processes the input file and generates CycloneDX BOM file. The input file can be package file or a cycloneDx BOM file generated using the standard tool. If there are multiple input files, it can be processed by just passing the path to the directory in the argument
 
 
    >**2. SW360 Package Creator**
@@ -122,15 +122,8 @@ CA-Tool reduces the effort in creating components in SW360 and identifying the m
    >**3. Artifactory Uploader**
       - Processes the CycloneDXBOM file(i.e., the output of the SW360PackageCreator) and uploads the already cleared components(clearing state-Report approved) to the siparty release repo in Jfrog Artifactory.The components in the states other than "Report approved" will be handled by the clearing experts via the Clearing Automation Dashboard.
 
-2. **Prerequisite for CA Tool execution**
-   
-   - Create local directories for mapping to the CA tool container directories
-        - Input  : Place to keep input files.
-        - Output : Resulted files will be stored here.
-        - Log    : CA log files.
-        - CAConfig :  Place to keep Config files i.e., `appSettings.json`.
+### **Prerequisite for CA Tool execution** 
 
-    **Note** : It is not recommended to use `Primary drive(Ex C:\)` for project execution or directory creation and also the `drive` should be configured as `Shared Drives` in docker.
    - Input files according to project type
 
       - **Project Type :** **NPM** 
@@ -146,20 +139,22 @@ CA-Tool reduces the effort in creating components in SW360 and identifying the m
           
       - **Project Type :**  **Debian** 
       
-   		       `Note : below steps is required only if you have tar file to process , otherwise you can keep `CycloneDx.json` file in the above created InputDirectory.`
-          *  Create `InputImage` directory for keeping tar images and output directory will be above created `InputDirectory` .
+   		 **Note** : below steps is required only if you have `tar` file to process , otherwise you can keep `CycloneDx.json` file in the InputDirectory.
+          *  Create `InputImage` directory for keeping `tar` images and `InputDirectory` for resulted file storing .
 
           *  Run the command given below by replacing the place holder values (i.e., path to input image directory, path to input directory and file name of the Debian image to be cleared) with actual values.
+            
+              **Example**:   `docker run --rm -v <path/to/InputImageDirectory>:/tmp/InputImages -v <path/to/InputDirectory>:/tmp/OutputFiles clearingautomationtool ./syft packages /tmp/InputImages/<fileNameofthedebianImageTobeCleared.tar> -o cyclonedx-json --file "/tmp/OutputFiles/output.json"`
+           
+           
+             After successful execution, `output.json` (_CycloneDX.json_) file will be created in specified directory
+           
+             ![image.png](../doc/usagedocimg/output.PNG)
+           
+             Resulted `output.json` file will be having the list of installed packages  and the same file will be used as  an input to `CA- Bom creator` as an argument(`--packagefilepath`). The remaining process is same as other project types.
 
-           `docker run --rm -v <path/to/InputImageDirectory>:/tmp/InputImages -v <path/to/InputDirectory>:/tmp/OutputFiles clearingautomationtool ./syft packages /tmp/InputImages/<fileNameofthedebianImageTobeCleared.tar> -o cyclonedx-json --file "/tmp/OutputFiles/output.json"`
-           
-           After successful execution, `output.json` (_CycloneDX.json_) file will be created in specified output directory
-           
-           ![image.png](../doc/usagedocimg/output.PNG)
-           
-           Resulted `output.json` file will be having the list of installed packages  and the same file will be used as  an input to `CA- Bom creator` as an argument(`--packagefilepath`). The remaining process is same as other project types.
 
-3. **Configuring the CA Tool**
+### **Configuring the CA Tool**
 
    Copy the below content and create new `appSettings.json` file in `CAConfig` directory.
 
@@ -254,7 +249,24 @@ Description for the settings in `appSettings.json` file
   In order to **Exclude specific folders** from the execution, It can be specified under the **Exclude section** of that specific **package type**.
 
 
-# CA Tool Execution
+### **CA Tool Execution** 
+
+CA Tool can be executed as container or as binaries,
+
+  <details>
+  <summary>Docker run</summary>
+
+   ### Prerequisite
+   1. Install Docker (Latest stable version).
+   2.  Create local directories for mapping to the CA tool container directories
+        - Input  : Place to keep input files.
+        - Output : Resulted files will be stored here.
+        - Log    : CA log files.
+        - CAConfig :  Place to keep Config files i.e., `appSettings.json`.
+
+
+
+  **Note** : It is not recommended to use `Primary drive(Ex C:\)` for project execution or directory creation and also the `drive` should be configured as `Shared Drives` in docker.
 
 ### Package Identifier
 
@@ -263,14 +275,11 @@ Description for the settings in `appSettings.json` file
     **Example** : `docker run --rm -it -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool clearingautomationtool dotnet PackageIdentifier.dll --settingsfilepath /etc/CATool/appSettings.json`
 
 
-
-
 ### SW360 Package Creator
 
   - In order to run the SW360PackageCreator.dll , execute the below command. 
 
     **Example** : `docker run --rm -it -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool clearingautomationtool dotnet SW360PackageCreator.dll --settingsfilepath /etc/CATool/appSettings.json`
-
 
 ###  Artifactory Uploader
 
@@ -280,8 +289,36 @@ Description for the settings in `appSettings.json` file
   
      **Example** : `docker run --rm -it -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool clearingautomationtool dotnet ArtifactoryUploader.dll --settingsfilepath /etc/CATool/appSettings.json`
 
+</details>
+
+<details>
+<summary>Binary execution</summary>
+
+### Prerequisite
+1. .NET 6 runtime [https://dotnet.microsoft.com/download/dotnet-core/6.0](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
+2. Node.js and Git latest
 
 
+ ### Package Identifier
+
+  - In order to run the PackageIdentifier.exe, execute the below command.
+
+    **Example** : `PackageIdentifier.exe --settingsfilepath /<PathToConfig>/appSettings.json`
+
+### SW360 Package Creator
+
+  - In order to run the SW360PackageCreator.exe, execute the below command. 
+
+    **Example** : `SW360PackageCreator.exe --settingsfilepath /<PathToConfig>/appSettings.json`
+
+###  Artifactory Uploader
+
+  * Artifactory uploader is **_`not applicable for Debian type package`_** clearance.
+
+  *  In order to run the Artifactory Uploader exe, execute the below command.
+  
+     **Example** : `ArtifactoryUploader.exe --settingsfilepath /<PathToConfig>/appSettings.json`
+</details>
 
 # Clearing Automation Tool Execution Test Mode
 
@@ -291,6 +328,11 @@ Description for the settings in `appSettings.json` file
 argument list.
     
     **Example** : `docker run --rm -it -v /D/Projects/Output:/mnt/Output -v /D/Projects/DockerLog:/var/log -v /D/Projects/CAConfig:/etc/CATool clearingautomationtool dotnet ArtifactoryUploader.dll --settingsfilepath /etc/CATool/appSettings.json --mode test`
+
+    or
+
+    **Example** : `ArtifactoryUploader.exe --settingsfilepath /<PathToConfig>/appSettings.json --mode test`
+
 
 # How to handle multiple project types in same project
 
@@ -318,16 +360,11 @@ Incase your project has both NPM/Nuget components it can be handled by merely ru
 # Manual Update
 Upload attachment manually for [Debian](/UsageDoc/Manual-attachment-Debian-Overview.md) type.
 
-# Feedback
-Please add your feedbacks below
 
-[Give feedback](https://github.com/siemens/continuous-clearing/issues)
 # Bug or Enhancements
 
-For reporting any bug or enhancement please follow below link
-
-[Issues](https://github.com/siemens/continuous-clearing/issues)
-
+For reporting any bug or enhancement and for your feedbacks click [here](https://github.com/siemens/continuous-clearing/issues)
+ 
 
 # Glossary of Terms
 
