@@ -97,8 +97,7 @@ jobs:
         $outPath = Join-Path $outFolder $fileName
         Compress-Archive -DestinationPath $outPath -Path $sourceFolder -CompressionLevel Optimal
       
-    - name: SW3360 Instance refresh
-      if: ${{ false }}
+    - name: SW3360 Instance refresh      
       run: |
         docker exec -dt sw360confctnr1 service postgresql stop
         docker stop sw360confctnr1
@@ -109,8 +108,7 @@ jobs:
          SW360APPPORT: ${{ secrets.SW360APPPORT }}
          DOCKERDEVARTIFACTORY: ${{ secrets.DOCKERDEVARTIFACTORY }}
          
-    - name: Test
-      if: ${{ false }}
+    - name: Test      
       run: |
         $TestProjects = Get-ChildItem -Path *test*.csproj -Recurse -exclude TestUtilities.csproj,UnitTestUtilities.csproj
         Write-Host "**************************The test projects considered for execution: $TestProjects   ******************************"
@@ -143,15 +141,13 @@ jobs:
         path: |
           *.nupkg
           
-    - name: Build the Docker image
-      if: ${{ false }}
+    - name: Build the Docker image      
       run: |
         docker build . --file Dockerfile --tag siemens_continuous-clearing:continuous-clearing-v$($env:GitVersion_SemVer)
         docker save siemens_continuous-clearing:continuous-clearing-v$($env:GitVersion_SemVer) -o continuous-clearing-v$($env:GitVersion_SemVer).tar
       
 
-    - name: Archive docker image
-      if: ${{ false }}
+    - name: Archive docker image      
       uses: actions/upload-artifact@v2
       with:
         name: docker-continuous-clearing
@@ -159,7 +155,7 @@ jobs:
           *.tar
           
   release:
-    if: github.ref == 'refs/heads/publish'    
+    if: github.ref == 'refs/heads/main'    
     runs-on: self-hosted
     needs: build
   
