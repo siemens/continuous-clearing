@@ -9,7 +9,7 @@ permissions:
   contents: read  
   
 jobs:
-  publish:
+  build:
     runs-on: windows-latest
     
     steps:
