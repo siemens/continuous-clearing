@@ -143,8 +143,8 @@ jobs:
           
     - name: Build the Docker image      
       run: |
-        docker build . --file Dockerfile --tag licenseclearingtool:continuous-clearing-v$($env:GitVersion_SemVer)
-        docker save licenseclearingtool:continuous-clearing-v$($env:GitVersion_SemVer) -o continuous-clearing-v$($env:GitVersion_SemVer).tar
+        docker build . --file Dockerfile --tag ${{ github.repository }}:continuous-clearing-v$($env:GitVersion_SemVer)
+        docker save ${{ github.repository }}:continuous-clearing-v$($env:GitVersion_SemVer) -o continuous-clearing-v$($env:GitVersion_SemVer).tar
       
 
     - name: Archive docker image      
