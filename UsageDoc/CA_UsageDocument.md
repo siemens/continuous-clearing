@@ -188,15 +188,15 @@ CA-Tool reduces the effort in creating components in SW360 and identifying the m
   "RemoveDevDependency": true,
   "EnableFossTrigger": true,
   "InternalRepoList": [
-    "<Repo1>",
-    "<Repo2>"
+    "<Npm Internal Repo Names>", //This should be the internal repo names in JFrog for NPM
+    "<Nuget Internal Repo Names>",//This should be the internal repo names in JFrog for Nuget
   ],
   "Npm": {
     "Include": [ "p*-lock.json" ],
     "Exclude": [ "node_modules" ],
     "JfrogNpmRepoList": [
-      "<Repo1>",
-      "<Repo2>"
+      "<Npm Remote Cache Repo Name>",//This is a mirror repo for npm registry in JFrog
+      "<Npm Release Repo Name>", //This should be the release repo in JFrog
     ],
     "ExcludedComponents": []
   },
@@ -204,8 +204,8 @@ CA-Tool reduces the effort in creating components in SW360 and identifying the m
     "Include": [ "pack*.config", "p*.lock.json" ],
     "Exclude": [],
     "JfrogNugetRepoList": [
-      "<Repo1>",
-      "<Repo2>"
+      "<Nuget Remote Cache Repo Name>",//This is a mirror repo for nuget.org in JFrog
+      "<Nuget Release Repo Name>",//This should be the release repo in JFrog
     ],
     "ExcludedComponents": []
   },
