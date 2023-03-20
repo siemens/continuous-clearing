@@ -183,8 +183,8 @@ CA-Tool reduces the effort in creating components in SW360 and identifying the m
   "BomFilePath":"/mnt/Output/<SW360 Project Name>_Bom.cdx.json",
 //IdentifierBomFilePath : For multiple project type 
   "IdentifierBomFilePath": "",
-  "ArtifactoryUploadApiKey": "<Insert ArtifactoryUploadApiKey in a secure way>",
-  "ArtifactoryUploadUser": "<Insert ArtifactoryUploadUser>",
+  "ArtifactoryUploadApiKey": "<Insert ArtifactoryUploadApiKey in a secure way>",//This should be Jfrog Key
+  "ArtifactoryUploadUser": "<Insert ArtifactoryUploadUser>",//This should be Jfrog user name
   "RemoveDevDependency": true,
   "EnableFossTrigger": true,
   "InternalRepoList": [
