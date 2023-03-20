@@ -3,11 +3,13 @@
     SPDX-License-Identifier: MIT--> 
 <package >
   <metadata>
-    <id>LicenseClearingTool</id>
+    <id>continuous-clearing</id>
     <version>3.0.0</version>
-    <authors>Vijayalakshmi Periyasamy</authors>
-    <owners>Siemens AG</owners>
+    <authors>Siemens AG</authors>
+    <owners>continuous-clearing contributors</owners>
     <projectUrl>https://github.com/siemens/continuous-clearing</projectUrl>
+    <license type="expression">MIT</license>
+    <repository type="git" url="https://github.com/siemens/continuous-clearing.git" /> 
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>
       The License clearing tool helps the Project Manager/Developer, to reduce the manual effort and enable the faster license clearing process,
