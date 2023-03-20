@@ -1,6 +1,6 @@
 ![Build & Test](https://github.com/siemens/continuous-clearing/workflows/Build%20&%20Test/badge.svg?branch=main)
-![Build & Test](https://github.com/siemens/continuous-clearing/workflows/Docker-publish/badge.svg?branch=main)
-![Build & Test](https://github.com/siemens/continuous-clearing/workflows/Publish%20NuGet%20Pacakges/badge.svg?branch=main)
+![Docker-publish](https://github.com/siemens/continuous-clearing/workflows/Docker-publish/badge.svg?branch=main)
+![Publish NuGet Packages](https://github.com/siemens/continuous-clearing/workflows/Publish%20NuGet%20Packages/badge.svg?branch=main)
 
 
 
