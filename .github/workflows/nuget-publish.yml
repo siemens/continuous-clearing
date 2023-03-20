@@ -1,4 +1,4 @@
-name: Publish NuGet Pacakges
+name: Publish NuGet Packages
 
 on:
   release:
