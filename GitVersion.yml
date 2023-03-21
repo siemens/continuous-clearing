@@ -1,0 +1,5 @@
+mode: Mainline
+next-version: 3.0.0
+branches:
+   master:
+      regex: ^master$|^main$

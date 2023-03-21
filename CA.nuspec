@@ -1,13 +1,15 @@
 <?xml version="1.0"?>
 <!--SPDX-FileCopyrightText: 2023 Siemens AG
-    SPDX-License-Identifier: MIT-->
+    SPDX-License-Identifier: MIT--> 
 <package >
   <metadata>
-    <id>LicenseClearingTool</id>
+    <id>continuous-clearing</id>
     <version>3.0.0</version>
-    <authors>Vijayalakshmi Periyasamy</authors>
-    <owners>Siemens AG</owners>
+    <authors>Siemens AG</authors>
+    <owners>continuous-clearing contributors</owners>
     <projectUrl>https://github.com/siemens/continuous-clearing</projectUrl>
+    <license type="expression">MIT</license>
+    <repository type="git" url="https://github.com/siemens/continuous-clearing.git" /> 
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>
       The License clearing tool helps the Project Manager/Developer, to reduce the manual effort and enable the faster license clearing process,
@@ -37,7 +39,7 @@
     <file src="out\net6.0\JsonSchema.Net.dll" target="tools"/>
     <file src="out\net6.0\LCT.APICommunications.dll" target="tools"/>
     <file src="out\net6.0\LCT.APICommunications.pdb" target="tools"/>
-	<file src="out\net6.0\LCT.APICommunications.deps.json" target="tools"/>
+    <file src="out\net6.0\LCT.APICommunications.deps.json" target="tools"/>
     <file src="out\net6.0\LCT.Common.deps.json" target="tools"/>
     <file src="out\net6.0\LCT.Common.dll" target="tools"/>
     <file src="out\net6.0\LCT.Common.pdb" target="tools"/>

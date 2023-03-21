@@ -1,0 +1,209 @@
+name: Build & Test
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: self-hosted
+  
+    defaults:
+      run:
+        working-directory: .
+    outputs:
+      semver: ${{ steps.gitversion.outputs.semver }}
+      LicenseClearingTool: ${{ steps.packageBuildResults.outputs.LicenseClearingTool }}  
+      nupkg-LicenseClearingTool: ${{ steps.createNupkg.outputs.nupkg-LicenseClearingTool }}
+        
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0   
+    
+    - name: Setup Version      
+      uses: gittools/actions/gitversion/setup@v0.10.2
+      with:
+        versionSpec: '5.3.6'
+      env: 
+        ACTIONS_ALLOW_UNSECURE_COMMANDS: TRUE
+    
+    - name: Determine Version      
+      uses: gittools/actions/gitversion/execute@v0.10.2
+      with:
+        useConfigFile: true        
+      env: 
+        ACTIONS_ALLOW_UNSECURE_COMMANDS: TRUE
+
+    - name: get SemVer       
+      id: gitversion
+      run: |
+        echo "SemVer: v$($env:GitVersion_SemVer)" 
+        Write-Host "::set-output name=semver::v$($env:GitVersion_SemVer)"        
+        $fileName = "dummy-v$($env:GitVersion_SemVer)"
+        echo "SemVerMMP: v$($env:GitVersion_MajorMinorPatch)"
+        Write-Host "Filename: '$fileName'" 
+        
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.2
+      
+    - name: update appSettingsSW360IntegrationTest.json
+      run: ./Scripts/json_update.ps1 -JsonFile 'src\TestUtilities\appSettingsSW360IntegrationTest.json' 
+      env:
+        SW360HOST: ${{ secrets.SW360HOST }}
+        SW360APPPORT: ${{ secrets.SW360APPPORT }}
+        FOSSYHOST: ${{ secrets.FOSSYHOST }}
+        FOSSYAPPPORT: ${{ secrets.FOSSYAPPPORT }}
+        USEREMAIL: ${{ secrets.USEREMAIL }}
+        ARTIFACTORYAPIKEY: ${{ secrets.ARTIFACTORYAPIKEY }}
+        JFROGURL: ${{ secrets.JFROGURL }}
+        SW360AUTHKEY: ${{ secrets.SW360AUTHTOKEN }}
+      
+    - name: update appsettingsUnitTest.json
+      run: ./Scripts/json_update_ut.ps1 -JsonFile 'src\UnitTestUtilities\appsettingsUnitTest.json' 
+      env:
+        SW360HOST: ${{ secrets.SW360HOST }}
+        SW360APPPORT: ${{ secrets.SW360APPPORT }}
+        FOSSYHOST: ${{ secrets.FOSSYHOST }}
+        FOSSYAPPPORT: ${{ secrets.FOSSYAPPPORT }}
+        JFROGURL: ${{ secrets.JFROGURL }}
+        
+    - name: Restore Packages
+      run: dotnet restore src\LicenseClearingTool.sln 
+    
+    - name: Build
+      run: msbuild -m -t:Rebuild -p:Configuration=Release -bl:continous-clearing.binlog -noconlog src\LicenseClearingTool.sln
+    
+    - name: Archive Build Log
+      uses: actions/upload-artifact@v2
+      if: ${{ success() || failure() }}
+      with:
+        name: Compile_Solution_log
+        path: |
+          src/*.binlog
+          *.binlog    
+    
+    - name: Create zip
+      id: packageBuildResults
+      run: |
+        $sourceFolder = Join-Path $env:GITHUB_WORKSPACE "out" | Join-Path -ChildPath "*"
+        $outFolder = Join-Path $env:GITHUB_WORKSPACE "out" | Join-Path -ChildPath "continuous-clearing" 
+        New-Item -ItemType Directory -Force -Path $outFolder
+        $fileName = "continuous-clearing-v$($env:GitVersion_SemVer).zip"
+        Write-Host "Filename: '$fileName'"
+        Write-Host "sourceFolder: '$sourceFolder'"
+        Write-Host "Outfolder: '$outFolder'"
+        Write-Host "::set-output name=LicenseClearingTool::$($fileName)"
+        $outPath = Join-Path $outFolder $fileName
+        Compress-Archive -DestinationPath $outPath -Path $sourceFolder -CompressionLevel Optimal
+      
+    - name: SW3360 Instance refresh      
+      run: |
+        docker exec -dt sw360confctnr1 service postgresql stop
+        docker stop sw360confctnr1
+        docker rm sw360confctnr1        
+        docker run --name sw360confctnr1 --memory=7g -t -d -p ${env:SW360APPPORT}:8080 -p 5990:5984 -p 5440:5432 ${env:DOCKERDEVARTIFACTORY}/energy-dev/software-clearing/sw360/sw360conf:latest
+        Start-Sleep -s 200
+      env:
+         SW360APPPORT: ${{ secrets.SW360APPPORT }}
+         DOCKERDEVARTIFACTORY: ${{ secrets.DOCKERDEVARTIFACTORY }}
+         
+    - name: Test      
+      run: |
+        $TestProjects = Get-ChildItem -Path *test*.csproj -Recurse -exclude TestUtilities.csproj,UnitTestUtilities.csproj
+        Write-Host "**************************The test projects considered for execution: $TestProjects   ******************************"
+        Write-Host "********************************************************************************************************************"
+        foreach ($Project in $TestProjects) 
+        {                 
+                Write-Host $Project.DirectoryName
+                $TestProject = $Project.DirectoryName
+                Push-Location $Project.PSParentPath
+                dotnet test --no-build --configuration Release
+        }
+
+    - name: Archive Build Output
+      uses: actions/upload-artifact@v2
+      with:
+        name: continuous-clearing
+        path: |
+           out/continuous-clearing
+           
+    - name: Create Nuget Packages 
+      id: createNupkg
+      run: |
+        nuget pack CA.nuspec -Version $($env:GitVersion_SemVer)
+        Write-Host "::set-output name=nupkg-LicenseClearingTool::continuous-clearing.$($env:GitVersion_SemVer).nupkg"
+        
+    - name: Archive NuGet Packages
+      uses: actions/upload-artifact@v2
+      with:
+        name: nuget-continuous-clearing
+        path: |
+          *.nupkg
+          
+    - name: Build the Docker image      
+      run: |
+        docker build . --file Dockerfile --tag ${{ github.repository }}:continuous-clearing-v$($env:GitVersion_SemVer)
+        docker save ${{ github.repository }}:continuous-clearing-v$($env:GitVersion_SemVer) -o continuous-clearing-v$($env:GitVersion_SemVer).tar
+      
+
+    - name: Archive docker image      
+      uses: actions/upload-artifact@v2
+      with:
+        name: docker-continuous-clearing
+        path: |
+          *.tar
+          
+  release:
+    if: github.ref == 'refs/heads/main'    
+    runs-on: self-hosted
+    needs: build
+  
+    steps:
+      - name: Download Build Output
+        uses: actions/download-artifact@v2
+        with:
+          name: continuous-clearing
+
+      - name: Download NuGet Package
+        uses: actions/download-artifact@v2
+        with:
+          name: nuget-continuous-clearing
+      
+      - name: Debug
+        run: |
+          tree
+      
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+        with:
+          #tag_name: ${{ needs.build.outputs.semver }}
+          tag_name: ${{ needs.build.outputs.semver }}
+          release_name: Release ${{ needs.build.outputs.semver }}
+          body: |
+            ${{ github.event.head_commit.message }}
+          draft: true
+          prerelease: false   
+          
+      - name: Upload Zip
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} 
+          asset_path: ./${{ needs.build.outputs.LicenseClearingTool }}
+          asset_name: ${{ needs.build.outputs.LicenseClearingTool }}
+          asset_content_type: application/zip
+          
+      - name: Upload Nupkg
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} 
+          asset_path: ./${{ needs.build.outputs.nupkg-LicenseClearingTool }}
+          asset_name: ${{ needs.build.outputs.nupkg-LicenseClearingTool }}
+          asset_content_type: application/zip
