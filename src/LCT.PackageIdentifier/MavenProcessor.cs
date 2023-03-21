@@ -79,13 +79,12 @@ namespace LCT.PackageIdentifier
 
         private static void ParseConfigFile(string depFilePath, CommonAppSettings appSettings, ref List<Component> foundPackages)
         {
-
             string[] lines = File.ReadAllLines(depFilePath);
             int noOfExcludedComponents = 0;
             int totalComponenstinInputFile = 0;
             foreach (string line in lines)
             {
-                Component component = new();
+                Component component;
                 string trimmedLine = line.Trim();
 
                 if (trimmedLine != string.Empty && trimmedLine != "none" && trimmedLine != "The following files have been resolved:")
@@ -93,40 +92,10 @@ namespace LCT.PackageIdentifier
                     totalComponenstinInputFile++;
                     //Example entry: org.mockito:mockito-core:jar:1.10.19:compile
                     string[] parts = trimmedLine.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
-                    MavenPackage package;
                     string scope = "";
                     bool isDevelopmentComponent;
 
-                    if (parts.Length == 5)
-                    {
-                        package = new()
-                        {
-                            ID = parts[1],
-                            Version = parts[3],
-                            GroupID = parts[0].Replace('.', '/')
-                        };
-                        scope = parts[4];
-                        component.Name = package.ID;
-                        component.Version = package.Version;
-                        component.Group = package.GroupID;
-                        component.BomRef = $"pkg:maven/{component.Name}@{component.Version}";
-                        component.Purl = $"pkg:maven/{component.Name}@{component.Version}";
-                    }
-                    else if (parts.Length == 6)
-                    {
-                        package = new()
-                        {
-                            ID = parts[1],
-                            Version = $"{parts[4]}-{parts[3]}",
-                            GroupID = parts[0].Replace('.', '/')
-                        };
-                        scope = parts[4];
-                        component.Name = package.ID;
-                        component.Version = package.Version;
-                        component.Group = package.GroupID;
-                        component.BomRef = $"pkg:maven/{component.Name}@{component.Version}";
-                        component.Purl = $"pkg:maven/{component.Name}@{component.Version}";
-                    }
+                    scope = GetPackageDetails(parts, out component);
 
                     isDevelopmentComponent = GetDevDependentScopeList(appSettings, scope);
 
@@ -319,7 +288,47 @@ namespace LCT.PackageIdentifier
 
         private static bool GetDevDependentScopeList(CommonAppSettings appSettings, string scope)
         {
-            return appSettings.Maven.DevDependentScopeList.Contains(scope);
+            return appSettings.Maven.DevDependentScopeList?.Contains(scope) ?? false;
+        }
+
+        private static string GetPackageDetails(string[] parts, out Component component)
+        {
+            string scope = string.Empty;
+            MavenPackage package;
+            component = new Component();
+
+            if (parts.Length == 5)
+            {
+                package = new()
+                {
+                    ID = parts[1],
+                    Version = parts[3],
+                    GroupID = parts[0].Replace('.', '/')
+                };
+                scope = parts[4];
+                component.Name = package.ID;
+                component.Version = package.Version;
+                component.Group = package.GroupID;
+                component.BomRef = $"pkg:maven/{component.Name}@{component.Version}";
+                component.Purl = $"pkg:maven/{component.Name}@{component.Version}";
+            }
+            else if (parts.Length == 6)
+            {
+                package = new()
+                {
+                    ID = parts[1],
+                    Version = $"{parts[4]}-{parts[3]}",
+                    GroupID = parts[0].Replace('.', '/')
+                };
+                scope = parts[4];
+                component.Name = package.ID;
+                component.Version = package.Version;
+                component.Group = package.GroupID;
+                component.BomRef = $"pkg:maven/{component.Name}@{component.Version}";
+                component.Purl = $"pkg:maven/{component.Name}@{component.Version}";
+            }
+
+            return scope;
         }
 
     }
