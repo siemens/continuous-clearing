@@ -229,6 +229,15 @@ CA-Tool reduces the effort in creating components in SW360 and identifying the m
     ],
     "ExcludedComponents": []
   },
+  "Maven": {
+    "Include": [ "pom.xml" ],
+    "Exclude": [],
+    "JfrogMavenRepoList": [
+      "<Repo1>",
+      "<Repo2>"
+    ],
+    "ExcludedComponents": []
+  },
   "Debian": {
     "Include": [ "*.json" ],
     "Exclude": [],
@@ -259,7 +268,7 @@ Description for the settings in `appSettings.json` file
 | 16    | --artifactoryuploaduser              | Jfrog User Email                              | Yes                                                       |
 | 17  | --jfrognpmdestreponame         | The destination folder name for the NPM package to be copied to                  | Yes                                                    |
 | 18    | --jfrognugetdestreponame         | The destination folder name for the Nuget package to be copied to                  | Yes                                                    |
-| 19    | --jfrogmavendestreponame         | The destination folder name for the Maven package to be copied to                  | Yes                                                    |
+| 19    | --jfrogmavendestreponame         | The destination folder name for the Maven package to be copied to                  | Yes                                                    |                                            |
 | 20   | --timeout          | SW360 response timeout value                  | No                                                       |                                                |
 
   #### Exclude  Component or Folders :
