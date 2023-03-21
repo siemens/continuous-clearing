@@ -12,6 +12,9 @@ namespace LCT.APICommunications.Model
     /// <summary>
     /// The ReleaseLinks Model
     /// </summary>
+    /// 
+
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class ReleaseLinks
     {
         [JsonProperty("self")]

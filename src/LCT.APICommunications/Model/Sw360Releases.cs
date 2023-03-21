@@ -12,6 +12,9 @@ namespace LCT.APICommunications.Model
     /// <summary>
     /// Sw360Releases model
     /// </summary>
+    /// 
+
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class Sw360Releases
     {
         [JsonProperty("name")]

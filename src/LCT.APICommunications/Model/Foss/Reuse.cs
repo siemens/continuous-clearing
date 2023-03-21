@@ -11,6 +11,8 @@ namespace LCT.APICommunications.Model.Foss
     /// <summary>
     /// Reuse scanner model
     /// </summary>
+
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class Reuse
     {
         [JsonProperty("reuse_upload")]

@@ -23,14 +23,18 @@
 
   * [Execution](#ca-tool-execution)
   
- * [Clearing Automation Tool Execution Test Mode](#clearing-automation-tool-execution-test-mode)
+* [Clearing Automation Tool Execution Test Mode](#clearing-automation-tool-execution-test-mode)
 
- * [How to handle multiple project types in same project](#how-to-handle-multiple-project-types-in-same-project)
+* [How to handle multiple project types in same project](#how-to-handle-multiple-project-types-in-same-project)
 
 * [Troubleshoot](#troubleshoot)
+
 * [Manual Update](#manual-update)
+
 * [Bug or Enhancements](#bug-or-enhancements)
+
 * [Glossary of Terms](#glossary-of-terms)
+
 * [References](#references)
 
   * [Image References](#image-references)
@@ -41,7 +45,7 @@
 <!--te-->
 # Introduction
 
-The Clearing Automation Tool (CA-Tool) helps the Project Manager/Developer to automate the sw360 clearing process of 3rd party components. This tool scans and identifies the third-party components used in a NPM, NUGET and Debian projects and makes an entry in SW360, if it is not present. CA-Tool links the components to the respective project and creates job for code scan in FOSSology.
+The Clearing Automation Tool (CA-Tool) helps the Project Manager/Developer to automate the sw360 clearing process of 3rd party components. This tool scans and identifies the third-party components used in a NPM, NUGET,MAVEN and Debian projects and makes an entry in SW360, if it is not present. CA-Tool links the components to the respective project and creates job for code scan in FOSSology.
 
 CA-Tool reduces the effort in creating components in SW360 and identifying the matching source codes from the public repository. Tool eliminates the manual error while creating component and identifying correct version of source code from public repository. CA-Tool harmonize the creation of 3P components in SW360 by filling necessary information.
 # Clearing Automation tool workflow diagram
@@ -190,20 +194,20 @@ CA-Tool reduces the effort in creating components in SW360 and identifying the m
   "BomFilePath":"/mnt/Output/<SW360 Project Name>_Bom.cdx.json",
 //IdentifierBomFilePath : For multiple project type 
   "IdentifierBomFilePath": "",
-  "ArtifactoryUploadApiKey": "<Insert ArtifactoryUploadApiKey in a secure way>",
-  "ArtifactoryUploadUser": "<Insert ArtifactoryUploadUser>",
+  "ArtifactoryUploadApiKey": "<Insert ArtifactoryUploadApiKey in a secure way>",//This should be Jfrog Key
+  "ArtifactoryUploadUser": "<Insert ArtifactoryUploadUser>",//This should be Jfrog user name
   "RemoveDevDependency": true,
   "EnableFossTrigger": true,
   "InternalRepoList": [
-    "<Repo1>",
-    "<Repo2>"
+    "<Npm Internal Repo Names>", //This should be the internal repo names in JFrog for NPM
+    "<Nuget Internal Repo Names>",//This should be the internal repo names in JFrog for Nuget
   ],
   "Npm": {
     "Include": [ "p*-lock.json" ],
     "Exclude": [ "node_modules" ],
     "JfrogNpmRepoList": [
-      "<Repo1>",
-      "<Repo2>"
+      "<Npm Remote Cache Repo Name>",//This is a mirror repo for npm registry in JFrog
+      "<Npm Release Repo Name>", //This should be the release repo in JFrog
     ],
     "ExcludedComponents": []
   },
@@ -211,6 +215,15 @@ CA-Tool reduces the effort in creating components in SW360 and identifying the m
     "Include": [ "pack*.config", "p*.lock.json" ],
     "Exclude": [],
     "JfrogNugetRepoList": [
+      "<Nuget Remote Cache Repo Name>",//This is a mirror repo for nuget.org in JFrog
+      "<Nuget Release Repo Name>",//This should be the release repo in JFrog
+    ],
+    "ExcludedComponents": []
+  },
+  "Maven": {
+    "Include": [ "pom.xml" ],
+    "Exclude": [],
+    "JfrogMavenRepoList": [
       "<Repo1>",
       "<Repo2>"
     ],
@@ -255,8 +268,8 @@ Description for the settings in `appSettings.json` file
 | 16    | --artifactoryuploaduser              | Jfrog User Email                              | Yes                                                       |
 | 17  | --jfrognpmdestreponame         | The destination folder name for the NPM package to be copied to                  | Yes                                                    |
 | 18    | --jfrognugetdestreponame         | The destination folder name for the Nuget package to be copied to                  | Yes                                                    |
-| 19    | --jfrogmavendestreponame         | The destination folder name for the Maven package to be copied to                  | Yes                                                    |
-| 20    | --timeout          | SW360 response timeout value                  | No                                                       |                                                |
+| 19    | --jfrogmavendestreponame         | The destination folder name for the Maven package to be copied to                  | Yes                                                    |                                            |
+| 20   | --timeout          | SW360 response timeout value                  | No                                                       |                                                |
 
   #### Exclude  Component or Folders :
   In order to exclude any components ,it can be configured in the  "appSettings.json" by providing the package name and version as specified above in the *_ExcludedComponents_* field.

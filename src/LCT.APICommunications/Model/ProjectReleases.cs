@@ -13,6 +13,9 @@ namespace LCT.APICommunications.Model
     /// <summary>
     /// The ProjectRelease Model
     /// </summary>
+    /// 
+
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class ProjectReleases
     {
         [JsonProperty("name")]

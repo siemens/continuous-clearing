@@ -8,12 +8,14 @@ using Newtonsoft.Json;
 
 namespace LCT.APICommunications.Model.Foss
 {
-  /// <summary>
-  /// Release Attachment model
-  /// </summary>
-  public class ReleaseAttachments
-  {
-    [JsonProperty("_embedded")]
-    public AttachmentEmbedded Embedded { get; set; }
-  }
+    /// <summary>
+    /// Release Attachment model
+    /// </summary>
+
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    public class ReleaseAttachments
+    {
+        [JsonProperty("_embedded")]
+        public AttachmentEmbedded Embedded { get; set; }
+    }
 }

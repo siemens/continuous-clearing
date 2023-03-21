@@ -10,6 +10,7 @@ namespace LCT.APICommunications
     /// <summary>
     /// constans need for all the api calls
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public static class ApiConstant
     {
         public const string Sw360ComponentApiSuffix = "/resource/api/components";
@@ -31,6 +32,7 @@ namespace LCT.APICommunications
         public const string NugetExternalID = "pkg:nuget/";
         public const string NpmExtension = ".tgz";
         public const string NugetExtension = ".nupkg";
+        public const string MavenExtension = "-sources.jar";
         public const string PackageInfoApi = "/api/storage/";
         public const string CopyPackageApi = "/api/copy/";
         public const string Releases = "releases";

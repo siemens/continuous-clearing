@@ -109,6 +109,11 @@ namespace LCT.ArtifactoryUploader
                 url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.PackageName}.{component.Version}" +
                $"{ApiConstant.NugetExtension}?to=/{component.DestRepoName}/{component.Name}.{component.Version}{ApiConstant.NugetExtension}";
             }
+            else if (component.ComponentType == "MAVEN")
+            {
+                url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.Name}/{component.Version}" +
+               $"?to=/{component.DestRepoName}/{component.Name}/{component.Version}";
+            }
             else
             {
                 // Do nothing
@@ -127,6 +132,10 @@ namespace LCT.ArtifactoryUploader
             {
                 url = $"{component.JfrogApi}{ApiConstant.PackageInfoApi}{component.SrcRepoName}/{component.PackageName}.{component.Version}{ApiConstant.NugetExtension}";
             }
+            else if (component.ComponentType == "MAVEN")
+            {
+                url = $"{component.JfrogApi}{ApiConstant.PackageInfoApi}{component.SrcRepoName}/{component.Name}/{component.Version}";
+            }
             else
             {
                 // Do nothing
@@ -143,6 +152,10 @@ namespace LCT.ArtifactoryUploader
             else if (item.Purl.Contains("nuget", StringComparison.OrdinalIgnoreCase))
             {
                 return appSettings.JfrogNugetDestRepoName;
+            }
+            else if (item.Purl.Contains("maven", StringComparison.OrdinalIgnoreCase))
+            {
+                return appSettings.JfrogMavenDestRepoName;
             }
             else
             {
@@ -161,6 +174,10 @@ namespace LCT.ArtifactoryUploader
             else if (item.Purl.Contains("nuget", StringComparison.OrdinalIgnoreCase))
             {
                 return "NUGET";
+            }
+            else if (item.Purl.Contains("maven", StringComparison.OrdinalIgnoreCase))
+            {
+                return "MAVEN";
             }
             else
             {
