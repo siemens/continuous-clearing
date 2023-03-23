@@ -224,17 +224,8 @@ CA-Tool reduces the effort in creating components in SW360 and identifying the m
     "Include": [ "pom.xml" ],
     "Exclude": [],
     "JfrogMavenRepoList": [
-      "<Repo1>",
-      "<Repo2>"
-    ],
-    "ExcludedComponents": []
-  },
-  "Maven": {
-    "Include": [ "pom.xml" ],
-    "Exclude": [],
-    "JfrogMavenRepoList": [
-      "<Repo1>",
-      "<Repo2>"
+      "<Maven Remote Cache Repo Name>",//This is a mirror repo for repo.maven in JFrog
+      "<Maven Release Repo Name>",//This should be the release repo.maven in JFrog
     ],
     "ExcludedComponents": []
   },
