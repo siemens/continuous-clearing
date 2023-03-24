@@ -139,5 +139,6 @@ See  [CONTRIBUTING.md](CONTRIBUTING.md).
 
 Code and documentation under [MIT License](LICENSE)
 
+Third-party software components list: [ReadmeOSS](https://htmlpreview.github.io/?https://github.com/siemens/continuous-clearing/blob/main/ReadmeOSS.html)
 
 Copyright 2023 Siemens AG

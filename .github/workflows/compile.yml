@@ -39,10 +39,11 @@ jobs:
       id: gitversion
       run: |
         echo "SemVer: v$($env:GitVersion_SemVer)" 
-        Write-Host "::set-output name=semver::v$($env:GitVersion_SemVer)"        
+        Write-Host "::set-output name=semver::v$($env:GitVersion_SemVer)"                
         $fileName = "dummy-v$($env:GitVersion_SemVer)"
         echo "SemVerMMP: v$($env:GitVersion_MajorMinorPatch)"
         Write-Host "Filename: '$fileName'" 
+        
         
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
@@ -89,7 +90,7 @@ jobs:
         $sourceFolder = Join-Path $env:GITHUB_WORKSPACE "out" | Join-Path -ChildPath "*"
         $outFolder = Join-Path $env:GITHUB_WORKSPACE "out" | Join-Path -ChildPath "continuous-clearing" 
         New-Item -ItemType Directory -Force -Path $outFolder
-        $fileName = "continuous-clearing-v$($env:GitVersion_SemVer).zip"
+        $fileName = "continuous-clearing-v3.0.0.zip"
         Write-Host "Filename: '$fileName'"
         Write-Host "sourceFolder: '$sourceFolder'"
         Write-Host "Outfolder: '$outFolder'"
@@ -97,7 +98,8 @@ jobs:
         $outPath = Join-Path $outFolder $fileName
         Compress-Archive -DestinationPath $outPath -Path $sourceFolder -CompressionLevel Optimal
       
-    - name: SW3360 Instance refresh      
+    - name: SW360 Instance refresh  
+      #if: ${{ false }}  # disable for now
       run: |
         docker exec -dt sw360confctnr1 service postgresql stop
         docker stop sw360confctnr1
@@ -108,7 +110,8 @@ jobs:
          SW360APPPORT: ${{ secrets.SW360APPPORT }}
          DOCKERDEVARTIFACTORY: ${{ secrets.DOCKERDEVARTIFACTORY }}
          
-    - name: Test      
+    - name: Test 
+      #if: ${{ false }}  # disable for now
       run: |
         $TestProjects = Get-ChildItem -Path *test*.csproj -Recurse -exclude TestUtilities.csproj,UnitTestUtilities.csproj
         Write-Host "**************************The test projects considered for execution: $TestProjects   ******************************"
@@ -131,8 +134,8 @@ jobs:
     - name: Create Nuget Packages 
       id: createNupkg
       run: |
-        nuget pack CA.nuspec -Version $($env:GitVersion_SemVer)
-        Write-Host "::set-output name=nupkg-LicenseClearingTool::continuous-clearing.$($env:GitVersion_SemVer).nupkg"
+        nuget pack CA.nuspec -Version 3.0.0
+        Write-Host "::set-output name=nupkg-LicenseClearingTool::continuous-clearing.3.0.0.nupkg"
         
     - name: Archive NuGet Packages
       uses: actions/upload-artifact@v2
@@ -141,13 +144,15 @@ jobs:
         path: |
           *.nupkg
           
-    - name: Build the Docker image      
+    - name: Build the Docker image
+      #if: ${{ false }}  # disable for now
       run: |
-        docker build . --file Dockerfile --tag ${{ github.repository }}:continuous-clearing-v$($env:GitVersion_SemVer)
-        docker save ${{ github.repository }}:continuous-clearing-v$($env:GitVersion_SemVer) -o continuous-clearing-v$($env:GitVersion_SemVer).tar
+        docker build . --file Dockerfile --tag ${{ github.repository }}:continuous-clearing-v3.0.0
+        docker save ${{ github.repository }}:continuous-clearing-v3.0.0 -o continuous-clearing-v3.0.0.tar
       
 
     - name: Archive docker image      
+      #if: ${{ false }}  # disable for now
       uses: actions/upload-artifact@v2
       with:
         name: docker-continuous-clearing
@@ -180,9 +185,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
         with:
+          tag_name: v3.0.0
           #tag_name: ${{ needs.build.outputs.semver }}
-          tag_name: ${{ needs.build.outputs.semver }}
-          release_name: Release ${{ needs.build.outputs.semver }}
+          release_name: Release v3.0.0
           body: |
             ${{ github.event.head_commit.message }}
           draft: true
@@ -207,3 +212,15 @@ jobs:
           asset_path: ./${{ needs.build.outputs.nupkg-LicenseClearingTool }}
           asset_name: ${{ needs.build.outputs.nupkg-LicenseClearingTool }}
           asset_content_type: application/zip
+      
+      - name: Upload OSS file
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} 
+          asset_path: ./ReadmeOSS.html
+          asset_name: ReadmeOSS.html
+          asset_content_type: text/html
+        
+        
