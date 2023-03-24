@@ -159,7 +159,7 @@ jobs:
           *.tar
           
   release:
-    if: github.ref == 'refs/heads/OSS'    
+    if: github.ref == 'refs/heads/ReadmeOSS'    
     runs-on: self-hosted
     needs: build
   
