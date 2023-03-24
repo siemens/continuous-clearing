@@ -141,13 +141,15 @@ jobs:
         path: |
           *.nupkg
           
-    - name: Build the Docker image      
+    - name: Build the Docker image
+      if: ${{ false }}  # disable for now
       run: |
         docker build . --file Dockerfile --tag ${{ github.repository }}:continuous-clearing-v$($env:GitVersion_SemVer)
         docker save ${{ github.repository }}:continuous-clearing-v$($env:GitVersion_SemVer) -o continuous-clearing-v$($env:GitVersion_SemVer).tar
       
 
     - name: Archive docker image      
+      if: ${{ false }}  # disable for now
       uses: actions/upload-artifact@v2
       with:
         name: docker-continuous-clearing
@@ -207,3 +209,12 @@ jobs:
           asset_path: ./${{ needs.build.outputs.nupkg-LicenseClearingTool }}
           asset_name: ${{ needs.build.outputs.nupkg-LicenseClearingTool }}
           asset_content_type: application/zip
+      
+      - name: Upload OSS
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} 
+          asset_path: ./ReadMe_OSS_Continuous-Clearing.html
+
