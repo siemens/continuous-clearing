@@ -90,7 +90,7 @@ jobs:
         $sourceFolder = Join-Path $env:GITHUB_WORKSPACE "out" | Join-Path -ChildPath "*"
         $outFolder = Join-Path $env:GITHUB_WORKSPACE "out" | Join-Path -ChildPath "continuous-clearing" 
         New-Item -ItemType Directory -Force -Path $outFolder
-        $fileName = "continuous-clearing-v3.0.0.zip"
+        $fileName = "continuous-clearing-3.0.0.zip"
         Write-Host "Filename: '$fileName'"
         Write-Host "sourceFolder: '$sourceFolder'"
         Write-Host "Outfolder: '$outFolder'"
@@ -135,7 +135,7 @@ jobs:
       id: createNupkg
       run: |
         nuget pack CA.nuspec -Version 3.0.0
-        Write-Host "::set-output name=nupkg-LicenseClearingTool::continuous-clearing.v3.0.0.nupkg"
+        Write-Host "::set-output name=nupkg-LicenseClearingTool::continuous-clearing.3.0.0.nupkg"
         
     - name: Archive NuGet Packages
       uses: actions/upload-artifact@v2
