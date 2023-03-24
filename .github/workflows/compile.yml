@@ -97,8 +97,8 @@ jobs:
         $outPath = Join-Path $outFolder $fileName
         Compress-Archive -DestinationPath $outPath -Path $sourceFolder -CompressionLevel Optimal
       
-    - name: SW3360 Instance refresh  
-      if: ${{ false }}  # disable for now
+    - name: SW360 Instance refresh  
+      #if: ${{ false }}  # disable for now
       run: |
         docker exec -dt sw360confctnr1 service postgresql stop
         docker stop sw360confctnr1
@@ -110,7 +110,7 @@ jobs:
          DOCKERDEVARTIFACTORY: ${{ secrets.DOCKERDEVARTIFACTORY }}
          
     - name: Test 
-      if: ${{ false }}  # disable for now
+      #if: ${{ false }}  # disable for now
       run: |
         $TestProjects = Get-ChildItem -Path *test*.csproj -Recurse -exclude TestUtilities.csproj,UnitTestUtilities.csproj
         Write-Host "**************************The test projects considered for execution: $TestProjects   ******************************"
@@ -159,7 +159,7 @@ jobs:
           *.tar
           
   release:
-    if: github.ref == 'refs/heads/ReadmeOSS'    
+    if: github.ref == 'refs/heads/main'    
     runs-on: self-hosted
     needs: build
   
