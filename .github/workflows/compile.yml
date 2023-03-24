@@ -42,10 +42,10 @@ jobs:
         #Write-Host "::set-output name=semver::v$($env:GitVersion_SemVer)"        
         Write-Host "::set-output name=semver::v3.0.0"
         $fileName = "dummy-v$($env:GitVersion_SemVer)"
-        $fileName1 = "dummy-$SemVer"
+        $fileName1 = "dummy-${{ needs.build.outputs.semver }}"
         echo "SemVerMMP: v$($env:GitVersion_MajorMinorPatch)"
         Write-Host "Filename: '$fileName'" 
-        Write-Host "Filename: '$fileName1'"
+        Write-Host "Filename_M: '$fileName1'"
         
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
