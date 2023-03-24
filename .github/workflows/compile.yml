@@ -92,7 +92,7 @@ jobs:
         $sourceFolder = Join-Path $env:GITHUB_WORKSPACE "out" | Join-Path -ChildPath "*"
         $outFolder = Join-Path $env:GITHUB_WORKSPACE "out" | Join-Path -ChildPath "continuous-clearing" 
         New-Item -ItemType Directory -Force -Path $outFolder
-        $fileName = "continuous-clearing-v$($env:GitVersion_SemVer).zip"
+        $fileName = "continuous-clearing-v3.0.0.zip"
         Write-Host "Filename: '$fileName'"
         Write-Host "sourceFolder: '$sourceFolder'"
         Write-Host "Outfolder: '$outFolder'"
@@ -147,14 +147,14 @@ jobs:
           *.nupkg
           
     - name: Build the Docker image
-      if: ${{ false }}  # disable for now
+      #if: ${{ false }}  # disable for now
       run: |
-        docker build . --file Dockerfile --tag ${{ github.repository }}:continuous-clearing-v$($env:GitVersion_SemVer)
-        docker save ${{ github.repository }}:continuous-clearing-v$($env:GitVersion_SemVer) -o continuous-clearing-v$($env:GitVersion_SemVer).tar
+        docker build . --file Dockerfile --tag ${{ github.repository }}:continuous-clearing-v3.0.0
+        docker save ${{ github.repository }}:continuous-clearing-v3.0.0 -o continuous-clearing-v3.0.0.tar
       
 
     - name: Archive docker image      
-      if: ${{ false }}  # disable for now
+      #if: ${{ false }}  # disable for now
       uses: actions/upload-artifact@v2
       with:
         name: docker-continuous-clearing
@@ -162,7 +162,7 @@ jobs:
           *.tar
           
   release:
-    if: github.ref == 'refs/heads/ReadmeOSS'    
+    if: github.ref == 'refs/heads/main'    
     runs-on: self-hosted
     needs: build
   
