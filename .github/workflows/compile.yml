@@ -39,13 +39,11 @@ jobs:
       id: gitversion
       run: |
         echo "SemVer: v$($env:GitVersion_SemVer)" 
-        #Write-Host "::set-output name=semver::v$($env:GitVersion_SemVer)"        
-        Write-Host "::set-output name=semver::v3.0.0"
+        Write-Host "::set-output name=semver::v$($env:GitVersion_SemVer)"                
         $fileName = "dummy-v$($env:GitVersion_SemVer)"
-        $fileName1 = "dummy-${{ needs.build.outputs.semver }}"
         echo "SemVerMMP: v$($env:GitVersion_MajorMinorPatch)"
         Write-Host "Filename: '$fileName'" 
-        Write-Host "Filename_M: '$fileName1'"
+        
         
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
@@ -101,7 +99,7 @@ jobs:
         Compress-Archive -DestinationPath $outPath -Path $sourceFolder -CompressionLevel Optimal
       
     - name: SW360 Instance refresh  
-      if: ${{ false }}  # disable for now
+      #if: ${{ false }}  # disable for now
       run: |
         docker exec -dt sw360confctnr1 service postgresql stop
         docker stop sw360confctnr1
@@ -113,7 +111,7 @@ jobs:
          DOCKERDEVARTIFACTORY: ${{ secrets.DOCKERDEVARTIFACTORY }}
          
     - name: Test 
-      if: ${{ false }}  # disable for now
+      #if: ${{ false }}  # disable for now
       run: |
         $TestProjects = Get-ChildItem -Path *test*.csproj -Recurse -exclude TestUtilities.csproj,UnitTestUtilities.csproj
         Write-Host "**************************The test projects considered for execution: $TestProjects   ******************************"

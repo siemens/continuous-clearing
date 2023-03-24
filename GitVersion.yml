@@ -1,9 +1,5 @@
-assembly-versioning-scheme: MajorMinorPatchTag
-assembly-file-versioning-scheme: MajorMinorPatchTag
-assembly-informational-format: '{FullSemVer}'
 mode: Mainline
 next-version: 3.0.0
-increment: None
 branches:
    master:
       regex: ^master$|^main$
