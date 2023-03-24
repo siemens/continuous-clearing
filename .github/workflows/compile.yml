@@ -135,7 +135,7 @@ jobs:
       id: createNupkg
       run: |
         nuget pack CA.nuspec -Version 3.0.0
-        Write-Host "::set-output name=nupkg-LicenseClearingTool::continuous-clearing.3.0.0.nupkg"
+        Write-Host "::set-output name=nupkg-LicenseClearingTool::continuous-clearing.v3.0.0.nupkg"
         
     - name: Archive NuGet Packages
       uses: actions/upload-artifact@v2
