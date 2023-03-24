@@ -136,8 +136,8 @@ jobs:
     - name: Create Nuget Packages 
       id: createNupkg
       run: |
-        nuget pack CA.nuspec -Version ${{ needs.build.outputs.semver }}
-        Write-Host "::set-output name=nupkg-LicenseClearingTool::continuous-clearing.${{ needs.build.outputs.semver }}.nupkg"
+        nuget pack CA.nuspec -Version 3.0.0
+        Write-Host "::set-output name=nupkg-LicenseClearingTool::continuous-clearing.3.0.0.nupkg"
         
     - name: Archive NuGet Packages
       uses: actions/upload-artifact@v2
@@ -162,7 +162,7 @@ jobs:
           *.tar
           
   release:
-    if: github.ref == 'refs/heads/main'    
+    if: github.ref == 'refs/heads/ReadmeOSS'    
     runs-on: self-hosted
     needs: build
   
@@ -187,9 +187,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
         with:
+          tag_name: v3.0.0
           #tag_name: ${{ needs.build.outputs.semver }}
-          tag_name: ${{ needs.build.outputs.semver }}
-          release_name: Release ${{ needs.build.outputs.semver }}
+          release_name: Release v3.0.0
           body: |
             ${{ github.event.head_commit.message }}
           draft: true
