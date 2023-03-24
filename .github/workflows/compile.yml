@@ -157,7 +157,7 @@ jobs:
           *.tar
           
   release:
-    if: github.ref == 'refs/heads/main'    
+    if: github.ref == 'refs/heads/OSS'    
     runs-on: self-hosted
     needs: build
   
