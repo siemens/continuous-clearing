@@ -136,8 +136,8 @@ jobs:
     - name: Create Nuget Packages 
       id: createNupkg
       run: |
-        nuget pack CA.nuspec -Version $($env:GitVersion_SemVer)
-        Write-Host "::set-output name=nupkg-LicenseClearingTool::continuous-clearing.$($env:GitVersion_SemVer).nupkg"
+        nuget pack CA.nuspec -Version ${{ needs.build.outputs.semver }}
+        Write-Host "::set-output name=nupkg-LicenseClearingTool::continuous-clearing.${{ needs.build.outputs.semver }}.nupkg"
         
     - name: Archive NuGet Packages
       uses: actions/upload-artifact@v2
