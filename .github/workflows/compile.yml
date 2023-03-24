@@ -220,5 +220,6 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }} 
           asset_path: ./ReadMe_OSS_Continuous-Clearing.html
           asset_name: ReadMe_OSS_Continuous-Clearing.html
+          asset_content_type: text/html
         
         
