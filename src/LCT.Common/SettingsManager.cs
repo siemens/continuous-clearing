@@ -83,6 +83,7 @@ namespace LCT.Common
             string line = sr.ReadToEnd();
 
             Console.WriteLine(line);
+            sr.Dispose();
         }
         internal string GetConfigFilePathFromArgs(string[] args, string jsonSettingsFileName)
         {
