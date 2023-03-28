@@ -1,4 +1,4 @@
-﻿ // --------------------------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // SPDX-FileCopyrightText: 2023 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
@@ -11,7 +11,6 @@ using log4net.Core;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 
 namespace LCT.Common
@@ -39,7 +38,7 @@ namespace LCT.Common
             }
             if (args?.Length == 0)
             {
-                Logger.Debug($"ReadConfiguration():args: {string.Join(",", args)},Argument Count : {args.Length}");
+                Logger.Debug($"Argument Count : {args.Length}");
                 DisplayHelp();
                 Environment.Exit(0);
             }
@@ -52,7 +51,7 @@ namespace LCT.Common
                                                                     .AddJsonFile(settingsFilePath, true, true)
                                                                     .AddEnvironmentVariables()
                                                                     .AddCommandLine(args);
-                                                                    
+
 
             IConfiguration settingsConfig = settingsConfigBuilder.Build();
 
@@ -71,17 +70,12 @@ namespace LCT.Common
 
             return appSettings;
         }
-        private static bool HelpRequired(string param)
-        {
-            return param == "-h" || param == "--help" || param == "/?" || param == "";
-        }
 
         private static void DisplayHelp()
         {
             StreamReader sr = new("../../UsageDoc/CLIUsageNpkg.txt");
             //Read the whole file
             string line = sr.ReadToEnd();
-
             Console.WriteLine(line);
             sr.Dispose();
         }
