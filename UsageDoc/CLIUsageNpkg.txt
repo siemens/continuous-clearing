@@ -1,0 +1,17 @@
+Usage:
+   [flags]
+   [command]
+
+Examples:
+   PackageIdentifier.exe --settingsfilepath /etc/CATool/appSettings.json                    Creates Bom file by identifying packages in input
+
+Available Commands:
+   PackageIdentifier.exe   --settingsfilepath /etc/CATool/appSettings.json                   Creates Bom file by identifying packages in input
+   SW360PackageCreator.exe --settingsfilepath /etc/CATool/appSettings.json                   Creates Components and Release in SW360
+   ArtifactoryUploader.exe --settingsfilepath /etc/CATool/appSettings.json                   Uploads source package to JFrog Artifactory
+
+Flags:
+   --settingsfilepath           Path of application config file
+
+
+For more examples refer the Clearing Automation Usage Document.
