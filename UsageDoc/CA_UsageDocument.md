@@ -272,7 +272,7 @@ CA Tool can be executed as container or as binaries,
 
   - In order to run the PackageIdentifier.dll , execute the below command.
 
-    **Example** : `docker run --rm -it -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool clearingautomationtool dotnet PackageIdentifier.dll --settingsfilepath /etc/CATool/appSettings.json`
+    **Example** : `docker run --rm -it -v /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool clearingautomationtool dotnet PackageIdentifier.dll --settingsfilepath /etc/CATool/appSettings.json`
 
 
 ### SW360 Package Creator
