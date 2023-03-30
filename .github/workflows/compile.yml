@@ -213,14 +213,22 @@ jobs:
           asset_name: ${{ needs.build.outputs.nupkg-LicenseClearingTool }}
           asset_content_type: application/zip
       
-      - name: Upload OSS file
+      - name: Upload ReadmeOSS_nupkg file
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} 
-          asset_path: ./ReadmeOSS.html
-          asset_name: ReadmeOSS.html
+          asset_path: ./ReadmeOSS_continuous-clearing_nupkg.html
+          asset_name: ReadmeOSS_continuous-clearing_nupkg.html
           asset_content_type: text/html
         
-        
+      - name: Upload ReadmeOSS_Docker file
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} 
+          asset_path: ./ReadmeOSS_contnuous-clearing-DockerImage.html
+          asset_name: ReadmeOSS_contnuous-clearing-DockerImage.html
+          asset_content_type: text/html
