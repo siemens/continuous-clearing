@@ -327,7 +327,7 @@ CA Tool can be executed as container or as binaries,
   - In order to execute the tool in test mode we need to pass an extra parameter to the existing 
 argument list.
     
-    **Example** : `docker run --rm -it -v /D/Projects/Output:/mnt/Output -v /D/Projects/DockerLog:/var/log -v /D/Projects/CAConfig:/etc/CATool clearingautomationtool dotnet ArtifactoryUploader.dll --settingsfilepath /etc/CATool/appSettings.json --mode test`
+    **Example** : `docker run --rm -it -v /D/Projects/Output:/mnt/Output -v /D/Projects/DockerLog:/var/log -v /D/Projects/CAConfig:/etc/CATool ghcr.io/siemens/continuous-clearing dotnet ArtifactoryUploader.dll --settingsfilepath /etc/CATool/appSettings.json --mode test`
 
     or
 
