@@ -44,7 +44,7 @@ you can run CATool as container or as a dotnet package,
 1. **Package Identifier** - This executable takes `package-lock.json` or a `cycloneDX BOM` as input and provides a CycloneDX BOM file as output. For each of the component the availability in jfrog artifactory is identified and added in the BOM file.
  
 ```text
-docker run --rm -it -v /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool sw30clearingautomationtool dotnet PackageIdentifier.dll --settingsfilepath /etc/CATool/appSetting.json
+docker run --rm -it -v /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool <CATool_DockerImageName> dotnet PackageIdentifier.dll --settingsfilepath /etc/CATool/appSetting.json
  ```
  * Input (i.e., /path/to/InputDirectory -> place to keep input files)
  * Output (i.e.,/path/to/OutputDirectory -> resulted files will be stored here) 
@@ -54,11 +54,11 @@ docker run --rm -it -v /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDire
  2. **SW360 Package Creator** - This executable expects the `CycloneDX BOM` as the input, creates the missing components/releases in SW360 and links all the components to the respective project in SW360 portal and triggers the fossology upload.
  
  ```text
- docker run --rm -it -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool sw30clearingautomationtool dotnet SW360PackageCreator.dll --settingsfilepath /etc/CATool/appSetting.json
+ docker run --rm -it -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool <CATool_DockerImageName> dotnet SW360PackageCreator.dll --settingsfilepath /etc/CATool/appSetting.json
 ```
  3. **Artifactory Uploader** - This executable takes `CycloneDX BOM` which is updated by the ` SW360PackageCreator.dll` as input and uploads the components that are already cleared (clearing state - "Report approved") to the SIPARTY release repo in Jfrog Artifactory.
  ```text
-  docker run --rm -it -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool sw30clearingautomationtool dotnet ArtifactoryUploader.dll --settingsfilepath /etc/CATool/appSetting.json
+  docker run --rm -it -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool <CATool_DockerImageName> dotnet ArtifactoryUploader.dll --settingsfilepath /etc/CATool/appSetting.json
   ```
 </details>
 
