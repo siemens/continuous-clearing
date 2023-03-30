@@ -141,7 +141,7 @@ Code and documentation under [MIT License](LICENSE)
 
 Third-party software components list: 
 - [ReadmeOSS_continuous-clearing_nupkg](https://htmlpreview.github.io/?https://github.com/siemens/continuous-clearing/blob/main/ReadmeOSS_continuous-clearing_nupkg.html)
-- [ReadmeOSS_contnuous-clearing_DockerImage](https://htmlpreview.github.io/?https://github.com/siemens/continuous-clearing/blob/main/ReadmeOSS_contnuous-clearing-DockerImage.html)
+- [ReadmeOSS_continuous-clearing_DockerImage](https://htmlpreview.github.io/?https://github.com/siemens/continuous-clearing/blob/main/ReadmeOSS_continuous-clearing_DockerImage.html)
     
 Copyright 2023 Siemens AG
 
