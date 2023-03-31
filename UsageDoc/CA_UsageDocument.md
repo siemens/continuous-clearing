@@ -154,7 +154,7 @@ CA-Tool reduces the effort in creating components in SW360 and identifying the m
 
           *  Run the command given below by replacing the place holder values (i.e., path to input image directory, path to input directory and file name of the Debian image to be cleared) with actual values.
             
-              **Example**:   `docker run --rm -v <path/to/InputImageDirectory>:/tmp/InputImages -v <path/to/InputDirectory>:/tmp/OutputFiles clearingautomationtool ./syft packages /tmp/InputImages/<fileNameofthedebianImageTobeCleared.tar> -o cyclonedx-json --file "/tmp/OutputFiles/output.json"`
+              **Example**:   `docker run --rm -v <path/to/InputImageDirectory>:/tmp/InputImages -v <path/to/InputDirectory>:/tmp/OutputFiles ghcr.io/siemens/continuous-clearing ./syft packages /tmp/InputImages/<fileNameofthedebianImageTobeCleared.tar> -o cyclonedx-json --file "/tmp/OutputFiles/output.json"`
            
            
              After successful execution, `output.json` (_CycloneDX.json_) file will be created in specified directory
@@ -293,14 +293,14 @@ CA Tool can be executed as container or as binaries,
 
   - In order to run the PackageIdentifier.dll , execute the below command.
 
-    **Example** : `docker run --rm -it -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool clearingautomationtool dotnet PackageIdentifier.dll --settingsfilepath /etc/CATool/appSettings.json`
+    **Example** : `docker run --rm -it -v /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool ghcr.io/siemens/continuous-clearing dotnet PackageIdentifier.dll --settingsfilepath /etc/CATool/appSettings.json`
 
 
 ### SW360 Package Creator
 
   - In order to run the SW360PackageCreator.dll , execute the below command. 
 
-    **Example** : `docker run --rm -it -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool clearingautomationtool dotnet SW360PackageCreator.dll --settingsfilepath /etc/CATool/appSettings.json`
+    **Example** : `docker run --rm -it -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool ghcr.io/siemens/continuous-clearing dotnet SW360PackageCreator.dll --settingsfilepath /etc/CATool/appSettings.json`
 
 ###  Artifactory Uploader
 
@@ -308,7 +308,7 @@ CA Tool can be executed as container or as binaries,
 
   *  In order to run the Artifactory Uploader dll , execute the below command.
   
-     **Example** : `docker run --rm -it -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool clearingautomationtool dotnet ArtifactoryUploader.dll --settingsfilepath /etc/CATool/appSettings.json`
+     **Example** : `docker run --rm -it -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool ghcr.io/siemens/continuous-clearing dotnet ArtifactoryUploader.dll --settingsfilepath /etc/CATool/appSettings.json`
 
 </details>
 
@@ -348,7 +348,7 @@ CA Tool can be executed as container or as binaries,
   - In order to execute the tool in test mode we need to pass an extra parameter to the existing 
 argument list.
     
-    **Example** : `docker run --rm -it -v /D/Projects/Output:/mnt/Output -v /D/Projects/DockerLog:/var/log -v /D/Projects/CAConfig:/etc/CATool clearingautomationtool dotnet ArtifactoryUploader.dll --settingsfilepath /etc/CATool/appSettings.json --mode test`
+    **Example** : `docker run --rm -it -v /D/Projects/Output:/mnt/Output -v /D/Projects/DockerLog:/var/log -v /D/Projects/CAConfig:/etc/CATool ghcr.io/siemens/continuous-clearing dotnet ArtifactoryUploader.dll --settingsfilepath /etc/CATool/appSettings.json --mode test`
 
     or
 
