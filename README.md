@@ -30,7 +30,6 @@ docker pull ghcr.io/siemens/continuous-clearing
 
 Download the .nupkg file from [GitHub Releases](https://github.com/siemens/continuous-clearing/releases)
 	
-##### Docker Image Installation
 
  # Execution via terminal
  
