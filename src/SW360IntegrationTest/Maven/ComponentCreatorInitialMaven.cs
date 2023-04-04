@@ -116,9 +116,9 @@ namespace SW360IntegrationTest
             httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue(testParameters.SW360AuthTokenType, testParameters.SW360AuthTokenValue);
             string expectedcomponentType = "OSS";
-            string expectedname = "hamcrest-core";
+            string expectedname = "joda-time";
             //url formation for retrieving component details
-            string url = TestConstant.Sw360ComponentApi + TestConstant.componentNameUrl + "hamcrest-core";
+            string url = TestConstant.Sw360ComponentApi + TestConstant.componentNameUrl + "joda-time";
             string responseBody = await httpClient.GetStringAsync(url); //GET request
             var responseData = JsonConvert.DeserializeObject<ComponentsModel>(responseBody);
             string name = responseData.Embedded.Sw360components[0].Name;
@@ -140,13 +140,13 @@ namespace SW360IntegrationTest
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue(testParameters.SW360AuthTokenType, testParameters.SW360AuthTokenValue);
-            string expectedname = "hamcrest-core";
-            string expectedversion = "1.3";
+            string expectedname = "joda-time";
+            string expectedversion = "2.9.2";
             string expectedclearingState = "NEW_CLEARING";
-            string expecteddownloadurl = "https://repo.maven.apache.org/maven2/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3-sources.jar";
-            string expectedexternalid = "pkg:maven/hamcrest-core@1.3";
+            string expecteddownloadurl = "https://repo.maven.apache.org/maven2/joda-time/joda-time/2.9.2/joda-time-2.9.2-sources.jar";
+            string expectedexternalid = "pkg:maven/joda-time@2.9.2";
             //url formation for retrieving component details
-            string url = TestConstant.Sw360ReleaseApi + TestConstant.componentNameUrl + "hamcrest-core";
+            string url = TestConstant.Sw360ReleaseApi + TestConstant.componentNameUrl + "joda-time";
             string responseBody = await httpClient.GetStringAsync(url);//GET method         
             var responseData = JsonConvert.DeserializeObject<ReleaseIdOfComponent>(responseBody);
             string urlofreleaseid = responseData.Embedded.Sw360Releases[0].Links.Self.Href;
