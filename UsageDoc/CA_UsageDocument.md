@@ -246,7 +246,7 @@ Description for the settings in `appSettings.json` file
 | 3 |--bomfolderpath | Path to keep the generated boms  |  Yes     | D:\Clearing Automation\BOM
 |  4| --sw360token  |  SW360 Auth Token |  Yes| Refer the SW360 Doc [here](https://www.eclipse.org/sw360/docs/development/restapi/access).Make sure you pass this credential in a secured way. |
 | 5 | --sw360projectid |  Project ID from SW360 project URL of the project  |  Yes| Obtained from SW360 |
-|  6|  --projecttype    | Type of the package         | Yes |  NPM/NUGET/Debian|
+|  6|  --projecttype    | Type of the package         | Yes |  NPM/NUGET/Debian/MAVEN |
 |7 | --removedevdependency  |  Make this field to `true` , if Dev dependencies needs to be excluded from clearing |  Optional ( By default set to true) | true/false |
 | 8|  --sw360url  |  SW360 URL              |Yes |  https://<my_sw360_server>|
 |  9| --sw360authtokentype   |  SW360 Auth Token  |Yes  | Token/Bearer |
