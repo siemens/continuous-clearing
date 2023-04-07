@@ -9,6 +9,8 @@ using Newtonsoft.Json;
 
 namespace LCT.APICommunications.Model
 {
+
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class UpdateLinkedRelease
     {
         [JsonProperty("comment")]

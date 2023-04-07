@@ -4,12 +4,9 @@
 
 
 
-
-
-
 # Introduction 
 
-The Clearing Automation Tool scans and collects the 3rd party OSS components used in a NPM/NuGet/Debian project and uploads it to SW360 and Fossology by accepting respective project ID for license clearing. 
+The Clearing Automation Tool scans and collects the 3rd party OSS components used in a NPM/NuGet/Maven/Debian project and uploads it to SW360 and Fossology by accepting respective project ID for license clearing. 
 The tool helps the developer/project manager to enable the clearing process faster by reducing the 
 manual effort of creating SW360 and FOSSology workflows.
 
@@ -29,6 +26,7 @@ docker pull ghcr.io/siemens/continuous-clearing
 #### Use Binary
 
 Download the .nupkg file from [GitHub Releases](https://github.com/siemens/continuous-clearing/releases)
+	
 
  # Execution via terminal
  

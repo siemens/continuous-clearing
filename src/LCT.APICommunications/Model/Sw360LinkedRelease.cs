@@ -12,6 +12,9 @@ namespace LCT.APICommunications.Model
     /// <summary>
     /// SW360LinkedReleases model
     /// </summary>
+    /// 
+
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class Sw360LinkedRelease
     {
         [JsonProperty("createdBy")]

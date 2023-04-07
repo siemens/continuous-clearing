@@ -6,7 +6,6 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 
-using LCT.PackageIdentifier;
 using LCT.PackageIdentifier.Model;
 using NUnit.Framework;
 using System;
@@ -15,6 +14,7 @@ using System.IO;
 using LCT.Common;
 using LCT.Common.Model;
 using System.Security;
+using LCT.PackageIdentifier;
 
 namespace PackageIdentifier.UTest
 {
@@ -27,15 +27,14 @@ namespace PackageIdentifier.UTest
         {
             //Arrange
             int expectednoofcomponents = 7;
-            BomKpiData bomKpiData = new BomKpiData();
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
             string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles\packages.config";
-            string csprojPath = outFolder + @"\PackageIdentifierUTTestFiles";
-            NugetProcessor NugetProcessor = new NugetProcessor();
+
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
-                PackageFilePath = csprojPath
+                PackageFilePath = outFolder + @"\PackageIdentifierUTTestFiles"
             };
 
             //Act
@@ -55,7 +54,7 @@ namespace PackageIdentifier.UTest
             string outFolder = Path.GetDirectoryName(exePath);
             string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles\packages.lock.json";
             string csprojPath = outFolder + @"\PackageIdentifierUTTestFiles";
-            NugetProcessor NugetProcessor = new NugetProcessor();
+
 
             CommonAppSettings appSettings = new CommonAppSettings()
             {

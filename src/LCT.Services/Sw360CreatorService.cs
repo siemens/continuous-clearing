@@ -19,10 +19,13 @@ using log4net.Core;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -52,7 +55,6 @@ namespace LCT.Services
             ComparisonBomData componentInfo, Dictionary<string, string> attachmentUrlList)
         {
             Logger.Debug($"CreateComponent(): Name-{componentInfo.Name},version-{componentInfo.Version}");
-
             ComponentCreateStatus componentCreateStatus = new ComponentCreateStatus
             {
                 IsCreated = true,
@@ -103,6 +105,7 @@ namespace LCT.Services
             return componentCreateStatus;
         }
 
+       
         public async Task<FossTriggerStatus> TriggerFossologyProcess(string releaseId, string sw360link)
         {
             FossTriggerStatus fossTriggerStatus = null;
@@ -135,11 +138,11 @@ namespace LCT.Services
             }
             catch (JsonReaderException ex)
             {
-                Logger.Error($" TriggerFossologyProcess {ex.Message}");
+                Logger.Error($"TriggerFossologyProcess {ex.Message}");
             }
             catch (HttpRequestException ex)
             {
-                Logger.Error($" TriggerFossologyProcess {ex.Message}");
+                Logger.Error($"TriggerFossologyProcess {ex.Message}");
             }
             return fossTriggerStatus;
 
@@ -165,7 +168,7 @@ namespace LCT.Services
                 release.ExternalIds.Package_Url = componentInfo.ReleaseExternalId;
                 release.ExternalIds.Purl_Id = string.Empty;
                 var response = await m_SW360ApiCommunicationFacade.CreateRelease(release);
-
+                //come here - if success to attch src code
                 if (response.IsSuccessStatusCode)
                 {
                     releaseId = AttachSourceAndBinary(attachmentUrlList, createStatus, response);

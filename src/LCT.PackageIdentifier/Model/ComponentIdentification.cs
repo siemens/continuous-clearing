@@ -9,6 +9,8 @@ using System.Collections.Generic;
 
 namespace LCT.PackageIdentifier.Model
 {
+
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class ComponentIdentification
     {
         public List<Component> comparisonBOMData { get; set; }

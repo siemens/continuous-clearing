@@ -1,0 +1,171 @@
+{
+  "BomFormat": "CycloneDX",
+  "SpecVersion": 4,
+  "SpecVersionString": "1.4",
+  "SerialNumber": null,
+  "Version": null,
+  "Metadata": {
+    "Tools": [
+      {
+        "Vendor": "Siemens AG",
+        "Name": "Clearing Automation Tool",
+        "Version": "3.0.0",
+        "Hashes": null
+      }
+    ],
+    "Authors": null,
+    "Component": null,
+    "Manufacture": null,
+    "Supplier": null
+  },
+  "Components": [
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:maven/hamcrest-core@1.3",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": "org/hamcrest",
+      "Name": "hamcrest-core",
+      "Version": "1.3",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:maven/hamcrest-core@1.3",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "org1-bintray-maven-remote-cache"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "maven"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "Not Available"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/524a56cb343c42e9b3971da2856eb59a"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": null
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:maven/junit@4.12",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": "junit",
+      "Name": "junit",
+      "Version": "4.12",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:maven/junit@4.12",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "org1-bintray-maven-remote-cache"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "maven"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "Not Available"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/1436256a01534555864706c3ef2eb975"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": null
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:maven/joda-time@2.9.2",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": "joda-time",
+      "Name": "joda-time",
+      "Version": "2.9.2",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:maven/joda-time@2.9.2",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "maven"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "Not Available"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/4c1cec751c2e40c0a2a357a7e305af28"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": null
+        }
+      ],
+      "Evidence": null
+    }
+  ],
+  "Compositions": null
+}

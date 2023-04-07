@@ -93,6 +93,8 @@ namespace LCT.SW360PackageCreator
             return sourceURL;
         }
 
+   
+
         /// <summary>
         /// Gets the Source URL for NPM Package
         /// </summary>
@@ -174,7 +176,9 @@ namespace LCT.SW360PackageCreator
             }
             catch (HttpRequestException ex)
             {
-                Logger.Debug($"GetSourceURLFromNuspecFile():", ex);
+                Logger.Warn($"Identification of SRC url failed for {componentName}, " +
+            $"Exclude if it is an internal component or manually update the SRC url");
+                Logger.Debug($"GetSourceURLFromNuspecFile()", ex);
             }
             return GithubUrl;
         }

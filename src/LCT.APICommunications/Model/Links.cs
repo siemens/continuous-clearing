@@ -12,9 +12,11 @@ namespace LCT.APICommunications.Model
     /// <summary>
     /// The Link model
     /// </summary>
+
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class Links
-  {
-    [JsonProperty("self")]
-    public Self Self { get; set; }
-  }
+    {
+        [JsonProperty("self")]
+        public Self Self { get; set; }
+    }
 }

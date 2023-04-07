@@ -1,4 +1,4 @@
-﻿ // --------------------------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // SPDX-FileCopyrightText: 2023 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
@@ -9,6 +9,7 @@ using LCT.Common.Interface;
 using log4net;
 using log4net.Core;
 using Microsoft.Extensions.Configuration;
+using System;
 using System.IO;
 using System.Reflection;
 
@@ -35,7 +36,12 @@ namespace LCT.Common
             {
                 Logger.Debug($"ReadConfiguration():args: {string.Join(",", args)}");
             }
-
+            if (args?.Length == 0)
+            {
+                Logger.Debug($"Argument Count : {args.Length}");
+                DisplayHelp();
+                Environment.Exit(0);
+            }
             string settingsFilePath = GetConfigFilePathFromArgs(args, jsonSettingsFileName);
             Logger.Logger.Log(null, Level.Notice, $"Settings File: {settingsFilePath}", null);
 
@@ -45,7 +51,7 @@ namespace LCT.Common
                                                                     .AddJsonFile(settingsFilePath, true, true)
                                                                     .AddEnvironmentVariables()
                                                                     .AddCommandLine(args);
-                                                                    
+
 
             IConfiguration settingsConfig = settingsConfigBuilder.Build();
 
@@ -65,6 +71,14 @@ namespace LCT.Common
             return appSettings;
         }
 
+        private static void DisplayHelp()
+        {
+            StreamReader sr = new("../../UsageDoc/CLIUsageNpkg.txt");
+            //Read the whole file
+            string line = sr.ReadToEnd();
+            Console.WriteLine(line);
+            sr.Dispose();
+        }
         internal string GetConfigFilePathFromArgs(string[] args, string jsonSettingsFileName)
         {
             IConfigurationBuilder settingsFileConfigBuilder = new ConfigurationBuilder()

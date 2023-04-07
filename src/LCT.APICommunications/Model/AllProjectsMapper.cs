@@ -14,8 +14,8 @@ namespace LCT.APICommunications.Model
     /// </summary>
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class AllProjectsMapper
-  {
-    [JsonProperty("_embedded")]
-    public AllProjectsEmbedded Embedded { get; set; }
-  }
+    {
+        [JsonProperty("_embedded")]
+        public AllProjectsEmbedded Embedded { get; set; }
+    }
 }

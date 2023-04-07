@@ -11,6 +11,8 @@ namespace LCT.APICommunications.Model.Foss
     /// <summary>
     /// Fossoloygy decider model
     /// </summary>
+
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class Decider
     {
         [JsonProperty("nomos_monk")]

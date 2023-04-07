@@ -11,6 +11,8 @@ namespace LCT.APICommunications.Model.Foss
     /// <summary>
     /// File upload Model
     /// </summary>
+
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class FileUpload
     {
         [JsonProperty("folderid")]
