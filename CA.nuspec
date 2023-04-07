@@ -18,7 +18,7 @@
     </description>
     <releaseNotes></releaseNotes>
     <copyright>Copyright 2023</copyright>
-    <tags>ClearingTool SW360 OSS ClearingSoftware Continuous-Clearing NPM NUGET DEBIAN</tags>
+    <tags>ClearingTool SW360 OSS ClearingSoftware Continuous-Clearing NPM NUGET DEBIAN MAVEN</tags>
   </metadata>
 
   <files>
