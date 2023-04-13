@@ -17,8 +17,9 @@ namespace LCT.PackageIdentifier.Model
     public class NugetPackage 
     {
      public string ID { get; set; }
-
+        
      public string Version { get; set; }
+     public bool Isdevdependent { get; set; }
 
     public string Filepath { get; set; }
 

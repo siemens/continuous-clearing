@@ -58,12 +58,19 @@ namespace LCT.PackageIdentifier
             };
             artifactoryrepo.Name = Dataconstant.Cdx_ArtifactoryRepoUrl;
             artifactoryrepo.Value = repo;
-            Property internalType = new Property
+            Property internalType = new()
             {
                 Name = Dataconstant.Cdx_IsInternal,
                 Value = "false"
             };
+            Property isdevelopmentDependency = new()
+            {
+                Name = Dataconstant.Cdx_IsDevelopmentDependency,
+                Value = component.Cpe
+            };
+            component.Cpe = null;
             propList.Add(internalType);
+            propList.Add(isdevelopmentDependency);
             propList.Add(artifactoryrepo);
             propList.Add(projectType);
             component.Properties = propList;

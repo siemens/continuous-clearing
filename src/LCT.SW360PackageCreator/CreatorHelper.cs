@@ -127,6 +127,7 @@ namespace LCT.SW360PackageCreator
                 mapper.Version = item.Version;
                 mapper.ComponentExternalId = item.ComponentExternalId;
                 mapper.ReleaseExternalId = item.ReleaseExternalId;
+                mapper.IsDevelopmentDependent = item.IsDevelopmentDependent.ToString();
                 mapper.SourceUrl = item.SourceUrl;
                 mapper.DownloadUrl = item.DownloadUrl;
                 mapper.ComponentStatus = GetComponentAvailabilityStatus(componentsAvailableInSw360, item);

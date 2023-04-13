@@ -54,5 +54,6 @@ namespace LCT.Common.Model
 
         [JsonIgnore]
         public string ProjectType { get; set; }
+        public string IsDevelopmentDependent { get; set; }
     }
 }

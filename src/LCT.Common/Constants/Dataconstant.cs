@@ -39,5 +39,6 @@ namespace LCT.Common.Constants
         public const string Cdx_IsInternal = "internal:siemens:clearing:is-internal";
         public const string Cdx_ReleaseUrl = "internal:siemens:clearing:sw360:release-url";
         public const string Cdx_FossologyUrl = "internal:siemens:clearing:fossology:url";
+        public const string Cdx_IsDevelopmentDependency = "internal:siemens:clearing:development";
     }
 }

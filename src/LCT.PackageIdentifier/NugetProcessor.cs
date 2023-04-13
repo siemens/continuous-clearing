@@ -62,6 +62,7 @@ namespace LCT.PackageIdentifier
         public static List<NugetPackage> ParsePackageConfig(string packagesFilePath, CommonAppSettings appSettings)
         {
             List<NugetPackage> nugetPackages = new List<NugetPackage>();
+         
             try
             {
                 List<ReferenceDetails> referenceList = Parsecsproj(appSettings);
@@ -70,17 +71,19 @@ namespace LCT.PackageIdentifier
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += nodes.Count();
                 foreach (XElement element in nodes)
                 {
+                    bool devdependencyFlag = false;
                     XAttribute idAttribute = element.Attribute("id");
                     XAttribute versionAttribute = element.Attribute("version");
                     XAttribute devDependencyAttribute = element.Attribute("developmentDependency");
                     string name = (string)element.Attribute("id");
                     string version = (string)element.Attribute("version");
 
+              
                     if (IsDevDependent(referenceList, name, version) || devDependencyAttribute?.Value != null)
                     {
 
                         BomCreator.bomKpiData.DevDependentComponents++;
-                        continue;
+                        devdependencyFlag = true;
                     }
 
                     if (idAttribute?.Value == null)
@@ -98,6 +101,7 @@ namespace LCT.PackageIdentifier
                     {
                         ID = idAttribute.Value,
                         Version = versionAttribute.Value,
+                        Isdevdependent= devdependencyFlag,
                         Filepath = packagesFilePath
                     };
                     nugetPackages.Add(package);
@@ -118,6 +122,7 @@ namespace LCT.PackageIdentifier
         public static List<NugetPackage> ParsePackageLock(string packagesFilePath, CommonAppSettings appSettings)
         {
             List<NugetPackage> packageList = new List<NugetPackage>();
+   
             try
             {
                 List<ReferenceDetails> referenceList = Parsecsproj(appSettings);
@@ -132,12 +137,13 @@ namespace LCT.PackageIdentifier
                     {
                         foreach (JToken dependencyToken in targetVersion.Children().Children())
                         {
+                            bool devdependencyFlag = false;
                             string id = dependencyToken.ToObject<JProperty>().Name;
                             string version = dependencyToken.First.Value<string>("resolved");
                             if (dependencyToken.First.Value<string>("type") == "Dev" || IsDevDependent(referenceList, id, version))
                             {
                                 BomCreator.bomKpiData.DevDependentComponents++;
-                                continue;
+                                devdependencyFlag = true;
                             }
                             if (dependencyToken.First.Value<string>("type") == "Project" || string.IsNullOrEmpty(version) && string.IsNullOrEmpty(id))
                             {
@@ -151,6 +157,7 @@ namespace LCT.PackageIdentifier
                             {
                                 ID = id,
                                 Version = version,
+                                Isdevdependent= devdependencyFlag,
                                 Filepath = packagesFilePath
                             };
                             packageList.Add(package);
@@ -430,7 +437,8 @@ namespace LCT.PackageIdentifier
                 Component components = new Component
                 {
                     Name = prop.ID,
-                    Version = prop.Version
+                    Version = prop.Version,
+                    Cpe = prop.Isdevdependent.ToString().ToLower()
                 };
 
                 components.Purl = $"{ApiConstant.NugetExternalID}{prop.ID}@{components.Version}";

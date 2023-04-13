@@ -23,6 +23,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -51,8 +52,26 @@ namespace LCT.SW360PackageCreator
             // Removing Duplicates
             ListofBomComponents = RemoveDuplicateComponents(ListofBomComponents);
 
+            //Remove development Dependent components
+            ListofBomComponents = RemoveDevDependentComponent(ListofBomComponents,appSettings.RemoveDevDependency);
+
+
+
             List<ComparisonBomData> comparisonBomData = await creatorHelper.SetContentsForComparisonBOM(ListofBomComponents, sw360Service);
             return comparisonBomData;
+        }
+
+        private List<Components> RemoveDevDependentComponent(List<Components> listofBomComponents,bool removeDevDependency)
+        {
+            
+          if (removeDevDependency)
+            {
+             
+              listofBomComponents.RemoveAll(r => r.IsDevelopmentDependent == "true");
+                    
+                 
+            }
+            return listofBomComponents;
         }
 
         private async Task<List<Components>> GetListOfBomData(List<Component> components)
@@ -65,7 +84,8 @@ namespace LCT.SW360PackageCreator
 
                 string currName = item.Name;
                 string currVersion = item.Version;
-
+            
+                componentsData.IsDevelopmentDependent = item.Properties[1].Value.ToString();                 
                 bool isInternalComponent = GetPackageType(item, ref componentsData);
 
                 if (isInternalComponent)
