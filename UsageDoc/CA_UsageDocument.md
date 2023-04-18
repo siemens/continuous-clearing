@@ -241,9 +241,9 @@ Description for the settings in `appSettings.json` file
 
 |S.No| Argument name   |Description  | Is it Mandatory    | Example |
 |--|--|--|--|--|
-| 1 |--packagefilepath   | Path to the package-lock.json file or to the directory where the project is present in case we have multiple package-lock.json files.                                      |Yes  | D:\Clearing Automation|
+| 1 |--packagefilepath   | Path to the package-lock.json file or to the directory where the project is present in case we have multiple package-lock.json files.                                      |Yes ,For Docker run /mnt/Input | D:\Clearing Automation |
 | 2 |--cycloneDxbomfilePath | Path to the cycloneDx BOM file. This should not be used along with the package file path(arg no 1).Please note to give only  one type of input at a time.                           |No if the first argument is provided| D:\ExternalToolOutput|
-| 3 |--bomfolderpath | Path to keep the generated boms  |  Yes     | D:\Clearing Automation\BOM
+| 3 |--bomfolderpath | Path to keep the generated boms  |  Yes , For Docker run /mnt/Output    | D:\Clearing Automation\BOM
 |  4| --sw360token  |  SW360 Auth Token |  Yes| Refer the SW360 Doc [here](https://www.eclipse.org/sw360/docs/development/restapi/access).Make sure you pass this credential in a secured way. |
 | 5 | --sw360projectid |  Project ID from SW360 project URL of the project  |  Yes| Obtained from SW360 |
 |  6|  --projecttype    | Type of the package         | Yes |  NPM/NUGET/Debian/MAVEN |
