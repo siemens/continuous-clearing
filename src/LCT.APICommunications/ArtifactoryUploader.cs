@@ -175,8 +175,9 @@ namespace LCT.APICommunications
         public async Task<HttpResponseMessage> UploadPackageToRepo(ComponentsToArtifactory component)
         {
             Logger.Debug("Starting UploadPackageToArtifactory method");
-
+            IJFrogApiCommunication jfrogApicommunication;
             HttpResponseMessage responsemessage = new HttpResponseMessage();
+            HttpResponseMessage responseBodyJfrog = new HttpResponseMessage();
             try
             {
                 ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials()
@@ -184,16 +185,24 @@ namespace LCT.APICommunications
                     ApiKey = component.ApiKey,
                     Email = component.Email
                 };
-                IJFrogApiCommunication jfrogApicommunication = new NpmJfrogApiCommunication(component.JfrogApi, component.SrcRepoName, repoCredentials);
-                HttpResponseMessage responseBodyJfrog = await jfrogApicommunication.GetPackageInfo(component);
-
+                if (component?.ComponentType?.ToUpperInvariant() == "MAVEN")
+                {
+                    jfrogApicommunication = new MavenJfrogApiCommunication(component.JfrogApi, component.SrcRepoName, repoCredentials);
+                    responseBodyJfrog = await jfrogApicommunication.GetPackageInfo(component);
+                }
+                else
+                {
+                    jfrogApicommunication = new NpmJfrogApiCommunication(component.JfrogApi, component.SrcRepoName, repoCredentials);
+                    responseBodyJfrog = await jfrogApicommunication.GetPackageInfo(component);
+                }
                 if (responseBodyJfrog.StatusCode == HttpStatusCode.NotFound)
                 {
                     component.PackageInfoApiUrl = component.PackageInfoApiUrl.ToLower();
                     responseBodyJfrog = await jfrogApicommunication.GetPackageInfo(component);
                     component.CopyPackageApiUrl = component.CopyPackageApiUrl.ToLower();
                 }
-
+          
+             
                 if (responseBodyJfrog.StatusCode != HttpStatusCode.OK)
                 {
                     responsemessage.StatusCode = responseBodyJfrog.StatusCode;

@@ -8,18 +8,20 @@ using Newtonsoft.Json;
 
 namespace LCT.APICommunications.Model.Foss
 {
-  /// <summary>
-  /// The UploadComponentModel
-  /// </summary>
-  public class UploadComponentModel
-  {
-    [JsonProperty("code")]
-    public string Code { get; set; }
+    /// <summary>
+    /// The UploadComponentModel
+    /// </summary>
 
-    [JsonProperty("message")]
-    public string UploadId { get; set; }
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    public class UploadComponentModel
+    {
+        [JsonProperty("code")]
+        public string Code { get; set; }
 
-    [JsonProperty("type")]
-    public string Type { get; set; }
-  }
+        [JsonProperty("message")]
+        public string UploadId { get; set; }
+
+        [JsonProperty("type")]
+        public string Type { get; set; }
+    }
 }

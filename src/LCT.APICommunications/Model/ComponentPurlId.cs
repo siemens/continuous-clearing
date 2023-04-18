@@ -13,6 +13,9 @@ namespace LCT.APICommunications.Model
     /// <summary>
     /// The Component Level Purl id model
     /// </summary>
+    /// 
+
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class ComponentPurlId
     {
         [JsonProperty("externalIds")]

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 
 namespace LCT.APICommunications.Model
 {
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class UpdateReleaseExternalId
     {
         [JsonProperty("externalIds")]

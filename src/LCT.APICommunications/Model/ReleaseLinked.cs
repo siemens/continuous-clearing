@@ -10,6 +10,9 @@ namespace LCT.APICommunications.Model
     /// <summary>
     /// The ReleasesLinked info class
     /// </summary>
+    /// 
+
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class ReleaseLinked
     {
         public string Name { get; set; } = string.Empty;

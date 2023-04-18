@@ -161,7 +161,7 @@ namespace NUnitTestProject1
                 SW360URL = "http://localhost:8081/"
             };
             sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(fossTriggerStatus);
-            var ComponentCreator = new ComponentCreator();
+           
 
             //Act
             await ComponentCreator.TriggerFossologyProcess(item, sw360CreatorServiceMock.Object, appSettings);
@@ -188,7 +188,7 @@ namespace NUnitTestProject1
                 SW360URL = "http://localhost:8081/"
             };
             sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>())).ThrowsAsync(new AggregateException());
-            var ComponentCreator = new ComponentCreator();
+            
 
             //Act
             string value = await ComponentCreator.TriggerFossologyProcess(item, sw360CreatorServiceMock.Object, appSettings);
@@ -208,12 +208,19 @@ namespace NUnitTestProject1
             {
                 Name = "internal:siemens:clearing:project-type",
                 Value = "DEBIAN"
+
+            });
+
+            properties.Add(new Property()
+            {
+                Name = "internal:siemens:clearing:development",
+                Value = "true"
             });
 
             Bom bom = new Bom();
             bom.Components = new List<Component>()
                 {
-                    new Component() { Name = "adduser",Version="3.118",Group="",Purl="pkg:deb/debian/adduser@3.118@arch=source",Properties = properties },
+                    new Component() { Name = "adduser",Version="3.118",Group="",Purl="pkg:deb/debian/adduser@3.118@arch=source",Properties = properties,Cpe="true" },
                 };
 
             CommonAppSettings CommonAppSettings = new CommonAppSettings();

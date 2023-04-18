@@ -75,8 +75,8 @@ namespace SW360ComponentCreator.UTest
             var creatorHelper = new CreatorHelper(_packageDownloderList);
 
             //Act
-
             var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(lstComparisonBomData);
+
 
             //Assert
             Assert.That(attachmentUrlList.ContainsKey("SOURCE"));
@@ -150,6 +150,7 @@ namespace SW360ComponentCreator.UTest
             {
                 Name = "adduser",
                 Version = "3.118",
+                IsDevelopmentDependent="true",
                 ComponentExternalId = "pkg:deb/debian/adduser?arch=source",
                 ReleaseExternalId = "pkg:deb/debian/adduser@3.118?arch=source",
                 SourceUrl = "https://snapshot.debian.org/archive/debian/20180915T211528Z/pool/main/a/adduser/adduser_3.118.tar.xz",
@@ -161,6 +162,7 @@ namespace SW360ComponentCreator.UTest
             {
                 Name = "adduser",
                 Version = "3.118",
+                IsDevelopmentDependent = "true",
                 ComponentExternalId = "pkg:deb/debian/adduser?arch=source",
                 ReleaseExternalId = "pkg:deb/debian/adduser@3.118?arch=source",
                 SourceUrl = "https://snapshot.debian.org/archive/debian/20180915T211528Z/pool/main/a/adduser/adduser_3.118.tar.xz",
@@ -189,7 +191,7 @@ namespace SW360ComponentCreator.UTest
             {
                 Components = new List<Component>()
                 {
-                    new Component() { Name = "adduser",Version="3.118",Group="",Properties = new List<Property>() }
+                    new Component() { Name = "adduser",Version="3.118",BomRef= "pkg:deb/debian/adduser?type=source",Group="",Properties = new List<Property>() }
                 }
             };
 
@@ -198,6 +200,7 @@ namespace SW360ComponentCreator.UTest
             {
                 Name = "adduser",
                 Version = "3.118"
+                
             });
 
             List<Components> componentsAvailableInSw360 = new List<Components>();

@@ -51,6 +51,10 @@
           "Name": "internal:siemens:clearing:is-internal",
           "Value": "false"
         },
+		{
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
         {
           "Name": "internal:siemens:clearing:repo-url",
           "Value": "Not Found in JFrogRepo"
@@ -98,6 +102,10 @@
       "Properties": [
         {
           "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+		{
+          "Name": "internal:siemens:clearing:development",
           "Value": "false"
         },
         {
@@ -149,6 +157,10 @@
           "Name": "internal:siemens:clearing:is-internal",
           "Value": "false"
         },
+	    {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
         {
           "Name": "internal:siemens:clearing:repo-url",
           "Value": "Not Found in JFrogRepo"
@@ -196,6 +208,10 @@
       "Properties": [
         {
           "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+		{
+          "Name": "internal:siemens:clearing:development",
           "Value": "false"
         },
         {
@@ -247,6 +263,10 @@
           "Name": "internal:siemens:clearing:is-internal",
           "Value": "false"
         },
+		{
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
         {
           "Name": "internal:siemens:clearing:repo-url",
           "Value": "Not Found in JFrogRepo"
@@ -294,6 +314,10 @@
       "Properties": [
         {
           "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+		{
+          "Name": "internal:siemens:clearing:development",
           "Value": "false"
         },
         {

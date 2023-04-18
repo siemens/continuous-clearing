@@ -16,6 +16,7 @@ namespace LCT.Common.Model
     public class ComparisonBomData
     {
         public string Name { get; set; }
+        public string Group { get; set; }
         public string Version { get; set; }
         public string ComponentExternalId { get; set; }
         public string ReleaseExternalId { get; set; }

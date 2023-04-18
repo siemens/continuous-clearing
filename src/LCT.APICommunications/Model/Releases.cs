@@ -12,6 +12,9 @@ namespace LCT.APICommunications.Model
     /// <summary>
     /// Releases model
     /// </summary>
+    /// 
+
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class Releases
     {
         [JsonProperty("name")]

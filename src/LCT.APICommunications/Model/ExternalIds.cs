@@ -12,7 +12,11 @@ namespace LCT.APICommunications.Model
     /// <summary>
     /// ExternalIds model
     /// </summary>   
+    /// 
+
+
     [DataContract]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class ExternalIds
     {
         [DataMember(Name = "purl.id")]

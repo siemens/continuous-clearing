@@ -7,6 +7,7 @@
 
 namespace LCT.Common.Model
 {
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class SW360ConnectionSettings
     {
         public string SW360URL { get; set; }

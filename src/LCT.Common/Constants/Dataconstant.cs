@@ -33,6 +33,7 @@ namespace LCT.Common.Constants
         public const char ForwardSlash = '/';
         public const string SourceURLSuffix = "/srcfiles?fileinfo=1";
         public const string DebianPackage = "pkg:deb/debian";
+        public const string MavenPackage = "pkg:maven";
         public const string Cdx_ArtifactoryRepoUrl = "internal:siemens:clearing:repo-url";
         public const string Cdx_ProjectType = "internal:siemens:clearing:project-type";
         public const string Cdx_ClearingState = "internal:siemens:clearing:clearing-state";

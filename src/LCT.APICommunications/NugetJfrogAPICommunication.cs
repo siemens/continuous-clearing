@@ -55,7 +55,8 @@ namespace LCT.APICommunications
         public override async Task<HttpResponseMessage> CopyFromRemoteRepo(ComponentsToArtifactory component)
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-            return await httpClient.GetAsync(component.CopyPackageApiUrl);
+            const HttpContent httpContent = null;
+            return await httpClient.PostAsync(component.CopyPackageApiUrl, httpContent);
         }
         public override async Task<HttpResponseMessage> GetPackageInfo(ComponentsToArtifactory component)
         {

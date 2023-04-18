@@ -9,6 +9,8 @@ using Newtonsoft.Json;
 
 namespace LCT.APICommunications.Model.Foss
 {
+
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class ProcessSteps
     {
         [JsonProperty("processStstepNameeps")]

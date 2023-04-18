@@ -18,6 +18,8 @@ namespace LCT.Common.Model
     {
         [JsonProperty("name")]
         public string Name { get; set; }
+        [JsonProperty("group")]
+        public string Group { get; set; }
 
         [JsonProperty("version")]
         public string Version { get; set; }
