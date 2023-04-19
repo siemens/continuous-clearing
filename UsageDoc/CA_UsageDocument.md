@@ -1,4 +1,4 @@
-# Clearing Automation Tool
+# Continuous Clearing Tool
 
 ## Contents
 <!--ts-->
@@ -41,10 +41,10 @@
 <!--te-->
 # Introduction
 
-The Clearing Automation Tool (CA-Tool) helps the Project Manager/Developer to automate the sw360 clearing process of 3rd party components. This tool scans and identifies the third-party components used in a NPM, NUGET and Debian projects and makes an entry in SW360, if it is not present. CA-Tool links the components to the respective project and creates job for code scan in FOSSology.
+The Continuous Clearing Tool helps the Project Manager/Developer to automate the sw360 clearing process of 3rd party components. This tool scans and identifies the third-party components used in a NPM, NUGET and Debian projects and makes an entry in SW360, if it is not present. Continuous Clearing Tool links the components to the respective project and creates job for code scan in FOSSology.
 
-CA-Tool reduces the effort in creating components in SW360 and identifying the matching source codes from the public repository. Tool eliminates the manual error while creating component and identifying correct version of source code from public repository. CA-Tool harmonize the creation of 3P components in SW360 by filling necessary information.
-# Clearing Automation tool workflow diagram
+Continuous Clearing Tool reduces the effort in creating components in SW360 and identifying the matching source codes from the public repository. Tool eliminates the manual error while creating component and identifying correct version of source code from public repository. Continuous Clearing Tool harmonize the creation of 3P components in SW360 by filling necessary information.
+# Continuous Clearing Tool workflow diagram
 
 - Package Identifier
    - [NPM/NUGET](../doc/usagedocimg/packageIdentifiernpmnuget.PNG)
@@ -83,7 +83,7 @@ CA-Tool reduces the effort in creating components in SW360 and identifying the m
    | 1 | Critical failure/error in the run |
    | 2 | Action item required from user's side |
 
-   While configuring the CA Tool in the pipeline , user can configure each stage to display the result based on these exit codes. 
+   While configuring the Continuous Clearing Tool in the pipeline , user can configure each stage to display the result based on these exit codes. 
    
    This can be done by the configuration management team at the time of modifying the pipeline to support CA tool.
   
@@ -104,11 +104,11 @@ CA-Tool reduces the effort in creating components in SW360 and identifying the m
 # Demo project after consuming the package 
  You can find sample yml files under the [DemoProject](../DemoProject).
 
-# Clearing Automation Tool Execution
+# Continuous Clearing Tool Execution
 
  ### Overview
  
- The Clearing Automation Tool has 3 dll &#39;s, Execute them in the following order to achieve the complete License clearing process.
+ The Continuous Clearing Tool has 3 dll &#39;s, Execute them in the following order to achieve the complete License clearing process.
  
     
    > **1. Package Identifier**
@@ -120,9 +120,9 @@ CA-Tool reduces the effort in creating components in SW360 and identifying the m
 
 
    >**3. Artifactory Uploader**
-      - Processes the CycloneDXBOM file(i.e., the output of the SW360PackageCreator) and uploads the already cleared components(clearing state-Report approved) to the siparty release repo in Jfrog Artifactory.The components in the states other than "Report approved" will be handled by the clearing experts via the Clearing Automation Dashboard.
+      - Processes the CycloneDXBOM file(i.e., the output of the SW360PackageCreator) and uploads the already cleared components(clearing state-Report approved) to the siparty release repo in Jfrog Artifactory.The components in the states other than "Report approved" will be handled by the clearing experts via the Continuous Clearing Dashboard.
 
-### **Prerequisite for CA Tool execution** 
+### **Prerequisite for Continuous Clearing Tool execution** 
 
    - Input files according to project type
 
@@ -154,7 +154,7 @@ CA-Tool reduces the effort in creating components in SW360 and identifying the m
              Resulted `output.json` file will be having the list of installed packages  and the same file will be used as  an input to `CA- Bom creator` as an argument(`--packagefilepath`). The remaining process is same as other project types.
 
 
-### **Configuring the CA Tool**
+### **Configuring the Continuous Clearing Tool**
 
    Copy the below content and create new `appSettings.json` file in `CAConfig` directory.
 
@@ -249,9 +249,9 @@ Description for the settings in `appSettings.json` file
   In order to **Exclude specific folders** from the execution, It can be specified under the **Exclude section** of that specific **package type**.
 
 
-### **CA Tool Execution** 
+### **Continuous Clearing Tool Execution** 
 
-CA Tool can be executed as container or as binaries,
+Continuous Clearing Toolcan be executed as container or as binaries,
 
   <details>
   <summary>Docker run</summary>
