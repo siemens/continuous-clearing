@@ -5,7 +5,7 @@
 
 * [Introduction](#introduction)
 
-* [Clearing Automation tool workflow diagram](#clearing-automation-tool-workflow-diagram)
+* [Continuous Clearing Tool workflow diagram](#continuous-clearing-tool-workflow-diagram)
 
 * [Prerequisite](#prerequisite)
 
@@ -13,7 +13,7 @@
 
 * [Demo Project](#demo-project-after-consuming-the-package)
 
-* [Clearing Automation Tool Execution](#clearing-automation-tool-execution)
+* [Continuous Clearing Tool Execution](#continuous-clearing-tool-execution)
 
   * [Overview](#overview)
 
@@ -23,7 +23,7 @@
 
   * [Execution](#ca-tool-execution)
   
- * [Clearing Automation Tool Execution Test Mode](#clearing-automation-tool-execution-test-mode)
+ * [Continuous Clearing Tool Execution Test Mode](#continuous-clearing-tool-execution-test-mode)
 
  * [How to handle multiple project types in same project](#how-to-handle-multiple-project-types-in-same-project)
 
@@ -44,6 +44,7 @@
 The Continuous Clearing Tool helps the Project Manager/Developer to automate the sw360 clearing process of 3rd party components. This tool scans and identifies the third-party components used in a NPM, NUGET and Debian projects and makes an entry in SW360, if it is not present. Continuous Clearing Tool links the components to the respective project and creates job for code scan in FOSSology.
 
 Continuous Clearing Tool reduces the effort in creating components in SW360 and identifying the matching source codes from the public repository. Tool eliminates the manual error while creating component and identifying correct version of source code from public repository. Continuous Clearing Tool harmonize the creation of 3P components in SW360 by filling necessary information.
+
 # Continuous Clearing Tool workflow diagram
 
 - Package Identifier
@@ -54,9 +55,10 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
   - [Debian](../doc/usagedocimg/packagecreatordebian.PNG)
 - Artifactory Uploader
   - [NPM/NUGET](../doc/usagedocimg/artifactoryuploader.PNG)
+
 # Prerequisite
 
-1. **Make an entry for your project in SW360** for license clearance and is **should be in Active state** while running CA tool
+1. **Make an entry for your project in SW360** for license clearance and is **should be in Active state** while running Continuous Clearing Tool
 
 
 2. **Access request :**
@@ -85,7 +87,7 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
 
    While configuring the Continuous Clearing Tool in the pipeline , user can configure each stage to display the result based on these exit codes. 
    
-   This can be done by the configuration management team at the time of modifying the pipeline to support CA tool.
+   This can be done by the configuration management team at the time of modifying the pipeline to support Continuous Clearing Tool.
   
    After the configuration your pipeline will look like this : 
    
@@ -151,12 +153,12 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
            
              ![image.png](../doc/usagedocimg/output.PNG)
            
-             Resulted `output.json` file will be having the list of installed packages  and the same file will be used as  an input to `CA- Bom creator` as an argument(`--packagefilepath`). The remaining process is same as other project types.
+             Resulted `output.json` file will be having the list of installed packages  and the same file will be used as  an input to `Continuous clearing tool - Bom creator` as an argument(`--packagefilepath`). The remaining process is same as other project types.
 
 
 ### **Configuring the Continuous Clearing Tool**
 
-   Copy the below content and create new `appSettings.json` file in `CAConfig` directory.
+   Copy the below content and create new `appSettings.json` file in `Continuous Clearing tool Config` directory.
 
   
    Below is the list of settings can be made in `appSettings.json` file.
@@ -251,17 +253,17 @@ Description for the settings in `appSettings.json` file
 
 ### **Continuous Clearing Tool Execution** 
 
-Continuous Clearing Toolcan be executed as container or as binaries,
+Continuous Clearing Tool can be executed as container or as binaries,
 
   <details>
   <summary>Docker run</summary>
 
    ### Prerequisite
    1. Install Docker (Latest stable version).
-   2.  Create local directories for mapping to the CA tool container directories
+   2.  Create local directories for mapping to the Continuous clearing tool container directories
         - Input  : Place to keep input files.
         - Output : Resulted files will be stored here.
-        - Log    : CA log files.
+        - Log    : Continuous clearing log files.
         - CAConfig :  Place to keep Config files i.e., `appSettings.json`.
 
 
@@ -320,7 +322,7 @@ Continuous Clearing Toolcan be executed as container or as binaries,
      **Example** : `ArtifactoryUploader.exe --settingsfilepath /<PathToConfig>/appSettings.json`
 </details>
 
-# Clearing Automation Tool Execution Test Mode
+# Continuous Clearing Tool Execution Test Mode
 
   The purpose the test mode execution of the tool is to ensure that there are no any connectivity issues with SW360 server.
   
