@@ -9,13 +9,13 @@
 
 # Introduction 
 
-The Clearing Automation Tool scans and collects the 3rd party OSS components used in a NPM/NuGet/Debian project and uploads it to SW360 and Fossology by accepting respective project ID for license clearing. 
+The Continuous Clearing tool scans and collects the 3rd party OSS components used in a NPM/NuGet/Debian project and uploads it to SW360 and Fossology by accepting respective project ID for license clearing. 
 The tool helps the developer/project manager to enable the clearing process faster by reducing the 
 manual effort of creating SW360 and FOSSology workflows.
 
 This tool has been  logically split into 3 different executables that enable it to be used as separate modules as per the user's requirement.
 
-**_Note: CA Tool internally uses [Syft](https://github.com/anchore/syft) for component detection for debian type projects._**
+**_Note: Continuous Clearing tool internally uses [Syft](https://github.com/anchore/syft) for component detection for debian type projects._**
  
 # Package Installation 
 
@@ -32,9 +32,9 @@ Download the .nupkg file from [GitHub Releases](https://github.com/siemens/conti
 
  # Execution via terminal
  
- The Clearing Automation Tool has 3 executables.
+ The Continuous Clearing tool has 3 executables.
  
-you can run CATool as container or as a dotnet package,
+you can run Continuous Clearing tool as container or as a dotnet package,
  
 <details>
 <summary>Run as container</summary>
@@ -98,7 +98,7 @@ These instructions will get the project up and running on your local machine for
 
 1. Download Visual Studio 2022.
 2. Download Docker latest version.
-3. Docker image of Clearing Automation tool to be loaded locally.
+3. Docker image of Continuous Clearing tool to be loaded locally.
 
 
 
