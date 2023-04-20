@@ -10,6 +10,8 @@ using System.Collections.Generic;
 
 namespace LCT.APICommunications.Model
 {
+
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class UpdateReleaseAdditinoalData
     {
         [JsonProperty("additionalData")]

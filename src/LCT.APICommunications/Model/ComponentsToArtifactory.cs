@@ -7,6 +7,8 @@
 
 namespace LCT.APICommunications.Model
 {
+
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class ComponentsToArtifactory
     {
         public string Name { get; set; }

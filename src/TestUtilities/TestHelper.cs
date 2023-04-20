@@ -39,15 +39,19 @@ namespace TestUtilities
             proc.Start();
             // To avoid deadlocks, always read the output stream first and then wait. 
             proc.StandardOutput.ReadToEnd();
+
+
 #if DEBUG
             Console.WriteLine(proc.StandardOutput.ReadToEnd());
 #endif
             proc.WaitForExit();
 
             if (proc.ExitCode == 0)
+            {
                 BOMCreated = true;
+            }
 
-            return proc.ExitCode;
+                return proc.ExitCode;
         }
 
         public static int RunComponentCreatorExe(string[] args)

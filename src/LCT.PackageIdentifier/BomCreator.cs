@@ -132,6 +132,9 @@ namespace LCT.PackageIdentifier
                 case "NUGET":
                     parser = new NugetProcessor();
                     return await ComponentIdentification(appSettings, parser);
+                case "MAVEN":
+                    parser = new MavenProcessor();
+                    return await ComponentIdentification(appSettings, parser);
                 case "DEBIAN":
                     parser = new DebianProcessor();
                     return await ComponentIdentification(appSettings, parser);

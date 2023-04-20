@@ -10,12 +10,15 @@ using Newtonsoft.Json;
 
 namespace LCT.APICommunications.Model
 {
-  /// <summary>
-  /// The ProjectsMapper model
-  /// </summary>
-  public class ProjectsMapper
-  {
-    [JsonProperty("_embedded")]
-    public ProjectEmbedded Embedded { get; set; }
-  }
+    /// <summary>
+    /// The ProjectsMapper model
+    /// </summary>
+
+
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    public class ProjectsMapper
+    {
+        [JsonProperty("_embedded")]
+        public ProjectEmbedded Embedded { get; set; }
+    }
 }

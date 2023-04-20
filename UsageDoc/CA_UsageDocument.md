@@ -23,14 +23,19 @@
 
   * [Execution](#ca-tool-execution)
   
+
  * [Continuous Clearing Tool Execution Test Mode](#continuous-clearing-tool-execution-test-mode)
 
- * [How to handle multiple project types in same project](#how-to-handle-multiple-project-types-in-same-project)
+* [How to handle multiple project types in same project](#how-to-handle-multiple-project-types-in-same-project)
 
 * [Troubleshoot](#troubleshoot)
+
 * [Manual Update](#manual-update)
+
 * [Bug or Enhancements](#bug-or-enhancements)
+
 * [Glossary of Terms](#glossary-of-terms)
+
 * [References](#references)
 
   * [Image References](#image-references)
@@ -41,21 +46,21 @@
 <!--te-->
 # Introduction
 
-The Continuous Clearing Tool helps the Project Manager/Developer to automate the sw360 clearing process of 3rd party components. This tool scans and identifies the third-party components used in a NPM, NUGET and Debian projects and makes an entry in SW360, if it is not present. Continuous Clearing Tool links the components to the respective project and creates job for code scan in FOSSology.
+The Continuous Clearing Tool helps the Project Manager/Developer to automate the sw360 clearing process of 3rd party components. This tool scans and identifies the third-party components used in a NPM, NUGET, MAVEN and Debian projects and makes an entry in SW360, if it is not present. Continuous Clearing Tool links the components to the respective project and creates job for code scan in FOSSology.
 
 Continuous Clearing Tool reduces the effort in creating components in SW360 and identifying the matching source codes from the public repository. Tool eliminates the manual error while creating component and identifying correct version of source code from public repository. Continuous Clearing Tool harmonize the creation of 3P components in SW360 by filling necessary information.
 
 # Continuous Clearing Tool workflow diagram
 
 - Package Identifier
-   - [NPM/NUGET](../doc/usagedocimg/packageIdentifiernpmnuget.PNG)
+   - [NPM/NUGET/MAVEN](../doc/usagedocimg/packageIdentifiernpmnuget.PNG)
    - [Debian](../doc/usagedocimg/packageIdentifierdebian.PNG)
 - SW360 Package Creator
-  - [NPM/NUGET](../doc/usagedocimg/packageCreatirnpmnuget.PNG)
+  - [NPM/NUGET/MAVEN](../doc/usagedocimg/packageCreatirnpmnuget.PNG)
   - [Debian](../doc/usagedocimg/packagecreatordebian.PNG)
 - Artifactory Uploader
-  - [NPM/NUGET](../doc/usagedocimg/artifactoryuploader.PNG)
-
+  - [NPM/NUGET/MAVEN](../doc/usagedocimg/artifactoryuploader.PNG)
+ 
 # Prerequisite
 
 1. **Make an entry for your project in SW360** for license clearance and is **should be in Active state** while running Continuous Clearing Tool
@@ -138,6 +143,12 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
           * .Net core/.Net standard type project's input file repository should contain **package.lock.json** file. If not present do a `dotnet restore --use-lock-file`.
           
           * .Net Framework projects, input file repository should contain a **packages.config** file.
+
+      - **Project Type :** **Maven**
+      
+          * [Apache Maven](https://dlcdn.apache.org/maven/maven-3/3.9.0/binaries/apache-maven-3.9.0-bin.zip) has to be installed in the build machine and added in the `PATH` variable.
+
+          * Input file repository should contain **pom.xml** file.
           
       - **Project Type :**  **Debian** 
       
@@ -180,6 +191,7 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
   "JFrogApi": "<Insert JFrogApi>",
   "JfrogNugetDestRepoName": "JfrogNugetDestRepo Name",
   "JfrogNpmDestRepoName": "JfrogNpmDestRepo Name",
+  "JfrogMavenDestRepoName": "JfrogMavenDestRepo Name",
   "PackageFilePath": "/mnt/Input",
   "BomFolderPath": "/mnt/Output",
   "BomFilePath":"/mnt/Output/<SW360 Project Name>_Bom.cdx.json",
@@ -211,6 +223,15 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
     ],
     "ExcludedComponents": []
   },
+  "Maven": {
+    "Include": [ "pom.xml" ],
+    "Exclude": [],
+    "JfrogMavenRepoList": [
+      "<Maven Remote Cache Repo Name>",//This is a mirror repo for repo.maven in JFrog
+      "<Maven Release Repo Name>",//This should be the release repo.maven in JFrog
+    ],
+    "ExcludedComponents": []
+  },
   "Debian": {
     "Include": [ "*.json" ],
     "Exclude": [],
@@ -223,12 +244,12 @@ Description for the settings in `appSettings.json` file
 
 |S.No| Argument name   |Description  | Is it Mandatory    | Example |
 |--|--|--|--|--|
-| 1 |--packagefilepath   | Path to the package-lock.json file or to the directory where the project is present in case we have multiple package-lock.json files.                                      |Yes  | D:\Clearing Automation|
+| 1 |--packagefilepath   | Path to the package-lock.json file or to the directory where the project is present in case we have multiple package-lock.json files.                                      |Yes ,For Docker run /mnt/Input | D:\Clearing Automation |
 | 2 |--cycloneDxbomfilePath | Path to the cycloneDx BOM file. This should not be used along with the package file path(arg no 1).Please note to give only  one type of input at a time.                           |No if the first argument is provided| D:\ExternalToolOutput|
-| 3 |--bomfolderpath | Path to keep the generated boms  |  Yes     | D:\Clearing Automation\BOM
+| 3 |--bomfolderpath | Path to keep the generated boms  |  Yes , For Docker run /mnt/Output    | D:\Clearing Automation\BOM
 |  4| --sw360token  |  SW360 Auth Token |  Yes| Refer the SW360 Doc [here](https://www.eclipse.org/sw360/docs/development/restapi/access).Make sure you pass this credential in a secured way. |
 | 5 | --sw360projectid |  Project ID from SW360 project URL of the project  |  Yes| Obtained from SW360 |
-|  6|  --projecttype    | Type of the package         | Yes |  NPM/NUGET/Debian|
+|  6|  --projecttype    | Type of the package         | Yes |  NPM/NUGET/Debian/MAVEN |
 |7 | --removedevdependency  |  Make this field to `true` , if Dev dependencies needs to be excluded from clearing |  Optional ( By default set to true) | true/false |
 | 8|  --sw360url  |  SW360 URL              |Yes |  https://<my_sw360_server>|
 |  9| --sw360authtokentype   |  SW360 Auth Token  |Yes  | Token/Bearer |
@@ -241,7 +262,8 @@ Description for the settings in `appSettings.json` file
 | 16    | --artifactoryuploaduser              | Jfrog User Email                              | Yes                                                       |
 | 17  | --jfrognpmdestreponame         | The destination folder name for the NPM package to be copied to                  | Yes                                                    |
 | 18    | --jfrognugetdestreponame         | The destination folder name for the Nuget package to be copied to                  | Yes                                                    |
-| 19    | --timeout          | SW360 response timeout value                  | No                                                       |                                                |
+| 19    | --jfrogmavendestreponame         | The destination folder name for the Maven package to be copied to                  | Yes                                                    |                                            |
+| 20   | --timeout          | SW360 response timeout value                  | No                                                       |                                                |
 
   #### Exclude  Component or Folders :
   In order to exclude any components ,it can be configured in the  "appSettings.json" by providing the package name and version as specified above in the *_ExcludedComponents_* field.

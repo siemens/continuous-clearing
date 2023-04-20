@@ -11,27 +11,30 @@ using System.Collections.Generic;
 
 namespace LCT.APICommunications.Model
 {
-  /// <summary>
-  /// The Sw360Projects mapper model class
-  /// </summary>
-  public class Sw360Projects
-  {
-    [JsonProperty("name")]
-    public string Name { get; set; }
+    /// <summary>
+    /// The Sw360Projects mapper model class
+    /// </summary>
+    /// 
 
-    [JsonProperty("version")]
-    public string Version { get; set; }
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    public class Sw360Projects
+    {
+        [JsonProperty("name")]
+        public string Name { get; set; }
 
-    [JsonProperty("securityResponsibles")]
-    public IList<object> SecurityResponsibles { get; set; }
+        [JsonProperty("version")]
+        public string Version { get; set; }
 
-    [JsonProperty("projectType")]
-    public string ProjectType { get; set; }
+        [JsonProperty("securityResponsibles")]
+        public IList<object> SecurityResponsibles { get; set; }
 
-    [JsonProperty("visibility")]
-    public string Visibility { get; set; }
+        [JsonProperty("projectType")]
+        public string ProjectType { get; set; }
 
-    [JsonProperty("_links")]
-    public Links Links { get; set; }
-  }
+        [JsonProperty("visibility")]
+        public string Visibility { get; set; }
+
+        [JsonProperty("_links")]
+        public Links Links { get; set; }
+    }
 }

@@ -7,11 +7,14 @@
 
 namespace LCT.APICommunications.Model
 {
-  /// <summary>
-  /// Roles model
-  /// </summary>
-  public class Roles
-  {
-    // implement here
-  }
+    /// <summary>
+    /// Roles model
+    /// </summary>
+    /// 
+
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    public class Roles
+    {
+        // implement here
+    }
 }
