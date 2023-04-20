@@ -97,7 +97,7 @@ These instructions will get the project up and running on your local machine for
 
 1. Download Visual Studio 2022.
 2. Download Docker latest version.
-3. Docker image of Clearing Automation tool to be loaded locally.
+3. Docker image of continuous Clearing tool to be loaded locally.
 
 
 
