@@ -75,6 +75,8 @@ namespace LCT.SW360PackageCreator
             return listofBomComponents;
         }
 
+
+
         private async Task<List<Components>> GetListOfBomData(List<Component> components)
         {
             List<Components> lstOfBomDataToBeCompared = new List<Components>();
@@ -92,6 +94,7 @@ namespace LCT.SW360PackageCreator
                 if (isInternalComponent)
                 {
                     Logger.Debug($"{item.Name}-{item.Version} found as internal component. ");
+                    Logger.Info($"{item.Name}-{item.Version} found as internal component. ");
                 }
                 else
                 {

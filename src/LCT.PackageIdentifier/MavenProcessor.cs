@@ -9,6 +9,7 @@ using CycloneDX.Models;
 using LCT.APICommunications;
 using LCT.APICommunications.Model;
 using LCT.Common;
+using LCT.Common.Constants;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using log4net;
@@ -96,10 +97,15 @@ namespace LCT.PackageIdentifier
                     bool isDevelopmentComponent;
 
                     scope = GetPackageDetails(parts, out component);
-
+              
                     isDevelopmentComponent = GetDevDependentScopeList(appSettings, scope);
-                    component.Cpe = isDevelopmentComponent.ToString().ToLower();
+                    Property devDependency = new()
+                    {
+                        Name = Dataconstant.Cdx_IsDevelopmentDependency,
+                        Value = isDevelopmentComponent.ToString().ToLower()
+                    };
 
+                    component.Properties.Add(devDependency);
                     if (!component.Version.Contains("win"))
                     {
                         foundPackages.Add(component);
@@ -249,7 +255,12 @@ namespace LCT.PackageIdentifier
                 foreach (var item in componentNotForBOM)
                 {
                     Component component = componentData.comparisonBOMData.First(x => x.Name == item.Name && x.Version == item.Version);
-                    componentData.comparisonBOMData.Remove(component);
+                    Property internalType = new()
+                    {
+                        Name = Dataconstant.Cdx_IsInternal,
+                        Value = "true"
+                    };
+                    component.Properties.Add(internalType);
                 }
                 componentData.internalComponents = componentNotForBOM;
                 BomCreator.bomKpiData.InternalComponents = componentNotForBOM.Count;

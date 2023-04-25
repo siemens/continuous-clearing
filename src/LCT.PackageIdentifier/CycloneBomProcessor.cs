@@ -10,6 +10,7 @@ using LCT.Common;
 using LCT.Common.Constants;
 using log4net;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace LCT.PackageIdentifier
@@ -19,7 +20,7 @@ namespace LCT.PackageIdentifier
 
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        public static Bom SetMetadataInComparisonBOM(Bom bom,CommonAppSettings appSettings)
+        public static Bom SetMetadataInComparisonBOM(Bom bom, CommonAppSettings appSettings)
         {
             Logger.Debug("Starting to add metadata info into the BOM");
 
@@ -45,38 +46,51 @@ namespace LCT.PackageIdentifier
             }
             return bom;
         }
-
-        public static void SetProperties(CommonAppSettings appSettings, Component component,ref List<Component> componentForBOM, string repo = "Not Found in JFrogRepo")
+        public static void SetProperties(CommonAppSettings appSettings, Component component, ref List<Component> componentForBOM, string repo = "Not Found in JFrogRepo")
         {
-            component.Description = string.Empty;
-            List<Property> propList = new List<Property>();
-            Property artifactoryrepo = new Property();
-            Property projectType = new Property
+            List<Property> propList = new();
+
+            if (component.Properties?.Count == null || component.Properties.Count <= 0)
+            {
+                component.Properties = propList;
+
+            }
+
+
+            bool res = component.Properties.Any(x => x.Name.Equals(Dataconstant.Cdx_IsInternal));
+
+            if (res)
+            {
+                //do nothing
+            }
+            else
+            {
+                Property internalType = new()
+                {
+                    Name = Dataconstant.Cdx_IsInternal,
+                    Value = "false"
+                };
+                component.Properties.Add(internalType);
+
+            }
+
+            Property projectType = new()
             {
                 Name = Dataconstant.Cdx_ProjectType,
                 Value = appSettings.ProjectType
             };
-            artifactoryrepo.Name = Dataconstant.Cdx_ArtifactoryRepoUrl;
-            artifactoryrepo.Value = repo;
-            Property internalType = new()
+            Property artifactoryrepo = new()
             {
-                Name = Dataconstant.Cdx_IsInternal,
-                Value = "false"
+                Name = Dataconstant.Cdx_ArtifactoryRepoUrl,
+                Value = repo
             };
-            Property isdevelopmentDependency = new()
-            {
-                Name = Dataconstant.Cdx_IsDevelopmentDependency,
-                Value = component.Cpe
-            };
-            component.Cpe = null;
-            propList.Add(internalType);
-            propList.Add(isdevelopmentDependency);
-            propList.Add(artifactoryrepo);
-            propList.Add(projectType);
-            component.Properties = propList;
+
+            component.Properties.Add(artifactoryrepo);
+            component.Properties.Add(projectType);
+            component.Description = string.Empty;
             componentForBOM.Add(component);
-          
         }
+
 
     }
 }

@@ -9,6 +9,7 @@ using CycloneDX.Models;
 using LCT.APICommunications;
 using LCT.APICommunications.Model;
 using LCT.Common;
+using LCT.Common.Constants;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using log4net;
@@ -142,7 +143,7 @@ namespace LCT.PackageIdentifier
                             string version = dependencyToken.First.Value<string>("resolved");
                             if (dependencyToken.First.Value<string>("type") == "Dev" || IsDevDependent(referenceList, id, version))
                             {
-                                BomCreator.bomKpiData.DevDependentComponents++;
+                                BomCreator.bomKpiData.DevDependentComponents++;                            
                                 devdependencyFlag = true;
                             }
                             if (dependencyToken.First.Value<string>("type") == "Project" || string.IsNullOrEmpty(version) && string.IsNullOrEmpty(id))
@@ -356,17 +357,23 @@ namespace LCT.PackageIdentifier
         public async Task<ComponentIdentification> IdentificationOfInternalComponents(ComponentIdentification componentData, CommonAppSettings appSettings)
         {
 
-            List<Component> componentNotForBOM;
+            List<Component> Internalcomponents;
             if (appSettings.InternalRepoList != null && appSettings.InternalRepoList.Length > 0)
             {
-                componentNotForBOM = await ComponentIdentification(componentData.comparisonBOMData, appSettings);
-                foreach (var item in componentNotForBOM)
+                Internalcomponents = await ComponentIdentification(componentData.comparisonBOMData, appSettings);
+                foreach (var item in Internalcomponents)
                 {
                     Component component = componentData.comparisonBOMData.First(x => x.Name == item.Name && x.Version == item.Version);
-                    componentData.comparisonBOMData.Remove(component);
+                    Property internalType = new()
+                    {
+                        Name = Dataconstant.Cdx_IsInternal,
+                        Value = "true"
+                    };
+                    component.Properties.Add(internalType);
+              
                 }
-                componentData.internalComponents = componentNotForBOM;
-                BomCreator.bomKpiData.InternalComponents = componentNotForBOM.Count;
+                componentData.internalComponents = Internalcomponents;
+                BomCreator.bomKpiData.InternalComponents = Internalcomponents.Count;
             }
 
             return componentData;
@@ -433,14 +440,19 @@ namespace LCT.PackageIdentifier
         {
             foreach (var prop in listofComponents)
             {
-
+                Property devDependency = new()
+                {
+                    Name = Dataconstant.Cdx_IsDevelopmentDependency,
+                    Value = prop.Isdevdependent.ToString().ToLower()
+                };
                 Component components = new Component
                 {
                     Name = prop.ID,
                     Version = prop.Version,
-                    Cpe = prop.Isdevdependent.ToString().ToLower()
+                   
                 };
-
+                components.Properties = new List<Property>();
+                components.Properties.Add(devDependency);
                 components.Purl = $"{ApiConstant.NugetExternalID}{prop.ID}@{components.Version}";
                 components.BomRef = $"{ApiConstant.NugetExternalID}{prop.ID}@{components.Version}";
                 components.Description = prop.Filepath;
