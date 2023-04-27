@@ -104,8 +104,9 @@ namespace LCT.PackageIdentifier
                         Name = Dataconstant.Cdx_IsDevelopmentDependency,
                         Value = isDevelopmentComponent.ToString().ToLower()
                     };
-
-                    component.Properties.Add(devDependency);
+                    component.Properties = new List<Property>()
+                    { devDependency};
+                   
                     if (!component.Version.Contains("win"))
                     {
                         foundPackages.Add(component);
