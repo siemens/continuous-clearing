@@ -17,11 +17,11 @@
 
   * [Overview](#overview)
 
-  * [Prerequisite for execution](#prerequisite-for-ca-tool-execution) 
+  * [Prerequisite for execution](#prerequisite-for-continuous-clearing-tool-execution) 
 
-  * [Configuration](#configuring-the-ca-tool)
+  * [Configuration](#configuring-the-continuous-clearing-tool)
 
-  * [Execution](#ca-tool-execution)
+  * [Execution](#continuous-clearing-tool-execution)
   
 
  * [Continuous Clearing Tool Execution Test Mode](#continuous-clearing-tool-execution-test-mode)
