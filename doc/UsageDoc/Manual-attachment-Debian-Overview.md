@@ -12,11 +12,11 @@ https://snapshot.debian.org/package/<SourceName>/<Version>/
 Ex: https://snapshot.debian.org/package/adduser/3.118/
 ```
 
-![image.png](../doc/usagedocimg/DebianImg/SnapShot.PNG)
+![image.png](../usagedocimg/DebianImg/SnapShot.PNG)
 
 -    **If the response contains only the source file and dsc file** , click on the source file (i.e., ends with .tar.xz/.tar.gz) and save it with the correct file name`(Ex: adduser_3.118.tar.xz).`
 
-![image.png](../doc/usagedocimg/DebianImg/SnapShotResult.PNG)
+![image.png](../usagedocimg/DebianImg/SnapShotResult.PNG)
 
   **Note**: `Postman` can be used for downloading the source code.
 
@@ -24,13 +24,13 @@ Ex: https://snapshot.debian.org/package/adduser/3.118/
 
 -   **If the response contains both the Original (`*orig.tar.**`) and Debian patch files `(*debian.tar.**)`** , a patch needs to be applied to get the correct source file,
 
-![image.png](../doc/usagedocimg/DebianImg/SnapShotSource.PNG)
+![image.png](../usagedocimg/DebianImg/SnapShotSource.PNG)
 
   **Note** : Select the files under `Seen in debian` section first ,if not available go for other sections.
 
 -  Open the `.dsc file (Ex: e2fsprogs_1.44.5-1+deb10u3.dsc)` and look for the `Files` section and download all the files specified in that section.
 
-![image.png](../doc/usagedocimg/DebianImg/ListofFiles.PNG)
+![image.png](../usagedocimg/DebianImg/ListofFiles.PNG)
  
 -  Keep all the downloaded files in one folder along with `.dsc` file for applying the patch.
 
@@ -45,5 +45,5 @@ Ex: https://snapshot.debian.org/package/adduser/3.118/
 i.e., shown in snapshot given below)
 
 
-![image.png](../doc/usagedocimg/DebianImg/FolderCheck.PNG)
+![image.png](../usagedocimg/DebianImg/FolderCheck.PNG)
 -  Attach  the `<source_Name>_<version><-debian-combined.tar.bz2>` file as SRC under the attachment section for the release in SW360.
