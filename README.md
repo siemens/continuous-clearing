@@ -48,7 +48,7 @@ docker run --rm -it -v /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDire
  * Input (i.e., /path/to/InputDirectory -> place to keep input files)
  * Output (i.e.,/path/to/OutputDirectory -> resulted files will be stored here) 
  * Log (i.e., /path/to/logDirectory -> logs will be stored here) 
- * Configuration (i.e., /path/to/ConfigDirectory -> place to keep the Config files i.e **appSetting.json**) 
+ * Configuration (i.e., /path/to/ConfigDirectory -> place to keep the Config files i.e [**appSetting.json**](https://github.com/siemens/continuous-clearing/blob/main/src/LCT.Common/appSettings.json)) 
  
  2. **SW360 Package Creator** - This executable expects the `CycloneDX BOM` as the input, creates the missing components/releases in SW360 and links all the components to the respective project in SW360 portal and triggers the fossology upload.
  
