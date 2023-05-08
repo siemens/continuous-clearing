@@ -73,7 +73,7 @@ namespace LCT.Common
 
         private static void DisplayHelp()
         {
-            StreamReader sr = new("../../UsageDoc/CLIUsageNpkg.txt");
+            StreamReader sr = new("../../doc/UsageDoc/CLIUsageNpkg.txt");
             //Read the whole file
             string line = sr.ReadToEnd();
             Console.WriteLine(line);
