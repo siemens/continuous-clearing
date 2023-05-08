@@ -22,15 +22,15 @@
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 	</ItemGroup>
   
-  <ItemGroup>
-    <None Include="..\..\doc\UsageDoc\CLIUsage.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  
 	<ItemGroup>
 		<ProjectReference Include="..\LCT.Common\LCT.Common.csproj" />
 		<ProjectReference Include="..\LCT.Facade\LCT.Facade.csproj" />
 		<ProjectReference Include="..\LCT.Services\LCT.Services.csproj" />
+	</ItemGroup>
+  
+	<ItemGroup>
+	  <None Update="CLIUsageNpkg.txt">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 </Project>

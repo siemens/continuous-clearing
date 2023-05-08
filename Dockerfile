@@ -26,5 +26,3 @@ RUN apt-get update && \
 # Copying files from host to current working directory
 COPY /out/net6.0 /app/out
 
-# Displaying Usage Info
-CMD cat CLIUsage.txt
