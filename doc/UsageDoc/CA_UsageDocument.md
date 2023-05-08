@@ -53,13 +53,13 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
 # Continuous Clearing Tool workflow diagram
 
 - Package Identifier
-   - [NPM/NUGET/MAVEN](../doc/usagedocimg/packageIdentifiernpmnuget.PNG)
-   - [Debian](../doc/usagedocimg/packageIdentifierdebian.PNG)
+   - [NPM/NUGET/MAVEN](../usagedocimg/packageIdentifiernpmnuget.PNG)
+   - [Debian](../usagedocimg/packageIdentifierdebian.PNG)
 - SW360 Package Creator
-  - [NPM/NUGET/MAVEN](../doc/usagedocimg/packageCreatirnpmnuget.PNG)
-  - [Debian](../doc/usagedocimg/packagecreatordebian.PNG)
+  - [NPM/NUGET/MAVEN](../usagedocimg/packageCreatirnpmnuget.PNG)
+  - [Debian](../usagedocimg/packagecreatordebian.PNG)
 - Artifactory Uploader
-  - [NPM/NUGET/MAVEN](../doc/usagedocimg/artifactoryuploader.PNG)
+  - [NPM/NUGET/MAVEN](../usagedocimg/artifactoryuploader.PNG)
  
 # Prerequisite
 
@@ -96,7 +96,7 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
   
    After the configuration your pipeline will look like this : 
    
-   ![folderpic](../doc/usagedocimg/piplinepic.PNG)
+   ![folderpic](../usagedocimg/piplinepic.PNG)
 
 # Installation   
   ### Use container image 
@@ -109,7 +109,7 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
 
 
 # Demo project after consuming the package 
- You can find sample yml files under the [DemoProject](../DemoProject).
+ You can find sample yml files under the [DemoProject](../../DemoProject).
 
 # Continuous Clearing Tool Execution
 
@@ -136,7 +136,7 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
       - **Project Type :** **NPM** 
 
           * Input file repository should contain **package-lock.json** file. If not present do an `npm install`.
-          ![folderpic](../doc/usagedocimg/npminstall.PNG)
+          ![folderpic](../usagedocimg/npminstall.PNG)
       
       - **Project Type :** **Nuget**
       
@@ -162,7 +162,7 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
            
              After successful execution, `output.json` (_CycloneDX.json_) file will be created in specified directory
            
-             ![image.png](../doc/usagedocimg/output.PNG)
+             ![image.png](../usagedocimg/output.PNG)
            
              Resulted `output.json` file will be having the list of installed packages  and the same file will be used as  an input to `Continuous clearing tool - Bom creator` as an argument(`--packagefilepath`). The remaining process is same as other project types.
 
@@ -382,7 +382,7 @@ Incase your project has both NPM/Nuget components it can be handled by merely ru
 
 
 # Manual Update
-Upload attachment manually for [Debian](/UsageDoc/Manual-attachment-Debian-Overview.md) type.
+Upload attachment manually for [Debian](Manual-attachment-Debian-Overview.md) type.
 
 
 # Bug or Enhancements
@@ -401,7 +401,7 @@ For reporting any bug or enhancement and for your feedbacks click [here](https:/
  ## Image References
 - Fetching Project Id from SW360
 
-![sw360pic](../doc/usagedocimg/sw360.PNG)
+![sw360pic](../usagedocimg/sw360.PNG)
 
 
 ## API References 
