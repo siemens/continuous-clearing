@@ -23,7 +23,7 @@
 
   <files>
     <file src="DemoProject\**\*.*" target="demoproject"/>
-    <file src="UsageDoc\**\*.*" target="usagedocument"/>
+    <file src="doc\UsageDoc\**\*.*" target="usagedocument"/>
     <file src="out\net6.0\App.config" target="tools"/>
     <file src="out\net6.0\appSettings.json" target="tools"/>
     <file src="out\net6.0\ArtifactoryUploader.deps.json" target="tools"/>
