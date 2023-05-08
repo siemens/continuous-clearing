@@ -112,6 +112,34 @@ namespace LCT.PackageIdentifier
             hashCode = result?.StdOut;
             return hashCode?.Trim() ?? string.Empty;
         }
+        public static Result GetDependencyList(string bomFilePath, string depFilePath)
+        {
+            bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            Process p = new Process();
+            p.StartInfo.RedirectStandardError = true;
+            p.StartInfo.RedirectStandardOutput = true;
+            p.StartInfo.RedirectStandardInput = true;
+            p.StartInfo.UseShellExecute = false;
+            p.StartInfo.CreateNoWindow = true;
+
+            if (isWindows)
+            {
+                p.StartInfo.FileName = Path.Combine(@"cmd.exe");
+                p.StartInfo.Arguments = $"/c mvn -f \"{bomFilePath}\" dependency:list -DoutputFile=\"{depFilePath}\" -DappendOutput=\"true\"";
+
+            }
+            else
+            {
+                p.StartInfo.FileName = Path.Combine(@"mvn");
+                p.StartInfo.Arguments = $"-f {bomFilePath} dependency:list -DoutputFile={depFilePath} -DappendOutput=true";
+
+            }
+            var processResult = ProcessAsyncHelper.RunAsync(p.StartInfo);
+            Result result = processResult?.Result;
+            return result;
+
+
+        }
         #endregion
     }
 }

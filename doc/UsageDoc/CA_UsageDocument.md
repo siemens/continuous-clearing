@@ -1,11 +1,11 @@
-# Continuous Clearing tool
+# Continuous Clearing Tool
 
 ## Contents
 <!--ts-->
 
 * [Introduction](#introduction)
 
-* [Continuous Clearing tool workflow diagram](#continuous-clearing-tool-workflow-diagram)
+* [Continuous Clearing Tool workflow diagram](#continuous-clearing-tool-workflow-diagram)
 
 * [Prerequisite](#prerequisite)
 
@@ -13,7 +13,7 @@
 
 * [Demo Project](#demo-project-after-consuming-the-package)
 
-* [Continuous Clearing tool Execution](#continuous-clearing-tool-execution)
+* [Continuous Clearing Tool Execution](#continuous-clearing-tool-execution)
 
   * [Overview](#overview)
 
@@ -23,14 +23,19 @@
 
   * [Execution](#continuous-clearing-tool-execution)
   
- * [Continuous Clearing tool Execution Test Mode](#continuous-clearing-tool-execution-test-mode)
 
- * [How to handle multiple project types in same project](#how-to-handle-multiple-project-types-in-same-project)
+ * [Continuous Clearing Tool Execution Test Mode](#continuous-clearing-tool-execution-test-mode)
+
+* [How to handle multiple project types in same project](#how-to-handle-multiple-project-types-in-same-project)
 
 * [Troubleshoot](#troubleshoot)
+
 * [Manual Update](#manual-update)
+
 * [Bug or Enhancements](#bug-or-enhancements)
+
 * [Glossary of Terms](#glossary-of-terms)
+
 * [References](#references)
 
   * [Image References](#image-references)
@@ -41,22 +46,24 @@
 <!--te-->
 # Introduction
 
-The Continuous Clearing tool helps the Project Manager/Developer to automate the sw360 clearing process of 3rd party components. This tool scans and identifies the third-party components used in a NPM, NUGET and Debian projects and makes an entry in SW360, if it is not present. Continuous Clearing tool links the components to the respective project and creates job for code scan in FOSSology.
+The Continuous Clearing Tool helps the Project Manager/Developer to automate the sw360 clearing process of 3rd party components. This tool scans and identifies the third-party components used in a NPM, NUGET, MAVEN and Debian projects and makes an entry in SW360, if it is not present. Continuous Clearing Tool links the components to the respective project and creates job for code scan in FOSSology.
 
-Continuous Clearing tool reduces the effort in creating components in SW360 and identifying the matching source codes from the public repository. Tool eliminates the manual error while creating component and identifying correct version of source code from public repository. Continuous Clearing tool harmonize the creation of 3P components in SW360 by filling necessary information.
-# Continuous Clearing tool workflow diagram
+Continuous Clearing Tool reduces the effort in creating components in SW360 and identifying the matching source codes from the public repository. Tool eliminates the manual error while creating component and identifying correct version of source code from public repository. Continuous Clearing Tool harmonize the creation of 3P components in SW360 by filling necessary information.
+
+# Continuous Clearing Tool workflow diagram
 
 - Package Identifier
-   - [NPM/NUGET](../doc/usagedocimg/packageIdentifiernpmnuget.PNG)
-   - [Debian](../doc/usagedocimg/packageIdentifierdebian.PNG)
+   - [NPM/NUGET/MAVEN](../usagedocimg/packageIdentifiernpmnuget.PNG)
+   - [Debian](../usagedocimg/packageIdentifierdebian.PNG)
 - SW360 Package Creator
-  - [NPM/NUGET](../doc/usagedocimg/packageCreatirnpmnuget.PNG)
-  - [Debian](../doc/usagedocimg/packagecreatordebian.PNG)
+  - [NPM/NUGET/MAVEN](../usagedocimg/packageCreatirnpmnuget.PNG)
+  - [Debian](../usagedocimg/packagecreatordebian.PNG)
 - Artifactory Uploader
-  - [NPM/NUGET](../doc/usagedocimg/artifactoryuploader.PNG)
+  - [NPM/NUGET/MAVEN](../usagedocimg/artifactoryuploader.PNG)
+ 
 # Prerequisite
 
-1. **Make an entry for your project in SW360** for license clearance and is **should be in Active state** while running Continuous Clearing tool
+1. **Make an entry for your project in SW360** for license clearance and is **should be in Active state** while running Continuous Clearing Tool
 
 
 2. **Access request :**
@@ -83,13 +90,13 @@ Continuous Clearing tool reduces the effort in creating components in SW360 and 
    | 1 | Critical failure/error in the run |
    | 2 | Action item required from user's side |
 
-   While configuring the Continuous Clearing tool in the pipeline , user can configure each stage to display the result based on these exit codes. 
+   While configuring the Continuous Clearing Tool in the pipeline , user can configure each stage to display the result based on these exit codes. 
    
-   This can be done by the configuration management team at the time of modifying the pipeline to support Continuous Clearing tool.
+   This can be done by the configuration management team at the time of modifying the pipeline to support Continuous Clearing Tool.
   
    After the configuration your pipeline will look like this : 
    
-   ![folderpic](../doc/usagedocimg/piplinepic.PNG)
+   ![folderpic](../usagedocimg/piplinepic.PNG)
 
 # Installation   
   ### Use container image 
@@ -102,13 +109,13 @@ Continuous Clearing tool reduces the effort in creating components in SW360 and 
 
 
 # Demo project after consuming the package 
- You can find sample yml files under the [DemoProject](../DemoProject).
+ You can find sample yml files under the [DemoProject](../../DemoProject).
 
-# Continuous Clearing tool Execution
+# Continuous Clearing Tool Execution
 
  ### Overview
  
- The Continuous Clearing tool has 3 dll &#39;s, Execute them in the following order to achieve the complete License clearing process.
+ The Continuous Clearing Tool has 3 dll &#39;s, Execute them in the following order to achieve the complete License clearing process.
  
     
    > **1. Package Identifier**
@@ -122,20 +129,26 @@ Continuous Clearing tool reduces the effort in creating components in SW360 and 
    >**3. Artifactory Uploader**
       - Processes the CycloneDXBOM file(i.e., the output of the SW360PackageCreator) and uploads the already cleared components(clearing state-Report approved) to the siparty release repo in Jfrog Artifactory.The components in the states other than "Report approved" will be handled by the clearing experts via the Continuous Clearing Dashboard.
 
-### **Prerequisite for Continuous Clearing tool execution** 
+### **Prerequisite for Continuous Clearing Tool execution** 
 
    - Input files according to project type
 
       - **Project Type :** **NPM** 
 
           * Input file repository should contain **package-lock.json** file. If not present do an `npm install`.
-          ![folderpic](../doc/usagedocimg/npminstall.PNG)
+          ![folderpic](../usagedocimg/npminstall.PNG)
       
       - **Project Type :** **Nuget**
       
           * .Net core/.Net standard type project's input file repository should contain **package.lock.json** file. If not present do a `dotnet restore --use-lock-file`.
           
           * .Net Framework projects, input file repository should contain a **packages.config** file.
+
+      - **Project Type :** **Maven**
+      
+          * [Apache Maven](https://dlcdn.apache.org/maven/maven-3/3.9.0/binaries/apache-maven-3.9.0-bin.zip) has to be installed in the build machine and added in the `PATH` variable.
+
+          * Input file repository should contain **pom.xml** file.
           
       - **Project Type :**  **Debian** 
       
@@ -149,14 +162,14 @@ Continuous Clearing tool reduces the effort in creating components in SW360 and 
            
              After successful execution, `output.json` (_CycloneDX.json_) file will be created in specified directory
            
-             ![image.png](../doc/usagedocimg/output.PNG)
+             ![image.png](../usagedocimg/output.PNG)
            
-             Resulted `output.json` file will be having the list of installed packages  and the same file will be used as  an input to `Continuous Clearing- Bom creator` as an argument(`--packagefilepath`). The remaining process is same as other project types.
+             Resulted `output.json` file will be having the list of installed packages  and the same file will be used as  an input to `Continuous clearing tool - Bom creator` as an argument(`--packagefilepath`). The remaining process is same as other project types.
 
 
-### **Configuring the Continuous Clearing tool**
+### **Configuring the Continuous Clearing Tool**
 
-   Copy the below content and create new `appSettings.json` file in `CAConfig` directory.
+   Copy the below content and create new `appSettings.json` file in `Continuous Clearing tool Config` directory.
 
   
    Below is the list of settings can be made in `appSettings.json` file.
@@ -178,6 +191,7 @@ Continuous Clearing tool reduces the effort in creating components in SW360 and 
   "JFrogApi": "<Insert JFrogApi>",
   "JfrogNugetDestRepoName": "JfrogNugetDestRepo Name",
   "JfrogNpmDestRepoName": "JfrogNpmDestRepo Name",
+  "JfrogMavenDestRepoName": "JfrogMavenDestRepo Name",
   "PackageFilePath": "/mnt/Input",
   "BomFolderPath": "/mnt/Output",
   "BomFilePath":"/mnt/Output/<SW360 Project Name>_Bom.cdx.json",
@@ -209,6 +223,15 @@ Continuous Clearing tool reduces the effort in creating components in SW360 and 
     ],
     "ExcludedComponents": []
   },
+  "Maven": {
+    "Include": [ "pom.xml" ],
+    "Exclude": [],
+    "JfrogMavenRepoList": [
+      "<Maven Remote Cache Repo Name>",//This is a mirror repo for repo.maven in JFrog
+      "<Maven Release Repo Name>",//This should be the release repo.maven in JFrog
+    ],
+    "ExcludedComponents": []
+  },
   "Debian": {
     "Include": [ "*.json" ],
     "Exclude": [],
@@ -221,12 +244,12 @@ Description for the settings in `appSettings.json` file
 
 |S.No| Argument name   |Description  | Is it Mandatory    | Example |
 |--|--|--|--|--|
-| 1 |--packagefilepath   | Path to the package-lock.json file or to the directory where the project is present in case we have multiple package-lock.json files.                                      |Yes  | D:\Clearing Automation|
+| 1 |--packagefilepath   | Path to the package-lock.json file or to the directory where the project is present in case we have multiple package-lock.json files.                                      |Yes ,For Docker run /mnt/Input | D:\Clearing Automation |
 | 2 |--cycloneDxbomfilePath | Path to the cycloneDx BOM file. This should not be used along with the package file path(arg no 1).Please note to give only  one type of input at a time.                           |No if the first argument is provided| D:\ExternalToolOutput|
-| 3 |--bomfolderpath | Path to keep the generated boms  |  Yes     | D:\Clearing Automation\BOM
+| 3 |--bomfolderpath | Path to keep the generated boms  |  Yes , For Docker run /mnt/Output    | D:\Clearing Automation\BOM
 |  4| --sw360token  |  SW360 Auth Token |  Yes| Refer the SW360 Doc [here](https://www.eclipse.org/sw360/docs/development/restapi/access).Make sure you pass this credential in a secured way. |
 | 5 | --sw360projectid |  Project ID from SW360 project URL of the project  |  Yes| Obtained from SW360 |
-|  6|  --projecttype    | Type of the package         | Yes |  NPM/NUGET/Debian|
+|  6|  --projecttype    | Type of the package         | Yes |  NPM/NUGET/Debian/MAVEN |
 |7 | --removedevdependency  |  Make this field to `true` , if Dev dependencies needs to be excluded from clearing |  Optional ( By default set to true) | true/false |
 | 8|  --sw360url  |  SW360 URL              |Yes |  https://<my_sw360_server>|
 |  9| --sw360authtokentype   |  SW360 Auth Token  |Yes  | Token/Bearer |
@@ -239,7 +262,8 @@ Description for the settings in `appSettings.json` file
 | 16    | --artifactoryuploaduser              | Jfrog User Email                              | Yes                                                       |
 | 17  | --jfrognpmdestreponame         | The destination folder name for the NPM package to be copied to                  | Yes                                                    |
 | 18    | --jfrognugetdestreponame         | The destination folder name for the Nuget package to be copied to                  | Yes                                                    |
-| 19    | --timeout          | SW360 response timeout value                  | No                                                       |                                                |
+| 19    | --jfrogmavendestreponame         | The destination folder name for the Maven package to be copied to                  | Yes                                                    |                                            |
+| 20   | --timeout          | SW360 response timeout value                  | No                                                       |                                                |
 
   #### Exclude  Component or Folders :
   In order to exclude any components ,it can be configured in the  "appSettings.json" by providing the package name and version as specified above in the *_ExcludedComponents_* field.
@@ -249,19 +273,19 @@ Description for the settings in `appSettings.json` file
   In order to **Exclude specific folders** from the execution, It can be specified under the **Exclude section** of that specific **package type**.
 
 
-### **Continuous Clearing tool Execution** 
+### **Continuous Clearing Tool Execution** 
 
-Continuous Clearing tool can be executed as container or as binaries,
+Continuous Clearing Tool can be executed as container or as binaries,
 
   <details>
   <summary>Docker run</summary>
 
    ### Prerequisite
    1. Install Docker (Latest stable version).
-   2.  Create local directories for mapping to the Continuous Clearing tool container directories
+   2.  Create local directories for mapping to the Continuous clearing tool container directories
         - Input  : Place to keep input files.
         - Output : Resulted files will be stored here.
-        - Log    : Continuous Clearing log files.
+        - Log    : Continuous clearing log files.
         - CAConfig :  Place to keep Config files i.e., `appSettings.json`.
 
 
@@ -320,7 +344,7 @@ Continuous Clearing tool can be executed as container or as binaries,
      **Example** : `ArtifactoryUploader.exe --settingsfilepath /<PathToConfig>/appSettings.json`
 </details>
 
-# Continuous Clearing tool Execution Test Mode
+# Continuous Clearing Tool Execution Test Mode
 
   The purpose the test mode execution of the tool is to ensure that there are no any connectivity issues with SW360 server.
   
@@ -358,7 +382,7 @@ Incase your project has both NPM/Nuget components it can be handled by merely ru
 
 
 # Manual Update
-Upload attachment manually for [Debian](/UsageDoc/Manual-attachment-Debian-Overview.md) type.
+Upload attachment manually for [Debian](Manual-attachment-Debian-Overview.md) type.
 
 
 # Bug or Enhancements
@@ -377,7 +401,7 @@ For reporting any bug or enhancement and for your feedbacks click [here](https:/
  ## Image References
 - Fetching Project Id from SW360
 
-![sw360pic](../doc/usagedocimg/sw360.PNG)
+![sw360pic](../usagedocimg/sw360.PNG)
 
 
 ## API References 

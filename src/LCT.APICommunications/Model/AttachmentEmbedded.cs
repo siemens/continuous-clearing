@@ -15,8 +15,8 @@ namespace LCT.APICommunications.Model
     /// </summary>
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class AttachmentEmbedded
-  {
-    [JsonProperty("sw360:attachments")]
-    public IList<Sw360Attachments> Sw360attachments { get; set; }
-  }
+    {
+        [JsonProperty("sw360:attachments")]
+        public IList<Sw360Attachments> Sw360attachments { get; set; }
+    }
 }

@@ -11,6 +11,7 @@ namespace LCT.APICommunications.Model.Foss
     /// <summary>
     /// SW360Releases Model
     /// </summary>
+
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class SW360Releases
     {

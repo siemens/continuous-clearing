@@ -17,17 +17,17 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Include="..\..\UsageDoc\CLIUsage.txt">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="log4net" Version="2.0.9" />
+		<PackageReference Include="log4net" Version="2.0.15" />
 		<PackageReference Include="Microsoft.CodeCoverage" Version="17.1.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 	</ItemGroup>
-
+  
+  <ItemGroup>
+    <None Include="..\..\doc\UsageDoc\CLIUsage.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  
 	<ItemGroup>
 		<ProjectReference Include="..\LCT.Common\LCT.Common.csproj" />
 		<ProjectReference Include="..\LCT.Facade\LCT.Facade.csproj" />

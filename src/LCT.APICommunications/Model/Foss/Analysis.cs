@@ -11,6 +11,9 @@ namespace LCT.APICommunications.Model.Foss
     /// <summary>
     /// Fossology Analyzer model
     /// </summary>
+    /// 
+
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class Analysis
     {
         [JsonProperty("bucket")]

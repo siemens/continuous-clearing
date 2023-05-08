@@ -25,6 +25,7 @@ namespace LCT.Common
 
         public static string PackageUrlApi { get; set; } = $"https://www.nuget.org/api/v2/package/";
         public static string SourceURLNugetApi { get; set; } = $"https://api.nuget.org/v3-flatcontainer/";
+        public static string SourceURLMavenApi { get; set; } = $"https://repo.maven.apache.org/maven2/";
 
         public static string SnapshotBaseURL { get; set; } = $"https://snapshot.debian.org/mr/";
         public static string SnapshotDownloadURL { get; set; } = $"https://snapshot.debian.org/archive/";
@@ -60,6 +61,8 @@ namespace LCT.Common
         public int TimeOut { get; set; } = 200;
         public Config Npm { get; set; }
         public Config Nuget { get; set; }
+
+        public Config Maven { get; set; }
         public Config Debian { get; set; }
         public string CaVersion { get; set; }
         public string CycloneDxBomFilePath { get; set; }
@@ -68,6 +71,7 @@ namespace LCT.Common
         public string JfrogNpmDestRepoName { get; set; }
         public string JfrogNpmSrcRepo { get; set; }
         public string JfrogNugetDestRepoName { get; set; }
+        public string JfrogMavenDestRepoName { get; set; }
         public string JfrogNugetSrcRepo { get; set; }
         public string Mode { get; set; } = string.Empty;
 

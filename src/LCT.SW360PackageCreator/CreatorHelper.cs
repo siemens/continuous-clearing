@@ -6,7 +6,6 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using LCT.APICommunications;
 using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Common.Constants;
@@ -27,6 +26,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace LCT.SW360PackageCreator
@@ -66,47 +66,104 @@ namespace LCT.SW360PackageCreator
 
         public async Task<Dictionary<string, string>> DownloadReleaseAttachmentSource(ComparisonBomData component)
         {
-            ServicePointManager.Expect100Continue = true;
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             Dictionary<string, string> AttachmentUrlList = new Dictionary<string, string>();
             string localPathforDownload = GetDownloadPathForComponetType(component);
-
-            Logger.Debug($"DownloadReleaseAttachmentSource()-Name-{component.Name},version-{component.Version},localPathforDownload-{localPathforDownload}");
-
-            if (string.IsNullOrEmpty(component.SourceUrl) || component.SourceUrl.Equals(Dataconstant.SourceUrlNotFound))
-                Logger.Warn($"Source URL is not Found for {component.Name}-{component.Version}");
-
-            if (string.IsNullOrEmpty(component.ApprovedStatus) && !component.ReleaseExternalId.Contains(Dataconstant.DebianPackage))
+            if (!component.ReleaseExternalId.Contains(Dataconstant.MavenPackage))
             {
-                Logger.Warn($"Package URL is not Found for {component.Name}-{component.Version}");
-            }
+                ServicePointManager.Expect100Continue = true;
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+             
 
-            string downloadPath = string.Empty;
-            if (component.DownloadUrl.Equals(Dataconstant.DownloadUrlNotFound))
-            {
-                Logger.Warn($"Source file is not attached,Release source Download Url is not Found for {component.Name}-{component.Version}");
-                Logger.Debug($"DownloadReleaseAttachmentSource():Source file is not attached,Release source Download Url is not Found for {component.Name}-{component.Version}");
-            }
-            else
-            {
-                if (component.ReleaseExternalId.Contains(Dataconstant.DebianPackage))
+
+                Logger.Debug($"DownloadReleaseAttachmentSource()-Name-{component.Name},version-{component.Version},localPathforDownload-{localPathforDownload}");
+
+
+                if (string.IsNullOrEmpty(component.SourceUrl) || component.SourceUrl.Equals(Dataconstant.SourceUrlNotFound))
+                    Logger.Warn($"Source URL is not Found for {component.Name}-{component.Version}");
+
+
+
+                if (component.DownloadUrl.Equals(Dataconstant.DownloadUrlNotFound))
                 {
-                    if (!string.IsNullOrEmpty(component.SourceUrl))
-                    {
-                        downloadPath = await _packageDownloderList["DEBIAN"].DownloadPackage(component, localPathforDownload);
-                    }
+                    Logger.Warn($"Source file is not attached,Release source Download Url is not Found for {component.Name}-{component.Version}");
+                    Logger.Debug($"DownloadReleaseAttachmentSource():Source file is not attached,Release source Download Url is not Found for {component.Name}-{component.Version}");
                 }
                 else
                 {
-                    downloadPath = await _packageDownloderList["NPM"].DownloadPackage(component, localPathforDownload);
-                }
-                if (!string.IsNullOrEmpty(downloadPath))
-                {
-                    AttachmentUrlList.Add(SOURCE, downloadPath);
+                    await GetAttachmentUrlList(component, AttachmentUrlList, localPathforDownload);
                 }
             }
+            else
+            {
 
+                await DownloadDependencyList(component);
+                GetAttachmentUrlListForMvn(localPathforDownload, component, ref AttachmentUrlList);
+
+            }
             return AttachmentUrlList;
+        }
+
+        private async Task<string> GetAttachmentUrlList(ComparisonBomData component, Dictionary<string, string> AttachmentUrlList, string localPathforDownload)
+        {
+            string downloadPath = string.Empty;
+            if (component.ReleaseExternalId.Contains(Dataconstant.DebianPackage))
+            {
+                if (!string.IsNullOrEmpty(component.SourceUrl))
+                {
+                    downloadPath = await _packageDownloderList["DEBIAN"].DownloadPackage(component, localPathforDownload);
+                }
+            }
+            else
+            {
+                downloadPath = await _packageDownloderList["NPM"].DownloadPackage(component, localPathforDownload);
+            }
+            if (!string.IsNullOrEmpty(downloadPath))
+            {
+                AttachmentUrlList.Add(SOURCE, downloadPath);
+            }
+
+            return downloadPath;
+        }
+
+        private static async Task DownloadDependencyList(ComparisonBomData component)
+        {
+            string localPathforDownload = $"{Path.GetTempPath()}ClearingTool\\DownloadedFiles/";
+            bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            Process p = new();
+            p.StartInfo.RedirectStandardError = true;
+            p.StartInfo.RedirectStandardOutput = true;
+            p.StartInfo.RedirectStandardInput = true;
+            p.StartInfo.UseShellExecute = false;
+            p.StartInfo.CreateNoWindow = true;
+
+            if (isWindows)
+            {
+                p.StartInfo.FileName = Path.Combine(@"cmd.exe");
+                p.StartInfo.Arguments = $"/c mvn org.apache.maven.plugins:maven-dependency-plugin:3.3.0:copy -Dartifact={component.Group}:{component.Name}:{component.Version}:jar:sources -DoutputDirectory={localPathforDownload}";
+
+            }
+            else
+            {
+                p.StartInfo.FileName = Path.Combine(@"mvn");
+                p.StartInfo.Arguments = $"org.apache.maven.plugins:maven-dependency-plugin:3.3.0:copy -Dartifact={component.Group}:{component.Name}:{component.Version}:jar:sources -DoutputDirectory={localPathforDownload}";
+
+            }
+
+            var processResult = ProcessAsyncHelper.RunAsync(p.StartInfo);
+            await processResult;
+        }
+
+
+
+        private static  void GetAttachmentUrlListForMvn(string localPathforDownload, ComparisonBomData component, ref Dictionary<string, string> attachmentUrlList)
+        {
+            localPathforDownload = $"{localPathforDownload}{component.Name}-{component.Version}-sources.jar";
+
+            if (File.Exists(localPathforDownload))
+            {
+                attachmentUrlList.Add(SOURCE, localPathforDownload);
+            }
+
         }
 
         public async Task<List<ComparisonBomData>> SetContentsForComparisonBOM(List<Components> lstComponentForBOM, ISW360Service sw360Service)
@@ -124,6 +181,7 @@ namespace LCT.SW360PackageCreator
                 IRepository repo = new Repository();
 
                 mapper.Name = item.Name;
+                mapper.Group = item.Group;
                 mapper.Version = item.Version;
                 mapper.ComponentExternalId = item.ComponentExternalId;
                 mapper.ReleaseExternalId = item.ReleaseExternalId;
@@ -141,6 +199,10 @@ namespace LCT.SW360PackageCreator
                     }
                     mapper.PatchURls = item.PatchURLs;
                 }
+                else if (!string.IsNullOrEmpty(item.ReleaseExternalId) && item.ReleaseExternalId.Contains(Dataconstant.MavenPackage))
+                {
+                    mapper.DownloadUrl = GetMavenDownloadUrl(mapper, item, releasesInfo);
+                }
                 else
                 {
                     mapper.DownloadUrl = GetComponentDownloadUrl(mapper, item, repo, releasesInfo);
@@ -156,6 +218,25 @@ namespace LCT.SW360PackageCreator
 
             Logger.Debug($"SetContentsForComparisonBOM():End");
             return comparisonBomData;
+        }
+
+        private static string GetMavenDownloadUrl(ComparisonBomData mapper, Components item, ReleasesInfo releasesInfo)
+        {
+
+            string sourceURL = string.Empty;
+
+            //IF Release already exists in SW360 , tool will not update any field.
+            //Hence do not need to find DOWNLOAD URL URL here and this REDUCE the exeuction time
+
+            if (mapper.ReleaseStatus.Equals(Dataconstant.Available))
+            {
+                return releasesInfo?.SourceCodeDownloadUrl ?? string.Empty;
+            }
+            else
+            {
+                sourceURL = $"{CommonAppSettings.SourceURLMavenApi}{item.Group}/{item.Name}/{item.Version}/{item.Name}-{item.Version}-sources.jar";
+            }
+            return sourceURL;
         }
 
         public async Task<Bom> GetUpdatedComponentsDetails(List<Components> ListofBomComponents, List<ComparisonBomData> updatedCompareBomData,
@@ -181,9 +262,16 @@ namespace LCT.SW360PackageCreator
                      new Property { Name = Dataconstant.Cdx_FossologyUrl, Value = comBom.FossologyLink }
                 };
 
-                    bom.Components.FirstOrDefault(com => string.IsNullOrEmpty(com.Group) ?
-                    com.Name == comBom.Name && com.Version.Contains(comBom.Version)
-                    : $"{com.Group}{Dataconstant.ForwardSlash}{com.Name}" == comBom.Name && com.Version.Contains(comBom.Version))?.Properties.AddRange(prop);
+                    if (!(bom.Components.Any(x => x.BomRef.Contains(Dataconstant.MavenPackage))))
+                    {
+                        bom.Components.FirstOrDefault(com => string.IsNullOrEmpty(com.Group) ? com.Name == comBom.Name && com.Version.Contains(comBom.Version)
+                        : $"{com.Group}{Dataconstant.ForwardSlash}{com.Name}" == comBom.Name && com.Version.Contains(comBom.Version))?.Properties.AddRange(prop);
+                    }
+                    else
+                    {
+                        bom.Components.FirstOrDefault(com => com.Name == comBom.Name && com.Version.Contains(comBom.Version))?.Properties.AddRange(prop);
+
+                    }
                 }
                 catch (JsonSerializationException ex)
                 {

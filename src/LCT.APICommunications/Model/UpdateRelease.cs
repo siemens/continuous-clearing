@@ -13,6 +13,8 @@ namespace LCT.APICommunications.Model
     /// <summary>
     /// The UpdateRelease model
     /// </summary>
+
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class UpdateRelease
     {
         [JsonProperty("clearingState")]

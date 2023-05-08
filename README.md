@@ -4,18 +4,16 @@
 
 
 
-
-
-
 # Introduction 
 
-The Continuous Clearing tool scans and collects the 3rd party OSS components used in a NPM/NuGet/Debian project and uploads it to SW360 and Fossology by accepting respective project ID for license clearing. 
+The Continuous Clearing Tool scans and collects the 3rd party OSS components used in a NPM/NuGet/Maven/Debian project and uploads it to SW360 and Fossology by accepting respective project ID for license clearing. 
+
 The tool helps the developer/project manager to enable the clearing process faster by reducing the 
 manual effort of creating SW360 and FOSSology workflows.
 
 This tool has been  logically split into 3 different executables that enable it to be used as separate modules as per the user's requirement.
 
-**_Note: Continuous Clearing tool internally uses [Syft](https://github.com/anchore/syft) for component detection for debian type projects._**
+**_Note: Continuous Clearing Tool internally uses [Syft](https://github.com/anchore/syft) for component detection for debian type projects._**
  
 # Package Installation 
 
@@ -29,12 +27,13 @@ docker pull ghcr.io/siemens/continuous-clearing
 #### Use Binary
 
 Download the .nupkg file from [GitHub Releases](https://github.com/siemens/continuous-clearing/releases)
+	
 
  # Execution via terminal
  
- The Continuous Clearing tool has 3 executables.
+ The Continuous Clearing Tool has 3 executables.
  
-you can run Continuous Clearing tool as container or as a dotnet package,
+you can run Continuous Clearing Tool as container or as a dotnet package,
  
 <details>
 <summary>Run as container</summary>
@@ -49,7 +48,7 @@ docker run --rm -it -v /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDire
  * Input (i.e., /path/to/InputDirectory -> place to keep input files)
  * Output (i.e.,/path/to/OutputDirectory -> resulted files will be stored here) 
  * Log (i.e., /path/to/logDirectory -> logs will be stored here) 
- * Configuration (i.e., /path/to/ConfigDirectory -> place to keep the Config files i.e **appSetting.json**) 
+ * Configuration (i.e., /path/to/ConfigDirectory -> place to keep the Config files i.e [**appSetting.json**](/src/LCT.Common/appSettings.json)) 
  
  2. **SW360 Package Creator** - This executable expects the `CycloneDX BOM` as the input, creates the missing components/releases in SW360 and links all the components to the respective project in SW360 portal and triggers the fossology upload.
  
@@ -98,7 +97,7 @@ These instructions will get the project up and running on your local machine for
 
 1. Download Visual Studio 2022.
 2. Download Docker latest version.
-3. Docker image of Continuous Clearing tool to be loaded locally.
+3. Docker image of continuous Clearing tool to be loaded locally.
 
 
 

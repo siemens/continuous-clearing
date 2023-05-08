@@ -13,6 +13,8 @@ using System.Threading.Tasks;
 
 namespace LCT.APICommunications.Model
 {
+
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public  class ComponentStatus
     {
         public Sw360Components Sw360components { get; set; }

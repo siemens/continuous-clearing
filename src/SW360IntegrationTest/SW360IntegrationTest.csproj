@@ -27,6 +27,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="PackageCreatorTestFiles\Maven\CCTComparisonBOMMavenUpdated.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierTestFiles\Maven\CCTLocalBOMMavenInitial.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="PackageIdentifierTestFiles\Npm\CCTComparisonBOMNpmInitial.json">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
@@ -54,6 +60,10 @@
     <None Update="Nuget\appSettingsNugetSW360IntegrationTest.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Maven\" />
   </ItemGroup>
 
 </Project>

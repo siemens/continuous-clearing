@@ -13,6 +13,9 @@ namespace LCT.APICommunications.Model
     /// <summary>
     /// ReleaseIdOfComponent model
     /// </summary>
+    /// 
+
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class ReleaseIdOfComponent
     {
         [JsonProperty("name")]
