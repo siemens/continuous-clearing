@@ -85,7 +85,7 @@ docker run --rm -it -v /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDire
 </details>
 
 
-Detailed insight on configuration and execution is provided in [Usage Doc](UsageDoc/CA_UsageDocument.md).
+Detailed insight on configuration and execution is provided in [Usage Doc](doc/UsageDoc/CA_UsageDocument.md).
  
  **_Note: ArtifactoryUploader is not applicable for Debian clearing._**
 
