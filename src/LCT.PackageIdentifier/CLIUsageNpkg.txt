@@ -10,11 +10,9 @@ Available Commands:
    SW360PackageCreator.exe --settingsfilepath /CAToolConfigPath/appSettings.json                  Creates Components and Release in SW360
    ArtifactoryUploader.exe --settingsfilepath /CAToolConfigPath/appSettings.json                  Uploads source package to JFrog Artifactory
 
-
-Note : For Docker run replace .exe with .dll
-
 Flags:
    --settingsfilepath           Path of application config file
 
-
 For more examples refer the Clearing Automation Usage Document.
+
+Note : For Docker run replace .exe with .dll
