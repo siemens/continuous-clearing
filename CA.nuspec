@@ -25,6 +25,7 @@
     <file src="DemoProject\**\*.*" target="demoproject"/>
     <file src="doc\UsageDoc\**\*.*" target="usagedocument"/>
     <file src="out\net6.0\App.config" target="tools"/>
+	<file src="out\net6.0\CLIUsageNpkg.txt" target="tools"/>
     <file src="out\net6.0\appSettings.json" target="tools"/>
     <file src="out\net6.0\ArtifactoryUploader.deps.json" target="tools"/>
     <file src="out\net6.0\ArtifactoryUploader.dll" target="tools"/>
