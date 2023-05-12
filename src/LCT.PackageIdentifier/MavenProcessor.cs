@@ -36,44 +36,51 @@ namespace LCT.PackageIdentifier
             string depFilePath = "";
             int totalComponentsIdentified = 0;
             List<string> configFiles = new();
-
-            //Create empty dependency list file
-            if (!string.IsNullOrEmpty(appSettings.PackageFilePath))
+            if (string.IsNullOrEmpty(appSettings.CycloneDxBomFilePath))
             {
-                configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Maven);
-                depFilePath = Path.Combine(appSettings.PackageFilePath, "POMDependencies.txt");
-                File.Create(depFilePath).Close();
-            }
-
-            foreach (var bomFilePath in configFiles)
-            {
-                Result result = BomHelper.GetDependencyList(bomFilePath, depFilePath);
-                if (result.ExitCode != 0)
+                //Create empty dependency list file
+                if (!string.IsNullOrEmpty(appSettings.PackageFilePath))
                 {
-                    Logger.Debug("Error in downloading maven packages");
+                    configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Maven);
+                    depFilePath = Path.Combine(appSettings.PackageFilePath, "POMDependencies.txt");
+                    File.Create(depFilePath).Close();
                 }
-            }
 
-            ParseConfigFile(depFilePath, appSettings, ref componentsForBOM);
-
-            totalComponentsIdentified = componentsForBOM.Count;
-
-            componentsForBOM = componentsForBOM.Distinct(new ComponentEqualityComparer()).ToList();
-
-            BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - componentsForBOM.Count;
-
-            var componentsWithMultipleVersions = componentsForBOM.GroupBy(s => s.Name)
-                     .Where(g => g.Count() > 1).SelectMany(g => g).ToList();
-
-            if (componentsWithMultipleVersions.Count != 0)
-            {
-                Logger.Warn($"Multiple versions detected :\n");
-                foreach (var item in componentsWithMultipleVersions)
+                foreach (var bomFilePath in configFiles)
                 {
-                    Logger.Warn($"Component Name : {item.Name}\nComponent Version : {item.Version}\nPackage Found in : {appSettings.PackageFilePath}\n");
+                    Result result = BomHelper.GetDependencyList(bomFilePath, depFilePath);
+                    if (result.ExitCode != 0)
+                    {
+                        Logger.Debug("Error in downloading maven packages");
+                    }
                 }
+
+                ParseConfigFile(depFilePath, appSettings, ref componentsForBOM);
+
+                totalComponentsIdentified = componentsForBOM.Count;
+
+                componentsForBOM = componentsForBOM.Distinct(new ComponentEqualityComparer()).ToList();
+
+                BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - componentsForBOM.Count;
+
+                var componentsWithMultipleVersions = componentsForBOM.GroupBy(s => s.Name)
+                         .Where(g => g.Count() > 1).SelectMany(g => g).ToList();
+
+                if (componentsWithMultipleVersions.Count != 0)
+                {
+                    Logger.Warn($"Multiple versions detected :\n");
+                    foreach (var item in componentsWithMultipleVersions)
+                    {
+                        Logger.Warn($"Component Name : {item.Name}\nComponent Version : {item.Version}\nPackage Found in : {appSettings.PackageFilePath}\n");
+                    }
+                }
+                bom.Components = componentsForBOM;
             }
-            bom.Components = componentsForBOM;
+            else
+            {
+                bom = ParseCycloneDXBom(appSettings.CycloneDxBomFilePath);
+                BomCreator.bomKpiData.ComponentsinPackageLockJsonFile=bom.Components.Count;
+            }
             Logger.Debug($"ParsePackageFile():End");
             return bom;
         }
@@ -97,7 +104,7 @@ namespace LCT.PackageIdentifier
                     bool isDevelopmentComponent;
 
                     scope = GetPackageDetails(parts, out component);
-              
+
                     isDevelopmentComponent = GetDevDependentScopeList(appSettings, scope);
                     Property devDependency = new()
                     {
@@ -106,7 +113,7 @@ namespace LCT.PackageIdentifier
                     };
                     component.Properties = new List<Property>()
                     { devDependency};
-                   
+
                     if (!component.Version.Contains("win"))
                     {
                         foundPackages.Add(component);
