@@ -150,7 +150,7 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
 
           * Input file repository should contain **pom.xml** file.
 
-         * **Note** : Incase your project has internal dependencies compile the project prior to running the clearing tool
+         * **Note** : Incase your project has internal dependencies, compile the project **prior to running the clearing tool**
  
                  mvn clean install -DskipTests=true 
     
