@@ -149,10 +149,15 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
           * [Apache Maven](https://dlcdn.apache.org/maven/maven-3/3.9.0/binaries/apache-maven-3.9.0-bin.zip) has to be installed in the build machine and added in the `PATH` variable.
 
           * Input file repository should contain **pom.xml** file.
-          
-      - **Project Type :**  **Debian** 
+
+         * **Note** : Incase your project has internal dependencies, compile the project **prior to running the clearing tool**
+ 
+                 mvn clean install -DskipTests=true 
+    
+    
+     - **Project Type :**  **Debian** 
       
-   		 **Note** : below steps is required only if you have `tar` file to process , otherwise you can keep `CycloneDx.json` file in the InputDirectory.
+   	      **Note** : below steps is required only if you have `tar` file to process , otherwise you can keep `CycloneDx.json` file in the InputDirectory.
           *  Create `InputImage` directory for keeping `tar` images and `InputDirectory` for resulted file storing .
 
           *  Run the command given below by replacing the place holder values (i.e., path to input image directory, path to input directory and file name of the Debian image to be cleared) with actual values.
