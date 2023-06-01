@@ -139,13 +139,13 @@ namespace LCT.SW360PackageCreator
             if (isWindows)
             {
                 p.StartInfo.FileName = Path.Combine(@"cmd.exe");
-                p.StartInfo.Arguments = $"/c mvn org.apache.maven.plugins:maven-dependency-plugin:3.3.0:copy -Dartifact={component.Group}:{component.Name}:{component.Version}:jar:sources -DoutputDirectory={localPathforDownload}";
+                p.StartInfo.Arguments = $"/c mvn org.apache.maven.plugins:maven-dependency-plugin:copy -Dartifact={component.Group}:{component.Name}:{component.Version}:jar:sources -DoutputDirectory={localPathforDownload}";
 
             }
             else
             {
                 p.StartInfo.FileName = Path.Combine(@"mvn");
-                p.StartInfo.Arguments = $"org.apache.maven.plugins:maven-dependency-plugin:3.3.0:copy -Dartifact={component.Group}:{component.Name}:{component.Version}:jar:sources -DoutputDirectory={localPathforDownload}";
+                p.StartInfo.Arguments = $"org.apache.maven.plugins:maven-dependency-plugin:copy -Dartifact={component.Group}:{component.Name}:{component.Version}:jar:sources -DoutputDirectory={localPathforDownload}";
 
             }
 
