@@ -10,6 +10,7 @@ using LCT.Common;
 using LCT.Common.Constants;
 using log4net;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace LCT.PackageIdentifier
@@ -48,27 +49,47 @@ namespace LCT.PackageIdentifier
 
         public static void SetProperties(CommonAppSettings appSettings, Component component,ref List<Component> componentForBOM, string repo = "Not Found in JFrogRepo")
         {
-            component.Description = string.Empty;
-            List<Property> propList = new List<Property>();
-            Property artifactoryrepo = new Property();
-            Property projectType = new Property
+            List<Property> propList = new();
+
+            if (component.Properties?.Count == null || component.Properties.Count <= 0)
+            {
+                component.Properties = propList;
+
+            }
+
+            bool res = component.Properties.Any(x => x.Name.Equals(Dataconstant.Cdx_IsInternal));
+
+            if (res)
+            {
+                //do nothing
+            }
+            else
+            {
+                Property internalType = new()
+                {
+                    Name = Dataconstant.Cdx_IsInternal,
+                    Value = "false"
+                };
+                component.Properties.Add(internalType);
+
+            }
+
+            Property projectType = new()
             {
                 Name = Dataconstant.Cdx_ProjectType,
                 Value = appSettings.ProjectType
             };
-            artifactoryrepo.Name = Dataconstant.Cdx_ArtifactoryRepoUrl;
-            artifactoryrepo.Value = repo;
-            Property internalType = new Property
+            Property artifactoryrepo = new()
             {
-                Name = Dataconstant.Cdx_IsInternal,
-                Value = "false"
+                Name = Dataconstant.Cdx_ArtifactoryRepoUrl,
+                Value = repo
             };
-            propList.Add(internalType);
-            propList.Add(artifactoryrepo);
-            propList.Add(projectType);
-            component.Properties = propList;
+
+            component.Properties.Add(artifactoryrepo);
+            component.Properties.Add(projectType);
+            component.Description = string.Empty;
             componentForBOM.Add(component);
-          
+
         }
 
     }

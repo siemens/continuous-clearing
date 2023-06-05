@@ -13,6 +13,7 @@ using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using log4net;
 using log4net.Core;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -517,16 +518,23 @@ namespace LCT.PackageIdentifier
 
             };
 
-
-            foreach (var item in appSettings?.Nuget?.JfrogNugetRepoList)
+            var repolist = appSettings?.Nuget?.JfrogNugetRepoList;
+            if (repolist != null)
             {
-                List<Component> componentsForBOM = await GetJfrogArtifactoryRepoInfo(appSettings, artifactoryUpload, component, item);
-                if (componentsForBOM.Count > 0)
+                foreach (var item in repolist)
                 {
-                    modifiedBOM = componentsForBOM;
-                    break;
-                }
+                    List<Component> componentsForBOM = await GetJfrogArtifactoryRepoInfo(appSettings, artifactoryUpload, component, item);
+                    if (componentsForBOM.Count > 0)
+                    {
+                        modifiedBOM = componentsForBOM;
+                        break;
+                    }
 
+                }
+            }
+            else
+            {
+                Logger.Debug($"AddPackageAvailability():No Repo list manitained!!");
             }
 
             return modifiedBOM;
