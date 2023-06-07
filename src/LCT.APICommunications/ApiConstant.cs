@@ -2,7 +2,6 @@
 //  SPDX-FileCopyrightText: 2023 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
-
 // -------------------------------------------------------------------------------------------------------------------- 
 
 namespace LCT.APICommunications
@@ -69,5 +68,6 @@ namespace LCT.APICommunications
         public const string InvalidArtifactory = "Invalid artifactory";
         public const string PackageNotFound = "Package Not Found";
         public const string ArtifactoryRepoName = "ArtifactoryRepoName";
+        public const string JfrogArtifactoryApiSearchAql = $"/api/search/aql";
     }
 }

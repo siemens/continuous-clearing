@@ -2,7 +2,6 @@
 // SPDX-FileCopyrightText: 2023 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
-
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
@@ -11,6 +10,7 @@ using LCT.Common.Constants;
 using LCT.Common.Interface;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
+using LCT.Services.Interface;
 using log4net;
 using log4net.Core;
 using System;
@@ -28,6 +28,10 @@ namespace LCT.PackageIdentifier
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static readonly BomKpiData bomKpiData = new();
         ComponentIdentification componentData;
+
+        public IJFrogService JFrogService { get; set; }
+        public IBomHelper BomHelper { get; set; }
+
         public async Task GenerateBom(CommonAppSettings appSettings, IBomHelper bomHelper, IFileOperations fileOperations)
         {
             Logger.Debug($"GenerateBom():Start");
@@ -150,22 +154,31 @@ namespace LCT.PackageIdentifier
             ComponentIdentification lstOfComponents;
             List<Component> components;
             Metadata metadata;
-            Bom bom;
-            //Parsing the input file
-            bom = parser.ParsePackageFile(appSettings);
-            metadata = bom.Metadata;
-            componentData = new ComponentIdentification()
+            Bom bom = new Bom();
+            try
             {
-                comparisonBOMData = bom.Components,
-                internalComponents=new List<Component>()
-            };
-            //Identification of internal components
-            lstOfComponents = await parser.IdentificationOfInternalComponents(componentData, appSettings);
-            components = lstOfComponents.comparisonBOMData;
-            //Setting the artifactory repo info
-            components = await parser.GetRepoDetails(components, appSettings);
-            bom.Components = components;
-            bom.Metadata = metadata;
+                //Parsing the input file
+                bom = parser.ParsePackageFile(appSettings);
+                metadata = bom.Metadata;
+                componentData = new ComponentIdentification()
+                {
+                    comparisonBOMData = bom.Components,
+                    internalComponents = new List<Component>()
+                };
+
+                //Identification of internal components
+                lstOfComponents = await parser.IdentificationOfInternalComponents(componentData, appSettings, JFrogService, BomHelper);
+                components = lstOfComponents.comparisonBOMData;
+
+                //Setting the artifactory repo info
+                components = await parser.GetJfrogRepoDetailsOfAComponent(components, appSettings, JFrogService, BomHelper);
+                bom.Components = components;
+                bom.Metadata = metadata;
+            }
+            catch (Exception ex)
+            {
+                Logger.Debug($"ComponentIdentification: {ex}");
+            }
             return bom;
         }
     }

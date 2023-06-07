@@ -2,7 +2,6 @@
 // SPDX-FileCopyrightText: 2023 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
-
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.APICommunications.Interfaces;
@@ -46,7 +45,7 @@ namespace LCT.APICommunications
                 return responseBody;
             }
 
-            string response = await responseBody?.Content?.ReadAsStringAsync();
+            string response = await responseBody?.Content?.ReadAsStringAsync() ?? string.Empty;
             releaseInfo = JsonConvert.DeserializeObject<ReleasesDetails>(response);
             if (releaseInfo.Embedded != null)
             {

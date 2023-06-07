@@ -2,9 +2,7 @@
 // SPDX-FileCopyrightText: 2023 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
-
 // -------------------------------------------------------------------------------------------------------------------- 
-
 
 using LCT.PackageIdentifier.Model;
 using NUnit.Framework;
@@ -13,8 +11,13 @@ using System.Collections.Generic;
 using System.IO;
 using LCT.Common;
 using LCT.Common.Model;
-using System.Security;
 using LCT.PackageIdentifier;
+using LCT.Services.Interface;
+using LCT.PackageIdentifier.Interface;
+using Moq;
+using LCT.APICommunications.Model.AQL;
+using CycloneDX.Models;
+using System.Threading.Tasks;
 
 namespace PackageIdentifier.UTest
 {
@@ -204,7 +207,7 @@ namespace PackageIdentifier.UTest
             CommonAppSettings CommonAppSettings = new CommonAppSettings()
             {
                 PackageFilePath = csprojfilepath,
-                Nuget = new Config() { Exclude = Excludes ,ExcludedComponents =new List<string>()}
+                Nuget = new Config() { Exclude = Excludes, ExcludedComponents = new List<string>() }
             };
 
             //Act
@@ -213,6 +216,196 @@ namespace PackageIdentifier.UTest
             //Assert
             Assert.AreEqual(0, updatedBom.Components.Count, "Zero component exculded");
 
+        }
+
+        [Test]
+        public async Task IdentificationOfInternalComponents_Nuget_ReturnsComponentData_Successfully()
+        {
+            // Arrange
+            Component component1 = new Component();
+            component1.Name = "animations";
+            component1.Group = "";
+            component1.Description = string.Empty;
+            component1.Version = "1.0.0";
+            var components = new List<Component>() { component1 };
+            ComponentIdentification component = new() { comparisonBOMData = components };
+            string[] reooListArr = { "energy-dev-npm-egll", "energy-release-npm-egll" };
+            CommonAppSettings appSettings = new() { InternalRepoList = reooListArr };
+
+            AqlResult aqlResult = new()
+            {
+                Name = "animations-1.0.0.tgz",
+                Path = "@siemens-gds/saap-api-node/-/@siemens-gds",
+                Repo = "energy-dev-npm-egll"
+            };
+
+            List<AqlResult> results = new List<AqlResult>() { aqlResult };
+            Mock<IJFrogService> mockJfrogService = new Mock<IJFrogService>();
+            Mock<IBomHelper> mockBomHelper = new Mock<IBomHelper>();
+            mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
+                .ReturnsAsync(results);
+            mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations");
+
+            // Act
+            NugetProcessor nugetProcessor = new NugetProcessor();
+            var actual = await nugetProcessor.IdentificationOfInternalComponents(
+                component, appSettings, mockJfrogService.Object, mockBomHelper.Object);
+
+            // Assert
+            Assert.That(actual, Is.Not.Null);
+        }
+
+        [Test]
+        public async Task IdentificationOfInternalComponents_Nuget_ReturnsComponentData2_Successfully()
+        {
+            // Arrange
+            Component component1 = new Component();
+            component1.Name = "animations";
+            component1.Group = "";
+            component1.Description = string.Empty;
+            component1.Version = "1.0.0";
+            var components = new List<Component>() { component1 };
+            ComponentIdentification component = new() { comparisonBOMData = components };
+            string[] reooListArr = { "energy-dev-npm-egll", "energy-release-npm-egll" };
+            CommonAppSettings appSettings = new() { InternalRepoList = reooListArr };
+
+            AqlResult aqlResult = new()
+            {
+                Name = "animations-common_license-1.0.0.tgz",
+                Path = "@siemens-gds/saap-api-node/-/@siemens-gds",
+                Repo = "energy-dev-npm-egll"
+            };
+
+            List<AqlResult> results = new List<AqlResult>() { aqlResult };
+            Mock<IJFrogService> mockJfrogService = new Mock<IJFrogService>();
+            Mock<IBomHelper> mockBomHelper = new Mock<IBomHelper>();
+            mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
+                .ReturnsAsync(results);
+            mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations");
+
+            // Act
+            NugetProcessor nugetProcessor = new NugetProcessor();
+            var actual = await nugetProcessor.IdentificationOfInternalComponents(component, appSettings, mockJfrogService.Object, mockBomHelper.Object);
+
+            // Assert
+            Assert.That(actual, Is.Not.Null);
+        }
+
+        [Test]
+        public async Task IdentificationOfInternalComponents_ReturnsComponentData3_Successfully()
+        {
+            // Arrange
+            Component component1 = new Component
+            {
+                Name = "animations",
+                Group = "common",
+                Description = string.Empty,
+                Version = "1.0.0"
+            };
+            var components = new List<Component>() { component1 };
+            ComponentIdentification componentIdentification = new() { comparisonBOMData = components };
+            string[] reooListArr = { "energy-dev-npm-egll", "energy-release-npm-egll" };
+            CommonAppSettings appSettings = new() { InternalRepoList = reooListArr };
+
+            AqlResult aqlResult = new()
+            {
+                Name = "animations-common-1.0.0.tgz",
+                Path = "@siemens-gds/saap-api-node/-/@siemens-gds",
+                Repo = "energy-dev-npm-egll"
+            };
+
+            List<AqlResult> results = new List<AqlResult>() { aqlResult };
+            Mock<IJFrogService> mockJfrogService = new Mock<IJFrogService>();
+            Mock<IBomHelper> mockBomHelper = new Mock<IBomHelper>();
+            mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
+                .ReturnsAsync(results);
+            mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations/common");
+
+            // Act
+            NugetProcessor nugetProcessor = new NugetProcessor();
+            var actual = await nugetProcessor.IdentificationOfInternalComponents(
+                componentIdentification, appSettings, mockJfrogService.Object, mockBomHelper.Object);
+
+            // Assert
+            Assert.That(actual, Is.Not.Null);
+        }
+
+        [Test]
+        public async Task GetJfrogRepoDetailsOfAComponent_ReturnsWithData_SuccessFully()
+        {
+            // Arrange
+            Component component1 = new Component
+            {
+                Name = "animations",
+                Group = "common",
+                Description = string.Empty,
+                Version = "1.0.0"
+            };
+            var components = new List<Component>() { component1 };
+            string[] reooListArr = { "siparty-release-npm-egll", "org1-npmjs-npm-remote-cache" };
+            CommonAppSettings appSettings = new();
+            appSettings.Nuget = new LCT.Common.Model.Config() { JfrogNugetRepoList = reooListArr };
+            AqlResult aqlResult = new()
+            {
+                Name = "animations-common-1.0.0.tgz",
+                Path = "@siemens-gds/saap-api-node/-/@siemens-gds",
+                Repo = "siparty-release-npm-egll"
+            };
+
+            List<AqlResult> results = new List<AqlResult>() { aqlResult };
+
+            Mock<IJFrogService> mockJfrogService = new Mock<IJFrogService>();
+            Mock<IBomHelper> mockBomHelper = new Mock<IBomHelper>();
+            mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
+                .ReturnsAsync(results);
+            mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations/common");
+
+            // Act
+            NugetProcessor nugetProcessor = new NugetProcessor();
+            var actual = await nugetProcessor.GetJfrogRepoDetailsOfAComponent(
+                components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
+
+            // Assert
+            Assert.That(actual, Is.Not.Null);
+        }
+
+        [Test]
+        public async Task GetJfrogRepoDetailsOfAComponent_Nuget_ReturnsWithData2_SuccessFully()
+        {
+            // Arrange
+            Component component1 = new Component
+            {
+                Name = "animations",
+                Group = "",
+                Description = string.Empty,
+                Version = "1.0.0"
+            };
+            var components = new List<Component>() { component1 };
+            string[] reooListArr = { "siparty-release-npm-egll", "org1-npmjs-npm-remote-cache" };
+            CommonAppSettings appSettings = new();
+            appSettings.Nuget = new LCT.Common.Model.Config() { JfrogNugetRepoList = reooListArr };
+            AqlResult aqlResult = new()
+            {
+                Name = "animations-common-1.0.0.tgz",
+                Path = "@siemens-gds/saap-api-node/-/@siemens-gds",
+                Repo = "siparty-release-npm-egll"
+            };
+
+            List<AqlResult> results = new List<AqlResult>() { aqlResult };
+
+            Mock<IJFrogService> mockJfrogService = new Mock<IJFrogService>();
+            Mock<IBomHelper> mockBomHelper = new Mock<IBomHelper>();
+            mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
+                .ReturnsAsync(results);
+            mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations");
+
+            // Act
+            NugetProcessor nugetProcessor = new NugetProcessor();
+            var actual = await nugetProcessor.GetJfrogRepoDetailsOfAComponent(
+                components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
+
+            // Assert
+            Assert.That(actual, Is.Not.Null);
         }
     }
 }

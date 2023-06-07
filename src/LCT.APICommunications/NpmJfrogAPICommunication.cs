@@ -2,9 +2,7 @@
 // SPDX-FileCopyrightText: 2023 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
-
 // -------------------------------------------------------------------------------------------------------------------- 
-
 
 using LCT.APICommunications.Model;
 using System.Net.Http;
@@ -17,6 +15,7 @@ namespace LCT.APICommunications
         public NpmJfrogApiCommunication(string repoDomainName, string srcrepoName, ArtifactoryCredentials repoCredentials) : base(repoDomainName, srcrepoName, repoCredentials)
         {
         }
+
         private static HttpClient GetHttpClient(ArtifactoryCredentials credentials)
         {
             HttpClient httpClient = new HttpClient();
@@ -25,17 +24,11 @@ namespace LCT.APICommunications
             httpClient.DefaultRequestHeaders.Add(ApiConstant.Email, credentials.Email);
             return httpClient;
         }
+
         public override async Task<HttpResponseMessage> GetApiKey()
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
             string url = $"{DomainName}/api/security/apiKey";
-            return await httpClient.GetAsync(url);
-        }
-
-        public override async Task<HttpResponseMessage> CheckPackageAvailabilityInRepo(string repoName, string componentName, string componentVersion)
-        {
-            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-            string url = $"{DomainName}/api/storage/{repoName}/{componentName}/-/{componentName}-{componentVersion}.tgz";
             return await httpClient.GetAsync(url);
         }
 
@@ -47,17 +40,20 @@ namespace LCT.APICommunications
               $".tgz?to=/{destreponame}/{uploadArgs.PackageName}/-/{uploadArgs.ReleaseName}-{uploadArgs.Version}.tgz";
             return await httpClient.PostAsync(url, httpContent);
         }
+
         public override async Task<HttpResponseMessage> CopyFromRemoteRepo(ComponentsToArtifactory component)
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
             const HttpContent httpContent = null;
             return await httpClient.PostAsync(component.CopyPackageApiUrl, httpContent);
         }
+
         public override async Task<HttpResponseMessage> GetPackageInfo(ComponentsToArtifactory component)
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
             return await httpClient.GetAsync(component.PackageInfoApiUrl);
         }
+
         public override async Task<HttpResponseMessage> GetPackageByPackageName(UploadArgs uploadArgs)
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
@@ -73,6 +69,5 @@ namespace LCT.APICommunications
               $"properties=sw360url={sw360releaseUrl}";
             httpClient.PutAsync(url, httpContent);
         }
-
     }
 }

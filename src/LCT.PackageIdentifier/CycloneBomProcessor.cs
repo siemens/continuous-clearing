@@ -2,7 +2,6 @@
 // SPDX-FileCopyrightText: 2023 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
-
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
@@ -19,7 +18,7 @@ namespace LCT.PackageIdentifier
 
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        public static Bom SetMetadataInComparisonBOM(Bom bom,CommonAppSettings appSettings)
+        public static Bom SetMetadataInComparisonBOM(Bom bom, CommonAppSettings appSettings)
         {
             Logger.Debug("Starting to add metadata info into the BOM");
 
@@ -46,30 +45,43 @@ namespace LCT.PackageIdentifier
             return bom;
         }
 
-        public static void SetProperties(CommonAppSettings appSettings, Component component,ref List<Component> componentForBOM, string repo = "Not Found in JFrogRepo")
+        public static void SetProperties(CommonAppSettings appSettings, Component component, ref List<Component> componentForBOM, string repo = "Not Found in JFrogRepo")
         {
-            component.Description = string.Empty;
-            List<Property> propList = new List<Property>();
-            Property artifactoryrepo = new Property();
-            Property projectType = new Property
+            List<Property> propList = new();
+            if (component.Properties?.Count == null || component.Properties.Count <= 0)
+            {
+                component.Properties = propList;
+            }
+
+            Property projectType = new()
             {
                 Name = Dataconstant.Cdx_ProjectType,
                 Value = appSettings.ProjectType
             };
-            artifactoryrepo.Name = Dataconstant.Cdx_ArtifactoryRepoUrl;
-            artifactoryrepo.Value = repo;
-            Property internalType = new Property
+            Property artifactoryrepo = new()
+            {
+                Name = Dataconstant.Cdx_ArtifactoryRepoUrl,
+                Value = repo
+            };
+
+            Property internalType = new()
             {
                 Name = Dataconstant.Cdx_IsInternal,
                 Value = "false"
             };
-            propList.Add(internalType);
-            propList.Add(artifactoryrepo);
-            propList.Add(projectType);
-            component.Properties = propList;
-            componentForBOM.Add(component);
-          
-        }
 
+            Property isDevelopment = new()
+            {
+                Name = Dataconstant.Cdx_IsDevelopment,
+                Value = "false"
+            };
+
+            component.Properties.Add(internalType);
+            component.Properties.Add(artifactoryrepo);
+            component.Properties.Add(projectType);
+            component.Properties.Add(isDevelopment);
+            component.Description = string.Empty;
+            componentForBOM.Add(component);
+        }
     }
 }
