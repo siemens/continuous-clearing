@@ -167,6 +167,7 @@ namespace LCT.PackageIdentifier
                 };
 
                 //Identification of internal components
+                Logger.Logger.Log(null, Level.Notice, $"Identifying the internal components", null);
                 lstOfComponents = await parser.IdentificationOfInternalComponents(componentData, appSettings, JFrogService, BomHelper);
                 components = lstOfComponents.comparisonBOMData;
 
