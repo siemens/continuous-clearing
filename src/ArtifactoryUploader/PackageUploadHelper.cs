@@ -186,12 +186,12 @@ namespace LCT.ArtifactoryUploader
             return string.Empty;
         }
 
-        public static async Task UploadingThePackages(List<ComponentsToArtifactory> componentsToUpload)
+        public static async Task UploadingThePackages(List<ComponentsToArtifactory> componentsToUpload,int timeout)
         {
             Logger.Debug("Starting UploadingThePackages() method");
             foreach (var item in componentsToUpload)
             {
-                await PackageUploadToArtifactory(PackageUploader.uploaderKpiData, item);
+                await PackageUploadToArtifactory(PackageUploader.uploaderKpiData, item,timeout);
             }
 
             if (SetWarningCode)
@@ -204,7 +204,7 @@ namespace LCT.ArtifactoryUploader
             Program.UploaderStopWatch?.Stop();
         }
 
-        private static async Task PackageUploadToArtifactory(UploaderKpiData uploaderKpiData, ComponentsToArtifactory item)
+        private static async Task PackageUploadToArtifactory(UploaderKpiData uploaderKpiData, ComponentsToArtifactory item,int timeout)
         {
             if (!(item.SrcRepoName.Contains("siparty")))
             {
@@ -212,7 +212,7 @@ namespace LCT.ArtifactoryUploader
                 {
 
                     ArtfactoryUploader artifactoryUpload = new ArtfactoryUploader();
-                    HttpResponseMessage responseMessage = await artifactoryUpload.UploadPackageToRepo(item);
+                    HttpResponseMessage responseMessage = await artifactoryUpload.UploadPackageToRepo(item,timeout);
                     if (responseMessage.StatusCode == HttpStatusCode.OK)
                     {
                         uploaderKpiData.PackagesUploadedToJfrog++;

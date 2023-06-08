@@ -5,20 +5,27 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.APICommunications.Model;
+using log4net;
+using System;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace LCT.APICommunications
 {
-    public class MavenJfrogApiCommunication: JfrogApicommunication
+    public class MavenJfrogApiCommunication : JfrogApicommunication
     {
-        public MavenJfrogApiCommunication(string repoDomainName, string srcrepoName, ArtifactoryCredentials repoCredentials) : base(repoDomainName, srcrepoName, repoCredentials)
+        private static int timeoutsec { get; set; }
+        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        public MavenJfrogApiCommunication(string repoDomainName, string srcrepoName, ArtifactoryCredentials repoCredentials, int timeout) : base(repoDomainName, srcrepoName, repoCredentials, timeout)
         {
+            timeoutsec = timeout;
         }
         private static HttpClient GetHttpClient(ArtifactoryCredentials credentials)
         {
             HttpClient httpClient = new HttpClient();
-
+            TimeSpan timeOutInSec = TimeSpan.FromSeconds(timeoutsec);
+            httpClient.Timeout = timeOutInSec;
             httpClient.DefaultRequestHeaders.Add(ApiConstant.JFrog_API_Header, credentials.ApiKey);
             httpClient.DefaultRequestHeaders.Add(ApiConstant.Email, credentials.Email);
             return httpClient;
@@ -42,9 +49,28 @@ namespace LCT.APICommunications
 
         public override async Task<HttpResponseMessage> GetPackageByPackageName(UploadArgs uploadArgs)
         {
-            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-            string url = $"{DomainName}/api/storage/{SourceRepoName}/{uploadArgs.ReleaseName}/{uploadArgs.PackageName}/{uploadArgs.Version}";
-            return await httpClient.GetAsync(url);
+            HttpResponseMessage responseMessage = new HttpResponseMessage();
+            var result = responseMessage;
+            try
+            {
+                HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
+                string url = $"{DomainName}/api/storage/{SourceRepoName}/{uploadArgs.ReleaseName}/{uploadArgs.PackageName}/{uploadArgs.Version}";
+                result = await httpClient.GetAsync(url);
+            }
+            catch (HttpRequestException ex)
+            {
+                Logger.Debug($"{ex.Message}");
+                Logger.Error("Connection issue with Jfrog artifactory!Please rerun the pipeline");
+                Environment.Exit(-1);
+            }
+            catch (TaskCanceledException ex)
+            {
+                Logger.Debug($"{ex.Message}");
+                Logger.Error("A timeout error is thrown from Jfrog server,Please wait for sometime and re run the pipeline again");
+                Environment.Exit(-1);
+
+            }
+            return result;
         }
 
         public override async Task<HttpResponseMessage> CopyFromRemoteRepo(ComponentsToArtifactory component)

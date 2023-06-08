@@ -143,7 +143,7 @@ namespace LCT.Common
 
             foreach (var item in printTimingData)
             {
-                Logger.Info($"\n{TimeTakenBy,8} {item.Key,-5} {":",1} {item.Value,8} ms\n");
+                Logger.Info($"\n{TimeTakenBy,8} {item.Key,-5} {":",1} {item.Value,8} s\n");
             }
         }
 
