@@ -2,7 +2,6 @@
 // SPDX-FileCopyrightText: 2023 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
-
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.APICommunications.Model;
@@ -16,6 +15,7 @@ namespace LCT.APICommunications
         public NugetJfrogApiCommunication(string repoDomainName, string srcrepoName, ArtifactoryCredentials repoCredentials):base(repoDomainName,srcrepoName,repoCredentials)
         {
         }
+
         private static HttpClient GetHttpClient(ArtifactoryCredentials credentials)
         {
             HttpClient httpClient = new HttpClient();
@@ -24,12 +24,7 @@ namespace LCT.APICommunications
             httpClient.DefaultRequestHeaders.Add(ApiConstant.Email, credentials.Email);
             return httpClient;
         }
-        public override async Task<HttpResponseMessage> CheckPackageAvailabilityInRepo(string repoName, string componentName, string componentVersion)
-        {
-            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-            string url = $"{DomainName}/api/storage/{repoName}/{componentName}.{componentVersion}.nupkg";
-            return await httpClient.GetAsync(url);
-        }
+
         public override async Task<HttpResponseMessage> GetApiKey()
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
@@ -52,17 +47,20 @@ namespace LCT.APICommunications
             string url = $"{DomainName}/api/storage/{SourceRepoName}/{uploadArgs.PackageName}.{uploadArgs.Version}.nupkg";
             return await httpClient.GetAsync(url);
         }
+
         public override async Task<HttpResponseMessage> CopyFromRemoteRepo(ComponentsToArtifactory component)
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
             const HttpContent httpContent = null;
             return await httpClient.PostAsync(component.CopyPackageApiUrl, httpContent);
         }
+
         public override async Task<HttpResponseMessage> GetPackageInfo(ComponentsToArtifactory component)
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
             return await httpClient.GetAsync(component.PackageInfoApiUrl);
         }
+
         public override void UpdatePackagePropertiesInJfrog(string sw360releaseUrl, string destRepoName, UploadArgs uploadArgs)
         {
              HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);

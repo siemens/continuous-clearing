@@ -2,31 +2,30 @@
 // SPDX-FileCopyrightText: 2023 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
-
 // --------------------------------------------------------------------------------------------------------------------
 
 using CycloneDX.Models;
-using LCT.APICommunications;
-using LCT.APICommunications.Model;
+using LCT.APICommunications.Model.AQL;
 using LCT.Common;
+using LCT.Common.Constants;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
+using LCT.Services.Interface;
 using log4net;
-using log4net.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 
 namespace LCT.PackageIdentifier
 {
-    public class MavenProcessor : CycloneDXBomParser, IParser, IProcessor
+    public class MavenProcessor : CycloneDXBomParser, IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private const string NotFoundInRepo = "Not Found in JFrogRepo";
+
         public Bom ParsePackageFile(CommonAppSettings appSettings)
         {
             List<Component> componentsForBOM = new();
@@ -118,172 +117,98 @@ namespace LCT.PackageIdentifier
 
             }
         }
-        public async Task<List<Component>> GetJfrogArtifactoryRepoInfo(CommonAppSettings appSettings, ArtifactoryCredentials artifactoryUpload, Component component, string repo)
+
+        public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM, CommonAppSettings appSettings,
+                                                          IJFrogService jFrogService,
+                                                          IBomHelper bomhelper)
         {
 
-            List<Component> componentForBOM = new();
-
-            string releaseName = component.Name;
-            HttpResponseMessage responseBody;
-            JfrogApicommunication jfrogApicommunication = new MavenJfrogApiCommunication(appSettings.JFrogApi, repo, artifactoryUpload);
-            if (!string.IsNullOrEmpty(component.Group))
-            {
-                releaseName = $"{component.Group}";
-            }
-            UploadArgs uploadArgs = new()
-            {
-                PackageName = component.Name,
-                ReleaseName = releaseName,
-                Version = component.Version
-            };
-
-            responseBody = await jfrogApicommunication.GetPackageByPackageName(uploadArgs);
-            if (responseBody.StatusCode == HttpStatusCode.NotFound)
-            {
-                string componentName = component.Name.ToLowerInvariant();
-                UploadArgs uploadArgument = new()
-                {
-                    PackageName = componentName,
-                    ReleaseName = releaseName,
-                    Version = component.Version
-                };
-                responseBody = await jfrogApicommunication.GetPackageByPackageName(uploadArgument);
-            }
-            if (responseBody.StatusCode == HttpStatusCode.OK)
-            {
-                CycloneBomProcessor.SetProperties(appSettings, component, ref componentForBOM, repo);
-            }
-            return componentForBOM;
-        }
-        public async Task<List<Component>> GetRepoDetails(List<Component> componentsForBOM, CommonAppSettings appSettings)
-        {
-
-            List<Component> modifiedBOM = new();
+            // get the  component list from Jfrog for given repo
+            List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(appSettings.Maven?.JfrogMavenRepoList, jFrogService);
+            Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
+            List<Component> modifiedBOM = new List<Component>();
 
             foreach (var component in componentsForBOM)
             {
+                string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper);
+                Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoUrl, Value = repoName };
+                Component componentVal = component;
 
-                List<Component> repoInfoBOM = await AddPackageAvailability(appSettings, component);
-                modifiedBOM.AddRange(repoInfoBOM);
-                if (repoInfoBOM.Count == 0)
+                if (componentVal.Properties?.Count == null || componentVal.Properties?.Count <= 0)
                 {
-                    CycloneBomProcessor.SetProperties(appSettings, component, ref modifiedBOM);
-
+                    componentVal.Properties = new List<Property>();
                 }
+                componentVal.Properties.Add(artifactoryrepo);
+                componentVal.Properties.Add(projectType);
+                componentVal.Description = string.Empty;
 
-
-            }
-            return modifiedBOM;
-
-        }
-        private async Task<List<Component>> AddPackageAvailability(CommonAppSettings appSettings, Component component)
-        {
-            List<Component> modifiedBOM = new();
-            ArtifactoryCredentials artifactoryUpload = new()
-            {
-                ApiKey = appSettings.ArtifactoryUploadApiKey
-
-            };
-
-
-            foreach (var item in appSettings?.Maven?.JfrogMavenRepoList)
-            {
-                List<Component> componentsForBOM = await GetJfrogArtifactoryRepoInfo(appSettings, artifactoryUpload, component, item);
-                if (componentsForBOM.Count > 0)
-                {
-                    modifiedBOM = componentsForBOM;
-                    break;
-                }
-
+                modifiedBOM.Add(componentVal);
             }
 
             return modifiedBOM;
         }
 
-        public async Task<List<Component>> CheckInternalComponentsInJfrogArtifactory(CommonAppSettings appSettings, ArtifactoryCredentials artifactoryUpload, Component component, string repo)
+        public async Task<ComponentIdentification> IdentificationOfInternalComponents(
+           ComponentIdentification componentData, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
 
-            List<Component> componentNotForBOM = new();
-            HttpResponseMessage responseBody;
-            UploadArgs uploadArgs = new()
+            // get the  component list from Jfrog for given repo
+            List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(appSettings.InternalRepoList, jFrogService);
+
+            // find the components in the list of internal components
+            List<Component> internalComponents = new List<Component>();
+            Property isInternal = new() { Name = Dataconstant.Cdx_IsInternal, Value = "false" };
+            var internalComponentStatusUpdatedList = new List<Component>();
+            var inputIterationList = componentData.comparisonBOMData;
+
+            foreach (Component component in inputIterationList)
             {
-                PackageName = component.Name,
-                ReleaseName = component.Group,
-                Version = component.Version
-            };
-            JfrogApicommunication jfrogApicommunication = new MavenJfrogApiCommunication(appSettings.JFrogApi, repo, artifactoryUpload);
-            responseBody = await jfrogApicommunication.GetPackageByPackageName(uploadArgs);
-            if (responseBody.StatusCode == HttpStatusCode.NotFound)
-            {
-                string componentName = component.Name.ToLowerInvariant();
-                UploadArgs uploadArgument = new()
+                var currentIterationItem = component;
+
+                bool isTrue = IsInternalMavenComponent(aqlResultList, currentIterationItem, bomhelper);
+                if (currentIterationItem.Properties?.Count == null || currentIterationItem.Properties?.Count <= 0)
                 {
-                    PackageName = componentName,
-                    ReleaseName = component.Group,
-                    Version = component.Version
-                };
-                responseBody = await jfrogApicommunication.GetPackageByPackageName(uploadArgument);
-            }
-            if (responseBody.StatusCode == HttpStatusCode.OK)
-            {
-                componentNotForBOM.Add(component);
-            }
-
-            if (responseBody.StatusCode == HttpStatusCode.Forbidden)
-            {
-                Logger.Logger.Log(null, Level.Warn, $"Provide a valid token for JFrog Artifactory to enable" +
-                    $" the internal component identification", null);
-                throw new UnauthorizedAccessException();
-            }
-            return componentNotForBOM;
-
-        }
-        public async Task<ComponentIdentification> IdentificationOfInternalComponents(ComponentIdentification componentData, CommonAppSettings appSettings)
-        {
-
-            List<Component> componentNotForBOM;
-            if (appSettings.InternalRepoList != null && appSettings.InternalRepoList.Length > 0)
-            {
-                componentNotForBOM = await ComponentIdentification(componentData.comparisonBOMData, appSettings);
-                foreach (var item in componentNotForBOM)
-                {
-                    Component component = componentData.comparisonBOMData.First(x => x.Name == item.Name && x.Version == item.Version);
-                    componentData.comparisonBOMData.Remove(component);
+                    currentIterationItem.Properties = new List<Property>();
                 }
-                componentData.internalComponents = componentNotForBOM;
-                BomCreator.bomKpiData.InternalComponents = componentNotForBOM.Count;
+
+                if (isTrue)
+                {
+                    internalComponents.Add(currentIterationItem);
+                    isInternal.Value = "true";
+                }
+                else
+                {
+                    isInternal.Value = "false";
+                }
+
+                currentIterationItem.Properties.Add(isInternal);
+                internalComponentStatusUpdatedList.Add(currentIterationItem);
             }
+
+            // update the comparision bom data
+            componentData.comparisonBOMData = internalComponentStatusUpdatedList;
+            componentData.internalComponents = internalComponents;
 
             return componentData;
         }
-        public static async Task<List<Component>> ComponentIdentification(List<Component> comparisonBOMData, CommonAppSettings appSettings)
+
+        private bool IsInternalMavenComponent(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
         {
-
-            List<Component> componentNotForBOM = new();
-            await DefinedParallel.ParallelForEachAsync(
-                        comparisonBOMData,
-                        async component =>
-                        {
-
-                            foreach (var repo in appSettings.InternalRepoList)
-                            {
-                                componentNotForBOM.AddRange(await CheckPackageAvailability(appSettings, component, repo));
-                            }
-                        });
-            return componentNotForBOM;
-        }
-        private static async Task<List<Component>> CheckPackageAvailability(CommonAppSettings appSettings, Component component, string repo)
-        {
-
-            ArtifactoryCredentials artifactoryUpload = new()
+            string jfrogcomponentName = $"{component.Name}-{component.Version}";
+            if (aqlResultList.Exists(x => x.Name.Contains(jfrogcomponentName, StringComparison.OrdinalIgnoreCase)))
             {
-                ApiKey = appSettings.ArtifactoryUploadApiKey
+                return true;
+            }
 
-            };
-            IProcessor processor = new MavenProcessor();
-            List<Component> componentNotForBOM = await processor.CheckInternalComponentsInJfrogArtifactory(appSettings, artifactoryUpload, component, repo);
-            return componentNotForBOM;
+            string fullName = bomHelper.GetFullNameOfComponent(component);
+            string fullNameVersion = $"{fullName}-{component.Version}";
+            if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase) && aqlResultList.Exists(
+                x => x.Name.Contains(fullNameVersion, StringComparison.OrdinalIgnoreCase)))
+            {
+                return true;
+            }
 
+            return false;
         }
 
         private static bool GetDevDependentScopeList(CommonAppSettings appSettings, string scope)
@@ -329,6 +254,26 @@ namespace LCT.PackageIdentifier
             }
 
             return scope;
+        }
+
+        private string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
+        {
+            string jfrogcomponentName = $"{component.Name}-{component.Version}";
+
+            string repoName = aqlResultList.Find(x => x.Name.Contains(
+                jfrogcomponentName, StringComparison.OrdinalIgnoreCase))?.Repo ?? NotFoundInRepo;
+
+            string fullName = bomHelper.GetFullNameOfComponent(component);
+            string fullNameVersion = $"{fullName}-{component.Version}";
+
+            if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase) &&
+                repoName.Equals(NotFoundInRepo, StringComparison.OrdinalIgnoreCase))
+            {
+                repoName = aqlResultList.Find(x => x.Name.Contains(
+                    fullNameVersion, StringComparison.OrdinalIgnoreCase))?.Repo ?? NotFoundInRepo;
+            }
+
+            return repoName;
         }
 
     }

@@ -2,7 +2,6 @@
 // SPDX-FileCopyrightText: 2023 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
-
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
@@ -11,7 +10,6 @@ using log4net;
 using log4net.Core;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 
