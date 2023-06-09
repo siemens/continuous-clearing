@@ -19,6 +19,7 @@ namespace LCT.APICommunications
         private static int timeoutsec { get; set; }
         public NpmJfrogApiCommunication(string repoDomainName, string srcrepoName, ArtifactoryCredentials repoCredentials, int timeout) : base(repoDomainName, srcrepoName, repoCredentials, timeout)
         {
+            timeoutsec = timeout;
         }
 
         private static HttpClient GetHttpClient(ArtifactoryCredentials credentials)
