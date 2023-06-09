@@ -2,8 +2,8 @@
 // SPDX-FileCopyrightText: 2023 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
-
 // -------------------------------------------------------------------------------------------------------------------- 
+
 using CycloneDX.Models;
 
 namespace LCT.Common

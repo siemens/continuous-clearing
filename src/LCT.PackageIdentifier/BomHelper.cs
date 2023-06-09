@@ -2,14 +2,15 @@
 // SPDX-FileCopyrightText: 2023 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
-
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
 using LCT.APICommunications;
+using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
+using LCT.Services.Interface;
 using log4net;
 using log4net.Core;
 using System.Collections.Generic;
@@ -18,6 +19,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace LCT.PackageIdentifier
 {
@@ -140,6 +142,34 @@ namespace LCT.PackageIdentifier
 
 
         }
+
+        public string GetFullNameOfComponent(Component item)
+        {
+            if (!string.IsNullOrEmpty(item.Group))
+            {
+                return $"{item.Group}/{item.Name}";
+            }
+            else
+            {
+                return item.Name;
+            }
+        }
+
+        public async Task<List<AqlResult>> GetListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService)
+        {
+            List<AqlResult> aqlResultList = new();
+            if (repoList != null && repoList.Length > 0)
+            {
+                foreach (var repo in repoList)
+                {
+                    var test = await jFrogService.GetInternalComponentDataByRepo(repo) ?? new List<AqlResult>();
+                    aqlResultList.AddRange(test);
+                }
+            }
+
+            return aqlResultList;
+        }
+
         #endregion
     }
 }
