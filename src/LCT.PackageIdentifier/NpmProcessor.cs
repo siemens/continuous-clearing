@@ -126,14 +126,11 @@ namespace LCT.PackageIdentifier
             foreach (JProperty prop in depencyComponentList)
             {
                 Component components = new Component();
-                // Property isdev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" }
-
                 var properties = JObject.Parse(Convert.ToString(prop.Value));
 
                 // ignoring the dev= true components, because they are not needed in clearing     
                 if (IsDevDependency(appSettings.RemoveDevDependency, prop.Value[Dev], ref noOfDevDependent))
                 {
-                    // isdev.Value = "true"
                     continue;
                 }
 
@@ -163,8 +160,6 @@ namespace LCT.PackageIdentifier
                 components.Version = Convert.ToString(properties[Version]);
                 components.Purl = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
                 components.BomRef = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
-                // components.Properties = new List<Property>()
-                // components.Properties.Add(isdev)
                 lstComponentForBOM.Add(components);
                 lstComponentForBOM = RemoveBundledComponentFromList(bundledComponents, lstComponentForBOM);
             }
@@ -186,14 +181,20 @@ namespace LCT.PackageIdentifier
             foreach (Component component in inputIterationList)
             {
                 var currentIterationItem = component;
-
                 bool isTrue = IsInternalNpmComponent(aqlResultList, currentIterationItem, bomhelper);
+                if (currentIterationItem.Properties?.Count == null || currentIterationItem.Properties?.Count <= 0)
+                {
+                    currentIterationItem.Properties = new List<Property>();
+                }
+
+                Property isInternal = new() { Name = Dataconstant.Cdx_IsInternal, Value = "false" };
                 if (isTrue)
                 {
                     internalComponents.Add(currentIterationItem);
                     continue;
                 }
 
+                currentIterationItem.Properties.Add(isInternal);
                 internalComponentStatusUpdatedList.Add(currentIterationItem);
             }
 

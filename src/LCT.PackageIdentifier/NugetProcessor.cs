@@ -326,28 +326,23 @@ namespace LCT.PackageIdentifier
 
             // find the components in the list of internal components
             List<Component> internalComponents = new List<Component>();
-            Property isInternal = new() { Name = Dataconstant.Cdx_IsInternal, Value = "false" };
             var internalComponentStatusUpdatedList = new List<Component>();
             var inputIterationList = componentData.comparisonBOMData;
 
             foreach (Component component in inputIterationList)
             {
                 var currentIterationItem = component;
-
                 bool isTrue = IsInternalNugetComponent(aqlResultList, currentIterationItem, bomhelper);
                 if (currentIterationItem.Properties?.Count == null || currentIterationItem.Properties?.Count <= 0)
                 {
                     currentIterationItem.Properties = new List<Property>();
                 }
 
+                Property isInternal = new() { Name = Dataconstant.Cdx_IsInternal, Value = "false" };
                 if (isTrue)
                 {
                     internalComponents.Add(currentIterationItem);
-                    isInternal.Value = "true";
-                }
-                else
-                {
-                    isInternal.Value = "false";
+                    continue;
                 }
 
                 currentIterationItem.Properties.Add(isInternal);
