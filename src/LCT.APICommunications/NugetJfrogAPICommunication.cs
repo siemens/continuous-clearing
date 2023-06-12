@@ -15,17 +15,17 @@ namespace LCT.APICommunications
 {
     public class NugetJfrogApiCommunication : JfrogApicommunication
     {
-        private static int timeoutsec { get; set; }
+        private static int TimeoutInSec { get; set; }
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public NugetJfrogApiCommunication(string repoDomainName, string srcrepoName, ArtifactoryCredentials repoCredentials,int timeout):base(repoDomainName,srcrepoName,repoCredentials,timeout)
         {
-            timeoutsec = timeout;
+            TimeoutInSec = timeout;
         }
 
         private static HttpClient GetHttpClient(ArtifactoryCredentials credentials)
         {
             HttpClient httpClient = new HttpClient();
-            TimeSpan timeOutInSec = TimeSpan.FromSeconds(timeoutsec);
+            TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
             httpClient.Timeout = timeOutInSec;
             httpClient.DefaultRequestHeaders.Add(ApiConstant.JFrog_API_Header, credentials.ApiKey);
             httpClient.DefaultRequestHeaders.Add(ApiConstant.Email, credentials.Email);

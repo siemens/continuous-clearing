@@ -6,6 +6,7 @@
 
 using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
+using System;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,17 +16,20 @@ namespace LCT.APICommunications
     public class JfrogAqlApiCommunication : IJfrogAqlApiCommunication
     {
         protected string DomainName { get; set; }
+        private static int TimeoutInSec { get; set; }
         protected ArtifactoryCredentials ArtifactoryCredentials { get; set; }
-        public JfrogAqlApiCommunication(string repoDomainName, ArtifactoryCredentials artifactoryCredentials)
+        public JfrogAqlApiCommunication(string repoDomainName, ArtifactoryCredentials artifactoryCredentials, int timeout)
         {
             DomainName = repoDomainName;
             ArtifactoryCredentials = artifactoryCredentials;
+            TimeoutInSec = timeout;
         }
 
         public async Task<HttpResponseMessage> GetInternalComponentDataByRepo(string repoName)
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-
+            TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
+            httpClient.Timeout = timeOutInSec;
             StringBuilder query = new();
             query.Append("items.find({\"repo\":\"");
             query.Append($"{repoName}");

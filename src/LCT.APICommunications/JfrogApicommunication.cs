@@ -19,20 +19,20 @@ namespace LCT.APICommunications
         protected ArtifactoryCredentials ArtifactoryCredentials { get; set; }
 
         protected string SourceRepoName { get; set; }
-        private static int timeoutSec { get; set; }
+        private static int TimeoutInSec { get; set; }
 
         protected JfrogApicommunication(string repoDomainName, string srcrepoName, ArtifactoryCredentials artifactoryCredentials,int timeout)
         {
             DomainName = repoDomainName;
             ArtifactoryCredentials = artifactoryCredentials;
             SourceRepoName = srcrepoName;
-            timeoutSec = timeout;
+            TimeoutInSec = timeout;
         }
 
         private static HttpClient GetHttpClient(ArtifactoryCredentials credentials)
         {
             HttpClient httpClient = new HttpClient();
-            TimeSpan timeOutInSec = TimeSpan.FromSeconds(timeoutSec);
+            TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
             httpClient.Timeout = timeOutInSec;
             httpClient.DefaultRequestHeaders.Add(ApiConstant.JFrog_API_Header, credentials.ApiKey);
             httpClient.DefaultRequestHeaders.Add(ApiConstant.Email, credentials.Email);

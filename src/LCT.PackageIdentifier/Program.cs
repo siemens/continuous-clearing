@@ -91,7 +91,7 @@ namespace LCT.PackageIdentifier
                 ApiKey = appSettings.ArtifactoryUploadApiKey
             };
             IJfrogAqlApiCommunication jfrogAqlApiCommunication =
-                new JfrogAqlApiCommunication(appSettings.JFrogApi, artifactoryUpload);
+                new JfrogAqlApiCommunication(appSettings.JFrogApi, artifactoryUpload,appSettings.TimeOut);
             IJfrogAqlApiCommunicationFacade jFrogApiCommunicationFacade =
                 new JfrogAqlApiCommunicationFacade(jfrogAqlApiCommunication);
             IJFrogService jFrogService = new JFrogService(jFrogApiCommunicationFacade);
