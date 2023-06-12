@@ -23,7 +23,7 @@ namespace LCT.APICommunications.UTest
             ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials();
 
             //Act
-            JfrogApicommunication jfrogApicommunication = new NugetJfrogApiCommunication("", "", repoCredentials);
+            JfrogApicommunication jfrogApicommunication = new NugetJfrogApiCommunication("", "", repoCredentials, 100);
 
             //Assert
             Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApicommunication.GetApiKey());
@@ -37,7 +37,7 @@ namespace LCT.APICommunications.UTest
             UploadArgs uploadArgs = new UploadArgs();
 
             //Act
-            JfrogApicommunication jfrogApicommunication = new NugetJfrogApiCommunication("", "", repoCredentials);
+            JfrogApicommunication jfrogApicommunication = new NugetJfrogApiCommunication("", "", repoCredentials, 100);
 
             //Assert
             Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApicommunication.CopyPackageFromRemoteRepo(uploadArgs, ""));
@@ -51,7 +51,7 @@ namespace LCT.APICommunications.UTest
             ComponentsToArtifactory cmpts = new ComponentsToArtifactory();
 
             //Act
-            JfrogApicommunication jfrogApicommunication = new NugetJfrogApiCommunication("", "", repoCredentials);
+            JfrogApicommunication jfrogApicommunication = new NugetJfrogApiCommunication("", "", repoCredentials, 100);
 
             //Assert
             Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApicommunication.CopyFromRemoteRepo(cmpts));
@@ -65,7 +65,7 @@ namespace LCT.APICommunications.UTest
             ComponentsToArtifactory cmpts = new ComponentsToArtifactory();
 
             //Act
-            JfrogApicommunication jfrogApicommunication = new NugetJfrogApiCommunication("", "", repoCredentials);
+            JfrogApicommunication jfrogApicommunication = new NugetJfrogApiCommunication("", "", repoCredentials, 100);
 
             //Assert
             Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApicommunication.GetPackageInfo(cmpts));
@@ -79,7 +79,7 @@ namespace LCT.APICommunications.UTest
             UploadArgs uploadArgs = new UploadArgs();
 
             //Act
-            JfrogApicommunication jfrogApicommunication = new NugetJfrogApiCommunication("", "", repoCredentials);
+            JfrogApicommunication jfrogApicommunication = new NugetJfrogApiCommunication("", "", repoCredentials, 100);
 
             //Assert
             Assert.ThrowsAsync<InvalidOperationException>(() => { jfrogApicommunication.UpdatePackagePropertiesInJfrog("", "", uploadArgs); return Task.CompletedTask; });

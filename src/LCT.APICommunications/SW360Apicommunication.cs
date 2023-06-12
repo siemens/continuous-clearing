@@ -7,11 +7,13 @@
 using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
 using LCT.Common.Model;
+using log4net;
 using Newtonsoft.Json;
 using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -34,6 +36,7 @@ namespace LCT.APICommunications
         private readonly string sw360ComponentByExternalId;
         private readonly string sw360UsersApi;
         private readonly int timeOut;
+        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         #endregion
 
         #region PUBLIC METHODS
@@ -56,7 +59,20 @@ namespace LCT.APICommunications
         public async Task<string> GetProjects()
         {
             HttpClient httpClient = GetHttpClient();
-            return await httpClient.GetStringAsync(sw360ProjectsApi);
+
+            var result = string.Empty;
+            try
+            {
+                result = await httpClient.GetStringAsync(sw360ProjectsApi);
+            }
+            catch (TaskCanceledException ex)
+            {
+                Logger.Debug($"{ex.Message}");
+                Logger.Error("A timeout error is thrown from SW360 server,Please wait for sometime and re run the pipeline again");
+                Environment.Exit(-1);
+
+            }
+            return result;
         }
 
         public async Task<string> GetSw360Users()
@@ -82,14 +98,40 @@ namespace LCT.APICommunications
         public async Task<HttpResponseMessage> GetProjectById(string projectId)
         {
             HttpClient httpClient = GetHttpClient();
+            HttpResponseMessage obj = new HttpResponseMessage();
+            var result = obj;
             string projectsByTagUrl = $"{sw360ProjectsApi}/{projectId}";
-            return await httpClient.GetAsync(projectsByTagUrl);
+            try
+            {
+
+                result = await httpClient.GetAsync(projectsByTagUrl);
+            }
+            catch (TaskCanceledException ex)
+            {
+                Logger.Debug($"{ex.Message}");
+                Logger.Error("A timeout error is thrown from SW360 server,Please wait for sometime and re run the pipeline again");
+                Environment.Exit(-1);
+
+            }
+            return result;
         }
 
         public async Task<string> GetReleases()
         {
             HttpClient httpClient = GetHttpClient();
-            return await httpClient.GetStringAsync(sw360ReleaseApi);
+            var result = string.Empty;
+            try
+            {
+                return await httpClient.GetStringAsync(sw360ReleaseApi);
+            }
+            catch (TaskCanceledException ex)
+            {
+                Logger.Debug($"{ex.Message}");
+                Logger.Error("A timeout error is thrown from SW360 server,Please wait for sometime and re run the pipeline again");
+                Environment.Exit(-1);
+
+            }
+            return result;
         }
         public async Task<string> TriggerFossologyProcess(string releaseId, string sw360link)
         {

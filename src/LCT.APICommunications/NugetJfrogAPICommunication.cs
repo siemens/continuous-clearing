@@ -5,21 +5,28 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.APICommunications.Model;
+using log4net;
+using System;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace LCT.APICommunications
 {
     public class NugetJfrogApiCommunication : JfrogApicommunication
     {
-        public NugetJfrogApiCommunication(string repoDomainName, string srcrepoName, ArtifactoryCredentials repoCredentials):base(repoDomainName,srcrepoName,repoCredentials)
+        private static int TimeoutInSec { get; set; }
+        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        public NugetJfrogApiCommunication(string repoDomainName, string srcrepoName, ArtifactoryCredentials repoCredentials,int timeout):base(repoDomainName,srcrepoName,repoCredentials,timeout)
         {
+            TimeoutInSec = timeout;
         }
 
         private static HttpClient GetHttpClient(ArtifactoryCredentials credentials)
         {
             HttpClient httpClient = new HttpClient();
-
+            TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
+            httpClient.Timeout = timeOutInSec;
             httpClient.DefaultRequestHeaders.Add(ApiConstant.JFrog_API_Header, credentials.ApiKey);
             httpClient.DefaultRequestHeaders.Add(ApiConstant.Email, credentials.Email);
             return httpClient;
@@ -43,9 +50,28 @@ namespace LCT.APICommunications
 
         public override async Task<HttpResponseMessage> GetPackageByPackageName(UploadArgs uploadArgs)
         {
-            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-            string url = $"{DomainName}/api/storage/{SourceRepoName}/{uploadArgs.PackageName}.{uploadArgs.Version}.nupkg";
-            return await httpClient.GetAsync(url);
+            HttpResponseMessage responseMessage = new HttpResponseMessage();
+            var result = responseMessage;
+            try
+            {
+                HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
+                string url = $"{DomainName}/api/storage/{SourceRepoName}/{uploadArgs.PackageName}.{uploadArgs.Version}.nupkg";
+                return await httpClient.GetAsync(url);
+            }
+            catch (HttpRequestException ex)
+            {
+                Logger.Debug($"{ex.Message}");
+                Logger.Error("Connection issue with Jfrog artifactory!Please rerun the pipeline");
+                Environment.Exit(-1);
+            }
+            catch (TaskCanceledException ex)
+            {
+                Logger.Debug($"{ex.Message}");
+                Logger.Error("A timeout error is thrown from Jfrog server,Please wait for sometime and re run the pipeline again");
+                Environment.Exit(-1);
+
+            }
+            return result;
         }
 
         public override async Task<HttpResponseMessage> CopyFromRemoteRepo(ComponentsToArtifactory component)
@@ -57,8 +83,21 @@ namespace LCT.APICommunications
 
         public override async Task<HttpResponseMessage> GetPackageInfo(ComponentsToArtifactory component)
         {
-            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-            return await httpClient.GetAsync(component.PackageInfoApiUrl);
+            HttpResponseMessage responseMessage = new HttpResponseMessage();
+            var result = responseMessage;
+            try
+            {
+                HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
+                result = await httpClient.GetAsync(component.PackageInfoApiUrl);
+            }
+            catch (TaskCanceledException ex)
+            {
+                Logger.Debug($"{ex.Message}");
+                Logger.Error("A timeout error is thrown from Jfrog server,Please wait for sometime and re run the pipeline again");
+                Environment.Exit(-1);
+
+            }
+            return result;
         }
 
         public override void UpdatePackagePropertiesInJfrog(string sw360releaseUrl, string destRepoName, UploadArgs uploadArgs)
