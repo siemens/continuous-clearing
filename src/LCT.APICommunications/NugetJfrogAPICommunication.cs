@@ -39,41 +39,6 @@ namespace LCT.APICommunications
             return await httpClient.GetAsync(url);
         }
 
-        public override async Task<HttpResponseMessage> CopyPackageFromRemoteRepo(UploadArgs uploadArgs, string destreponame)
-        {
-            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-            const HttpContent httpContent = null;
-             string url = $"{DomainName}/api/copy/{SourceRepoName}/{uploadArgs.PackageName}.{uploadArgs.Version}" +
-               $".nupkg?to=/{destreponame}/{uploadArgs.ReleaseName}-{uploadArgs.Version}.nupkg";
-            return await httpClient.PostAsync(url, httpContent);
-        }
-
-        public override async Task<HttpResponseMessage> GetPackageByPackageName(UploadArgs uploadArgs)
-        {
-            HttpResponseMessage responseMessage = new HttpResponseMessage();
-            var result = responseMessage;
-            try
-            {
-                HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-                string url = $"{DomainName}/api/storage/{SourceRepoName}/{uploadArgs.PackageName}.{uploadArgs.Version}.nupkg";
-                return await httpClient.GetAsync(url);
-            }
-            catch (HttpRequestException ex)
-            {
-                Logger.Debug($"{ex.Message}");
-                Logger.Error("Connection issue with Jfrog artifactory!Please rerun the pipeline");
-                Environment.Exit(-1);
-            }
-            catch (TaskCanceledException ex)
-            {
-                Logger.Debug($"{ex.Message}");
-                Logger.Error("A timeout error is thrown from Jfrog server,Please wait for sometime and re run the pipeline again");
-                Environment.Exit(-1);
-
-            }
-            return result;
-        }
-
         public override async Task<HttpResponseMessage> CopyFromRemoteRepo(ComponentsToArtifactory component)
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);

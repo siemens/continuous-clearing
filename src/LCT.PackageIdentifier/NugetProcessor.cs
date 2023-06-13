@@ -111,7 +111,6 @@ namespace LCT.PackageIdentifier
                 Logger.Error($"ParsePackageFile():", ex);
             }
             return nugetPackages;
-
         }
 
         public static List<NugetPackage> ParsePackageLock(string packagesFilePath, CommonAppSettings appSettings)
@@ -165,10 +164,9 @@ namespace LCT.PackageIdentifier
             {
                 Logger.Error($"ParsePackageFile():", ex);
             }
-
             return packageList;
-
         }
+
         public static bool IsDevDependent(List<ReferenceDetails> referenceDetails, string name, string version)
         {
             foreach (var item in referenceDetails)
@@ -181,6 +179,7 @@ namespace LCT.PackageIdentifier
             }
             return false;
         }
+
         public static List<ReferenceDetails> Parsecsproj(CommonAppSettings appSettings)
         {
             List<ReferenceDetails> referenceList = new List<ReferenceDetails>();
@@ -292,9 +291,7 @@ namespace LCT.PackageIdentifier
 
                 modifiedBOM.Add(componentVal);
             }
-
             return modifiedBOM;
-
         }
 
         private string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
@@ -375,7 +372,6 @@ namespace LCT.PackageIdentifier
             return false;
         }
 
-
         public static Bom RemoveExcludedComponents(CommonAppSettings appSettings, Bom cycloneDXBOM)
         {
             List<Component> componentForBOM = cycloneDXBOM.Components.ToList();
@@ -390,22 +386,20 @@ namespace LCT.PackageIdentifier
             return cycloneDXBOM;
         }
 
-
         #endregion
+
         #region private methods
         private void ParsingInputFileForBOM(CommonAppSettings appSettings, ref List<Component> listComponentForBOM, ref Bom bom)
         {
             List<string> configFiles;
             if (string.IsNullOrEmpty(appSettings.CycloneDxBomFilePath))
             {
-
                 configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Nuget);
                 List<NugetPackage> listofComponents = new List<NugetPackage>();
 
                 ParseInputFiles(appSettings, configFiles, listofComponents);
 
                 ConvertToCycloneDXModel(listComponentForBOM, listofComponents);
-
             }
             else
             {
@@ -414,15 +408,12 @@ namespace LCT.PackageIdentifier
                 bom = RemoveExcludedComponents(appSettings, bom);
                 listComponentForBOM = bom.Components;
             }
-
-
         }
 
         private static void ConvertToCycloneDXModel(List<Component> listComponentForBOM, List<NugetPackage> listofComponents)
         {
             foreach (var prop in listofComponents)
             {
-
                 Component components = new Component
                 {
                     Name = prop.ID,
@@ -449,7 +440,6 @@ namespace LCT.PackageIdentifier
                 {
                     listofComponents.AddRange(ParsePackageConfig(filepath, appSettings));
                 }
-
             }
         }
 
@@ -471,6 +461,7 @@ namespace LCT.PackageIdentifier
                 }
             }
         }
+
         private static List<string> GetValidCsprojfile(CommonAppSettings appSettings)
         {
             List<string> allFoundCsprojFiles = new List<string>();
@@ -504,8 +495,6 @@ namespace LCT.PackageIdentifier
                 else
                     version = "";
                 library = packageDetails.Replace(version, "");
-
-
             }
 
             //Invalid Package Details..
@@ -526,6 +515,7 @@ namespace LCT.PackageIdentifier
             }
             return library.Remove(library.Length - 1, 1);
         }
+
         private static string ReferenceTagDetailsForPackageReference(XmlNode childNode, out string version, out bool isPrivateRef)
         {
             string library = string.Empty;
@@ -556,6 +546,5 @@ namespace LCT.PackageIdentifier
             return library;
         }
         #endregion
-
     }
 }

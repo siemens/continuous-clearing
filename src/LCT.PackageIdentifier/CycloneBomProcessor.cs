@@ -70,16 +70,9 @@ namespace LCT.PackageIdentifier
                 Value = "false"
             };
 
-            Property isDevelopment = new()
-            {
-                Name = Dataconstant.Cdx_IsDevelopment,
-                Value = "false"
-            };
-
             component.Properties.Add(internalType);
             component.Properties.Add(artifactoryrepo);
             component.Properties.Add(projectType);
-            component.Properties.Add(isDevelopment);
             component.Description = string.Empty;
             componentForBOM.Add(component);
         }

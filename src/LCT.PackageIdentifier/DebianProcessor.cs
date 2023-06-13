@@ -5,7 +5,6 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.PackageIdentifier.Interface;
@@ -54,17 +53,6 @@ namespace LCT.PackageIdentifier
             bom.Components = listComponentForBOM;
             bom = RemoveExcludedComponents(appSettings, bom);
             return bom;
-        }
-
-        public async Task<List<Component>> CheckInternalComponentsInJfrogArtifactory(CommonAppSettings appSettings, ArtifactoryCredentials artifactoryUpload, Component component, string repo)
-        {
-            List<Component> componentToBOM = new List<Component>
-            {
-                component
-            };
-
-            await Task.Yield();
-            return componentToBOM;
         }
 
         public static Bom RemoveExcludedComponents(CommonAppSettings appSettings, Bom cycloneDXBOM)

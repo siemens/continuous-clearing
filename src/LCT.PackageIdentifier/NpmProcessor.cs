@@ -255,7 +255,6 @@ namespace LCT.PackageIdentifier
             {
                 Logger.Debug($"ParsePackageFile():Start");
 
-
                 configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Npm);
 
 
@@ -263,7 +262,6 @@ namespace LCT.PackageIdentifier
                 {
                     componentsForBOM.AddRange(ParsePackageLockJson(filepath, appSettings));
                 }
-
             }
             else
             {
@@ -273,7 +271,6 @@ namespace LCT.PackageIdentifier
 
                 componentsForBOM = bom.Components;
             }
-
         }
 
         private static bool IsDevDependency(bool removeDevDependency, JToken devValue, ref int noOfDevDependent)

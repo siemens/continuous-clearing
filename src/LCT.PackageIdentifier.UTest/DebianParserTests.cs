@@ -2,7 +2,6 @@
 // SPDX-FileCopyrightText: 2023 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
-
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
@@ -11,8 +10,6 @@ using NUnit.Framework;
 using System.IO;
 using LCT.Common;
 using LCT.Common.Model;
-using LCT.APICommunications.Model;
-using System.Threading.Tasks;
 
 namespace PackageIdentifier.UTest
 {
@@ -141,26 +138,6 @@ namespace PackageIdentifier.UTest
         }
 
         [Test]
-        public async Task CheckInternalComponentsInJfrogArtifactory_GivenRepoDeatils_ReturnInternalList()
-        {
-            //Arrange
-            CommonAppSettings appSettings = new CommonAppSettings()
-            {
-
-            };
-            ArtifactoryCredentials artifactoryUpload = new ArtifactoryCredentials();
-            Component component = new Component();
-            string repo = string.Empty;
-            DebianProcessor DebianProcessor = new DebianProcessor();
-
-            //Act
-            var components = await DebianProcessor.CheckInternalComponentsInJfrogArtifactory(appSettings, artifactoryUpload, component, repo);
-
-            //Assert
-            Assert.AreEqual(1, components.Count, "Internal Component found");
-        }
-
-        [Test]
         public void ParsePackageConfig_GivenXMLInputFilePath_ReturnsNoComponents()
         {
             //Arrange
@@ -184,6 +161,5 @@ namespace PackageIdentifier.UTest
             //Assert
             Assert.AreEqual(0, listofcomponents.Components.Count, "Return Zero Components");
         }
-
     }
 }

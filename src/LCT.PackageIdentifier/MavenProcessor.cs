@@ -114,7 +114,6 @@ namespace LCT.PackageIdentifier
                         BomCreator.bomKpiData.DevDependentComponents++;
                     }
                 }
-
             }
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = totalComponenstinInputFile;
             if (appSettings.Maven.ExcludedComponents != null)
@@ -277,6 +276,5 @@ namespace LCT.PackageIdentifier
 
             return repoName;
         }
-
     }
 }
