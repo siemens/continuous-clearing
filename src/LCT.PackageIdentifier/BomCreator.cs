@@ -15,6 +15,7 @@ using log4net;
 using log4net.Core;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -176,7 +177,7 @@ namespace LCT.PackageIdentifier
                 bom.Components = components;
                 bom.Metadata = metadata;
             }
-            catch (Exception ex)
+            catch (HttpRequestException ex)
             {
                 Logger.Debug($"ComponentIdentification: {ex}");
             }

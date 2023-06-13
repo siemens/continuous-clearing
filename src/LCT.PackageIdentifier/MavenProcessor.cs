@@ -193,7 +193,7 @@ namespace LCT.PackageIdentifier
             return componentData;
         }
 
-        private bool IsInternalMavenComponent(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
+        private static bool IsInternalMavenComponent(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
         {
             string jfrogcomponentName = $"{component.Name}-{component.Version}";
             if (aqlResultList.Exists(x => x.Name.Contains(jfrogcomponentName, StringComparison.OrdinalIgnoreCase)))
@@ -257,7 +257,7 @@ namespace LCT.PackageIdentifier
             return scope;
         }
 
-        private string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
+        private static string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
         {
             string jfrogcomponentName = $"{component.Name}-{component.Version}";
 

@@ -319,7 +319,7 @@ namespace LCT.PackageIdentifier
             return components;
         }
 
-        private bool IsInternalNpmComponent(
+        private static bool IsInternalNpmComponent(
             List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
         {
             string jfrogcomponentName = $"{component.Name}-{component.Version}.tgz";
@@ -341,7 +341,7 @@ namespace LCT.PackageIdentifier
             return false;
         }
 
-        private string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
+        private static string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
         {
             string jfrogcomponentName = $"{component.Name}-{component.Version}.tgz";
 

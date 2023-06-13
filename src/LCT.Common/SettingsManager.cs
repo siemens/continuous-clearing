@@ -75,9 +75,10 @@ namespace LCT.Common
             StreamReader sr = new("CLIUsageNpkg.txt");
             //Read the whole file
             string line = sr.ReadToEnd();
-            Console.WriteLine(line);
+            Logger.Logger.Log(null, Level.Notice, $"{line}", null);
             sr.Dispose();
         }
+
         internal string GetConfigFilePathFromArgs(string[] args, string jsonSettingsFileName)
         {
             IConfigurationBuilder settingsFileConfigBuilder = new ConfigurationBuilder()

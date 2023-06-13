@@ -294,7 +294,7 @@ namespace LCT.PackageIdentifier
             return modifiedBOM;
         }
 
-        private string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
+        private static string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
         {
             string jfrogcomponentName = $"{component.Name}-{component.Version}.tgz";
 
@@ -353,7 +353,7 @@ namespace LCT.PackageIdentifier
             return componentData;
         }
 
-        private bool IsInternalNugetComponent(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
+        private static bool IsInternalNugetComponent(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
         {
             string jfrogcomponentName = $"{component.Name}.{component.Version}.nupkg";
             if (aqlResultList.Exists(x => x.Name.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase)))
