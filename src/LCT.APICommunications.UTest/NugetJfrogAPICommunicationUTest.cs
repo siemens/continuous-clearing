@@ -30,20 +30,6 @@ namespace LCT.APICommunications.UTest
         }
 
         [Test]
-        public void NugetJfrogApiCommunication_CopyPackageFromRemoteRepo_ReturnsInvalidOperationException()
-        {
-            //Arrange
-            ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials();
-            UploadArgs uploadArgs = new UploadArgs();
-
-            //Act
-            JfrogApicommunication jfrogApicommunication = new NugetJfrogApiCommunication("", "", repoCredentials, 100);
-
-            //Assert
-            Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApicommunication.CopyPackageFromRemoteRepo(uploadArgs, ""));
-        }
-
-        [Test]
         public void NugetJfrogApiCommunication_CopyFromRemoteRepo_ReturnsInvalidOperationException()
         {
             //Arrange

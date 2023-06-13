@@ -48,11 +48,7 @@ namespace LCT.APICommunications
 
         public abstract Task<HttpResponseMessage> GetApiKey();
 
-        public abstract Task<HttpResponseMessage> GetPackageByPackageName(UploadArgs uploadArgs);
-
         public abstract Task<HttpResponseMessage> GetPackageInfo(ComponentsToArtifactory component);
-
-        public abstract Task<HttpResponseMessage> CopyPackageFromRemoteRepo(UploadArgs uploadArgs, string destreponame);
 
         public abstract Task<HttpResponseMessage> CopyFromRemoteRepo(ComponentsToArtifactory component);
 

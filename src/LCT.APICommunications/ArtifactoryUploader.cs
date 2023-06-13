@@ -7,10 +7,8 @@
 using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
 using log4net;
-using Newtonsoft.Json;
 using System;
 using System.Configuration;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
