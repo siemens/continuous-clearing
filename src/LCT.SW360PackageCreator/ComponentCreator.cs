@@ -43,7 +43,7 @@ namespace LCT.SW360PackageCreator
         public async Task<List<ComparisonBomData>> CycloneDxBomParser(CommonAppSettings appSettings,
             ISW360Service sw360Service, ICycloneDXBomParser cycloneDXBomParser, ICreatorHelper creatorHelper)
         {
-            bom = cycloneDXBomParser.ParseCycloneDXBom(appSettings.BomFilePath);
+            bom.Components = cycloneDXBomParser.ParseCycloneDXBom(appSettings.BomFilePath);
             TotalComponentsFromPackageIdentifier = bom != null ? bom.Components.Count : 0;
             ListofBomComponents = await GetListOfBomData(bom?.Components ?? new List<Component>());
 

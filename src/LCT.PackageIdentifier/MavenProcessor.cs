@@ -76,7 +76,12 @@ namespace LCT.PackageIdentifier
             }
             else
             {
-                bom = ParseCycloneDXBom(appSettings.CycloneDxBomFilePath);
+                configFiles = FolderScanner.FileScanner(appSettings.CycloneDxBomFilePath, appSettings.Npm);
+                foreach (string filepath in configFiles)
+                {
+                    componentsForBOM.AddRange(ParseCycloneDXBom(filepath));
+                }
+                bom.Components = componentsForBOM;
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = bom.Components.Count;
             }
             Logger.Debug($"ParsePackageFile():End");
