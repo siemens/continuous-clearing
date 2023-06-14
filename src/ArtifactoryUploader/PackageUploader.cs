@@ -2,7 +2,6 @@
 // SPDX-FileCopyrightText: 2023 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
-
 //---------------------------------------------------------------------------------------------------------------------
 
 using ArtifactoryUploader;
@@ -38,7 +37,7 @@ namespace LCT.ArtifactoryUploader
             //Uploading the component to artifactory
 
             uploaderKpiData.PackagesToBeUploaded = m_ComponentsToBeUploaded.Count;
-            await PackageUploadHelper.UploadingThePackages(m_ComponentsToBeUploaded);
+            await PackageUploadHelper.UploadingThePackages(m_ComponentsToBeUploaded,appSettings.TimeOut);
 
             // write kpi info to console table 
             PackageUploadHelper.WriteCreatorKpiDataToConsole(uploaderKpiData);

@@ -2,7 +2,6 @@
 // SPDX-FileCopyrightText: 2023 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
-
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.Common;
@@ -21,6 +20,10 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using LCT.Common.Model;
+using LCT.Facade.Interfaces;
+using LCT.APICommunications.Interfaces;
+using LCT.APICommunications;
+using LCT.APICommunications.Model;
 
 namespace LCT.PackageIdentifier
 {
@@ -37,7 +40,6 @@ namespace LCT.PackageIdentifier
 
         static async Task Main(string[] args)
         {
-         
             BomStopWatch = new Stopwatch();
             BomStopWatch.Start();
 
@@ -75,9 +77,25 @@ namespace LCT.PackageIdentifier
 
 
             IBomCreator bomCreator = new BomCreator();
+            bomCreator.JFrogService = GetJfrogService(appSettings);
+            bomCreator.BomHelper = new BomHelper();
             await bomCreator.GenerateBom(appSettings, new BomHelper(), new FileOperations());
 
             Logger.Logger.Log(null, Level.Notice, $"End of Package Identifier execution : {DateTime.Now}\n", null);
+        }
+
+        private static IJFrogService GetJfrogService(CommonAppSettings appSettings)
+        {
+            ArtifactoryCredentials artifactoryUpload = new ArtifactoryCredentials()
+            {
+                ApiKey = appSettings.ArtifactoryUploadApiKey
+            };
+            IJfrogAqlApiCommunication jfrogAqlApiCommunication =
+                new JfrogAqlApiCommunication(appSettings.JFrogApi, artifactoryUpload,appSettings.TimeOut);
+            IJfrogAqlApiCommunicationFacade jFrogApiCommunicationFacade =
+                new JfrogAqlApiCommunicationFacade(jfrogAqlApiCommunication);
+            IJFrogService jFrogService = new JFrogService(jFrogApiCommunicationFacade);
+            return jFrogService;
         }
 
         private static async Task ValidateAppsettingsFile(CommonAppSettings appSettings)

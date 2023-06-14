@@ -2,15 +2,14 @@
 // SPDX-FileCopyrightText: 2023 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
-
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
+using LCT.Services.Interface;
 using log4net;
 using Newtonsoft.Json;
 using System.Collections.Generic;
@@ -26,7 +25,7 @@ namespace LCT.PackageIdentifier
     /// <summary>
     /// The DebianProcessor class
     /// </summary>
-    public class DebianProcessor : IParser, IProcessor
+    public class DebianProcessor : IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -56,27 +55,6 @@ namespace LCT.PackageIdentifier
             return bom;
         }
 
-        public async Task<List<Component>> CheckInternalComponentsInJfrogArtifactory(CommonAppSettings appSettings, ArtifactoryCredentials artifactoryUpload, Component component, string repo)
-        {
-             List<Component> componentToBOM = new List<Component>
-            {
-                component
-            };
-
-            await Task.Yield();
-            return  componentToBOM;
-        }
-
-        public Task<List<Component>> GetJfrogArtifactoryRepoInfo(CommonAppSettings appSettings, ArtifactoryCredentials artifactoryUpload, Component component, string repo)
-        {
-            List<Component> componentBOM = new List<Component>
-            {
-                component
-            };
-           
-            return Task.FromResult(componentBOM);
-        }
-
         public static Bom RemoveExcludedComponents(CommonAppSettings appSettings, Bom cycloneDXBOM)
         {
             List<Component> componentForBOM = cycloneDXBOM.Components.ToList();
@@ -91,7 +69,9 @@ namespace LCT.PackageIdentifier
             return cycloneDXBOM;
         }
 
-        public async Task<List<Component>> GetRepoDetails(List<Component> componentsForBOM, CommonAppSettings appSettings)
+        public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM, CommonAppSettings appSettings,
+                                                          IJFrogService jFrogService,
+                                                          IBomHelper bomhelper)
         {
             List<Component> modifiedBOM = new List<Component>();
 
@@ -103,7 +83,8 @@ namespace LCT.PackageIdentifier
             return modifiedBOM;
         }
 
-        public async Task<ComponentIdentification> IdentificationOfInternalComponents(ComponentIdentification componentData, CommonAppSettings appSettings)
+        public async Task<ComponentIdentification> IdentificationOfInternalComponents(ComponentIdentification componentData,
+            CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
             await Task.Yield();
             return componentData;

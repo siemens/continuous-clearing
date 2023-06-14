@@ -2,7 +2,6 @@
 // SPDX-FileCopyrightText: 2023 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
-
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using System.Diagnostics.CodeAnalysis;
@@ -36,7 +35,6 @@ namespace LCT.Common.Constants
         public const string ComponentCreatorLog = "PacakgeCreator.log";
         public const string BomCreatorLog = "PacakgeIdentifier.log";
         public const string FossologyUploaderLog = "FossologyUploader.log";
-
         public const string ArtifactoryUploaderLog = "ArtifactoryUploader.log";
         public const string XzFileExtension = ".tar.xz";
         public const string Bz2FileExtension = ".tar.bz2";

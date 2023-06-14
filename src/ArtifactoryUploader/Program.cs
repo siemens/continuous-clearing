@@ -2,8 +2,8 @@
 // SPDX-FileCopyrightText: 2023 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
-
 // -------------------------------------------------------------------------------------------------------------------- 
+
 using LCT.APICommunications;
 using LCT.APICommunications.Model;
 using LCT.ArtifactoryUploader;
@@ -60,7 +60,7 @@ namespace ArtifactoryUploader
                 ApiKey = appSettings.ArtifactoryUploadApiKey,
                 Email = appSettings.ArtifactoryUploadUser
             };
-            NpmJfrogApiCommunication jfrogCommunication = new NpmJfrogApiCommunication(appSettings.JFrogApi, appSettings.JfrogNpmSrcRepo, artifactoryCredentials);
+            NpmJfrogApiCommunication jfrogCommunication = new NpmJfrogApiCommunication(appSettings.JFrogApi, appSettings.JfrogNpmSrcRepo, artifactoryCredentials,appSettings.TimeOut);
             ArtifactoryValidator artifactoryValidator = new(jfrogCommunication);
             await artifactoryValidator.ValidateArtifactoryCredentials(appSettings);
 

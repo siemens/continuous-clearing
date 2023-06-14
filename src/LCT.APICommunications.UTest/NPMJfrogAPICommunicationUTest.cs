@@ -2,7 +2,6 @@
 // SPDX-FileCopyrightText: 2023 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
-
 // -------------------------------------------------------------------------------------------------------------------- 
 
 
@@ -19,26 +18,13 @@ namespace LCT.APICommunications.UTest
         }
 
         [Test]
-        public void NpmJfrogApiCommunication_CopyPackageFromRemoteRepo_ReturnsInvalidOperationException()
-        {
-            //Arrange
-            ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials();
-
-            //Act
-            JfrogApicommunication jfrogApicommunication = new NpmJfrogApiCommunication("", "", repoCredentials);
-
-            //Assert
-            Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApicommunication.CopyPackageFromRemoteRepo(new UploadArgs(),""));
-        }
-
-        [Test]
         public void NpmJfrogApiCommunication_CopyFromRemoteRepo_ReturnsInvalidOperationException()
         {
             //Arrange
             ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials();
 
             //Act
-            JfrogApicommunication jfrogApicommunication = new NpmJfrogApiCommunication("", "", repoCredentials);
+            JfrogApicommunication jfrogApicommunication = new NpmJfrogApiCommunication("", "", repoCredentials,100);
 
             //Assert
             Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApicommunication.CopyFromRemoteRepo(new ComponentsToArtifactory()));
@@ -51,7 +37,7 @@ namespace LCT.APICommunications.UTest
             ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials();
 
             //Act
-            JfrogApicommunication jfrogApicommunication = new NpmJfrogApiCommunication("", "", repoCredentials);
+            JfrogApicommunication jfrogApicommunication = new NpmJfrogApiCommunication("", "", repoCredentials, 100);
 
             //Assert
             Assert.ThrowsAsync<InvalidOperationException>(() => { jfrogApicommunication.UpdatePackagePropertiesInJfrog("", "", new UploadArgs()); return Task.CompletedTask; });

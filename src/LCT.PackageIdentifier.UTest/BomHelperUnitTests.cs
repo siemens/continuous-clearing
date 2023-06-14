@@ -2,7 +2,6 @@
 // SPDX-FileCopyrightText: 2023 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
-
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
@@ -15,8 +14,8 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using LCT.Common;
 using System.Threading.Tasks;
-using UnitTestUtilities;
 using LCT.Common.Model;
+using LCT.Services.Interface;
 
 namespace PackageIdentifier.UTest
 {
@@ -25,84 +24,6 @@ namespace PackageIdentifier.UTest
     {
         private readonly Mock<IProcessor> mockIProcessor = new Mock<IProcessor>();
 
-        [TestCase]
-        public async Task GetRepoDetails_GivenProjectTypeAsNPM_ReturnsListOFComponents()
-        {
-
-            //Arrange
-            var lstComponentForBOM = new List<Component>()
-            {
-                new Component()
-                {
-                 Name="Test",
-                 Version="1",
-
-
-                }
-            };
-            CommonAppSettings appSettings = new CommonAppSettings()
-            {
-                ArtifactoryUploadApiKey = "testvalue",
-                ProjectType = "NPM",
-                Npm = new Config()
-                {
-                    JfrogNpmRepoList = new string[] { "here" }
-                },
-                JFrogApi = UTParams.JFrogURL
-
-            };
-
-
-            mockIProcessor.Setup(x => x.GetJfrogArtifactoryRepoInfo(It.IsAny<CommonAppSettings>(), It.IsAny<ArtifactoryCredentials>(), It.IsAny<Component>(), It.IsAny<string>())).ReturnsAsync(lstComponentForBOM);
-
-
-            IParser parser = new NpmProcessor();
-
-            //Act
-            var expected = await parser.GetRepoDetails(lstComponentForBOM, appSettings);
-
-            //Assert           
-            Assert.AreEqual(expected.Count, lstComponentForBOM.Count);
-        }
-        [TestCase]
-        public async Task GetRepoDetails_GivenProjectTypeAsNUGET_ReturnsListOFComponents()
-        {
-
-            //Arrange
-            var lstComponentForBOM = new List<Component>()
-            {
-                new Component()
-                {
-                 Name="Test",
-                 Version="1",
-
-
-                }
-            };
-            CommonAppSettings appSettings = new CommonAppSettings()
-            {
-                ArtifactoryUploadApiKey = "testvalue",
-                ProjectType = "NUGET",
-                Nuget = new Config()
-                {
-                    JfrogNugetRepoList = new string[] { "here" }
-                },
-                JFrogApi = UTParams.JFrogURL
-            };
-
-
-
-            mockIProcessor.Setup(x => x.GetJfrogArtifactoryRepoInfo(It.IsAny<CommonAppSettings>(), It.IsAny<ArtifactoryCredentials>(), It.IsAny<Component>(), It.IsAny<string>())).ReturnsAsync(lstComponentForBOM);
-
-
-            IParser parser = new NugetProcessor();
-
-            //Act
-            var expected = await parser.GetRepoDetails(lstComponentForBOM, appSettings);
-
-            //Assert           
-            Assert.AreEqual(expected.Count, lstComponentForBOM.Count);
-        }
         [TestCase]
         public async Task GetRepoDetails_GivenProjectTypeAsDebian_ReturnsListOFComponents()
         {
@@ -114,10 +35,9 @@ namespace PackageIdentifier.UTest
                 {
                  Name="Test",
                  Version="1",
-
-
                 }
             };
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ArtifactoryUploadApiKey = "testvalue",
@@ -129,14 +49,14 @@ namespace PackageIdentifier.UTest
                 JFrogApi = "https://jfrogapi"
             };
 
-
             mockIProcessor.Setup(x => x.GetJfrogArtifactoryRepoInfo(It.IsAny<CommonAppSettings>(), It.IsAny<ArtifactoryCredentials>(), It.IsAny<Component>(), It.IsAny<string>())).ReturnsAsync(lstComponentForBOM);
 
-
             IParser parser = new DebianProcessor();
+            Mock<IJFrogService> jFrogService = new Mock<IJFrogService>();
+            Mock<IBomHelper> bomHelper = new Mock<IBomHelper>();
 
             //Act
-            var expected = await parser.GetRepoDetails(lstComponentForBOM, appSettings);
+            var expected = await parser.GetJfrogRepoDetailsOfAComponent(lstComponentForBOM, appSettings, jFrogService.Object, bomHelper.Object);
 
             //Assert           
             Assert.AreEqual(expected.Count, lstComponentForBOM.Count);
@@ -168,7 +88,5 @@ namespace PackageIdentifier.UTest
             helper.WriteInternalComponentsListToKpi(lstComponentForBOM);
             Assert.AreEqual(true, true);
         }
-
-
     }
 }

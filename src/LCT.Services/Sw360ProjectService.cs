@@ -2,7 +2,6 @@
 // SPDX-FileCopyrightText: 2023 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
-
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.APICommunications.Model;
@@ -43,11 +42,17 @@ namespace LCT.Services
         public async Task<string> GetProjectNameByProjectIDFromSW360(string projectId, string projectName)
         {
             string sw360ProjectName = string.Empty;
+
             try
             {
-                var response =await m_SW360ApiCommunicationFacade.GetProjectById(projectId);
-                string result =await response?.Content?.ReadAsStringAsync() ?? string.Empty;
-                if(!string.IsNullOrEmpty(result))
+                var response = await m_SW360ApiCommunicationFacade.GetProjectById(projectId);
+                if (response == null || !response.IsSuccessStatusCode)
+                {
+                    return string.Empty;
+                }
+
+                string result = response?.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
+                if (!string.IsNullOrEmpty(result))
                 {
                     var projectInfo = JsonConvert.DeserializeObject<ProjectReleases>(result);
                     sw360ProjectName = projectInfo?.Name;
@@ -74,7 +79,7 @@ namespace LCT.Services
             List<ReleaseLinked> alreadyLinkedReleases = new List<ReleaseLinked>();
             try
             {
-                HttpResponseMessage projectResponsebyId =await m_SW360ApiCommunicationFacade.GetProjectById(projectId);
+                HttpResponseMessage projectResponsebyId = await m_SW360ApiCommunicationFacade.GetProjectById(projectId);
                 if (projectResponsebyId.StatusCode != HttpStatusCode.OK)
                 {
                     Logger.Debug($"GetProjectReleasesByProjectIdFromSw360()-{projectResponsebyId.StatusCode}:{projectResponsebyId.ReasonPhrase}");

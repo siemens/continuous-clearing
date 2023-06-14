@@ -2,8 +2,8 @@
 // SPDX-FileCopyrightText: 2023 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
-
 // -------------------------------------------------------------------------------------------------------------------- 
+
 using LCT.Common;
 using LCT.APICommunications;
 using LCT.APICommunications.Model;
@@ -42,7 +42,7 @@ namespace AritfactoryUploader.UTest
                 ApiKey = "tyyteye",
                 Email = "user@test.com"
             };
-            Mock<NpmJfrogApiCommunication> jfrogCommunicationMck = new Mock<NpmJfrogApiCommunication>(UTParams.JFrogURL, "test", artifactoryCredentials);
+            Mock<NpmJfrogApiCommunication> jfrogCommunicationMck = new Mock<NpmJfrogApiCommunication>(UTParams.JFrogURL, "test", artifactoryCredentials,100);
             ArtifactoryValidator artifactoryValidator = new ArtifactoryValidator(jfrogCommunicationMck.Object);
             jfrogCommunicationMck.Setup(x => x.GetApiKey()).ReturnsAsync(httpResponseMessage);
 
@@ -75,7 +75,7 @@ namespace AritfactoryUploader.UTest
                 ApiKey = "tyyteye",
                 Email = "user@test.com"
             };
-            Mock<NpmJfrogApiCommunication> jfrogCommunicationMck = new Mock<NpmJfrogApiCommunication>(UTParams.JFrogURL, "test", artifactoryCredentials);
+            Mock<NpmJfrogApiCommunication> jfrogCommunicationMck = new Mock<NpmJfrogApiCommunication>(UTParams.JFrogURL, "test", artifactoryCredentials,100);
             ArtifactoryValidator artifactoryValidator = new ArtifactoryValidator(jfrogCommunicationMck.Object);
             jfrogCommunicationMck.Setup(x => x.GetApiKey()).ReturnsAsync(httpResponseMessage);
 

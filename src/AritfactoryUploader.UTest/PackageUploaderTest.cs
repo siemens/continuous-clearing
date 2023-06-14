@@ -2,8 +2,8 @@
 // SPDX-FileCopyrightText: 2023 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
-
 // -------------------------------------------------------------------------------------------------------------------- 
+
 using ArtifactoryUploader;
 using LCT.ArtifactoryUploader;
 using NUnit.Framework;

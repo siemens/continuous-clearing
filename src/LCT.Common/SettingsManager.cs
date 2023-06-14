@@ -2,7 +2,6 @@
 // SPDX-FileCopyrightText: 2023 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
-
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.Common.Interface;
@@ -10,6 +9,7 @@ using log4net;
 using log4net.Core;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 
@@ -73,12 +73,15 @@ namespace LCT.Common
 
         private static void DisplayHelp()
         {
+
             StreamReader sr = new("CLIUsageNpkg.txt");
             //Read the whole file
             string line = sr.ReadToEnd();
             Console.WriteLine(line);
+
             sr.Dispose();
         }
+
         internal string GetConfigFilePathFromArgs(string[] args, string jsonSettingsFileName)
         {
             IConfigurationBuilder settingsFileConfigBuilder = new ConfigurationBuilder()

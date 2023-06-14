@@ -2,7 +2,6 @@
 // SPDX-FileCopyrightText: 2023 Siemens AG
 //
 // SPDX-License-Identifier: MIT
-
 // --------------------------------------------------------------------------------------------------------------------
 
 using LCT.Common.Constants;
@@ -122,7 +121,7 @@ namespace LCT.Common
             set
             {
                 if (!AppDomain.CurrentDomain.FriendlyName.Contains("SW360PackageCreator") &&
-                    !AppDomain.CurrentDomain.FriendlyName.Contains("ArtifactoryUploader"))
+                    !AppDomain.CurrentDomain.FriendlyName.Contains("ArtifactoryUploader") && string.IsNullOrEmpty(CycloneDxBomFilePath))
                 {
                     folderAction.ValidateFolderPath(value);
                     m_PackageFilePath = value;

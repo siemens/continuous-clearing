@@ -2,7 +2,6 @@
 // SPDX-FileCopyrightText: 2023 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
-
 //---------------------------------------------------------------------------------------------------------------------
 
 using LCT.Common;
@@ -22,20 +21,17 @@ namespace LCT.ArtifactoryUploader
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private readonly NpmJfrogApiCommunication JfrogApiCommunication;
+
         public ArtifactoryValidator(NpmJfrogApiCommunication jfrogApiCommunication)
         {
-
             JfrogApiCommunication = jfrogApiCommunication;
         }
 
         public async Task ValidateArtifactoryCredentials(CommonAppSettings appSettings)
         {
-        
-
             HttpResponseMessage responseMessage = await JfrogApiCommunication.GetApiKey();
             string response = await responseMessage.Content.ReadAsStringAsync();
             JfrogKey apiKey = JsonConvert.DeserializeObject<JfrogKey>(response);
-
 
             bool isValid = apiKey.ApiKey == appSettings.ArtifactoryUploadApiKey;
             if (!isValid)
