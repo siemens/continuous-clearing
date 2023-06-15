@@ -18,7 +18,8 @@ jobs:
       semver: ${{ steps.gitversion.outputs.semver }}
       LicenseClearingTool: ${{ steps.packageBuildResults.outputs.LicenseClearingTool }}  
       nupkg-LicenseClearingTool: ${{ steps.createNupkg.outputs.nupkg-LicenseClearingTool }}
-        
+      docker-LicenseClearingTool: ${{ steps.builddocker.outputs.docker-LicenseClearingTool }}
+      
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -149,11 +150,12 @@ jobs:
           *.nupkg
           
     - name: Build the Docker image
+      id: builddocker
       #if: ${{ false }}  # disable for now
       run: |
         docker build . --file Dockerfile --tag ${{ github.repository }}:continuous-clearing-v3.1.1
         docker save ${{ github.repository }}:continuous-clearing-v3.1.1 -o continuous-clearing-v3.1.1.tar
-      
+        Write-Host "::set-output name=docker-LicenseClearingTool::continuous-clearing-v3.1.1.tar"
 
     - name: Archive docker image      
       #if: ${{ false }}  # disable for now
@@ -179,6 +181,11 @@ jobs:
         with:
           name: nuget-continuous-clearing
       
+      - name: Download Docker image
+        uses: actions/download-artifact@v2
+        with:
+          name: docker-continuous-clearing
+          
       - name: Debug
         run: |
           tree
@@ -216,7 +223,17 @@ jobs:
           asset_path: ./${{ needs.build.outputs.nupkg-LicenseClearingTool }}
           asset_name: ${{ needs.build.outputs.nupkg-LicenseClearingTool }}
           asset_content_type: application/zip
-      
+        
+      - name: Upload Nupkg
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} 
+          asset_path: ./${{ needs.build.outputs.docker-LicenseClearingTool }}
+          asset_name: ${{ needs.build.outputs.docker-LicenseClearingTool }}
+          asset_content_type: application/zip
+          
       - name: Upload ReadmeOSS_nupkg file
         uses: actions/upload-release-asset@v1
         env:
