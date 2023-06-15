@@ -39,7 +39,7 @@ namespace LCT.PackageIdentifier.UTest
             NpmProcessor.ParsePackageFile(appSettings);
 
             //Assert
-            Assert.That(25, Is.EqualTo(BomCreator.bomKpiData.DuplicateComponents), "Returns the count of duplicate components");
+            Assert.That(2974, Is.EqualTo(BomCreator.bomKpiData.DuplicateComponents), "Returns the count of duplicate components");
 
         }
 

@@ -126,12 +126,14 @@ namespace LCT.PackageIdentifier
             foreach (JProperty prop in depencyComponentList)
             {
                 Component components = new Component();
+                Property isdev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
+
                 var properties = JObject.Parse(Convert.ToString(prop.Value));
 
                 // ignoring the dev= true components, because they are not needed in clearing     
-                if (IsDevDependency(appSettings.RemoveDevDependency, prop.Value[Dev], ref noOfDevDependent))
+                if (IsDevDependency(prop.Value[Dev], ref noOfDevDependent))
                 {
-                    continue;
+                    isdev.Value = "true";
                 }
 
                 IEnumerable<JProperty> subDependencyComponentList = prop.Value[Dependencies]?.OfType<JProperty>();
@@ -160,6 +162,8 @@ namespace LCT.PackageIdentifier
                 components.Version = Convert.ToString(properties[Version]);
                 components.Purl = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
                 components.BomRef = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
+                components.Properties = new List<Property>();
+                components.Properties.Add(isdev);
                 lstComponentForBOM.Add(components);
                 lstComponentForBOM = RemoveBundledComponentFromList(bundledComponents, lstComponentForBOM);
             }
@@ -191,7 +195,11 @@ namespace LCT.PackageIdentifier
                 if (isTrue)
                 {
                     internalComponents.Add(currentIterationItem);
-                    continue;
+                    isInternal.Value = "true";
+                }
+                else
+                {
+                    isInternal.Value = "false";
                 }
 
                 currentIterationItem.Properties.Add(isInternal);
@@ -278,14 +286,14 @@ namespace LCT.PackageIdentifier
             }
         }
 
-        private static bool IsDevDependency(bool removeDevDependency, JToken devValue, ref int noOfDevDependent)
+        private static bool IsDevDependency( JToken devValue, ref int noOfDevDependent)
         {
             if (devValue != null)
             {
                 noOfDevDependent++;
             }
 
-            return removeDevDependency && devValue != null;
+            return devValue != null;
         }
 
         private static void GetBundledComponents(JToken subdependencies, ref List<BundledComponents> bundledComponents)
