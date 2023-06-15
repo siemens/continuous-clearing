@@ -81,6 +81,12 @@ namespace LCT.PackageIdentifier
                 {
                     componentsForBOM.AddRange(ParseCycloneDXBom(filepath));
                 }
+                foreach (var component in componentsForBOM)
+                {
+                    component.Properties = new List<Property>();
+                    Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
+                    component.Properties.Add(isDev);
+                }
                 bom.Components = componentsForBOM;
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = bom.Components.Count;
             }
@@ -105,19 +111,21 @@ namespace LCT.PackageIdentifier
                     string[] parts = trimmedLine.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
                     string scope = "";
                     bool isDevelopmentComponent;
-
+                    Property isInternal = new() { Name = Dataconstant.Cdx_IsInternal, Value = "false" };
                     scope = GetPackageDetails(parts, out component);
 
                     isDevelopmentComponent = GetDevDependentScopeList(appSettings, scope);
-
-                    if (!component.Version.Contains("win") && !isDevelopmentComponent)
+                    if (isDevelopmentComponent)
+                    {
+                        isInternal.Value = "true";
+                        BomCreator.bomKpiData.DevDependentComponents++;
+                    }
+                    component.Properties.Add(isInternal);
+                    if (!component.Version.Contains("win"))
                     {
                         foundPackages.Add(component);
                     }
-                    if (isDevelopmentComponent)
-                    {
-                        BomCreator.bomKpiData.DevDependentComponents++;
-                    }
+               
                 }
             }
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = totalComponenstinInputFile;

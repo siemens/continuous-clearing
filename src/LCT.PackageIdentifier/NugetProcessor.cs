@@ -397,6 +397,7 @@ namespace LCT.PackageIdentifier
         {
             List<string> configFiles;
             List<Component> componentsForBOM=new List<Component>();
+          
             if (string.IsNullOrEmpty(appSettings.CycloneDxBomFilePath))
             {
                 configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Nuget);
@@ -408,10 +409,16 @@ namespace LCT.PackageIdentifier
             }
             else
             {
-                configFiles = FolderScanner.FileScanner(appSettings.CycloneDxBomFilePath, appSettings.Npm);
+                configFiles = FolderScanner.FileScanner(appSettings.CycloneDxBomFilePath, appSettings.Nuget);
                 foreach (string filepath in configFiles)
                 {
                     componentsForBOM.AddRange(ParseCycloneDXBom(filepath));
+                }
+                foreach(var component in componentsForBOM)
+                {
+                    component.Properties = new List<Property>();
+                   Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
+                    component.Properties.Add(isDev);
                 }
                 bom.Components = componentsForBOM;
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = bom.Components.Count;
