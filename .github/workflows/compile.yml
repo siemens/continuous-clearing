@@ -1,6 +1,10 @@
 name: Build & Test
 
-on: [push, pull_request]
+on: 
+ push:
+ pull_request:
+ schedule:
+   - cron: "30 0 * * 5"
 
 jobs:
   build:
