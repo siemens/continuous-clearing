@@ -67,7 +67,7 @@ namespace LCT.SW360PackageCreator
 
                 bool isInternalComponent = GetPackageType(item, ref componentsData);
 
-                if (isInternalComponent)
+                if (isInternalComponent )
                 {
                     Logger.Debug($"{item.Name}-{item.Version} found as internal component. ");
                 }

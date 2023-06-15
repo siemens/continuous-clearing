@@ -179,7 +179,11 @@ namespace LCT.PackageIdentifier
                 if (isTrue)
                 {
                     internalComponents.Add(currentIterationItem);
-                    continue;
+                    isInternal.Value = "true";
+                }
+                else
+                {
+                    isInternal.Value = "false";
                 }
 
                 currentIterationItem.Properties.Add(isInternal);
