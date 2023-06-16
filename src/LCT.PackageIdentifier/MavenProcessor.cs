@@ -53,7 +53,7 @@ namespace LCT.PackageIdentifier
                     }
                 }
 
-                ParseConfigFile(depFilePath, appSettings, ref componentsForBOM);
+                ParseDependencyTextFile(depFilePath, appSettings, ref componentsForBOM);
 
                 totalComponentsIdentified = componentsForBOM.Count;
 
@@ -94,7 +94,7 @@ namespace LCT.PackageIdentifier
             return bom;
         }
 
-        private static void ParseConfigFile(string depFilePath, CommonAppSettings appSettings, ref List<Component> foundPackages)
+        private static void ParseDependencyTextFile(string depFilePath, CommonAppSettings appSettings, ref List<Component> foundPackages)
         {
             string[] lines = File.ReadAllLines(depFilePath);
             int noOfExcludedComponents = 0;
@@ -111,16 +111,19 @@ namespace LCT.PackageIdentifier
                     string[] parts = trimmedLine.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
                     string scope = "";
                     bool isDevelopmentComponent;
-                    Property isInternal = new() { Name = Dataconstant.Cdx_IsInternal, Value = "false" };
-                    scope = GetPackageDetails(parts, out component);
+                   
+                    Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
 
+                    scope = GetPackageDetails(parts, out component);
+                   
                     isDevelopmentComponent = GetDevDependentScopeList(appSettings, scope);
                     if (isDevelopmentComponent)
                     {
-                        isInternal.Value = "true";
+                        component.Properties = new List<Property>();
+                        isDev.Value = "true";
                         BomCreator.bomKpiData.DevDependentComponents++;
                     }
-                    component.Properties.Add(isInternal);
+                    component.Properties.Add(isDev);
                     if (!component.Version.Contains("win"))
                     {
                         foundPackages.Add(component);
