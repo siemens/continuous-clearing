@@ -33,17 +33,36 @@ namespace LCT.PackageIdentifier
 
         public Bom ParsePackageFile(CommonAppSettings appSettings)
         {
-            List<string> configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Debian);
+            List<string> configFiles = new();
             List<DebianPackage> listofComponents = new List<DebianPackage>();
             Bom bom = new Bom();
             List<Component> listComponentForBOM;
-            foreach (string filepath in configFiles)
+
+            if (string.IsNullOrEmpty(appSettings.CycloneDxBomFilePath))
             {
-                if (filepath.EndsWith(".xml") || filepath.EndsWith(".json"))
+                configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Debian);
+
+                foreach (string filepath in configFiles)
                 {
-                    listofComponents.AddRange(ParseCycloneDX(filepath));
+                    if (filepath.EndsWith(".xml") || filepath.EndsWith(".json"))
+                    {
+                        listofComponents.AddRange(ParseCycloneDX(filepath));
+                    }
                 }
             }
+            else if (!string.IsNullOrEmpty(appSettings.CycloneDxBomFilePath)) //todo: need to add a folder in the docker , to mount this
+            {
+
+                configFiles = FolderScanner.FileScanner(appSettings.CycloneDxBomFilePath, appSettings.Debian);
+                foreach (string filepath in configFiles)
+                {
+                    if (filepath.EndsWith(".xml") || filepath.EndsWith(".json")) //todo: decide the end string . is it only .json or _Bom.cdx.json
+                    {
+                        listofComponents.AddRange(ParseCycloneDX(filepath));
+                    }
+                }
+            }
+            //todo:testing is pending for the new logic addition
 
             int initialCount = listofComponents.Count;
             GetDistinctComponentList(ref listofComponents);

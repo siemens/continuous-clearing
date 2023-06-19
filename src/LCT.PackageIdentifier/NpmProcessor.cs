@@ -89,6 +89,17 @@ namespace LCT.PackageIdentifier
                     GetComponentsForBom(filepath, appSettings, ref bundledComponents, ref lstComponentForBOM, ref noOfDevDependent, depencyComponentList);
                 }
 
+                // the below logic for angular 16+version due to package-lock.json file format change
+                if (dependencies == null)
+                {
+                    var pacakages = jsonDeserialized["packages"];
+                    if (pacakages?.Children() != null)
+                    {
+                        IEnumerable<JProperty> depencyComponentList = pacakages?.Children().OfType<JProperty>();
+                        GetPackagesForBom(filepath, ref bundledComponents, ref lstComponentForBOM, ref noOfDevDependent, depencyComponentList);
+                    }
+                }
+
                 if (appSettings.Npm.ExcludedComponents != null)
                 {
                     lstComponentForBOM = CommonHelper.RemoveExcludedComponents(lstComponentForBOM, appSettings.Npm.ExcludedComponents, ref noOfExcludedComponents);
@@ -116,6 +127,64 @@ namespace LCT.PackageIdentifier
 
             return lstComponentForBOM;
         }
+
+        private static void GetPackagesForBom(string filepath, ref List<BundledComponents> bundledComponents, ref List<Component> lstComponentForBOM, ref int noOfDevDependent, IEnumerable<JProperty> depencyComponentList)
+        {
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += depencyComponentList.Count();
+
+            foreach (JProperty prop in depencyComponentList)
+            {
+                if (string.IsNullOrEmpty(prop.Name))
+                {
+                    BomCreator.bomKpiData.ComponentsinPackageLockJsonFile--;
+                    continue;
+                }
+
+                Component components = new Component();
+                var properties = JObject.Parse(Convert.ToString(prop.Value));
+
+                // ignoring the dev= true components, because they are not needed in clearing     
+                if (IsDevDependency(prop.Value[Dev], ref noOfDevDependent))
+                {
+                    continue;
+                }
+
+                string folderPath = CommonHelper.TrimEndOfString(filepath, $"\\{FileConstant.PackageLockFileName}");
+                string packageName = CommonHelper.GetSubstringOfLastOccurance(prop.Name, $"node_modules/");
+                string componentName = packageName.StartsWith('@') ? packageName.Replace("@", "%40") : packageName;
+
+                if (packageName.Contains('@'))
+                {
+                    components.Group = packageName.Split('/')[0];
+                    components.Name = packageName.Split('/')[1];
+                }
+                else
+                {
+                    components.Name = packageName;
+                }
+
+                components.Description = folderPath;
+                components.Version = Convert.ToString(properties[Version]);
+                components.Purl = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
+                components.BomRef = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
+
+                CheckAndAddToBundleComponents(bundledComponents, prop, components);
+
+                lstComponentForBOM.Add(components);
+                lstComponentForBOM = RemoveBundledComponentFromList(bundledComponents, lstComponentForBOM);
+            }
+        }
+
+        private static void CheckAndAddToBundleComponents(List<BundledComponents> bundledComponents, JProperty prop, Component components)
+        {
+            if (prop.Value[Bundled] != null &&
+                  !(bundledComponents.Any(x => x.Name == components.Name && x.Version.ToLowerInvariant() == components.Version)))
+            {
+                BundledComponents component = new() { Name = components.Name, Version = components.Version };
+                bundledComponents.Add(component);
+            }
+        }
+
 
         private void GetComponentsForBom(string filepath, CommonAppSettings appSettings,
             ref List<BundledComponents> bundledComponents, ref List<Component> lstComponentForBOM,
