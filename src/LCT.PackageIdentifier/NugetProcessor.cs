@@ -423,7 +423,9 @@ namespace LCT.PackageIdentifier
                 {
                     component.Properties = new List<Property>();
                     Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
+                    Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "Manually Added" };
                     component.Properties.Add(isDev);
+                    component.Properties.Add(identifierType);
                 }
                 bom.Components = componentsForBOM;
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = bom.Components.Count;
@@ -450,6 +452,10 @@ namespace LCT.PackageIdentifier
                     new()
                     {
                        Name = Dataconstant.Cdx_IsDevelopment, Value = prop.IsDev
+                    },
+                    new Property()
+                    {
+                        Name=Dataconstant.Cdx_IdentifierType,Value="Discovered"
                     }
                 };
                 

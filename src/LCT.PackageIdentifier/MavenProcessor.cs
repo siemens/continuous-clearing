@@ -85,7 +85,10 @@ namespace LCT.PackageIdentifier
                 {
                     component.Properties = new List<Property>();
                     Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
+                    Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "Manually Added" };
                     component.Properties.Add(isDev);
+                    component.Properties.Add(identifierType);
+
                 }
                 bom.Components = componentsForBOM;
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = bom.Components.Count;
@@ -111,24 +114,24 @@ namespace LCT.PackageIdentifier
                     string[] parts = trimmedLine.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
                     string scope = "";
                     bool isDevelopmentComponent;
-                   
-                    Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
 
+                    Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
+                    Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "Discovered" };
                     scope = GetPackageDetails(parts, out component);
-                   
+                    component.Properties = new List<Property>();
                     isDevelopmentComponent = GetDevDependentScopeList(appSettings, scope);
                     if (isDevelopmentComponent)
                     {
-                        component.Properties = new List<Property>();
                         isDev.Value = "true";
                         BomCreator.bomKpiData.DevDependentComponents++;
                     }
                     component.Properties.Add(isDev);
+                    component.Properties.Add(identifierType);
                     if (!component.Version.Contains("win"))
                     {
                         foundPackages.Add(component);
                     }
-               
+
                 }
             }
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = totalComponenstinInputFile;
@@ -190,7 +193,7 @@ namespace LCT.PackageIdentifier
                 {
                     currentIterationItem.Properties = new List<Property>();
                 }
-                
+
                 Property isInternal = new() { Name = Dataconstant.Cdx_IsInternal, Value = "false" };
                 if (isTrue)
                 {
