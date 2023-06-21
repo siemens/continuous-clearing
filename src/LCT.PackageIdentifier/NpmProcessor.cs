@@ -13,6 +13,7 @@ using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -295,7 +296,7 @@ namespace LCT.PackageIdentifier
                 string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper);
                 Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoUrl, Value = repoName };
                 Component componentVal = component;
-                
+
                 if (componentVal.Properties?.Count == null || componentVal.Properties?.Count <= 0)
                 {
                     componentVal.Properties = new List<Property>();
@@ -328,29 +329,29 @@ namespace LCT.PackageIdentifier
         {
             List<string> configFiles;
 
-            if (string.IsNullOrEmpty(appSettings.CycloneDxBomFilePath))
+            configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Npm);
+
+            foreach (string filepath in configFiles)
             {
-                Logger.Debug($"ParsePackageFile():Start");
-
-                configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Npm);
-
-
-                foreach (string filepath in configFiles)
+                Logger.Debug($"ParsingInputFileForBOM():FileName: " + filepath);
+                if (filepath.EndsWith(FileConstant.CycloneDXFileExtension))
                 {
+                    Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
+                    bom = ParseCycloneDXBom(filepath);
+                    BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = bom.Components.Count;
+                    bom = RemoveExcludedComponents(appSettings, bom);
+
+                    componentsForBOM.AddRange(bom.Components);
+                }
+                else
+                {
+                    Logger.Debug($"ParsingInputFileForBOM():Found as Package File");
                     componentsForBOM.AddRange(ParsePackageLockJson(filepath, appSettings));
                 }
             }
-            else
-            {
-                bom = ParseCycloneDXBom(appSettings.CycloneDxBomFilePath);
-                BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = bom.Components.Count;
-                bom = RemoveExcludedComponents(appSettings, bom);
-
-                componentsForBOM = bom.Components;
-            }
         }
 
-        private static bool IsDevDependency( JToken devValue, ref int noOfDevDependent)
+        private static bool IsDevDependency(JToken devValue, ref int noOfDevDependent)
         {
             if (devValue != null)
             {
