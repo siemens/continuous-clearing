@@ -14,6 +14,6 @@ namespace LCT.Common
     /// </summary>
     public interface ICycloneDXBomParser
     {
-        public List<Component> ParseCycloneDXBom(string filePath);
+        public Bom ParseCycloneDXBom(string filePath);
     }
 }

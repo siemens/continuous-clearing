@@ -79,7 +79,8 @@ namespace LCT.PackageIdentifier
                 configFiles = FolderScanner.FileScanner(appSettings.CycloneDxBomFilePath, appSettings.Npm);
                 foreach (string filepath in configFiles)
                 {
-                    componentsForBOM.AddRange(ParseCycloneDXBom(filepath));
+                    Bom bomList=ParseCycloneDXBom(filepath);
+                    componentsForBOM.AddRange(bomList.Components);
                 }
                 foreach (var component in componentsForBOM)
                 {

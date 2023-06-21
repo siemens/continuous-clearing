@@ -20,7 +20,7 @@ namespace LCT.Common
     public class CycloneDXBomParser : ICycloneDXBomParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        public List<Component> ParseCycloneDXBom(string filePath)
+        public Bom ParseCycloneDXBom(string filePath)
         {
             Bom bom = new Bom();
             string json = string.Empty;
@@ -47,7 +47,7 @@ namespace LCT.Common
             {
                 Logger.Error("Exception in reading cycloneDx bom", ex);
             }
-            return bom.Components;
+            return bom;
         }
     }
 }
