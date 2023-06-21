@@ -128,10 +128,10 @@ namespace PackageIdentifier.UTest
 
             //Act
             CycloneDXBomParser cycloneBomProcessor = new CycloneDXBomParser();
-            List<Component> files = cycloneBomProcessor.ParseCycloneDXBom(BomTestFile);
+            Bom files = cycloneBomProcessor.ParseCycloneDXBom(BomTestFile);
 
             //Assert
-            Assert.That(4, Is.EqualTo(files.Count), "Returns components in BOM");
+            Assert.That(4, Is.EqualTo(files.Components.Count), "Returns components in BOM");
 
         }
 
@@ -145,10 +145,10 @@ namespace PackageIdentifier.UTest
 
             //Act
             CycloneDXBomParser cycloneBomProcessor = new CycloneDXBomParser();
-            List<Component> files = cycloneBomProcessor.ParseCycloneDXBom(BomTestFile);
+            Bom files = cycloneBomProcessor.ParseCycloneDXBom(BomTestFile);
 
             //Assert
-            Assert.IsNull(files, "Returns Zero components in BOM");
+            Assert.IsNull(files.Components, "Returns Zero components in BOM");
 
         }
 
@@ -161,10 +161,10 @@ namespace PackageIdentifier.UTest
 
             //Act
             CycloneDXBomParser cycloneBomProcessor = new CycloneDXBomParser();
-            List<Component> files = cycloneBomProcessor.ParseCycloneDXBom(sourcePath + "/output.json");
+            Bom files = cycloneBomProcessor.ParseCycloneDXBom(sourcePath + "/output.json");
 
             //Assert
-            Assert.IsNull(files, "Returns Zero components in BOM");
+            Assert.IsNull(files.Components, "Returns Zero components in BOM");
 
         }
     }

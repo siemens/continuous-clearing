@@ -221,7 +221,7 @@ namespace NUnitTestProject1
             var sw360Service = new Mock<ISW360Service>();
             var creatorHelper = new Mock<ICreatorHelper>();
             var parser = new Mock<ICycloneDXBomParser>();
-            parser.Setup(x => x.ParseCycloneDXBom(It.IsAny<string>())).Returns(bom.Components);
+            parser.Setup(x => x.ParseCycloneDXBom(It.IsAny<string>())).Returns(bom);
             creatorHelper.Setup(x => x.SetContentsForComparisonBOM(It.IsAny<List<Components>>(), sw360Service.Object)).ReturnsAsync(comparisonBomData);
             var cycloneDXBomParser = new ComponentCreator();
 
