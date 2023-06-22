@@ -25,7 +25,7 @@ namespace LCT.PackageIdentifier
     /// <summary>
     /// The DebianProcessor class
     /// </summary>
-    public class DebianProcessor : IParser
+    public class DebianProcessor : CycloneDXBomParser, IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -33,17 +33,20 @@ namespace LCT.PackageIdentifier
 
         public Bom ParsePackageFile(CommonAppSettings appSettings)
         {
-            List<string> configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Debian);
+            List<string> configFiles;
             List<DebianPackage> listofComponents = new List<DebianPackage>();
             Bom bom = new Bom();
             List<Component> listComponentForBOM;
+
+            configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Debian);
+
             foreach (string filepath in configFiles)
             {
-                if (filepath.EndsWith(".xml") || filepath.EndsWith(".json"))
-                {
-                    listofComponents.AddRange(ParseCycloneDX(filepath));
-                }
+                Logger.Debug($"ParsePackageFile():FileName: " + filepath);
+                listofComponents.AddRange(ParseCycloneDX(filepath));
             }
+
+            //todo:testing is pending for the new logic addition
 
             int initialCount = listofComponents.Count;
             GetDistinctComponentList(ref listofComponents);
@@ -94,121 +97,39 @@ namespace LCT.PackageIdentifier
 
         #region private methods
 
-        private static List<DebianPackage> ParseCycloneDX(string filePath)
+        public List<DebianPackage> ParseCycloneDX(string filePath)
         {
             List<DebianPackage> debianPackages = new List<DebianPackage>();
-            try
-            {
-                if (filePath.EndsWith(".xml"))
-                {
-                    XmlDocument doc = new XmlDocument();
-                    doc.Load(filePath);
-                    XmlNodeList PackageNodes = doc.GetElementsByTagName("components");
-
-                    foreach (XmlNode node in PackageNodes)
-                    {
-                        ExtractDetailsForXML(node.ChildNodes, ref debianPackages);
-                    }
-                }
-                else if (filePath.EndsWith(".json"))
-                {
-                    ExtractDetailsForJson(filePath, ref debianPackages);
-                }
-                else
-                {
-                    // do nothing
-                }
-            }
-            catch (XmlException ex)
-            {
-                Logger.Debug($"ParseCycloneDX", ex);
-            }
+            ExtractDetailsForJson(filePath, ref debianPackages);
             return debianPackages;
         }
 
-        private static void ExtractDetailsForXML(XmlNodeList packageNodes, ref List<DebianPackage> debianPackages)
+        private void ExtractDetailsForJson(string filePath, ref List<DebianPackage> debianPackages)
         {
-            foreach (XmlNode packageinfo in packageNodes)
+            Bom bom = ParseCycloneDXBom(filePath);
+           
+            foreach (var componentsInfo in bom.Components)
             {
-                if (packageinfo.Name == "component")
+                BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;
+                DebianPackage package = new DebianPackage
                 {
-                    DebianPackage package = GetPackageDetails(packageinfo);
-                    BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;
+                    Name = componentsInfo.Name,
+                    Version = componentsInfo.Version,
+                    PurlID = componentsInfo.Purl,
+                };
 
-                    if (!string.IsNullOrEmpty(package.Name) && !string.IsNullOrEmpty(package.Version) && !string.IsNullOrEmpty(package.PurlID) && package.PurlID.Contains(Dataconstant.DebianPackage))
-                    {
-                        BomCreator.bomKpiData.DebianComponents++;
-                        debianPackages.Add(package);
-                        Logger.Debug($"ExtractDetailsForXML():ValidComponent:Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
-                    }
-                    else
-                    {
-                        BomCreator.bomKpiData.ComponentsExcluded++;
-                        Logger.Debug($"ExtractDetailsForXML():InvalidComponent:Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
-                    }
+                if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.DebianPackage))
+                {
+                    BomCreator.bomKpiData.DebianComponents++;
+                    debianPackages.Add(package);
+                    Logger.Debug($"ExtractDetailsForJson():ValidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
+                }
+                else
+                {
+                    BomCreator.bomKpiData.ComponentsExcluded++;
+                    Logger.Debug($"ExtractDetailsForJson():InvalidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
                 }
             }
-        }
-
-        private static void ExtractDetailsForJson(string filePath, ref List<DebianPackage> debianPackages)
-        {
-            Model.CycloneDxBomData cycloneDxBomData;
-            string json = File.ReadAllText(filePath);
-            cycloneDxBomData = JsonConvert.DeserializeObject<CycloneDxBomData>(json);
-
-            if (cycloneDxBomData != null && cycloneDxBomData.ComponentsInfo != null)
-            {
-                foreach (var componentsInfo in cycloneDxBomData.ComponentsInfo)
-                {
-                    if (componentsInfo.Type == "library")
-                    {
-                        BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;
-                        DebianPackage package = new DebianPackage
-                        {
-                            Name = componentsInfo.Name,
-                            Version = componentsInfo.Version,
-                            PurlID = componentsInfo.ReleaseExternalId,
-                        };
-
-                        if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.ReleaseExternalId) && componentsInfo.ReleaseExternalId.Contains(Dataconstant.DebianPackage))
-                        {
-                            BomCreator.bomKpiData.DebianComponents++;
-                            debianPackages.Add(package);
-                            Logger.Debug($"ExtractDetailsForJson():ValidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
-                        }
-                        else
-                        {
-                            BomCreator.bomKpiData.ComponentsExcluded++;
-                            Logger.Debug($"ExtractDetailsForJson():InvalidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
-                        }
-                    }
-                }
-            }
-            else
-            {
-                Logger.Debug($"ExtractDetailsForJson():NoComponenstFound!!");
-            }
-        }
-
-        private static DebianPackage GetPackageDetails(XmlNode packageinfo)
-        {
-            DebianPackage package = new DebianPackage();
-            foreach (XmlNode mainNode in packageinfo.ChildNodes)
-            {
-                if (mainNode.Name == "name")
-                {
-                    package.Name = mainNode.InnerText;
-                }
-                if (mainNode.Name == "version")
-                {
-                    package.Version = mainNode.InnerText;
-                }
-                if (mainNode.Name == "purl")
-                {
-                    package.PurlID = mainNode.InnerText;
-                }
-            }
-            return package;
         }
 
         private static void GetDistinctComponentList(ref List<DebianPackage> listofComponents)
