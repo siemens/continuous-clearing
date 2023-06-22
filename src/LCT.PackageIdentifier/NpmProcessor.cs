@@ -46,8 +46,9 @@ namespace LCT.PackageIdentifier
 
             int totalComponentsIdentified = 0;
 
-
             ParsingInputFileForBOM(appSettings, ref componentsForBOM, ref bom);
+
+            componentsForBOM = GetExcludedComponentsList(componentsForBOM);
 
             totalComponentsIdentified = componentsForBOM.Count;
 
@@ -328,6 +329,7 @@ namespace LCT.PackageIdentifier
         private void ParsingInputFileForBOM(CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom)
         {
             List<string> configFiles;
+            int count = 0;
 
             configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Npm);
 
@@ -338,7 +340,7 @@ namespace LCT.PackageIdentifier
                 {
                     Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
                     bom = ParseCycloneDXBom(filepath);
-                    BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = bom.Components.Count;
+                    count += bom.Components.Count;
                     bom = RemoveExcludedComponents(appSettings, bom);
 
                     componentsForBOM.AddRange(bom.Components);
@@ -346,9 +348,12 @@ namespace LCT.PackageIdentifier
                 else
                 {
                     Logger.Debug($"ParsingInputFileForBOM():Found as Package File");
-                    componentsForBOM.AddRange(ParsePackageLockJson(filepath, appSettings));
+                    var lst = ParsePackageLockJson(filepath, appSettings);
+                    count += lst.Count;
+                    componentsForBOM.AddRange(lst);
                 }
             }
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = count;
         }
 
         private static bool IsDevDependency(JToken devValue, ref int noOfDevDependent)
@@ -437,6 +442,25 @@ namespace LCT.PackageIdentifier
             }
 
             return repoName;
+        }
+
+        private static List<Component> GetExcludedComponentsList(List<Component> componentsForBOM)
+        {
+            List<Component> components = new List<Component>();
+            foreach (Component componentsInfo in componentsForBOM)
+            {
+                if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.NPMPackage))
+                {
+                    components.Add(componentsInfo);
+                    Logger.Debug($"GetExcludedComponentsList():ValidComponent For NPM : Component Details : {componentsInfo.Name} @ {componentsInfo.Version} @ {componentsInfo.Purl}");
+                }
+                else
+                {
+                    BomCreator.bomKpiData.ComponentsExcluded++;
+                    Logger.Debug($"GetExcludedComponentsList():InvalidComponent For NPM : Component Details : {componentsInfo?.Name} @ {componentsInfo?.Version} @ {componentsInfo?.Purl}");
+                }
+            }
+            return components;
         }
     }
 }
