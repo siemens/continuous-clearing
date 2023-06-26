@@ -367,7 +367,7 @@ namespace LCT.PackageIdentifier
 
             string fullName = bomHelper.GetFullNameOfComponent(component);
             string fullNameVersion = $"{fullName}.{component.Version}.nupkg";
-            if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase) 
+            if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase)
                 && aqlResultList.Exists(
                 x => x.Name.Equals(fullNameVersion, StringComparison.OrdinalIgnoreCase)))
             {

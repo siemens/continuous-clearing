@@ -9,9 +9,12 @@ using NUnit.Framework;
 using System.IO;
 using LCT.Common;
 using LCT.Common.Model;
+using System.Collections.Generic;
+using CycloneDX.Models;
 
 namespace LCT.PackageIdentifier.UTest
 {
+
     [TestFixture]
     public class NPMParserTests
     {
@@ -69,6 +72,30 @@ namespace LCT.PackageIdentifier.UTest
 
             //Assert
             Assert.That(0, Is.EqualTo(bomKpiData.DuplicateComponents), "Returns the count of duplicate components as zero");
+        }
+
+        [Test]
+        public void ParseCycloneDXFile_GivenMultipleInputFiles_ReturnsCounts()
+        {
+            //Arrange
+            int expectednoofcomponents = 5;
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string OutFolder = Path.GetDirectoryName(exePath);
+            NpmProcessor npmProcessor = new NpmProcessor();
+            string[] Includes = { "*_NPM.cdx.json" };
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                PackageFilePath = OutFolder + @"\PackageIdentifierUTTestFiles",
+                ProjectType = "NPM",
+                RemoveDevDependency = true,
+                Npm = new Config() { Include = Includes }
+            };
+
+            //Act
+            Bom listofcomponents = npmProcessor.ParsePackageFile(appSettings);
+
+            //Assert
+            Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
         }
     }
 }

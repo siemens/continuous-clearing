@@ -1,0 +1,103 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.4",
+  "serialNumber": "urn:uuid:28b76031-a717-4131-9938-805c2745de64",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-05-18T06:55:13Z",
+    "tools": [
+      {
+        "vendor": "anchore",
+        "name": "syft",
+        "version": "0.76.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "4d4b9c6291d0c9dc",
+      "type": "file",
+      "name": "/mnt/InputImages"
+    }
+  },
+  "components": [
+    {
+      "bom-ref": "pkg:npm/%40ampproject/remapping@2.2.0?package-id=75aaab6a957ad46c",
+      "type": "library",
+      "name": "@ampproject/remapping",
+      "version": "2.2.0",
+      "cpe": "cpe:2.3:a:\\@ampproject\\/remapping:\\@ampproject\\/remapping:2.2.0:*:*:*:*:*:*:*",
+      "purl": "pkg:npm/%40ampproject/remapping@2.2.0",
+      "properties": [
+        {
+          "name": "syft:package:foundBy",
+          "value": "javascript-lock-cataloger"
+        },
+        {
+          "name": "syft:package:language",
+          "value": "javascript"
+        },
+        {
+          "name": "syft:package:metadataType",
+          "value": "NpmPackageLockJsonMetadata"
+        },
+        {
+          "name": "syft:package:type",
+          "value": "npm"
+        },
+        {
+          "name": "syft:location:0:path",
+          "value": "ui/package-lock.json"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/%40angular-devkit/architect@0.1303.0?package-id=b48d57ed0326a119",
+      "type": "library",
+      "name": "@angular-devkit/architect",
+      "version": "0.1303.0",
+      "cpe": "cpe:2.3:a:\\@angular-devkit\\/architect:\\@angular-devkit\\/architect:0.1303.0:*:*:*:*:*:*:*",
+      "purl": "pkg:npm/%40angular-devkit/architect@0.1303.0",
+      "properties": [
+        {
+          "name": "syft:package:foundBy",
+          "value": "javascript-lock-cataloger"
+        },
+        {
+          "name": "syft:package:language",
+          "value": "javascript"
+        },
+        {
+          "name": "syft:package:metadataType",
+          "value": "NpmPackageLockJsonMetadata"
+        },
+        {
+          "name": "syft:package:type",
+          "value": "npm"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:\\@angular-devkit\\/architect:\\@angular_devkit\\/architect:0.1303.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:\\@angular_devkit\\/architect:\\@angular-devkit\\/architect:0.1303.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:\\@angular_devkit\\/architect:\\@angular_devkit\\/architect:0.1303.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:\\@angular:\\@angular-devkit\\/architect:0.1303.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:\\@angular:\\@angular_devkit\\/architect:0.1303.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:location:0:path",
+          "value": "ui/package-lock.json"
+        }
+      ]
+    }
+  ]
+}

@@ -143,6 +143,9 @@ namespace LCT.PackageIdentifier
                 case "DEBIAN":
                     parser = new DebianProcessor();
                     return await ComponentIdentification(appSettings, parser);
+                case "PYTHON":
+                    parser = new PythonProcessor();
+                    return await ComponentIdentification(appSettings, parser);
                 default:
                     Logger.Error($"GenerateBom():Invalid ProjectType - {appSettings.ProjectType}");
                     break;

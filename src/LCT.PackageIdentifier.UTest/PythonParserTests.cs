@@ -14,27 +14,31 @@ using LCT.Common.Model;
 namespace PackageIdentifier.UTest
 {
     [TestFixture]
-    class DebianParserTests
+    class PythonParserTests
     {
+        readonly PythonProcessor pythonProcessor;
+        public PythonParserTests()
+        {
+            pythonProcessor = new PythonProcessor();
+        }
         [Test]
         public void ParsePackageConfig_GivenAMultipleInputFilePath_ReturnsCounts()
         {
             //Arrange
-            int expectednoofcomponents = 8;
+            int expectednoofcomponents = 9;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            DebianProcessor DebianProcessor = new DebianProcessor();
-            string[] Includes = { "*_Debian.cdx.json" };
+            string[] Includes = { "*_Python.cdx.json" };
             CommonAppSettings appSettings = new CommonAppSettings()
             {
-                ProjectType = "DEBIAN",
+                ProjectType = "PYTHON",
                 RemoveDevDependency = true,
-                Debian = new Config() { Include = Includes },
+                Python = new Config() { Include = Includes },
                 PackageFilePath = OutFolder + @"\PackageIdentifierUTTestFiles"
             };
 
             //Act
-            Bom listofcomponents = DebianProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = pythonProcessor.ParsePackageFile(appSettings);
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
@@ -48,18 +52,17 @@ namespace PackageIdentifier.UTest
             int expectednoofcomponents = 4;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            DebianProcessor DebianProcessor = new DebianProcessor();
-            string[] Includes = { "CycloneDX_Debian.cdx.json" };
+            string[] Includes = { "CycloneDX_Python.cdx.json" };
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 PackageFilePath = OutFolder + @"\PackageIdentifierUTTestFiles",
-                ProjectType = "DEBIAN",
+                ProjectType = "PYTHON",
                 RemoveDevDependency = true,
-                Debian = new Config() { Include = Includes }
+                Python = new Config() { Include = Includes }
             };
 
             //Act
-            Bom listofcomponents = DebianProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = pythonProcessor.ParsePackageFile(appSettings);
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
@@ -72,45 +75,21 @@ namespace PackageIdentifier.UTest
             int duplicateComponents = 1;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            DebianProcessor DebianProcessor = new DebianProcessor();
-            string[] Includes = { "*_Debian.cdx.json" };
+            string[] Includes = { "*_Python.cdx.json" };
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 PackageFilePath = OutFolder + @"\PackageIdentifierUTTestFiles",
-                ProjectType = "DEBIAN",
+                ProjectType = "PYTHON",
                 RemoveDevDependency = true,
-                Debian = new Config() { Include = Includes }
+                Python = new Config() { Include = Includes }
             };
 
             //Act
-            DebianProcessor.ParsePackageFile(appSettings);
+            pythonProcessor.ParsePackageFile(appSettings);
 
             //Assert
             Assert.That(duplicateComponents, Is.EqualTo(BomCreator.bomKpiData.DuplicateComponents), "Checks for no of duplicate components");
         }
-
-        [Test]
-        public void ParsePackageConfig_GivenAInputFilePath_ReturnsSourceDetails()
-        {
-            //Arrange
-            string sourceName = "adduser" + "_" + "3.118";
-            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string OutFolder = Path.GetDirectoryName(exePath);
-            DebianProcessor DebianProcessor = new DebianProcessor();
-            string[] Includes = { "SourceDetails_Cyclonedx.json" };
-            CommonAppSettings appSettings = new CommonAppSettings()
-            {
-                PackageFilePath = OutFolder + @"\PackageIdentifierUTTestFiles",
-                ProjectType = "DEBIAN",
-                RemoveDevDependency = true,
-                Debian = new Config() { Include = Includes }
-            };
-
-            //Act
-            Bom listofcomponents = DebianProcessor.ParsePackageFile(appSettings);
-
-            //Assert
-            Assert.AreEqual(sourceName, listofcomponents.Components[0].Name + "_" + listofcomponents.Components[0].Version, "Checks componet name and version");
-        }
     }
 }
+
