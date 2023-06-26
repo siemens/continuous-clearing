@@ -107,7 +107,6 @@ namespace LCT.PackageIdentifier
             List<Component> listComponentForBOM;
             bool mainLockFileScanned = false;
 
-
             foreach (string config in configFiles)
             {
                 if (config.EndsWith("poetry.lock") && !mainLockFileScanned)
@@ -137,7 +136,6 @@ namespace LCT.PackageIdentifier
         {
             List<PythonPackage> PythonPackages;
             PythonPackages = PoetrySetOfCmds(filePath);
-
             return PythonPackages;
         }
 
