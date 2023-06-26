@@ -80,14 +80,9 @@ namespace LCT.PackageIdentifier
 
         private static void WritecontentsToBOM(CommonAppSettings appSettings, BomKpiData bomKpiData, Bom listOfComponentsToBom)
         {
-            if (string.IsNullOrEmpty(appSettings.CycloneDxBomFilePath))
-            {
+           
                 WriteContentToComparisonBOM(appSettings, listOfComponentsToBom, ref bomKpiData);
-            }
-            else
-            {
-                WriteContentToCycloneDxBOM(appSettings, listOfComponentsToBom, ref bomKpiData);
-            }
+       
 
         }
 
@@ -96,13 +91,13 @@ namespace LCT.PackageIdentifier
             IFileOperations fileOperations = new FileOperations();
             if (string.IsNullOrEmpty(appSettings.IdentifierBomFilePath))
             {
-                fileOperations.WriteContentToCycloneDXFile(listOfComponentsToBom, appSettings.BomFolderPath, appSettings.CycloneDxBomFilePath);
+                fileOperations.WriteContentToCycloneDXFile(listOfComponentsToBom, appSettings.BomFolderPath, appSettings.SW360ProjectName);
             }
             else
             {
                 listOfComponentsToBom = fileOperations.CombineComponentsFromExistingBOM(listOfComponentsToBom, appSettings.IdentifierBomFilePath);
                 bomKpiData.ComponentsInComparisonBOM = listOfComponentsToBom.Components.Count;
-                fileOperations.WriteContentToCycloneDXFile(listOfComponentsToBom, appSettings.BomFolderPath, appSettings.CycloneDxBomFilePath);
+                fileOperations.WriteContentToCycloneDXFile(listOfComponentsToBom, appSettings.BomFolderPath, appSettings.SW360ProjectName);
             }
 
         }

@@ -73,7 +73,7 @@ namespace LCT.PackageIdentifier.UTest
             Bom bom = MavenProcessor.ParsePackageFile(appSettings);
 
             //Assert
-            Assert.That(bom.Components.Count, Is.EqualTo(1), "Returns the count of NON Dev Dependency components");
+            Assert.That(bom.Components.Count-BomCreator.bomKpiData.DevDependentComponents, Is.EqualTo(1), "Returns the count of NON Dev Dependency components");
         }
 
         [Test]

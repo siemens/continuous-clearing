@@ -53,7 +53,7 @@ namespace LCT.PackageIdentifier
                     }
                 }
 
-                ParseConfigFile(depFilePath, appSettings, ref componentsForBOM);
+                ParseDependencyTextFile(depFilePath, appSettings, ref componentsForBOM);
 
                 totalComponentsIdentified = componentsForBOM.Count;
 
@@ -76,14 +76,29 @@ namespace LCT.PackageIdentifier
             }
             else
             {
-                bom = ParseCycloneDXBom(appSettings.CycloneDxBomFilePath);
+                configFiles = FolderScanner.FileScanner(appSettings.CycloneDxBomFilePath, appSettings.Npm);
+                foreach (string filepath in configFiles)
+                {
+                    Bom bomList=ParseCycloneDXBom(filepath);
+                    componentsForBOM.AddRange(bomList.Components);
+                }
+                foreach (var component in componentsForBOM)
+                {
+                    component.Properties = new List<Property>();
+                    Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
+                    Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "Manually Added" };
+                    component.Properties.Add(isDev);
+                    component.Properties.Add(identifierType);
+
+                }
+                bom.Components = componentsForBOM;
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = bom.Components.Count;
             }
             Logger.Debug($"ParsePackageFile():End");
             return bom;
         }
 
-        private static void ParseConfigFile(string depFilePath, CommonAppSettings appSettings, ref List<Component> foundPackages)
+        private static void ParseDependencyTextFile(string depFilePath, CommonAppSettings appSettings, ref List<Component> foundPackages)
         {
             string[] lines = File.ReadAllLines(depFilePath);
             int noOfExcludedComponents = 0;
@@ -101,18 +116,23 @@ namespace LCT.PackageIdentifier
                     string scope = "";
                     bool isDevelopmentComponent;
 
+                    Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
+                    Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "Discovered" };
                     scope = GetPackageDetails(parts, out component);
-
+                    component.Properties = new List<Property>();
                     isDevelopmentComponent = GetDevDependentScopeList(appSettings, scope);
-
-                    if (!component.Version.Contains("win") && !isDevelopmentComponent)
+                    if (isDevelopmentComponent)
+                    {
+                        isDev.Value = "true";
+                        BomCreator.bomKpiData.DevDependentComponents++;
+                    }
+                    component.Properties.Add(isDev);
+                    component.Properties.Add(identifierType);
+                    if (!component.Version.Contains("win"))
                     {
                         foundPackages.Add(component);
                     }
-                    if (isDevelopmentComponent)
-                    {
-                        BomCreator.bomKpiData.DevDependentComponents++;
-                    }
+
                 }
             }
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = totalComponenstinInputFile;
@@ -174,7 +194,7 @@ namespace LCT.PackageIdentifier
                 {
                     currentIterationItem.Properties = new List<Property>();
                 }
-                
+
                 Property isInternal = new() { Name = Dataconstant.Cdx_IsInternal, Value = "false" };
                 if (isTrue)
                 {

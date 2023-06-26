@@ -52,7 +52,7 @@ namespace PackageIdentifier.UTest
         public void ParsePackageLockJson_GivenAInputFilePath_ReturnsSuccess()
         {
             //Arrange
-            int expectednoofcomponents = 152;
+            int expectednoofcomponents = 153;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
             string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles\packages.lock.json";

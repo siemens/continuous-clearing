@@ -46,7 +46,7 @@ namespace LCT.PackageIdentifier
                 listofComponents.AddRange(ParseCycloneDX(filepath));
             }
 
-            //todo:testing is pending for the new logic addition
+          
 
             int initialCount = listofComponents.Count;
             GetDistinctComponentList(ref listofComponents);
