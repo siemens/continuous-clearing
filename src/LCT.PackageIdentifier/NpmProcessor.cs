@@ -332,25 +332,27 @@ namespace LCT.PackageIdentifier
             int count = 0;
 
             configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Npm);
-
-            foreach (string filepath in configFiles)
+            if (string.IsNullOrEmpty(appSettings.CycloneDxBomFilePath))
             {
-                Logger.Debug($"ParsingInputFileForBOM():FileName: " + filepath);
-                if (filepath.EndsWith(FileConstant.CycloneDXFileExtension))
+                foreach (string filepath in configFiles)
                 {
-                    Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
-                    bom = ParseCycloneDXBom(filepath);
-                    count += bom.Components.Count;
-                    bom = RemoveExcludedComponents(appSettings, bom);
+                    Logger.Debug($"ParsingInputFileForBOM():FileName: " + filepath);
+                    if (filepath.EndsWith(FileConstant.CycloneDXFileExtension))
+                    {
+                        Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
+                        bom = ParseCycloneDXBom(filepath);
+                        count += bom.Components.Count;
+                        bom = RemoveExcludedComponents(appSettings, bom);
 
-                    componentsForBOM.AddRange(bom.Components);
-                }
-                else
-                {
-                    Logger.Debug($"ParsingInputFileForBOM():Found as Package File");
-                    var lst = ParsePackageLockJson(filepath, appSettings);
-                    count += lst.Count;
-                    componentsForBOM.AddRange(lst);
+                        componentsForBOM.AddRange(bom.Components);
+                    }
+                    else
+                    {
+                        Logger.Debug($"ParsingInputFileForBOM():Found as Package File");
+                        var lst = ParsePackageLockJson(filepath, appSettings);
+                        count += lst.Count;
+                        componentsForBOM.AddRange(lst);
+                    }
                 }
             }
             else
