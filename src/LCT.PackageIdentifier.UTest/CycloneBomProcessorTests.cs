@@ -124,7 +124,7 @@ namespace PackageIdentifier.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string BomTestFile = outFolder + @"\PackageIdentifierUTTestFiles\Cyclonedx.json";
+            string BomTestFile = outFolder + @"\PackageIdentifierUTTestFiles\CycloneDX_Debian.cdx.json";
 
             //Act
             CycloneDXBomParser cycloneBomProcessor = new CycloneDXBomParser();
