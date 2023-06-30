@@ -33,11 +33,11 @@ namespace LCT.PackageIdentifier
             List<string> configFiles=new();
             if (string.IsNullOrEmpty(appSettings.CycloneDxBomFilePath))
             {
-              configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Npm);
+              configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Maven);
             }
             else
             {
-               configFiles = FolderScanner.FileScanner(appSettings.CycloneDxBomFilePath, appSettings.Npm);
+               configFiles = FolderScanner.FileScanner(appSettings.CycloneDxBomFilePath, appSettings.Maven);
             }
             
             foreach (string filepath in configFiles)
@@ -49,7 +49,7 @@ namespace LCT.PackageIdentifier
             {
                 component.Properties = new List<Property>();
                 Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
-                Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "Manually Added" };
+                Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "Manually" };
                 component.Properties.Add(isDev);
                 component.Properties.Add(identifierType);
 
