@@ -1,10 +1,10 @@
-## CA Tool
-The Continuous Clearing Tool scans and collects the 3rd party OSS components used in a NPM/NuGet/Maven/Debian project and uploads it to SW360 and Fossology by accepting respective project ID for license clearing.
+## Continuous Clearing Tool
+The Continuous Clearing Tool scans and collects the 3rd party OSS components used in a NPM/NuGet/Maven/Debian & Python project and uploads it to SW360 and Fossology by accepting respective project ID for license clearing.
 
-## CA Tool SBOM
-BOM generated from the CA Tool will have all the dependencies included in the scanned package , component type, Source repo URL, dependency type etc..,
+## Continuous Clearing SBOM Tool
+BOM generated from the continuous clearing Tool will have all the dependencies included in the scanned package , component type, Source repo URL, dependency type etc..,
 
-##Features
+## Features
 
 - Creates all dependencies in SW360 and triggers Fossology for license clearing .  
 - Provides secured SBOM for legal compliance.
@@ -20,11 +20,11 @@ BOM generated from the CA Tool will have all the dependencies included in the sc
 - Maven (jar)
 - Python (poetry, requiremens.txt)
 
-##Workflow
+## Workflow
 
 ![image.png](../usagedocimg/WF.png)
 
-##Use Cases:
+## Use Cases:
 1. Package identifier Should read all 1st and 3rd components of package type (NPM,NUGET,DEBIAN,PYPI & MAVEN)  
    -   Read SBOM supplied from customer.
    - [ ]         SBOM needs to be in specified CycloneDX format.
