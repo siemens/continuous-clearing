@@ -353,20 +353,7 @@ namespace LCT.PackageIdentifier
                     componentsForBOM.AddRange(lst);
                 }
             }
-            else
-            {
-                configFiles = FolderScanner.FileScanner(appSettings.CycloneDxBomFilePath, appSettings.Npm);
-                foreach (string filepath in configFiles)
-                {
-                    Bom bomList = ParseCycloneDXBom(filepath);
-                    componentsForBOM.AddRange(bomList.Components);
-                }
-                bom.Components = componentsForBOM;
-                BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = bom.Components.Count;
-                bom = RemoveExcludedComponents(appSettings, bom);
-
-                componentsForBOM = bom.Components;
-            }
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = count;
         }
 
         private static bool IsDevDependency(JToken devValue, ref int noOfDevDependent)
