@@ -1,5 +1,5 @@
 ## Continuous Clearing Tool
-The Continuous Clearing Tool scans and collects the 3rd party OSS components used in a NPM/NuGet/Maven/Debian & Python project and uploads it to SW360 and Fossology by accepting respective project ID for license clearing.
+The Continuous Clearing Tool scans and collects the 3rd party OSS components used in a NPM/NuGet/Maven/Debian & Python project and uploads it to SW360 and Fossology by accepting respective project ID for license clearing..
 
 ## Continuous Clearing SBOM Tool
 BOM generated from the continuous clearing Tool will have all the dependencies included in the scanned package , component type, Source repo URL, dependency type etc..,
