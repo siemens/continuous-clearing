@@ -310,12 +310,12 @@ namespace LCT.PackageIdentifier
                 repoName = aqlResultList.Find(x => x.Name.Equals(
                     fullNameVersion, StringComparison.OrdinalIgnoreCase))?.Repo ?? NotFoundInRepo;
             }
-            if(repoName==NotFoundInRepo)
+            if (repoName == NotFoundInRepo)
             {
                 jfrogcomponentName = $"{component.Name}.{component.Version}.nupkg";
                 repoName = aqlResultList.Find(x => x.Name.Equals(
                   jfrogcomponentName, StringComparison.OrdinalIgnoreCase))?.Repo ?? NotFoundInRepo;
-          
+
             }
 
             return repoName;
@@ -370,7 +370,7 @@ namespace LCT.PackageIdentifier
 
             string fullName = bomHelper.GetFullNameOfComponent(component);
             string fullNameVersion = $"{fullName}.{component.Version}.nupkg";
-            if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase) 
+            if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase)
                 && aqlResultList.Exists(
                 x => x.Name.Equals(fullNameVersion, StringComparison.OrdinalIgnoreCase)))
             {
