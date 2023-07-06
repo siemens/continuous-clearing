@@ -4,6 +4,7 @@
 
 
 
+
 # Introduction 
 
 The Continuous Clearing Tool scans and collects the 3rd party OSS components used in a NPM/NuGet/Maven/Debian project and uploads it to SW360 and Fossology by accepting respective project ID for license clearing. 
