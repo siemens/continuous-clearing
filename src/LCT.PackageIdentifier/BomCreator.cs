@@ -86,7 +86,21 @@ namespace LCT.PackageIdentifier
 
         }
 
+        private static void WriteContentToCycloneDxBOM(CommonAppSettings appSettings, Bom listOfComponentsToBom, ref BomKpiData bomKpiData)
+        {
+            IFileOperations fileOperations = new FileOperations();
+            if (string.IsNullOrEmpty(appSettings.IdentifierBomFilePath))
+            {
+                fileOperations.WriteContentToCycloneDXFile(listOfComponentsToBom, appSettings.BomFolderPath, appSettings.SW360ProjectName);
+            }
+            else
+            {
+                listOfComponentsToBom = fileOperations.CombineComponentsFromExistingBOM(listOfComponentsToBom, appSettings.IdentifierBomFilePath);
+                bomKpiData.ComponentsInComparisonBOM = listOfComponentsToBom.Components.Count;
+                fileOperations.WriteContentToCycloneDXFile(listOfComponentsToBom, appSettings.BomFolderPath, appSettings.SW360ProjectName);
+            }
 
+        }
 
         private static void WriteContentToComparisonBOM(CommonAppSettings appSettings, Bom listOfComponentsToBom, ref BomKpiData bomKpiData)
         {

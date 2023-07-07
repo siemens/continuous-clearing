@@ -28,7 +28,7 @@ namespace LCT.PackageIdentifier.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
             string filepath = outFolder + @"\PackageIdentifierUTTestFiles";
-            string[] Includes = { "*.cdx.json" };
+            string[] Includes = { "POM.xml" };
             string[] Excludes = { "lol" };
 
             CommonAppSettings appSettings = new CommonAppSettings()
@@ -45,7 +45,7 @@ namespace LCT.PackageIdentifier.UTest
             Bom bom = MavenProcessor.ParsePackageFile(appSettings);
 
             //Assert
-            Assert.That(bom.Components.Count, Is.EqualTo(2), "Returns the count of components");
+            Assert.That(bom.Components.Count, Is.EqualTo(3), "Returns the count of components");
 
         }
 
@@ -56,7 +56,7 @@ namespace LCT.PackageIdentifier.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
             string filepath = outFolder + @"\PackageIdentifierUTTestFiles";
-            string[] Includes = { "*.cdx.json" };
+            string[] Includes = { "POM.xml" };
             string[] Excludes = { "lol" };
 
             CommonAppSettings appSettings = new CommonAppSettings()

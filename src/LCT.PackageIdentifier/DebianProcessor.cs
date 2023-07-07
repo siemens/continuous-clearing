@@ -44,7 +44,9 @@ namespace LCT.PackageIdentifier
             {
                 Logger.Debug($"ParsePackageFile():FileName: " + filepath);
                 listofComponents.AddRange(ParseCycloneDX(filepath));
-            }          
+            }
+
+          
 
             int initialCount = listofComponents.Count;
             GetDistinctComponentList(ref listofComponents);

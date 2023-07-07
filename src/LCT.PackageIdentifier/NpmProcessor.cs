@@ -332,27 +332,25 @@ namespace LCT.PackageIdentifier
             int count = 0;
 
             configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Npm);
-            if (string.IsNullOrEmpty(appSettings.CycloneDxBomFilePath))
-            {
-                foreach (string filepath in configFiles)
-                {
-                    Logger.Debug($"ParsingInputFileForBOM():FileName: " + filepath);
-                    if (filepath.EndsWith(FileConstant.CycloneDXFileExtension))
-                    {
-                        Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
-                        bom = ParseCycloneDXBom(filepath);
-                        count += bom.Components.Count;
-                        bom = RemoveExcludedComponents(appSettings, bom);
 
-                        componentsForBOM.AddRange(bom.Components);
-                    }
-                    else
-                    {
-                        Logger.Debug($"ParsingInputFileForBOM():Found as Package File");
-                        var lst = ParsePackageLockJson(filepath, appSettings);
-                        count += lst.Count;
-                        componentsForBOM.AddRange(lst);
-                    }
+            foreach (string filepath in configFiles)
+            {
+                Logger.Debug($"ParsingInputFileForBOM():FileName: " + filepath);
+                if (filepath.EndsWith(FileConstant.CycloneDXFileExtension))
+                {
+                    Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
+                    bom = ParseCycloneDXBom(filepath);
+                    count += bom.Components.Count;
+                    bom = RemoveExcludedComponents(appSettings, bom);
+
+                    componentsForBOM.AddRange(bom.Components);
+                }
+                else
+                {
+                    Logger.Debug($"ParsingInputFileForBOM():Found as Package File");
+                    var lst = ParsePackageLockJson(filepath, appSettings);
+                    count += lst.Count;
+                    componentsForBOM.AddRange(lst);
                 }
             }
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = count;
