@@ -56,7 +56,7 @@ namespace SW360IntegrationTest
             string bomPath = OutFolder + $"\\..\\BOMs\\{testParameters.SW360ProjectName}_Bom.cdx.json";
 
             // Assert
-            // Check return with warning
+            // Check return with warning code 2
             Assert.AreEqual(2, TestHelper.RunComponentCreatorExe(new string[] {
                 TestConstant.BomFilePath,bomPath,
                 TestConstant.Sw360Token, testParameters.SW360AuthTokenValue,
