@@ -53,6 +53,12 @@
     <ProjectReference Include="..\UnitTestUtilities\UnitTestUtilities.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <None Update="PackageIdentifierUTTestFiles\bom.cdx.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\bom1.cdx.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="PackageIdentifierUTTestFiles\Cyclonedx.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
