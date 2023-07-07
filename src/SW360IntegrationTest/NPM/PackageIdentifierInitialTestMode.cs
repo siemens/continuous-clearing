@@ -27,6 +27,8 @@ namespace SW360IntegrationTest
 
             CCTLocalBomTestFile = OutFolder + @"..\..\..\src\SW360IntegrationTest\PackageIdentifierTestFiles\Npm\CCTLocalBOMNpmInitial.json";
 
+            string val = OutFolder + @"\..\BOMs";
+
             if (!Directory.Exists(OutFolder + @"\..\BOMs"))
             {
                 Directory.CreateDirectory(OutFolder + @"\..\BOMs");

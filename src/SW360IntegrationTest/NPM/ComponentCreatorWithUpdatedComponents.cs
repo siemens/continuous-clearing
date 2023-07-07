@@ -120,9 +120,9 @@ namespace SW360IntegrationTest
                 new AuthenticationHeaderValue(TestConstant.TestSw360TokenType, TestConstant.TestSw360TokenValue);
 
             string expectedcomponentType = "OSS";
-            string expectedname = "axios";
+            string expectedname = "rxjs";
             //url formation for retrieving component details
-            string url = TestConstant.Sw360ComponentApi + TestConstant.componentNameUrl + "axios";
+            string url = TestConstant.Sw360ComponentApi + TestConstant.componentNameUrl + "rxjs";
             string responseBody = await httpClient.GetStringAsync(url); //GET request
             var responseData = JsonConvert.DeserializeObject<ComponentsModel>(responseBody);
             string name = responseData.Embedded.Sw360components[0].Name;
@@ -145,12 +145,12 @@ namespace SW360IntegrationTest
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue(TestConstant.TestSw360TokenType, TestConstant.TestSw360TokenValue);
-            string expectedname = "axios";
-            string expectedversion = "0.19.0";
-            string expecteddownloadurl = "https://github.com/axios/axios.git";
-            string expectedexternalid = "pkg:npm/axios@0.19.0";
+            string expectedname = "rxjs";
+            string expectedversion = "6.5.5";
+            string expecteddownloadurl = "https://github.com/reactivex/rxjs.git";
+            string expectedexternalid = "pkg:npm/rxjs@6.5.5";
             //url formation for retrieving component details
-            string url = TestConstant.Sw360ReleaseApi + TestConstant.componentNameUrl + "axios";
+            string url = TestConstant.Sw360ReleaseApi + TestConstant.componentNameUrl + "rxjs";
             string responseBody = await httpClient.GetStringAsync(url);//GET method         
             var responseData = JsonConvert.DeserializeObject<ReleaseIdOfComponent>(responseBody);
             string urlofreleaseid = responseData.Embedded.Sw360Releases[0].Links.Self.Href;
