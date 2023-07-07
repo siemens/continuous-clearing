@@ -30,60 +30,38 @@ namespace LCT.PackageIdentifier
         {
             List<Component> componentsForBOM = new();
             Bom bom = new();
-
-            string depFilePath = "";
-            int totalComponentsIdentified = 0;
-            List<string> configFiles = new();
+            List<string> configFiles=new();
             if (string.IsNullOrEmpty(appSettings.CycloneDxBomFilePath))
             {
-                //Create empty dependency list file
-                if (!string.IsNullOrEmpty(appSettings.PackageFilePath))
-                {
-                    configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Maven);
-                    depFilePath = Path.Combine(appSettings.PackageFilePath, "POMDependencies.txt");
-                    File.Create(depFilePath).Close();
-                }
-
-                foreach (var bomFilePath in configFiles)
-                {
-                    Result result = BomHelper.GetDependencyList(bomFilePath, depFilePath);
-                    if (result.ExitCode != 0)
-                    {
-                        Logger.Debug("Error in downloading maven packages");
-                    }
-                }
-
-                ParseConfigFile(depFilePath, appSettings, ref componentsForBOM);
-
-                totalComponentsIdentified = componentsForBOM.Count;
-
-                componentsForBOM = componentsForBOM.Distinct(new ComponentEqualityComparer()).ToList();
-
-                BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - componentsForBOM.Count;
-
-                var componentsWithMultipleVersions = componentsForBOM.GroupBy(s => s.Name)
-                         .Where(g => g.Count() > 1).SelectMany(g => g).ToList();
-
-                if (componentsWithMultipleVersions.Count != 0)
-                {
-                    Logger.Warn($"Multiple versions detected :\n");
-                    foreach (var item in componentsWithMultipleVersions)
-                    {
-                        Logger.Warn($"Component Name : {item.Name}\nComponent Version : {item.Version}\nPackage Found in : {appSettings.PackageFilePath}\n");
-                    }
-                }
-                bom.Components = componentsForBOM;
+              configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Maven);
             }
             else
             {
-                bom = ParseCycloneDXBom(appSettings.CycloneDxBomFilePath);
-                BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = bom.Components.Count;
+               configFiles = FolderScanner.FileScanner(appSettings.CycloneDxBomFilePath, appSettings.Maven);
             }
+            
+            foreach (string filepath in configFiles)
+            {
+                Bom bomList = ParseCycloneDXBom(filepath);
+                componentsForBOM.AddRange(bomList.Components);
+            }
+            foreach (var component in componentsForBOM)
+            {
+                component.Properties = new List<Property>();
+                Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
+                Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "Manually" };
+                component.Properties.Add(isDev);
+                component.Properties.Add(identifierType);
+
+            }
+            bom.Components = componentsForBOM;
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = bom.Components.Count;
+            BomCreator.bomKpiData.ComponentsInComparisonBOM = bom.Components.Count;
             Logger.Debug($"ParsePackageFile():End");
             return bom;
         }
 
-        private static void ParseConfigFile(string depFilePath, CommonAppSettings appSettings, ref List<Component> foundPackages)
+        private static void ParseDependencyTextFile(string depFilePath, CommonAppSettings appSettings, ref List<Component> foundPackages)
         {
             string[] lines = File.ReadAllLines(depFilePath);
             int noOfExcludedComponents = 0;
@@ -101,18 +79,23 @@ namespace LCT.PackageIdentifier
                     string scope = "";
                     bool isDevelopmentComponent;
 
+                    Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
+                    Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "Discovered" };
                     scope = GetPackageDetails(parts, out component);
-
+                    component.Properties = new List<Property>();
                     isDevelopmentComponent = GetDevDependentScopeList(appSettings, scope);
-
-                    if (!component.Version.Contains("win") && !isDevelopmentComponent)
+                    if (isDevelopmentComponent)
+                    {
+                        isDev.Value = "true";
+                        BomCreator.bomKpiData.DevDependentComponents++;
+                    }
+                    component.Properties.Add(isDev);
+                    component.Properties.Add(identifierType);
+                    if (!component.Version.Contains("win"))
                     {
                         foundPackages.Add(component);
                     }
-                    if (isDevelopmentComponent)
-                    {
-                        BomCreator.bomKpiData.DevDependentComponents++;
-                    }
+
                 }
             }
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = totalComponenstinInputFile;
@@ -174,7 +157,7 @@ namespace LCT.PackageIdentifier
                 {
                     currentIterationItem.Properties = new List<Property>();
                 }
-                
+
                 Property isInternal = new() { Name = Dataconstant.Cdx_IsInternal, Value = "false" };
                 if (isTrue)
                 {

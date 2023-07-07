@@ -6,10 +6,12 @@
 
 using CycloneDX.Json;
 using CycloneDX.Models;
+using LCT.Common.Model;
 using log4net;
 using log4net.Core;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
