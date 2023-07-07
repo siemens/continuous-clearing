@@ -82,7 +82,7 @@ namespace LCT.PackageIdentifier
         {
             if (string.IsNullOrEmpty(appSettings.CycloneDxBomFilePath))
             {
-                WriteContentToComparisonBOM(appSettings, listOfComponentsToBom, ref bomKpiData);
+                WriteContentToCycloneDxBOM(appSettings, listOfComponentsToBom, ref bomKpiData);
             }
             else
             {
@@ -96,32 +96,17 @@ namespace LCT.PackageIdentifier
             IFileOperations fileOperations = new FileOperations();
             if (string.IsNullOrEmpty(appSettings.IdentifierBomFilePath))
             {
-                fileOperations.WriteContentToCycloneDXFile(listOfComponentsToBom, appSettings.BomFolderPath, appSettings.CycloneDxBomFilePath);
-            }
-            else
-            {
-                listOfComponentsToBom = fileOperations.CombineComponentsFromExistingBOM(listOfComponentsToBom, appSettings.IdentifierBomFilePath);
-                bomKpiData.ComponentsInComparisonBOM = listOfComponentsToBom.Components.Count;
-                fileOperations.WriteContentToCycloneDXFile(listOfComponentsToBom, appSettings.BomFolderPath, appSettings.CycloneDxBomFilePath);
-            }
-
-        }
-
-        private static void WriteContentToComparisonBOM(CommonAppSettings appSettings, Bom listOfComponentsToBom, ref BomKpiData bomKpiData)
-        {
-            IFileOperations fileOperations = new FileOperations();
-            if (string.IsNullOrEmpty(appSettings.IdentifierBomFilePath))
-            {
                 fileOperations.WriteContentToFile(listOfComponentsToBom, appSettings.BomFolderPath,
-                FileConstant.BomFileName, appSettings.SW360ProjectName);
+            FileConstant.BomFileName, appSettings.SW360ProjectName);
             }
             else
             {
                 listOfComponentsToBom = fileOperations.CombineComponentsFromExistingBOM(listOfComponentsToBom, appSettings.IdentifierBomFilePath);
                 bomKpiData.ComponentsInComparisonBOM = listOfComponentsToBom.Components.Count;
                 fileOperations.WriteContentToFile(listOfComponentsToBom, appSettings.BomFolderPath,
-                  FileConstant.BomFileName, appSettings.SW360ProjectName);
+          FileConstant.BomFileName, appSettings.SW360ProjectName);
             }
+
         }
 
         private async Task<Bom> CallPackageParser(CommonAppSettings appSettings)

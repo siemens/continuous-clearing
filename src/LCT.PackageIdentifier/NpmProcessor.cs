@@ -4,6 +4,7 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using CycloneDX.Json.Converters;
 using CycloneDX.Models;
 using LCT.APICommunications;
 using LCT.APICommunications.Model.AQL;
@@ -26,6 +27,7 @@ using System.Threading.Tasks;
 
 namespace LCT.PackageIdentifier
 {
+
     /// <summary>
     /// Parses the NPM Packages
     /// </summary>
@@ -37,16 +39,18 @@ namespace LCT.PackageIdentifier
         private const string Dev = "dev";
         private const string Version = "version";
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
+        private const string Requires = "requires";
+
 
         public Bom ParsePackageFile(CommonAppSettings appSettings)
         {
             List<Component> componentsForBOM = new List<Component>();
             Bom bom = new Bom();
-
+            List<Dependency> dependencies = new List<Dependency>();
             int totalComponentsIdentified = 0;
 
 
-            ParsingInputFileForBOM(appSettings, ref componentsForBOM, ref bom);
+            ParsingInputFileForBOM(appSettings, ref componentsForBOM, ref bom, ref dependencies);
 
             totalComponentsIdentified = componentsForBOM.Count;
 
@@ -66,6 +70,7 @@ namespace LCT.PackageIdentifier
                 }
             }
             bom.Components = componentsForBOM;
+            bom.Dependencies = dependencies;
             Logger.Debug($"ParsePackageFile():End");
             return bom;
         }
@@ -96,7 +101,7 @@ namespace LCT.PackageIdentifier
                     if (pacakages?.Children() != null)
                     {
                         IEnumerable<JProperty> depencyComponentList = pacakages?.Children().OfType<JProperty>();
-                        GetPackagesForBom(filepath,appSettings, ref bundledComponents, ref lstComponentForBOM,
+                        GetPackagesForBom(filepath, appSettings, ref bundledComponents, ref lstComponentForBOM,
                             ref noOfDevDependent, depencyComponentList);
                     }
                 }
@@ -166,6 +171,7 @@ namespace LCT.PackageIdentifier
 
                 components.Description = folderPath;
                 components.Version = Convert.ToString(properties[Version]);
+                components.Author = prop?.Value[Requires].ToString();
                 components.Purl = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
                 components.BomRef = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
 
@@ -228,6 +234,7 @@ namespace LCT.PackageIdentifier
 
                 components.Description = folderPath;
                 components.Version = Convert.ToString(properties[Version]);
+                components.Author = prop?.Value[Requires]?.ToString();
                 components.Purl = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
                 components.BomRef = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
                 lstComponentForBOM.Add(components);
@@ -288,7 +295,7 @@ namespace LCT.PackageIdentifier
                 string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper);
                 Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoUrl, Value = repoName };
                 Component componentVal = component;
-                
+
                 if (componentVal.Properties?.Count == null || componentVal.Properties?.Count <= 0)
                 {
                     componentVal.Properties = new List<Property>();
@@ -317,7 +324,7 @@ namespace LCT.PackageIdentifier
             return cycloneDXBOM;
         }
 
-        private void ParsingInputFileForBOM(CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom)
+        private void ParsingInputFileForBOM(CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom, ref List<Dependency> dependencies)
         {
             List<string> configFiles;
 
@@ -332,6 +339,7 @@ namespace LCT.PackageIdentifier
                 {
                     componentsForBOM.AddRange(ParsePackageLockJson(filepath, appSettings));
                 }
+                GetdependencyDetails(componentsForBOM, dependencies);
             }
             else
             {
@@ -340,6 +348,44 @@ namespace LCT.PackageIdentifier
                 bom = RemoveExcludedComponents(appSettings, bom);
 
                 componentsForBOM = bom.Components;
+                dependencies = bom.Dependencies;
+            }
+      
+        }
+
+        private static void GetdependencyDetails(List<Component> componentsForBOM, List<Dependency> dependencies)
+        {
+            List<Dependency> dependencyList = new();
+            List<Dependency> subDependencies = new();
+            foreach (var component in componentsForBOM)
+            {
+                if ((component.Author?.Split(",")) != null)
+                {
+
+                    foreach (var item in component.Author?.Split(","))
+                    {
+                        var componentDetails = item.Split(":");
+                        var name = componentDetails[0].Replace("@", "%40").Replace("\"", "").Replace("{", "").Trim();
+                        var version = componentDetails[1].Replace("\"", "").Replace("\"r", "").Replace("}", "").Replace("\n", "").Trim();
+                        string purlId = $"{ApiConstant.NPMExternalID}{name}@{version}";
+                        Dependency dependentList = new Dependency()
+                        {
+                            Ref = purlId
+                        };
+                        subDependencies.Add(dependentList);
+
+                    }
+                    var dependency = new Dependency()
+                    {
+                        Ref = component.Purl,
+                        Dependencies = subDependencies
+                    };
+
+                    dependencyList.Add(dependency);
+                    dependencies.AddRange(dependencyList);
+                    component.Author = "";
+
+                }
             }
         }
 
