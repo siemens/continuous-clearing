@@ -178,8 +178,7 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
 
  #### **Method 1 (Recommended)**
    Copy the below content and create new `appSettings.json` file in `Continuous Clearing tool Config` directory.
-
-  
+   
    Below is the list of settings can be made in `appSettings.json` file.
 
    _`Sample appSettings.json file`_
@@ -273,12 +272,13 @@ Description for the settings in `appSettings.json` file
 | 19    | --jfrogmavendestreponame         | The destination folder name for the Maven package to be copied to                  | Yes                                                    |                                            |
 | 20   | --timeout          | SW360 response timeout value                  | No                                                       |                                                |
 
+
  #### **Method 2**
 
 You can also pass the above mentioned arguments in the command line.
 
 `Note: If the second approach is followed then make sure you provide all the settings mentioned in the appsettings.json in the command line`
-
+  
   #### Exclude  Component or Folders :
   In order to exclude any components ,it can be configured in the  "appSettings.json" by providing the package name and version as specified above in the *_ExcludedComponents_* field.
 

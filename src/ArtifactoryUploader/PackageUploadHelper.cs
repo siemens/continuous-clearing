@@ -246,7 +246,7 @@ namespace LCT.ArtifactoryUploader
             else
             {
                 uploaderKpiData.PackagesUploadedToJfrog++;
-                Logger.Warn($"Package {item.Name}-{item.Version} is already uploaded to {item.DestRepoName}");
+                Logger.Info($"Package {item.Name}-{item.Version} is already uploaded to {item.DestRepoName}");
             }
         }
 
