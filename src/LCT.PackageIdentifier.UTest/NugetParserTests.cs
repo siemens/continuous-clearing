@@ -18,6 +18,7 @@ using Moq;
 using LCT.APICommunications.Model.AQL;
 using CycloneDX.Models;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace PackageIdentifier.UTest
 {
@@ -234,7 +235,7 @@ namespace PackageIdentifier.UTest
 
             AqlResult aqlResult = new()
             {
-                Name = "animations-1.0.0.tgz",
+                Name = "animations-1.0.0.nupkg",
                 Path = "@siemens-gds/saap-api-node/-/@siemens-gds",
                 Repo = "energy-dev-npm-egll"
             };
@@ -271,7 +272,7 @@ namespace PackageIdentifier.UTest
 
             AqlResult aqlResult = new()
             {
-                Name = "animations-common_license-1.0.0.tgz",
+                Name = "animations-common_license-1.0.0.nupkg",
                 Path = "@siemens-gds/saap-api-node/-/@siemens-gds",
                 Repo = "energy-dev-npm-egll"
             };
@@ -309,7 +310,7 @@ namespace PackageIdentifier.UTest
 
             AqlResult aqlResult = new()
             {
-                Name = "animations-common-1.0.0.tgz",
+                Name = "animations-common-1.0.0.nupkg",
                 Path = "@siemens-gds/saap-api-node/-/@siemens-gds",
                 Repo = "energy-dev-npm-egll"
             };
@@ -347,7 +348,7 @@ namespace PackageIdentifier.UTest
             appSettings.Nuget = new LCT.Common.Model.Config() { JfrogNugetRepoList = reooListArr };
             AqlResult aqlResult = new()
             {
-                Name = "animations-common-1.0.0.tgz",
+                Name = "animations-common-1.0.0.nupkg",
                 Path = "@siemens-gds/saap-api-node/-/@siemens-gds",
                 Repo = "siparty-release-npm-egll"
             };
@@ -383,10 +384,10 @@ namespace PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "siparty-release-npm-egll", "org1-npmjs-npm-remote-cache" };
             CommonAppSettings appSettings = new();
-            appSettings.Nuget = new LCT.Common.Model.Config() { JfrogNugetRepoList = reooListArr };
+            appSettings.Nuget = new Config() { JfrogNugetRepoList = reooListArr };
             AqlResult aqlResult = new()
             {
-                Name = "animations-common-1.0.0.tgz",
+                Name = "animations-common-1.0.0.nupkg",
                 Path = "@siemens-gds/saap-api-node/-/@siemens-gds",
                 Repo = "siparty-release-npm-egll"
             };
@@ -406,6 +407,163 @@ namespace PackageIdentifier.UTest
 
             // Assert
             Assert.That(actual, Is.Not.Null);
+        }
+
+        [Test]
+        public async Task GetArtifactoryRepoName_Nuget_ReturnsRepoName_SuccessFully()
+        {
+            // Arrange
+            Component component1 = new()
+            {
+                Name = "animations-common",
+                Group = "",
+                Description = string.Empty,
+                Version = "1.0.0"
+            };
+            var components = new List<Component>() { component1 };
+            string[] reooListArr = { "siparty-release-npm-egll", "org1-npmjs-npm-remote-cache" };
+            CommonAppSettings appSettings = new();
+            appSettings.Nuget = new Config() { JfrogNugetRepoList = reooListArr };
+            AqlResult aqlResult = new()
+            {
+                Name = "animations-common-1.0.0.nupkg",
+                Path = "@siemens-gds/saap-api-node/-/@siemens-gds",
+                Repo = "siparty-release-npm-egll"
+            };
+
+            List<AqlResult> results = new List<AqlResult>() { aqlResult };
+
+            Mock<IJFrogService> mockJfrogService = new Mock<IJFrogService>();
+            Mock<IBomHelper> mockBomHelper = new Mock<IBomHelper>();
+            mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
+                .ReturnsAsync(results);
+            mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations");
+
+            // Act
+            NugetProcessor nugetProcessor = new NugetProcessor();
+            var actual = await nugetProcessor.GetJfrogRepoDetailsOfAComponent(
+                components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
+
+            var reponameActual = actual.First(x => x.Properties[0].Name == "internal:siemens:clearing:repo-url").Properties[0].Value;
+
+            Assert.That(reponameActual, Is.EqualTo(aqlResult.Repo));
+        }
+        [Test]
+        public async Task GetArtifactoryRepoName_Nuget_ReturnsRepoName_ReturnsFailure()
+        {
+            // Arrange
+            Component component1 = new()
+            {
+                Name = "animations-common",
+                Group = "",
+                Description = string.Empty,
+                Version = "1.0.0"
+            };
+            var components = new List<Component>() { component1 };
+            string[] reooListArr = { "siparty-release-npm-egll", "org1-npmjs-npm-remote-cache" };
+            CommonAppSettings appSettings = new();
+            appSettings.Nuget = new Config() { JfrogNugetRepoList = reooListArr };
+            AqlResult aqlResult = new()
+            {
+                Name = "animation-test-1.0.0.nupkg",
+                Path = "@siemens-gds/saap-api-node/-/@siemens-gds",
+                Repo = "siparty-release-npm-egll"
+            };
+
+            List<AqlResult> results = new () { aqlResult };
+
+            Mock<IJFrogService> mockJfrogService = new Mock<IJFrogService>();
+            Mock<IBomHelper> mockBomHelper = new Mock<IBomHelper>();
+            mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
+                .ReturnsAsync(results);
+            mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations");
+
+            // Act
+            NugetProcessor nugetProcessor = new NugetProcessor();
+            var actual = await nugetProcessor.GetJfrogRepoDetailsOfAComponent(
+                components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
+
+            var reponameActual = actual.First(x => x.Properties[0].Name == "internal:siemens:clearing:repo-url").Properties[0].Value;
+
+            Assert.That("Not Found in JFrogRepo", Is.EqualTo(reponameActual));
+        }
+        [Test]
+        public async Task GetArtifactoryRepoName_Nuget_ReturnsRepoName_ReturnsSuccess()
+        {
+            // Arrange
+            Component component1 = new()
+            {
+                Name = "animations-common",
+                Group = "",
+                Description = string.Empty,
+                Version = "1.0.0"
+            };
+            var components = new List<Component>() { component1 };
+            string[] reooListArr = { "siparty-release-npm-egll", "org1-npmjs-npm-remote-cache" };
+            CommonAppSettings appSettings = new();
+            appSettings.Nuget = new Config() { JfrogNugetRepoList = reooListArr };
+            AqlResult aqlResult = new()
+            {
+                Name = "animations-common.1.0.0.nupkg",
+                Path = "@siemens-gds/saap-api-node/-/@siemens-gds",
+                Repo = "siparty-release-npm-egll"
+            };
+
+            List<AqlResult> results = new() { aqlResult };
+
+            Mock<IJFrogService> mockJfrogService = new Mock<IJFrogService>();
+            Mock<IBomHelper> mockBomHelper = new Mock<IBomHelper>();
+            mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
+                .ReturnsAsync(results);
+            mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations");
+
+            // Act
+            NugetProcessor nugetProcessor = new NugetProcessor();
+            var actual = await nugetProcessor.GetJfrogRepoDetailsOfAComponent(
+                components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
+
+            var reponameActual = actual.First(x => x.Properties[0].Name == "internal:siemens:clearing:repo-url").Properties[0].Value;
+
+            Assert.That("siparty-release-npm-egll", Is.EqualTo(reponameActual));
+        }
+        [Test]
+        public async Task GetArtifactoryRepoName_Nuget_ReturnsNotFound_ReturnsFailure()
+        {
+            // Arrange
+            Component component1 = new()
+            {
+                Name = "animations-common",
+                Group = "",
+                Description = string.Empty,
+                Version = "1.0.0"
+            };
+            var components = new List<Component>() { component1 };
+            string[] reooListArr = { "siparty-release-npm-egll", "org1-npmjs-npm-remote-cache" };
+            CommonAppSettings appSettings = new();
+            appSettings.Nuget = new Config() { JfrogNugetRepoList = reooListArr };
+            AqlResult aqlResult = new()
+            {
+                Name = "animation-common.1.0.0.nupkg",
+                Path = "@siemens-gds/saap-api-node/-/@siemens-gds",
+                Repo = "siparty-release-npm-egll"
+            };
+
+            List<AqlResult> results = new() { aqlResult };
+
+            Mock<IJFrogService> mockJfrogService = new Mock<IJFrogService>();
+            Mock<IBomHelper> mockBomHelper = new Mock<IBomHelper>();
+            mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
+                .ReturnsAsync(results);
+            mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations");
+
+            // Act
+            NugetProcessor nugetProcessor = new NugetProcessor();
+            var actual = await nugetProcessor.GetJfrogRepoDetailsOfAComponent(
+                components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
+
+            var reponameActual = actual.First(x => x.Properties[0].Name == "internal:siemens:clearing:repo-url").Properties[0].Value;
+
+            Assert.That("Not Found in JFrogRepo", Is.EqualTo(reponameActual));
         }
     }
 }
