@@ -19,6 +19,7 @@ namespace LCT.PackageIdentifier.Model
      public string Version { get; set; }
 
     public string Filepath { get; set; }
+    public string IsDev { get; set; }
 
     }
 }
