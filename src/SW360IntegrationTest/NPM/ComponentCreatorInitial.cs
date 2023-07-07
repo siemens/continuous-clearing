@@ -143,12 +143,12 @@ namespace SW360IntegrationTest
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue(TestConstant.TestSw360TokenType, TestConstant.TestSw360TokenValue);
-            string expectedname = "rxjs";
-            string expectedversion = "6.5.4";
-            string expecteddownloadurl = "https://github.com/reactivex/rxjs.git";
-            string expectedexternalid = "pkg:npm/rxjs@6.5.4";
+            string expectedname = "zone.js";
+            string expectedversion = "0.10.3";
+            string expecteddownloadurl = "https://github.com/angular/angular.git";
+            string expectedexternalid = "pkg:npm/zone.js@0.10.3";
             //url formation for retrieving component details
-            string url = TestConstant.Sw360ReleaseApi + TestConstant.componentNameUrl + "rxjs";
+            string url = TestConstant.Sw360ReleaseApi + TestConstant.componentNameUrl + "zone.js";
             string responseBody = await httpClient.GetStringAsync(url);//GET method         
             var responseData = JsonConvert.DeserializeObject<ReleaseIdOfComponent>(responseBody);
             string urlofreleaseid = responseData.Embedded.Sw360Releases[0].Links.Self.Href;
