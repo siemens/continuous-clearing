@@ -146,9 +146,9 @@ namespace SW360IntegrationTest
             httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue(TestConstant.TestSw360TokenType, TestConstant.TestSw360TokenValue);
             string expectedname = "rxjs";
-            string expectedversion = "6.5.5";
+            string expectedversion = "6.5.4";
             string expecteddownloadurl = "https://github.com/reactivex/rxjs.git";
-            string expectedexternalid = "pkg:npm/rxjs@6.5.5";
+            string expectedexternalid = "pkg:npm/rxjs@6.5.4";
             //url formation for retrieving component details
             string url = TestConstant.Sw360ReleaseApi + TestConstant.componentNameUrl + "rxjs";
             string responseBody = await httpClient.GetStringAsync(url);//GET method         
