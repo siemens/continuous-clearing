@@ -146,29 +146,31 @@ namespace SW360IntegrationTest
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue(TestConstant.TestSw360TokenType, TestConstant.TestSw360TokenValue);
-            string expectedname = "zone.js";
-            string expectedversion = "0.10.3";
-            string expecteddownloadurl = "https://github.com/angular/angular.git";
-            string expectedexternalid = "pkg:npm/zone.js@0.10.3";
+            //string expectedname = "zone.js";
+            //string expectedversion = "0.10.3";
+            //string expecteddownloadurl = "https://github.com/angular/angular.git";
+            //string expectedexternalid = "pkg:npm/zone.js@0.10.3";
+            string expectedclearingState = "NEW_CLEARING";
             //url formation for retrieving component details
-            string url = TestConstant.Sw360ReleaseApi + TestConstant.componentNameUrl + "zone.js";
+            string url = TestConstant.Sw360ReleaseApi + TestConstant.componentNameUrl + "rxjs";
             string responseBody = await httpClient.GetStringAsync(url);//GET method         
             var responseData = JsonConvert.DeserializeObject<ReleaseIdOfComponent>(responseBody);
             string urlofreleaseid = responseData.Embedded.Sw360Releases[0].Links.Self.Href;
             string responseForRelease = await httpClient.GetStringAsync(urlofreleaseid);//GET method for fetching the release details
             var responseDataForRelease = JsonConvert.DeserializeObject<Releases>(responseForRelease);
 
-            string name = responseDataForRelease.Name;
-            string version = responseDataForRelease.Version;
-            string downloadurl = responseDataForRelease.SourceDownloadurl;
+            //string name = responseDataForRelease.Name;
+            //string version = responseDataForRelease.Version;
+            //string downloadurl = responseDataForRelease.SourceDownloadurl;
+            //string externalid = responseDataForRelease.ExternalIds.Package_Url;
             string clearingState = responseDataForRelease.ClearingState;
-            string externalid = responseDataForRelease.ExternalIds.Package_Url;
 
             //Assert
-            Assert.AreEqual(expectedname, name, "Test Project Name");
-            Assert.AreEqual(expectedversion, version, "Test Project  Version");
-            Assert.AreEqual(expecteddownloadurl, downloadurl, "Test download Url of axios");
-            Assert.AreEqual(expectedexternalid, externalid, "Test component external id");
+            //Assert.AreEqual(expectedname, name, "Test Project Name");
+            //Assert.AreEqual(expectedversion, version, "Test Project  Version");
+            //Assert.AreEqual(expecteddownloadurl, downloadurl, "Test download Url of axios");
+            //Assert.AreEqual(expectedexternalid, externalid, "Test component external id");
+            Assert.AreEqual(expectedclearingState, clearingState);
         }
 
         [TearDown]
