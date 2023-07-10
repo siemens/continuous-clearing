@@ -104,6 +104,12 @@
     <None Update="PackageIdentifierUTTestFiles\TestDir\SubDir\package.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+	  <None Update="PackageIdentifierUTTestFiles\Cyclonedx_Maven.cdx.json">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="PackageIdentifierUTTestFiles\Cyclonedx2_Maven.cdx.json">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
   </ItemGroup>
 
 </Project>
