@@ -313,6 +313,7 @@ namespace PackageIdentifier.UTest
                 Name = "animations-common-1.0.0.nupkg",
                 Path = "@testfolder/-/folder",
                 Repo = "internalrepo1"
+
             };
 
             List<AqlResult> results = new List<AqlResult>() { aqlResult };
