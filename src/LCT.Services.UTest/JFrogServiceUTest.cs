@@ -29,8 +29,8 @@ namespace LCT.Services.UTest
 
             AqlResult aqlResult = new AqlResult()
             {
-                Name = "saap-api-node-2.26.3-LicenseClearing.16.sha-058fada.tgz",
-                Path = "@siemens-gds/saap-api-node/-/@siemens-gds",
+                Name = "api-node-2.26.3-LicenseClearing.16.sha-058fada.tgz",
+                Path = "@testfolder/-/folder",
                 Repo = "energy-dev-npm-egll"
             };
 

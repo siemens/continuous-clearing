@@ -31,14 +31,14 @@ namespace LCT.PackageIdentifier.UTest
             component1.Version = "1.0.0";
             var components = new List<Component>() { component1 };
             ComponentIdentification component = new() { comparisonBOMData = components };
-            string[] reooListArr = { "energy-dev-npm-egll", "energy-release-npm-egll" };
+            string[] reooListArr = { "internalrepo1", "internalrepo2" };
             CommonAppSettings appSettings = new() { InternalRepoList = reooListArr };
 
             AqlResult aqlResult = new()
             {
                 Name = "animations-1.0.0.tgz",
-                Path = "@siemens-gds/saap-api-node/-/@siemens-gds",
-                Repo = "energy-dev-npm-egll"
+                Path = "@testfolder/-/folder",
+                Repo = "internalrepo1"
             };
 
             List<AqlResult> results = new List<AqlResult>() { aqlResult };
@@ -67,14 +67,14 @@ namespace LCT.PackageIdentifier.UTest
             component1.Version = "1.0.0";
             var components = new List<Component>() { component1 };
             ComponentIdentification component = new() { comparisonBOMData = components };
-            string[] reooListArr = { "energy-dev-npm-egll", "energy-release-npm-egll" };
+            string[] reooListArr = { "internalrepo1", "internalrepo2" };
             CommonAppSettings appSettings = new() { InternalRepoList = reooListArr };
 
             AqlResult aqlResult = new()
             {
                 Name = "animations-common_license-1.0.0.tgz",
-                Path = "@siemens-gds/saap-api-node/-/@siemens-gds",
-                Repo = "energy-dev-npm-egll"
+                Path = "@testfolder/-/folder",
+                Repo = "internalrepo1"
             };
 
             List<AqlResult> results = new List<AqlResult>() { aqlResult };
@@ -105,14 +105,14 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             ComponentIdentification componentIdentification = new() { comparisonBOMData = components };
-            string[] reooListArr = { "energy-dev-npm-egll", "energy-release-npm-egll" };
+            string[] reooListArr = { "internalrepo1", "internalrepo1" };
             CommonAppSettings appSettings = new() { InternalRepoList = reooListArr };
 
             AqlResult aqlResult = new()
             {
                 Name = "animations-common-1.0.0.tgz",
-                Path = "@siemens-gds/saap-api-node/-/@siemens-gds",
-                Repo = "energy-dev-npm-egll"
+                Path = "@testfolder/-/folder",
+                Repo = "internalrepo1"
             };
 
             List<AqlResult> results = new List<AqlResult>() { aqlResult };
@@ -143,14 +143,14 @@ namespace LCT.PackageIdentifier.UTest
                 Version = "1.0.0"
             };
             var components = new List<Component>() { component1 };
-            string[] reooListArr = { "siparty-release-npm-egll", "org1-npmjs-npm-remote-cache" };
+            string[] reooListArr = { "internalrepo1", "internalrepo1" };
             CommonAppSettings appSettings = new();
             appSettings.Npm = new Common.Model.Config() { JfrogNpmRepoList = reooListArr };
             AqlResult aqlResult = new()
             {
                 Name = "animations-common-1.0.0.tgz",
-                Path = "@siemens-gds/saap-api-node/-/@siemens-gds",
-                Repo = "siparty-release-npm-egll"
+                Path = "@testfolder/-/folder",
+                Repo = "internalrepo1"
             };
 
             List<AqlResult> results = new List<AqlResult>() { aqlResult };
@@ -182,14 +182,14 @@ namespace LCT.PackageIdentifier.UTest
                 Version = "1.0.0"
             };
             var components = new List<Component>() { component1 };
-            string[] reooListArr = { "siparty-release-npm-egll", "org1-npmjs-npm-remote-cache" };
+            string[] reooListArr = { "internalrepo1", "internalrepo2" };
             CommonAppSettings appSettings = new();
             appSettings.Npm = new Common.Model.Config() { JfrogNpmRepoList = reooListArr };
             AqlResult aqlResult = new()
             {
                 Name = "animations-common-1.0.0.tgz",
-                Path = "@siemens-gds/saap-api-node/-/@siemens-gds",
-                Repo = "siparty-release-npm-egll"
+                Path = "@testfolder/-/folder",
+                Repo = "internalrepo1"
             };
 
             List<AqlResult> results = new List<AqlResult>() { aqlResult };
