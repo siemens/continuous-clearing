@@ -30,7 +30,7 @@ namespace LCT.PackageIdentifier
         {
             List<Component> componentsForBOM = new();
             Bom bom = new();
-            List<string> configFiles=new();
+            List<string> configFiles;
             if (string.IsNullOrEmpty(appSettings.CycloneDxBomFilePath))
             {
               configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Maven);
@@ -59,52 +59,6 @@ namespace LCT.PackageIdentifier
             BomCreator.bomKpiData.ComponentsInComparisonBOM = bom.Components.Count;
             Logger.Debug($"ParsePackageFile():End");
             return bom;
-        }
-
-        private static void ParseDependencyTextFile(string depFilePath, CommonAppSettings appSettings, ref List<Component> foundPackages)
-        {
-            string[] lines = File.ReadAllLines(depFilePath);
-            int noOfExcludedComponents = 0;
-            int totalComponenstinInputFile = 0;
-            foreach (string line in lines)
-            {
-                Component component;
-                string trimmedLine = line.Trim();
-
-                if (trimmedLine != string.Empty && trimmedLine != "none" && trimmedLine != "The following files have been resolved:")
-                {
-                    totalComponenstinInputFile++;
-                    //Example entry: org.mockito:mockito-core:jar:1.10.19:compile
-                    string[] parts = trimmedLine.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
-                    string scope = "";
-                    bool isDevelopmentComponent;
-
-                    Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
-                    Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "Discovered" };
-                    scope = GetPackageDetails(parts, out component);
-                    component.Properties = new List<Property>();
-                    isDevelopmentComponent = GetDevDependentScopeList(appSettings, scope);
-                    if (isDevelopmentComponent)
-                    {
-                        isDev.Value = "true";
-                        BomCreator.bomKpiData.DevDependentComponents++;
-                    }
-                    component.Properties.Add(isDev);
-                    component.Properties.Add(identifierType);
-                    if (!component.Version.Contains("win"))
-                    {
-                        foundPackages.Add(component);
-                    }
-
-                }
-            }
-            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = totalComponenstinInputFile;
-            if (appSettings.Maven.ExcludedComponents != null)
-            {
-                foundPackages = CommonHelper.RemoveExcludedComponents(foundPackages, appSettings.Maven.ExcludedComponents, ref noOfExcludedComponents);
-                BomCreator.bomKpiData.ComponentsExcluded += noOfExcludedComponents;
-
-            }
         }
 
         public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM, CommonAppSettings appSettings,
@@ -197,51 +151,6 @@ namespace LCT.PackageIdentifier
             }
 
             return false;
-        }
-
-        private static bool GetDevDependentScopeList(CommonAppSettings appSettings, string scope)
-        {
-            return appSettings.Maven.DevDependentScopeList?.Contains(scope) ?? false;
-        }
-
-        private static string GetPackageDetails(string[] parts, out Component component)
-        {
-            string scope = string.Empty;
-            MavenPackage package;
-            component = new Component();
-
-            if (parts.Length == 5)
-            {
-                package = new()
-                {
-                    ID = parts[1],
-                    Version = parts[3],
-                    GroupID = parts[0].Replace('.', '/')
-                };
-                scope = parts[4];
-                component.Name = package.ID;
-                component.Version = package.Version;
-                component.Group = package.GroupID;
-                component.BomRef = $"pkg:maven/{component.Name}@{component.Version}";
-                component.Purl = $"pkg:maven/{component.Name}@{component.Version}";
-            }
-            else if (parts.Length == 6)
-            {
-                package = new()
-                {
-                    ID = parts[1],
-                    Version = $"{parts[4]}-{parts[3]}",
-                    GroupID = parts[0].Replace('.', '/')
-                };
-                scope = parts[4];
-                component.Name = package.ID;
-                component.Version = package.Version;
-                component.Group = package.GroupID;
-                component.BomRef = $"pkg:maven/{component.Name}@{component.Version}";
-                component.Purl = $"pkg:maven/{component.Name}@{component.Version}";
-            }
-
-            return scope;
         }
 
         private static string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)

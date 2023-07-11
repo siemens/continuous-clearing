@@ -60,6 +60,10 @@
           "Value": "DEBIAN"
         },
         {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
+        {
           "Name": "internal:siemens:clearing:clearing-state",
           "Value": "NEW_CLEARING"
         },
@@ -107,6 +111,10 @@
         {
           "Name": "internal:siemens:clearing:project-type",
           "Value": "DEBIAN"
+        },
+        {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
         },
         {
           "Name": "internal:siemens:clearing:clearing-state",
@@ -157,6 +165,10 @@
           "Name": "internal:siemens:clearing:project-type",
           "Value": "DEBIAN"
         },
+         {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
         {
           "Name": "internal:siemens:clearing:clearing-state",
           "Value": "NEW_CLEARING"
@@ -205,6 +217,10 @@
         {
           "Name": "internal:siemens:clearing:project-type",
           "Value": "DEBIAN"
+        },
+        {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
         },
         {
           "Name": "internal:siemens:clearing:clearing-state",

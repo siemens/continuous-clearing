@@ -63,6 +63,7 @@ namespace LCT.Common
 
         public Config Maven { get; set; }
         public Config Debian { get; set; }
+        public Config Python { get; set; }
         public string CaVersion { get; set; }
         public string CycloneDxBomFilePath { get; set; }
         public string[] InternalRepoList { get; set; }

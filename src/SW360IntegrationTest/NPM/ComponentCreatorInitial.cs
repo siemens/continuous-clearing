@@ -56,8 +56,8 @@ namespace SW360IntegrationTest
             string bomPath = OutFolder + $"\\..\\BOMs\\{testParameters.SW360ProjectName}_Bom.cdx.json";
 
             // Assert
-            // Check exit is normal
-            Assert.AreEqual(0, TestHelper.RunComponentCreatorExe(new string[] {
+            // Check return with warning code 2
+            Assert.AreEqual(2, TestHelper.RunComponentCreatorExe(new string[] {
                 TestConstant.BomFilePath,bomPath,
                 TestConstant.Sw360Token, testParameters.SW360AuthTokenValue,
                 TestConstant.SW360URL, testParameters.SW360URL,
@@ -143,12 +143,13 @@ namespace SW360IntegrationTest
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue(TestConstant.TestSw360TokenType, TestConstant.TestSw360TokenValue);
-            string expectedname = "rxjs";
-            string expectedversion = "6.5.5";
-            string expecteddownloadurl = "https://github.com/reactivex/rxjs.git";
-            string expectedexternalid = "pkg:npm/rxjs@6.5.5";
+            string expectedname = "typescript";
+            string expectedversion = "3.6.5";
+            string expecteddownloadurl = "https://github.com/Microsoft/TypeScript.git";
+            string expectedexternalid = "pkg:npm/typescript@3.6.5";
+            string expectedclearingState = "NEW_CLEARING";
             //url formation for retrieving component details
-            string url = TestConstant.Sw360ReleaseApi + TestConstant.componentNameUrl + "rxjs";
+            string url = TestConstant.Sw360ReleaseApi + TestConstant.componentNameUrl + "typescript";
             string responseBody = await httpClient.GetStringAsync(url);//GET method         
             var responseData = JsonConvert.DeserializeObject<ReleaseIdOfComponent>(responseBody);
             string urlofreleaseid = responseData.Embedded.Sw360Releases[0].Links.Self.Href;
@@ -166,6 +167,7 @@ namespace SW360IntegrationTest
             Assert.AreEqual(expectedversion, version, "Test Project  Version");
             Assert.AreEqual(expecteddownloadurl, downloadurl, "Test download Url of rxjs");
             Assert.AreEqual(expectedexternalid, externalid, "Test component external id");
+            Assert.AreEqual(expectedclearingState, clearingState);
         }
 
 

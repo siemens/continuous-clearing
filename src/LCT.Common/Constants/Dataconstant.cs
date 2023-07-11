@@ -32,9 +32,9 @@ namespace LCT.Common.Constants
         public const char ForwardSlash = '/';
         public const string SourceURLSuffix = "/srcfiles?fileinfo=1";
         public const string DebianPackage = "pkg:deb/debian";
-        public const string NPMPackage = "pkg:npm";
-        public const string NUGETPackage = "pkg:pypi";
+        public const string NpmPackage = "pkg:npm";
         public const string MavenPackage = "pkg:maven";
+        public const string PythonPackage = "pkg:pypi";
         public const string Cdx_ArtifactoryRepoUrl = "internal:siemens:clearing:repo-url";
         public const string Cdx_ProjectType = "internal:siemens:clearing:project-type";
         public const string Cdx_ClearingState = "internal:siemens:clearing:clearing-state";
@@ -43,5 +43,6 @@ namespace LCT.Common.Constants
         public const string Cdx_FossologyUrl = "internal:siemens:clearing:fossology:url";
         public const string Cdx_IsDevelopment = "internal:siemens:clearing:development";
         public const string Cdx_IdentifierType = "internal:siemens:clearing:identifier-type";
+        public const string Cdx_IsDevelopmentDependency = "internal:siemens:clearing:development";
     }
 }
