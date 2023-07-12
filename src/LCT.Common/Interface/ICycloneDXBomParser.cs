@@ -5,6 +5,7 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using System.Collections.Generic;
 
 namespace LCT.Common
 {

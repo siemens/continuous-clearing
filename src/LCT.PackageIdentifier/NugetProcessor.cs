@@ -61,6 +61,7 @@ namespace LCT.PackageIdentifier
         public static List<NugetPackage> ParsePackageConfig(string packagesFilePath, CommonAppSettings appSettings)
         {
             List<NugetPackage> nugetPackages = new List<NugetPackage>();
+            string isDev = "false";
             try
             {
                 List<ReferenceDetails> referenceList = Parsecsproj(appSettings);
@@ -79,7 +80,7 @@ namespace LCT.PackageIdentifier
                     {
 
                         BomCreator.bomKpiData.DevDependentComponents++;
-                        continue;
+                        isDev = "true";
                     }
 
                     if (idAttribute?.Value == null)
@@ -97,7 +98,8 @@ namespace LCT.PackageIdentifier
                     {
                         ID = idAttribute.Value,
                         Version = versionAttribute.Value,
-                        Filepath = packagesFilePath
+                        Filepath = packagesFilePath,
+                        IsDev= isDev
                     };
                     nugetPackages.Add(package);
                 }
@@ -116,6 +118,7 @@ namespace LCT.PackageIdentifier
         public static List<NugetPackage> ParsePackageLock(string packagesFilePath, CommonAppSettings appSettings)
         {
             List<NugetPackage> packageList = new List<NugetPackage>();
+            string isDev = "false";
             try
             {
                 List<ReferenceDetails> referenceList = Parsecsproj(appSettings);
@@ -134,8 +137,8 @@ namespace LCT.PackageIdentifier
                             string version = dependencyToken.First.Value<string>("resolved");
                             if (dependencyToken.First.Value<string>("type") == "Dev" || IsDevDependent(referenceList, id, version))
                             {
-                                BomCreator.bomKpiData.DevDependentComponents++;
-                                continue;
+                               BomCreator.bomKpiData.DevDependentComponents++;                          
+                                isDev = "true";
                             }
                             if (dependencyToken.First.Value<string>("type") == "Project" || string.IsNullOrEmpty(version) && string.IsNullOrEmpty(id))
                             {
@@ -149,7 +152,9 @@ namespace LCT.PackageIdentifier
                             {
                                 ID = id,
                                 Version = version,
-                                Filepath = packagesFilePath
+                                Filepath = packagesFilePath,
+                                IsDev= isDev
+                                
                             };
                             packageList.Add(package);
                         }
@@ -339,7 +344,11 @@ namespace LCT.PackageIdentifier
                 if (isTrue)
                 {
                     internalComponents.Add(currentIterationItem);
-                    continue;
+                    isInternal.Value = "true";
+                }
+                else
+                {
+                    isInternal.Value = "false";
                 }
 
                 currentIterationItem.Properties.Add(isInternal);
@@ -363,7 +372,7 @@ namespace LCT.PackageIdentifier
 
             string fullName = bomHelper.GetFullNameOfComponent(component);
             string fullNameVersion = $"{fullName}.{component.Version}.nupkg";
-            if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase) 
+            if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase)
                 && aqlResultList.Exists(
                 x => x.Name.Equals(fullNameVersion, StringComparison.OrdinalIgnoreCase)))
             {
@@ -392,6 +401,8 @@ namespace LCT.PackageIdentifier
         private void ParsingInputFileForBOM(CommonAppSettings appSettings, ref List<Component> listComponentForBOM, ref Bom bom)
         {
             List<string> configFiles;
+            List<Component> componentsForBOM=new List<Component>();
+          
             if (string.IsNullOrEmpty(appSettings.CycloneDxBomFilePath))
             {
                 configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Nuget);
@@ -403,7 +414,21 @@ namespace LCT.PackageIdentifier
             }
             else
             {
-                bom = ParseCycloneDXBom(appSettings.CycloneDxBomFilePath);
+                configFiles = FolderScanner.FileScanner(appSettings.CycloneDxBomFilePath, appSettings.Nuget);
+                foreach (string filepath in configFiles)
+                {
+                    Bom bomList = ParseCycloneDXBom(filepath);
+                    componentsForBOM.AddRange(bomList.Components);
+                }
+                foreach(var component in componentsForBOM)
+                {
+                    component.Properties = new List<Property>();
+                    Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
+                    Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "Manually Added" };
+                    component.Properties.Add(isDev);
+                    component.Properties.Add(identifierType);
+                }
+                bom.Components = componentsForBOM;
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = bom.Components.Count;
                 bom = RemoveExcludedComponents(appSettings, bom);
                 listComponentForBOM = bom.Components;
@@ -423,6 +448,19 @@ namespace LCT.PackageIdentifier
                 components.Purl = $"{ApiConstant.NugetExternalID}{prop.ID}@{components.Version}";
                 components.BomRef = $"{ApiConstant.NugetExternalID}{prop.ID}@{components.Version}";
                 components.Description = prop.Filepath;
+                components.Properties = new List<Property>()
+                {
+                    new()
+                    {
+                       Name = Dataconstant.Cdx_IsDevelopment, Value = prop.IsDev
+                    },
+                    new Property()
+                    {
+                        Name=Dataconstant.Cdx_IdentifierType,Value="Discovered"
+                    }
+                };
+                
+
                 listComponentForBOM.Add(components);
             }
         }

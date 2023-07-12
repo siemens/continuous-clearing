@@ -53,10 +53,22 @@
     <ProjectReference Include="..\UnitTestUtilities\UnitTestUtilities.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="PackageIdentifierUTTestFiles\Cyclonedx.json">
+    <None Update="PackageIdentifierUTTestFiles\CycloneDX2_Python.cdx.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="PackageIdentifierUTTestFiles\Cyclonedx2.json">
+    <None Update="PackageIdentifierUTTestFiles\Cyclonedx_Debian.cdx.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\Cyclonedx2_Debian.cdx.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\CycloneDX2_NPM.cdx.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\CycloneDX_NPM.cdx.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\CycloneDX_Python.cdx.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="PackageIdentifierUTTestFiles\Duplicate_Cyclonedx.json">
@@ -66,9 +78,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="PackageIdentifierUTTestFiles\SourceDetails_Cyclonedx.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="PackageIdentifierUTTestFiles\SourceDetails_Cyclonedx2.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="PackageIdentifierUTTestFiles\TestDir\DupDir\package-lock.json">
@@ -95,6 +104,12 @@
     <None Update="PackageIdentifierUTTestFiles\TestDir\SubDir\package.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+	  <None Update="PackageIdentifierUTTestFiles\Cyclonedx_Maven.cdx.json">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="PackageIdentifierUTTestFiles\Cyclonedx2_Maven.cdx.json">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
   </ItemGroup>
 
 </Project>

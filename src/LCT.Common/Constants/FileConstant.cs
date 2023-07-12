@@ -47,5 +47,6 @@ namespace LCT.Common.Constants
         public const string DockerImage = "clearingautomationtool";
         public static readonly string DockerCMDTool = Path.Combine(@"/bin/bash");
         public const string appSettingFileName = "appSettings.json";
+        public const string CycloneDXFileExtension = ".cdx.json";
     }
 }

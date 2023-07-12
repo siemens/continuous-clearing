@@ -58,6 +58,7 @@ namespace LCT.PackageIdentifier
                 Name = Dataconstant.Cdx_ProjectType,
                 Value = appSettings.ProjectType
             };
+
             Property artifactoryrepo = new()
             {
                 Name = Dataconstant.Cdx_ArtifactoryRepoUrl,
@@ -70,9 +71,16 @@ namespace LCT.PackageIdentifier
                 Value = "false"
             };
 
+            Property isDevelopment = new()
+            {
+                Name = Dataconstant.Cdx_IsDevelopment,
+                Value = "false"
+            };
+
             component.Properties.Add(internalType);
             component.Properties.Add(artifactoryrepo);
             component.Properties.Add(projectType);
+            component.Properties.Add(isDevelopment);
             component.Description = string.Empty;
             componentForBOM.Add(component);
         }

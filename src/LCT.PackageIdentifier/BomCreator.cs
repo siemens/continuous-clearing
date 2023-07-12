@@ -80,14 +80,9 @@ namespace LCT.PackageIdentifier
 
         private static void WritecontentsToBOM(CommonAppSettings appSettings, BomKpiData bomKpiData, Bom listOfComponentsToBom)
         {
-            if (string.IsNullOrEmpty(appSettings.CycloneDxBomFilePath))
-            {
+           
                 WriteContentToCycloneDxBOM(appSettings, listOfComponentsToBom, ref bomKpiData);
-            }
-            else
-            {
-                WriteContentToCycloneDxBOM(appSettings, listOfComponentsToBom, ref bomKpiData);
-            }
+       
 
         }
 
@@ -127,6 +122,9 @@ namespace LCT.PackageIdentifier
                     return await ComponentIdentification(appSettings, parser);
                 case "DEBIAN":
                     parser = new DebianProcessor();
+                    return await ComponentIdentification(appSettings, parser);
+                case "PYTHON":
+                    parser = new PythonProcessor();
                     return await ComponentIdentification(appSettings, parser);
                 default:
                     Logger.Error($"GenerateBom():Invalid ProjectType - {appSettings.ProjectType}");

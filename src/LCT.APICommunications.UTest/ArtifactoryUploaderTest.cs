@@ -27,7 +27,6 @@ namespace LCT.APICommunications.UTest
             //Arrange
             ReleasesDetails releasesDetails = new ReleasesDetails();
             var sw360ApiCommunication = new Mock<ISw360ApiCommunication>();
-            var artfactoryUploader = new ArtfactoryUploader(sw360ApiCommunication.Object);
             ComponentsToArtifactory componentsToArtifactory = new ComponentsToArtifactory();
             sw360ApiCommunication.Setup(x => x.GetReleaseById(It.IsAny<string>())).ReturnsAsync(new HttpResponseMessage
             {
@@ -37,7 +36,7 @@ namespace LCT.APICommunications.UTest
 
             ///Act & Assert
 
-            Assert.ThrowsAsync<InvalidOperationException>(async () => await artfactoryUploader.UploadPackageToRepo(componentsToArtifactory,100));
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await ArtfactoryUploader.UploadPackageToRepo(componentsToArtifactory,100));
         }
 
         [Test]
@@ -45,10 +44,9 @@ namespace LCT.APICommunications.UTest
         {
             //Arrange
             bool returnValue = true;
-            var artfactoryUploader = new ArtfactoryUploader();
 
             //Act
-            artfactoryUploader.SetConfigurationValues();
+            ArtfactoryUploader.SetConfigurationValues();
 
             //Assert
             Assert.That(returnValue, Is.True);

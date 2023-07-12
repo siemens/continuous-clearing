@@ -1,0 +1,147 @@
+{
+  "bomFormat" : "CycloneDX",
+  "specVersion" : "1.3",
+  "serialNumber" : "urn:uuid:f33a1063-8d60-45e0-aa93-ae7352b6fe86",
+  "version" : 1,
+  "metadata" : {
+    "timestamp" : "2023-06-30T05:40:11Z",
+    "tools" : [
+      {
+        "vendor" : "CycloneDX",
+        "name" : "CycloneDX Maven plugin",
+        "version" : "2.5.3",
+        "hashes" : [
+          {
+            "alg" : "MD5",
+            "content" : "4f7d894200ad695fc9f0aad66d7da40a"
+          },
+          {
+            "alg" : "SHA-1",
+            "content" : "c044d9b726650cbea3adeb5cc1715c67d8356c0a"
+          },
+          {
+            "alg" : "SHA-256",
+            "content" : "b9a385e430e1f5efd9b835a084c195dde4d5e1bc79e469a8187ec58275c15313"
+          },
+          {
+            "alg" : "SHA-384",
+            "content" : "d96f68ef4b8830d70dc2eb5f2de5211d96b70dd1169da641f34474265c06a5321b63d2c80fe2d82d74c767391225e480"
+          },
+          {
+            "alg" : "SHA-512",
+            "content" : "1d7d1129cdc8604772b3c454d8dff98d936f85af705c95705e3263a038c0bb58fdd58c0b90efa3f56b4ce8ef9c84d3154b74b8451e0470f856f4d688489704b0"
+          },
+          {
+            "alg" : "SHA3-256",
+            "content" : "44231962fe0c1e5501ca38ad3320f9223ea5e8d62aa8aad170577818801ce349"
+          },
+          {
+            "alg" : "SHA3-384",
+            "content" : "99659ce3e58d8416f9e28d6b87c800442a79c4a5703fb657f6a9da87495d1d9d3b9788e06a3d6ea0e1b659a4681a4c92"
+          },
+          {
+            "alg" : "SHA3-512",
+            "content" : "8d5c3f0ee5a53cc714c4d829ccc07688f951a6b6655ad1e6435b8ab1c281bc38a78073b329bdaaf4887114b6843723ac8b5176a5f954581960a43662c688a95a"
+          }
+        ]
+      }
+    ],
+    "component" : {
+      "group" : "org.springframework",
+      "name" : "gs-maven",
+      "version" : "0.1.0",
+      "licenses" : [ ],
+      "purl" : "pkg:maven/org.springframework/gs-maven@0.1.0?type=jar",
+      "type" : "library",
+      "bom-ref" : "pkg:maven/org.springframework/gs-maven@0.1.0?type=jar"
+    }
+  },
+  "components" : [
+    {
+      "publisher" : "Joda.org",
+      "group" : "joda-time",
+      "name" : "joda-time",
+      "version" : "2.9.2",
+      "description" : "Date and time library to replace JDK date handling",
+      "scope" : "optional",
+      "hashes" : [
+        {
+          "alg" : "MD5",
+          "content" : "32a794b6a820daf3fad92e59988df64c"
+        },
+        {
+          "alg" : "SHA-1",
+          "content" : "36d6e77a419cb455e6fd5909f6f96b168e21e9d0"
+        },
+        {
+          "alg" : "SHA-256",
+          "content" : "0be5c40e8cdce9ec0643d76be99f276db17c45d7616a217fd1b19b7ef73ca7b1"
+        },
+        {
+          "alg" : "SHA-384",
+          "content" : "fe4d61fa8c2ae6bfe94b897fb100a23678bbd172b5c939531197c5566c5836f9a719484b5cf2f70960996bd397c0025c"
+        },
+        {
+          "alg" : "SHA-512",
+          "content" : "52bf64e32ae5303ecf78510f78acfdce46b1654214a106f4d92f7c8e09ab4214790567198dd4c54b0f6e2b75765ad0c7b4a2d2cb3483e2782f16faed5546a8da"
+        },
+        {
+          "alg" : "SHA3-256",
+          "content" : "361583e31c9add8f66af3220979a7a96aea0f2886644cd40e15e90ac5da0ca24"
+        },
+        {
+          "alg" : "SHA3-384",
+          "content" : "4aaa49db59997ce580609dfb0142ed91656cb2f8db667e9fc7d8e206f4480e379601c8c16ee3e7a8870048b7da8209f0"
+        },
+        {
+          "alg" : "SHA3-512",
+          "content" : "047292bca529cf8e9702041982348af816dbcec95917df377197eb22d798c3ac3d09a70591d21cea16a4e5e55ec491c74e0a9d062994303a7715548a9b122454"
+        }
+      ],
+      "licenses" : [
+        {
+          "license" : {
+            "id" : "Apache-2.0"
+          }
+        }
+      ],
+      "purl" : "pkg:maven/joda-time/joda-time@2.9.2?type=jar",
+      "externalReferences" : [
+        {
+          "type" : "website",
+          "url" : "http://www.joda.org"
+        },
+        {
+          "type" : "distribution",
+          "url" : "http://oss.sonatype.org/content/repositories/joda-releases"
+        },
+        {
+          "type" : "issue-tracker",
+          "url" : "https://github.com/JodaOrg/joda-time/issues"
+        },
+        {
+          "type" : "mailing-list",
+          "url" : "http://sourceforge.net/mailarchive/forum.php?forum_name=joda-interest"
+        },
+        {
+          "type" : "vcs",
+          "url" : "https://github.com/JodaOrg/joda-time"
+        }
+      ],
+      "type" : "library",
+      "bom-ref" : "pkg:maven/joda-time/joda-time@2.9.2?type=jar"
+    }
+  ],
+  "dependencies" : [
+    {
+      "ref" : "pkg:maven/org.springframework/gs-maven@0.1.0?type=jar",
+      "dependsOn" : [
+        "pkg:maven/joda-time/joda-time@2.9.2?type=jar"
+      ]
+    },
+    {
+      "ref" : "pkg:maven/joda-time/joda-time@2.9.2?type=jar",
+      "dependsOn" : [ ]
+    }
+  ]
+}
