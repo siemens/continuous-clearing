@@ -143,13 +143,13 @@ namespace SW360IntegrationTest
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue(TestConstant.TestSw360TokenType, TestConstant.TestSw360TokenValue);
-            string expectedname = "tslib";
-            string expectedversion = "1.13.0";
-            string expecteddownloadurl = "https://github.com/Microsoft/tslib.git";
-            string expectedexternalid = "pkg:npm/tslib@1.13.0";
+            string expectedname = "rxjs";
+            string expectedversion = "6.5.4";
+            string expecteddownloadurl = "https://github.com/reactivex/rxjs.git";
+            string expectedexternalid = " pkg:npm/rxjs@6.5.4";
             string expectedclearingState = "NEW_CLEARING";
             //url formation for retrieving component details
-            string url = TestConstant.Sw360ReleaseApi + TestConstant.componentNameUrl + "tslib";
+            string url = TestConstant.Sw360ReleaseApi + TestConstant.componentNameUrl + "rxjs";
             string responseBody = await httpClient.GetStringAsync(url);//GET method         
             var responseData = JsonConvert.DeserializeObject<ReleaseIdOfComponent>(responseBody);
             string urlofreleaseid = responseData.Embedded.Sw360Releases[0].Links.Self.Href;
