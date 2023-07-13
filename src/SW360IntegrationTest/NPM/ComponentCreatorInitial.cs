@@ -57,7 +57,7 @@ namespace SW360IntegrationTest
 
             // Assert
             // Check return with warning code 2
-            Assert.AreEqual(0, TestHelper.RunComponentCreatorExe(new string[] {
+            Assert.AreEqual(2, TestHelper.RunComponentCreatorExe(new string[] {
                 TestConstant.BomFilePath,bomPath,
                 TestConstant.Sw360Token, testParameters.SW360AuthTokenValue,
                 TestConstant.SW360URL, testParameters.SW360URL,
@@ -146,7 +146,7 @@ namespace SW360IntegrationTest
             string expectedname = "rxjs";
             string expectedversion = "6.5.4";
             string expecteddownloadurl = "https://github.com/reactivex/rxjs.git";
-            string expectedexternalid = " pkg:npm/rxjs@6.5.4";
+            string expectedexternalid = "pkg:npm/rxjs@6.5.4";
             string expectedclearingState = "NEW_CLEARING";
             //url formation for retrieving component details
             string url = TestConstant.Sw360ReleaseApi + TestConstant.componentNameUrl + "rxjs";
