@@ -41,7 +41,7 @@ namespace LCT.PackageIdentifier
             // Calls package parser
             listOfComponentsToBom = await CallPackageParser(appSettings);
             Logger.Logger.Log(null, Level.Notice, $"No of components to BOM after removing bundled, dev dependency & " +
-                $"internal components = {listOfComponentsToBom.Components.Count}", null);
+                $"= {listOfComponentsToBom.Components.Count}", null);
 
 
             bomKpiData.ComponentsInComparisonBOM = listOfComponentsToBom.Components.Count;

@@ -392,6 +392,7 @@ namespace LCT.PackageIdentifier
                 else
                 {
                     val.Isdevdependent = true;
+                    BomCreator.bomKpiData.DevDependentComponents++;
                 }
                 lst.Add(val);
             }
