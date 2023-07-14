@@ -66,7 +66,7 @@ namespace LCT.PackageIdentifier.UTest
             AqlResult aqlResult = new()
             {
                 Name = "animations-1.0.0.tgz",
-                Path = "@siemens-gds/saap-api-node/-/@siemens-gds",
+                Path = "@testfolder/-/folder",
                 Repo = "energy-dev-npm-egll"
             };
 
@@ -102,7 +102,7 @@ namespace LCT.PackageIdentifier.UTest
             AqlResult aqlResult = new()
             {
                 Name = "animations-common_license-1.0.0.tgz",
-                Path = "@siemens-gds/saap-api-node/-/@siemens-gds",
+                Path = "@testfolder/-/folder",
                 Repo = "energy-dev-npm-egll"
             };
 
@@ -140,7 +140,7 @@ namespace LCT.PackageIdentifier.UTest
             AqlResult aqlResult = new()
             {
                 Name = "animations-common-1.0.0.tgz",
-                Path = "@siemens-gds/saap-api-node/-/@siemens-gds",
+                Path = "@testfolder/-/folder",
                 Repo = "energy-dev-npm-egll"
             };
 
@@ -178,7 +178,7 @@ namespace LCT.PackageIdentifier.UTest
             AqlResult aqlResult = new()
             {
                 Name = "animations-common-1.0.0.tgz",
-                Path = "@siemens-gds/saap-api-node/-/@siemens-gds",
+                Path = "@testfolder/-/folder",
                 Repo = "siparty-release-npm-egll"
             };
 
@@ -217,7 +217,7 @@ namespace LCT.PackageIdentifier.UTest
             AqlResult aqlResult = new()
             {
                 Name = "animations-common-1.0.0.tgz",
-                Path = "@siemens-gds/saap-api-node/-/@siemens-gds",
+                Path = "@testfolder/-/folder",
                 Repo = "siparty-release-npm-egll"
             };
 

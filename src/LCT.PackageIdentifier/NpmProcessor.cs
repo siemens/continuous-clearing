@@ -378,7 +378,7 @@ namespace LCT.PackageIdentifier
       
         }
 
-        private static void GetdependencyDetails(List<Component> componentsForBOM, List<Dependency> dependencies)
+        public static void GetdependencyDetails(List<Component> componentsForBOM, List<Dependency> dependencies)
         {
             List<Dependency> dependencyList = new();
         
