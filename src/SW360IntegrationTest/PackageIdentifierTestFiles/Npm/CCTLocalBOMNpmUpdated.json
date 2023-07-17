@@ -15,7 +15,7 @@
       {
         "Vendor": "Siemens AG",
         "Name": "Clearing Automation Tool",
-        "Version": "2.0.0",
+        "Version": "3.1.1",
         "Hashes": null
       }
     ],
@@ -48,456 +48,16 @@
       "Components": null,
       "Properties": [
         {
-          "Name": "internal:siemens:clearing:is-internal",
+          "Name": "internal:siemens:clearing:development",
           "Value": "false"
         },
-        {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrogRepo"
-        },
-        {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "NPM"
-        }
-      ],
-      "Evidence": null
-    },
-    {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:npm/tslib@2.3.0",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": null,
-      "Name": "tslib",
-      "Version": "2.3.0",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:npm/tslib@2.3.0",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
         {
           "Name": "internal:siemens:clearing:is-internal",
           "Value": "false"
         },
         {
           "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrogRepo"
-        },
-        {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "NPM"
-        }
-      ],
-      "Evidence": null
-    },
-    {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:npm/%40angular/compiler@10.1.6",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": "@angular",
-      "Name": "compiler",
-      "Version": "10.1.6",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:npm/%40angular/compiler@10.1.6",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
-        {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
-        },
-        {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrogRepo"
-        },
-        {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "NPM"
-        }
-      ],
-      "Evidence": null
-    },
-    {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:npm/%40angular/core@9.1.12",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": "@angular",
-      "Name": "core",
-      "Version": "9.1.12",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:npm/%40angular/core@9.1.12",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
-        {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
-        },
-        {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrogRepo"
-        },
-        {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "NPM"
-        }
-      ],
-      "Evidence": null
-    },
-    {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:npm/%40angular/forms@9.1.12",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": "@angular",
-      "Name": "forms",
-      "Version": "9.1.12",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:npm/%40angular/forms@9.1.12",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
-        {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
-        },
-        {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrogRepo"
-        },
-        {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "NPM"
-        }
-      ],
-      "Evidence": null
-    },
-    {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:npm/%40angular/platform-browser@9.1.12",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": "@angular",
-      "Name": "platform-browser",
-      "Version": "9.1.12",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:npm/%40angular/platform-browser@9.1.12",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
-        {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
-        },
-        {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrogRepo"
-        },
-        {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "NPM"
-        }
-      ],
-      "Evidence": null
-    },
-    {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:npm/%40angular/platform-browser-dynamic@9.1.12",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": "@angular",
-      "Name": "platform-browser-dynamic",
-      "Version": "9.1.12",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:npm/%40angular/platform-browser-dynamic@9.1.12",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
-        {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
-        },
-        {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrogRepo"
-        },
-        {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "NPM"
-        }
-      ],
-      "Evidence": null
-    },
-    {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:npm/%40angular/router@9.1.12",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": "@angular",
-      "Name": "router",
-      "Version": "9.1.12",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:npm/%40angular/router@9.1.12",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
-        {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
-        },
-        {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrogRepo"
-        },
-        {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "NPM"
-        }
-      ],
-      "Evidence": null
-    },
-    {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:npm/axios@0.19.0",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": null,
-      "Name": "axios",
-      "Version": "0.19.0",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:npm/axios@0.19.0",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
-        {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
-        },
-        {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrogRepo"
-        },
-        {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "NPM"
-        }
-      ],
-      "Evidence": null
-    },
-    {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:npm/debug@3.1.0",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": null,
-      "Name": "debug",
-      "Version": "3.1.0",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:npm/debug@3.1.0",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
-        {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
-        },
-        {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrogRepo"
-        },
-        {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "NPM"
-        }
-      ],
-      "Evidence": null
-    },
-    {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:npm/follow-redirects@1.5.10",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": null,
-      "Name": "follow-redirects",
-      "Version": "1.5.10",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:npm/follow-redirects@1.5.10",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
-        {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
-        },
-        {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrogRepo"
-        },
-        {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "NPM"
-        }
-      ],
-      "Evidence": null
-    },
-    {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:npm/is-buffer@2.0.4",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": null,
-      "Name": "is-buffer",
-      "Version": "2.0.4",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:npm/is-buffer@2.0.4",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
-        {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
-        },
-        {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrogRepo"
-        },
-        {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "NPM"
-        }
-      ],
-      "Evidence": null
-    },
-    {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:npm/ms@2.0.0",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": null,
-      "Name": "ms",
-      "Version": "2.0.0",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:npm/ms@2.0.0",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
-        {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
-        },
-        {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrogRepo"
+          "Value": "org1-npmjs-npm-remote-cache"
         },
         {
           "Name": "internal:siemens:clearing:project-type",
@@ -511,7 +71,7 @@
       "MimeType": null,
       "BomRef": "pkg:npm/rxjs@6.5.5",
       "Supplier": null,
-      "Author": null,
+      "Author": "",
       "Publisher": null,
       "Group": null,
       "Name": "rxjs",
@@ -529,12 +89,16 @@
       "Components": null,
       "Properties": [
         {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
+        {
           "Name": "internal:siemens:clearing:is-internal",
           "Value": "false"
         },
         {
           "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrogRepo"
+          "Value": "siparty-release-npm-egll"
         },
         {
           "Name": "internal:siemens:clearing:project-type",
@@ -566,12 +130,16 @@
       "Components": null,
       "Properties": [
         {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
+        {
           "Name": "internal:siemens:clearing:is-internal",
           "Value": "false"
         },
         {
           "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrogRepo"
+          "Value": "siparty-release-npm-egll"
         },
         {
           "Name": "internal:siemens:clearing:project-type",
@@ -603,12 +171,16 @@
       "Components": null,
       "Properties": [
         {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
+        {
           "Name": "internal:siemens:clearing:is-internal",
           "Value": "false"
         },
         {
           "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrogRepo"
+          "Value": "siparty-release-npm-egll"
         },
         {
           "Name": "internal:siemens:clearing:project-type",
@@ -616,6 +188,17 @@
         }
       ],
       "Evidence": null
+    }
+  ],
+  "Dependencies": [
+    {
+      "Ref": "pkg:npm/rxjs@6.5.5",
+      "Dependencies": [
+        {
+          "Ref": "pkg:npm/tslib@^1.9.0",
+          "Dependencies": null
+        }
+      ]
     }
   ],
   "Compositions": null

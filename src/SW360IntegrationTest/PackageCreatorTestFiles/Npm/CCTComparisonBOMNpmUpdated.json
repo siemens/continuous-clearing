@@ -57,7 +57,7 @@
         },
         {
           "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrogRepo"
+          "Value": "org1-npmjs-npm-remote-cache"
         },
         {
           "Name": "internal:siemens:clearing:project-type",
@@ -69,7 +69,7 @@
         },
         {
           "Name": "internal:siemens:clearing:sw360:release-url",
-          "Value": "http://md2pdvnc.ad001.siemens.net:8095/resource/api/releases/bc397be557fd4defb7eac7200c8bbb9a"
+          "Value": "http://localhost:8090/resource/api/releases/598fc00fd6d542379988db11a01312e7"
         },
         {
           "Name": "internal:siemens:clearing:fossology:url",
@@ -83,7 +83,7 @@
       "MimeType": null,
       "BomRef": "pkg:npm/rxjs@6.5.5",
       "Supplier": null,
-      "Author": null,
+      "Author": "",
       "Publisher": null,
       "Group": null,
       "Name": "rxjs",
@@ -110,7 +110,7 @@
         },
         {
           "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrogRepo"
+          "Value": "siparty-release-npm-egll"
         },
         {
           "Name": "internal:siemens:clearing:project-type",
@@ -122,7 +122,7 @@
         },
         {
           "Name": "internal:siemens:clearing:sw360:release-url",
-          "Value": "http://md2pdvnc.ad001.siemens.net:8095/resource/api/releases/1498df0950164a3bb21d2a22e52205e0"
+          "Value": "http://localhost:8090/resource/api/releases/3bd208ca8bec416db94255f46515341b"
         },
         {
           "Name": "internal:siemens:clearing:fossology:url",
@@ -163,7 +163,7 @@
         },
         {
           "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrogRepo"
+          "Value": "siparty-release-npm-egll"
         },
         {
           "Name": "internal:siemens:clearing:project-type",
@@ -175,7 +175,7 @@
         },
         {
           "Name": "internal:siemens:clearing:sw360:release-url",
-          "Value": "http://md2pdvnc.ad001.siemens.net:8095/resource/api/releases/f2e38214a8a149ee9e29491cd111f76e"
+          "Value": "http://localhost:8090/resource/api/releases/3fa522520dc6462da46a85dc4929a4b2"
         },
         {
           "Name": "internal:siemens:clearing:fossology:url",
@@ -216,7 +216,7 @@
         },
         {
           "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrogRepo"
+          "Value": "siparty-release-npm-egll"
         },
         {
           "Name": "internal:siemens:clearing:project-type",
@@ -228,7 +228,7 @@
         },
         {
           "Name": "internal:siemens:clearing:sw360:release-url",
-          "Value": "http://md2pdvnc.ad001.siemens.net:8095/resource/api/releases/5ec935a0bca14b12bc807da62d35d1b8"
+          "Value": "http://localhost:8090/resource/api/releases/6fff327ff2ec4575be1fc889c58f51b3"
         },
         {
           "Name": "internal:siemens:clearing:fossology:url",
@@ -236,6 +236,17 @@
         }
       ],
       "Evidence": null
+    }
+  ],
+  "Dependencies": [
+    {
+      "Ref": "pkg:npm/rxjs@6.5.5",
+      "Dependencies": [
+        {
+          "Ref": "pkg:npm/tslib@^1.9.0",
+          "Dependencies": null
+        }
+      ]
     }
   ],
   "Compositions": null

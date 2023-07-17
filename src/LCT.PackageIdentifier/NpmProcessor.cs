@@ -52,9 +52,10 @@ namespace LCT.PackageIdentifier
 
             ParsingInputFileForBOM(appSettings, ref componentsForBOM, ref bom, ref dependencies);
 
+
             componentsForBOM = GetExcludedComponentsList(componentsForBOM);
 
-            totalComponentsIdentified = componentsForBOM.Count;
+           
 
             componentsForBOM = componentsForBOM.Distinct(new ComponentEqualityComparer()).ToList();
 
@@ -152,7 +153,7 @@ namespace LCT.PackageIdentifier
                 Component components = new Component();
                 var properties = JObject.Parse(Convert.ToString(prop.Value));
 
-                // ignoring the dev= true components, because they are not needed in clearing     
+                // dev components are not ignored and added as a part of SBOM   
                 if (IsDevDependency( prop.Value[Dev], ref noOfDevDependent))
                 {
                     isdev.Value = "true";
@@ -210,7 +211,7 @@ namespace LCT.PackageIdentifier
 
                 var properties = JObject.Parse(Convert.ToString(prop.Value));
 
-                // not ignoring the dev components, because they are not needed in clearing     
+                // dev components are not ignored and added as a part of SBOM    
                 if (IsDevDependency(prop.Value[Dev], ref noOfDevDependent))
                 {
                     isdev.Value = "true";
