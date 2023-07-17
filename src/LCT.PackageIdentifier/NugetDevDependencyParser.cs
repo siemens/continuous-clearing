@@ -13,12 +13,14 @@ using System.Reflection;
 using System.Security.Cryptography;
 using LCT.PackageIdentifier.Model.NugetModel;
 using System.Text.Json;
+using log4net.Repository.Hierarchy;
 
 namespace LCT.PackageIdentifier
 {
     internal class NugetDevDependencyParser
     {
         private static NugetDevDependencyParser instance = null;
+        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private NugetDevDependencyParser()
         {
@@ -72,9 +74,16 @@ namespace LCT.PackageIdentifier
             {
                 csProj = new Project(projectPath);
             }
-            catch (InvalidProjectFileException e)
+            catch (InvalidProjectFileException ex)
             {
-                //Logger.Error(e, "Failed to read project file \"{path}\"", projectPath);
+                Logger.Error($"IsTestProject(): Failed to read project file : " + projectPath, ex);
+                Logger.Warn($"IsTestProject?: Failed to read project file : " + projectPath);
+                return false;
+            }
+            catch (MissingFieldException ex)
+            {
+                Logger.Error($"IsTestProject(): Failed to read project file : " + projectPath, ex);
+                Logger.Warn($"IsTestProject?: Failed to read project file : " + projectPath);
                 return false;
             }
 
@@ -96,24 +105,32 @@ namespace LCT.PackageIdentifier
 
         internal void ParseJsonFile(string filePath, Container container)
         {
-            IDictionary<string, BuildInfoComponent> components = container.Components;
-            LockFileFormat assetFileReader = new();
-            LockFile assetFile = assetFileReader.Read(filePath);
-            bool isTestProject = IsTestProject(assetFile.PackageSpec.RestoreMetadata.ProjectPath);
-
-            container.Name = Path.GetFileName(assetFile.PackageSpec.RestoreMetadata.ProjectPath);
-
-            if (isTestProject)
+            try
             {
-                container.Scope = ComponentScope.DevDependency;
-            }
+                IDictionary<string, BuildInfoComponent> components = container.Components;
+                LockFileFormat assetFileReader = new();
+                LockFile assetFile = assetFileReader.Read(filePath);
+                bool isTestProject = IsTestProject(assetFile.PackageSpec.RestoreMetadata.ProjectPath);
 
-            foreach (LockFileTarget target in assetFile.Targets)
-            {
-                foreach (LockFileTargetLibrary library in target.Libraries)
+                container.Name = Path.GetFileName(assetFile.PackageSpec.RestoreMetadata.ProjectPath);
+
+                if (isTestProject)
                 {
-                    ParseLibrary(library, isTestProject, components, assetFile);
+                    container.Scope = ComponentScope.DevDependency;
                 }
+
+                foreach (LockFileTarget target in assetFile.Targets)
+                {
+                    foreach (LockFileTargetLibrary library in target.Libraries)
+                    {
+                        ParseLibrary(library, isTestProject, components, assetFile);
+                    }
+                }
+            }
+            catch (InvalidProjectFileException ex)
+            {
+                Logger.Error($"ParseJsonFile():", ex);
+                Logger.Warn($"While parsing project asset file : " + filePath + " Error : " + ex.Message + "\n");
             }
         }
 
@@ -214,13 +231,13 @@ namespace LCT.PackageIdentifier
             int count = foundFiles.Count();
             if (count == 0)
             {
-                //Logger.Error("Unable to find NuGet package \"{purl}\" in \"{path}\".", nuGetComponent.PackageUrl, packagePath);
+                Logger.Error("Unable to find NuGet package " + nuGetComponent.PackageUrl + " in " + packagePath);
                 return;
             }
 
             if (count > 1)
             {
-                //Logger.LogWarning("Found multiple NuGet packages files of \"{purl}\" in \"{path}\": {files}", nuGetComponent.PackageUrl, packagePath, JsonSerializer.Serialize(foundFiles));
+                Logger.Warn($"Found multiple NuGet packages files of : " + nuGetComponent.PackageUrl + " in : " + packagePath + "  " + JsonSerializer.Serialize(foundFiles) + "\n");
             }
 
             string filePath = foundFiles.First();

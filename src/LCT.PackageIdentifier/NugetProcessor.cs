@@ -331,7 +331,7 @@ namespace LCT.PackageIdentifier
             List<Component> internalComponents = new List<Component>();
             var internalComponentStatusUpdatedList = new List<Component>();
             var inputIterationList = componentData.comparisonBOMData;
-            
+
             foreach (Component component in inputIterationList)
             {
                 var currentIterationItem = component;
@@ -345,11 +345,11 @@ namespace LCT.PackageIdentifier
                 if (isTrue)
                 {
                     internalComponents.Add(currentIterationItem);
-                    isInternal.Value = "true";
+                    isInternal.Value = "TRUE";
                 }
                 else
                 {
-                    isInternal.Value = "false";
+                    isInternal.Value = "FALSE";
                 }
 
                 currentIterationItem.Properties.Add(isInternal);
@@ -439,7 +439,7 @@ namespace LCT.PackageIdentifier
             {
                 component.Properties = new List<Property>();
                 Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
-                Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "Manually Added" };
+                Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "MANUALLY ADDED" };
                 component.Properties.Add(isDev);
                 component.Properties.Add(identifierType);
                 listComponentForBOM.Add(component);
@@ -467,7 +467,7 @@ namespace LCT.PackageIdentifier
                     },
                     new Property()
                     {
-                        Name=Dataconstant.Cdx_IdentifierType,Value="Discovered"
+                        Name=Dataconstant.Cdx_IdentifierType,Value="DISCOVRED"
                     }
                 };
 

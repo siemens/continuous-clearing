@@ -40,7 +40,7 @@ namespace LCT.PackageIdentifier
 
             // Calls package parser
             listOfComponentsToBom = await CallPackageParser(appSettings);
-            Logger.Logger.Log(null, Level.Notice, $"No of components to BOM after removing bundled, dev dependency & " +
+            Logger.Logger.Log(null, Level.Notice, $"No of components to BOM after removing bundled & exluded components " +
                 $"= {listOfComponentsToBom.Components.Count}", null);
 
 

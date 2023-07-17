@@ -18,6 +18,7 @@ using Moq;
 using LCT.APICommunications.Model.AQL;
 using CycloneDX.Models;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace PackageIdentifier.UTest
 {
@@ -33,7 +34,6 @@ namespace PackageIdentifier.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
             string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles\packages.config";
-
 
             CommonAppSettings appSettings = new CommonAppSettings()
             {
@@ -406,6 +406,66 @@ namespace PackageIdentifier.UTest
 
             // Assert
             Assert.That(actual, Is.Not.Null);
+        }
+
+        [TestCase]
+        public void ParseProjectAssetFile_GivenAInputFilePath_ReturnsSuccess()
+        {
+            //Arrange
+            int expectednoofcomponents = 2;
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string packagefilepath = outFolder + @"\..\..\TestFiles\NugetTestForAssetFile";
+
+            string[] Includes = { "project.assets.json" };
+            Config config = new Config()
+            {
+                Include = Includes
+            };
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                PackageFilePath = packagefilepath,
+                Nuget = config
+            };
+
+            //Act
+            Bom listofcomponents = new NugetProcessor().ParsePackageFile(appSettings);
+
+            //Assert
+            Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
+
+        }
+
+        [TestCase]
+        public void ParseProjectAssetFile_GivenAInputFilePath_ReturnDevDependentComp()
+        {
+            //Arrange
+            string IsDev = "TRUE";
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string packagefilepath = outFolder + @"\..\..\TestFiles\NugetTestForAssetFile";
+
+            string[] Includes = { "project.assets.json" };
+            Config config = new Config()
+            {
+                Include = Includes
+            };
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                PackageFilePath = packagefilepath,
+                Nuget = config
+            };
+
+            //Act
+            Bom listofcomponents = new NugetProcessor().ParsePackageFile(appSettings);
+
+            var IsDevDependency = listofcomponents.Components.Find(a => a.Name == "SonarAnalyzer.CSharp").Properties[0].Value;
+
+            //Assert
+            Assert.That(IsDev, Is.EqualTo(IsDevDependency), "Checks if Dev Dependency Component or not");
+
         }
     }
 }
