@@ -415,7 +415,7 @@ namespace PackageIdentifier.UTest
             int expectednoofcomponents = 2;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string packagefilepath = outFolder + @"\..\..\TestFiles\NugetTestForAssetFile";
+            string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles";
 
             string[] Includes = { "project.assets.json" };
             Config config = new Config()
@@ -444,7 +444,7 @@ namespace PackageIdentifier.UTest
             string IsDev = "TRUE";
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string packagefilepath = outFolder + @"\..\..\TestFiles\NugetTestForAssetFile";
+            string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles";
 
             string[] Includes = { "project.assets.json" };
             Config config = new Config()

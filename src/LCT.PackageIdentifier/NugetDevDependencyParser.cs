@@ -86,6 +86,12 @@ namespace LCT.PackageIdentifier
                 Logger.Warn($"IsTestProject?: Failed to read project file : " + projectPath);
                 return false;
             }
+            catch(ArgumentException ex)
+            {
+                Logger.Error($"IsTestProject(): Failed to read project file : " + projectPath, ex);
+                Logger.Warn($"IsTestProject?: Failed to read project file : " + projectPath);
+                return false;
+            }
 
             foreach (ProjectItem item in csProj.Items)
             {

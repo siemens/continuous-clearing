@@ -79,20 +79,20 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\z004neay\\.nuget\\packages\\": {}
+    "": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Nuget-SBOM\\ProjectAssets\\ProjectAssets\\ProjectAssets\\ProjectAssets.csproj",
+      "projectUniqueName": "",
       "projectName": "ProjectAssets",
-      "projectPath": "D:\\Nuget-SBOM\\ProjectAssets\\ProjectAssets\\ProjectAssets\\ProjectAssets.csproj",
-      "packagesPath": "C:\\Users\\z004neay\\.nuget\\packages\\",
-      "outputPath": "D:\\Nuget-SBOM\\ProjectAssets\\ProjectAssets\\ProjectAssets\\obj\\",
+      "projectPath": "",
+      "packagesPath": "",
+      "outputPath": "",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\z004neay\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "",
+        ""
       ],
       "originalTargetFrameworks": [
         "net6.0"
