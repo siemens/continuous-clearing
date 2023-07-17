@@ -45,6 +45,34 @@ namespace LCT.PackageIdentifier.UTest
             Assert.That(2974, Is.EqualTo(BomCreator.bomKpiData.DuplicateComponents), "Returns the count of duplicate components");
 
         }
+        [Test]
+        public void ParsePackageFile_PackageLockWithangular16_ReturnsCountOfComponents()
+        {
+            //Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string filepath = outFolder + @"\PackageIdentifierUTTestFiles";
+            string[] Includes = { "p*-lock16.json" };
+            string[] Excludes = { "node_modules" };
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                PackageFilePath = filepath,
+                ProjectType = "NPM",
+                RemoveDevDependency = true,
+                Npm = new Config() { Include = Includes, Exclude = Excludes }
+            };
+
+            NpmProcessor NpmProcessor = new NpmProcessor();
+
+            //Act
+            Bom bom=NpmProcessor.ParsePackageFile(appSettings);
+
+            //Assert
+            Assert.That(10, Is.EqualTo(bom.Components.Count), "Returns the count of components");
+            Assert.That(6, Is.EqualTo(bom.Dependencies.Count), "Returns the count of dependencies");
+
+        }
 
         [Test]
         public void ParsePackageFile_PackageLockWithoutDuplicateComponents_ReturnsCountZeroDuplicates()

@@ -4,6 +4,7 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using CycloneDX.Json.Converters;
 using CycloneDX.Models;
 using LCT.APICommunications;
 using LCT.APICommunications.Model.AQL;
@@ -27,6 +28,7 @@ using System.Threading.Tasks;
 
 namespace LCT.PackageIdentifier
 {
+
     /// <summary>
     /// Parses the NPM Packages
     /// </summary>
@@ -38,19 +40,22 @@ namespace LCT.PackageIdentifier
         private const string Dev = "dev";
         private const string Version = "version";
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
+        private const string Requires = "requires";
+
 
         public Bom ParsePackageFile(CommonAppSettings appSettings)
         {
             List<Component> componentsForBOM = new List<Component>();
             Bom bom = new Bom();
-
+            List<Dependency> dependencies = new List<Dependency>();
             int totalComponentsIdentified = 0;
 
-            ParsingInputFileForBOM(appSettings, ref componentsForBOM, ref bom);
+            ParsingInputFileForBOM(appSettings, ref componentsForBOM, ref bom, ref dependencies);
+
 
             componentsForBOM = GetExcludedComponentsList(componentsForBOM);
 
-            totalComponentsIdentified = componentsForBOM.Count;
+           
 
             componentsForBOM = componentsForBOM.Distinct(new ComponentEqualityComparer()).ToList();
 
@@ -68,6 +73,7 @@ namespace LCT.PackageIdentifier
                 }
             }
             bom.Components = componentsForBOM;
+            bom.Dependencies = dependencies;
             Logger.Debug($"ParsePackageFile():End");
             return bom;
         }
@@ -98,7 +104,8 @@ namespace LCT.PackageIdentifier
                     if (pacakages?.Children() != null)
                     {
                         IEnumerable<JProperty> depencyComponentList = pacakages?.Children().OfType<JProperty>();
-                        GetPackagesForBom(filepath, ref bundledComponents, ref lstComponentForBOM, ref noOfDevDependent, depencyComponentList);
+                        GetPackagesForBom(filepath, ref bundledComponents, ref lstComponentForBOM,
+                            ref noOfDevDependent, depencyComponentList);
                     }
                 }
 
@@ -133,9 +140,10 @@ namespace LCT.PackageIdentifier
         private static void GetPackagesForBom(string filepath, ref List<BundledComponents> bundledComponents, ref List<Component> lstComponentForBOM, ref int noOfDevDependent, IEnumerable<JProperty> depencyComponentList)
         {
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += depencyComponentList.Count();
-
+       
             foreach (JProperty prop in depencyComponentList)
             {
+                Property isdev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
                 if (string.IsNullOrEmpty(prop.Name))
                 {
                     BomCreator.bomKpiData.ComponentsinPackageLockJsonFile--;
@@ -145,10 +153,10 @@ namespace LCT.PackageIdentifier
                 Component components = new Component();
                 var properties = JObject.Parse(Convert.ToString(prop.Value));
 
-                // ignoring the dev= true components, because they are not needed in clearing     
-                if (IsDevDependency(prop.Value[Dev], ref noOfDevDependent))
+                // dev components are not ignored and added as a part of SBOM   
+                if (IsDevDependency( prop.Value[Dev], ref noOfDevDependent))
                 {
-                    continue;
+                    isdev.Value = "true";
                 }
 
                 string folderPath = CommonHelper.TrimEndOfString(filepath, $"\\{FileConstant.PackageLockFileName}");
@@ -167,11 +175,13 @@ namespace LCT.PackageIdentifier
 
                 components.Description = folderPath;
                 components.Version = Convert.ToString(properties[Version]);
+                components.Author = prop?.Value[Dependencies]?.ToString();
                 components.Purl = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
                 components.BomRef = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
 
                 CheckAndAddToBundleComponents(bundledComponents, prop, components);
-
+                components.Properties = new List<Property>();
+                components.Properties.Add(isdev);
                 lstComponentForBOM.Add(components);
                 lstComponentForBOM = RemoveBundledComponentFromList(bundledComponents, lstComponentForBOM);
             }
@@ -201,7 +211,7 @@ namespace LCT.PackageIdentifier
 
                 var properties = JObject.Parse(Convert.ToString(prop.Value));
 
-                // ignoring the dev= true components, because they are not needed in clearing     
+                // dev components are not ignored and added as a part of SBOM    
                 if (IsDevDependency(prop.Value[Dev], ref noOfDevDependent))
                 {
                     isdev.Value = "true";
@@ -231,6 +241,7 @@ namespace LCT.PackageIdentifier
 
                 components.Description = folderPath;
                 components.Version = Convert.ToString(properties[Version]);
+                components.Author = prop?.Value[Requires]?.ToString();
                 components.Purl = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
                 components.BomRef = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
                 components.Properties = new List<Property>();
@@ -326,22 +337,22 @@ namespace LCT.PackageIdentifier
             return cycloneDXBOM;
         }
 
-        private void ParsingInputFileForBOM(CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom)
+        private void ParsingInputFileForBOM(CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom, ref List<Dependency> dependencies)
         {
             List<string> configFiles;
-            int count = 0;
-
-            configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Npm);
+  
             if (string.IsNullOrEmpty(appSettings.CycloneDxBomFilePath))
             {
+                configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Npm);
+            
                 foreach (string filepath in configFiles)
                 {
                     Logger.Debug($"ParsingInputFileForBOM():FileName: " + filepath);
+
                     if (filepath.EndsWith(FileConstant.CycloneDXFileExtension))
                     {
                         Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
                         bom = ParseCycloneDXBom(filepath);
-                        count += bom.Components.Count;
                         bom = RemoveExcludedComponents(appSettings, bom);
 
                         componentsForBOM.AddRange(bom.Components);
@@ -349,16 +360,72 @@ namespace LCT.PackageIdentifier
                     else
                     {
                         Logger.Debug($"ParsingInputFileForBOM():Found as Package File");
-                        var lst = ParsePackageLockJson(filepath, appSettings);
-                        count += lst.Count;
-                        componentsForBOM.AddRange(lst);
+                        var components = ParsePackageLockJson(filepath, appSettings);
+                        componentsForBOM.AddRange(components);
                     }
                 }
+                GetdependencyDetails(componentsForBOM, dependencies);
+
             }
-            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = count;
+            else
+            {
+                bom = ParseCycloneDXBom(appSettings.CycloneDxBomFilePath);
+                BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = bom.Components.Count;
+                bom = RemoveExcludedComponents(appSettings, bom);
+
+                componentsForBOM = bom.Components;
+                dependencies = bom.Dependencies;
+            }
+      
         }
 
-        private static bool IsDevDependency(JToken devValue, ref int noOfDevDependent)
+        public static void GetdependencyDetails(List<Component> componentsForBOM, List<Dependency> dependencies)
+        {
+            List<Dependency> dependencyList = new();
+        
+            foreach (var component in componentsForBOM)
+            {
+                if ((component.Author?.Split(",")) != null)
+                {
+                    List<Dependency> subDependencies = new();
+                    foreach (var item in (component?.Author?.Split(",")).Where(item => item.Contains(":")))
+                    {
+                      
+                        var componentDetails = item.Split(":");
+                        var name = StringFormat(componentDetails[0]);
+                        var version = StringFormat(componentDetails[1]);
+                        string purlId = $"{ApiConstant.NPMExternalID}{name}@{version}";
+                        Dependency dependentList = new Dependency()
+                        {
+                            Ref = purlId
+                        };
+                        subDependencies.Add(dependentList);
+                    }
+
+                    var dependency = new Dependency()
+                    {
+                        Ref = component.Purl,
+                        Dependencies = subDependencies
+                    };
+
+                    dependencyList.Add(dependency);
+
+                    component.Author = "";
+
+                }
+            }
+            dependencies.AddRange(dependencyList);
+        }
+
+        private static string StringFormat(string componentInfo)
+        {
+            var replacements = new Dictionary<string, string> { { "@", "%40" }, { "\"", "" }, { "{", "" }, { "\r", "" }, { "}", "" }, { "\n", "" } };
+
+            var formattedstring = replacements.Aggregate(componentInfo, (current, replacement) => current.Replace(replacement.Key, replacement.Value));
+            return formattedstring.Trim();
+        }
+
+        private static bool IsDevDependency( JToken devValue, ref int noOfDevDependent)
         {
             if (devValue != null)
             {

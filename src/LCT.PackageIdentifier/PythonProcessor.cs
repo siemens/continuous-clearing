@@ -7,14 +7,13 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using CycloneDX.Models;
-using LCT.APICommunications;
 using LCT.APICommunications.Model;
+using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
-using LCT.Common.Model;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
-using log4net.Core;
+using LCT.Services.Interface;
 using log4net;
 using Newtonsoft.Json;
 using System;
@@ -22,18 +21,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading.Tasks;
-using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
-using System.Xml.Linq;
 using Component = CycloneDX.Models.Component;
-using static System.Net.Mime.MediaTypeNames;
-using LCT.Services.Interface;
-using LCT.APICommunications.Model.AQL;
 
 namespace LCT.PackageIdentifier
 {

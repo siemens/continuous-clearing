@@ -81,28 +81,27 @@ namespace LCT.PackageIdentifier
         private static void WritecontentsToBOM(CommonAppSettings appSettings, BomKpiData bomKpiData, Bom listOfComponentsToBom)
         {
            
-                WriteContentToComparisonBOM(appSettings, listOfComponentsToBom, ref bomKpiData);
+                WriteContentToCycloneDxBOM(appSettings, listOfComponentsToBom, ref bomKpiData);
        
 
         }
 
-
-
-        private static void WriteContentToComparisonBOM(CommonAppSettings appSettings, Bom listOfComponentsToBom, ref BomKpiData bomKpiData)
+        private static void WriteContentToCycloneDxBOM(CommonAppSettings appSettings, Bom listOfComponentsToBom, ref BomKpiData bomKpiData)
         {
             IFileOperations fileOperations = new FileOperations();
             if (string.IsNullOrEmpty(appSettings.IdentifierBomFilePath))
             {
                 fileOperations.WriteContentToFile(listOfComponentsToBom, appSettings.BomFolderPath,
-                FileConstant.BomFileName, appSettings.SW360ProjectName);
+            FileConstant.BomFileName, appSettings.SW360ProjectName);
             }
             else
             {
                 listOfComponentsToBom = fileOperations.CombineComponentsFromExistingBOM(listOfComponentsToBom, appSettings.IdentifierBomFilePath);
                 bomKpiData.ComponentsInComparisonBOM = listOfComponentsToBom.Components.Count;
                 fileOperations.WriteContentToFile(listOfComponentsToBom, appSettings.BomFolderPath,
-                  FileConstant.BomFileName, appSettings.SW360ProjectName);
+          FileConstant.BomFileName, appSettings.SW360ProjectName);
             }
+
         }
 
         private async Task<Bom> CallPackageParser(CommonAppSettings appSettings)
