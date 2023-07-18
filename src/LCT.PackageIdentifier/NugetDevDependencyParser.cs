@@ -86,7 +86,7 @@ namespace LCT.PackageIdentifier
                 Logger.Warn($"IsTestProject?: Failed to read project file : " + projectPath);
                 return false;
             }
-            catch(ArgumentException ex)
+            catch (ArgumentException ex)
             {
                 Logger.Error($"IsTestProject(): Failed to read project file : " + projectPath, ex);
                 Logger.Warn($"IsTestProject?: Failed to read project file : " + projectPath);
@@ -135,8 +135,13 @@ namespace LCT.PackageIdentifier
             }
             catch (InvalidProjectFileException ex)
             {
-                Logger.Error($"ParseJsonFile():", ex);
-                Logger.Warn($"While parsing project asset file : " + filePath + " Error : " + ex.Message + "\n");
+                Logger.Error($"ParseJsonFile():InvalidProjectFileException : ", ex);
+                Logger.Warn($"InvalidProjectFileException : While parsing project asset file : " + filePath + " Error : " + ex.Message + "\n");
+            }
+            catch (NullReferenceException ex)
+            {
+                Logger.Error($"ParseJsonFile(): NullReferenceException : ", ex);
+                Logger.Warn($"NullReferenceException : While parsing project asset file : " + filePath + " Error : " + ex.Message + "\n");
             }
         }
 
