@@ -45,7 +45,7 @@ namespace LCT.SW360PackageCreator
         {
             bom = cycloneDXBomParser.ParseCycloneDXBom(appSettings.BomFilePath);
             TotalComponentsFromPackageIdentifier = bom != null ? bom.Components.Count : 0;
-            ListofBomComponents = await GetListOfBomData(bom?.Components ?? new List<Component>());
+            ListofBomComponents = await GetListOfBomData(bom?.Components ?? new List<Component>(),appSettings);
 
             // Removing Duplicates
             ListofBomComponents = RemoveDuplicateComponents(ListofBomComponents);
@@ -54,7 +54,7 @@ namespace LCT.SW360PackageCreator
             return comparisonBomData;
         }
 
-        private async Task<List<Components>> GetListOfBomData(List<Component> components)
+        private async Task<List<Components>> GetListOfBomData(List<Component> components, CommonAppSettings appSettings)
         {
             List<Components> lstOfBomDataToBeCompared = new List<Components>();
 
@@ -70,6 +70,10 @@ namespace LCT.SW360PackageCreator
                 if (isInternalComponent )
                 {
                     Logger.Debug($"{item.Name}-{item.Version} found as internal component. ");
+                }
+                else if(componentsData.IsDev=="true" && appSettings.RemoveDevDependency)
+                {
+                    //do nothing
                 }
                 else
                 {
@@ -149,6 +153,10 @@ namespace LCT.SW360PackageCreator
                 if (property.Name?.ToLower() == Dataconstant.Cdx_IsInternal.ToLower())
                 {
                     _ = bool.TryParse(property.Value, out isInternalComponent);
+                }
+                if (property.Name?.ToLower() == Dataconstant.Cdx_IsDevelopment.ToLower())
+                {
+                    componentsData.IsDev = property.Value;
                 }
             }
 

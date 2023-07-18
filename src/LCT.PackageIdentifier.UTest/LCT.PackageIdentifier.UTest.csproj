@@ -74,6 +74,9 @@
     <None Update="PackageIdentifierUTTestFiles\Duplicate_Cyclonedx.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="PackageIdentifierUTTestFiles\package-lock16.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="PackageIdentifierUTTestFiles\POM.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

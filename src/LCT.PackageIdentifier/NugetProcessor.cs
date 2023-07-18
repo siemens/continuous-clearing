@@ -302,13 +302,13 @@ namespace LCT.PackageIdentifier
 
         private static string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
         {
-            string jfrogcomponentName = $"{component.Name}-{component.Version}.tgz";
+            string jfrogcomponentName = $"{component.Name}-{component.Version}.nupkg";
 
             string repoName = aqlResultList.Find(x => x.Name.Equals(
                 jfrogcomponentName, StringComparison.OrdinalIgnoreCase))?.Repo ?? NotFoundInRepo;
 
             string fullName = bomHelper.GetFullNameOfComponent(component);
-            string fullNameVersion = $"{fullName}-{component.Version}.tgz";
+            string fullNameVersion = $"{fullName}-{component.Version}.nupkg";
 
             if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase) &&
                 repoName.Equals(NotFoundInRepo, StringComparison.OrdinalIgnoreCase))
