@@ -6,9 +6,11 @@
 
 using CycloneDX.Models;
 using LCT.APICommunications;
+using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Model;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.PackageIdentifier.Model.NugetModel;
@@ -17,9 +19,11 @@ using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Management.Automation.Language;
 using System.Reflection;
 using System.Security;
 using System.Text.RegularExpressions;
@@ -47,7 +51,10 @@ namespace LCT.PackageIdentifier
             totalComponentsIdentified = listComponentForBOM.Count;
 
             listComponentForBOM = listComponentForBOM.Distinct(new ComponentEqualityComparer()).ToList();
-            BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - listComponentForBOM.Count;
+            if (BomCreator.bomKpiData.DuplicateComponents == 0)
+            {
+                BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - listComponentForBOM.Count;
+            }
 
             var componentsWithMultipleVersions = listComponentForBOM.GroupBy(s => s.Name)
                               .Where(g => g.Count() > 1).SelectMany(g => g).ToList();
@@ -428,8 +435,10 @@ namespace LCT.PackageIdentifier
                 }
             }
 
-            bom.Components = listComponentForBOM;
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = listComponentForBOM.Count;
+            listComponentForBOM = KeepUniqueNonDevComponents(listComponentForBOM);
+            BomCreator.bomKpiData.DevDependentComponents = listComponentForBOM.Count(s => s.Properties[0].Value == "true");
+            bom.Components = listComponentForBOM;
             bom = RemoveExcludedComponents(appSettings, bom);
         }
 
@@ -439,7 +448,7 @@ namespace LCT.PackageIdentifier
             {
                 component.Properties = new List<Property>();
                 Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
-                Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "MANUALLY ADDED" };
+                Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "ManuallyAdded" };
                 component.Properties.Add(isDev);
                 component.Properties.Add(identifierType);
                 listComponentForBOM.Add(component);
@@ -467,12 +476,35 @@ namespace LCT.PackageIdentifier
                     },
                     new Property()
                     {
-                        Name=Dataconstant.Cdx_IdentifierType,Value="DISCOVRED"
+                        Name=Dataconstant.Cdx_IdentifierType,Value="Discovred"
                     }
                 };
-
                 listComponentForBOM.Add(components);
             }
+        }
+
+        private static List<Component> KeepUniqueNonDevComponents(List<Component> listComponentForBOM)
+        {
+            Dictionary<string, Component> keyValuePairs = new Dictionary<string, Component>();
+            foreach (var component in listComponentForBOM)
+            {
+                if (!keyValuePairs.ContainsKey(component.Purl))
+                {
+                    keyValuePairs.Add(component.Purl, component);
+                }
+                else
+                {
+                    if (keyValuePairs[component.Purl].Properties[0].Value == "true" && component.Properties[0].Value == "false")
+                    {
+                        //Already Comp with Development Dependent added as 'true' ,remove that Comp
+                        //& add New Comp as Development Dependent 'false' If case of Duplicate
+                        keyValuePairs.Remove(component.Purl);
+                        keyValuePairs.Add(component.Purl, component);
+                    }
+                }
+            }
+            BomCreator.bomKpiData.DuplicateComponents = listComponentForBOM.Count - keyValuePairs.Values.Count;
+            return keyValuePairs.Values.ToList();
         }
 
         private static void ParseInputFiles(CommonAppSettings appSettings, string filepath, List<NugetPackage> listofComponents)
@@ -612,12 +644,8 @@ namespace LCT.PackageIdentifier
                     {
                         ID = lst.Value.Name,
                         Version = lst.Value.Version,
-                        IsDev = lst.Value.Scope.ToString() == "DevDependency" ? "TRUE" : "FALSE",
+                        IsDev = lst.Value.Scope.ToString() == "DevDependency" ? "true" : "false",
                     });
-
-                    if (lst.Value.Scope.ToString() == "DevDependency")
-                        BomCreator.bomKpiData.DevDependentComponents++;
-
                 }
             }
 

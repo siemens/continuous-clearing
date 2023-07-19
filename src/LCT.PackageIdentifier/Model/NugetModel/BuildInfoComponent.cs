@@ -1,4 +1,10 @@
-﻿using System;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2023 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
@@ -34,8 +40,6 @@ namespace LCT.PackageIdentifier.Model.NugetModel
         public string TypeName { get; }
 
         public abstract string PackageUrl { get; }
-
-        public virtual string BuildInfoId => $"{Name}:{Version}";
 
         public string Md5 { get; set; }
         public string Sha1 { get; set; }
@@ -101,12 +105,6 @@ namespace LCT.PackageIdentifier.Model.NugetModel
             return ancestorsPathList;
         }
 
-        public override string ToString()
-        {
-            return $"{TypeName}, \"{Name}\", \"{Version}\", {Scope}";
-        }
-
-
         public virtual bool Equals(BuildInfoComponent other)
         {
             if (other is null)
@@ -151,46 +149,5 @@ namespace LCT.PackageIdentifier.Model.NugetModel
                            StringComparison.InvariantCultureIgnoreCase);
         }
 
-        public override bool Equals(object obj)
-        {
-            if (obj is null)
-            {
-                return false;
-            }
-
-            if (ReferenceEquals(this, obj))
-            {
-                return true;
-            }
-
-            if (obj.GetType() != GetType())
-            {
-                return false;
-            }
-
-            return Equals((BuildInfoComponent)obj);
-        }
-
-        public override int GetHashCode()
-        {
-            HashCode hashCode = new HashCode();
-            hashCode.Add(Name, StringComparer.InvariantCultureIgnoreCase);
-            hashCode.Add(Version, StringComparer.InvariantCultureIgnoreCase);
-            hashCode.Add((int)Scope);
-            hashCode.Add(Repository, StringComparer.InvariantCultureIgnoreCase);
-            hashCode.Add(RepositoryPath, StringComparer.InvariantCultureIgnoreCase);
-            hashCode.Add(Dependencies);
-            hashCode.Add(Ancestors);
-            hashCode.Add(TypeName, StringComparer.InvariantCultureIgnoreCase);
-            hashCode.Add(PackageUrl, StringComparer.InvariantCultureIgnoreCase);
-            hashCode.Add(Md5, StringComparer.InvariantCultureIgnoreCase);
-            hashCode.Add(Sha1, StringComparer.InvariantCultureIgnoreCase);
-            hashCode.Add(Sha256, StringComparer.InvariantCultureIgnoreCase);
-            return hashCode.ToHashCode();
-        }
-
-        public static bool operator ==(BuildInfoComponent left, BuildInfoComponent right) => Equals(left, right);
-
-        public static bool operator !=(BuildInfoComponent left, BuildInfoComponent right) => !Equals(left, right);
     }
 }

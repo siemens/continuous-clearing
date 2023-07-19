@@ -1,8 +1,13 @@
-﻿using log4net;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2023 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+
+using log4net;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Exceptions;
 using Microsoft.Build.Locator;
-using Microsoft.Extensions.Logging;
 using NuGet.Packaging.Core;
 using NuGet.ProjectModel;
 using System;
@@ -13,7 +18,6 @@ using System.Reflection;
 using System.Security.Cryptography;
 using LCT.PackageIdentifier.Model.NugetModel;
 using System.Text.Json;
-using log4net.Repository.Hierarchy;
 
 namespace LCT.PackageIdentifier
 {
@@ -107,7 +111,6 @@ namespace LCT.PackageIdentifier
             }
             return false;
         }
-
 
         internal void ParseJsonFile(string filePath, Container container)
         {

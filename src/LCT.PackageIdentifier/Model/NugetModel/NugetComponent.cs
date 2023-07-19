@@ -1,4 +1,10 @@
-﻿using PackageUrl;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2023 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// --------------------------------------------------------------------------------------------------------------------
+
+using PackageUrl;
 
 namespace LCT.PackageIdentifier.Model.NugetModel
 {

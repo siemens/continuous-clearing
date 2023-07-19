@@ -1,4 +1,10 @@
-﻿using System.Collections.Generic;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2023 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace LCT.PackageIdentifier.Model.NugetModel
