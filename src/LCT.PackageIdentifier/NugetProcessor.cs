@@ -630,10 +630,10 @@ namespace LCT.PackageIdentifier
         {
             NugetDevDependencyParser nugetDevDependencyParser = NugetDevDependencyParser.Instance;
             List<Container> containers = nugetDevDependencyParser.Parse(configFile);
-            return ConvertContainerAsNugetPackage(containers);
+            return ConvertContainerAsNugetPackage(containers, configFile);
         }
 
-        private static List<NugetPackage> ConvertContainerAsNugetPackage(List<Container> containers)
+        private static List<NugetPackage> ConvertContainerAsNugetPackage(List<Container> containers, string configFile)
         {
             List<NugetPackage> nugetPackages = new List<NugetPackage>();
             foreach (Container containermodule in containers)
@@ -644,6 +644,7 @@ namespace LCT.PackageIdentifier
                     {
                         ID = lst.Value.Name,
                         Version = lst.Value.Version,
+                        Filepath = configFile,
                         IsDev = lst.Value.Scope.ToString() == "DevDependency" ? "true" : "false",
                     });
                 }
