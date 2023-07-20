@@ -352,11 +352,11 @@ namespace LCT.PackageIdentifier
                 if (isTrue)
                 {
                     internalComponents.Add(currentIterationItem);
-                    isInternal.Value = "TRUE";
+                    isInternal.Value = "true";
                 }
                 else
                 {
-                    isInternal.Value = "FALSE";
+                    isInternal.Value = "false";
                 }
 
                 currentIterationItem.Properties.Add(isInternal);
@@ -476,7 +476,7 @@ namespace LCT.PackageIdentifier
                     },
                     new Property()
                     {
-                        Name=Dataconstant.Cdx_IdentifierType,Value="Discovred"
+                        Name=Dataconstant.Cdx_IdentifierType,Value="Discovered"
                     }
                 };
                 listComponentForBOM.Add(components);
