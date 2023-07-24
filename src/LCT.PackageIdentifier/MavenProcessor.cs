@@ -5,6 +5,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using CycloneDX.Models;
+using LCT.APICommunications;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
@@ -28,8 +29,9 @@ namespace LCT.PackageIdentifier
 
         public Bom ParsePackageFile(CommonAppSettings appSettings)
         {
-            List<Component> componentsForBOM = new();
-            Bom bom = new();
+            List<Component> componentsForBOM = new ();
+            Bom bom = new ();
+            List<Dependency> dependenciesForBOM = new ();
             List<string> configFiles;
             if (string.IsNullOrEmpty(appSettings.CycloneDxBomFilePath))
             {
@@ -44,6 +46,10 @@ namespace LCT.PackageIdentifier
             {
                 Bom bomList = ParseCycloneDXBom(filepath);
                 componentsForBOM.AddRange(bomList.Components);
+                if (bomList.Dependencies!=null)
+                {                   
+                    dependenciesForBOM.AddRange(bomList.Dependencies);
+                }
             }
             foreach (var component in componentsForBOM)
             {
@@ -55,6 +61,7 @@ namespace LCT.PackageIdentifier
 
             }
             bom.Components = componentsForBOM;
+            bom.Dependencies = dependenciesForBOM;
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = bom.Components.Count;
             BomCreator.bomKpiData.ComponentsInComparisonBOM = bom.Components.Count;
             Logger.Debug($"ParsePackageFile():End");
@@ -134,6 +141,7 @@ namespace LCT.PackageIdentifier
             return componentData;
         }
 
+       
         private static bool IsInternalMavenComponent(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
         {
             string jfrogcomponentName = $"{component.Name}-{component.Version}";
