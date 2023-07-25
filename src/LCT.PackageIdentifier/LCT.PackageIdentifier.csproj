@@ -18,7 +18,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="log4net" Version="2.0.15" />
-		<PackageReference Include="Microsoft.Build" Version="17.6.3" ExcludeAssets="runtime" />
+		<PackageReference Include="Microsoft.Build" Version="17.3.2" ExcludeAssets="runtime" />
 		<PackageReference Include="Microsoft.Build.Locator" Version="1.5.5" />
 		<PackageReference Include="Microsoft.CodeCoverage" Version="17.1.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
