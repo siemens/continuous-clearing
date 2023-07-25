@@ -80,20 +80,20 @@ namespace LCT.PackageIdentifier
             }
             catch (InvalidProjectFileException ex)
             {
-                Logger.Error($"IsTestProject(): Failed to read project file : " + projectPath, ex);
-                Logger.Warn($"IsTestProject?: Failed to read project file : " + projectPath);
+                Logger.Debug($"IsTestProject(): Failed to read project file : " + projectPath, ex);
+                Logger.Warn($"IsTestProject: Failed to read project file : " + projectPath);
                 return false;
             }
             catch (MissingFieldException ex)
             {
-                Logger.Error($"IsTestProject(): Failed to read project file : " + projectPath, ex);
-                Logger.Warn($"IsTestProject?: Failed to read project file : " + projectPath);
+                Logger.Debug($"IsTestProject(): Failed to read project file : " + projectPath, ex);
+                Logger.Warn($"IsTestProject: Failed to read project file : " + projectPath);
                 return false;
             }
             catch (ArgumentException ex)
             {
-                Logger.Error($"IsTestProject(): Failed to read project file : " + projectPath, ex);
-                Logger.Warn($"IsTestProject?: Failed to read project file : " + projectPath);
+                Logger.Debug($"IsTestProject(): Failed to read project file : " + projectPath, ex);
+                Logger.Warn($"IsTestProject: Failed to read project file : " + projectPath);
                 return false;
             }
 
