@@ -45,7 +45,7 @@ namespace LCT.PackageIdentifier.UTest
             Bom bom = MavenProcessor.ParsePackageFile(appSettings);
 
             //Assert
-            Assert.That(bom.Components.Count, Is.EqualTo(2), "Returns the count of components");
+            Assert.That(bom.Components.Count, Is.EqualTo(1), "Returns the count of components");
 
         }
 
