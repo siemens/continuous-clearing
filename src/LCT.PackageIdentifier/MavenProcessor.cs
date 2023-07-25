@@ -32,7 +32,7 @@ namespace LCT.PackageIdentifier
             List<Component> componentsForBOM = new();
             List<Component> componentsToBOM = new();
             Bom bom = new();
-            int totalComponentsIdentified = 0;
+
             List<string> configFiles;
             if (string.IsNullOrEmpty(appSettings.CycloneDxBomFilePath))
             {
@@ -49,13 +49,14 @@ namespace LCT.PackageIdentifier
                 Bom bomList = ParseCycloneDXBom(filepath);
                 DevDependencyIdentification( componentsForBOM, bomList,ref componentsToBOM);
                 componentsForBOM.AddRange(bomList.Components);
+                SetPropertiesforBOM(componentsForBOM, componentsToBOM);
 
             }
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = componentsForBOM.Count;
 
-            totalComponentsIdentified = componentsForBOM.Count;
+            int totalComponentsIdentified = componentsForBOM.Count;
 
-            //Removing if there are any other duplicates
+            //Removing if there are any other duplicates           
             componentsForBOM = componentsToBOM.Distinct(new ComponentEqualityComparer()).ToList();
 
             BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - componentsForBOM.Count;
@@ -66,6 +67,18 @@ namespace LCT.PackageIdentifier
             BomCreator.bomKpiData.ComponentsInComparisonBOM = bom.Components.Count;
             Logger.Debug($"ParsePackageFile():End");
             return bom;
+        }
+
+        private void SetPropertiesforBOM(List<Component> componentsForBOM, List<Component> componentsToBOM)
+        {
+            if (componentsToBOM.Count == 0&& componentsForBOM.Count!=0)
+            {
+                foreach (var entry in componentsForBOM)
+                {
+                    SetPropertiesforBOM(ref componentsToBOM, entry, "false");
+                }
+            }
+          
         }
 
         private static void SetPropertiesforBOM(ref List<Component> componentsToBOM, Component component, string devValue)
@@ -119,7 +132,7 @@ namespace LCT.PackageIdentifier
             }
             else
             {
-               //do nothing
+             //do nothing
             }
 
         }
