@@ -31,6 +31,7 @@ namespace LCT.PackageIdentifier
         {
             List<Component> componentsForBOM = new();
             List<Component> componentsToBOM = new();
+            List<Component> ListOfComponents = new();
             Bom bom = new();
 
             List<string> configFiles;
@@ -43,21 +44,30 @@ namespace LCT.PackageIdentifier
                 configFiles = FolderScanner.FileScanner(appSettings.CycloneDxBomFilePath, appSettings.Maven);
             }
 
-
             foreach (string filepath in configFiles)
             {
                 Bom bomList = ParseCycloneDXBom(filepath);
-                DevDependencyIdentification( componentsForBOM, bomList,ref componentsToBOM);
-                componentsForBOM.AddRange(bomList.Components);
-                SetPropertiesforBOM(componentsForBOM, componentsToBOM);
+                if (componentsForBOM.Count == 0)
+                {
+                    componentsForBOM.AddRange(bomList?.Components);
+                }
+                else
+                {
+                    componentsToBOM.AddRange(bomList?.Components);
+                }
 
             }
-            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = componentsForBOM.Count;
 
-            int totalComponentsIdentified = componentsForBOM.Count;
+            //checking Dev dependency
+            DevDependencyIdentificationLogic(componentsForBOM, componentsToBOM, ref ListOfComponents);
+
+
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = componentsForBOM.Count + componentsToBOM.Count;
+
+            int totalComponentsIdentified = BomCreator.bomKpiData.ComponentsinPackageLockJsonFile;
 
             //Removing if there are any other duplicates           
-            componentsForBOM = componentsToBOM.Distinct(new ComponentEqualityComparer()).ToList();
+            componentsForBOM = ListOfComponents.Distinct(new ComponentEqualityComparer()).ToList();
 
             BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - componentsForBOM.Count;
 
@@ -69,31 +79,53 @@ namespace LCT.PackageIdentifier
             return bom;
         }
 
-        private void SetPropertiesforBOM(List<Component> componentsForBOM, List<Component> componentsToBOM)
+        public void DevDependencyIdentificationLogic(List<Component> componentsForBOM, List<Component> componentsToBOM, ref List<Component> ListOfComponents)
         {
-            if (componentsToBOM.Count == 0&& componentsForBOM.Count!=0)
+                       
+            List<Component> iterateBOM = componentsForBOM.Count > componentsToBOM.Count ? componentsForBOM : componentsToBOM;
+            List<Component> checkBOM = componentsForBOM.Count < componentsToBOM.Count ? componentsForBOM : componentsToBOM;
+
+      
+            ListOfComponents = DevdependencyIdentification(ListOfComponents, iterateBOM, checkBOM);
+
+        }
+
+        private static List<Component> DevdependencyIdentification(List<Component> ListOfComponents, List<Component> iterateBOM, List<Component> checkBOM)
+        {
+            foreach (var item in iterateBOM)
             {
-                foreach (var entry in componentsForBOM)
+                if (checkBOM.Count == 0)
                 {
-                    SetPropertiesforBOM(ref componentsToBOM, entry, "false");
+                    SetPropertiesforBOM(ref ListOfComponents, item, "false");
+                }
+                else if (checkBOM.Exists(x => x.Name == item.Name && x.Version == item.Version))
+                {
+                    SetPropertiesforBOM(ref ListOfComponents, item, "false");
+                }
+                else
+                {
+                    SetPropertiesforBOM(ref ListOfComponents, item, "true");
+
+                    BomCreator.bomKpiData.DevDependentComponents++;
                 }
             }
-          
+
+            return ListOfComponents;
         }
 
         private static void SetPropertiesforBOM(ref List<Component> componentsToBOM, Component component, string devValue)
         {
-        
-                component.Properties = new List<Property>();
-                Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = devValue };
-                Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "Discovered" };
-                component.Properties.Add(isDev);
-                component.Properties.Add(identifierType);
-                componentsToBOM.Add(component);
-      
+
+            component.Properties = new List<Property>();
+            Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = devValue };
+            Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "Discovered" };
+            component.Properties.Add(isDev);
+            component.Properties.Add(identifierType);
+            componentsToBOM.Add(component);
+
         }
 
-        private static void DevDependencyIdentification( List<Component> componentsForBOM, Bom bomList,ref List<Component> componentsToBOM)
+        private static void DevDependencyIdentification(List<Component> componentsForBOM, Bom bomList, ref List<Component> componentsToBOM)
         {
             List<Component> componentList = bomList.Components;
 
@@ -121,10 +153,13 @@ namespace LCT.PackageIdentifier
                     if (componentsForBOM.Exists(x => x.Name == entry.Name))
                     {
                         SetPropertiesforBOM(ref componentsToBOM, entry, "false");
+
+
                     }
                     else
                     {
                         SetPropertiesforBOM(ref componentsToBOM, entry, "true");
+
 
                         BomCreator.bomKpiData.DevDependentComponents++;
                     }
@@ -132,7 +167,7 @@ namespace LCT.PackageIdentifier
             }
             else
             {
-             //do nothing
+                //do nothing
             }
 
         }

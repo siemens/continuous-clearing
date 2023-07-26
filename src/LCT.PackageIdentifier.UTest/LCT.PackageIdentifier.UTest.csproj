@@ -74,6 +74,21 @@
     <None Update="PackageIdentifierUTTestFiles\Duplicate_Cyclonedx.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="PackageIdentifierUTTestFiles\MavenDevDependency\bom-without.cdx.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\MavenDevDependency\bom.cdx.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\MavenDevDependency\WithDev\bom-without.cdx.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\MavenDevDependency\WithDev\bom.cdx.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\MavenDevDependency\WithOneInputFile\bom-without.cdx.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="PackageIdentifierUTTestFiles\package-lock16.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
