@@ -33,7 +33,7 @@ namespace LCT.PackageIdentifier
             List<Component> componentsToBOM = new();
             List<Component> ListOfComponents = new();
             Bom bom = new();
-
+            List<Dependency> dependenciesForBOM = new();
             List<string> configFiles;
             if (string.IsNullOrEmpty(appSettings.CycloneDxBomFilePath))
             {
@@ -56,6 +56,10 @@ namespace LCT.PackageIdentifier
                     componentsToBOM.AddRange(bomList?.Components);
                 }
 
+                if (bomList.Dependencies != null)
+                {
+                    dependenciesForBOM.AddRange(bomList.Dependencies);
+                }
             }
 
             //checking Dev dependency
@@ -73,7 +77,8 @@ namespace LCT.PackageIdentifier
 
 
             bom.Components = componentsForBOM;
-
+            bom.Dependencies = dependenciesForBOM;
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = bom.Components.Count;
             BomCreator.bomKpiData.ComponentsInComparisonBOM = bom.Components.Count;
             Logger.Debug($"ParsePackageFile():End");
             return bom;
