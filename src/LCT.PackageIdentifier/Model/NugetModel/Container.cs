@@ -25,7 +25,7 @@ namespace LCT.PackageIdentifier.Model.NugetModel
     {
         public IDictionary<string, BuildInfoComponent> Components { get; set; } = new Dictionary<string, BuildInfoComponent>();
 
-        public string? Name { get; set; }
+        public string Name { get; set; }
 
         public ContainerType Type { get; set; }
 

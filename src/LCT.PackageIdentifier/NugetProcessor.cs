@@ -16,8 +16,10 @@ using LCT.PackageIdentifier.Model;
 using LCT.PackageIdentifier.Model.NugetModel;
 using LCT.Services.Interface;
 using log4net;
+using Microsoft.Build.Locator;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NuGet.ProjectModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -652,6 +654,7 @@ namespace LCT.PackageIdentifier
 
             return nugetPackages;
         }
+
         #endregion
     }
 }

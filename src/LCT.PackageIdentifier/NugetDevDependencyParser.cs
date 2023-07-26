@@ -138,12 +138,12 @@ namespace LCT.PackageIdentifier
             }
             catch (InvalidProjectFileException ex)
             {
-                Logger.Error($"ParseJsonFile():InvalidProjectFileException : ", ex);
+                Logger.Debug($"ParseJsonFile():InvalidProjectFileException : ", ex);
                 Logger.Warn($"InvalidProjectFileException : While parsing project asset file : " + filePath + " Error : " + ex.Message + "\n");
             }
             catch (NullReferenceException ex)
             {
-                Logger.Error($"ParseJsonFile(): NullReferenceException : ", ex);
+                Logger.Debug($"ParseJsonFile(): NullReferenceException : ", ex);
                 Logger.Warn($"NullReferenceException : While parsing project asset file : " + filePath + " Error : " + ex.Message + "\n");
             }
         }
@@ -162,7 +162,7 @@ namespace LCT.PackageIdentifier
                 Scope = isTestProject || IsDevDependecy(library) ? ComponentScope.DevDependency : ComponentScope.Required
             };
 
-            if (components.TryGetValue(component.Id, out BuildInfoComponent? existingComponent))
+            if (components.TryGetValue(component.Id, out BuildInfoComponent existingComponent))
             {
                 component = (NuGetComponent)existingComponent;
             }
@@ -190,7 +190,7 @@ namespace LCT.PackageIdentifier
                     Scope = component.Scope
                 };
 
-                bool exists = components.TryGetValue(depPackage.Id, out BuildInfoComponent? existingDependency);
+                bool exists = components.TryGetValue(depPackage.Id, out BuildInfoComponent existingDependency);
                 if (exists)
                 {
                     depPackage = (existingDependency as NuGetComponent)!;
@@ -261,7 +261,7 @@ namespace LCT.PackageIdentifier
             nuGetComponent.Sha256 = GetFileHash(filePath, SHA256.Create());
         }
 
-        internal static string? GetFileHash(string path, HashAlgorithm hashAlgorithm)
+        internal static string GetFileHash(string path, HashAlgorithm hashAlgorithm)
         {
             if (!File.Exists(path)) return null;
 
