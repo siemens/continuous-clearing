@@ -213,7 +213,7 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "siparty-release-npm-egll", "org1-npmjs-npm-remote-cache" };
             CommonAppSettings appSettings = new();
-            appSettings.Maven = new Common.Model.Config() { JfrogMavenRepoList = reooListArr };
+            appSettings.Maven = new Config() { JfrogMavenRepoList = reooListArr };
             AqlResult aqlResult = new()
             {
                 Name = "animations-common-1.0.0.tgz",

@@ -47,6 +47,7 @@ namespace LCT.PackageIdentifier
             foreach (string filepath in configFiles)
             {
                 Bom bomList = ParseCycloneDXBom(filepath);
+            
                 if (componentsForBOM.Count == 0)
                 {
                     componentsForBOM.AddRange(bomList?.Components);
@@ -99,15 +100,16 @@ namespace LCT.PackageIdentifier
         {
             foreach (var item in iterateBOM)
             {
+                //check to see if the second list is empty(which means customer has only provided one bom file)no dev dependency will be identified here
                 if (checkBOM.Count == 0)
                 {
                     SetPropertiesforBOM(ref ListOfComponents, item, "false");
                 }
-                else if (checkBOM.Exists(x => x.Name == item.Name && x.Version == item.Version))
+                else if (checkBOM.Exists(x => x.Name == item.Name && x.Version == item.Version)) //check t see if both list has common elements
                 {
                     SetPropertiesforBOM(ref ListOfComponents, item, "false");
                 }
-                else
+                else //incase one list has a component not present in another then it will be marked as Dev
                 {
                     SetPropertiesforBOM(ref ListOfComponents, item, "true");
 
