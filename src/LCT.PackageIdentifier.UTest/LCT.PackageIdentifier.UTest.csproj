@@ -50,6 +50,90 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>-->
+  <ItemGroup>
+    <ProjectReference Include="..\LCT.PackageIdentifier\LCT.PackageIdentifier.csproj" />
+    <ProjectReference Include="..\UnitTestUtilities\UnitTestUtilities.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="PackageIdentifierUTTestFiles\CycloneDX2_Python.cdx.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\Cyclonedx_Debian.cdx.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\Cyclonedx2_Debian.cdx.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\CycloneDX2_NPM.cdx.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\CycloneDX_NPM.cdx.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\CycloneDX_Python.cdx.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\Duplicate_Cyclonedx.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\MavenDevDependency\bom-without.cdx.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\MavenDevDependency\bom.cdx.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\MavenDevDependency\WithDev\bom-without.cdx.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\MavenDevDependency\WithDev\bom.cdx.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\MavenDevDependency\WithOneInputFile\bom-without.cdx.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\package-lock16.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\POM.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\project.assets.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\SourceDetails_Cyclonedx.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\TestDir\DupDir\package-lock.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\TestDir\DupDir\package.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\packages.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\packages.lock.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\TestDir\package-lock.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\TestDir\package.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\TestDir\SubDir\package-lock.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\TestDir\SubDir\package.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+	  <None Update="PackageIdentifierUTTestFiles\Cyclonedx_Maven.cdx.json">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="PackageIdentifierUTTestFiles\Cyclonedx2_Maven.cdx.json">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+  </ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\LCT.PackageIdentifier\LCT.PackageIdentifier.csproj" />
 		<ProjectReference Include="..\UnitTestUtilities\UnitTestUtilities.csproj" />

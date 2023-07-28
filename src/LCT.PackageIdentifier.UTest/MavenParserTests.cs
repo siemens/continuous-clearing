@@ -45,7 +45,7 @@ namespace LCT.PackageIdentifier.UTest
             Bom bom = MavenProcessor.ParsePackageFile(appSettings);
 
             //Assert
-            Assert.That(bom.Components.Count, Is.EqualTo(2), "Returns the count of components");
+            Assert.That(bom.Components.Count, Is.EqualTo(1), "Returns the count of components");
             Assert.That(bom.Dependencies.Count, Is.EqualTo(4), "Returns the count of dependencies");
 
         }
@@ -175,7 +175,7 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "siparty-release-maven-egll", "org1-bintray-maven-remote-cache" };
             CommonAppSettings appSettings = new();
-            appSettings.Maven = new Common.Model.Config() { JfrogMavenRepoList = reooListArr };
+            appSettings.Maven = new Config() { JfrogMavenRepoList = reooListArr };
             AqlResult aqlResult = new()
             {
                 Name = "junit-junit-1.0.0.tgz",
@@ -214,7 +214,7 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "siparty-release-maven-egll", "org1-bintray-maven-remote-cache" };
             CommonAppSettings appSettings = new();
-            appSettings.Maven = new Common.Model.Config() { JfrogMavenRepoList = reooListArr };
+            appSettings.Maven = new Config() { JfrogMavenRepoList = reooListArr };
             AqlResult aqlResult = new()
             {
                 Name = "junit-junit-1.0.0.tgz",
@@ -238,5 +238,61 @@ namespace LCT.PackageIdentifier.UTest
             // Assert
             Assert.That(actual, Is.Not.Null);
         }
+
+        [Test]
+        public void DevDependencyIdentificationLogic_ReturnsCountOfDevDependentcomponents_SuccessFully()
+        {
+            //Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string filepath = outFolder + @"\PackageIdentifierUTTestFiles\MavenDevDependency";
+            string[] Includes = { "*.cdx.json" };
+            string[] Excludes = { "lol" };
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                PackageFilePath = filepath,
+                ProjectType = "MAVEN",
+                RemoveDevDependency = true,
+                Maven = new Config() { Include = Includes, Exclude = Excludes }
+            };
+
+            MavenProcessor MavenProcessor = new MavenProcessor();
+
+            //Act
+            Bom bom = MavenProcessor.ParsePackageFile(appSettings);
+
+            //Assert
+            Assert.That(BomCreator.bomKpiData.DevDependentComponents, Is.EqualTo(6), "Returns the count of components");
+
+        }
+        [Test]
+        public void DevDependencyIdentificationLogic_ReturnsCountOfComponents_WithoutDevdependency()
+        {
+            //Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string filepath = outFolder + @"\PackageIdentifierUTTestFiles\MavenDevDependency\WithOneInputFile";
+            string[] Includes = { "*.cdx.json" };
+            string[] Excludes = { "lol" };
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                PackageFilePath = filepath,
+                ProjectType = "MAVEN",
+                RemoveDevDependency = true,
+                Maven = new Config() { Include = Includes, Exclude = Excludes }
+            };
+
+            MavenProcessor MavenProcessor = new MavenProcessor();
+
+            //Act
+            Bom bom = MavenProcessor.ParsePackageFile(appSettings);
+
+            //Assert
+            Assert.That(BomCreator.bomKpiData.DevDependentComponents, Is.EqualTo(0), "Returns the count of components");
+
+        }
+
     }
 }

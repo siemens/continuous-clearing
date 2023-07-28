@@ -14,7 +14,6 @@ using LCT.Services.Interface;
 using log4net;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -26,39 +25,58 @@ namespace LCT.PackageIdentifier
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
 
+
+
         public Bom ParsePackageFile(CommonAppSettings appSettings)
         {
             List<Component> componentsForBOM = new();
+            List<Component> componentsToBOM = new();
+            List<Component> ListOfComponents = new();
             Bom bom = new();
             List<Dependency> dependenciesForBOM = new();
             List<string> configFiles;
             if (string.IsNullOrEmpty(appSettings.CycloneDxBomFilePath))
             {
-              configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Maven);
+                configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Maven);
             }
             else
             {
-               configFiles = FolderScanner.FileScanner(appSettings.CycloneDxBomFilePath, appSettings.Maven);
+                configFiles = FolderScanner.FileScanner(appSettings.CycloneDxBomFilePath, appSettings.Maven);
             }
-            
+
             foreach (string filepath in configFiles)
             {
                 Bom bomList = ParseCycloneDXBom(filepath);
-                componentsForBOM.AddRange(bomList.Components);
+            
+                if (componentsForBOM.Count == 0)
+                {
+                    componentsForBOM.AddRange(bomList?.Components);
+                }
+                else
+                {
+                    componentsToBOM.AddRange(bomList?.Components);
+                }
+
                 if (bomList.Dependencies != null)
                 {
                     dependenciesForBOM.AddRange(bomList.Dependencies);
                 }
             }
-            foreach (var component in componentsForBOM)
-            {
-                component.Properties = new List<Property>();
-                Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
-                Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "Manually" };
-                component.Properties.Add(isDev);
-                component.Properties.Add(identifierType);
 
-            }
+            //checking Dev dependency
+            DevDependencyIdentificationLogic(componentsForBOM, componentsToBOM, ref ListOfComponents);
+
+
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = componentsForBOM.Count + componentsToBOM.Count;
+
+            int totalComponentsIdentified = BomCreator.bomKpiData.ComponentsinPackageLockJsonFile;
+
+            //Removing if there are any other duplicates           
+            componentsForBOM = ListOfComponents.Distinct(new ComponentEqualityComparer()).ToList();
+
+            BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - componentsForBOM.Count;
+
+
             bom.Components = componentsForBOM;
             bom.Dependencies = dependenciesForBOM;
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = bom.Components.Count;
@@ -66,6 +84,101 @@ namespace LCT.PackageIdentifier
             Logger.Debug($"ParsePackageFile():End");
             return bom;
         }
+
+        public static void DevDependencyIdentificationLogic(List<Component> componentsForBOM, List<Component> componentsToBOM, ref List<Component> ListOfComponents)
+        {
+                       
+            List<Component> iterateBOM = componentsForBOM.Count > componentsToBOM.Count ? componentsForBOM : componentsToBOM;
+            List<Component> checkBOM = componentsForBOM.Count < componentsToBOM.Count ? componentsForBOM : componentsToBOM;
+
+      
+            ListOfComponents = DevdependencyIdentification(ListOfComponents, iterateBOM, checkBOM);
+
+        }
+
+        private static List<Component> DevdependencyIdentification(List<Component> ListOfComponents, List<Component> iterateBOM, List<Component> checkBOM)
+        {
+            foreach (var item in iterateBOM)
+            {
+                //check to see if the second list is empty(which means customer has only provided one bom file)no dev dependency will be identified here
+                if (checkBOM.Count == 0)
+                {
+                    SetPropertiesforBOM(ref ListOfComponents, item, "false");
+                }
+                else if (checkBOM.Exists(x => x.Name == item.Name && x.Version == item.Version)) //check t see if both list has common elements
+                {
+                    SetPropertiesforBOM(ref ListOfComponents, item, "false");
+                }
+                else //incase one list has a component not present in another then it will be marked as Dev
+                {
+                    SetPropertiesforBOM(ref ListOfComponents, item, "true");
+
+                    BomCreator.bomKpiData.DevDependentComponents++;
+                }
+            }
+
+            return ListOfComponents;
+        }
+
+        private static void SetPropertiesforBOM(ref List<Component> componentsToBOM, Component component, string devValue)
+        {
+
+            component.Properties = new List<Property>();
+            Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = devValue };
+            Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "Discovered" };
+            component.Properties.Add(isDev);
+            component.Properties.Add(identifierType);
+            componentsToBOM.Add(component);
+
+        }
+
+        private static void DevDependencyIdentification(List<Component> componentsForBOM, Bom bomList, ref List<Component> componentsToBOM)
+        {
+            List<Component> componentList = bomList.Components;
+
+            if (componentsForBOM?.Count >= componentList?.Count && componentsForBOM.Count != 0)
+            {
+                foreach (var entry in componentsForBOM)
+                {
+                    if (componentList.Exists(x => x.Name == entry.Name))
+                    {
+                        SetPropertiesforBOM(ref componentsToBOM, entry, "false");
+                    }
+                    else
+                    {
+                        SetPropertiesforBOM(ref componentsToBOM, entry, "true");
+
+                        BomCreator.bomKpiData.DevDependentComponents++;
+                    }
+                }
+            }
+            else if (componentsForBOM?.Count <= componentList?.Count && componentsForBOM.Count != 0)
+            {
+                foreach (var entry in componentList)
+                {
+
+                    if (componentsForBOM.Exists(x => x.Name == entry.Name))
+                    {
+                        SetPropertiesforBOM(ref componentsToBOM, entry, "false");
+
+
+                    }
+                    else
+                    {
+                        SetPropertiesforBOM(ref componentsToBOM, entry, "true");
+
+
+                        BomCreator.bomKpiData.DevDependentComponents++;
+                    }
+                }
+            }
+            else
+            {
+                //do nothing
+            }
+
+        }
+
 
         public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM, CommonAppSettings appSettings,
                                                           IJFrogService jFrogService,
@@ -82,7 +195,6 @@ namespace LCT.PackageIdentifier
                 string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper);
                 Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoUrl, Value = repoName };
                 Component componentVal = component;
-
                 if (componentVal.Properties?.Count == null || componentVal.Properties?.Count <= 0)
                 {
                     componentVal.Properties = new List<Property>();
