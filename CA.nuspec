@@ -121,7 +121,6 @@
     <file src="out\net6.0\NuGet.Protocol.dll" target="tools"/>
     <file src="out\net6.0\NuGet.Versioning.dll" target="tools"/>
     <file src="out\net6.0\NuGet.Resolver.dll" target="tools"/>
-    <file src="out\net6.0\System.Security.Cryptography.Pkcs.dll" target="tools"/>
     <file src="out\net6.0\runtimes\linux-arm\native\libpsl-native.so" target="tools\runtimes\linux-arm\native"/>
     <file src="out\net6.0\runtimes\linux-arm64\native\libpsl-native.so" target="tools\runtimes\linux-arm64\native"/>
     <file src="out\net6.0\runtimes\linux-musl-x64\native\libpsl-native.so" target="tools\runtimes\linux-musl-x64\native"/>
