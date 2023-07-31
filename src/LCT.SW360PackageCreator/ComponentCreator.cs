@@ -165,7 +165,7 @@ namespace LCT.SW360PackageCreator
 
         private static string GetPackageName(Component item)
         {
-            if (!string.IsNullOrEmpty(item.Group) && !item.Purl.Contains(Dataconstant.MavenPackage))
+            if (!string.IsNullOrEmpty(item.Group) && !item.Purl.Contains(Dataconstant.PurlCheck()["MAVEN"]))
             {
                 return $"{item.Group}/{item.Name}";
             }
@@ -296,7 +296,7 @@ namespace LCT.SW360PackageCreator
                 Logger.Logger.Log(null, Level.Notice, $"Creating the Component & Release : Name - {item.Name} , version - {item.Version}", null);
                 var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(item);
 
-                if (item.ReleaseExternalId.Contains(Dataconstant.DebianPackage) && !attachmentUrlList.ContainsKey("SOURCE"))
+                if (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]) && !attachmentUrlList.ContainsKey("SOURCE"))
                 {
                     item.DownloadUrl = Dataconstant.DownloadUrlNotFound;
                     UpdatedCompareBomData.Add(item);
@@ -369,7 +369,7 @@ namespace LCT.SW360PackageCreator
                 Logger.Logger.Log(null, Level.Notice, $"Creating Release : Name - {item.Name} , version - {item.Version}", null);
                 var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(item);
 
-                if (item.ReleaseExternalId.Contains(Dataconstant.DebianPackage) && !attachmentUrlList.ContainsKey("SOURCE"))
+                if (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]) && !attachmentUrlList.ContainsKey("SOURCE"))
                 {
                     item.DownloadUrl = Dataconstant.DownloadUrlNotFound;
                     UpdatedCompareBomData.Add(item);

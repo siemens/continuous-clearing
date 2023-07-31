@@ -49,6 +49,8 @@ namespace LCT.PackageIdentifier
                 {CommonHelper.Convert(bomKpiData,nameof(bomKpiData.ComponentsExcluded)),bomKpiData.ComponentsExcluded},
                 {CommonHelper.Convert(bomKpiData,nameof(bomKpiData.DuplicateComponents)),bomKpiData.DuplicateComponents},
                 {CommonHelper.Convert(bomKpiData,nameof(bomKpiData.InternalComponents)),bomKpiData.InternalComponents},
+                {CommonHelper.Convert(bomKpiData,nameof(bomKpiData.ComponentsinSBOMTemplateFile)),bomKpiData.ComponentsinSBOMTemplateFile},
+                {CommonHelper.Convert(bomKpiData,nameof(bomKpiData.ComponentsUpdatedFromSBOMTemplateFile)),bomKpiData.ComponentsUpdatedFromSBOMTemplateFile},
                 {CommonHelper.Convert(bomKpiData,nameof(bomKpiData.ComponentsInComparisonBOM)),bomKpiData.ComponentsInComparisonBOM }
             };
 

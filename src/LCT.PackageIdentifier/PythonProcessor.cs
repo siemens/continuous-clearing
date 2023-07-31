@@ -34,6 +34,12 @@ namespace LCT.PackageIdentifier
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
 
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        readonly CycloneDXBomParser cycloneDXBomParser;
+
+        public PythonProcessor()
+        {
+            cycloneDXBomParser = new CycloneDXBomParser();
+        }
 
         public async Task<List<Component>> CheckInternalComponentsInJfrogArtifactory(CommonAppSettings appSettings, ArtifactoryCredentials artifactoryUpload, Component component, string repo)
         {
@@ -108,8 +114,14 @@ namespace LCT.PackageIdentifier
                 }
                 else if (config.EndsWith(FileConstant.CycloneDXFileExtension))
                 {
-                    listofComponents.AddRange(ExtractDetailsFromJson(config));
+                    listofComponents.AddRange(ExtractDetailsFromJson(config, appSettings));
                 }
+            }
+
+            Bom sbomdDetails = new Bom();
+            if (File.Exists(appSettings.CycloneDxSBomTemplatePath))
+            {
+                sbomdDetails = cycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
             }
 
             int initialCount = listofComponents.Count;
@@ -117,7 +129,10 @@ namespace LCT.PackageIdentifier
             listComponentForBOM = FormComponentReleaseExternalID(listofComponents);
             BomCreator.bomKpiData.DuplicateComponents = initialCount - listComponentForBOM.Count;
             BomCreator.bomKpiData.ComponentsInComparisonBOM = listComponentForBOM.Count;
+
             bom.Components = listComponentForBOM;
+            //Adding Template Component Details & MetaData
+            SbomTemplate.AddComponentDetails(bom.Components, sbomdDetails);
             bom = RemoveExcludedComponents(appSettings, bom);
             return bom;
         }
@@ -131,44 +146,75 @@ namespace LCT.PackageIdentifier
             return PythonPackages;
         }
 
-        private static List<PythonPackage> ExtractDetailsFromJson(string filePath)
+        //private static List<PythonPackage> ExtractDetailsFromJson(string filePath)
+        //{
+        //    List<PythonPackage> PythonPackages = new List<PythonPackage>();
+        //    Model.CycloneDxBomData cycloneDxBomData;
+        //    string json = File.ReadAllText(filePath);
+        //    cycloneDxBomData = JsonConvert.DeserializeObject<CycloneDxBomData>(json);
+
+        //    if (cycloneDxBomData != null && cycloneDxBomData.ComponentsInfo != null)
+        //    {
+        //        foreach (var componentsInfo in cycloneDxBomData.ComponentsInfo)
+        //        {
+        //            if (componentsInfo.Type == "library")
+        //            {
+        //                BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;
+        //                PythonPackage package = new PythonPackage
+        //                {
+        //                    Name = componentsInfo.Name,
+        //                    Version = componentsInfo.Version,
+        //                    PurlID = componentsInfo.ReleaseExternalId,
+        //                };
+
+        //                if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.ReleaseExternalId) && componentsInfo.ReleaseExternalId.Contains(Dataconstant.PythonPackage))
+        //                {
+        //                    BomCreator.bomKpiData.DebianComponents++;
+        //                    PythonPackages.Add(package);
+        //                    Logger.Debug($"ExtractDetailsFromJson():ValidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
+        //                }
+        //                else
+        //                {
+        //                    BomCreator.bomKpiData.ComponentsExcluded++;
+        //                    Logger.Debug($"ExtractDetailsFromJson():InvalidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
+        //                }
+        //            }
+        //        }
+        //    }
+        //    else
+        //    {
+        //        Logger.Debug($"ExtractDetailsFromJson():NoComponenstFound!!");
+        //    }
+        //    return PythonPackages;
+        //}
+
+        private List<PythonPackage> ExtractDetailsFromJson(string filePath, CommonAppSettings appSettings)
         {
             List<PythonPackage> PythonPackages = new List<PythonPackage>();
-            Model.CycloneDxBomData cycloneDxBomData;
-            string json = File.ReadAllText(filePath);
-            cycloneDxBomData = JsonConvert.DeserializeObject<CycloneDxBomData>(json);
+            Bom bom = cycloneDXBomParser.ParseCycloneDXBom(filePath);
+            cycloneDXBomParser.CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
 
-            if (cycloneDxBomData != null && cycloneDxBomData.ComponentsInfo != null)
+            foreach (var componentsInfo in bom.Components)
             {
-                foreach (var componentsInfo in cycloneDxBomData.ComponentsInfo)
+                BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;
+                PythonPackage package = new PythonPackage
                 {
-                    if (componentsInfo.Type == "library")
-                    {
-                        BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;
-                        PythonPackage package = new PythonPackage
-                        {
-                            Name = componentsInfo.Name,
-                            Version = componentsInfo.Version,
-                            PurlID = componentsInfo.ReleaseExternalId,
-                        };
+                    Name = componentsInfo.Name,
+                    Version = componentsInfo.Version,
+                    PurlID = componentsInfo.Purl,
+                };
 
-                        if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.ReleaseExternalId) && componentsInfo.ReleaseExternalId.Contains(Dataconstant.PythonPackage))
-                        {
-                            BomCreator.bomKpiData.DebianComponents++;
-                            PythonPackages.Add(package);
-                            Logger.Debug($"ExtractDetailsFromJson():ValidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
-                        }
-                        else
-                        {
-                            BomCreator.bomKpiData.ComponentsExcluded++;
-                            Logger.Debug($"ExtractDetailsFromJson():InvalidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
-                        }
-                    }
+                if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["PYTHON"]))
+                {
+                    BomCreator.bomKpiData.DebianComponents++;
+                    PythonPackages.Add(package);
+                    Logger.Debug($"ExtractDetailsFromJson():ValidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
                 }
-            }
-            else
-            {
-                Logger.Debug($"ExtractDetailsFromJson():NoComponenstFound!!");
+                else
+                {
+                    BomCreator.bomKpiData.ComponentsExcluded++;
+                    Logger.Debug($"ExtractDetailsFromJson():InvalidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
+                }
             }
             return PythonPackages;
         }
@@ -187,7 +233,7 @@ namespace LCT.PackageIdentifier
             version = WebUtility.UrlEncode(version);
             version = version.Replace("%3A", ":");
 
-            return $"{Dataconstant.PythonPackage}{Dataconstant.ForwardSlash}{name}@{version}?arch=source";
+            return $"{Dataconstant.PurlCheck()["PYTHON"]}{Dataconstant.ForwardSlash}{name}@{version}?arch=source";
         }
 
         private static List<Component> FormComponentReleaseExternalID(List<PythonPackage> listOfComponents)

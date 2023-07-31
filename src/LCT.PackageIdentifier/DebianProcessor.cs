@@ -25,9 +25,15 @@ namespace LCT.PackageIdentifier
     /// <summary>
     /// The DebianProcessor class
     /// </summary>
-    public class DebianProcessor : CycloneDXBomParser, IParser
+    public class DebianProcessor : IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        readonly CycloneDXBomParser cycloneDXBomParser;
+
+        public DebianProcessor()
+        {
+            cycloneDXBomParser = new CycloneDXBomParser();
+        }
 
         #region public method
 
@@ -44,14 +50,22 @@ namespace LCT.PackageIdentifier
             {
                 Logger.Debug($"ParsePackageFile():FileName: " + filepath);
                 listofComponents.AddRange(ParseCycloneDX(filepath));
-            }          
+            }
 
             int initialCount = listofComponents.Count;
             GetDistinctComponentList(ref listofComponents);
             listComponentForBOM = FormComponentReleaseExternalID(listofComponents);
             BomCreator.bomKpiData.DuplicateComponents = initialCount - listComponentForBOM.Count;
-            BomCreator.bomKpiData.ComponentsInComparisonBOM = listComponentForBOM.Count;
+
             bom.Components = listComponentForBOM;
+            if (File.Exists(appSettings.CycloneDxSBomTemplatePath))
+            {
+                Bom sbomdDetails;
+                sbomdDetails = cycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
+                //Adding Template Component Details & MetaData
+                SbomTemplate.AddComponentDetails(bom.Components, sbomdDetails);
+            }
+
             bom = RemoveExcludedComponents(appSettings, bom);
             return bom;
         }
@@ -104,8 +118,8 @@ namespace LCT.PackageIdentifier
 
         private void ExtractDetailsForJson(string filePath, ref List<DebianPackage> debianPackages)
         {
-            Bom bom = ParseCycloneDXBom(filePath);
-           
+            Bom bom = cycloneDXBomParser.ParseCycloneDXBom(filePath);
+
             foreach (var componentsInfo in bom.Components)
             {
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;
@@ -116,7 +130,7 @@ namespace LCT.PackageIdentifier
                     PurlID = componentsInfo.Purl,
                 };
 
-                if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.DebianPackage))
+                if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
                 {
                     BomCreator.bomKpiData.DebianComponents++;
                     debianPackages.Add(package);
@@ -144,7 +158,7 @@ namespace LCT.PackageIdentifier
             version = WebUtility.UrlEncode(version);
             version = version.Replace("%3A", ":");
 
-            return $"{Dataconstant.DebianPackage}{Dataconstant.ForwardSlash}{name}@{version}?arch=source";
+            return $"{Dataconstant.PurlCheck()["DEBIAN"]}{Dataconstant.ForwardSlash}{name}@{version}?arch=source";
         }
 
         private static List<Component> FormComponentReleaseExternalID(List<DebianPackage> listOfComponents)

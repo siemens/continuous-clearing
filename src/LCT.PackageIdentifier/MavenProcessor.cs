@@ -15,7 +15,6 @@ using log4net;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -25,26 +24,34 @@ namespace LCT.PackageIdentifier
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
+        readonly CycloneDXBomParser cycloneDXBomParser;
+
+        public MavenProcessor()
+        {
+            cycloneDXBomParser = new CycloneDXBomParser();
+        }
 
         public Bom ParsePackageFile(CommonAppSettings appSettings)
         {
             List<Component> componentsForBOM = new();
             Bom bom = new();
             List<string> configFiles;
-            if (string.IsNullOrEmpty(appSettings.CycloneDxBomFilePath))
-            {
-              configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Maven);
-            }
-            else
-            {
-               configFiles = FolderScanner.FileScanner(appSettings.CycloneDxBomFilePath, appSettings.Maven);
-            }
-            
+            configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Maven);
+
             foreach (string filepath in configFiles)
             {
                 Bom bomList = ParseCycloneDXBom(filepath);
                 componentsForBOM.AddRange(bomList.Components);
             }
+
+            if (File.Exists(appSettings.CycloneDxSBomTemplatePath))
+            {
+                //Adding Template Component Details
+                Bom sbomdDetails;
+                sbomdDetails = cycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
+                SbomTemplate.AddComponentDetails(componentsForBOM, sbomdDetails);
+            }
+
             foreach (var component in componentsForBOM)
             {
                 component.Properties = new List<Property>();
@@ -52,8 +59,8 @@ namespace LCT.PackageIdentifier
                 Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "Manually" };
                 component.Properties.Add(isDev);
                 component.Properties.Add(identifierType);
-
             }
+
             bom.Components = componentsForBOM;
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = bom.Components.Count;
             BomCreator.bomKpiData.ComponentsInComparisonBOM = bom.Components.Count;
