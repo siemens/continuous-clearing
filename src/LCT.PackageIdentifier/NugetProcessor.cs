@@ -14,8 +14,10 @@ using LCT.PackageIdentifier.Model;
 using LCT.PackageIdentifier.Model.NugetModel;
 using LCT.Services.Interface;
 using log4net;
+using Microsoft.Build.Locator;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NuGet.ProjectModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -530,7 +532,7 @@ namespace LCT.PackageIdentifier
                 listofComponents.AddRange(ParsePackageLock(filepath, appSettings));
             }
             else
-            {
+            {            
                 listofComponents.AddRange(ParsePackageConfig(filepath, appSettings));
             }
         }
@@ -664,6 +666,7 @@ namespace LCT.PackageIdentifier
 
             return nugetPackages;
         }
+
         #endregion
     }
 }

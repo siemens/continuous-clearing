@@ -110,11 +110,17 @@
     <file src="out\net6.0\System.Text.Json.dll" target="tools"/>
     <file src="out\net6.0\System.Threading.AccessControl.dll" target="tools"/>
     <file src="out\net6.0\System.Windows.Extensions.dll" target="tools"/>
-    <file src="out\net6.0\Microsoft.Build.dll" target="tools"/>
     <file src="out\net6.0\Microsoft.Build.Locator.dll" target="tools"/>
     <file src="out\net6.0\NuGet.Packaging.dll" target="tools"/>
     <file src="out\net6.0\NuGet.ProjectModel.dll" target="tools"/>
-    <file src="out\net6.0\System.Collections.Immutable.dll" target="tools"/>
+    <file src="out\net6.0\NuGet.Common.dll" target="tools"/>
+    <file src="out\net6.0\NuGet.Configuration.dll" target="tools"/>
+    <file src="out\net6.0\NuGet.DependencyResolver.Core.dll" target="tools"/>
+    <file src="out\net6.0\NuGet.Frameworks.dll" target="tools"/>
+    <file src="out\net6.0\NuGet.LibraryModel.dll" target="tools"/>
+    <file src="out\net6.0\NuGet.Protocol.dll" target="tools"/>
+    <file src="out\net6.0\NuGet.Versioning.dll" target="tools"/>
+    <file src="out\net6.0\NuGet.Resolver.dll" target="tools"/>
     <file src="out\net6.0\runtimes\linux-arm\native\libpsl-native.so" target="tools\runtimes\linux-arm\native"/>
     <file src="out\net6.0\runtimes\linux-arm64\native\libpsl-native.so" target="tools\runtimes\linux-arm64\native"/>
     <file src="out\net6.0\runtimes\linux-musl-x64\native\libpsl-native.so" target="tools\runtimes\linux-musl-x64\native"/>
