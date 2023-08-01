@@ -46,6 +46,7 @@ namespace LCT.PackageIdentifier.UTest
 
             //Assert
             Assert.That(bom.Components.Count, Is.EqualTo(1), "Returns the count of components");
+            Assert.That(bom.Dependencies.Count, Is.EqualTo(4), "Returns the count of dependencies");
 
         }
 
@@ -54,20 +55,20 @@ namespace LCT.PackageIdentifier.UTest
         {
             // Arrange
             Component component1 = new Component();
-            component1.Name = "animations";
+            component1.Name = "junit";
             component1.Group = "";
             component1.Description = string.Empty;
             component1.Version = "1.0.0";
             var components = new List<Component>() { component1 };
             ComponentIdentification component = new() { comparisonBOMData = components };
-            string[] reooListArr = { "energy-dev-npm-egll", "energy-release-npm-egll" };
+            string[] reooListArr = { "energy-dev-maven-egll", "energy-release-maven-egll" };
             CommonAppSettings appSettings = new() { InternalRepoList = reooListArr };
 
             AqlResult aqlResult = new()
             {
-                Name = "animations-1.0.0.tgz",
+                Name = "junit-1.0.0.tgz",
                 Path = "@testfolder/-/folder",
-                Repo = "energy-dev-npm-egll"
+                Repo = "energy-dev-maven-egll"
             };
 
             List<AqlResult> results = new List<AqlResult>() { aqlResult };
@@ -75,7 +76,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<IBomHelper> mockBomHelper = new Mock<IBomHelper>();
             mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
-            mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations");
+            mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("junit");
 
             // Act
             MavenProcessor mavenProcessor = new MavenProcessor();
@@ -90,20 +91,20 @@ namespace LCT.PackageIdentifier.UTest
         {
             // Arrange
             Component component1 = new Component();
-            component1.Name = "animations";
+            component1.Name = "junit";
             component1.Group = "";
             component1.Description = string.Empty;
             component1.Version = "1.0.0";
             var components = new List<Component>() { component1 };
             ComponentIdentification component = new() { comparisonBOMData = components };
-            string[] reooListArr = { "energy-dev-npm-egll", "energy-release-npm-egll" };
+            string[] reooListArr = { "energy-dev-maven-egll", "energy-release-maven-egll" };
             CommonAppSettings appSettings = new() { InternalRepoList = reooListArr };
 
             AqlResult aqlResult = new()
             {
-                Name = "animations-common_license-1.0.0.tgz",
+                Name = "junit_license-1.0.0.tgz",
                 Path = "@testfolder/-/folder",
-                Repo = "energy-dev-npm-egll"
+                Repo = "energy-dev-maven-egll"
             };
 
             List<AqlResult> results = new List<AqlResult>() { aqlResult };
@@ -111,7 +112,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<IBomHelper> mockBomHelper = new Mock<IBomHelper>();
             mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
-            mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations");
+            mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("junit");
 
             // Act
             MavenProcessor mavenProcessor = new MavenProcessor();
@@ -127,21 +128,21 @@ namespace LCT.PackageIdentifier.UTest
             // Arrange
             Component component1 = new Component
             {
-                Name = "animations",
-                Group = "common",
+                Name = "junit",
+                Group = "junit",
                 Description = string.Empty,
                 Version = "1.0.0"
             };
             var components = new List<Component>() { component1 };
             ComponentIdentification componentIdentification = new() { comparisonBOMData = components };
-            string[] reooListArr = { "energy-dev-npm-egll", "energy-release-npm-egll" };
+            string[] reooListArr = { "energy-dev-maven-egll", "energy-release-maven-egll" };
             CommonAppSettings appSettings = new() { InternalRepoList = reooListArr };
 
             AqlResult aqlResult = new()
             {
-                Name = "animations-common-1.0.0.tgz",
+                Name = "junit-junit-1.0.0.tgz",
                 Path = "@testfolder/-/folder",
-                Repo = "energy-dev-npm-egll"
+                Repo = "energy-dev-maven-egll"
             };
 
             List<AqlResult> results = new List<AqlResult>() { aqlResult };
@@ -149,7 +150,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<IBomHelper> mockBomHelper = new Mock<IBomHelper>();
             mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
-            mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations/common");
+            mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("junit/junit");
 
             // Act
             MavenProcessor mavenProcessor = new MavenProcessor();
@@ -166,20 +167,20 @@ namespace LCT.PackageIdentifier.UTest
             // Arrange
             Component component1 = new Component
             {
-                Name = "animations",
-                Group = "common",
+                Name = "junit",
+                Group = "junit",
                 Description = string.Empty,
                 Version = "1.0.0"
             };
             var components = new List<Component>() { component1 };
-            string[] reooListArr = { "siparty-release-npm-egll", "org1-npmjs-npm-remote-cache" };
+            string[] reooListArr = { "siparty-release-maven-egll", "org1-bintray-maven-remote-cache" };
             CommonAppSettings appSettings = new();
             appSettings.Maven = new Config() { JfrogMavenRepoList = reooListArr };
             AqlResult aqlResult = new()
             {
-                Name = "animations-common-1.0.0.tgz",
+                Name = "junit-junit-1.0.0.tgz",
                 Path = "@testfolder/-/folder",
-                Repo = "siparty-release-npm-egll"
+                Repo = "siparty-release-maven-egll"
             };
 
             List<AqlResult> results = new List<AqlResult>() { aqlResult };
@@ -188,7 +189,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<IBomHelper> mockBomHelper = new Mock<IBomHelper>();
             mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
-            mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations/common");
+            mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("junit/junit");
 
             // Act
             MavenProcessor mavenProcessor = new MavenProcessor();
@@ -205,20 +206,20 @@ namespace LCT.PackageIdentifier.UTest
             // Arrange
             Component component1 = new Component
             {
-                Name = "animations",
+                Name = "junit",
                 Group = "",
                 Description = string.Empty,
                 Version = "1.0.0"
             };
             var components = new List<Component>() { component1 };
-            string[] reooListArr = { "siparty-release-npm-egll", "org1-npmjs-npm-remote-cache" };
+            string[] reooListArr = { "siparty-release-maven-egll", "org1-bintray-maven-remote-cache" };
             CommonAppSettings appSettings = new();
             appSettings.Maven = new Config() { JfrogMavenRepoList = reooListArr };
             AqlResult aqlResult = new()
             {
-                Name = "animations-common-1.0.0.tgz",
+                Name = "junit-junit-1.0.0.tgz",
                 Path = "@testfolder/-/folder",
-                Repo = "siparty-release-npm-egll"
+                Repo = "siparty-release-maven-egll"
             };
 
             List<AqlResult> results = new List<AqlResult>() { aqlResult };
@@ -227,7 +228,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<IBomHelper> mockBomHelper = new Mock<IBomHelper>();
             mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
-            mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations");
+            mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("junit");
 
             // Act
             MavenProcessor mavenProcessor = new MavenProcessor();

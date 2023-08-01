@@ -441,7 +441,7 @@ namespace PackageIdentifier.UTest
         public void ParseProjectAssetFile_GivenAInputFilePath_ReturnDevDependentComp()
         {
             //Arrange
-            string IsDev = "TRUE";
+            string IsDev = "true";
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
             string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles";

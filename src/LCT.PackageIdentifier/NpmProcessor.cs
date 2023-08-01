@@ -55,7 +55,7 @@ namespace LCT.PackageIdentifier
 
             componentsForBOM = GetExcludedComponentsList(componentsForBOM);
 
-           
+            totalComponentsIdentified = componentsForBOM.Count;
 
             componentsForBOM = componentsForBOM.Distinct(new ComponentEqualityComparer()).ToList();
 
