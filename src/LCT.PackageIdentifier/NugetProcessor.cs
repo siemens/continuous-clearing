@@ -19,6 +19,7 @@ using log4net;
 using Microsoft.Build.Locator;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NuGet.Packaging;
 using NuGet.ProjectModel;
 using System;
 using System.Collections;
@@ -412,6 +413,7 @@ namespace LCT.PackageIdentifier
         {
             List<string> configFiles;
             List<Component> componentsForBOM = new List<Component>();
+            List<Dependency> dependencies = new List<Dependency>();
             configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Nuget);
 
             foreach (string filepath in configFiles)
@@ -428,11 +430,11 @@ namespace LCT.PackageIdentifier
                 {
                     Logger.Debug($"ParsingInputFileForBOM():Found as Package File");
                     List<NugetPackage> listofComponents = new List<NugetPackage>();
-
+                 
                     ParseInputFiles(appSettings, filepath, listofComponents);
 
-                    ConvertToCycloneDXModel(listComponentForBOM, listofComponents);
-
+                    ConvertToCycloneDXModel(listComponentForBOM, listofComponents, dependencies);
+                    bom.Dependencies= dependencies;
                     BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = listComponentForBOM.Count;
                 }
             }
@@ -457,8 +459,9 @@ namespace LCT.PackageIdentifier
             }
         }
 
-        private static void ConvertToCycloneDXModel(List<Component> listComponentForBOM, List<NugetPackage> listofComponents)
+        private static void ConvertToCycloneDXModel(List<Component> listComponentForBOM, List<NugetPackage> listofComponents, List<Dependency> dependencies)
         {
+         
             foreach (var prop in listofComponents)
             {
                 Component components = new Component
@@ -482,7 +485,28 @@ namespace LCT.PackageIdentifier
                     }
                 };
                 listComponentForBOM.Add(components);
+                GetDependencyDetails(components,prop, ref dependencies);
             }
+        }
+
+        private static void GetDependencyDetails(Component compnent, NugetPackage prop,ref List<Dependency> dependencies)
+        {
+            List<Dependency> subDependencies = new();
+            foreach (var item in prop.Dependencies)
+            {
+                string pUrl = item;
+                Dependency dependentList = new Dependency()
+                {
+                    Ref = pUrl
+                };
+                subDependencies.Add(dependentList);
+            }
+            var dependency = new Dependency()
+            {
+                Ref = compnent.Purl,
+                Dependencies = subDependencies
+            };
+            dependencies.Add(dependency);
         }
 
         private static List<Component> KeepUniqueNonDevComponents(List<Component> listComponentForBOM)
@@ -523,7 +547,10 @@ namespace LCT.PackageIdentifier
             {            
                 listofComponents.AddRange(ParsePackageConfig(filepath, appSettings));
             }
+    
         }
+
+   
 
         private static void CheckForMultipleVersions(CommonAppSettings appSettings, ref List<Component> listComponentForBOM, ref int noOfExcludedComponents, List<Component> componentsWithMultipleVersions)
         {
@@ -642,19 +669,31 @@ namespace LCT.PackageIdentifier
             {
                 foreach (var lst in containermodule.Components)
                 {
+                    List<string> depvalue =new List<string>();
+                    var dep = lst.Value.Dependencies.Count > 0 ? lst.Value.Dependencies : null;
+                    GetDependencyList(lst,ref depvalue);
                     nugetPackages.Add(new NugetPackage()
                     {
                         ID = lst.Value.Name,
                         Version = lst.Value.Version,
+                        Dependencies = depvalue,
                         Filepath = configFile,
                         IsDev = lst.Value.Scope.ToString() == "DevDependency" ? "true" : "false",
-                    });
+                    }); 
+                 
                 }
             }
 
             return nugetPackages;
         }
-
+        public static void GetDependencyList(KeyValuePair<string,BuildInfoComponent> lst,ref List<string> depvalue)
+        {
+            foreach(var item in lst.Value.Dependencies)
+            {
+               var  depvaltestue = item.PackageUrl;
+                depvalue.Add(depvaltestue);
+            }
+        }
         #endregion
     }
 }
