@@ -65,7 +65,7 @@ namespace LCT.PackageIdentifier
         private static bool UpdateLicenseDetails(Component bomComp, Component sbomcomp)
         {
             //Adding Licenses if mainatined
-            if (sbomcomp.Licenses.Count > 0)
+            if (sbomcomp.Licenses?.Count > 0)
             {
                 bomComp.Licenses = sbomcomp.Licenses;
                 return true;
@@ -76,7 +76,7 @@ namespace LCT.PackageIdentifier
         private static bool UpdatePropertiesDetails(Component bomComp, Component sbomcomp)
         {
             //Adding properties if mainatined
-            if (sbomcomp.Properties.Count > 0)
+            if (sbomcomp.Properties?.Count > 0)
             {
                 if (bomComp.Properties == null)
                 {

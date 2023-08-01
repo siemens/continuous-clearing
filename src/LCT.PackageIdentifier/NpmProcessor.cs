@@ -371,12 +371,15 @@ namespace LCT.PackageIdentifier
             {
                 Bom sbomdDetails;
                 sbomdDetails = cycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
+                cycloneDXBomParser.CheckValidComponentsForProjectType(sbomdDetails.Components, appSettings.ProjectType);
                 //Adding Template Component Details
                 SbomTemplate.AddComponentDetails(componentsForBOM, sbomdDetails);
             }
 
-            GetdependencyDetails(componentsForBOM, dependencies);
-
+            if (dependencies != null)
+            {
+                GetdependencyDetails(componentsForBOM, dependencies);
+            }
         }
 
         public static void GetdependencyDetails(List<Component> componentsForBOM, List<Dependency> dependencies)

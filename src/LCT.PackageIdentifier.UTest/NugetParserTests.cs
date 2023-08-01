@@ -19,6 +19,8 @@ using LCT.APICommunications.Model.AQL;
 using CycloneDX.Models;
 using System.Threading.Tasks;
 using System.Linq;
+using LCT.Common.Constants;
+using Markdig.Extensions.Yaml;
 
 namespace PackageIdentifier.UTest
 {
@@ -465,7 +467,69 @@ namespace PackageIdentifier.UTest
 
             //Assert
             Assert.That(IsDev, Is.EqualTo(IsDevDependency), "Checks if Dev Dependency Component or not");
+        }
 
+
+        [TestCase]
+        public void ParsingInputFileForBOM_GivenAInputFilePathAlongWithSBOMTemplate_ReturnTotalComponentsList()
+        {
+            //Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles";
+            int TotalCount = 3;
+
+            string[] Includes = { "project.assets.json" };
+            Config config = new Config()
+            {
+                Include = Includes
+            };
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                PackageFilePath = packagefilepath,
+                Nuget = config,
+                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOMTemplate_Nuget.cdx.json",
+                ProjectType = "nuget"
+            };
+
+            //Act
+            Bom listofcomponents = new NugetProcessor().ParsePackageFile(appSettings);
+
+            //Assert
+            Assert.That(TotalCount, Is.EqualTo(listofcomponents.Components.Count), "Checks For Total Component Count");
+        }
+
+        [TestCase]
+        public void ParsingInputFileForBOM_GivenAInputFilePathAlongWithSBOMTemplate_ReturnUpdatedComponents()
+        {
+            //Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles";
+            bool isUpdated = false;
+
+            string[] Includes = { "project.assets.json" };
+            Config config = new Config()
+            {
+                Include = Includes
+            };
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                PackageFilePath = packagefilepath,
+                Nuget = config,
+                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOMTemplate_Nuget.cdx.json",
+                ProjectType = "nuget"
+            };
+
+            //Act
+            Bom listofcomponents = new NugetProcessor().ParsePackageFile(appSettings);
+
+            isUpdated = listofcomponents.Components.Exists(x => x.Properties.Exists(x => x.Name == Dataconstant.Cdx_IdentifierType && x.Value == "TemplateAdded"));
+
+            //Assert
+            Assert.IsTrue(isUpdated, "Checks For Updated Property In List ");
         }
     }
 }

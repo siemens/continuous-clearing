@@ -10,6 +10,7 @@ using NUnit.Framework;
 using System.IO;
 using LCT.Common;
 using LCT.Common.Model;
+using LCT.Common.Constants;
 
 namespace PackageIdentifier.UTest
 {
@@ -97,7 +98,8 @@ namespace PackageIdentifier.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             DebianProcessor DebianProcessor = new DebianProcessor();
-            string[] Includes = { "SourceDetails_Cyclonedx.json" };
+            string[] Includes = { "SourceDetails_Cyclonedx.cdx.json" };
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 PackageFilePath = OutFolder + @"\PackageIdentifierUTTestFiles",
@@ -110,7 +112,61 @@ namespace PackageIdentifier.UTest
             Bom listofcomponents = DebianProcessor.ParsePackageFile(appSettings);
 
             //Assert
-            Assert.AreEqual(sourceName, listofcomponents.Components[0].Name + "_" + listofcomponents.Components[0].Version, "Checks componet name and version");
+            Assert.AreEqual(sourceName, listofcomponents.Components[0].Name + "_" + listofcomponents.Components[0].Version, "Checks component name and version");
+        }
+
+        [Test]
+        public void ParsePackageConfig_GivenAInputFilePathAlongWithSBOMTemplate_ReturnTotalComponentsList()
+        {
+            //Arrange
+            int expectednoofcomponents = 5;
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string OutFolder = Path.GetDirectoryName(exePath);
+            DebianProcessor DebianProcessor = new DebianProcessor();
+            string[] Includes = { "CycloneDX_Debian.cdx.json" };
+            string packagefilepath = OutFolder + @"\PackageIdentifierUTTestFiles";
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                PackageFilePath = packagefilepath,
+                ProjectType = "DEBIAN",
+                RemoveDevDependency = true,
+                Debian = new Config() { Include = Includes },
+                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOMTemplate_Debian.cdx.json"
+            };
+
+            //Act
+            Bom listofcomponents = DebianProcessor.ParsePackageFile(appSettings);
+
+            //Assert
+            Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
+        }
+
+        [Test]
+        public void ParsePackageConfig_GivenAInputFilePathAlongWithSBOMTemplate_ReturnUpdatedComponents()
+        {
+            //Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string OutFolder = Path.GetDirectoryName(exePath);
+            DebianProcessor DebianProcessor = new DebianProcessor();
+            string[] Includes = { "CycloneDX_Debian.cdx.json" };
+            string packagefilepath = OutFolder + @"\PackageIdentifierUTTestFiles";
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                PackageFilePath = packagefilepath,
+                ProjectType = "DEBIAN",
+                RemoveDevDependency = true,
+                Debian = new Config() { Include = Includes },
+                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOMTemplate_Debian.cdx.json",
+            };
+
+            //Act
+            Bom listofcomponents = DebianProcessor.ParsePackageFile(appSettings);
+            bool isUpdated = listofcomponents.Components.Exists(x => x.Properties != null && x.Properties.Exists(x => x.Name == Dataconstant.Cdx_IdentifierType && x.Value == "TemplateAdded"));
+
+            //Assert
+            Assert.IsTrue(isUpdated, "Checks For Updated Property In List ");
         }
     }
 }

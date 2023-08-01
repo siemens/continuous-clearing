@@ -46,6 +46,7 @@ namespace LCT.PackageIdentifier
             foreach (string filepath in configFiles)
             {
                 Bom bomList = ParseCycloneDXBom(filepath);
+                cycloneDXBomParser.CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
                 componentsForBOM.AddRange(bomList.Components);
 
                 if (bomList.Dependencies != null)
@@ -59,6 +60,7 @@ namespace LCT.PackageIdentifier
                 //Adding Template Component Details
                 Bom sbomdDetails;
                 sbomdDetails = cycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
+                cycloneDXBomParser.CheckValidComponentsForProjectType(sbomdDetails.Components, appSettings.ProjectType);
                 SbomTemplate.AddComponentDetails(componentsForBOM, sbomdDetails);
             }
        

@@ -16,6 +16,7 @@ using LCT.PackageIdentifier.Interface;
 using LCT.Services.Interface;
 using Moq;
 using System.Threading.Tasks;
+using LCT.Common.Constants;
 
 namespace LCT.PackageIdentifier.UTest
 {
@@ -291,6 +292,67 @@ namespace LCT.PackageIdentifier.UTest
 
             //Assert
             Assert.That(BomCreator.bomKpiData.DevDependentComponents, Is.EqualTo(0), "Returns the count of components");
+
+        }
+
+        [Test]
+        public void ParsePackageFile_GivenAInputFilePathAlongWithSBOMTemplate_ReturnTotalComponentsList()
+        {
+            //Arrange
+            int expectednoofcomponents = 2;
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string filepath = outFolder + @"\PackageIdentifierUTTestFiles";
+            string[] Includes = { "CycloneDX_Maven.cdx.json" };
+            string[] Excludes = { "lol" };
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                PackageFilePath = filepath,
+                ProjectType = "MAVEN",
+                RemoveDevDependency = true,
+                Maven = new Config() { Include = Includes, Exclude = Excludes },
+                CycloneDxSBomTemplatePath = filepath + "\\SBOMTemplates\\SBOMTemplate_Maven.cdx.json"
+            };
+
+            MavenProcessor MavenProcessor = new MavenProcessor();
+
+            //Act
+            Bom bom = MavenProcessor.ParsePackageFile(appSettings);
+
+            //Assert
+            Assert.That(expectednoofcomponents, Is.EqualTo(bom.Components.Count), "Checks for no of components");
+
+        }
+
+        [Test]
+        public void ParsePackageFile_GivenAInputFilePathAlongWithSBOMTemplate_ReturnUpdatedComponents()
+        {
+            //Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string filepath = outFolder + @"\PackageIdentifierUTTestFiles";
+            string[] Includes = { "CycloneDX_Maven.cdx.json" };
+            string[] Excludes = { "lol" };
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                PackageFilePath = filepath,
+                ProjectType = "MAVEN",
+                RemoveDevDependency = true,
+                Maven = new Config() { Include = Includes, Exclude = Excludes },
+                CycloneDxSBomTemplatePath = filepath + "\\SBOMTemplates\\SBOMTemplate_Maven.cdx.json"
+            };
+
+            MavenProcessor MavenProcessor = new MavenProcessor();
+
+            //Act
+            Bom bom = MavenProcessor.ParsePackageFile(appSettings);
+
+            bool isUpdated = bom.Components.Exists(x => x.Properties != null && x.Properties.Exists(x => x.Name == Dataconstant.Cdx_IdentifierType && x.Value == "TemplateAdded"));
+
+            //Assert
+            Assert.IsTrue(isUpdated, "Checks For Updated Property In List ");
 
         }
 
