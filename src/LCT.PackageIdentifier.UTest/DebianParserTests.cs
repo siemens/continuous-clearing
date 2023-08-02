@@ -70,11 +70,12 @@ namespace PackageIdentifier.UTest
         public void ParsePackageConfig_GivenMultipleInputFiles_ReturnsCountOfDuplicates()
         {
             //Arrange
-            int duplicateComponents = 1;
+            int duplicateComponents = 2;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             DebianProcessor DebianProcessor = new DebianProcessor();
             string[] Includes = { "*_Debian.cdx.json" };
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 PackageFilePath = OutFolder + @"\PackageIdentifierUTTestFiles",

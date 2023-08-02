@@ -20,6 +20,11 @@ namespace LCT.PackageIdentifier
 
         public static void AddComponentDetails(List<Component> bom, Bom sbomdDetails)
         {
+            if (sbomdDetails.Components == null)
+            {
+                return;
+            }
+
             foreach (var sbomcomp in sbomdDetails.Components)
             {
                 try
@@ -52,7 +57,10 @@ namespace LCT.PackageIdentifier
                             });
                             BomCreator.bomKpiData.ComponentsUpdatedFromSBOMTemplateFile++;
                         }
-
+                        else
+                        {
+                            Logger.Debug($"AddComponentDetails():No Details updated for SBOM Template component " + sbomcomp.Name + " : " + sbomcomp.Version);
+                        }
                     }
                 }
                 catch (ArgumentException ex)
@@ -78,16 +86,8 @@ namespace LCT.PackageIdentifier
             //Adding properties if mainatined
             if (sbomcomp.Properties?.Count > 0)
             {
-                if (bomComp.Properties == null)
-                {
-                    bomComp.Properties = sbomcomp.Properties;
-                    return true;
-                }
-                else
-                {
-                    bomComp.Properties.AddRange(sbomcomp.Properties);
-                    return true;
-                }
+                bomComp.Properties = sbomcomp.Properties;
+                return true;
             }
             return false;
         }

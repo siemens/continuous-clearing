@@ -26,7 +26,7 @@ namespace PackageIdentifier.UTest
         public void ParsePackageConfig_GivenAMultipleInputFilePath_ReturnsCounts()
         {
             //Arrange
-            int expectednoofcomponents = 9;
+            int expectednoofcomponents = 10;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "*_Python.cdx.json" };
@@ -73,7 +73,7 @@ namespace PackageIdentifier.UTest
         public void ParsePackageConfig_GivenMultipleInputFiles_ReturnsCountOfDuplicates()
         {
             //Arrange
-            int duplicateComponents = 1;
+            int duplicateComponents = 2;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "*_Python.cdx.json" };

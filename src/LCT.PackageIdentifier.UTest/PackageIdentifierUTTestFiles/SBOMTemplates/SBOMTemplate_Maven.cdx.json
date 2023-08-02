@@ -31,62 +31,6 @@
       "purl": "pkg:maven/com.rabbitmq/amqp-client@5.14.2",
       "properties": [
         {
-          "name": "syft:package:foundBy",
-          "value": "java-cataloger"
-        },
-        {
-          "name": "syft:package:language",
-          "value": "java"
-        },
-        {
-          "name": "syft:package:metadataType",
-          "value": "JavaMetadata"
-        },
-        {
-          "name": "syft:package:type",
-          "value": "java-archive"
-        },
-        {
-          "name": "syft:cpe23",
-          "value": "cpe:2.3:a:amqp-client:amqp_client:5.14.2:*:*:*:*:*:*:*"
-        },
-        {
-          "name": "syft:cpe23",
-          "value": "cpe:2.3:a:amqp_client:amqp-client:5.14.2:*:*:*:*:*:*:*"
-        },
-        {
-          "name": "syft:cpe23",
-          "value": "cpe:2.3:a:amqp_client:amqp_client:5.14.2:*:*:*:*:*:*:*"
-        },
-        {
-          "name": "syft:cpe23",
-          "value": "cpe:2.3:a:rabbitmq:amqp-client:5.14.2:*:*:*:*:*:*:*"
-        },
-        {
-          "name": "syft:cpe23",
-          "value": "cpe:2.3:a:rabbitmq:amqp_client:5.14.2:*:*:*:*:*:*:*"
-        },
-        {
-          "name": "syft:cpe23",
-          "value": "cpe:2.3:a:amqp:amqp-client:5.14.2:*:*:*:*:*:*:*"
-        },
-        {
-          "name": "syft:cpe23",
-          "value": "cpe:2.3:a:amqp:amqp_client:5.14.2:*:*:*:*:*:*:*"
-        },
-        {
-          "name": "syft:location:0:path",
-          "value": "sams-infrastructure/keycloak/plugins/event-listeners/keycloak-to-rabbit-3.0.2.jar"
-        },
-        {
-          "name": "syft:metadata:-:artifactID",
-          "value": "amqp-client"
-        },
-        {
-          "name": "syft:metadata:-:groupID",
-          "value": "com.rabbitmq"
-        },
-        {
           "name": "syft:metadata:virtualPath",
           "value": "sams-infrastructure/keycloak/plugins/event-listeners/keycloak-to-rabbit-3.0.2.jar:amqp-client"
         }

@@ -47,7 +47,15 @@ namespace LCT.PackageIdentifier
             {
                 Bom bomList = ParseCycloneDXBom(filepath);
                 cycloneDXBomParser.CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
-                componentsForBOM.AddRange(bomList.Components);
+
+                if (componentsForBOM.Count == 0)
+                {
+                    componentsForBOM.AddRange(bomList?.Components);
+                }
+                else
+                {
+                    componentsToBOM.AddRange(bomList?.Components);
+                }
 
                 if (bomList.Dependencies != null)
                 {
@@ -63,7 +71,7 @@ namespace LCT.PackageIdentifier
                 cycloneDXBomParser.CheckValidComponentsForProjectType(sbomdDetails.Components, appSettings.ProjectType);
                 SbomTemplate.AddComponentDetails(componentsForBOM, sbomdDetails);
             }
-       
+
             //checking Dev dependency
             DevDependencyIdentificationLogic(componentsForBOM, componentsToBOM, ref ListOfComponents);
 
@@ -122,63 +130,31 @@ namespace LCT.PackageIdentifier
 
         private static void SetPropertiesforBOM(ref List<Component> componentsToBOM, Component component, string devValue)
         {
-
-            component.Properties = new List<Property>();
-            Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = devValue };
             Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "Discovered" };
-            component.Properties.Add(isDev);
-            component.Properties.Add(identifierType);
-            componentsToBOM.Add(component);
+            Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = devValue };
 
-        }
-
-        private static void DevDependencyIdentification(List<Component> componentsForBOM, Bom bomList, ref List<Component> componentsToBOM)
-        {
-            List<Component> componentList = bomList.Components;
-
-            if (componentsForBOM?.Count >= componentList?.Count && componentsForBOM.Count != 0)
+            if (ComponentPropertyCheck(component))
             {
-                foreach (var entry in componentsForBOM)
-                {
-                    if (componentList.Exists(x => x.Name == entry.Name))
-                    {
-                        SetPropertiesforBOM(ref componentsToBOM, entry, "false");
-                    }
-                    else
-                    {
-                        SetPropertiesforBOM(ref componentsToBOM, entry, "true");
-
-                        BomCreator.bomKpiData.DevDependentComponents++;
-                    }
-                }
-            }
-            else if (componentsForBOM?.Count <= componentList?.Count && componentsForBOM.Count != 0)
-            {
-                foreach (var entry in componentList)
-                {
-
-                    if (componentsForBOM.Exists(x => x.Name == entry.Name))
-                    {
-                        SetPropertiesforBOM(ref componentsToBOM, entry, "false");
-
-
-                    }
-                    else
-                    {
-                        SetPropertiesforBOM(ref componentsToBOM, entry, "true");
-
-
-                        BomCreator.bomKpiData.DevDependentComponents++;
-                    }
-                }
+                component.Properties.Add(isDev);
+                componentsToBOM.Add(component);
             }
             else
             {
-                //do nothing
+                component.Properties = new List<Property>();
+                component.Properties.Add(isDev);
+                component.Properties.Add(identifierType);
+                componentsToBOM.Add(component);
             }
-
         }
 
+        private static bool ComponentPropertyCheck(Component component)
+        {
+            if (component.Properties == null)
+            {
+                return false;
+            }
+            return component.Properties.Exists(x => x.Name == Dataconstant.Cdx_IdentifierType);
+        }
 
         public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM, CommonAppSettings appSettings,
                                                           IJFrogService jFrogService,

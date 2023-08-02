@@ -107,7 +107,7 @@ namespace LCT.PackageIdentifier.UTest
         public void ParseCycloneDXFile_GivenMultipleInputFiles_ReturnsCounts()
         {
             //Arrange
-            int expectednoofcomponents = 5;
+            int expectednoofcomponents = 6;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             NpmProcessor npmProcessor = new NpmProcessor();

@@ -46,7 +46,7 @@ namespace LCT.PackageIdentifier.UTest
             Bom bom = MavenProcessor.ParsePackageFile(appSettings);
 
             //Assert
-            Assert.That(bom.Components.Count, Is.EqualTo(1), "Returns the count of components");
+            Assert.That(bom.Components.Count, Is.EqualTo(2), "Returns the count of components");
             Assert.That(bom.Dependencies.Count, Is.EqualTo(4), "Returns the count of dependencies");
 
         }
@@ -246,7 +246,7 @@ namespace LCT.PackageIdentifier.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string filepath = outFolder + @"\PackageIdentifierUTTestFiles\MavenDevDependency";
+            string filepath = outFolder + @"\PackageIdentifierUTTestFiles\MavenDevDependency\WithDev";
             string[] Includes = { "*.cdx.json" };
             string[] Excludes = { "lol" };
 
@@ -261,7 +261,7 @@ namespace LCT.PackageIdentifier.UTest
             MavenProcessor MavenProcessor = new MavenProcessor();
 
             //Act
-            Bom bom = MavenProcessor.ParsePackageFile(appSettings);
+            MavenProcessor.ParsePackageFile(appSettings);
 
             //Assert
             Assert.That(BomCreator.bomKpiData.DevDependentComponents, Is.EqualTo(6), "Returns the count of components");
