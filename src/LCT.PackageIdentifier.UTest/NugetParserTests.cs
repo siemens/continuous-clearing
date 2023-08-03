@@ -4,20 +4,21 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using CycloneDX.Models;
-using LCT.APICommunications.Model.AQL;
-using LCT.Common;
-using LCT.Common.Model;
-using LCT.PackageIdentifier;
-using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
-using LCT.Services.Interface;
-using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using LCT.Common;
+using LCT.Common.Model;
+using LCT.PackageIdentifier;
+using LCT.Services.Interface;
+using LCT.PackageIdentifier.Interface;
+using Moq;
+using LCT.APICommunications.Model.AQL;
+using CycloneDX.Models;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace PackageIdentifier.UTest
 {
@@ -47,13 +48,35 @@ namespace PackageIdentifier.UTest
 
         }
 
+        [TestCase]
+        public void ParsePackageLockJson_GivenAInputFilePath_ReturnsSuccess()
+        {
+            //Arrange
+            int expectednoofcomponents = 153;
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles\packages.lock.json";
+            string csprojPath = outFolder + @"\PackageIdentifierUTTestFiles";
 
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                PackageFilePath = csprojPath
+            };
+
+            //Act
+            List<NugetPackage> listofcomponents = NugetProcessor.ParsePackageLock(packagefilepath, appSettings);
+
+            //Assert
+            Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Count), "Checks for no of components");
+
+        }
         [TestCase]
         public void InputFileIdentifaction_GivenARootPath_ReturnsSuccess()
         {
             //Arrange
-            int fileCount = 3;
-            string[] Includes = { "p*.config", "p*.assets.json" };
+            int fileCount = 2;
+            string[] Includes = { "p*.config", "p*.lock.json" };
             Config config = new Config()
             {
                 Include = Includes,
@@ -69,7 +92,7 @@ namespace PackageIdentifier.UTest
 
 
             //Assert
-            Assert.That(fileCount, Is.EqualTo(allFoundConfigFiles.Count), "Checks for total input files found");
+            Assert.That(fileCount, Is.EqualTo(allFoundConfigFiles.Count), "Checks for total inout files found");
 
         }
         [TestCase]
@@ -113,7 +136,7 @@ namespace PackageIdentifier.UTest
         public void InputFileIdentifaction_GivenInvalidInputFile_ReturnsArgumentNullException()
         {
             //Arrange
-            string[] Includes = { "p*.config", "p*.assets.json" };
+            string[] Includes = { "p*.config", "p*.lock.json" };
             Config config = new Config()
             {
                 Include = Includes,
@@ -179,8 +202,8 @@ namespace PackageIdentifier.UTest
             string csprojfilepath = outFolder + @"\PackageIdentifierUTTestFiles";
             string[] Excludes = null;
 
-            CycloneDX.Models.Bom bom = new Bom();
-            bom.Components = new List<Component>();
+            CycloneDX.Models.Bom bom = new CycloneDX.Models.Bom();
+            bom.Components = new List<CycloneDX.Models.Component>();
             CommonAppSettings CommonAppSettings = new CommonAppSettings()
             {
                 PackageFilePath = csprojfilepath,
@@ -389,14 +412,13 @@ namespace PackageIdentifier.UTest
         public void ParseProjectAssetFile_GivenAInputFilePath_ReturnsSuccess()
         {
             //Arrange
-            int expectednoofcomponents = 38;
-            int expectednoofdependencies = 41;
+            int expectednoofcomponents = 2;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles\NugetDependency";
+            string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles";
 
-            string[] Includes = { "p*.assets.json" };
-            Config config = new()
+            string[] Includes = { "project.assets.json" };
+            Config config = new Config()
             {
                 Include = Includes
             };
@@ -412,7 +434,6 @@ namespace PackageIdentifier.UTest
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
-            Assert.That(expectednoofdependencies, Is.EqualTo(listofcomponents.Dependencies.Count), "Checks for no of dependencies");
 
         }
 

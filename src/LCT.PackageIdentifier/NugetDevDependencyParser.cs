@@ -78,12 +78,6 @@ namespace LCT.PackageIdentifier
             {
                 csProj = new Project(projectPath);
             }
-            catch(FileLoadException ex )
-            {
-                Logger.Debug($"IsTestProject(): Failed to load project file : " + projectPath, ex);
-                Logger.Warn($"IsTestProject: Failed to load project file : " + projectPath);
-                return false;
-            }
             catch (InvalidProjectFileException ex)
             {
                 Logger.Debug($"IsTestProject(): Failed to read project file : " + projectPath, ex);

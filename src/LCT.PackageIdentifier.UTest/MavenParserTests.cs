@@ -245,7 +245,7 @@ namespace LCT.PackageIdentifier.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string filepath = outFolder + @"\PackageIdentifierUTTestFiles\MavenDevDependency\WithDev";
+            string filepath = outFolder + @"\PackageIdentifierUTTestFiles\MavenDevDependency";
             string[] Includes = { "*.cdx.json" };
             string[] Excludes = { "lol" };
 

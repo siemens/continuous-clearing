@@ -6,20 +6,27 @@
 
 using CycloneDX.Models;
 using LCT.APICommunications;
+using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Model;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.PackageIdentifier.Model.NugetModel;
 using LCT.Services.Interface;
 using log4net;
+using Microsoft.Build.Locator;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NuGet.Packaging;
+using NuGet.ProjectModel;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Management.Automation.Language;
 using System.Reflection;
 using System.Security;
 using System.Text.RegularExpressions;
@@ -117,7 +124,64 @@ namespace LCT.PackageIdentifier
                 Logger.Error($"ParsePackageFile():", ex);
             }
             return nugetPackages;
-        }      
+        }
+
+        public static List<NugetPackage> ParsePackageLock(string packagesFilePath, CommonAppSettings appSettings)
+        {
+            List<NugetPackage> packageList = new List<NugetPackage>();
+            string isDev = "false";
+            try
+            {
+                List<ReferenceDetails> referenceList = Parsecsproj(appSettings);
+                using (StreamReader r = new StreamReader(packagesFilePath))
+                {
+                    string json = r.ReadToEnd();
+                    JObject jObject = JObject.Parse(json);
+
+                    JToken jDependencies = jObject["dependencies"];
+
+                    foreach (JToken targetVersion in jDependencies.Children())
+                    {
+                        foreach (JToken dependencyToken in targetVersion.Children().Children())
+                        {
+                            string id = dependencyToken.ToObject<JProperty>().Name;
+                            string version = dependencyToken.First.Value<string>("resolved");
+                            if (dependencyToken.First.Value<string>("type") == "Dev" || IsDevDependent(referenceList, id, version))
+                            {
+                                BomCreator.bomKpiData.DevDependentComponents++;
+                                isDev = "true";
+                            }
+                            if (dependencyToken.First.Value<string>("type") == "Project" || string.IsNullOrEmpty(version) && string.IsNullOrEmpty(id))
+                            {
+
+                                continue;
+                            }
+
+                            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;
+
+                            NugetPackage package = new NugetPackage()
+                            {
+                                ID = id,
+                                Version = version,
+                                Filepath = packagesFilePath,
+                                IsDev = isDev
+
+                            };
+                            packageList.Add(package);
+                        }
+                    }
+                }
+            }
+            catch (JsonReaderException ex)
+            {
+                Logger.Error($"ParsePackageFile():", ex);
+            }
+            catch (IOException ex)
+            {
+                Logger.Error($"ParsePackageFile():", ex);
+            }
+            return packageList;
+        }
 
         public static bool IsDevDependent(List<ReferenceDetails> referenceDetails, string name, string version)
         {
@@ -366,11 +430,11 @@ namespace LCT.PackageIdentifier
                 {
                     Logger.Debug($"ParsingInputFileForBOM():Found as Package File");
                     List<NugetPackage> listofComponents = new List<NugetPackage>();
-
+                 
                     ParseInputFiles(appSettings, filepath, listofComponents);
 
                     ConvertToCycloneDXModel(listComponentForBOM, listofComponents, dependencies);
-                    bom.Dependencies = dependencies;
+                    bom.Dependencies= dependencies;
                     BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = listComponentForBOM.Count;
                 }
             }
@@ -397,7 +461,7 @@ namespace LCT.PackageIdentifier
 
         private static void ConvertToCycloneDXModel(List<Component> listComponentForBOM, List<NugetPackage> listofComponents, List<Dependency> dependencies)
         {
-
+         
             foreach (var prop in listofComponents)
             {
                 Component components = new Component
@@ -421,19 +485,19 @@ namespace LCT.PackageIdentifier
                     }
                 };
                 listComponentForBOM.Add(components);
-                GetDependencyDetails(components, prop, ref dependencies);
+                GetDependencyDetails(components,prop, ref dependencies);
             }
         }
 
-        private static void GetDependencyDetails(Component compnent, NugetPackage prop, ref List<Dependency> dependencies)
+        private static void GetDependencyDetails(Component compnent, NugetPackage prop,ref List<Dependency> dependencies)
         {
             List<Dependency> subDependencies = new();
             foreach (var item in prop.Dependencies)
             {
-                string purlId = item;
+                string pUrl = item;
                 Dependency dependentList = new Dependency()
                 {
-                    Ref = purlId
+                    Ref = pUrl
                 };
                 subDependencies.Add(dependentList);
             }
@@ -475,18 +539,18 @@ namespace LCT.PackageIdentifier
             {
                 listofComponents.AddRange(ParseAssetFile(filepath));
             }
-            else if (filepath.EndsWith(".config"))
+            else if (filepath.EndsWith("lock.json"))
             {
-                listofComponents.AddRange(ParsePackageConfig(filepath, appSettings));
+                listofComponents.AddRange(ParsePackageLock(filepath, appSettings));
             }
             else
-            {
-                Logger.Error("Unsupported file type given as input");
+            {            
+                listofComponents.AddRange(ParsePackageConfig(filepath, appSettings));
             }
-
+    
         }
 
-
+   
 
         private static void CheckForMultipleVersions(CommonAppSettings appSettings, ref List<Component> listComponentForBOM, ref int noOfExcludedComponents, List<Component> componentsWithMultipleVersions)
         {
@@ -605,9 +669,9 @@ namespace LCT.PackageIdentifier
             {
                 foreach (var lst in containermodule.Components)
                 {
-                    List<string> depvalue = new List<string>();
+                    List<string> depvalue =new List<string>();
                     var dep = lst.Value.Dependencies.Count > 0 ? lst.Value.Dependencies : null;
-                    GetDependencyList(lst, ref depvalue);
+                    GetDependencyList(lst,ref depvalue);
                     nugetPackages.Add(new NugetPackage()
                     {
                         ID = lst.Value.Name,
@@ -615,18 +679,18 @@ namespace LCT.PackageIdentifier
                         Dependencies = depvalue,
                         Filepath = configFile,
                         IsDev = lst.Value.Scope.ToString() == "DevDependency" ? "true" : "false",
-                    });
-
+                    }); 
+                 
                 }
             }
 
             return nugetPackages;
         }
-        public static void GetDependencyList(KeyValuePair<string, BuildInfoComponent> lst, ref List<string> depvalue)
+        public static void GetDependencyList(KeyValuePair<string,BuildInfoComponent> lst,ref List<string> depvalue)
         {
-            foreach (var item in lst.Value.Dependencies)
+            foreach(var item in lst.Value.Dependencies)
             {
-                var depvaltestue = item.PackageUrl;
+               var  depvaltestue = item.PackageUrl;
                 depvalue.Add(depvaltestue);
             }
         }

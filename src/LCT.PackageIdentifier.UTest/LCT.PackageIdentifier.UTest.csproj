@@ -91,16 +91,10 @@
     <None Update="PackageIdentifierUTTestFiles\MavenDevDependency\WithOneInputFile\bom-without.cdx.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="PackageIdentifierUTTestFiles\NugetDependency\project.assets.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="PackageIdentifierUTTestFiles\package-lock16.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="PackageIdentifierUTTestFiles\POM.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="PackageIdentifierUTTestFiles\project.assets-UT.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="PackageIdentifierUTTestFiles\project.assets.json">
