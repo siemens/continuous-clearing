@@ -46,6 +46,7 @@ namespace LCT.PackageIdentifier
 
             foreach (string filepath in configFiles)
             {
+               
                 Bom bomList = ParseCycloneDXBom(filepath);
             
                 if (componentsForBOM.Count == 0)
