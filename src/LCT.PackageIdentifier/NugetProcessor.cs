@@ -327,6 +327,14 @@ namespace LCT.PackageIdentifier
                     fullNameVersion, StringComparison.OrdinalIgnoreCase))?.Repo ?? NotFoundInRepo;
             }
 
+            if (repoName == NotFoundInRepo)
+            {
+                jfrogcomponentName = $"{component.Name}.{component.Version}.nupkg";
+                repoName = aqlResultList.Find(x => x.Name.Equals(
+                  jfrogcomponentName, StringComparison.OrdinalIgnoreCase))?.Repo ?? NotFoundInRepo;
+
+            }
+
             return repoName;
         }
 
