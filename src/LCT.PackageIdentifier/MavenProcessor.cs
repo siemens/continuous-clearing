@@ -133,54 +133,6 @@ namespace LCT.PackageIdentifier
 
         }
 
-        private static void DevDependencyIdentification(List<Component> componentsForBOM, Bom bomList, ref List<Component> componentsToBOM)
-        {
-            List<Component> componentList = bomList.Components;
-
-            if (componentsForBOM?.Count >= componentList?.Count && componentsForBOM.Count != 0)
-            {
-                foreach (var entry in componentsForBOM)
-                {
-                    if (componentList.Exists(x => x.Name == entry.Name))
-                    {
-                        SetPropertiesforBOM(ref componentsToBOM, entry, "false");
-                    }
-                    else
-                    {
-                        SetPropertiesforBOM(ref componentsToBOM, entry, "true");
-
-                        BomCreator.bomKpiData.DevDependentComponents++;
-                    }
-                }
-            }
-            else if (componentsForBOM?.Count <= componentList?.Count && componentsForBOM.Count != 0)
-            {
-                foreach (var entry in componentList)
-                {
-
-                    if (componentsForBOM.Exists(x => x.Name == entry.Name))
-                    {
-                        SetPropertiesforBOM(ref componentsToBOM, entry, "false");
-
-
-                    }
-                    else
-                    {
-                        SetPropertiesforBOM(ref componentsToBOM, entry, "true");
-
-
-                        BomCreator.bomKpiData.DevDependentComponents++;
-                    }
-                }
-            }
-            else
-            {
-                //do nothing
-            }
-
-        }
-
-
         public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM, CommonAppSettings appSettings,
                                                           IJFrogService jFrogService,
                                                           IBomHelper bomhelper)

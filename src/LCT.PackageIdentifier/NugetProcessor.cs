@@ -437,10 +437,8 @@ namespace LCT.PackageIdentifier
                 else
                 {
                     Logger.Debug($"ParsingInputFileForBOM():Found as Package File");
-                    List<NugetPackage> listofComponents = new List<NugetPackage>();
-                 
+                    List<NugetPackage> listofComponents = new();                
                     ParseInputFiles(appSettings, filepath, listofComponents);
-
                     ConvertToCycloneDXModel(listComponentForBOM, listofComponents, dependencies);
                     bom.Dependencies= dependencies;
                     BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = listComponentForBOM.Count;
@@ -502,10 +500,10 @@ namespace LCT.PackageIdentifier
             List<Dependency> subDependencies = new();
             foreach (var item in prop.Dependencies)
             {
-                string pUrl = item;
+                string purl = item;
                 Dependency dependentList = new Dependency()
                 {
-                    Ref = pUrl
+                    Ref = purl
                 };
                 subDependencies.Add(dependentList);
             }
@@ -557,8 +555,7 @@ namespace LCT.PackageIdentifier
             }
     
         }
-
-   
+  
 
         private static void CheckForMultipleVersions(CommonAppSettings appSettings, ref List<Component> listComponentForBOM, ref int noOfExcludedComponents, List<Component> componentsWithMultipleVersions)
         {
