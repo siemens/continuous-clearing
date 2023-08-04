@@ -35,6 +35,8 @@ namespace LCT.PackageIdentifier
             Bom bom = new();
             List<Dependency> dependenciesForBOM = new();
             List<string> configFiles;
+            int noOfExcludedComponents = 0;
+
             if (string.IsNullOrEmpty(appSettings.CycloneDxBomFilePath))
             {
                 configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Maven);
@@ -62,7 +64,7 @@ namespace LCT.PackageIdentifier
                     dependenciesForBOM.AddRange(bomList.Dependencies);
                 }
             }
-
+                    
             //checking Dev dependency
             DevDependencyIdentificationLogic(componentsForBOM, componentsToBOM, ref ListOfComponents);
 
@@ -76,7 +78,13 @@ namespace LCT.PackageIdentifier
 
             BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - componentsForBOM.Count;
 
-
+            
+            //Removing Excluded components
+            if (appSettings.Maven.ExcludedComponents != null)
+            {
+                componentsForBOM = CommonHelper.RemoveExcludedComponents(componentsForBOM, appSettings.Maven.ExcludedComponents, ref noOfExcludedComponents);
+                BomCreator.bomKpiData.ComponentsExcluded += noOfExcludedComponents;
+            }
             bom.Components = componentsForBOM;
             bom.Dependencies = dependenciesForBOM;
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = bom.Components.Count;
@@ -84,7 +92,7 @@ namespace LCT.PackageIdentifier
             Logger.Debug($"ParsePackageFile():End");
             return bom;
         }
-
+        
         public static void DevDependencyIdentificationLogic(List<Component> componentsForBOM, List<Component> componentsToBOM, ref List<Component> ListOfComponents)
         {
                        
