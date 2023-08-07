@@ -452,12 +452,7 @@ namespace LCT.PackageIdentifier
 
         private static void CheckForMultipleVersions(CommonAppSettings appSettings, ref List<Component> listComponentForBOM, ref int noOfExcludedComponents, List<Component> componentsWithMultipleVersions)
         {
-            if (appSettings.Nuget.ExcludedComponents != null)
-            {
-                listComponentForBOM = CommonHelper.RemoveExcludedComponents(listComponentForBOM, appSettings.Nuget.ExcludedComponents, ref noOfExcludedComponents);
-                BomCreator.bomKpiData.ComponentsExcluded += noOfExcludedComponents;
-            }
-
+           
             if (componentsWithMultipleVersions.Count != 0)
             {
                 Logger.Warn($"Multiple versions detected :\n");

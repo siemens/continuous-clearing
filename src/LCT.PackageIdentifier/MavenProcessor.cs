@@ -34,6 +34,7 @@ namespace LCT.PackageIdentifier
             string depFilePath = "";
             int totalComponentsIdentified = 0;
             List<string> configFiles = new();
+            int noOfExcludedComponents = 0;
             if (string.IsNullOrEmpty(appSettings.CycloneDxBomFilePath))
             {
                 //Create empty dependency list file
@@ -60,6 +61,12 @@ namespace LCT.PackageIdentifier
                 componentsForBOM = componentsForBOM.Distinct(new ComponentEqualityComparer()).ToList();
 
                 BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - componentsForBOM.Count;
+
+                if (appSettings.Maven.ExcludedComponents != null)
+                {
+                    componentsForBOM = CommonHelper.RemoveExcludedComponents(componentsForBOM, appSettings.Maven.ExcludedComponents, ref noOfExcludedComponents);
+                    BomCreator.bomKpiData.ComponentsExcluded += noOfExcludedComponents;
+                }
 
                 var componentsWithMultipleVersions = componentsForBOM.GroupBy(s => s.Name)
                          .Where(g => g.Count() > 1).SelectMany(g => g).ToList();
