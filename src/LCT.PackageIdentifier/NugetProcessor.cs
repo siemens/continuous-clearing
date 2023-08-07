@@ -422,7 +422,14 @@ namespace LCT.PackageIdentifier
             List<string> configFiles;
             List<Component> componentsForBOM = new List<Component>();
             List<Dependency> dependencies = new List<Dependency>();
-            configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Nuget);
+            if (string.IsNullOrEmpty(appSettings.CycloneDxBomFilePath))
+            {
+                configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Nuget);
+            }
+            else
+            {
+                configFiles = FolderScanner.FileScanner(appSettings.CycloneDxBomFilePath, appSettings.Nuget);
+            }
 
             foreach (string filepath in configFiles)
             {
