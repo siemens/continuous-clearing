@@ -369,11 +369,11 @@ namespace LCT.PackageIdentifier
 
             if (File.Exists(appSettings.CycloneDxSBomTemplatePath))
             {
-                Bom sbomdDetails;
-                sbomdDetails = cycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
-                cycloneDXBomParser.CheckValidComponentsForProjectType(sbomdDetails.Components, appSettings.ProjectType);
+                Bom templateDetails;
+                templateDetails = cycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
+                cycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
                 //Adding Template Component Details
-                SbomTemplate.AddComponentDetails(componentsForBOM, sbomdDetails);
+                SbomTemplate.AddComponentDetails(componentsForBOM, templateDetails);
             }
 
             if (dependencies != null)

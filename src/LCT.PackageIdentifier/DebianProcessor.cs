@@ -60,11 +60,11 @@ namespace LCT.PackageIdentifier
             bom.Components = listComponentForBOM;
             if (File.Exists(appSettings.CycloneDxSBomTemplatePath))
             {
-                Bom sbomdDetails;
-                sbomdDetails = cycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
-                cycloneDXBomParser.CheckValidComponentsForProjectType(sbomdDetails.Components, appSettings.ProjectType);
+                Bom templateDetails;
+                templateDetails = cycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
+                cycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
                 //Adding Template Component Details & MetaData
-                SbomTemplate.AddComponentDetails(bom.Components, sbomdDetails);
+                SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
             }
 
             bom = RemoveExcludedComponents(appSettings, bom);

@@ -448,10 +448,10 @@ namespace LCT.PackageIdentifier
             if (File.Exists(appSettings.CycloneDxSBomTemplatePath))
             {
                 //Adding Template Component Details
-                Bom sbomdDetails;
-                sbomdDetails = cycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
-                cycloneDXBomParser.CheckValidComponentsForProjectType(sbomdDetails.Components, appSettings.ProjectType);
-                SbomTemplate.AddComponentDetails(bom.Components, sbomdDetails);
+                Bom templateDetails;
+                templateDetails = cycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
+                cycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
+                SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
             }
 
             bom = RemoveExcludedComponents(appSettings, bom);

@@ -52,6 +52,7 @@ namespace LCT.Common
         private string m_LogFolderPath;
         private string m_FOSSURL;
         private string m_ArtifactoryUser;
+        private string m_CycloneDxSBomTemplatePath;
 
 
         public bool RemoveDevDependency { get; set; } = true;
@@ -273,6 +274,19 @@ namespace LCT.Common
                     m_BomFilePath = value;
                     _fileOperations.ValidateFilePath(m_BomFilePath);
                 }
+            }
+        }
+
+        public string SBomTemplatePath
+        {
+            get
+            {
+                return m_CycloneDxSBomTemplatePath;
+            }
+            set
+            {
+                m_CycloneDxSBomTemplatePath = value;
+                _fileOperations.ValidateFilePath(m_CycloneDxSBomTemplatePath);
             }
         }
 

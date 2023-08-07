@@ -118,11 +118,11 @@ namespace LCT.PackageIdentifier
                 }
             }
 
-            Bom sbomdDetails = new Bom();
+            Bom templateDetails = new Bom();
             if (File.Exists(appSettings.CycloneDxSBomTemplatePath))
             {
-                sbomdDetails = cycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
-                cycloneDXBomParser.CheckValidComponentsForProjectType(sbomdDetails.Components, appSettings.ProjectType);
+                templateDetails = cycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
+                cycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
             }
 
             int initialCount = listofComponents.Count;
@@ -133,7 +133,7 @@ namespace LCT.PackageIdentifier
 
             bom.Components = listComponentForBOM;
             //Adding Template Component Details & MetaData
-            SbomTemplate.AddComponentDetails(bom.Components, sbomdDetails);
+            SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
             bom = RemoveExcludedComponents(appSettings, bom);
             return bom;
         }
@@ -146,48 +146,6 @@ namespace LCT.PackageIdentifier
             PythonPackages = PoetrySetOfCmds(filePath);
             return PythonPackages;
         }
-
-        //private static List<PythonPackage> ExtractDetailsFromJson(string filePath)
-        //{
-        //    List<PythonPackage> PythonPackages = new List<PythonPackage>();
-        //    Model.CycloneDxBomData cycloneDxBomData;
-        //    string json = File.ReadAllText(filePath);
-        //    cycloneDxBomData = JsonConvert.DeserializeObject<CycloneDxBomData>(json);
-
-        //    if (cycloneDxBomData != null && cycloneDxBomData.ComponentsInfo != null)
-        //    {
-        //        foreach (var componentsInfo in cycloneDxBomData.ComponentsInfo)
-        //        {
-        //            if (componentsInfo.Type == "library")
-        //            {
-        //                BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;
-        //                PythonPackage package = new PythonPackage
-        //                {
-        //                    Name = componentsInfo.Name,
-        //                    Version = componentsInfo.Version,
-        //                    PurlID = componentsInfo.ReleaseExternalId,
-        //                };
-
-        //                if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.ReleaseExternalId) && componentsInfo.ReleaseExternalId.Contains(Dataconstant.PythonPackage))
-        //                {
-        //                    BomCreator.bomKpiData.DebianComponents++;
-        //                    PythonPackages.Add(package);
-        //                    Logger.Debug($"ExtractDetailsFromJson():ValidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
-        //                }
-        //                else
-        //                {
-        //                    BomCreator.bomKpiData.ComponentsExcluded++;
-        //                    Logger.Debug($"ExtractDetailsFromJson():InvalidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
-        //                }
-        //            }
-        //        }
-        //    }
-        //    else
-        //    {
-        //        Logger.Debug($"ExtractDetailsFromJson():NoComponenstFound!!");
-        //    }
-        //    return PythonPackages;
-        //}
 
         private List<PythonPackage> ExtractDetailsFromJson(string filePath, CommonAppSettings appSettings)
         {
