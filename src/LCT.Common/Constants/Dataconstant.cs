@@ -49,7 +49,6 @@ namespace LCT.Common.Constants
         public const string Cdx_FossologyUrl = "internal:siemens:clearing:fossology:url";
         public const string Cdx_IsDevelopment = "internal:siemens:clearing:development";
         public const string Cdx_IdentifierType = "internal:siemens:clearing:identifier-type";
-        public const string Cdx_IsDevelopmentDependency = "internal:siemens:clearing:development";
 
         public static Dictionary<string, string> PurlCheck()
         {

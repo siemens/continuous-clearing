@@ -206,16 +206,16 @@ namespace LCT.PackageIdentifier
                 {
                     devDependency = new()
                     {
-                        Name = Dataconstant.Cdx_IsDevelopmentDependency,
-                        Value = "TRUE"
+                        Name = Dataconstant.Cdx_IsDevelopment,
+                        Value = "true"
                     };
                 }
                 else
                 {
                     devDependency = new()
                     {
-                        Name = Dataconstant.Cdx_IsDevelopmentDependency,
-                        Value = "FALSE"
+                        Name = Dataconstant.Cdx_IsDevelopment,
+                        Value = "false"
                     };
                 }
 
@@ -382,7 +382,7 @@ namespace LCT.PackageIdentifier
             foreach (var val in AllComps)
             {
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;
-                if (MainComps.Any(a => a.Name == val.Name && a.Version == val.Version))
+                if (MainComps.Exists(a => a.Name == val.Name && a.Version == val.Version))
                 {
                     val.Isdevdependent = false;
                 }

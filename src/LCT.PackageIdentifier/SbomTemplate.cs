@@ -37,6 +37,13 @@ namespace LCT.PackageIdentifier
                             Name = Dataconstant.Cdx_IdentifierType,
                             Value = "TemplateAdded"
                         });
+
+                        sbomcomp.Properties.Add(
+                         new Property()
+                         {
+                             Name = Dataconstant.Cdx_IsDevelopment,
+                             Value = "false"
+                         });
                         bom.Add(sbomcomp);
                         BomCreator.bomKpiData.ComponentsinSBOMTemplateFile++;
                     }
