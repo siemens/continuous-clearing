@@ -49,29 +49,6 @@ namespace PackageIdentifier.UTest
         }
 
         [TestCase]
-        public void ParsePackageLockJson_GivenAInputFilePath_ReturnsSuccess()
-        {
-            //Arrange
-            int expectednoofcomponents = 153;
-            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string outFolder = Path.GetDirectoryName(exePath);
-            string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles\packages.lock.json";
-            string csprojPath = outFolder + @"\PackageIdentifierUTTestFiles";
-
-
-            CommonAppSettings appSettings = new CommonAppSettings()
-            {
-                PackageFilePath = csprojPath
-            };
-
-            //Act
-            List<NugetPackage> listofcomponents = NugetProcessor.ParsePackageLock(packagefilepath, appSettings);
-
-            //Assert
-            Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Count), "Checks for no of components");
-
-        }
-        [TestCase]
         public void InputFileIdentifaction_GivenARootPath_ReturnsSuccess()
         {
             //Arrange

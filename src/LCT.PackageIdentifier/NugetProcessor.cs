@@ -126,63 +126,6 @@ namespace LCT.PackageIdentifier
             return nugetPackages;
         }
 
-        public static List<NugetPackage> ParsePackageLock(string packagesFilePath, CommonAppSettings appSettings)
-        {
-            List<NugetPackage> packageList = new List<NugetPackage>();
-            string isDev = "false";
-            try
-            {
-                List<ReferenceDetails> referenceList = Parsecsproj(appSettings);
-                using (StreamReader r = new StreamReader(packagesFilePath))
-                {
-                    string json = r.ReadToEnd();
-                    JObject jObject = JObject.Parse(json);
-
-                    JToken jDependencies = jObject["dependencies"];
-
-                    foreach (JToken targetVersion in jDependencies.Children())
-                    {
-                        foreach (JToken dependencyToken in targetVersion.Children().Children())
-                        {
-                            string id = dependencyToken.ToObject<JProperty>().Name;
-                            string version = dependencyToken.First.Value<string>("resolved");
-                            if (dependencyToken.First.Value<string>("type") == "Dev" || IsDevDependent(referenceList, id, version))
-                            {
-                                BomCreator.bomKpiData.DevDependentComponents++;
-                                isDev = "true";
-                            }
-                            if (dependencyToken.First.Value<string>("type") == "Project" || string.IsNullOrEmpty(version) && string.IsNullOrEmpty(id))
-                            {
-
-                                continue;
-                            }
-
-                            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;
-
-                            NugetPackage package = new NugetPackage()
-                            {
-                                ID = id,
-                                Version = version,
-                                Filepath = packagesFilePath,
-                                IsDev = isDev
-
-                            };
-                            packageList.Add(package);
-                        }
-                    }
-                }
-            }
-            catch (JsonReaderException ex)
-            {
-                Logger.Error($"ParsePackageFile():", ex);
-            }
-            catch (IOException ex)
-            {
-                Logger.Error($"ParsePackageFile():", ex);
-            }
-            return packageList;
-        }
-
         public static bool IsDevDependent(List<ReferenceDetails> referenceDetails, string name, string version)
         {
             foreach (var item in referenceDetails)
@@ -498,14 +441,17 @@ namespace LCT.PackageIdentifier
                     }
                 };
                 listComponentForBOM.Add(components);
-                GetDependencyDetails(components,prop, ref dependencies);
+                if (prop.Dependencies != null)
+                {
+                    GetDependencyDetails(components, prop, ref dependencies);
+                }
             }
         }
 
         private static void GetDependencyDetails(Component compnent, NugetPackage prop,ref List<Dependency> dependencies)
         {
             List<Dependency> subDependencies = new();
-            foreach (var item in prop.Dependencies)
+            foreach (var item in prop?.Dependencies)
             {
                 string purl = item;
                 Dependency dependentList = new Dependency()
@@ -552,13 +498,13 @@ namespace LCT.PackageIdentifier
             {
                 listofComponents.AddRange(ParseAssetFile(filepath));
             }
-            else if (filepath.EndsWith("lock.json"))
+            else if (filepath.EndsWith(".config"))
             {
-                listofComponents.AddRange(ParsePackageLock(filepath, appSettings));
+                listofComponents.AddRange(ParsePackageConfig(filepath, appSettings));
             }
             else
             {            
-                listofComponents.AddRange(ParsePackageConfig(filepath, appSettings));
+               //do nothing
             }
     
         }
