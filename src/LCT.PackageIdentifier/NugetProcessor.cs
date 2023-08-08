@@ -533,8 +533,9 @@ namespace LCT.PackageIdentifier
                 listofComponents.AddRange(ParsePackageLock(filepath, appSettings));
             }
             else
-            {            
-                listofComponents.AddRange(ParsePackageConfig(filepath, appSettings));
+            {
+                var list = ParsePackageConfig(filepath, appSettings);
+                listofComponents.AddRange(list);
             }
         }
 

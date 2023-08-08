@@ -170,6 +170,10 @@
           "Value": "TemplateAdded"
         },
         {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
+        {
           "Name": "internal:siemens:clearing:is-internal",
           "Value": "false"
         },
