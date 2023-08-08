@@ -284,6 +284,8 @@ You can also pass the above mentioned arguments in the command line.
 
   Incase the component you want to exclude is of the format _"@group/componentname"_ `eg : @angular/common` specify it as _"@group/componentname:version"_ i.e `@angular/common:4.2.6`
 
+  Incase the component you want to exclude multiple versions is of the format _"@group/componentname"_ `eg : @angular/common` specify it as _"@group/componentname:*"_ i.e `@angular/common:*`
+  
   In order to **Exclude specific folders** from the execution, It can be specified under the **Exclude section** of that specific **package type**.
 
 
