@@ -1,0 +1,183 @@
+// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2023 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+
+// --------------------------------------------------------------------------------------------------------------------
+{
+  "BomFormat": "CycloneDX",
+  "SpecVersion": 4,
+  "SpecVersionString": "1.4",
+  "SerialNumber": null,
+  "Version": null,
+  "Metadata": {
+    "Tools": [
+      {
+        "Vendor": "Siemens AG",
+        "Name": "Clearing Automation Tool",
+        "Version": "3.1.1",
+        "Hashes": null
+      }
+    ],
+    "Authors": null,
+    "Component": null,
+    "Manufacture": null,
+    "Supplier": null
+  },
+  "Components": [
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:nuget/Newtonsoft.Json@13.0.3",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "Newtonsoft.Json",
+      "Version": "13.0.3",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": [
+        {
+          "License": {
+            "Id": "GPL-2.0-only",
+            "Text": null,
+            "Url": null
+          },
+          "Expression": null
+        }
+      ],
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:nuget/Newtonsoft.Json@13.0.3",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "syft:package:foundBy",
+          "Value": "Testing Properties"
+        },
+        {
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "TemplateUpdated"
+        },
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "NUGET"
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:nuget/SonarAnalyzer.CSharp@9.5.0.73987",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "SonarAnalyzer.CSharp",
+      "Version": "9.5.0.73987",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:nuget/SonarAnalyzer.CSharp@9.5.0.73987",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "true"
+        },
+        {
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
+        },
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "NUGET"
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 3,
+      "MimeType": null,
+      "BomRef": "pkg:nuget/Ninject@3.2.2.0?arch=all&distro=debian-10&package-id=fa3d4bdfaf909c6b",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": "",
+      "Group": null,
+      "Name": "Ninject",
+      "Version": "3.2.2.0",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": [
+        {
+          "License": {
+            "Id": "GPL-2.0-only",
+            "Text": null,
+            "Url": null
+          },
+          "Expression": null
+        }
+      ],
+      "Copyright": null,
+      "Cpe": "cpe:2.3:a:libblkid1:libblkid1:2.33.1-0.1:*:*:*:*:*:*:*",
+      "Purl": "pkg:nuget/Ninject@3.2.2.0?arch=all&distro=debian-10&package-id=fa3d4bdfaf909c6b",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "syft:package:foundBy",
+          "Value": "Testing Properties"
+        },
+        {
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "TemplateAdded"
+        },
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "NUGET"
+        }
+      ],
+      "Evidence": null
+    }
+  ],
+  "Compositions": null
+}

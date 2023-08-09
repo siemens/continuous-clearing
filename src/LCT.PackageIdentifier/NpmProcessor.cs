@@ -10,6 +10,7 @@ using LCT.APICommunications;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Model;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
@@ -35,6 +36,7 @@ namespace LCT.PackageIdentifier
     public class NpmProcessor : CycloneDXBomParser, IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        readonly CycloneDXBomParser cycloneDXBomParser;
         private const string Bundled = "bundled";
         private const string Dependencies = "dependencies";
         private const string Dev = "dev";
@@ -42,6 +44,13 @@ namespace LCT.PackageIdentifier
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
         private const string Requires = "requires";
 
+        public NpmProcessor()
+        {
+            if (cycloneDXBomParser == null)
+            {
+                cycloneDXBomParser = new CycloneDXBomParser();
+            }
+        }
 
         public Bom ParsePackageFile(CommonAppSettings appSettings)
         {
@@ -52,15 +61,9 @@ namespace LCT.PackageIdentifier
 
             ParsingInputFileForBOM(appSettings, ref componentsForBOM, ref bom, ref dependencies);
             totalComponentsIdentified = componentsForBOM.Count;
-
             componentsForBOM = GetExcludedComponentsList(componentsForBOM);
-
-            totalComponentsIdentified = componentsForBOM.Count;
-
             componentsForBOM = componentsForBOM.Distinct(new ComponentEqualityComparer()).ToList();
-
             BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - componentsForBOM.Count;
-
             var componentsWithMultipleVersions = componentsForBOM.GroupBy(s => s.Name)
                               .Where(g => g.Count() > 1).SelectMany(g => g).ToList();
 
@@ -140,7 +143,7 @@ namespace LCT.PackageIdentifier
         private static void GetPackagesForBom(string filepath, ref List<BundledComponents> bundledComponents, ref List<Component> lstComponentForBOM, ref int noOfDevDependent, IEnumerable<JProperty> depencyComponentList)
         {
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += depencyComponentList.Count();
-       
+
             foreach (JProperty prop in depencyComponentList)
             {
                 Property isdev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
@@ -154,7 +157,7 @@ namespace LCT.PackageIdentifier
                 var properties = JObject.Parse(Convert.ToString(prop.Value));
 
                 // dev components are not ignored and added as a part of SBOM   
-                if (IsDevDependency( prop.Value[Dev], ref noOfDevDependent))
+                if (IsDevDependency(prop.Value[Dev], ref noOfDevDependent))
                 {
                     isdev.Value = "true";
                 }
@@ -340,49 +343,49 @@ namespace LCT.PackageIdentifier
         private void ParsingInputFileForBOM(CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom, ref List<Dependency> dependencies)
         {
             List<string> configFiles;
-  
-            if (string.IsNullOrEmpty(appSettings.CycloneDxBomFilePath))
+            configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Npm);
+
+            foreach (string filepath in configFiles)
             {
-                configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Npm);
-            
-                foreach (string filepath in configFiles)
+                Logger.Debug($"ParsingInputFileForBOM():FileName: " + filepath);
+
+                if (filepath.EndsWith(FileConstant.CycloneDXFileExtension))
                 {
-                    Logger.Debug($"ParsingInputFileForBOM():FileName: " + filepath);
-
-                    if (filepath.EndsWith(FileConstant.CycloneDXFileExtension))
-                    {
-                        Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
-                        bom = ParseCycloneDXBom(filepath);
-                        bom = RemoveExcludedComponents(appSettings, bom);
-
-                        componentsForBOM.AddRange(bom.Components);
-                    }
-                    else
-                    {
-                        Logger.Debug($"ParsingInputFileForBOM():Found as Package File");
-                        var components = ParsePackageLockJson(filepath, appSettings);
-                        componentsForBOM.AddRange(components);
-                    }
+                    Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
+                    bom = ParseCycloneDXBom(filepath);
+                    bom = RemoveExcludedComponents(appSettings, bom);
+                    cycloneDXBomParser.CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
+                    componentsForBOM.AddRange(bom.Components);
+                    dependencies = bom.Dependencies;
                 }
-                GetdependencyDetails(componentsForBOM, dependencies);
-
+                else
+                {
+                    Logger.Debug($"ParsingInputFileForBOM():Found as Package File");
+                    var components = ParsePackageLockJson(filepath, appSettings);
+                    componentsForBOM.AddRange(components);
+                }
             }
-            else
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = componentsForBOM.Count;
+
+            if (File.Exists(appSettings.CycloneDxSBomTemplatePath))
             {
-                bom = ParseCycloneDXBom(appSettings.CycloneDxBomFilePath);
-                BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = bom.Components.Count;
-                bom = RemoveExcludedComponents(appSettings, bom);
-
-                componentsForBOM = bom.Components;
-                dependencies = bom.Dependencies;
+                Bom templateDetails;
+                templateDetails = cycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
+                cycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
+                //Adding Template Component Details
+                SbomTemplate.AddComponentDetails(componentsForBOM, templateDetails);
             }
-      
+
+            if (dependencies != null)
+            {
+                GetdependencyDetails(componentsForBOM, dependencies);
+            }
         }
 
         public static void GetdependencyDetails(List<Component> componentsForBOM, List<Dependency> dependencies)
         {
             List<Dependency> dependencyList = new();
-        
+
             foreach (var component in componentsForBOM)
             {
                 if ((component.Author?.Split(",")) != null)
@@ -390,7 +393,6 @@ namespace LCT.PackageIdentifier
                     List<Dependency> subDependencies = new();
                     foreach (var item in (component?.Author?.Split(",")).Where(item => item.Contains(":")))
                     {
-                      
                         var componentDetails = item.Split(":");
                         var name = StringFormat(componentDetails[0]);
                         var version = StringFormat(componentDetails[1]);
@@ -425,7 +427,7 @@ namespace LCT.PackageIdentifier
             return formattedstring.Trim();
         }
 
-        private static bool IsDevDependency( JToken devValue, ref int noOfDevDependent)
+        private static bool IsDevDependency(JToken devValue, ref int noOfDevDependent)
         {
             if (devValue != null)
             {
@@ -518,7 +520,7 @@ namespace LCT.PackageIdentifier
             List<Component> components = new List<Component>();
             foreach (Component componentsInfo in componentsForBOM)
             {
-                if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.NpmPackage))
+                if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["NPM"]))
                 {
                     components.Add(componentsInfo);
                     Logger.Debug($"GetExcludedComponentsList():ValidComponent For NPM : Component Details : {componentsInfo.Name} @ {componentsInfo.Version} @ {componentsInfo.Purl}");

@@ -6,11 +6,9 @@
 
 using CycloneDX.Models;
 using LCT.APICommunications;
-using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
-using LCT.Common.Model;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.PackageIdentifier.Model.NugetModel;
@@ -21,11 +19,9 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NuGet.ProjectModel;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Management.Automation.Language;
 using System.Reflection;
 using System.Security;
 using System.Text.RegularExpressions;
@@ -35,10 +31,16 @@ using System.Xml.Linq;
 
 namespace LCT.PackageIdentifier
 {
-    public class NugetProcessor : CycloneDXBomParser, IParser
+    public class NugetProcessor : IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
+        readonly CycloneDXBomParser cycloneDXBomParser;
+
+        public NugetProcessor()
+        {
+            cycloneDXBomParser = new CycloneDXBomParser();
+        }
 
         #region public methods
         public Bom ParsePackageFile(CommonAppSettings appSettings)
@@ -420,7 +422,8 @@ namespace LCT.PackageIdentifier
                 if (filepath.EndsWith(FileConstant.CycloneDXFileExtension))
                 {
                     Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
-                    bom = ParseCycloneDXBom(filepath);
+                    bom = cycloneDXBomParser.ParseCycloneDXBom(filepath);
+                    cycloneDXBomParser.CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
                     componentsForBOM.AddRange(bom.Components);
                     GetDetailsforManuallyAdded(componentsForBOM, listComponentForBOM);
                 }
@@ -441,6 +444,16 @@ namespace LCT.PackageIdentifier
             listComponentForBOM = KeepUniqueNonDevComponents(listComponentForBOM);
             BomCreator.bomKpiData.DevDependentComponents = listComponentForBOM.Count(s => s.Properties[0].Value == "true");
             bom.Components = listComponentForBOM;
+
+            if (File.Exists(appSettings.CycloneDxSBomTemplatePath))
+            {
+                //Adding Template Component Details
+                Bom templateDetails;
+                templateDetails = cycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
+                cycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
+                SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
+            }
+
             bom = RemoveExcludedComponents(appSettings, bom);
         }
 
@@ -520,8 +533,9 @@ namespace LCT.PackageIdentifier
                 listofComponents.AddRange(ParsePackageLock(filepath, appSettings));
             }
             else
-            {            
-                listofComponents.AddRange(ParsePackageConfig(filepath, appSettings));
+            {
+                var list = ParsePackageConfig(filepath, appSettings);
+                listofComponents.AddRange(list);
             }
         }
 
@@ -538,7 +552,7 @@ namespace LCT.PackageIdentifier
                 Logger.Warn($"Multiple versions detected :\n");
                 foreach (var item in componentsWithMultipleVersions)
                 {
-                    item.Description = !string.IsNullOrEmpty(appSettings.CycloneDxBomFilePath) ? appSettings.CycloneDxBomFilePath : item.Description;
+                    item.Description = !string.IsNullOrEmpty(appSettings.CycloneDxSBomTemplatePath) ? appSettings.CycloneDxSBomTemplatePath : item.Description;
                     Logger.Warn($"Component Name : {item.Name}\nComponent Version : {item.Version}\nPackage Found in : {item.Description}\n");
                 }
             }

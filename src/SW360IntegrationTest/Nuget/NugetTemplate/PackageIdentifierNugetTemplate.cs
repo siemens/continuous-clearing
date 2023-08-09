@@ -1,4 +1,4 @@
-// --------------------------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // SPDX-FileCopyrightText: 2023 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
@@ -12,8 +12,8 @@ using TestUtilities;
 
 namespace SW360IntegrationTest
 {
-    [TestFixture, Order(13)]
-    public class PackageIdentifierInitialNuget
+    [TestFixture, Order(22)]
+    public class PackageIdentifierNugetTemplate
     {
         private string CCTLocalBomTestFile { get; set; }
         private string OutFolder { get; set; }
@@ -24,7 +24,7 @@ namespace SW360IntegrationTest
         {
             OutFolder = TestHelper.OutFolder;
 
-            CCTLocalBomTestFile = OutFolder + @"..\..\..\src\SW360IntegrationTest\PackageIdentifierTestFiles\Nuget\CCTLocalBOMNugetInitial.json";
+            CCTLocalBomTestFile = OutFolder + @"..\..\..\src\SW360IntegrationTest\PackageIdentifierTestFiles\CCTLocalBOMTemplateNugetInitial.json";
 
             if (!Directory.Exists(OutFolder + @"\..\BOMs"))
             {
@@ -36,7 +36,8 @@ namespace SW360IntegrationTest
         [Test, Order(1)]
         public void RunBOMCreatorexe_ProvidedPackageJsonFilePath_ReturnsSuccess()
         {
-            string packagejsonPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest1stIterationData\Nuget";
+            string packagejsonPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest1stIterationData\Nuget-Assets";
+            string sbomTemplatePath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest1stIterationData\Template-Nuget\Template_Nuget.cdx.json";
             string bomPath = OutFolder + @"\..\BOMs";
 
             // Test BOM Creator ran with exit code 0
@@ -51,6 +52,7 @@ namespace SW360IntegrationTest
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
                 TestConstant.ProjectType,"NUGET",
+                TestConstant.CycloneDxSBomTemplatePath,sbomTemplatePath,
                 TestConstant.Mode,""}),
                 "Test to run  Package Identifier EXE execution");
         }

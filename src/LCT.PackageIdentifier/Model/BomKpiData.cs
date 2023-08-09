@@ -15,10 +15,10 @@ namespace LCT.PackageIdentifier.Model
     [ExcludeFromCodeCoverage]
     public class BomKpiData
     {
-        [DisplayName(@"Debian Components in input file")]
+        [DisplayName(@"Debian Components In Input File")]
         public int DebianComponents { get; set; }
 
-        [DisplayName(@"Components in input file")]
+        [DisplayName(@"Components In Input File")]
         public int ComponentsinPackageLockJsonFile { get; set; }
 
         [DisplayName(@"Dev Dependent Components")]
@@ -39,11 +39,17 @@ namespace LCT.PackageIdentifier.Model
         [DisplayName(@"Components With SourceURL")]
         public int ComponentsWithSourceURL { get; set; }
 
-        [DisplayName(@"Components in Comparison BOM")]
+        [DisplayName(@"Components In Comparison BOM")]
         public int ComponentsInComparisonBOM { get; set; }
 
         [DisplayName(@"Time taken by BOM Creator")]
         public double TimeTakenByBomCreator { get; set; }
+
+        [DisplayName(@"Components Added From SBOM Template")]
+        public int ComponentsinSBOMTemplateFile { get; set; }
+
+        [DisplayName(@"Components Updated From SBOM Template")]
+        public int ComponentsUpdatedFromSBOMTemplateFile { get; set; }
 
         public string ProjectSummaryLink { get; set; }
     }

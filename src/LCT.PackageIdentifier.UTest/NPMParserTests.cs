@@ -11,6 +11,7 @@ using LCT.Common;
 using LCT.Common.Model;
 using System.Collections.Generic;
 using CycloneDX.Models;
+using LCT.Common.Constants;
 
 namespace LCT.PackageIdentifier.UTest
 {
@@ -106,7 +107,7 @@ namespace LCT.PackageIdentifier.UTest
         public void ParseCycloneDXFile_GivenMultipleInputFiles_ReturnsCounts()
         {
             //Arrange
-            int expectednoofcomponents = 5;
+            int expectednoofcomponents = 6;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             NpmProcessor npmProcessor = new NpmProcessor();
@@ -124,6 +125,61 @@ namespace LCT.PackageIdentifier.UTest
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
+        }
+
+        [Test]
+        public void ParseCycloneDXFile_GivenAInputFilePathAlongWithSBOMTemplate_ReturnTotalComponentsList()
+        {
+            //Arrange
+            int expectednoofcomponents = 4;
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string OutFolder = Path.GetDirectoryName(exePath);
+            NpmProcessor npmProcessor = new NpmProcessor();
+            string[] Includes = { "CycloneDX2_NPM.cdx.json" };
+            string packagefilepath = OutFolder + @"\PackageIdentifierUTTestFiles";
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                PackageFilePath = packagefilepath,
+                ProjectType = "NPM",
+                RemoveDevDependency = true,
+                Npm = new Config() { Include = Includes },
+                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOMTemplate_Npm.cdx.json"
+            };
+
+            //Act
+            Bom listofcomponents = npmProcessor.ParsePackageFile(appSettings);
+
+            //Assert
+            Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
+        }
+
+        [Test]
+        public void ParseCycloneDXFile_GivenAInputFilePathAlongWithSBOMTemplate_ReturnUpdatedComponents()
+        {
+            //Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string OutFolder = Path.GetDirectoryName(exePath);
+            NpmProcessor npmProcessor = new NpmProcessor();
+            string[] Includes = { "CycloneDX2_NPM.cdx.json" };
+            string packagefilepath = OutFolder + @"\PackageIdentifierUTTestFiles";
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                PackageFilePath = packagefilepath,
+                ProjectType = "NPM",
+                RemoveDevDependency = true,
+                Npm = new Config() { Include = Includes },
+                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOMTemplate_Npm.cdx.json"
+            };
+
+            //Act
+            Bom listofcomponents = npmProcessor.ParsePackageFile(appSettings);
+
+            bool isUpdated = listofcomponents.Components.Exists(x => x.Properties != null && x.Properties.Exists(x => x.Name == Dataconstant.Cdx_IdentifierType && x.Value == "TemplateAdded"));
+
+            //Assert
+            Assert.IsTrue(isUpdated, "Checks For Updated Property In List ");
         }
     }
 }

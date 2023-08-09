@@ -67,7 +67,7 @@ namespace LCT.SW360PackageCreator
         {
             Dictionary<string, string> AttachmentUrlList = new Dictionary<string, string>();
             string localPathforDownload = GetDownloadPathForComponetType(component);
-            if (!component.ReleaseExternalId.Contains(Dataconstant.MavenPackage))
+            if (!component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["MAVEN"]))
             {
                 ServicePointManager.Expect100Continue = true;
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
@@ -105,7 +105,7 @@ namespace LCT.SW360PackageCreator
         private async Task<string> GetAttachmentUrlList(ComparisonBomData component, Dictionary<string, string> AttachmentUrlList, string localPathforDownload)
         {
             string downloadPath = string.Empty;
-            if (component.ReleaseExternalId.Contains(Dataconstant.DebianPackage))
+            if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
             {
                 if (!string.IsNullOrEmpty(component.SourceUrl))
                 {
@@ -188,7 +188,7 @@ namespace LCT.SW360PackageCreator
                 mapper.DownloadUrl = item.DownloadUrl;
                 mapper.ComponentStatus = GetComponentAvailabilityStatus(componentsAvailableInSw360, item);
                 mapper.ReleaseStatus = IsReleaseAvailable(item.Name, item.Version, item.ReleaseExternalId);
-                if (!string.IsNullOrEmpty(item.ReleaseExternalId) && item.ReleaseExternalId.Contains(Dataconstant.DebianPackage))
+                if (!string.IsNullOrEmpty(item.ReleaseExternalId) && item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
                 {
                     if ((string.IsNullOrEmpty(item.SourceUrl) || item.SourceUrl == Dataconstant.SourceUrlNotFound) && !string.IsNullOrEmpty(releasesInfo.SourceCodeDownloadUrl))
                     {
@@ -198,7 +198,7 @@ namespace LCT.SW360PackageCreator
                     }
                     mapper.PatchURls = item.PatchURLs;
                 }
-                else if (!string.IsNullOrEmpty(item.ReleaseExternalId) && item.ReleaseExternalId.Contains(Dataconstant.MavenPackage))
+                else if (!string.IsNullOrEmpty(item.ReleaseExternalId) && item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["MAVEN"]))
                 {
                     mapper.DownloadUrl = GetMavenDownloadUrl(mapper, item, releasesInfo);
                 }
@@ -261,7 +261,7 @@ namespace LCT.SW360PackageCreator
                      new Property { Name = Dataconstant.Cdx_FossologyUrl, Value = comBom.FossologyLink }
                 };
 
-                    if (!(bom.Components.Any(x => x.BomRef.Contains(Dataconstant.MavenPackage))))
+                    if (!(bom.Components.Any(x => x.BomRef.Contains(Dataconstant.PurlCheck()["MAVEN"]))))
                     {
                         bom.Components.FirstOrDefault(com => string.IsNullOrEmpty(com.Group) ? com.Name == comBom.Name && com.Version.Contains(comBom.Version)
                         : $"{com.Group}{Dataconstant.ForwardSlash}{com.Name}" == comBom.Name && com.Version.Contains(comBom.Version))?.Properties.AddRange(prop);
@@ -286,7 +286,7 @@ namespace LCT.SW360PackageCreator
             string localPathforDownload = string.Empty;
             try
             {
-                if (component.ReleaseExternalId.Contains(Dataconstant.DebianPackage))
+                if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
                 {
                     localPathforDownload = $"{Directory.GetParent(Directory.GetCurrentDirectory())}/ClearingTool/DownloadedFiles/";
                 }
