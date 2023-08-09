@@ -115,6 +115,9 @@
     <None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOMTemplate_Python.cdx.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="PackageIdentifierUTTestFiles\SourceDetails_Cyclonedx.cdx.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="PackageIdentifierUTTestFiles\SourceDetails_Cyclonedx.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
