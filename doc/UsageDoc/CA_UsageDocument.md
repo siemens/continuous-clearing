@@ -159,7 +159,7 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
           * Input file repository should contain **poetry.lock** file. 
     
      - **Project Type :**  **Debian** 
-      ]
+       
    	      **Note** : below steps is required only if you have `tar` file to process , otherwise you can keep `CycloneDx.json` file in the InputDirectory.
           *  Create `InputImage` directory for keeping `tar` images and `InputDirectory` for resulted file storing .
 
