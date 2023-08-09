@@ -281,9 +281,11 @@ You can also pass the above mentioned arguments in the command line.
   
   #### Exclude  Component or Folders :
   In order to exclude any components ,it can be configured in the  "appSettings.json" by providing the package name and version as specified above in the *_ExcludedComponents_* field.
+  
+  Incase the if you want to exclude a single component of the format _"@group/componentname"_ `eg : @angular/common` specify it as _"@group/componentname:version"_ i.e `@angular/common:4.2.6`
 
-  Incase the component you want to exclude is of the format _"@group/componentname"_ `eg : @angular/common` specify it as _"@group/componentname:version"_ i.e `@angular/common:4.2.6`
-
+  If multiple versions has to be excluded of the same component specify it as _"@group/componentname:*"_ i.e `@angular/common:*`
+  
   In order to **Exclude specific folders** from the execution, It can be specified under the **Exclude section** of that specific **package type**.
 
 
