@@ -46,7 +46,7 @@
 <!--te-->
 # Introduction
 
-The Continuous Clearing Tool helps the Project Manager/Developer to automate the sw360 clearing process of 3rd party components. This tool scans and identifies the third-party components used in a NPM, NUGET, MAVEN and Debian projects and makes an entry in SW360, if it is not present. Continuous Clearing Tool links the components to the respective project and creates job for code scan in FOSSology.
+The SBOM Continuous Clearing Tool helps the Project Manager/Developer to automate the sw360 clearing process of 3rd party components. This tool scans and identifies the third-party components used in a NPM, NUGET, MAVEN , Debian and Python projects and makes an entry in SW360, if it is not present. Continuous Clearing Tool links the components to the respective project and creates job for code scan in FOSSology.
 
 Continuous Clearing Tool reduces the effort in creating components in SW360 and identifying the matching source codes from the public repository. Tool eliminates the manual error while creating component and identifying correct version of source code from public repository. Continuous Clearing Tool harmonize the creation of 3P components in SW360 by filling necessary information.
 
@@ -153,10 +153,13 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
          * **Note** : Incase your project has internal dependencies, compile the project **prior to running the clearing tool**
  
                  mvn clean install -DskipTests=true 
-    
+
+       - **Project Type :** **Python** 
+
+          * Input file repository should contain **poetry.lock** file. 
     
      - **Project Type :**  **Debian** 
-      
+       
    	      **Note** : below steps is required only if you have `tar` file to process , otherwise you can keep `CycloneDx.json` file in the InputDirectory.
           *  Create `InputImage` directory for keeping `tar` images and `InputDirectory` for resulted file storing .
 
@@ -202,6 +205,7 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
   "BomFilePath":"/mnt/Output/<SW360 Project Name>_Bom.cdx.json",
 //IdentifierBomFilePath : For multiple project type 
   "IdentifierBomFilePath": "",
+  "CycloneDxSBomTemplatePath": "/PathToSBOMTemplateFile",
   "ArtifactoryUploadApiKey": "<Insert ArtifactoryUploadApiKey in a secure way>",//This should be Jfrog Key
   "ArtifactoryUploadUser": "<Insert ArtifactoryUploadUser>",//This should be Jfrog user name
   "RemoveDevDependency": true,
@@ -241,6 +245,11 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
     "Include": [ "*.json" ],
     "Exclude": [],
     "ExcludedComponents": []
+  },
+  "Python": {
+    "Include": [ "poetry.lock", "*.cdx.json" ],
+    "Exclude": [],
+    "ExcludedComponents": []
   }
 }
 ```
@@ -250,7 +259,7 @@ Description for the settings in `appSettings.json` file
 |S.No| Argument name   |Description  | Is it Mandatory    | Example |
 |--|--|--|--|--|
 | 1 |--packagefilepath   | Path to the package-lock.json file or to the directory where the project is present in case we have multiple package-lock.json files.                                      |Yes ,For Docker run /mnt/Input | D:\Clearing Automation |
-| 2 |--cycloneDxbomfilePath | Path to the cycloneDx BOM file. This should not be used along with the package file path(arg no 1).Please note to give only  one type of input at a time.                           |No if the first argument is provided| D:\ExternalToolOutput|
+| 2 |--cylonedxsbomtemplatepath | Path to the SBOM cycloneDx BOM file. Can be passed along with packagefilepath.                           |No if the first argument is provided| D:\ExternalToolOutput|
 | 3 |--bomfolderpath | Path to keep the generated boms  |  Yes , For Docker run /mnt/Output    | D:\Clearing Automation\BOM
 |  4| --sw360token  |  SW360 Auth Token |  Yes| Refer the SW360 Doc [here](https://www.eclipse.org/sw360/docs/development/restapi/access).Make sure you pass this credential in a secured way. |
 | 5 | --sw360projectid |  Project ID from SW360 project URL of the project  |  Yes| Obtained from SW360 |

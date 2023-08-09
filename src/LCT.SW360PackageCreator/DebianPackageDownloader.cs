@@ -86,16 +86,23 @@ namespace LCT.SW360PackageCreator
 
             foreach (string path in component.PatchURls)
             {
-                string file = await DownloadTarFileAndGetPath(component, path, currentDownloadFolder);
-
-                if (string.IsNullOrEmpty(file))
+                try
                 {
-                    IsAllFileDownloaded = false;
+                    string file = await DownloadTarFileAndGetPath(component, path, currentDownloadFolder);
+
+                    if (string.IsNullOrEmpty(file))
+                    {
+                        IsAllFileDownloaded = false;
+                    }
+
+                    if (!string.IsNullOrEmpty(file) && file.Contains(FileConstant.DSCFileExtension) && !fileInfo.ContainsKey("DSCFILE"))
+                    {
+                        fileInfo.Add("DSCFILE", Path.GetFileName(file));
+                    }
                 }
-
-                if (!string.IsNullOrEmpty(file) && file.Contains(FileConstant.DSCFileExtension))
+                catch (ArgumentException ex)
                 {
-                    fileInfo.Add("DSCFILE", Path.GetFileName(file));
+                    Logger.Debug($"GetFileDetails:Release Name : {component.Name}@{component.Version}: Error {ex}");
                 }
             }
 
@@ -190,7 +197,7 @@ namespace LCT.SW360PackageCreator
             return downloadedPath;
         }
 
-        private string ApplyPatchforComponents(ComparisonBomData component, string localDownloadPath, string fileName)
+        private string ApplyPatchforComponents(ComparisonBomData component, string localDownloadPath, string fileName)     
         {
             Result result;
             string patchedFile = string.Empty;

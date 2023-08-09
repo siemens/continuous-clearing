@@ -14,6 +14,7 @@ using LCT.Services.Interface;
 using log4net;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -24,8 +25,12 @@ namespace LCT.PackageIdentifier
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
+        readonly CycloneDXBomParser cycloneDXBomParser;
 
-
+        public MavenProcessor()
+        {
+            cycloneDXBomParser = new CycloneDXBomParser();
+        }
 
         public Bom ParsePackageFile(CommonAppSettings appSettings)
         {
@@ -35,20 +40,15 @@ namespace LCT.PackageIdentifier
             Bom bom = new();
             List<Dependency> dependenciesForBOM = new();
             List<string> configFiles;
-            if (string.IsNullOrEmpty(appSettings.CycloneDxBomFilePath))
-            {
-                configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Maven);
-            }
-            else
-            {
-                configFiles = FolderScanner.FileScanner(appSettings.CycloneDxBomFilePath, appSettings.Maven);
-            }
+
+            configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Maven);
 
             foreach (string filepath in configFiles)
             {
                
                 Bom bomList = ParseCycloneDXBom(filepath);
-            
+                cycloneDXBomParser.CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
+
                 if (componentsForBOM.Count == 0)
                 {
                     componentsForBOM.AddRange(bomList?.Components);
@@ -64,9 +64,17 @@ namespace LCT.PackageIdentifier
                 }
             }
 
+            if (File.Exists(appSettings.CycloneDxSBomTemplatePath))
+            {
+                //Adding Template Component Details
+                Bom templateDetails;
+                templateDetails = cycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
+                cycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
+                SbomTemplate.AddComponentDetails(componentsForBOM, templateDetails);
+            }
+
             //checking Dev dependency
             DevDependencyIdentificationLogic(componentsForBOM, componentsToBOM, ref ListOfComponents);
-
 
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = componentsForBOM.Count + componentsToBOM.Count;
 
@@ -88,11 +96,11 @@ namespace LCT.PackageIdentifier
 
         public static void DevDependencyIdentificationLogic(List<Component> componentsForBOM, List<Component> componentsToBOM, ref List<Component> ListOfComponents)
         {
-                       
+
             List<Component> iterateBOM = componentsForBOM.Count > componentsToBOM.Count ? componentsForBOM : componentsToBOM;
             List<Component> checkBOM = componentsForBOM.Count < componentsToBOM.Count ? componentsForBOM : componentsToBOM;
 
-      
+
             ListOfComponents = DevdependencyIdentification(ListOfComponents, iterateBOM, checkBOM);
 
         }
@@ -123,14 +131,30 @@ namespace LCT.PackageIdentifier
 
         private static void SetPropertiesforBOM(ref List<Component> componentsToBOM, Component component, string devValue)
         {
-
-            component.Properties = new List<Property>();
-            Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = devValue };
             Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "Discovered" };
-            component.Properties.Add(isDev);
-            component.Properties.Add(identifierType);
-            componentsToBOM.Add(component);
+            Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = devValue };
 
+            if (ComponentPropertyCheck(component))
+            {
+                component.Properties.Add(isDev);
+                componentsToBOM.Add(component);
+            }
+            else
+            {
+                component.Properties = new List<Property>();
+                component.Properties.Add(isDev);
+                component.Properties.Add(identifierType);
+                componentsToBOM.Add(component);
+            }
+        }
+
+        private static bool ComponentPropertyCheck(Component component)
+        {
+            if (component.Properties == null)
+            {
+                return false;
+            }
+            return component.Properties.Exists(x => x.Name == Dataconstant.Cdx_IdentifierType);
         }
 
         public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM, CommonAppSettings appSettings,

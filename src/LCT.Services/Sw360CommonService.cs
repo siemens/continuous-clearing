@@ -63,7 +63,7 @@ namespace LCT.Services
                 foreach (string externalIdKey in externalIdKeyList)
                 {
                     var sw360ComponentsList = await GetCompListFromExternalIDCombinations(externalIdUriString, externalIdKey);
-                    if (sw360ComponentsList.Count == 0 && externalIdUriString.Contains(Dataconstant.DebianPackage))
+                    if (sw360ComponentsList.Count == 0 && externalIdUriString.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
                     {
                         string NewExternalIdUriString = Uri.EscapeDataString(componentExternalId.Replace("?arch=source", ""));
                         sw360ComponentsList = await GetCompListFromExternalIDCombinations(NewExternalIdUriString, externalIdKey);

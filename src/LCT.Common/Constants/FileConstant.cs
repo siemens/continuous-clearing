@@ -44,7 +44,7 @@ namespace LCT.Common.Constants
         public const string DebianCombinedPatchExtension = "-debian-combined.tar.bz2";
         public const string DSCFileExtension = ".dsc";
         public static readonly string ContainerDir = Path.Combine(@"/app/opt/PatchedFiles");
-        public const string DockerImage = "clearingautomationtool";
+        public const string DockerImage = "ghcr.io/siemens/continuous-clearing";
         public static readonly string DockerCMDTool = Path.Combine(@"/bin/bash");
         public const string appSettingFileName = "appSettings.json";
         public const string CycloneDXFileExtension = ".cdx.json";
