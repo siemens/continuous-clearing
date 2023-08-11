@@ -459,7 +459,7 @@ namespace LCT.PackageIdentifier
         private static void GetDependencyDetails(Component compnent, NugetPackage prop,ref List<Dependency> dependencies)
         {
             List<Dependency> subDependencies = new();
-            foreach (var item in prop?.Dependencies)
+            foreach (var item in prop.Dependencies)
             {
                 string purl = item;
                 Dependency dependentList = new Dependency()
@@ -637,7 +637,6 @@ namespace LCT.PackageIdentifier
                 foreach (var lst in containermodule.Components)
                 {
                     List<string> depvalue =new List<string>();
-                    var dep = lst.Value.Dependencies.Count > 0 ? lst.Value.Dependencies : null;
                     GetDependencyList(lst,ref depvalue);
                     nugetPackages.Add(new NugetPackage()
                     {
