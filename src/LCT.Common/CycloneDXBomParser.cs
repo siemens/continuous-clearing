@@ -56,7 +56,7 @@ namespace LCT.Common
         {
             Bom bom = new Bom();
             bom.Components = new List<Component>();
-            if (template.Components == null)
+            if (template?.Components == null)
             {
                 return bom;
             }
@@ -72,7 +72,8 @@ namespace LCT.Common
             }
 
             //Taking SBOM Template Metadata
-            bom.Metadata = template.Metadata;
+            bom.Metadata = template?.Metadata;
+            bom.Dependencies = template?.Dependencies;
             return bom;
         }
 
