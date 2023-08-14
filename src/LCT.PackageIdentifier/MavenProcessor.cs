@@ -84,7 +84,6 @@ namespace LCT.PackageIdentifier
 
             BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - componentsForBOM.Count;
 
-
             bom.Components = componentsForBOM;
             bom.Dependencies = dependenciesForBOM;
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = bom.Components.Count;
