@@ -17,6 +17,7 @@ using log4net;
 using Microsoft.Build.Locator;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NuGet.Packaging;
 using NuGet.ProjectModel;
 using System;
 using System.Collections.Generic;
@@ -125,63 +126,6 @@ namespace LCT.PackageIdentifier
                 Logger.Error($"ParsePackageFile():", ex);
             }
             return nugetPackages;
-        }
-
-        public static List<NugetPackage> ParsePackageLock(string packagesFilePath, CommonAppSettings appSettings)
-        {
-            List<NugetPackage> packageList = new List<NugetPackage>();
-            string isDev = "false";
-            try
-            {
-                List<ReferenceDetails> referenceList = Parsecsproj(appSettings);
-                using (StreamReader r = new StreamReader(packagesFilePath))
-                {
-                    string json = r.ReadToEnd();
-                    JObject jObject = JObject.Parse(json);
-
-                    JToken jDependencies = jObject["dependencies"];
-
-                    foreach (JToken targetVersion in jDependencies.Children())
-                    {
-                        foreach (JToken dependencyToken in targetVersion.Children().Children())
-                        {
-                            string id = dependencyToken.ToObject<JProperty>().Name;
-                            string version = dependencyToken.First.Value<string>("resolved");
-                            if (dependencyToken.First.Value<string>("type") == "Dev" || IsDevDependent(referenceList, id, version))
-                            {
-                                BomCreator.bomKpiData.DevDependentComponents++;
-                                isDev = "true";
-                            }
-                            if (dependencyToken.First.Value<string>("type") == "Project" || string.IsNullOrEmpty(version) && string.IsNullOrEmpty(id))
-                            {
-
-                                continue;
-                            }
-
-                            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;
-
-                            NugetPackage package = new NugetPackage()
-                            {
-                                ID = id,
-                                Version = version,
-                                Filepath = packagesFilePath,
-                                IsDev = isDev
-
-                            };
-                            packageList.Add(package);
-                        }
-                    }
-                }
-            }
-            catch (JsonReaderException ex)
-            {
-                Logger.Error($"ParsePackageFile():", ex);
-            }
-            catch (IOException ex)
-            {
-                Logger.Error($"ParsePackageFile():", ex);
-            }
-            return packageList;
         }
 
         public static bool IsDevDependent(List<ReferenceDetails> referenceDetails, string name, string version)
@@ -328,6 +272,14 @@ namespace LCT.PackageIdentifier
                     fullNameVersion, StringComparison.OrdinalIgnoreCase))?.Repo ?? NotFoundInRepo;
             }
 
+            if (repoName == NotFoundInRepo)
+            {
+                jfrogcomponentName = $"{component.Name}.{component.Version}.nupkg";
+                repoName = aqlResultList.Find(x => x.Name.Equals(
+                  jfrogcomponentName, StringComparison.OrdinalIgnoreCase))?.Repo ?? NotFoundInRepo;
+
+            }
+
             return repoName;
         }
 
@@ -414,7 +366,10 @@ namespace LCT.PackageIdentifier
         {
             List<string> configFiles;
             List<Component> componentsForBOM = new List<Component>();
+            List<Dependency> dependencies = new List<Dependency>();
+       
             configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Nuget);
+       
 
             foreach (string filepath in configFiles)
             {
@@ -430,12 +385,10 @@ namespace LCT.PackageIdentifier
                 else
                 {
                     Logger.Debug($"ParsingInputFileForBOM():Found as Package File");
-                    List<NugetPackage> listofComponents = new List<NugetPackage>();
-
+                    List<NugetPackage> listofComponents = new();                
                     ParseInputFiles(appSettings, filepath, listofComponents);
-
-                    ConvertToCycloneDXModel(listComponentForBOM, listofComponents);
-
+                    ConvertToCycloneDXModel(listComponentForBOM, listofComponents, dependencies);
+                    bom.Dependencies= dependencies;
                     BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = listComponentForBOM.Count;
                 }
             }
@@ -470,8 +423,9 @@ namespace LCT.PackageIdentifier
             }
         }
 
-        private static void ConvertToCycloneDXModel(List<Component> listComponentForBOM, List<NugetPackage> listofComponents)
+        private static void ConvertToCycloneDXModel(List<Component> listComponentForBOM, List<NugetPackage> listofComponents, List<Dependency> dependencies)
         {
+         
             foreach (var prop in listofComponents)
             {
                 Component components = new Component
@@ -495,7 +449,31 @@ namespace LCT.PackageIdentifier
                     }
                 };
                 listComponentForBOM.Add(components);
+                if (prop.Dependencies != null)
+                {
+                    GetDependencyDetails(components, prop, ref dependencies);
+                }
             }
+        }
+
+        private static void GetDependencyDetails(Component compnent, NugetPackage prop,ref List<Dependency> dependencies)
+        {
+            List<Dependency> subDependencies = new();
+            foreach (var item in prop.Dependencies)
+            {
+                string purl = item;
+                Dependency dependentList = new Dependency()
+                {
+                    Ref = purl
+                };
+                subDependencies.Add(dependentList);
+            }
+            var dependency = new Dependency()
+            {
+                Ref = compnent.Purl,
+                Dependencies = subDependencies
+            };
+            dependencies.Add(dependency);
         }
 
         private static List<Component> KeepUniqueNonDevComponents(List<Component> listComponentForBOM)
@@ -528,16 +506,18 @@ namespace LCT.PackageIdentifier
             {
                 listofComponents.AddRange(ParseAssetFile(filepath));
             }
-            else if (filepath.EndsWith("lock.json"))
+            else if (filepath.EndsWith(".config"))
             {
-                listofComponents.AddRange(ParsePackageLock(filepath, appSettings));
+                listofComponents.AddRange(ParsePackageConfig(filepath, appSettings));
             }
             else
             {
                 var list = ParsePackageConfig(filepath, appSettings);
                 listofComponents.AddRange(list);
             }
+    
         }
+  
 
         private static void CheckForMultipleVersions(CommonAppSettings appSettings, ref List<Component> listComponentForBOM, ref int noOfExcludedComponents, List<Component> componentsWithMultipleVersions)
         {
@@ -656,19 +636,30 @@ namespace LCT.PackageIdentifier
             {
                 foreach (var lst in containermodule.Components)
                 {
+                    List<string> depvalue =new List<string>();
+                    GetDependencyList(lst,ref depvalue);
                     nugetPackages.Add(new NugetPackage()
                     {
                         ID = lst.Value.Name,
                         Version = lst.Value.Version,
+                        Dependencies = depvalue,
                         Filepath = configFile,
                         IsDev = lst.Value.Scope.ToString() == "DevDependency" ? "true" : "false",
-                    });
+                    }); 
+                 
                 }
             }
 
             return nugetPackages;
         }
-
+        public static void GetDependencyList(KeyValuePair<string,BuildInfoComponent> lst,ref List<string> depvalue)
+        {
+            foreach(var item in lst.Value?.Dependencies)
+            {
+               var  depvaltestue = item.PackageUrl;
+                depvalue.Add(depvaltestue);
+            }
+        }
         #endregion
     }
 }

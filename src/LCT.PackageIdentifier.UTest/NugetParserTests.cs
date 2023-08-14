@@ -51,29 +51,6 @@ namespace PackageIdentifier.UTest
         }
 
         [TestCase]
-        public void ParsePackageLockJson_GivenAInputFilePath_ReturnsSuccess()
-        {
-            //Arrange
-            int expectednoofcomponents = 153;
-            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string outFolder = Path.GetDirectoryName(exePath);
-            string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles\packages.lock.json";
-            string csprojPath = outFolder + @"\PackageIdentifierUTTestFiles";
-
-
-            CommonAppSettings appSettings = new CommonAppSettings()
-            {
-                PackageFilePath = csprojPath
-            };
-
-            //Act
-            List<NugetPackage> listofcomponents = NugetProcessor.ParsePackageLock(packagefilepath, appSettings);
-
-            //Assert
-            Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Count), "Checks for no of components");
-
-        }
-        [TestCase]
         public void InputFileIdentifaction_GivenARootPath_ReturnsSuccess()
         {
             //Arrange
@@ -415,6 +392,7 @@ namespace PackageIdentifier.UTest
         {
             //Arrange
             int expectednoofcomponents = 2;
+            int expectednoofdependencies = 2;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
             string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles";
@@ -436,6 +414,7 @@ namespace PackageIdentifier.UTest
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
+            Assert.That(expectednoofdependencies, Is.EqualTo(listofcomponents.Dependencies.Count), "Checks for no of dependencies");
 
         }
 
@@ -478,6 +457,7 @@ namespace PackageIdentifier.UTest
             string outFolder = Path.GetDirectoryName(exePath);
             string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles";
             int TotalCount = 3;
+            int TotalCountofDependencies = 2;
 
             string[] Includes = { "project.assets.json" };
             Config config = new Config()
@@ -498,6 +478,7 @@ namespace PackageIdentifier.UTest
 
             //Assert
             Assert.That(TotalCount, Is.EqualTo(listofcomponents.Components.Count), "Checks For Total Component Count");
+            Assert.That(TotalCountofDependencies, Is.EqualTo(listofcomponents.Dependencies.Count), "Checks For Total Dependencies Count");
         }
 
         [TestCase]

@@ -45,6 +45,7 @@ namespace LCT.PackageIdentifier
 
             foreach (string filepath in configFiles)
             {
+               
                 Bom bomList = ParseCycloneDXBom(filepath);
                 cycloneDXBomParser.CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
 
