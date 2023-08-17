@@ -160,7 +160,7 @@ namespace LCT.PackageIdentifier.UTest
             mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations/common");
-           
+
             // Act
             NpmProcessor npmProcessor = new NpmProcessor();
             var actual = await npmProcessor.GetJfrogRepoDetailsOfAComponent(
@@ -207,6 +207,53 @@ namespace LCT.PackageIdentifier.UTest
 
             // Assert
             Assert.That(actual, Is.Not.Null);
+        }
+
+        [Test]
+        public void GetdependencyDetailsOfAComponent_ReturnsListOfDependency_SuccessFully()
+        {
+            // Arrange
+            Component component = new Component
+            {
+                Name = "animations",
+                Group = "",
+                Description = string.Empty,
+                Version = "1.0.0",
+                Purl = "pkg:npm/animations@1.0.0",
+                Author = "{ testcomponent:1.2.3 , subdepenendency:3.4.1 }"
+
+            };
+            List<Component> componentsForBOM = new List<Component>();
+            componentsForBOM.Add(component);
+            List<Dependency> dependencyList = new();
+            List<Dependency> expectedDependencyList = new()
+            {
+                new()
+                {
+                      Ref="pkg:npm/animations@1.0.0",
+                      Dependencies=new()
+                      {
+                         new()
+                            {
+                            Ref="pkg:npm/testcomponent@1.2.3"
+
+                            },
+                         new()
+                            {
+                             Ref="pkg:npm/subdepenendency@3.4.1"
+                             }
+                       }
+                 }
+            };
+
+            //Act
+
+            NpmProcessor.GetdependencyDetails(componentsForBOM, dependencyList);
+
+            //Assert
+            Assert.That(expectedDependencyList.Count, Is.EqualTo(dependencyList.Count));
+
+
         }
     }
 }

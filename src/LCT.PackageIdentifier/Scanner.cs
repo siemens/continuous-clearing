@@ -56,15 +56,12 @@ namespace LCT.PackageIdentifier
 
                 if (foundConfigFiles != null && foundConfigFiles.Length > 0)
                 {
-
                     foreach (string configFile in foundConfigFiles)
                     {
                         CheckingForExcludedFiles(config, fileOperations, allFoundConfigFiles, configFile);
                     }
                     Logger.Logger.Log(null, Level.Notice, $"\n----------------------------------------------------", null);
                 }
-
-
             }
 
             return allFoundConfigFiles;

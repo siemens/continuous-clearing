@@ -1,9 +1,3 @@
-// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2023 Siemens AG
-//
-//  SPDX-License-Identifier: MIT
-
-// --------------------------------------------------------------------------------------------------------------------
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.3",
@@ -29,8 +23,8 @@
     {
       "type": "library",
       "publisher": "Debian Adduser Developers \u003cadduser@packages.debian.org\u003e",
-      "name": "nginx",
-      "version": "1.21.3-1~buster",
+      "name": "adduser",
+      "version": "3.118",
       "licenses": [
         {
           "license": {
@@ -39,7 +33,7 @@
         }
       ],
       "cpe": "cpe:2.3:a:adduser:adduser:3.118:*:*:*:*:*:*:*",
-      "purl": "pkg:deb/debian/nginx@1.21.3-1~buster?arch=amd64",
+      "purl": "pkg:deb/debian/adduser@3.118?arch=all\u0026distro=debian-10",
       "properties": [
         {
           "name": "foundBy",

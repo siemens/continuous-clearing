@@ -1,0 +1,205 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.4",
+  "serialNumber": "urn:uuid:28b76031-a717-4131-9938-805c2745de64",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-05-18T06:55:13Z",
+    "tools": [
+      {
+        "vendor": "anchore",
+        "name": "syft",
+        "version": "0.76.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "4d4b9c6291d0c9dc",
+      "type": "file",
+      "name": "/mnt/InputImages"
+    }
+  },
+  "components": [
+    {
+      "bom-ref": "pkg:npm/%40angular-devkit/schematics@13.3.0?package-id=2d3b698d5e12c2d9",
+      "type": "library",
+      "name": "@angular-devkit/schematics",
+      "version": "13.3.0",
+      "cpe": "cpe:2.3:a:\\@angular-devkit\\/schematics:\\@angular-devkit\\/schematics:13.3.0:*:*:*:*:*:*:*",
+      "purl": "pkg:npm/%40angular-devkit/schematics@13.3.0",
+      "properties": [
+        {
+          "name": "syft:package:foundBy",
+          "value": "javascript-lock-cataloger"
+        },
+        {
+          "name": "syft:package:language",
+          "value": "javascript"
+        },
+        {
+          "name": "syft:package:metadataType",
+          "value": "NpmPackageLockJsonMetadata"
+        },
+        {
+          "name": "syft:package:type",
+          "value": "npm"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:\\@angular-devkit\\/schematics:\\@angular_devkit\\/schematics:13.3.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:\\@angular_devkit\\/schematics:\\@angular-devkit\\/schematics:13.3.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:\\@angular_devkit\\/schematics:\\@angular_devkit\\/schematics:13.3.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:\\@angular:\\@angular-devkit\\/schematics:13.3.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:\\@angular:\\@angular_devkit\\/schematics:13.3.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:location:0:path",
+          "value": "ui/package-lock.json"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/%40angular-eslint/builder@15.1.0?package-id=d47b98f46d74868e",
+      "type": "library",
+      "name": "@angular-eslint/builder",
+      "version": "15.1.0",
+      "cpe": "cpe:2.3:a:\\@angular-eslint\\/builder:\\@angular-eslint\\/builder:15.1.0:*:*:*:*:*:*:*",
+      "purl": "pkg:npm/%40angular-eslint/builder@15.1.0",
+      "properties": [
+        {
+          "name": "syft:package:foundBy",
+          "value": "javascript-lock-cataloger"
+        },
+        {
+          "name": "syft:package:language",
+          "value": "javascript"
+        },
+        {
+          "name": "syft:package:metadataType",
+          "value": "NpmPackageLockJsonMetadata"
+        },
+        {
+          "name": "syft:package:type",
+          "value": "npm"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:\\@angular-eslint\\/builder:\\@angular_eslint\\/builder:15.1.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:\\@angular_eslint\\/builder:\\@angular-eslint\\/builder:15.1.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:\\@angular_eslint\\/builder:\\@angular_eslint\\/builder:15.1.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:\\@angular:\\@angular-eslint\\/builder:15.1.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:\\@angular:\\@angular_eslint\\/builder:15.1.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:location:0:path",
+          "value": "ui/package-lock.json"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/%40angular-eslint/bundled-angular-compiler@13.5.0?package-id=eeaeaf975ae64550",
+      "type": "library",
+      "name": "@angular-eslint/bundled-angular-compiler",
+      "version": "13.5.0",
+      "cpe": "cpe:2.3:a:\\@angular-eslint\\/bundled-angular-compiler:\\@angular-eslint\\/bundled-angular-compiler:13.5.0:*:*:*:*:*:*:*",
+      "purl": "pkg:npm/%40angular-eslint/bundled-angular-compiler@13.5.0",
+      "properties": [
+        {
+          "name": "syft:package:foundBy",
+          "value": "javascript-lock-cataloger"
+        },
+        {
+          "name": "syft:package:language",
+          "value": "javascript"
+        },
+        {
+          "name": "syft:package:metadataType",
+          "value": "NpmPackageLockJsonMetadata"
+        },
+        {
+          "name": "syft:package:type",
+          "value": "npm"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:\\@angular-eslint\\/bundled-angular-compiler:\\@angular_eslint\\/bundled_angular_compiler:13.5.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:\\@angular_eslint\\/bundled_angular_compiler:\\@angular-eslint\\/bundled-angular-compiler:13.5.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:\\@angular_eslint\\/bundled_angular_compiler:\\@angular_eslint\\/bundled_angular_compiler:13.5.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:\\@angular-eslint\\/bundled-angular:\\@angular-eslint\\/bundled-angular-compiler:13.5.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:\\@angular-eslint\\/bundled-angular:\\@angular_eslint\\/bundled_angular_compiler:13.5.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:\\@angular_eslint\\/bundled_angular:\\@angular-eslint\\/bundled-angular-compiler:13.5.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:\\@angular_eslint\\/bundled_angular:\\@angular_eslint\\/bundled_angular_compiler:13.5.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:\\@angular-eslint\\/bundled:\\@angular-eslint\\/bundled-angular-compiler:13.5.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:\\@angular-eslint\\/bundled:\\@angular_eslint\\/bundled_angular_compiler:13.5.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:\\@angular_eslint\\/bundled:\\@angular-eslint\\/bundled-angular-compiler:13.5.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:\\@angular_eslint\\/bundled:\\@angular_eslint\\/bundled_angular_compiler:13.5.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:\\@angular:\\@angular-eslint\\/bundled-angular-compiler:13.5.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:\\@angular:\\@angular_eslint\\/bundled_angular_compiler:13.5.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:location:0:path",
+          "value": "ui/package-lock.json"
+        }
+      ]
+    }
+  ]
+}

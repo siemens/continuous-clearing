@@ -42,8 +42,6 @@ namespace SW360IntegrationTest.NPM
             string comparisonBOMPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\ArtifactoryUploaderTestData\NugetComparisonBOM.json";
             if (File.Exists(comparisonBOMPath))
             {
-
-
                 ComponentJsonParsor expected = new ComponentJsonParsor();
                 expected.Read(comparisonBOMPath);
 

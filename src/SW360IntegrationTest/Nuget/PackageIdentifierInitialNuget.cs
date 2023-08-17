@@ -56,7 +56,6 @@ namespace SW360IntegrationTest
         }
 
 
-
         [Test, Order(2)]
         public void LocalBOMCreation_AfterSuccessfulExeRun_ReturnsSuccess()
         {

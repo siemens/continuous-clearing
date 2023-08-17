@@ -1,0 +1,293 @@
+{
+  "bomFormat" : "CycloneDX",
+  "specVersion" : "1.4",
+  "serialNumber" : "urn:uuid:e90ca179-bae3-4b30-ba22-d50a36d6c41a",
+  "version" : 1,
+  "metadata" : {
+    "timestamp" : "2023-07-12T04:24:51Z",
+    "tools" : [
+      {
+        "vendor" : "OWASP Foundation",
+        "name" : "CycloneDX Maven plugin",
+        "version" : "2.7.1",
+        "hashes" : [
+          {
+            "alg" : "MD5",
+            "content" : "538c878ebf89b372876e247d056a3fc5"
+          },
+          {
+            "alg" : "SHA-1",
+            "content" : "4561e50edb47e12a03712b1afce9b20cba32fd28"
+          },
+          {
+            "alg" : "SHA-256",
+            "content" : "f0ea7b3bcf5c7ba649b8d9807e805385330501881677d47333aebce8305ef4d4"
+          },
+          {
+            "alg" : "SHA-512",
+            "content" : "a35400ca6411692ae8964fe7030eaba2a83a2fa50e2883def3054191283c3b48e2dcdd68bf80f5a0ede3898cc6b7cb7b998aacd2c1e969320053c43b6ab8d873"
+          },
+          {
+            "alg" : "SHA-384",
+            "content" : "75c0c03a03c69e82ad1f7b942d6d733da8261c4058174355d6b24ebd88cee34180f2e8484d2b0fedaf459078bdf6e927"
+          },
+          {
+            "alg" : "SHA3-384",
+            "content" : "98cd312d4dfc104a0a66d65023d0aade423f08951f2a9e0215e703f0c81c4f274d8e11a2db1abc30a558b820d65860c4"
+          },
+          {
+            "alg" : "SHA3-256",
+            "content" : "0c5fd65013128de457b049a824c4ad11212d668b503613ce19a54d545e5cf82d"
+          },
+          {
+            "alg" : "SHA3-512",
+            "content" : "72ea0ed8faa3cc4493db96d0223094842e7153890b091ff364040ad3ad89363157fc9d1bd852262124aec83134f0c19aa4fd0fa482031d38a76d74dfd36b7964"
+          }
+        ]
+      }
+    ],
+    "component" : {
+      "group" : "org.springframework",
+      "name" : "gs-maven",
+      "version" : "0.1.0",
+      "licenses" : [ ],
+      "purl" : "pkg:maven/org.springframework/gs-maven@0.1.0?type=jar",
+      "type" : "library",
+      "bom-ref" : "pkg:maven/org.springframework/gs-maven@0.1.0?type=jar"
+    }
+  },
+  "components" : [
+    {
+      "publisher" : "Joda.org",
+      "group" : "joda-time",
+      "name" : "joda-time",
+      "version" : "2.9.2",
+      "description" : "Date and time library to replace JDK date handling",
+      "scope" : "optional",
+      "hashes" : [
+        {
+          "alg" : "MD5",
+          "content" : "32a794b6a820daf3fad92e59988df64c"
+        },
+        {
+          "alg" : "SHA-1",
+          "content" : "36d6e77a419cb455e6fd5909f6f96b168e21e9d0"
+        },
+        {
+          "alg" : "SHA-256",
+          "content" : "0be5c40e8cdce9ec0643d76be99f276db17c45d7616a217fd1b19b7ef73ca7b1"
+        },
+        {
+          "alg" : "SHA-512",
+          "content" : "52bf64e32ae5303ecf78510f78acfdce46b1654214a106f4d92f7c8e09ab4214790567198dd4c54b0f6e2b75765ad0c7b4a2d2cb3483e2782f16faed5546a8da"
+        },
+        {
+          "alg" : "SHA-384",
+          "content" : "fe4d61fa8c2ae6bfe94b897fb100a23678bbd172b5c939531197c5566c5836f9a719484b5cf2f70960996bd397c0025c"
+        },
+        {
+          "alg" : "SHA3-384",
+          "content" : "4aaa49db59997ce580609dfb0142ed91656cb2f8db667e9fc7d8e206f4480e379601c8c16ee3e7a8870048b7da8209f0"
+        },
+        {
+          "alg" : "SHA3-256",
+          "content" : "361583e31c9add8f66af3220979a7a96aea0f2886644cd40e15e90ac5da0ca24"
+        },
+        {
+          "alg" : "SHA3-512",
+          "content" : "047292bca529cf8e9702041982348af816dbcec95917df377197eb22d798c3ac3d09a70591d21cea16a4e5e55ec491c74e0a9d062994303a7715548a9b122454"
+        }
+      ],
+      "licenses" : [
+        {
+          "license" : {
+            "id" : "Apache-2.0"
+          }
+        }
+      ],
+      "purl" : "pkg:maven/joda-time/joda-time@2.9.2?type=jar",
+      "externalReferences" : [
+        {
+          "type" : "website",
+          "url" : "http://www.joda.org"
+        },
+        {
+          "type" : "distribution",
+          "url" : "http://oss.sonatype.org/content/repositories/joda-releases"
+        },
+        {
+          "type" : "issue-tracker",
+          "url" : "https://github.com/JodaOrg/joda-time/issues"
+        },
+        {
+          "type" : "mailing-list",
+          "url" : "http://sourceforge.net/mailarchive/forum.php?forum_name=joda-interest"
+        },
+        {
+          "type" : "vcs",
+          "url" : "https://github.com/JodaOrg/joda-time"
+        }
+      ],
+      "type" : "library",
+      "bom-ref" : "pkg:maven/joda-time/joda-time@2.9.2?type=jar"
+    },
+    {
+      "publisher" : "JUnit",
+      "group" : "junit",
+      "name" : "junit",
+      "version" : "4.12",
+      "description" : "JUnit is a unit testing framework for Java, created by Erich Gamma and Kent Beck.",
+      "scope" : "optional",
+      "hashes" : [
+        {
+          "alg" : "MD5",
+          "content" : "5b38c40c97fbd0adee29f91e60405584"
+        },
+        {
+          "alg" : "SHA-1",
+          "content" : "2973d150c0dc1fefe998f834810d68f278ea58ec"
+        },
+        {
+          "alg" : "SHA-256",
+          "content" : "59721f0805e223d84b90677887d9ff567dc534d7c502ca903c0c2b17f05c116a"
+        },
+        {
+          "alg" : "SHA-512",
+          "content" : "5974670c3d178a12da5929ba5dd9b4f5ff461bdc1b92618c2c36d53e88650df7adbf3c1684017bb082b477cb8f40f15dcf7526f06f06183f93118ba9ebeaccce"
+        },
+        {
+          "alg" : "SHA-384",
+          "content" : "e2f0c2db405e282d0f84a1766b9e8d9736d4377e292a5ef8457aec10384f9077005865167025b2779634d75bcb4d62cd"
+        },
+        {
+          "alg" : "SHA3-384",
+          "content" : "a24a1d6d5ffe2f9fc3a90a442c3d1d5a12ae7bda3c68996c3b50f00186a2f961808c5ef504a771e9d6ab95ee38a383f0"
+        },
+        {
+          "alg" : "SHA3-256",
+          "content" : "02b1f076652120813646a0cb34350f0c73a3299b221567e089f6aaadf8ab444a"
+        },
+        {
+          "alg" : "SHA3-512",
+          "content" : "9e8f7057647c11564178e4569cf4f5682d3688b49d81acc60fd301f61053932ee9ac109c19cb639f7710d23afc76cb106ebde0f8143e2fe5fa08605201720a8b"
+        }
+      ],
+      "licenses" : [
+        {
+          "license" : {
+            "id" : "EPL-1.0",
+            "url" : "http://www.eclipse.org/legal/epl-v10.html"
+          }
+        }
+      ],
+      "purl" : "pkg:maven/junit/junit@4.12?type=jar",
+      "externalReferences" : [
+        {
+          "type" : "website",
+          "url" : "http://www.junit.org"
+        },
+        {
+          "type" : "build-system",
+          "url" : "https://junit.ci.cloudbees.com/"
+        },
+        {
+          "type" : "distribution",
+          "url" : "https://github.com/junit-team/junit/wiki/Download-and-Install"
+        },
+        {
+          "type" : "issue-tracker",
+          "url" : "https://github.com/junit-team/junit/issues"
+        },
+        {
+          "type" : "mailing-list",
+          "url" : "https://groups.yahoo.com/neo/groups/junit/info"
+        },
+        {
+          "type" : "vcs",
+          "url" : "http://github.com/junit-team/junit/tree/master"
+        }
+      ],
+      "type" : "library",
+      "bom-ref" : "pkg:maven/junit/junit@4.12?type=jar"
+    },
+    {
+      "group" : "org.hamcrest",
+      "name" : "hamcrest-core",
+      "version" : "1.3",
+      "description" : "This is the core API of hamcrest matcher framework to be used by third-party framework providers. This includes the a foundation set of matcher implementations for common operations.",
+      "hashes" : [
+        {
+          "alg" : "MD5",
+          "content" : "6393363b47ddcbba82321110c3e07519"
+        },
+        {
+          "alg" : "SHA-1",
+          "content" : "42a25dc3219429f0e5d060061f71acb49bf010a0"
+        },
+        {
+          "alg" : "SHA-256",
+          "content" : "66fdef91e9739348df7a096aa384a5685f4e875584cce89386a7a47251c4d8e9"
+        },
+        {
+          "alg" : "SHA-512",
+          "content" : "e237ae735aac4fa5a7253ec693191f42ef7ddce384c11d29fbf605981c0be077d086757409acad53cb5b9e53d86a07cc428d459ff0f5b00d32a8cbbca390be49"
+        },
+        {
+          "alg" : "SHA-384",
+          "content" : "4b5297d2a12cc32b824153afc83f1ba9f1869ca288330f0a2f759659d09e4c420eb6ba4a1efbfa0657b625edd41293d5"
+        },
+        {
+          "alg" : "SHA3-384",
+          "content" : "b14d34985c0a78cf0ba19b5a18bffd403e08adcb2afde228ddef6e16121c7046dbebf58c04d3419311c4496c48aa93be"
+        },
+        {
+          "alg" : "SHA3-256",
+          "content" : "f679af77deedf69b3c3066f7916583848c6fd32a950f9c0b0e2ef1da121717ba"
+        },
+        {
+          "alg" : "SHA3-512",
+          "content" : "bca821931e438a1977b7b4356b5f8cebf485634f82159d505c48267c34e6a0f4fde9c2917331365f66dc0e52e2ca3a2db5256863584110c27ecebefc28741f63"
+        }
+      ],
+      "licenses" : [
+        {
+          "license" : {
+            "id" : "BSD-3-Clause"
+          }
+        }
+      ],
+      "purl" : "pkg:maven/org.hamcrest/hamcrest-core@1.3?type=jar",
+      "externalReferences" : [
+        {
+          "type" : "vcs",
+          "url" : "https://github.com/hamcrest/JavaHamcrest"
+        }
+      ],
+      "type" : "library",
+      "bom-ref" : "pkg:maven/org.hamcrest/hamcrest-core@1.3?type=jar"
+    }
+  ],
+  "dependencies" : [
+    {
+      "ref" : "pkg:maven/org.springframework/gs-maven@0.1.0?type=jar",
+      "dependsOn" : [
+        "pkg:maven/joda-time/joda-time@2.9.2?type=jar",
+        "pkg:maven/junit/junit@4.12?type=jar"
+      ]
+    },
+    {
+      "ref" : "pkg:maven/joda-time/joda-time@2.9.2?type=jar",
+      "dependsOn" : [ ]
+    },
+    {
+      "ref" : "pkg:maven/junit/junit@4.12?type=jar",
+      "dependsOn" : [
+        "pkg:maven/org.hamcrest/hamcrest-core@1.3?type=jar"
+      ]
+    },
+    {
+      "ref" : "pkg:maven/org.hamcrest/hamcrest-core@1.3?type=jar",
+      "dependsOn" : [ ]
+    }
+  ]
+}

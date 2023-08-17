@@ -579,7 +579,7 @@ namespace LCT.Services
         private static string GetDecodedExternalId(string ReleaseExternalID)
         {
             string releaseID;
-            if (!string.IsNullOrEmpty(ReleaseExternalID) && ReleaseExternalID.Contains(Dataconstant.DebianPackage))
+            if (!string.IsNullOrEmpty(ReleaseExternalID) && ReleaseExternalID.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
             {
                 releaseID = WebUtility.UrlDecode(ReleaseExternalID);
             }

@@ -19,6 +19,8 @@ using LCT.APICommunications.Model.AQL;
 using CycloneDX.Models;
 using System.Threading.Tasks;
 using System.Linq;
+using LCT.Common.Constants;
+using Markdig.Extensions.Yaml;
 
 namespace PackageIdentifier.UTest
 {
@@ -35,7 +37,6 @@ namespace PackageIdentifier.UTest
             string outFolder = Path.GetDirectoryName(exePath);
             string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles\packages.config";
 
-
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 PackageFilePath = outFolder + @"\PackageIdentifierUTTestFiles"
@@ -49,29 +50,6 @@ namespace PackageIdentifier.UTest
 
         }
 
-        [TestCase]
-        public void ParsePackageLockJson_GivenAInputFilePath_ReturnsSuccess()
-        {
-            //Arrange
-            int expectednoofcomponents = 152;
-            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string outFolder = Path.GetDirectoryName(exePath);
-            string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles\packages.lock.json";
-            string csprojPath = outFolder + @"\PackageIdentifierUTTestFiles";
-
-
-            CommonAppSettings appSettings = new CommonAppSettings()
-            {
-                PackageFilePath = csprojPath
-            };
-
-            //Act
-            List<NugetPackage> listofcomponents = NugetProcessor.ParsePackageLock(packagefilepath, appSettings);
-
-            //Assert
-            Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Count), "Checks for no of components");
-
-        }
         [TestCase]
         public void InputFileIdentifaction_GivenARootPath_ReturnsSuccess()
         {

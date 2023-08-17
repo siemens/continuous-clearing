@@ -1,0 +1,40 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.4.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.4",
+  "serialNumber": "urn:uuid:43858d10-328d-40d3-8184-ad4f0b5ea53c",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-11T12:11:14Z",
+    "tools": [
+      {
+        "vendor": "anchore",
+        "name": "syft",
+        "version": "0.84.1"
+      }
+    ],
+    "component": {
+      "bom-ref": "f8e285590963f51a",
+      "type": "container",
+      "name": "/mnt/InputImages/Buster_amd64.tar",
+      "version": "sha256:b75774030c2c10178aad29230221cad47aa607c72895aa4af389b3f1f01f71f4"
+    }
+  },
+  "components": [
+    {
+      "bom-ref": "pkg:maven/com.rabbitmq/amqp-client@5.14.2?package-id=986803b204fb27b1",
+      "type": "library",
+      "group": "com.rabbitmq",
+      "name": "amqp-client",
+      "version": "5.14.2",
+      "cpe": "cpe:2.3:a:amqp-client:amqp-client:5.14.2:*:*:*:*:*:*:*",
+      "purl": "pkg:maven/com.rabbitmq/amqp-client@5.14.2",
+      "properties": [
+        {
+          "name": "syft:metadata:virtualPath",
+          "value": "sams-infrastructure/keycloak/plugins/event-listeners/keycloak-to-rabbit-3.0.2.jar:amqp-client"
+        }
+      ]
+    }
+  ]
+}

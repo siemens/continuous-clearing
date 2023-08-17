@@ -25,103 +25,136 @@ namespace LCT.PackageIdentifier
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
+        readonly CycloneDXBomParser cycloneDXBomParser;
+
+        public MavenProcessor()
+        {
+            cycloneDXBomParser = new CycloneDXBomParser();
+        }
 
         public Bom ParsePackageFile(CommonAppSettings appSettings)
         {
             List<Component> componentsForBOM = new();
+            List<Component> componentsToBOM = new();
+            List<Component> ListOfComponents = new();
             Bom bom = new();
+            List<Dependency> dependenciesForBOM = new();
+            List<string> configFiles;
 
-            string depFilePath = "";
-            int totalComponentsIdentified = 0;
-            List<string> configFiles = new();
-            if (string.IsNullOrEmpty(appSettings.CycloneDxBomFilePath))
+            configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Maven);
+
+            foreach (string filepath in configFiles)
             {
-                //Create empty dependency list file
-                if (!string.IsNullOrEmpty(appSettings.PackageFilePath))
+               
+                Bom bomList = ParseCycloneDXBom(filepath);
+                cycloneDXBomParser.CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
+
+                if (componentsForBOM.Count == 0)
                 {
-                    configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Maven);
-                    depFilePath = Path.Combine(appSettings.PackageFilePath, "POMDependencies.txt");
-                    File.Create(depFilePath).Close();
+                    componentsForBOM.AddRange(bomList?.Components);
+                }
+                else
+                {
+                    componentsToBOM.AddRange(bomList?.Components);
                 }
 
-                foreach (var bomFilePath in configFiles)
+                if (bomList.Dependencies != null)
                 {
-                    Result result = BomHelper.GetDependencyList(bomFilePath, depFilePath);
-                    if (result.ExitCode != 0)
-                    {
-                        Logger.Debug("Error in downloading maven packages");
-                    }
+                    dependenciesForBOM.AddRange(bomList.Dependencies);
                 }
-
-                ParseConfigFile(depFilePath, appSettings, ref componentsForBOM);
-
-                totalComponentsIdentified = componentsForBOM.Count;
-
-                componentsForBOM = componentsForBOM.Distinct(new ComponentEqualityComparer()).ToList();
-
-                BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - componentsForBOM.Count;               
-
-                var componentsWithMultipleVersions = componentsForBOM.GroupBy(s => s.Name)
-                         .Where(g => g.Count() > 1).SelectMany(g => g).ToList();
-
-                if (componentsWithMultipleVersions.Count != 0)
-                {
-                    Logger.Warn($"Multiple versions detected :\n");
-                    foreach (var item in componentsWithMultipleVersions)
-                    {
-                        Logger.Warn($"Component Name : {item.Name}\nComponent Version : {item.Version}\nPackage Found in : {appSettings.PackageFilePath}\n");
-                    }
-                }
-                bom.Components = componentsForBOM;
             }
-            else
+
+            if (File.Exists(appSettings.CycloneDxSBomTemplatePath))
             {
-                bom = ParseCycloneDXBom(appSettings.CycloneDxBomFilePath);
-                BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = bom.Components.Count;
+                //Adding Template Component Details
+                Bom templateDetails;
+                templateDetails = cycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
+                cycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
+                SbomTemplate.AddComponentDetails(componentsForBOM, templateDetails);
             }
+
+            //checking Dev dependency
+            DevDependencyIdentificationLogic(componentsForBOM, componentsToBOM, ref ListOfComponents);
+
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = componentsForBOM.Count + componentsToBOM.Count;
+
+            int totalComponentsIdentified = BomCreator.bomKpiData.ComponentsinPackageLockJsonFile;
+
+            //Removing if there are any other duplicates           
+            componentsForBOM = ListOfComponents.Distinct(new ComponentEqualityComparer()).ToList();
+
+            BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - componentsForBOM.Count;
+
+
+            bom.Components = componentsForBOM;
+            bom.Dependencies = dependenciesForBOM;
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = bom.Components.Count;
+            BomCreator.bomKpiData.ComponentsInComparisonBOM = bom.Components.Count;
             Logger.Debug($"ParsePackageFile():End");
             return bom;
         }
 
-        private static void ParseConfigFile(string depFilePath, CommonAppSettings appSettings, ref List<Component> foundPackages)
+        public static void DevDependencyIdentificationLogic(List<Component> componentsForBOM, List<Component> componentsToBOM, ref List<Component> ListOfComponents)
         {
-            string[] lines = File.ReadAllLines(depFilePath);
-            int noOfExcludedComponents = 0;
-            int totalComponenstinInputFile = 0;
-            foreach (string line in lines)
+
+            List<Component> iterateBOM = componentsForBOM.Count > componentsToBOM.Count ? componentsForBOM : componentsToBOM;
+            List<Component> checkBOM = componentsForBOM.Count < componentsToBOM.Count ? componentsForBOM : componentsToBOM;
+
+
+            ListOfComponents = DevdependencyIdentification(ListOfComponents, iterateBOM, checkBOM);
+
+        }
+
+        private static List<Component> DevdependencyIdentification(List<Component> ListOfComponents, List<Component> iterateBOM, List<Component> checkBOM)
+        {
+            foreach (var item in iterateBOM)
             {
-                Component component;
-                string trimmedLine = line.Trim();
-
-                if (trimmedLine != string.Empty && trimmedLine != "none" && trimmedLine != "The following files have been resolved:")
+                //check to see if the second list is empty(which means customer has only provided one bom file)no dev dependency will be identified here
+                if (checkBOM.Count == 0)
                 {
-                    totalComponenstinInputFile++;
-                    //Example entry: org.mockito:mockito-core:jar:1.10.19:compile
-                    string[] parts = trimmedLine.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
-                    string scope = "";
-                    bool isDevelopmentComponent;
+                    SetPropertiesforBOM(ref ListOfComponents, item, "false");
+                }
+                else if (checkBOM.Exists(x => x.Name == item.Name && x.Version == item.Version)) //check t see if both list has common elements
+                {
+                    SetPropertiesforBOM(ref ListOfComponents, item, "false");
+                }
+                else //incase one list has a component not present in another then it will be marked as Dev
+                {
+                    SetPropertiesforBOM(ref ListOfComponents, item, "true");
 
-                    scope = GetPackageDetails(parts, out component);
-
-                    isDevelopmentComponent = GetDevDependentScopeList(appSettings, scope);
-
-                    if (!component.Version.Contains("win") && !isDevelopmentComponent)
-                    {
-                        foundPackages.Add(component);
-                    }
-                    if (isDevelopmentComponent)
-                    {
-                        BomCreator.bomKpiData.DevDependentComponents++;
-                    }
+                    BomCreator.bomKpiData.DevDependentComponents++;
                 }
             }
-            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = totalComponenstinInputFile;
-            if (appSettings.Maven.ExcludedComponents != null)
-            {
-                foundPackages = CommonHelper.RemoveExcludedComponents(foundPackages, appSettings.Maven.ExcludedComponents, ref noOfExcludedComponents);
-                BomCreator.bomKpiData.ComponentsExcluded += noOfExcludedComponents;
 
+            return ListOfComponents;
+        }
+
+        private static void SetPropertiesforBOM(ref List<Component> componentsToBOM, Component component, string devValue)
+        {
+            Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "Discovered" };
+            Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = devValue };
+
+            if (ComponentPropertyCheck(component))
+            {
+                component.Properties.Add(isDev);
+                componentsToBOM.Add(component);
             }
+            else
+            {
+                component.Properties = new List<Property>();
+                component.Properties.Add(isDev);
+                component.Properties.Add(identifierType);
+                componentsToBOM.Add(component);
+            }
+        }
+
+        private static bool ComponentPropertyCheck(Component component)
+        {
+            if (component.Properties == null)
+            {
+                return false;
+            }
+            return component.Properties.Exists(x => x.Name == Dataconstant.Cdx_IdentifierType);
         }
 
         public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM, CommonAppSettings appSettings,
@@ -139,7 +172,6 @@ namespace LCT.PackageIdentifier
                 string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper);
                 Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoUrl, Value = repoName };
                 Component componentVal = component;
-
                 if (componentVal.Properties?.Count == null || componentVal.Properties?.Count <= 0)
                 {
                     componentVal.Properties = new List<Property>();
@@ -174,12 +206,16 @@ namespace LCT.PackageIdentifier
                 {
                     currentIterationItem.Properties = new List<Property>();
                 }
-                
+
                 Property isInternal = new() { Name = Dataconstant.Cdx_IsInternal, Value = "false" };
                 if (isTrue)
                 {
                     internalComponents.Add(currentIterationItem);
-                    continue;
+                    isInternal.Value = "true";
+                }
+                else
+                {
+                    isInternal.Value = "false";
                 }
 
                 currentIterationItem.Properties.Add(isInternal);
@@ -210,51 +246,6 @@ namespace LCT.PackageIdentifier
             }
 
             return false;
-        }
-
-        private static bool GetDevDependentScopeList(CommonAppSettings appSettings, string scope)
-        {
-            return appSettings.Maven.DevDependentScopeList?.Contains(scope) ?? false;
-        }
-
-        private static string GetPackageDetails(string[] parts, out Component component)
-        {
-            string scope = string.Empty;
-            MavenPackage package;
-            component = new Component();
-
-            if (parts.Length == 5)
-            {
-                package = new()
-                {
-                    ID = parts[1],
-                    Version = parts[3],
-                    GroupID = parts[0].Replace('.', '/')
-                };
-                scope = parts[4];
-                component.Name = package.ID;
-                component.Version = package.Version;
-                component.Group = package.GroupID;
-                component.BomRef = $"pkg:maven/{component.Name}@{component.Version}";
-                component.Purl = $"pkg:maven/{component.Name}@{component.Version}";
-            }
-            else if (parts.Length == 6)
-            {
-                package = new()
-                {
-                    ID = parts[1],
-                    Version = $"{parts[4]}-{parts[3]}",
-                    GroupID = parts[0].Replace('.', '/')
-                };
-                scope = parts[4];
-                component.Name = package.ID;
-                component.Version = package.Version;
-                component.Group = package.GroupID;
-                component.BomRef = $"pkg:maven/{component.Name}@{component.Version}";
-                component.Purl = $"pkg:maven/{component.Name}@{component.Version}";
-            }
-
-            return scope;
         }
 
         private static string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
