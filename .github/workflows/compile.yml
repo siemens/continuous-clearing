@@ -95,7 +95,7 @@ jobs:
         $sourceFolder = Join-Path $env:GITHUB_WORKSPACE "out" | Join-Path -ChildPath "*"
         $outFolder = Join-Path $env:GITHUB_WORKSPACE "out" | Join-Path -ChildPath "continuous-clearing" 
         New-Item -ItemType Directory -Force -Path $outFolder
-        $fileName = "continuous-clearing-.zip"
+        $fileName = "continuous-clearing-3.1.3.zip"
         Write-Host "Filename: '$fileName'"
         Write-Host "sourceFolder: '$sourceFolder'"
         Write-Host "Outfolder: '$outFolder'"
