@@ -2,7 +2,6 @@
 // SPDX-FileCopyrightText: 2023 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
-
 // --------------------------------------------------------------------------------------------------------------------
 
 using CycloneDX.Models;
@@ -367,13 +366,14 @@ namespace LCT.PackageIdentifier
         }
 
 
-        private static List<PythonPackage> GetPackagesFromPoteryOutput(Result result)
+        private static List<PythonPackage> GetPackagesFromPoetryOutput(Result result)
         {
             List<PythonPackage> packages = new List<PythonPackage>();
             var strings = result.StdOut.Split(Environment.NewLine).ToList();
 
             foreach (var package in strings)
             {
+                //Needs to extract Name & Version details from EX: "attrs (!) 22.2.0 Classes Without Boilerplate"
                 var lst = package.Split(" ");
                 lst = lst.Where(x => !string.IsNullOrEmpty(x)).Where(y => !y.Contains("(!)")).ToArray();
 
@@ -390,7 +390,6 @@ namespace LCT.PackageIdentifier
             return packages;
         }
 
-
         private static List<PythonPackage> PoetrySetOfCmds(string SourceFilePath, List<Dependency> dependencies)
         {
 
@@ -399,8 +398,8 @@ namespace LCT.PackageIdentifier
             string CommandForMainComp = "poetry show --only main -C " + SourceFilePath;
             string showCMD = "poetry show ";
 
-            List<PythonPackage> AllComps = GetPackagesFromPoteryOutput(ExecutePoetryCMD(CommandForALlComp));
-            List<PythonPackage> MainComps = GetPackagesFromPoteryOutput(ExecutePoetryCMD(CommandForMainComp));
+            List<PythonPackage> AllComps = GetPackagesFromPoetryOutput(ExecutePoetryCMD(CommandForALlComp));
+            List<PythonPackage> MainComps = GetPackagesFromPoetryOutput(ExecutePoetryCMD(CommandForMainComp));
 
             foreach (var val in AllComps)
             {
