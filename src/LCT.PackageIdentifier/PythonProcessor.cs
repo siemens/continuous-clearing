@@ -1,9 +1,7 @@
-﻿
-// --------------------------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // SPDX-FileCopyrightText: 2023 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
-
 // --------------------------------------------------------------------------------------------------------------------
 
 using CycloneDX.Models;
@@ -103,14 +101,12 @@ namespace LCT.PackageIdentifier
             List<PythonPackage> listofComponents = new List<PythonPackage>();
             Bom bom = new Bom();
             List<Component> listComponentForBOM;
-            bool mainLockFileScanned = false;
 
             foreach (string config in configFiles)
             {
-                if (config.EndsWith("poetry.lock") && !mainLockFileScanned)
+                if (config.EndsWith("poetry.lock"))
                 {
                     listofComponents.AddRange(ExtractDetailsForPoetryLockfile(config));
-                    mainLockFileScanned = true;
                 }
                 else if (config.EndsWith(FileConstant.CycloneDXFileExtension))
                 {
@@ -405,13 +401,11 @@ namespace LCT.PackageIdentifier
         public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
             // get the  component list from Jfrog for given repo
-            List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(appSettings.Python?.JfrogNpmRepoList, jFrogService);
             Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
             List<Component> modifiedBOM = new List<Component>();
 
             foreach (var component in componentsForBOM)
             {
-                //string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper);
                 string repoName = NotFoundInRepo;
                 Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoUrl, Value = repoName };
                 Component componentVal = component;

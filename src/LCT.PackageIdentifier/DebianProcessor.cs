@@ -12,6 +12,7 @@ using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -49,7 +50,8 @@ namespace LCT.PackageIdentifier
             foreach (string filepath in configFiles)
             {
                 Logger.Debug($"ParsePackageFile():FileName: " + filepath);
-                listofComponents.AddRange(ParseCycloneDX(filepath));
+                var list = ParseCycloneDX(filepath, ref bom);
+                listofComponents.AddRange(list);
             }
 
             int initialCount = listofComponents.Count;
@@ -79,7 +81,6 @@ namespace LCT.PackageIdentifier
             {
                 componentForBOM = CommonHelper.RemoveExcludedComponents(componentForBOM, appSettings.Debian.ExcludedComponents, ref noOfExcludedComponents);
                 BomCreator.bomKpiData.ComponentsExcluded += noOfExcludedComponents;
-
             }
             cycloneDXBOM.Components = componentForBOM;
             return cycloneDXBOM;
@@ -110,14 +111,14 @@ namespace LCT.PackageIdentifier
 
         #region private methods
 
-        public List<DebianPackage> ParseCycloneDX(string filePath)
+        public List<DebianPackage> ParseCycloneDX(string filePath, ref Bom bom)
         {
             List<DebianPackage> debianPackages = new List<DebianPackage>();
-            ExtractDetailsForJson(filePath, ref debianPackages);
+            bom = ExtractDetailsForJson(filePath, ref debianPackages);
             return debianPackages;
         }
 
-        private void ExtractDetailsForJson(string filePath, ref List<DebianPackage> debianPackages)
+        private Bom ExtractDetailsForJson(string filePath, ref List<DebianPackage> debianPackages)
         {
             Bom bom = cycloneDXBomParser.ParseCycloneDXBom(filePath);
 
@@ -143,6 +144,7 @@ namespace LCT.PackageIdentifier
                     Logger.Debug($"ExtractDetailsForJson():InvalidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
                 }
             }
+            return bom;
         }
 
         private static void GetDistinctComponentList(ref List<DebianPackage> listofComponents)
@@ -175,6 +177,12 @@ namespace LCT.PackageIdentifier
                     Purl = GetReleaseExternalId(prop.Name, prop.Version)
                 };
                 component.BomRef = component.Purl;
+
+                //For Debian projects we will be considering CycloneDX file reading components as Discovered
+                //since it's Discovered from syft Tool
+                Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "Discovered" };
+                component.Properties = new List<Property> { identifierType };
+
                 listComponentForBOM.Add(component);
             }
             return listComponentForBOM;

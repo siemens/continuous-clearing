@@ -43,19 +43,15 @@ namespace LCT.PackageIdentifier
             Logger.Logger.Log(null, Level.Notice, $"No of components added to BOM after removing bundled & excluded components " +
                 $"= {listOfComponentsToBom.Components.Count}", null);
 
-
             bomKpiData.ComponentsInComparisonBOM = listOfComponentsToBom.Components.Count;
-
 
             //sets metadata properties
             listOfComponentsToBom = CycloneBomProcessor.SetMetadataInComparisonBOM(listOfComponentsToBom, appSettings);
-
 
             // Writes Comparison Bom
             Logger.Logger.Log(null, Level.Notice, $"Writing CycloneDX BOM..", null);
             WritecontentsToBOM(appSettings, bomKpiData, listOfComponentsToBom);
             Logger.Logger.Log(null, Level.Notice, $"Writing CycloneDX BOM completed", null);
-
 
             // Writes Kpi data 
             Program.BomStopWatch?.Stop();
@@ -80,10 +76,7 @@ namespace LCT.PackageIdentifier
 
         private static void WritecontentsToBOM(CommonAppSettings appSettings, BomKpiData bomKpiData, Bom listOfComponentsToBom)
         {
-           
-                WriteContentToCycloneDxBOM(appSettings, listOfComponentsToBom, ref bomKpiData);
-       
-
+            WriteContentToCycloneDxBOM(appSettings, listOfComponentsToBom, ref bomKpiData);
         }
 
         private static void WriteContentToCycloneDxBOM(CommonAppSettings appSettings, Bom listOfComponentsToBom, ref BomKpiData bomKpiData)

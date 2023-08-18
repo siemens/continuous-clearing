@@ -38,23 +38,20 @@ namespace LCT.Common
             List<Component> ExcludedList = new List<Component>();
             foreach (string excludedComponent in ExcludedComponents)
             {
-
                 string[] excludedcomponent = excludedComponent.ToLower().Split(':');
                 foreach (var component in ComponentList)
                 {
                     string name = component.Name;
-                    if (!string.IsNullOrEmpty(component.Group)&&(component.Group!=component.Name))
+                    if (!string.IsNullOrEmpty(component.Group) && (component.Group != component.Name))
                     {
                         name = $"{component.Group}/{component.Name}";
                     }
-
 
                     if (name.ToLowerInvariant() == excludedcomponent[0].ToLowerInvariant() && (component.Version.ToLowerInvariant() == excludedcomponent[1].ToLowerInvariant() || excludedcomponent[1].ToLowerInvariant() == "*"))
                     {
                         noOfExcludedComponents++;
                         ExcludedList.Add(component);
                     }
-
                 }
             }
             ComponentList.RemoveAll(item => ExcludedList.Contains(item));
