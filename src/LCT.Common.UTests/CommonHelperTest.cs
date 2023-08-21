@@ -44,5 +44,29 @@ namespace LCT.Common.UTest
             //Assert
             Assert.IsTrue(result.Count > 0);
         }
+
+        [Test]
+        public void RemoveMultipleExcludedComponents_ReturnSuccess()
+        {
+            //Arrange
+            List<Component> ComponentsForBom = new List<Component>();
+            ComponentsForBom.Add(new Component() { Name = "Debian", Version = "3.1.0" });
+            ComponentsForBom.Add(new Component() { Name = "Debian", Version = "3.1.1" });
+            ComponentsForBom.Add(new Component() { Name = "Debian", Version = "3.1.2" });
+            ComponentsForBom.Add(new Component() { Name = "Newton", Version = "3.1.3" });
+            ComponentsForBom.Add(new Component() { Name = "Log4t", Version = "3.1.4" });
+            int noOfExcludedComponents = 0;
+
+            List<string> list = new List<string>();
+            list.Add("Debian:*");
+            list.Add("Newton:3.1.3");
+
+            //Act
+            CommonHelper.RemoveExcludedComponents(ComponentsForBom, list, ref noOfExcludedComponents);
+
+            //Assert            
+            Assert.That(noOfExcludedComponents, Is.EqualTo(4), "Returns the count of excluded components");
+
+        }
     }
 }

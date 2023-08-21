@@ -59,7 +59,7 @@ namespace LCT.PackageIdentifier
 
                 componentsForBOM = componentsForBOM.Distinct(new ComponentEqualityComparer()).ToList();
 
-                BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - componentsForBOM.Count;
+                BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - componentsForBOM.Count;               
 
                 var componentsWithMultipleVersions = componentsForBOM.GroupBy(s => s.Name)
                          .Where(g => g.Count() > 1).SelectMany(g => g).ToList();

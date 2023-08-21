@@ -93,7 +93,7 @@ namespace LCT.SW360PackageCreator
                     IsAllFileDownloaded = false;
                 }
 
-                if (!string.IsNullOrEmpty(file) && file.Contains(FileConstant.DSCFileExtension))
+                if (!string.IsNullOrEmpty(file) && file.Contains(FileConstant.DSCFileExtension) && !fileInfo.ContainsKey("DSCFILE"))
                 {
                     fileInfo.Add("DSCFILE", Path.GetFileName(file));
                 }

@@ -49,7 +49,7 @@ namespace LCT.Common
                     }
 
 
-                    if (name.ToLowerInvariant() == excludedcomponent[0].ToLowerInvariant() && component.Version.ToLowerInvariant() == excludedcomponent[1].ToLowerInvariant())
+                    if (name.ToLowerInvariant() == excludedcomponent[0].ToLowerInvariant() && (component.Version.ToLowerInvariant() == excludedcomponent[1].ToLowerInvariant() || excludedcomponent[1].ToLowerInvariant() == "*"))
                     {
                         noOfExcludedComponents++;
                         ExcludedList.Add(component);
