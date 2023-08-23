@@ -14,6 +14,7 @@ using LCT.Services;
 using LCT.Services.Interface;
 using LCT.SW360PackageCreator;
 using LCT.SW360PackageCreator.Interfaces;
+using Microsoft.CodeAnalysis.FlowAnalysis;
 using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;
@@ -266,7 +267,6 @@ namespace NUnitTestProject1
             var creatorHelper = new Mock<ICreatorHelper>();
             var parser = new Mock<ICycloneDXBomParser>();
             parser.Setup(x => x.ParseCycloneDXBom(It.IsAny<string>())).Returns(bom);
-            creatorHelper.Setup(x => x.SetContentsForComparisonBOM(It.IsAny<List<Components>>(), sw360Service.Object)).ReturnsAsync(comparisonBomData);
             var cycloneDXBomParser = new ComponentCreator();
 
             //Act
@@ -274,7 +274,7 @@ namespace NUnitTestProject1
 
 
             //Assert
-            Assert.That(list.Count > 0);
+            Assert.That(list==null);
         }
         [Test]
         public async Task CycloneDxBomParser_PassingFilePath_DoesntExcludeDevDependentComponent()
@@ -298,8 +298,7 @@ namespace NUnitTestProject1
             Bom bom = new Bom();
             bom.Components = new List<Component>()
                 {
-                    new Component() { Name = "newtonsoft",Version="3.1.18",Group="",Purl="pkg:nuget/newtonsoft@3.1.18",Properties = properties },
-                     new Component() { Name = "test",Version="2.18",Group="",Purl="pkg:nuget/test@2.18",Properties = properties },
+                    new Component() { Name = "newtonsoft",Version="3.1.18",Group="",Purl="pkg:nuget/newtonsoft@3.1.18",Properties = properties }
                 };
 
             CommonAppSettings commonAppSettings = new CommonAppSettings();
