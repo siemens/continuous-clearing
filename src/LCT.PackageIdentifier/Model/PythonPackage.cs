@@ -17,7 +17,7 @@ namespace LCT.PackageIdentifier.Model
         public string Name { get; set; }
         public string Version { get; set; }
         public bool Isdevdependent { get; set; }
-
+        public string FoundType { get; set; }
         public string Filepath { get; set; }
 
     }

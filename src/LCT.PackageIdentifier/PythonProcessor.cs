@@ -6,15 +6,12 @@
 
 using CycloneDX.Models;
 using LCT.APICommunications.Model;
-using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
-using Newtonsoft.Json;
-using NuGet.Packaging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -87,7 +84,6 @@ namespace LCT.PackageIdentifier
                         Value = "true"
                     };
                     component.Properties.Add(internalType);
-
                 }
                 componentData.internalComponents = Internalcomponents;
                 BomCreator.bomKpiData.InternalComponents = Internalcomponents.Count;
@@ -122,7 +118,6 @@ namespace LCT.PackageIdentifier
                 templateDetails = cycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
                 cycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
             }
-
 
             int initialCount = listofComponents.Count;
             GetDistinctComponentList(ref listofComponents);
@@ -232,13 +227,29 @@ namespace LCT.PackageIdentifier
                     Purl = GetReleaseExternalId(prop.Name, prop.Version),
                 };
 
+                Property identifierType;
+                if (prop.FoundType == "Discovered")
+                {
+                    identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "Discovered" };
+                }
+                else
+                {
+                    identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "ManuallyAdded" };
+                }
+
                 component.Properties = new List<Property>
                 {
-                    devDependency
+                    devDependency,
+                    identifierType
                 };
+
+                if (!component.Properties.Exists(x => x.Name == Dataconstant.Cdx_IsInternal))
+                {
+                    Property isInternal = new() { Name = Dataconstant.Cdx_IsInternal, Value = "false" };
+                    component.Properties.Add(isInternal);
+                }
+
                 component.BomRef = component.Purl;
-
-
 
                 listComponentForBOM.Add(component);
             }
@@ -420,6 +431,7 @@ namespace LCT.PackageIdentifier
                     dependencies.Add(dependency);
                 }
 
+                val.FoundType = "Discovered";
                 lst.Add(val);
             }
 
