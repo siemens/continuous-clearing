@@ -45,7 +45,7 @@ namespace LCT.PackageIdentifier
 
             foreach (string filepath in configFiles)
             {
-               
+
                 Bom bomList = ParseCycloneDXBom(filepath);
                 cycloneDXBomParser.CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
 
@@ -134,10 +134,17 @@ namespace LCT.PackageIdentifier
             Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "Discovered" };
             Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = devValue };
 
-            if (ComponentPropertyCheck(component))
+            if (ComponentPropertyCheck(component, Dataconstant.Cdx_IdentifierType))
             {
-                component.Properties.Add(isDev);
-                componentsToBOM.Add(component);
+                if(!ComponentPropertyCheck(component, Dataconstant.Cdx_IsDevelopment))
+                {
+                    component.Properties.Add(isDev);
+                    componentsToBOM.Add(component);
+                }
+                else
+                {
+                    componentsToBOM.Add(component);
+                }
             }
             else
             {
@@ -148,13 +155,13 @@ namespace LCT.PackageIdentifier
             }
         }
 
-        private static bool ComponentPropertyCheck(Component component)
+        private static bool ComponentPropertyCheck(Component component, string constant)
         {
             if (component.Properties == null)
             {
                 return false;
             }
-            return component.Properties.Exists(x => x.Name == Dataconstant.Cdx_IdentifierType);
+            return component.Properties.Exists(x => x.Name == constant);
         }
 
         public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM, CommonAppSettings appSettings,
