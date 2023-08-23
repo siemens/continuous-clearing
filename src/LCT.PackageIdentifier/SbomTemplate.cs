@@ -29,23 +29,28 @@ namespace LCT.PackageIdentifier
             {
                 try
                 {
+                    Property cdxIdentifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "TemplateAdded" };
+                    Property cdxIsDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };                   
+
+
                     Component bomComp = bom.SingleOrDefault(x => x.Name == sbomcomp.Name && x.Version == sbomcomp.Version);
                     if (bomComp == null)
                     {
-                        sbomcomp.Properties.Add(new Property()
+                        if (sbomcomp.Properties == null)
                         {
-                            Name = Dataconstant.Cdx_IdentifierType,
-                            Value = "TemplateAdded"
-                        });
-
-                        sbomcomp.Properties.Add(
-                         new Property()
-                         {
-                             Name = Dataconstant.Cdx_IsDevelopment,
-                             Value = "false"
-                         });
-                        bom.Add(sbomcomp);
-                        BomCreator.bomKpiData.ComponentsinSBOMTemplateFile++;
+                            sbomcomp.Properties = new List<Property>();
+                            sbomcomp.Properties.Add(cdxIdentifierType);
+                            sbomcomp.Properties.Add(cdxIsDev);
+                            bom.Add(sbomcomp);
+                            BomCreator.bomKpiData.ComponentsinSBOMTemplateFile++;
+                        }
+                        else
+                        {
+                            sbomcomp.Properties.Add(cdxIdentifierType);
+                            sbomcomp.Properties.Add(cdxIsDev);
+                            bom.Add(sbomcomp);
+                            BomCreator.bomKpiData.ComponentsinSBOMTemplateFile++;
+                        }
                     }
                     else
                     {

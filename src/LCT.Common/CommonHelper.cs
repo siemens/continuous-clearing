@@ -219,5 +219,14 @@ namespace LCT.Common
                 Logger.Info("\n");
             }
         }
+
+        public static bool ComponentPropertyCheck(Component component, string constant)
+        {
+            if (component.Properties == null)
+            {
+                return false;
+            }
+            return component.Properties.Exists(x => x.Name == constant);
+        }
     }
 }
