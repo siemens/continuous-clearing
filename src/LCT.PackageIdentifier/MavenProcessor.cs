@@ -1,5 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2023 Siemens AG
+﻿// SPDX-FileCopyrightText: 2023 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // --------------------------------------------------------------------------------------------------------------------
@@ -134,9 +133,9 @@ namespace LCT.PackageIdentifier
             Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "Discovered" };
             Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = devValue };
 
-            if (ComponentPropertyCheck(component, Dataconstant.Cdx_IdentifierType))
+            if (CommonHelper.ComponentPropertyCheck(component, Dataconstant.Cdx_IdentifierType))
             {
-                if(!ComponentPropertyCheck(component, Dataconstant.Cdx_IsDevelopment))
+                if(!CommonHelper.ComponentPropertyCheck(component, Dataconstant.Cdx_IsDevelopment))
                 {
                     component.Properties.Add(isDev);
                     componentsToBOM.Add(component);
@@ -153,16 +152,7 @@ namespace LCT.PackageIdentifier
                 component.Properties.Add(identifierType);
                 componentsToBOM.Add(component);
             }
-        }
-
-        private static bool ComponentPropertyCheck(Component component, string constant)
-        {
-            if (component.Properties == null)
-            {
-                return false;
-            }
-            return component.Properties.Exists(x => x.Name == constant);
-        }
+        }       
 
         public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM, CommonAppSettings appSettings,
                                                           IJFrogService jFrogService,
