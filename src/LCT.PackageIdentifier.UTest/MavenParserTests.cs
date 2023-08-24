@@ -349,7 +349,7 @@ namespace LCT.PackageIdentifier.UTest
             //Act
             Bom bom = MavenProcessor.ParsePackageFile(appSettings);
 
-            bool isUpdated = bom.Components.Exists(x => x.Properties != null && x.Properties.Exists(x => x.Name == Dataconstant.Cdx_IdentifierType && x.Value == "TemplateAdded"));
+            bool isUpdated = bom.Components.Exists(x => x.Properties != null && x.Properties.Exists(x => x.Name == Dataconstant.Cdx_IdentifierType && x.Value == Dataconstant.TemplateAdded));
 
             //Assert
             Assert.IsTrue(isUpdated, "Checks For Updated Property In List ");

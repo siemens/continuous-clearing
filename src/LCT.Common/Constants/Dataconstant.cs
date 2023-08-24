@@ -24,6 +24,12 @@ namespace LCT.Common.Constants
         {"PYTHON", "pkg:pypi"},
          };
 
+        //Identified types
+        public const string ManullayAdded = "ManuallyAdded";
+        public const string Discovered = "Discovered";
+        public const string TemplateAdded = "TemplateAdded";
+        public const string TemplateUpdated = "TemplateUpdated";
+
         public const string Created = "Created";
         public const string NewlyCreated = "Newly Created";
         public const string Uploaded = "Uploaded";

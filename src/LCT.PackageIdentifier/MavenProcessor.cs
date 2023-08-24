@@ -129,7 +129,7 @@ namespace LCT.PackageIdentifier
 
         private static void SetPropertiesforBOM(ref List<Component> componentsToBOM, Component component, string devValue)
         {
-            Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "Discovered" };
+            Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.Discovered };
             Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = devValue };
 
             if (CommonHelper.ComponentPropertyCheck(component, Dataconstant.Cdx_IdentifierType))

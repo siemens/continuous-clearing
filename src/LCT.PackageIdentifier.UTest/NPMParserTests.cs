@@ -176,7 +176,7 @@ namespace LCT.PackageIdentifier.UTest
             //Act
             Bom listofcomponents = npmProcessor.ParsePackageFile(appSettings);
 
-            bool isUpdated = listofcomponents.Components.Exists(x => x.Properties != null && x.Properties.Exists(x => x.Name == Dataconstant.Cdx_IdentifierType && x.Value == "TemplateAdded"));
+            bool isUpdated = listofcomponents.Components.Exists(x => x.Properties != null && x.Properties.Exists(x => x.Name == Dataconstant.Cdx_IdentifierType && x.Value == Dataconstant.TemplateAdded));
 
             //Assert
             Assert.IsTrue(isUpdated, "Checks For Updated Property In List ");

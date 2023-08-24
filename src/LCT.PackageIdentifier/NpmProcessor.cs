@@ -355,6 +355,7 @@ namespace LCT.PackageIdentifier
                     bom = ParseCycloneDXBom(filepath);
                     bom = RemoveExcludedComponents(appSettings, bom);
                     cycloneDXBomParser.CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
+                    AddingIdentifierType(bom.Components, "CycloneDXFile");
                     componentsForBOM.AddRange(bom.Components);
                     dependencies = bom.Dependencies;
                 }
@@ -362,10 +363,10 @@ namespace LCT.PackageIdentifier
                 {
                     Logger.Debug($"ParsingInputFileForBOM():Found as Package File");
                     var components = ParsePackageLockJson(filepath, appSettings);
+                    AddingIdentifierType(components, "PackageFile");
                     componentsForBOM.AddRange(components);
                 }
             }
-            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = componentsForBOM.Count;
 
             if (File.Exists(appSettings.CycloneDxSBomTemplatePath))
             {
@@ -533,5 +534,28 @@ namespace LCT.PackageIdentifier
             }
             return components;
         }
+
+        private void AddingIdentifierType(List<Component> components, string identifiedBy)
+        {
+            foreach (var component in components)
+            {
+                component.Properties = new List<Property>();
+                Property isDev;
+                Property identifierType;
+                if (identifiedBy == "PackageFile")
+                {
+                    identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.Discovered };
+                    component.Properties.Add(identifierType);
+                }
+                else
+                {
+                    isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
+                    identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.ManullayAdded };
+                    component.Properties.Add(isDev);
+                    component.Properties.Add(identifierType);
+                }
+            }
+        }
+
     }
 }

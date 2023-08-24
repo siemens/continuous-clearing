@@ -228,13 +228,13 @@ namespace LCT.PackageIdentifier
                 };
 
                 Property identifierType;
-                if (prop.FoundType == "Discovered")
+                if (prop.FoundType == Dataconstant.Discovered)
                 {
-                    identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "Discovered" };
+                    identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.Discovered };
                 }
                 else
                 {
-                    identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "ManuallyAdded" };
+                    identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.ManullayAdded };
                 }
 
                 component.Properties = new List<Property>
@@ -431,7 +431,7 @@ namespace LCT.PackageIdentifier
                     dependencies.Add(dependency);
                 }
 
-                val.FoundType = "Discovered";
+                val.FoundType = Dataconstant.Discovered;
                 lst.Add(val);
             }
 

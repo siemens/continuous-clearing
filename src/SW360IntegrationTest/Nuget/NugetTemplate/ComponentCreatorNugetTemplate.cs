@@ -7,6 +7,7 @@
 
 using CycloneDX.Models;
 using LCT.APICommunications.Model;
+using LCT.Common.Constants;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using System.IO;
@@ -106,7 +107,7 @@ namespace SW360IntegrationTest
 
                             if (item.Name == "System.Memory")
                             {
-                                Assert.IsTrue(item.Properties.Exists(x => x.Value == "TemplateAdded"), "Checks for template addition");
+                                Assert.IsTrue(item.Properties.Exists(x => x.Value == Dataconstant.TemplateAdded), "Checks for template addition");
                             }
                         }
                     }

@@ -29,7 +29,7 @@ namespace LCT.PackageIdentifier
             {
                 try
                 {
-                    Property cdxIdentifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "TemplateAdded" };
+                    Property cdxIdentifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.TemplateAdded };
                     Property cdxIsDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };                   
 
 
@@ -65,7 +65,7 @@ namespace LCT.PackageIdentifier
                             sbomcomp.Properties.Add(new Property()
                             {
                                 Name = Dataconstant.Cdx_IdentifierType,
-                                Value = "TemplateUpdated"
+                                Value = Dataconstant.TemplateUpdated
                             });
                             BomCreator.bomKpiData.ComponentsUpdatedFromSBOMTemplateFile++;
                         }

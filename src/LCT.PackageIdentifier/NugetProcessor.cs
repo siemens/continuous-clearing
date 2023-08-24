@@ -377,7 +377,6 @@ namespace LCT.PackageIdentifier
 
             configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Nuget);
 
-
             foreach (string filepath in configFiles)
             {
                 Logger.Debug($"ParsingInputFileForBOM():FileName: " + filepath);
@@ -423,7 +422,7 @@ namespace LCT.PackageIdentifier
             {
                 component.Properties = new List<Property>();
                 Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
-                Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "ManuallyAdded" };
+                Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.ManullayAdded };
                 component.Properties.Add(isDev);
                 component.Properties.Add(identifierType);
                 listComponentForBOM.Add(component);
@@ -452,7 +451,7 @@ namespace LCT.PackageIdentifier
                     },
                     new Property()
                     {
-                        Name = Dataconstant.Cdx_IdentifierType,Value="Discovered"
+                        Name = Dataconstant.Cdx_IdentifierType,Value=Dataconstant.Discovered
                     }
                 };
                 listComponentForBOM.Add(components);

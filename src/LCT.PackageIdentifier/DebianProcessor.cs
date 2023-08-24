@@ -180,7 +180,7 @@ namespace LCT.PackageIdentifier
 
                 //For Debian projects we will be considering CycloneDX file reading components as Discovered
                 //since it's Discovered from syft Tool
-                Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "Discovered" };
+                Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.Discovered };
                 component.Properties = new List<Property> { identifierType };
 
                 listComponentForBOM.Add(component);
