@@ -106,14 +106,14 @@ namespace LCT.PackageIdentifier
                 {
                     listofComponents.AddRange(ExtractDetailsForPoetryLockfile(config, dependencies));
                 }
-                else if (config.EndsWith(FileConstant.CycloneDXFileExtension))
+                else if (config.EndsWith(FileConstant.CycloneDXFileExtension) && !config.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     listofComponents.AddRange(ExtractDetailsFromJson(config, appSettings, ref dependencies));
                 }
             }
 
             Bom templateDetails = new Bom();
-            if (File.Exists(appSettings.CycloneDxSBomTemplatePath))
+            if (File.Exists(appSettings.CycloneDxSBomTemplatePath) && appSettings.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
                 templateDetails = cycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
                 cycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);

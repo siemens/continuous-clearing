@@ -382,11 +382,14 @@ namespace LCT.PackageIdentifier
                 Logger.Debug($"ParsingInputFileForBOM():FileName: " + filepath);
                 if (filepath.EndsWith(FileConstant.CycloneDXFileExtension))
                 {
-                    Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
-                    bom = cycloneDXBomParser.ParseCycloneDXBom(filepath);
-                    cycloneDXBomParser.CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
-                    componentsForBOM.AddRange(bom.Components);
-                    GetDetailsforManuallyAdded(componentsForBOM, listComponentForBOM);
+                    if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                    {
+                        Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
+                        bom = cycloneDXBomParser.ParseCycloneDXBom(filepath);
+                        cycloneDXBomParser.CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
+                        componentsForBOM.AddRange(bom.Components);
+                        GetDetailsforManuallyAdded(componentsForBOM, listComponentForBOM);
+                    }
                 }
                 else
                 {
@@ -404,7 +407,7 @@ namespace LCT.PackageIdentifier
             BomCreator.bomKpiData.DevDependentComponents = listComponentForBOM.Count(s => s.Properties[0].Value == "true");
             bom.Components = listComponentForBOM;
 
-            if (File.Exists(appSettings.CycloneDxSBomTemplatePath))
+            if (File.Exists(appSettings.CycloneDxSBomTemplatePath) && appSettings.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
                 //Adding Template Component Details
                 Bom templateDetails;

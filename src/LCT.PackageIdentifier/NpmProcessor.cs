@@ -351,13 +351,16 @@ namespace LCT.PackageIdentifier
 
                 if (filepath.EndsWith(FileConstant.CycloneDXFileExtension))
                 {
-                    Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
-                    bom = ParseCycloneDXBom(filepath);
-                    bom = RemoveExcludedComponents(appSettings, bom);
-                    cycloneDXBomParser.CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
-                    AddingIdentifierType(bom.Components, "CycloneDXFile");
-                    componentsForBOM.AddRange(bom.Components);
-                    dependencies = bom.Dependencies;
+                    if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                    {
+                        Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
+                        bom = ParseCycloneDXBom(filepath);
+                        bom = RemoveExcludedComponents(appSettings, bom);
+                        cycloneDXBomParser.CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
+                        AddingIdentifierType(bom.Components, "CycloneDXFile");
+                        componentsForBOM.AddRange(bom.Components);
+                        dependencies = bom.Dependencies;
+                    }
                 }
                 else
                 {
@@ -368,7 +371,7 @@ namespace LCT.PackageIdentifier
                 }
             }
 
-            if (File.Exists(appSettings.CycloneDxSBomTemplatePath))
+            if (File.Exists(appSettings.CycloneDxSBomTemplatePath) && appSettings.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
                 Bom templateDetails;
                 templateDetails = cycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
@@ -535,11 +538,15 @@ namespace LCT.PackageIdentifier
             return components;
         }
 
-        private void AddingIdentifierType(List<Component> components, string identifiedBy)
+        private static void AddingIdentifierType(List<Component> components, string identifiedBy)
         {
             foreach (var component in components)
             {
-                component.Properties = new List<Property>();
+                if (component.Properties == null)
+                {
+                    component.Properties = new List<Property>();
+                }
+
                 Property isDev;
                 Property identifierType;
                 if (identifiedBy == "PackageFile")

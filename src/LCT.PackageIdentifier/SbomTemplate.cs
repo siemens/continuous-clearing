@@ -30,10 +30,10 @@ namespace LCT.PackageIdentifier
                 try
                 {
                     Property cdxIdentifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.TemplateAdded };
-                    Property cdxIsDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };                   
+                    Property cdxIsDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
 
 
-                    Component bomComp = bom.SingleOrDefault(x => x.Name == sbomcomp.Name && x.Version == sbomcomp.Version);
+                    Component bomComp = bom.Find(x => x.Name == sbomcomp.Name && x.Version == sbomcomp.Version);
                     if (bomComp == null)
                     {
                         if (sbomcomp.Properties == null)
@@ -77,7 +77,11 @@ namespace LCT.PackageIdentifier
                 }
                 catch (ArgumentException ex)
                 {
-                    Logger.Error($"AddComponentDetails():Error from " + sbomcomp.Name + " : " + sbomcomp.Version, ex);
+                    Logger.Error($"AddComponentDetails():ArgumentException:Error from " + sbomcomp.Name + " : " + sbomcomp.Version, ex);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    Logger.Error($"AddComponentDetails():InvalidOperationException:Error from " + sbomcomp.Name + " : " + sbomcomp.Version, ex);
                 }
             }
         }

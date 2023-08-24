@@ -44,26 +44,28 @@ namespace LCT.PackageIdentifier
 
             foreach (string filepath in configFiles)
             {
-
-                Bom bomList = ParseCycloneDXBom(filepath);
-                cycloneDXBomParser.CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
-
-                if (componentsForBOM.Count == 0)
+                if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
-                    componentsForBOM.AddRange(bomList?.Components);
-                }
-                else
-                {
-                    componentsToBOM.AddRange(bomList?.Components);
-                }
+                    Bom bomList = ParseCycloneDXBom(filepath);
+                    cycloneDXBomParser.CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
 
-                if (bomList.Dependencies != null)
-                {
-                    dependenciesForBOM.AddRange(bomList.Dependencies);
+                    if (componentsForBOM.Count == 0)
+                    {
+                        componentsForBOM.AddRange(bomList?.Components);
+                    }
+                    else
+                    {
+                        componentsToBOM.AddRange(bomList?.Components);
+                    }
+
+                    if (bomList.Dependencies != null)
+                    {
+                        dependenciesForBOM.AddRange(bomList.Dependencies);
+                    }
                 }
             }
 
-            if (File.Exists(appSettings.CycloneDxSBomTemplatePath))
+            if (File.Exists(appSettings.CycloneDxSBomTemplatePath) && appSettings.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
                 //Adding Template Component Details
                 Bom templateDetails;
@@ -134,7 +136,7 @@ namespace LCT.PackageIdentifier
 
             if (CommonHelper.ComponentPropertyCheck(component, Dataconstant.Cdx_IdentifierType))
             {
-                if(!CommonHelper.ComponentPropertyCheck(component, Dataconstant.Cdx_IsDevelopment))
+                if (!CommonHelper.ComponentPropertyCheck(component, Dataconstant.Cdx_IsDevelopment))
                 {
                     component.Properties.Add(isDev);
                     componentsToBOM.Add(component);
@@ -151,7 +153,7 @@ namespace LCT.PackageIdentifier
                 component.Properties.Add(identifierType);
                 componentsToBOM.Add(component);
             }
-        }       
+        }
 
         public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM, CommonAppSettings appSettings,
                                                           IJFrogService jFrogService,

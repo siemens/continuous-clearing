@@ -49,9 +49,12 @@ namespace LCT.PackageIdentifier
 
             foreach (string filepath in configFiles)
             {
-                Logger.Debug($"ParsePackageFile():FileName: " + filepath);
-                var list = ParseCycloneDX(filepath, ref bom);
-                listofComponents.AddRange(list);
+                if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                {
+                    Logger.Debug($"ParsePackageFile():FileName: " + filepath);
+                    var list = ParseCycloneDX(filepath, ref bom);
+                    listofComponents.AddRange(list);
+                }
             }
 
             int initialCount = listofComponents.Count;
@@ -60,7 +63,7 @@ namespace LCT.PackageIdentifier
             BomCreator.bomKpiData.DuplicateComponents = initialCount - listComponentForBOM.Count;
 
             bom.Components = listComponentForBOM;
-            if (File.Exists(appSettings.CycloneDxSBomTemplatePath))
+            if (File.Exists(appSettings.CycloneDxSBomTemplatePath) && appSettings.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
                 Bom templateDetails;
                 templateDetails = cycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
