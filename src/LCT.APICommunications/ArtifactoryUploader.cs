@@ -18,20 +18,12 @@ namespace LCT.APICommunications
 {
     public class ArtfactoryUploader 
     {
-        //ConfigurationAttribute
-        private readonly ISw360ApiCommunication m_Sw360ApiCommunication;
+        //ConfigurationAttribute        
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private string destRepoName = Environment.GetEnvironmentVariable("JfrogDestRepoName");
         private string JfrogApi = Environment.GetEnvironmentVariable("JfrogApi");
         private string srcRepoName = Environment.GetEnvironmentVariable("JfrogSrcRepo");
-
-        public ArtfactoryUploader(ISw360ApiCommunication sw360ApiCommunication)
-        {
-            m_Sw360ApiCommunication = sw360ApiCommunication;
-        }
-        public ArtfactoryUploader()
-        {
-        }
+        
 
         public async Task<HttpResponseMessage> UploadPackageToRepo(ComponentsToArtifactory component,int timeout)
         {
