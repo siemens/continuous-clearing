@@ -211,8 +211,8 @@ namespace LCT.ArtifactoryUploader
                 if (!(item.SrcRepoName.Contains("Not Found in JFrog")))
                 {
 
-                    ArtfactoryUploader artifactoryUpload = new ArtfactoryUploader();
-                    HttpResponseMessage responseMessage = await artifactoryUpload.UploadPackageToRepo(item,timeout);
+                    
+                    HttpResponseMessage responseMessage = await ArtfactoryUploader.UploadPackageToRepo(item,timeout);
                     if (responseMessage.StatusCode == HttpStatusCode.OK)
                     {
                         uploaderKpiData.PackagesUploadedToJfrog++;
