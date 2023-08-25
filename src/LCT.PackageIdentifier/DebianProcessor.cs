@@ -62,7 +62,7 @@ namespace LCT.PackageIdentifier
             {
                 Bom templateDetails;
                 templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
-                cycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
+                CycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
                 //Adding Template Component Details & MetaData
                 SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
             }

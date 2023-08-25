@@ -354,7 +354,7 @@ namespace LCT.PackageIdentifier
                     Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
                     bom = ParseCycloneDXBom(filepath);
                     bom = RemoveExcludedComponents(appSettings, bom);
-                    cycloneDXBomParser.CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
+                    CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
                     componentsForBOM.AddRange(bom.Components);
                     dependencies = bom.Dependencies;
                 }
@@ -371,7 +371,7 @@ namespace LCT.PackageIdentifier
             {
                 Bom templateDetails;
                 templateDetails = ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
-                cycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
+                CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
                 //Adding Template Component Details
                 SbomTemplate.AddComponentDetails(componentsForBOM, templateDetails);
             }
@@ -391,7 +391,7 @@ namespace LCT.PackageIdentifier
                 if ((component.Author?.Split(",")) != null)
                 {
                     List<Dependency> subDependencies = new();
-                    foreach (var item in (component?.Author?.Split(",")).Where(item => item.Contains(":")))
+                    foreach (var item in (component?.Author?.Split(",")).Where(item => item.Contains(':')))
                     {
                         var componentDetails = item.Split(":");
                         var name = StringFormat(componentDetails[0]);

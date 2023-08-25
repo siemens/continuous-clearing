@@ -77,7 +77,7 @@ namespace LCT.Common
             return bom;
         }
 
-        public void CheckValidComponentsForProjectType(List<Component> bom, string projectType)
+        public static void CheckValidComponentsForProjectType(List<Component> bom, string projectType)
         {
             foreach (var component in bom.ToList())
             {

@@ -40,7 +40,7 @@ namespace LCT.PackageIdentifier
             cycloneDXBomParser = new CycloneDXBomParser();
         }
 
-        public async Task<List<Component>> CheckInternalComponentsInJfrogArtifactory(CommonAppSettings appSettings, ArtifactoryCredentials artifactoryUpload, Component component, string repo)
+        public static async Task<List<Component>> CheckInternalComponentsInJfrogArtifactory(CommonAppSettings appSettings, ArtifactoryCredentials artifactoryUpload, Component component, string repo)
         {
             List<Component> componentNotForBOM = new List<Component>();
 
@@ -48,7 +48,7 @@ namespace LCT.PackageIdentifier
             return await Task.FromResult(componentNotForBOM);
         }
 
-        public async Task<List<Component>> GetJfrogArtifactoryRepoInfo(CommonAppSettings appSettings, ArtifactoryCredentials artifactoryUpload, Component component, string repo)
+        public static async Task<List<Component>> GetJfrogArtifactoryRepoInfo(CommonAppSettings appSettings, ArtifactoryCredentials artifactoryUpload, Component component, string repo)
         {
             List<Component> componentForBOM = new List<Component>();
 
@@ -122,7 +122,7 @@ namespace LCT.PackageIdentifier
             if (File.Exists(appSettings.CycloneDxSBomTemplatePath))
             {
                 templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
-                cycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
+                CycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
             }
 
 
@@ -153,7 +153,7 @@ namespace LCT.PackageIdentifier
         {
             List<PythonPackage> PythonPackages = new List<PythonPackage>();
             Bom bom = cycloneDXBomParser.ParseCycloneDXBom(filePath);
-            cycloneDXBomParser.CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
+            CycloneDXBomParser.CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
 
             foreach (var componentsInfo in bom.Components)
             {

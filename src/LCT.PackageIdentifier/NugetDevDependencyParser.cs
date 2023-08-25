@@ -71,7 +71,7 @@ namespace LCT.PackageIdentifier
                 && library.ToolsAssemblies.Count == 0;
         }
 
-        internal bool IsTestProject(string projectPath)
+        internal static bool IsTestProject(string projectPath)
         {
             Project csProj;
             try
@@ -233,7 +233,7 @@ namespace LCT.PackageIdentifier
             }
         }
 
-        private void CalculateHashOfPackage(NuGetComponent nuGetComponent, LockFileItem packageFolder, LockFileLibrary lockFileLibrary)
+        private static void CalculateHashOfPackage(NuGetComponent nuGetComponent, LockFileItem packageFolder, LockFileLibrary lockFileLibrary)
         {
             string packagePath = Path.GetFullPath(Path.Combine(packageFolder.Path, lockFileLibrary.Path));
             if (!Directory.Exists(packagePath))
