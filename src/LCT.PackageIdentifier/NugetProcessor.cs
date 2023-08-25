@@ -654,10 +654,13 @@ namespace LCT.PackageIdentifier
         }
         public static void GetDependencyList(KeyValuePair<string,BuildInfoComponent> lst,ref List<string> depvalue)
         {
-            foreach(var item in lst.Value?.Dependencies)
+            if (lst.Value!=null)
             {
-               var  depvaltestue = item.PackageUrl;
-                depvalue.Add(depvaltestue);
+                foreach (var item in lst.Value.Dependencies)
+                {
+                    var depvaltestue = item.PackageUrl;
+                    depvalue.Add(depvaltestue);
+                }
             }
         }
         #endregion

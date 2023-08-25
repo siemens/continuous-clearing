@@ -396,7 +396,7 @@ namespace LCT.PackageIdentifier
             List<PythonPackage> lst = new List<PythonPackage>();
             string CommandForALlComp = "poetry show -C " + SourceFilePath;
             string CommandForMainComp = "poetry show --only main -C " + SourceFilePath;
-            string showCMD = "poetry show ";
+            const string showCMD = "poetry show ";
 
             List<PythonPackage> AllComps = GetPackagesFromPoetryOutput(ExecutePoetryCMD(CommandForALlComp));
             List<PythonPackage> MainComps = GetPackagesFromPoetryOutput(ExecutePoetryCMD(CommandForMainComp));
@@ -511,7 +511,7 @@ namespace LCT.PackageIdentifier
             return Task.FromResult(componentData);
         }
 
-        public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
+        public Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
             // get the  component list from Jfrog for given repo
             Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
@@ -519,7 +519,7 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in componentsForBOM)
             {
-                string repoName = NotFoundInRepo;
+                const string repoName = NotFoundInRepo;
                 Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoUrl, Value = repoName };
                 Component componentVal = component;
 
@@ -534,7 +534,7 @@ namespace LCT.PackageIdentifier
                 modifiedBOM.Add(componentVal);
             }
 
-            return modifiedBOM;
+            return Task.FromResult(modifiedBOM);
         }
 
         #endregion
