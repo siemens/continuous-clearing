@@ -148,7 +148,7 @@ namespace LCT.PackageIdentifier
             }
         }
 
-        private void ParseLibrary(LockFileTargetLibrary library, bool isTestProject, IDictionary<string, BuildInfoComponent> components, LockFile assetFile)
+        private static void ParseLibrary(LockFileTargetLibrary library, bool isTestProject, IDictionary<string, BuildInfoComponent> components, LockFile assetFile)
         {
             if (library.Type.Equals("project", StringComparison.InvariantCultureIgnoreCase))
             {

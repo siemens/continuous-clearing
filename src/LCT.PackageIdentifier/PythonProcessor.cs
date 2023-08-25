@@ -276,7 +276,7 @@ namespace LCT.PackageIdentifier
             return componentNotForBOM;
         }
 
-        private async Task<List<Component>> CheckPackageAvailability(CommonAppSettings appSettings, Component component, string repo)
+        private static async Task<List<Component>> CheckPackageAvailability(CommonAppSettings appSettings, Component component, string repo)
         {
 
             ArtifactoryCredentials artifactoryUpload = new ArtifactoryCredentials()
@@ -289,7 +289,7 @@ namespace LCT.PackageIdentifier
 
         }
 
-        private async Task<List<Component>> AddPackageAvailability(CommonAppSettings appSettings, Component component)
+        private static async Task<List<Component>> AddPackageAvailability(CommonAppSettings appSettings, Component component)
         {
             List<Component> modifiedBOM = new List<Component>();
             ArtifactoryCredentials artifactoryUpload = new ArtifactoryCredentials()
