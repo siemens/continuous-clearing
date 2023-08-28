@@ -654,7 +654,7 @@ namespace LCT.PackageIdentifier
         }
         public static void GetDependencyList(KeyValuePair<string,BuildInfoComponent> lst,ref List<string> depvalue)
         {
-            if (lst.Value.Dependencies !=null)
+            if (lst.Value !=null)
             {
             foreach (var item in lst.Value.Dependencies)
                 {
