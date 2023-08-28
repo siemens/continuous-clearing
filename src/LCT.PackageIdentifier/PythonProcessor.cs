@@ -56,7 +56,7 @@ namespace LCT.PackageIdentifier
             return await Task.FromResult(componentForBOM);
         }
 
-        public async Task<List<Component>> GetRepoDetails(List<Component> componentsForBOM, CommonAppSettings appSettings)
+        public static async Task<List<Component>> GetRepoDetails(List<Component> componentsForBOM, CommonAppSettings appSettings)
         {
             List<Component> modifiedBOM = new List<Component>();
 
@@ -72,7 +72,7 @@ namespace LCT.PackageIdentifier
             return modifiedBOM;
         }
 
-        public async Task<ComponentIdentification> IdentificationOfInternalComponents(ComponentIdentification componentData, CommonAppSettings appSettings)
+        public static async Task<ComponentIdentification> IdentificationOfInternalComponents(ComponentIdentification componentData, CommonAppSettings appSettings)
         {
             List<Component> Internalcomponents;
             if (appSettings.InternalRepoList != null && appSettings.InternalRepoList.Length > 0)

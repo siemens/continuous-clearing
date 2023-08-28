@@ -112,7 +112,7 @@ namespace LCT.PackageIdentifier
             return false;
         }
 
-        internal void ParseJsonFile(string filePath, Container container)
+        internal static void ParseJsonFile(string filePath, Container container)
         {
             try
             {
