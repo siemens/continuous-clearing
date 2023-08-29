@@ -5,6 +5,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using CycloneDX.Models;
+using LCT.Common;
 using LCT.Common.Constants;
 using log4net;
 using System;
@@ -31,7 +32,6 @@ namespace LCT.PackageIdentifier
                 {
                     Property cdxIdentifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.TemplateAdded };
                     Property cdxIsDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
-
 
                     Component bomComp = bom.Find(x => x.Name == sbomcomp.Name && x.Version == sbomcomp.Version);
                     if (bomComp == null)
@@ -62,11 +62,7 @@ namespace LCT.PackageIdentifier
 
                         if (isLicenseUpdated || isPropertiesUpdated)
                         {
-                            sbomcomp.Properties.Add(new Property()
-                            {
-                                Name = Dataconstant.Cdx_IdentifierType,
-                                Value = Dataconstant.TemplateUpdated
-                            });
+
                             BomCreator.bomKpiData.ComponentsUpdatedFromSBOMTemplateFile++;
                         }
                         else
@@ -91,8 +87,16 @@ namespace LCT.PackageIdentifier
             //Adding Licenses if mainatined
             if (sbomcomp.Licenses?.Count > 0)
             {
-                bomComp.Licenses = sbomcomp.Licenses;
-                return true;
+                if (bomComp.Licenses != null)
+                {
+                    bomComp.Licenses.AddRange(sbomcomp.Licenses);
+                    return true;
+                }
+                else
+                {
+                    bomComp.Licenses = sbomcomp.Licenses;
+                    return true;
+                }
             }
             return false;
         }
@@ -102,7 +106,21 @@ namespace LCT.PackageIdentifier
             //Adding properties if mainatined
             if (sbomcomp.Properties?.Count > 0)
             {
-                bomComp.Properties = sbomcomp.Properties;
+                if (CommonHelper.ComponentPropertyCheck(bomComp, Dataconstant.Cdx_IdentifierType))
+                {
+                    var val = bomComp.Properties.Single(x => x.Name == Dataconstant.Cdx_IdentifierType);
+                    val.Value = Dataconstant.TemplateUpdated;
+                }
+                else
+                {
+                    bomComp.Properties.Add(new Property()
+                    {
+                        Name = Dataconstant.Cdx_IdentifierType,
+                        Value = Dataconstant.TemplateUpdated
+                    });
+                }
+
+                bomComp.Properties?.AddRange(sbomcomp.Properties);
                 return true;
             }
             return false;
