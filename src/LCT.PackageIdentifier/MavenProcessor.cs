@@ -88,7 +88,6 @@ namespace LCT.PackageIdentifier
 
             bom.Components = componentsForBOM;
             bom.Dependencies = dependenciesForBOM;
-            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = bom.Components.Count;
             BomCreator.bomKpiData.ComponentsInComparisonBOM = bom.Components.Count;
             Logger.Debug($"ParsePackageFile():End");
             return bom;
