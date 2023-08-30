@@ -386,7 +386,7 @@ namespace LCT.PackageIdentifier
                     {
                         Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
                         bom = cycloneDXBomParser.ParseCycloneDXBom(filepath);
-                        cycloneDXBomParser.CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
+                        CycloneDXBomParser.CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
                         componentsForBOM.AddRange(bom.Components);
                         GetDetailsforManuallyAdded(componentsForBOM, listComponentForBOM);
                     }
@@ -411,8 +411,8 @@ namespace LCT.PackageIdentifier
             {
                 //Adding Template Component Details
                 Bom templateDetails;
-                templateDetails = cycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
-                cycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
+                templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
+                CycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
                 SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
             }
 
@@ -663,11 +663,15 @@ namespace LCT.PackageIdentifier
         }
         public static void GetDependencyList(KeyValuePair<string, BuildInfoComponent> lst, ref List<string> depvalue)
         {
-            foreach (var item in lst.Value?.Dependencies)
+            if (lst.Value.Dependencies.Count>0)
             {
-                var depvaltestue = item.PackageUrl;
-                depvalue.Add(depvaltestue);
+                foreach (var item in lst.Value.Dependencies)
+                {
+                    var depvaltestue = item.PackageUrl;
+                    depvalue.Add(depvaltestue);
+                }
             }
+            
         }
         #endregion
     }
