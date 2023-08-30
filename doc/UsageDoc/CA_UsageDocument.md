@@ -74,7 +74,7 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
    
    > >a) The user can generate a token from their functional account. 
 
-   > >b) The necessary credentials for token generation i.e the client id and client secret, could be obtained from the Sw360 team by creating an issue in their [repository](https://github.com/eclipse/sw360/issues)
+   > >b) The necessary credentials for token generation i.e the client id and client secret.
 
    >**_2.Artifactory Token :_**
 
@@ -115,7 +115,7 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
 
  ### Overview
  
- The Continuous Clearing Tool has 3 dll &#39;s, Execute them in the following order to achieve the complete License clearing process.
+ The Continuous Clearing Tool has 3 dlls, Execute them in the following order to achieve the complete License clearing process.
  
     
    > **1. Package Identifier**
@@ -123,9 +123,10 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
 
 
    >**2. SW360 Package Creator**
-      - Process the CycloneDX BOM file(i.e., output of the first dll) and creates the missing components/releases in SW360 and links all the components to the project in the SW360 portal. This exe also triggers the upload of the components to Fossology and automatically updates the clearing state in SW360.
+      - Process the SBOM file(i.e., output of the first dll) and creates the missing components/releases in SW360 and links all the components to the project in the SW360 portal. This exe also triggers the upload of the components to Fossology and automatically updates the clearing state in SW360.
 
-
+      `Note : Since the PackageIDentifier generates an SBOM file both Dev dependency and internal components will be existing in the BOM file.Make sure to set `RemoveDevDependency` Flag as treu while running this exe`
+	  
    >**3. Artifactory Uploader**
       - Processes the CycloneDXBOM file(i.e., the output of the SW360PackageCreator) and uploads the already cleared components(clearing state-Report approved) to the siparty release repo in Jfrog Artifactory.The components in the states other than "Report approved" will be handled by the clearing experts via the Continuous Clearing Dashboard.
 
@@ -147,8 +148,11 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
       - **Project Type :** **Maven**
       
           * [Apache Maven](https://dlcdn.apache.org/maven/maven-3/3.9.0/binaries/apache-maven-3.9.0-bin.zip) has to be installed in the build machine and added in the `PATH` variable.
+		  *Add the cycloneDX Maven Plugin to the main **pom.xml" and run the command to generate the input bom file.
+		  
+				 mvn install cyclonedx:makeAggregateBom
 
-          * Input file repository should contain **pom.xml** file.
+          * Input file repository should contain **bom.cdx.json** file,Which will be the output of CycloneDx-Maven-Plugin tool
 
          * **Note** : Incase your project has internal dependencies, compile the project **prior to running the clearing tool**
  
@@ -157,6 +161,8 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
        - **Project Type :** **Python** 
 
           * Input file repository should contain **poetry.lock** file. 
+		  
+		  `Note : Python package support in clearing tool is currently only for SBOM discovery and classification.Component Creation and Source code identification is not supported currently`
     
      - **Project Type :**  **Debian** 
        
@@ -189,7 +195,7 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
  
 ```
 {
-  "CaVersion": "3.0.0",
+  "CaVersion": "4.0.0",
   "TimeOut": 200,
   "ProjectType": "<Insert ProjectType>",
   "SW360ProjectName": "<Insert SW360 Project Name>",
@@ -207,6 +213,7 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
   "BomFilePath":"/mnt/Output/<SW360 Project Name>_Bom.cdx.json",
 //IdentifierBomFilePath : For multiple project type 
   "IdentifierBomFilePath": "",
+//CycloneDxSBomTemplatePath : To be used when customer is providing manual SBOM template
   "CycloneDxSBomTemplatePath": "/PathToSBOMTemplateFile",
   "ArtifactoryUploadApiKey": "<Insert ArtifactoryUploadApiKey in a secure way>",//This should be Jfrog Key
   "ArtifactoryUploadUser": "<Insert ArtifactoryUploadUser>",//This should be Jfrog user name
