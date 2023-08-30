@@ -11,7 +11,7 @@ The Continuous Clearing Tool scans and collects the 3rd party OSS components use
 The tool helps the developer/project manager to enable the clearing process faster by reducing the 
 manual effort of creating SW360 and FOSSology workflows.
 
-### Continuous Clearing Tool as SBOM :
+### Continuous Clearing Tool for SBOM :
 
 
 To secure overall DevOps supply chain, we need to ensure that the coding is secure and other mandatory security aspects is integrated in Software development lifecycle from beginning to end. 
@@ -48,7 +48,7 @@ you can run Continuous Clearing Tool as container or as a dotnet package,
  
  Execute them in the following order to achieve the complete License clearing process.
 
-1. **Package Identifier** - This executable takes `package-lock.json` or a `cycloneDX BOM` as input and provides a SBOM file as output. For each of the component the dependency classification (development,internal) and the availability in jfrog artifactory is identified and added in the SBOM file.
+1. **Package Identifier** - This executable takes Package file or a `cycloneDX BOM` as input and provides a SBOM file as output. For each of the component the dependency classification (development,internal) and the availability in jfrog artifactory is identified and added in the SBOM file.
 
  
 ```text
@@ -85,7 +85,7 @@ docker run --rm -it -v /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDire
  
  2. **SW360 Package Creator** - This executable expects the `CycloneDX BOM` as the input, creates the missing components/releases in SW360 and links all the components to the respective project in SW360 portal and triggers the fossology upload.
 
-  `Note`: By default the SBOM contains both dev and non dev dependent components. Hence while creating the compoenents in Sw360  make sure to set the *RemoveDevDependency* flag as `true` to skip creating the development dependent components.
+  `Note`: By default the SBOM contains both dev and non dev dependent components. Hence while creating the components in Sw360  make sure to set the *RemoveDevDependency* flag as `true` to skip creating the development dependent components.
  
  ```text
   SW360PackageCreator.exe --settingsfilepath /<Config_Path>/appSetting.json

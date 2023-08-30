@@ -125,7 +125,7 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
    >**2. SW360 Package Creator**
       - Process the SBOM file(i.e., output of the first dll) and creates the missing components/releases in SW360 and links all the components to the project in the SW360 portal. This exe also triggers the upload of the components to Fossology and automatically updates the clearing state in SW360.
 
-      `Note : Since the PackageIDentifier generates an SBOM file both Dev dependency and internal components will be existing in the BOM file.Make sure to set `RemoveDevDependency` Flag as treu while running this exe`
+      `Note : Since the PackageIDentifier generates an SBOM file both Dev dependency and internal components will be existing in the BOM file.Make sure to set `RemoveDevDependency` Flag as true while running this exe`
 	  
    >**3. Artifactory Uploader**
       - Processes the CycloneDXBOM file(i.e., the output of the SW360PackageCreator) and uploads the already cleared components(clearing state-Report approved) to the siparty release repo in Jfrog Artifactory.The components in the states other than "Report approved" will be handled by the clearing experts via the Continuous Clearing Dashboard.
