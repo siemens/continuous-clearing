@@ -299,11 +299,11 @@ namespace LCT.PackageIdentifier.UTest
         public void ParsePackageFile_GivenAInputFilePathAlongWithSBOMTemplate_ReturnTotalComponentsList()
         {
             //Arrange
-            int expectednoofcomponents = 2;
+            int expectednoofcomponents = 1;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
             string filepath = outFolder + @"\PackageIdentifierUTTestFiles";
-            string[] Includes = { "CycloneDX_Maven.cdx.json" };
+            string[] Includes = { "CycloneDX_Maven.cdx.json", "SBOMTemplate_Maven.cdx.json" };
             string[] Excludes = { "lol" };
 
             CommonAppSettings appSettings = new CommonAppSettings()
@@ -349,7 +349,7 @@ namespace LCT.PackageIdentifier.UTest
             //Act
             Bom bom = MavenProcessor.ParsePackageFile(appSettings);
 
-            bool isUpdated = bom.Components.Exists(x => x.Properties != null && x.Properties.Exists(x => x.Name == Dataconstant.Cdx_IdentifierType && x.Value == Dataconstant.TemplateAdded));
+            bool isUpdated = bom.Components.Exists(x => x.Properties != null && x.Properties.Exists(x => x.Name == Dataconstant.Cdx_IdentifierType && x.Value == Dataconstant.Discovered));
 
             //Assert
             Assert.IsTrue(isUpdated, "Checks For Updated Property In List ");

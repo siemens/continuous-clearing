@@ -33,7 +33,7 @@ namespace SW360IntegrationTest
             if (!TestHelper.BOMCreated)
             {
                 OutFolder = TestHelper.OutFolder;
-                string packagjsonPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest1stIterationData";
+                string packagjsonPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest1stIterationData\Npm";
                 string bomPath = OutFolder + @"\..\BOMs";
                 TestHelper.RunBOMCreatorExe(new string[]{
                 TestConstant.PackageFilePath, packagjsonPath,
