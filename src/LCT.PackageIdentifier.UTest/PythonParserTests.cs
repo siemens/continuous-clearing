@@ -23,7 +23,7 @@ namespace PackageIdentifier.UTest
             pythonProcessor = new PythonProcessor();
         }
         [Test]
-        public void ParsePackageConfig_GivenAMultipleInputFilePath_ReturnsCounts()
+        public void ParseCycloneDXFile_GivenAMultipleInputFilePath_ReturnsCounts()
         {
             //Arrange
             int expectednoofcomponents = 10;
@@ -47,7 +47,7 @@ namespace PackageIdentifier.UTest
 
 
         [Test]
-        public void ParsePackageConfig_GivenAInputFilePath_ReturnsCounts()
+        public void ParseCycloneDXFile_GivenAInputFilePath_ReturnsCounts()
         {
             //Arrange
             int expectednoofcomponents = 4;
@@ -70,7 +70,7 @@ namespace PackageIdentifier.UTest
         }
 
         [Test]
-        public void ParsePackageConfig_GivenMultipleInputFiles_ReturnsCountOfDuplicates()
+        public void ParseCycloneDXFile_GivenMultipleInputFiles_ReturnsCountOfDuplicates()
         {
             //Arrange
             int duplicateComponents = 2;
@@ -93,7 +93,7 @@ namespace PackageIdentifier.UTest
         }
 
         [Test]
-        public void ParsePackageConfig_GivenAInputFilePathAlongWithSBOMTemplate_ReturnTotalComponentsList()
+        public void ParseCycloneDXFile_GivenAInputFilePathAlongWithSBOMTemplate_ReturnTotalComponentsList()
         {
             //Arrange
             int expectednoofcomponents = 5;
@@ -119,7 +119,7 @@ namespace PackageIdentifier.UTest
         }
 
         [Test]
-        public void ParsePackageConfig_GivenAInputFilePathAlongWithSBOMTemplate_ReturnUpdatedComponents()
+        public void ParseCycloneDXFile_GivenAInputFilePathAlongWithSBOMTemplate_ReturnUpdatedComponents()
         {
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
