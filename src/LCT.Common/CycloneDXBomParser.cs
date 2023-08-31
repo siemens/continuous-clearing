@@ -52,7 +52,7 @@ namespace LCT.Common
             return bom;
         }
 
-        public Bom ExtractSBOMDetailsFromTemplate(Bom template)
+        public static Bom ExtractSBOMDetailsFromTemplate(Bom template)
         {
             Bom bom = new Bom();
             bom.Components = new List<Component>();
@@ -77,7 +77,7 @@ namespace LCT.Common
             return bom;
         }
 
-        public void CheckValidComponentsForProjectType(List<Component> bom, string projectType)
+        public static void CheckValidComponentsForProjectType(List<Component> bom, string projectType)
         {
             foreach (var component in bom.ToList())
             {

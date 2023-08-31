@@ -124,7 +124,7 @@ namespace PackageIdentifier.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             DebianProcessor DebianProcessor = new DebianProcessor();
-            string[] Includes = { "CycloneDX_Debian.cdx.json" };
+            string[] Includes = { "CycloneDX_Debian.cdx.json", "SBOMTemplate_Debian.cdx.json" };
             string packagefilepath = OutFolder + @"\PackageIdentifierUTTestFiles";
 
             CommonAppSettings appSettings = new CommonAppSettings()
@@ -150,7 +150,7 @@ namespace PackageIdentifier.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             DebianProcessor DebianProcessor = new DebianProcessor();
-            string[] Includes = { "CycloneDX_Debian.cdx.json" };
+            string[] Includes = { "CycloneDX_Debian.cdx.json", "SBOMTemplate_Debian.cdx.json" };
             string packagefilepath = OutFolder + @"\PackageIdentifierUTTestFiles";
 
             CommonAppSettings appSettings = new CommonAppSettings()
@@ -164,7 +164,7 @@ namespace PackageIdentifier.UTest
 
             //Act
             Bom listofcomponents = DebianProcessor.ParsePackageFile(appSettings);
-            bool isUpdated = listofcomponents.Components.Exists(x => x.Properties != null && x.Properties.Exists(x => x.Name == Dataconstant.Cdx_IdentifierType && x.Value == Dataconstant.TemplateAdded));
+            bool isUpdated = listofcomponents.Components.Exists(x => x.Properties != null && x.Properties.Exists(x => x.Name == Dataconstant.Cdx_IdentifierType && x.Value == Dataconstant.Discovered));
 
             //Assert
             Assert.IsTrue(isUpdated, "Checks For Updated Property In List ");
