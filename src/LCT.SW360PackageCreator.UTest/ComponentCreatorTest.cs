@@ -14,6 +14,7 @@ using LCT.Services;
 using LCT.Services.Interface;
 using LCT.SW360PackageCreator;
 using LCT.SW360PackageCreator.Interfaces;
+using Microsoft.CodeAnalysis.FlowAnalysis;
 using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;
@@ -231,6 +232,92 @@ namespace NUnitTestProject1
 
             //Assert
             Assert.That(list.Count > 0);
+        }
+
+
+        [Test]
+        public async Task CycloneDxBomParser_PassingFilePath_ReturnsComponentsExcludingDev()
+        {
+            //Arrange
+
+            List<Property> properties = new List<Property>();
+            properties.Add(new Property()
+            {
+                Name = "internal:siemens:clearing:project-type",
+                Value = "NUGET"
+            });
+            properties.Add(new Property()
+            {
+                Name = "internal:siemens:clearing:development",
+                Value = "true"
+            });
+
+
+
+            Bom bom = new Bom();
+            bom.Components = new List<Component>()
+                {
+                    new Component() { Name = "newtonsoft",Version="3.1.18",Group="",Purl="pkg:nuget/newtonsoft@3.1.18",Properties = properties },
+                };
+
+            CommonAppSettings CommonAppSettings = new CommonAppSettings();
+            List<ComparisonBomData> comparisonBomData = new List<ComparisonBomData>();
+            comparisonBomData.Add(new ComparisonBomData());
+            var sw360Service = new Mock<ISW360Service>();
+            var creatorHelper = new Mock<ICreatorHelper>();
+            var parser = new Mock<ICycloneDXBomParser>();
+            parser.Setup(x => x.ParseCycloneDXBom(It.IsAny<string>())).Returns(bom);
+            var cycloneDXBomParser = new ComponentCreator();
+
+            //Act
+            var list = await cycloneDXBomParser.CycloneDxBomParser(CommonAppSettings, sw360Service.Object, parser.Object, creatorHelper.Object);
+
+
+            //Assert
+            Assert.That(list==null);
+        }
+        [Test]
+        public async Task CycloneDxBomParser_PassingFilePath_DoesntExcludeDevDependentComponent()
+        {
+            //Arrange
+
+            List<Property> properties = new List<Property>();
+            properties.Add(new Property()
+            {
+                Name = "internal:siemens:clearing:project-type",
+                Value = "NUGET"
+            });
+            properties.Add(new Property()
+            {
+                Name = "internal:siemens:clearing:development",
+                Value = "true"
+            });
+
+
+
+            Bom bom = new Bom();
+            bom.Components = new List<Component>()
+                {
+                    new Component() { Name = "newtonsoft",Version="3.1.18",Group="",Purl="pkg:nuget/newtonsoft@3.1.18",Properties = properties }
+                };
+
+            CommonAppSettings commonAppSettings = new CommonAppSettings();
+            commonAppSettings.RemoveDevDependency = false;
+            List<ComparisonBomData> comparisonBomData = new List<ComparisonBomData>();
+            comparisonBomData.Add(new ComparisonBomData());
+            var sw360Service = new Mock<ISW360Service>();
+            var creatorHelper = new Mock<ICreatorHelper>();
+            var parser = new Mock<ICycloneDXBomParser>();
+            parser.Setup(x => x.ParseCycloneDXBom(It.IsAny<string>())).Returns(bom);
+            creatorHelper.Setup(x => x.SetContentsForComparisonBOM(It.IsAny<List<Components>>(), sw360Service.Object)).ReturnsAsync(comparisonBomData);
+            var cycloneDXBomParser = new ComponentCreator();
+
+            //Act
+            var list = await cycloneDXBomParser.CycloneDxBomParser(commonAppSettings, sw360Service.Object, parser.Object, creatorHelper.Object);
+
+
+            //Assert
+            Assert.That(list.Count == 1);
         }
 
     }

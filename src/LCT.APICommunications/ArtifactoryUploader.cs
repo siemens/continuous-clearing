@@ -23,8 +23,7 @@ namespace LCT.APICommunications
         private static string destRepoName = Environment.GetEnvironmentVariable("JfrogDestRepoName");
         private static string JfrogApi = Environment.GetEnvironmentVariable("JfrogApi");
         private static string srcRepoName = Environment.GetEnvironmentVariable("JfrogSrcRepo");
-
-
+        
         public static async Task<HttpResponseMessage> UploadPackageToRepo(ComponentsToArtifactory component,int timeout)
         {
             Logger.Debug("Starting UploadPackageToArtifactory method");

@@ -351,23 +351,27 @@ namespace LCT.PackageIdentifier
 
                 if (filepath.EndsWith(FileConstant.CycloneDXFileExtension))
                 {
-                    Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
-                    bom = ParseCycloneDXBom(filepath);
-                    bom = RemoveExcludedComponents(appSettings, bom);
-                    cycloneDXBomParser.CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
-                    componentsForBOM.AddRange(bom.Components);
-                    dependencies = bom.Dependencies;
+                    if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                    {
+                        Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
+                        bom = ParseCycloneDXBom(filepath);
+                        bom = RemoveExcludedComponents(appSettings, bom);
+                        cycloneDXBomParser.CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
+                        AddingIdentifierType(bom.Components, "CycloneDXFile");
+                        componentsForBOM.AddRange(bom.Components);
+                        dependencies = bom.Dependencies;
+                    }
                 }
                 else
                 {
                     Logger.Debug($"ParsingInputFileForBOM():Found as Package File");
                     var components = ParsePackageLockJson(filepath, appSettings);
+                    AddingIdentifierType(components, "PackageFile");
                     componentsForBOM.AddRange(components);
                 }
             }
-            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = componentsForBOM.Count;
 
-            if (File.Exists(appSettings.CycloneDxSBomTemplatePath))
+            if (File.Exists(appSettings.CycloneDxSBomTemplatePath) && appSettings.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
                 Bom templateDetails;
                 templateDetails = cycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
@@ -533,5 +537,32 @@ namespace LCT.PackageIdentifier
             }
             return components;
         }
+
+        private static void AddingIdentifierType(List<Component> components, string identifiedBy)
+        {
+            foreach (var component in components)
+            {
+                if (component.Properties == null)
+                {
+                    component.Properties = new List<Property>();
+                }
+
+                Property isDev;
+                Property identifierType;
+                if (identifiedBy == "PackageFile")
+                {
+                    identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.Discovered };
+                    component.Properties.Add(identifierType);
+                }
+                else
+                {
+                    isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
+                    identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.ManullayAdded };
+                    component.Properties.Add(isDev);
+                    component.Properties.Add(identifierType);
+                }
+            }
+        }
+
     }
 }

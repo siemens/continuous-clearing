@@ -106,14 +106,14 @@ namespace LCT.PackageIdentifier
                 {
                     listofComponents.AddRange(ExtractDetailsForPoetryLockfile(config, dependencies));
                 }
-                else if (config.EndsWith(FileConstant.CycloneDXFileExtension))
+                else if (config.EndsWith(FileConstant.CycloneDXFileExtension) && !config.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     listofComponents.AddRange(ExtractDetailsFromJson(config, appSettings, ref dependencies));
                 }
             }
 
             Bom templateDetails = new Bom();
-            if (File.Exists(appSettings.CycloneDxSBomTemplatePath))
+            if (File.Exists(appSettings.CycloneDxSBomTemplatePath) && appSettings.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
                 templateDetails = cycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
                 cycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
@@ -228,13 +228,13 @@ namespace LCT.PackageIdentifier
                 };
 
                 Property identifierType;
-                if (prop.FoundType == "Discovered")
+                if (prop.FoundType == Dataconstant.Discovered)
                 {
-                    identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "Discovered" };
+                    identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.Discovered };
                 }
                 else
                 {
-                    identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "ManuallyAdded" };
+                    identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.ManullayAdded };
                 }
 
                 component.Properties = new List<Property>
@@ -431,7 +431,7 @@ namespace LCT.PackageIdentifier
                     dependencies.Add(dependency);
                 }
 
-                val.FoundType = "Discovered";
+                val.FoundType = Dataconstant.Discovered;
                 lst.Add(val);
             }
 

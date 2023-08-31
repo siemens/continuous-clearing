@@ -66,7 +66,8 @@ namespace LCT.SW360PackageCreator
               $"SW360ProjectName\t --> {appSettings.SW360ProjectName}\n\t" +
               $"SW360ProjectID\t\t --> {appSettings.SW360ProjectID}\n\t" +
               $"EnableFossTrigger\t --> {appSettings.EnableFossTrigger}\n\t" +
-              $"LogFolderPath\t\t --> {Path.GetFullPath(FolderPath)}", null);
+              $"RemoveDevDependency\t --> {appSettings.RemoveDevDependency}\n\t" +
+              $"LogFolderPath\t\t --> {Path.GetFullPath(FolderPath)}\n\t", null);
 
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);

@@ -49,9 +49,12 @@ namespace LCT.PackageIdentifier
 
             foreach (string filepath in configFiles)
             {
-                Logger.Debug($"ParsePackageFile():FileName: " + filepath);
-                var list = ParseCycloneDX(filepath, ref bom);
-                listofComponents.AddRange(list);
+                if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                {
+                    Logger.Debug($"ParsePackageFile():FileName: " + filepath);
+                    var list = ParseCycloneDX(filepath, ref bom);
+                    listofComponents.AddRange(list);
+                }
             }
 
             int initialCount = listofComponents.Count;
@@ -60,7 +63,7 @@ namespace LCT.PackageIdentifier
             BomCreator.bomKpiData.DuplicateComponents = initialCount - listComponentForBOM.Count;
 
             bom.Components = listComponentForBOM;
-            if (File.Exists(appSettings.CycloneDxSBomTemplatePath))
+            if (File.Exists(appSettings.CycloneDxSBomTemplatePath) && appSettings.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
                 Bom templateDetails;
                 templateDetails = cycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
@@ -180,7 +183,7 @@ namespace LCT.PackageIdentifier
 
                 //For Debian projects we will be considering CycloneDX file reading components as Discovered
                 //since it's Discovered from syft Tool
-                Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = "Discovered" };
+                Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.Discovered };
                 component.Properties = new List<Property> { identifierType };
 
                 listComponentForBOM.Add(component);
