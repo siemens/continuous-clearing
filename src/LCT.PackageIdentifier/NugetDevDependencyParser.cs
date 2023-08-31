@@ -71,7 +71,7 @@ namespace LCT.PackageIdentifier
                 && library.ToolsAssemblies.Count == 0;
         }
 
-        internal bool IsTestProject(string projectPath)
+        internal static bool IsTestProject(string projectPath)
         {
             Project csProj;
             try
@@ -112,7 +112,7 @@ namespace LCT.PackageIdentifier
             return false;
         }
 
-        internal void ParseJsonFile(string filePath, Container container)
+        internal static void ParseJsonFile(string filePath, Container container)
         {
             try
             {
@@ -148,7 +148,7 @@ namespace LCT.PackageIdentifier
             }
         }
 
-        private void ParseLibrary(LockFileTargetLibrary library, bool isTestProject, IDictionary<string, BuildInfoComponent> components, LockFile assetFile)
+        private static void ParseLibrary(LockFileTargetLibrary library, bool isTestProject, IDictionary<string, BuildInfoComponent> components, LockFile assetFile)
         {
             if (library.Type.Equals("project", StringComparison.InvariantCultureIgnoreCase))
             {
@@ -212,7 +212,7 @@ namespace LCT.PackageIdentifier
             }
         }
 
-        protected void GetLocalPackageHashes(NuGetComponent nuGetComponent, LockFile assetFile, LockFileTargetLibrary lockFileTargetLibrary)
+        protected static void GetLocalPackageHashes(NuGetComponent nuGetComponent, LockFile assetFile, LockFileTargetLibrary lockFileTargetLibrary)
         {
             if (!string.IsNullOrEmpty(nuGetComponent.Md5) && !string.IsNullOrEmpty(nuGetComponent.Sha1) && !string.IsNullOrEmpty(nuGetComponent.Sha256))
             {
@@ -233,7 +233,7 @@ namespace LCT.PackageIdentifier
             }
         }
 
-        private void CalculateHashOfPackage(NuGetComponent nuGetComponent, LockFileItem packageFolder, LockFileLibrary lockFileLibrary)
+        private static void CalculateHashOfPackage(NuGetComponent nuGetComponent, LockFileItem packageFolder, LockFileLibrary lockFileLibrary)
         {
             string packagePath = Path.GetFullPath(Path.Combine(packageFolder.Path, lockFileLibrary.Path));
             if (!Directory.Exists(packagePath))
