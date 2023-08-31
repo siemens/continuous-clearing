@@ -36,7 +36,7 @@ namespace SW360IntegrationTest
         [Test, Order(1)]
         public void TestBOMCreatorexe()
         {
-            string packagjsonPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest1stIterationData";
+            string packagjsonPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest1stIterationData\Npm";
             string bomPath = OutFolder + @"\..\BOMs";
 
             // Test BOM Creator ran with exit code 0
