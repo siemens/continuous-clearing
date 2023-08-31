@@ -416,7 +416,7 @@ namespace LCT.PackageIdentifier
 
                     dependencyList.Add(dependency);
 
-                    component.Author = "";
+                    component.Author = " ";
 
                 }
             }

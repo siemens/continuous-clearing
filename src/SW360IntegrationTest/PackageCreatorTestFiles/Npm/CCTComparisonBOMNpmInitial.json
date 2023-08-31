@@ -51,6 +51,10 @@
           "Name": "internal:siemens:clearing:development",
           "Value": "false"
         },
+		{
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
+        },
         {
           "Name": "internal:siemens:clearing:is-internal",
           "Value": "false"
@@ -103,6 +107,10 @@
         {
           "Name": "internal:siemens:clearing:development",
           "Value": "false"
+        },
+		{
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
         },
         {
           "Name": "internal:siemens:clearing:is-internal",
@@ -157,6 +165,10 @@
           "Name": "internal:siemens:clearing:development",
           "Value": "true"
         },
+		{
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
+        },
         {
           "Name": "internal:siemens:clearing:is-internal",
           "Value": "false"
@@ -197,6 +209,10 @@
         {
           "Name": "internal:siemens:clearing:development",
           "Value": "true"
+        },
+		{
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
         },
         {
           "Name": "internal:siemens:clearing:is-internal",
@@ -239,6 +255,10 @@
           "Name": "internal:siemens:clearing:development",
           "Value": "true"
         },
+		{
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
+        },
         {
           "Name": "internal:siemens:clearing:is-internal",
           "Value": "false"
@@ -279,6 +299,10 @@
         {
           "Name": "internal:siemens:clearing:development",
           "Value": "true"
+        },
+		{
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
         },
         {
           "Name": "internal:siemens:clearing:is-internal",
