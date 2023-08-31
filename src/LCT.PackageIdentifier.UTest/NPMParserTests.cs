@@ -135,7 +135,7 @@ namespace LCT.PackageIdentifier.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             NpmProcessor npmProcessor = new NpmProcessor();
-            string[] Includes = { "CycloneDX2_NPM.cdx.json" };
+            string[] Includes = { "CycloneDX2_NPM.cdx.json", "SBOMTemplate_Npm.cdx.json" };
             string packagefilepath = OutFolder + @"\PackageIdentifierUTTestFiles";
 
             CommonAppSettings appSettings = new CommonAppSettings()
@@ -176,7 +176,7 @@ namespace LCT.PackageIdentifier.UTest
             //Act
             Bom listofcomponents = npmProcessor.ParsePackageFile(appSettings);
 
-            bool isUpdated = listofcomponents.Components.Exists(x => x.Properties != null && x.Properties.Exists(x => x.Name == Dataconstant.Cdx_IdentifierType && x.Value == Dataconstant.TemplateAdded));
+            bool isUpdated = listofcomponents.Components.Exists(x => x.Properties != null && x.Properties.Exists(x => x.Name == Dataconstant.Cdx_IdentifierType && x.Value == Dataconstant.ManullayAdded));
 
             //Assert
             Assert.IsTrue(isUpdated, "Checks For Updated Property In List ");

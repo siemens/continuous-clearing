@@ -99,7 +99,7 @@ namespace PackageIdentifier.UTest
             int expectednoofcomponents = 5;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            string[] Includes = { "CycloneDX_Python.cdx.json" };
+            string[] Includes = { "CycloneDX_Python.cdx.json", "SBOMTemplate_Python.cdx.json" };
             string packagefilepath = OutFolder + @"\PackageIdentifierUTTestFiles";
 
             CommonAppSettings appSettings = new CommonAppSettings()
@@ -124,7 +124,7 @@ namespace PackageIdentifier.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            string[] Includes = { "CycloneDX_Python.cdx.json" };
+            string[] Includes = { "CycloneDX_Python.cdx.json", "SBOMTemplate_Python.cdx.json" };
             string packagefilepath = OutFolder + @"\PackageIdentifierUTTestFiles";
 
             CommonAppSettings appSettings = new CommonAppSettings()
@@ -139,7 +139,7 @@ namespace PackageIdentifier.UTest
             //Act
             Bom listofcomponents = pythonProcessor.ParsePackageFile(appSettings);
 
-            bool isUpdated = listofcomponents.Components.Exists(x => x.Properties != null && x.Properties.Exists(x => x.Name == Dataconstant.Cdx_IdentifierType && x.Value == Dataconstant.TemplateAdded));
+            bool isUpdated = listofcomponents.Components.Exists(x => x.Properties != null && x.Properties.Exists(x => x.Name == Dataconstant.Cdx_IdentifierType && x.Value == Dataconstant.ManullayAdded));
 
             //Assert
             Assert.IsTrue(isUpdated, "Checks For Updated Property In List ");
