@@ -77,7 +77,7 @@ docker run --rm -it -v /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDire
  
  Extract the downloaded .nupkg package , execute the following commands inside the tools folder.
 
- 1. **Package Identifier** - This executable takes `package-lock.json` as input and provides a CycloneDX BOM file as output. For each of the component the  dependency classification (development,internal) and the availability in jfrog artifactory is identified and added in the BOM file.
+ 1. **Package Identifier** - This executable takes Package file as input and provides a CycloneDX BOM file as output. For each of the component the  dependency classification (development,internal) and the availability in jfrog artifactory is identified and added in the BOM file.
  
 ```text
   PackageIdentifier.exe --settingsfilepath /<Config_Path>/appSetting.json
