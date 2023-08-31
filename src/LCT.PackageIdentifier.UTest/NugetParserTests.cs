@@ -545,5 +545,66 @@ namespace PackageIdentifier.UTest
 
             Assert.That("Not Found in JFrogRepo", Is.EqualTo(reponameActual));
         }
+
+        [Test]
+        public void ParsePackageFile_GivenAInputFilePathAlongWithSBOMTemplate_ReturnTotalComponentsList()
+        { 
+            //Arrange
+            int expectednoofcomponents = 3;
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string filepath = outFolder + @"\PackageIdentifierUTTestFiles";
+            string[] Includes = { "CycloneDX_Nuget.cdx.json" };
+            string[] Excludes = { "lol" };
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                PackageFilePath = filepath,
+                ProjectType = "Nuget",
+                RemoveDevDependency = true,
+                Nuget = new Config() { Include = Includes, Exclude = Excludes },
+                CycloneDxSBomTemplatePath = filepath + "\\SBOMTemplates\\SBOM_Nuget_CATemplate.cdx.json"
+            };
+
+            NugetProcessor NugetProcessor = new NugetProcessor();
+
+            //Act
+            Bom bom = NugetProcessor.ParsePackageFile(appSettings);
+
+            //Assert
+            Assert.That(expectednoofcomponents, Is.EqualTo(bom.Components.Count), "Checks for no of components");
+
+        }
+
+        [Test]
+        public void ParsePackageFile_GivenAInputFilePathAlongWithSBOMTemplate_ReturnUpdatedComponents()
+        {
+            //Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string filepath = outFolder + @"\PackageIdentifierUTTestFiles";
+            string[] Includes = { "CycloneDX_Nuget.cdx.json" };
+            string[] Excludes = { "lol" };
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                PackageFilePath = filepath,
+                ProjectType = "Nuget",
+                RemoveDevDependency = true,
+                Nuget = new Config() { Include = Includes, Exclude = Excludes },
+                CycloneDxSBomTemplatePath = filepath + "\\SBOMTemplates\\SBOM_Nuget_CATemplate.cdx.json"
+            };
+
+            NugetProcessor NugetProcessor = new NugetProcessor();
+
+            //Act
+            Bom bom = NugetProcessor.ParsePackageFile(appSettings);
+
+            bool isUpdated = bom.Components.Exists(x => x.Properties != null && x.Properties.Exists(x => x.Name == Dataconstant.Cdx_IdentifierType && x.Value == Dataconstant.TemplateAdded));
+
+            //Assert
+            Assert.IsTrue(isUpdated, "Checks For Updated Property In List ");
+
+        }
     }
 }

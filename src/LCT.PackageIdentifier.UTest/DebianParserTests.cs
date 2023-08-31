@@ -133,7 +133,7 @@ namespace PackageIdentifier.UTest
                 ProjectType = "DEBIAN",
                 RemoveDevDependency = true,
                 Debian = new Config() { Include = Includes },
-                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOMTemplate_Debian.cdx.json"
+                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOM_Debian_CATemplate.cdx.json"
             };
 
             //Act
@@ -159,7 +159,7 @@ namespace PackageIdentifier.UTest
                 ProjectType = "DEBIAN",
                 RemoveDevDependency = true,
                 Debian = new Config() { Include = Includes },
-                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOMTemplate_Debian.cdx.json",
+                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOM_Debian_CATemplate.cdx.json",
             };
 
             //Act

@@ -1,0 +1,162 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.4.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.4",
+  "serialNumber": "urn:uuid:9ec05672-849e-4fc3-b41f-2b028e59954c",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-08-16T10:18:06Z",
+    "tools": [
+      {
+        "vendor": "anchore",
+        "name": "syft",
+        "version": "0.87.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "f8e285590963f51a",
+      "type": "container",
+      "name": "/mnt/InputImages/Buster_amd64.tar"
+      
+    }
+  },
+  "components": [
+    {
+      "bom-ref": "pkg:nuget/log4net@2.0.15",
+      "type": "library",
+      "publisher": "",
+      "name": "log4net",
+      "version": "2.0.15",
+      "licenses": [
+        {
+          "license": {
+            "id": "GPL-2.0-only"
+          }
+        }
+      ],
+      "cpe": "cpe:2.3:a:adduser:adduser:3.118:*:*:*:*:*:*:*",
+      "purl": "pkg:nuget/log4net@2.0.15",
+      "properties": [
+        {
+          "name": "syft:package:foundBy",
+          "value": "dpkgdb-cataloger"
+        },
+        {
+          "name": "syft:package:metadataType",
+          "value": "DpkgMetadata"
+        },
+        {
+          "name": "syft:package:type",
+          "value": "deb"
+        },
+        {
+          "name": "syft:location:0:layerID",
+          "value": "sha256:764055ebc9a7a290b64d17cf9ea550f1099c202d83795aa967428ebdf335c9f7"
+        },
+        {
+          "name": "syft:location:0:path",
+          "value": "/usr/share/doc/adduser/copyright"
+        },
+        {
+          "name": "syft:location:1:layerID",
+          "value": "sha256:764055ebc9a7a290b64d17cf9ea550f1099c202d83795aa967428ebdf335c9f7"
+        },
+        {
+          "name": "syft:location:1:path",
+          "value": "/var/lib/dpkg/info/adduser.conffiles"
+        },
+        {
+          "name": "syft:location:2:layerID",
+          "value": "sha256:764055ebc9a7a290b64d17cf9ea550f1099c202d83795aa967428ebdf335c9f7"
+        },
+        {
+          "name": "syft:location:2:path",
+          "value": "/var/lib/dpkg/info/adduser.md5sums"
+        },
+        {
+          "name": "syft:location:3:layerID",
+          "value": "sha256:764055ebc9a7a290b64d17cf9ea550f1099c202d83795aa967428ebdf335c9f7"
+        },
+        {
+          "name": "syft:location:3:path",
+          "value": "/var/lib/dpkg/status"
+        },
+        {
+          "name": "syft:metadata:installedSize",
+          "value": "849"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:nuget/Newtonsoft.Json@13.0.3",
+      "type": "library",
+      "publisher": "APT Development Team <deity@lists.debian.org>",
+      "name": "Newtonsoft.Json",
+      "version": "13.0.3",
+      "licenses": [
+        {
+          "license": {
+            "id": "GPL-2.0-only"
+          }
+        },
+        {
+          "license": {
+            "name": "GPLv2+"
+          }
+        }
+      ],
+      "cpe": "cpe:2.3:a:apt:apt:1.8.2.3:*:*:*:*:*:*:*",
+      "purl": "pkg:nuget/Newtonsoft.Json@13.0.3",
+      "properties": [
+        {
+          "name": "syft:package:foundBy",
+          "value": "dpkgdb-cataloger"
+        },
+        {
+          "name": "syft:package:metadataType",
+          "value": "DpkgMetadata"
+        },
+        {
+          "name": "syft:package:type",
+          "value": "deb"
+        },
+        {
+          "name": "syft:location:0:layerID",
+          "value": "sha256:764055ebc9a7a290b64d17cf9ea550f1099c202d83795aa967428ebdf335c9f7"
+        },
+        {
+          "name": "syft:location:0:path",
+          "value": "/usr/share/doc/apt/copyright"
+        },
+        {
+          "name": "syft:location:1:layerID",
+          "value": "sha256:764055ebc9a7a290b64d17cf9ea550f1099c202d83795aa967428ebdf335c9f7"
+        },
+        {
+          "name": "syft:location:1:path",
+          "value": "/var/lib/dpkg/info/apt.conffiles"
+        },
+        {
+          "name": "syft:location:2:layerID",
+          "value": "sha256:764055ebc9a7a290b64d17cf9ea550f1099c202d83795aa967428ebdf335c9f7"
+        },
+        {
+          "name": "syft:location:2:path",
+          "value": "/var/lib/dpkg/info/apt.md5sums"
+        },
+        {
+          "name": "syft:location:3:layerID",
+          "value": "sha256:764055ebc9a7a290b64d17cf9ea550f1099c202d83795aa967428ebdf335c9f7"
+        },
+        {
+          "name": "syft:location:3:path",
+          "value": "/var/lib/dpkg/status"
+        },
+        {
+          "name": "syft:metadata:installedSize",
+          "value": "4064"
+        }
+      ]
+    }
+  ]
+}

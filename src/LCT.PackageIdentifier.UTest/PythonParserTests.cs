@@ -108,7 +108,7 @@ namespace PackageIdentifier.UTest
                 ProjectType = "PYTHON",
                 RemoveDevDependency = true,
                 Python = new Config() { Include = Includes },
-                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOMTemplate_Python.cdx.json"
+                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOM_Python_CATemplate.cdx.json"
             };
 
             //Act
@@ -133,7 +133,7 @@ namespace PackageIdentifier.UTest
                 ProjectType = "PYTHON",
                 RemoveDevDependency = true,
                 Python = new Config() { Include = Includes },
-                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOMTemplate_Python.cdx.json"
+                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOM_Python_CATemplate.cdx.json"
             };
 
             //Act

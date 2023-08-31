@@ -144,7 +144,7 @@ namespace LCT.PackageIdentifier.UTest
                 ProjectType = "NPM",
                 RemoveDevDependency = true,
                 Npm = new Config() { Include = Includes },
-                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOMTemplate_Npm.cdx.json"
+                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOM_Npm_CATemplate.cdx.json"
             };
 
             //Act
@@ -170,7 +170,7 @@ namespace LCT.PackageIdentifier.UTest
                 ProjectType = "NPM",
                 RemoveDevDependency = true,
                 Npm = new Config() { Include = Includes },
-                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOMTemplate_Npm.cdx.json"
+                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOM_Npm_CATemplate.cdx.json"
             };
 
             //Act

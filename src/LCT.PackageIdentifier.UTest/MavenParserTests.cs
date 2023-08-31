@@ -312,7 +312,7 @@ namespace LCT.PackageIdentifier.UTest
                 ProjectType = "MAVEN",
                 RemoveDevDependency = true,
                 Maven = new Config() { Include = Includes, Exclude = Excludes },
-                CycloneDxSBomTemplatePath = filepath + "\\SBOMTemplates\\SBOMTemplate_Maven.cdx.json"
+                CycloneDxSBomTemplatePath = filepath + "\\SBOMTemplates\\SBOM_Maven_CATemplate.cdx.json"
             };
 
             MavenProcessor MavenProcessor = new MavenProcessor();
@@ -341,7 +341,7 @@ namespace LCT.PackageIdentifier.UTest
                 ProjectType = "MAVEN",
                 RemoveDevDependency = true,
                 Maven = new Config() { Include = Includes, Exclude = Excludes },
-                CycloneDxSBomTemplatePath = filepath + "\\SBOMTemplates\\SBOMTemplate_Maven.cdx.json"
+                CycloneDxSBomTemplatePath = filepath + "\\SBOMTemplates\\SBOM_Maven_CATemplate.cdx.json"
             };
 
             MavenProcessor MavenProcessor = new MavenProcessor();

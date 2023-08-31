@@ -151,6 +151,9 @@
 	  <None Update="PackageIdentifierUTTestFiles\Cyclonedx2_Maven.cdx.json">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
+    <None Update="PackageIdentifierUTTestFiles\CycloneDX_Nuget.cdx.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\LCT.PackageIdentifier\LCT.PackageIdentifier.csproj" />
