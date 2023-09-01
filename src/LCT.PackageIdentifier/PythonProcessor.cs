@@ -441,17 +441,17 @@ namespace LCT.PackageIdentifier
 
         private static bool IsInternalPythonComponent(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
         {
-            string jfrogcomponentName = $"{component.Name}.{component.Version}.tar.gz";
+            string jfrogcomponentName = $"{component.Name}-{component.Version}.tar.gz";
             if (aqlResultList.Exists(x => x.Name.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase)))
             {
                 return true;
             }
 
             string fullName = bomHelper.GetFullNameOfComponent(component);
-            string fullNameVersion = $"{fullName}.{component.Version}.tar.gz";
+            string fullNameVersion = $"{fullName}-{component.Version}";
             if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase)
                 && aqlResultList.Exists(
-                x => x.Name.Equals(fullNameVersion, StringComparison.OrdinalIgnoreCase)))
+                x => x.Name.Equals(fullNameVersion, StringComparison.OrdinalIgnoreCase) && (x.Name.EndsWith(".whl") || x.Name.EndsWith(".tar.gz"))))
             {
                 return true;
             }
