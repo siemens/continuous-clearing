@@ -88,7 +88,7 @@ namespace LCT.PackageIdentifier
             }
             else
             {
-                Logger.Debug($"AddComponentDetails():No Details updated for SBOM Template component " + sbomcomp.Name + " : " + sbomcomp.Version);
+                Logger.Debug($"TemplateComponentUpdation():No Details updated for SBOM Template component " + sbomcomp.Name + " : " + sbomcomp.Version);
             }
         }
 
