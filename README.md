@@ -6,10 +6,18 @@
 
 # Introduction 
 
-The Continuous Clearing Tool scans and collects the 3rd party OSS components used in a NPM/NuGet/Maven/Debian and Python project and uploads it to SW360 and Fossology by accepting respective project ID for license clearing. 
+The Continuous Clearing Tool scans and collects the 3rd party OSS components used in a NPM/NuGet/Maven/Debian and uploads it to SW360 and Fossology by accepting respective project ID for license clearing. 
 
 The tool helps the developer/project manager to enable the clearing process faster by reducing the 
 manual effort of creating SW360 and FOSSology workflows.
+
+### Continuous Clearing Tool for SBOM :
+
+
+To secure overall DevOps supply chain, we need to ensure that the coding is secure and other mandatory security aspects is integrated in Software development lifecycle from beginning to end. 
+To ensure such practises are in place, we need to provide software bill of material ( SBOM ) for every automated build in DevOps chain. This SBOM will contain all the first and 3rd party components details including dependencies such as development,transitive and internal.
+
+
 
 This tool has been  logically split into 3 different executables that enable it to be used as separate modules as per the user's requirement.
 
@@ -40,7 +48,8 @@ you can run Continuous Clearing Tool as container or as a dotnet package,
  
  Execute them in the following order to achieve the complete License clearing process.
 
-1. **Package Identifier** - This executable takes `package-lock.json` or a `cycloneDX BOM` as input and provides a CycloneDX BOM file as output. For each of the component the availability in jfrog artifactory is identified and added in the BOM file.
+1. **Package Identifier** - This executable takes Package file or a `cycloneDX BOM` as input and provides a SBOM file as output. For each of the component the dependency classification (development,internal) and the availability in jfrog artifactory is identified and added in the SBOM file.
+
  
 ```text
 docker run --rm -it -v /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool ghcr.io/siemens/continuous-clearing dotnet PackageIdentifier.dll --settingsfilepath /etc/CATool/appSetting.json
@@ -51,6 +60,8 @@ docker run --rm -it -v /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDire
  * Configuration (i.e., /path/to/ConfigDirectory -> place to keep the Config files i.e [**appSetting.json**](/src/LCT.Common/appSettings.json)) 
  
  2. **SW360 Package Creator** - This executable expects the `CycloneDX BOM` as the input, creates the missing components/releases in SW360 and links all the components to the respective project in SW360 portal and triggers the fossology upload.
+
+ `Note`: By default the SBOM contains both dev and non dev dependent components. Hence while creating the components in Sw360  make sure to set the *RemoveDevDependency* flag as `true` to skip creating the development dependent components.
  
  ```text
  docker run --rm -it -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool ghcr.io/siemens/continuous-clearing dotnet SW360PackageCreator.dll --settingsfilepath /etc/CATool/appSetting.json
@@ -66,13 +77,15 @@ docker run --rm -it -v /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDire
  
  Extract the downloaded .nupkg package , execute the following commands inside the tools folder.
 
- 1. **Package Identifier** - This executable takes `package-lock.json` as input and provides a CycloneDX BOM file as output. For each of the component the availability in jfrog artifactory is identified and added in the BOM file.
+ 1. **Package Identifier** - This executable takes Package file as input and provides a CycloneDX BOM file as output. For each of the component the  dependency classification (development,internal) and the availability in jfrog artifactory is identified and added in the BOM file.
  
 ```text
   PackageIdentifier.exe --settingsfilepath /<Config_Path>/appSetting.json
  ```
  
  2. **SW360 Package Creator** - This executable expects the `CycloneDX BOM` as the input, creates the missing components/releases in SW360 and links all the components to the respective project in SW360 portal and triggers the fossology upload.
+
+  `Note`: By default the SBOM contains both dev and non dev dependent components. Hence while creating the components in Sw360  make sure to set the *RemoveDevDependency* flag as `true` to skip creating the development dependent components.
  
  ```text
   SW360PackageCreator.exe --settingsfilepath /<Config_Path>/appSetting.json
