@@ -69,7 +69,7 @@ namespace LCT.PackageIdentifier
             return modifiedBOM;
         }
 
-        public async Task<ComponentIdentification> IdentificationOfInternalComponents(ComponentIdentification componentData, CommonAppSettings appSettings)
+        public async static Task<ComponentIdentification> IdentificationOfInternalComponents(ComponentIdentification componentData, CommonAppSettings appSettings)
         {
             List<Component> Internalcomponents;
             if (appSettings.InternalRepoList != null && appSettings.InternalRepoList.Length > 0)

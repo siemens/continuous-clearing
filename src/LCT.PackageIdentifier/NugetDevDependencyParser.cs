@@ -43,7 +43,7 @@ namespace LCT.PackageIdentifier
             }
         }
 
-        public static List<Container> Parse(string configFile)
+        public List<Container> Parse(string configFile)
         {
             List<Container> containerList = new();
 
@@ -145,11 +145,6 @@ namespace LCT.PackageIdentifier
             {
                 Logger.Debug($"ParseJsonFile():InvalidProjectFileException : ", ex);
                 Logger.Warn($"InvalidProjectFileException : While parsing project asset file : " + filePath + " Error : " + ex.Message + "\n");
-            }
-            catch (NullReferenceException ex)
-            {
-                Logger.Debug($"ParseJsonFile(): NullReferenceException : ", ex);
-                Logger.Warn($"NullReferenceException : While parsing project asset file : " + filePath + " Error : " + ex.Message + "\n");
             }
         }
 
