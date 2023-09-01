@@ -60,7 +60,7 @@ namespace LCT.PackageIdentifier
                 }
                 else
                 {
-                    NewComponentPropertyAddition(sbomcomp, bomComp);
+                    TemplateComponentUpdation(sbomcomp, bomComp);
                 }
             }
             catch (ArgumentException ex)
@@ -73,7 +73,7 @@ namespace LCT.PackageIdentifier
             }
         }
 
-        private static void NewComponentPropertyAddition(Component sbomcomp, Component bomComp)
+        private static void TemplateComponentUpdation(Component sbomcomp, Component bomComp)
         {
             bool isLicenseUpdated = false;
             bool isPropertiesUpdated = false;
