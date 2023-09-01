@@ -270,7 +270,7 @@ namespace LCT.PackageIdentifier
             return cycloneDXBOM;
         }
 
-        private async Task<List<Component>> ComponentIdentification(List<Component> comparisonBOMData, CommonAppSettings appSettings)
+        private async static Task<List<Component>> ComponentIdentification(List<Component> comparisonBOMData, CommonAppSettings appSettings)
         {
             List<Component> componentNotForBOM = new List<Component>();
             await DefinedParallel.ParallelForEachAsync(

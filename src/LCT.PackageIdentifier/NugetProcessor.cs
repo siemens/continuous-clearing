@@ -14,11 +14,6 @@ using LCT.PackageIdentifier.Model;
 using LCT.PackageIdentifier.Model.NugetModel;
 using LCT.Services.Interface;
 using log4net;
-using Microsoft.Build.Locator;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using NuGet.Packaging;
-using NuGet.ProjectModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -633,8 +628,8 @@ namespace LCT.PackageIdentifier
 
         private static List<NugetPackage> ParseAssetFile(string configFile)
         {
-            NugetDevDependencyParser nugetDevDependencyParser = NugetDevDependencyParser.Instance;
-            List<Container> containers = nugetDevDependencyParser.Parse(configFile);
+
+            List<Container> containers = NugetDevDependencyParser.Parse(configFile);
             return ConvertContainerAsNugetPackage(containers, configFile);
         }
 
@@ -663,7 +658,7 @@ namespace LCT.PackageIdentifier
         }
         public static void GetDependencyList(KeyValuePair<string, BuildInfoComponent> lst, ref List<string> depvalue)
         {
-            if (lst.Value.Dependencies.Count>0)
+            if (lst.Value.Dependencies.Count > 0)
             {
                 foreach (var item in lst.Value.Dependencies)
                 {
@@ -671,7 +666,7 @@ namespace LCT.PackageIdentifier
                     depvalue.Add(depvaltestue);
                 }
             }
-            
+
         }
         #endregion
     }

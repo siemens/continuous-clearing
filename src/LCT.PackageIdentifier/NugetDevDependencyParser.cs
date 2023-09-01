@@ -43,7 +43,7 @@ namespace LCT.PackageIdentifier
             }
         }
 
-        public List<Container> Parse(string configFile)
+        public static List<Container> Parse(string configFile)
         {
             List<Container> containerList = new();
 
@@ -114,27 +114,32 @@ namespace LCT.PackageIdentifier
 
         internal static void ParseJsonFile(string filePath, Container container)
         {
+            bool isTestProject;
             try
             {
                 IDictionary<string, BuildInfoComponent> components = container.Components;
                 LockFileFormat assetFileReader = new();
                 LockFile assetFile = assetFileReader.Read(filePath);
-                bool isTestProject = IsTestProject(assetFile.PackageSpec.RestoreMetadata.ProjectPath);
-
-                container.Name = Path.GetFileName(assetFile.PackageSpec.RestoreMetadata.ProjectPath);
-
-                if (isTestProject)
+                if (assetFile.PackageSpec != null)
                 {
-                    container.Scope = ComponentScope.DevDependency;
-                }
+                    isTestProject = IsTestProject(assetFile.PackageSpec.RestoreMetadata.ProjectPath);
 
-                foreach (LockFileTarget target in assetFile.Targets)
-                {
-                    foreach (LockFileTargetLibrary library in target.Libraries)
+                    container.Name = Path.GetFileName(assetFile.PackageSpec.RestoreMetadata.ProjectPath);
+
+                    if (isTestProject)
                     {
-                        ParseLibrary(library, isTestProject, components, assetFile);
+                        container.Scope = ComponentScope.DevDependency;
+                    }
+
+                    foreach (LockFileTarget target in assetFile.Targets)
+                    {
+                        foreach (LockFileTargetLibrary library in target.Libraries)
+                        {
+                            ParseLibrary(library, isTestProject, components, assetFile);
+                        }
                     }
                 }
+               
             }
             catch (InvalidProjectFileException ex)
             {

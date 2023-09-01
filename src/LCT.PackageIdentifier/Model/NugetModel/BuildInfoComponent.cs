@@ -149,5 +149,14 @@ namespace LCT.PackageIdentifier.Model.NugetModel
                            StringComparison.InvariantCultureIgnoreCase);
         }
 
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as BuildInfoComponent);
+        }
+
+        public override int GetHashCode()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
