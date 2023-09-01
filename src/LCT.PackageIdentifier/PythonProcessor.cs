@@ -6,6 +6,7 @@
 
 using CycloneDX.Models;
 using LCT.APICommunications.Model;
+using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.PackageIdentifier.Interface;
@@ -35,61 +36,6 @@ namespace LCT.PackageIdentifier
         public PythonProcessor()
         {
             cycloneDXBomParser = new CycloneDXBomParser();
-        }
-
-        public static async Task<List<Component>> CheckInternalComponentsInJfrogArtifactory(CommonAppSettings appSettings, ArtifactoryCredentials artifactoryUpload, Component component, string repo)
-        {
-            List<Component> componentNotForBOM = new List<Component>();
-
-            // Python Artifactory checking code..
-            return await Task.FromResult(componentNotForBOM);
-        }
-
-        public static async Task<List<Component>> GetJfrogArtifactoryRepoInfo(CommonAppSettings appSettings, ArtifactoryCredentials artifactoryUpload, Component component, string repo)
-        {
-            List<Component> componentForBOM = new List<Component>();
-
-            // Python Artifactory checking code..
-            return await Task.FromResult(componentForBOM);
-        }
-
-        public static async Task<List<Component>> GetRepoDetails(List<Component> componentsForBOM, CommonAppSettings appSettings)
-        {
-            List<Component> modifiedBOM = new List<Component>();
-
-            foreach (var component in componentsForBOM)
-            {
-                List<Component> repoInfoBOM = await AddPackageAvailability(appSettings, component);
-                modifiedBOM.AddRange(repoInfoBOM);
-                if (repoInfoBOM.Count == 0)
-                {
-                    CycloneBomProcessor.SetProperties(appSettings, component, ref modifiedBOM);
-                }
-            }
-            return modifiedBOM;
-        }
-
-        public async static Task<ComponentIdentification> IdentificationOfInternalComponents(ComponentIdentification componentData, CommonAppSettings appSettings)
-        {
-            List<Component> Internalcomponents;
-            if (appSettings.InternalRepoList != null && appSettings.InternalRepoList.Length > 0)
-            {
-                Internalcomponents = await ComponentIdentification(componentData.comparisonBOMData, appSettings);
-                foreach (var item in Internalcomponents)
-                {
-                    Component component = componentData.comparisonBOMData.First(x => x.Name == item.Name && x.Version == item.Version);
-                    Property internalType = new()
-                    {
-                        Name = Dataconstant.Cdx_IsInternal,
-                        Value = "true"
-                    };
-                    component.Properties.Add(internalType);
-                }
-                componentData.internalComponents = Internalcomponents;
-                BomCreator.bomKpiData.InternalComponents = Internalcomponents.Count;
-            }
-
-            return componentData;
         }
 
         public Bom ParsePackageFile(CommonAppSettings appSettings)
@@ -243,12 +189,6 @@ namespace LCT.PackageIdentifier
                     identifierType
                 };
 
-                if (!component.Properties.Exists(x => x.Name == Dataconstant.Cdx_IsInternal))
-                {
-                    Property isInternal = new() { Name = Dataconstant.Cdx_IsInternal, Value = "false" };
-                    component.Properties.Add(isInternal);
-                }
-
                 component.BomRef = component.Purl;
 
                 listComponentForBOM.Add(component);
@@ -270,63 +210,6 @@ namespace LCT.PackageIdentifier
             return cycloneDXBOM;
         }
 
-        private async static Task<List<Component>> ComponentIdentification(List<Component> comparisonBOMData, CommonAppSettings appSettings)
-        {
-            List<Component> componentNotForBOM = new List<Component>();
-            await DefinedParallel.ParallelForEachAsync(
-                        comparisonBOMData,
-                        async component =>
-                        {
-                            foreach (var repo in appSettings.InternalRepoList)
-                            {
-                                componentNotForBOM.AddRange(await CheckPackageAvailability(appSettings, component, repo));
-                            }
-                        });
-            return componentNotForBOM;
-        }
-
-        private static async Task<List<Component>> CheckPackageAvailability(CommonAppSettings appSettings, Component component, string repo)
-        {
-
-            ArtifactoryCredentials artifactoryUpload = new ArtifactoryCredentials()
-            {
-                ApiKey = appSettings.ArtifactoryUploadApiKey
-
-            };
-            List<Component> componentNotForBOM = await CheckInternalComponentsInJfrogArtifactory(appSettings, artifactoryUpload, component, repo);
-            return componentNotForBOM;
-
-        }
-
-        private static async Task<List<Component>> AddPackageAvailability(CommonAppSettings appSettings, Component component)
-        {
-            List<Component> modifiedBOM = new List<Component>();
-            ArtifactoryCredentials artifactoryUpload = new ArtifactoryCredentials()
-            {
-                ApiKey = appSettings.ArtifactoryUploadApiKey
-            };
-
-            var repolist = appSettings?.Python?.JfrogPythonRepoList;
-            if (repolist != null)
-            {
-                foreach (var item in repolist)
-                {
-                    List<Component> componentsForBOM = await GetJfrogArtifactoryRepoInfo(appSettings, artifactoryUpload, component, item);
-                    if (componentsForBOM.Count > 0)
-                    {
-                        modifiedBOM = componentsForBOM;
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                Logger.Debug($"AddPackageAvailability():No Repo list manitained!!");
-            }
-
-            return modifiedBOM;
-        }
-
         private static Result ExecutePoetryCMD(string CommandForPoetry)
         {
             Result result;
@@ -343,17 +226,17 @@ namespace LCT.PackageIdentifier
                 {
                     p.StartInfo.FileName = Path.Combine(@"/bin/bash");
                     p.StartInfo.Arguments = "-c \" " + CommandForPoetry + " \"";
-                    Logger.Debug($"GetHashCodeUsingNpmView():Linux OS Found!!");
+                    Logger.Debug($"ExecutePoetryCMD():Linux OS Found!!");
                 }
                 else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
                     p.StartInfo.FileName = Path.Combine(@"cmd.exe");
                     p.StartInfo.Arguments = "/c " + CommandForPoetry;
-                    Logger.Debug($"GetHashCodeUsingNpmView():Windows OS Found!!");
+                    Logger.Debug($"ExecutePoetryCMD():Windows OS Found!!");
                 }
                 else
                 {
-                    Logger.Debug($"GetHashCodeUsingNpmView():OS Details not Found!!");
+                    Logger.Debug($"ExecutePoetryCMD():OS Details not Found!!");
                 }
 
                 // Run as administrator
@@ -373,7 +256,6 @@ namespace LCT.PackageIdentifier
 
             return result;
         }
-
 
         private static List<PythonPackage> GetPackagesFromPoetryOutput(Result result)
         {
@@ -515,20 +397,77 @@ namespace LCT.PackageIdentifier
             return dependency;
         }
 
-        public Task<ComponentIdentification> IdentificationOfInternalComponents(ComponentIdentification componentData, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
-        {
-            return Task.FromResult(componentData);
-        }
-
-        public Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
+        public async Task<ComponentIdentification> IdentificationOfInternalComponents(ComponentIdentification componentData, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
             // get the  component list from Jfrog for given repo
+            List<AqlResult> aqlResultList =
+                await bomhelper.GetListOfComponentsFromRepo(appSettings.InternalRepoList, jFrogService);
+
+            // find the components in the list of internal components
+            List<Component> internalComponents = new List<Component>();
+            var internalComponentStatusUpdatedList = new List<Component>();
+            var inputIterationList = componentData.comparisonBOMData;
+
+            foreach (Component component in inputIterationList)
+            {
+                var currentIterationItem = component;
+                bool isTrue = IsInternalPythonComponent(aqlResultList, currentIterationItem, bomhelper);
+                if (currentIterationItem.Properties?.Count == null || currentIterationItem.Properties?.Count <= 0)
+                {
+                    currentIterationItem.Properties = new List<Property>();
+                }
+
+                Property isInternal = new() { Name = Dataconstant.Cdx_IsInternal, Value = "false" };
+                if (isTrue)
+                {
+                    internalComponents.Add(currentIterationItem);
+                    isInternal.Value = "true";
+                }
+                else
+                {
+                    isInternal.Value = "false";
+                }
+
+                currentIterationItem.Properties.Add(isInternal);
+                internalComponentStatusUpdatedList.Add(currentIterationItem);
+            }
+
+            // update the comparision bom data
+            componentData.comparisonBOMData = internalComponentStatusUpdatedList;
+            componentData.internalComponents = internalComponents;
+
+            return componentData;
+        }
+
+        private static bool IsInternalPythonComponent(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
+        {
+            string jfrogcomponentName = $"{component.Name}-{component.Version}.tar.gz";
+            if (aqlResultList.Exists(x => x.Name.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase)))
+            {
+                return true;
+            }
+
+            string fullName = bomHelper.GetFullNameOfComponent(component);
+            string fullNameVersion = $"{fullName}-{component.Version}";
+            if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase)
+                && aqlResultList.Exists(
+                x => x.Name.Equals(fullNameVersion, StringComparison.OrdinalIgnoreCase) && (x.Name.EndsWith(".whl") || x.Name.EndsWith(".tar.gz"))))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
+        {
+            // get the  component list from Jfrog for given repo
+            List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(appSettings.Python?.JfrogPythonRepoList, jFrogService);
             Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
             List<Component> modifiedBOM = new List<Component>();
 
             foreach (var component in componentsForBOM)
             {
-                const string repoName = NotFoundInRepo;
+                string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper);
                 Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoUrl, Value = repoName };
                 Component componentVal = component;
 
@@ -542,8 +481,27 @@ namespace LCT.PackageIdentifier
 
                 modifiedBOM.Add(componentVal);
             }
+            return modifiedBOM;
+        }
 
-            return Task.FromResult(modifiedBOM);
+        private static string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
+        {
+            string jfrogcomponentName = $"{component.Name}-{component.Version}.tar.gz";
+
+            string repoName = aqlResultList.Find(x => x.Name.Equals(
+                jfrogcomponentName, StringComparison.OrdinalIgnoreCase))?.Repo ?? NotFoundInRepo;
+
+            string fullName = bomHelper.GetFullNameOfComponent(component);
+            string fullNameVersion = $"{fullName}-{component.Version}";
+
+            if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase) &&
+                repoName.Equals(NotFoundInRepo, StringComparison.OrdinalIgnoreCase))
+            {
+                repoName = aqlResultList.Find(x => x.Name.Contains(
+                    fullNameVersion, StringComparison.OrdinalIgnoreCase) && (x.Name.EndsWith(".whl") || x.Name.EndsWith(".tar.gz")))?.Repo ?? NotFoundInRepo;
+            }
+
+            return repoName;
         }
 
         #endregion

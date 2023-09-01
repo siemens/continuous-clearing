@@ -11,6 +11,13 @@ using System.IO;
 using LCT.Common;
 using LCT.Common.Model;
 using LCT.Common.Constants;
+using LCT.APICommunications.Model.AQL;
+using LCT.PackageIdentifier.Interface;
+using LCT.PackageIdentifier.Model;
+using LCT.Services.Interface;
+using Moq;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace PackageIdentifier.UTest
 {
@@ -143,6 +150,156 @@ namespace PackageIdentifier.UTest
 
             //Assert
             Assert.IsTrue(isUpdated, "Checks For Updated Property In List ");
+        }
+
+        [Test]
+        public async Task IdentificationOfInternalComponents_Python_ReturnsComponentData_Successfully()
+        {
+            // Arrange
+            Component component1 = new Component();
+            component1.Name = "cachy";
+            component1.Group = "";
+            component1.Description = string.Empty;
+            component1.Version = "0.3.0";
+            var components = new List<Component>() { component1 };
+            ComponentIdentification component = new() { comparisonBOMData = components };
+            string[] reooListArr = { "internalrepo1", "internalrepo2" };
+            CommonAppSettings appSettings = new() { InternalRepoList = reooListArr };
+
+            AqlResult aqlResult = new()
+            {
+                Name = "cachy-0.3.0.tar.gz",
+                Path = "@testfolder/-/folder",
+                Repo = "internalrepo1"
+            };
+
+            List<AqlResult> results = new List<AqlResult>() { aqlResult };
+            Mock<IJFrogService> mockJfrogService = new Mock<IJFrogService>();
+            Mock<IBomHelper> mockBomHelper = new Mock<IBomHelper>();
+            mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
+                .ReturnsAsync(results);
+            mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("cachy");
+
+            // Act
+            PythonProcessor pyProcessor = new PythonProcessor();
+            var actual = await pyProcessor.IdentificationOfInternalComponents(
+                component, appSettings, mockJfrogService.Object, mockBomHelper.Object);
+
+            // Assert
+            Assert.AreEqual("true", actual.comparisonBOMData[0].Properties[0].Value);
+        }
+
+        [Test]
+        public async Task IdentificationOfInternalComponents_Python_ReturnsComponentData_Failure()
+        {
+            // Arrange
+            Component component1 = new Component();
+            component1.Name = "cachy";
+            component1.Group = "";
+            component1.Description = string.Empty;
+            component1.Version = "0.3.0";
+            var components = new List<Component>() { component1 };
+            ComponentIdentification component = new() { comparisonBOMData = components };
+            string[] reooListArr = { "internalrepo1", "internalrepo2" };
+            CommonAppSettings appSettings = new() { InternalRepoList = reooListArr };
+
+            AqlResult aqlResult = new()
+            {
+                Name = "cachy-1.3.0.tar.gz",
+                Path = "@testfolder/-/folder",
+                Repo = "internalrepo1"
+            };
+
+            List<AqlResult> results = new List<AqlResult>() { aqlResult };
+            Mock<IJFrogService> mockJfrogService = new Mock<IJFrogService>();
+            Mock<IBomHelper> mockBomHelper = new Mock<IBomHelper>();
+            mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
+                .ReturnsAsync(results);
+            mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("cachy");
+
+            // Act
+            PythonProcessor pyProcessor = new PythonProcessor();
+            var actual = await pyProcessor.IdentificationOfInternalComponents(
+                component, appSettings, mockJfrogService.Object, mockBomHelper.Object);
+
+            // Assert
+            Assert.AreEqual("false", actual.comparisonBOMData[0].Properties[0].Value);
+        }
+
+        [Test]
+        public async Task GetJfrogRepoDetailsOfAComponentForPython_ReturnsWithData_SuccessFully()
+        {
+            // Arrange
+            Component component1 = new Component
+            {
+                Name = "html5lib",
+                Description = string.Empty,
+                Version = "1.1"
+            };
+            var components = new List<Component>() { component1 };
+            string[] reooListArr = { "internalrepo1", "internalrepo2" };
+            CommonAppSettings appSettings = new();
+            appSettings.Python = new Config() { JfrogNugetRepoList = reooListArr };
+            AqlResult aqlResult = new()
+            {
+                Name = "html5lib-1.1.tar.gz",
+                Path = "@testfolder/-/folder",
+                Repo = "internalrepo1"
+            };
+
+            List<AqlResult> results = new List<AqlResult>() { aqlResult };
+
+            Mock<IJFrogService> mockJfrogService = new Mock<IJFrogService>();
+            Mock<IBomHelper> mockBomHelper = new Mock<IBomHelper>();
+            mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
+                .ReturnsAsync(results);
+            mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("html5lib");
+
+            // Act
+            PythonProcessor pyProcessor = new PythonProcessor();
+            var actual = await pyProcessor.GetJfrogRepoDetailsOfAComponent(
+                components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
+
+            // Assert
+            Assert.That(actual, Is.Not.Null);
+        }
+
+        [Test]
+        public async Task GetJfrogRepoDetailsOfAComponentForPython_ReturnsWithData2_SuccessFully()
+        {
+            // Arrange
+            Component component1 = new Component
+            {
+                Name = "html5lib",
+                Description = string.Empty,
+                Version = "1.1"
+            };
+            var components = new List<Component>() { component1 };
+            string[] reooListArr = { "internalrepo1", "internalrepo2" };
+            CommonAppSettings appSettings = new();
+            appSettings.Python = new Config() { JfrogNugetRepoList = reooListArr };
+            AqlResult aqlResult = new()
+            {
+                Name = "html5lib-1.1-py2.py3-none-any.whl",
+                Path = "@testfolder/-/folder",
+                Repo = "internalrepo1"
+            };
+
+            List<AqlResult> results = new List<AqlResult>() { aqlResult };
+
+            Mock<IJFrogService> mockJfrogService = new Mock<IJFrogService>();
+            Mock<IBomHelper> mockBomHelper = new Mock<IBomHelper>();
+            mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
+                .ReturnsAsync(results);
+            mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("html5lib");
+
+            // Act
+            PythonProcessor pyProcessor = new PythonProcessor();
+            var actual = await pyProcessor.GetJfrogRepoDetailsOfAComponent(
+                components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
+
+            // Assert
+            Assert.That(actual, Is.Not.Null);
         }
     }
 }
