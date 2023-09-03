@@ -6,6 +6,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -19,6 +20,8 @@ namespace LCT.PackageIdentifier.Model.NugetModel
         DevDependency = 2
     }
 
+
+    [ExcludeFromCodeCoverage]
     public abstract class BuildInfoComponent : IEquatable<BuildInfoComponent>
     {
         protected static readonly HashAlgorithm HashAlgorithm = SHA512.Create();

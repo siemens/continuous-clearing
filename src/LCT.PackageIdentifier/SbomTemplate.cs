@@ -15,7 +15,7 @@ using System.Reflection;
 
 namespace LCT.PackageIdentifier
 {
-    internal static class SbomTemplate
+    public static class SbomTemplate
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
