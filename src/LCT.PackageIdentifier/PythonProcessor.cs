@@ -81,13 +81,13 @@ namespace LCT.PackageIdentifier
 
         #region Private Methods
 
-        private static List<PythonPackage> ExtractDetailsForPoetryLockfile(string filePath, List<Dependency> dependencies)
+        public static List<PythonPackage> ExtractDetailsForPoetryLockfile(string filePath, List<Dependency> dependencies)
         {
             List<PythonPackage> PythonPackages;
             PythonPackages = PoetrySetOfCmds(filePath, dependencies);
             return PythonPackages;
         }
-
+        
         private List<PythonPackage> ExtractDetailsFromJson(string filePath, CommonAppSettings appSettings, ref List<Dependency> dependencies)
         {
             List<PythonPackage> PythonPackages = new List<PythonPackage>();
