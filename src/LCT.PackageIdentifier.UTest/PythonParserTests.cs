@@ -335,18 +335,9 @@ namespace PackageIdentifier.UTest
         public void ExtractDetailsForPoetryLockfile_GivenAMultipleInputFilePath_ReturnsCounts()
         {
             //Arrange
-            int expectednoofcomponents = 10;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            string[] Includes = { "CycloneDX_Python.cdx.json" };
 
-            CommonAppSettings appSettings = new CommonAppSettings()
-            {
-                ProjectType = "PYTHON",
-                RemoveDevDependency = true,
-                Python = new Config() { Include = Includes },
-                PackageFilePath = OutFolder + @"\PackageIdentifierUTTestFiles"
-            };
             List<Dependency> dependencies=new List<Dependency>();
             string filePath = OutFolder + @"\PackageIdentifierUTTestFiles\CycloneDX_Python.cdx.json";
             //Act

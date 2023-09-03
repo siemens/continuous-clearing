@@ -20,6 +20,7 @@ namespace LCT.PackageIdentifier.Model.NugetModel
         DevDependency = 2
     }
 
+    [ExcludeFromCodeCoverage]
     public abstract class BuildInfoComponent : IEquatable<BuildInfoComponent>
     {
         protected static readonly HashAlgorithm HashAlgorithm = SHA512.Create();
