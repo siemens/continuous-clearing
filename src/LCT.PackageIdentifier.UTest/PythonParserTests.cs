@@ -332,7 +332,7 @@ namespace PackageIdentifier.UTest
             Assert.That(actual, Is.Not.Null);
         }
         [Test]
-        public void ExtractDetailsForPoetryLockfile_GivenAMultipleInputFilePath_ReturnsCounts()
+        public void ExtractDetailsForCycloneDX_GivenInputFilePath_ReturnsCounts()
         {
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
@@ -346,6 +346,22 @@ namespace PackageIdentifier.UTest
 
             //Assert
             Assert.That(0,Is.EqualTo(listofcomponents.Count));
+        }
+        [Test]
+        public void ExtractDetailsForPoetryLockfile_GivenAMultipleInputFilePath_ReturnsCounts()
+        {
+            //Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string OutFolder = Path.GetDirectoryName(exePath);
+
+            List<Dependency> dependencies = new List<Dependency>();
+            string filePath = OutFolder + @"\PackageIdentifierUTTestFiles\PythonTestProject";
+            //Act
+
+            List<PythonPackage> listofcomponents = PythonProcessor.ExtractDetailsForPoetryLockfile(filePath, dependencies);
+
+            //Assert
+            Assert.That(4, Is.EqualTo(listofcomponents.Count));
         }
     }
 }
