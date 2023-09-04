@@ -103,11 +103,17 @@
     <None Update="PackageIdentifierUTTestFiles\project.assets.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="PackageIdentifierUTTestFiles\PythonTestProject\example_package\__init__.py">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="PackageIdentifierUTTestFiles\PythonTestProject\poetry.lock">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="PackageIdentifierUTTestFiles\PythonTestProject\pyproject.toml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\PythonTestProject\tests\__init__.py">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOMTemplate_Debian.cdx.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
