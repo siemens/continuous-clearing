@@ -361,7 +361,7 @@ namespace PackageIdentifier.UTest
             List<PythonPackage> listofcomponents = PythonProcessor.ExtractDetailsForPoetryLockfile(filePath, dependencies);
 
             //Assert
-            Assert.IsNotNull(listofcomponents);
+            Assert.That(4,Is.EqualTo(listofcomponents.Count));
         }
     }
 }
