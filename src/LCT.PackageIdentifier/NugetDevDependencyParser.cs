@@ -60,7 +60,7 @@ namespace LCT.PackageIdentifier
             return containerList;
         }
 
-        internal static bool IsDevDependecy(LockFileTargetLibrary library)
+        private static bool IsDevDependecy(LockFileTargetLibrary library)
         {
             return library.CompileTimeAssemblies.Count == 0
                 && library.ContentFiles.Count == 0
@@ -71,7 +71,7 @@ namespace LCT.PackageIdentifier
                 && library.ToolsAssemblies.Count == 0;
         }
 
-        internal static bool IsTestProject(string projectPath)
+        private static bool IsTestProject(string projectPath)
         {
             Project csProj;
             try
@@ -112,7 +112,7 @@ namespace LCT.PackageIdentifier
             return false;
         }
 
-        internal static void ParseJsonFile(string filePath, Container container)
+        private static void ParseJsonFile(string filePath, Container container)
         {
             bool isTestProject;
             try
@@ -139,7 +139,7 @@ namespace LCT.PackageIdentifier
                         }
                     }
                 }
-               
+
             }
             catch (InvalidProjectFileException ex)
             {
@@ -181,7 +181,7 @@ namespace LCT.PackageIdentifier
             GetDependencies(library, component, components);
         }
 
-        internal static void GetDependencies(LockFileTargetLibrary library, NuGetComponent component, IDictionary<string, BuildInfoComponent> components)
+        private static void GetDependencies(LockFileTargetLibrary library, NuGetComponent component, IDictionary<string, BuildInfoComponent> components)
         {
             foreach (PackageDependency dependency in library.Dependencies)
             {
@@ -212,7 +212,7 @@ namespace LCT.PackageIdentifier
             }
         }
 
-        protected static void GetLocalPackageHashes(NuGetComponent nuGetComponent, LockFile assetFile, LockFileTargetLibrary lockFileTargetLibrary)
+        private static void GetLocalPackageHashes(NuGetComponent nuGetComponent, LockFile assetFile, LockFileTargetLibrary lockFileTargetLibrary)
         {
             if (!string.IsNullOrEmpty(nuGetComponent.Md5) && !string.IsNullOrEmpty(nuGetComponent.Sha1) && !string.IsNullOrEmpty(nuGetComponent.Sha256))
             {
@@ -261,7 +261,7 @@ namespace LCT.PackageIdentifier
             nuGetComponent.Sha256 = GetFileHash(filePath, SHA256.Create());
         }
 
-        internal static string GetFileHash(string path, HashAlgorithm hashAlgorithm)
+        private static string GetFileHash(string path, HashAlgorithm hashAlgorithm)
         {
             if (!File.Exists(path)) return null;
 

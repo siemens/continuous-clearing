@@ -16,6 +16,7 @@ using log4net;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -26,6 +27,7 @@ using Component = CycloneDX.Models.Component;
 
 namespace LCT.PackageIdentifier
 {
+    [ExcludeFromCodeCoverage]
     public class PythonProcessor : IParser
     {
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
