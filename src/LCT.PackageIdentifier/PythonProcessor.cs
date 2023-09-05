@@ -26,7 +26,6 @@ using Component = CycloneDX.Models.Component;
 
 namespace LCT.PackageIdentifier
 {
-    [ExcludeFromCodeCoverage]
     public class PythonProcessor : IParser
     {
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
