@@ -5,7 +5,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using CycloneDX.Models;
-using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
