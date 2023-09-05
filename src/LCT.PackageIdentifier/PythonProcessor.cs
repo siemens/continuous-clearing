@@ -139,7 +139,7 @@ namespace LCT.PackageIdentifier
             version = WebUtility.UrlEncode(version);
             version = version.Replace("%3A", ":");
 
-            return $"{Dataconstant.PurlCheck()["PYTHON"]}{Dataconstant.ForwardSlash}{name}@{version}?arch=source";
+            return $"{Dataconstant.PurlCheck()["PYTHON"]}{Dataconstant.ForwardSlash}{name}@{version}";
         }
 
         private static List<Component> FormComponentReleaseExternalID(List<PythonPackage> listOfComponents)
@@ -441,7 +441,7 @@ namespace LCT.PackageIdentifier
 
         private static bool IsInternalPythonComponent(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
         {
-            string jfrogcomponentName = $"{component.Name}-{component.Version}.tar.gz";
+            string jfrogcomponentName = $"{component.Name}-{component.Version}{FileConstant.TargzFileExtension}";
             if (aqlResultList.Exists(x => x.Name.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase)))
             {
                 return true;
@@ -451,7 +451,7 @@ namespace LCT.PackageIdentifier
             string fullNameVersion = $"{fullName}-{component.Version}";
             if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase)
                 && aqlResultList.Exists(
-                x => x.Name.Equals(fullNameVersion, StringComparison.OrdinalIgnoreCase) && (x.Name.EndsWith(".whl") || x.Name.EndsWith(".tar.gz"))))
+                x => x.Name.Equals(fullNameVersion, StringComparison.OrdinalIgnoreCase) && (x.Name.EndsWith(".whl") || x.Name.EndsWith(FileConstant.TargzFileExtension))))
             {
                 return true;
             }
@@ -486,7 +486,7 @@ namespace LCT.PackageIdentifier
 
         private static string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
         {
-            string jfrogcomponentName = $"{component.Name}-{component.Version}.tar.gz";
+            string jfrogcomponentName = $"{component.Name}-{component.Version}{FileConstant.TargzFileExtension}";
 
             string repoName = aqlResultList.Find(x => x.Name.Equals(
                 jfrogcomponentName, StringComparison.OrdinalIgnoreCase))?.Repo ?? NotFoundInRepo;
@@ -498,7 +498,7 @@ namespace LCT.PackageIdentifier
                 repoName.Equals(NotFoundInRepo, StringComparison.OrdinalIgnoreCase))
             {
                 repoName = aqlResultList.Find(x => x.Name.Contains(
-                    fullNameVersion, StringComparison.OrdinalIgnoreCase) && (x.Name.EndsWith(".whl") || x.Name.EndsWith(".tar.gz")))?.Repo ?? NotFoundInRepo;
+                    fullNameVersion, StringComparison.OrdinalIgnoreCase) && (x.Name.EndsWith(".whl") || x.Name.EndsWith(FileConstant.TargzFileExtension)))?.Repo ?? NotFoundInRepo;
             }
 
             return repoName;

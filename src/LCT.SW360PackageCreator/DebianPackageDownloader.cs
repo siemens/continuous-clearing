@@ -148,7 +148,7 @@ namespace LCT.SW360PackageCreator
                 if (!string.IsNullOrEmpty(SourceUrl) && !component.SourceUrl.Equals(Dataconstant.SourceUrlNotFound))
                 {
                     Uri uri = new Uri(SourceUrl);
-                    downloadPath = await DownloadFileFromSnapshotorgAsync(uri, downloadFilePath);
+                    downloadPath = await UrlHelper.DownloadFileAsync(uri, downloadFilePath);
                 }
             }
             catch (WebException ex)
@@ -161,40 +161,6 @@ namespace LCT.SW360PackageCreator
             }
 
             return downloadPath;
-        }
-
-        private static async Task<string> DownloadFileFromSnapshotorgAsync(Uri uri, string downloadFilePath)
-        {
-            string downloadedPath = string.Empty;
-            try
-            {
-                using (WebClient webClient = new WebClient())
-                {
-                    await webClient.DownloadFileTaskAsync(uri, downloadFilePath);
-                }
-                downloadedPath = downloadFilePath;
-                Logger.Debug($"DownloadFileFromSnapshotorgAsync:File Name : {Path.GetFileName(downloadFilePath)} ,Downloaded Successfully!!");
-            }
-            catch (WebException webex)
-            {
-                Logger.Debug($"DownloadFileFromSnapshotorgAsync:File Name : {Path.GetFileName(downloadFilePath)},Error {webex}");
-                //Waiting for server to up..
-                await Task.Delay(4000);
-                try
-                {
-                    using (WebClient webClient = new WebClient())
-                    {
-                        await webClient.DownloadFileTaskAsync(uri, downloadFilePath);
-                    }
-                    downloadedPath = downloadFilePath;
-                    Logger.Debug($"DownloadFileFromSnapshotorgAsync:File Name : {Path.GetFileName(downloadFilePath)},Success in retry!!");
-                }
-                catch (WebException)
-                {
-                    Logger.Debug($"DownloadFileFromSnapshotorgAsync:File Name : {Path.GetFileName(downloadFilePath)},Error in retry!!");
-                }
-            }
-            return downloadedPath;
         }
 
         private string ApplyPatchforComponents(ComparisonBomData component, string localDownloadPath, string fileName)     
