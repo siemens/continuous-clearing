@@ -15,7 +15,7 @@ using System.Reflection;
 
 namespace LCT.PackageIdentifier
 {
-    internal static class SbomTemplate
+    public static class SbomTemplate
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -28,57 +28,67 @@ namespace LCT.PackageIdentifier
 
             foreach (var sbomcomp in sbomdDetails.Components)
             {
-                try
-                {
-                    Property cdxIdentifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.TemplateAdded };
-                    Property cdxIsDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
+                PropertyAdditionForTemplate(bom, sbomcomp);
+            }
+        }
 
-                    Component bomComp = bom.Find(x => x.Name == sbomcomp.Name && x.Version == sbomcomp.Version);
-                    if (bomComp == null)
+        private static void PropertyAdditionForTemplate(List<Component> bom, Component sbomcomp)
+        {
+            try
+            {
+                Property cdxIdentifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.TemplateAdded };
+                Property cdxIsDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
+
+                Component bomComp = bom.Find(x => x.Name == sbomcomp.Name && x.Version == sbomcomp.Version);
+                if (bomComp == null)
+                {
+                    if (sbomcomp.Properties == null)
                     {
-                        if (sbomcomp.Properties == null)
-                        {
-                            sbomcomp.Properties = new List<Property>();
-                            sbomcomp.Properties.Add(cdxIdentifierType);
-                            sbomcomp.Properties.Add(cdxIsDev);
-                            bom.Add(sbomcomp);
-                            BomCreator.bomKpiData.ComponentsinSBOMTemplateFile++;
-                        }
-                        else
-                        {
-                            sbomcomp.Properties.Add(cdxIdentifierType);
-                            sbomcomp.Properties.Add(cdxIsDev);
-                            bom.Add(sbomcomp);
-                            BomCreator.bomKpiData.ComponentsinSBOMTemplateFile++;
-                        }
+                        sbomcomp.Properties = new List<Property>();
+                        sbomcomp.Properties.Add(cdxIdentifierType);
+                        sbomcomp.Properties.Add(cdxIsDev);
+                        bom.Add(sbomcomp);
+                        BomCreator.bomKpiData.ComponentsinSBOMTemplateFile++;
                     }
                     else
                     {
-                        bool isLicenseUpdated = false;
-                        bool isPropertiesUpdated = false;
-
-                        isLicenseUpdated = UpdateLicenseDetails(bomComp, sbomcomp);
-                        isPropertiesUpdated = UpdatePropertiesDetails(bomComp, sbomcomp);
-
-                        if (isLicenseUpdated || isPropertiesUpdated)
-                        {
-
-                            BomCreator.bomKpiData.ComponentsUpdatedFromSBOMTemplateFile++;
-                        }
-                        else
-                        {
-                            Logger.Debug($"AddComponentDetails():No Details updated for SBOM Template component " + sbomcomp.Name + " : " + sbomcomp.Version);
-                        }
+                        sbomcomp.Properties.Add(cdxIdentifierType);
+                        sbomcomp.Properties.Add(cdxIsDev);
+                        bom.Add(sbomcomp);
+                        BomCreator.bomKpiData.ComponentsinSBOMTemplateFile++;
                     }
                 }
-                catch (ArgumentException ex)
+                else
                 {
-                    Logger.Error($"AddComponentDetails():ArgumentException:Error from " + sbomcomp.Name + " : " + sbomcomp.Version, ex);
+                    TemplateComponentUpdation(sbomcomp, bomComp);
                 }
-                catch (InvalidOperationException ex)
-                {
-                    Logger.Error($"AddComponentDetails():InvalidOperationException:Error from " + sbomcomp.Name + " : " + sbomcomp.Version, ex);
-                }
+            }
+            catch (ArgumentException ex)
+            {
+                Logger.Error($"AddComponentDetails():ArgumentException:Error from " + sbomcomp.Name + " : " + sbomcomp.Version, ex);
+            }
+            catch (InvalidOperationException ex)
+            {
+                Logger.Error($"AddComponentDetails():InvalidOperationException:Error from " + sbomcomp.Name + " : " + sbomcomp.Version, ex);
+            }
+        }
+
+        private static void TemplateComponentUpdation(Component sbomcomp, Component bomComp)
+        {
+            bool isLicenseUpdated = false;
+            bool isPropertiesUpdated = false;
+
+            isLicenseUpdated = UpdateLicenseDetails(bomComp, sbomcomp);
+            isPropertiesUpdated = UpdatePropertiesDetails(bomComp, sbomcomp);
+
+            if (isLicenseUpdated || isPropertiesUpdated)
+            {
+
+                BomCreator.bomKpiData.ComponentsUpdatedFromSBOMTemplateFile++;
+            }
+            else
+            {
+                Logger.Debug($"TemplateComponentUpdation():No Details updated for SBOM Template component " + sbomcomp.Name + " : " + sbomcomp.Version);
             }
         }
 

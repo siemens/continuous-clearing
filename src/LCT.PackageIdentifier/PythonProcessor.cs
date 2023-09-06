@@ -5,7 +5,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using CycloneDX.Models;
-using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
@@ -16,6 +15,7 @@ using log4net;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -81,13 +81,13 @@ namespace LCT.PackageIdentifier
 
         #region Private Methods
 
-        private static List<PythonPackage> ExtractDetailsForPoetryLockfile(string filePath, List<Dependency> dependencies)
+        public static List<PythonPackage> ExtractDetailsForPoetryLockfile(string filePath, List<Dependency> dependencies)
         {
             List<PythonPackage> PythonPackages;
             PythonPackages = PoetrySetOfCmds(filePath, dependencies);
             return PythonPackages;
         }
-
+        
         private List<PythonPackage> ExtractDetailsFromJson(string filePath, CommonAppSettings appSettings, ref List<Dependency> dependencies)
         {
             List<PythonPackage> PythonPackages = new List<PythonPackage>();

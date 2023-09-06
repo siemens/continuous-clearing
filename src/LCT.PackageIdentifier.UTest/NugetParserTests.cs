@@ -27,7 +27,6 @@ namespace PackageIdentifier.UTest
     [TestFixture]
     public class NugetParserTests
     {
-
         [TestCase]
         public void ParsePackageConfig_GivenAInputFilePath_ReturnsSuccess()
         {
@@ -49,7 +48,6 @@ namespace PackageIdentifier.UTest
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Count), "Checks for no of components");
 
         }
-
         [TestCase]
         public void InputFileIdentifaction_GivenARootPath_ReturnsSuccess()
         {
@@ -361,7 +359,7 @@ namespace PackageIdentifier.UTest
                 Version = "1.0.0"
             };
             var components = new List<Component>() { component1 };
-            string[] reooListArr = {"internalrepo1", "internalrepo2" };
+            string[] reooListArr = { "internalrepo1", "internalrepo2" };
             CommonAppSettings appSettings = new();
             appSettings.Nuget = new Config() { JfrogNugetRepoList = reooListArr };
             AqlResult aqlResult = new()
@@ -400,7 +398,7 @@ namespace PackageIdentifier.UTest
                 Version = "1.0.0"
             };
             var components = new List<Component>() { component1 };
-            string[] reooListArr = {"internalrepo1", "internalrepo2" };
+            string[] reooListArr = { "internalrepo1", "internalrepo2" };
             CommonAppSettings appSettings = new();
             appSettings.Nuget = new Config() { JfrogNugetRepoList = reooListArr };
             AqlResult aqlResult = new()
@@ -439,7 +437,7 @@ namespace PackageIdentifier.UTest
                 Version = "1.0.0"
             };
             var components = new List<Component>() { component1 };
-            string[] reooListArr = {"internalrepo1", "internalrepo2" };
+            string[] reooListArr = { "internalrepo1", "internalrepo2" };
             CommonAppSettings appSettings = new();
             appSettings.Nuget = new Config() { JfrogNugetRepoList = reooListArr };
             AqlResult aqlResult = new()
@@ -449,7 +447,7 @@ namespace PackageIdentifier.UTest
                 Repo = "internalrepo1"
             };
 
-            List<AqlResult> results = new () { aqlResult };
+            List<AqlResult> results = new() { aqlResult };
 
             Mock<IJFrogService> mockJfrogService = new Mock<IJFrogService>();
             Mock<IBomHelper> mockBomHelper = new Mock<IBomHelper>();
@@ -478,7 +476,7 @@ namespace PackageIdentifier.UTest
                 Version = "1.0.0"
             };
             var components = new List<Component>() { component1 };
-            string[] reooListArr = {"internalrepo1", "internalrepo2" };
+            string[] reooListArr = { "internalrepo1", "internalrepo2" };
             CommonAppSettings appSettings = new();
             appSettings.Nuget = new Config() { JfrogNugetRepoList = reooListArr };
             AqlResult aqlResult = new()
@@ -544,6 +542,66 @@ namespace PackageIdentifier.UTest
             var reponameActual = actual.First(x => x.Properties[0].Name == "internal:siemens:clearing:repo-url").Properties[0].Value;
 
             Assert.That("Not Found in JFrogRepo", Is.EqualTo(reponameActual));
+        }
+
+        [TestCase]
+        public void ParseProjectAssetFile_GivenAInputFilePath_ReturnsSuccess()
+        {
+            //Arrange
+            int expectednoofcomponents = 2;
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles";
+
+            string[] Includes = { "project.assets.json" };
+            Config config = new Config()
+            {
+                Include = Includes
+            };
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                PackageFilePath = packagefilepath,
+                Nuget = config
+            };
+
+            //Act
+            Bom listofcomponents = new NugetProcessor().ParsePackageFile(appSettings);
+
+            //Assert
+            Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
+
+        }
+
+        [TestCase]
+        public void ParseProjectAssetFile_GivenAInputFilePath_ReturnDevDependentComp()
+        {
+            //Arrange
+            string IsDev = "true";
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles";
+
+            string[] Includes = { "project.assets.json" };
+            Config config = new Config()
+            {
+                Include = Includes
+            };
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                PackageFilePath = packagefilepath,
+                Nuget = config
+            };
+
+            //Act
+            Bom listofcomponents = new NugetProcessor().ParsePackageFile(appSettings);
+
+            var IsDevDependency = listofcomponents.Components.Find(a => a.Name == "SonarAnalyzer.CSharp").Properties[0].Value;
+
+            //Assert
+            Assert.That(IsDev, Is.EqualTo(IsDevDependency), "Checks if Dev Dependency Component or not");
+
         }
     }
 }
