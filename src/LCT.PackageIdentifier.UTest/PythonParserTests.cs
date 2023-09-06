@@ -75,6 +75,36 @@ namespace PackageIdentifier.UTest
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
         }
+        [Test]
+        public void ParseCycloneDXFile_GivenAInputFilePathExcludeOneComponent_ReturnsCounts()
+        {
+            //Arrange
+            int expectednoofcomponents = 3;
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string OutFolder = Path.GetDirectoryName(exePath);
+            string[] Includes = { "CycloneDX_Python.cdx.json" };
+            Config config = new Config()
+            {
+                Include = Includes,
+                ExcludedComponents = new List<string>()
+                {
+                   "attrs:22.2.0"
+                }
+            };
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                PackageFilePath = OutFolder + @"\PackageIdentifierUTTestFiles",
+                ProjectType = "PYTHON",
+                RemoveDevDependency = true,
+                Python = config
+            };
+
+            //Act
+            Bom listofcomponents = pythonProcessor.ParsePackageFile(appSettings);
+
+            //Assert
+            Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
+        }
 
         [Test]
         public void ParseCycloneDXFile_GivenMultipleInputFiles_ReturnsCountOfDuplicates()
@@ -300,6 +330,44 @@ namespace PackageIdentifier.UTest
 
             // Assert
             Assert.That(actual, Is.Not.Null);
+        }
+
+        [Test]
+        public void ExtractDetailsForCycloneDX_GivenInputFilePath_ReturnsCounts()
+        {
+            //Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string OutFolder = Path.GetDirectoryName(exePath);
+            List<Dependency> dependencies = new List<Dependency>();
+            string filePath = OutFolder + @"\PackageIdentifierUTTestFiles\CycloneDX_Python.cdx.json";
+
+            //Act
+            List<PythonPackage> listofcomponents = PythonProcessor.ExtractDetailsForPoetryLockfile(filePath, dependencies);
+
+            //Assert
+            Assert.That(0, Is.EqualTo(listofcomponents.Count));
+        }
+
+        [Test]
+        public void ExtractDetailsForPoetryLockfile_GivenAInputFilePath_ReturnsCounts()
+        {
+            //Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string OutFolder = Path.GetDirectoryName(exePath);
+            string[] Includes = { "poetry.lock" };
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                PackageFilePath = OutFolder + @"\PackageIdentifierUTTestFiles\PythonTestProject",
+                ProjectType = "PYTHON",
+                RemoveDevDependency = true,
+                Python = new Config() { Include = Includes }
+            };
+
+            //Act
+            Bom listofcomponents = pythonProcessor.ParsePackageFile(appSettings);
+
+            //Assert  Need to change this after python package clearence implementaion
+            Assert.True(listofcomponents.Components.Count == 0 || listofcomponents.Components.Count == 4);
         }
     }
 }

@@ -395,7 +395,7 @@ namespace LCT.PackageIdentifier
                 if ((component.Author?.Split(",")) != null)
                 {
                     List<Dependency> subDependencies = new();
-                    foreach (var item in (component?.Author?.Split(",")).Where(item => item.Contains(":")))
+                    foreach (var item in (component?.Author?.Split(",")).Where(item => item.Contains(':')))
                     {
                         var componentDetails = item.Split(":");
                         var name = StringFormat(componentDetails[0]);

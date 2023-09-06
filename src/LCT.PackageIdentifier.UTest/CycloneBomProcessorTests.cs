@@ -167,5 +167,48 @@ namespace PackageIdentifier.UTest
             Assert.IsNull(files.Components, "Returns Zero components in BOM");
 
         }
+
+        [Test]
+        public void ExtractSBOMDetailsFromTemplate_GivenBomTemplateWithComponents_RetrunsBom()
+        {
+            //Arrange
+            Bom bom = new Bom()
+            {
+                Metadata = null,
+                Components = new List<Component>()
+            {
+                new Component(){Name="Test",Version="2.2"},
+                new Component(){Name="new",Version="4.2"}
+            }
+            };
+
+            //Act
+
+            Bom files = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(bom);
+
+            //Assert
+            Assert.IsNotNull(files.Components, "Returns Non Zero components in BOM");
+
+        }
+        [Test]
+        public void ExtractSBOMDetailsFromTemplate_GivenBomTemplateWithoutComponents_RetrunsBom()
+        {
+            //Arrange
+            Bom bom = new Bom()
+            {
+                Metadata = null,
+                Components = null
+         
+            
+            };
+
+            //Act
+
+            Bom files = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(bom);
+
+            //Assert
+            Assert.That(0,Is.EqualTo(files.Components.Count), "Returns Zero components in BOM");
+
+        }
     }
 }
