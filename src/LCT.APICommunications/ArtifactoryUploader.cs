@@ -16,15 +16,14 @@ using System.Threading.Tasks;
 
 namespace LCT.APICommunications
 {
-    public class ArtfactoryUploader 
+    public static class ArtfactoryUploader 
     {
-        //ConfigurationAttribute        
+        //ConfigurationAttribute
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private string destRepoName = Environment.GetEnvironmentVariable("JfrogDestRepoName");
-        private string JfrogApi = Environment.GetEnvironmentVariable("JfrogApi");
-        private string srcRepoName = Environment.GetEnvironmentVariable("JfrogSrcRepo");
+        private static string destRepoName = Environment.GetEnvironmentVariable("JfrogDestRepoName");
+        private static string JfrogApi = Environment.GetEnvironmentVariable("JfrogApi");
+        private static string srcRepoName = Environment.GetEnvironmentVariable("JfrogSrcRepo");
         
-
         public static async Task<HttpResponseMessage> UploadPackageToRepo(ComponentsToArtifactory component,int timeout)
         {
             Logger.Debug("Starting UploadPackageToArtifactory method");
@@ -82,9 +81,8 @@ namespace LCT.APICommunications
         }
 
         /// </summary>
-        public void SetConfigurationValues()
+        public static void SetConfigurationValues()
         {
-
             if (string.IsNullOrEmpty(destRepoName))
             {
                 destRepoName = ConfigurationManager.AppSettings["JfrogDestRepoName"];

@@ -29,7 +29,7 @@ namespace LCT.Services.UTest
 
             AqlResult aqlResult = new AqlResult()
             {
-                Name = "api-node-2.26.3-LicenseClearing.16.sha-058fada.tgz",
+                Name = "saap-api-node-2.26.3-LicenseClearing.16.sha-058fada.tgz",
                 Path = "@testfolder/-/folder",
                 Repo = "energy-dev-npm-egll"
             };

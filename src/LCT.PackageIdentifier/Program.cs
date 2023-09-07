@@ -63,7 +63,7 @@ namespace LCT.PackageIdentifier
             Logger.Logger.Log(null, Level.Notice, $"Input Parameters used in Package Identifier:\n\t" +
                 $"PackageFilePath\t\t --> {appSettings.PackageFilePath}\n\t" +
                 $"BomFolderPath\t\t --> {appSettings.BomFolderPath}\n\t" +
-                $"CycloneDXFilePath\t --> {appSettings.CycloneDxBomFilePath}\n\t" +
+                $"SBOMTemplateFilePath\t --> {appSettings.CycloneDxSBomTemplatePath}\n\t" +
                 $"SW360Url\t\t --> {appSettings.SW360URL}\n\t" +
                 $"SW360AuthTokenType\t --> {appSettings.SW360AuthTokenType}\n\t" +
                 $"SW360ProjectName\t --> {appSettings.SW360ProjectName}\n\t" +

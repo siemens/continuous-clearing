@@ -19,10 +19,13 @@ RUN apt-get update && \
     apt-get -y install --no-install-recommends maven && \
     apt-get -y install --no-install-recommends curl && \
     apt-get -y install --no-install-recommends dpkg-dev && \
+    apt-get -y install --no-install-recommends python3-distutils && \    
     curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /opt/DebianImageClearing && \
+    curl -sSL https://install.python-poetry.org | python3 - && \
     rm -rf /var/lib/apt/lists/* && \
     rm -rf archive.tar.gz
 
+ENV PATH="/root/.local/bin:$PATH"
+
 # Copying files from host to current working directory
 COPY /out/net6.0 /app/out
-

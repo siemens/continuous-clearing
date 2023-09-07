@@ -51,6 +51,10 @@
           "Name": "internal:siemens:clearing:is-internal",
           "Value": "false"
         },
+		{
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
+        },
         {
           "Name": "internal:siemens:clearing:repo-url",
           "Value": "Not Found in JFrogRepo"
@@ -58,6 +62,10 @@
         {
           "Name": "internal:siemens:clearing:project-type",
           "Value": "DEBIAN"
+        },
+        {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
         },
         {
           "Name": "internal:siemens:clearing:clearing-state",
@@ -100,6 +108,10 @@
           "Name": "internal:siemens:clearing:is-internal",
           "Value": "false"
         },
+		{
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
+        },
         {
           "Name": "internal:siemens:clearing:repo-url",
           "Value": "Not Found in JFrogRepo"
@@ -107,6 +119,10 @@
         {
           "Name": "internal:siemens:clearing:project-type",
           "Value": "DEBIAN"
+        },
+        {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
         },
         {
           "Name": "internal:siemens:clearing:clearing-state",
@@ -149,6 +165,10 @@
           "Name": "internal:siemens:clearing:is-internal",
           "Value": "false"
         },
+		{
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
+        },
         {
           "Name": "internal:siemens:clearing:repo-url",
           "Value": "Not Found in JFrogRepo"
@@ -156,6 +176,10 @@
         {
           "Name": "internal:siemens:clearing:project-type",
           "Value": "DEBIAN"
+        },
+         {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
         },
         {
           "Name": "internal:siemens:clearing:clearing-state",
@@ -198,6 +222,10 @@
           "Name": "internal:siemens:clearing:is-internal",
           "Value": "false"
         },
+		{
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
+        },
         {
           "Name": "internal:siemens:clearing:repo-url",
           "Value": "Not Found in JFrogRepo"
@@ -205,6 +233,10 @@
         {
           "Name": "internal:siemens:clearing:project-type",
           "Value": "DEBIAN"
+        },
+        {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
         },
         {
           "Name": "internal:siemens:clearing:clearing-state",

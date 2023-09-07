@@ -4,9 +4,14 @@
 //  SPDX-License-Identifier: MIT
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace LCT.PackageIdentifier.Model
 {
-
+    /// <summary>
+    /// MavenPackage constants
+    /// </summary>
+    [ExcludeFromCodeCoverage]
     public class MavenPackage
     {
         public string ID { get; set; }

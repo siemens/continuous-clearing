@@ -11,10 +11,9 @@ using LCT.Common;
 using LCT.Common.Constants;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
+using LCT.PackageIdentifier.Model.NugetModel;
 using LCT.Services.Interface;
 using log4net;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -28,10 +27,16 @@ using System.Xml.Linq;
 
 namespace LCT.PackageIdentifier
 {
-    public class NugetProcessor : CycloneDXBomParser, IParser
+    public class NugetProcessor : IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
+        readonly CycloneDXBomParser cycloneDXBomParser;
+
+        public NugetProcessor()
+        {
+            cycloneDXBomParser = new CycloneDXBomParser();
+        }
 
         #region public methods
         public Bom ParsePackageFile(CommonAppSettings appSettings)
@@ -46,7 +51,10 @@ namespace LCT.PackageIdentifier
             totalComponentsIdentified = listComponentForBOM.Count;
 
             listComponentForBOM = listComponentForBOM.Distinct(new ComponentEqualityComparer()).ToList();
-            BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - listComponentForBOM.Count;
+            if (BomCreator.bomKpiData.DuplicateComponents == 0)
+            {
+                BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - listComponentForBOM.Count;
+            }
 
             var componentsWithMultipleVersions = listComponentForBOM.GroupBy(s => s.Name)
                               .Where(g => g.Count() > 1).SelectMany(g => g).ToList();
@@ -61,6 +69,7 @@ namespace LCT.PackageIdentifier
         public static List<NugetPackage> ParsePackageConfig(string packagesFilePath, CommonAppSettings appSettings)
         {
             List<NugetPackage> nugetPackages = new List<NugetPackage>();
+            string isDev = "false";
             try
             {
                 List<ReferenceDetails> referenceList = Parsecsproj(appSettings);
@@ -79,7 +88,7 @@ namespace LCT.PackageIdentifier
                     {
 
                         BomCreator.bomKpiData.DevDependentComponents++;
-                        continue;
+                        isDev = "true";
                     }
 
                     if (idAttribute?.Value == null)
@@ -97,7 +106,8 @@ namespace LCT.PackageIdentifier
                     {
                         ID = idAttribute.Value,
                         Version = versionAttribute.Value,
-                        Filepath = packagesFilePath
+                        Filepath = packagesFilePath,
+                        IsDev = isDev
                     };
                     nugetPackages.Add(package);
                 }
@@ -111,60 +121,6 @@ namespace LCT.PackageIdentifier
                 Logger.Error($"ParsePackageFile():", ex);
             }
             return nugetPackages;
-        }
-
-        public static List<NugetPackage> ParsePackageLock(string packagesFilePath, CommonAppSettings appSettings)
-        {
-            List<NugetPackage> packageList = new List<NugetPackage>();
-            try
-            {
-                List<ReferenceDetails> referenceList = Parsecsproj(appSettings);
-                using (StreamReader r = new StreamReader(packagesFilePath))
-                {
-                    string json = r.ReadToEnd();
-                    JObject jObject = JObject.Parse(json);
-
-                    JToken jDependencies = jObject["dependencies"];
-
-                    foreach (JToken targetVersion in jDependencies.Children())
-                    {
-                        foreach (JToken dependencyToken in targetVersion.Children().Children())
-                        {
-                            string id = dependencyToken.ToObject<JProperty>().Name;
-                            string version = dependencyToken.First.Value<string>("resolved");
-                            if (dependencyToken.First.Value<string>("type") == "Dev" || IsDevDependent(referenceList, id, version))
-                            {
-                                BomCreator.bomKpiData.DevDependentComponents++;
-                                continue;
-                            }
-                            if (dependencyToken.First.Value<string>("type") == "Project" || string.IsNullOrEmpty(version) && string.IsNullOrEmpty(id))
-                            {
-
-                                continue;
-                            }
-
-                            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;
-
-                            NugetPackage package = new NugetPackage()
-                            {
-                                ID = id,
-                                Version = version,
-                                Filepath = packagesFilePath
-                            };
-                            packageList.Add(package);
-                        }
-                    }
-                }
-            }
-            catch (JsonReaderException ex)
-            {
-                Logger.Error($"ParsePackageFile():", ex);
-            }
-            catch (IOException ex)
-            {
-                Logger.Error($"ParsePackageFile():", ex);
-            }
-            return packageList;
         }
 
         public static bool IsDevDependent(List<ReferenceDetails> referenceDetails, string name, string version)
@@ -318,6 +274,14 @@ namespace LCT.PackageIdentifier
 
             }
 
+            if (repoName == NotFoundInRepo)
+            {
+                jfrogcomponentName = $"{component.Name}.{component.Version}.nupkg";
+                repoName = aqlResultList.Find(x => x.Name.Equals(
+                  jfrogcomponentName, StringComparison.OrdinalIgnoreCase))?.Repo ?? NotFoundInRepo;
+
+            }
+
             return repoName;
         }
 
@@ -346,7 +310,11 @@ namespace LCT.PackageIdentifier
                 if (isTrue)
                 {
                     internalComponents.Add(currentIterationItem);
-                    continue;
+                    isInternal.Value = "true";
+                }
+                else
+                {
+                    isInternal.Value = "false";
                 }
 
                 currentIterationItem.Properties.Add(isInternal);
@@ -399,26 +367,69 @@ namespace LCT.PackageIdentifier
         private void ParsingInputFileForBOM(CommonAppSettings appSettings, ref List<Component> listComponentForBOM, ref Bom bom)
         {
             List<string> configFiles;
-            if (string.IsNullOrEmpty(appSettings.CycloneDxBomFilePath))
+            List<Component> componentsForBOM = new List<Component>();
+            List<Dependency> dependencies = new List<Dependency>();
+
+            configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Nuget);
+
+            foreach (string filepath in configFiles)
             {
-                configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Nuget);
-                List<NugetPackage> listofComponents = new List<NugetPackage>();
-
-                ParseInputFiles(appSettings, configFiles, listofComponents);
-
-                ConvertToCycloneDXModel(listComponentForBOM, listofComponents);
+                Logger.Debug($"ParsingInputFileForBOM():FileName: " + filepath);
+                if (filepath.EndsWith(FileConstant.CycloneDXFileExtension))
+                {
+                    if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                    {
+                        Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
+                        bom = cycloneDXBomParser.ParseCycloneDXBom(filepath);
+                        CycloneDXBomParser.CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
+                        componentsForBOM.AddRange(bom.Components);
+                        GetDetailsforManuallyAdded(componentsForBOM, listComponentForBOM);
+                    }
+                }
+                else
+                {
+                    Logger.Debug($"ParsingInputFileForBOM():Found as Package File");
+                    List<NugetPackage> listofComponents = new();
+                    ParseInputFiles(appSettings, filepath, listofComponents);
+                    ConvertToCycloneDXModel(listComponentForBOM, listofComponents, dependencies);
+                    bom.Dependencies = dependencies;
+                    BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = listComponentForBOM.Count;
+                }
             }
-            else
+
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = listComponentForBOM.Count;
+            listComponentForBOM = KeepUniqueNonDevComponents(listComponentForBOM);
+            BomCreator.bomKpiData.DevDependentComponents = listComponentForBOM.Count(s => s.Properties[0].Value == "true");
+            bom.Components = listComponentForBOM;
+
+            if (File.Exists(appSettings.CycloneDxSBomTemplatePath) && appSettings.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
-                bom = ParseCycloneDXBom(appSettings.CycloneDxBomFilePath);
-                BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = bom.Components.Count;
-                bom = RemoveExcludedComponents(appSettings, bom);
-                listComponentForBOM = bom.Components;
+                //Adding Template Component Details
+                Bom templateDetails;
+                templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
+                CycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
+                SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
+            }
+
+            bom = RemoveExcludedComponents(appSettings, bom);
+        }
+
+        private static void GetDetailsforManuallyAdded(List<Component> componentsForBOM, List<Component> listComponentForBOM)
+        {
+            foreach (var component in componentsForBOM)
+            {
+                component.Properties = new List<Property>();
+                Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
+                Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.ManullayAdded };
+                component.Properties.Add(isDev);
+                component.Properties.Add(identifierType);
+                listComponentForBOM.Add(component);
             }
         }
 
-        private static void ConvertToCycloneDXModel(List<Component> listComponentForBOM, List<NugetPackage> listofComponents)
+        private static void ConvertToCycloneDXModel(List<Component> listComponentForBOM, List<NugetPackage> listofComponents, List<Dependency> dependencies)
         {
+
             foreach (var prop in listofComponents)
             {
                 Component components = new Component
@@ -430,25 +441,87 @@ namespace LCT.PackageIdentifier
                 components.Purl = $"{ApiConstant.NugetExternalID}{prop.ID}@{components.Version}";
                 components.BomRef = $"{ApiConstant.NugetExternalID}{prop.ID}@{components.Version}";
                 components.Description = prop.Filepath;
+                components.Properties = new List<Property>()
+                {
+                    new()
+                    {
+                       Name = Dataconstant.Cdx_IsDevelopment, Value = prop.IsDev
+                    },
+                    new Property()
+                    {
+                        Name = Dataconstant.Cdx_IdentifierType,Value=Dataconstant.Discovered
+                    }
+                };
                 listComponentForBOM.Add(components);
+                if (prop.Dependencies != null)
+                {
+                    GetDependencyDetails(components, prop, ref dependencies);
+                }
             }
         }
 
-        private static void ParseInputFiles(CommonAppSettings appSettings, List<string> configFiles, List<NugetPackage> listofComponents)
+        private static void GetDependencyDetails(Component compnent, NugetPackage prop, ref List<Dependency> dependencies)
         {
-            foreach (string filepath in configFiles)
+            List<Dependency> subDependencies = new();
+            foreach (var item in prop.Dependencies)
             {
-                if (filepath.Contains(".json"))
+                string purl = item;
+                Dependency dependentList = new Dependency()
                 {
-                    listofComponents.AddRange(ParsePackageLock(filepath, appSettings));
+                    Ref = purl
+                };
+                subDependencies.Add(dependentList);
+            }
+            var dependency = new Dependency()
+            {
+                Ref = compnent.Purl,
+                Dependencies = subDependencies
+            };
+            dependencies.Add(dependency);
+        }
 
+        private static List<Component> KeepUniqueNonDevComponents(List<Component> listComponentForBOM)
+        {
+            Dictionary<string, Component> keyValuePairs = new Dictionary<string, Component>();
+            foreach (var component in listComponentForBOM)
+            {
+                if (!keyValuePairs.ContainsKey(component.Purl))
+                {
+                    keyValuePairs.Add(component.Purl, component);
                 }
                 else
                 {
-                    listofComponents.AddRange(ParsePackageConfig(filepath, appSettings));
+                    if (keyValuePairs[component.Purl].Properties[0].Value == "true" && component.Properties[0].Value == "false")
+                    {
+                        //Already Comp with Development Dependent added as 'true' ,remove that Comp
+                        //& add New Comp as Development Dependent 'false' If case of Duplicate
+                        keyValuePairs.Remove(component.Purl);
+                        keyValuePairs.Add(component.Purl, component);
+                    }
                 }
             }
+            BomCreator.bomKpiData.DuplicateComponents = listComponentForBOM.Count - keyValuePairs.Values.Count;
+            return keyValuePairs.Values.ToList();
         }
+
+        private static void ParseInputFiles(CommonAppSettings appSettings, string filepath, List<NugetPackage> listofComponents)
+        {
+            if (filepath.EndsWith(FileConstant.NugetAssetFile))
+            {
+                listofComponents.AddRange(ParseAssetFile(filepath));
+            }
+            else if (filepath.EndsWith(".config"))
+            {
+                listofComponents.AddRange(ParsePackageConfig(filepath, appSettings));
+            }
+            else
+            {
+                var list = ParsePackageConfig(filepath, appSettings);
+                listofComponents.AddRange(list);
+            }
+
+        }
+
 
         private static void CheckForMultipleVersions(CommonAppSettings appSettings, ref List<Component> listComponentForBOM, ref int noOfExcludedComponents, List<Component> componentsWithMultipleVersions)
         {
@@ -463,7 +536,7 @@ namespace LCT.PackageIdentifier
                 Logger.Warn($"Multiple versions detected :\n");
                 foreach (var item in componentsWithMultipleVersions)
                 {
-                    item.Description = !string.IsNullOrEmpty(appSettings.CycloneDxBomFilePath) ? appSettings.CycloneDxBomFilePath : item.Description;
+                    item.Description = !string.IsNullOrEmpty(appSettings.CycloneDxSBomTemplatePath) ? appSettings.CycloneDxSBomTemplatePath : item.Description;
                     Logger.Warn($"Component Name : {item.Name}\nComponent Version : {item.Version}\nPackage Found in : {item.Description}\n");
                 }
             }
@@ -551,6 +624,49 @@ namespace LCT.PackageIdentifier
             }
 
             return library;
+        }
+
+        private static List<NugetPackage> ParseAssetFile(string configFile)
+        {
+            NugetDevDependencyParser nugetDevDependencyParser = NugetDevDependencyParser.Instance;
+            List<Container> containers = nugetDevDependencyParser.Parse(configFile);
+            return ConvertContainerAsNugetPackage(containers, configFile);
+        }
+
+        private static List<NugetPackage> ConvertContainerAsNugetPackage(List<Container> containers, string configFile)
+        {
+            List<NugetPackage> nugetPackages = new List<NugetPackage>();
+            foreach (Container containermodule in containers)
+            {
+                foreach (var lst in containermodule.Components)
+                {
+                    List<string> depvalue = new List<string>();
+                    GetDependencyList(lst, ref depvalue);
+                    nugetPackages.Add(new NugetPackage()
+                    {
+                        ID = lst.Value.Name,
+                        Version = lst.Value.Version,
+                        Dependencies = depvalue,
+                        Filepath = configFile,
+                        IsDev = lst.Value.Scope.ToString() == "DevDependency" ? "true" : "false",
+                    });
+
+                }
+            }
+
+            return nugetPackages;
+        }
+        public static void GetDependencyList(KeyValuePair<string, BuildInfoComponent> lst, ref List<string> depvalue)
+        {
+            if (lst.Value.Dependencies.Count > 0)
+            {
+                foreach (var item in lst.Value.Dependencies)
+                {
+                    var depvaltestue = item.PackageUrl;
+                    depvalue.Add(depvaltestue);
+                }
+            }
+
         }
         #endregion
     }

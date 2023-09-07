@@ -44,10 +44,9 @@ namespace LCT.APICommunications.UTest
         {
             //Arrange
             bool returnValue = true;
-            var artfactoryUploader = new ArtfactoryUploader();
 
             //Act
-            artfactoryUploader.SetConfigurationValues();
+            ArtfactoryUploader.SetConfigurationValues();
 
             //Assert
             Assert.That(returnValue, Is.True);

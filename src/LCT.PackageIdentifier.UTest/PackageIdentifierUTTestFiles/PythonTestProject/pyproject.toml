@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "example-package"
+version = "0.1.0"
+description = ""
+authors = ["karthika"]
+readme = "README.md"
+packages = [{include = "example_package"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pendulum = "^2.1.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

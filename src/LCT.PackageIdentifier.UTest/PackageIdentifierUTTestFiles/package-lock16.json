@@ -1,0 +1,126 @@
+{
+  "name": "test",
+  "version": "0.0.0",
+  "lockfileVersion": 3,
+  "requires": true,
+  "packages": {
+    "": {
+      "name": "test",
+      "version": "0.0.0",
+      "dependencies": {
+        "@angular/animations": "^16.1.0",
+        "@angular/common": "^16.1.0",
+        "@angular/compiler": "^16.1.0",
+        "joi-browser": "13.4.0"
+      },
+      "devDependencies": {
+        "@types/jasmine": "~4.3.0",
+        "jasmine-core": "~4.6.0"
+      }
+    },
+    "node_modules/@angular/animations": {
+      "version": "16.1.1",
+      "resolved": "http://test.artifactory/api/npm/energy-dev-npm/@angular/animations/-/animations-16.1.1.tgz",
+      "integrity": "sha512-Na+eGoLvek3rmIanqXdMJoVAxd00AfYsMoHzhAVuPQpbW1H3EGqMvbzPHf1WhP19yFZ9gXGV0rFZf1qieQPufA==",
+      "dependencies": {
+        "tslib": "^2.3.0"
+      },
+      "engines": {
+        "node": "^16.14.0 || >=18.10.0"
+      },
+      "peerDependencies": {
+        "@angular/core": "16.1.1"
+      }
+    },
+    "node_modules/@angular/common": {
+      "version": "16.1.1",
+      "resolved": "http://test.artifactory/api/npm/energy-dev-npm/@angular/common/-/common-16.1.1.tgz",
+      "integrity": "sha512-qsMYqk7U7IcuE8swJ7Sppv0MkYBTfzrsq5jfAaAZYw035Po5FfxkFrh/Pmgp7QZndCsO9H+03JLH03jzuIqfrw==",
+      "dependencies": {
+        "tslib": "^2.3.0"
+      },
+      "engines": {
+        "node": "^16.14.0 || >=18.10.0"
+      },
+      "peerDependencies": {
+        "@angular/core": "16.1.1",
+        "rxjs": "^6.5.3 || ^7.4.0"
+      }
+    },
+    "node_modules/@angular/compiler": {
+      "version": "16.1.1",
+      "resolved": "http://test.artifactory/api/npm/energy-dev-npm/@angular/compiler/-/compiler-16.1.1.tgz",
+      "integrity": "sha512-TKLZS4d7dHvFlULvaZLlG+NKX8wIPoz9sUGzxnS+FPqa0GLfeeVY+KCj4bWSTBhESjgdIeDBu7KdT4vakvb8Nw==",
+      "dependencies": {
+        "tslib": "^2.3.0"
+      },
+      "engines": {
+        "node": "^16.14.0 || >=18.10.0"
+      },
+      "peerDependencies": {
+        "@angular/core": "16.1.1"
+      },
+      "peerDependenciesMeta": {
+        "@angular/core": {
+          "optional": true
+        }
+      }
+    },
+    "node_modules/@angular/core": {
+      "version": "16.1.1",
+      "resolved": "http://test.artifactory/api/npm/energy-dev-npm/@angular/core/-/core-16.1.1.tgz",
+      "integrity": "sha512-hi0O2Gc0L4PavczQweC9cxVfdemXj76wfJ3GjtUP+f9I4uKLBQ6/JABExRIoW9eY0rK5fZgYP0IeCYisW4gxnQ==",
+      "peer": true,
+      "dependencies": {
+        "tslib": "^2.3.0"
+      },
+      "engines": {
+        "node": "^16.14.0 || >=18.10.0"
+      },
+      "peerDependencies": {
+        "rxjs": "^6.5.3 || ^7.4.0",
+        "zone.js": "~0.13.0"
+      }
+    },
+    "node_modules/@types/jasmine": {
+      "version": "4.3.4",
+      "resolved": "http://test.artifactory/api/npm/energy-dev-npm/@types/jasmine/-/jasmine-4.3.4.tgz",
+      "integrity": "sha512-DsJbnxCdjmhRP7dXwjD6JcPc+z7V/4mG3VA1cEFec/+R343TaNPnZ9eJzMkjR4T1BYkjkDIUsPDybkDC0qLrvA==",
+      "dev": true
+    },
+    "node_modules/jasmine-core": {
+      "version": "4.6.0",
+      "resolved": "http://test.artifactory/api/npm/energy-dev-npm/jasmine-core/-/jasmine-core-4.6.0.tgz",
+      "integrity": "sha512-O236+gd0ZXS8YAjFx8xKaJ94/erqUliEkJTDedyE7iHvv4ZVqi+q+8acJxu05/WJDKm512EUNn809In37nWlAQ==",
+      "dev": true
+    },
+    "node_modules/joi-browser": {
+      "version": "13.4.0",
+      "resolved": "http://test.artifactory/api/npm/energy-dev-npm/joi-browser/-/joi-browser-13.4.0.tgz",
+      "integrity": "sha1-tyumG2EOP1jlG1Y6FOD1Ilz7aJY="
+    },
+    "node_modules/rxjs": {
+      "version": "7.8.1",
+      "resolved": "http://test.artifactory/api/npm/energy-dev-npm/rxjs/-/rxjs-7.8.1.tgz",
+      "integrity": "sha1-b289meqARCke/ZLnx/z1YsQFdUM=",
+      "peer": true,
+      "dependencies": {
+        "tslib": "^2.1.0"
+      }
+    },
+    "node_modules/tslib": {
+      "version": "2.5.3",
+      "resolved": "http://test.artifactory/api/npm/energy-dev-npm/tslib/-/tslib-2.5.3.tgz",
+      "integrity": "sha512-mSxlJJwl3BMEQCUNnxXBU9jP4JBktcEGhURcPR6VQVlnP0FdDEsIaz0C35dXNGLyRfrATNofF0F5p2KPxQgB+w=="
+    },
+    "node_modules/zone.js": {
+      "version": "0.13.1",
+      "resolved": "http://test.artifactory/api/npm/energy-dev-npm/zone.js/-/zone.js-0.13.1.tgz",
+      "integrity": "sha512-+bIeDAFEBYuXRuU3qGQvzdPap+N1zjM4KkBAiiQuVVCrHrhjDuY6VkUhNa5+U27+9w0q3fbKiMCbpJ0XzMmSWA==",
+      "peer": true,
+      "dependencies": {
+        "tslib": "^2.3.0"
+      }
+    }
+  }
+}

@@ -23,7 +23,7 @@ namespace PackageIdentifier.UTest
             {
                 string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
                 string outFolder = Path.GetDirectoryName(exePath);
-                string CCTComparisonBomTestFile = outFolder + @"\PackageIdentifierUTTestFiles\Cyclonedx.json";
+                string CCTComparisonBomTestFile = outFolder + @"\PackageIdentifierUTTestFiles\CycloneDX_Debian.cdx.json";
 
                 string json = "";
                 if (File.Exists(CCTComparisonBomTestFile))

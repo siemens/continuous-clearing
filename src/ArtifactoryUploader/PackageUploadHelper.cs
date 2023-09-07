@@ -187,7 +187,7 @@ namespace LCT.ArtifactoryUploader
         }
 
         public static async Task UploadingThePackages(List<ComponentsToArtifactory> componentsToUpload,int timeout)
-        {
+        {   
             Logger.Debug("Starting UploadingThePackages() method");
             foreach (var item in componentsToUpload)
             {
@@ -210,8 +210,6 @@ namespace LCT.ArtifactoryUploader
             {
                 if (!(item.SrcRepoName.Contains("Not Found in JFrog")))
                 {
-
-                    
                     HttpResponseMessage responseMessage = await ArtfactoryUploader.UploadPackageToRepo(item,timeout);
                     if (responseMessage.StatusCode == HttpStatusCode.OK)
                     {

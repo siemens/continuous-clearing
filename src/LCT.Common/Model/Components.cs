@@ -55,5 +55,9 @@ namespace LCT.Common.Model
 
         [JsonIgnore]
         public string ProjectType { get; set; }
+
+        [JsonIgnore]
+        public string IsDev { get; set; }
+        
     }
 }
