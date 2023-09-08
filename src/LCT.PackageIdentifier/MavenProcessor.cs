@@ -87,8 +87,6 @@ namespace LCT.PackageIdentifier
 
             BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - componentsForBOM.Count;
             
-            componentsForBOM = CommonHelper.RemoveExcludedComponents(componentsForBOM, appSettings.Maven.ExcludedComponents, ref noOfExcludedComponents);
-            BomCreator.bomKpiData.ComponentsExcluded += noOfExcludedComponents;
 
             if (appSettings.Maven.ExcludedComponents != null)
             {
