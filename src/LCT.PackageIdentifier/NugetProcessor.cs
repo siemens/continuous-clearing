@@ -392,7 +392,15 @@ namespace LCT.PackageIdentifier
                     List<NugetPackage> listofComponents = new();
                     ParseInputFiles(appSettings, filepath, listofComponents);
                     ConvertToCycloneDXModel(listComponentForBOM, listofComponents, dependencies);
-                    bom.Dependencies = dependencies;
+                    if (bom.Dependencies == null)
+                    {
+                        bom.Dependencies = dependencies;
+                        dependencies = new List<Dependency>();
+                    }
+                    else
+                    {
+                        bom.Dependencies.AddRange(dependencies);
+                    }
                     BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = listComponentForBOM.Count;
                 }
             }
@@ -429,7 +437,6 @@ namespace LCT.PackageIdentifier
 
         private static void ConvertToCycloneDXModel(List<Component> listComponentForBOM, List<NugetPackage> listofComponents, List<Dependency> dependencies)
         {
-
             foreach (var prop in listofComponents)
             {
                 Component components = new Component
