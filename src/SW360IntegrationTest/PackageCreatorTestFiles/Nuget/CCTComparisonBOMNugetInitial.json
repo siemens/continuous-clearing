@@ -48,6 +48,14 @@
       "Components": null,
       "Properties": [
         {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
+        },
+        {
           "Name": "internal:siemens:clearing:is-internal",
           "Value": "false"
         },
@@ -96,6 +104,14 @@
       "Pedigree": null,
       "Components": null,
       "Properties": [
+        {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
+        },
         {
           "Name": "internal:siemens:clearing:is-internal",
           "Value": "false"
@@ -146,6 +162,14 @@
       "Components": null,
       "Properties": [
         {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
+        },
+        {
           "Name": "internal:siemens:clearing:is-internal",
           "Value": "false"
         },
@@ -194,6 +218,14 @@
       "Pedigree": null,
       "Components": null,
       "Properties": [
+        {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
+        },
         {
           "Name": "internal:siemens:clearing:is-internal",
           "Value": "false"
@@ -244,6 +276,14 @@
       "Components": null,
       "Properties": [
         {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
+        },
+        {
           "Name": "internal:siemens:clearing:is-internal",
           "Value": "false"
         },
@@ -292,6 +332,14 @@
       "Pedigree": null,
       "Components": null,
       "Properties": [
+        {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
+        },
         {
           "Name": "internal:siemens:clearing:is-internal",
           "Value": "false"

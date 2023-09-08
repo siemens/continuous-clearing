@@ -40,22 +40,18 @@ namespace LCT.PackageIdentifier
 
             // Calls package parser
             listOfComponentsToBom = await CallPackageParser(appSettings);
-            Logger.Logger.Log(null, Level.Notice, $"No of components to BOM after removing bundled, dev dependency & " +
-                $"internal components = {listOfComponentsToBom.Components.Count}", null);
-
+            Logger.Logger.Log(null, Level.Notice, $"No of components added to BOM after removing bundled & excluded components " +
+                $"= {listOfComponentsToBom.Components.Count}", null);
 
             bomKpiData.ComponentsInComparisonBOM = listOfComponentsToBom.Components.Count;
 
-
             //sets metadata properties
             listOfComponentsToBom = CycloneBomProcessor.SetMetadataInComparisonBOM(listOfComponentsToBom, appSettings);
-
 
             // Writes Comparison Bom
             Logger.Logger.Log(null, Level.Notice, $"Writing CycloneDX BOM..", null);
             WritecontentsToBOM(appSettings, bomKpiData, listOfComponentsToBom);
             Logger.Logger.Log(null, Level.Notice, $"Writing CycloneDX BOM completed", null);
-
 
             // Writes Kpi data 
             Program.BomStopWatch?.Stop();
@@ -80,15 +76,7 @@ namespace LCT.PackageIdentifier
 
         private static void WritecontentsToBOM(CommonAppSettings appSettings, BomKpiData bomKpiData, Bom listOfComponentsToBom)
         {
-            if (string.IsNullOrEmpty(appSettings.CycloneDxBomFilePath))
-            {
-                WriteContentToComparisonBOM(appSettings, listOfComponentsToBom, ref bomKpiData);
-            }
-            else
-            {
-                WriteContentToCycloneDxBOM(appSettings, listOfComponentsToBom, ref bomKpiData);
-            }
-
+            WriteContentToCycloneDxBOM(appSettings, listOfComponentsToBom, ref bomKpiData);
         }
 
         private static void WriteContentToCycloneDxBOM(CommonAppSettings appSettings, Bom listOfComponentsToBom, ref BomKpiData bomKpiData)
@@ -96,32 +84,17 @@ namespace LCT.PackageIdentifier
             IFileOperations fileOperations = new FileOperations();
             if (string.IsNullOrEmpty(appSettings.IdentifierBomFilePath))
             {
-                fileOperations.WriteContentToCycloneDXFile(listOfComponentsToBom, appSettings.BomFolderPath, appSettings.CycloneDxBomFilePath);
-            }
-            else
-            {
-                listOfComponentsToBom = fileOperations.CombineComponentsFromExistingBOM(listOfComponentsToBom, appSettings.IdentifierBomFilePath);
-                bomKpiData.ComponentsInComparisonBOM = listOfComponentsToBom.Components.Count;
-                fileOperations.WriteContentToCycloneDXFile(listOfComponentsToBom, appSettings.BomFolderPath, appSettings.CycloneDxBomFilePath);
-            }
-
-        }
-
-        private static void WriteContentToComparisonBOM(CommonAppSettings appSettings, Bom listOfComponentsToBom, ref BomKpiData bomKpiData)
-        {
-            IFileOperations fileOperations = new FileOperations();
-            if (string.IsNullOrEmpty(appSettings.IdentifierBomFilePath))
-            {
                 fileOperations.WriteContentToFile(listOfComponentsToBom, appSettings.BomFolderPath,
-                FileConstant.BomFileName, appSettings.SW360ProjectName);
+            FileConstant.BomFileName, appSettings.SW360ProjectName);
             }
             else
             {
                 listOfComponentsToBom = fileOperations.CombineComponentsFromExistingBOM(listOfComponentsToBom, appSettings.IdentifierBomFilePath);
                 bomKpiData.ComponentsInComparisonBOM = listOfComponentsToBom.Components.Count;
                 fileOperations.WriteContentToFile(listOfComponentsToBom, appSettings.BomFolderPath,
-                  FileConstant.BomFileName, appSettings.SW360ProjectName);
+          FileConstant.BomFileName, appSettings.SW360ProjectName);
             }
+
         }
 
         private async Task<Bom> CallPackageParser(CommonAppSettings appSettings)
@@ -142,6 +115,9 @@ namespace LCT.PackageIdentifier
                     return await ComponentIdentification(appSettings, parser);
                 case "DEBIAN":
                     parser = new DebianProcessor();
+                    return await ComponentIdentification(appSettings, parser);
+                case "PYTHON":
+                    parser = new PythonProcessor();
                     return await ComponentIdentification(appSettings, parser);
                 default:
                     Logger.Error($"GenerateBom():Invalid ProjectType - {appSettings.ProjectType}");

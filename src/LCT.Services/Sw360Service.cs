@@ -318,7 +318,7 @@ namespace LCT.Services
                 sw360Releases.FirstOrDefault(x => x.Name?.Trim()?.ToLowerInvariant() == component?.Name?.Trim()?.ToLowerInvariant()
                 && x.Version?.Trim()?.ToLowerInvariant() == component?.Version?.Trim()?.ToLowerInvariant());
 
-            if (sw360Release == null && component.ReleaseExternalId.Contains(Dataconstant.DebianPackage))
+            if (sw360Release == null && component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
             {
                 string debianVersion = $"{component?.Version?.Trim()?.ToLowerInvariant() ?? string.Empty}.debian";
                 sw360Release = sw360Releases.FirstOrDefault(x => x.Name?.Trim()?.ToLowerInvariant() == component?.Name?.Trim()?.ToLowerInvariant()

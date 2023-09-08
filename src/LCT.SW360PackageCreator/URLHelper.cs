@@ -215,12 +215,12 @@ namespace LCT.SW360PackageCreator
             version = WebUtility.UrlEncode(version);
             version = version.Replace("%3A", ":");
 
-            return $"{Dataconstant.DebianPackage}{Dataconstant.ForwardSlash}{name}@{version}?arch=source";
+            return $"{Dataconstant.PurlCheck()["DEBIAN"]}{Dataconstant.ForwardSlash}{name}@{version}?arch=source";
         }
 
         private static string GetComponentExternalId(string name)
         {
-            return $"{Dataconstant.DebianPackage}{Dataconstant.ForwardSlash}{name}?arch=source";
+            return $"{Dataconstant.PurlCheck()["DEBIAN"]}{Dataconstant.ForwardSlash}{name}?arch=source";
         }
 
         private async Task<DebianPackage> GetSourceUrl(string name, string version)

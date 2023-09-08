@@ -4,6 +4,7 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace LCT.Common.Constants
@@ -14,6 +15,21 @@ namespace LCT.Common.Constants
     [ExcludeFromCodeCoverage]
     public static class Dataconstant
     {
+        private static Dictionary<string, string> purlids = new Dictionary<string, string>
+         {
+        {"NPM", "pkg:npm"},
+        {"NUGET", "pkg:nuget"},
+        {"DEBIAN", "pkg:deb/debian"},
+        {"MAVEN", "pkg:maven"},
+        {"PYTHON", "pkg:pypi"},
+         };
+
+        //Identified types
+        public const string ManullayAdded = "ManuallyAdded";
+        public const string Discovered = "Discovered";
+        public const string TemplateAdded = "TemplateAdded";
+        public const string TemplateUpdated = "TemplateUpdated";
+
         public const string Created = "Created";
         public const string NewlyCreated = "Newly Created";
         public const string Uploaded = "Uploaded";
@@ -31,8 +47,6 @@ namespace LCT.Common.Constants
         public const string ReleaseAttachmentComment = "Attached by CA Tool";
         public const char ForwardSlash = '/';
         public const string SourceURLSuffix = "/srcfiles?fileinfo=1";
-        public const string DebianPackage = "pkg:deb/debian";
-        public const string MavenPackage = "pkg:maven";
         public const string Cdx_ArtifactoryRepoUrl = "internal:siemens:clearing:repo-url";
         public const string Cdx_ProjectType = "internal:siemens:clearing:project-type";
         public const string Cdx_ClearingState = "internal:siemens:clearing:clearing-state";
@@ -40,5 +54,11 @@ namespace LCT.Common.Constants
         public const string Cdx_ReleaseUrl = "internal:siemens:clearing:sw360:release-url";
         public const string Cdx_FossologyUrl = "internal:siemens:clearing:fossology:url";
         public const string Cdx_IsDevelopment = "internal:siemens:clearing:development";
+        public const string Cdx_IdentifierType = "internal:siemens:clearing:identifier-type";
+
+        public static Dictionary<string, string> PurlCheck()
+        {
+            return purlids;
+        }
     }
 }

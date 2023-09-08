@@ -33,7 +33,7 @@ namespace SW360IntegrationTest
             if (!TestHelper.BOMCreated)
             {
                 OutFolder = TestHelper.OutFolder;
-                string packagjsonPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest1stIterationData";
+                string packagjsonPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest1stIterationData\Npm";
                 string bomPath = OutFolder + @"\..\BOMs";
                 TestHelper.RunBOMCreatorExe(new string[]{
                 TestConstant.PackageFilePath, packagjsonPath,
@@ -56,8 +56,8 @@ namespace SW360IntegrationTest
             string bomPath = OutFolder + $"\\..\\BOMs\\{testParameters.SW360ProjectName}_Bom.cdx.json";
 
             // Assert
-            // Check exit is normal
-            Assert.AreEqual(0, TestHelper.RunComponentCreatorExe(new string[] {
+            // Check return with warning code 2
+            Assert.AreEqual(2, TestHelper.RunComponentCreatorExe(new string[] {
                 TestConstant.BomFilePath,bomPath,
                 TestConstant.Sw360Token, testParameters.SW360AuthTokenValue,
                 TestConstant.SW360URL, testParameters.SW360URL,
@@ -144,9 +144,10 @@ namespace SW360IntegrationTest
             httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue(TestConstant.TestSw360TokenType, TestConstant.TestSw360TokenValue);
             string expectedname = "rxjs";
-            string expectedversion = "6.5.5";
+            string expectedversion = "6.5.4";
             string expecteddownloadurl = "https://github.com/reactivex/rxjs.git";
-            string expectedexternalid = "pkg:npm/rxjs@6.5.5";
+            string expectedexternalid = "pkg:npm/rxjs@6.5.4";
+            string expectedclearingState = "NEW_CLEARING";
             //url formation for retrieving component details
             string url = TestConstant.Sw360ReleaseApi + TestConstant.componentNameUrl + "rxjs";
             string responseBody = await httpClient.GetStringAsync(url);//GET method         
@@ -166,6 +167,7 @@ namespace SW360IntegrationTest
             Assert.AreEqual(expectedversion, version, "Test Project  Version");
             Assert.AreEqual(expecteddownloadurl, downloadurl, "Test download Url of rxjs");
             Assert.AreEqual(expectedexternalid, externalid, "Test component external id");
+            Assert.AreEqual(expectedclearingState, clearingState);
         }
 
 

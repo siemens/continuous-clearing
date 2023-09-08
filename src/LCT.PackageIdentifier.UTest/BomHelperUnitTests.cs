@@ -88,5 +88,17 @@ namespace PackageIdentifier.UTest
             helper.WriteInternalComponentsListToKpi(lstComponentForBOM);
             Assert.AreEqual(true, true);
         }
+
+        [TestCase]
+        public void TestGetHashCodeUsingNpmView_InputNameAndVersion_ReturnsHashCode()
+        {
+            string expectedhashcode = "5f845b1a58ffb6f3ea6103edf0756ac65320b725";
+            string name = "@angular/animations";
+            string version = "12.0.0";
+
+        
+            string hashcode= BomHelper.GetHashCodeUsingNpmView(name,version);
+            Assert.That(expectedhashcode, Is.EqualTo(hashcode));
+        }
     }
 }

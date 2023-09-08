@@ -34,7 +34,7 @@ namespace SW360IntegrationTest
             if (!TestHelper.BOMCreated)
             {
                 OutFolder = TestHelper.OutFolder;
-                string packagejsonPath = OutFolder + @"\..\..\TestFiles\NPMTestFile\SystemTest1stIterationData\Maven";
+                string packagejsonPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest1stIterationData\Maven";
                 string bomPath = OutFolder + @"\..\BOMs";
                 TestHelper.RunBOMCreatorExe(new string[]{
                 TestConstant.PackageFilePath, packagejsonPath,
@@ -144,7 +144,7 @@ namespace SW360IntegrationTest
             string expectedversion = "2.9.2";
             string expectedclearingState = "NEW_CLEARING";
             string expecteddownloadurl = "https://repo.maven.apache.org/maven2/joda-time/joda-time/2.9.2/joda-time-2.9.2-sources.jar";
-            string expectedexternalid = "pkg:maven/joda-time@2.9.2";
+            string expectedexternalid = "pkg:maven/joda-time/joda-time@2.9.2?type=jar";
             //url formation for retrieving component details
             string url = TestConstant.Sw360ReleaseApi + TestConstant.componentNameUrl + "joda-time";
             string responseBody = await httpClient.GetStringAsync(url);//GET method         

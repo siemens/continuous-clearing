@@ -1,0 +1,47 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.4.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.4",
+  "serialNumber": "urn:uuid:43858d10-328d-40d3-8184-ad4f0b5ea53c",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-11T12:11:14Z",
+    "tools": [
+      {
+        "vendor": "anchore",
+        "name": "syft",
+        "version": "0.84.1"
+      }
+    ],
+    "component": {
+      "bom-ref": "f8e285590963f51a",
+      "type": "container",
+      "name": "/mnt/InputImages/Buster_amd64.tar",
+      "version": "sha256:b75774030c2c10178aad29230221cad47aa607c72895aa4af389b3f1f01f71f4"
+    }
+  },
+  "components": [
+    {
+      "bom-ref": "pkg:deb/debian/libblkid1@2.33.1-0.1?arch=amd64&upstream=util-linux&distro=debian-10&package-id=ef0026c7016096be",
+      "type": "library",
+      "publisher": "LaMont Jones <lamont@debian.org>",
+      "name": "libblkid1",
+      "version": "2.33.1-0.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "Testing License"
+          }
+        }
+      ],
+      "cpe": "cpe:2.3:a:libblkid1:libblkid1:2.33.1-0.1:*:*:*:*:*:*:*",
+      "purl": "pkg:deb/debian/libblkid1@2.33.1-0.1?arch=amd64&upstream=util-linux&distro=debian-10",
+      "properties": [
+        {
+          "name": "syft:package:foundBy",
+          "value": "Testing Properties"
+        }
+      ]
+    }
+  ]
+}

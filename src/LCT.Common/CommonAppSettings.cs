@@ -52,6 +52,7 @@ namespace LCT.Common
         private string m_LogFolderPath;
         private string m_FOSSURL;
         private string m_ArtifactoryUser;
+        private string m_CycloneDxSBomTemplatePath;
 
 
         public bool RemoveDevDependency { get; set; } = true;
@@ -63,8 +64,9 @@ namespace LCT.Common
 
         public Config Maven { get; set; }
         public Config Debian { get; set; }
+        public Config Python { get; set; }
         public string CaVersion { get; set; }
-        public string CycloneDxBomFilePath { get; set; }
+        public string CycloneDxSBomTemplatePath { get; set; }
         public string[] InternalRepoList { get; set; }
         public bool EnableFossTrigger { get; set; } = true;
         public string JfrogNpmDestRepoName { get; set; }
@@ -121,7 +123,7 @@ namespace LCT.Common
             set
             {
                 if (!AppDomain.CurrentDomain.FriendlyName.Contains("SW360PackageCreator") &&
-                    !AppDomain.CurrentDomain.FriendlyName.Contains("ArtifactoryUploader") && string.IsNullOrEmpty(CycloneDxBomFilePath))
+                    !AppDomain.CurrentDomain.FriendlyName.Contains("ArtifactoryUploader"))
                 {
                     folderAction.ValidateFolderPath(value);
                     m_PackageFilePath = value;
@@ -272,6 +274,19 @@ namespace LCT.Common
                     m_BomFilePath = value;
                     _fileOperations.ValidateFilePath(m_BomFilePath);
                 }
+            }
+        }
+
+        public string SBomTemplatePath
+        {
+            get
+            {
+                return m_CycloneDxSBomTemplatePath;
+            }
+            set
+            {
+                m_CycloneDxSBomTemplatePath = value;
+                _fileOperations.ValidateFilePath(m_CycloneDxSBomTemplatePath);
             }
         }
 
