@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 # Get parent image as latest debian patch of bullseye
-FROM mcr.microsoft.com/dotnet/sdk:6.0-bullseye-slim-amd64
+FROM mcr.microsoft.com/dotnet/runtime:6.0.15-bullseye-slim-amd64
 WORKDIR /app/out
 
 # Creating required directories
