@@ -86,9 +86,12 @@ namespace LCT.PackageIdentifier
             componentsForBOM = ListOfComponents.Distinct(new ComponentEqualityComparer()).ToList();
 
             BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - componentsForBOM.Count;
-            
-            componentsForBOM = CommonHelper.RemoveExcludedComponents(componentsForBOM, appSettings.Maven.ExcludedComponents, ref noOfExcludedComponents);
-            BomCreator.bomKpiData.ComponentsExcluded += noOfExcludedComponents;
+
+            if (appSettings.Maven.ExcludedComponents != null)
+            {
+                componentsForBOM = CommonHelper.RemoveExcludedComponents(componentsForBOM, appSettings.Maven.ExcludedComponents, ref noOfExcludedComponents);
+                BomCreator.bomKpiData.ComponentsExcluded += noOfExcludedComponents;
+            }
 
             bom.Components = componentsForBOM;
             bom.Dependencies = dependenciesForBOM;
