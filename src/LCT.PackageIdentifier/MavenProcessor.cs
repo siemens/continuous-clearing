@@ -37,6 +37,7 @@ namespace LCT.PackageIdentifier
             List<Component> componentsToBOM = new();
             List<Component> ListOfComponents = new();
             Bom bom = new();
+            int noOfExcludedComponents = 0;
             List<Dependency> dependenciesForBOM = new();
             List<string> configFiles;
 
@@ -85,6 +86,9 @@ namespace LCT.PackageIdentifier
             componentsForBOM = ListOfComponents.Distinct(new ComponentEqualityComparer()).ToList();
 
             BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - componentsForBOM.Count;
+            
+            componentsForBOM = CommonHelper.RemoveExcludedComponents(componentsForBOM, appSettings.Maven.ExcludedComponents, ref noOfExcludedComponents);
+            BomCreator.bomKpiData.ComponentsExcluded += noOfExcludedComponents;
 
             bom.Components = componentsForBOM;
             bom.Dependencies = dependenciesForBOM;

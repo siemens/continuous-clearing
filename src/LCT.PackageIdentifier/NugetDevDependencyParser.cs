@@ -18,6 +18,7 @@ using System.Reflection;
 using System.Security.Cryptography;
 using LCT.PackageIdentifier.Model.NugetModel;
 using System.Text.Json;
+using System.Runtime.InteropServices;
 
 namespace LCT.PackageIdentifier
 {
@@ -122,9 +123,37 @@ namespace LCT.PackageIdentifier
                 LockFile assetFile = assetFileReader.Read(filePath);
                 if (assetFile.PackageSpec != null)
                 {
-                    isTestProject = IsTestProject(assetFile.PackageSpec.RestoreMetadata.ProjectPath);
-
-                    container.Name = Path.GetFileName(assetFile.PackageSpec.RestoreMetadata.ProjectPath);
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        Logger.Debug($"ParseJsonFile():Windows Asset FileName: " + assetFile.PackageSpec.RestoreMetadata.ProjectPath);
+                        isTestProject = IsTestProject(assetFile.PackageSpec.RestoreMetadata.ProjectPath);
+                        container.Name = Path.GetFileName(assetFile.PackageSpec.RestoreMetadata.ProjectPath);
+                        Logger.Debug($"ParseJsonFile():Windows Asset File: IsTestProject: " + isTestProject);
+                    }
+                    else
+                    {
+                        string csprojFilePath = "";
+                        string dirName = Path.GetDirectoryName(filePath);
+                        if (dirName.Contains("obj"))
+                        {
+                            dirName = dirName.Replace("obj", "");
+                            string[] filePaths = Directory.GetFiles(dirName, "*.csproj");
+                            csprojFilePath = filePaths.Length > 0 ? filePaths[0] : "";
+                        }
+                        if(!string.IsNullOrEmpty(csprojFilePath) && File.Exists(csprojFilePath))
+                        {
+                            Logger.Debug($"ParseJsonFile():Linux Asset FileName: " + csprojFilePath);
+                            isTestProject = IsTestProject(csprojFilePath);
+                            container.Name = Path.GetFileName(csprojFilePath);
+                            Logger.Debug($"ParseJsonFile():Linux Asset File: IsTestProject: " + isTestProject);
+                        }
+                        else
+                        {
+                            Logger.Debug($"ParseJsonFile():Linux Asset FileName Not Found!! ");
+                            isTestProject = false;
+                            container.Name = Path.GetFileName(filePath);
+                        }
+                    }
 
                     if (isTestProject)
                     {
@@ -138,6 +167,8 @@ namespace LCT.PackageIdentifier
                             ParseLibrary(library, isTestProject, components, assetFile);
                         }
                     }
+
+                    Logger.Debug($"ParseJsonFile():Asset file found components: " + components.Count);
                 }
 
             }
