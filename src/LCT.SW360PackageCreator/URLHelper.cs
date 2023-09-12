@@ -440,6 +440,13 @@ namespace LCT.SW360PackageCreator
             return sourceDetails;
         }
 
+        /// <summary>
+        /// Gets the Source Url For Python Package
+        /// </summary>
+        /// <param name="componentName"></param>
+        /// <param name="componenVersion"></param>
+        /// <param name="isDebugMode"></param>
+        /// <returns>string</returns>
         public async Task<string> GetSourceUrlForPythonPackage(string componentName, string componenVersion)
         {
             Logger.Debug($"URLHelper.GetSourceUrlForPythonPackage():Start");
@@ -550,7 +557,6 @@ namespace LCT.SW360PackageCreator
             return fullname;
         }
 
-
         public void Dispose()
         {
             Dispose(true);
@@ -571,5 +577,6 @@ namespace LCT.SW360PackageCreator
 
             _disposed = true;
         }
+
     }
 }

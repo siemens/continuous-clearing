@@ -158,7 +158,7 @@ namespace LCT.PackageIdentifier.Model.NugetModel
 
         public override int GetHashCode()
         {
-            throw new NotImplementedException();
+            return 0;
         }
     }
 }
