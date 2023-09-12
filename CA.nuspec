@@ -82,6 +82,7 @@
     <file src="out\net6.0\Microsoft.Win32.Registry.AccessControl.dll" target="tools"/>
     <file src="out\net6.0\Microsoft.Win32.SystemEvents.dll" target="tools"/>
     <file src="out\net6.0\Namotion.Reflection.dll" target="tools"/>
+    <file src="out\net6.0\PackageUrl.dll" target="tools"/>
     <file src="out\net6.0\Newtonsoft.Json.Bson.dll" target="tools"/>
     <file src="out\net6.0\Newtonsoft.Json.dll" target="tools"/>
     <file src="out\net6.0\NJsonSchema.dll" target="tools"/>
