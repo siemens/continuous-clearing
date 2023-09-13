@@ -72,6 +72,12 @@
 		<None Update="PackageCreatorTestFiles\CCTComparisonBOMNugetTemplateInitial.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
+		<None Update="PackageCreatorTestFiles\Python\CCTComparisonBOMPythonUpdated.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="PackageIdentifierTestFiles\Python\CCTLocalBOMPythonInitial.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 
 	<ItemGroup>

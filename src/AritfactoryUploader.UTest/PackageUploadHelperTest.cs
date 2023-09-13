@@ -32,17 +32,15 @@ namespace AritfactoryUploader.UTest
             // Assert
             Assert.That(11, Is.EqualTo(componentList.Components.Count), "Checks for no of components");
         }
+
         [Test]
         public void GetComponentListFromComparisonBOM_GivenInvalidComparisonBOM_ReturnsException()
         {
             //Arrange
             string comparisonBOMPath = @"TestFiles\CCTComparisonBOM.json";
 
-
             //Act && Assert
             Assert.Throws<FileNotFoundException>(() => PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath));
-
-
         }
         [Test]
         public void GetComponentListFromComparisonBOM_GivenInvalidfile_ReturnsException()
@@ -54,8 +52,6 @@ namespace AritfactoryUploader.UTest
 
             //Act && Assert
             Assert.Throws<JsonReaderException>(() => PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath));
-
-
         }
 
 
@@ -88,7 +84,6 @@ namespace AritfactoryUploader.UTest
         {
             //Arrange
             List<Component> componentLists = GetComponentList();
-
             foreach (var component in componentLists)
             {
                 if (component.Name == "@angular/core")
@@ -109,8 +104,10 @@ namespace AritfactoryUploader.UTest
                 LogFolderPath= outFolder
             };
             string LogfolderPath = appSettings.LogFolderPath;
+
             //Act
             List<ComponentsToArtifactory> uploadList = PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(componentLists, appSettings);
+
             // Assert
             Assert.That(4, Is.EqualTo(uploadList.Count), "Checks for 3 no of components to upload");
         }
@@ -121,10 +118,7 @@ namespace AritfactoryUploader.UTest
             List<Component> componentLists = GetComponentList();
             foreach (var component in componentLists)
             {
-
                 component.Properties[1].Value = "NEW_CLEARING";
-
-
             }
 
             CommonAppSettings appSettings = new CommonAppSettings()
@@ -138,6 +132,7 @@ namespace AritfactoryUploader.UTest
         
             //Act
             List<ComponentsToArtifactory> uploadList = PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(componentLists, appSettings);
+
             // Assert
             Assert.That(0, Is.EqualTo(uploadList.Count), "Checks for components to upload to be zero");
         }
@@ -212,12 +207,7 @@ namespace AritfactoryUploader.UTest
             comp4.Properties.Add(propinternal);
             comp4.Properties.Add(prop3);
             componentLists.Add(comp4);
-
-
             return componentLists;
         }
-
-
-
     }
 }

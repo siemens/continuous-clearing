@@ -42,8 +42,6 @@ namespace SW360IntegrationTest.NPM
             string comparisonBOMPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\ArtifactoryUploaderTestData\NPMComparisonBOM.json";
             if (File.Exists(comparisonBOMPath))
             {
-
-
                 ComponentJsonParsor expected = new ComponentJsonParsor();
                 expected.Read(comparisonBOMPath);
 
@@ -52,13 +50,9 @@ namespace SW360IntegrationTest.NPM
                     Component components = item;
                     if (components.Properties[3].Name.Contains("ApprovedStatus"))
                     {
-
                         // Assert
                         Assert.AreEqual("siparty-release-npm-egll", components.Properties[1].Value);
-
-
                     }
-
                 }
             }
         }
@@ -69,20 +63,15 @@ namespace SW360IntegrationTest.NPM
         public void ComponentUpload_IsFailure()
         {
             HttpClient httpClient = new HttpClient();
-
             httpClient.DefaultRequestHeaders.Add(TestConstant.JFrog_API_Header, testParameters.ArtifactoryUploadApiKey);
             httpClient.DefaultRequestHeaders.Add(TestConstant.Email, testParameters.ArtifactoryUploadUser);
 
             // Act
             string url = $"{TestConstant.JfrogApi}/@angular/core/-/core-9.1.3.tgz";
-
             HttpResponseMessage responseBody = httpClient.GetAsync(url).Result;
-
 
             // Assert
             Assert.That(HttpStatusCode.NotFound, Is.EqualTo(responseBody.StatusCode), "Returns Failure status code");
-
-
         }
 
     }

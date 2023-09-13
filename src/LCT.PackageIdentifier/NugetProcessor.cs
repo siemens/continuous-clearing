@@ -86,7 +86,6 @@ namespace LCT.PackageIdentifier
 
                     if (IsDevDependent(referenceList, name, version) || devDependencyAttribute?.Value != null)
                     {
-
                         BomCreator.bomKpiData.DevDependentComponents++;
                         isDev = "true";
                     }
@@ -129,7 +128,6 @@ namespace LCT.PackageIdentifier
             {
                 if (item.Library == name && item.Version == version && item.Private)
                 {
-
                     return true;
                 }
             }
@@ -519,14 +517,13 @@ namespace LCT.PackageIdentifier
             }
             else if (filepath.EndsWith(".config"))
             {
-                listofComponents.AddRange(ParsePackageConfig(filepath, appSettings));
-            }
-            else
-            {
                 var list = ParsePackageConfig(filepath, appSettings);
                 listofComponents.AddRange(list);
             }
-
+            else
+            {
+                Logger.Warn("No Proper input files found for Nuget package types.");
+            }
         }
 
 
