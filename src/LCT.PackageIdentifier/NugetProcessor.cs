@@ -390,7 +390,7 @@ namespace LCT.PackageIdentifier
                     List<NugetPackage> listofComponents = new();
                     ParseInputFiles(appSettings, filepath, listofComponents);
                     ConvertToCycloneDXModel(listComponentForBOM, listofComponents, dependencies);
-                    if (bom.Dependencies == null)
+                    if (bom.Dependencies == null || bom.Dependencies.Count == 0)
                     {
                         bom.Dependencies = dependencies;
                         dependencies = new List<Dependency>();

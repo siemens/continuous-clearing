@@ -307,7 +307,7 @@ namespace LCT.PackageIdentifier
                 //Adding dependencies
                 Result result = ExecutePoetryCMD(showCMD + val.Name + " -C " + SourceFilePath);
                 Dependency dependency = GetDependenciesDetails(result, val, AllComps);
-                if (dependency.Dependencies != null)
+                if (dependency.Ref != null)
                 {
                     dependencies.Add(dependency);
                 }
@@ -349,6 +349,18 @@ namespace LCT.PackageIdentifier
                         addDependencies = false;
                 }
                 dependency = GetDependencyMappings(mainComp, dependencyList, AllComps);
+            }
+            else if(result != null && result.StdOut.Contains("name"))
+            {
+                return new Dependency()
+                {
+                    Ref = mainComp.PurlID,
+                    Dependencies = null
+                };
+            }
+            else
+            {
+                Logger.Debug("Invalid Python Component Details!!");
             }
             return dependency;
         }
