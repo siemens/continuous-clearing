@@ -1,11 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2023 Siemens AG
-//
-//  SPDX-License-Identifier: MIT
-
-// -------------------------------------------------------------------------------------------------------------------- 
-
-using CycloneDX.Models;
+﻿using CycloneDX.Models;
 using LCT.APICommunications.Model;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -15,12 +8,11 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using TestUtilities;
 
-namespace SW360IntegrationTest
+namespace SW360IntegrationTest.Conan
 {
-    [TestFixture, Order(2)]
-    class ComponentCreatorTestMode
+    public class ComponentCreatorInitialConan
     {
-        private static readonly TestParam testParameters = new TestParam();
+        private static readonly TestParamConan testParameters = new TestParamConan();
 
         [SetUp]
         public void Setup()
@@ -48,7 +40,6 @@ namespace SW360IntegrationTest
                 });
             }
         }
-
         [Test, Order(1)]
         public void TestComponentCreatorExe_TestMode()
         {
@@ -106,9 +97,6 @@ namespace SW360IntegrationTest
             Assert.IsTrue(filecheck, "CycloneDx BOM not exist");
         }
 
-
-
-
         [Test, Order(3)]
         public async Task TestComponentCreation_TestMode()
         {
@@ -130,4 +118,5 @@ namespace SW360IntegrationTest
         private string CCTComparisonBomTestFile { get; set; }
         private string OutFolder { get; set; }
     }
+
 }
