@@ -5,11 +5,16 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.APICommunications;
+using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
 using LCT.ArtifactoryUploader;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
+using LCT.Facade.Interfaces;
+using LCT.Facade;
+using LCT.Services.Interface;
+using LCT.Services;
 using log4net;
 using log4net.Core;
 using System;
@@ -65,7 +70,9 @@ namespace ArtifactoryUploader
             await artifactoryValidator.ValidateArtifactoryCredentials(appSettings);
 
             //Uploading Package to artifactory
+            PackageUploadHelper.jFrogService = GetJfrogService(appSettings);
             await PackageUploader.UploadPackageToArtifactory(appSettings);
+            
 
             Logger.Logger.Log(null, Level.Notice, $"End of Artifactory Uploader execution : {DateTime.Now}\n", null);
         }
@@ -92,6 +99,20 @@ namespace ArtifactoryUploader
             }
 
             return FolderPath;
+        }
+
+        private static IJFrogService GetJfrogService(CommonAppSettings appSettings)
+        {
+            ArtifactoryCredentials artifactoryUpload = new ArtifactoryCredentials()
+            {
+                ApiKey = appSettings.ArtifactoryUploadApiKey
+            };
+            IJfrogAqlApiCommunication jfrogAqlApiCommunication =
+                new JfrogAqlApiCommunication(appSettings.JFrogApi, artifactoryUpload, appSettings.TimeOut);
+            IJfrogAqlApiCommunicationFacade jFrogApiCommunicationFacade =
+                new JfrogAqlApiCommunicationFacade(jfrogAqlApiCommunication);
+            IJFrogService jFrogService = new JFrogService(jFrogApiCommunicationFacade);
+            return jFrogService;
         }
     }
 }

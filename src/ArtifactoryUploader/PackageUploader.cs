@@ -33,11 +33,11 @@ namespace LCT.ArtifactoryUploader
 
             uploaderKpiData.ComponentInComparisonBOM = m_ComponentsInBOM.Components.Count;
 
-            List<ComponentsToArtifactory> m_ComponentsToBeUploaded = PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(m_ComponentsInBOM.Components, appSettings);
+            List<ComponentsToArtifactory> m_ComponentsToBeUploaded = await PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(m_ComponentsInBOM.Components, appSettings);
             //Uploading the component to artifactory
 
             uploaderKpiData.PackagesToBeUploaded = m_ComponentsToBeUploaded.Count;
-            await PackageUploadHelper.UploadingThePackages(m_ComponentsToBeUploaded,appSettings.TimeOut);
+            await PackageUploadHelper.UploadingThePackages(m_ComponentsToBeUploaded, appSettings.TimeOut);
 
             // write kpi info to console table 
             PackageUploadHelper.WriteCreatorKpiDataToConsole(uploaderKpiData);

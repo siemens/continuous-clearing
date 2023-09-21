@@ -73,6 +73,7 @@ namespace LCT.Common
         public string JfrogNpmSrcRepo { get; set; }
         public string JfrogNugetDestRepoName { get; set; }
         public string JfrogMavenDestRepoName { get; set; }
+        public string JfrogPythonDestRepoName { get; set; }
         public string JfrogNugetSrcRepo { get; set; }
         public string Mode { get; set; } = string.Empty;
 

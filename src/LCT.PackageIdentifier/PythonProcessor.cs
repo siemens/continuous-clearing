@@ -5,6 +5,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using CycloneDX.Models;
+using LCT.APICommunications;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
@@ -463,7 +464,7 @@ namespace LCT.PackageIdentifier
             string fullNameVersion = $"{fullName}-{component.Version}";
             if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase)
                 && aqlResultList.Exists(
-                x => x.Name.Equals(fullNameVersion, StringComparison.OrdinalIgnoreCase) && (x.Name.EndsWith(".whl") || x.Name.EndsWith(FileConstant.TargzFileExtension))))
+                x => x.Name.Equals(fullNameVersion, StringComparison.OrdinalIgnoreCase) && (x.Name.EndsWith(ApiConstant.PythonExtension) || x.Name.EndsWith(FileConstant.TargzFileExtension))))
             {
                 return true;
             }
@@ -510,7 +511,7 @@ namespace LCT.PackageIdentifier
                 repoName.Equals(NotFoundInRepo, StringComparison.OrdinalIgnoreCase))
             {
                 repoName = aqlResultList.Find(x => x.Name.Contains(
-                    fullNameVersion, StringComparison.OrdinalIgnoreCase) && (x.Name.EndsWith(".whl") || x.Name.EndsWith(FileConstant.TargzFileExtension)))?.Repo ?? NotFoundInRepo;
+                    fullNameVersion, StringComparison.OrdinalIgnoreCase) && (x.Name.EndsWith(ApiConstant.PythonExtension) || x.Name.EndsWith(FileConstant.TargzFileExtension)))?.Repo ?? NotFoundInRepo;
             }
 
             return repoName;

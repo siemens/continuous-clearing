@@ -6,6 +6,8 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.APICommunications.Model;
+using LCT.APICommunications.Model.AQL;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -51,6 +53,21 @@ namespace LCT.APICommunications
                  $"properties=sw360url={sw360releaseUrl}";
             httpClient.PutAsync(url, httpContent);
         }
+
+        //public async Task<List<AqlResult>> GetListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService)
+        //{
+        //    List<AqlResult> aqlResultList = new();
+        //    if (repoList != null && repoList.Length > 0)
+        //    {
+        //        foreach (var repo in repoList)
+        //        {
+        //            var test = await jFrogService.GetInternalComponentDataByRepo(repo) ?? new List<AqlResult>();
+        //            aqlResultList.AddRange(test);
+        //        }
+        //    }
+
+        //    return aqlResultList;
+        //}
 
     }
 }
