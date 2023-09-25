@@ -14,6 +14,7 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
 using UnitTestUtilities;
+using System.Threading.Tasks;
 
 namespace AritfactoryUploader.UTest
 {
@@ -56,7 +57,7 @@ namespace AritfactoryUploader.UTest
 
 
         [Test]
-        public void GetComponentsToBeUploadedToArtifactory_GivenFewApprovedComponentList_ReturnsUploadList()
+        public async Task GetComponentsToBeUploadedToArtifactory_GivenFewApprovedComponentList_ReturnsUploadList()
         {
             //Arrange
             List<Component> componentLists = GetComponentList();
@@ -73,14 +74,14 @@ namespace AritfactoryUploader.UTest
             };
 
             //Act
-            List<ComponentsToArtifactory> uploadList = PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(componentLists, appSettings);
+            List<ComponentsToArtifactory> uploadList = await PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(componentLists, appSettings);
             // Assert
             Assert.That(3, Is.EqualTo(uploadList.Count), "Checks for 2  no of components to upload");
         }
 
 
         [Test]
-        public void GetComponentsToBeUploadedToArtifactory_GivenAllApprovedComponentList_ReturnsUploadList()
+        public async Task GetComponentsToBeUploadedToArtifactory_GivenAllApprovedComponentList_ReturnsUploadList()
         {
             //Arrange
             List<Component> componentLists = GetComponentList();
@@ -101,18 +102,18 @@ namespace AritfactoryUploader.UTest
                 JfrogNpmDestRepoName = "npm-test",
                 JfrogNpmSrcRepo = "remote-cache",
                 JFrogApi = UTParams.JFrogURL,
-                LogFolderPath= outFolder
+                LogFolderPath = outFolder
             };
-            string LogfolderPath = appSettings.LogFolderPath;
 
             //Act
-            List<ComponentsToArtifactory> uploadList = PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(componentLists, appSettings);
+            List<ComponentsToArtifactory> uploadList = await PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(componentLists, appSettings);
 
             // Assert
             Assert.That(4, Is.EqualTo(uploadList.Count), "Checks for 3 no of components to upload");
         }
+
         [Test]
-        public void GetComponentsToBeUploadedToArtifactory_GivenNotApprovedComponentList_ReturnsUploadList()
+        public async Task GetComponentsToBeUploadedToArtifactory_GivenNotApprovedComponentList_ReturnsUploadList()
         {
             //Arrange
             List<Component> componentLists = GetComponentList();
@@ -129,13 +130,14 @@ namespace AritfactoryUploader.UTest
                 JfrogNugetSrcRepo = "remote-cache",
                 JFrogApi = UTParams.JFrogURL
             };
-        
+
             //Act
-            List<ComponentsToArtifactory> uploadList = PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(componentLists, appSettings);
+            List<ComponentsToArtifactory> uploadList =await PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(componentLists, appSettings);
 
             // Assert
             Assert.That(0, Is.EqualTo(uploadList.Count), "Checks for components to upload to be zero");
         }
+
         private static List<Component> GetComponentList()
         {
             List<Component> componentLists = new List<Component>();

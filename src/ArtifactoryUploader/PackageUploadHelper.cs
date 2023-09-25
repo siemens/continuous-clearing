@@ -80,7 +80,7 @@ namespace LCT.ArtifactoryUploader
                         PackageName = item.Name,
                         Version = item.Version,
                         ComponentType = GetComponentType(item),
-                        SrcRepoName = item.Properties.Find(s => s.Name == Dataconstant.Cdx_ArtifactoryRepoUrl).Value,
+                        SrcRepoName = item.Properties.Find(s => s.Name == Dataconstant.Cdx_ArtifactoryRepoUrl)?.Value,
                         DestRepoName = GetDestinationRepo(item, appSettings),
                         ApiKey = appSettings.ArtifactoryUploadApiKey,
                         Email = appSettings.ArtifactoryUploadUser,
