@@ -48,7 +48,8 @@ jobs:
         echo "SemVerMMP: v$($env:GitVersion_MajorMinorPatch)"
         Write-Host "Filename: '$fileName'" 
         
-        
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.3.1
   
       
     - name: update appSettingsSW360IntegrationTest.json
