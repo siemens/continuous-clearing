@@ -28,7 +28,7 @@ namespace PackageIdentifier.UTest
         public void ParseLockFile_GivenAInputFilePath_ReturnsSuccess()
         {
             //Arrange
-            int expectednoofcomponents = 17;
+            int expectedNoOfcomponents = 17;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
             string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles";
@@ -49,7 +49,7 @@ namespace PackageIdentifier.UTest
             Bom listofcomponents = new ConanProcessor().ParsePackageFile(appSettings);
 
             //Assert
-            Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
+            Assert.That(expectedNoOfcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
 
         }
 
@@ -76,8 +76,8 @@ namespace PackageIdentifier.UTest
 
             //Act
             Bom listofcomponents = new ConanProcessor().ParsePackageFile(appSettings);
-
-            var IsDevDependency = listofcomponents.Components.Find(a => a.Name == "googletest").Properties[0].Value;
+            var IsDevDependency = listofcomponents.Components.Find(a => a.Name == "googletest")
+                .Properties.First(x => x.Name == "internal:siemens:clearing:development").Value;
 
             //Assert
             Assert.That(IsDev, Is.EqualTo(IsDevDependency), "Checks if Dev Dependency Component or not");
