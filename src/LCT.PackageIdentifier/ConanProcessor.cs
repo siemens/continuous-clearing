@@ -150,6 +150,18 @@ namespace LCT.PackageIdentifier
             return modifiedBOM;
         }
 
+        public static bool IsDevDependency(ConanPackage component, ConanPackage rootNode, ref int noOfDevDependent)
+        {
+            var isDev = false;
+            if (rootNode.DevDependencies != null && rootNode.DevDependencies.Contains(component.Id))
+            {
+                isDev = true;
+                noOfDevDependent++;
+            }
+
+            return isDev;
+        }
+
         #endregion
 
         #region private methods
@@ -265,18 +277,6 @@ namespace LCT.PackageIdentifier
                 components.Properties.Add(isdev);
                 lstComponentForBOM.Add(components);
             }
-        }
-
-        private static bool IsDevDependency(ConanPackage component, ConanPackage rootNode, ref int noOfDevDependent)
-        {
-            var isDev = false;
-            if (rootNode.DevDependencies != null && rootNode.DevDependencies.Contains(component.Id))
-            {
-                isDev = true;
-                noOfDevDependent++;
-            }
-
-            return isDev;
         }
 
         private static bool IsInternalConanComponent(List<AqlResult> aqlResultList, Component component)
