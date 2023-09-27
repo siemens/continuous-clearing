@@ -460,7 +460,7 @@ namespace LCT.SW360PackageCreator
         private async Task<string> GetResponseFromPyPiOrg(string componentName, string componenVersion)
         {
             string URL;
-            string result = "";
+            const string result = "";
             try
             {
                 URL = $"{CommonAppSettings.PyPiURL}{componentName}" +
@@ -480,7 +480,7 @@ namespace LCT.SW360PackageCreator
             return result;
         }
 
-        private string GetSourceURLFromPyPiResponse(string response)
+        private static string GetSourceURLFromPyPiResponse(string response)
         {
             string SourceURL = "";
 

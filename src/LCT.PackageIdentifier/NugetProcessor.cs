@@ -633,7 +633,7 @@ namespace LCT.PackageIdentifier
         private static List<NugetPackage> ParseAssetFile(string configFile)
         {
             NugetDevDependencyParser nugetDevDependencyParser = NugetDevDependencyParser.Instance;
-            List<Container> containers = nugetDevDependencyParser.Parse(configFile);
+            List<Container> containers = NugetDevDependencyParser.Parse(configFile);
             return ConvertContainerAsNugetPackage(containers, configFile);
         }
 
