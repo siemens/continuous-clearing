@@ -53,13 +53,13 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
 # Continuous Clearing Tool workflow diagram
 
 - Package Identifier
-   - [NPM/NUGET/MAVEN](../usagedocimg/packageIdentifiernpmnuget.PNG)
+   - [NPM/NUGET/MAVEN/PYTHON](../usagedocimg/packageIdentifiernpmnuget.PNG)
    - [Debian](../usagedocimg/packageIdentifierdebian.PNG)
 - SW360 Package Creator
-  - [NPM/NUGET/MAVEN](../usagedocimg/packageCreatirnpmnuget.PNG)
+  - [NPM/NUGET/MAVEN/PYTHON](../usagedocimg/packageCreatirnpmnuget.PNG)
   - [Debian](../usagedocimg/packagecreatordebian.PNG)
 - Artifactory Uploader
-  - [NPM/NUGET/MAVEN](../usagedocimg/artifactoryuploader.PNG)
+  - [NPM/NUGET/MAVEN/PYTHON](../usagedocimg/artifactoryuploader.PNG)
  
 # Prerequisite
 
