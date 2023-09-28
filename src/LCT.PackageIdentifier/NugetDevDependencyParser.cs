@@ -44,7 +44,7 @@ namespace LCT.PackageIdentifier
             }
         }
 
-        public static List<Container> Parse(string configFile)
+        public List<Container> Parse(string configFile)
         {
             List<Container> containerList = new();
 
