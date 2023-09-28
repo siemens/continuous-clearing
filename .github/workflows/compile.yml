@@ -3,8 +3,7 @@ name: Build & Test
 on: 
  push:
  pull_request:
- schedule:
-   - cron: "30 0 * * 5"
+
 
 jobs:
 
@@ -49,9 +48,9 @@ jobs:
         echo "SemVerMMP: v$($env:GitVersion_MajorMinorPatch)"
         Write-Host "Filename: '$fileName'" 
         
-        
     - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v1.0.2
+      uses: microsoft/setup-msbuild@v1.3.1
+  
       
     - name: update appSettingsSW360IntegrationTest.json
       run: ./Scripts/json_update.ps1 -JsonFile 'src\TestUtilities\appSettingsSW360IntegrationTest.json' 

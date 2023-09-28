@@ -6,6 +6,8 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.APICommunications.Model;
+using LCT.APICommunications.Model.AQL;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -51,7 +53,6 @@ namespace LCT.APICommunications
                  $"properties=sw360url={sw360releaseUrl}";
             httpClient.PutAsync(url, httpContent);
         }
-
     }
 }
 

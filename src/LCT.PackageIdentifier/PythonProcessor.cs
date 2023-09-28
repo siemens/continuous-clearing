@@ -5,6 +5,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using CycloneDX.Models;
+using LCT.APICommunications;
+using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
@@ -87,7 +89,7 @@ namespace LCT.PackageIdentifier
             PythonPackages = PoetrySetOfCmds(filePath, dependencies);
             return PythonPackages;
         }
-        
+
         private List<PythonPackage> ExtractDetailsFromJson(string filePath, CommonAppSettings appSettings, ref List<Dependency> dependencies)
         {
             List<PythonPackage> PythonPackages = new List<PythonPackage>();
@@ -139,7 +141,7 @@ namespace LCT.PackageIdentifier
             version = WebUtility.UrlEncode(version);
             version = version.Replace("%3A", ":");
 
-            return $"{Dataconstant.PurlCheck()["PYTHON"]}{Dataconstant.ForwardSlash}{name}@{version}?arch=source";
+            return $"{Dataconstant.PurlCheck()["PYTHON"]}{Dataconstant.ForwardSlash}{name}@{version}";
         }
 
         private static List<Component> FormComponentReleaseExternalID(List<PythonPackage> listOfComponents)
@@ -307,7 +309,7 @@ namespace LCT.PackageIdentifier
                 //Adding dependencies
                 Result result = ExecutePoetryCMD(showCMD + val.Name + " -C " + SourceFilePath);
                 Dependency dependency = GetDependenciesDetails(result, val, AllComps);
-                if (dependency.Dependencies != null)
+                if (dependency.Ref != null)
                 {
                     dependencies.Add(dependency);
                 }
@@ -327,30 +329,47 @@ namespace LCT.PackageIdentifier
             {
                 var details = result.StdOut;
                 List<string> lines = details.Split(Environment.NewLine).ToList();
-                bool addDependencies = false;
-                List<string> dependencyList = new List<string>();
-
-                foreach (string line in lines)
-                {
-                    if (line == "dependencies")
-                    {
-                        addDependencies = true;
-                        continue;
-                    }
-
-                    if (addDependencies && !string.IsNullOrEmpty(line))
-                    {
-                        string comp = line;
-                        comp = comp.Replace(" - ", "");
-                        dependencyList.Add(comp.Split(" ")[0]);
-                    }
-
-                    if (string.IsNullOrEmpty(line))
-                        addDependencies = false;
-                }
+                List<string> dependencyList = GetDetailsFromLines(lines);
                 dependency = GetDependencyMappings(mainComp, dependencyList, AllComps);
             }
+            else if (result != null && result.StdOut.Contains("name"))
+            {
+                return new Dependency()
+                {
+                    Ref = mainComp.PurlID,
+                    Dependencies = null
+                };
+            }
+            else
+            {
+                Logger.Debug("Invalid Python Component Details!!");
+            }
             return dependency;
+        }
+
+        private static List<string> GetDetailsFromLines(List<string> lines)
+        {
+            bool addDependencies = false;
+            List<string> dependencyList = new List<string>();
+            foreach (string line in lines)
+            {
+                if (line == "dependencies")
+                {
+                    addDependencies = true;
+                    continue;
+                }
+
+                if (addDependencies && !string.IsNullOrEmpty(line))
+                {
+                    string comp = line;
+                    comp = comp.Replace(" - ", "");
+                    dependencyList.Add(comp.Split(" ")[0]);
+                }
+
+                if (string.IsNullOrEmpty(line))
+                    addDependencies = false;
+            }
+            return dependencyList;
         }
 
         private static Dependency GetDependencyMappings(PythonPackage mainComp, List<string> dependencyList, List<PythonPackage> AllComps)
@@ -441,7 +460,7 @@ namespace LCT.PackageIdentifier
 
         private static bool IsInternalPythonComponent(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
         {
-            string jfrogcomponentName = $"{component.Name}-{component.Version}.tar.gz";
+            string jfrogcomponentName = $"{component.Name}-{component.Version}{FileConstant.TargzFileExtension}";
             if (aqlResultList.Exists(x => x.Name.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase)))
             {
                 return true;
@@ -451,7 +470,7 @@ namespace LCT.PackageIdentifier
             string fullNameVersion = $"{fullName}-{component.Version}";
             if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase)
                 && aqlResultList.Exists(
-                x => x.Name.Equals(fullNameVersion, StringComparison.OrdinalIgnoreCase) && (x.Name.EndsWith(".whl") || x.Name.EndsWith(".tar.gz"))))
+                x => x.Name.Equals(fullNameVersion, StringComparison.OrdinalIgnoreCase) && (x.Name.EndsWith(ApiConstant.PythonExtension) || x.Name.EndsWith(FileConstant.TargzFileExtension))))
             {
                 return true;
             }
@@ -486,7 +505,7 @@ namespace LCT.PackageIdentifier
 
         private static string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
         {
-            string jfrogcomponentName = $"{component.Name}-{component.Version}.tar.gz";
+            string jfrogcomponentName = $"{component.Name}-{component.Version}{FileConstant.TargzFileExtension}";
 
             string repoName = aqlResultList.Find(x => x.Name.Equals(
                 jfrogcomponentName, StringComparison.OrdinalIgnoreCase))?.Repo ?? NotFoundInRepo;
@@ -498,7 +517,7 @@ namespace LCT.PackageIdentifier
                 repoName.Equals(NotFoundInRepo, StringComparison.OrdinalIgnoreCase))
             {
                 repoName = aqlResultList.Find(x => x.Name.Contains(
-                    fullNameVersion, StringComparison.OrdinalIgnoreCase) && (x.Name.EndsWith(".whl") || x.Name.EndsWith(".tar.gz")))?.Repo ?? NotFoundInRepo;
+                    fullNameVersion, StringComparison.OrdinalIgnoreCase) && (x.Name.EndsWith(ApiConstant.PythonExtension) || x.Name.EndsWith(FileConstant.TargzFileExtension)))?.Repo ?? NotFoundInRepo;
             }
 
             return repoName;

@@ -86,6 +86,7 @@ namespace LCT.PackageIdentifier
             componentsForBOM = ListOfComponents.Distinct(new ComponentEqualityComparer()).ToList();
 
             BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - componentsForBOM.Count;
+            
 
             if (appSettings.Maven.ExcludedComponents != null)
             {

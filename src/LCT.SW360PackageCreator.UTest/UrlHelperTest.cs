@@ -104,5 +104,31 @@ namespace LCT.SW360PackageCreator.UTest
             Assert.That(sourceUrlDetails, Is.EqualTo("pkg:deb/debian/gnutls28@3.6.7-4%2Bdeb10u7?arch=source"));
 
         }
+
+        [TestCase("cachecontrol", "0.12.11")]
+        public async Task GetSourceUrlForPythonPackage_ProvidedPackageDetails_ReturnsValidSourceURL(string componentName, string version)
+        {
+            // Arrange
+            IUrlHelper urlHelper = new UrlHelper();
+
+            // Act
+            string sourceUrl = await urlHelper.GetSourceUrlForPythonPackage(componentName, version);
+
+            // Assert
+            Assert.That(sourceUrl, Is.EqualTo("https://files.pythonhosted.org/packages/46/9b/34215200b0c2b2229d7be45c1436ca0e8cad3b10de42cfea96983bd70248/CacheControl-0.12.11.tar.gz"));
+        }
+
+        [TestCase("cachecontrol22", "0.12.111")]
+        public async Task GetSourceUrlForPythonPackage_ProvidedInvalidPackageDetails_ReturnsEmptyString(string componentName, string version)
+        {
+            // Arrange
+            IUrlHelper urlHelper = new UrlHelper();
+
+            // Act
+            string sourceUrl = await urlHelper.GetSourceUrlForPythonPackage(componentName, version);
+
+            // Assert
+            Assert.That(string.IsNullOrEmpty(sourceUrl));
+        }
     }
 }
