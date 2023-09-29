@@ -6,7 +6,6 @@
 
 using CycloneDX.Models;
 using LCT.APICommunications;
-using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
@@ -17,13 +16,14 @@ using log4net;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+using Tommy;
 using Component = CycloneDX.Models.Component;
 
 namespace LCT.PackageIdentifier
@@ -86,8 +86,78 @@ namespace LCT.PackageIdentifier
         public static List<PythonPackage> ExtractDetailsForPoetryLockfile(string filePath, List<Dependency> dependencies)
         {
             List<PythonPackage> PythonPackages;
-            PythonPackages = PoetrySetOfCmds(filePath, dependencies);
+            PythonPackages = GetPackagesFromTOMLFile(filePath, dependencies);
             return PythonPackages;
+        }
+
+        private static List<PythonPackage> GetPackagesFromTOMLFile(string filePath, List<Dependency> dependencies)
+        {
+            List<PythonPackage> PythonPackages = new();
+            List<KeyValuePair<string, TomlNode>> keyValuePair = new();
+            FileParser fileParser = new();
+            TomlTable tomlTable = fileParser.ParseTomlFile(filePath);
+
+            foreach (TomlNode node in tomlTable["package"])
+            {
+                PythonPackage pythonPackage = new()
+                {
+                    Name = node["name"].ToString(),
+                    Version = node["version"].ToString(),
+                    PurlID = Dataconstant.PurlCheck()["PYTHON"] + "/" + node["name"].ToString() + "@" + node["version"].ToString(),
+                    Isdevdependent = node["category"].ToString() != "main",
+                    FoundType = Dataconstant.Discovered
+                };
+
+                if (pythonPackage.Isdevdependent)
+                    BomCreator.bomKpiData.DevDependentComponents++;
+
+                BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;
+                PythonPackages.Add(pythonPackage);
+                keyValuePair.Add(new KeyValuePair<string, TomlNode>(pythonPackage.PurlID, node));
+            }
+
+            GetRefDetailsFromDependencyText(keyValuePair, dependencies, PythonPackages);
+
+            return PythonPackages;
+        }
+
+        private static void GetRefDetailsFromDependencyText(List<KeyValuePair<string, TomlNode>> keyValues, List<Dependency> dependencies, List<PythonPackage> PythonPackages)
+        {
+            foreach (var node in keyValues)
+            {
+                var dep = node.Value["dependencies"];
+                List<Dependency> subDependencies = new();
+                if (dep != null && dep.ChildrenCount > 0)
+                {
+                    foreach (var dependency in dep.AsTable.RawTable)
+                    {
+                        subDependencies.Add(new Dependency()
+                        {
+                            Ref = FormRefFromNodeDetails(dependency, PythonPackages)
+                        });
+                    }
+                }
+
+                dependencies.Add(new Dependency()
+                {
+                    Ref = node.Key,
+                    Dependencies = subDependencies.Count == 0 ? null : subDependencies
+                });
+            }
+        }
+
+        private static string FormRefFromNodeDetails(KeyValuePair<string, TomlNode> valuePair, List<PythonPackage> PythonPackages)
+        {
+            var value = PythonPackages.Find(val => val.Name == valuePair.Key)?.Version;
+
+            if (string.IsNullOrEmpty(value))
+            {
+                return Dataconstant.PurlCheck()["PYTHON"] + "/" + valuePair.Key + "@" + "*";
+            }
+            else
+            {
+                return Dataconstant.PurlCheck()["PYTHON"] + "/" + valuePair.Key + "@" + value;
+            }
         }
 
         private List<PythonPackage> ExtractDetailsFromJson(string filePath, CommonAppSettings appSettings, ref List<Dependency> dependencies)
@@ -210,210 +280,6 @@ namespace LCT.PackageIdentifier
             }
             cycloneDXBOM.Components = componentForBOM;
             return cycloneDXBOM;
-        }
-
-        private static Result ExecutePoetryCMD(string CommandForPoetry)
-        {
-            Result result;
-            const int timeoutInMs = 200 * 60 * 1000;
-            using (Process p = new Process())
-            {
-                p.StartInfo.RedirectStandardError = true;
-                p.StartInfo.RedirectStandardOutput = true;
-                p.StartInfo.RedirectStandardInput = true;
-                p.StartInfo.UseShellExecute = false;
-                p.StartInfo.CreateNoWindow = true;
-
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                {
-                    p.StartInfo.FileName = Path.Combine(@"/bin/bash");
-                    p.StartInfo.Arguments = "-c \" " + CommandForPoetry + " \"";
-                    Logger.Debug($"ExecutePoetryCMD():Linux OS Found!!");
-                }
-                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    p.StartInfo.FileName = Path.Combine(@"cmd.exe");
-                    p.StartInfo.Arguments = "/c " + CommandForPoetry;
-                    Logger.Debug($"ExecutePoetryCMD():Windows OS Found!!");
-                }
-                else
-                {
-                    Logger.Debug($"ExecutePoetryCMD():OS Details not Found!!");
-                }
-
-                // Run as administrator
-                p.StartInfo.Verb = "runas";
-
-                var processResult = ProcessAsyncHelper.RunAsync(p.StartInfo, timeoutInMs);
-                result = processResult?.Result;
-            }
-            if (result != null && result.ExitCode == 0)
-            {
-                Logger.Debug($"ExecutePoetryCMD():Poetry CMD execution Success : " + result?.StdOut);
-            }
-            else
-            {
-                Logger.Debug($"ExecutePoetryCMD():Poetry CMD execution failed : " + result?.StdErr);
-            }
-
-            return result;
-        }
-
-        private static List<PythonPackage> GetPackagesFromPoetryOutput(Result result)
-        {
-            List<PythonPackage> packages = new List<PythonPackage>();
-            var strings = result.StdOut.Split(Environment.NewLine).ToList();
-
-            foreach (var package in strings)
-            {
-                //Needs to extract Name & Version details from EX: "attrs (!) 22.2.0 Classes Without Boilerplate"
-                var lst = package.Split(" ");
-                lst = lst.Where(x => !string.IsNullOrEmpty(x)).Where(y => !y.Contains("(!)")).ToArray();
-
-                if (lst.Length > 1)
-                {
-                    packages.Add(new PythonPackage()
-                    {
-                        Name = lst[0],
-                        Version = lst[1],
-                        PurlID = "pkg:pypi/" + lst[0] + "@" + lst[1] + "?arch=source"
-                    });
-                }
-            }
-            return packages;
-        }
-
-        private static List<PythonPackage> PoetrySetOfCmds(string SourceFilePath, List<Dependency> dependencies)
-        {
-
-            List<PythonPackage> lst = new List<PythonPackage>();
-            string CommandForALlComp = "poetry show -C " + SourceFilePath;
-            string CommandForMainComp = "poetry show --only main -C " + SourceFilePath;
-            const string showCMD = "poetry show ";
-            List<PythonPackage> AllComps = GetPackagesFromPoetryOutput(ExecutePoetryCMD(CommandForALlComp));
-            List<PythonPackage> MainComps = GetPackagesFromPoetryOutput(ExecutePoetryCMD(CommandForMainComp));
-
-            foreach (var val in AllComps)
-            {
-                BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;
-                if (MainComps.Exists(a => a.Name == val.Name && a.Version == val.Version))
-                {
-                    val.Isdevdependent = false;
-                }
-                else
-                {
-                    val.Isdevdependent = true;
-                    BomCreator.bomKpiData.DevDependentComponents++;
-                }
-
-                //Adding dependencies
-                Result result = ExecutePoetryCMD(showCMD + val.Name + " -C " + SourceFilePath);
-                Dependency dependency = GetDependenciesDetails(result, val, AllComps);
-                if (dependency.Ref != null)
-                {
-                    dependencies.Add(dependency);
-                }
-
-                val.FoundType = Dataconstant.Discovered;
-                lst.Add(val);
-            }
-
-            return lst;
-        }
-
-        private static Dependency GetDependenciesDetails(Result result, PythonPackage mainComp, List<PythonPackage> AllComps)
-        {
-            Dependency dependency = new Dependency();
-
-            if (result != null && result.StdOut.Contains("dependencies"))
-            {
-                var details = result.StdOut;
-                List<string> lines = details.Split(Environment.NewLine).ToList();
-                List<string> dependencyList = GetDetailsFromLines(lines);
-                dependency = GetDependencyMappings(mainComp, dependencyList, AllComps);
-            }
-            else if (result != null && result.StdOut.Contains("name"))
-            {
-                return new Dependency()
-                {
-                    Ref = mainComp.PurlID,
-                    Dependencies = null
-                };
-            }
-            else
-            {
-                Logger.Debug("Invalid Python Component Details!!");
-            }
-            return dependency;
-        }
-
-        private static List<string> GetDetailsFromLines(List<string> lines)
-        {
-            bool addDependencies = false;
-            List<string> dependencyList = new List<string>();
-            foreach (string line in lines)
-            {
-                if (line == "dependencies")
-                {
-                    addDependencies = true;
-                    continue;
-                }
-
-                if (addDependencies && !string.IsNullOrEmpty(line))
-                {
-                    string comp = line;
-                    comp = comp.Replace(" - ", "");
-                    dependencyList.Add(comp.Split(" ")[0]);
-                }
-
-                if (string.IsNullOrEmpty(line))
-                    addDependencies = false;
-            }
-            return dependencyList;
-        }
-
-        private static Dependency GetDependencyMappings(PythonPackage mainComp, List<string> dependencyList, List<PythonPackage> AllComps)
-        {
-            List<Dependency> subDependencies = new();
-            foreach (var item in dependencyList)
-            {
-                try
-                {
-                    var purl = AllComps.Find(comp => comp.Name == item)?.PurlID;
-                    if (!string.IsNullOrEmpty(purl))
-                    {
-                        Dependency dependentList = new Dependency()
-                        {
-                            Ref = purl
-                        };
-                        subDependencies.Add(dependentList);
-                    }
-                    else
-                    {
-                        //Adding just NAME as subdependencies insted fo PURLID
-                        Dependency dependentList = new Dependency()
-                        {
-                            Ref = item + " *"
-                        };
-                        subDependencies.Add(dependentList);
-                    }
-                }
-                catch (ArgumentNullException ex)
-                {
-                    Logger.Error($"GetDependencyMappings(): " + mainComp.Name, ex);
-                }
-                catch (InvalidOperationException ex)
-                {
-                    Logger.Error($"GetDependencyMappings(): " + mainComp.Name, ex);
-                }
-            }
-            var dependency = new Dependency()
-            {
-                Ref = mainComp.PurlID,
-                Dependencies = subDependencies
-            };
-
-            return dependency;
         }
 
         public async Task<ComponentIdentification> IdentificationOfInternalComponents(ComponentIdentification componentData, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
