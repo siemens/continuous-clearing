@@ -55,6 +55,10 @@
           "Value": "Testing Properties"
         },
         {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
+        {
           "Name": "internal:siemens:clearing:identifier-type",
           "Value": "TemplateUpdated"
         },

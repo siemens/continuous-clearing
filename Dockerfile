@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 # Get parent image as latest debian patch of bullseye
-FROM mcr.microsoft.com/dotnet/runtime:6.0.15-bullseye-slim-amd64
+FROM mcr.microsoft.com/dotnet/sdk:6.0-bullseye-slim-amd64
 WORKDIR /app/out
 
 # Creating required directories
@@ -18,10 +18,8 @@ RUN apt-get update && \
     apt-get -y install --no-install-recommends git && \
     apt-get -y install --no-install-recommends maven && \
     apt-get -y install --no-install-recommends curl && \
-    apt-get -y install --no-install-recommends dpkg-dev && \
-    apt-get -y install --no-install-recommends python3-distutils && \    
+    apt-get -y install --no-install-recommends dpkg-dev && \   
     curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /opt/DebianImageClearing && \
-    curl -sSL https://install.python-poetry.org | python3 - && \
     rm -rf /var/lib/apt/lists/* && \
     rm -rf archive.tar.gz
 

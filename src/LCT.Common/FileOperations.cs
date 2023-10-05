@@ -99,7 +99,18 @@ namespace LCT.Common
                     list.AddRange(comparisonData.Components);
                     list.AddRange(components.Components);
                     comparisonData.Components = list;
+
                     comparisonData.Components = comparisonData.Components?.GroupBy(x => new { x.Name, x.Version }).Select(y => y.First()).ToList();
+
+                    if (comparisonData.Dependencies.Count > 0)
+                    {
+                        comparisonData.Dependencies.AddRange(components.Dependencies);
+                    }
+                    else
+                    {
+                        comparisonData.Dependencies = components.Dependencies;
+                    }
+                    comparisonData.Dependencies = comparisonData.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
                 }
                 else
                 {
@@ -120,14 +131,14 @@ namespace LCT.Common
             }
             return comparisonData;
         }
-        public string WriteContentToCycloneDXFile<T>(T dataToWrite,string filePath, string fileNameWithExtension)
+        public string WriteContentToCycloneDXFile<T>(T dataToWrite, string filePath, string fileNameWithExtension)
         {
             try
             {
                 Logger.Debug($"WriteContentToCycloneDXFile():folderpath-{filePath}");
                 string jsonString = JsonConvert.SerializeObject(dataToWrite, Formatting.Indented);
                 string filename = Path.GetFileName(fileNameWithExtension);
-                filePath =$"{filePath}\\{filename}";
+                filePath = $"{filePath}\\{filename}";
                 File.Copy(fileNameWithExtension, filePath);
                 File.WriteAllText(filePath, jsonString);
 

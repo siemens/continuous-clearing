@@ -37,7 +37,7 @@ namespace SW360IntegrationTest
         public void RunBOMCreatorexe_ProvidedPackageJsonFilePath_ReturnsSuccess()
         {
             string packagejsonPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest1stIterationData\Nuget-Assets";
-            string sbomTemplatePath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest1stIterationData\Template-Nuget\Template_Nuget.cdx.json";
+            string sbomTemplatePath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest1stIterationData\Template-Nuget\Nuget_CATemplate.cdx.json";
             string bomPath = OutFolder + @"\..\BOMs";
 
             // Test BOM Creator ran with exit code 0
