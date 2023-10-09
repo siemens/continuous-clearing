@@ -126,6 +126,9 @@ namespace LCT.PackageIdentifier
                 case "PYTHON":
                     parser = new PythonProcessor();
                     return await ComponentIdentification(appSettings, parser);
+                case "ALPINE":
+                    parser = new AlpineProcessor();
+                    return await ComponentIdentification(appSettings, parser);
                 default:
                     Logger.Error($"GenerateBom():Invalid ProjectType - {appSettings.ProjectType}");
                     break;
