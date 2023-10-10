@@ -46,7 +46,7 @@
 <!--te-->
 # Introduction
 
-The Continuous Clearing Tool helps the Project Manager/Developer to automate the sw360 clearing process of 3rd party components. This tool scans and identifies the third-party components used in a NPM, NUGET, MAVEN and Debian  projects and makes an entry in SW360, if it is not present. Continuous Clearing Tool links the components to the respective project and creates job for code scan in FOSSology.The output is an SBOM file which has a nested description of software artifact components and metadata.
+The Continuous Clearing Tool helps the Project Manager/Developer to automate the sw360 clearing process of 3rd party components. This tool scans and identifies the third-party components used in a NPM, NUGET, MAVEN,PYTHON and Debian  projects and makes an entry in SW360, if it is not present. Continuous Clearing Tool links the components to the respective project and creates job for code scan in FOSSology.The output is an SBOM file which has a nested description of software artifact components and metadata.
 
 Continuous Clearing Tool reduces the effort in creating components in SW360 and identifying the matching source codes from the public repository. Tool eliminates the manual error while creating component and identifying correct version of source code from public repository. Continuous Clearing Tool harmonize the creation of 3P components in SW360 by filling necessary information.
 
@@ -161,9 +161,7 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
        - **Project Type :** **Python** 
 
           * Input file repository should contain **poetry.lock** file. 
-		  
-		  `Note : Python package support in clearing tool is currently only for SBOM discovery and classification.Component Creation and Source code identification is not supported currently`
-    
+		 
      - **Project Type :**  **Debian** 
        
    	      **Note** : below steps is required only if you have `tar` file to process , otherwise you can keep `CycloneDx.json` file in the InputDirectory.
@@ -208,6 +206,7 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
   "JfrogNugetDestRepoName": "JfrogNugetDestRepo Name",
   "JfrogNpmDestRepoName": "JfrogNpmDestRepo Name",
   "JfrogMavenDestRepoName": "JfrogMavenDestRepo Name",
+  "JfrogPythonDestRepoName": "JfrogPythonDestRepo Name",
   "PackageFilePath": "/mnt/Input",
   "BomFolderPath": "/mnt/Output",
   "BomFilePath":"/mnt/Output/<SW360 Project Name>_Bom.cdx.json",
@@ -222,9 +221,11 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
   "InternalRepoList": [
     "<Npm Internal Repo Names>", //This should be the internal repo names in JFrog for NPM
     "<Nuget Internal Repo Names>",//This should be the internal repo names in JFrog for Nuget
+    "<Maven Internal Repo Names>",//This should be the internal repo names in JFrog for Maven
+    "<Python Internal Repo Names>",//This should be the internal repo names in JFrog for Python
   ],
   "Npm": {
-    "Include": [ "p*-lock.json" ],
+    "Include": [ "p*-lock.json" ,"*.cdx.json"],
     "Exclude": [ "node_modules" ],
     "JfrogNpmRepoList": [
       "<Npm Remote Cache Repo Name>",//This is a mirror repo for npm registry in JFrog
@@ -233,7 +234,7 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
     "ExcludedComponents": []
   },
   "Nuget": {
-    "Include": [ "pack*.config", "p*.lock.json" ],
+    "Include": [ "pack*.config", "p*.assets.json", "*.cdx.json" ],
     "Exclude": [],
     "JfrogNugetRepoList": [
       "<Nuget Remote Cache Repo Name>",//This is a mirror repo for nuget.org in JFrog
@@ -242,7 +243,7 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
     "ExcludedComponents": []
   },
   "Maven": {
-    "Include": [ "pom.xml" ],
+    "Include": [ "*.cdx.json" ],
     "Exclude": [],
     "JfrogMavenRepoList": [
       "<Maven Remote Cache Repo Name>",//This is a mirror repo for repo.maven in JFrog
@@ -258,6 +259,10 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
   "Python": {
     "Include": [ "poetry.lock", "*.cdx.json" ],
     "Exclude": [],
+    "JfrogPythonRepoList": [
+      <Python Remote Cache Repo Name>, //This is a mirror repo for pypi in JFrog
+      "<Python Release Repo Name>" //This should be the release pypi in JFrog
+    ],
     "ExcludedComponents": []
   }
 }
@@ -286,7 +291,8 @@ Description for the settings in `appSettings.json` file
 | 17  | --jfrognpmdestreponame         | The destination folder name for the NPM package to be copied to                  | Yes                                                    |
 | 18    | --jfrognugetdestreponame         | The destination folder name for the Nuget package to be copied to                  | Yes                                                    |
 | 19    | --jfrogmavendestreponame         | The destination folder name for the Maven package to be copied to                  | Yes                                                    |                                            |
-| 20   | --timeout          | SW360 response timeout value                  | No                                                       |                                                |
+| 20    | --jfrogpythondestreponame         | The destination folder name for the Python package to be copied to                  | Yes                                                    |                                            |
+| 21   | --timeout          | SW360 response timeout value                  | No                                                       |                                                |
 
 
  #### **Method 2**
