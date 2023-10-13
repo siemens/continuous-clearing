@@ -46,7 +46,7 @@
 <!--te-->
 # Introduction
 
-The Continuous Clearing Tool helps the Project Manager/Developer to automate the sw360 clearing process of 3rd party components. This tool scans and identifies the third-party components used in a NPM, NUGET, MAVEN and Debian  projects and makes an entry in SW360, if it is not present. Continuous Clearing Tool links the components to the respective project and creates job for code scan in FOSSology.The output is an SBOM file which has a nested description of software artifact components and metadata.
+The Continuous Clearing Tool helps the Project Manager/Developer to automate the sw360 clearing process of 3rd party components. This tool scans and identifies the third-party components used in a NPM, NUGET, MAVEN, Debian and Alpine  projects and makes an entry in SW360, if it is not present. Continuous Clearing Tool links the components to the respective project and creates job for code scan in FOSSology.The output is an SBOM file which has a nested description of software artifact components and metadata.
 
 Continuous Clearing Tool reduces the effort in creating components in SW360 and identifying the matching source codes from the public repository. Tool eliminates the manual error while creating component and identifying correct version of source code from public repository. Continuous Clearing Tool harmonize the creation of 3P components in SW360 by filling necessary information.
 
@@ -54,7 +54,7 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
 
 - Package Identifier
    - [NPM/NUGET/MAVEN/PYTHON](../usagedocimg/packageIdentifiernpmnuget.PNG)
-   - [Debian](../usagedocimg/packageIdentifierdebian.PNG)
+   - [Debian/Alpine](../usagedocimg/packageIdentifierdebianalpine.PNG)
 - SW360 Package Creator
   - [NPM/NUGET/MAVEN/PYTHON](../usagedocimg/packageCreatirnpmnuget.PNG)
   - [Debian](../usagedocimg/packagecreatordebian.PNG)
@@ -180,7 +180,21 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
            
              Resulted `output.json` file will be having the list of installed packages  and the same file will be used as  an input to `Continuous clearing tool - Bom creator` as an argument(`--packagefilepath`). The remaining process is same as other project types.
 
+ - **Project Type :**  **Alpine** 
+       
+   	**Note** : below steps is required only if you have `tar` file to process , otherwise you can keep `CycloneDx.json` file in the InputDirectory.
+    *  Create `InputImage` directory for keeping `tar` images and `InputDirectory` for resulted file storing .
 
+    *  Run the command given below by replacing the place holder values (i.e., path to input image directory, path to input directory and file name of the Alpine image to be cleared) with actual values.
+            
+    **Example**:   `docker run --rm -v <path/to/InputImageDirectory>:/tmp/InputImages -v <path/to/InputDirectory>:/tmp/OutputFiles ghcr.io/siemens/continuous-clearing ./syft packages /tmp/InputImages/<fileNameoftheAlpineImageTobeCleared.tar> -o cyclonedx-json --file "/tmp/OutputFiles/output.json"`
+           
+           
+             After successful execution, `output.json` (_CycloneDX.json_) file will be created in specified directory
+           
+             ![image.png](../usagedocimg/output.PNG)
+           
+             Resulted `output.json` file will be having the list of installed packages  and the same file will be used as  an input to `Continuous clearing tool - Bom creator` as an argument(`--packagefilepath`). The remaining process is same as other project types.
 ### **Configuring the Continuous Clearing Tool**
 
    Arguments can be provided to the tool in two ways :
@@ -255,6 +269,11 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
     "Exclude": [],
     "ExcludedComponents": []
   },
+  "Alpine": {
+    "Include": [ "*.json" ],
+    "Exclude": [],
+    "ExcludedComponents": []
+  },
   "Python": {
     "Include": [ "poetry.lock", "*.cdx.json" ],
     "Exclude": [],
@@ -272,7 +291,7 @@ Description for the settings in `appSettings.json` file
 | 3 |--bomfolderpath | Path to keep the generated boms  |  Yes , For Docker run /mnt/Output    | D:\Clearing Automation\BOM
 |  4| --sw360token  |  SW360 Auth Token |  Yes| Refer the SW360 Doc [here](https://www.eclipse.org/sw360/docs/development/restapi/access).Make sure you pass this credential in a secured way. |
 | 5 | --sw360projectid |  Project ID from SW360 project URL of the project  |  Yes| Obtained from SW360 |
-|  6|  --projecttype    | Type of the package         | Yes |  NPM/NUGET/Debian/MAVEN |
+|  6|  --projecttype    | Type of the package         | Yes |  NPM/NUGET/Debian/MAVEN/Alpine |
 |7 | --removedevdependency  |  Make this field to `true` , if Dev dependencies needs to be excluded from clearing |  Optional ( By default set to true) | true/false |
 | 8|  --sw360url  |  SW360 URL              |Yes |  https://<my_sw360_server>|
 |  9| --sw360authtokentype   |  SW360 Auth Token  |Yes  | Token/Bearer |
@@ -333,13 +352,14 @@ Continuous Clearing Tool can be executed as container or as binaries,
 
 ### SW360 Package Creator
 
+  * SW360 Package Creator is **_`not currently applicable Alpine type package`_** clearance.
   - In order to run the SW360PackageCreator.dll , execute the below command. 
 
     **Example** : `docker run --rm -it -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool ghcr.io/siemens/continuous-clearing dotnet SW360PackageCreator.dll --settingsfilepath /etc/CATool/appSettings.json`
 
 ###  Artifactory Uploader
 
-  * Artifactory uploader is **_`not applicable for Debian type package`_** clearance.
+  * Artifactory uploader is **_`not applicable for Debian and Alpine type package`_** clearance.
 
   *  In order to run the Artifactory Uploader dll , execute the below command.
   
