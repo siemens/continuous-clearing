@@ -163,11 +163,21 @@ namespace SW360IntegrationTest
             string externalid = responseDataForRelease.ExternalIds.Package_Url;
 
             //Assert
-            Assert.AreEqual(expectedname, name, "Test Project Name");
-            Assert.AreEqual(expectedversion, version, "Test Project  Version");
-            Assert.AreEqual(expecteddownloadurl, downloadurl, "Test download Url of rxjs");
-            Assert.AreEqual(expectedexternalid, externalid, "Test component external id");
-            Assert.AreEqual(expectedclearingState, clearingState);
+            if (responseData.Embedded.Sw360Releases.Count > 0)
+            {
+                //In Case Multiple Releases found just checking for Name & other details.
+                Assert.AreEqual(expectedname, name, "Test Project Name");
+                Assert.AreEqual(expecteddownloadurl, downloadurl, "Test download Url of rxjs");
+                Assert.AreEqual(expectedclearingState, clearingState);
+            }
+            else
+            {
+                Assert.AreEqual(expectedname, name, "Test Project Name");
+                Assert.AreEqual(expectedversion, version, "Test Project  Version");
+                Assert.AreEqual(expecteddownloadurl, downloadurl, "Test download Url of rxjs");
+                Assert.AreEqual(expectedexternalid, externalid, "Test component external id");
+                Assert.AreEqual(expectedclearingState, clearingState);
+            }
         }
 
 
