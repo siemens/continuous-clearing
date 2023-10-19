@@ -25,9 +25,9 @@ namespace LCT.Common
         public static string PackageUrlApi { get; set; } = $"https://www.nuget.org/api/v2/package/";
         public static string SourceURLNugetApi { get; set; } = $"https://api.nuget.org/v3-flatcontainer/";
         public static string SourceURLMavenApi { get; set; } = $"https://repo.maven.apache.org/maven2/";
-
         public static string SnapshotBaseURL { get; set; } = $"https://snapshot.debian.org/mr/";
         public static string SnapshotDownloadURL { get; set; } = $"https://snapshot.debian.org/archive/";
+        public static string PyPiURL { get; set; } = $"https://pypi.org/pypi/";
 
         public CommonAppSettings()
         {
@@ -73,6 +73,7 @@ namespace LCT.Common
         public string JfrogNpmSrcRepo { get; set; }
         public string JfrogNugetDestRepoName { get; set; }
         public string JfrogMavenDestRepoName { get; set; }
+        public string JfrogPythonDestRepoName { get; set; }
         public string JfrogNugetSrcRepo { get; set; }
         public string Mode { get; set; } = string.Empty;
 

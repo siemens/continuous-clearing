@@ -45,8 +45,6 @@ namespace AritfactoryUploader.UTest
             await PackageUploader.UploadPackageToArtifactory(CommonAppSettings);
 
             // Assert
-
-
             Assert.That(11, Is.EqualTo(PackageUploader.uploaderKpiData.PackagesToBeUploaded), "Checks for no of components");
         }
     }

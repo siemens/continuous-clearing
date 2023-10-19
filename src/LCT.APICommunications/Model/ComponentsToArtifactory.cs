@@ -16,6 +16,8 @@ namespace LCT.APICommunications.Model
         public string ComponentType { get; set; }
         public string JfrogApi { get; set; }
         public string SrcRepoName { get; set; }
+        public string SrcRepoPathWithFullName { get; set; }
+        public string PypiCompName { get; set; }
         public string DestRepoName { get; set; }
         public string ApiKey { get; set; }
         public string Email { get; set; }

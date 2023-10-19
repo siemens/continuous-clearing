@@ -32,6 +32,7 @@ namespace LCT.APICommunications
         public const string NpmExtension = ".tgz";
         public const string NugetExtension = ".nupkg";
         public const string MavenExtension = "-sources.jar";
+        public const string PythonExtension = ".whl";
         public const string PackageInfoApi = "/api/storage/";
         public const string CopyPackageApi = "/api/copy/";
         public const string Releases = "releases";

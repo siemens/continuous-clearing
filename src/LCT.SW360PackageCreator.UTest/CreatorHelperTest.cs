@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using CycloneDX.Models;
 using System.Diagnostics;
 using LCT.Common;
+using Castle.Core.Internal;
 
 namespace SW360ComponentCreator.UTest
 {
@@ -47,9 +48,11 @@ namespace SW360ComponentCreator.UTest
                 }
 
             };
-            IDictionary<string, IPackageDownloader> _packageDownloderList = new Dictionary<string, IPackageDownloader>();
-            _packageDownloderList.Add("NPM", new PackageDownloader());
-            _packageDownloderList.Add("NUGET", new PackageDownloader());
+            IDictionary<string, IPackageDownloader> _packageDownloderList = new Dictionary<string, IPackageDownloader>
+            {
+                { "NPM", new PackageDownloader() },
+                { "NUGET", new PackageDownloader() }
+            };
             var creatorHelper = new CreatorHelper(_packageDownloderList);
             var actual = creatorHelper.GetDownloadUrlNotFoundList(lstComparisonBomData);
 
@@ -68,14 +71,15 @@ namespace SW360ComponentCreator.UTest
                 SourceUrl = "https://github.com/angular/angular.git",
                 DownloadUrl = "https://github.com/angular/angular.git"
             };
-            IDictionary<string, IPackageDownloader> _packageDownloderList = new Dictionary<string, IPackageDownloader>();
-            _packageDownloderList.Add("NPM", new PackageDownloader());
-            _packageDownloderList.Add("NUGET", new PackageDownloader());
+            IDictionary<string, IPackageDownloader> _packageDownloderList = new Dictionary<string, IPackageDownloader>
+            {
+                { "NPM", new PackageDownloader() },
+                { "NUGET", new PackageDownloader() }
+            };
             var creatorHelper = new CreatorHelper(_packageDownloderList);
 
             //Act
             var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(lstComparisonBomData);
-
 
             //Assert
             Assert.That(attachmentUrlList.ContainsKey("SOURCE"));
@@ -97,13 +101,8 @@ namespace SW360ComponentCreator.UTest
             appSettings.SW360AuthTokenType = "Token";
             appSettings.Sw360Token = "uifhiopsjfposddkf[fopefp[ld[p[lfffuhdffdkf";
             appSettings.SW360URL = "http://localhost:8090";
-            //IDictionary<string, IPackageDownloader> _packageDownloderList = new Dictionary<string, IPackageDownloader>();
-            //_packageDownloderList.Add("NPM", new PackageDownloader());
-            //_packageDownloderList.Add("NUGET", new PackageDownloader());
-            //var creatorHelper = new CreatorHelper(_packageDownloderList);
 
             // Act
-
             ISw360ProjectService sw360ProjectService = CreatorHelper.InitializeSw360ProjectService(appSettings);
 
             // assert
@@ -118,10 +117,6 @@ namespace SW360ComponentCreator.UTest
             appSettings.SW360AuthTokenType = "Token";
             appSettings.Sw360Token = "uifhiopsjfposddkf[fopefp[ld[p[lfffuhdffdkf";
             appSettings.SW360URL = "http://localhost:8090";
-            //IDictionary<string, IPackageDownloader> _packageDownloderList = new Dictionary<string, IPackageDownloader>();
-            //_packageDownloderList.Add("NPM", new PackageDownloader());
-            //_packageDownloderList.Add("NUGET", new PackageDownloader());
-            //var creatorHelper = new CreatorHelper(_packageDownloderList);
 
             // Act
             ISw360CreatorService sw360CreatorService = CreatorHelper.InitializeSw360CreatorService(appSettings);
@@ -129,8 +124,6 @@ namespace SW360ComponentCreator.UTest
             // assert
             Assert.That(sw360CreatorService, Is.Not.Null);
         }
-
-
 
         [Test]
         public async Task SetContentsForComparisonBOM_ProvidedValidBomDetails_ReturnsListOfComparisonBomData()
@@ -307,6 +300,56 @@ namespace SW360ComponentCreator.UTest
 
             //Assert
             Assert.IsTrue(true);
+        }
+
+        [Test]
+        public async Task DownloadReleaseAttachmentSource_ForPythonPackage_ReturnSuccess()
+        {
+            //Arrange
+            var lstComparisonBomData = new ComparisonBomData()
+            {
+                Name = "cachecontrol",
+                Version = "0.12.11",
+                ReleaseExternalId = "pkg:pypi/cachecontrol@0.12.11",
+                SourceUrl = "https://files.pythonhosted.org/packages/46/9b/34215200b0c2b2229d7be45c1436ca0e8cad3b10de42cfea96983bd70248/CacheControl-0.12.11.tar.gz",
+                DownloadUrl = "https://files.pythonhosted.org/packages/46/9b/34215200b0c2b2229d7be45c1436ca0e8cad3b10de42cfea96983bd70248/CacheControl-0.12.11.tar.gz"
+            };
+            IDictionary<string, IPackageDownloader> _packageDownloderList = new Dictionary<string, IPackageDownloader>
+            {
+                { "PYTHON", new PackageDownloader() }
+            };
+            var creatorHelper = new CreatorHelper(_packageDownloderList);
+
+            //Act
+            var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(lstComparisonBomData);
+
+            //Assert
+            Assert.That(attachmentUrlList.ContainsKey("SOURCE"));
+        }
+
+        [Test]
+        public async Task DownloadReleaseAttachmentSource_ForPythonPackage_ReturnFailure()
+        {
+            //Arrange
+            var lstComparisonBomData = new ComparisonBomData()
+            {
+                Name = "cachecontrol22",
+                Version = "0.12.1122",
+                ReleaseExternalId = "pkg:pypi/cachecontrol22@0.12.1122",
+                SourceUrl = "https://files.pythonhosted.org/packages/46/9b/34215200b0c2b2229d7be45c1436ca0e8cad3b10de42cfea96983bd70248/CacheControl22-0.12.1122.tar.gz",
+                DownloadUrl = "https://files.pythonhosted.org/packages/46/9b/34215200b0c2b2229d7be45c1436ca0e8cad3b10de42cfea96983bd70248/CacheControl22-0.12.1122.tar.gz"
+            };
+            IDictionary<string, IPackageDownloader> _packageDownloderList = new Dictionary<string, IPackageDownloader>
+            {
+                { "PYTHON", new PackageDownloader() }
+            };
+            var creatorHelper = new CreatorHelper(_packageDownloderList);
+
+            //Act
+            var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(lstComparisonBomData);
+
+            //Assert
+            Assert.That(attachmentUrlList.IsNullOrEmpty);
         }
 
     }

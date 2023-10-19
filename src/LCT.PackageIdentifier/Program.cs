@@ -69,7 +69,6 @@ namespace LCT.PackageIdentifier
                 $"SW360ProjectName\t --> {appSettings.SW360ProjectName}\n\t" +
                 $"SW360ProjectID\t\t --> {appSettings.SW360ProjectID}\n\t" +
                 $"ProjectType\t\t --> {appSettings.ProjectType}\n\t" +
-                $"RemoveDevDependency\t --> {appSettings.RemoveDevDependency}\n\t" +
                 $"LogFolderPath\t\t --> {Path.GetFullPath(FolderPath)}", null);
 
             if (appSettings.IsTestMode)

@@ -103,10 +103,12 @@ namespace LCT.SW360PackageCreator
             ICycloneDXBomParser cycloneDXBomParser = new CycloneDXBomParser();
 
             IDebianPatcher debianPatcher = new DebianPatcher();
-            IDictionary<string, IPackageDownloader> _packageDownloderList = new Dictionary<string, IPackageDownloader>();
-            _packageDownloderList.Add("NPM", new PackageDownloader());
-            _packageDownloderList.Add("NUGET", new PackageDownloader());
-            _packageDownloderList.Add("DEBIAN", new DebianPackageDownloader(debianPatcher));
+            IDictionary<string, IPackageDownloader> _packageDownloderList = new Dictionary<string, IPackageDownloader>
+            {
+                { "NPM", new PackageDownloader() },
+                { "NUGET", new PackageDownloader() },
+                { "DEBIAN", new DebianPackageDownloader(debianPatcher) }
+            };
 
             ICreatorHelper creatorHelper = new CreatorHelper(_packageDownloderList);
 

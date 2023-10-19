@@ -92,8 +92,6 @@ namespace LCT.SW360PackageCreator
             return sourceURL;
         }
 
-   
-
         /// <summary>
         /// Gets the Source URL for NPM Package
         /// </summary>
@@ -378,7 +376,7 @@ namespace LCT.SW360PackageCreator
             }
 
             // Finding upstream source file(.orig.tar.*)
-            string OrigFile = URLs.FirstOrDefault(item => item.Contains(FileConstant.OrigTarFileExtension) &&
+            string OrigFile = URLs.Find(item => item.Contains(FileConstant.OrigTarFileExtension) &&
                                                  (item.EndsWith(FileConstant.TargzFileExtension) ||
                                                  item.EndsWith(FileConstant.XzFileExtension) ||
                                                  item.EndsWith(FileConstant.TgzFileExtension) ||
@@ -392,7 +390,7 @@ namespace LCT.SW360PackageCreator
             else
             {
                 // Finding actual source file ()
-                var sourceURL = URLs.FirstOrDefault(item => !item.Contains(FileConstant.OrigTarFileExtension) && !item.Contains(FileConstant.DSCFileExtension)
+                var sourceURL = URLs.Find(item => !item.Contains(FileConstant.OrigTarFileExtension) && !item.Contains(FileConstant.DSCFileExtension)
                                     && !item.Contains(FileConstant.DebianTarFileExtension) && !item.Contains(FileConstant.DebianFileExtension)
                                     && (item.EndsWith(FileConstant.TargzFileExtension)
                                     || item.EndsWith(FileConstant.XzFileExtension)
@@ -406,7 +404,7 @@ namespace LCT.SW360PackageCreator
                 else
                 {
                     // Not able to distinguish source file, so taking DSC file as source file
-                    var dscFile = URLs.FirstOrDefault(item => item.Contains(FileConstant.DSCFileExtension));
+                    var dscFile = URLs.Find(item => item.Contains(FileConstant.DSCFileExtension));
 
                     if (!string.IsNullOrEmpty(dscFile))
                     {
@@ -442,6 +440,123 @@ namespace LCT.SW360PackageCreator
             return sourceDetails;
         }
 
+        /// <summary>
+        /// Gets the Source Url For Python Package
+        /// </summary>
+        /// <param name="componentName"></param>
+        /// <param name="componenVersion"></param>
+        /// <param name="isDebugMode"></param>
+        /// <returns>string</returns>
+        public async Task<string> GetSourceUrlForPythonPackage(string componentName, string componenVersion)
+        {
+            Logger.Debug($"URLHelper.GetSourceUrlForPythonPackage():Start");
+            string name = componentName.ToLowerInvariant();
+            string version = componenVersion.ToLowerInvariant();
+            var response = await GetResponseFromPyPiOrg(name, version);
+            string sourceURL = GetSourceURLFromPyPiResponse(response);
+            return sourceURL;
+        }
+
+        private async Task<string> GetResponseFromPyPiOrg(string componentName, string componenVersion)
+        {
+            string URL;
+            const string result = "";
+            try
+            {
+                URL = $"{CommonAppSettings.PyPiURL}{componentName}" +
+                    $"{Dataconstant.ForwardSlash}{componenVersion}{Dataconstant.ForwardSlash}json";
+
+                var response = await httpClient.GetStringAsync(URL);
+                return response.ToString();
+            }
+            catch (HttpRequestException ex)
+            {
+                Logger.Debug($"GetResponseFromPyPiOrg():HttpRequestException", ex);
+            }
+            catch (TaskCanceledException ex)
+            {
+                Logger.Debug($"GetResponseFromPyPiOrg():TaskCanceledException", ex);
+            }
+            return result;
+        }
+
+        private static string GetSourceURLFromPyPiResponse(string response)
+        {
+            string SourceURL = "";
+
+            try
+            {
+                JObject data = JObject.Parse(response);
+                JToken fileinformations = data["urls"];
+
+                foreach (JToken fileinfo in fileinformations.Children())
+                {
+                    var url = fileinfo["url"];
+
+                    if (!string.IsNullOrEmpty(url.ToString()) && url.ToString().EndsWith(FileConstant.TargzFileExtension))
+                    {
+                        SourceURL = url.ToString();
+                    }
+                }
+            }
+            catch (JsonReaderException ex)
+            {
+                Logger.Debug($"GetSourceURLFromPyPiResponse():", ex);
+            }
+            catch (IOException ex)
+            {
+                Logger.Debug($"GetSourceURLFromPyPiResponse():", ex);
+            }
+            return SourceURL;
+        }
+
+        public static async Task<string> DownloadFileAsync(Uri uri, string downloadFilePath)
+        {
+            string downloadedPath = string.Empty;
+            try
+            {
+                using (WebClient webClient = new WebClient())
+                {
+                    await webClient.DownloadFileTaskAsync(uri, downloadFilePath);
+                }
+                downloadedPath = downloadFilePath;
+                Logger.Debug($"DownloadFileFromSnapshotorgAsync:File Name : {Path.GetFileName(downloadFilePath)} ,Downloaded Successfully!!");
+            }
+            catch (WebException webex)
+            {
+                Logger.Debug($"DownloadFileFromSnapshotorgAsync:File Name : {Path.GetFileName(downloadFilePath)},Error {webex}");
+                //Waiting for server to up..
+                await Task.Delay(4000);
+                try
+                {
+                    using (WebClient webClient = new WebClient())
+                    {
+                        await webClient.DownloadFileTaskAsync(uri, downloadFilePath);
+                    }
+                    downloadedPath = downloadFilePath;
+                    Logger.Debug($"DownloadFileFromSnapshotorgAsync:File Name : {Path.GetFileName(downloadFilePath)},Success in retry!!");
+                }
+                catch (WebException)
+                {
+                    Logger.Debug($"DownloadFileFromSnapshotorgAsync:File Name : {Path.GetFileName(downloadFilePath)},Error in retry!!");
+                }
+            }
+            return downloadedPath;
+        }
+
+        public static string GetCorrectFileExtension(string sourceURL)
+        {
+            int idx = sourceURL.LastIndexOf(Dataconstant.ForwardSlash);
+            string fullname = string.Empty;
+
+            if (idx != -1)
+            {
+                fullname = sourceURL.Substring(idx + 1);
+            }
+
+            return fullname;
+        }
+
         public void Dispose()
         {
             Dispose(true);
@@ -462,5 +577,6 @@ namespace LCT.SW360PackageCreator
 
             _disposed = true;
         }
+
     }
 }

@@ -4,7 +4,7 @@
 <package >
   <metadata>
     <id>continuous-clearing</id>
-    <version>4.0.0</version>
+    <version>5.0.0</version>
     <authors>Siemens AG</authors>
     <owners>continuous-clearing contributors</owners>
     <projectUrl>https://github.com/siemens/continuous-clearing</projectUrl>
@@ -13,12 +13,12 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>
       The License clearing tool helps the Project Manager/Developer, to reduce the manual effort and enable the faster license clearing process,
-      by automatically identifying the third party oss components used in their project(i.e., npm, nuget, maven and Debian type) and it creates them in the sw360 and fossology
+      by automatically identifying the third party oss components used in their project(i.e., npm, nuget, maven,python and Debian type) and it creates them in the sw360 and fossology
       for clearing license
     </description>
     <releaseNotes></releaseNotes>
     <copyright>Copyright 2023</copyright>
-    <tags>ClearingTool SW360 OSS Clearing Software Continuous-Clearing NPM NUGET DEBIAN MAVEN SBOM</tags>
+    <tags>ClearingTool SW360 OSS Clearing Software Continuous-Clearing NPM NUGET DEBIAN MAVEN PYTHON SBOM</tags>
   </metadata>
 
   <files>
@@ -122,6 +122,7 @@
     <file src="out\net6.0\NuGet.Protocol.dll" target="tools"/>
     <file src="out\net6.0\NuGet.Versioning.dll" target="tools"/>
     <file src="out\net6.0\NuGet.Resolver.dll" target="tools"/>
+    <file src="out\net6.0\Tommy.dll" target="tools"/>
     <file src="out\net6.0\runtimes\linux-arm\native\libpsl-native.so" target="tools\runtimes\linux-arm\native"/>
     <file src="out\net6.0\runtimes\linux-arm64\native\libpsl-native.so" target="tools\runtimes\linux-arm64\native"/>
     <file src="out\net6.0\runtimes\linux-musl-x64\native\libpsl-native.so" target="tools\runtimes\linux-musl-x64\native"/>
