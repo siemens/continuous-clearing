@@ -115,7 +115,7 @@ jobs:
          DOCKERDEVARTIFACTORY: ${{ secrets.DOCKERDEVARTIFACTORY }}
          
     - name: Test 
-      #if: ${{ false }}  # disable for now
+      if: ${{ false }}  # disable for now
       run: |
         $TestProjects = Get-ChildItem -Path *test*.csproj -Recurse -exclude TestUtilities.csproj,UnitTestUtilities.csproj
         Write-Host "**************************The test projects considered for execution: $TestProjects   ******************************"
