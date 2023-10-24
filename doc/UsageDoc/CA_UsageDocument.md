@@ -46,20 +46,20 @@
 <!--te-->
 # Introduction
 
-The Continuous Clearing Tool helps the Project Manager/Developer to automate the sw360 clearing process of 3rd party components. This tool scans and identifies the third-party components used in a NPM, NUGET, MAVEN and Debian  projects and makes an entry in SW360, if it is not present. Continuous Clearing Tool links the components to the respective project and creates job for code scan in FOSSology.The output is an SBOM file which has a nested description of software artifact components and metadata.
+The Continuous Clearing Tool helps the Project Manager/Developer to automate the sw360 clearing process of 3rd party components. This tool scans and identifies the third-party components used in a NPM, NUGET, MAVEN, PYTHON, CONAN and Debian  projects and makes an entry in SW360, if it is not present. Continuous Clearing Tool links the components to the respective project and creates job for code scan in FOSSology.The output is an SBOM file which has a nested description of software artifact components and metadata.
 
 Continuous Clearing Tool reduces the effort in creating components in SW360 and identifying the matching source codes from the public repository. Tool eliminates the manual error while creating component and identifying correct version of source code from public repository. Continuous Clearing Tool harmonize the creation of 3P components in SW360 by filling necessary information.
 
 # Continuous Clearing Tool workflow diagram
 
 - Package Identifier
-   - [NPM/NUGET/MAVEN](../usagedocimg/packageIdentifiernpmnuget.PNG)
+   - [NPM/NUGET/MAVEN/PYTHON/CONAN](../usagedocimg/packageIdentifiernpmnuget.PNG)
    - [Debian](../usagedocimg/packageIdentifierdebian.PNG)
 - SW360 Package Creator
-  - [NPM/NUGET/MAVEN](../usagedocimg/packageCreatirnpmnuget.PNG)
+  - [NPM/NUGET/MAVEN/PYTHON/CONAN](../usagedocimg/packageCreatirnpmnuget.PNG)
   - [Debian](../usagedocimg/packagecreatordebian.PNG)
 - Artifactory Uploader
-  - [NPM/NUGET/MAVEN](../usagedocimg/artifactoryuploader.PNG)
+  - [NPM/NUGET/MAVEN/PYTHON/CONAN](../usagedocimg/artifactoryuploader.PNG)
  
 # Prerequisite
 
@@ -158,13 +158,19 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
  
                  mvn clean install -DskipTests=true 
 
-       - **Project Type :** **Python** 
+      - **Project Type :** **Python** 
 
           * Input file repository should contain **poetry.lock** file. 
 		  
 		  `Note : Python package support in clearing tool is currently only for SBOM discovery and classification.Component Creation and Source code identification is not supported currently`
+		  
+	  - **Project Type :** **Conan** 
+
+          * Input file repository should contain **conan.lock** file. 
+		  
+		  `Note : Conan package support in clearing tool is currently only for SBOM discovery and classification.Component Creation and Source code identification is not supported currently`
     
-     - **Project Type :**  **Debian** 
+      - **Project Type :**  **Debian** 
        
    	      **Note** : below steps is required only if you have `tar` file to process , otherwise you can keep `CycloneDx.json` file in the InputDirectory.
           *  Create `InputImage` directory for keeping `tar` images and `InputDirectory` for resulted file storing .
@@ -258,8 +264,22 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
   "Python": {
     "Include": [ "poetry.lock", "*.cdx.json" ],
     "Exclude": [],
+    "JfrogPythonRepoList": [
+      "<Python Remote Cache Repo Name>",
+      "<Python Release Repo Name>",//This should be the release repo in JFrog
+    ],
+    "ExcludedComponents": []
+  },
+  "Conan": {
+    "Include": [ "conan.lock"],
+    "Exclude": [],
+	"JfrogConanRepoList": [
+      "<Conan Remote Cache Repo Name>",
+      "<Conan Release Repo Name>",
+    ],
     "ExcludedComponents": []
   }
+  
 }
 ```
 
