@@ -118,10 +118,10 @@ namespace PackageIdentifier.UTest
         {
             //Arrange
             var conanPackage = new ConanPackage() {Id = "10"};
-            var rootNode = new ConanPackage() {DevDependencies = new List<string> { "10", "11", "12" }};
+            var buildNodeIds = new List<string> { "10", "11", "12" };
             var noOfDevDependent = 0;
             //Act
-            bool actual = ConanProcessor.IsDevDependency(conanPackage, rootNode, ref noOfDevDependent);
+            bool actual = ConanProcessor.IsDevDependency(conanPackage, buildNodeIds, ref noOfDevDependent);
 
             //Assert
             Assert.That(true, Is.EqualTo(actual), "Component is a dev dependent");

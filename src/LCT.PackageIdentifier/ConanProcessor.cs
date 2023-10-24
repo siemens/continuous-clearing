@@ -23,7 +23,6 @@ using System.Reflection;
 using System.Security;
 using System.Threading.Tasks;
 
-
 namespace LCT.PackageIdentifier
 {
 
@@ -150,10 +149,10 @@ namespace LCT.PackageIdentifier
             return modifiedBOM;
         }
 
-        public static bool IsDevDependency(ConanPackage component, ConanPackage rootNode, ref int noOfDevDependent)
+        public static bool IsDevDependency(ConanPackage component, List<string> buildNodeIds, ref int noOfDevDependent)
         {
             var isDev = false;
-            if (rootNode.DevDependencies != null && rootNode.DevDependencies.Contains(component.Id))
+            if (buildNodeIds!= null && buildNodeIds.Contains(component.Id))
             {
                 isDev = true;
                 noOfDevDependent++;
@@ -238,7 +237,8 @@ namespace LCT.PackageIdentifier
                 throw new ArgumentNullException(nameof(nodePackages), "Dependency(requires) node name details not present in the root node.");
             }
             
-            // Ignoring the root node as it is the package information node.
+            // Ignoring the root node as it is the package information node and we are anyways considering all
+            // nodes in the lock file.
             foreach (var component in nodePackages.Skip(1))
             {
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += 1;
@@ -253,7 +253,8 @@ namespace LCT.PackageIdentifier
                 Component components = new Component();
 
                 // dev components are not ignored and added as a part of SBOM   
-                if (IsDevDependency(component, rootNode, ref noOfDevDependent))
+                var buildNodeIds = GetBuildNodeIds(nodePackages);
+                if (IsDevDependency(component, buildNodeIds, ref noOfDevDependent))
                 {
                     isdev.Value = "true";
                 }
@@ -277,6 +278,14 @@ namespace LCT.PackageIdentifier
                 components.Properties.Add(isdev);
                 lstComponentForBOM.Add(components);
             }
+        }
+
+        private static List<string> GetBuildNodeIds(List<ConanPackage> nodePackages)
+        {
+            return nodePackages
+                    .Where(y => y.DevDependencies != null)
+                    .SelectMany(y => y.DevDependencies)
+                    .ToList();
         }
 
         private static bool IsInternalConanComponent(List<AqlResult> aqlResultList, Component component)
