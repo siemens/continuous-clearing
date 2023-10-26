@@ -54,9 +54,9 @@ namespace LCT.PackageIdentifier
             Bom bom = new Bom();
             int totalComponentsIdentified = 0;
 
-            ParsingInputFileForBOM(appSettings, ref componentsForBOM);
-            totalComponentsIdentified = componentsForBOM.Count;
+            ParsingInputFileForBOM(appSettings, ref componentsForBOM, ref bom);
 
+            totalComponentsIdentified = componentsForBOM.Count;
             componentsForBOM = GetExcludedComponentsList(componentsForBOM);
             componentsForBOM = componentsForBOM.Distinct(new ComponentEqualityComparer()).ToList();
 
@@ -149,7 +149,7 @@ namespace LCT.PackageIdentifier
             return modifiedBOM;
         }
 
-        public static bool IsDevDependency(ConanPackage component, List<string> buildNodeIds, ref int noOfDevDependent)
+        public static bool IsDevDependency(ConanPackage component, ConanPackage rootNode, ref int noOfDevDependent)
         {
             var isDev = false;
             if (buildNodeIds!= null && buildNodeIds.Contains(component.Id))
@@ -164,18 +164,48 @@ namespace LCT.PackageIdentifier
         #endregion
 
         #region private methods
-        private void ParsingInputFileForBOM(CommonAppSettings appSettings, ref List<Component> componentsForBOM)
+        private void ParsingInputFileForBOM(CommonAppSettings appSettings, ref List<Component> listComponentForBOM, ref Bom bom)
         {
             List<string> configFiles;
+            List<Component> componentsForBOM = new List<Component>();
             configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Conan);
 
             foreach (string filepath in configFiles)
             {
-                Logger.Debug($"ParsingInputFileForBOM():FileName: " + filepath);
-                var components = ParsePackageLockJson(filepath, appSettings);
-                AddingIdentifierType(components, "PackageFile");
-                componentsForBOM.AddRange(components);
+                if (filepath.ToLower().EndsWith("conan.lock"))
+                {
+                    Logger.Debug($"ParsingInputFileForBOM():FileName: " + filepath);
+                    var components = ParsePackageLockJson(filepath, appSettings);
+                    AddingIdentifierType(components, "PackageFile");
+                    componentsForBOM.AddRange(components);
+                }
+                else if (filepath.EndsWith(FileConstant.CycloneDXFileExtension) && !filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                {
+                    Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
+                    bom = cycloneDXBomParser.ParseCycloneDXBom(filepath);
+                    CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
+                    componentsForBOM.AddRange(bom.Components);
+                    CommonHelper.GetDetailsforManuallyAdded(componentsForBOM, listComponentForBOM);
+                }
             }
+
+            int initialCount = componentsForBOM.Count;
+            GetDistinctComponentList(ref componentsForBOM);
+            BomCreator.bomKpiData.DuplicateComponents = initialCount - listComponentForBOM.Count;
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = listComponentForBOM.Count;
+            BomCreator.bomKpiData.DevDependentComponents = listComponentForBOM.Count(s => s.Properties[0].Value == "true");
+            bom.Components = listComponentForBOM;
+
+            if (File.Exists(appSettings.CycloneDxSBomTemplatePath) && appSettings.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+            {
+                //Adding Template Component Details
+                Bom templateDetails;
+                templateDetails = ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
+                CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
+                SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
+            }
+
+            bom = RemoveExcludedComponents(appSettings, bom);
         }
 
         private List<Component> ParsePackageLockJson(string filepath, CommonAppSettings appSettings)
@@ -232,11 +262,11 @@ namespace LCT.PackageIdentifier
         private static void GetPackagesForBom(ref List<Component> lstComponentForBOM, ref int noOfDevDependent, List<ConanPackage> nodePackages)
         {
             var rootNode = nodePackages.FirstOrDefault();
-            if (!rootNode.Dependencies.Any() || rootNode.Dependencies == null)
+            if (rootNode == null || !rootNode.Dependencies.Any() || rootNode.Dependencies == null)
             {
                 throw new ArgumentNullException(nameof(nodePackages), "Dependency(requires) node name details not present in the root node.");
             }
-            
+
             // Ignoring the root node as it is the package information node and we are anyways considering all
             // nodes in the lock file.
             foreach (var component in nodePackages.Skip(1))
@@ -323,7 +353,7 @@ namespace LCT.PackageIdentifier
                 else
                 {
                     BomCreator.bomKpiData.ComponentsExcluded++;
-                    Logger.Debug($"GetExcludedComponentsList():InvalidComponent For CONAN : Component Details : {componentsInfo?.Name} @ {componentsInfo?.Version} @ {componentsInfo?.Purl}");
+                    Logger.Debug($"GetExcludedComponentsList():InvalidComponent For CONAN : Component Details : {componentsInfo.Name} @ {componentsInfo.Version} @ {componentsInfo.Purl}");
                 }
             }
             return components;
@@ -353,6 +383,28 @@ namespace LCT.PackageIdentifier
                     component.Properties.Add(identifierType);
                 }
             }
+        }
+
+        private static Bom RemoveExcludedComponents(CommonAppSettings appSettings, Bom cycloneDXBOM)
+        {
+            List<Component> componentForBOM = cycloneDXBOM.Components.ToList();
+            int noOfExcludedComponents = 0;
+            if (appSettings.Conan.ExcludedComponents != null)
+            {
+                componentForBOM = CommonHelper.RemoveExcludedComponents(componentForBOM, appSettings.Conan.ExcludedComponents, ref noOfExcludedComponents);
+                BomCreator.bomKpiData.ComponentsExcluded += noOfExcludedComponents;
+            }
+            cycloneDXBOM.Components = componentForBOM;
+            return cycloneDXBOM;
+        }
+
+        private static void GetDistinctComponentList(ref List<Component> listofComponents)
+        {
+            int initialCount = listofComponents.Count;
+            listofComponents = listofComponents.GroupBy(x => new { x.Name, x.Version, x.Purl }).Select(y => y.First()).ToList();
+
+            if (listofComponents.Count != initialCount)
+                BomCreator.bomKpiData.DuplicateComponents = initialCount - listofComponents.Count;
         }
 
         #endregion

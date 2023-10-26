@@ -48,7 +48,7 @@ namespace LCT.PackageIdentifier
 
             foreach (string config in configFiles)
             {
-                if (config.EndsWith("poetry.lock"))
+                if (config.ToLower().EndsWith("poetry.lock"))
                 {
                     listofComponents.AddRange(ExtractDetailsForPoetryLockfile(config, dependencies));
                 }
