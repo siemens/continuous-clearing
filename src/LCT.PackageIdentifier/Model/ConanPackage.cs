@@ -17,7 +17,7 @@ namespace LCT.PackageIdentifier.Model
     {
         public string Id { get; set; }
         [JsonProperty("ref")]
-        public string Reference { get; set; }
+        public string Reference { get; set; } = string.Empty;
         [JsonProperty("requires")]
         public List<string> Dependencies { get; set; }
         [JsonProperty("build_requires")]
