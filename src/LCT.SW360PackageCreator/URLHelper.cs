@@ -21,14 +21,18 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using JetBrains.Annotations;
+using LCT.APICommunications.Model.Foss;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Model;
 using LCT.SW360PackageCreator.Interfaces;
 using LCT.SW360PackageCreator.Model;
 using log4net;
+using Microsoft.PowerShell.Commands;
+using Microsoft.Web.Administration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using YamlDotNet.Core.Tokens;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -164,26 +168,51 @@ namespace LCT.SW360PackageCreator
             string sourceURL = "https://raw.githubusercontent.com/conan-io/conan-center-index/master/recipes/";
             var downLoadUrl = sourceURL + componentName + "/all/conandata.yml";
             var deserializer = new DeserializerBuilder().WithNamingConvention(UnderscoredNamingConvention.Instance).Build();
-            var request = new HttpRequestMessage(HttpMethod.Get, downLoadUrl);
-            var response = await httpClient.SendAsync(request);
-            response.EnsureSuccessStatusCode();
-            var jsonObject=await response.Content.ReadAsStringAsync();
-            Sources packageSourcesInfo= deserializer.Deserialize<Sources>(jsonObject);
             string componentSrcURL = string.Empty;
-            foreach (var item in packageSourcesInfo.SourcesData) {
-                if (item.Key== version)
+            Sources packageSourcesInfo;
+            using (HttpClient _httpClient=new HttpClient())
+            {
+                try
                 {
-                    if (item.Value.Url.GetType().Name != "string")
+                    var request = new HttpRequestMessage(HttpMethod.Get, downLoadUrl);
+                    var response = await httpClient.SendAsync(request);
+                    response.EnsureSuccessStatusCode();
+                    var jsonObject = await response.Content.ReadAsStringAsync();
+                    packageSourcesInfo = deserializer.Deserialize<Sources>(jsonObject);
+                }
+                catch (Exception ex)
+                {
+
+                    var response = new HttpResponseMessage(HttpStatusCode.NotFound)
                     {
-                        List<object> urlList = (List<object>)item.Value.Url;
-                        componentSrcURL = urlList[0].ToString();
-                    }
-                    else 
+                        Content = new StringContent(string.Format("Problem Getting Information from Conan Server For = {0}", componentName)),
+                        ReasonPhrase = "Problem Occured while connecting to conan Server"
+                    };
+
+                    throw new HttpResponseException("Problem Inside GetSourceUrlForConanPackage", response);
+                }
+                if (packageSourcesInfo!=null)
+                {
+                    foreach (var item in packageSourcesInfo.SourcesData)
                     {
-                        componentSrcURL = item.Value.Url.ToString();
+                        if (item.Key == version)
+                        {
+                            if (item.Value.Url.GetType().Name == "string")
+                            {
+                                componentSrcURL = item.Value.Url.ToString();
+                            }
+                            else 
+                            {
+                                List<object> urlList = (List<object>)item.Value.Url;
+                                if (urlList.Count > 0)
+                                componentSrcURL = urlList[0].ToString();
+                            }
+                            
+                        }
+
                     }
                 }
-
+                
             }
             return componentSrcURL;
         }
