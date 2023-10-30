@@ -18,6 +18,8 @@ namespace LCT.SW360PackageCreator.Model
         public object Url { get; set; }
         [YamlMember(Alias = "sha256")]
         public string Sha256 { get; set; }
+
+
     }
 
     public class Patch
