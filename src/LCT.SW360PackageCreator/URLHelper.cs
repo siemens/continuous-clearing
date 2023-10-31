@@ -175,7 +175,7 @@ namespace LCT.SW360PackageCreator
                 try
                 {
                     var request = new HttpRequestMessage(HttpMethod.Get, downLoadUrl);
-                    var response = await httpClient.SendAsync(request);
+                    var response = await _httpClient.SendAsync(request);
                     response.EnsureSuccessStatusCode();
                     var jsonObject = await response.Content.ReadAsStringAsync();
                     packageSourcesInfo = deserializer.Deserialize<Sources>(jsonObject);
@@ -191,28 +191,20 @@ namespace LCT.SW360PackageCreator
 
                     throw new HttpResponseException("Problem Inside GetSourceUrlForConanPackage", response);
                 }
-                if (packageSourcesInfo!=null)
+                if (packageSourcesInfo.SourcesData.TryGetValue(version,out var release))
                 {
-                    foreach (var item in packageSourcesInfo.SourcesData)
+                    if (release.Url.GetType().Name == "string")
                     {
-                        if (item.Key == version)
-                        {
-                            if (item.Value.Url.GetType().Name == "string")
-                            {
-                                componentSrcURL = item.Value.Url.ToString();
-                            }
-                            else 
-                            {
-                                List<object> urlList = (List<object>)item.Value.Url;
-                                if (urlList.Count > 0)
-                                componentSrcURL = urlList[0].ToString();
-                            }
-                            
-                        }
-
+                        componentSrcURL = release.Url.ToString();
+                    }
+                    else
+                    {
+                        List<object> urlList = (List<object>)release.Url;
+                        componentSrcURL = urlList.FirstOrDefault() != null ? urlList.FirstOrDefault().ToString() : "";
                     }
                 }
                 
+
             }
             return componentSrcURL;
         }

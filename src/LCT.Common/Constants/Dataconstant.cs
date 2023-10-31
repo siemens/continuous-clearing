@@ -22,6 +22,7 @@ namespace LCT.Common.Constants
         {"DEBIAN", "pkg:deb/debian"},
         {"MAVEN", "pkg:maven"},
         {"PYTHON", "pkg:pypi"},
+        {"CONAN", "pkg:conan"},
          };
 
         //Identified types
