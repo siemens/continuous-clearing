@@ -52,16 +52,13 @@ namespace LCT.PackageIdentifier
         {
             List<Component> componentsForBOM;
             Bom bom = new Bom();
-            int totalComponentsIdentified = 0;
 
             ParsingInputFileForBOM(appSettings, ref bom);
             componentsForBOM = bom.Components;
-            totalComponentsIdentified = componentsForBOM.Count;
 
             componentsForBOM = GetExcludedComponentsList(componentsForBOM);
             componentsForBOM = componentsForBOM.Distinct(new ComponentEqualityComparer()).ToList();
 
-            BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - componentsForBOM.Count;
             var componentsWithMultipleVersions = componentsForBOM.GroupBy(s => s.Name)
                               .Where(g => g.Count() > 1).SelectMany(g => g).ToList();
 
@@ -171,7 +168,6 @@ namespace LCT.PackageIdentifier
             List<string> configFiles;
             List<Dependency> dependencies = new List<Dependency>();
             List<Component> componentsForBOM = new List<Component>();
-            List<Component> listComponentForBOM = new List<Component>();
             configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Conan);
 
             foreach (string filepath in configFiles)
@@ -189,16 +185,24 @@ namespace LCT.PackageIdentifier
                     bom = cycloneDXBomParser.ParseCycloneDXBom(filepath);
                     CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
                     componentsForBOM.AddRange(bom.Components);
-                    CommonHelper.GetDetailsforManuallyAdded(componentsForBOM, listComponentForBOM);
+                    GetDetailsforManuallyAddedComp(componentsForBOM);
                 }
             }
 
             int initialCount = componentsForBOM.Count;
             GetDistinctComponentList(ref componentsForBOM);
-            BomCreator.bomKpiData.DuplicateComponents = initialCount - listComponentForBOM.Count;
-            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = listComponentForBOM.Count;
-            bom.Components = listComponentForBOM;
-            bom.Dependencies.AddRange(dependencies);
+            BomCreator.bomKpiData.DuplicateComponents = initialCount - componentsForBOM.Count;
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = componentsForBOM.Count;
+            bom.Components = componentsForBOM;
+
+            if (bom.Dependencies != null)
+            {
+                bom.Dependencies.AddRange(dependencies);
+            }
+            else
+            {
+                bom.Dependencies = dependencies;
+            }
 
             if (File.Exists(appSettings.CycloneDxSBomTemplatePath) && appSettings.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
@@ -430,6 +434,18 @@ namespace LCT.PackageIdentifier
             }
             cycloneDXBOM.Components = componentForBOM;
             return cycloneDXBOM;
+        }
+
+        private static void GetDetailsforManuallyAddedComp(List<Component> componentsForBOM)
+        {
+            foreach (var component in componentsForBOM)
+            {
+                component.Properties = new List<Property>();
+                Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
+                Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.ManullayAdded };
+                component.Properties.Add(isDev);
+                component.Properties.Add(identifierType);
+            }
         }
 
         #endregion
