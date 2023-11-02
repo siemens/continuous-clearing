@@ -383,7 +383,7 @@ namespace LCT.PackageIdentifier
                         bom = cycloneDXBomParser.ParseCycloneDXBom(filepath);
                         CycloneDXBomParser.CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
                         componentsForBOM.AddRange(bom.Components);
-                        GetDetailsforManuallyAdded(componentsForBOM, listComponentForBOM);
+                        CommonHelper.GetDetailsforManuallyAdded(componentsForBOM, listComponentForBOM);
                     }
                 }
                 else
@@ -420,19 +420,6 @@ namespace LCT.PackageIdentifier
             }
 
             bom = RemoveExcludedComponents(appSettings, bom);
-        }
-
-        private static void GetDetailsforManuallyAdded(List<Component> componentsForBOM, List<Component> listComponentForBOM)
-        {
-            foreach (var component in componentsForBOM)
-            {
-                component.Properties = new List<Property>();
-                Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
-                Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.ManullayAdded };
-                component.Properties.Add(isDev);
-                component.Properties.Add(identifierType);
-                listComponentForBOM.Add(component);
-            }
         }
 
         private static void ConvertToCycloneDXModel(List<Component> listComponentForBOM, List<NugetPackage> listofComponents, List<Dependency> dependencies)

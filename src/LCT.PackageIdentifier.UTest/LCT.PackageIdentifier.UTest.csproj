@@ -55,6 +55,9 @@
     <ProjectReference Include="..\UnitTestUtilities\UnitTestUtilities.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <None Update="PackageIdentifierUTTestFiles\conan.lock">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="PackageIdentifierUTTestFiles\CycloneDX2_Python.cdx.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

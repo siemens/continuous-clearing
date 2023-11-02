@@ -5,6 +5,7 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using LCT.Common.Constants;
 using LCT.Common.Model;
 using log4net;
 using log4net.Core;
@@ -227,6 +228,19 @@ namespace LCT.Common
                 return false;
             }
             return component.Properties.Exists(x => x.Name == constant);
+        }
+
+        public static void GetDetailsforManuallyAdded(List<Component> componentsForBOM, List<Component> listComponentForBOM)
+        {
+            foreach (var component in componentsForBOM)
+            {
+                component.Properties = new List<Property>();
+                Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
+                Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.ManullayAdded };
+                component.Properties.Add(isDev);
+                component.Properties.Add(identifierType);
+                listComponentForBOM.Add(component);
+            }
         }
     }
 }

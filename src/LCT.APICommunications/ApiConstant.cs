@@ -29,6 +29,7 @@ namespace LCT.APICommunications
         public const string ComponentNameUrl = "?name=";
         public const string NPMExternalID = "pkg:npm/";
         public const string NugetExternalID = "pkg:nuget/";
+        public const string ConanExternalID = "pkg:conan/";
         public const string NpmExtension = ".tgz";
         public const string NugetExtension = ".nupkg";
         public const string MavenExtension = "-sources.jar";

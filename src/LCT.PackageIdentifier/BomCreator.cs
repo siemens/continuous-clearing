@@ -119,6 +119,9 @@ namespace LCT.PackageIdentifier
                 case "PYTHON":
                     parser = new PythonProcessor();
                     return await ComponentIdentification(appSettings, parser);
+                case "CONAN":
+                    parser = new ConanProcessor();
+                    return await ComponentIdentification(appSettings, parser);
                 default:
                     Logger.Error($"GenerateBom():Invalid ProjectType - {appSettings.ProjectType}");
                     break;
