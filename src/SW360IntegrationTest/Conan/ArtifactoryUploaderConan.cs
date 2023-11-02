@@ -30,7 +30,7 @@ namespace SW360IntegrationTest
         }
 
         [Test, Order(2)]
-        public void ComponentUpload_IsUnsuccessful_AlreadyPresentInDestination()
+        public void ComponentUpload_IsUnsuccessful_AlreadyPresentInDestination_Conan()
         {
             OutFolder = TestHelper.OutFolder;
             string comparisonBOMPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\ArtifactoryUploaderTestData\NPMComparisonBOM.json";
@@ -57,7 +57,7 @@ namespace SW360IntegrationTest
         }
 
         [Test, Order(3)]
-        public void ComponentUpload_IsFailure()
+        public void ComponentUpload_IsFailure_Conan()
         {
             HttpClient httpClient = new HttpClient();
 

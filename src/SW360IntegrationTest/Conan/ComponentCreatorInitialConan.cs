@@ -42,7 +42,7 @@ namespace SW360IntegrationTest
             }
         }
         [Test, Order(1)]
-        public void TestComponentCreatorExe_TestMode()
+        public void TestComponentCreatorExe_Conan()
         {
             string bomPath = OutFolder + $"\\..\\BOMs\\{testParameters.SW360ProjectName}_Bom.cdx.json";
             // Assert
@@ -60,7 +60,7 @@ namespace SW360IntegrationTest
         }
 
         [Test, Order(2)]
-        public void TestComparisionBOMUpdation()
+        public void TestComparisionBOMUpdation_Conan()
         {
             bool filecheck = false;
 
@@ -99,7 +99,7 @@ namespace SW360IntegrationTest
         }
 
         [Test, Order(3)]
-        public async Task TestComponentCreation_TestMode()
+        public async Task TestComponentCreation_Conan()
         {
             //Setting the httpclient
             var httpClient = new HttpClient() { };
