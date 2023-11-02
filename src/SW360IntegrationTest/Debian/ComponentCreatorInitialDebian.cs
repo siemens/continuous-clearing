@@ -15,7 +15,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using TestUtilities;
 
-namespace SW360IntegrationTest.Debian
+namespace SW360IntegrationTest
 {
     [TestFixture, Order(18)]
     class ComponentCreatorInitialDebian

@@ -12,7 +12,7 @@ using System.IO;
 using NUnit.Framework;
 using CycloneDX.Models;
 
-namespace SW360IntegrationTest.Debian
+namespace SW360IntegrationTest
 {
     [TestFixture, Order(17)]
     class PackageIdentifierInitialDebian

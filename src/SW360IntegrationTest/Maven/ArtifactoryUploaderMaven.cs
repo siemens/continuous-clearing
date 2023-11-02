@@ -12,7 +12,7 @@ using System.Net;
 using System.Net.Http;
 using TestUtilities;
 
-namespace SW360IntegrationTest.NPM
+namespace SW360IntegrationTest
 {
     [TestFixture, Order(21)]
     public class ArtifactoryUploaderMaven

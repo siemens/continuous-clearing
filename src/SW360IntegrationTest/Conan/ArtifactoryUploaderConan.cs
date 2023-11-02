@@ -5,8 +5,9 @@ using System.Net;
 using System.Net.Http;
 using TestUtilities;
 
-namespace SW360IntegrationTest.Conan
+namespace SW360IntegrationTest
 {
+    [TestFixture, Order(25),Ignore("Out of Scope")]
     public class ArtifactoryUploaderConan
     {
         private string OutFolder { get; set; }

@@ -1,0 +1,154 @@
+﻿{
+ "graph_lock": {
+  "nodes": {
+   "0": {
+    "options": "libcurl:static=None\nopenssl:static=False",
+    "requires": [
+     "1",
+     "2",
+     "3",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9",
+     "10",
+     "11",
+     "12",
+     "13",
+     "14",
+     "15",
+     "16"
+    ],
+    "build_requires": [
+     "17"
+    ],
+    "path": "conan\\conanfile\\linux-x86_64",
+    "context": "host"
+   },
+   "1": {
+    "ref": "rapidjson/1.1.0-csc-01@siemens-energy/stable#6d624490b731387491675eebeff7ab66",
+    "options": "",
+    "package_id": "5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9",
+    "prev": "85ca839500f017c06cd5c39b4ad50c5e",
+    "context": "host"
+   },
+   "2": {
+    "ref": "libest/3.2.0-shared.5@siemens-energy/stable#0",
+    "options": "",
+    "package_id": "49e7f59961e8ed9b7d1d33caa2e6d613b00b72a5",
+    "prev": "0",
+    "context": "host"
+   },
+   "3": {
+    "ref": "openssl/3.0.9-shared.3@siemens-energy/stable#0",
+    "options": "static=False",
+    "package_id": "49e7f59961e8ed9b7d1d33caa2e6d613b00b72a5",
+    "prev": "0",
+    "context": "host"
+   },
+   "4": {
+    "ref": "sqlite/3.37.0-shared.1@siemens-energy/stable#0",
+    "options": "",
+    "package_id": "49e7f59961e8ed9b7d1d33caa2e6d613b00b72a5",
+    "prev": "0",
+    "context": "host"
+   },
+   "5": {
+    "ref": "oss_mbedtls/2.28.2-shared@siemens-energy/stable#0",
+    "options": "",
+    "package_id": "5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9",
+    "prev": "0",
+    "context": "host"
+   },
+   "6": {
+    "ref": "mongoose/v7.11-csc-01@siemens-energy/stable#7084912b9de8ac5f93c2e8aa16c259a8",
+    "options": "",
+    "package_id": "5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9",
+    "prev": "c4b1dedbd2bd5223337ce892732c693e",
+    "context": "host"
+   },
+   "7": {
+    "ref": "basics/1.0.8@siemens-energy/stable#0",
+    "options": "",
+    "package_id": "5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9",
+    "prev": "0",
+    "context": "host"
+   },
+   "8": {
+    "ref": "osal/1.0.30@siemens-energy/stable#21e224648b08c0c356e2e60d0f143ae7",
+    "options": "",
+    "package_id": "5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9",
+    "prev": "f5db57253fc37159485da5d9d37d4844",
+    "context": "host"
+   },
+   "9": {
+    "ref": "SecurityBasics/2.10.2@siemens-energy/stable#0",
+    "options": "",
+    "package_id": "5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9",
+    "prev": "0",
+    "context": "host"
+   },
+   "10": {
+    "ref": "securityaccessmanager/2.2.6@siemens-energy/stable#7522ada1783555e22afd338d9bd03d60",
+    "options": "",
+    "package_id": "5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9",
+    "prev": "493721829e0ba6c4cccb9304acc9ad71",
+    "context": "host"
+   },
+   "11": {
+    "ref": "SecurityEventLogger/2.0.24@siemens-energy/stable#ddd584e3d5551e3ba568f07b95a9e6af",
+    "options": "",
+    "package_id": "5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9",
+    "prev": "f32d263a0ba627319365f9ee41781589",
+    "context": "host"
+   },
+   "12": {
+    "ref": "securitypkimanager/2.6.3@siemens-energy/stable#a8d80c7af932e2062513e94fd2001077",
+    "options": "",
+    "package_id": "5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9",
+    "prev": "33612b4203a7c283c1dd56aa795863f6",
+    "context": "host"
+   },
+   "13": {
+    "ref": "SecurityStorageManager/2.11.2@siemens-energy/stable#6c98465724cb00ab842f16a6a17c64b6",
+    "options": "",
+    "package_id": "5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9",
+    "prev": "8f87b12afc830478491b566d2b7bf7e1",
+    "context": "host"
+   },
+   "14": {
+    "ref": "securitycommunicationmanager/2.6.5@siemens-energy/stable#fbacb77f419f7c1dc2af769841266fba",
+    "options": "",
+    "package_id": "5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9",
+    "prev": "dcd1c2048a844e785cb79e918452d56e",
+    "context": "host"
+   },
+   "15": {
+    "ref": "openldap/2.6.4-shared-ossl3.1@siemens-energy/stable#0",
+    "options": "",
+    "package_id": "49e7f59961e8ed9b7d1d33caa2e6d613b00b72a5",
+    "prev": "0",
+    "context": "host"
+   },
+   "16": {
+    "ref": "libcurl/7.87.0-shared-ossl3.1@siemens-energy/stable#0",
+    "options": "static=None",
+    "package_id": "49e7f59961e8ed9b7d1d33caa2e6d613b00b72a5",
+    "prev": "0",
+    "context": "host"
+   },
+   "17": {
+    "ref": "googletest/1.8.0@siemens-energy/stable#0",
+    "options": "",
+    "package_id": "5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9",
+    "prev": "0",
+    "context": "host"
+   }
+  },
+  "revisions_enabled": true
+ },
+ "version": "0.4",
+ "profile_host": "[settings]\narch=x86_64\narch_build=x86_64\nbuild_type=Release\ncompiler=gcc\ncompiler.libcxx=libstdc++11\ncompiler.version=9.3\nos=Linux\nos_build=Linux\nswsign:os=Windows\nswsign:os_build=Windows\nswsign:compiler=Visual Studio\nswsign:compiler.version=15\nswsign:build_type=Release\nswsign:compiler.runtime=MD\nmbedtls_csc:os=Windows\nmbedtls_csc:os_build=Windows\nmbedtls_csc:compiler=Visual Studio\nmbedtls_csc:compiler.version=15\nmbedtls_csc:build_type=Release\nmbedtls_csc:compiler.runtime=MD\n[options]\nopenssl:static=False\n[build_requires]\n[env]\n"
+}

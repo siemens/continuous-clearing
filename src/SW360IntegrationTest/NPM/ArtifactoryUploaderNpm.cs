@@ -11,7 +11,7 @@ using System.Net;
 using System.Net.Http;
 using TestUtilities;
 
-namespace SW360IntegrationTest.NPM
+namespace SW360IntegrationTest
 {
     [TestFixture, Order(12)]
     public class ArtifactoryUploaderNpm
