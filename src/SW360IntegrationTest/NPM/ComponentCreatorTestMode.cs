@@ -119,7 +119,7 @@ namespace SW360IntegrationTest
                 new AuthenticationHeaderValue(TestConstant.TestSw360TokenType, TestConstant.TestSw360TokenValue);
 
             //url formation for retrieving component details
-            string url = TestConstant.Sw360ComponentApi + TestConstant.componentNameUrl + "rxjs";
+            string url = TestConstant.Sw360ComponentApi + TestConstant.componentNameUrl + "typescript";
             string responseBody = await httpClient.GetStringAsync(url); //GET request
             var responseData = JsonConvert.DeserializeObject<ComponentsModel>(responseBody);
             //Assert

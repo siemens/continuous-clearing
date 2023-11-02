@@ -45,7 +45,7 @@ namespace LCT.SW360PackageCreator
         {
             bom = cycloneDXBomParser.ParseCycloneDXBom(appSettings.BomFilePath);
             TotalComponentsFromPackageIdentifier = bom != null ? bom.Components.Count : 0;
-            ListofBomComponents = await GetListOfBomData(bom?.Components ?? new List<Component>(),appSettings);
+            ListofBomComponents = await GetListOfBomData(bom?.Components ?? new List<Component>(), appSettings);
 
             // Removing Duplicates
             ListofBomComponents = RemoveDuplicateComponents(ListofBomComponents);
@@ -71,7 +71,7 @@ namespace LCT.SW360PackageCreator
                 {
                     Logger.Debug($"{item.Name}-{item.Version} found as internal component. ");
                 }
-                else if(componentsData.IsDev=="true" && appSettings.RemoveDevDependency)
+                else if (componentsData.IsDev == "true" && appSettings.RemoveDevDependency)
                 {
                     //do nothing
                 }
@@ -191,6 +191,9 @@ namespace LCT.SW360PackageCreator
                     componentsData = debComponentData;
                     componentsData.ProjectType = projectType;
                     break;
+                case "PYTHON":
+                    componentsData.SourceUrl = await UrlHelper.Instance.GetSourceUrlForPythonPackage(name, version);
+                    break;
                 default:
                     break;
             }
@@ -252,10 +255,8 @@ namespace LCT.SW360PackageCreator
 
             try
             {
-
                 foreach (ComparisonBomData item in componentsToBoms)
                 {
-
                     await CreateComponentAndRealease(creatorHelper, sw360CreatorService, item, sw360Url, appSettings);
                 }
             }
@@ -289,8 +290,6 @@ namespace LCT.SW360PackageCreator
         private async Task CreateComponentAndReleaseWhenNotAvailable(ComparisonBomData item,
             ISw360CreatorService sw360CreatorService, ICreatorHelper creatorHelper, CommonAppSettings appSettings)
         {
-       
-      
             if (item.ComponentStatus == Dataconstant.NotAvailable && item.ReleaseStatus == Dataconstant.NotAvailable)
             {
                 Logger.Logger.Log(null, Level.Notice, $"Creating the Component & Release : Name - {item.Name} , version - {item.Version}", null);
@@ -302,7 +301,6 @@ namespace LCT.SW360PackageCreator
                     UpdatedCompareBomData.Add(item);
                     return;
                 }
-
 
                 //till here
 
@@ -319,8 +317,6 @@ namespace LCT.SW360PackageCreator
                 {
                     await TriggeringFossologyUploadAndUpdateAdditionalData(item, sw360CreatorService, appSettings);
                 }
-
-
                 UpdatedCompareBomData.Add(item);
             }
         }

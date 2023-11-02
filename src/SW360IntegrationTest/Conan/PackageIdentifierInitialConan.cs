@@ -5,7 +5,7 @@ using TestUtilities;
 
 namespace SW360IntegrationTest
 {
-    [TestFixture, Order(23)]
+    [TestFixture, Order(26)]
     public class PackageIdentifierInitialConan
     {
         private string CCTLocalBomTestFile { get; set; }

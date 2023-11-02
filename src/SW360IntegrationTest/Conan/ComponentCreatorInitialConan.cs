@@ -10,7 +10,7 @@ using TestUtilities;
 
 namespace SW360IntegrationTest
 {
-    [TestFixture, Order(24), Ignore("Out of Scope")]
+    [TestFixture, Order(27), Ignore("Out of Scope")]
     public class ComponentCreatorInitialConan
     {
         private static readonly TestParamConan testParameters = new TestParamConan();

@@ -4,7 +4,7 @@
 <package >
   <metadata>
     <id>continuous-clearing</id>
-    <version>6.0.0</version>
+    <version>5.1.0</version>
     <authors>Siemens AG</authors>
     <owners>continuous-clearing contributors</owners>
     <projectUrl>https://github.com/siemens/continuous-clearing</projectUrl>
@@ -18,7 +18,7 @@
     </description>
     <releaseNotes></releaseNotes>
     <copyright>Copyright 2023</copyright>
-    <tags>ClearingTool SW360 OSS Clearing Software Continuous-Clearing NPM NUGET DEBIAN MAVEN SBOM</tags>
+    <tags>ClearingTool SW360 OSS Clearing Software Continuous-Clearing NPM NUGET DEBIAN MAVEN PYTHON SBOM</tags>
   </metadata>
 
   <files>
@@ -122,6 +122,7 @@
     <file src="out\net6.0\NuGet.Protocol.dll" target="tools"/>
     <file src="out\net6.0\NuGet.Versioning.dll" target="tools"/>
     <file src="out\net6.0\NuGet.Resolver.dll" target="tools"/>
+    <file src="out\net6.0\Tommy.dll" target="tools"/>
     <file src="out\net6.0\runtimes\linux-arm\native\libpsl-native.so" target="tools\runtimes\linux-arm\native"/>
     <file src="out\net6.0\runtimes\linux-arm64\native\libpsl-native.so" target="tools\runtimes\linux-arm64\native"/>
     <file src="out\net6.0\runtimes\linux-musl-x64\native\libpsl-native.so" target="tools\runtimes\linux-musl-x64\native"/>

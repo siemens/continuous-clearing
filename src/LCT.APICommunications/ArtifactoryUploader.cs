@@ -16,15 +16,15 @@ using System.Threading.Tasks;
 
 namespace LCT.APICommunications
 {
-    public static class ArtfactoryUploader 
+    public static class ArtfactoryUploader
     {
         //ConfigurationAttribute
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static string destRepoName = Environment.GetEnvironmentVariable("JfrogDestRepoName");
         private static string JfrogApi = Environment.GetEnvironmentVariable("JfrogApi");
         private static string srcRepoName = Environment.GetEnvironmentVariable("JfrogSrcRepo");
-        
-        public static async Task<HttpResponseMessage> UploadPackageToRepo(ComponentsToArtifactory component,int timeout)
+
+        public static async Task<HttpResponseMessage> UploadPackageToRepo(ComponentsToArtifactory component, int timeout)
         {
             Logger.Debug("Starting UploadPackageToArtifactory method");
             IJFrogApiCommunication jfrogApicommunication;
@@ -37,14 +37,19 @@ namespace LCT.APICommunications
                     ApiKey = component.ApiKey,
                     Email = component.Email
                 };
-                if (component?.ComponentType?.ToUpperInvariant() == "MAVEN")
+                if (component.ComponentType?.ToUpperInvariant() == "MAVEN")
                 {
-                    jfrogApicommunication = new MavenJfrogApiCommunication(component.JfrogApi, component.SrcRepoName, repoCredentials,timeout);
+                    jfrogApicommunication = new MavenJfrogApiCommunication(component.JfrogApi, component.SrcRepoName, repoCredentials, timeout);
+                    responseBodyJfrog = await jfrogApicommunication.GetPackageInfo(component);
+                }
+                else if (component.ComponentType?.ToUpperInvariant() == "PYTHON")
+                {
+                    jfrogApicommunication = new PythonJfrogApiCommunication(component.JfrogApi, component.SrcRepoName, repoCredentials, timeout);
                     responseBodyJfrog = await jfrogApicommunication.GetPackageInfo(component);
                 }
                 else
                 {
-                    jfrogApicommunication = new NpmJfrogApiCommunication(component.JfrogApi, component.SrcRepoName, repoCredentials,timeout);
+                    jfrogApicommunication = new NpmJfrogApiCommunication(component.JfrogApi, component.SrcRepoName, repoCredentials, timeout);
                     responseBodyJfrog = await jfrogApicommunication.GetPackageInfo(component);
                 }
                 if (responseBodyJfrog.StatusCode == HttpStatusCode.NotFound)
@@ -53,8 +58,6 @@ namespace LCT.APICommunications
                     responseBodyJfrog = await jfrogApicommunication.GetPackageInfo(component);
                     component.CopyPackageApiUrl = component.CopyPackageApiUrl.ToLower();
                 }
-          
-             
                 if (responseBodyJfrog.StatusCode != HttpStatusCode.OK)
                 {
                     responsemessage.StatusCode = responseBodyJfrog.StatusCode;

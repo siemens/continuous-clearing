@@ -7,7 +7,7 @@ using TestUtilities;
 
 namespace SW360IntegrationTest
 {
-    [TestFixture, Order(25),Ignore("Out of Scope")]
+    [TestFixture, Order(28),Ignore("Out of Scope")]
     public class ArtifactoryUploaderConan
     {
         private string OutFolder { get; set; }

@@ -132,27 +132,8 @@ namespace LCT.PackageIdentifier
                     }
                     else
                     {
-                        string csprojFilePath = "";
-                        string dirName = Path.GetDirectoryName(filePath);
-                        if (dirName.Contains("obj"))
-                        {
-                            dirName = dirName.Replace("obj", "");
-                            string[] filePaths = Directory.GetFiles(dirName, "*.csproj");
-                            csprojFilePath = filePaths.Length > 0 ? filePaths[0] : "";
-                        }
-                        if(!string.IsNullOrEmpty(csprojFilePath) && File.Exists(csprojFilePath))
-                        {
-                            Logger.Debug($"ParseJsonFile():Linux Asset FileName: " + csprojFilePath);
-                            isTestProject = IsTestProject(csprojFilePath);
-                            container.Name = Path.GetFileName(csprojFilePath);
-                            Logger.Debug($"ParseJsonFile():Linux Asset File: IsTestProject: " + isTestProject);
-                        }
-                        else
-                        {
-                            Logger.Debug($"ParseJsonFile():Linux Asset FileName Not Found!! ");
-                            isTestProject = false;
-                            container.Name = Path.GetFileName(filePath);
-                        }
+                        //when it's running as container
+                        isTestProject = ParseJsonInContainer(filePath, ref container);
                     }
 
                     if (isTestProject)
@@ -177,6 +158,34 @@ namespace LCT.PackageIdentifier
                 Logger.Debug($"ParseJsonFile():InvalidProjectFileException : ", ex);
                 Logger.Warn($"InvalidProjectFileException : While parsing project asset file : " + filePath + " Error : " + ex.Message + "\n");
             }
+        }
+
+        private static bool ParseJsonInContainer(string filePath, ref Container container)
+        {
+            bool isTestProject;
+            string csprojFilePath = "";
+            string dirName = Path.GetDirectoryName(filePath);
+            if (dirName.Contains("obj"))
+            {
+                dirName = dirName.Replace("obj", "");
+                string[] filePaths = Directory.GetFiles(dirName, "*.csproj");
+                csprojFilePath = filePaths.Length > 0 ? filePaths[0] : "";
+            }
+            if (!string.IsNullOrEmpty(csprojFilePath) && File.Exists(csprojFilePath))
+            {
+                Logger.Debug($"ParseJsonFile():Linux Asset FileName: " + csprojFilePath);
+                isTestProject = IsTestProject(csprojFilePath);
+                container.Name = Path.GetFileName(csprojFilePath);
+                Logger.Debug($"ParseJsonFile():Linux Asset File: IsTestProject: " + isTestProject);
+            }
+            else
+            {
+                Logger.Debug($"ParseJsonFile():Linux Asset FileName Not Found!! ");
+                isTestProject = false;
+                container.Name = Path.GetFileName(filePath);
+            }
+
+            return isTestProject;
         }
 
         private static void ParseLibrary(LockFileTargetLibrary library, bool isTestProject, IDictionary<string, BuildInfoComponent> components, LockFile assetFile)

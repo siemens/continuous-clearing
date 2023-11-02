@@ -1,0 +1,252 @@
+{
+  "BomFormat": "CycloneDX",
+  "SpecVersion": 4,
+  "SpecVersionString": "1.4",
+  "SerialNumber": null,
+  "Version": null,
+  "Metadata": {
+    "Tools": [
+      {
+        "Vendor": "Siemens AG",
+        "Name": "Clearing Automation Tool",
+        "Version": "4.0.0",
+        "Hashes": null
+      }
+    ],
+    "Authors": null,
+    "Component": null,
+    "Manufacture": null,
+    "Supplier": null
+  },
+  "Components": [
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:pypi/html5lib@1.1",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "html5lib",
+      "Version": "1.1",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:pypi/html5lib@1.1",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "ManuallyAdded"
+        },
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "PYTHON"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "Not Available"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/131c06a0c522488ebc8fbe9162529094"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": null
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:pypi/attrs@22.1.0",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "attrs",
+      "Version": "22.1.0",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:pypi/attrs@22.1.0",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "ManuallyAdded"
+        },
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "PYTHON"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "Not Available"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/c58e917444084bfa8955485c151cf945"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": null
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:pypi/beautifulsoup4@4.11.1",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "beautifulsoup4",
+      "Version": "4.11.1",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:pypi/beautifulsoup4@4.11.1",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "ManuallyAdded"
+        },
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "PYTHON"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "Not Available"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/35dd2b7677774c139cea87df7af3fe8e"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": null
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:pypi/certifi@2022.6.15",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "certifi",
+      "Version": "2022.6.15",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:pypi/certifi@2022.6.15",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "ManuallyAdded"
+        },
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "PYTHON"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "Not Available"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/46fe1664a0b7424fa9c8db018f66cd50"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": null
+        }
+      ],
+      "Evidence": null
+    }
+  ],
+  "Compositions": null
+}
