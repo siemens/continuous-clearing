@@ -67,7 +67,7 @@ namespace LCT.Services
 
                 if (modelMappedObject != null)
                 {
-                    availableComponentsList = await GetAvailableComponenentsList(modelMappedObject?.Embedded?.Sw360Releases, listOfComponentsToBom);
+                    availableComponentsList = await GetAvailableComponenentsList(modelMappedObject.Embedded?.Sw360Releases, listOfComponentsToBom);
                 }
             }
             catch (HttpRequestException ex)
