@@ -193,7 +193,7 @@ namespace LCT.SW360PackageCreator
                 }
                 if (packageSourcesInfo.SourcesData.TryGetValue(version,out var release))
                 {
-                    if (release.Url.GetType().Name == "string")
+                    if (release.Url.GetType().Name.ToLowerInvariant() == "string")
                     {
                         componentSrcURL = release.Url.ToString();
                     }
