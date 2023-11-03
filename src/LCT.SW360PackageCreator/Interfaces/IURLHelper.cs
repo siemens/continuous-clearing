@@ -39,5 +39,13 @@ namespace LCT.SW360PackageCreator.Interfaces
         /// <param name="version"></param>
         /// <returns>string</returns>
         string GetSourceUrlForNpmPackage(string componentName, string version);
+
+        /// <summary>
+        /// Gets the Source URL for PYTHON Package
+        /// </summary>
+        /// <param name="componentName"></param>
+        /// <param name="componenVersion"></param>
+        /// <returns>string</returns>
+        Task<string> GetSourceUrlForPythonPackage(string componentName, string componenVersion);
     }
 }

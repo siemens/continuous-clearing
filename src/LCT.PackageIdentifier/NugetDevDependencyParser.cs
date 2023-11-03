@@ -18,6 +18,7 @@ using System.Reflection;
 using System.Security.Cryptography;
 using LCT.PackageIdentifier.Model.NugetModel;
 using System.Text.Json;
+using System.Runtime.InteropServices;
 
 namespace LCT.PackageIdentifier
 {
@@ -122,9 +123,18 @@ namespace LCT.PackageIdentifier
                 LockFile assetFile = assetFileReader.Read(filePath);
                 if (assetFile.PackageSpec != null)
                 {
-                    isTestProject = IsTestProject(assetFile.PackageSpec.RestoreMetadata.ProjectPath);
-
-                    container.Name = Path.GetFileName(assetFile.PackageSpec.RestoreMetadata.ProjectPath);
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        Logger.Debug($"ParseJsonFile():Windows Asset FileName: " + assetFile.PackageSpec.RestoreMetadata.ProjectPath);
+                        isTestProject = IsTestProject(assetFile.PackageSpec.RestoreMetadata.ProjectPath);
+                        container.Name = Path.GetFileName(assetFile.PackageSpec.RestoreMetadata.ProjectPath);
+                        Logger.Debug($"ParseJsonFile():Windows Asset File: IsTestProject: " + isTestProject);
+                    }
+                    else
+                    {
+                        //when it's running as container
+                        isTestProject = ParseJsonInContainer(filePath, ref container);
+                    }
 
                     if (isTestProject)
                     {
@@ -138,6 +148,8 @@ namespace LCT.PackageIdentifier
                             ParseLibrary(library, isTestProject, components, assetFile);
                         }
                     }
+
+                    Logger.Debug($"ParseJsonFile():Asset file found components: " + components.Count);
                 }
 
             }
@@ -146,6 +158,34 @@ namespace LCT.PackageIdentifier
                 Logger.Debug($"ParseJsonFile():InvalidProjectFileException : ", ex);
                 Logger.Warn($"InvalidProjectFileException : While parsing project asset file : " + filePath + " Error : " + ex.Message + "\n");
             }
+        }
+
+        private static bool ParseJsonInContainer(string filePath, ref Container container)
+        {
+            bool isTestProject;
+            string csprojFilePath = "";
+            string dirName = Path.GetDirectoryName(filePath);
+            if (dirName.Contains("obj"))
+            {
+                dirName = dirName.Replace("obj", "");
+                string[] filePaths = Directory.GetFiles(dirName, "*.csproj");
+                csprojFilePath = filePaths.Length > 0 ? filePaths[0] : "";
+            }
+            if (!string.IsNullOrEmpty(csprojFilePath) && File.Exists(csprojFilePath))
+            {
+                Logger.Debug($"ParseJsonFile():Linux Asset FileName: " + csprojFilePath);
+                isTestProject = IsTestProject(csprojFilePath);
+                container.Name = Path.GetFileName(csprojFilePath);
+                Logger.Debug($"ParseJsonFile():Linux Asset File: IsTestProject: " + isTestProject);
+            }
+            else
+            {
+                Logger.Debug($"ParseJsonFile():Linux Asset FileName Not Found!! ");
+                isTestProject = false;
+                container.Name = Path.GetFileName(filePath);
+            }
+
+            return isTestProject;
         }
 
         private static void ParseLibrary(LockFileTargetLibrary library, bool isTestProject, IDictionary<string, BuildInfoComponent> components, LockFile assetFile)

@@ -86,7 +86,6 @@ namespace LCT.PackageIdentifier
 
                     if (IsDevDependent(referenceList, name, version) || devDependencyAttribute?.Value != null)
                     {
-
                         BomCreator.bomKpiData.DevDependentComponents++;
                         isDev = "true";
                     }
@@ -129,7 +128,6 @@ namespace LCT.PackageIdentifier
             {
                 if (item.Library == name && item.Version == version && item.Private)
                 {
-
                     return true;
                 }
             }
@@ -392,7 +390,15 @@ namespace LCT.PackageIdentifier
                     List<NugetPackage> listofComponents = new();
                     ParseInputFiles(appSettings, filepath, listofComponents);
                     ConvertToCycloneDXModel(listComponentForBOM, listofComponents, dependencies);
-                    bom.Dependencies = dependencies;
+                    if (bom.Dependencies == null || bom.Dependencies.Count == 0)
+                    {
+                        bom.Dependencies = dependencies;
+                        dependencies = new List<Dependency>();
+                    }
+                    else
+                    {
+                        bom.Dependencies.AddRange(dependencies);
+                    }
                     BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = listComponentForBOM.Count;
                 }
             }
@@ -416,7 +422,6 @@ namespace LCT.PackageIdentifier
 
         private static void ConvertToCycloneDXModel(List<Component> listComponentForBOM, List<NugetPackage> listofComponents, List<Dependency> dependencies)
         {
-
             foreach (var prop in listofComponents)
             {
                 Component components = new Component
@@ -499,14 +504,13 @@ namespace LCT.PackageIdentifier
             }
             else if (filepath.EndsWith(".config"))
             {
-                listofComponents.AddRange(ParsePackageConfig(filepath, appSettings));
-            }
-            else
-            {
                 var list = ParsePackageConfig(filepath, appSettings);
                 listofComponents.AddRange(list);
             }
-
+            else
+            {
+                Logger.Warn("No Proper input files found for Nuget package types.");
+            }
         }
 
 

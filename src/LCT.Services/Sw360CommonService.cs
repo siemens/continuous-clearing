@@ -148,6 +148,10 @@ namespace LCT.Services
             {
                 Logger.Error($"GetReleaseDataByExternalId():", ex);
             }
+            catch (JsonReaderException ex)
+            {
+                Logger.Error($"GetReleaseDataByExternalId():JsonReaderException", ex);
+            }
 
             return releasestatus;
         }

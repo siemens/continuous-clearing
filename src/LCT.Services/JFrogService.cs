@@ -44,7 +44,7 @@ namespace LCT.Services
                     return new List<AqlResult>();
                 }
 
-                string stringData = httpResponseMessage?.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
+                string stringData = httpResponseMessage.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
                 var aqlResponse = JsonConvert.DeserializeObject<AqlResponse>(stringData);
                 aqlResult = aqlResponse?.Results ?? new List<AqlResult>();
             }

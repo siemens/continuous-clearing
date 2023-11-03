@@ -18,7 +18,7 @@
     </description>
     <releaseNotes></releaseNotes>
     <copyright>Copyright 2023</copyright>
-    <tags>ClearingTool SW360 OSS Clearing Software Continuous-Clearing NPM NUGET DEBIAN MAVEN SBOM</tags>
+    <tags>ClearingTool SW360 OSS Clearing Software Continuous-Clearing NPM NUGET DEBIAN MAVEN PYTHON SBOM</tags>
   </metadata>
 
   <files>
@@ -82,6 +82,7 @@
     <file src="out\net6.0\Microsoft.Win32.Registry.AccessControl.dll" target="tools"/>
     <file src="out\net6.0\Microsoft.Win32.SystemEvents.dll" target="tools"/>
     <file src="out\net6.0\Namotion.Reflection.dll" target="tools"/>
+    <file src="out\net6.0\PackageUrl.dll" target="tools"/>
     <file src="out\net6.0\Newtonsoft.Json.Bson.dll" target="tools"/>
     <file src="out\net6.0\Newtonsoft.Json.dll" target="tools"/>
     <file src="out\net6.0\NJsonSchema.dll" target="tools"/>
@@ -121,6 +122,7 @@
     <file src="out\net6.0\NuGet.Protocol.dll" target="tools"/>
     <file src="out\net6.0\NuGet.Versioning.dll" target="tools"/>
     <file src="out\net6.0\NuGet.Resolver.dll" target="tools"/>
+    <file src="out\net6.0\Tommy.dll" target="tools"/>
     <file src="out\net6.0\runtimes\linux-arm\native\libpsl-native.so" target="tools\runtimes\linux-arm\native"/>
     <file src="out\net6.0\runtimes\linux-arm64\native\libpsl-native.so" target="tools\runtimes\linux-arm64\native"/>
     <file src="out\net6.0\runtimes\linux-musl-x64\native\libpsl-native.so" target="tools\runtimes\linux-musl-x64\native"/>
