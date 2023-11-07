@@ -85,10 +85,21 @@ namespace LCT.ArtifactoryUploader
                         ApiKey = appSettings.ArtifactoryUploadApiKey,
                         Email = appSettings.ArtifactoryUploadUser,
                         JfrogApi = appSettings.JFrogApi,
-                        SrcRepoPathWithFullName = aqlResult != null ? aqlResult.Repo + "/" + aqlResult.Path + "/" + aqlResult.Name : string.Empty,
-                        Path = aqlResult != null ? GetConanPath(aqlResult.Path, $"{item.Name}/{item.Version}") : string.Empty,
-                        PypiCompName = aqlResult != null ? aqlResult.Name : string.Empty
                     };
+
+                    if (aqlResult != null)
+                    {
+                        components.SrcRepoPathWithFullName = aqlResult.Repo + "/" + aqlResult.Path + "/" + aqlResult.Name;
+                        components.Path = GetConanPath(aqlResult.Path, $"{item.Name}/{item.Version}");
+                        components.PypiCompName = aqlResult.Name;
+                    }
+                    else
+                    {
+                        components.SrcRepoPathWithFullName = string.Empty;
+                        components.Path = string.Empty;
+                        components.PypiCompName = string.Empty;
+                    }
+
                     components.PackageInfoApiUrl = GetPackageInfoURL(components);
                     components.CopyPackageApiUrl = GetCopyURL(components);
                     componentsToBeUploaded.Add(components);
