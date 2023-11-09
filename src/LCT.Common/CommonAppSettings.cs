@@ -65,6 +65,7 @@ namespace LCT.Common
         public Config Maven { get; set; }
         public Config Debian { get; set; }
         public Config Python { get; set; }
+        public Config Conan { get; set; }
         public string CaVersion { get; set; }
         public string CycloneDxSBomTemplatePath { get; set; }
         public string[] InternalRepoList { get; set; }
@@ -74,6 +75,7 @@ namespace LCT.Common
         public string JfrogNugetDestRepoName { get; set; }
         public string JfrogMavenDestRepoName { get; set; }
         public string JfrogPythonDestRepoName { get; set; }
+        public string JfrogConanDestRepoName { get; set; }
         public string JfrogNugetSrcRepo { get; set; }
         public string Mode { get; set; } = string.Empty;
 
