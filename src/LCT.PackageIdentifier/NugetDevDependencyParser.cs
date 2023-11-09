@@ -82,7 +82,13 @@ namespace LCT.PackageIdentifier
             catch (InvalidProjectFileException ex)
             {
                 Logger.Debug($"IsTestProject(): Failed to read project file : " + projectPath, ex);
-                Logger.Warn($"IsTestProject: Failed to read project file : " + projectPath);
+                Logger.Warn($"IsTestProject: Failed to read project file, evaluation fails for : " + projectPath);
+                return false;
+            }
+            catch (InvalidOperationException ex)
+            {
+                Logger.Debug($"IsTestProject(): Failed to read project file : " + projectPath, ex);
+                Logger.Warn($"IsTestProject: Failed to read project file, Maybe there is already an equivalent project loaded in the project collection " + projectPath);
                 return false;
             }
             catch (MissingFieldException ex)
@@ -92,6 +98,12 @@ namespace LCT.PackageIdentifier
                 return false;
             }
             catch (ArgumentException ex)
+            {
+                Logger.Debug($"IsTestProject(): Failed to read project file : " + projectPath, ex);
+                Logger.Warn($"IsTestProject: Failed to read project file : " + projectPath);
+                return false;
+            }
+            catch (IOException ex)
             {
                 Logger.Debug($"IsTestProject(): Failed to read project file : " + projectPath, ex);
                 Logger.Warn($"IsTestProject: Failed to read project file : " + projectPath);
