@@ -169,7 +169,7 @@ namespace LCT.SW360PackageCreator
             var downLoadUrl = sourceURL + componentName + "/all/conandata.yml";
             var deserializer = new DeserializerBuilder().WithNamingConvention(UnderscoredNamingConvention.Instance).Build();
             string componentSrcURL = string.Empty;
-            Sources packageSourcesInfo;
+            Sources packageSourcesInfo=new Sources();
             using (HttpClient _httpClient=new HttpClient())
             {
                 try
@@ -180,7 +180,7 @@ namespace LCT.SW360PackageCreator
                     var jsonObject = await response.Content.ReadAsStringAsync();
                     packageSourcesInfo = deserializer.Deserialize<Sources>(jsonObject);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
 
                     var response = new HttpResponseMessage(HttpStatusCode.NotFound)
@@ -188,8 +188,10 @@ namespace LCT.SW360PackageCreator
                         Content = new StringContent(string.Format("Problem Getting Information from Conan Server For = {0}", componentName)),
                         ReasonPhrase = "Problem Occured while connecting to conan Server"
                     };
-
-                    throw new HttpResponseException("Problem Inside GetSourceUrlForConanPackage", response);
+                }
+                finally
+                { 
+                    _httpClient.Dispose(); 
                 }
                 if (packageSourcesInfo.SourcesData.TryGetValue(version,out var release))
                 {
