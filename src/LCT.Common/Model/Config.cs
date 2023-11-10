@@ -22,6 +22,7 @@ namespace LCT.Common.Model
         public string[] JfrogNugetRepoList { get; set; }
         public string[] JfrogMavenRepoList { get; set; }
         public string[] JfrogPythonRepoList { get; set; }
+        public string[] JfrogConanRepoList { get; set; }
         public string[] DevDependentScopeList { get; set; }
         
     }

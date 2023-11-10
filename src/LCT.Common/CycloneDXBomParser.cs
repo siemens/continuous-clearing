@@ -72,8 +72,8 @@ namespace LCT.Common
             }
 
             //Taking SBOM Template Metadata
-            bom.Metadata = template?.Metadata;
-            bom.Dependencies = template?.Dependencies;
+            bom.Metadata = template.Metadata;
+            bom.Dependencies = template.Dependencies;
             return bom;
         }
 
