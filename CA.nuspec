@@ -4,7 +4,7 @@
 <package >
   <metadata>
     <id>continuous-clearing</id>
-    <version>5.0.0</version>
+    <version>5.1.0</version>
     <authors>Siemens AG</authors>
     <owners>continuous-clearing contributors</owners>
     <projectUrl>https://github.com/siemens/continuous-clearing</projectUrl>
@@ -13,7 +13,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>
       The License clearing tool helps the Project Manager/Developer, to reduce the manual effort and enable the faster license clearing process,
-      by automatically identifying the third party oss components used in their project(i.e., npm, nuget, maven,python and Debian type) and it creates them in the sw360 and fossology
+      by automatically identifying the third party oss components used in their project(i.e., npm, nuget, maven, python, conan and Debian type) and it creates them in the sw360 and fossology
       for clearing license
     </description>
     <releaseNotes></releaseNotes>
