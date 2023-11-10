@@ -195,9 +195,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
         with:
-          tag_name: v5.0.0
+          tag_name: v5.1.0
           #tag_name: ${{ needs.build.outputs.semver }}
-          release_name: Release v5.0.0
+          release_name: Release v5.1.0
           body: |
             ${{ github.event.head_commit.message }}
           draft: true
