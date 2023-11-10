@@ -179,6 +179,18 @@ namespace LCT.SW360PackageCreator
                     response.EnsureSuccessStatusCode();
                     var jsonObject = await response.Content.ReadAsStringAsync();
                     packageSourcesInfo = deserializer.Deserialize<Sources>(jsonObject);
+                    if (packageSourcesInfo.SourcesData.TryGetValue(version, out var release))
+                    {
+                        if (release.Url.GetType().Name.ToLowerInvariant() == "string")
+                        {
+                            componentSrcURL = release.Url.ToString();
+                        }
+                        else
+                        {
+                            List<object> urlList = (List<object>)release.Url;
+                            componentSrcURL = urlList.FirstOrDefault() != null ? urlList.FirstOrDefault().ToString() : "";
+                        }
+                    }
                 }
                 catch (Exception)
                 {
@@ -193,18 +205,7 @@ namespace LCT.SW360PackageCreator
                 { 
                     _httpClient.Dispose(); 
                 }
-                if (packageSourcesInfo.SourcesData.TryGetValue(version,out var release))
-                {
-                    if (release.Url.GetType().Name.ToLowerInvariant() == "string")
-                    {
-                        componentSrcURL = release.Url.ToString();
-                    }
-                    else
-                    {
-                        List<object> urlList = (List<object>)release.Url;
-                        componentSrcURL = urlList.FirstOrDefault() != null ? urlList.FirstOrDefault().ToString() : "";
-                    }
-                }
+                
                 
 
             }
