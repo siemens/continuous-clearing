@@ -140,8 +140,8 @@ namespace LCT.ArtifactoryUploader
             }
             else if (component.ComponentType == "CONAN")
             {
-                url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.Path}" +
-                $"?to=/{component.DestRepoName}/{component.Path}";
+                url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/siemens-energy/{component.Name}/{component.Version}" +
+                $"?to=/{component.DestRepoName}";
             }
             else
             {
@@ -185,7 +185,7 @@ namespace LCT.ArtifactoryUploader
             }
             else if (component.ComponentType == "CONAN")
             {
-                url = $"{component.JfrogApi}{ApiConstant.PackageInfoApi}{component.SrcRepoName}/{component.Path}";
+                url = $"{component.JfrogApi}{ApiConstant.PackageInfoApi}{component.SrcRepoName}/siemens-energy/{component.Name}/{component.Version}";
             }
             else
             {
