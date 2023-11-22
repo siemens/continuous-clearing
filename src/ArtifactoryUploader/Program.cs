@@ -46,8 +46,11 @@ namespace ArtifactoryUploader
             Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Artifactory Uploader >>>>>====================", null);
             Logger.Logger.Log(null, Level.Notice, $"\nStart of Artifactory Uploader execution: {DateTime.Now}", null);
 
-            if (appSettings.IsTestMode)
-                Logger.Logger.Log(null, Level.Alert, $"Artifactory Uploader is running in TEST mode \n", null);
+            if (appSettings.Release)
+                Logger.Logger.Log(null, Level.Alert, $"Artifactory Uploader is running in release mode !!! \n", null);
+            else
+                Logger.Logger.Log(null, Level.Alert, $"Artifactory Uploader is running in dry-run mode, no packages will be moved \n", null);
+
 
 
             Logger.Logger.Log(null, Level.Notice, $"Input Parameters used in Artifactory Uploader:\n\t" +
@@ -55,9 +58,6 @@ namespace ArtifactoryUploader
                 $"JFrogUrl\t\t --> {appSettings.JFrogApi}\n\t" +
                 $"Artifactory User\t --> {appSettings.ArtifactoryUploadUser}\n\t" +
                 $"LogFolderPath\t\t --> {Path.GetFullPath(FolderPath)}", null);
-
-            if (appSettings.IsTestMode)
-                Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);
 
             //Validator method to check token validity
             ArtifactoryCredentials artifactoryCredentials = new ArtifactoryCredentials()

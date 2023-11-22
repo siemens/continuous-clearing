@@ -33,7 +33,7 @@ namespace LCT.APICommunications
             try
             {
                 ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials()
-                {
+                { 
                     ApiKey = component.ApiKey,
                     Email = component.Email
                 };
@@ -51,7 +51,7 @@ namespace LCT.APICommunications
                 {
                     jfrogApicommunication = new NpmJfrogApiCommunication(component.JfrogApi, component.SrcRepoName, repoCredentials, timeout);
                     responseBodyJfrog = await jfrogApicommunication.GetPackageInfo(component);
-                }
+                }             
                 if (responseBodyJfrog.StatusCode == HttpStatusCode.NotFound)
                 {
                     component.PackageInfoApiUrl = component.PackageInfoApiUrl.ToLower();
@@ -72,7 +72,15 @@ namespace LCT.APICommunications
                     responsemessage.ReasonPhrase = ApiConstant.ErrorInUpload;
                     return responsemessage;
                 }
-                Logger.Info($"Successfully copied package {component.PackageName}-{component.Version} from {component.SrcRepoName} to {component.DestRepoName}");
+
+                if (component.DryRun)
+                {
+                    Logger.Info($"Successful dry-run for package {component.PackageName}-{component.Version} from {component.SrcRepoName} to {component.DestRepoName}");
+                }
+                else
+                {
+                    Logger.Info($"Successfully copied package {component.PackageName}-{component.Version} from {component.SrcRepoName} to {component.DestRepoName}");
+                }
             }
             catch (HttpRequestException ex)
             {
