@@ -68,7 +68,6 @@ namespace LCT.APICommunications
                 responsemessage = await jfrogApicommunication.CopyFromRemoteRepo(component);
                 if (responsemessage.StatusCode != HttpStatusCode.OK)
                 {
-                    responsemessage.StatusCode = responseBodyJfrog.StatusCode;
                     responsemessage.ReasonPhrase = ApiConstant.ErrorInUpload;
                     return responsemessage;
                 }

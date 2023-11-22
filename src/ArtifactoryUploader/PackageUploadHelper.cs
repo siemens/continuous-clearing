@@ -363,7 +363,6 @@ namespace LCT.ArtifactoryUploader
                         Logger.Error($"Package {item.Name}-{item.Version} Upload Failed!!");
                         IncrementCountersBasedOnPackageType(uploaderKpiData, packageType, false);
                         item.DestRepoName = null;
-                        uploaderKpiData.PackagesNotUploadedDueToError++;
                     }
                     else
                     {
