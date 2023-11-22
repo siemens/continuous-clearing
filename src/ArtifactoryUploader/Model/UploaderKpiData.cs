@@ -39,5 +39,23 @@ namespace LCT.ArtifactoryUploader.Model
         [DisplayName(@"Time taken by ComponentCreator")]
         public double TimeTakenByComponentCreator { get; set; }
 
+        [DisplayName(@"Development Packages to be uploaded")]
+        public int DevPackagesToBeUploaded { get; set; }
+
+        [DisplayName(@"Development Packages Uploaded to Siparty DevDep Repo")]
+        public int DevPackagesUploaded { get; set; }
+
+        [DisplayName(@"Development Packages Not Uploaded to Siparty DevDep Repo")]
+        public int DevPackagesNotUploadedToJfrog { get; set; }
+
+        [DisplayName(@"Internal Packages to be uploaded")]
+        public int InternalPackagesToBeUploaded { get; set; }
+
+        [DisplayName(@"Internal Packages Uploaded to Repo")]
+        public int InternalPackagesUploaded { get; set; }
+
+        [DisplayName(@"Internal Packages Not Uploaded to Repo")]
+        public int InternalPackagesNotUploadedToJfrog { get; set; }
+
     }
 }
