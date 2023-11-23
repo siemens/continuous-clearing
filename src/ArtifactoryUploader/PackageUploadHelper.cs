@@ -239,7 +239,7 @@ namespace LCT.ArtifactoryUploader
                         return GetRepoName(packageType, appSettings.JfrogInternalNugetDestRepo, appSettings.JfrogDevNugetDestRepo, appSettings.JfrogNugetDestRepoName);
                     case "maven":
                         return GetRepoName(packageType, appSettings.JfrogInternalMavenDestRepo, appSettings.JfrogDevMavenDestRepo, appSettings.JfrogMavenDestRepoName);
-                    case "pypi":
+                    case "python":
                         return GetRepoName(packageType, appSettings.JfrogInternalPythonDestRepo, appSettings.JfrogDevPythonDestRepo, appSettings.JfrogPythonDestRepoName);
                     case "conan":
                         return GetRepoName(packageType, appSettings.JfrogInternalConanDestRepo, appSettings.JfrogDevConanDestRepo, appSettings.JfrogConanDestRepoName);
@@ -296,7 +296,7 @@ namespace LCT.ArtifactoryUploader
 
         private async static Task<AqlResult> GetSrcRepoDetailsForPyPiOrConanPackages(Component item, CommonAppSettings appSettings)
         {
-            if (item.Purl.Contains("pypi", StringComparison.OrdinalIgnoreCase) && aqlResultList.Count == 0)
+            if (item.Purl.Contains("pypi", StringComparison.OrdinalIgnoreCase))
             {
                 // get the  component list from Jfrog for given repo
                 aqlResultList = await GetListOfComponentsFromRepo(appSettings.Python?.JfrogPythonRepoList, jFrogService);
@@ -344,7 +344,7 @@ namespace LCT.ArtifactoryUploader
             if (!(item.SrcRepoName.Equals(item.DestRepoName, StringComparison.OrdinalIgnoreCase)))
             {
                 if (!(item.SrcRepoName.Contains("Not Found in JFrog")))
-                {
+                {   
                     HttpResponseMessage responseMessage = await ArtfactoryUploader.UploadPackageToRepo(item, timeout);
 
                     if (responseMessage.StatusCode == HttpStatusCode.OK && !item.DryRun)
