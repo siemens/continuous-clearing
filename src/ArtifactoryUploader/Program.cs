@@ -57,6 +57,7 @@ namespace ArtifactoryUploader
                 $"BomFilePath\t\t --> {appSettings.BomFilePath}\n\t" +
                 $"JFrogUrl\t\t --> {appSettings.JFrogApi}\n\t" +
                 $"Artifactory User\t --> {appSettings.ArtifactoryUploadUser}\n\t" +
+                $"Release\t\t\t --> {appSettings.Release}\n\t" +
                 $"LogFolderPath\t\t --> {Path.GetFullPath(FolderPath)}", null);
 
             //Validator method to check token validity
