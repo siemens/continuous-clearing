@@ -104,7 +104,7 @@ namespace LCT.APICommunications
             return httpClient;
         }
 
-        private void ValidateParameters(string packageName, string path)
+        private static void ValidateParameters(string packageName, string path)
         {
             if (string.IsNullOrEmpty(packageName) && string.IsNullOrEmpty(path))
             {
@@ -112,7 +112,7 @@ namespace LCT.APICommunications
             }
         }
 
-        private string BuildAqlQuery(string repoName, string packageName, string path)
+        private static string BuildAqlQuery(string repoName, string packageName, string path)
         {
             var queryList = new List<string>()
             {
