@@ -179,20 +179,6 @@ namespace LCT.ArtifactoryUploader
             return component.DryRun ? $"{url}&dry=1" : url;
         }
 
-        private static string GetConanPath(string path, string package)
-        {
-            //// Get Path only till PackageName/Version so that everything in folder can be copied
-            if (path.Contains(package))
-            {
-                int index = path.IndexOf(package);
-                return path.Substring(0, index + package.Length);
-            }
-            else
-            {
-                return path;
-            }
-        }
-
         private static string GetPackagePath(ComponentsToArtifactory component, AqlResult aqlResult)
         {
             switch (component.ComponentType)
