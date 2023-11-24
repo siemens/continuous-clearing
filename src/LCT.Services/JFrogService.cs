@@ -14,6 +14,7 @@ using LCT.APICommunications.Model.AQL;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace LCT.Services
 {
@@ -47,6 +48,35 @@ namespace LCT.Services
                 string stringData = httpResponseMessage.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
                 var aqlResponse = JsonConvert.DeserializeObject<AqlResponse>(stringData);
                 aqlResult = aqlResponse?.Results ?? new List<AqlResult>();
+            }
+            catch (HttpRequestException httpException)
+            {
+                Logger.Debug(httpException);
+            }
+            catch (InvalidOperationException invalidOperationExcep)
+            {
+                Logger.Debug(invalidOperationExcep);
+            }
+            catch (TaskCanceledException taskCancelledException)
+            {
+                Logger.Debug(taskCancelledException);
+            }
+
+            return aqlResult;
+        }
+
+        public async Task<AqlResult?> GetPackageInfo(string repoName, string packageName, string path)
+        {
+            HttpResponseMessage httpResponseMessage = null;
+            AqlResult aqlResult = null;
+            try
+            {
+                httpResponseMessage = await m_JFrogApiCommunicationFacade.GetPackageInfo(repoName, packageName, path);
+                httpResponseMessage.EnsureSuccessStatusCode();
+
+                string stringData = httpResponseMessage.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
+                var aqlResponse = JsonConvert.DeserializeObject<AqlResponse>(stringData);
+                aqlResult = aqlResponse?.Results.FirstOrDefault();
             }
             catch (HttpRequestException httpException)
             {

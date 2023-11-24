@@ -89,25 +89,22 @@ namespace LCT.ArtifactoryUploader
                         ApiKey = appSettings.ArtifactoryUploadApiKey,
                         Email = appSettings.ArtifactoryUploadUser,
                         JfrogApi = appSettings.JFrogApi,
-                        SrcRepoPathWithFullName = aqlResult != null ? aqlResult.Repo + "/" + aqlResult.Path + "/" + aqlResult.Name : string.Empty,
-                        PypiCompName = aqlResult != null ? aqlResult.Name : string.Empty
                     };
 
                     if (aqlResult != null)
                     {
                         components.SrcRepoPathWithFullName = aqlResult.Repo + "/" + aqlResult.Path + "/" + aqlResult.Name;
-                        components.Path = GetConanPath(aqlResult.Path, $"{item.Name}/{item.Version}");
                         components.PypiCompName = aqlResult.Name;
                     }
                     else
                     {
                         components.SrcRepoPathWithFullName = string.Empty;
-                        components.Path = string.Empty;
                         components.PypiCompName = string.Empty;
                     }
 
-                    components.PackageInfoApiUrl = GetPackageInfoURL(components);
+                    components.Path = GetPackagePath(components, aqlResult);
                     components.CopyPackageApiUrl = GetCopyURL(components);
+                    components.JfrogPackageName = GetJfrogPackageName(components);
                     componentsToBeUploaded.Add(components);
                 }
                 else
@@ -172,6 +169,8 @@ namespace LCT.ArtifactoryUploader
             {
                 url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.Path}" +
                $"?to=/{component.DestRepoName}/{component.Path}";
+               // Add a wild card to the path end for jFrog AQL query search
+               component.Path= $"{component.Path}/*" ;
             }
             else
             {
@@ -194,34 +193,60 @@ namespace LCT.ArtifactoryUploader
             }
         }
 
-        private static string GetPackageInfoURL(ComponentsToArtifactory component)
+        private static string GetPackagePath(ComponentsToArtifactory component, AqlResult aqlResult)
         {
-            string url = string.Empty;
-            if (component.ComponentType == "NPM")
+            switch (component.ComponentType)
             {
-                url = $"{component.JfrogApi}{ApiConstant.PackageInfoApi}{component.SrcRepoName}/{component.Name}/-/{component.PackageName}-{component.Version}{ApiConstant.NpmExtension}";
+                case "NPM":
+                    return $"{component.Name}/-";
+
+                case "CONAN" when aqlResult != null:
+                    string path = aqlResult.Path;
+                    string package = $"{component.Name}/{component.Version}";
+
+                    if (path.Contains(package))
+                    {
+                        int index = path.IndexOf(package);
+                        return path.Substring(0, index + package.Length);
+                    }
+                    else
+                    {
+                        return path;
+                    }
+
+                default:
+                    return string.Empty;
             }
-            else if (component.ComponentType == "NUGET")
+        }
+
+        private static string GetJfrogPackageName(ComponentsToArtifactory component)
+        {
+            string packageName;
+
+            switch (component.ComponentType)
             {
-                url = $"{component.JfrogApi}{ApiConstant.PackageInfoApi}{component.SrcRepoName}/{component.PackageName}.{component.Version}{ApiConstant.NugetExtension}";
+                case "NPM":
+                    packageName = $"{component.PackageName}-{component.Version}{ApiConstant.NpmExtension}";
+                    break;
+
+                case "NUGET":
+                    packageName = $"{component.PackageName}.{component.Version}{ApiConstant.NugetExtension}";
+                    break;
+
+                case "MAVEN":
+                    packageName = $"/{component.Name}/{component.Version}";
+                    break;
+
+                case "PYTHON":
+                    packageName = component.PypiCompName;
+                    break;
+
+                default:
+                    packageName = string.Empty;
+                    break;
             }
-            else if (component.ComponentType == "MAVEN")
-            {
-                url = $"{component.JfrogApi}{ApiConstant.PackageInfoApi}{component.SrcRepoName}/{component.Name}/{component.Version}";
-            }
-            else if (component.ComponentType == "PYTHON")
-            {
-                url = $"{component.JfrogApi}{ApiConstant.PackageInfoApi}{component.SrcRepoPathWithFullName}";
-            }
-            else if (component.ComponentType == "CONAN")
-            {
-                url = $"{component.JfrogApi}{ApiConstant.PackageInfoApi}{component.SrcRepoName}/{component.Path}";
-            }
-            else
-            {
-                // Do nothing
-            }
-            return url;
+
+            return packageName;
         }
 
         private static string GetDestinationRepo(Component item, CommonAppSettings appSettings)
@@ -344,7 +369,8 @@ namespace LCT.ArtifactoryUploader
             if (!(item.SrcRepoName.Equals(item.DestRepoName, StringComparison.OrdinalIgnoreCase)))
             {
                 if (!(item.SrcRepoName.Contains("Not Found in JFrog")))
-                {   
+                {
+                    ArtfactoryUploader.jFrogService = jFrogService;
                     HttpResponseMessage responseMessage = await ArtfactoryUploader.UploadPackageToRepo(item, timeout);
 
                     if (responseMessage.StatusCode == HttpStatusCode.OK && !item.DryRun)

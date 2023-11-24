@@ -28,5 +28,6 @@ namespace LCT.APICommunications.Model
         public  PackageType PackageType { get; set; }
         public bool DryRun { get; set; } = true;
         public string Purl { get; set; }
+        public string JfrogPackageName { get;set; }
     }
 }
