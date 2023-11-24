@@ -58,6 +58,13 @@ namespace LCT.APICommunications
             return await httpClient.PostAsync(uri, httpContent);
         }
 
+        /// <summary>
+        /// Gets the package information in the repo, via the name or path
+        /// </summary>
+        /// <param name="repoName">repoName</param>
+        /// <param name="packageName">repoName</param>
+        /// <param name="path">repoName</param>
+        /// <returns>AqlResult</returns>
         public async Task<HttpResponseMessage> GetPackageInfo(string repoName, string packageName)
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
@@ -78,11 +85,35 @@ namespace LCT.APICommunications
 
         public async Task<HttpResponseMessage> GetPackageInfo(string repoName, string packageName = null, string path = null)
         {
-            if(string.IsNullOrEmpty(packageName) && string.IsNullOrEmpty(path))
+            ValidateParameters(packageName, path);
+
+            var aqlQueryToBody = BuildAqlQuery(repoName, packageName, path);
+
+            string uri = $"{DomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}";
+            HttpContent httpContent = new StringContent(aqlQueryToBody);
+
+            return await ExecuteSearchAqlAsync(uri, httpContent);
+        }
+
+        private static HttpClient GetHttpClient(ArtifactoryCredentials credentials)
+        {
+            HttpClient httpClient = new HttpClient();
+
+            httpClient.DefaultRequestHeaders.Add(ApiConstant.JFrog_API_Header, credentials.ApiKey);
+            httpClient.DefaultRequestHeaders.Add(ApiConstant.Email, credentials.Email);
+            return httpClient;
+        }
+
+        private void ValidateParameters(string packageName, string path)
+        {
+            if (string.IsNullOrEmpty(packageName) && string.IsNullOrEmpty(path))
             {
                 throw new ArgumentException("Either packageName or path, or both must be provided.");
             }
+        }
 
+        private string BuildAqlQuery(string repoName, string packageName, string path)
+        {
             var queryList = new List<string>()
             {
                 $"\"repo\":{{\"$eq\":\"{repoName}\"}}"
@@ -98,26 +129,19 @@ namespace LCT.APICommunications
                 queryList.Add($"\"name\":{{\"$match\":\"{packageName}\"}}");
             }
 
+            StringBuilder query = new();
+            query.Append($"items.find({{{string.Join(", ", queryList)}}}).include(\"repo\", \"path\", \"name\").limit(1)");
+
+            return query.ToString();
+        }
+
+        private async Task<HttpResponseMessage> ExecuteSearchAqlAsync(string uri, HttpContent httpContent)
+        {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
             TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
             httpClient.Timeout = timeOutInSec;
 
-            StringBuilder query = new();
-            query.Append($"items.find({{{string.Join(", ", queryList)}}}).include(\"repo\", \"path\", \"name\").limit(1)");
-
-            string aqlQueryToBody = query.ToString();
-            string uri = $"{DomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}";
-            HttpContent httpContent = new StringContent(aqlQueryToBody);
             return await httpClient.PostAsync(uri, httpContent);
-        }
-
-        private static HttpClient GetHttpClient(ArtifactoryCredentials credentials)
-        {
-            HttpClient httpClient = new HttpClient();
-
-            httpClient.DefaultRequestHeaders.Add(ApiConstant.JFrog_API_Header, credentials.ApiKey);
-            httpClient.DefaultRequestHeaders.Add(ApiConstant.Email, credentials.Email);
-            return httpClient;
         }
     }
 }
