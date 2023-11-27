@@ -45,9 +45,9 @@ namespace LCT.SW360PackageCreator
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly HttpClient httpClient = new HttpClient();
-        private HttpResponseMessage responseMessage=new HttpResponseMessage();
         public static string GithubUrl { get; set; } = string.Empty;
         public static UrlHelper Instance { get; } = new UrlHelper();
+        public CommonAppSettings CommonAppSettings =new CommonAppSettings();
 
         private bool _disposed;
 
@@ -165,8 +165,7 @@ namespace LCT.SW360PackageCreator
         public async Task<string> GetSourceUrlForConanPackage(string componentName, string version) 
         {
 
-            string sourceURL = "https://raw.githubusercontent.com/conan-io/conan-center-index/master/recipes/";
-            var downLoadUrl = sourceURL + componentName + "/all/conandata.yml";
+            var downLoadUrl = $"{CommonAppSettings.SourceURLConan}" + componentName + "/all/conandata.yml";
             var deserializer = new DeserializerBuilder().WithNamingConvention(UnderscoredNamingConvention.Instance).Build();
             string componentSrcURL = string.Empty;
             Sources packageSourcesInfo=new Sources();
