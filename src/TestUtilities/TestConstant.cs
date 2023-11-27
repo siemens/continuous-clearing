@@ -46,6 +46,7 @@ namespace TestUtilities
         public const string JfrogNPMDestRepoName = "--jfrognpmdestreponame ";
         public const string JfrogNugetDestRepoName = "--jfrognugetdestreponame ";
         public const string JfrogMavenDestRepoName = "--jfrogmavendestreponame ";
+        public const string JfrogConanDestRepoName = "--jfrogconandestreponame ";
         public const string NuspecMode = "--NuspecMode";
         public const string JFrogApiURL = "--JFrogApi";
         public const string CycloneDxSBomTemplatePath = "--cycloneDxSBomTemplatePath"; 

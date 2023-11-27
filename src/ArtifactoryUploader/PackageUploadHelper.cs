@@ -141,7 +141,7 @@ namespace LCT.ArtifactoryUploader
             else if (component.ComponentType == "CONAN")
             {
                 url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.Path}" +
-                $"?to=/{component.DestRepoName}/{component.Path}";
+               $"?to=/{component.DestRepoName}/{component.Path}";
             }
             else
             {
@@ -267,7 +267,7 @@ namespace LCT.ArtifactoryUploader
             }
             else if (item.Purl.Contains("conan", StringComparison.OrdinalIgnoreCase))
             {
-                var aqlConanResultList = await GetListOfComponentsFromRepo(appSettings.Conan?.JfrogConanRepoList, jFrogService);
+                var aqlConanResultList = await GetListOfComponentsFromRepo(new string[] { item.Properties.Where(x => x.Name == Dataconstant.Cdx_ArtifactoryRepoUrl).FirstOrDefault()?.Value }, jFrogService);
 
                 if (aqlConanResultList.Count > 0)
                 {
