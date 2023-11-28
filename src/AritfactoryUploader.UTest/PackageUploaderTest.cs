@@ -6,13 +6,13 @@
 
 using ArtifactoryUploader;
 using LCT.ArtifactoryUploader;
+using LCT.Common;
 using NUnit.Framework;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using UnitTestUtilities;
-using LCT.Common;
 
 namespace AritfactoryUploader.UTest
 {
@@ -39,8 +39,6 @@ namespace AritfactoryUploader.UTest
             Program.UploaderStopWatch.Start();
             Thread.Sleep(10);
             Program.UploaderStopWatch.Stop();
-
-
             //Act
             await PackageUploader.UploadPackageToArtifactory(CommonAppSettings);
 
