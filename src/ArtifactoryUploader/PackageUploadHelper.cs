@@ -371,7 +371,7 @@ namespace LCT.ArtifactoryUploader
 
         public static async Task<List<AqlResult>> GetListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService)
         {
-            if (repoList != null && repoList.Length > 0)
+            if (jFrogService != null && repoList != null && repoList.Length > 0)
             {
                 foreach (var repo in repoList)
                 {
