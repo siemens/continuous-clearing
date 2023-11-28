@@ -23,7 +23,7 @@ namespace LCT.Common
                 table = TOML.Parse(reader);
                 return table;
             }
-            catch(Exception ex)
+            catch(TomlParseException)
             {
                 return new TomlTable();
             }

@@ -292,7 +292,7 @@ namespace LCT.PackageIdentifier
         private static void GetPackagesForBom(ref List<Component> lstComponentForBOM, ref int noOfDevDependent, List<ConanPackage> nodePackages)
         {
             var rootNode = nodePackages.FirstOrDefault();
-            if (!rootNode.Dependencies.Any() || rootNode.Dependencies == null)
+            if (rootNode != null && (!rootNode.Dependencies.Any() || rootNode.Dependencies == null))
             {
                 throw new ArgumentNullException(nameof(nodePackages), "Dependency(requires) node name details not present in the root node.");
             }
