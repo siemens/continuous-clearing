@@ -107,7 +107,8 @@ namespace LCT.SW360PackageCreator
             {
                 { "NPM", new PackageDownloader() },
                 { "NUGET", new PackageDownloader() },
-                { "DEBIAN", new DebianPackageDownloader(debianPatcher) }
+                { "DEBIAN", new DebianPackageDownloader(debianPatcher) },
+                { "CONAN", new ConanPackageDownloader() }
             };
 
             ICreatorHelper creatorHelper = new CreatorHelper(_packageDownloderList);

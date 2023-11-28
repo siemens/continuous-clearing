@@ -73,7 +73,7 @@ namespace LCT.ArtifactoryUploader
             {
                 if (item.Properties.Exists(p => p.Name == Dataconstant.Cdx_ClearingState && p.Value.ToUpperInvariant() == "APPROVED"))
                 {
-                    AqlResult aqlResult = await GetSrcRepoDetailsForPyPiPackages(item, appSettings);
+                    AqlResult aqlResult = await GetSrcRepoDetailsForPyPiOrConanPackages(item, appSettings);
                     ComponentsToArtifactory components = new ComponentsToArtifactory()
                     {
                         Name = !string.IsNullOrEmpty(item.Group) ? $"{item.Group}/{item.Name}" : item.Name,
@@ -85,9 +85,21 @@ namespace LCT.ArtifactoryUploader
                         ApiKey = appSettings.ArtifactoryUploadApiKey,
                         Email = appSettings.ArtifactoryUploadUser,
                         JfrogApi = appSettings.JFrogApi,
-                        SrcRepoPathWithFullName = aqlResult != null ? aqlResult.Repo + "/" + aqlResult.Path + "/" + aqlResult.Name : string.Empty,
-                        PypiCompName = aqlResult != null ? aqlResult.Name : string.Empty
                     };
+
+                    if (aqlResult != null)
+                    {
+                        components.SrcRepoPathWithFullName = aqlResult.Repo + "/" + aqlResult.Path + "/" + aqlResult.Name;
+                        components.Path = GetConanPath(aqlResult.Path, $"{item.Name}/{item.Version}");
+                        components.PypiCompName = aqlResult.Name;
+                    }
+                    else
+                    {
+                        components.SrcRepoPathWithFullName = string.Empty;
+                        components.Path = string.Empty;
+                        components.PypiCompName = string.Empty;
+                    }
+
                     components.PackageInfoApiUrl = GetPackageInfoURL(components);
                     components.CopyPackageApiUrl = GetCopyURL(components);
                     componentsToBeUploaded.Add(components);
@@ -126,11 +138,30 @@ namespace LCT.ArtifactoryUploader
                 url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoPathWithFullName}" +
                $"?to=/{component.DestRepoName}/{component.PypiCompName}";
             }
+            else if (component.ComponentType == "CONAN")
+            {
+                url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.Path}" +
+               $"?to=/{component.DestRepoName}/{component.Path}";
+            }
             else
             {
                 // Do nothing
             }
             return url;
+        }
+
+        private static string GetConanPath(string path, string package)
+        { 
+            //// Get Path only till PackageName/Version so that everything in folder can be copied
+            if (path.Contains(package))
+            {
+                int index = path.IndexOf(package);
+                return path.Substring(0, index + package.Length);
+            }
+            else
+            {
+                return path;
+            }
         }
 
         private static string GetPackageInfoURL(ComponentsToArtifactory component)
@@ -151,6 +182,10 @@ namespace LCT.ArtifactoryUploader
             else if (component.ComponentType == "PYTHON")
             {
                 url = $"{component.JfrogApi}{ApiConstant.PackageInfoApi}{component.SrcRepoPathWithFullName}";
+            }
+            else if (component.ComponentType == "CONAN")
+            {
+                url = $"{component.JfrogApi}{ApiConstant.PackageInfoApi}{component.SrcRepoName}/{component.Path}";
             }
             else
             {
@@ -177,16 +212,20 @@ namespace LCT.ArtifactoryUploader
             {
                 return appSettings.JfrogPythonDestRepoName;
             }
+            else if (item.Purl.Contains("conan", StringComparison.OrdinalIgnoreCase))
+            {
+                return appSettings.JfrogConanDestRepoName;
+            }
             else
             {
                 // Do nothing
             }
+
             return string.Empty;
         }
 
         private static string GetComponentType(Component item)
         {
-
             if (item.Purl.Contains("npm", StringComparison.OrdinalIgnoreCase))
             {
                 return "NPM";
@@ -203,6 +242,10 @@ namespace LCT.ArtifactoryUploader
             {
                 return "PYTHON";
             }
+            else if (item.Purl.Contains("conan", StringComparison.OrdinalIgnoreCase))
+            {
+                return "CONAN";
+            }
             else
             {
                 // Do nothing
@@ -210,19 +253,28 @@ namespace LCT.ArtifactoryUploader
             return string.Empty;
         }
 
-        private async static Task<AqlResult> GetSrcRepoDetailsForPyPiPackages(Component item, CommonAppSettings appSettings)
+        private async static Task<AqlResult> GetSrcRepoDetailsForPyPiOrConanPackages(Component item, CommonAppSettings appSettings)
         {
             if (item.Purl.Contains("pypi", StringComparison.OrdinalIgnoreCase) && aqlResultList.Count == 0)
             {
                 // get the  component list from Jfrog for given repo
                 aqlResultList = await GetListOfComponentsFromRepo(appSettings.Python?.JfrogPythonRepoList, jFrogService);
-            }
 
-            if (aqlResultList.Count > 0)
+                if (aqlResultList.Count > 0)
+                {
+                    return GetArtifactoryRepoName(aqlResultList, item);
+                }
+            }
+            else if (item.Purl.Contains("conan", StringComparison.OrdinalIgnoreCase))
             {
-                return GetArtifactoryRepoName(aqlResultList, item);
-            }
+                var aqlConanResultList = await GetListOfComponentsFromRepo(new string[] { item.Properties.Where(x => x.Name == Dataconstant.Cdx_ArtifactoryRepoUrl).FirstOrDefault()?.Value }, jFrogService);
 
+                if (aqlConanResultList.Count > 0)
+                {
+                    return GetArtifactoryRepoNameForConan(aqlConanResultList, item);
+                }
+            }
+            
             return null;
         }
 
@@ -319,7 +371,7 @@ namespace LCT.ArtifactoryUploader
 
         public static async Task<List<AqlResult>> GetListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService)
         {
-            if (repoList != null && repoList.Length > 0)
+            if (jFrogService != null && repoList != null && repoList.Length > 0)
             {
                 foreach (var repo in repoList)
                 {
@@ -340,6 +392,14 @@ namespace LCT.ArtifactoryUploader
             return repoName;
         }
 
-    }
+        private static AqlResult GetArtifactoryRepoNameForConan(List<AqlResult> aqlResultList, Component component)
+        {
+            string jfrogcomponentPath = $"{component.Name}/{component.Version}";
 
+            AqlResult repoName = aqlResultList.Find(x => x.Path.Contains(
+                jfrogcomponentPath, StringComparison.OrdinalIgnoreCase));
+
+            return repoName;
+        }
+    }
 }

@@ -194,6 +194,9 @@ namespace LCT.SW360PackageCreator
                 case "PYTHON":
                     componentsData.SourceUrl = await UrlHelper.Instance.GetSourceUrlForPythonPackage(name, version);
                     break;
+                case "CONAN":
+                    componentsData.SourceUrl = await UrlHelper.Instance.GetSourceUrlForConanPackage(name, version);
+                    break;
                 default:
                     break;
             }

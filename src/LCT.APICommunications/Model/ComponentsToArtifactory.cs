@@ -24,6 +24,6 @@ namespace LCT.APICommunications.Model
         public string PackageInfoApiUrl { get; set; }
         public string CopyPackageApiUrl { get; set; }
         public string PackageExtension { get; set; }
-
+        public string Path { get; set; }
     }
 }

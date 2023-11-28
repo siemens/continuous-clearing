@@ -5,25 +5,36 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Security.Policy;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Xml.Linq;
+using JetBrains.Annotations;
+using LCT.APICommunications.Model.Foss;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Model;
 using LCT.SW360PackageCreator.Interfaces;
 using LCT.SW360PackageCreator.Model;
 using log4net;
+using Microsoft.PowerShell.Commands;
+using Microsoft.Web.Administration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using YamlDotNet.Core.Tokens;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace LCT.SW360PackageCreator
 {
@@ -36,6 +47,7 @@ namespace LCT.SW360PackageCreator
         private readonly HttpClient httpClient = new HttpClient();
         public static string GithubUrl { get; set; } = string.Empty;
         public static UrlHelper Instance { get; } = new UrlHelper();
+        public CommonAppSettings CommonAppSettings =new CommonAppSettings();
 
         private bool _disposed;
 
@@ -141,6 +153,62 @@ namespace LCT.SW360PackageCreator
             Logger.Debug($"GetSourceUrl():End");
 
             return GithubUrl;
+        }
+
+
+        /// <summary>
+        /// Gets the Source URL for CONAN Packages
+        /// </summary>
+        /// <param name="componentName"></param>
+        /// <param name="version"></param>
+        /// <returns>string</returns>
+        public async Task<string> GetSourceUrlForConanPackage(string componentName, string version) 
+        {
+
+            var downLoadUrl = $"{CommonAppSettings.SourceURLConan}" + componentName + "/all/conandata.yml";
+            var deserializer = new DeserializerBuilder().WithNamingConvention(UnderscoredNamingConvention.Instance).Build();
+            string componentSrcURL = string.Empty;
+            Sources packageSourcesInfo=new Sources();
+            using (HttpClient _httpClient=new HttpClient())
+            {
+                try
+                {
+                    var request = new HttpRequestMessage(HttpMethod.Get, downLoadUrl);
+                    var response = await _httpClient.SendAsync(request);
+                    response.EnsureSuccessStatusCode();
+                    var jsonObject = await response.Content.ReadAsStringAsync();
+                    packageSourcesInfo = deserializer.Deserialize<Sources>(jsonObject);
+                    if (packageSourcesInfo.SourcesData.TryGetValue(version, out var release))
+                    {
+                        if (release.Url.GetType().Name.ToLowerInvariant() == "string")
+                        {
+                            componentSrcURL = release.Url.ToString();
+                        }
+                        else
+                        {
+                            List<object> urlList = (List<object>)release.Url;
+                            componentSrcURL = urlList.FirstOrDefault() != null ? urlList.FirstOrDefault().ToString() : "";
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+
+                    var response = new HttpResponseMessage(HttpStatusCode.NotFound)
+                    {
+                        Content = new StringContent(string.Format("Problem Getting Information from Conan Server For = {0}", componentName)),
+                        ReasonPhrase = "Problem Occured while connecting to conan Server"
+                    };
+                }
+                finally
+                { 
+                    _httpClient.Dispose(); 
+                }
+                
+                
+
+            }
+            return componentSrcURL;
         }
 
         private async Task<string> GetSourceURLFromNuspecFile(string nuspecURL, string componentName)

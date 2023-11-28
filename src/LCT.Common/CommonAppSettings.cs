@@ -28,7 +28,7 @@ namespace LCT.Common
         public static string SnapshotBaseURL { get; set; } = $"https://snapshot.debian.org/mr/";
         public static string SnapshotDownloadURL { get; set; } = $"https://snapshot.debian.org/archive/";
         public static string PyPiURL { get; set; } = $"https://pypi.org/pypi/";
-
+        public static string SourceURLConan { get; set; } = "https://raw.githubusercontent.com/conan-io/conan-center-index/master/recipes/";
         public CommonAppSettings()
         {
             folderAction = new FolderAction();
@@ -75,6 +75,7 @@ namespace LCT.Common
         public string JfrogNugetDestRepoName { get; set; }
         public string JfrogMavenDestRepoName { get; set; }
         public string JfrogPythonDestRepoName { get; set; }
+        public string JfrogConanDestRepoName { get; set; }
         public string JfrogNugetSrcRepo { get; set; }
         public string Mode { get; set; } = string.Empty;
 
