@@ -123,8 +123,9 @@ namespace LCT.PackageIdentifier
         public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM,
             CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
-            // get the  component list from Jfrog for given repository
-            List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(appSettings.Conan?.JfrogConanRepoList, jFrogService);
+            // get the  component list from Jfrog for given repo + internal repo
+            string[] repoList = appSettings.InternalRepoList.Concat(appSettings.Conan?.JfrogConanRepoList).ToArray();
+            List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(repoList, jFrogService);
             Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
             List<Component> modifiedBOM = new List<Component>();
 
