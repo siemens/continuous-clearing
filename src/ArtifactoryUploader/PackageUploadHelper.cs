@@ -104,6 +104,7 @@ namespace LCT.ArtifactoryUploader
 
                     components.Path = GetPackagePath(components, aqlResult);
                     components.CopyPackageApiUrl = GetCopyURL(components);
+                    components.MovePackageApiUrl = GetMoveURL(components);
                     components.JfrogPackageName = GetJfrogPackageName(components);
                     componentsToBeUploaded.Add(components);
                 }
@@ -179,6 +180,43 @@ namespace LCT.ArtifactoryUploader
             return component.DryRun ? $"{url}&dry=1" : url;
         }
 
+        private static string GetMoveURL(ComponentsToArtifactory component)
+        {
+            string url = string.Empty;
+            if (component.ComponentType == "NPM")
+            {
+                url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.Name}/-/{component.PackageName}-{component.Version}" +
+              $"{ApiConstant.NpmExtension}?to=/{component.DestRepoName}/{component.Name}/-/{component.PackageName}-{component.Version}{ApiConstant.NpmExtension}";
+            }
+            else if (component.ComponentType == "NUGET")
+            {
+                url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.PackageName}.{component.Version}" +
+               $"{ApiConstant.NugetExtension}?to=/{component.DestRepoName}/{component.Name}.{component.Version}{ApiConstant.NugetExtension}";
+            }
+            else if (component.ComponentType == "MAVEN")
+            {
+                url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.Name}/{component.Version}" +
+               $"?to=/{component.DestRepoName}/{component.Name}/{component.Version}";
+            }
+            else if (component.ComponentType == "PYTHON")
+            {
+                url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoPathWithFullName}" +
+               $"?to=/{component.DestRepoName}/{component.PypiCompName}";
+            }
+            else if (component.ComponentType == "CONAN")
+            {
+                url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.Path}" +
+               $"?to=/{component.DestRepoName}/{component.Path}";
+                // Add a wild card to the path end for jFrog AQL query search
+                component.Path = $"{component.Path}/*";
+            }
+            else
+            {
+                // Do nothing
+            }
+            return component.DryRun ? $"{url}&dry=1" : url;
+        }
+
         private static string GetPackagePath(ComponentsToArtifactory component, AqlResult aqlResult)
         {
             switch (component.ComponentType)
@@ -245,15 +283,15 @@ namespace LCT.ArtifactoryUploader
                 switch (componentType.ToLower())
                 {
                     case "npm":
-                        return GetRepoName(packageType, appSettings.JfrogInternalNpmDestRepo, appSettings.JfrogDevNpmDestRepo, appSettings.JfrogNpmDestRepoName);
+                        return GetRepoName(packageType, appSettings.Npm.JfrogInternalDestRepoName, appSettings.Npm.JfrogDevDestRepoName, appSettings.Npm.JfrogThirdPartyDestRepoName);
                     case "nuget":
-                        return GetRepoName(packageType, appSettings.JfrogInternalNugetDestRepo, appSettings.JfrogDevNugetDestRepo, appSettings.JfrogNugetDestRepoName);
+                        return GetRepoName(packageType, appSettings.Nuget.JfrogInternalDestRepoName, appSettings.Nuget.JfrogDevDestRepoName, appSettings.Nuget.JfrogThirdPartyDestRepoName);
                     case "maven":
-                        return GetRepoName(packageType, appSettings.JfrogInternalMavenDestRepo, appSettings.JfrogDevMavenDestRepo, appSettings.JfrogMavenDestRepoName);
+                        return GetRepoName(packageType, appSettings.Maven.JfrogInternalDestRepoName, appSettings.Maven.JfrogDevDestRepoName, appSettings.Maven.JfrogThirdPartyDestRepoName);
                     case "python":
-                        return GetRepoName(packageType, appSettings.JfrogInternalPythonDestRepo, appSettings.JfrogDevPythonDestRepo, appSettings.JfrogPythonDestRepoName);
+                        return GetRepoName(packageType, appSettings.Python.JfrogInternalDestRepoName, appSettings.Python.JfrogDevDestRepoName, appSettings.Python.JfrogThirdPartyDestRepoName);
                     case "conan":
-                        return GetRepoName(packageType, appSettings.JfrogInternalConanDestRepo, appSettings.JfrogDevConanDestRepo, appSettings.JfrogConanDestRepoName);
+                        return GetRepoName(packageType, appSettings.Conan.JfrogInternalDestRepoName, appSettings.Conan.JfrogDevDestRepoName, appSettings.Conan.JfrogThirdPartyDestRepoName);
                 }
             }
 
@@ -356,6 +394,7 @@ namespace LCT.ArtifactoryUploader
             {
                 if (!(item.SrcRepoName.Contains("Not Found in JFrog")))
                 {
+                    string operationType = item.PackageType == PackageType.ClearedThirdParty ? "copy" : "move";
                     ArtfactoryUploader.jFrogService = jFrogService;
                     HttpResponseMessage responseMessage = await ArtfactoryUploader.UploadPackageToRepo(item, timeout);
 
@@ -372,7 +411,7 @@ namespace LCT.ArtifactoryUploader
                     }
                     else if (responseMessage.ReasonPhrase == ApiConstant.ErrorInUpload)
                     {
-                        Logger.Error($"Package {item.Name}-{item.Version} Upload Failed!!");
+                        Logger.Error($"Package {item.Name}-{item.Version} {operationType} Failed!!");
                         IncrementCountersBasedOnPackageType(uploaderKpiData, packageType, false);
                         item.DestRepoName = null;
                     }

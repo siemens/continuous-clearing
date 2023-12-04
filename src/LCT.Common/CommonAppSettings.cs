@@ -70,23 +70,7 @@ namespace LCT.Common
         public string CycloneDxSBomTemplatePath { get; set; }
         public string[] InternalRepoList { get; set; }
         public bool EnableFossTrigger { get; set; } = true;
-        public string JfrogNpmDestRepoName { get; set; }
         public string JfrogNpmSrcRepo { get; set; }
-        public string JfrogNugetDestRepoName { get; set; }
-        public string JfrogMavenDestRepoName { get; set; }
-        public string JfrogPythonDestRepoName { get; set; }
-        public string JfrogNugetSrcRepo { get; set; }
-        public string JfrogDevNugetDestRepo { get; set; }
-        public string JfrogInternalNugetDestRepo { get; set; }
-        public string JfrogDevNpmDestRepo { get; set; }
-        public string JfrogInternalNpmDestRepo { get; set; }
-        public string JfrogDevMavenDestRepo { get; set; }
-        public string JfrogInternalMavenDestRepo { get; set; }
-        public string JfrogDevPythonDestRepo { get; set; }
-        public string JfrogInternalPythonDestRepo { get; set; }
-        public string JfrogConanDestRepoName { get; set; }
-        public string JfrogDevConanDestRepo { get; set; }
-        public string JfrogInternalConanDestRepo { get; set; }
         public string Mode { get; set; } = string.Empty;
 
 

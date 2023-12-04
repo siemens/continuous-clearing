@@ -32,59 +32,67 @@ namespace LCT.ArtifactoryUploader
         public static async Task<HttpResponseMessage> UploadPackageToRepo(ComponentsToArtifactory component, int timeout)
         {
             Logger.Debug("Starting UploadPackageToArtifactory method");
-            IJFrogApiCommunication jfrogApicommunication;
+            string operationType = component.PackageType == PackageType.ClearedThirdParty ? "copy" : "move";
+            string dryRunSuffix = component.DryRun ? " dry-run" : "";
             HttpResponseMessage responsemessage = new HttpResponseMessage();
             try
             {
-                //Package Information
+                IJFrogApiCommunication jfrogApicommunication;
+
+                // Package Information
                 var packageInfo = await GetPackageInfoWithRetry(jFrogService, component);
                 if (packageInfo == null)
                 {
-                    responsemessage.StatusCode = HttpStatusCode.NotFound;
-                    responsemessage.ReasonPhrase = ApiConstant.PackageNotFound;
-                    return responsemessage;
+                    return new HttpResponseMessage(HttpStatusCode.NotFound)
+                    {
+                        ReasonPhrase = ApiConstant.PackageNotFound
+                    };
                 }
 
                 ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials()
-                { 
+                {
                     ApiKey = component.ApiKey,
                     Email = component.Email
                 };
-                if (component.ComponentType?.ToUpperInvariant() == "MAVEN")
-                {
-                    jfrogApicommunication = new MavenJfrogApiCommunication(component.JfrogApi, component.SrcRepoName, repoCredentials, timeout);
-                }
-                else if (component.ComponentType?.ToUpperInvariant() == "PYTHON")
-                {
-                    jfrogApicommunication = new PythonJfrogApiCommunication(component.JfrogApi, component.SrcRepoName, repoCredentials, timeout);
-                }
-                else
-                {
-                    jfrogApicommunication = new NpmJfrogApiCommunication(component.JfrogApi, component.SrcRepoName, repoCredentials, timeout);
-                }
 
-                responsemessage = await jfrogApicommunication.CopyFromRemoteRepo(component);
+                // Initialize JFrog API communication based on Component Type
+                jfrogApicommunication = component.ComponentType?.ToUpperInvariant() switch
+                {
+                    "MAVEN" => new MavenJfrogApiCommunication(component.JfrogApi, component.SrcRepoName, repoCredentials, timeout),
+                    "PYTHON" => new PythonJfrogApiCommunication(component.JfrogApi, component.SrcRepoName, repoCredentials, timeout),
+                    _ => new NpmJfrogApiCommunication(component.JfrogApi, component.SrcRepoName, repoCredentials, timeout)
+                };
+
+                // Perform Copy or Move operation
+                responsemessage = component.PackageType switch
+                {
+                    PackageType.ClearedThirdParty => await jfrogApicommunication.CopyFromRemoteRepo(component),
+                    PackageType.Internal or PackageType.Development => await jfrogApicommunication.MoveFromRepo(component),
+                    _ => new HttpResponseMessage(HttpStatusCode.NotFound)
+                };
+
+                // Check status code and handle errors
                 if (responsemessage.StatusCode != HttpStatusCode.OK)
                 {
                     responsemessage.ReasonPhrase = ApiConstant.ErrorInUpload;
                     return responsemessage;
                 }
 
-                if (component.DryRun)
-                {
-                    Logger.Info($"Successful dry-run for package {component.PackageName}-{component.Version} from {component.SrcRepoName} to {component.DestRepoName}");
-                }
-                else
-                {
-                    Logger.Info($"Successfully copied package {component.PackageName}-{component.Version} from {component.SrcRepoName} to {component.DestRepoName}");
-                }
+                Logger.Info($"Successful{dryRunSuffix} {operationType} package {component.PackageName}-{component.Version}" +
+                                    $" from {component.SrcRepoName} to {component.DestRepoName}");
+
             }
             catch (HttpRequestException ex)
             {
-                Logger.Error($"Error has occured in UploadPackageToArtifactory--{ex}");
+                Logger.Error($"Error has occurred in UploadPackageToArtifactory--{ex}");
+                responsemessage.ReasonPhrase = ApiConstant.ErrorInUpload;
                 return responsemessage;
             }
-            Logger.Debug("Ending UploadPackageToArtifactory method");
+            finally
+            {
+                Logger.Debug("Ending UploadPackageToArtifactory method");
+            }
+
             return responsemessage;
         }
 
