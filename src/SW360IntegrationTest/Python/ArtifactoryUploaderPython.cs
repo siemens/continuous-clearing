@@ -24,19 +24,14 @@ namespace SW360IntegrationTest.Python
         public void TestArtifactoryUploaderexe()
         {
             OutFolder = TestHelper.OutFolder;
-            string comparisonBOMPath = "C:\\Users\\z004tjcm\\Desktop\\CATool\\Output\\SICAMDeviceManager_Bom.cdx.json";
+            string comparisonBOMPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\ArtifactoryUploaderTestData\PythonComparisonBOM.json";
 
             int result = TestHelper.RunArtifactoryUploaderExe(new string[]{
                 TestConstant.BomFilePath, comparisonBOMPath,
-                TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.ArtifactoryUser, testParameters.ArtifactoryUploadUser,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
-                TestConstant.JfrogPythonThirdPartyDestRepoName,testParameters.ThirdPartyDestinationRepoName,
-                TestConstant.JfrogPythonDevDestRepoName,testParameters.DevDestinationRepoName,
-                TestConstant.JfrogPythonInternalDestRepoName,testParameters.InternalDestinationRepoName,
-                TestConstant.JFrogApiURL,testParameters.JfrogApi,
-                TestConstant.Release, false.ToString(),
-                "--LogFolderPath C:\\Users\\z004tjcm\\Desktop\\CATool\\Logs"
+                TestConstant.JfrogNPMDestRepoName,testParameters.DestinationRepoName,
+                TestConstant.JFrogApiURL,testParameters.JfrogApi
             });
 
             // Test BOM Creator ran with exit code 0 or 2 (Warning)

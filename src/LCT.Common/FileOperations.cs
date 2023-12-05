@@ -102,7 +102,7 @@ namespace LCT.Common
 
                     comparisonData.Components = comparisonData.Components?.GroupBy(x => new { x.Name, x.Version }).Select(y => y.First()).ToList();
 
-                    if (comparisonData.Dependencies != null && comparisonData.Dependencies.Count > 0)
+                    if (comparisonData.Dependencies.Count > 0)
                     {
                         comparisonData.Dependencies.AddRange(components.Dependencies);
                     }

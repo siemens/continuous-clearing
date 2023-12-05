@@ -30,9 +30,7 @@ namespace SW360IntegrationTest.NPM
                 TestConstant.BomFilePath, comparisonBOMPath,
                 TestConstant.ArtifactoryUser, testParameters.ArtifactoryUploadUser,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
-                 TestConstant.JfrogNpmThirdPartyDestRepoName,testParameters.ThirdPartyDestinationRepoName,
-                TestConstant.JfrogNpmDevDestRepoName,testParameters.DevDestinationRepoName,
-                TestConstant.JfrogNpmInternalDestRepoName,testParameters.InternalDestinationRepoName,
+                TestConstant.JfrogNugetDestRepoName,testParameters.DestinationRepoName,
                 TestConstant.JFrogApiURL,testParameters.JfrogApi
             }),
                 "Test to run Artifactory Uploader EXE execution");
