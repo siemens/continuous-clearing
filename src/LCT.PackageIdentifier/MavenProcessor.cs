@@ -168,7 +168,7 @@ namespace LCT.PackageIdentifier
         {
 
             // get the  component list from Jfrog for given repo + internal repo
-            string[] repoList = appSettings.InternalRepoList.Concat(appSettings.Maven?.JfrogMavenRepoList).ToArray();
+            string[] repoList = appSettings.InternalRepoList?.Concat(appSettings.Maven?.JfrogMavenRepoList).ToArray();
             List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(repoList, jFrogService);
             Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
             List<Component> modifiedBOM = new List<Component>();
