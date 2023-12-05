@@ -161,14 +161,13 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
 
       - **Project Type :** **Python** 
 
-          * Input file repository should contain **poetry.lock** file. 
-		  
-		  
-	  - **Project Type :** **Conan** 
+          * Input file repository should contain **poetry.lock** file.
+            
+          
+      - **Project Type :** **Conan** 
 
           * Input file repository should contain **conan.lock** file. 
 		  
-		  `Note : Conan package support in clearing tool is currently only for SBOM discovery and classification.Component Creation and Source code identification is not supported currently`
     
       - **Project Type :**  **Debian** 
        
@@ -211,10 +210,11 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
   "SW360URL": "<Insert SW360URL>",
   "Fossologyurl": "<Insert Fossologyurl>",
   "JFrogApi": "<Insert JFrogApi>",
-  "JfrogNugetDestRepoName": "JfrogNugetDestRepo Name",
-  "JfrogNpmDestRepoName": "JfrogNpmDestRepo Name",
-  "JfrogMavenDestRepoName": "JfrogMavenDestRepo Name",
-  "JfrogPythonDestRepoName": "JfrogPythonDestRepo Name",
+  "JfrogNugetDestRepoName": "<Insert JfrogNugetDestRepoName>",
+  "JfrogNpmDestRepoName": "<Insert JfrogNpmDestRepoName>",
+  "JfrogMavenDestRepoName": "<Insert JfrogMavenDestRepoName>",
+  "JfrogPythonDestRepoName": "<Insert JfrogPythonDestRepoName>",
+  "JfrogConanDestRepoName": "<Insert ConanDestRepoName>",
   "PackageFilePath": "/mnt/Input",
   "BomFolderPath": "/mnt/Output",
   "BomFilePath":"/mnt/Output/<SW360 Project Name>_Bom.cdx.json",
@@ -310,7 +310,8 @@ Description for the settings in `appSettings.json` file
 | 18    | --jfrognugetdestreponame         | The destination folder name for the Nuget package to be copied to                  | Yes                                                    |
 | 19    | --jfrogmavendestreponame         | The destination folder name for the Maven package to be copied to                  | Yes                                                    |                                            |
 | 20    | --jfrogpythondestreponame         | The destination folder name for the Python package to be copied to                  | Yes                                                    |                                            |
-| 21   | --timeout          | SW360 response timeout value                  | No                                                       |                                                |
+| 21    | --jfrogconandestreponame         | The destination folder name for the Conan package to be copied to                  | Yes                                                    |                                            |
+| 22   | --timeout          | SW360 response timeout value                  | No                                                       |                                                |
 
 
  #### **Method 2**

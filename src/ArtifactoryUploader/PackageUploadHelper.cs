@@ -210,6 +210,10 @@ namespace LCT.ArtifactoryUploader
                 // Add a wild card to the path end for jFrog AQL query search
                 component.Path = $"{component.Path}/*";
             }
+            else if (component.ComponentType == "CONAN")
+            {
+                url = $"{component.JfrogApi}{ApiConstant.PackageInfoApi}{component.SrcRepoName}/{component.Path}";
+            }
             else
             {
                 // Do nothing
@@ -314,7 +318,6 @@ namespace LCT.ArtifactoryUploader
 
         private static string GetComponentType(Component item)
         {
-
             if (item.Purl.Contains("npm", StringComparison.OrdinalIgnoreCase))
             {
                 return "NPM";
@@ -363,7 +366,16 @@ namespace LCT.ArtifactoryUploader
                     return GetArtifactoryRepoNameForConan(aqlConanResultList, item);
                 }
             }
+            else if (item.Purl.Contains("conan", StringComparison.OrdinalIgnoreCase))
+            {
+                var aqlConanResultList = await GetListOfComponentsFromRepo(new string[] { item.Properties.Where(x => x.Name == Dataconstant.Cdx_ArtifactoryRepoUrl).FirstOrDefault()?.Value }, jFrogService);
 
+                if (aqlConanResultList.Count > 0)
+                {
+                    return GetArtifactoryRepoNameForConan(aqlConanResultList, item);
+                }
+            }
+            
             return null;
         }
 
@@ -519,7 +531,7 @@ namespace LCT.ArtifactoryUploader
 
         public static async Task<List<AqlResult>> GetListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService)
         {
-            if (repoList != null && repoList.Length > 0)
+            if (jFrogService != null && repoList != null && repoList.Length > 0)
             {
                 foreach (var repo in repoList)
                 {
@@ -564,4 +576,10 @@ namespace LCT.ArtifactoryUploader
 
     }
 
+            AqlResult repoName = aqlResultList.Find(x => x.Path.Contains(
+                jfrogcomponentPath, StringComparison.OrdinalIgnoreCase));
+
+            return repoName;
+        }
+    }
 }

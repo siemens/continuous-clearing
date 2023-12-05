@@ -44,7 +44,9 @@ namespace LCT.PackageIdentifier
             }
         }
 
+#pragma warning disable CA1822 // Mark members as static
         public List<Container> Parse(string configFile)
+#pragma warning restore CA1822 // Mark members as static
         {
             List<Container> containerList = new();
 

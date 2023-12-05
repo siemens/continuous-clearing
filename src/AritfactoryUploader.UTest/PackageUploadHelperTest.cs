@@ -32,7 +32,7 @@ namespace AritfactoryUploader.UTest
             //Act
             Bom componentList = PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath);
             // Assert
-            Assert.That(11, Is.EqualTo(componentList.Components.Count), "Checks for no of components");
+            Assert.That(12, Is.EqualTo(componentList.Components.Count), "Checks for no of components");
         }
 
         [Test]
