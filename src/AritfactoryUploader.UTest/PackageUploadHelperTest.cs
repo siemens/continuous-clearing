@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnitTestUtilities;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace AritfactoryUploader.UTest
 {
@@ -67,7 +68,8 @@ namespace AritfactoryUploader.UTest
             {
                 ArtifactoryUploadApiKey = "wfwfwfwfwegwgweg",
                 ArtifactoryUploadUser = "user@account.com",
-                JfrogNpmDestRepoName = "npm-test",
+                Npm = new LCT.Common.Model.Config { JfrogThirdPartyDestRepoName = "npm-test" },
+                Nuget = new LCT.Common.Model.Config { JfrogThirdPartyDestRepoName = "nuget-test" },
                 JfrogNpmSrcRepo = "remote-cache",
                 JFrogApi = UTParams.JFrogURL,
                 LogFolderPath = outFolder
@@ -99,8 +101,8 @@ namespace AritfactoryUploader.UTest
             {
                 ArtifactoryUploadApiKey = "wfwfwfwfwegwgweg",
                 ArtifactoryUploadUser = "user@account.com",
-                JfrogNpmDestRepoName = "npm-test",
-                JfrogNpmSrcRepo = "remote-cache",
+                Npm = new LCT.Common.Model.Config { JfrogThirdPartyDestRepoName = "npm-test" },
+                Nuget = new LCT.Common.Model.Config { JfrogThirdPartyDestRepoName = "nuget-test" },
                 JFrogApi = UTParams.JFrogURL,
                 LogFolderPath = outFolder
             };
@@ -126,8 +128,10 @@ namespace AritfactoryUploader.UTest
             {
                 ArtifactoryUploadApiKey = "wfwfwfwfwegwgweg",
                 ArtifactoryUploadUser = "user@account.com",
-                JfrogNugetDestRepoName = "nuget-test",
-                JfrogNugetSrcRepo = "remote-cache",
+                Npm = new LCT.Common.Model.Config
+                {
+                    JfrogThirdPartyDestRepoName = "nuget-test",
+                },
                 JFrogApi = UTParams.JFrogURL
             };
 
@@ -136,6 +140,57 @@ namespace AritfactoryUploader.UTest
 
             // Assert
             Assert.That(0, Is.EqualTo(uploadList.Count), "Checks for components to upload to be zero");
+        }
+
+        [Test]
+        public void UpdateBomArtifactoryRepoUrl_GivenBomAndComponentsUploadedToArtifactory_UpdatesBom()
+        {
+            //Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string comparisonBOMPath = outFolder + @"\ArtifactoryUTTestFiles\CyclonedxBom.json";
+            Bom bom = PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath);
+            List<ComponentsToArtifactory> components = new List<ComponentsToArtifactory>()
+            {
+                new ComponentsToArtifactory()
+                {
+                    Purl = "pkg:npm/%40angular/animations@11.0.4",
+                    DestRepoName = "siparty-release-npm-egll",
+                    DryRun = false,
+                }
+            };
+
+            //Act
+            PackageUploadHelper.UpdateBomArtifactoryRepoUrl(ref bom, components);
+
+            //Assert
+            var repoUrl = bom.Components.First(x => x.Properties[1].Name == "internal:siemens:clearing:repo-name").Properties[1].Value;
+            Assert.AreEqual(repoUrl, "siparty-release-npm-egll");
+        }
+
+        [Test]
+        public void UpdateBomArtifactoryRepoUrl_GivenBomAndComponentsUploadedToArtifactoryDryRun_NoUpdateBom()
+        {
+            //Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string comparisonBOMPath = outFolder + @"\ArtifactoryUTTestFiles\CyclonedxBom.json";
+            Bom bom = PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath);
+            List<ComponentsToArtifactory> components = new List<ComponentsToArtifactory>()
+            {
+                new ComponentsToArtifactory()
+                {
+                    Purl = "pkg:npm/%40angular/animations@11.0.4",
+                    DestRepoName = "siparty-release-npm-egll",
+                }
+            };
+
+            //Act
+            PackageUploadHelper.UpdateBomArtifactoryRepoUrl(ref bom, components);
+
+            //Assert
+            var repoUrl = bom.Components.First(x => x.Properties[1].Name == "internal:siemens:clearing:repo-name").Properties[1].Value;
+            Assert.AreNotEqual(repoUrl, "siparty-release-npm-egll");
         }
 
         private static List<Component> GetComponentList()

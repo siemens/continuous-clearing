@@ -269,7 +269,7 @@ namespace PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
             CommonAppSettings appSettings = new();
-            appSettings.Python = new Config() { JfrogNugetRepoList = reooListArr };
+            appSettings.Python = new Config() { JfrogPythonRepoList = reooListArr };
             AqlResult aqlResult = new()
             {
                 Name = "html5lib-1.1.tar.gz",
@@ -307,7 +307,7 @@ namespace PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
             CommonAppSettings appSettings = new();
-            appSettings.Python = new Config() { JfrogNugetRepoList = reooListArr };
+            appSettings.Python = new Config() { JfrogPythonRepoList = reooListArr };
             AqlResult aqlResult = new()
             {
                 Name = "html5lib-1.1-py2.py3-none-any.whl",
