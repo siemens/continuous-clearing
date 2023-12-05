@@ -238,6 +238,9 @@ namespace LCT.ArtifactoryUploader
                         return path;
                     }
 
+                case "MAVEN":
+                    return $"{component.Name}/{component.Version}";
+
                 default:
                     return string.Empty;
             }
@@ -255,10 +258,6 @@ namespace LCT.ArtifactoryUploader
 
                 case "NUGET":
                     packageName = $"{component.PackageName}.{component.Version}{ApiConstant.NugetExtension}";
-                    break;
-
-                case "MAVEN":
-                    packageName = $"/{component.Name}/{component.Version}";
                     break;
 
                 case "PYTHON":
