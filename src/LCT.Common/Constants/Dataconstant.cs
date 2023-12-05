@@ -48,7 +48,7 @@ namespace LCT.Common.Constants
         public const string ReleaseAttachmentComment = "Attached by CA Tool";
         public const char ForwardSlash = '/';
         public const string SourceURLSuffix = "/srcfiles?fileinfo=1";
-        public const string Cdx_ArtifactoryRepoUrl = "internal:siemens:clearing:repo-url";
+        public const string Cdx_ArtifactoryRepoUrl = "internal:siemens:clearing:repo-name";
         public const string Cdx_ProjectType = "internal:siemens:clearing:project-type";
         public const string Cdx_ClearingState = "internal:siemens:clearing:clearing-state";
         public const string Cdx_IsInternal = "internal:siemens:clearing:is-internal";
