@@ -17,7 +17,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using TestUtilities;
 
-namespace SW360IntegrationTest
+namespace SW360IntegrationTest.Maven
 {
     [TestFixture, Order(20)]
     public class ComponentCreatorInitialMaven

@@ -15,7 +15,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using TestUtilities;
 
-namespace SW360IntegrationTest
+namespace SW360IntegrationTest.Nuget
 {
     [TestFixture, Order(14)]
     public class ComponentCreatorInitialNuget

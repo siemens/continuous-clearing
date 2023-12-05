@@ -12,7 +12,7 @@ using System.Net;
 using System.Net.Http;
 using TestUtilities;
 
-namespace SW360IntegrationTest.NPM
+namespace SW360IntegrationTest.Nuget
 {
     [TestFixture, Order(16)]
     public class ArtifactoryUploaderNuget
@@ -30,7 +30,9 @@ namespace SW360IntegrationTest.NPM
                 TestConstant.BomFilePath, comparisonBOMPath,
                 TestConstant.ArtifactoryUser, testParameters.ArtifactoryUploadUser,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
-                TestConstant.JfrogNugetDestRepoName,testParameters.DestinationRepoName,
+                 TestConstant.JfrogNpmThirdPartyDestRepoName,testParameters.ThirdPartyDestinationRepoName,
+                TestConstant.JfrogNpmDevDestRepoName,testParameters.DevDestinationRepoName,
+                TestConstant.JfrogNpmInternalDestRepoName,testParameters.InternalDestinationRepoName,
                 TestConstant.JFrogApiURL,testParameters.JfrogApi
             }),
                 "Test to run Artifactory Uploader EXE execution");

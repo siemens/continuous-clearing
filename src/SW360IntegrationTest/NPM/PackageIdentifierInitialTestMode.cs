@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using TestUtilities;
 
-namespace SW360IntegrationTest
+namespace SW360IntegrationTest.NPM
 {
     [TestFixture, Order(1)]
     public class PackageIdentifierInitialTestMode

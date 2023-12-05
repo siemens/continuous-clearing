@@ -36,5 +36,17 @@ namespace LCT.Facade
         {
            return await m_jfrogAqlApiCommunication.GetInternalComponentDataByRepo(repoName);
         }
+
+        /// <summary>
+        /// Gets the package information in the repo, via the name or path
+        /// </summary>
+        /// <param name="repoName">repoName</param>
+        /// <param name="packageName">repoName</param>
+        /// <param name="path">repoName</param>
+        /// <returns>AqlResult</returns>
+        public async Task<HttpResponseMessage> GetPackageInfo(string repoName, string packageName, string path)
+        {
+            return await m_jfrogAqlApiCommunication.GetPackageInfo(repoName, packageName, path);
+        }
     }
 }

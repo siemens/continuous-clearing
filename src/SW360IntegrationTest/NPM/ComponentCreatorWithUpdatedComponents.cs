@@ -18,7 +18,7 @@ using System.Security.Policy;
 using System.Threading.Tasks;
 using TestUtilities;
 
-namespace SW360IntegrationTest
+namespace SW360IntegrationTest.NPM
 {
     [TestFixture, Order(8)]
     public class ComponentCreatorWithUpdatedComponents

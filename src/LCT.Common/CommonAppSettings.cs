@@ -68,15 +68,9 @@ namespace LCT.Common
         public Config Conan { get; set; }
         public string CaVersion { get; set; }
         public string CycloneDxSBomTemplatePath { get; set; }
-        public string[] InternalRepoList { get; set; }
+        public string[] InternalRepoList { get; set; } = new string[] { };
         public bool EnableFossTrigger { get; set; } = true;
-        public string JfrogNpmDestRepoName { get; set; }
         public string JfrogNpmSrcRepo { get; set; }
-        public string JfrogNugetDestRepoName { get; set; }
-        public string JfrogMavenDestRepoName { get; set; }
-        public string JfrogPythonDestRepoName { get; set; }
-        public string JfrogConanDestRepoName { get; set; }
-        public string JfrogNugetSrcRepo { get; set; }
         public string Mode { get; set; } = string.Empty;
 
 
@@ -306,6 +300,8 @@ namespace LCT.Common
             }
 
         }
+
+        public bool Release { get; set; } = false;
 
     }
 }
