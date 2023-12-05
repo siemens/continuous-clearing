@@ -10,7 +10,7 @@ using NUnit.Framework;
 using System.IO;
 using TestUtilities;
 
-namespace SW360IntegrationTest
+namespace SW360IntegrationTest.Nuget
 {
     [TestFixture, Order(22)]
     public class PackageIdentifierNugetTemplate

@@ -9,7 +9,7 @@ using System;
 using System.Diagnostics;
 using TestUtilities;
 
-namespace SW360IntegrationTest
+namespace SW360IntegrationTest.LoadTest
 {
     [Ignore("Load test need to run separatly")]
     [TestFixture, Order(11)]

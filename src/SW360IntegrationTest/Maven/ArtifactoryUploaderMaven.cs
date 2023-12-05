@@ -11,7 +11,7 @@ using System.Net;
 using System.Net.Http;
 using TestUtilities;
 
-namespace SW360IntegrationTest.NPM
+namespace SW360IntegrationTest.Maven
 {
     [TestFixture, Order(21)]
     public class ArtifactoryUploaderMaven
@@ -27,10 +27,15 @@ namespace SW360IntegrationTest.NPM
             // Test BOM Creator ran with exit code 0
             Assert.AreEqual(0, TestHelper.RunArtifactoryUploaderExe(new string[]{
                 TestConstant.BomFilePath, comparisonBOMPath,
+                TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.ArtifactoryUser, testParameters.ArtifactoryUploadUser,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
-                TestConstant.JfrogMavenDestRepoName,testParameters.DestinationRepoName,
-                TestConstant.JFrogApiURL,testParameters.JfrogApi}),
+                TestConstant.JfrogMavenThirdPartyDestRepoName,testParameters.ThirdPartyDestinationRepoName,
+                TestConstant.JfrogMavenDevDestRepoName,testParameters.DevDestinationRepoName,
+                TestConstant.JfrogMavenInternalDestRepoName,testParameters.InternalDestinationRepoName,
+                TestConstant.JFrogApiURL,testParameters.JfrogApi,
+                TestConstant.Release, false.ToString(),
+                "--LogFolderPath C:\\Users\\z004tjcm\\Desktop\\CATool\\Logs"}),
                 "Test to run Artifactory Uploader EXE execution");
         }
         [Test, Order(2)]
