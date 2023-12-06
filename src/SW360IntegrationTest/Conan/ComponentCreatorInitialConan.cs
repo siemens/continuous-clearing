@@ -19,7 +19,7 @@ namespace SW360IntegrationTest.Conan
         public void Setup()
         {
             OutFolder = TestHelper.OutFolder;
-            CCTComparisonBomTestFile = OutFolder + @"..\..\..\src\SW360IntegrationTest\PackageCreatorTestFiles\Npm\CCTComparisonBOMNpmInitial.json";
+            CCTComparisonBomTestFile = OutFolder + @"..\..\..\src\SW360IntegrationTest\PackageCreatorTestFiles\Conan\CCTComparisonBOMConanInitial.json";
 
             if (!TestHelper.BOMCreated)
             {
@@ -36,7 +36,7 @@ namespace SW360IntegrationTest.Conan
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
-                TestConstant.ProjectType, "NPM",
+                TestConstant.ProjectType, "CONAN",
                 TestConstant.Mode,"test"
                 });
             }
@@ -112,7 +112,7 @@ namespace SW360IntegrationTest.Conan
             string responseBody = await httpClient.GetStringAsync(url); //GET request
             var responseData = JsonConvert.DeserializeObject<ComponentsModel>(responseBody);
             //Assert
-            Assert.IsTrue(responseData.Embedded.Sw360components.Count == 0);
+            Assert.IsTrue(responseData.Embedded.Sw360components.Count == 1);
 
         }
 
