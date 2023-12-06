@@ -13,7 +13,6 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using UnitTestUtilities;
-using LCT.Common;
 using LCT.Services.Interface;
 using LCT.APICommunications.Model;
 using LCT.APICommunications.Interfaces;

@@ -28,6 +28,7 @@ namespace LCT.Services.Interface
         /// <param name="packageName">repoName</param>
         /// <param name="path">repoName</param>
         /// <returns>AqlResult</returns>
+#nullable enable
         public Task<AqlResult?> GetPackageInfo(string repoName, string packageName, string path);
     }
 }

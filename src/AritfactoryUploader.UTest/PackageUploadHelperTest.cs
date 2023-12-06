@@ -165,7 +165,7 @@ namespace AritfactoryUploader.UTest
 
             //Assert
             var repoUrl = bom.Components.First(x => x.Properties[1].Name == "internal:siemens:clearing:repo-name").Properties[1].Value;
-            Assert.AreEqual(repoUrl, "siparty-release-npm-egll");
+            Assert.AreEqual("siparty-release-npm-egll", repoUrl);
         }
 
         [Test]
@@ -190,7 +190,7 @@ namespace AritfactoryUploader.UTest
 
             //Assert
             var repoUrl = bom.Components.First(x => x.Properties[1].Name == "internal:siemens:clearing:repo-name").Properties[1].Value;
-            Assert.AreNotEqual(repoUrl, "siparty-release-npm-egll");
+            Assert.AreNotEqual("siparty-release-npm-egll", repoUrl);
         }
 
         private static List<Component> GetComponentList()

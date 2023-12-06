@@ -68,7 +68,7 @@ namespace LCT.Common
         public Config Conan { get; set; }
         public string CaVersion { get; set; }
         public string CycloneDxSBomTemplatePath { get; set; }
-        public string[] InternalRepoList { get; set; } = new string[] { };
+        public string[] InternalRepoList { get; set; } = Array.Empty<string>();
         public bool EnableFossTrigger { get; set; } = true;
         public string JfrogNpmSrcRepo { get; set; }
         public string Mode { get; set; } = string.Empty;

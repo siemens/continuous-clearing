@@ -64,10 +64,11 @@ namespace LCT.Services
             return aqlResult;
         }
 
+#nullable enable
         public async Task<AqlResult?> GetPackageInfo(string repoName, string packageName, string path)
         {
-            HttpResponseMessage httpResponseMessage = null;
-            AqlResult aqlResult = null;
+            HttpResponseMessage? httpResponseMessage = null;
+            AqlResult? aqlResult = null;
             try
             {
                 httpResponseMessage = await m_JFrogApiCommunicationFacade.GetPackageInfo(repoName, packageName, path);
