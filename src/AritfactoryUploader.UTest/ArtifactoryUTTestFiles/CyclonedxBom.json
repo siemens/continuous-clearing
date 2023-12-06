@@ -621,7 +621,7 @@
           "Value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:repo-url",
+          "Name": "internal:siemens:clearing:repo-name",
           "Value": "energy-dev-conan-egll"
         },
         {

@@ -5,7 +5,7 @@ using System.Net;
 using System.Net.Http;
 using TestUtilities;
 
-namespace SW360IntegrationTest
+namespace SW360IntegrationTest.Conan
 {
     [TestFixture, Order(28)]
     public class ArtifactoryUploaderConan
@@ -21,10 +21,15 @@ namespace SW360IntegrationTest
             // Test BOM Creator ran with exit code 0
             Assert.AreEqual(0, TestHelper.RunArtifactoryUploaderExe(new string[]{
                 TestConstant.BomFilePath, comparisonBOMPath,
+                TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.ArtifactoryUser, testParameters.ArtifactoryUploadUser,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
-                TestConstant.JfrogConanDestRepoName,testParameters.DestinationRepoName,
-                TestConstant.JFrogApiURL,testParameters.JfrogApi
+                TestConstant.JfrogConanThirdPartyDestRepoName,testParameters.ThirdPartyDestinationRepoName,
+                TestConstant.JfrogConanDevDestRepoName,testParameters.DevDestinationRepoName,
+                TestConstant.JfrogConanInternalDestRepoName,testParameters.InternalDestinationRepoName,
+                TestConstant.JFrogApiURL,testParameters.JfrogApi,
+                TestConstant.Release, false.ToString(),
+                "--LogFolderPath C:\\Users\\z004tjcm\\Desktop\\CATool\\Logs"
             }),
                 "Test to run Artifactory Uploader EXE execution");
         }

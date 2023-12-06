@@ -60,6 +60,10 @@ namespace TestUtilities
         public const string JfrogPythonInternalDestRepoName = "--python:JfrogInternalDestRepoName ";
         public const string JfrogPythonDevDestRepoName = "--python:JfrogDevDestRepoName ";
 
+        public const string JfrogConanThirdPartyDestRepoName = "--conan:JfrogThirdPartyDestRepoName ";
+        public const string JfrogConanInternalDestRepoName = "--conan:JfrogInternalDestRepoName ";
+        public const string JfrogConanDevDestRepoName = "--conan:JfrogDevDestRepoName ";
+
         public const string NuspecMode = "--NuspecMode";
         public const string JFrogApiURL = "--JFrogApi";
         public const string CycloneDxSBomTemplatePath = "--cycloneDxSBomTemplatePath";

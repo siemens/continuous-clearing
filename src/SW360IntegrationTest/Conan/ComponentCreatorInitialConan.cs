@@ -8,7 +8,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using TestUtilities;
 
-namespace SW360IntegrationTest
+namespace SW360IntegrationTest.Conan
 {
     [TestFixture, Order(27)]
     public class ComponentCreatorInitialConan

@@ -39,7 +39,6 @@ namespace LCT.Services
             try
             {
                 httpResponseMessage = await m_JFrogApiCommunicationFacade.GetInternalComponentDataByRepo(repoName);
-
                 if (httpResponseMessage == null || !httpResponseMessage.IsSuccessStatusCode)
                 {
                     return new List<AqlResult>();
