@@ -32,6 +32,7 @@ using Microsoft.PowerShell.Commands;
 using Microsoft.Web.Administration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using YamlDotNet.Core;
 using YamlDotNet.Core.Tokens;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
@@ -192,6 +193,12 @@ namespace LCT.SW360PackageCreator
                     }
                 }
                 catch (HttpRequestException ex)
+                {
+                    Logger.Warn($"Identification of SRC url failed for {componentName}, " +
+                                    $"Exclude if it is an internal component or manually update the SRC url");
+                    Logger.Debug($"GetSourceUrlForConanPackage()", ex);
+                }
+                catch(YamlException ex)
                 {
                     Logger.Warn($"Identification of SRC url failed for {componentName}, " +
                                     $"Exclude if it is an internal component or manually update the SRC url");
