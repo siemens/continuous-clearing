@@ -228,11 +228,8 @@ namespace LCT.SW360PackageCreator
                 {
                     mapper.DownloadUrl = GetMavenDownloadUrl(mapper, item, releasesInfo);
                 }
-                else if (!string.IsNullOrEmpty(item.ReleaseExternalId) && item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["PYTHON"]))
-                {
-                    mapper.DownloadUrl = mapper.SourceUrl;
-                }
-                else if (!string.IsNullOrEmpty(item.ReleaseExternalId) && item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CONAN"]))
+                else if (!string.IsNullOrEmpty(item.ReleaseExternalId) && 
+                            (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["PYTHON"]) || item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CONAN"]))
                 {
                     mapper.DownloadUrl = mapper.SourceUrl;
                 }
