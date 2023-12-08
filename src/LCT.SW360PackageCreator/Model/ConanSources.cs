@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using YamlDotNet.Serialization;
 
 namespace LCT.SW360PackageCreator.Model
 {
-
+    [ExcludeFromCodeCoverage]
     public class Sources
     {
         [YamlMember(Alias ="sources")]
@@ -12,6 +13,7 @@ namespace LCT.SW360PackageCreator.Model
         public Dictionary<string, List<Patch>> Patches { get; set; }
     }
 
+    [ExcludeFromCodeCoverage]
     public class Source
     {
         [YamlMember(Alias = "url")]
@@ -22,6 +24,7 @@ namespace LCT.SW360PackageCreator.Model
 
     }
 
+    [ExcludeFromCodeCoverage]
     public class Patch
     {
         public string PatchFile { get; set; }
