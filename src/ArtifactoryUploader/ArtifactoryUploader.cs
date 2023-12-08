@@ -66,8 +66,8 @@ namespace LCT.ArtifactoryUploader
                 // Perform Copy or Move operation
                 responsemessage = component.PackageType switch
                 {
-                    PackageType.ClearedThirdParty => await jfrogApicommunication.CopyFromRemoteRepo(component),
-                    PackageType.Internal or PackageType.Development => await jfrogApicommunication.MoveFromRepo(component),
+                    PackageType.ClearedThirdParty or PackageType.Development => await jfrogApicommunication.CopyFromRemoteRepo(component),
+                    PackageType.Internal => await jfrogApicommunication.MoveFromRepo(component),
                     _ => new HttpResponseMessage(HttpStatusCode.NotFound)
                 };
 
