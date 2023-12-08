@@ -388,7 +388,7 @@ namespace LCT.ArtifactoryUploader
         {
             var packageType = item.PackageType;
 
-            if (!(item.SrcRepoName.Equals(item.DestRepoName, StringComparison.OrdinalIgnoreCase)))
+            if (!(item.SrcRepoName.Equals(item.DestRepoName, StringComparison.OrdinalIgnoreCase)) && !item.SrcRepoName.Contains("siparty-release"))
             {
                 if (!(item.SrcRepoName.Contains("Not Found in JFrog")))
                 {
@@ -428,7 +428,7 @@ namespace LCT.ArtifactoryUploader
             else
             {
                 IncrementCountersBasedOnPackageType(uploaderKpiData, packageType, true);
-                Logger.Info($"Package {item.Name}-{item.Version} is already uploaded to {item.DestRepoName}");
+                Logger.Info($"Package {item.Name}-{item.Version} is already uploaded");
                 item.DestRepoName = null;
             }
         }
