@@ -225,7 +225,7 @@ Continuous Clearing Tool reduces the effort in creating components in SW360 and 
   "ArtifactoryUploadUser": "<Insert ArtifactoryUploadUser>",//This should be Jfrog user name
   "RemoveDevDependency": true,
   "EnableFossTrigger": true,
-  "Release": true,
+  "Release": false,
   "InternalRepoList": [
     "<Npm Internal Repo Names>", //This should be the internal repo names in JFrog for NPM
     "<Nuget Internal Repo Names>",//This should be the internal repo names in JFrog for Nuget
