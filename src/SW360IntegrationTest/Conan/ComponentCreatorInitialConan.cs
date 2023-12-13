@@ -37,7 +37,7 @@ namespace SW360IntegrationTest.Conan
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
                 TestConstant.ProjectType, "CONAN",
-                TestConstant.Mode,
+                TestConstant.Mode,""
                 });
             }
         }
@@ -54,7 +54,7 @@ namespace SW360IntegrationTest.Conan
                 TestConstant.SW360AuthTokenType, testParameters.SW360AuthTokenType,
                 TestConstant.SW360ProjectID, testParameters.SW360ProjectID,
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
-                TestConstant.Mode,"test"
+                TestConstant.Mode,""
             }),
                 "Test to run Package Creator EXE execution");
         }
