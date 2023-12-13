@@ -24,7 +24,7 @@ namespace SW360IntegrationTest.Python
         public void TestArtifactoryUploaderexe()
         {
             OutFolder = TestHelper.OutFolder;
-            string comparisonBOMPath = "C:\\Users\\z004tjcm\\Desktop\\CATool\\Output\\SICAMDeviceManager_Bom.cdx.json";
+            string comparisonBOMPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\ArtifactoryUploaderTestData\PythonComparisonBOM.json";
 
             int result = TestHelper.RunArtifactoryUploaderExe(new string[]{
                 TestConstant.BomFilePath, comparisonBOMPath,
