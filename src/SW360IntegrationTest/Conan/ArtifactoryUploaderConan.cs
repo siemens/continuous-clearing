@@ -28,8 +28,7 @@ namespace SW360IntegrationTest.Conan
                 TestConstant.JfrogConanDevDestRepoName,testParameters.DevDestinationRepoName,
                 TestConstant.JfrogConanInternalDestRepoName,testParameters.InternalDestinationRepoName,
                 TestConstant.JFrogApiURL,testParameters.JfrogApi,
-                TestConstant.Release, false.ToString(),
-                "--LogFolderPath C:\\Users\\z004tjcm\\Desktop\\CATool\\Logs"
+                TestConstant.Release, false.ToString()
             }),
                 "Test to run Artifactory Uploader EXE execution");
         }

@@ -35,8 +35,7 @@ namespace SW360IntegrationTest.Python
                 TestConstant.JfrogPythonDevDestRepoName,testParameters.DevDestinationRepoName,
                 TestConstant.JfrogPythonInternalDestRepoName,testParameters.InternalDestinationRepoName,
                 TestConstant.JFrogApiURL,testParameters.JfrogApi,
-                TestConstant.Release, false.ToString(),
-                "--LogFolderPath C:\\Users\\z004tjcm\\Desktop\\CATool\\Logs"
+                TestConstant.Release, false.ToString()
             });
 
             // Test BOM Creator ran with exit code 0 or 2 (Warning)

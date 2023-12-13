@@ -34,8 +34,8 @@ namespace SW360IntegrationTest.Maven
                 TestConstant.JfrogMavenDevDestRepoName,testParameters.DevDestinationRepoName,
                 TestConstant.JfrogMavenInternalDestRepoName,testParameters.InternalDestinationRepoName,
                 TestConstant.JFrogApiURL,testParameters.JfrogApi,
-                TestConstant.Release, false.ToString(),
-                "--LogFolderPath C:\\Users\\z004tjcm\\Desktop\\CATool\\Logs"}),
+                TestConstant.Release, false.ToString()
+            }),
                 "Test to run Artifactory Uploader EXE execution");
         }
         [Test, Order(2)]
