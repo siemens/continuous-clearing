@@ -10,6 +10,7 @@ using LCT.APICommunications.Model;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -148,7 +149,7 @@ namespace SW360IntegrationTest
             string url = TestConstant.Sw360ReleaseApi + TestConstant.componentNameUrl + "Newtonsoft.Json";
             string responseBody = await httpClient.GetStringAsync(url);//GET method         
             var responseData = JsonConvert.DeserializeObject<ReleaseIdOfComponent>(responseBody);
-            string urlofreleaseid = responseData.Embedded.Sw360Releases[0].Links.Self.Href;
+            string urlofreleaseid = responseData.Embedded.Sw360Releases.First(x => x.Version == "12.0.3").Links.Self.Href.ToString();
             string responseForRelease = await httpClient.GetStringAsync(urlofreleaseid);//GET method for fetching the release details
             var responseDataForRelease = JsonConvert.DeserializeObject<Releases>(responseForRelease);
 
