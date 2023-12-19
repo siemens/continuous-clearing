@@ -40,6 +40,7 @@ namespace LCT.PackageIdentifier
         private const string Bundled = "bundled";
         private const string Dependencies = "dependencies";
         private const string Dev = "dev";
+        private const string DevOptional = "devOptional";
         private const string Version = "version";
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
         private const string Requires = "requires";
@@ -214,8 +215,13 @@ namespace LCT.PackageIdentifier
 
                 var properties = JObject.Parse(Convert.ToString(prop.Value));
 
-                // dev components are not ignored and added as a part of SBOM    
+                // dev components are not ignored and added as a part of SBOM 
+                // If package section has Dev or DevOptional as true , considering it as Dev Component 
                 if (IsDevDependency(prop.Value[Dev], ref noOfDevDependent))
+                {
+                    isdev.Value = "true";
+                }
+                else if (IsDevDependency(prop.Value[DevOptional], ref noOfDevDependent))
                 {
                     isdev.Value = "true";
                 }
@@ -501,6 +507,10 @@ namespace LCT.PackageIdentifier
 
         private static string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
         {
+            //component.Name = "moment-timezone";
+            //component.Version = "0.5.37";
+
+
             string jfrogcomponentName = $"{component.Name}-{component.Version}.tgz";
 
             string repoName = aqlResultList.Find(x => x.Name.Equals(
