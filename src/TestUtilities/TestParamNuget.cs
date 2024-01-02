@@ -29,7 +29,9 @@ namespace TestUtilities
         public string ArtifactoryUploadUser { get; set; }
         public string ArtifactoryUploadApiKey { get; set; }
         public string JfrogApi { get; set; }
-        public string DestinationRepoName { get; set; }
+        public string ThirdPartyDestinationRepoName { get; set; }
+        public string InternalDestinationRepoName { get; set; }
+        public string DevDestinationRepoName { get; set; }
 
         public TestParamNuget()
         {
@@ -44,7 +46,9 @@ namespace TestUtilities
             ArtifactoryUploadUser = s_Config["ArtifactoryUploadUser"];
             ArtifactoryUploadApiKey = s_Config["ArtifactoryUploadApiKey"];
             JfrogApi = s_Config["JfrogApi"];
-            DestinationRepoName = "nuget-test";
+            ThirdPartyDestinationRepoName = "nuget-test";
+            InternalDestinationRepoName = "nuget-test";
+            DevDestinationRepoName = "nuget-test";
         }
     }
 }

@@ -51,19 +51,15 @@
         },
         {
           "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
+          "Value": "true"
         },
         {
-          "Name": "internal:siemens:clearing:repo-url",
+          "Name": "internal:siemens:clearing:repo-name",
           "Value": "energy-dev-conan-egll"
         },
         {
           "Name": "internal:siemens:clearing:project-type",
           "Value": "CONAN"
-        },
-        {
-          "Name": "internal:siemens:clearing:clearing-state",
-          "Value": "Approved"
         },
         {
           "Name": "internal:siemens:clearing:sw360:release-url",
@@ -111,7 +107,7 @@
           "Value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:repo-url",
+          "Name": "internal:siemens:clearing:repo-name",
           "Value": "Not Found in JFrogRepo"
         },
         {

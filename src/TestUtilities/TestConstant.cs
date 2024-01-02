@@ -17,8 +17,8 @@ namespace TestUtilities
 
         public static readonly string Sw360ComponentApi = $"{s_testParamObj.SW360URL}/resource/api/components";
         public static readonly string Sw360ReleaseApi = $"{s_testParamObj.SW360URL}/resource/api/releases";
-        public static readonly string JfrogApi = $"{s_testParamObj.JfrogApi}/api/storage/{s_testParamObj.DestinationRepoName}";
-        public static readonly string JfrogApiNuget = $"{s_testParamObjnuget.JfrogApi}/api/storage/{s_testParamObjnuget.DestinationRepoName}";
+        public static readonly string JfrogApi = $"{s_testParamObj.JfrogApi}/api/storage/{s_testParamObj.ThirdPartyDestinationRepoName}";
+        public static readonly string JfrogApiNuget = $"{s_testParamObjnuget.JfrogApi}/api/storage/{s_testParamObjnuget.ThirdPartyDestinationRepoName}";
 
 
 
@@ -43,12 +43,30 @@ namespace TestUtilities
         public const string Email = "Email";
         public const string ArtifactoryUser = "--artifactoryuploaduser";
         public const string ArtifactoryKey = "--artifactoryuploadapikey";
-        public const string JfrogNPMDestRepoName = "--jfrognpmdestreponame ";
-        public const string JfrogNugetDestRepoName = "--jfrognugetdestreponame ";
-        public const string JfrogMavenDestRepoName = "--jfrogmavendestreponame ";
-        public const string JfrogConanDestRepoName = "--jfrogconandestreponame ";
+
+        public const string JfrogNpmThirdPartyDestRepoName = "--npm:JfrogThirdPartyDestRepoName ";
+        public const string JfrogNpmInternalDestRepoName = "--npm:JfrogInternalDestRepoName ";
+        public const string JfrogNpmDevDestRepoName = "--npm:JfrogDevDestRepoName ";
+
+        public const string JfrogMavenThirdPartyDestRepoName = "--maven:JfrogThirdPartyDestRepoName ";
+        public const string JfrogMavenInternalDestRepoName = "--maven:JfrogInternalDestRepoName ";
+        public const string JfrogMavenDevDestRepoName = "--maven:JfrogDevDestRepoName ";
+
+        public const string JfrogNugetThirdPartyDestRepoName = "--nuget:JfrogThirdPartyDestRepoName ";
+        public const string JfrogNugetInternalDestRepoName = "--nuget:JfrogInternalDestRepoName ";
+        public const string JfrogNugetDevDestRepoName = "--nuget:JfrogDevDestRepoName ";
+
+        public const string JfrogPythonThirdPartyDestRepoName = "--python:JfrogThirdPartyDestRepoName ";
+        public const string JfrogPythonInternalDestRepoName = "--python:JfrogInternalDestRepoName ";
+        public const string JfrogPythonDevDestRepoName = "--python:JfrogDevDestRepoName ";
+
+        public const string JfrogConanThirdPartyDestRepoName = "--conan:JfrogThirdPartyDestRepoName ";
+        public const string JfrogConanInternalDestRepoName = "--conan:JfrogInternalDestRepoName ";
+        public const string JfrogConanDevDestRepoName = "--conan:JfrogDevDestRepoName ";
+
         public const string NuspecMode = "--NuspecMode";
         public const string JFrogApiURL = "--JFrogApi";
-        public const string CycloneDxSBomTemplatePath = "--cycloneDxSBomTemplatePath"; 
+        public const string CycloneDxSBomTemplatePath = "--cycloneDxSBomTemplatePath";
+        public const string Release = "--release";
     }
 }

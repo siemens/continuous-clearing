@@ -18,6 +18,8 @@ namespace LCT.APICommunications.Interfaces
 
         Task<HttpResponseMessage> CopyFromRemoteRepo(ComponentsToArtifactory component);
 
+        Task<HttpResponseMessage> MoveFromRepo(ComponentsToArtifactory component);
+
         Task<HttpResponseMessage> GetApiKey();
 
         void UpdatePackagePropertiesInJfrog(string sw360releaseUrl, string destRepoName, UploadArgs uploadArgs);

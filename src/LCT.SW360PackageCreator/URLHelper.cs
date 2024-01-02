@@ -32,6 +32,7 @@ using Microsoft.PowerShell.Commands;
 using Microsoft.Web.Administration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using YamlDotNet.Core;
 using YamlDotNet.Core.Tokens;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
@@ -47,7 +48,7 @@ namespace LCT.SW360PackageCreator
         private readonly HttpClient httpClient = new HttpClient();
         public static string GithubUrl { get; set; } = string.Empty;
         public static UrlHelper Instance { get; } = new UrlHelper();
-        public CommonAppSettings CommonAppSettings =new CommonAppSettings();
+        public CommonAppSettings CommonAppSettings { get; } = new CommonAppSettings();
 
         private bool _disposed;
 
@@ -162,7 +163,7 @@ namespace LCT.SW360PackageCreator
         /// <param name="componentName"></param>
         /// <param name="version"></param>
         /// <returns>string</returns>
-        public async Task<string> GetSourceUrlForConanPackage(string componentName, string version) 
+        public async Task<string> GetSourceUrlForConanPackage(string componentName, string componenVersion) 
         {
 
             var downLoadUrl = $"{CommonAppSettings.SourceURLConan}" + componentName + "/all/conandata.yml";
@@ -178,7 +179,7 @@ namespace LCT.SW360PackageCreator
                     response.EnsureSuccessStatusCode();
                     var jsonObject = await response.Content.ReadAsStringAsync();
                     packageSourcesInfo = deserializer.Deserialize<Sources>(jsonObject);
-                    if (packageSourcesInfo.SourcesData.TryGetValue(version, out var release))
+                    if (packageSourcesInfo.SourcesData.TryGetValue(componenVersion, out var release))
                     {
                         if (release.Url.GetType().Name.ToLowerInvariant() == "string")
                         {
@@ -187,26 +188,26 @@ namespace LCT.SW360PackageCreator
                         else
                         {
                             List<object> urlList = (List<object>)release.Url;
-                            componentSrcURL = urlList.FirstOrDefault() != null ? urlList.FirstOrDefault().ToString() : "";
+                            componentSrcURL = urlList.FirstOrDefault()?.ToString() ?? "";
                         }
                     }
                 }
-                catch (Exception)
+                catch (HttpRequestException ex)
                 {
-
-                    var response = new HttpResponseMessage(HttpStatusCode.NotFound)
-                    {
-                        Content = new StringContent(string.Format("Problem Getting Information from Conan Server For = {0}", componentName)),
-                        ReasonPhrase = "Problem Occured while connecting to conan Server"
-                    };
+                    Logger.Warn($"Identification of SRC url failed for {componentName}, " +
+                                    $"Exclude if it is an internal component or manually update the SRC url");
+                    Logger.Debug($"GetSourceUrlForConanPackage()", ex);
                 }
-                finally
-                { 
-                    _httpClient.Dispose(); 
+                catch(YamlException ex)
+                {
+                    Logger.Warn($"Identification of SRC url failed for {componentName}, " +
+                                    $"Exclude if it is an internal component or manually update the SRC url");
+                    Logger.Debug($"GetSourceUrlForConanPackage()", ex);
                 }
-                
-                
-
+                catch (ArgumentNullException ex)
+                {
+                    Logger.Debug($"GetSourceUrlForConanPackage()", ex);
+                }
             }
             return componentSrcURL;
         }

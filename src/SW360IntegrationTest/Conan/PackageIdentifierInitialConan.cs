@@ -3,7 +3,7 @@ using NUnit.Framework;
 using System.IO;
 using TestUtilities;
 
-namespace SW360IntegrationTest
+namespace SW360IntegrationTest.Conan
 {
     [TestFixture, Order(26)]
     public class PackageIdentifierInitialConan

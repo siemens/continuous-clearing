@@ -23,7 +23,12 @@ namespace LCT.APICommunications.Model
         public string Email { get; set; }
         public string PackageInfoApiUrl { get; set; }
         public string CopyPackageApiUrl { get; set; }
+        public string MovePackageApiUrl { get; set; }
         public string PackageExtension { get; set; }
         public string Path { get; set; }
+        public  PackageType PackageType { get; set; }
+        public bool DryRun { get; set; } = true;
+        public string Purl { get; set; }
+        public string JfrogPackageName { get;set; }
     }
 }

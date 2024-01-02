@@ -24,7 +24,9 @@ namespace TestUtilities
         public string ArtifactoryUploadUser { get; set; }
         public string ArtifactoryUploadApiKey { get; set; }
         public string JfrogApi { get; set; }
-        public string DestinationRepoName { get; set; }
+        public string ThirdPartyDestinationRepoName { get; set; }
+        public string InternalDestinationRepoName { get; set; }
+        public string DevDestinationRepoName { get; set; }
 
         public TestParamConan()
         {
@@ -39,7 +41,9 @@ namespace TestUtilities
             ArtifactoryUploadUser = s_Config["ArtifactoryUploadUser"];
             ArtifactoryUploadApiKey = s_Config["ArtifactoryUploadApiKey"];
             JfrogApi = s_Config["JfrogApi"];
-            DestinationRepoName = "conan-test";
+            ThirdPartyDestinationRepoName = "conan-test";
+            InternalDestinationRepoName = "conan-test";
+            DevDestinationRepoName = "conan-test";
         }
     }
 }

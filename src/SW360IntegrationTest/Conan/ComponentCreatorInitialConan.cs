@@ -8,7 +8,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using TestUtilities;
 
-namespace SW360IntegrationTest
+namespace SW360IntegrationTest.Conan
 {
     [TestFixture, Order(27)]
     public class ComponentCreatorInitialConan
@@ -19,12 +19,12 @@ namespace SW360IntegrationTest
         public void Setup()
         {
             OutFolder = TestHelper.OutFolder;
-            CCTComparisonBomTestFile = OutFolder + @"..\..\..\src\SW360IntegrationTest\PackageCreatorTestFiles\Npm\CCTComparisonBOMNpmInitial.json";
+            CCTComparisonBomTestFile = OutFolder + @"..\..\..\src\SW360IntegrationTest\PackageCreatorTestFiles\Conan\CCTComparisonBOMConanInitial.json";
 
             if (!TestHelper.BOMCreated)
             {
                 OutFolder = TestHelper.OutFolder;
-                string packagjsonPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest1stIterationData";
+                string packagjsonPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest1stIterationData\Conan";
                 string bomPath = OutFolder + @"\..\BOMs";
                 TestHelper.RunBOMCreatorExe(new string[]{
                 TestConstant.PackageFilePath, packagjsonPath,
@@ -36,8 +36,8 @@ namespace SW360IntegrationTest
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
-                TestConstant.ProjectType, "NPM",
-                TestConstant.Mode,"test"
+                TestConstant.ProjectType, "CONAN",
+                TestConstant.Mode,""
                 });
             }
         }
@@ -54,7 +54,7 @@ namespace SW360IntegrationTest
                 TestConstant.SW360AuthTokenType, testParameters.SW360AuthTokenType,
                 TestConstant.SW360ProjectID, testParameters.SW360ProjectID,
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
-                TestConstant.Mode,"test"
+                TestConstant.Mode,""
             }),
                 "Test to run Package Creator EXE execution");
         }
@@ -112,7 +112,7 @@ namespace SW360IntegrationTest
             string responseBody = await httpClient.GetStringAsync(url); //GET request
             var responseData = JsonConvert.DeserializeObject<ComponentsModel>(responseBody);
             //Assert
-            Assert.IsTrue(responseData.Embedded.Sw360components.Count == 0);
+            Assert.IsTrue(responseData.Embedded.Sw360components.Count == 1);
 
         }
 
