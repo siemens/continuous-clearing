@@ -13,13 +13,14 @@ RUN mkdir /opt/DebianImageClearing && \
     mkdir /app/out/PatchedFiles
 
 # Installing required packages
+# Installing syft:v0.90.0
 RUN apt-get update && \
     apt-get -y install --no-install-recommends nodejs npm && \
     apt-get -y install --no-install-recommends git && \
     apt-get -y install --no-install-recommends maven && \
     apt-get -y install --no-install-recommends curl && \
     apt-get -y install --no-install-recommends dpkg-dev && \   
-    curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /opt/DebianImageClearing && \
+    curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /opt/DebianImageClearing v0.90.0 && \
     rm -rf /var/lib/apt/lists/* && \
     rm -rf archive.tar.gz
 
