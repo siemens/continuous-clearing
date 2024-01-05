@@ -13,6 +13,7 @@ RUN mkdir /opt/DebianImageClearing && \
     mkdir /app/out/PatchedFiles
 
 # Installing required packages
+# Installing syft:v0.90.0
 RUN apt-get update && \
     apt-get -y install --no-install-recommends nodejs npm && \
     apt-get -y install --no-install-recommends git && \
