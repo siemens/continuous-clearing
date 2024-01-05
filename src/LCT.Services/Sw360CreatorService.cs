@@ -104,7 +104,7 @@ namespace LCT.Services
             return componentCreateStatus;
         }
 
-       
+
         public async Task<FossTriggerStatus> TriggerFossologyProcess(string releaseId, string sw360link)
         {
             FossTriggerStatus fossTriggerStatus = null;
@@ -739,7 +739,7 @@ namespace LCT.Services
 
             Dictionary<string, string> additonalData = new Dictionary<string, string>();
 
-            if (releasesInfo?.AdditionalData == null || releasesInfo?.AdditionalData?.Count == 0)
+            if (releasesInfo?.AdditionalData == null || releasesInfo.AdditionalData?.Count == 0)
             {
                 additonalData.Add(ApiConstant.AdditionalDataFossologyURL, fossologyUrl);
             }
@@ -752,7 +752,9 @@ namespace LCT.Services
             {
                 additonalData = releasesInfo.AdditionalData;
                 if (!additonalData[ApiConstant.AdditionalDataFossologyURL].Equals(fossologyUrl))
-                { additonalData[ApiConstant.AdditionalDataFossologyURL] = fossologyUrl; }
+                {
+                    additonalData[ApiConstant.AdditionalDataFossologyURL] = fossologyUrl;
+                }
             }
             else
             {
