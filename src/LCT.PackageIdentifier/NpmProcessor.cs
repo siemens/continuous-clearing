@@ -157,12 +157,17 @@ namespace LCT.PackageIdentifier
                 Component components = new Component();
                 var properties = JObject.Parse(Convert.ToString(prop.Value));
 
-                // dev components are not ignored and added as a part of SBOM   
+                // dev components are not ignored and added as a part of SBOM 
+                // If package section has Dev or DevOptional as true , considering it as Dev Component
                 if (IsDevDependency(prop.Value[Dev], ref noOfDevDependent))
                 {
                     isdev.Value = "true";
                 }
-
+                else if (IsDevDependency(prop.Value[DevOptional], ref noOfDevDependent))
+                {
+                    isdev.Value = "true";
+                }
+                
                 string folderPath = CommonHelper.TrimEndOfString(filepath, $"\\{FileConstant.PackageLockFileName}");
                 string packageName = CommonHelper.GetSubstringOfLastOccurance(prop.Name, $"node_modules/");
                 string componentName = packageName.StartsWith('@') ? packageName.Replace("@", "%40") : packageName;
