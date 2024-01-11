@@ -1,21 +1,18 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2023 Siemens AG
+// SPDX-FileCopyrightText: 2024 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using CycloneDX.Json.Converters;
 using CycloneDX.Models;
 using LCT.APICommunications;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
-using LCT.Common.Model;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -167,7 +164,7 @@ namespace LCT.PackageIdentifier
                 {
                     isdev.Value = "true";
                 }
-                
+
                 string folderPath = CommonHelper.TrimEndOfString(filepath, $"\\{FileConstant.PackageLockFileName}");
                 string packageName = CommonHelper.GetSubstringOfLastOccurance(prop.Name, $"node_modules/");
                 string componentName = packageName.StartsWith('@') ? packageName.Replace("@", "%40") : packageName;
@@ -513,9 +510,6 @@ namespace LCT.PackageIdentifier
 
         private static string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
         {
-            //component.Name = "moment-timezone";
-            //component.Version = "0.5.37";
-
 
             string jfrogcomponentName = $"{component.Name}-{component.Version}.tgz";
 
