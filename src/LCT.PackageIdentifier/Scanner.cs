@@ -59,11 +59,10 @@ namespace LCT.PackageIdentifier
                     foreach (string configFile in foundConfigFiles)
                     {
                         CheckingForExcludedFiles(config, fileOperations, allFoundConfigFiles, configFile);
-                    }
-                    Logger.Logger.Log(null, Level.Notice, $"\n----------------------------------------------------", null);
-                }
+                    }                  
+                }             
             }
-
+            Logger.Logger.Log(null, Level.Notice, $"\n----------------------------------------------------", null);
             return allFoundConfigFiles;
 
         }
