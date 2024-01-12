@@ -94,7 +94,7 @@ jobs:
         $sourceFolder = Join-Path $env:GITHUB_WORKSPACE "out" | Join-Path -ChildPath "*"
         $outFolder = Join-Path $env:GITHUB_WORKSPACE "out" | Join-Path -ChildPath "continuous-clearing" 
         New-Item -ItemType Directory -Force -Path $outFolder
-        $fileName = "continuous-clearing-5.1.1.zip"
+        $fileName = "continuous-clearing-6.0.0.zip"
         Write-Host "Filename: '$fileName'"
         Write-Host "sourceFolder: '$sourceFolder'"
         Write-Host "Outfolder: '$outFolder'"
@@ -115,7 +115,7 @@ jobs:
          DOCKERDEVARTIFACTORY: ${{ secrets.DOCKERDEVARTIFACTORY }}
          
     - name: Test 
-      if: ${{ false }}  # disable for now
+      #if: ${{ false }}  # disable for now
       run: |
         $TestProjects = Get-ChildItem -Path *test*.csproj -Recurse -exclude TestUtilities.csproj,UnitTestUtilities.csproj
         Write-Host "**************************The test projects considered for execution: $TestProjects   ******************************"
@@ -138,8 +138,8 @@ jobs:
     - name: Create Nuget Packages 
       id: createNupkg
       run: |
-        nuget pack CA.nuspec -Version 5.1.1
-        Write-Host "::set-output name=nupkg-LicenseClearingTool::continuous-clearing.5.1.1.nupkg"
+        nuget pack CA.nuspec -Version 6.0.0
+        Write-Host "::set-output name=nupkg-LicenseClearingTool::continuous-clearing.6.0.0.nupkg"
         
     - name: Archive NuGet Packages
       uses: actions/upload-artifact@v2
@@ -152,9 +152,9 @@ jobs:
       id: builddocker
       #if: ${{ false }}  # disable for now
       run: |
-        docker build . --file Dockerfile --tag ${{ github.repository }}:continuous-clearing-v5.1.1
-        docker save ${{ github.repository }}:continuous-clearing-v5.1.1 -o continuous-clearing-v5.1.1.tar
-        Write-Host "::set-output name=docker-LicenseClearingTool::continuous-clearing-v5.1.1.tar"
+        docker build . --file Dockerfile --tag ${{ github.repository }}:continuous-clearing-v6.0.0
+        docker save ${{ github.repository }}:continuous-clearing-v6.0.0 -o continuous-clearing-v6.0.0.tar
+        Write-Host "::set-output name=docker-LicenseClearingTool::continuous-clearing-v6.0.0.tar"
 
     - name: Archive docker image      
       #if: ${{ false }}  # disable for now
@@ -195,9 +195,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
         with:
-          tag_name: v5.1.1
+          tag_name: v6.0.0
           #tag_name: ${{ needs.build.outputs.semver }}
-          release_name: Release v5.1.1
+          release_name: Release v6.0.0
           body: |
             ${{ github.event.head_commit.message }}
           draft: true

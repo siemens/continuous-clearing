@@ -3,6 +3,7 @@
 ![Publish NuGet Packages](https://github.com/siemens/continuous-clearing/workflows/Publish%20NuGet%20Packages/badge.svg)
 
 
+
 # Introduction 
 
 The Continuous Clearing Tool scans and collects the 3rd party OSS components used in a NPM/NuGet/Maven/Python/Debian and uploads it to SW360 and Fossology by accepting respective project ID for license clearing. 

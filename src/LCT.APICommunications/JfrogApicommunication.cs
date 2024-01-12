@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2023 Siemens AG
+// SPDX-FileCopyrightText: 2024 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -51,6 +51,8 @@ namespace LCT.APICommunications
         public abstract Task<HttpResponseMessage> GetPackageInfo(ComponentsToArtifactory component);
 
         public abstract Task<HttpResponseMessage> CopyFromRemoteRepo(ComponentsToArtifactory component);
+
+        public abstract Task<HttpResponseMessage> MoveFromRepo(ComponentsToArtifactory component);
 
         public abstract void UpdatePackagePropertiesInJfrog(string sw360releaseUrl, string destRepoName, UploadArgs uploadArgs);
 

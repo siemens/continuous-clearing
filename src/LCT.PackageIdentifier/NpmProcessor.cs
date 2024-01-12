@@ -1,21 +1,18 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2023 Siemens AG
+// SPDX-FileCopyrightText: 2024 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using CycloneDX.Json.Converters;
 using CycloneDX.Models;
 using LCT.APICommunications;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
-using LCT.Common.Model;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -157,8 +154,13 @@ namespace LCT.PackageIdentifier
                 Component components = new Component();
                 var properties = JObject.Parse(Convert.ToString(prop.Value));
 
-                // dev components are not ignored and added as a part of SBOM   
+                // dev components are not ignored and added as a part of SBOM 
+                // If package section has Dev or DevOptional as true , considering it as Dev Component
                 if (IsDevDependency(prop.Value[Dev], ref noOfDevDependent))
+                {
+                    isdev.Value = "true";
+                }
+                else if (IsDevDependency(prop.Value[DevOptional], ref noOfDevDependent))
                 {
                     isdev.Value = "true";
                 }
@@ -215,8 +217,8 @@ namespace LCT.PackageIdentifier
 
                 var properties = JObject.Parse(Convert.ToString(prop.Value));
 
-                // dev components are not ignored and added as a part of SBOM
-                // If package section has Dev or DevOptional as true , considering it as Dev Component
+                // dev components are not ignored and added as a part of SBOM 
+                // If package section has Dev or DevOptional as true , considering it as Dev Component 
                 if (IsDevDependency(prop.Value[Dev], ref noOfDevDependent))
                 {
                     isdev.Value = "true";
@@ -307,8 +309,9 @@ namespace LCT.PackageIdentifier
         public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM,
             CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
-            // get the  component list from Jfrog for given repo
-            List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(appSettings.Npm?.JfrogNpmRepoList, jFrogService);
+            // get the  component list from Jfrog for given repo + internal repo
+            string[] repoList = appSettings.InternalRepoList.Concat(appSettings.Npm?.JfrogNpmRepoList).ToArray();
+            List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(repoList, jFrogService);
             Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
             List<Component> modifiedBOM = new List<Component>();
 
@@ -507,6 +510,7 @@ namespace LCT.PackageIdentifier
 
         private static string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
         {
+
             string jfrogcomponentName = $"{component.Name}-{component.Version}.tgz";
 
             string repoName = aqlResultList.Find(x => x.Name.Equals(

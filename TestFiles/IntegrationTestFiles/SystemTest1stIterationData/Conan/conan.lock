@@ -1,0 +1,24 @@
+﻿{
+ "graph_lock": {
+  "nodes": {
+   "0": {
+    "options": "libcurl:static=None\nopenssl:static=False",
+    "requires": [
+     "1",
+    ],
+    "path": "conan\\conanfile\\linux-x86_64",
+    "context": "host"
+   },
+   "1": {
+    "ref": "rapidjson/1.1.0@siemens-energy/stable#6d624490b731387491675eebeff7ab66",
+    "options": "",
+    "package_id": "5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9",
+    "prev": "85ca839500f017c06cd5c39b4ad50c5e",
+    "context": "host"
+   }
+  },
+  "revisions_enabled": true
+ },
+ "version": "0.4",
+ "profile_host": "[settings]\narch=x86_64\narch_build=x86_64\nbuild_type=Release\ncompiler=gcc\ncompiler.libcxx=libstdc++11\ncompiler.version=9.3\nos=Linux\nos_build=Linux\nswsign:os=Windows\nswsign:os_build=Windows\nswsign:compiler=Visual Studio\nswsign:compiler.version=15\nswsign:build_type=Release\nswsign:compiler.runtime=MD\nmbedtls_csc:os=Windows\nmbedtls_csc:os_build=Windows\nmbedtls_csc:compiler=Visual Studio\nmbedtls_csc:compiler.version=15\nmbedtls_csc:build_type=Release\nmbedtls_csc:compiler.runtime=MD\n[options]\nopenssl:static=False\n[build_requires]\n[env]\n"
+}

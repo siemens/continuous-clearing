@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2023 Siemens AG
+// SPDX-FileCopyrightText: 2024 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -107,7 +107,11 @@ namespace LCT.SW360PackageCreator
             }
             else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["PYTHON"]))
             {
-                downloadPath = await GetAttachmentUrlListForPython(component, localPathforDownload);
+                downloadPath = await GetAttachmentUrlList(component, localPathforDownload);
+            }
+            else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CONAN"]))
+            {
+                downloadPath = await GetAttachmentUrlList(component, localPathforDownload);
             }
             else
             {
@@ -160,7 +164,7 @@ namespace LCT.SW360PackageCreator
 
         }
 
-        private static async Task<string> GetAttachmentUrlListForPython(ComparisonBomData component, string localPathforDownload)
+        private static async Task<string> GetAttachmentUrlList(ComparisonBomData component, string localPathforDownload)
         {
             string downloadPath = string.Empty;
             try
@@ -224,7 +228,8 @@ namespace LCT.SW360PackageCreator
                 {
                     mapper.DownloadUrl = GetMavenDownloadUrl(mapper, item, releasesInfo);
                 }
-                else if (!string.IsNullOrEmpty(item.ReleaseExternalId) && item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["PYTHON"]))
+                else if (!string.IsNullOrEmpty(item.ReleaseExternalId) && 
+                            (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["PYTHON"]) || item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CONAN"])))
                 {
                     mapper.DownloadUrl = mapper.SourceUrl;
                 }

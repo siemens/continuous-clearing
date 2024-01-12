@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2023 Siemens AG
+// SPDX-FileCopyrightText: 2024 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 
@@ -53,7 +53,7 @@
 
         },
         {
-          "Name": "internal:siemens:clearing:repo-url",
+          "Name": "internal:siemens:clearing:repo-name",
           "Value": "org1-npmjs-npm-remote"
         },
         {
@@ -102,20 +102,15 @@
       "Properties": [
         {
           "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
+          "Value": "true"
         },
         {
-          "Name": "internal:siemens:clearing:repo-url",
+          "Name": "internal:siemens:clearing:repo-name",
           "Value": "Not Found in JFrog"
         },
         {
           "Name": "internal:siemens:clearing:project-type",
           "Value": "Npm"
-        },
-        {
-          "Name": "internal:siemens:clearing:clearing-state",
-          "Value": "APPROVED"
-
         },
         {
           "Name": "internal:siemens:clearing:sw360:release-url",
@@ -154,20 +149,15 @@
       "Properties": [
         {
           "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
+          "Value": "true"
         },
         {
-          "Name": "internal:siemens:clearing:repo-url",
+          "Name": "internal:siemens:clearing:repo-name",
           "Value": "Not Found in JFrog"
         },
         {
           "Name": "internal:siemens:clearing:project-type",
           "Value": "Npm"
-        },
-        {
-          "Name": "internal:siemens:clearing:clearing-state",
-          "Value": "APPROVED"
-
         },
         {
           "Name": "internal:siemens:clearing:sw360:release-url",
@@ -203,35 +193,85 @@
       "Modified": null,
       "Pedigree": null,
       "Components": null,
-      "Properties": [
-        {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
-        },
-        {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrog"
-        },
-        {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "Npm"
-        },
-        {
-          "Name": "internal:siemens:clearing:clearing-state",
-          "Value": "APPROVED"
+        "Properties": [
+            {
+                "Name": "internal:siemens:clearing:development",
+                "Value": "true"
+            },
+            {
+                "Name": "internal:siemens:clearing:is-internal",
+                "Value": "false"
+            },
+            {
+                "Name": "internal:siemens:clearing:repo-name",
+                "Value": "Not Found in JFrog"
+            },
+            {
+                "Name": "internal:siemens:clearing:project-type",
+                "Value": "Npm"
+            },
+            {
+                "Name": "internal:siemens:clearing:sw360:release-url",
+                "Value": "false"
 
-        },
-        {
-          "Name": "internal:siemens:clearing:sw360:release-url",
-          "Value": "false"
+            },
+            {
+                "Name": "internal:siemens:clearing:fossology:url",
+                "Value": "false"
 
-        },
-        {
-          "Name": "internal:siemens:clearing:fossology:url",
-          "Value": "false"
+            }
+        ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:npm/%40angular/cdk@11.2.4",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": "@angular",
+      "Name": "cdk",
+      "Version": "11.2.4",
+      "Description": null,
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:npm/%40angular/cdk@11.2.4",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+        "Properties": [
+            {
+                "Name": "internal:siemens:clearing:development",
+                "Value": "true"
+            },
+            {
+                "Name": "internal:siemens:clearing:is-internal",
+                "Value": "false"
+            },
+            {
+                "Name": "internal:siemens:clearing:repo-name",
+                "Value": "Not Found in JFrog"
+            },
+            {
+                "Name": "internal:siemens:clearing:project-type",
+                "Value": "Npm"
+            },
+            {
+                "Name": "internal:siemens:clearing:sw360:release-url",
+                "Value": "false"
 
-        }
-      ],
+            },
+            {
+                "Name": "internal:siemens:clearing:fossology:url",
+                "Value": ""
+
+            }
+        ],
       "Evidence": null
     },
     {
@@ -261,7 +301,7 @@
           "Value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:repo-url",
+          "Name": "internal:siemens:clearing:repo-name",
           "Value": "Not Found in JFrog"
         },
         {
@@ -313,7 +353,7 @@
           "Value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:repo-url",
+          "Name": "internal:siemens:clearing:repo-name",
           "Value": "Not Found in JFrog"
         },
         {
@@ -365,59 +405,7 @@
           "Value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrog"
-        },
-        {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "Npm"
-        },
-        {
-          "Name": "internal:siemens:clearing:clearing-state",
-          "Value": "APPROVED"
-
-        },
-        {
-          "Name": "internal:siemens:clearing:sw360:release-url",
-          "Value": "false"
-
-        },
-        {
-          "Name": "internal:siemens:clearing:fossology:url",
-          "Value": ""
-
-        }
-      ],
-      "Evidence": null
-    },
-    {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:npm/%40angular/cdk@11.2.4",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": "@angular",
-      "Name": "cdk",
-      "Version": "11.2.4",
-      "Description": null,
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:npm/%40angular/cdk@11.2.4",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
-        {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
-        },
-        {
-          "Name": "internal:siemens:clearing:repo-url",
+          "Name": "internal:siemens:clearing:repo-name",
           "Value": "Not Found in JFrog"
         },
         {
@@ -469,7 +457,7 @@
           "Value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:repo-url",
+          "Name": "internal:siemens:clearing:repo-name",
           "Value": "Not Found in JFrog"
         },
         {
@@ -521,7 +509,7 @@
           "Value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:repo-url",
+          "Name": "internal:siemens:clearing:repo-name",
           "Value": "Not Found in JFrog"
         },
         {
@@ -573,7 +561,7 @@
           "Value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:repo-url",
+          "Name": "internal:siemens:clearing:repo-name",
           "Value": "Not Found in JFrog"
         },
         {
@@ -594,6 +582,63 @@
           "Name": "internal:siemens:clearing:fossology:url",
           "Value": "false"
 
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:conan/protobuf@3.21.9",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "protobuf",
+      "Version": "3.21.9",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:conan/protobuf@3.21.9",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
+        },
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-name",
+          "Value": "energy-dev-conan-egll"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "CONAN"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "Approved"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://md2pdvnc.ad001.siemens.net:8095/resource/api/releases/e13e0e564b004ef4adabbd01bf0b93ce"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": null
         }
       ],
       "Evidence": null

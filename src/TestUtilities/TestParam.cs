@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2023 Siemens AG
+// SPDX-FileCopyrightText: 2024 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 
@@ -27,7 +27,9 @@ namespace TestUtilities
         public string ArtifactoryUploadUser { get; set; }
         public string ArtifactoryUploadApiKey { get; set; }
         public string JfrogApi { get; set; }
-        public string DestinationRepoName { get; set; }
+        public string ThirdPartyDestinationRepoName { get; set; }
+        public string InternalDestinationRepoName { get; set; }
+        public string DevDestinationRepoName { get; set; }
 
         public TestParam()
         {
@@ -42,7 +44,9 @@ namespace TestUtilities
             ArtifactoryUploadUser = s_Config["ArtifactoryUploadUser"];
             ArtifactoryUploadApiKey = s_Config["ArtifactoryUploadApiKey"];
             JfrogApi = s_Config["JfrogApi"];
-            DestinationRepoName = "npm-test";
+            ThirdPartyDestinationRepoName = "npm-test";
+            InternalDestinationRepoName = "npm-test";
+            DevDestinationRepoName = "npm-test";
         }
     }
 }

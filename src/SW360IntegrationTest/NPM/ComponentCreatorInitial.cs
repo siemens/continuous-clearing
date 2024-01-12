@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2023 Siemens AG
+// SPDX-FileCopyrightText: 2024 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 
@@ -17,7 +17,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using TestUtilities;
 
-namespace SW360IntegrationTest
+namespace SW360IntegrationTest.NPM
 {
     [TestFixture, Order(5)]
     public class ComponentCreatorInitial

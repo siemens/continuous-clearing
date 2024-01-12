@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2023 Siemens AG
+// SPDX-FileCopyrightText: 2024 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -20,5 +20,14 @@ namespace LCT.APICommunications.Interfaces
         /// <param name="repoName">repoName</param>
         /// <returns>HttpResponseMessage</returns>
         Task<HttpResponseMessage> GetInternalComponentDataByRepo(string repoName);
+
+        /// <summary>
+        /// Gets the package information in the repo, via the name or path
+        /// </summary>
+        /// <param name="repoName">repoName</param>
+        /// <param name="packageName">repoName</param>
+        /// <param name="path">repoName</param>
+        /// <returns>AqlResult</returns>
+        Task<HttpResponseMessage> GetPackageInfo(string repoName, string packageName = null, string path = null);
     }
 }

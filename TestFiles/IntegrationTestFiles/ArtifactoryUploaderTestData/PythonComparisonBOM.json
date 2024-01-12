@@ -9,7 +9,7 @@
       {
         "Vendor": "Siemens AG",
         "Name": "Clearing Automation Tool",
-        "Version": "3.1.0",
+        "Version": "4.0.0",
         "Hashes": null
       }
     ],
@@ -22,20 +22,20 @@
     {
       "Type": 0,
       "MimeType": null,
-      "BomRef": "pkg:pypi/html5lib@1.1",
+      "BomRef": "pkg:pypi/requests@2.28.1",
       "Supplier": null,
       "Author": null,
       "Publisher": null,
       "Group": null,
-      "Name": "html5lib",
-      "Version": "1.1",
+      "Name": "requests",
+      "Version": "2.28.1",
       "Description": "",
       "Scope": null,
       "Hashes": null,
       "Licenses": null,
       "Copyright": null,
       "Cpe": null,
-      "Purl": "pkg:pypi/html5lib@1.1",
+      "Purl": "pkg:pypi/requests@2.28.1",
       "Swid": null,
       "Modified": null,
       "Pedigree": null,
@@ -43,35 +43,23 @@
       "Properties": [
         {
           "Name": "internal:siemens:clearing:development",
-          "Value": "false"
+          "Value": "true"
         },
         {
           "Name": "internal:siemens:clearing:identifier-type",
-          "Value": "ManuallyAdded"
+          "Value": "Discovered"
         },
         {
           "Name": "internal:siemens:clearing:is-internal",
           "Value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:repo-url",
+          "Name": "internal:siemens:clearing:repo-name",
           "Value": "org1-pythonhosted-pypi-remote-cache"
         },
         {
           "Name": "internal:siemens:clearing:project-type",
           "Value": "PYTHON"
-        },
-        {
-          "Name": "internal:siemens:clearing:clearing-state",
-          "Value": "Approved"
-        },
-        {
-          "Name": "internal:siemens:clearing:sw360:release-url",
-          "Value": "http://md2pdvnc.ad001.siemens.net:8095/resource/api/releases/f697515c180646c3b8b9b70ce6f2a2d8"
-        },
-        {
-          "Name": "internal:siemens:clearing:fossology:url",
-          "Value": null
         }
       ],
       "Evidence": null
@@ -79,20 +67,20 @@
     {
       "Type": 0,
       "MimeType": null,
-      "BomRef": "pkg:pypi/attrs@22.1.0",
+      "BomRef": "pkg:pypi/urllib3@1.26.17",
       "Supplier": null,
       "Author": null,
       "Publisher": null,
       "Group": null,
-      "Name": "attrs",
-      "Version": "22.1.0",
+      "Name": "urllib3",
+      "Version": "1.26.17",
       "Description": "",
       "Scope": null,
       "Hashes": null,
       "Licenses": null,
       "Copyright": null,
       "Cpe": null,
-      "Purl": "pkg:pypi/attrs@22.1.0",
+      "Purl": "pkg:pypi/urllib3@1.26.17",
       "Swid": null,
       "Modified": null,
       "Pedigree": null,
@@ -104,148 +92,32 @@
         },
         {
           "Name": "internal:siemens:clearing:identifier-type",
-          "Value": "ManuallyAdded"
+          "Value": "Discovered"
         },
         {
           "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
+          "Value": "true"
         },
         {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrogRepo"
-        },
-        {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "PYTHON"
-        },
-        {
-          "Name": "internal:siemens:clearing:clearing-state",
-          "Value": "Approved"
-        },
-        {
-          "Name": "internal:siemens:clearing:sw360:release-url",
-          "Value": "http://md2pdvnc.ad001.siemens.net:8095/resource/api/releases/37fcf2d0725a46b8b777c849111e9be4"
-        },
-        {
-          "Name": "internal:siemens:clearing:fossology:url",
-          "Value": null
-        }
-      ],
-      "Evidence": null
-    },
-    {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:pypi/beautifulsoup4@4.11.1",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": null,
-      "Name": "beautifulsoup4",
-      "Version": "4.11.1",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:pypi/beautifulsoup4@4.11.1",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
-        {
-          "Name": "internal:siemens:clearing:development",
-          "Value": "false"
-        },
-        {
-          "Name": "internal:siemens:clearing:identifier-type",
-          "Value": "ManuallyAdded"
-        },
-        {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
-        },
-        {
-          "Name": "internal:siemens:clearing:repo-url",
+          "Name": "internal:siemens:clearing:repo-name",
           "Value": "org1-pythonhosted-pypi-remote-cache"
         },
         {
           "Name": "internal:siemens:clearing:project-type",
           "Value": "PYTHON"
-        },
-        {
-          "Name": "internal:siemens:clearing:clearing-state",
-          "Value": "Approved"
-        },
-        {
-          "Name": "internal:siemens:clearing:sw360:release-url",
-          "Value": "http://md2pdvnc.ad001.siemens.net:8095/resource/api/releases/4b92d5ac32f84d43a82f2c2c57771e6d"
-        },
-        {
-          "Name": "internal:siemens:clearing:fossology:url",
-          "Value": null
         }
       ],
       "Evidence": null
+    }
+  ],
+  "Dependencies": [
+    {
+      "Ref": "pkg:pypi/requests@2.28.1",
+      "Dependencies": null
     },
     {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:pypi/cachy@0.3.0",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": null,
-      "Name": "cachy",
-      "Version": "0.3.0",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:pypi/cachy@0.3.0",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
-        {
-          "Name": "internal:siemens:clearing:development",
-          "Value": "false"
-        },
-        {
-          "Name": "internal:siemens:clearing:identifier-type",
-          "Value": "ManuallyAdded"
-        },
-        {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
-        },
-        {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "org1-pythonhosted-pypi-remote-cache"
-        },
-        {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "PYTHON"
-        },
-        {
-          "Name": "internal:siemens:clearing:clearing-state",
-          "Value": "Approved"
-        },
-        {
-          "Name": "internal:siemens:clearing:sw360:release-url",
-          "Value": "http://md2pdvnc.ad001.siemens.net:8095/resource/api/releases/cece81ace4b14374af2432067bca5fb2"
-        },
-        {
-          "Name": "internal:siemens:clearing:fossology:url",
-          "Value": null
-        }
-      ],
-      "Evidence": null
+      "Ref": "pkg:pypi/urllib3@1.26.17",
+      "Dependencies": null
     }
   ],
   "Compositions": null

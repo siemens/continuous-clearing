@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2023 Siemens AG
+// SPDX-FileCopyrightText: 2024 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -123,8 +123,9 @@ namespace LCT.PackageIdentifier
         public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM,
             CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
-            // get the  component list from Jfrog for given repository
-            List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(appSettings.Conan?.JfrogConanRepoList, jFrogService);
+            // get the  component list from Jfrog for given repo + internal repo
+            string[] repoList = appSettings.InternalRepoList.Concat(appSettings.Conan?.JfrogConanRepoList).ToArray();
+            List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(repoList, jFrogService);
             Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
             List<Component> modifiedBOM = new List<Component>();
 
@@ -292,7 +293,7 @@ namespace LCT.PackageIdentifier
         private static void GetPackagesForBom(ref List<Component> lstComponentForBOM, ref int noOfDevDependent, List<ConanPackage> nodePackages)
         {
             var rootNode = nodePackages.FirstOrDefault();
-            if (!rootNode.Dependencies.Any() || rootNode.Dependencies == null)
+            if (rootNode != null && (!rootNode.Dependencies.Any() || rootNode.Dependencies == null))
             {
                 throw new ArgumentNullException(nameof(nodePackages), "Dependency(requires) node name details not present in the root node.");
             }

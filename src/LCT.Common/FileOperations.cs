@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2023 Siemens AG
+// SPDX-FileCopyrightText: 2024 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -102,7 +102,7 @@ namespace LCT.Common
 
                     comparisonData.Components = comparisonData.Components?.GroupBy(x => new { x.Name, x.Version }).Select(y => y.First()).ToList();
 
-                    if (comparisonData.Dependencies.Count > 0)
+                    if (comparisonData.Dependencies != null && comparisonData.Dependencies.Count > 0)
                     {
                         comparisonData.Dependencies.AddRange(components.Dependencies);
                     }

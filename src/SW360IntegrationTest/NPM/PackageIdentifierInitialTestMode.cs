@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2023 Siemens AG
+// SPDX-FileCopyrightText: 2024 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 
@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using TestUtilities;
 
-namespace SW360IntegrationTest
+namespace SW360IntegrationTest.NPM
 {
     [TestFixture, Order(1)]
     public class PackageIdentifierInitialTestMode

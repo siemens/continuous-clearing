@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2023 Siemens AG
+// SPDX-FileCopyrightText: 2024 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 //---------------------------------------------------------------------------------------------------------------------
@@ -14,6 +14,9 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using LCT.Common;
+using System.Linq;
+using LCT.Common.Constants;
+using System.IO;
 
 namespace LCT.ArtifactoryUploader
 {
@@ -36,8 +39,17 @@ namespace LCT.ArtifactoryUploader
             List<ComponentsToArtifactory> m_ComponentsToBeUploaded = await PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(m_ComponentsInBOM.Components, appSettings);
             //Uploading the component to artifactory
 
-            uploaderKpiData.PackagesToBeUploaded = m_ComponentsToBeUploaded.Count;
+            uploaderKpiData.PackagesToBeUploaded = m_ComponentsToBeUploaded.Count(x => x.PackageType == PackageType.ClearedThirdParty);
+            uploaderKpiData.DevPackagesToBeUploaded = m_ComponentsToBeUploaded.Count(x => x.PackageType == PackageType.Development);
+            uploaderKpiData.InternalPackagesToBeUploaded = m_ComponentsToBeUploaded.Count(x => x.PackageType == PackageType.Internal);
+
             await PackageUploadHelper.UploadingThePackages(m_ComponentsToBeUploaded, appSettings.TimeOut);
+
+            //Updating the component's new location
+            var fileOperations = new FileOperations();
+            string bomGenerationPath = Path.GetDirectoryName(appSettings.BomFilePath);
+            PackageUploadHelper.UpdateBomArtifactoryRepoUrl(ref m_ComponentsInBOM, m_ComponentsToBeUploaded);
+            fileOperations.WriteContentToFile(m_ComponentsInBOM, bomGenerationPath, FileConstant.BomFileName, appSettings.SW360ProjectName);
 
             // write kpi info to console table 
             PackageUploadHelper.WriteCreatorKpiDataToConsole(uploaderKpiData);

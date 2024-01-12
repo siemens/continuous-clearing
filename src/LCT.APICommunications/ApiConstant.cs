@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-//  SPDX-FileCopyrightText: 2023 Siemens AG
+//  SPDX-FileCopyrightText: 2024 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -36,6 +36,7 @@ namespace LCT.APICommunications
         public const string PythonExtension = ".whl";
         public const string PackageInfoApi = "/api/storage/";
         public const string CopyPackageApi = "/api/copy/";
+        public const string MovePackageApi = "/api/move/";
         public const string Releases = "releases";
         public const string Release = "release";
         public const string FolderId = "folderId";

@@ -1,0 +1,789 @@
+{
+  "BomFormat": "CycloneDX",
+  "SpecVersion": 4,
+  "SpecVersionString": "1.4",
+  "SerialNumber": null,
+  "Version": null,
+  "Metadata": {
+    "Tools": [
+      {
+        "Vendor": "Siemens AG",
+        "Name": "Clearing Automation Tool",
+        "Version": "4.0.0",
+        "Hashes": null
+      }
+    ],
+    "Authors": null,
+    "Component": null,
+    "Manufacture": null,
+    "Supplier": null
+  },
+  "Components": [
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:conan/rapidjson@1.1.0-csc-01",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "rapidjson",
+      "Version": "1.1.0-csc-01",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:conan/rapidjson@1.1.0-csc-01",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
+        },
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "conan"
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:conan/libest@3.2.0-shared.5",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "libest",
+      "Version": "3.2.0-shared.5",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:conan/libest@3.2.0-shared.5",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
+        },
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "conan"
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:conan/openssl@3.0.9-shared.3",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "openssl",
+      "Version": "3.0.9-shared.3",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:conan/openssl@3.0.9-shared.3",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
+        },
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "conan"
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:conan/sqlite@3.37.0-shared.1",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "sqlite",
+      "Version": "3.37.0-shared.1",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:conan/sqlite@3.37.0-shared.1",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
+        },
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "conan"
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:conan/oss_mbedtls@2.28.2-shared",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "oss_mbedtls",
+      "Version": "2.28.2-shared",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:conan/oss_mbedtls@2.28.2-shared",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
+        },
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "conan"
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:conan/mongoose@v7.11-csc-01",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "mongoose",
+      "Version": "v7.11-csc-01",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:conan/mongoose@v7.11-csc-01",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
+        },
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "conan"
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:conan/basics@1.0.8",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "basics",
+      "Version": "1.0.8",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:conan/basics@1.0.8",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
+        },
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "conan"
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:conan/osal@1.0.30",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "osal",
+      "Version": "1.0.30",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:conan/osal@1.0.30",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
+        },
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "conan"
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:conan/SecurityBasics@2.10.2",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "SecurityBasics",
+      "Version": "2.10.2",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:conan/SecurityBasics@2.10.2",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
+        },
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "conan"
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:conan/securityaccessmanager@2.2.6",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "securityaccessmanager",
+      "Version": "2.2.6",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:conan/securityaccessmanager@2.2.6",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
+        },
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "conan"
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:conan/SecurityEventLogger@2.0.24",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "SecurityEventLogger",
+      "Version": "2.0.24",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:conan/SecurityEventLogger@2.0.24",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
+        },
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "conan"
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:conan/securitypkimanager@2.6.3",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "securitypkimanager",
+      "Version": "2.6.3",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:conan/securitypkimanager@2.6.3",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
+        },
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "conan"
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:conan/SecurityStorageManager@2.11.2",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "SecurityStorageManager",
+      "Version": "2.11.2",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:conan/SecurityStorageManager@2.11.2",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
+        },
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "conan"
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:conan/securitycommunicationmanager@2.6.5",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "securitycommunicationmanager",
+      "Version": "2.6.5",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:conan/securitycommunicationmanager@2.6.5",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
+        },
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "conan"
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:conan/openldap@2.6.4-shared-ossl3.1",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "openldap",
+      "Version": "2.6.4-shared-ossl3.1",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:conan/openldap@2.6.4-shared-ossl3.1",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
+        },
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "conan"
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:conan/libcurl@7.87.0-shared-ossl3.1",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "libcurl",
+      "Version": "7.87.0-shared-ossl3.1",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:conan/libcurl@7.87.0-shared-ossl3.1",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
+        },
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "conan"
+        }
+      ],
+      "Evidence": null
+    },
+    {
+      "Type": 0,
+      "MimeType": null,
+      "BomRef": "pkg:conan/googletest@1.8.0",
+      "Supplier": null,
+      "Author": null,
+      "Publisher": null,
+      "Group": null,
+      "Name": "googletest",
+      "Version": "1.8.0",
+      "Description": "",
+      "Scope": null,
+      "Hashes": null,
+      "Licenses": null,
+      "Copyright": null,
+      "Cpe": null,
+      "Purl": "pkg:conan/googletest@1.8.0",
+      "Swid": null,
+      "Modified": null,
+      "Pedigree": null,
+      "Components": null,
+      "Properties": [
+        {
+          "Name": "internal:siemens:clearing:development",
+          "Value": "true"
+        },
+        {
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
+        },
+        {
+          "Name": "internal:siemens:clearing:is-internal",
+          "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:repo-url",
+          "Value": "Not Found in JFrogRepo"
+        },
+        {
+          "Name": "internal:siemens:clearing:project-type",
+          "Value": "conan"
+        }
+      ],
+      "Evidence": null
+    }
+  ],
+  "Compositions": null
+}

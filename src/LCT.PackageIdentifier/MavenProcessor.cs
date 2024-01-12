@@ -1,4 +1,4 @@
-﻿// SPDX-FileCopyrightText: 2023 Siemens AG
+﻿// SPDX-FileCopyrightText: 2024 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // --------------------------------------------------------------------------------------------------------------------
@@ -167,8 +167,9 @@ namespace LCT.PackageIdentifier
                                                           IBomHelper bomhelper)
         {
 
-            // get the  component list from Jfrog for given repo
-            List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(appSettings.Maven?.JfrogMavenRepoList, jFrogService);
+            // get the  component list from Jfrog for given repo + internal repo
+            string[] repoList = appSettings.InternalRepoList.Concat(appSettings.Maven?.JfrogMavenRepoList).ToArray();
+            List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(repoList, jFrogService);
             Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
             List<Component> modifiedBOM = new List<Component>();
 

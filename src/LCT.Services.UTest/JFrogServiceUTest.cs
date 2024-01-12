@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2023 Siemens AG
+// SPDX-FileCopyrightText: 2024 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -152,6 +152,83 @@ namespace LCT.Services.UTest
 
             // Assert
             Assert.That(actual.Count, Is.EqualTo(0));
+        }
+
+        [Test]
+        public async Task GetPackageInfo_GetsPackageInfo_Successfully()
+        {
+            // Arrange
+
+            AqlResult aqlResult = new AqlResult()
+            {
+                Name = "saap-api-node-2.26.3-LicenseClearing.16.sha-058fada.tgz",
+                Path = "@testfolder/-/folder",
+                Repo = "energy-dev-npm-egll"
+            };
+
+            IList<AqlResult> results = new List<AqlResult>();
+            results.Add(aqlResult);
+
+            AqlResponse aqlResponse = new AqlResponse();
+            aqlResponse.Results = results;
+
+            var aqlResponseSerialized = JsonConvert.SerializeObject(aqlResponse);
+            var content = new StringContent(aqlResponseSerialized, Encoding.UTF8, "application/json");
+            HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK);
+            httpResponseMessage.Content = content;
+
+
+            Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade =
+                new Mock<IJfrogAqlApiCommunicationFacade>();
+            mockJfrogApiComFacade
+                .Setup(x => x.GetPackageInfo(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(httpResponseMessage);
+
+            // Act
+            IJFrogService jFrogService = new JFrogService(mockJfrogApiComFacade.Object);
+            AqlResult actual = await jFrogService.GetPackageInfo("energy-dev-npm-egll", "saap-api-node-2.26.3-LicenseClearing.16.sha-058fada.tgz", string.Empty);
+
+            // Assert
+            Assert.NotNull(actual);
+        }
+
+        [Test]
+        public async Task GetPackageInfo_ResultsWith_NoContent()
+        {
+            // Arrange
+
+            HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.NoContent);
+
+            Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade =
+                new Mock<IJfrogAqlApiCommunicationFacade>();
+            mockJfrogApiComFacade
+                .Setup(x => x.GetPackageInfo(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(httpResponseMessage);
+
+            // Act
+            IJFrogService jFrogService = new JFrogService(mockJfrogApiComFacade.Object);
+            AqlResult actual = await jFrogService.GetPackageInfo("energy-dev-npm-egll", "saap-api-node-2.26.3-LicenseClearing.16.sha-058fada.tgz", string.Empty);
+
+            // Assert
+            Assert.Null(actual);
+        }
+
+        [Test]
+        public async Task GetPackageInfo_ResultsWith_HttpRequestException()
+        {
+            // Arrange
+            Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade =
+                new Mock<IJfrogAqlApiCommunicationFacade>();
+            mockJfrogApiComFacade
+                .Setup(x => x.GetPackageInfo(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).
+                Throws<HttpRequestException>();
+
+            // Act
+            IJFrogService jFrogService = new JFrogService(mockJfrogApiComFacade.Object);
+            AqlResult actual = await jFrogService.GetPackageInfo("energy-dev-npm-egll", "saap-api-node-2.26.3-LicenseClearing.16.sha-058fada.tgz", string.Empty);
+
+            // Assert
+            Assert.Null(actual);
         }
     }
 }

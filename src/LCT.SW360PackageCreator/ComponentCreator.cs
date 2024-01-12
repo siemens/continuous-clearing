@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2023 Siemens AG
+// SPDX-FileCopyrightText: 2024 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -194,6 +194,9 @@ namespace LCT.SW360PackageCreator
                 case "PYTHON":
                     componentsData.SourceUrl = await UrlHelper.Instance.GetSourceUrlForPythonPackage(name, version);
                     break;
+                case "CONAN":
+                    componentsData.SourceUrl = await UrlHelper.Instance.GetSourceUrlForConanPackage(name, version);
+                    break;
                 default:
                     break;
             }
@@ -341,15 +344,16 @@ namespace LCT.SW360PackageCreator
                     item.FossologyUploadStatus = Dataconstant.Uploaded;
                     item.FossologyLink = $"{appSettings.Fossologyurl}{ApiConstant.FossUploadJobUrlSuffix}{uploadId}";
                     Logger.Logger.Log(null, Level.Info, $"\tFossology upload successful for Release : Name - {item.Name} , version - {item.Version}", null);
+
+                    // Updating foss url in additional data
+                    await sw360CreatorService.UdpateSW360ReleaseContent(new Components()
+                    {
+                        Name = item.Name,
+                        Version = item.Version,
+                        UploadId = uploadId,
+                        ReleaseId = item.ReleaseID
+                    }, appSettings.Fossologyurl);
                 }
-                // Updating foss url in additional data
-                await sw360CreatorService.UdpateSW360ReleaseContent(new Components()
-                {
-                    Name = item.Name,
-                    Version = item.Version,
-                    UploadId = uploadId,
-                    ReleaseId = item.ReleaseID
-                }, appSettings.Fossologyurl);
             }
             else
             {

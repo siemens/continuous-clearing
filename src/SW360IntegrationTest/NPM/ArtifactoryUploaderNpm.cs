@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2023 Siemens AG
+// SPDX-FileCopyrightText: 2024 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 
@@ -27,10 +27,14 @@ namespace SW360IntegrationTest.NPM
             // Test BOM Creator ran with exit code 0
             Assert.AreEqual(0, TestHelper.RunArtifactoryUploaderExe(new string[]{
                 TestConstant.BomFilePath, comparisonBOMPath,
+                TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.ArtifactoryUser, testParameters.ArtifactoryUploadUser,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
-                TestConstant.JfrogNPMDestRepoName,testParameters.DestinationRepoName,
-                TestConstant.JFrogApiURL,testParameters.JfrogApi
+                TestConstant.JfrogNpmThirdPartyDestRepoName,testParameters.ThirdPartyDestinationRepoName,
+                TestConstant.JfrogNpmDevDestRepoName,testParameters.DevDestinationRepoName,
+                TestConstant.JfrogNpmInternalDestRepoName,testParameters.InternalDestinationRepoName,
+                TestConstant.JFrogApiURL,testParameters.JfrogApi,
+                TestConstant.Release, false.ToString()
             }),
                 "Test to run Artifactory Uploader EXE execution");
         }

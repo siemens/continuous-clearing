@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2023 Siemens AG
+// SPDX-FileCopyrightText: 2024 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -14,6 +14,7 @@ using LCT.APICommunications.Model.AQL;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace LCT.Services
 {
@@ -38,7 +39,6 @@ namespace LCT.Services
             try
             {
                 httpResponseMessage = await m_JFrogApiCommunicationFacade.GetInternalComponentDataByRepo(repoName);
-
                 if (httpResponseMessage == null || !httpResponseMessage.IsSuccessStatusCode)
                 {
                     return new List<AqlResult>();
@@ -47,6 +47,36 @@ namespace LCT.Services
                 string stringData = httpResponseMessage.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
                 var aqlResponse = JsonConvert.DeserializeObject<AqlResponse>(stringData);
                 aqlResult = aqlResponse?.Results ?? new List<AqlResult>();
+            }
+            catch (HttpRequestException httpException)
+            {
+                Logger.Debug(httpException);
+            }
+            catch (InvalidOperationException invalidOperationExcep)
+            {
+                Logger.Debug(invalidOperationExcep);
+            }
+            catch (TaskCanceledException taskCancelledException)
+            {
+                Logger.Debug(taskCancelledException);
+            }
+
+            return aqlResult;
+        }
+
+#nullable enable
+        public async Task<AqlResult?> GetPackageInfo(string repoName, string packageName, string path)
+        {
+            HttpResponseMessage? httpResponseMessage = null;
+            AqlResult? aqlResult = null;
+            try
+            {
+                httpResponseMessage = await m_JFrogApiCommunicationFacade.GetPackageInfo(repoName, packageName, path);
+                httpResponseMessage.EnsureSuccessStatusCode();
+
+                string stringData = httpResponseMessage.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
+                var aqlResponse = JsonConvert.DeserializeObject<AqlResponse>(stringData);
+                aqlResult = aqlResponse?.Results.FirstOrDefault();
             }
             catch (HttpRequestException httpException)
             {

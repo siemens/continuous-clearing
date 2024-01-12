@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2023 Siemens AG
+// SPDX-FileCopyrightText: 2024 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -44,6 +44,13 @@ namespace LCT.APICommunications
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
             const HttpContent httpContent = null;
             return await httpClient.PostAsync(component.CopyPackageApiUrl, httpContent);
+        }
+
+        public override async Task<HttpResponseMessage> MoveFromRepo(ComponentsToArtifactory component)
+        {
+            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
+            const HttpContent httpContent = null;
+            return await httpClient.PostAsync(component.MovePackageApiUrl, httpContent);
         }
 
         public override async Task<HttpResponseMessage> GetPackageInfo(ComponentsToArtifactory component)

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2023 Siemens AG
+// SPDX-FileCopyrightText: 2024 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -47,5 +47,14 @@ namespace LCT.SW360PackageCreator.Interfaces
         /// <param name="componenVersion"></param>
         /// <returns>string</returns>
         Task<string> GetSourceUrlForPythonPackage(string componentName, string componenVersion);
+
+
+        /// <summary>
+        /// Gets the Source URL for Conan Package
+        /// </summary>
+        /// <param name="componentName"></param>
+        /// <param name="componenVersion"></param>
+        /// <returns>string</returns>
+        Task<string> GetSourceUrlForConanPackage(string componentName, string componenVersion);
     }
 }

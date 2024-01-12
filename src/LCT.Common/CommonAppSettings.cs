@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2023 Siemens AG
+// SPDX-FileCopyrightText: 2024 Siemens AG
 //
 // SPDX-License-Identifier: MIT
 // --------------------------------------------------------------------------------------------------------------------
@@ -28,7 +28,7 @@ namespace LCT.Common
         public static string SnapshotBaseURL { get; set; } = $"https://snapshot.debian.org/mr/";
         public static string SnapshotDownloadURL { get; set; } = $"https://snapshot.debian.org/archive/";
         public static string PyPiURL { get; set; } = $"https://pypi.org/pypi/";
-
+        public static string SourceURLConan { get; set; } = "https://raw.githubusercontent.com/conan-io/conan-center-index/master/recipes/";
         public CommonAppSettings()
         {
             folderAction = new FolderAction();
@@ -68,14 +68,9 @@ namespace LCT.Common
         public Config Conan { get; set; }
         public string CaVersion { get; set; }
         public string CycloneDxSBomTemplatePath { get; set; }
-        public string[] InternalRepoList { get; set; }
+        public string[] InternalRepoList { get; set; } = Array.Empty<string>();
         public bool EnableFossTrigger { get; set; } = true;
-        public string JfrogNpmDestRepoName { get; set; }
         public string JfrogNpmSrcRepo { get; set; }
-        public string JfrogNugetDestRepoName { get; set; }
-        public string JfrogMavenDestRepoName { get; set; }
-        public string JfrogPythonDestRepoName { get; set; }
-        public string JfrogNugetSrcRepo { get; set; }
         public string Mode { get; set; } = string.Empty;
 
 
@@ -305,6 +300,8 @@ namespace LCT.Common
             }
 
         }
+
+        public bool Release { get; set; } = false;
 
     }
 }

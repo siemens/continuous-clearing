@@ -28,16 +28,20 @@ namespace SW360IntegrationTest.Python
 
             int result = TestHelper.RunArtifactoryUploaderExe(new string[]{
                 TestConstant.BomFilePath, comparisonBOMPath,
+                TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.ArtifactoryUser, testParameters.ArtifactoryUploadUser,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
-                TestConstant.JfrogNPMDestRepoName,testParameters.DestinationRepoName,
-                TestConstant.JFrogApiURL,testParameters.JfrogApi
+                TestConstant.JfrogPythonThirdPartyDestRepoName,testParameters.ThirdPartyDestinationRepoName,
+                TestConstant.JfrogPythonDevDestRepoName,testParameters.DevDestinationRepoName,
+                TestConstant.JfrogPythonInternalDestRepoName,testParameters.InternalDestinationRepoName,
+                TestConstant.JFrogApiURL,testParameters.JfrogApi,
+                TestConstant.Release, false.ToString()
             });
 
             // Test BOM Creator ran with exit code 0 or 2 (Warning)
             Assert.IsTrue(result == 0 || result == 2,
                 "Test to run Artifactory Uploader EXE execution");
-        }    
+        }
 
         [Test, Order(2)]
         public void ComponentUpload_IsFailure()

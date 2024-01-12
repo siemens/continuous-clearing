@@ -4,7 +4,7 @@
 <package >
   <metadata>
     <id>continuous-clearing</id>
-    <version>5.1.1</version>
+    <version>6.0.0</version>
     <authors>Siemens AG</authors>
     <owners>continuous-clearing contributors</owners>
     <projectUrl>https://github.com/siemens/continuous-clearing</projectUrl>
@@ -123,6 +123,7 @@
     <file src="out\net6.0\NuGet.Versioning.dll" target="tools"/>
     <file src="out\net6.0\NuGet.Resolver.dll" target="tools"/>
     <file src="out\net6.0\Tommy.dll" target="tools"/>
+	<file src="out\net6.0\YamlDotNet.dll" target="tools"/>
     <file src="out\net6.0\runtimes\linux-arm\native\libpsl-native.so" target="tools\runtimes\linux-arm\native"/>
     <file src="out\net6.0\runtimes\linux-arm64\native\libpsl-native.so" target="tools\runtimes\linux-arm64\native"/>
     <file src="out\net6.0\runtimes\linux-musl-x64\native\libpsl-native.so" target="tools\runtimes\linux-musl-x64\native"/>
