@@ -52,6 +52,12 @@ The Continuous Clearing Tool helps the Project Manager/Developer to automate the
 
 Continuous Clearing Tool reduces the effort in creating components in SW360 and identifying the matching source codes from the public repository. Tool eliminates the manual error while creating component and identifying correct version of source code from public repository. Continuous Clearing Tool harmonize the creation of 3P components in SW360 by filling necessary information.
 
+The Continuous Clearing Tool incorporates SEPP tool functionalities, seamlessly integrated into the [Artifactory uploader](../usagedocimg/artifactoryuploader.PNG).
+This integration ensures
+- Software License Clearing is done.
+- No pre-release versions of re-use components are used.
+- Trace-ability is guaranteed
+
 # Continuous Clearing Tool workflow diagram
 
 - Package Identifier
