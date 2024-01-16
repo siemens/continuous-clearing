@@ -392,7 +392,7 @@ namespace LCT.ArtifactoryUploader
             {
                 if (!(item.SrcRepoName.Contains("Not Found in JFrog")))
                 {
-                    string operationType = item.PackageType == PackageType.ClearedThirdParty ? "copy" : "move";
+                    string operationType = item.PackageType == PackageType.ClearedThirdParty || item.PackageType == PackageType.Development ? "copy" : "move";
                     ArtfactoryUploader.jFrogService = jFrogService;
                     HttpResponseMessage responseMessage = await ArtfactoryUploader.UploadPackageToRepo(item, timeout);
 
