@@ -402,16 +402,18 @@ namespace LCT.ArtifactoryUploader
                     }
                     else if (responseMessage.ReasonPhrase == ApiConstant.PackageNotFound)
                     {
-                        Logger.Error($"Package {item.Name}-{item.Version} not found in remote cache, Upload Failed!!");
+                        Logger.Error($"Package {item.Name}-{item.Version} not found in {item.SrcRepoName}, Upload Failed!!");
                         IncrementCountersBasedOnPackageType(uploaderKpiData, packageType, false);
                         item.DestRepoName = null;
                         SetWarningCode = true;
                     }
                     else if (responseMessage.ReasonPhrase == ApiConstant.ErrorInUpload)
                     {
-                        Logger.Error($"Package {item.Name}-{item.Version} {operationType} Failed!!");
+                        Logger.Error($"Package {item.Name}-{item.Version} {operationType} Failed!! {item.SrcRepoName} ---> {item.DestRepoName}");
                         IncrementCountersBasedOnPackageType(uploaderKpiData, packageType, false);
                         item.DestRepoName = null;
+                        var responseContent = await responseMessage.Content.ReadAsStringAsync();
+                        Logger.Debug($"JFrog Response - {responseContent}");
                     }
                     else
                     {
