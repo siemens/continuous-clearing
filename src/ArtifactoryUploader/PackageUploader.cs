@@ -57,6 +57,13 @@ namespace LCT.ArtifactoryUploader
                 uploaderKpiData.TimeTakenByComponentCreator =
                 TimeSpan.FromMilliseconds(Program.UploaderStopWatch.ElapsedMilliseconds).TotalSeconds;
             Logger.Debug($"UploadPackageToArtifactory():End");
+
+            // set the error code
+            if(uploaderKpiData.PackagesNotUploadedDueToError > 0 || uploaderKpiData.ComponentNotApproved > 0)
+            {
+                Environment.ExitCode = 2;
+                Logger.Debug("Setting ExitCode to 2");
+            }
         }
     }
 }
