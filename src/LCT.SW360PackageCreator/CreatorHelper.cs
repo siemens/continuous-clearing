@@ -113,6 +113,13 @@ namespace LCT.SW360PackageCreator
             {
                 downloadPath = await GetAttachmentUrlList(component, localPathforDownload);
             }
+            else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["ALPINE"]))
+            {
+                if (!string.IsNullOrEmpty(component.SourceUrl))
+                {
+                    downloadPath = await _packageDownloderList["ALPINE"].DownloadPackage(component, localPathforDownload);
+                }
+            }
             else
             {
                 downloadPath = await _packageDownloderList["NPM"].DownloadPackage(component, localPathforDownload);
@@ -229,7 +236,7 @@ namespace LCT.SW360PackageCreator
                     mapper.DownloadUrl = GetMavenDownloadUrl(mapper, item, releasesInfo);
                 }
                 else if (!string.IsNullOrEmpty(item.ReleaseExternalId) && 
-                            (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["PYTHON"]) || item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CONAN"])))
+                            (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["PYTHON"]) || item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CONAN"]) || item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["ALPINE"])))
                 {
                     mapper.DownloadUrl = mapper.SourceUrl;
                 }
@@ -315,6 +322,10 @@ namespace LCT.SW360PackageCreator
             try
             {
                 if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
+                {
+                    localPathforDownload = $"{Directory.GetParent(Directory.GetCurrentDirectory())}/ClearingTool/DownloadedFiles/";
+                }
+                else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["ALPINE"]))
                 {
                     localPathforDownload = $"{Directory.GetParent(Directory.GetCurrentDirectory())}/ClearingTool/DownloadedFiles/";
                 }

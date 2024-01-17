@@ -197,6 +197,11 @@ namespace LCT.SW360PackageCreator
                 case "CONAN":
                     componentsData.SourceUrl = await UrlHelper.Instance.GetSourceUrlForConanPackage(name, version);
                     break;
+                case "ALPINE":
+                    Components alpComponentData = await UrlHelper.Instance.GetSourceUrlForAlpinePackage(name, version);
+                    componentsData = alpComponentData;
+                    componentsData.ProjectType = projectType;
+                    break;
                 default:
                     break;
             }

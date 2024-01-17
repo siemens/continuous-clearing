@@ -29,6 +29,7 @@ namespace LCT.Common
         public static string SnapshotDownloadURL { get; set; } = $"https://snapshot.debian.org/archive/";
         public static string PyPiURL { get; set; } = $"https://pypi.org/pypi/";
         public static string SourceURLConan { get; set; } = "https://raw.githubusercontent.com/conan-io/conan-center-index/master/recipes/";
+        public static string AlpineAportsGitURL { get; set; } = $"https://gitlab.alpinelinux.org/alpine/aports.git";
         public CommonAppSettings()
         {
             folderAction = new FolderAction();
@@ -66,6 +67,7 @@ namespace LCT.Common
         public Config Debian { get; set; }
         public Config Python { get; set; }
         public Config Conan { get; set; }
+        public Config Alpine { get; set; }
         public string CaVersion { get; set; }
         public string CycloneDxSBomTemplatePath { get; set; }
         public string[] InternalRepoList { get; set; } = Array.Empty<string>();
