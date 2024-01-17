@@ -72,12 +72,12 @@
       "Components": null,
       "Properties": [
         {
-          "Name": "internal:siemens:clearing:identifier-type",
-          "Value": "Discovered"
-        },
-        {
           "Name": "internal:siemens:clearing:is-internal",
           "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
         },
         {
           "Name": "internal:siemens:clearing:repo-url",
@@ -85,11 +85,23 @@
         },
         {
           "Name": "internal:siemens:clearing:project-type",
-          "Value": "Alpine"
+          "Value": "ALPINE"
         },
         {
           "Name": "internal:siemens:clearing:development",
           "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "NEW_CLEARING"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/61326c123d044da9a151e37ff567b648"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": "/repo/?mod=view-license&upload="
         }
       ],
       "Evidence": null
@@ -117,12 +129,12 @@
       "Components": null,
       "Properties": [
         {
-          "Name": "internal:siemens:clearing:identifier-type",
-          "Value": "Discovered"
-        },
-        {
           "Name": "internal:siemens:clearing:is-internal",
           "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
         },
         {
           "Name": "internal:siemens:clearing:repo-url",
@@ -130,11 +142,23 @@
         },
         {
           "Name": "internal:siemens:clearing:project-type",
-          "Value": "Alpine"
+          "Value": "ALPINE"
         },
         {
           "Name": "internal:siemens:clearing:development",
           "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "NEW_CLEARING"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/61326c123d044da9a151e37ff567b648"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": "/repo/?mod=view-license&upload="
         }
       ],
       "Evidence": null
@@ -162,12 +186,12 @@
       "Components": null,
       "Properties": [
         {
-          "Name": "internal:siemens:clearing:identifier-type",
-          "Value": "Discovered"
-        },
-        {
           "Name": "internal:siemens:clearing:is-internal",
           "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
         },
         {
           "Name": "internal:siemens:clearing:repo-url",
@@ -175,11 +199,23 @@
         },
         {
           "Name": "internal:siemens:clearing:project-type",
-          "Value": "Alpine"
+          "Value": "ALPINE"
         },
         {
           "Name": "internal:siemens:clearing:development",
           "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "NEW_CLEARING"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/61326c123d044da9a151e37ff567b648"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": "/repo/?mod=view-license&upload="
         }
       ],
       "Evidence": null
@@ -207,12 +243,12 @@
       "Components": null,
       "Properties": [
         {
-          "Name": "internal:siemens:clearing:identifier-type",
-          "Value": "Discovered"
-        },
-        {
           "Name": "internal:siemens:clearing:is-internal",
           "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:identifier-type",
+          "Value": "Discovered"
         },
         {
           "Name": "internal:siemens:clearing:repo-url",
@@ -220,11 +256,23 @@
         },
         {
           "Name": "internal:siemens:clearing:project-type",
-          "Value": "Alpine"
+          "Value": "ALPINE"
         },
         {
           "Name": "internal:siemens:clearing:development",
           "Value": "false"
+        },
+        {
+          "Name": "internal:siemens:clearing:clearing-state",
+          "Value": "NEW_CLEARING"
+        },
+        {
+          "Name": "internal:siemens:clearing:sw360:release-url",
+          "Value": "http://localhost:8090/resource/api/releases/61326c123d044da9a151e37ff567b648"
+        },
+        {
+          "Name": "internal:siemens:clearing:fossology:url",
+          "Value": "/repo/?mod=view-license&upload="
         }
       ],
       "Evidence": null
