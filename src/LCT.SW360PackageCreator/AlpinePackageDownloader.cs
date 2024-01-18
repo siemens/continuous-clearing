@@ -38,12 +38,12 @@ namespace LCT.SW360PackageCreator
         private static void CopyBuildFilesFromSourceRepo(string localPathforDownload, ComparisonBomData component, string sourceData, string localPathforSourceRepo)
         {
 
-            string[] arreylist = sourceData.Split("\n");
+            string[] filenameList = sourceData.Split("\n");
 
 
-            foreach (var a in arreylist)
+            foreach (var name in filenameList)
             {
-                var fileName = a.Trim();
+                var fileName = name.Trim();
                 string buildFileLocation = localPathforSourceRepo + Dataconstant.ForwardSlash + "aports" + Dataconstant.ForwardSlash + "main" + Dataconstant.ForwardSlash + component.Name + Dataconstant.ForwardSlash + fileName;
                 if (System.IO.File.Exists(buildFileLocation) && !fileName.EndsWith(".patch"))
                 {
