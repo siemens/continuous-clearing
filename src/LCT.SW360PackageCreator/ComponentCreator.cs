@@ -86,7 +86,11 @@ namespace LCT.SW360PackageCreator
 
                     Components component = await GetSourceUrl(componentsData.Name, componentsData.Version, componentsData.ProjectType);
                     componentsData.SourceUrl = component.SourceUrl;
-
+                    
+                    if (componentsData.ProjectType.ToUpperInvariant() == "ALPINE")
+                    {
+                        componentsData.AlpineSourceData = component.AlpineSourceData;
+                    }
 
                     if (componentsData.ProjectType.ToUpperInvariant() == "DEBIAN")
                     {

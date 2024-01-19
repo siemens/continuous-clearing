@@ -1,13 +1,6 @@
 ﻿using LCT.Common.Model;
-using LCT.SW360PackageCreator.Interfaces;
-using Moq;
-using NuGet.Packaging;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace LCT.SW360PackageCreator.UTest
@@ -22,7 +15,8 @@ namespace LCT.SW360PackageCreator.UTest
             {
                 Name = "apk-tools",
                 Version = "2.14.0-r2",
-                SourceUrl = "https://gitlab.alpinelinux.org/alpine/apk-tools/-/archive/v2.14.0/apk-tools-v2.14.0.tar.gz"
+                SourceUrl = "https://gitlab.alpinelinux.org/alpine/apk-tools/-/archive/v2.14.0/apk-tools-v2.14.0.tar.gz",
+                AlpineSource= "https://gitlab.alpinelinux.org/alpine/apk-tools/-/archive/v$pkgver/apk-tools-v$pkgver.tar.gz\\n\\tfix-recursive-solve-1.patch\\n\\tfix-recursive-solve-2.patch\\n\\t_apk\\n\\t"
 
             };
             var localPathforDownload = $"{Directory.GetParent(Directory.GetCurrentDirectory())}/ClearingTool/DownloadedFiles/";
@@ -43,7 +37,8 @@ namespace LCT.SW360PackageCreator.UTest
             {
                 Name = "abi-compliance-checker",
                 Version = "2.14.0-r2",
-                SourceUrl = "https://github.com/lvc/abi-compliance-checker/archive/$pkgver.tar.gz"
+                SourceUrl = "https://github.com/lvc/abi-compliance-checker/archive/$pkgver.tar.gz",
+                AlpineSource=""
 
             };
             var localPathforDownload = $"{Directory.GetParent(Directory.GetCurrentDirectory())}/ClearingTool/DownloadedFiles/";

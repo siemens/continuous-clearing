@@ -41,6 +41,9 @@ namespace LCT.Common.Model
         [JsonProperty("PatchURLs")]
         public string[] PatchURLs { get; set; }
 
+        [JsonProperty("AlpineSourceData")]
+        public string AlpineSourceData { get; set; }
+
         [JsonIgnore]
         public string UploadId { get; set; }
 

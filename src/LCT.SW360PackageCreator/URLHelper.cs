@@ -74,12 +74,13 @@ namespace LCT.SW360PackageCreator
                 }
 
                 AlpinePackage alpinePackSourceDetails = await GetAlpineSourceUrl(componentName, componenVersion, localPathforSourceRepo);
+                componentsData.AlpineSourceData = alpinePackSourceDetails.SourceDataForAlpine;
                 componentsData.Name = alpinePackSourceDetails.Name;
                 componentsData.Version = Regex.Replace(alpinePackSourceDetails.Version, @"^[0-9]+:", "");
                 componentsData.ReleaseExternalId = GetReleaseExternalIdForAlpine(alpinePackSourceDetails.Name, alpinePackSourceDetails.Version);
                 componentsData.ComponentExternalId = GetComponentExternalIdForAlpine(alpinePackSourceDetails.Name);
                 componentsData.SourceUrl = string.IsNullOrEmpty(alpinePackSourceDetails.SourceUrl) ? Dataconstant.SourceUrlNotFound : alpinePackSourceDetails.SourceUrl;
-                componentsData.DownloadUrl = componentsData.SourceUrl.Equals(Dataconstant.SourceUrlNotFound) ? Dataconstant.DownloadUrlNotFound : componentsData.SourceUrl;
+                componentsData.DownloadUrl = componentsData.SourceUrl.Equals(Dataconstant.SourceUrlNotFound) ? Dataconstant.DownloadUrlNotFound : componentsData.SourceUrl;                
             }
             catch (IOException ex)
             {
@@ -100,6 +101,7 @@ namespace LCT.SW360PackageCreator
                     if (File.Exists(pkgFilePath))
                     {
                         var sourceData = GetSourceFromAPKBUILD(localPathforSourceRepo, name);
+                        sourceURLDetails.SourceDataForAlpine=sourceData;
                         var sourceUrl = GetSourceUrlForAlpine(pkgFilePath, sourceData);
                         if (sourceUrl.EndsWith(FileConstant.TargzFileExtension) || sourceUrl.EndsWith(FileConstant.XzFileExtension) || sourceUrl.EndsWith(FileConstant.TgzFileExtension) || sourceUrl.EndsWith(FileConstant.Bz2FileExtension))
                         {

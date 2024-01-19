@@ -27,7 +27,7 @@ namespace LCT.SW360PackageCreator
         public async Task<string> DownloadPackage(ComparisonBomData component, string localPathforDownload)
         {
             string localPathforSourceRepo = UrlHelper.GetDownloadPathForAlpineRepo();
-            var sourceData = UrlHelper.GetSourceFromAPKBUILD(localPathforSourceRepo, component.Name);
+            var sourceData = component.AlpineSource;
             string sourceCodeDownloadedFolder = GetCurrentDownloadFolderPath(localPathforDownload, component);
             string downloadPath = await DownloadTarFileAndGetPath(component, component.SourceUrl, sourceCodeDownloadedFolder, sourceData, localPathforSourceRepo);
 
@@ -37,22 +37,23 @@ namespace LCT.SW360PackageCreator
 
         private static void CopyBuildFilesFromSourceRepo(string localPathforDownload, ComparisonBomData component, string sourceData, string localPathforSourceRepo)
         {
-
-            string[] filenameList = sourceData.Split("\n");
-
-
-            foreach (var name in filenameList)
+            if (sourceData!=null)
             {
-                var fileName = name.Trim();
-                string buildFileLocation = localPathforSourceRepo + Dataconstant.ForwardSlash + "aports" + Dataconstant.ForwardSlash + "main" + Dataconstant.ForwardSlash + component.Name + Dataconstant.ForwardSlash + fileName;
-                if (System.IO.File.Exists(buildFileLocation) && !fileName.EndsWith(".patch"))
+                string[] filenameList = sourceData.Split("\n");
+                foreach (var name in filenameList)
                 {
+                    var fileName = name.Trim();
+                    string buildFileLocation = localPathforSourceRepo + Dataconstant.ForwardSlash + "aports" + Dataconstant.ForwardSlash + "main" + Dataconstant.ForwardSlash + component.Name + Dataconstant.ForwardSlash + fileName;
+                    if (System.IO.File.Exists(buildFileLocation) && !fileName.EndsWith(".patch"))
+                    {
 
-                    string destFile = System.IO.Path.Combine(Directory.CreateDirectory(localPathforDownload + "BuildFiles").ToString(), fileName);
-                    System.IO.File.Copy(buildFileLocation, destFile, true);
+                        string destFile = System.IO.Path.Combine(Directory.CreateDirectory(localPathforDownload + "BuildFiles").ToString(), fileName);
+                        System.IO.File.Copy(buildFileLocation, destFile, true);
 
+                    }
                 }
             }
+            
         }
 
         private static string GetCurrentDownloadFolderPath(string localPathforDownload, ComparisonBomData component)
