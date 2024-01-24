@@ -43,7 +43,7 @@ jobs:
       id: gitversion
       run: |
         echo "SemVer: v$($env:GitVersion_SemVer)" 
-        Write-Host "::set-output name=semver::v$($env:GitVersion_SemVer)"                
+        Write-Host "::set-output name=semver::$($env:GitVersion_MajorMinorPatch)"  
         $fileName = "dummy-v$($env:GitVersion_SemVer)"
         echo "SemVerMMP: v$($env:GitVersion_MajorMinorPatch)"
         Write-Host "Filename: '$fileName'" 
@@ -100,7 +100,7 @@ jobs:
         $sourceFolder = Join-Path $env:GITHUB_WORKSPACE "out" | Join-Path -ChildPath "*"
         $outFolder = Join-Path $env:GITHUB_WORKSPACE "out" | Join-Path -ChildPath "continuous-clearing" 
         New-Item -ItemType Directory -Force -Path $outFolder
-        $fileName = "continuous-clearing-6.0.0.zip"
+        $fileName = "continuous-clearing-v$($env:GitVersion_MajorMinorPatch).zip"
         Write-Host "Filename: '$fileName'"
         Write-Host "sourceFolder: '$sourceFolder'"
         Write-Host "Outfolder: '$outFolder'"
@@ -144,8 +144,8 @@ jobs:
     - name: Create Nuget Packages 
       id: createNupkg
       run: |
-        nuget pack CA.nuspec -Version 6.0.0
-        Write-Host "::set-output name=nupkg-LicenseClearingTool::continuous-clearing.6.0.0.nupkg"
+        nuget pack CA.nuspec -Version $($env:GitVersion_MajorMinorPatch)
+        Write-Host "::set-output name=nupkg-LicenseClearingTool::continuous-clearing$($env:GitVersion_MajorMinorPatch).nupkg"
         
     - name: Archive NuGet Packages
       uses: actions/upload-artifact@v2
