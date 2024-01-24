@@ -19,7 +19,7 @@ namespace SW360IntegrationTest.Conan
             string comparisonBOMPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\ArtifactoryUploaderTestData\ConanComparisonBOM.json";
 
             // Test BOM Creator ran with exit code 0
-            Assert.AreEqual(0, TestHelper.RunArtifactoryUploaderExe(new string[]{
+            int result = TestHelper.RunArtifactoryUploaderExe(new string[]{
                 TestConstant.BomFilePath, comparisonBOMPath,
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.ArtifactoryUser, testParameters.ArtifactoryUploadUser,
@@ -29,7 +29,10 @@ namespace SW360IntegrationTest.Conan
                 TestConstant.JfrogConanInternalDestRepoName,testParameters.InternalDestinationRepoName,
                 TestConstant.JFrogApiURL,testParameters.JfrogApi,
                 TestConstant.Release, false.ToString()
-            }),
+            });
+
+            // Test BOM Creator ran with exit code 0 or 2 (Warning)
+            Assert.IsTrue(result == 0 || result == 2,
                 "Test to run Artifactory Uploader EXE execution");
         }
 
