@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2023 Siemens AG
+// SPDX-FileCopyrightText: 2024 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -23,7 +23,7 @@ using System.Xml;
 namespace LCT.PackageIdentifier
 {
     /// <summary>
-    /// The DebianProcessor class
+    /// The AlpineProcessor class
     /// </summary>
     public class AlpineProcessor : IParser
     {

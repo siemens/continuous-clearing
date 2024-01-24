@@ -1,4 +1,9 @@
-﻿using LCT.Common.Model;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2024 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+using LCT.Common.Model;
 using NUnit.Framework;
 using System.IO;
 using System.Threading.Tasks;
