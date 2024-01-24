@@ -152,9 +152,9 @@ jobs:
       id: builddocker
       #if: ${{ false }}  # disable for now
       run: |
-        docker build . --file Dockerfile --tag ${{ github.repository }}:continuous-clearing-v6.0.0
-        docker save ${{ github.repository }}:continuous-clearing-v6.0.0 -o continuous-clearing-v6.0.0.tar
-        Write-Host "::set-output name=docker-LicenseClearingTool::continuous-clearing-v6.0.0.tar"
+        docker build . --file Dockerfile --tag ${{ github.repository }}:continuous-clearing-v$($env:GitVersion_MajorMinorPatch)
+        docker save ${{ github.repository }}:continuous-clearing-v$($env:GitVersion_MajorMinorPatch) -o continuous-clearing-v$($env:GitVersion_MajorMinorPatch).tar
+        Write-Host "::set-output name=docker-LicenseClearingTool::continuous-clearing-v$($env:GitVersion_MajorMinorPatch).tar"
 
     - name: Archive docker image      
       #if: ${{ false }}  # disable for now
@@ -195,9 +195,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
         with:
-          tag_name: v6.0.0
+          tag_name: v$($env:GitVersion_MajorMinorPatch)
           #tag_name: ${{ needs.build.outputs.semver }}
-          release_name: Release v6.0.0
+          release_name: Release v$($env:GitVersion_MajorMinorPatch)
           body: |
             ${{ github.event.head_commit.message }}
           draft: true
