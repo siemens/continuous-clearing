@@ -75,6 +75,12 @@ jobs:
         
     - name: Restore Packages
       run: dotnet restore src\LicenseClearingTool.sln 
+
+    - name: get nuspec version from file
+      shell: pwsh
+      run: |
+              $version = Get-Content version.txt | ForEach-Object { $_.split(".nuspec")[1]}
+              $version.Substring(0,$version.Length-1)
     
     - name: Build
       run: msbuild -m -t:Rebuild -p:Configuration=Release -bl:continous-clearing.binlog -noconlog src\LicenseClearingTool.sln
