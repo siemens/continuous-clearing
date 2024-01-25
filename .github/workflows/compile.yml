@@ -195,9 +195,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
         with:
-          tag_name: v$($env:GitVersion_MajorMinorPatch)
-          #tag_name: ${{ needs.build.outputs.semver }}
-          release_name: Release v$($env:GitVersion_MajorMinorPatch)
+          tag_name: v${{ needs.build.outputs.semver }}
+          release_name: Release v${{ needs.build.outputs.semver }}
           body: |
             ${{ github.event.head_commit.message }}
           draft: true
