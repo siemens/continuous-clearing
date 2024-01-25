@@ -4,6 +4,4 @@ branches:
    master:
       regex: ^master$|^main$
 ignore:
-  sha:
-    - 408943429d1788227ad19ef6434d1fb44257263c
-    - 51eaa765411149f8411676ed421b6274b38aeb4b
+  sha: [408943429d1788227ad19ef6434d1fb44257263c, 51eaa765411149f8411676ed421b6274b38aeb4b]
