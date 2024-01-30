@@ -25,7 +25,7 @@ This tool has been  logically split into 3 different executables that enable it 
 
 # SEPP Integration with Continuous Clearing Tool
 
-The Continuous Clearing Tool incorporates SEPP tool functionalities, seamlessly integrated into the [Artifactory uploader](https://github.com/siemens/continuous-clearing/blob/main/doc/usagedocimg/artifactoryuploader.PNG).
+The Continuous Clearing Tool incorporates SEPP tool functionalities, seamlessly integrated into the Artifactory uploader.
 This integration ensures
 - Software License Clearing is done.
 - No pre-release versions of re-use components are used.
