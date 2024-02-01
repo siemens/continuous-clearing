@@ -95,7 +95,7 @@ jobs:
         $sourceFolder = Join-Path $env:GITHUB_WORKSPACE "out" | Join-Path -ChildPath "*"
         $outFolder = Join-Path $env:GITHUB_WORKSPACE "out" | Join-Path -ChildPath "continuous-clearing" 
         New-Item -ItemType Directory -Force -Path $outFolder
-        $fileName = "continuous-clearing-v6.0.1.zip"
+        $fileName = "continuous-clearing-v6.0.2.zip"
         Write-Host "Filename: '$fileName'"
         Write-Host "sourceFolder: '$sourceFolder'"
         Write-Host "Outfolder: '$outFolder'"
@@ -139,8 +139,8 @@ jobs:
     - name: Create Nuget Packages 
       id: createNupkg
       run: |
-        nuget pack CA.nuspec -Version 6.0.1
-        Write-Host "::set-output name=nupkg-LicenseClearingTool::continuous-clearing.6.0.1.nupkg"
+        nuget pack CA.nuspec -Version 6.0.2
+        Write-Host "::set-output name=nupkg-LicenseClearingTool::continuous-clearing.6.0.2.nupkg"
         
     - name: Archive NuGet Packages
       uses: actions/upload-artifact@v2
@@ -153,9 +153,9 @@ jobs:
       id: builddocker
       #if: ${{ false }}  # disable for now
       run: |
-        docker build . --file Dockerfile --tag ${{ github.repository }}:continuous-clearing-v6.0.1
-        docker save ${{ github.repository }}:continuous-clearing-v6.0.1 -o continuous-clearing-v6.0.1.tar
-        Write-Host "::set-output name=docker-LicenseClearingTool::continuous-clearing-v6.0.1.tar"
+        docker build . --file Dockerfile --tag ${{ github.repository }}:continuous-clearing-v6.0.2
+        docker save ${{ github.repository }}:continuous-clearing-v6.0.2 -o continuous-clearing-v6.0.2.tar
+        Write-Host "::set-output name=docker-LicenseClearingTool::continuous-clearing-v6.0.2.tar"
 
     - name: Archive docker image      
       #if: ${{ false }}  # disable for now
@@ -196,8 +196,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
         with:
-          tag_name: v6.0.1
-          release_name: Release v6.0.1
+          tag_name: v6.0.2
+          release_name: Release v6.0.2
           body: |
             ${{ github.event.head_commit.message }}
           draft: true
