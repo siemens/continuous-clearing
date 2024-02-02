@@ -13,6 +13,7 @@ using System.IO;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Net;
 
 namespace LCT.ArtifactoryUploader
 {
@@ -27,18 +28,15 @@ namespace LCT.ArtifactoryUploader
             JfrogApiCommunication = jfrogApiCommunication;
         }
 
-        public async Task ValidateArtifactoryCredentials(CommonAppSettings appSettings)
-        {
-            HttpResponseMessage responseMessage = await JfrogApiCommunication.GetApiKey();
-            string response = await responseMessage.Content.ReadAsStringAsync();
-            JfrogKey apiKey = JsonConvert.DeserializeObject<JfrogKey>(response);
+         public async Task ValidateArtifactoryCredentials(CommonAppSettings appSettings)
+         {
+         HttpResponseMessage responseMessage = await JfrogApiCommunication.GetApiKey();
 
-            bool isValid = apiKey.ApiKey == appSettings.ArtifactoryUploadApiKey;
-            if (!isValid)
-            {
-                Logger.Error("Artifactory Token entered is invalid!");
-                throw new InvalidDataException($"Invalid Artifactory Token");
-            }
+        if (responseMessage.StatusCode != HttpStatusCode.OK)
+         {
+         Logger.Error("Artifactory Token entered is invalid!");
+         throw new InvalidDataException($"Invalid Artifactory Token");
+         }
         }
     }
 }
