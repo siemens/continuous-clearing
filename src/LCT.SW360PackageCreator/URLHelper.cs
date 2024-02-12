@@ -59,18 +59,25 @@ namespace LCT.SW360PackageCreator
         /// </summary>
         /// <param name="componentName"></param>
         /// <param name="componenVersion"></param>
+        /// <param name="bomRef"></param>
         /// <returns>Components</returns>
-        public async Task<Components> GetSourceUrlForAlpinePackage(string componentName, string componenVersion)
+        public async Task<Components> GetSourceUrlForAlpinePackage(string componentName, string componenVersion, string bomRef)
         {
             Components componentsData = new Components();
             try
             {
                 string localPathforSourceRepo = GetDownloadPathForAlpineRepo();
                 string fullPath = Path.Combine(localPathforSourceRepo, "aports");
+                var alpineDistro = GetAlpineDistro(bomRef);
                 if (!Directory.Exists(fullPath))
                 {
                     //Clone AlpineRepository
-                    CloneSource(localPathforSourceRepo);
+                    CloneSource(localPathforSourceRepo, alpineDistro, fullPath);
+                }
+                else
+                {
+                    //Checkout stable branch
+                    CheckoutDistro(alpineDistro, fullPath);
                 }
 
                 AlpinePackage alpinePackSourceDetails = await GetAlpineSourceUrl(componentName, componenVersion, localPathforSourceRepo);
@@ -87,6 +94,15 @@ namespace LCT.SW360PackageCreator
                 Logger.Error($"GetAlpineSourceUrl() ", ex);
             }
             return componentsData;
+        }
+        public static string GetAlpineDistro(string bomRef)
+        {
+
+            string[] getDistro = bomRef.Split("distro");
+            string[] getDestroVersion = getDistro[1].Split("-");
+            var output = getDestroVersion[1].Substring(0, getDestroVersion[1].Length - 2);
+            var distro = output + "-stable";
+            return distro;
         }
 
         private static Task<AlpinePackage> GetAlpineSourceUrl(string name, string version, string localPathforSourceRepo)
@@ -154,9 +170,11 @@ namespace LCT.SW360PackageCreator
             try
             {
                 var pkgVersionLine = File.ReadLines(pkgFilePath).FirstOrDefault(x => x.StartsWith("pkgver"));
+                var pkgNameLine = File.ReadLines(pkgFilePath).FirstOrDefault(x => x.StartsWith("pkgname"));
                 var _commitLine = File.ReadLines(pkgFilePath).FirstOrDefault(x => x.StartsWith("_commit"));
                 var _tzcodeverLine = File.ReadLines(pkgFilePath).FirstOrDefault(x => x.StartsWith("_tzcodever"));
                 string pkgVersion = string.Empty;
+                string pkgName = string.Empty;
                 string _commitValue = string.Empty;
                 string _tzcodever = string.Empty;
 
@@ -165,10 +183,19 @@ namespace LCT.SW360PackageCreator
                     string[] pkgVersionValue = Regex.Split(pkgVersionLine, @"\=");
                     pkgVersion = pkgVersionValue[1];
                 }
+                if (pkgNameLine != null)
+                {
+                    string[] pkgNameData = Regex.Split(pkgNameLine, @"\=");
+                    pkgName = pkgNameData[1];
+                }
                 if (_tzcodeverLine != null)
                 {
                     string[] _tzcodeverValue = Regex.Split(_tzcodeverLine, @"\=");
                     _tzcodever = _tzcodeverValue[1];
+                    if (_tzcodeverLine.Contains("pkgver"))
+                    {
+                        _tzcodever = pkgVersion;
+                    }
                 }
                 if (_commitLine != null)
                 {
@@ -179,7 +206,7 @@ namespace LCT.SW360PackageCreator
                 {
                     Match url = Regex.Match(sourceData, @"http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=$]*)?");
                     string finalUrl = url.ToString();
-                    sourceUrl = finalUrl.Replace("$pkgver", pkgVersion).Replace("$_commit", _commitValue).Replace("$_tzcodever", _tzcodever);
+                    sourceUrl = finalUrl.Replace("$pkgver", pkgVersion).Replace("$pkgname", pkgName).Replace("$_commit", _commitValue).Replace("$_tzcodever", _tzcodever);
                     if (pkgVersion == null && _commitValue == null && _tzcodever == null)
                     {
                         sourceUrl = string.Empty;
@@ -203,7 +230,7 @@ namespace LCT.SW360PackageCreator
             string localPathforSourceRepo = string.Empty;
             try
             {
-                localPathforSourceRepo = $"{Directory.GetParent(Directory.GetCurrentDirectory())}/ClearingTool/DownloadedFiles/";
+                localPathforSourceRepo = $"{Directory.GetParent(Directory.GetCurrentDirectory())}\\ClearingTool\\DownloadedFiles\\";
             }
             catch (IOException ex)
             {
@@ -227,7 +254,7 @@ namespace LCT.SW360PackageCreator
             return $"{Dataconstant.PurlCheck()["ALPINE"]}{Dataconstant.ForwardSlash}{name}?arch=source";
         }
 
-        private static void CloneSource(string localPathforSourceRepo)
+        private static void CloneSource(string localPathforSourceRepo, string alpineDistro, string fullPath)
         {
             List<string> gitCommands = GetGitCloneCommands();
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -263,7 +290,27 @@ namespace LCT.SW360PackageCreator
                 process.Start();
                 process.WaitForExit();
             }
+            if (Directory.Exists(fullPath))
+            {
+                CheckoutDistro(alpineDistro, fullPath);
+            }
 
+        }
+
+        private static void CheckoutDistro(string alpineDistro, string fullPath)
+        {
+            var process = new Process
+            {
+                StartInfo = new ProcessStartInfo()
+                {
+                    CreateNoWindow = true,
+                    FileName = "git",
+                    Arguments = $"checkout" + " " + alpineDistro,
+                    WorkingDirectory = fullPath,
+                }
+            };
+            process.Start();
+            process.WaitForExit();
         }
 
         private static List<string> GetGitCloneCommands()

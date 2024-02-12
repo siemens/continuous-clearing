@@ -124,6 +124,7 @@ namespace LCT.SW360PackageCreator
                             }
                         };
                         process.Start();
+                        process.WaitForExit();
                     }
 
                     foreach (var fileNames in buildFilesList)
@@ -220,8 +221,8 @@ namespace LCT.SW360PackageCreator
             if (Directory.GetDirectories(localPathforDownload).Length != 0)
             {
 
-                var tempFolder = Directory.CreateDirectory($"{Directory.GetParent(Directory.GetCurrentDirectory())}/ClearingTool/DownloadedFiles/SourceCodeZipped/{component.Name}/--{DateTime.Now.ToString("yyyyMMddHHmmss")}{Dataconstant.ForwardSlash}");
-                tarArchivePath = tempFolder + component.Name + ".tar.gz";
+                var tempFolder = Directory.CreateDirectory($"{Directory.GetParent(Directory.GetCurrentDirectory())}\\ClearingTool\\DownloadedFiles\\SourceCodeZipped\\{component.Name}\\--{DateTime.Now.ToString("yyyyMMddHHmmss")}\\");
+                tarArchivePath = tempFolder + (component.Name + "_" + component.Version) +".tar.gz";
                 var InputDirectory = localPathforDownload;
                 var OutputFilename = tarArchivePath;
                 using Stream zipStream = new FileStream(System.IO.Path.GetFullPath(OutputFilename), FileMode.Create, FileAccess.Write);

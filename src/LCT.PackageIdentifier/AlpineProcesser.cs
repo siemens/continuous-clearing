@@ -168,19 +168,27 @@ namespace LCT.PackageIdentifier
             return $"{Dataconstant.PurlCheck()["ALPINE"]}{Dataconstant.ForwardSlash}{name}@{version}?arch=source";
         }
 
+        private static string GetDistro(AlpinePackage alpinePackage)
+        {
+            var distro = alpinePackage.PurlID;
+            distro = distro.Substring(distro.LastIndexOf("distro"));
+            return distro;
+        }
+
         private static List<Component> FormComponentReleaseExternalID(List<AlpinePackage> listOfComponents)
         {
             List<Component> listComponentForBOM = new List<Component>();
 
             foreach (var prop in listOfComponents)
             {
+                var distro = GetDistro(prop);
                 Component component = new Component
                 {
                     Name = prop.Name,
                     Version = prop.Version,
                     Purl = GetReleaseExternalId(prop.Name, prop.Version)
                 };
-                component.BomRef = component.Purl;
+                component.BomRef = $"{Dataconstant.PurlCheck()["ALPINE"]}{Dataconstant.ForwardSlash}{prop.Name}@{prop.Version}?{distro}";
                 Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.Discovered };
                 component.Properties = new List<Property> { identifierType };
                 listComponentForBOM.Add(component);

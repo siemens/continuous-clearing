@@ -140,7 +140,7 @@ namespace SW360IntegrationTest.Alpine
                 new AuthenticationHeaderValue(testParameters.SW360AuthTokenType, testParameters.SW360AuthTokenValue);
             string expectedname = "apk-tools";
             string expectedversion = "2.12.9-r3";
-            string expecteddownloadurl = "https://gitlab.alpinelinux.org/alpine/apk-tools/-/archive/v2.14.0/apk-tools-v2.14.0.tar.gz";
+            string expecteddownloadurl = "https://gitlab.alpinelinux.org/alpine/apk-tools/-/archive/v2.12.9/apk-tools-v2.12.9.tar.gz";
             string expectedexternalid = "pkg:apk/alpine/apk-tools@2.12.9-r3?arch=source";
             //url formation for retrieving component details
             string url = TestConstant.Sw360ReleaseApi + TestConstant.componentNameUrl + "apk-tools";

@@ -84,7 +84,7 @@ namespace LCT.SW360PackageCreator
                     componentsData.ComponentExternalId = item.Purl.Substring(0, item.Purl.IndexOf('@'));
                     componentsData.ReleaseExternalId = item.Purl;
 
-                    Components component = await GetSourceUrl(componentsData.Name, componentsData.Version, componentsData.ProjectType);
+                    Components component = await GetSourceUrl(componentsData.Name, componentsData.Version, componentsData.ProjectType, item.BomRef);
                     componentsData.SourceUrl = component.SourceUrl;
                     
                     if (componentsData.ProjectType.ToUpperInvariant() == "ALPINE")
@@ -179,7 +179,7 @@ namespace LCT.SW360PackageCreator
             }
         }
 
-        private static async Task<Components> GetSourceUrl(string name, string version, string projectType)
+        private static async Task<Components> GetSourceUrl(string name, string version, string projectType, string bomRef)
         {
             Components componentsData = new Components();
             switch (projectType.ToUpperInvariant())
@@ -202,7 +202,7 @@ namespace LCT.SW360PackageCreator
                     componentsData.SourceUrl = await UrlHelper.Instance.GetSourceUrlForConanPackage(name, version);
                     break;
                 case "ALPINE":
-                    Components alpComponentData = await UrlHelper.Instance.GetSourceUrlForAlpinePackage(name, version);
+                    Components alpComponentData = await UrlHelper.Instance.GetSourceUrlForAlpinePackage(name, version,bomRef);
                     componentsData = alpComponentData;
                     componentsData.ProjectType = projectType;
                     break;
