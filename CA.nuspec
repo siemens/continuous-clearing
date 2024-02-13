@@ -4,7 +4,7 @@
 <package >
   <metadata>
     <id>continuous-clearing</id>
-    <version>6.0.0</version>
+    <version>6.0.3</version>
     <authors>Siemens AG</authors>
     <owners>continuous-clearing contributors</owners>
     <projectUrl>https://github.com/siemens/continuous-clearing</projectUrl>
@@ -27,6 +27,7 @@
     <file src="out\net6.0\App.config" target="tools"/>
 	<file src="out\net6.0\CLIUsageNpkg.txt" target="tools"/>
     <file src="out\net6.0\appSettings.json" target="tools"/>
+	<file src="out\net6.0\ICSharpCode.SharpZipLib.dll" target="tools"/>
     <file src="out\net6.0\ArtifactoryUploader.deps.json" target="tools"/>
     <file src="out\net6.0\ArtifactoryUploader.dll" target="tools"/>
     <file src="out\net6.0\ArtifactoryUploader.exe" target="tools"/>
