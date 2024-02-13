@@ -20,7 +20,7 @@ namespace LCT.PackageIdentifier.UTest
         public void ParsePackageConfig_GivenAMultipleInputFilePath_ReturnsCounts()
         {
             //Arrange
-            int expectednoofcomponents = 9;
+            int expectednoofcomponents = 5;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             AlpineProcessor alpineProcessor = new AlpineProcessor();
@@ -45,7 +45,7 @@ namespace LCT.PackageIdentifier.UTest
         public void ParsePackageConfig_GivenAInputFilePath_ReturnsCounts()
         {
             //Arrange
-            int expectednoofcomponents = 8;
+            int expectednoofcomponents = 4;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             AlpineProcessor alpineProcessor = new AlpineProcessor();
@@ -69,7 +69,7 @@ namespace LCT.PackageIdentifier.UTest
         public void ParsePackageConfig_GivenMultipleInputFiles_ReturnsCountOfDuplicates()
         {
             //Arrange
-            int duplicateComponents = 8;
+            int duplicateComponents = 4;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             AlpineProcessor alpineProcessor = new AlpineProcessor();
@@ -119,7 +119,7 @@ namespace LCT.PackageIdentifier.UTest
         public void ParsePackageConfig_GivenAInputFilePathAlongWithSBOMTemplate_ReturnTotalComponentsList()
         {
             //Arrange
-            int expectednoofcomponents = 9;
+            int expectednoofcomponents = 5;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             AlpineProcessor alpineProcessor = new AlpineProcessor();
