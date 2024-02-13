@@ -178,7 +178,7 @@ namespace LCT.SW360PackageCreator
                     using (Stream sourceStream = new BZip2InputStream(tarFileInfo.OpenRead()))
                     {
 
-                        using (TarArchive tarArchive = TarArchive.CreateInputTarArchive(sourceStream, TarBuffer.DefaultBlockFactor))
+                        using (TarArchive tarArchive = TarArchive.CreateInputTarArchive(sourceStream,null))
                         {
                             tarArchive.ExtractContents(targetDirectory.FullName);
                         }
@@ -200,7 +200,7 @@ namespace LCT.SW360PackageCreator
                     using (Stream sourceStream = new GZipInputStream(tarFileInfo.OpenRead()))
                     {
 
-                        using (TarArchive tarArchive = TarArchive.CreateInputTarArchive(sourceStream, TarBuffer.DefaultBlockFactor))
+                        using (TarArchive tarArchive = TarArchive.CreateInputTarArchive(sourceStream, null))
                         {
                             tarArchive.ExtractContents(targetDirectory.FullName);
                         }
