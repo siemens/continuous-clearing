@@ -268,8 +268,7 @@ namespace LCT.SW360PackageCreator
                     p.StartInfo.WorkingDirectory = localPathforSourceRepo;
 
                     p.Start();
-                    p.WaitForExit();
-                    p.WaitForExit();
+                    p.WaitForExit();                  
 
                 }
             }

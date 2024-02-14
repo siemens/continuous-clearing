@@ -143,7 +143,7 @@ namespace LCT.SW360PackageCreator
                     directory.Delete(true);
 
                 }
-                catch (Exception ex)
+                catch (IOException ex)
                 {
                     Logger.Debug(ex.ToString());
                 }
