@@ -263,7 +263,7 @@ namespace LCT.SW360PackageCreator
                 {
                     Process p = new Process();
                     p.StartInfo.CreateNoWindow = true;
-                    p.StartInfo.FileName = "git";
+                    p.StartInfo.FileName = Path.Combine(@"git");
                     p.StartInfo.Arguments = command;
                     p.StartInfo.WorkingDirectory = localPathforSourceRepo;
 
@@ -276,7 +276,7 @@ namespace LCT.SW360PackageCreator
             {
                 Process p = new Process();
                 p.StartInfo.CreateNoWindow = true;
-                p.StartInfo.FileName = "git";
+                p.StartInfo.FileName = Path.Combine(@"git");
                 p.StartInfo.Arguments = gitCommands[1];
                 p.StartInfo.WorkingDirectory = localPathforSourceRepo;
 
@@ -295,7 +295,7 @@ namespace LCT.SW360PackageCreator
 
             Process p = new Process();
             p.StartInfo.CreateNoWindow = true;
-            p.StartInfo.FileName = "git";
+            p.StartInfo.FileName = Path.Combine(@"git");
             p.StartInfo.Arguments = $"checkout" + " " + alpineDistro;
             p.StartInfo.WorkingDirectory = fullPath;
 

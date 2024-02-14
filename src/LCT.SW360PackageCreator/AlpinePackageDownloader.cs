@@ -115,7 +115,7 @@ namespace LCT.SW360PackageCreator
                         Process p = new Process();
 
                         p.StartInfo.CreateNoWindow = true;
-                        p.StartInfo.FileName = "git";
+                        p.StartInfo.FileName = Path.Combine(@"git");
                         p.StartInfo.Arguments = "init";
                         p.StartInfo.WorkingDirectory = sourceCodezippedFolder;
 
@@ -248,7 +248,7 @@ namespace LCT.SW360PackageCreator
         {
             Process p = new Process();
             p.StartInfo.CreateNoWindow = true;
-            p.StartInfo.FileName = "git";
+            p.StartInfo.FileName = Path.Combine(@"git");
             p.StartInfo.Arguments = $"apply" + " " + patchFileFolder;
             p.StartInfo.WorkingDirectory = sourceCodezippedFolder;
 
