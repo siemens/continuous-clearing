@@ -42,7 +42,7 @@ namespace LCT.SW360PackageCreator
 
         private static void CopyBuildFilesFromSourceRepo(string localPathforDownload, ComparisonBomData component, string sourceData, string localPathforSourceRepo)
         {
-            if (sourceData!=null)
+            if (sourceData != null)
             {
                 string[] filenameList = sourceData.Split("\n");
                 foreach (var name in filenameList)
@@ -58,7 +58,7 @@ namespace LCT.SW360PackageCreator
                     }
                 }
             }
-            
+
         }
 
         private static string GetCurrentDownloadFolderPath(string localPathforDownload, ComparisonBomData component)
@@ -97,10 +97,9 @@ namespace LCT.SW360PackageCreator
 
             return downloadPath;
         }
-        private static string ApplyPatchFilesToSourceCode(string downloadPath, string sourceData, string localPathforSourceRepo, ComparisonBomData component, string localPathforDownload)
+        private static void ApplyPatchFilesToSourceCode(string downloadPath, string sourceData, string localPathforSourceRepo, ComparisonBomData component, string localPathforDownload)
         {
             string[] buildFilesList = sourceData.Split("\n");
-            string directoryPath = string.Empty;
             string sourceCodezippedFolder = string.Empty;
 
             if (sourceData.Contains(".patch") && (downloadPath.EndsWith(".gz") || downloadPath.EndsWith(".bz2")))
@@ -113,20 +112,17 @@ namespace LCT.SW360PackageCreator
                     sourceCodezippedFolder = directoriesOfSourceFolder[0];
                     if (sourceData.Contains(".patch"))
                     {
-                        var process = new Process
-                        {
-                            StartInfo = new ProcessStartInfo()
-                            {
-                                CreateNoWindow = true,
-                                FileName = "git",
-                                Arguments = "init",
-                                WorkingDirectory = sourceCodezippedFolder,
-                            }
-                        };
-                        process.Start();
-                        process.WaitForExit();
-                    }
+                        Process p = new Process();
 
+                        p.StartInfo.CreateNoWindow = true;
+                        p.StartInfo.FileName = "git";
+                        p.StartInfo.Arguments = "init";
+                        p.StartInfo.WorkingDirectory = sourceCodezippedFolder;
+
+                        p.Start();
+                        p.WaitForExit();
+
+                    }
                     foreach (var fileNames in buildFilesList)
                     {
                         var fileName = fileNames.Trim();
@@ -152,12 +148,7 @@ namespace LCT.SW360PackageCreator
                     Logger.Debug(ex.ToString());
                 }
             }
-            if (!sourceData.Contains(".patch"))
-            {
-                directoryPath = downloadPath;
-            }
 
-            return directoryPath;
         }
 
 
@@ -178,7 +169,7 @@ namespace LCT.SW360PackageCreator
                     using (Stream sourceStream = new BZip2InputStream(tarFileInfo.OpenRead()))
                     {
 
-                        using (TarArchive tarArchive = TarArchive.CreateInputTarArchive(sourceStream,null))
+                        using (TarArchive tarArchive = TarArchive.CreateInputTarArchive(sourceStream, null))
                         {
                             tarArchive.ExtractContents(targetDirectory.FullName);
                         }
@@ -215,14 +206,12 @@ namespace LCT.SW360PackageCreator
 
         public static string PackageFolderGzip(string localPathforDownload, ComparisonBomData component, string sourceCodezippedFolder)
         {
-
-
             string tarArchivePath;
             if (Directory.GetDirectories(localPathforDownload).Length != 0)
             {
 
                 var tempFolder = Directory.CreateDirectory($"{Directory.GetParent(Directory.GetCurrentDirectory())}\\ClearingTool\\DownloadedFiles\\SourceCodeZipped\\{component.Name}\\--{DateTime.Now.ToString("yyyyMMddHHmmss")}\\");
-                tarArchivePath = tempFolder + (component.Name + "_" + component.Version) +".tar.gz";
+                tarArchivePath = tempFolder + (component.Name + "_" + component.Version) + ".tar.gz";
                 var InputDirectory = localPathforDownload;
                 var OutputFilename = tarArchivePath;
                 using Stream zipStream = new FileStream(System.IO.Path.GetFullPath(OutputFilename), FileMode.Create, FileAccess.Write);
@@ -257,18 +246,14 @@ namespace LCT.SW360PackageCreator
 
         private static void ApplyPatchsToSourceCode(string patchFileFolder, string sourceCodezippedFolder)
         {
-            var process = new Process
-            {
-                StartInfo = new ProcessStartInfo()
-                {
-                    CreateNoWindow = true,
-                    FileName = "git",
-                    Arguments = $"apply" + " " + patchFileFolder,
-                    WorkingDirectory = sourceCodezippedFolder,
-                }
-            };
-            process.Start();
-            process.WaitForExit();
+            Process p = new Process();
+            p.StartInfo.CreateNoWindow = true;
+            p.StartInfo.FileName = "git";
+            p.StartInfo.Arguments = $"apply" + " " + patchFileFolder;
+            p.StartInfo.WorkingDirectory = sourceCodezippedFolder;
+
+            p.Start();
+            p.WaitForExit();
         }
     }
 }

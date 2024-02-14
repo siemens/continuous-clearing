@@ -221,6 +221,7 @@ namespace LCT.SW360PackageCreator
                 mapper.DownloadUrl = item.DownloadUrl;
                 mapper.ComponentStatus = GetComponentAvailabilityStatus(componentsAvailableInSw360, item);
                 mapper.ReleaseStatus = IsReleaseAvailable(item.Name, item.Version, item.ReleaseExternalId);
+                mapper.AlpineSource = item.AlpineSourceData;
                 if (!string.IsNullOrEmpty(item.ReleaseExternalId) && item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
                 {
                     if ((string.IsNullOrEmpty(item.SourceUrl) || item.SourceUrl == Dataconstant.SourceUrlNotFound) && !string.IsNullOrEmpty(releasesInfo.SourceCodeDownloadUrl))
@@ -236,16 +237,10 @@ namespace LCT.SW360PackageCreator
                     mapper.DownloadUrl = GetMavenDownloadUrl(mapper, item, releasesInfo);
                 }
                 else if (!string.IsNullOrEmpty(item.ReleaseExternalId) && 
-                            (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["PYTHON"]) || item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CONAN"])))
+                            (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["PYTHON"]) || item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CONAN"]) || item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["ALPINE"])))
                 {
-                    mapper.DownloadUrl = mapper.SourceUrl;
-                    
-                }
-                else if (!string.IsNullOrEmpty(item.ReleaseExternalId) &&  item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["ALPINE"]))
-                {
-                    mapper.DownloadUrl = mapper.SourceUrl;
-                    mapper.AlpineSource = item.AlpineSourceData;
-                }
+                    mapper.DownloadUrl = mapper.SourceUrl;                    
+                }                
                 else
                 {
                     mapper.DownloadUrl = GetComponentDownloadUrl(mapper, item, repo, releasesInfo);

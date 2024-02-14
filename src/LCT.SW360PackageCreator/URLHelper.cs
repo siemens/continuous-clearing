@@ -87,7 +87,7 @@ namespace LCT.SW360PackageCreator
                 componentsData.ReleaseExternalId = GetReleaseExternalIdForAlpine(alpinePackSourceDetails.Name, alpinePackSourceDetails.Version);
                 componentsData.ComponentExternalId = GetComponentExternalIdForAlpine(alpinePackSourceDetails.Name);
                 componentsData.SourceUrl = string.IsNullOrEmpty(alpinePackSourceDetails.SourceUrl) ? Dataconstant.SourceUrlNotFound : alpinePackSourceDetails.SourceUrl;
-                componentsData.DownloadUrl = componentsData.SourceUrl.Equals(Dataconstant.SourceUrlNotFound) ? Dataconstant.DownloadUrlNotFound : componentsData.SourceUrl;                
+                componentsData.DownloadUrl = componentsData.SourceUrl.Equals(Dataconstant.SourceUrlNotFound) ? Dataconstant.DownloadUrlNotFound : componentsData.SourceUrl;
             }
             catch (IOException ex)
             {
@@ -117,7 +117,7 @@ namespace LCT.SW360PackageCreator
                     if (File.Exists(pkgFilePath))
                     {
                         var sourceData = GetSourceFromAPKBUILD(localPathforSourceRepo, name);
-                        sourceURLDetails.SourceDataForAlpine=sourceData;
+                        sourceURLDetails.SourceDataForAlpine = sourceData;
                         var sourceUrl = GetSourceUrlForAlpine(pkgFilePath, sourceData);
                         if (sourceUrl.EndsWith(FileConstant.TargzFileExtension) || sourceUrl.EndsWith(FileConstant.XzFileExtension) || sourceUrl.EndsWith(FileConstant.TgzFileExtension) || sourceUrl.EndsWith(FileConstant.Bz2FileExtension))
                         {
@@ -261,34 +261,28 @@ namespace LCT.SW360PackageCreator
             {
                 foreach (string command in gitCommands)
                 {
-                    var process = new Process
-                    {
-                        StartInfo = new ProcessStartInfo()
-                        {
-                            CreateNoWindow = true,
-                            FileName = "git",
-                            Arguments = command,
-                            WorkingDirectory = localPathforSourceRepo,
-                        }
-                    };
-                    process.Start();
-                    process.WaitForExit();
+                    Process p = new Process();
+                    p.StartInfo.CreateNoWindow = true;
+                    p.StartInfo.FileName = "git";
+                    p.StartInfo.Arguments = command;
+                    p.StartInfo.WorkingDirectory = localPathforSourceRepo;
+
+                    p.Start();
+                    p.WaitForExit();
+                    p.WaitForExit();
+
                 }
             }
             else
             {
-                var process = new Process
-                {
-                    StartInfo = new ProcessStartInfo()
-                    {
-                        CreateNoWindow = true,
-                        FileName = "git",
-                        Arguments = gitCommands[1],
-                        WorkingDirectory = localPathforSourceRepo,
-                    }
-                };
-                process.Start();
-                process.WaitForExit();
+                Process p = new Process();
+                p.StartInfo.CreateNoWindow = true;
+                p.StartInfo.FileName = "git";
+                p.StartInfo.Arguments = gitCommands[1];
+                p.StartInfo.WorkingDirectory = localPathforSourceRepo;
+
+                p.Start();
+                p.WaitForExit();
             }
             if (Directory.Exists(fullPath))
             {
@@ -299,18 +293,16 @@ namespace LCT.SW360PackageCreator
 
         private static void CheckoutDistro(string alpineDistro, string fullPath)
         {
-            var process = new Process
-            {
-                StartInfo = new ProcessStartInfo()
-                {
-                    CreateNoWindow = true,
-                    FileName = "git",
-                    Arguments = $"checkout" + " " + alpineDistro,
-                    WorkingDirectory = fullPath,
-                }
-            };
-            process.Start();
-            process.WaitForExit();
+
+            Process p = new Process();
+            p.StartInfo.CreateNoWindow = true;
+            p.StartInfo.FileName = "git";
+            p.StartInfo.Arguments = $"checkout" + " " + alpineDistro;
+            p.StartInfo.WorkingDirectory = fullPath;
+
+            p.Start();
+            p.WaitForExit();
+
         }
 
         private static List<string> GetGitCloneCommands()
@@ -432,14 +424,14 @@ namespace LCT.SW360PackageCreator
         /// <param name="componentName"></param>
         /// <param name="version"></param>
         /// <returns>string</returns>
-        public async Task<string> GetSourceUrlForConanPackage(string componentName, string componenVersion) 
+        public async Task<string> GetSourceUrlForConanPackage(string componentName, string componenVersion)
         {
 
             var downLoadUrl = $"{CommonAppSettings.SourceURLConan}" + componentName + "/all/conandata.yml";
             var deserializer = new DeserializerBuilder().WithNamingConvention(UnderscoredNamingConvention.Instance).Build();
             string componentSrcURL = string.Empty;
-            Sources packageSourcesInfo=new Sources();
-            using (HttpClient _httpClient=new HttpClient())
+            Sources packageSourcesInfo = new Sources();
+            using (HttpClient _httpClient = new HttpClient())
             {
                 try
                 {
@@ -467,7 +459,7 @@ namespace LCT.SW360PackageCreator
                                     $"Exclude if it is an internal component or manually update the SRC url");
                     Logger.Debug($"GetSourceUrlForConanPackage()", ex);
                 }
-                catch(YamlException ex)
+                catch (YamlException ex)
                 {
                     Logger.Warn($"Identification of SRC url failed for {componentName}, " +
                                     $"Exclude if it is an internal component or manually update the SRC url");
