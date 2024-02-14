@@ -52,6 +52,38 @@ The Continuous Clearing Tool helps the Project Manager/Developer to automate the
 
 Continuous Clearing Tool reduces the effort in creating components in SW360 and identifying the matching source codes from the public repository. Tool eliminates the manual error while creating component and identifying correct version of source code from public repository. Continuous Clearing Tool harmonize the creation of 3P components in SW360 by filling necessary information.
 
+# SEPP Integration with Continuous Clearing Tool
+
+The Continuous Clearing Tool incorporates SEPP tool functionalities, seamlessly integrated into the [Artifactory uploader](../usagedocimg/artifactoryuploader.PNG).
+This integration ensures
+- Software License Clearing is done.
+- No pre-release versions of re-use components are used.
+- Trace-ability is guaranteed
+
+### What is SEPP tool performing currently ?
+
+* Check for third-party packages in artifactory
+* Move internal packages from energy-dev- to energy-release- repos/
+* Clone Git repositories.
+* Export JSON file for Long term Archiving (LTA-Export)
+ 
+### What are the existing functionalities of Continuous Clearing Tool ?
+ 
+* Check for third party packages
+* Identification of correct source code from github
+* Creating third party components in SW360
+* Triggering source code scan in FOSSology
+* Copy cleared third party components from remote repo to SIPARTY release repo.
+
+### Which functionality of SEPP did Continuous Clearing adapt newly ?
+ 
+* Move internal packages from energy-dev-* to energy-release-* repos
+* Copy development dependency packages to siparty-devdep-* repos
+ 
+### What happens to SEPP now ?
+
+Currently LTA support is not provided for SBOM, hence until that is implemented SEPP will coexist with continuous clearing tool .Once the implementation is done SEPP will eventually phase out.
+
 # Continuous Clearing Tool workflow diagram
 
 - Package Identifier

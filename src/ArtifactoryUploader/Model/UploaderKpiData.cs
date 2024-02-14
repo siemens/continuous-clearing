@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2023 Siemens AG
+// SPDX-FileCopyrightText: 2024 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 //---------------------------------------------------------------------------------------------------------------------
@@ -39,13 +39,13 @@ namespace LCT.ArtifactoryUploader.Model
         [DisplayName(@"Time taken by ComponentCreator")]
         public double TimeTakenByComponentCreator { get; set; }
 
-        [DisplayName(@"Development Packages to be Moved to Siparty DevDep Repo")]
+        [DisplayName(@"Development Packages to be Copied to Siparty DevDep Repo")]
         public int DevPackagesToBeUploaded { get; set; }
 
-        [DisplayName(@"Development Packages Moved to Siparty DevDep Repo")]
+        [DisplayName(@"Development Packages Copied to Siparty DevDep Repo")]
         public int DevPackagesUploaded { get; set; }
 
-        [DisplayName(@"Development Packages Not Moved to Siparty DevDep Repo")]
+        [DisplayName(@"Development Packages Not Copied to Siparty DevDep Repo")]
         public int DevPackagesNotUploadedToJfrog { get; set; }
 
         [DisplayName(@"Internal Packages to be Moved")]
