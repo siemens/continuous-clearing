@@ -6,6 +6,7 @@
 
 using LCT.APICommunications.Model;
 using LCT.Common;
+using LCT.Common.Interface;
 using LCT.Facade.Interfaces;
 using LCT.Services.Interface;
 using log4net;
@@ -26,7 +27,6 @@ namespace LCT.Services
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         readonly ISW360ApicommunicationFacade m_SW360ApiCommunicationFacade;
-
 
         public Sw360ProjectService(ISW360ApicommunicationFacade sw360ApiCommunicationFacede)
         {
