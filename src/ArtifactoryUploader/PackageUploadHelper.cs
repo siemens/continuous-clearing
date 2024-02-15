@@ -106,14 +106,14 @@ namespace LCT.ArtifactoryUploader
                     components.CopyPackageApiUrl = GetCopyURL(components);
                     components.MovePackageApiUrl = GetMoveURL(components);
                     components.JfrogPackageName = GetJfrogPackageName(components);
-                    componentsToBeUploaded.Add(components);
+                   componentsToBeUploaded.Add(components);
                 }
                 else
                 {
                     PackageUploader.uploaderKpiData.ComponentNotApproved++;
                     PackageUploader.uploaderKpiData.PackagesNotUploadedToJfrog++;
                     Logger.Warn($"Package {item.Name}-{item.Version} is not in report approved state,hence artifactory upload will not be done!");
-                }
+                }               
             }
             Logger.Debug("Ending GetComponentsToBeUploadedToArtifactory() method");
             return componentsToBeUploaded;
@@ -173,6 +173,11 @@ namespace LCT.ArtifactoryUploader
                 // Add a wild card to the path end for jFrog AQL query search
                 component.Path = $"{component.Path}/*";
             }
+            else if(component.ComponentType == "DEBIAN")
+            {
+                url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension,"")}*" +
+                           $"?to=/{component.DestRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*";
+            }
             else
             {
                 // Do nothing
@@ -210,6 +215,11 @@ namespace LCT.ArtifactoryUploader
                 // Add a wild card to the path end for jFrog AQL query search
                 component.Path = $"{component.Path}/*";
             }
+            else if(component.ComponentType == "DEBIAN")
+            {
+                url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*" +
+                          $"?to=/{component.DestRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*";
+            }
             else
             {
                 // Do nothing
@@ -241,6 +251,8 @@ namespace LCT.ArtifactoryUploader
                 case "MAVEN":
                     return $"{component.Name}/{component.Version}";
 
+                case "DEBIAN":
+                    return $"pool/main/{component.Name[0]}/{component.Name}";
                 default:
                     return string.Empty;
             }
@@ -258,6 +270,10 @@ namespace LCT.ArtifactoryUploader
 
                 case "NUGET":
                     packageName = $"{component.PackageName}.{component.Version}{ApiConstant.NugetExtension}";
+                    break;
+
+                case "DEBIAN":
+                    packageName = $"{component.PackageName}_{component.Version.Replace(ApiConstant.DebianExtension, "")+"*"}";
                     break;
 
                 case "PYTHON":
@@ -291,6 +307,8 @@ namespace LCT.ArtifactoryUploader
                         return GetRepoName(packageType, appSettings.Python.JfrogInternalDestRepoName, appSettings.Python.JfrogDevDestRepoName, appSettings.Python.JfrogThirdPartyDestRepoName);
                     case "conan":
                         return GetRepoName(packageType, appSettings.Conan.JfrogInternalDestRepoName, appSettings.Conan.JfrogDevDestRepoName, appSettings.Conan.JfrogThirdPartyDestRepoName);
+                    case "debian":
+                        return GetRepoName(packageType, appSettings.Debian.JfrogInternalDestRepoName, appSettings.Debian.JfrogDevDestRepoName, appSettings.Debian.JfrogThirdPartyDestRepoName);
                 }
             }
 
@@ -334,6 +352,10 @@ namespace LCT.ArtifactoryUploader
             else if (item.Purl.Contains("conan", StringComparison.OrdinalIgnoreCase))
             {
                 return "CONAN";
+            }
+            else if (item.Purl.Contains("debian", StringComparison.OrdinalIgnoreCase))
+            {
+                return "DEBIAN";
             }
             else
             {

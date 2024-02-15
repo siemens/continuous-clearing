@@ -5,13 +5,13 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,7 +19,6 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
-using System.Xml;
 
 namespace LCT.PackageIdentifier
 {
@@ -30,6 +29,7 @@ namespace LCT.PackageIdentifier
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         readonly CycloneDXBomParser cycloneDXBomParser;
+        private const string NotFoundInRepo = "Not Found in JFrogRepo";
 
         public DebianProcessor()
         {
@@ -93,20 +93,72 @@ namespace LCT.PackageIdentifier
                                                           IJFrogService jFrogService,
                                                           IBomHelper bomhelper)
         {
+            // get the  component list from Jfrog for given repo + internal repo
+            string[] repoList = appSettings.InternalRepoList.Concat(appSettings.Debian?.JfrogDebianRepoList).ToArray();
+            List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(repoList, jFrogService);
+            Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
             List<Component> modifiedBOM = new List<Component>();
 
             foreach (var component in componentsForBOM)
             {
-                CycloneBomProcessor.SetProperties(appSettings, component, ref modifiedBOM);
+                string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper);
+                Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoUrl, Value = repoName };
+                Component componentVal = component;
+
+                if (componentVal.Properties?.Count == null || componentVal.Properties?.Count <= 0)
+                {
+                    componentVal.Properties = new List<Property>();
+                }
+                componentVal.Properties.Add(artifactoryrepo);
+                componentVal.Properties.Add(projectType);
+                componentVal.Description = string.Empty;
+
+                modifiedBOM.Add(componentVal);
             }
-            await Task.Yield();
+
             return modifiedBOM;
         }
 
         public async Task<ComponentIdentification> IdentificationOfInternalComponents(ComponentIdentification componentData,
             CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
-            await Task.Yield();
+            // get the  component list from Jfrog for given repo
+            List<AqlResult> aqlResultList =
+                await bomhelper.GetListOfComponentsFromRepo(appSettings.InternalRepoList, jFrogService);
+
+            // find the components in the list of internal components
+            List<Component> internalComponents = new List<Component>();
+            var internalComponentStatusUpdatedList = new List<Component>();
+            var inputIterationList = componentData.comparisonBOMData;
+
+            foreach (Component component in inputIterationList)
+            {
+                var currentIterationItem = component;
+                bool isTrue = IsInternalDebianComponent(aqlResultList, currentIterationItem, bomhelper);
+                if (currentIterationItem.Properties?.Count == null || currentIterationItem.Properties?.Count <= 0)
+                {
+                    currentIterationItem.Properties = new List<Property>();
+                }
+
+                Property isInternal = new() { Name = Dataconstant.Cdx_IsInternal, Value = "false" };
+                if (isTrue)
+                {
+                    internalComponents.Add(currentIterationItem);
+                    isInternal.Value = "true";
+                }
+                else
+                {
+                    isInternal.Value = "false";
+                }
+
+                currentIterationItem.Properties.Add(isInternal);
+                internalComponentStatusUpdatedList.Add(currentIterationItem);
+            }
+
+            // update the comparision bom data
+            componentData.comparisonBOMData = internalComponentStatusUpdatedList;
+            componentData.internalComponents = internalComponents;
+
             return componentData;
         }
 
@@ -119,6 +171,49 @@ namespace LCT.PackageIdentifier
             List<DebianPackage> debianPackages = new List<DebianPackage>();
             bom = ExtractDetailsForJson(filePath, ref debianPackages);
             return debianPackages;
+        }
+        private static string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
+        {
+
+            string jfrogcomponentName = $"{component.Name}_{component.Version}";
+
+            string repoName = aqlResultList.Find(x => x.Name.Contains(
+                jfrogcomponentName, StringComparison.OrdinalIgnoreCase))?.Repo ?? NotFoundInRepo;
+
+            string fullName = bomHelper.GetFullNameOfComponent(component);
+            string fullNameVersion = $"{fullName}";
+
+            if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase) &&
+                repoName.Equals(NotFoundInRepo, StringComparison.OrdinalIgnoreCase))
+            {
+                repoName = aqlResultList.Find(x => x.Name.Equals(
+                    fullNameVersion, StringComparison.OrdinalIgnoreCase))?.Repo ?? NotFoundInRepo;
+            }
+
+            return repoName;
+        }
+
+
+        private static bool IsInternalDebianComponent(
+            List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
+        {
+            string jfrogcomponentName = $"{component.Name}-{component.Version}.tgz";
+            if (aqlResultList.Exists(
+                x => x.Name.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase)))
+            {
+                return true;
+            }
+
+            string fullName = bomHelper.GetFullNameOfComponent(component);
+            string fullNameVersion = $"{fullName}-{component.Version}.tgz";
+            if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase)
+                && aqlResultList.Exists(
+                    x => x.Name.Equals(fullNameVersion, StringComparison.OrdinalIgnoreCase)))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         private Bom ExtractDetailsForJson(string filePath, ref List<DebianPackage> debianPackages)
