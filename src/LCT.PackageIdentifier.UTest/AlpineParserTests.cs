@@ -20,7 +20,7 @@ namespace LCT.PackageIdentifier.UTest
         public void ParsePackageConfig_GivenAMultipleInputFilePath_ReturnsCounts()
         {
             //Arrange
-            int expectednoofcomponents = 5;
+            int expectednoofcomponents = 4;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             AlpineProcessor alpineProcessor = new AlpineProcessor();
@@ -132,7 +132,7 @@ namespace LCT.PackageIdentifier.UTest
                 ProjectType = "ALPINE",
                 RemoveDevDependency = true,
                 Alpine = new Config() { Include = Includes },
-                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOMTemplate_Alpine.cdx.json"
+                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOM_AlpineCATemplate.cdx.json"
             };
 
             //Act
