@@ -27,6 +27,11 @@ namespace LCT.Facade
             m_jfrogAqlApiCommunication = jfrogAqlApiCommunication;
         }
 
+        public Task<HttpResponseMessage> CheckConnection()
+        {
+            return m_jfrogAqlApiCommunication.CheckConnection();
+        }
+
         /// <summary>
         /// Gets the Internal Component Data By Repo Name
         /// </summary>

@@ -34,7 +34,6 @@ namespace LCT.PackageIdentifier
         #region fields
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         readonly CycloneDXBomParser cycloneDXBomParser;
-        private const string NotFoundInRepo = "Not Found in JFrogRepo";
         #endregion
 
         #region constructor
@@ -364,8 +363,10 @@ namespace LCT.PackageIdentifier
         {
             string jfrogcomponentPath = $"{component.Name}/{component.Version}";
 
-            string repoName = aqlResultList.Find(x => x.Path.Contains(
-                jfrogcomponentPath, StringComparison.OrdinalIgnoreCase))?.Repo ?? NotFoundInRepo;
+            var list = aqlResultList.FindAll(x => x.Path.Contains(
+                jfrogcomponentPath, StringComparison.OrdinalIgnoreCase));
+
+            string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(list);
 
             return repoName;
         }

@@ -21,5 +21,7 @@ namespace LCT.PackageIdentifier.Interface
         public IBomHelper BomHelper { get; set; }
 
         public Task GenerateBom(CommonAppSettings appSettings, IBomHelper bomHelper, IFileOperations fileOperations);
+
+        public Task<bool> CheckJFrogConnection();
     }
 }

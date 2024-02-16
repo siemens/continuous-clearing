@@ -78,9 +78,17 @@ namespace LCT.PackageIdentifier
             IBomCreator bomCreator = new BomCreator();
             bomCreator.JFrogService = GetJfrogService(appSettings);
             bomCreator.BomHelper = new BomHelper();
-            await bomCreator.GenerateBom(appSettings, new BomHelper(), new FileOperations());
 
-            Logger.Logger.Log(null, Level.Notice, $"End of Package Identifier execution : {DateTime.Now}\n", null);
+            //Validating JFrog Settings
+            if (await bomCreator.CheckJFrogConnection())
+            {
+                await bomCreator.GenerateBom(appSettings, new BomHelper(), new FileOperations());
+                Logger.Logger.Log(null, Level.Notice, $"End of Package Identifier execution : {DateTime.Now}\n", null);
+            }
+            else
+            {
+                Logger.Logger.Log(null, Level.Alert, $"JFrog Connection was not successfull!! \n", null);
+            }
         }
 
         private static IJFrogService GetJfrogService(CommonAppSettings appSettings)
@@ -90,7 +98,7 @@ namespace LCT.PackageIdentifier
                 ApiKey = appSettings.ArtifactoryUploadApiKey
             };
             IJfrogAqlApiCommunication jfrogAqlApiCommunication =
-                new JfrogAqlApiCommunication(appSettings.JFrogApi, artifactoryUpload,appSettings.TimeOut);
+                new JfrogAqlApiCommunication(appSettings.JFrogApi, artifactoryUpload, appSettings.TimeOut);
             IJfrogAqlApiCommunicationFacade jFrogApiCommunicationFacade =
                 new JfrogAqlApiCommunicationFacade(jfrogAqlApiCommunication);
             IJFrogService jFrogService = new JFrogService(jFrogApiCommunicationFacade);

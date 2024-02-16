@@ -253,8 +253,10 @@ namespace LCT.PackageIdentifier
         {
             string jfrogcomponentName = $"{component.Name}-{component.Version}.nupkg";
 
-            string repoName = aqlResultList.Find(x => x.Name.Equals(
-                jfrogcomponentName, StringComparison.OrdinalIgnoreCase))?.Repo ?? NotFoundInRepo;
+            var list = aqlResultList.FindAll(x => x.Name.Equals(
+                jfrogcomponentName, StringComparison.OrdinalIgnoreCase));
+
+            string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(list);
 
             string fullName = bomHelper.GetFullNameOfComponent(component);
             string fullNameVersion = $"{fullName}-{component.Version}.nupkg";
@@ -262,23 +264,16 @@ namespace LCT.PackageIdentifier
             if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase) &&
                 repoName.Equals(NotFoundInRepo, StringComparison.OrdinalIgnoreCase))
             {
-                repoName = aqlResultList.Find(x => x.Name.Equals(
-                    fullNameVersion, StringComparison.OrdinalIgnoreCase))?.Repo ?? NotFoundInRepo;
+                var lst = aqlResultList.FindAll(x => x.Name.Equals(
+                    fullNameVersion, StringComparison.OrdinalIgnoreCase));
+                repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(lst);
             }
             if (repoName == NotFoundInRepo)
             {
                 jfrogcomponentName = $"{component.Name}.{component.Version}.nupkg";
-                repoName = aqlResultList.Find(x => x.Name.Equals(
-                  jfrogcomponentName, StringComparison.OrdinalIgnoreCase))?.Repo ?? NotFoundInRepo;
-
-            }
-
-            if (repoName == NotFoundInRepo)
-            {
-                jfrogcomponentName = $"{component.Name}.{component.Version}.nupkg";
-                repoName = aqlResultList.Find(x => x.Name.Equals(
-                  jfrogcomponentName, StringComparison.OrdinalIgnoreCase))?.Repo ?? NotFoundInRepo;
-
+                var lst = aqlResultList.FindAll(x => x.Name.Equals(
+                    jfrogcomponentName, StringComparison.OrdinalIgnoreCase));
+                repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(lst);
             }
 
             return repoName;
