@@ -453,9 +453,9 @@ namespace LCT.SW360PackageCreator
             try
             {
                 CheckFossologyProcess fossResult = await sw360CreatorService.CheckFossologyProcessStatus(link);
-                if (!string.IsNullOrEmpty(fossResult?.fossologyProcessInfo?.externalTool))
+                if (!string.IsNullOrEmpty(fossResult?.FossologyProcessInfo?.ExternalTool))
                 {
-                    uploadId = fossResult?.fossologyProcessInfo?.processSteps[0]?.processStepIdInTool;
+                    uploadId = fossResult?.FossologyProcessInfo?.ProcessSteps[0]?.ProcessStepIdInTool;
                 }
             }
             catch (AggregateException ex)

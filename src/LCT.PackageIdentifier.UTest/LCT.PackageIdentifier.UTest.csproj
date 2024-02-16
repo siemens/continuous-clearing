@@ -166,6 +166,9 @@
     <None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOM_AlpineCATemplate.cdx.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOM_ConanCATemplate.cdx.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOM_DebianCATemplate.cdx.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
