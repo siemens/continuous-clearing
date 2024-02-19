@@ -19,18 +19,18 @@ namespace LCT.Common
         public static void HttpException(Exception ex,HttpResponseMessage responce, string exceptionSource) 
         {
             if (400 <=Convert.ToInt32(responce.StatusCode) && Convert.ToInt32(responce.StatusCode) <= 499)
-            Logger.Error(ex.Message+": Exception might cause of wrong/missing token for " + exceptionSource + ", please ensure to give valid token and try again");
+            Logger.Error(ex.Message+ ": The exception may be caused by an incorrect or missing token for " + exceptionSource + ", Please ensure that a valid token is provided and try again");
             throw new Exception(ex.ToString());
         }
         public static void InternalException(Exception ex, HttpResponseMessage responce, string exceptionSource)
         {
             if (500 <= Convert.ToInt32(responce.StatusCode) && Convert.ToInt32(responce.StatusCode) <= 599)
-            Logger.Error(ex.Message + ": Exception might cause of "+ exceptionSource  + " is not responding at this moment, please try again after sometime");
+            Logger.Error(ex.Message + ": The exception may arise because " + exceptionSource  + " is currently unresponsive. Please try again later");
             throw new Exception(ex.ToString());
         }
         public static void GenericExceptions(Exception ex, string exceptionSource)
         {
-            Logger.Error(ex.Message+" : exception occured due to some unknown reason from "+ exceptionSource);
+            Logger.Error(ex.Message+ " : An exception has occurred due to unknown reasons originating from " + exceptionSource);
             throw new Exception(ex.ToString());
         }
     }
