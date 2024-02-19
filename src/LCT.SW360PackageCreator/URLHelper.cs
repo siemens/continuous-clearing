@@ -231,6 +231,10 @@ namespace LCT.SW360PackageCreator
             try
             {
                 localPathforSourceRepo = $"{Directory.GetParent(Directory.GetCurrentDirectory())}\\ClearingTool\\DownloadedFiles\\";
+                if(!Directory.Exists(localPathforSourceRepo))
+                {
+                    localPathforSourceRepo = Directory.CreateDirectory(localPathforSourceRepo).ToString();                    
+                }
             }
             catch (IOException ex)
             {
