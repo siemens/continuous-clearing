@@ -16,6 +16,7 @@ using LCT.Common;
 using System.Threading.Tasks;
 using LCT.Common.Model;
 using LCT.Services.Interface;
+using LCT.APICommunications.Model.AQL;
 
 namespace PackageIdentifier.UTest
 {
@@ -23,6 +24,7 @@ namespace PackageIdentifier.UTest
     public class BomHelperUnitTests
     {
         private readonly Mock<IProcessor> mockIProcessor = new Mock<IProcessor>();
+  
 
         [TestCase]
         public async Task GetRepoDetails_GivenProjectTypeAsDebian_ReturnsListOFComponents()
@@ -44,17 +46,26 @@ namespace PackageIdentifier.UTest
                 ProjectType = "DEBIAN",
                 Debian = new Config()
                 {
-                    JfrogNpmRepoList = new string[] { "here" }
+                    JfrogDebianRepoList = new string[] { "here" }
                 },
                 JFrogApi = "https://jfrogapi"
             };
-
+            List<AqlResult> aqlResultList = new()
+            {
+                new()
+                {
+                    Path="test/test",
+                    Name="compoenent",
+                    Repo="remote"
+                }
+            };
             mockIProcessor.Setup(x => x.GetJfrogArtifactoryRepoInfo(It.IsAny<CommonAppSettings>(), It.IsAny<ArtifactoryCredentials>(), It.IsAny<Component>(), It.IsAny<string>())).ReturnsAsync(lstComponentForBOM);
-
+    
             IParser parser = new DebianProcessor();
             Mock<IJFrogService> jFrogService = new Mock<IJFrogService>();
             Mock<IBomHelper> bomHelper = new Mock<IBomHelper>();
-
+            bomHelper.Setup(x => x.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>())).ReturnsAsync(aqlResultList);
+      
             //Act
             var expected = await parser.GetJfrogRepoDetailsOfAComponent(lstComponentForBOM, appSettings, jFrogService.Object, bomHelper.Object);
 
