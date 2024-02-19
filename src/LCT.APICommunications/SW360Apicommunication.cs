@@ -111,8 +111,7 @@ namespace LCT.APICommunications
             }
             catch (HttpRequestException ex)
             {
-                ExceptionHandling.HandleHttpException(ex,"");
-               
+                LogExceptionHandling.HttpException(ex,result,"Sw360");
             }
             return result;
         }

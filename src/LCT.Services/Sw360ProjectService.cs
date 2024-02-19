@@ -39,39 +39,27 @@ namespace LCT.Services
         /// <param name="projectId">projectId</param>
         /// <param name="projectName">projectName</param>
         /// <returns>string</returns>
-        public async Task<string> GetProjectNameByProjectIDFromSW360(string projectId, string projectName)
+        public async Task<HttpResponseMessage> GetProjectNameByProjectIDFromSW360(string projectId, string projectName)
         {
-            string sw360ProjectName = string.Empty;
-
+            var httpStatus = new HttpResponseMessage();
             try
             {
-                var response = await m_SW360ApiCommunicationFacade.GetProjectById(projectId);
-                if (response == null || !response.IsSuccessStatusCode)
-                {
-                    return string.Empty;
-                }
-
-                string result = response?.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
+                httpStatus = await m_SW360ApiCommunicationFacade.GetProjectById(projectId);
+                string result = httpStatus?.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
                 if (!string.IsNullOrEmpty(result))
                 {
                     var projectInfo = JsonConvert.DeserializeObject<ProjectReleases>(result);
-                    sw360ProjectName = projectInfo?.Name;
                 }
             }
             catch (HttpRequestException ex)
             {
-                Environment.ExitCode = -1;
-                Logger.Error($"Failed to connect SW360 : {ex.Message}");
-                Logger.Debug($"GetProjectNameByProjectIDFromSW360()", ex);
+                LogExceptionHandling.HttpException(ex, httpStatus, "SW360");
             }
             catch (AggregateException ex)
             {
-                Environment.ExitCode = -1;
-                Logger.Error($"Failed to connect SW360 : {ex.Message}");
-                Logger.Debug($"GetProjectNameByProjectIDFromSW360()", ex);
+                LogExceptionHandling.GenericExceptions(ex,"SW360");
             }
-
-            return sw360ProjectName;
+            return httpStatus;
         }
 
         public async Task<List<ReleaseLinked>> GetAlreadyLinkedReleasesByProjectId(string projectId)
