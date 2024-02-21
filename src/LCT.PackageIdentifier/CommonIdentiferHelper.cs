@@ -20,7 +20,7 @@ namespace LCT.PackageIdentifier
                 if (repoName == NotFoundInRepo)
                 {
                     repoName = aqlResults.Find(x => x.Repo.Contains("devdep"))?.Repo ?? NotFoundInRepo;
-                    if (repoName == NotFoundInRepo)
+                    if (repoName == NotFoundInRepo && aqlResults.Count > 0)
                     {
                         return aqlResults[0].Repo ?? NotFoundInRepo;
                     }
