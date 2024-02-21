@@ -353,7 +353,7 @@ namespace LCT.ArtifactoryUploader
             {
                 return "CONAN";
             }
-            else if (item.Purl.Contains("debian", StringComparison.OrdinalIgnoreCase))
+            else if (item.Purl.Contains("pkg:deb/debian", StringComparison.OrdinalIgnoreCase))
             {
                 return "DEBIAN";
             }

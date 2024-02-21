@@ -197,7 +197,7 @@ namespace LCT.PackageIdentifier
         private static bool IsInternalDebianComponent(
             List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
         {
-            string jfrogcomponentName = $"{component.Name}-{component.Version}.tgz";
+            string jfrogcomponentName = $"{component.Name}-{component.Version}";
             if (aqlResultList.Exists(
                 x => x.Name.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase)))
             {
@@ -205,7 +205,7 @@ namespace LCT.PackageIdentifier
             }
 
             string fullName = bomHelper.GetFullNameOfComponent(component);
-            string fullNameVersion = $"{fullName}-{component.Version}.tgz";
+            string fullNameVersion = $"{fullName}-{component.Version}";
             if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase)
                 && aqlResultList.Exists(
                     x => x.Name.Equals(fullNameVersion, StringComparison.OrdinalIgnoreCase)))
