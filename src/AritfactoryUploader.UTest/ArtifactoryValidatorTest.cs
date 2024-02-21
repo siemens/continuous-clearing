@@ -61,7 +61,7 @@ namespace AritfactoryUploader.UTest
         {
             //Arrange
             JfrogKey jfrogKey = new JfrogKey() { ApiKey = "tyyteye" };
-            HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
+            HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.BadRequest)
             {
                 Content = new ObjectContent<JfrogKey>(jfrogKey, new JsonMediaTypeFormatter(), "application/some-format")
             };
