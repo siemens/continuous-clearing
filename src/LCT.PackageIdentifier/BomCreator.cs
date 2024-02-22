@@ -116,6 +116,9 @@ namespace LCT.PackageIdentifier
                 case "DEBIAN":
                     parser = new DebianProcessor();
                     return await ComponentIdentification(appSettings, parser);
+                case "ALPINE":
+                    parser = new AlpineProcessor();
+                    return await ComponentIdentification(appSettings, parser);
                 case "PYTHON":
                     parser = new PythonProcessor();
                     return await ComponentIdentification(appSettings, parser);

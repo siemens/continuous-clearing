@@ -82,6 +82,8 @@
 
 	<ItemGroup>
 		<Folder Include="Maven\" />
+		<Folder Include="PackageCreatorTestFiles\Alpine\" />
+		<Folder Include="PackageIdentifierTestFiles\Alpine\" />
 	</ItemGroup>
 
 </Project>

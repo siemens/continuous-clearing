@@ -13,15 +13,15 @@ namespace LCT.APICommunications.Model.Foss
     public class ProcessSteps
     {
         [JsonProperty("processStstepNameeps")]
-        public string stepName { get; set; }
+        public string StepName { get; set; }
 
         [JsonProperty("stepStatus")]
-        public string stepStatus { get; set; }
+        public string StepStatus { get; set; }
 
         [JsonProperty("processStepIdInTool")]
-        public string processStepIdInTool { get; set; }
+        public string ProcessStepIdInTool { get; set; }
 
         [JsonProperty("result")]
-        public string result { get; set; }
+        public string Result { get; set; }
     }
 }

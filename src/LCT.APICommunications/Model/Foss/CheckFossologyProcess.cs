@@ -13,7 +13,7 @@ namespace LCT.APICommunications.Model.Foss
     public class CheckFossologyProcess
     {
         [JsonProperty("fossologyProcessInfo")]
-        public FossologyProcessInfo fossologyProcessInfo { get; set; }
+        public FossologyProcessInfo FossologyProcessInfo { get; set; }
 
     }
 }

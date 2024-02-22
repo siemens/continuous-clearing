@@ -84,9 +84,13 @@ namespace LCT.SW360PackageCreator
                     componentsData.ComponentExternalId = item.Purl.Substring(0, item.Purl.IndexOf('@'));
                     componentsData.ReleaseExternalId = item.Purl;
 
-                    Components component = await GetSourceUrl(componentsData.Name, componentsData.Version, componentsData.ProjectType);
+                    Components component = await GetSourceUrl(componentsData.Name, componentsData.Version, componentsData.ProjectType, item.BomRef);
                     componentsData.SourceUrl = component.SourceUrl;
-
+                    
+                    if (componentsData.ProjectType.ToUpperInvariant() == "ALPINE")
+                    {
+                        componentsData.AlpineSourceData = component.AlpineSourceData;
+                    }
 
                     if (componentsData.ProjectType.ToUpperInvariant() == "DEBIAN")
                     {
@@ -175,7 +179,7 @@ namespace LCT.SW360PackageCreator
             }
         }
 
-        private static async Task<Components> GetSourceUrl(string name, string version, string projectType)
+        private static async Task<Components> GetSourceUrl(string name, string version, string projectType, string bomRef)
         {
             Components componentsData = new Components();
             switch (projectType.ToUpperInvariant())
@@ -196,6 +200,11 @@ namespace LCT.SW360PackageCreator
                     break;
                 case "CONAN":
                     componentsData.SourceUrl = await UrlHelper.Instance.GetSourceUrlForConanPackage(name, version);
+                    break;
+                case "ALPINE":
+                    Components alpComponentData = await UrlHelper.Instance.GetSourceUrlForAlpinePackage(name, version,bomRef);
+                    componentsData = alpComponentData;
+                    componentsData.ProjectType = projectType;
                     break;
                 default:
                     break;
@@ -262,6 +271,23 @@ namespace LCT.SW360PackageCreator
                 {
                     await CreateComponentAndRealease(creatorHelper, sw360CreatorService, item, sw360Url, appSettings);
                 }
+
+                if (appSettings.ProjectType.ToUpperInvariant()=="ALPINE")
+                {
+                    string localPathforSourceRepo = UrlHelper.GetDownloadPathForAlpineRepo();
+                    if (Directory.GetDirectories(localPathforSourceRepo).Length != 0)
+                    {
+                        DirectoryInfo di = new DirectoryInfo(localPathforSourceRepo);
+                        foreach (DirectoryInfo dir in di.GetDirectories())
+                        {
+                            if (!dir.Name.Equals("aports"))
+                            {
+                                dir.Delete(true);
+                            }
+                        }
+                    }
+                }
+
             }
             catch (AggregateException ex)
             {
@@ -427,9 +453,9 @@ namespace LCT.SW360PackageCreator
             try
             {
                 CheckFossologyProcess fossResult = await sw360CreatorService.CheckFossologyProcessStatus(link);
-                if (!string.IsNullOrEmpty(fossResult?.fossologyProcessInfo?.externalTool))
+                if (!string.IsNullOrEmpty(fossResult?.FossologyProcessInfo?.ExternalTool))
                 {
-                    uploadId = fossResult?.fossologyProcessInfo?.processSteps[0]?.processStepIdInTool;
+                    uploadId = fossResult?.FossologyProcessInfo?.ProcessSteps[0]?.ProcessStepIdInTool;
                 }
             }
             catch (AggregateException ex)
