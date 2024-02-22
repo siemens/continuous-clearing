@@ -24,7 +24,6 @@ using LCT.Facade.Interfaces;
 using LCT.APICommunications.Interfaces;
 using LCT.APICommunications;
 using LCT.APICommunications.Model;
-using System.Drawing;
 
 namespace LCT.PackageIdentifier
 {
