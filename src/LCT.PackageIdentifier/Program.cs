@@ -87,12 +87,8 @@ namespace LCT.PackageIdentifier
             if (await bomCreator.CheckJFrogConnection())
             {
                 await bomCreator.GenerateBom(appSettings, new BomHelper(), new FileOperations());
-                Logger.Logger.Log(null, Level.Notice, $"End of Package Identifier execution : {DateTime.Now}\n", null);
             }
-            else
-            {
-                Logger.Logger.Log(null, Level.Alert, $"JFrog Connection was not successfull!! \n", null);
-            }
+            Logger.Logger.Log(null, Level.Notice, $"End of Package Identifier execution : {DateTime.Now}\n", null);
         }
 
         private static IJFrogService GetJfrogService(CommonAppSettings appSettings)

@@ -27,6 +27,10 @@ namespace LCT.Facade
             m_jfrogAqlApiCommunication = jfrogAqlApiCommunication;
         }
 
+        /// <summary>
+        /// Checks connectivity with JFrog server
+        /// </summary>
+        /// <returns>HttpResponseMessage</returns>
         public Task<HttpResponseMessage> CheckConnection()
         {
             return m_jfrogAqlApiCommunication.CheckConnection();

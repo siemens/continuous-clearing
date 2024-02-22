@@ -363,10 +363,10 @@ namespace LCT.PackageIdentifier
         {
             string jfrogcomponentPath = $"{component.Name}/{component.Version}";
 
-            var list = aqlResultList.FindAll(x => x.Path.Contains(
+            var aqllist = aqlResultList.FindAll(x => x.Path.Contains(
                 jfrogcomponentPath, StringComparison.OrdinalIgnoreCase));
 
-            string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(list);
+            string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqllist);
 
             return repoName;
         }

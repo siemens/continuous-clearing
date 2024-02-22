@@ -174,16 +174,16 @@ namespace LCT.PackageIdentifier
             {
                 if (response.IsSuccessStatusCode)
                 {
-                    Logger.Logger.Log(null, Level.Warn, $"JFrog Connection was successfull!!", null);
+                    Logger.Logger.Log(null, Level.Info, $"JFrog Connection was successfull!!", null);
                     return true;
                 }
                 else if (response.StatusCode == HttpStatusCode.Unauthorized)
                 {
-                    Logger.Logger.Log(null, Level.Warn, $"Check the JFrog token validity/permission..", null);
+                    Logger.Logger.Log(null, Level.Error, $"Check the JFrog token validity/permission..", null);
                 }
                 else if (response.StatusCode == HttpStatusCode.NotFound)
                 {
-                    Logger.Logger.Log(null, Level.Warn, $"Check the provided JFrog server details..", null);
+                    Logger.Logger.Log(null, Level.Error, $"Check the provided JFrog server details..", null);
                 }
             }
             return false;
