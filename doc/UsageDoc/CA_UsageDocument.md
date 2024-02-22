@@ -225,7 +225,7 @@ Currently LTA support is not provided for SBOM, hence until that is implemented 
       - **Project Type :**  **Alpine** 
 
    	      **Note** : below steps is required only if you have `tar` file to process , otherwise you can keep `CycloneDx.json` file in the InputDirectory.
-   	`       Note : Alpine package support in clearing tool is currently only for SBOM discovery and classification.Component Creation and Source code identification is not supported currently`
+   	`       
           *  Create `InputImage` directory for keeping `tar` images and `InputDirectory` for resulted file storing .
 
           *  Run the command given below by replacing the place holder values (i.e., path to input image directory, path to input directory and file name of the Alpine image to be cleared) with actual values.
