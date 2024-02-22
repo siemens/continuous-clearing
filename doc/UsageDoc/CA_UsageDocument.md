@@ -270,8 +270,8 @@ Currently LTA support is not provided for SBOM, hence until that is implemented 
   "IdentifierBomFilePath": "",
 //CycloneDxSBomTemplatePath : To be used when customer is providing manual SBOM template
   "CycloneDxSBomTemplatePath": "/PathToSBOMTemplateFile",
-  "ArtifactoryUploadApiKey": "<Insert ArtifactoryUploadApiKey in a secure way>",//This should be Jfrog Key
-  "ArtifactoryUploadUser": "<Insert ArtifactoryUploadUser>",//This should be Jfrog user name
+  "ArtifactoryUploadApiKey": "<Insert ArtifactoryUploadApiKey in a secure way>",//This should be Jfrog Ref token
+  "ArtifactoryUploadUser": "<Insert ArtifactoryUploadUser>",//This should be Jfrog user name and it's Optional
   "RemoveDevDependency": true,
   "EnableFossTrigger": true,
   "Release": false,
