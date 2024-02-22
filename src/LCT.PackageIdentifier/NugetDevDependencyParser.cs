@@ -310,8 +310,6 @@ namespace LCT.PackageIdentifier
 
             string filePath = foundFiles.First();
 
-            nuGetComponent.Md5 = GetFileHash(filePath, MD5.Create());
-            nuGetComponent.Sha1 = GetFileHash(filePath, SHA1.Create());
             nuGetComponent.Sha256 = GetFileHash(filePath, SHA256.Create());
         }
 

@@ -55,10 +55,19 @@
     <ProjectReference Include="..\UnitTestUtilities\UnitTestUtilities.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <None Update="PackageIdentifierUTTestFiles\AlpineSourceDetails_Cyclonedx.cdx.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="PackageIdentifierUTTestFiles\conan.lock">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="PackageIdentifierUTTestFiles\CycloneDX2_Alpine.cdx.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="PackageIdentifierUTTestFiles\CycloneDX2_Python.cdx.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\CycloneDX_Alpine.cdx.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="PackageIdentifierUTTestFiles\Cyclonedx_Debian.cdx.json">
@@ -118,19 +127,61 @@
     <None Update="PackageIdentifierUTTestFiles\PythonTestProject\tests\__init__.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOMAlpineCATemplate.cdx.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOMDebianCATemplate.cdx.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOMTemplate_Alpine.cdx.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOMTemplate_Debian.cdx.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOMTemplate_Maven.cdx.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOMTemplate_MavenCATemplate.cdx.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOMTemplate_Npm.cdx.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOMTemplate_NpmCATemplate.cdx.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOMTemplate_Nuget.cdx.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOMTemplate_NugetCATemplate.cdx.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOMTemplate_Python.cdx.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOMTemplate_PythonCATemplate.cdx.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOM_AlpineCATemplate.cdx.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOM_ConanCATemplate.cdx.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOM_DebianCATemplate.cdx.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOM_MavenCATemplate.cdx.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOM_NpmCATemplate.cdx.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOM_NugetCATemplate.cdx.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOM_PythonCATemplate.cdx.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="PackageIdentifierUTTestFiles\SourceDetails_Cyclonedx.cdx.json">
