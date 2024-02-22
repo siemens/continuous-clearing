@@ -174,7 +174,7 @@ namespace LCT.PackageIdentifier
             {
                 if (response.IsSuccessStatusCode)
                 {
-                    Logger.Logger.Log(null, Level.Warn, $"JFrog Connection was successfull!! \n", null);
+                    Logger.Logger.Log(null, Level.Warn, $"JFrog Connection was successfull!!", null);
                     return true;
                 }
                 else if (response.StatusCode == HttpStatusCode.Unauthorized)
