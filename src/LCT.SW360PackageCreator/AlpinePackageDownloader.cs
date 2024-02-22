@@ -114,6 +114,10 @@ namespace LCT.SW360PackageCreator
                     {
                         Process p = new Process();
 
+                        p.StartInfo.RedirectStandardError = false;
+                        p.StartInfo.RedirectStandardOutput = true;
+                        p.StartInfo.RedirectStandardInput = true;
+                        p.StartInfo.UseShellExecute = false;
                         p.StartInfo.CreateNoWindow = true;
                         p.StartInfo.FileName = Path.Combine(@"git");
                         p.StartInfo.Arguments = "init";
@@ -126,9 +130,9 @@ namespace LCT.SW360PackageCreator
                     foreach (var fileNames in buildFilesList)
                     {
                         var fileName = fileNames.Trim();
-                        if (fileName.Contains(".patch"))
+                        string patchFileFolder = localPathforSourceRepo + Dataconstant.ForwardSlash + "aports" + Dataconstant.ForwardSlash + "main" + Dataconstant.ForwardSlash + component.Name + Dataconstant.ForwardSlash + fileName;
+                        if (fileName.Contains(".patch")&& File.Exists(patchFileFolder))
                         {
-                            string patchFileFolder = localPathforSourceRepo + Dataconstant.ForwardSlash + "aports" + Dataconstant.ForwardSlash + "main" + Dataconstant.ForwardSlash + component.Name + Dataconstant.ForwardSlash + fileName;
                             ApplyPatchsToSourceCode(patchFileFolder, sourceCodezippedFolder);
                         }
                     }
@@ -247,6 +251,10 @@ namespace LCT.SW360PackageCreator
         private static void ApplyPatchsToSourceCode(string patchFileFolder, string sourceCodezippedFolder)
         {
             Process p = new Process();
+            p.StartInfo.RedirectStandardError = true;
+            p.StartInfo.RedirectStandardOutput = true;
+            p.StartInfo.RedirectStandardInput = true;
+            p.StartInfo.UseShellExecute = false;
             p.StartInfo.CreateNoWindow = true;
             p.StartInfo.FileName = Path.Combine(@"git");
             p.StartInfo.Arguments = $"apply" + " " + patchFileFolder;

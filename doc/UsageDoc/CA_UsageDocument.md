@@ -48,7 +48,7 @@
 <!--te-->
 # Introduction
 
-The Continuous Clearing Tool helps the Project Manager/Developer to automate the sw360 clearing process of 3rd party components. This tool scans and identifies the third-party components used in a NPM, NUGET, MAVEN, PYTHON, CONAN and Debian  projects and makes an entry in SW360, if it is not present. Continuous Clearing Tool links the components to the respective project and creates job for code scan in FOSSology.The output is an SBOM file which has a nested description of software artifact components and metadata.
+The Continuous Clearing Tool helps the Project Manager/Developer to automate the sw360 clearing process of 3rd party components. This tool scans and identifies the third-party components used in a NPM, NUGET, MAVEN, PYTHON, CONAN, Alpine and Debian  projects and makes an entry in SW360, if it is not present. Continuous Clearing Tool links the components to the respective project and creates job for code scan in FOSSology.The output is an SBOM file which has a nested description of software artifact components and metadata.
 
 Continuous Clearing Tool reduces the effort in creating components in SW360 and identifying the matching source codes from the public repository. Tool eliminates the manual error while creating component and identifying correct version of source code from public repository. Continuous Clearing Tool harmonize the creation of 3P components in SW360 by filling necessary information.
 
@@ -89,10 +89,12 @@ Currently LTA support is not provided for SBOM, hence until that is implemented 
 - Package Identifier
 
    - [NPM/NUGET/MAVEN/PYTHON/CONAN](../usagedocimg/packageIdentifiernpmnuget.PNG)
-   - [Debian](../usagedocimg/packageIdentifierdebian.PNG)
+   - [Debian/Alpine](../usagedocimg/packageIdentifierdebianalpine.PNG)
 - SW360 Package Creator
   - [NPM/NUGET/MAVEN/PYTHON/CONAN](../usagedocimg/packageCreatirnpmnuget.PNG)
   - [Debian](../usagedocimg/packagecreatordebian.PNG)
+  - [Alpine](../usagedocimg/ComponentcreaterforAlpine.PNG) 
+  
 - Artifactory Uploader
   - [NPM/NUGET/MAVEN/PYTHON/CONAN](../usagedocimg/artifactoryuploader.PNG)
  
@@ -220,7 +222,22 @@ Currently LTA support is not provided for SBOM, hence until that is implemented 
              ![image.png](../usagedocimg/output.PNG)
            
              Resulted `output.json` file will be having the list of installed packages  and the same file will be used as  an input to `Continuous clearing tool - Bom creator` as an argument(`--packagefilepath`). The remaining process is same as other project types.
+      - **Project Type :**  **Alpine** 
 
+   	      **Note** : below steps is required only if you have `tar` file to process , otherwise you can keep `CycloneDx.json` file in the InputDirectory.
+   	`       Note : Alpine package support in clearing tool is currently only for SBOM discovery and classification.Component Creation and Source code identification is not supported currently`
+          *  Create `InputImage` directory for keeping `tar` images and `InputDirectory` for resulted file storing .
+
+          *  Run the command given below by replacing the place holder values (i.e., path to input image directory, path to input directory and file name of the Alpine image to be cleared) with actual values.
+
+              **Example**:   `docker run --rm -v <path/to/InputImageDirectory>:/tmp/InputImages -v <path/to/InputDirectory>:/tmp/OutputFiles ghcr.io/siemens/continuous-clearing ./syft packages /tmp/InputImages/<fileNameoftheAlpineImageTobeCleared.tar> -o cyclonedx-json --file "/tmp/OutputFiles/output.json"`
+
+
+             After successful execution, `output.json` (_CycloneDX.json_) file will be created in specified directory
+
+             ![image.png](../usagedocimg/output.PNG)
+
+             Resulted `output.json` file will be having the list of installed packages  and the same file will be used as  an input to `Continuous clearing tool - Bom creator` as an argument(`--packagefilepath`). The remaining process is same as other project types.
 
 ### **Configuring the Continuous Clearing Tool**
 
@@ -308,6 +325,11 @@ Currently LTA support is not provided for SBOM, hence until that is implemented 
     "Exclude": [],
     "ExcludedComponents": []
   },
+  "Alpine": {
+    "Include": [ "*.json" ],
+    "Exclude": [],
+    "ExcludedComponents": []
+  },
   "Python": {
     "Include": [ "poetry.lock", "*.cdx.json" ],
     "Exclude": [],
@@ -347,7 +369,7 @@ Description for the settings in `appSettings.json` file
 | 3 |--bomfolderpath | Path to keep the generated boms  |  Yes , For Docker run /mnt/Output    | D:\Clearing Automation\BOM
 |  4| --sw360token  |  SW360 Auth Token |  Yes| Refer the SW360 Doc [here](https://www.eclipse.org/sw360/docs/development/restapi/access).Make sure you pass this credential in a secured way. |
 | 5 | --sw360projectid |  Project ID from SW360 project URL of the project  |  Yes| Obtained from SW360 |
-|  6|  --projecttype    | Type of the package         | Yes |  NPM/NUGET/Debian/MAVEN |
+|  6|  --projecttype    | Type of the package         | Yes |  NPM/NUGET/Debian/MAVEN/Alpine |
 |7 | --removedevdependency  |  Make this field to `true` , if Dev dependencies needs to be excluded from clearing |  Optional ( By default set to true) | true/false |
 | 8|  --sw360url  |  SW360 URL              |Yes |  https://<my_sw360_server>|
 |  9| --sw360authtokentype   |  SW360 Auth Token  |Yes  | Token/Bearer |
@@ -426,7 +448,7 @@ Continuous Clearing Tool can be executed as container or as binaries,
 
 ###  Artifactory Uploader
 
-  * Artifactory uploader is **_`not applicable for Debian type package`_** clearance.
+  * Artifactory uploader is **_`not applicable for Debian and Alpine  type package`_** clearance.
 
   *  In order to run the Artifactory Uploader dll , execute the below command.
   
@@ -456,7 +478,7 @@ Continuous Clearing Tool can be executed as container or as binaries,
 
 ###  Artifactory Uploader
 
-  * Artifactory uploader is **_`not applicable for Debian type package`_** clearance.
+  * Artifactory uploader is **_`not applicable for Debian and Alpine  type package`_** clearance.
 
   *  In order to run the Artifactory Uploader exe, execute the below command.
   

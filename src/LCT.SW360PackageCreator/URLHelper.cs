@@ -266,7 +266,11 @@ namespace LCT.SW360PackageCreator
                 foreach (string command in gitCommands)
                 {
                     Process p = new Process();
-                    p.StartInfo.CreateNoWindow = true;
+                    p.StartInfo.RedirectStandardError = true;
+                    p.StartInfo.RedirectStandardOutput = true;
+                    p.StartInfo.RedirectStandardInput = true;
+                    p.StartInfo.UseShellExecute = false;
+                    p.StartInfo.CreateNoWindow = true;                    
                     p.StartInfo.FileName = Path.Combine(@"git");
                     p.StartInfo.Arguments = command;
                     p.StartInfo.WorkingDirectory = localPathforSourceRepo;
@@ -279,6 +283,10 @@ namespace LCT.SW360PackageCreator
             else
             {
                 Process p = new Process();
+                p.StartInfo.RedirectStandardError = true;
+                p.StartInfo.RedirectStandardOutput = true;
+                p.StartInfo.RedirectStandardInput = true;
+                p.StartInfo.UseShellExecute = false;
                 p.StartInfo.CreateNoWindow = true;
                 p.StartInfo.FileName = Path.Combine(@"git");
                 p.StartInfo.Arguments = gitCommands[1];
@@ -298,6 +306,10 @@ namespace LCT.SW360PackageCreator
         {
 
             Process p = new Process();
+            p.StartInfo.RedirectStandardError = true;
+            p.StartInfo.RedirectStandardOutput = true;
+            p.StartInfo.RedirectStandardInput = true;
+            p.StartInfo.UseShellExecute = false;
             p.StartInfo.CreateNoWindow = true;
             p.StartInfo.FileName = Path.Combine(@"git");
             p.StartInfo.Arguments = $"checkout" + " " + alpineDistro;
