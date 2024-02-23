@@ -176,9 +176,10 @@ namespace LCT.PackageIdentifier
         {
 
             string jfrogcomponentName = $"{component.Name}_{component.Version}";
+            var aqlResults = aqlResultList.FindAll(x => x.Name.Contains(
+                jfrogcomponentName, StringComparison.OrdinalIgnoreCase));
 
-            string repoName = aqlResultList.Find(x => x.Name.Contains(
-                jfrogcomponentName, StringComparison.OrdinalIgnoreCase))?.Repo ?? NotFoundInRepo;
+            string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults);
 
             string fullName = bomHelper.GetFullNameOfComponent(component);
             string fullNameVersion = $"{fullName}";
@@ -186,8 +187,10 @@ namespace LCT.PackageIdentifier
             if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase) &&
                 repoName.Equals(NotFoundInRepo, StringComparison.OrdinalIgnoreCase))
             {
-                repoName = aqlResultList.Find(x => x.Name.Equals(
-                    fullNameVersion, StringComparison.OrdinalIgnoreCase))?.Repo ?? NotFoundInRepo;
+                var aqllist = aqlResultList.FindAll(x => x.Name.Contains(
+                jfrogcomponentName, StringComparison.OrdinalIgnoreCase));
+
+                repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqllist);
             }
 
             return repoName;
@@ -280,7 +283,7 @@ namespace LCT.PackageIdentifier
                 //since it's Discovered from syft Tool
                 Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.Discovered };
                 Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
-                component.Properties = new List<Property> { identifierType,isDev };
+                component.Properties = new List<Property> { identifierType, isDev };
 
                 listComponentForBOM.Add(component);
             }
