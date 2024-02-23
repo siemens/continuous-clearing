@@ -33,5 +33,6 @@ namespace LCT.Common.Model
         public string ReleaseLink { get; set; }
         public string FossologyLink { get; set; }
         public string ReleaseID { get; set; }
+        public string AlpineSource { get; set; }
     }
 }

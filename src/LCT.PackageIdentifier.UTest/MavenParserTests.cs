@@ -46,7 +46,7 @@ namespace LCT.PackageIdentifier.UTest
             Bom bom = MavenProcessor.ParsePackageFile(appSettings);
 
             //Assert
-            Assert.That(bom.Components.Count, Is.EqualTo(2), "Returns the count of components");
+            Assert.That(bom.Components.Count, Is.EqualTo(1), "Returns the count of components");
             Assert.That(bom.Dependencies.Count, Is.EqualTo(4), "Returns the count of dependencies");
 
         }
@@ -299,7 +299,7 @@ namespace LCT.PackageIdentifier.UTest
         public void ParsePackageFile_GivenAInputFilePathAlongWithSBOMTemplate_ReturnTotalComponentsList()
         {
             //Arrange
-            int expectednoofcomponents = 1;
+            int expectednoofcomponents = 2;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
             string filepath = outFolder + @"\PackageIdentifierUTTestFiles";
@@ -312,7 +312,7 @@ namespace LCT.PackageIdentifier.UTest
                 ProjectType = "MAVEN",
                 RemoveDevDependency = true,
                 Maven = new Config() { Include = Includes, Exclude = Excludes },
-                CycloneDxSBomTemplatePath = filepath + "\\SBOMTemplates\\SBOMTemplate_Maven.cdx.json"
+                CycloneDxSBomTemplatePath = filepath + "\\SBOMTemplates\\SBOM_MavenCATemplate.cdx.json"
             };
 
             MavenProcessor MavenProcessor = new MavenProcessor();

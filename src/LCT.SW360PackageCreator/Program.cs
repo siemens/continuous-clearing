@@ -15,6 +15,7 @@ using LCT.Services.Interface;
 using LCT.SW360PackageCreator.Interfaces;
 using log4net;
 using log4net.Core;
+using NuGet.Protocol.Plugins;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -54,6 +55,10 @@ namespace LCT.SW360PackageCreator
 
             Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Package creator >>>>>====================", null);
             Logger.Logger.Log(null, Level.Notice, $"\nStart of Package creator execution : {DateTime.Now}", null);
+            if (appSettings.ProjectType.ToUpperInvariant() == "ALPINE")
+            { 
+                Logger.Error($"\nPlease note that the Alpine feature is currently in preview state. This means it's available for testing and evaluation purposes. While functional, it may not yet include all planned features and could encounter occasional issues. Your feedback during this preview phase is appreciated as we work towards its official release. Thank you for exploring Alpine with us.");
+            }
 
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Alert, $"Package creator is running in TEST mode \n", null);
@@ -107,7 +112,8 @@ namespace LCT.SW360PackageCreator
             {
                 { "NPM", new PackageDownloader() },
                 { "NUGET", new PackageDownloader() },
-                { "DEBIAN", new DebianPackageDownloader(debianPatcher) }
+                { "DEBIAN", new DebianPackageDownloader(debianPatcher) },
+                { "ALPINE", new AlpinePackageDownloader() }
             };
 
             ICreatorHelper creatorHelper = new CreatorHelper(_packageDownloderList);

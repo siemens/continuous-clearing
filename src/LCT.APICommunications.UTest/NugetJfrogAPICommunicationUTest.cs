@@ -70,5 +70,19 @@ namespace LCT.APICommunications.UTest
             //Assert
             Assert.ThrowsAsync<InvalidOperationException>(() => { jfrogApicommunication.UpdatePackagePropertiesInJfrog("", "", uploadArgs); return Task.CompletedTask; });
         }
+
+        [Test]
+        public void NugetJfrogApiCommunication_MoveFromRepo_ReturnsInvalidOperationException()
+        {
+            //Arrange
+            ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials();
+            ComponentsToArtifactory cmpts = new ComponentsToArtifactory();
+
+            //Act
+            JfrogApicommunication jfrogApicommunication = new NugetJfrogApiCommunication("", "", repoCredentials, 100);
+
+            //Assert
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApicommunication.MoveFromRepo(cmpts));
+        }
     }
 }

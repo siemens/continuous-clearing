@@ -28,15 +28,15 @@ namespace LCT.ArtifactoryUploader
             JfrogApiCommunication = jfrogApiCommunication;
         }
 
-         public async Task ValidateArtifactoryCredentials(CommonAppSettings appSettings)
-         {
-         HttpResponseMessage responseMessage = await JfrogApiCommunication.GetApiKey();
+        public async Task ValidateArtifactoryCredentials(CommonAppSettings appSettings)
+        {
+            HttpResponseMessage responseMessage = await JfrogApiCommunication.GetApiKey();
 
-        if (responseMessage.StatusCode != HttpStatusCode.OK)
-         {
-         Logger.Error("Artifactory Token entered is invalid!");
-         throw new InvalidDataException($"Invalid Artifactory Token");
-         }
+            if (responseMessage.StatusCode != HttpStatusCode.OK)
+            {
+                Logger.Error("Artifactory Token entered is invalid!");
+                throw new InvalidDataException($"Invalid Artifactory Token");
+            }
         }
     }
 }

@@ -51,7 +51,7 @@ namespace LCT.Services
                     return string.Empty;
                 }
 
-                string result = response?.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
+                string result = response.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
                 if (!string.IsNullOrEmpty(result))
                 {
                     var projectInfo = JsonConvert.DeserializeObject<ProjectReleases>(result);
