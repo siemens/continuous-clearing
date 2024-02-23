@@ -32,6 +32,7 @@ namespace LCT.APICommunications
         public const string ConanExternalID = "pkg:conan/";
         public const string NpmExtension = ".tgz";
         public const string NugetExtension = ".nupkg";
+        public const string DebianExtension = ".debian";
         public const string MavenExtension = "-sources.jar";
         public const string PythonExtension = ".whl";
         public const string PackageInfoApi = "/api/storage/";
