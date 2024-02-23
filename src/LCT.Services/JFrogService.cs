@@ -15,6 +15,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 
 namespace LCT.Services
 {
@@ -64,7 +65,7 @@ namespace LCT.Services
             return aqlResult;
         }
 
-#nullable enable
+        #nullable enable
         public async Task<AqlResult?> GetPackageInfo(string repoName, string packageName, string path)
         {
             HttpResponseMessage? httpResponseMessage = null;
@@ -92,6 +93,14 @@ namespace LCT.Services
             }
 
             return aqlResult;
+        }
+
+        public async Task<HttpResponseMessage> CheckJFrogConnectivity()
+        {
+            HttpResponseMessage? httpResponseMessage = null;
+            httpResponseMessage = await m_JFrogApiCommunicationFacade.CheckConnection();
+
+            return httpResponseMessage;
         }
     }
 }

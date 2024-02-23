@@ -6,6 +6,7 @@
 
 using LCT.APICommunications.Model.AQL;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace LCT.Services.Interface
@@ -30,5 +31,7 @@ namespace LCT.Services.Interface
         /// <returns>AqlResult</returns>
 #nullable enable
         public Task<AqlResult?> GetPackageInfo(string repoName, string packageName, string path);
+
+        public Task<HttpResponseMessage> CheckJFrogConnectivity();
     }
 }

@@ -15,6 +15,7 @@ using log4net;
 using log4net.Core;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -164,6 +165,28 @@ namespace LCT.PackageIdentifier
                 Logger.Debug($"ComponentIdentification: {ex}");
             }
             return bom;
+        }
+
+        public async Task<bool> CheckJFrogConnection()
+        {
+            var response = await JFrogService.CheckJFrogConnectivity();
+            if (response != null)
+            {
+                if (response.IsSuccessStatusCode)
+                {
+                    Logger.Logger.Log(null, Level.Info, $"JFrog Connection was successfull!!", null);
+                    return true;
+                }
+                else if (response.StatusCode == HttpStatusCode.Unauthorized)
+                {
+                    Logger.Logger.Log(null, Level.Error, $"Check the JFrog token validity/permission..", null);
+                }
+                else if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    Logger.Logger.Log(null, Level.Error, $"Check the provided JFrog server details..", null);
+                }
+            }
+            return false;
         }
     }
 }
