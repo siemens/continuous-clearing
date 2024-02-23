@@ -29,5 +29,11 @@ namespace LCT.Facade.Interfaces
         /// <param name="path">repoName</param>
         /// <returns>AqlResult</returns>
         Task<HttpResponseMessage> GetPackageInfo(string repoName, string packageName, string path);
+
+        /// <summary>
+        /// Checks connectivity with JFrog server
+        /// </summary>
+        /// <returns>HttpResponseMessage</returns>
+        Task<HttpResponseMessage> CheckConnection();
     }
 }

@@ -21,6 +21,7 @@ namespace LCT.Common.Model
         public string[] JfrogNpmRepoList { get; set; }
         public string[] JfrogNugetRepoList { get; set; }
         public string[] JfrogMavenRepoList { get; set; }
+        public string[] JfrogDebianRepoList { get; set; }
         public string[] JfrogPythonRepoList { get; set; }
         public string[] JfrogConanRepoList { get; set; }
         public string JfrogThirdPartyDestRepoName { get; set; }

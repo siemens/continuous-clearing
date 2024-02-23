@@ -113,6 +113,13 @@ namespace LCT.SW360PackageCreator
             {
                 downloadPath = await GetAttachmentUrlList(component, localPathforDownload);
             }
+            else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["ALPINE"]))
+            {
+                if (!string.IsNullOrEmpty(component.SourceUrl))
+                {
+                    downloadPath = await _packageDownloderList["ALPINE"].DownloadPackage(component, localPathforDownload);
+                }
+            }
             else
             {
                 downloadPath = await _packageDownloderList["NPM"].DownloadPackage(component, localPathforDownload);
@@ -214,6 +221,7 @@ namespace LCT.SW360PackageCreator
                 mapper.DownloadUrl = item.DownloadUrl;
                 mapper.ComponentStatus = GetComponentAvailabilityStatus(componentsAvailableInSw360, item);
                 mapper.ReleaseStatus = IsReleaseAvailable(item.Name, item.Version, item.ReleaseExternalId);
+                mapper.AlpineSource = item.AlpineSourceData;
                 if (!string.IsNullOrEmpty(item.ReleaseExternalId) && item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
                 {
                     if ((string.IsNullOrEmpty(item.SourceUrl) || item.SourceUrl == Dataconstant.SourceUrlNotFound) && !string.IsNullOrEmpty(releasesInfo.SourceCodeDownloadUrl))
@@ -229,10 +237,10 @@ namespace LCT.SW360PackageCreator
                     mapper.DownloadUrl = GetMavenDownloadUrl(mapper, item, releasesInfo);
                 }
                 else if (!string.IsNullOrEmpty(item.ReleaseExternalId) && 
-                            (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["PYTHON"]) || item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CONAN"])))
+                            (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["PYTHON"]) || item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CONAN"]) || item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["ALPINE"])))
                 {
-                    mapper.DownloadUrl = mapper.SourceUrl;
-                }
+                    mapper.DownloadUrl = mapper.SourceUrl;                    
+                }                
                 else
                 {
                     mapper.DownloadUrl = GetComponentDownloadUrl(mapper, item, repo, releasesInfo);
@@ -315,6 +323,10 @@ namespace LCT.SW360PackageCreator
             try
             {
                 if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
+                {
+                    localPathforDownload = $"{Directory.GetParent(Directory.GetCurrentDirectory())}/ClearingTool/DownloadedFiles/";
+                }
+                else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["ALPINE"]))
                 {
                     localPathforDownload = $"{Directory.GetParent(Directory.GetCurrentDirectory())}/ClearingTool/DownloadedFiles/";
                 }

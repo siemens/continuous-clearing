@@ -9,6 +9,7 @@ using LCT.APICommunications.Model;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -34,6 +35,13 @@ namespace LCT.APICommunications
             DomainName = repoDomainName;
             ArtifactoryCredentials = artifactoryCredentials;
             TimeoutInSec = timeout;
+        }
+
+        public async Task<HttpResponseMessage> CheckConnection()
+        {
+            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
+            string url = $"{DomainName}/api/security/apiKey";
+            return await httpClient.GetAsync(url);
         }
 
         /// <summary>
@@ -80,9 +88,8 @@ namespace LCT.APICommunications
         private static HttpClient GetHttpClient(ArtifactoryCredentials credentials)
         {
             HttpClient httpClient = new HttpClient();
-
-            httpClient.DefaultRequestHeaders.Add(ApiConstant.JFrog_API_Header, credentials.ApiKey);
-            httpClient.DefaultRequestHeaders.Add(ApiConstant.Email, credentials.Email);
+            httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", credentials.ApiKey);
             return httpClient;
         }
 
@@ -125,5 +132,7 @@ namespace LCT.APICommunications
 
             return await httpClient.PostAsync(uri, httpContent);
         }
+
+
     }
 }

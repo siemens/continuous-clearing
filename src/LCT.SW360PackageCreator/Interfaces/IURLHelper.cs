@@ -56,5 +56,14 @@ namespace LCT.SW360PackageCreator.Interfaces
         /// <param name="componenVersion"></param>
         /// <returns>string</returns>
         Task<string> GetSourceUrlForConanPackage(string componentName, string componenVersion);
+
+        /// <summary>
+        /// Gets the SourceUrl For Alpine Package
+        /// </summary>
+        /// <param name="componentName"></param>
+        /// <param name="componenVersion"></param>
+        /// <param name="bomRef"></param>
+        /// <returns>string</returns>
+        Task<Components> GetSourceUrlForAlpinePackage(string componentName, string componenVersion, string bomRef);
     }
 }

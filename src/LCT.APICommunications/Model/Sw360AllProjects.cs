@@ -33,7 +33,7 @@ namespace LCT.APICommunications.Model
         [JsonProperty("_links")]
         public Links Links { get; set; }
 
-        [JsonProperty("LinkedReleases")]
+        [JsonProperty("linkedReleases")]
         public IList<LinkedReleases> LinkedReleases { get; set; }
 
     }

@@ -29,5 +29,11 @@ namespace LCT.APICommunications.Interfaces
         /// <param name="path">repoName</param>
         /// <returns>AqlResult</returns>
         Task<HttpResponseMessage> GetPackageInfo(string repoName, string packageName = null, string path = null);
+
+        /// <summary>
+        /// Checks connectivity with JFrog server
+        /// </summary>
+        /// <returns>HttpResponseMessage</returns>
+        Task<HttpResponseMessage> CheckConnection();
     }
 }

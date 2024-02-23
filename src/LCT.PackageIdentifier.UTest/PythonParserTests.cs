@@ -33,7 +33,7 @@ namespace PackageIdentifier.UTest
         public void ParseCycloneDXFile_GivenAMultipleInputFilePath_ReturnsCounts()
         {
             //Arrange
-            int expectednoofcomponents = 10;
+            int expectednoofcomponents = 9;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "*_Python.cdx.json" };
@@ -110,7 +110,7 @@ namespace PackageIdentifier.UTest
         public void ParseCycloneDXFile_GivenMultipleInputFiles_ReturnsCountOfDuplicates()
         {
             //Arrange
-            int duplicateComponents = 2;
+            int duplicateComponents = 1;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "*_Python.cdx.json" };
@@ -145,7 +145,7 @@ namespace PackageIdentifier.UTest
                 ProjectType = "PYTHON",
                 RemoveDevDependency = true,
                 Python = new Config() { Include = Includes },
-                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOMTemplate_Python.cdx.json"
+                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOM_PythonCATemplate.cdx.json"
             };
 
             //Act
