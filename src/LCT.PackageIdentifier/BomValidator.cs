@@ -20,7 +20,6 @@ namespace LCT.PackageIdentifier
         {
             string sw360ProjectName = await bomService.GetProjectNameByProjectIDFromSW360(appSettings.SW360ProjectID, appSettings.SW360ProjectName);
 
-
             if (string.IsNullOrEmpty(sw360ProjectName))
             {
                 throw new InvalidDataException($"Invalid Project Id - {appSettings.SW360ProjectID}");
