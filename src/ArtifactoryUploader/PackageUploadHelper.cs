@@ -12,7 +12,6 @@ using LCT.APICommunications.Model.AQL;
 using LCT.ArtifactoryUploader.Model;
 using LCT.Common;
 using LCT.Common.Constants;
-using LCT.Common.Model;
 using LCT.Services;
 using LCT.Services.Interface;
 using log4net;
@@ -69,12 +68,7 @@ namespace LCT.ArtifactoryUploader
         {
             Logger.Debug("Starting GetComponentsToBeUploadedToArtifactory() method");
             List<ComponentsToArtifactory> componentsToBeUploaded = new List<ComponentsToArtifactory>();
-            List<ComponentsToArtifactory> unknownPackagesofNPM = new List<ComponentsToArtifactory>();
-            List<ComponentsToArtifactory> unknownPackagesofNuget = new List<ComponentsToArtifactory>();
-            List<ComponentsToArtifactory> unknownPackagesofMaven = new List<ComponentsToArtifactory>();
-            List<ComponentsToArtifactory> unknownPackagesofPython = new List<ComponentsToArtifactory>();
-            List<ComponentsToArtifactory> unknownPackagesofConan = new List<ComponentsToArtifactory>();
-            List<ComponentsToArtifactory> unknownPackagesofOthers = new List<ComponentsToArtifactory>();
+
             foreach (var item in comparisonBomData)
             {
                 var packageType = GetPackageType(item);
@@ -118,92 +112,11 @@ namespace LCT.ArtifactoryUploader
                 {
                     PackageUploader.uploaderKpiData.ComponentNotApproved++;
                     PackageUploader.uploaderKpiData.PackagesNotUploadedToJfrog++;
-                    await AddUnknownPackagesAsync(item, unknownPackagesofNPM, unknownPackagesofNuget, unknownPackagesofMaven, unknownPackagesofPython, unknownPackagesofConan, unknownPackagesofOthers);
+                    Logger.Warn($"Package {item.Name}-{item.Version} is not in report approved state,hence artifactory upload will not be done!");
                 }
             }
-
-            DisplaySortedComponents(unknownPackagesofNPM, unknownPackagesofNuget, unknownPackagesofMaven, unknownPackagesofPython, unknownPackagesofConan, unknownPackagesofOthers);
-
             Logger.Debug("Ending GetComponentsToBeUploadedToArtifactory() method");
             return componentsToBeUploaded;
-        }
-
-        private static void DisplaySortedForeachComponents(List<ComponentsToArtifactory> data, string name)
-        {
-            if (data.Any())
-            {
-                Logger.Info("\n" + name + "\n");
-                foreach (var npmPackage in data)
-                {
-                    Logger.Warn($"Package {npmPackage.Name}-{npmPackage.Version} is not in report approved state,hence artifactory upload will not be done!");
-                }
-            }
-
-        }
-
-        private static void DisplaySortedComponents(List<ComponentsToArtifactory> unknownPackagesofNPM, List<ComponentsToArtifactory> unknownPackagesofNuget, List<ComponentsToArtifactory> unknownPackagesofMaven, List<ComponentsToArtifactory> unknownPackagesofPython, List<ComponentsToArtifactory> unknownPackagesofConan, List<ComponentsToArtifactory> unknownPackagesofOthers)
-        {
-            DisplaySortedForeachComponents(unknownPackagesofNPM, "NPM");
-            DisplaySortedForeachComponents(unknownPackagesofNuget, "Nuget");
-            DisplaySortedForeachComponents(unknownPackagesofMaven, "NPM");
-            DisplaySortedForeachComponents(unknownPackagesofConan, "Maven");
-            DisplaySortedForeachComponents(unknownPackagesofPython, "Python");
-            DisplaySortedForeachComponents(unknownPackagesofOthers, "");
-
-            Logger.Info("\n");
-
-        }
-
-        private static Task<ComponentsToArtifactory> GetUnknownPackageinfo(Component item)
-        {
-
-            ComponentsToArtifactory components = new ComponentsToArtifactory()
-            {
-                Name = item.Name,
-                Version = item.Version
-            };
-            return Task.FromResult(components);
-
-        }
-
-        private static async Task AddUnknownPackagesAsync(Component item, List<ComponentsToArtifactory> unknownPackagesofNPM, List<ComponentsToArtifactory> unknownPackagesofNuget, List<ComponentsToArtifactory> unknownPackagesofMaven, List<ComponentsToArtifactory> unknownPackagesofPython, List<ComponentsToArtifactory> unknownPackagesofConan, List<ComponentsToArtifactory> unknownPackagesofOthers)
-        {
-            string GetPropertyValue(string propertyName) =>
-                  item.Properties
-                      .Find(p => p.Name == propertyName)?
-                      .Value?
-                      .ToUpperInvariant();
-            if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "NPM")
-            {
-                ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
-                unknownPackagesofNPM.Add(components);
-            }
-            else if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "NUGET")
-            {
-                ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
-                unknownPackagesofNuget.Add(components);
-            }
-            else if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "MAVEN")
-            {
-                ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
-                unknownPackagesofMaven.Add(components);
-            }
-            else if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "PYTHON")
-            {
-                ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
-                unknownPackagesofPython.Add(components);
-            }
-            else if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "CONAN")
-            {
-                ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
-                unknownPackagesofConan.Add(components);
-            }
-            else
-            {
-                ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
-                unknownPackagesofOthers.Add(components);
-            }
-
         }
 
         private static PackageType GetPackageType(Component item)
