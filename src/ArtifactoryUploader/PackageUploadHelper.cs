@@ -67,7 +67,14 @@ namespace LCT.ArtifactoryUploader
         public async static Task<List<ComponentsToArtifactory>> GetComponentsToBeUploadedToArtifactory(List<Component> comparisonBomData, CommonAppSettings appSettings)
         {
             Logger.Debug("Starting GetComponentsToBeUploadedToArtifactory() method");
-            List<ComponentsToArtifactory> componentsToBeUploaded = new List<ComponentsToArtifactory>();
+            List<ComponentsToArtifactory> componentsToBeUploaded = new List<ComponentsToArtifactory>();            
+            UnknownPackagesAll unknownPackagesAll = new UnknownPackagesAll();
+            unknownPackagesAll.UnknownPackagesNpm = new List<ComponentsToArtifactory>();
+            unknownPackagesAll.UnknownPackagesNuget= new List<ComponentsToArtifactory>();
+            unknownPackagesAll.UnknownPackagesMaven = new List<ComponentsToArtifactory>();
+            unknownPackagesAll.UnknownPackagesConan = new List<ComponentsToArtifactory>();
+            unknownPackagesAll.UnknownPackagesPython = new List<ComponentsToArtifactory>();
+            unknownPackagesAll.UnknownPackagesDebian = new List<ComponentsToArtifactory>();
 
             foreach (var item in comparisonBomData)
             {
@@ -106,17 +113,98 @@ namespace LCT.ArtifactoryUploader
                     components.CopyPackageApiUrl = GetCopyURL(components);
                     components.MovePackageApiUrl = GetMoveURL(components);
                     components.JfrogPackageName = GetJfrogPackageName(components);
-                   componentsToBeUploaded.Add(components);
+                    componentsToBeUploaded.Add(components);
                 }
                 else
                 {
                     PackageUploader.uploaderKpiData.ComponentNotApproved++;
                     PackageUploader.uploaderKpiData.PackagesNotUploadedToJfrog++;
-                    Logger.Warn($"Package {item.Name}-{item.Version} is not in report approved state,hence artifactory upload will not be done!");
-                }               
+                    await AddUnknownPackagesAsync(item,unknownPackagesAll);
+                }
             }
+            DisplaySortedComponents(unknownPackagesAll);
             Logger.Debug("Ending GetComponentsToBeUploadedToArtifactory() method");
             return componentsToBeUploaded;
+        }
+
+        private static void DisplaySortedForeachComponents(List<ComponentsToArtifactory> packageDetails, string name)
+        {
+            if (packageDetails.Any())
+            {
+                Logger.Info("\n" + name + "\n");
+                foreach (var npmPackage in packageDetails)
+                {
+                    Logger.Warn($"Package {npmPackage.Name}-{npmPackage.Version} is not in report approved state,hence artifactory upload will not be done!");
+                }
+            }
+
+        }
+
+        private static void DisplaySortedComponents(UnknownPackagesAll unknownPackagesAlls)
+        {
+            DisplaySortedForeachComponents(unknownPackagesAlls.UnknownPackagesNpm, "NPM");
+            DisplaySortedForeachComponents(unknownPackagesAlls.UnknownPackagesNuget, "Nuget");
+            DisplaySortedForeachComponents(unknownPackagesAlls.UnknownPackagesMaven, "Maven");
+            DisplaySortedForeachComponents(unknownPackagesAlls.UnknownPackagesConan, "Conan");
+            DisplaySortedForeachComponents(unknownPackagesAlls.UnknownPackagesPython, "Python");
+            DisplaySortedForeachComponents(unknownPackagesAlls.UnknownPackagesDebian, "Debian");
+
+            Logger.Info("\n");
+
+        }
+
+        private static Task<ComponentsToArtifactory> GetUnknownPackageinfo(Component item)
+        {
+
+            ComponentsToArtifactory components = new ComponentsToArtifactory()
+            {
+                Name = item.Name,
+                Version = item.Version
+            };
+            return Task.FromResult(components);
+
+        }
+
+        private static async Task AddUnknownPackagesAsync(Component item, UnknownPackagesAll unknownPackagesAll)
+        {
+            string GetPropertyValue(string propertyName) =>
+                  item.Properties
+                      .Find(p => p.Name == propertyName)?
+                      .Value?
+                      .ToUpperInvariant();
+                        
+            if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "NPM")
+            {
+                
+                ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
+                unknownPackagesAll.UnknownPackagesNpm.Add(components);
+            }
+            else if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "NUGET")
+            {
+                ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
+                unknownPackagesAll.UnknownPackagesNuget.Add(components);
+            }
+            else if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "MAVEN")
+            {
+                ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
+                unknownPackagesAll.UnknownPackagesPython.Add(components);
+            }
+            else if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "PYTHON")
+            {
+                ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
+                unknownPackagesAll.UnknownPackagesMaven.Add(components);
+            }
+            else if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "CONAN")
+            {
+                ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
+                unknownPackagesAll.UnknownPackagesConan.Add(components);
+            }
+            else
+            {
+                ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
+                unknownPackagesAll.UnknownPackagesDebian.Add(components);
+            }
+
         }
 
         private static PackageType GetPackageType(Component item)
@@ -173,9 +261,9 @@ namespace LCT.ArtifactoryUploader
                 // Add a wild card to the path end for jFrog AQL query search
                 component.Path = $"{component.Path}/*";
             }
-            else if(component.ComponentType == "DEBIAN")
+            else if (component.ComponentType == "DEBIAN")
             {
-                url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension,"")}*" +
+                url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*" +
                            $"?to=/{component.DestRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*";
             }
             else
@@ -215,7 +303,7 @@ namespace LCT.ArtifactoryUploader
                 // Add a wild card to the path end for jFrog AQL query search
                 component.Path = $"{component.Path}/*";
             }
-            else if(component.ComponentType == "DEBIAN")
+            else if (component.ComponentType == "DEBIAN")
             {
                 url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*" +
                           $"?to=/{component.DestRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*";
@@ -273,7 +361,7 @@ namespace LCT.ArtifactoryUploader
                     break;
 
                 case "DEBIAN":
-                    packageName = $"{component.PackageName}_{component.Version.Replace(ApiConstant.DebianExtension, "")+"*"}";
+                    packageName = $"{component.PackageName}_{component.Version.Replace(ApiConstant.DebianExtension, "") + "*"}";
                     break;
 
                 case "PYTHON":
