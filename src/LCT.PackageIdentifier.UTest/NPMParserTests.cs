@@ -107,7 +107,7 @@ namespace LCT.PackageIdentifier.UTest
         public void ParseCycloneDXFile_GivenMultipleInputFiles_ReturnsCounts()
         {
             //Arrange
-            int expectednoofcomponents = 6;
+            int expectednoofcomponents = 5;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             NpmProcessor npmProcessor = new NpmProcessor();
@@ -144,7 +144,7 @@ namespace LCT.PackageIdentifier.UTest
                 ProjectType = "NPM",
                 RemoveDevDependency = true,
                 Npm = new Config() { Include = Includes },
-                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOMTemplate_Npm.cdx.json"
+                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOM_NpmCATemplate.cdx.json"
             };
 
             //Act

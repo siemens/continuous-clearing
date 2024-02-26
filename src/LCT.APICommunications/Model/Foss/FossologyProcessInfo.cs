@@ -14,9 +14,9 @@ namespace LCT.APICommunications.Model.Foss
     {
 
         [JsonProperty("externalTool")]
-        public string externalTool { get; set; }
+        public string ExternalTool { get; set; }
 
         [JsonProperty("processSteps")]
-        public ProcessSteps[] processSteps { get; set; }
+        public ProcessSteps[] ProcessSteps { get; set; }
     }
 }

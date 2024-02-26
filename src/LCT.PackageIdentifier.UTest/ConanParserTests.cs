@@ -243,5 +243,32 @@ namespace PackageIdentifier.UTest
 
             Assert.That("Not Found in JFrogRepo", Is.EqualTo(reponameActual));
         }
+
+        [Test]
+        public void ParsePackageConfig_GivenAInputFilePathAlongWithSBOMTemplate_ReturnTotalComponentsList()
+        {
+            //Arrange
+            int expectednoofcomponents = 1;
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string OutFolder = Path.GetDirectoryName(exePath);
+            ConanProcessor conanProcessor = new ConanProcessor();
+            string[] Includes = { "SBOM_ConanCATemplate.cdx.json" };
+            string packagefilepath = OutFolder + @"\PackageIdentifierUTTestFiles";
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                PackageFilePath = packagefilepath,
+                ProjectType = "CONAN",
+                RemoveDevDependency = true,
+                Conan = new Config() { Include = Includes },
+                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOM_ConanCATemplate.cdx.json"
+            };
+
+            //Act
+            Bom listofcomponents = conanProcessor.ParsePackageFile(appSettings);
+
+            //Assert
+            Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
+        }
     }
 }

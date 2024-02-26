@@ -242,5 +242,7 @@ namespace LCT.Common
                 listComponentForBOM.Add(component);
             }
         }
+
+        
     }
 }

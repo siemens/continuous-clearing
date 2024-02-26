@@ -70,7 +70,7 @@ namespace PackageIdentifier.UTest
         public void ParsePackageConfig_GivenMultipleInputFiles_ReturnsCountOfDuplicates()
         {
             //Arrange
-            int duplicateComponents = 2;
+            int duplicateComponents = 1;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             DebianProcessor DebianProcessor = new DebianProcessor();
@@ -133,7 +133,7 @@ namespace PackageIdentifier.UTest
                 ProjectType = "DEBIAN",
                 RemoveDevDependency = true,
                 Debian = new Config() { Include = Includes },
-                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOMTemplate_Debian.cdx.json"
+                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOM_DebianCATemplate.cdx.json"
             };
 
             //Act

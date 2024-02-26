@@ -8,7 +8,6 @@ using LCT.APICommunications;
 using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.AQL;
-using LCT.Services;
 using LCT.Services.Interface;
 using log4net;
 using System;
@@ -121,6 +120,10 @@ namespace LCT.ArtifactoryUploader
 
             var packageInfo = await jFrogService.GetPackageInfo(component.SrcRepoName, component.JfrogPackageName, component.Path);
 
+            if (component.ComponentType == "DEBIAN" && packageInfo.Name != component.JfrogPackageName)
+            {
+                component.CopyPackageApiUrl = component.CopyPackageApiUrl.Replace(component.JfrogPackageName, packageInfo.Name);
+            }
             if (packageInfo == null)
             {
                 // Retry with lowercase parameters

@@ -53,6 +53,10 @@ namespace LCT.PackageIdentifier
             Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Package Identifier >>>>>====================", null);
             Logger.Logger.Log(null, Level.Notice, $"\nStart of Package Identifier execution: {DateTime.Now}", null);
 
+            if (appSettings.ProjectType.ToUpperInvariant() == "ALPINE")
+            {
+                Logger.Error($"\nPlease note that the Alpine feature is currently in preview state. This means it's available for testing and evaluation purposes. While functional, it may not yet include all planned features and could encounter occasional issues. Your feedback during this preview phase is appreciated as we work towards its official release. Thank you for exploring Alpine with us.");
+            }
 
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Alert, $"Package Identifier is running in TEST mode \n", null);
@@ -78,8 +82,12 @@ namespace LCT.PackageIdentifier
             IBomCreator bomCreator = new BomCreator();
             bomCreator.JFrogService = GetJfrogService(appSettings);
             bomCreator.BomHelper = new BomHelper();
-            await bomCreator.GenerateBom(appSettings, new BomHelper(), new FileOperations());
 
+            //Validating JFrog Settings
+            if (await bomCreator.CheckJFrogConnection())
+            {
+                await bomCreator.GenerateBom(appSettings, new BomHelper(), new FileOperations());
+            }
             Logger.Logger.Log(null, Level.Notice, $"End of Package Identifier execution : {DateTime.Now}\n", null);
         }
 
@@ -90,7 +98,7 @@ namespace LCT.PackageIdentifier
                 ApiKey = appSettings.ArtifactoryUploadApiKey
             };
             IJfrogAqlApiCommunication jfrogAqlApiCommunication =
-                new JfrogAqlApiCommunication(appSettings.JFrogApi, artifactoryUpload,appSettings.TimeOut);
+                new JfrogAqlApiCommunication(appSettings.JFrogApi, artifactoryUpload, appSettings.TimeOut);
             IJfrogAqlApiCommunicationFacade jFrogApiCommunicationFacade =
                 new JfrogAqlApiCommunicationFacade(jfrogAqlApiCommunication);
             IJFrogService jFrogService = new JFrogService(jFrogApiCommunicationFacade);

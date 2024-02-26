@@ -320,6 +320,42 @@ namespace NUnitTestProject1
             Assert.That(list.Count == 1);
         }
 
+        [Test]
+        public async Task CycloneDxBomParser_Alpine_Component_Passing_ReturnsSuccess()
+        {
+            //Arrange
+
+            List<Property> properties = new List<Property>();
+            properties.Add(new Property()
+            {
+                Name = "internal:siemens:clearing:project-type",
+                Value = "ALPINE"
+            });
+
+            Bom bom = new Bom();
+            bom.Components = new List<Component>()
+                {
+                    new Component() { Name = "apk-tools",Version="2.12.9-r3",Group="",BomRef="pkg:apk/alpine/alpine-keys@2.4-r1?distro=alpine-3.16.2",Purl="pkg:apk/alpine/apk-tools@2.12.9-r3?arch=source",Properties = properties },
+                };
+
+            CommonAppSettings CommonAppSettings = new CommonAppSettings();
+            List<ComparisonBomData> comparisonBomData = new List<ComparisonBomData>();
+            comparisonBomData.Add(new ComparisonBomData());
+            var sw360Service = new Mock<ISW360Service>();
+            var creatorHelper = new Mock<ICreatorHelper>();
+            var parser = new Mock<ICycloneDXBomParser>();
+            parser.Setup(x => x.ParseCycloneDXBom(It.IsAny<string>())).Returns(bom);
+            creatorHelper.Setup(x => x.SetContentsForComparisonBOM(It.IsAny<List<Components>>(), sw360Service.Object)).ReturnsAsync(comparisonBomData);
+            var cycloneDXBomParser = new ComponentCreator();
+
+            //Act
+            var list = await cycloneDXBomParser.CycloneDxBomParser(CommonAppSettings, sw360Service.Object, parser.Object, creatorHelper.Object);
+
+
+            //Assert
+            Assert.That(list.Count > 0);
+        }
+
     }
 }
 
