@@ -39,15 +39,20 @@ namespace LCT.ArtifactoryUploader
             DiplayAllSettings(m_ComponentsInBOM.Components, appSettings);
             uploaderKpiData.ComponentInComparisonBOM = m_ComponentsInBOM.Components.Count;
 
-            List<ComponentsToArtifactory> m_ComponentsToBeUploaded = await PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(m_ComponentsInBOM.Components, appSettings);
+            UnknownPackagesAll unknownPackagesAll = PackageUploadHelper.GetComponentsToBePackages();           
+
+            List<ComponentsToArtifactory> m_ComponentsToBeUploaded = await PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(m_ComponentsInBOM.Components, appSettings,unknownPackagesAll);
             //Uploading the component to artifactory
 
             uploaderKpiData.PackagesToBeUploaded = m_ComponentsToBeUploaded.Count(x => x.PackageType == PackageType.ClearedThirdParty);
             uploaderKpiData.DevPackagesToBeUploaded = m_ComponentsToBeUploaded.Count(x => x.PackageType == PackageType.Development);
             uploaderKpiData.InternalPackagesToBeUploaded = m_ComponentsToBeUploaded.Count(x => x.PackageType == PackageType.Internal);
 
-            await PackageUploadHelper.UploadingThePackages(m_ComponentsToBeUploaded, appSettings.TimeOut);
-
+            await PackageUploadHelper.UploadingThePackages(m_ComponentsToBeUploaded, appSettings.TimeOut, unknownPackagesAll);
+            
+            //Display packages information 
+            PackageUploadHelper.DisplayPackageUploadInformation(unknownPackagesAll);
+            
             //Updating the component's new location
             var fileOperations = new FileOperations();
             string bomGenerationPath = Path.GetDirectoryName(appSettings.BomFilePath);
