@@ -7,6 +7,7 @@
 using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
 using Moq;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using System.Net;
 using System.Net.Http;
@@ -142,12 +143,12 @@ namespace LCT.Facade.UTest
             //Arrange 
             HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK);
             Mock<ISw360ApiCommunication> mockSw360comm = new Mock<ISw360ApiCommunication>();
-            mockSw360comm.Setup(x => x.LinkReleasesToProject(It.IsAny<string[]>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
+            mockSw360comm.Setup(x => x.LinkReleasesToProject(It.IsAny<HttpContent>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
 
             //Act          
             sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object, true);
-            HttpResponseMessage actual =await sW360ApicommunicationFacade.LinkReleasesToProject(
-                new string[] { "releasefowerjr393", "r3rilmmdlmawin48u" }, "ieuroejfklsndksdoldmfiosdfowemlfiwe");
+            StringContent content = new StringContent(JsonConvert.SerializeObject("{ \"12345\" : { \"releaseRelation\" : \"UNKNOWN\", \"comment\" : \"Test Comment 1\" }, \"54321\" : { \"releaseRelation\" : \"UNKNOWN\", \"comment\" : \"Test Comment 2\" } }"), Encoding.UTF8, "application/json");
+            HttpResponseMessage actual =await sW360ApicommunicationFacade.LinkReleasesToProject(content, "ieuroejfklsndksdoldmfiosdfowemlfiwe");
 
             //Assert
             Assert.That(actual.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -159,12 +160,12 @@ namespace LCT.Facade.UTest
             //Arrange 
             HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK);
             Mock<ISw360ApiCommunication> mockSw360comm = new Mock<ISw360ApiCommunication>();
-            mockSw360comm.Setup(x => x.LinkReleasesToProject(It.IsAny<string[]>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
+            mockSw360comm.Setup(x => x.LinkReleasesToProject(It.IsAny<HttpContent>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
 
             //Act          
             sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object, false);
-            HttpResponseMessage actual =await sW360ApicommunicationFacade.LinkReleasesToProject(
-                new string[] { "releasefowerjr393", "r3rilmmdlmawin48u" }, "ieuroejfklsndksdoldmfiosdfowemlfiwe");
+            StringContent content = new StringContent(JsonConvert.SerializeObject("{ \"12345\" : { \"releaseRelation\" : \"UNKNOWN\", \"comment\" : \"Test Comment 1\" }, \"54321\" : { \"releaseRelation\" : \"UNKNOWN\", \"comment\" : \"Test Comment 2\" } }"), Encoding.UTF8, "application/json");
+            HttpResponseMessage actual =await sW360ApicommunicationFacade.LinkReleasesToProject(content, "ieuroejfklsndksdoldmfiosdfowemlfiwe");
 
             //Assert
             Assert.That(actual.StatusCode, Is.EqualTo(HttpStatusCode.OK));
