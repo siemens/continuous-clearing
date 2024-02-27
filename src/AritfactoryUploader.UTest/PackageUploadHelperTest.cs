@@ -16,6 +16,7 @@ using System.IO;
 using UnitTestUtilities;
 using System.Threading.Tasks;
 using System.Linq;
+using LCT.ArtifactoryUploader.Model;
 
 namespace AritfactoryUploader.UTest
 {
@@ -74,9 +75,9 @@ namespace AritfactoryUploader.UTest
                 JFrogApi = UTParams.JFrogURL,
                 LogFolderPath = outFolder
             };
-
+            UnknownPackagesAll unknownPackagesAll = new();
             //Act
-            List<ComponentsToArtifactory> uploadList = await PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(componentLists, appSettings);
+            List<ComponentsToArtifactory> uploadList = await PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(componentLists, appSettings, unknownPackagesAll);
             // Assert
             Assert.That(3, Is.EqualTo(uploadList.Count), "Checks for 2  no of components to upload");
         }
@@ -106,9 +107,9 @@ namespace AritfactoryUploader.UTest
                 JFrogApi = UTParams.JFrogURL,
                 LogFolderPath = outFolder
             };
-
+            UnknownPackagesAll unknownPackagesAll = new();
             //Act
-            List<ComponentsToArtifactory> uploadList = await PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(componentLists, appSettings);
+            List<ComponentsToArtifactory> uploadList = await PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(componentLists, appSettings, unknownPackagesAll);
 
             // Assert
             Assert.That(4, Is.EqualTo(uploadList.Count), "Checks for 3 no of components to upload");
@@ -134,9 +135,9 @@ namespace AritfactoryUploader.UTest
                 },
                 JFrogApi = UTParams.JFrogURL
             };
-
+            UnknownPackagesAll unknownPackagesAll = new();
             //Act
-            List<ComponentsToArtifactory> uploadList =await PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(componentLists, appSettings);
+            List<ComponentsToArtifactory> uploadList =await PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(componentLists, appSettings, unknownPackagesAll);
 
             // Assert
             Assert.That(0, Is.EqualTo(uploadList.Count), "Checks for components to upload to be zero");
