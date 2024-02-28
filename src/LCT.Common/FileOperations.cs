@@ -166,8 +166,8 @@ namespace LCT.Common
 
         private static void BackupTheGivenFile(string folderPath, string fileName)
         {
-            string oldFile = Path.Combine(folderPath, fileName);
-            string newFile = string.Format("{0}/{1:MM-dd-yyyy_HHmm}_Backup_{2}", folderPath, DateTime.Now, fileName);
+            string oldFile = Path.Combine(folderPath, fileName);            
+            string newFile = string.Format("{0}/{1:MM-dd-yyyy_HHmm_ss}_Backup_{2}", folderPath, DateTime.Now, fileName);
             Logger.Debug($"BackupTheGivenFile():oldFile{oldFile},newFile{newFile}");
             try
             {
