@@ -178,16 +178,19 @@ namespace LCT.Common
                 }
             }
             catch (IOException ex)
-            {
-                Logger.Debug($"BackupTheGivenFile():", ex);
+            {                
+                Logger.Error($"BackupTheGivenFile():", ex);
+                Environment.ExitCode = -1;
             }
             catch (NotSupportedException ex)
             {
-                Logger.Debug($"BackupTheGivenFile():", ex);
+                Logger.Error($"BackupTheGivenFile():", ex);
+                Environment.ExitCode = -1;
             }
             catch (UnauthorizedAccessException ex)
             {
-                Logger.Debug($"BackupTheGivenFile():", ex);
+                Logger.Error($"BackupTheGivenFile():", ex);
+                Environment.ExitCode = -1;
             }
         }
     }
