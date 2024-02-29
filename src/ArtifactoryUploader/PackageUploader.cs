@@ -36,19 +36,19 @@ namespace LCT.ArtifactoryUploader
 
             uploaderKpiData.ComponentInComparisonBOM = m_ComponentsInBOM.Components.Count;
 
-            UnknownPackagesAll unknownPackagesAll = PackageUploadHelper.GetComponentsToBePackages();           
+            PackagesForErrorDisplay packagesForErrorDisplay = PackageUploadHelper.GetComponentsToBePackages();           
 
-            List<ComponentsToArtifactory> m_ComponentsToBeUploaded = await PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(m_ComponentsInBOM.Components, appSettings,unknownPackagesAll);
+            List<ComponentsToArtifactory> m_ComponentsToBeUploaded = await PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(m_ComponentsInBOM.Components, appSettings, packagesForErrorDisplay);
             //Uploading the component to artifactory
 
             uploaderKpiData.PackagesToBeUploaded = m_ComponentsToBeUploaded.Count(x => x.PackageType == PackageType.ClearedThirdParty);
             uploaderKpiData.DevPackagesToBeUploaded = m_ComponentsToBeUploaded.Count(x => x.PackageType == PackageType.Development);
             uploaderKpiData.InternalPackagesToBeUploaded = m_ComponentsToBeUploaded.Count(x => x.PackageType == PackageType.Internal);
 
-            await PackageUploadHelper.UploadingThePackages(m_ComponentsToBeUploaded, appSettings.TimeOut, unknownPackagesAll);
+            await PackageUploadHelper.UploadingThePackages(m_ComponentsToBeUploaded, appSettings.TimeOut, packagesForErrorDisplay);
             
             //Display packages information 
-            PackageUploadHelper.DisplayPackageUploadInformation(unknownPackagesAll);
+            PackageUploadHelper.DisplayPackageUploadInformation(packagesForErrorDisplay);
             
             //Updating the component's new location
             var fileOperations = new FileOperations();

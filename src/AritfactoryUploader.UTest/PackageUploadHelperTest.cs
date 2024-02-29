@@ -65,7 +65,7 @@ namespace AritfactoryUploader.UTest
             List<Component> componentLists = GetComponentList();
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            UnknownPackagesAll unknownPackagesAll = PackageUploadHelper.GetComponentsToBePackages();
+            PackagesForErrorDisplay packagesForErrorDisplay = PackageUploadHelper.GetComponentsToBePackages();
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ArtifactoryUploadApiKey = "wfwfwfwfwegwgweg",
@@ -78,7 +78,7 @@ namespace AritfactoryUploader.UTest
             };
 
             //Act
-            List<ComponentsToArtifactory> uploadList = await PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(componentLists, appSettings, unknownPackagesAll);
+            List<ComponentsToArtifactory> uploadList = await PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(componentLists, appSettings, packagesForErrorDisplay);
             // Assert
             Assert.That(3, Is.EqualTo(uploadList.Count), "Checks for 2  no of components to upload");
         }
@@ -89,7 +89,7 @@ namespace AritfactoryUploader.UTest
         {
             //Arrange
             List<Component> componentLists = GetComponentList();
-            UnknownPackagesAll unknownPackagesAll = PackageUploadHelper.GetComponentsToBePackages();
+            PackagesForErrorDisplay packagesForErrorDisplay = PackageUploadHelper.GetComponentsToBePackages();
             foreach (var component in componentLists)
             {
                 if (component.Name == "@angular/core")
@@ -111,7 +111,7 @@ namespace AritfactoryUploader.UTest
             };
 
             //Act
-            List<ComponentsToArtifactory> uploadList = await PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(componentLists, appSettings, unknownPackagesAll);
+            List<ComponentsToArtifactory> uploadList = await PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(componentLists, appSettings, packagesForErrorDisplay);
 
             // Assert
             Assert.That(4, Is.EqualTo(uploadList.Count), "Checks for 3 no of components to upload");
@@ -122,7 +122,7 @@ namespace AritfactoryUploader.UTest
         {
             //Arrange
             List<Component> componentLists = GetComponentList();
-            UnknownPackagesAll unknownPackagesAll = PackageUploadHelper.GetComponentsToBePackages();
+            PackagesForErrorDisplay packagesForErrorDisplay = PackageUploadHelper.GetComponentsToBePackages();
             foreach (var component in componentLists)
             {
                 component.Properties[1].Value = "NEW_CLEARING";
@@ -140,7 +140,7 @@ namespace AritfactoryUploader.UTest
             };
 
             //Act
-            List<ComponentsToArtifactory> uploadList =await PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(componentLists, appSettings, unknownPackagesAll);
+            List<ComponentsToArtifactory> uploadList =await PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(componentLists, appSettings, packagesForErrorDisplay);
 
             // Assert
             Assert.That(0, Is.EqualTo(uploadList.Count), "Checks for components to upload to be zero");

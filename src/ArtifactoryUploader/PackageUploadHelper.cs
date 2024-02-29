@@ -64,7 +64,7 @@ namespace LCT.ArtifactoryUploader
             return componentsToBoms;
         }
 
-        public async static Task<List<ComponentsToArtifactory>> GetComponentsToBeUploadedToArtifactory(List<Component> comparisonBomData, CommonAppSettings appSettings, UnknownPackagesAll unknownPackagesAll)
+        public async static Task<List<ComponentsToArtifactory>> GetComponentsToBeUploadedToArtifactory(List<Component> comparisonBomData, CommonAppSettings appSettings, PackagesForErrorDisplay packagesForErrorDisplay)
         {
             Logger.Debug("Starting GetComponentsToBeUploadedToArtifactory() method");
             List<ComponentsToArtifactory> componentsToBeUploaded = new List<ComponentsToArtifactory>();
@@ -112,7 +112,7 @@ namespace LCT.ArtifactoryUploader
                 {
                     PackageUploader.uploaderKpiData.ComponentNotApproved++;
                     PackageUploader.uploaderKpiData.PackagesNotUploadedToJfrog++;
-                    await AddUnknownPackagesAsync(item,unknownPackagesAll);
+                    await AddUnknownPackagesAsync(item, packagesForErrorDisplay);
                 }
             }
             
@@ -120,36 +120,36 @@ namespace LCT.ArtifactoryUploader
             return componentsToBeUploaded;
         }
 
-        public static UnknownPackagesAll GetComponentsToBePackages()
+        public static PackagesForErrorDisplay GetComponentsToBePackages()
         {
-            UnknownPackagesAll unknownPackagesAll = new UnknownPackagesAll();
-            unknownPackagesAll.UnknownPackagesNpm = new List<ComponentsToArtifactory>();
-            unknownPackagesAll.UnknownPackagesNuget = new List<ComponentsToArtifactory>();
-            unknownPackagesAll.UnknownPackagesMaven = new List<ComponentsToArtifactory>();
-            unknownPackagesAll.UnknownPackagesConan = new List<ComponentsToArtifactory>();
-            unknownPackagesAll.UnknownPackagesPython = new List<ComponentsToArtifactory>();
-            unknownPackagesAll.UnknownPackagesDebian = new List<ComponentsToArtifactory>();
-            unknownPackagesAll.JfrogNotFoundPackagesNpm = new List<ComponentsToArtifactory>();
-            unknownPackagesAll.JfrogNotFoundPackagesNuget = new List<ComponentsToArtifactory>();
-            unknownPackagesAll.JfrogNotFoundPackagesPython = new List<ComponentsToArtifactory>();
-            unknownPackagesAll.JfrogNotFoundPackagesMaven = new List<ComponentsToArtifactory>();
-            unknownPackagesAll.JfrogNotFoundPackagesConan = new List<ComponentsToArtifactory>();
-            unknownPackagesAll.JfrogNotFoundPackagesDebian = new List<ComponentsToArtifactory>();
-            unknownPackagesAll.JfrogFoundPackagesNpm = new List<ComponentsToArtifactory>();
-            unknownPackagesAll.JfrogFoundPackagesNuget = new List<ComponentsToArtifactory>();
-            unknownPackagesAll.JfrogFoundPackagesPython = new List<ComponentsToArtifactory>();
-            unknownPackagesAll.JfrogFoundPackagesMaven = new List<ComponentsToArtifactory>();
-            unknownPackagesAll.JfrogFoundPackagesConan = new List<ComponentsToArtifactory>();
-            unknownPackagesAll.JfrogFoundPackagesDebian = new List<ComponentsToArtifactory>();
-            unknownPackagesAll.SuccessfullPackagesNpm = new List<ComponentsToArtifactory>();
-            unknownPackagesAll.SuccessfullPackagesNuget = new List<ComponentsToArtifactory>();
-            unknownPackagesAll.SuccessfullPackagesPython = new List<ComponentsToArtifactory>();
-            unknownPackagesAll.SuccessfullPackagesMaven = new List<ComponentsToArtifactory>();
-            unknownPackagesAll.SuccessfullPackagesConan = new List<ComponentsToArtifactory>();
-            unknownPackagesAll.SuccessfullPackagesDebian = new List<ComponentsToArtifactory>();
+            PackagesForErrorDisplay packagesForErrorDisplay = new PackagesForErrorDisplay();
+            packagesForErrorDisplay.UnknownPackagesNpm = new List<ComponentsToArtifactory>();
+            packagesForErrorDisplay.UnknownPackagesNuget = new List<ComponentsToArtifactory>();
+            packagesForErrorDisplay.UnknownPackagesMaven = new List<ComponentsToArtifactory>();
+            packagesForErrorDisplay.UnknownPackagesConan = new List<ComponentsToArtifactory>();
+            packagesForErrorDisplay.UnknownPackagesPython = new List<ComponentsToArtifactory>();
+            packagesForErrorDisplay.UnknownPackagesDebian = new List<ComponentsToArtifactory>();
+            packagesForErrorDisplay.JfrogNotFoundPackagesNpm = new List<ComponentsToArtifactory>();
+            packagesForErrorDisplay.JfrogNotFoundPackagesNuget = new List<ComponentsToArtifactory>();
+            packagesForErrorDisplay.JfrogNotFoundPackagesPython = new List<ComponentsToArtifactory>();
+            packagesForErrorDisplay.JfrogNotFoundPackagesMaven = new List<ComponentsToArtifactory>();
+            packagesForErrorDisplay.JfrogNotFoundPackagesConan = new List<ComponentsToArtifactory>();
+            packagesForErrorDisplay.JfrogNotFoundPackagesDebian = new List<ComponentsToArtifactory>();
+            packagesForErrorDisplay.JfrogFoundPackagesNpm = new List<ComponentsToArtifactory>();
+            packagesForErrorDisplay.JfrogFoundPackagesNuget = new List<ComponentsToArtifactory>();
+            packagesForErrorDisplay.JfrogFoundPackagesPython = new List<ComponentsToArtifactory>();
+            packagesForErrorDisplay.JfrogFoundPackagesMaven = new List<ComponentsToArtifactory>();
+            packagesForErrorDisplay.JfrogFoundPackagesConan = new List<ComponentsToArtifactory>();
+            packagesForErrorDisplay.JfrogFoundPackagesDebian = new List<ComponentsToArtifactory>();
+            packagesForErrorDisplay.SuccessfullPackagesNpm = new List<ComponentsToArtifactory>();
+            packagesForErrorDisplay.SuccessfullPackagesNuget = new List<ComponentsToArtifactory>();
+            packagesForErrorDisplay.SuccessfullPackagesPython = new List<ComponentsToArtifactory>();
+            packagesForErrorDisplay.SuccessfullPackagesMaven = new List<ComponentsToArtifactory>();
+            packagesForErrorDisplay.SuccessfullPackagesConan = new List<ComponentsToArtifactory>();
+            packagesForErrorDisplay.SuccessfullPackagesDebian = new List<ComponentsToArtifactory>();
 
 
-            return unknownPackagesAll;
+            return packagesForErrorDisplay;
 
         }
 
@@ -235,14 +235,14 @@ namespace LCT.ArtifactoryUploader
 
             }
         }
-        public static void DisplayPackageUploadInformation(UnknownPackagesAll unknownPackagesAlls)
+        public static void DisplayPackageUploadInformation(PackagesForErrorDisplay packagesForErrorDisplay)
         {
-            DisplaySortedForeachComponents(unknownPackagesAlls.UnknownPackagesNpm,unknownPackagesAlls.JfrogNotFoundPackagesNpm,unknownPackagesAlls.SuccessfullPackagesNpm,unknownPackagesAlls.JfrogFoundPackagesNpm, "NPM:");
-            DisplaySortedForeachComponents(unknownPackagesAlls.UnknownPackagesNuget, unknownPackagesAlls.JfrogNotFoundPackagesNuget, unknownPackagesAlls.SuccessfullPackagesNuget, unknownPackagesAlls.JfrogFoundPackagesNuget, "Nuget:");
-            DisplaySortedForeachComponents(unknownPackagesAlls.UnknownPackagesMaven, unknownPackagesAlls.JfrogNotFoundPackagesMaven, unknownPackagesAlls.SuccessfullPackagesMaven, unknownPackagesAlls.JfrogFoundPackagesMaven, "Maven:");
-            DisplaySortedForeachComponents(unknownPackagesAlls.UnknownPackagesConan, unknownPackagesAlls.JfrogNotFoundPackagesConan, unknownPackagesAlls.SuccessfullPackagesConan, unknownPackagesAlls.JfrogFoundPackagesConan, "Conan:");
-            DisplaySortedForeachComponents(unknownPackagesAlls.UnknownPackagesPython, unknownPackagesAlls.JfrogNotFoundPackagesPython, unknownPackagesAlls.SuccessfullPackagesPython, unknownPackagesAlls.JfrogFoundPackagesPython, "Python:");
-            DisplaySortedForeachComponents(unknownPackagesAlls.UnknownPackagesDebian, unknownPackagesAlls.JfrogNotFoundPackagesDebian, unknownPackagesAlls.SuccessfullPackagesDebian, unknownPackagesAlls.JfrogFoundPackagesDebian, "Debian:");
+            DisplaySortedForeachComponents(packagesForErrorDisplay.UnknownPackagesNpm, packagesForErrorDisplay.JfrogNotFoundPackagesNpm, packagesForErrorDisplay.SuccessfullPackagesNpm, packagesForErrorDisplay.JfrogFoundPackagesNpm, "NPM:");
+            DisplaySortedForeachComponents(packagesForErrorDisplay.UnknownPackagesNuget, packagesForErrorDisplay.JfrogNotFoundPackagesNuget, packagesForErrorDisplay.SuccessfullPackagesNuget, packagesForErrorDisplay.JfrogFoundPackagesNuget, "Nuget:");
+            DisplaySortedForeachComponents(packagesForErrorDisplay.UnknownPackagesMaven, packagesForErrorDisplay.JfrogNotFoundPackagesMaven, packagesForErrorDisplay.SuccessfullPackagesMaven, packagesForErrorDisplay.JfrogFoundPackagesMaven, "Maven:");
+            DisplaySortedForeachComponents(packagesForErrorDisplay.UnknownPackagesConan, packagesForErrorDisplay.JfrogNotFoundPackagesConan, packagesForErrorDisplay.SuccessfullPackagesConan, packagesForErrorDisplay.JfrogFoundPackagesConan, "Conan:");
+            DisplaySortedForeachComponents(packagesForErrorDisplay.UnknownPackagesPython, packagesForErrorDisplay.JfrogNotFoundPackagesPython, packagesForErrorDisplay.SuccessfullPackagesPython, packagesForErrorDisplay.JfrogFoundPackagesPython, "Python:");
+            DisplaySortedForeachComponents(packagesForErrorDisplay.UnknownPackagesDebian, packagesForErrorDisplay.JfrogNotFoundPackagesDebian, packagesForErrorDisplay.SuccessfullPackagesDebian, packagesForErrorDisplay.JfrogFoundPackagesDebian, "Debian:");
 
         }
 
@@ -288,7 +288,7 @@ namespace LCT.ArtifactoryUploader
 
         }
 
-        private static async Task AddUnknownPackagesAsync(Component item, UnknownPackagesAll unknownPackagesAll)
+        private static async Task AddUnknownPackagesAsync(Component item, PackagesForErrorDisplay packagesForErrorDisplay)
         {
             string GetPropertyValue(string propertyName) =>
                   item.Properties
@@ -300,142 +300,142 @@ namespace LCT.ArtifactoryUploader
             {
                 
                 ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
-                unknownPackagesAll.UnknownPackagesNpm.Add(components);
+                packagesForErrorDisplay.UnknownPackagesNpm.Add(components);
             }
             else if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "NUGET")
             {
                 ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
-                unknownPackagesAll.UnknownPackagesNuget.Add(components);
+                packagesForErrorDisplay.UnknownPackagesNuget.Add(components);
             }
             else if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "MAVEN")
             {
                 ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
-                unknownPackagesAll.UnknownPackagesPython.Add(components);
+                packagesForErrorDisplay.UnknownPackagesPython.Add(components);
             }
             else if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "PYTHON")
             {
                 ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
-                unknownPackagesAll.UnknownPackagesMaven.Add(components);
+                packagesForErrorDisplay.UnknownPackagesMaven.Add(components);
             }
             else if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "CONAN")
             {
                 ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
-                unknownPackagesAll.UnknownPackagesConan.Add(components);
+                packagesForErrorDisplay.UnknownPackagesConan.Add(components);
             }
             else if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "DEBIAN")
             {
                 ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
-                unknownPackagesAll.UnknownPackagesDebian.Add(components);
+                packagesForErrorDisplay.UnknownPackagesDebian.Add(components);
             }
 
         }
 
-        private static async Task JfrogNotFoundPackagesAsync(ComponentsToArtifactory item, UnknownPackagesAll unknownPackagesAll)
+        private static async Task JfrogNotFoundPackagesAsync(ComponentsToArtifactory item, PackagesForErrorDisplay packagesForErrorDisplay)
         {
             
             if (item.ComponentType == "NPM")
             {
 
                 ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                unknownPackagesAll.JfrogNotFoundPackagesNpm.Add(components);
+                packagesForErrorDisplay.JfrogNotFoundPackagesNpm.Add(components);
             }
             else if (item.ComponentType == "NUGET")
             {
                 ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                unknownPackagesAll.JfrogNotFoundPackagesNuget.Add(components);
+                packagesForErrorDisplay.JfrogNotFoundPackagesNuget.Add(components);
             }
             else if (item.ComponentType == "MAVEN")
             {
                 ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                unknownPackagesAll.JfrogNotFoundPackagesMaven.Add(components);
+                packagesForErrorDisplay.JfrogNotFoundPackagesMaven.Add(components);
             }
             else if (item.ComponentType == "PYTHON")
             {
                 ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                unknownPackagesAll.JfrogNotFoundPackagesPython.Add(components);
+                packagesForErrorDisplay.JfrogNotFoundPackagesPython.Add(components);
             }
             else if (item.ComponentType == "CONAN")
             {
                 ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                unknownPackagesAll.JfrogNotFoundPackagesConan.Add(components);
+                packagesForErrorDisplay.JfrogNotFoundPackagesConan.Add(components);
             }
             else if (item.ComponentType == "DEBIAN")
             {
                 ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                unknownPackagesAll.JfrogNotFoundPackagesDebian.Add(components);
+                packagesForErrorDisplay.JfrogNotFoundPackagesDebian.Add(components);
             }
 
         }
 
-        public static async Task JfrogFoundPackagesAsync(ComponentsToArtifactory item, UnknownPackagesAll unknownPackagesAll, string operationType, HttpResponseMessage responseMessage,string dryRunSuffix)
+        public static async Task JfrogFoundPackagesAsync(ComponentsToArtifactory item, PackagesForErrorDisplay packagesForErrorDisplay, string operationType, HttpResponseMessage responseMessage,string dryRunSuffix)
         {
 
             if (item.ComponentType == "NPM")
             {
 
                 ComponentsToArtifactory components = await GetPackageinfo(item, operationType, responseMessage, dryRunSuffix);
-                unknownPackagesAll.JfrogFoundPackagesNpm.Add(components);
+                packagesForErrorDisplay.JfrogFoundPackagesNpm.Add(components);
             }
             else if (item.ComponentType == "NUGET")
             {
                 ComponentsToArtifactory components = await GetPackageinfo(item, operationType, responseMessage, dryRunSuffix);
-                unknownPackagesAll.JfrogFoundPackagesNuget.Add(components);
+                packagesForErrorDisplay.JfrogFoundPackagesNuget.Add(components);
             }
             else if (item.ComponentType == "MAVEN")
             {
                 ComponentsToArtifactory components = await GetPackageinfo(item, operationType, responseMessage, dryRunSuffix);
-                unknownPackagesAll.JfrogFoundPackagesMaven.Add(components);
+                packagesForErrorDisplay.JfrogFoundPackagesMaven.Add(components);
             }
             else if (item.ComponentType == "PYTHON")
             {
                 ComponentsToArtifactory components = await GetPackageinfo(item, operationType, responseMessage, dryRunSuffix);
-                unknownPackagesAll.JfrogFoundPackagesPython.Add(components);
+                packagesForErrorDisplay.JfrogFoundPackagesPython.Add(components);
             }
             else if (item.ComponentType == "CONAN")
             {
                 ComponentsToArtifactory components = await GetPackageinfo(item, operationType, responseMessage, dryRunSuffix);
-                unknownPackagesAll.JfrogFoundPackagesConan.Add(components);
+                packagesForErrorDisplay.JfrogFoundPackagesConan.Add(components);
             }
             else if (item.ComponentType == "DEBIAN")
             {
                 ComponentsToArtifactory components = await GetPackageinfo(item, operationType, responseMessage, dryRunSuffix);
-                unknownPackagesAll.JfrogFoundPackagesDebian.Add(components);
+                packagesForErrorDisplay.JfrogFoundPackagesDebian.Add(components);
             }
 
         }
-        private static async Task SucessfullPackagesAsync(ComponentsToArtifactory item, UnknownPackagesAll unknownPackagesAll)
+        private static async Task SucessfullPackagesAsync(ComponentsToArtifactory item, PackagesForErrorDisplay packagesForErrorDisplay)
         {
            
             if (item.ComponentType == "NPM")
             {
 
                 ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                unknownPackagesAll.SuccessfullPackagesNpm.Add(components);
+                packagesForErrorDisplay.SuccessfullPackagesNpm.Add(components);
             }
             else if (item.ComponentType == "NUGET")
             {
                 ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                unknownPackagesAll.SuccessfullPackagesNuget.Add(components);
+                packagesForErrorDisplay.SuccessfullPackagesNuget.Add(components);
             }
             else if (item.ComponentType == "MAVEN")
             {
                 ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                unknownPackagesAll.SuccessfullPackagesMaven.Add(components);
+                packagesForErrorDisplay.SuccessfullPackagesMaven.Add(components);
             }
             else if (item.ComponentType == "PYTHON")
             {
                 ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                unknownPackagesAll.UnknownPackagesPython.Add(components);
+                packagesForErrorDisplay.UnknownPackagesPython.Add(components);
             }
             else if (item.ComponentType == "CONAN")
             {
                 ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                unknownPackagesAll.SuccessfullPackagesConan.Add(components);
+                packagesForErrorDisplay.SuccessfullPackagesConan.Add(components);
             }
             else if(item.ComponentType == "DEBIAN")
             {
                 ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                unknownPackagesAll.SuccessfullPackagesDebian.Add(components);
+                packagesForErrorDisplay.SuccessfullPackagesDebian.Add(components);
             }
 
         }
@@ -709,12 +709,12 @@ namespace LCT.ArtifactoryUploader
             return null;
         }
 
-        public static async Task UploadingThePackages(List<ComponentsToArtifactory> componentsToUpload, int timeout, UnknownPackagesAll unknownPackagesAll)
+        public static async Task UploadingThePackages(List<ComponentsToArtifactory> componentsToUpload, int timeout, PackagesForErrorDisplay packagesForErrorDisplay)
         {
             Logger.Debug("Starting UploadingThePackages() method");
             foreach (var item in componentsToUpload)
             {
-                await PackageUploadToArtifactory(PackageUploader.uploaderKpiData, item, timeout,unknownPackagesAll);
+                await PackageUploadToArtifactory(PackageUploader.uploaderKpiData, item, timeout, packagesForErrorDisplay);
             }
 
             if (SetWarningCode)
@@ -727,7 +727,7 @@ namespace LCT.ArtifactoryUploader
             Program.UploaderStopWatch?.Stop();
         }
 
-        private static async Task PackageUploadToArtifactory(UploaderKpiData uploaderKpiData, ComponentsToArtifactory item, int timeout,UnknownPackagesAll unknownPackagesAll)
+        private static async Task PackageUploadToArtifactory(UploaderKpiData uploaderKpiData, ComponentsToArtifactory item, int timeout, PackagesForErrorDisplay packagesForErrorDisplay)
         {
             var packageType = item.PackageType;
            
@@ -739,7 +739,7 @@ namespace LCT.ArtifactoryUploader
                     const string dryRunSuffix = null;
                     string operationType = item.PackageType == PackageType.ClearedThirdParty || item.PackageType == PackageType.Development ? "copy" : "move";
                     ArtfactoryUploader.jFrogService = jFrogService;
-                    HttpResponseMessage responseMessage = await ArtfactoryUploader.UploadPackageToRepo(item, timeout,unknownPackagesAll);
+                    HttpResponseMessage responseMessage = await ArtfactoryUploader.UploadPackageToRepo(item, timeout, packagesForErrorDisplay);
 
                     if (responseMessage.StatusCode == HttpStatusCode.OK && !item.DryRun)
                     {
@@ -747,14 +747,14 @@ namespace LCT.ArtifactoryUploader
                     }
                     else if (responseMessage.ReasonPhrase == ApiConstant.PackageNotFound)
                     {
-                        await JfrogFoundPackagesAsync(item, unknownPackagesAll, operationType, responseMessage, dryRunSuffix);
+                        await JfrogFoundPackagesAsync(item, packagesForErrorDisplay, operationType, responseMessage, dryRunSuffix);
                         IncrementCountersBasedOnPackageType(uploaderKpiData, packageType, false);
                         item.DestRepoName = null;
                         SetWarningCode = true;
                     }
                     else if (responseMessage.ReasonPhrase == ApiConstant.ErrorInUpload)
                     {
-                        await JfrogFoundPackagesAsync(item, unknownPackagesAll, operationType, responseMessage, dryRunSuffix);
+                        await JfrogFoundPackagesAsync(item, packagesForErrorDisplay, operationType, responseMessage, dryRunSuffix);
                         IncrementCountersBasedOnPackageType(uploaderKpiData, packageType, false);
                         item.DestRepoName = null;
                         var responseContent = await responseMessage.Content.ReadAsStringAsync();
@@ -769,14 +769,14 @@ namespace LCT.ArtifactoryUploader
                 {
                     uploaderKpiData.PackagesNotExistingInRemoteCache++;
                     item.DestRepoName = null;
-                    await JfrogNotFoundPackagesAsync(item,unknownPackagesAll);
+                    await JfrogNotFoundPackagesAsync(item, packagesForErrorDisplay);
                     
                 }
             }
             else
             {
                 IncrementCountersBasedOnPackageType(uploaderKpiData, packageType, true);
-                await SucessfullPackagesAsync(item, unknownPackagesAll);                
+                await SucessfullPackagesAsync(item, packagesForErrorDisplay);                
                 item.DestRepoName = null;
             }
         }

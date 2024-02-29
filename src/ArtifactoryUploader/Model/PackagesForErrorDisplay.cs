@@ -15,7 +15,7 @@ namespace LCT.ArtifactoryUploader.Model
     /// <summary>
     /// The Model class for UnkmownPackagesAll
     /// </summary>
-    public class UnknownPackagesAll
+    public class PackagesForErrorDisplay
     {
         public List<ComponentsToArtifactory> UnknownPackagesNpm { get; set; }
         public List<ComponentsToArtifactory> UnknownPackagesNuget { get; set; }

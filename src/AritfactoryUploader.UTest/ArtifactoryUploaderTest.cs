@@ -43,7 +43,7 @@ namespace AritfactoryUploader.UTest
                 JFrogApi = UTParams.JFrogURL
             };
             ArtfactoryUploader.jFrogService = GetJfrogService(appSettings);
-            UnknownPackagesAll unknownPackagesAll = PackageUploadHelper.GetComponentsToBePackages();
+            PackagesForErrorDisplay packagesForErrorDisplay = PackageUploadHelper.GetComponentsToBePackages();
             var componentsToArtifactory = new ComponentsToArtifactory
             {
                 Name = "html5lib",
@@ -65,7 +65,7 @@ namespace AritfactoryUploader.UTest
             };
 
             //Act
-            var responseMessage = await ArtfactoryUploader.UploadPackageToRepo(componentsToArtifactory, 100,unknownPackagesAll);
+            var responseMessage = await ArtfactoryUploader.UploadPackageToRepo(componentsToArtifactory, 100, packagesForErrorDisplay);
             Assert.AreEqual(HttpStatusCode.NotFound, responseMessage.StatusCode);
             Assert.AreEqual("Package Not Found", responseMessage.ReasonPhrase);
 
