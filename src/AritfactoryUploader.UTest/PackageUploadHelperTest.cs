@@ -75,8 +75,7 @@ namespace AritfactoryUploader.UTest
                 JfrogNpmSrcRepo = "remote-cache",
                 JFrogApi = UTParams.JFrogURL,
                 LogFolderPath = outFolder
-            };
-
+            };            
             //Act
             List<ComponentsToArtifactory> uploadList = await PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(componentLists, appSettings, packagesForErrorDisplay);
             // Assert
@@ -109,7 +108,7 @@ namespace AritfactoryUploader.UTest
                 JFrogApi = UTParams.JFrogURL,
                 LogFolderPath = outFolder
             };
-
+            
             //Act
             List<ComponentsToArtifactory> uploadList = await PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(componentLists, appSettings, packagesForErrorDisplay);
 
@@ -138,7 +137,7 @@ namespace AritfactoryUploader.UTest
                 },
                 JFrogApi = UTParams.JFrogURL
             };
-
+            
             //Act
             List<ComponentsToArtifactory> uploadList =await PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(componentLists, appSettings, packagesForErrorDisplay);
 
