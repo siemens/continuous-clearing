@@ -179,17 +179,17 @@ namespace LCT.Common
             }
             catch (IOException ex)
             {                
-                Logger.Error($"BackupTheGivenFile():", ex);
+                Logger.Error($"Error occurred while generating backup BOM file", ex);
                 Environment.ExitCode = -1;
             }
             catch (NotSupportedException ex)
             {
-                Logger.Error($"BackupTheGivenFile():", ex);
+                Logger.Error($"Error occurred while generating backup BOM file", ex);
                 Environment.ExitCode = -1;
             }
             catch (UnauthorizedAccessException ex)
             {
-                Logger.Error($"BackupTheGivenFile():", ex);
+                Logger.Error($"Error occurred while generating backup BOM file", ex);
                 Environment.ExitCode = -1;
             }
         }
