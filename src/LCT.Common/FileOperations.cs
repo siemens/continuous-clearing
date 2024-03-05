@@ -166,8 +166,8 @@ namespace LCT.Common
 
         private static void BackupTheGivenFile(string folderPath, string fileName)
         {
-            string oldFile = Path.Combine(folderPath, fileName);
-            string newFile = string.Format("{0}/{1:MM-dd-yyyy_HHmm}_Backup_{2}", folderPath, DateTime.Now, fileName);
+            string oldFile = Path.Combine(folderPath, fileName);            
+            string newFile = string.Format("{0}/{1:MM-dd-yyyy_HHmm_ss}_Backup_{2}", folderPath, DateTime.Now, fileName);
             Logger.Debug($"BackupTheGivenFile():oldFile{oldFile},newFile{newFile}");
             try
             {
@@ -178,16 +178,19 @@ namespace LCT.Common
                 }
             }
             catch (IOException ex)
-            {
-                Logger.Debug($"BackupTheGivenFile():", ex);
+            {                
+                Logger.Error($"Error occurred while generating backup BOM file", ex);
+                Environment.ExitCode = -1;
             }
             catch (NotSupportedException ex)
             {
-                Logger.Debug($"BackupTheGivenFile():", ex);
+                Logger.Error($"Error occurred while generating backup BOM file", ex);
+                Environment.ExitCode = -1;
             }
             catch (UnauthorizedAccessException ex)
             {
-                Logger.Debug($"BackupTheGivenFile():", ex);
+                Logger.Error($"Error occurred while generating backup BOM file", ex);
+                Environment.ExitCode = -1;
             }
         }
     }
