@@ -30,7 +30,7 @@ namespace LCT.PackageIdentifier
             {
                 LogExceptionHandling.HttpException(ex, response, "SW360");
             }
-            catch (AggregateException ex)
+            catch (Exception ex)
             {
                 LogExceptionHandling.GenericExceptions(ex, "SW360");
             }
