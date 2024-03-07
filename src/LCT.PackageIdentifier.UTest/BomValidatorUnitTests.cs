@@ -82,7 +82,7 @@ namespace PackageIdentifier.UTest
                 .Verifiable();
 
             //Act && Assert
-            Assert.ThrowsAsync<Exception>(async () => await BomValidator.ValidateAppSettings(CommonAppSettings, mockISw360ProjectService.Object));
+            Assert.ThrowsAsync<InvalidDataException>(async () => await BomValidator.ValidateAppSettings(CommonAppSettings, mockISw360ProjectService.Object));
             return Task.CompletedTask;
         }
     }

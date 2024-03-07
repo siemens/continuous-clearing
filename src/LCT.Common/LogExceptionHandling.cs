@@ -1,15 +1,18 @@
-﻿using CycloneDX.Models.Vulnerabilities;
-using LCT.Common.Interface;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2024 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+
+
+
 using log4net;
-using log4net.Core;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+
+
 
 namespace LCT.Common
 {
