@@ -258,7 +258,7 @@ namespace LCT.Services
             return componentInfo.PackageUrl ?? string.Empty;
         }
 
-        public async Task<bool> LinkReleasesToProject(List<string> releasesTobeLinked, List<string> manuallyLinkedReleases, string sw360ProjectId)
+        public async Task<bool> LinkReleasesToProject(List<ReleaseLinked> releasesTobeLinked, List<ReleaseLinked> manuallyLinkedReleases, string sw360ProjectId)
         {
             if (manuallyLinkedReleases.Count <= 0 && releasesTobeLinked.Count <= 0)
             {
@@ -267,17 +267,24 @@ namespace LCT.Services
             }
             try
             {
-                manuallyLinkedReleases.AddRange(releasesTobeLinked);
-                var finalReleasesToBeLinked = manuallyLinkedReleases.Distinct().ToList();
+                var finalReleasesToBeLinked = manuallyLinkedReleases.Concat(releasesTobeLinked).Distinct().ToList();
                 Logger.Debug($"No of release Id's to link - {finalReleasesToBeLinked.Count}");
 
-                string[] releaseidArray = finalReleasesToBeLinked?.ToArray();
-                var response = await m_SW360ApiCommunicationFacade.LinkReleasesToProject(releaseidArray, sw360ProjectId);
-                if (response.IsSuccessStatusCode)
-                {
-                    await UpdateLinkedReleaseComment(sw360ProjectId, releasesTobeLinked);
-                }
-                else
+                Dictionary<string, AddLinkedRelease> linkedReleasesDict = new Dictionary<string, AddLinkedRelease>();
+                linkedReleasesDict = finalReleasesToBeLinked?
+                                        .ToDictionary(
+                                            releaseLinked => releaseLinked.ReleaseId,
+                                            releaseLinked => new AddLinkedRelease()
+                                            {
+                                                ReleaseRelation = string.IsNullOrEmpty(releaseLinked.Relation) ? Dataconstant.LinkedByCAToolReleaseRelation 
+                                                                    : releaseLinked.Relation,
+                                                Comment = manuallyLinkedReleases.Any(r => r.ReleaseId == releaseLinked.ReleaseId) ? releaseLinked.Comment : Dataconstant.LinkedByCATool
+                                            });
+
+                StringContent content = new StringContent(JsonConvert.SerializeObject(linkedReleasesDict), Encoding.UTF8, "application/json");
+
+                var response = await m_SW360ApiCommunicationFacade.LinkReleasesToProject(content, sw360ProjectId);
+                if (!response.IsSuccessStatusCode)
                 {
                     Environment.ExitCode = -1;
                     Logger.Error($"LinkReleasesToProject() : Linking releases to project Id {sw360ProjectId} is failed.");

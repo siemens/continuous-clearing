@@ -23,6 +23,7 @@ namespace LCT.Common.Constants
         {"MAVEN", "pkg:maven"},
         {"PYTHON", "pkg:pypi"},
         {"CONAN", "pkg:conan"},
+        {"ALPINE", "pkg:apk/alpine"},
          };
 
         //Identified types
@@ -45,6 +46,7 @@ namespace LCT.Common.Constants
         public const string SourceUrlNotFound = "Source URL not found";
         public const string PackageUrlNotFound = "Package URL not found";
         public const string LinkedByCATool = "Linked by CA Tool";
+        public const string LinkedByCAToolReleaseRelation = "UNKNOWN";
         public const string ReleaseAttachmentComment = "Attached by CA Tool";
         public const char ForwardSlash = '/';
         public const string SourceURLSuffix = "/srcfiles?fileinfo=1";
@@ -56,6 +58,7 @@ namespace LCT.Common.Constants
         public const string Cdx_FossologyUrl = "internal:siemens:clearing:fossology:url";
         public const string Cdx_IsDevelopment = "internal:siemens:clearing:development";
         public const string Cdx_IdentifierType = "internal:siemens:clearing:identifier-type";
+        public const string AlpineSourceURLSuffix = "?ref_type=heads";
 
         public static Dictionary<string, string> PurlCheck()
         {

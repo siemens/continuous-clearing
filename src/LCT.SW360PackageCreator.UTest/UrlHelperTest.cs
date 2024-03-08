@@ -130,5 +130,18 @@ namespace LCT.SW360PackageCreator.UTest
             // Assert
             Assert.That(string.IsNullOrEmpty(sourceUrl));
         }
+
+        [TestCase("apk-tools", "2.12.9-r3", "pkg:apk/alpine/apk-tools@2.12.9-r3?distro=alpine-3.16.2")]
+        public async Task GetSourceUrlForAlpinePackage_ProvidedPackageDetails_ReturnsValidSourceURL(string componentName, string version,string bomref)
+        {
+            // Arrange
+            IUrlHelper urlHelper = new UrlHelper();
+
+            // Act
+            var sourceUrlDetails = await urlHelper.GetSourceUrlForAlpinePackage(componentName, version,bomref);
+
+            // Assert
+            Assert.That(sourceUrlDetails.SourceUrl.Contains("apk-tools"));
+        }
     }
 }

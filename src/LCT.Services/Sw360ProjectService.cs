@@ -86,7 +86,8 @@ namespace LCT.Services
                     ReleaseLinked releaseLinked = new ReleaseLinked
                     {
                         Comment = sw360Release.Comment,
-                        ReleaseId = CommonHelper.GetSubstringOfLastOccurance(releaseUrl, "/")
+                        ReleaseId = CommonHelper.GetSubstringOfLastOccurance(releaseUrl, "/"),
+                        Relation= sw360Release.Relation
                     };
                     alreadyLinkedReleases.Add(releaseLinked);
                 }

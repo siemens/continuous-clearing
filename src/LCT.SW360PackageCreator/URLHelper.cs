@@ -36,6 +36,8 @@ using YamlDotNet.Core;
 using YamlDotNet.Core.Tokens;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
+using System.Management.Automation.Runspaces;
+using NuGet.ProjectModel;
 
 namespace LCT.SW360PackageCreator
 {
@@ -52,6 +54,280 @@ namespace LCT.SW360PackageCreator
 
         private bool _disposed;
 
+        /// <summary>
+        /// Gets the SourceUrl For Alpine Package
+        /// </summary>
+        /// <param name="componentName"></param>
+        /// <param name="componenVersion"></param>
+        /// <param name="bomRef"></param>
+        /// <returns>Components</returns>
+        public async Task<Components> GetSourceUrlForAlpinePackage(string componentName, string componenVersion, string bomRef)
+        {
+            Components componentsData = new Components();
+            try
+            {
+                string localPathforSourceRepo = GetDownloadPathForAlpineRepo();
+                string fullPath = Path.Combine(localPathforSourceRepo, "aports");
+                var alpineDistro = GetAlpineDistro(bomRef);
+                if (!Directory.Exists(fullPath))
+                {
+                    //Clone AlpineRepository
+                    CloneSource(localPathforSourceRepo, alpineDistro, fullPath);
+                }
+                else
+                {
+                    //Checkout stable branch
+                    CheckoutDistro(alpineDistro, fullPath);
+                }
+
+                AlpinePackage alpinePackSourceDetails = await GetAlpineSourceUrl(componentName, componenVersion, localPathforSourceRepo);
+                componentsData.AlpineSourceData = alpinePackSourceDetails.SourceDataForAlpine;
+                componentsData.Name = alpinePackSourceDetails.Name;
+                componentsData.Version = Regex.Replace(alpinePackSourceDetails.Version, @"^[0-9]+:", "");
+                componentsData.ReleaseExternalId = GetReleaseExternalIdForAlpine(alpinePackSourceDetails.Name, alpinePackSourceDetails.Version);
+                componentsData.ComponentExternalId = GetComponentExternalIdForAlpine(alpinePackSourceDetails.Name);
+                componentsData.SourceUrl = string.IsNullOrEmpty(alpinePackSourceDetails.SourceUrl) ? Dataconstant.SourceUrlNotFound : alpinePackSourceDetails.SourceUrl;
+                componentsData.DownloadUrl = componentsData.SourceUrl.Equals(Dataconstant.SourceUrlNotFound) ? Dataconstant.DownloadUrlNotFound : componentsData.SourceUrl;
+            }
+            catch (IOException ex)
+            {
+                Logger.Error($"GetAlpineSourceUrl() ", ex);
+            }
+            return componentsData;
+        }
+        public static string GetAlpineDistro(string bomRef)
+        {
+
+            string[] getDistro = bomRef.Split("distro");
+            string[] getDestroVersion = getDistro[1].Split("-");
+            var output = getDestroVersion[1].Substring(0, getDestroVersion[1].Length - 2);
+            var distro = output + "-stable";
+            return distro;
+        }
+
+        private static Task<AlpinePackage> GetAlpineSourceUrl(string name, string version, string localPathforSourceRepo)
+        {
+            AlpinePackage sourceURLDetails = new AlpinePackage { Name = name, Version = version };
+            try
+            {
+                var pkgFolderName = localPathforSourceRepo + Dataconstant.ForwardSlash + "aports" + Dataconstant.ForwardSlash + "main" + Dataconstant.ForwardSlash + name;
+                if (Directory.Exists(pkgFolderName))
+                {
+                    var pkgFilePath = localPathforSourceRepo + Dataconstant.ForwardSlash + "aports" + Dataconstant.ForwardSlash + "main" + Dataconstant.ForwardSlash + name + Dataconstant.ForwardSlash + "APKBUILD";
+                    if (File.Exists(pkgFilePath))
+                    {
+                        var sourceData = GetSourceFromAPKBUILD(localPathforSourceRepo, name);
+                        sourceURLDetails.SourceDataForAlpine = sourceData;
+                        var sourceUrl = GetSourceUrlForAlpine(pkgFilePath, sourceData);
+                        if (sourceUrl.EndsWith(FileConstant.TargzFileExtension) || sourceUrl.EndsWith(FileConstant.XzFileExtension) || sourceUrl.EndsWith(FileConstant.TgzFileExtension) || sourceUrl.EndsWith(FileConstant.Bz2FileExtension))
+                        {
+                            sourceURLDetails.SourceUrl = sourceUrl;
+                        }
+                    }
+                }
+            }
+            catch (IOException ex)
+            {
+                Logger.Error($"GetAlpineSourceUrl() ", ex);
+            }
+            return Task.FromResult(sourceURLDetails);
+        }
+        public static string GetSourceFromAPKBUILD(string localPathforSourceRepo, string name)
+        {
+            string sourceData = string.Empty;
+            string pkgFilePath = string.Empty;
+            try
+            {
+                var pkgFolderName = localPathforSourceRepo + Dataconstant.ForwardSlash + "aports" + Dataconstant.ForwardSlash + "main" + Dataconstant.ForwardSlash + name;
+                if (Directory.Exists(pkgFolderName))
+                {
+                    pkgFilePath = localPathforSourceRepo + Dataconstant.ForwardSlash + "aports" + Dataconstant.ForwardSlash + "main" + Dataconstant.ForwardSlash + name + Dataconstant.ForwardSlash + "APKBUILD";
+                    if (File.Exists(pkgFilePath))
+                    {
+                        var apkBuildTxt = File.ReadAllText(pkgFilePath);
+                        int sourceLength = apkBuildTxt.IndexOf("source=\"") + "source=\"".Length;
+                        int txtLengthFrom = apkBuildTxt.Length - sourceLength;
+                        string textFrom = apkBuildTxt.Substring(sourceLength, txtLengthFrom);
+                        int textLengthTo = textFrom.IndexOf("\"") - "\"".Length + 1;
+                        sourceData = textFrom.Substring(0, textLengthTo);
+                    }
+                }
+            }
+            catch (IOException ex)
+            {
+                Logger.Error($"GetSourceFromAPKBUILD() ", ex);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                Logger.Error($"GetSourceFromAPKBUILD() ", ex);
+            }
+
+            return sourceData;
+        }
+        public static string GetSourceUrlForAlpine(string pkgFilePath, string sourceData)
+        {
+            string sourceUrl = string.Empty;
+            try
+            {
+                var pkgVersionLine = File.ReadLines(pkgFilePath).FirstOrDefault(x => x.StartsWith("pkgver"));
+                var pkgNameLine = File.ReadLines(pkgFilePath).FirstOrDefault(x => x.StartsWith("pkgname"));
+                var _commitLine = File.ReadLines(pkgFilePath).FirstOrDefault(x => x.StartsWith("_commit"));
+                var _tzcodeverLine = File.ReadLines(pkgFilePath).FirstOrDefault(x => x.StartsWith("_tzcodever"));
+                string pkgVersion = string.Empty;
+                string pkgName = string.Empty;
+                string _commitValue = string.Empty;
+                string _tzcodever = string.Empty;
+
+                if (pkgVersionLine != null)
+                {
+                    string[] pkgVersionValue = Regex.Split(pkgVersionLine, @"\=");
+                    pkgVersion = pkgVersionValue[1];
+                }
+                if (pkgNameLine != null)
+                {
+                    string[] pkgNameData = Regex.Split(pkgNameLine, @"\=");
+                    pkgName = pkgNameData[1];
+                }
+                if (_tzcodeverLine != null)
+                {
+                    string[] _tzcodeverValue = Regex.Split(_tzcodeverLine, @"\=");
+                    _tzcodever = _tzcodeverValue[1];
+                    if (_tzcodeverLine.Contains("pkgver"))
+                    {
+                        _tzcodever = pkgVersion;
+                    }
+                }
+                if (_commitLine != null)
+                {
+                    string[] _commit = Regex.Split(_commitLine, @"\=");
+                    _commitValue = _commit[1].Trim('"');
+                }
+                if (sourceData.Contains("https"))
+                {
+                    Match url = Regex.Match(sourceData, @"http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=$]*)?");
+                    string finalUrl = url.ToString();
+                    sourceUrl = finalUrl.Replace("$pkgver", pkgVersion).Replace("$pkgname", pkgName).Replace("$_commit", _commitValue).Replace("$_tzcodever", _tzcodever);
+                    if (pkgVersion == null && _commitValue == null && _tzcodever == null)
+                    {
+                        sourceUrl = string.Empty;
+                    }
+                }
+            }
+            catch (IOException ex)
+            {
+                Logger.Error($"GetDownloadPathForAlpineRepo() ", ex);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                Logger.Error($"GetDownloadPathForAlpineRepo() ", ex);
+            }
+
+            return sourceUrl;
+        }
+
+        public static string GetDownloadPathForAlpineRepo()
+        {
+            string localPathforSourceRepo = string.Empty;
+            try
+            {
+                localPathforSourceRepo = $"{Directory.GetParent(Directory.GetCurrentDirectory())}\\ClearingTool\\DownloadedFiles\\";
+                if(!Directory.Exists(localPathforSourceRepo))
+                {
+                    localPathforSourceRepo = Directory.CreateDirectory(localPathforSourceRepo).ToString();                    
+                }
+            }
+            catch (IOException ex)
+            {
+                Logger.Error($"GetDownloadPathForAlpineRepo() ", ex);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                Logger.Error($"GetDownloadPathForAlpineRepo() ", ex);
+            }
+
+            return localPathforSourceRepo;
+        }
+        public static string GetReleaseExternalIdForAlpine(string name, string version)
+        {
+
+            return $"{Dataconstant.PurlCheck()["ALPINE"]}{Dataconstant.ForwardSlash}{name}@{version}?arch=source";
+        }
+
+        private static string GetComponentExternalIdForAlpine(string name)
+        {
+            return $"{Dataconstant.PurlCheck()["ALPINE"]}{Dataconstant.ForwardSlash}{name}?arch=source";
+        }
+
+        private static void CloneSource(string localPathforSourceRepo, string alpineDistro, string fullPath)
+        {
+            List<string> gitCommands = GetGitCloneCommands();
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                foreach (string command in gitCommands)
+                {
+                    Process p = new Process();
+                    p.StartInfo.RedirectStandardError = true;
+                    p.StartInfo.RedirectStandardOutput = true;
+                    p.StartInfo.RedirectStandardInput = true;
+                    p.StartInfo.UseShellExecute = false;
+                    p.StartInfo.CreateNoWindow = true;                    
+                    p.StartInfo.FileName = Path.Combine(@"git");
+                    p.StartInfo.Arguments = command;
+                    p.StartInfo.WorkingDirectory = localPathforSourceRepo;
+
+                    p.Start();
+                    p.WaitForExit();                  
+
+                }
+            }
+            else
+            {
+                Process p = new Process();
+                p.StartInfo.RedirectStandardError = true;
+                p.StartInfo.RedirectStandardOutput = true;
+                p.StartInfo.RedirectStandardInput = true;
+                p.StartInfo.UseShellExecute = false;
+                p.StartInfo.CreateNoWindow = true;
+                p.StartInfo.FileName = Path.Combine(@"git");
+                p.StartInfo.Arguments = gitCommands[1];
+                p.StartInfo.WorkingDirectory = localPathforSourceRepo;
+
+                p.Start();
+                p.WaitForExit();
+            }
+            if (Directory.Exists(fullPath))
+            {
+                CheckoutDistro(alpineDistro, fullPath);
+            }
+
+        }
+
+        private static void CheckoutDistro(string alpineDistro, string fullPath)
+        {
+
+            Process p = new Process();
+            p.StartInfo.RedirectStandardError = true;
+            p.StartInfo.RedirectStandardOutput = true;
+            p.StartInfo.RedirectStandardInput = true;
+            p.StartInfo.UseShellExecute = false;
+            p.StartInfo.CreateNoWindow = true;
+            p.StartInfo.FileName = Path.Combine(@"git");
+            p.StartInfo.Arguments = $"checkout" + " " + alpineDistro;
+            p.StartInfo.WorkingDirectory = fullPath;
+
+            p.Start();
+            p.WaitForExit();
+
+        }
+
+        private static List<string> GetGitCloneCommands()
+        {
+            return new List<string>()
+           {
+               $"config --global core.protectNTFS false",
+               $"clone" +" "+ CommonAppSettings.AlpineAportsGitURL,
+           };
+        }
 
         /// <summary>
         /// Gets the SourceUrl For Debian Package
@@ -163,14 +439,14 @@ namespace LCT.SW360PackageCreator
         /// <param name="componentName"></param>
         /// <param name="version"></param>
         /// <returns>string</returns>
-        public async Task<string> GetSourceUrlForConanPackage(string componentName, string componenVersion) 
+        public async Task<string> GetSourceUrlForConanPackage(string componentName, string componenVersion)
         {
 
             var downLoadUrl = $"{CommonAppSettings.SourceURLConan}" + componentName + "/all/conandata.yml";
             var deserializer = new DeserializerBuilder().WithNamingConvention(UnderscoredNamingConvention.Instance).Build();
             string componentSrcURL = string.Empty;
-            Sources packageSourcesInfo=new Sources();
-            using (HttpClient _httpClient=new HttpClient())
+            Sources packageSourcesInfo = new Sources();
+            using (HttpClient _httpClient = new HttpClient())
             {
                 try
                 {
@@ -198,7 +474,7 @@ namespace LCT.SW360PackageCreator
                                     $"Exclude if it is an internal component or manually update the SRC url");
                     Logger.Debug($"GetSourceUrlForConanPackage()", ex);
                 }
-                catch(YamlException ex)
+                catch (YamlException ex)
                 {
                     Logger.Warn($"Identification of SRC url failed for {componentName}, " +
                                     $"Exclude if it is an internal component or manually update the SRC url");

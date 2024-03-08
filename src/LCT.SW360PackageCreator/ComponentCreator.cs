@@ -84,9 +84,13 @@ namespace LCT.SW360PackageCreator
                     componentsData.ComponentExternalId = item.Purl.Substring(0, item.Purl.IndexOf('@'));
                     componentsData.ReleaseExternalId = item.Purl;
 
-                    Components component = await GetSourceUrl(componentsData.Name, componentsData.Version, componentsData.ProjectType);
+                    Components component = await GetSourceUrl(componentsData.Name, componentsData.Version, componentsData.ProjectType, item.BomRef);
                     componentsData.SourceUrl = component.SourceUrl;
-
+                    
+                    if (componentsData.ProjectType.ToUpperInvariant() == "ALPINE")
+                    {
+                        componentsData.AlpineSourceData = component.AlpineSourceData;
+                    }
 
                     if (componentsData.ProjectType.ToUpperInvariant() == "DEBIAN")
                     {
@@ -175,7 +179,7 @@ namespace LCT.SW360PackageCreator
             }
         }
 
-        private static async Task<Components> GetSourceUrl(string name, string version, string projectType)
+        private static async Task<Components> GetSourceUrl(string name, string version, string projectType, string bomRef)
         {
             Components componentsData = new Components();
             switch (projectType.ToUpperInvariant())
@@ -197,6 +201,11 @@ namespace LCT.SW360PackageCreator
                 case "CONAN":
                     componentsData.SourceUrl = await UrlHelper.Instance.GetSourceUrlForConanPackage(name, version);
                     break;
+                case "ALPINE":
+                    Components alpComponentData = await UrlHelper.Instance.GetSourceUrlForAlpinePackage(name, version,bomRef);
+                    componentsData = alpComponentData;
+                    componentsData.ProjectType = projectType;
+                    break;
                 default:
                     break;
             }
@@ -216,10 +225,14 @@ namespace LCT.SW360PackageCreator
             {
                 await CreateComponent(creatorHelper, sw360CreatorService, parsedBomData, sw360Url, appSettings);
             }
+            var alreadyLinkedReleases = await GetAlreadyLinkedReleasesByProjectId(appSettings.SW360ProjectID, sw360ProjectService);
 
-            var manuallyLinkedReleases = await GetManuallyLinkedReleasesFromProject(appSettings, sw360ProjectService);
+            var manuallyLinkedReleases = await GetManuallyLinkedReleasesFromProject(alreadyLinkedReleases);
 
-            var releasesFoundInCbom = ReleasesFoundInCbom.Select(x => x.ReleaseId).ToList();
+            await UpdateSBOMReleasesWithSw360Info(alreadyLinkedReleases);
+
+            var releasesFoundInCbom = ReleasesFoundInCbom.ToList();
+
             // Linking releases to the project
             await sw360CreatorService.LinkReleasesToProject(releasesFoundInCbom, manuallyLinkedReleases, appSettings.SW360ProjectID);
 
@@ -262,6 +275,23 @@ namespace LCT.SW360PackageCreator
                 {
                     await CreateComponentAndRealease(creatorHelper, sw360CreatorService, item, sw360Url, appSettings);
                 }
+
+                if (appSettings.ProjectType.ToUpperInvariant()=="ALPINE")
+                {
+                    string localPathforSourceRepo = UrlHelper.GetDownloadPathForAlpineRepo();
+                    if (Directory.GetDirectories(localPathforSourceRepo).Length != 0)
+                    {
+                        DirectoryInfo di = new DirectoryInfo(localPathforSourceRepo);
+                        foreach (DirectoryInfo dir in di.GetDirectories())
+                        {
+                            if (!dir.Name.Equals("aports"))
+                            {
+                                dir.Delete(true);
+                            }
+                        }
+                    }
+                }
+
             }
             catch (AggregateException ex)
             {
@@ -269,13 +299,31 @@ namespace LCT.SW360PackageCreator
             }
         }
 
-        private static async Task<List<string>> GetManuallyLinkedReleasesFromProject(CommonAppSettings appSettings, ISw360ProjectService sw360ProjectService)
+        private static async Task<List<ReleaseLinked>> GetManuallyLinkedReleasesFromProject(List<ReleaseLinked> alreadyLinkedReleases)
         {
-            List<ReleaseLinked> alreadyLinkedReleases = await sw360ProjectService.GetAlreadyLinkedReleasesByProjectId(appSettings.SW360ProjectID);
-            alreadyLinkedReleases.RemoveAll(x => string.Compare(x.Comment, Dataconstant.LinkedByCATool, StringComparison.OrdinalIgnoreCase) == 0);
-            var manuallyLinkedReleaseIds = alreadyLinkedReleases.Select(x => x.ReleaseId).ToList();
+            var manuallyLinkedReleases = new List<ReleaseLinked>(alreadyLinkedReleases);
+            manuallyLinkedReleases.RemoveAll(x => string.Compare(x.Comment, Dataconstant.LinkedByCATool, StringComparison.OrdinalIgnoreCase) == 0);
 
-            return manuallyLinkedReleaseIds;
+            return manuallyLinkedReleases;
+        }
+
+        private async Task<List<ReleaseLinked>> GetAlreadyLinkedReleasesByProjectId(string projectId, ISw360ProjectService sw360ProjectService)
+        {
+            List<ReleaseLinked> alreadyLinkedReleases = await sw360ProjectService.GetAlreadyLinkedReleasesByProjectId(projectId);
+            return alreadyLinkedReleases;
+        }
+
+        private async Task UpdateSBOMReleasesWithSw360Info(List<ReleaseLinked> alreadyLinkedReleases)
+        {
+            foreach (var release in ReleasesFoundInCbom)
+            {
+                var linkedRelease = alreadyLinkedReleases.FirstOrDefault(r => r.ReleaseId == release.ReleaseId);
+                if (linkedRelease != null)
+                {
+                    release.Comment = linkedRelease.Comment;
+                    release.Relation = linkedRelease.Relation;
+                }
+            }
         }
 
         private async Task CreateComponentAndRealease(ICreatorHelper creatorHelper,
@@ -427,9 +475,9 @@ namespace LCT.SW360PackageCreator
             try
             {
                 CheckFossologyProcess fossResult = await sw360CreatorService.CheckFossologyProcessStatus(link);
-                if (!string.IsNullOrEmpty(fossResult?.fossologyProcessInfo?.externalTool))
+                if (!string.IsNullOrEmpty(fossResult?.FossologyProcessInfo?.ExternalTool))
                 {
-                    uploadId = fossResult?.fossologyProcessInfo?.processSteps[0]?.processStepIdInTool;
+                    uploadId = fossResult?.FossologyProcessInfo?.ProcessSteps[0]?.ProcessStepIdInTool;
                 }
             }
             catch (AggregateException ex)

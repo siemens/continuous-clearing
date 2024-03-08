@@ -28,6 +28,15 @@ namespace LCT.Facade
         }
 
         /// <summary>
+        /// Checks connectivity with JFrog server
+        /// </summary>
+        /// <returns>HttpResponseMessage</returns>
+        public Task<HttpResponseMessage> CheckConnection()
+        {
+            return m_jfrogAqlApiCommunication.CheckConnection();
+        }
+
+        /// <summary>
         /// Gets the Internal Component Data By Repo Name
         /// </summary>
         /// <param name="repoName">repoName</param>
