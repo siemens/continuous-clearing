@@ -6,6 +6,8 @@
 
 using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
+using LCT.Common;
+using LCT.Common.Interface;
 using LCT.Common.Model;
 using log4net;
 using Newtonsoft.Json;
@@ -37,6 +39,8 @@ namespace LCT.APICommunications
         private readonly string sw360UsersApi;
         private readonly int timeOut;
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+        
         #endregion
 
         #region PUBLIC METHODS
@@ -98,20 +102,16 @@ namespace LCT.APICommunications
         public async Task<HttpResponseMessage> GetProjectById(string projectId)
         {
             HttpClient httpClient = GetHttpClient();
-            HttpResponseMessage obj = new HttpResponseMessage();
-            var result = obj;
+            var result = new HttpResponseMessage();
             string projectsByTagUrl = $"{sw360ProjectsApi}/{projectId}";
             try
             {
-
                 result = await httpClient.GetAsync(projectsByTagUrl);
+                result.EnsureSuccessStatusCode();
             }
-            catch (TaskCanceledException ex)
+            catch (HttpRequestException ex)
             {
-                Logger.Debug($"{ex.Message}");
-                Logger.Error("A timeout error is thrown from SW360 server,Please wait for sometime and re run the pipeline again");
-                Environment.Exit(-1);
-
+                LogExceptionHandling.HttpException(ex,result,"Sw360");
             }
             return result;
         }
