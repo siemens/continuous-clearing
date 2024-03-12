@@ -54,7 +54,7 @@
           "Value": "NUGET"
         },
         {
-          "Name": "ApprovedStatus",
+          "Name": "internal:siemens:clearing:clearing-state",
           "Value": "APPROVED"
         },
         {
@@ -99,7 +99,7 @@
           "Value": "NUGET"
         },
         {
-          "Name": "ApprovedStatus",
+          "Name": "internal:siemens:clearing:clearing-state",
           "Value": "Not Available"
         },
         {
