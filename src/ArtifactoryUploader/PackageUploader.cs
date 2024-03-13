@@ -36,7 +36,7 @@ namespace LCT.ArtifactoryUploader
         {
             //Reading the CycloneBOM data
             Bom m_ComponentsInBOM = PackageUploadHelper.GetComponentListFromComparisonBOM(appSettings.BomFilePath);
-            DiplayAllSettings(m_ComponentsInBOM.Components, appSettings);
+            DisplayAllSettings(m_ComponentsInBOM.Components, appSettings);
             uploaderKpiData.ComponentInComparisonBOM = m_ComponentsInBOM.Components.Count;
 
             DisplayPackagesInfo displayPackagesInfo = PackageUploadHelper.GetComponentsToBePackages();           
@@ -74,7 +74,7 @@ namespace LCT.ArtifactoryUploader
             }
         }
 
-        private static void DiplayAllSettings(List<Component> m_ComponentsInBOM, CommonAppSettings appSettings)
+        public static void DisplayAllSettings(List<Component> m_ComponentsInBOM, CommonAppSettings appSettings)
         {
             Logger.Info("Current Application Settings:");
             List<string> projectTypeList = new();
