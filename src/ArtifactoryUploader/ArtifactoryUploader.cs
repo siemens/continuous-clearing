@@ -29,7 +29,7 @@ namespace LCT.ArtifactoryUploader
         private static string srcRepoName = Environment.GetEnvironmentVariable("JfrogSrcRepo");
         public static IJFrogService jFrogService { get; set; }
 
-        public static async Task<HttpResponseMessage> UploadPackageToRepo(ComponentsToArtifactory component, int timeout, PackagesForErrorDisplay packagesForErrorDisplay)
+        public static async Task<HttpResponseMessage> UploadPackageToRepo(ComponentsToArtifactory component, int timeout, DisplayPackagesInfo displayPackagesInfo)
         {
             Logger.Debug("Starting UploadPackageToArtifactory method");
             string operationType = component.PackageType == PackageType.ClearedThirdParty || component.PackageType == PackageType.Development ? "copy" : "move";
@@ -78,7 +78,7 @@ namespace LCT.ArtifactoryUploader
                     return responsemessage;
                 }
 
-                await PackageUploadHelper.JfrogFoundPackagesAsync(component, packagesForErrorDisplay, operationType, responsemessage, dryRunSuffix);              
+                await PackageUploadHelper.JfrogFoundPackagesAsync(component, displayPackagesInfo, operationType, responsemessage, dryRunSuffix);              
                
 
             }
