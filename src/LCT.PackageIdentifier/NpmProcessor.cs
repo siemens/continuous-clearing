@@ -79,7 +79,7 @@ namespace LCT.PackageIdentifier
             return bom;
         }
 
-        public List<Component> ParsePackageLockJson(string filepath, CommonAppSettings appSettings)
+        public static List<Component> ParsePackageLockJson(string filepath, CommonAppSettings appSettings)
         {
             List<BundledComponents> bundledComponents = new List<BundledComponents>();
             List<Component> lstComponentForBOM = new List<Component>();
@@ -252,7 +252,7 @@ namespace LCT.PackageIdentifier
 
                 components.Description = folderPath;
                 components.Version = Convert.ToString(properties[Version]);
-                components.Author = prop?.Value[Requires]?.ToString();
+                components.Author = prop.Value[Requires]?.ToString();
                 components.Purl = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
                 components.BomRef = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
                 components.Properties = new List<Property>();
