@@ -33,7 +33,7 @@ namespace LCT.APICommunications.Interfaces
         Task<string> GetReleaseByCompoenentName(string componentName);
         Task<HttpResponseMessage> CreateRelease(Releases createReleaseContent);
         Task<HttpResponseMessage> CreateComponent(CreateComponent createComponentContent);
-        Task<HttpResponseMessage> LinkReleasesToProject(string[] releaseidArray, string sw360ProjectId);
+        Task<HttpResponseMessage> LinkReleasesToProject(HttpContent httpContent, string sw360ProjectId);
         Task<HttpResponseMessage> UpdateLinkedRelease(string projectId, string releaseId, UpdateLinkedRelease updateLinkedRelease);
         Task<HttpResponseMessage> UpdateRelease(string releaseId, HttpContent httpContent);
         Task<HttpResponseMessage> UpdateComponent(string componentId, HttpContent httpContent);

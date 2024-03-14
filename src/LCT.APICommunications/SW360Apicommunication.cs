@@ -6,6 +6,8 @@
 
 using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
+using LCT.Common;
+using LCT.Common.Interface;
 using LCT.Common.Model;
 using log4net;
 using Newtonsoft.Json;
@@ -37,6 +39,8 @@ namespace LCT.APICommunications
         private readonly string sw360UsersApi;
         private readonly int timeOut;
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+        
         #endregion
 
         #region PUBLIC METHODS
@@ -98,20 +102,16 @@ namespace LCT.APICommunications
         public async Task<HttpResponseMessage> GetProjectById(string projectId)
         {
             HttpClient httpClient = GetHttpClient();
-            HttpResponseMessage obj = new HttpResponseMessage();
-            var result = obj;
+            var result = new HttpResponseMessage();
             string projectsByTagUrl = $"{sw360ProjectsApi}/{projectId}";
             try
             {
-
                 result = await httpClient.GetAsync(projectsByTagUrl);
+                result.EnsureSuccessStatusCode();
             }
-            catch (TaskCanceledException ex)
+            catch (HttpRequestException ex)
             {
-                Logger.Debug($"{ex.Message}");
-                Logger.Error("A timeout error is thrown from SW360 server,Please wait for sometime and re run the pipeline again");
-                Environment.Exit(-1);
-
+                LogExceptionHandling.HttpException(ex,result,"Sw360");
             }
             return result;
         }
@@ -177,15 +177,11 @@ namespace LCT.APICommunications
             return await httpClient.GetAsync(releaseLink);
         }
 
-        public async Task<HttpResponseMessage> LinkReleasesToProject(string[] releaseidArray, string sw360ProjectId)
+        public async Task<HttpResponseMessage> LinkReleasesToProject(HttpContent httpContent, string sw360ProjectId)
         {
             HttpClient httpClient = GetHttpClient();
             string url = $"{sw360ProjectsApi}/{sw360ProjectId}/{ApiConstant.Releases}";
-
-            string releaseidList = JsonConvert.SerializeObject(releaseidArray);
-            HttpContent content = new StringContent(releaseidList, Encoding.UTF8, "application/json");
-
-            return await httpClient.PostAsync(url, content);
+            return await httpClient.PostAsync(url, httpContent);
         }
 
         public async Task<HttpResponseMessage> UpdateLinkedRelease(string projectId, string releaseId, UpdateLinkedRelease updateLinkedRelease)

@@ -225,10 +225,14 @@ namespace LCT.SW360PackageCreator
             {
                 await CreateComponent(creatorHelper, sw360CreatorService, parsedBomData, sw360Url, appSettings);
             }
+            var alreadyLinkedReleases = await GetAlreadyLinkedReleasesByProjectId(appSettings.SW360ProjectID, sw360ProjectService);
 
-            var manuallyLinkedReleases = await GetManuallyLinkedReleasesFromProject(appSettings, sw360ProjectService);
+            var manuallyLinkedReleases = await GetManuallyLinkedReleasesFromProject(alreadyLinkedReleases);
 
-            var releasesFoundInCbom = ReleasesFoundInCbom.Select(x => x.ReleaseId).ToList();
+            await UpdateSBOMReleasesWithSw360Info(alreadyLinkedReleases);
+
+            var releasesFoundInCbom = ReleasesFoundInCbom.ToList();
+
             // Linking releases to the project
             await sw360CreatorService.LinkReleasesToProject(releasesFoundInCbom, manuallyLinkedReleases, appSettings.SW360ProjectID);
 
@@ -295,13 +299,31 @@ namespace LCT.SW360PackageCreator
             }
         }
 
-        private static async Task<List<string>> GetManuallyLinkedReleasesFromProject(CommonAppSettings appSettings, ISw360ProjectService sw360ProjectService)
+        private static async Task<List<ReleaseLinked>> GetManuallyLinkedReleasesFromProject(List<ReleaseLinked> alreadyLinkedReleases)
         {
-            List<ReleaseLinked> alreadyLinkedReleases = await sw360ProjectService.GetAlreadyLinkedReleasesByProjectId(appSettings.SW360ProjectID);
-            alreadyLinkedReleases.RemoveAll(x => string.Compare(x.Comment, Dataconstant.LinkedByCATool, StringComparison.OrdinalIgnoreCase) == 0);
-            var manuallyLinkedReleaseIds = alreadyLinkedReleases.Select(x => x.ReleaseId).ToList();
+            var manuallyLinkedReleases = new List<ReleaseLinked>(alreadyLinkedReleases);
+            manuallyLinkedReleases.RemoveAll(x => string.Compare(x.Comment, Dataconstant.LinkedByCATool, StringComparison.OrdinalIgnoreCase) == 0);
 
-            return manuallyLinkedReleaseIds;
+            return manuallyLinkedReleases;
+        }
+
+        private async Task<List<ReleaseLinked>> GetAlreadyLinkedReleasesByProjectId(string projectId, ISw360ProjectService sw360ProjectService)
+        {
+            List<ReleaseLinked> alreadyLinkedReleases = await sw360ProjectService.GetAlreadyLinkedReleasesByProjectId(projectId);
+            return alreadyLinkedReleases;
+        }
+
+        private async Task UpdateSBOMReleasesWithSw360Info(List<ReleaseLinked> alreadyLinkedReleases)
+        {
+            foreach (var release in ReleasesFoundInCbom)
+            {
+                var linkedRelease = alreadyLinkedReleases.FirstOrDefault(r => r.ReleaseId == release.ReleaseId);
+                if (linkedRelease != null)
+                {
+                    release.Comment = linkedRelease.Comment;
+                    release.Relation = linkedRelease.Relation;
+                }
+            }
         }
 
         private async Task CreateComponentAndRealease(ICreatorHelper creatorHelper,

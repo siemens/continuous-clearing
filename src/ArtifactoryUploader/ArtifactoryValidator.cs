@@ -14,6 +14,8 @@ using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Net;
+using CycloneDX.Models.Vulnerabilities;
+using System;
 
 namespace LCT.ArtifactoryUploader
 {
@@ -30,12 +32,18 @@ namespace LCT.ArtifactoryUploader
 
         public async Task ValidateArtifactoryCredentials(CommonAppSettings appSettings)
         {
-            HttpResponseMessage responseMessage = await JfrogApiCommunication.GetApiKey();
-
-            if (responseMessage.StatusCode != HttpStatusCode.OK)
+            HttpResponseMessage responseMessage = new HttpResponseMessage();
+            try
             {
-                Logger.Error("Artifactory Token entered is invalid!");
-                throw new InvalidDataException($"Invalid Artifactory Token");
+                responseMessage = await JfrogApiCommunication.GetApiKey();
+            }
+            catch (HttpRequestException ex)
+            {
+                LogExceptionHandling.HttpException(ex, responseMessage, "JFROG");
+            }
+            catch (AggregateException ex)
+            {
+                LogExceptionHandling.GenericExceptions(ex, "JFROG");
             }
         }
     }

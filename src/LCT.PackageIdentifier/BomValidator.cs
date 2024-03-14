@@ -6,7 +6,7 @@
 
 using LCT.Common;
 using LCT.Services.Interface;
-using System.IO;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace LCT.PackageIdentifier
@@ -18,15 +18,15 @@ namespace LCT.PackageIdentifier
     {
         public static async Task ValidateAppSettings(CommonAppSettings appSettings, ISw360ProjectService bomService)
         {
-            string sw360ProjectName = await bomService.GetProjectNameByProjectIDFromSW360(appSettings.SW360ProjectID, appSettings.SW360ProjectName);
-
-            if (string.IsNullOrEmpty(sw360ProjectName))
+            var response=new HttpResponseMessage();
+            try
             {
-                throw new InvalidDataException($"Invalid Project Id - {appSettings.SW360ProjectID}");
+                response = await bomService.GetProjectNameByProjectIDFromSW360(appSettings.SW360ProjectID, appSettings.SW360ProjectName);
+                response.EnsureSuccessStatusCode();
             }
-            else
+            catch (HttpRequestException ex)
             {
-                appSettings.SW360ProjectName = sw360ProjectName;
+                LogExceptionHandling.HttpException(ex, response, "SW360");
             }
         }
     }
