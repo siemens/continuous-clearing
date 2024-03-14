@@ -40,10 +40,13 @@ namespace LCT.Services.UTest
       FossTriggerStatus fossTriggerStatus = new FossTriggerStatus();
       fossTriggerStatus.Links = new Links() { Self = new Self() { Href = "fossology upload link" } };
       var fossTriggerStatusSerialized = JsonConvert.SerializeObject(fossTriggerStatus);
+            HttpResponseMessage httpResponseMessage = new HttpResponseMessage();
+            var content = new StringContent(fossTriggerStatusSerialized, Encoding.UTF8, "application/json");
+            httpResponseMessage.Content = content;
 
-      Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
+            Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
       sw360ApiCommMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()))
-          .ReturnsAsync(fossTriggerStatusSerialized);
+          .ReturnsAsync(httpResponseMessage);
       ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object);
 
       // Act

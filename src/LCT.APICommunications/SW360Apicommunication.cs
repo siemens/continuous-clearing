@@ -133,11 +133,11 @@ namespace LCT.APICommunications
             }
             return result;
         }
-        public async Task<string> TriggerFossologyProcess(string releaseId, string sw360link)
+        public async Task<HttpResponseMessage> TriggerFossologyProcess(string releaseId, string sw360link)
         {
             HttpClient httpClient = GetHttpClient();
             string url = $"{sw360ReleaseApi}/{releaseId}{ApiConstant.FossTriggerAPIPrefix}{sw360link}{ApiConstant.FossTriggerAPISuffix}";
-            return await httpClient.GetStringAsync(url);
+            return await httpClient.GetAsync(url);
         }
         public async Task<HttpResponseMessage> CheckFossologyProcessStatus(string link)
         {

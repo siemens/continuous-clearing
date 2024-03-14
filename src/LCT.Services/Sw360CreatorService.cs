@@ -4,6 +4,7 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using CycloneDX.Models.Vulnerabilities;
 using LCT.APICommunications;
 using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.Foss;
@@ -108,16 +109,29 @@ namespace LCT.Services
         public async Task<FossTriggerStatus> TriggerFossologyProcess(string releaseId, string sw360link)
         {
             FossTriggerStatus fossTriggerStatus = null;
+            var triggerStatus = new HttpResponseMessage();
             try
             {
 
-                string triggerStatus = await m_SW360ApiCommunicationFacade.TriggerFossologyProcess(releaseId, sw360link);
-
-                fossTriggerStatus = JsonConvert.DeserializeObject<FossTriggerStatus>(triggerStatus);
+                triggerStatus = await m_SW360ApiCommunicationFacade.TriggerFossologyProcess(releaseId, sw360link);
+                triggerStatus.EnsureSuccessStatusCode();
+                string fossStatus = await triggerStatus.Content.ReadAsStringAsync();
+                fossTriggerStatus = JsonConvert.DeserializeObject<FossTriggerStatus>(fossStatus);
             }
             catch (HttpRequestException ex)
             {
-                Logger.Logger.Log(null, Level.Error, $"\tTriggering the FossologyProcess is failed due to {ex.StatusCode} : {ex.Message}", null);
+                if (400 <= Convert.ToInt32(triggerStatus.StatusCode) && Convert.ToInt32(triggerStatus.StatusCode) <= 499)
+                {
+                    LogExceptionHandling.HttpException(ex, triggerStatus, "fossology");
+                }else if (500 <= Convert.ToInt32(triggerStatus.StatusCode) && Convert.ToInt32(triggerStatus.StatusCode) <= 599)
+                {
+                    LogExceptionHandling.InternalException(ex, triggerStatus, "fossology");
+                }
+                else
+                {
+                    LogExceptionHandling.GenericExceptions(ex, "fossology");
+                }
+                
 
             }
 

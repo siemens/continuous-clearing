@@ -20,7 +20,7 @@ namespace LCT.Facade.Interfaces
         Task<string> GetSw360Users();
         Task<string> GetComponents();
         Task<string> GetProjectsByName(string projectName);
-        Task<string> TriggerFossologyProcess(string releaseId, string sw360link);
+        Task<HttpResponseMessage> TriggerFossologyProcess(string releaseId, string sw360link);
         Task<HttpResponseMessage> CheckFossologyProcessStatus(string link);
         Task<HttpResponseMessage> GetProjectById(string projectId);
         Task<HttpResponseMessage> GetProjectsByTag(string projectTag);
