@@ -230,7 +230,7 @@ namespace LCT.Services
 
             if (response.Content != null)
             {
-                string responseString = response?.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
+                string responseString = response.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
                 var responseData = JsonConvert.DeserializeObject<Releases>(responseString);
                 string href = responseData?.Links?.Self?.Href ?? string.Empty;
                 releaseId = CommonHelper.GetSubstringOfLastOccurance(href, "/");
@@ -271,7 +271,7 @@ namespace LCT.Services
                 var finalReleasesToBeLinked = manuallyLinkedReleases.Distinct().ToList();
                 Logger.Debug($"No of release Id's to link - {finalReleasesToBeLinked.Count}");
 
-                string[] releaseidArray = finalReleasesToBeLinked?.ToArray();
+                string[] releaseidArray = finalReleasesToBeLinked.ToArray();
                 var response = await m_SW360ApiCommunicationFacade.LinkReleasesToProject(releaseidArray, sw360ProjectId);
                 if (response.IsSuccessStatusCode)
                 {

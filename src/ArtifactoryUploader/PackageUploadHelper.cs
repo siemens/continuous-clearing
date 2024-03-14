@@ -736,34 +736,7 @@ namespace LCT.ArtifactoryUploader
                 
                 if (!(item.SrcRepoName.Contains("Not Found in JFrog")))
                 {
-                    const string dryRunSuffix = null;
-                    string operationType = item.PackageType == PackageType.ClearedThirdParty || item.PackageType == PackageType.Development ? "copy" : "move";
-                    ArtfactoryUploader.jFrogService = jFrogService;
-                    HttpResponseMessage responseMessage = await ArtfactoryUploader.UploadPackageToRepo(item, timeout, displayPackagesInfo);
-
-                    if (responseMessage.StatusCode == HttpStatusCode.OK && !item.DryRun)
-                    {
-                        IncrementCountersBasedOnPackageType(uploaderKpiData, packageType, true);
-                    }
-                    else if (responseMessage.ReasonPhrase == ApiConstant.PackageNotFound)
-                    {
-                        await JfrogFoundPackagesAsync(item, displayPackagesInfo, operationType, responseMessage, dryRunSuffix);
-                        IncrementCountersBasedOnPackageType(uploaderKpiData, packageType, false);
-                        item.DestRepoName = null;
-                        SetWarningCode = true;
-                    }
-                    else if (responseMessage.ReasonPhrase == ApiConstant.ErrorInUpload)
-                    {
-                        await JfrogFoundPackagesAsync(item, displayPackagesInfo, operationType, responseMessage, dryRunSuffix);
-                        IncrementCountersBasedOnPackageType(uploaderKpiData, packageType, false);
-                        item.DestRepoName = null;
-                        var responseContent = await responseMessage.Content.ReadAsStringAsync();
-                        Logger.Debug($"JFrog Response - {responseContent}");
-                    }
-                    else
-                    {
-                        // do nothing
-                    }
+                    await SourceRepoFoundToUploadArtifactory(packageType, uploaderKpiData, item, timeout, displayPackagesInfo);
                 }
                 else
                 {
@@ -778,6 +751,38 @@ namespace LCT.ArtifactoryUploader
                 IncrementCountersBasedOnPackageType(uploaderKpiData, packageType, true);
                 await SucessfullPackagesAsync(item, displayPackagesInfo);                
                 item.DestRepoName = null;
+            }
+        }
+
+        private static async Task SourceRepoFoundToUploadArtifactory(PackageType packageType, UploaderKpiData uploaderKpiData, ComponentsToArtifactory item, int timeout, DisplayPackagesInfo displayPackagesInfo)
+        {
+            const string dryRunSuffix = null;
+            string operationType = item.PackageType == PackageType.ClearedThirdParty || item.PackageType == PackageType.Development ? "copy" : "move";
+            ArtfactoryUploader.jFrogService = jFrogService;
+            HttpResponseMessage responseMessage = await ArtfactoryUploader.UploadPackageToRepo(item, timeout, displayPackagesInfo);
+
+            if (responseMessage.StatusCode == HttpStatusCode.OK && !item.DryRun)
+            {
+                IncrementCountersBasedOnPackageType(uploaderKpiData, packageType, true);
+            }
+            else if (responseMessage.ReasonPhrase == ApiConstant.PackageNotFound)
+            {
+                await JfrogFoundPackagesAsync(item, displayPackagesInfo, operationType, responseMessage, dryRunSuffix);
+                IncrementCountersBasedOnPackageType(uploaderKpiData, packageType, false);
+                item.DestRepoName = null;
+                SetWarningCode = true;
+            }
+            else if (responseMessage.ReasonPhrase == ApiConstant.ErrorInUpload)
+            {
+                await JfrogFoundPackagesAsync(item, displayPackagesInfo, operationType, responseMessage, dryRunSuffix);
+                IncrementCountersBasedOnPackageType(uploaderKpiData, packageType, false);
+                item.DestRepoName = null;
+                var responseContent = await responseMessage.Content.ReadAsStringAsync();
+                Logger.Debug($"JFrog Response - {responseContent}");
+            }
+            else
+            {
+                // do nothing
             }
         }
 

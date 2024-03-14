@@ -341,7 +341,7 @@ namespace LCT.SW360PackageCreator
                 if (!string.IsNullOrEmpty(createdStatus.ReleaseStatus.ReleaseIdToLink))
                     AddReleaseIdToLink(item, createdStatus.ReleaseStatus.ReleaseIdToLink);
 
-                item.ReleaseID = createdStatus?.ReleaseStatus?.ReleaseIdToLink ?? string.Empty;
+                item.ReleaseID = createdStatus.ReleaseStatus?.ReleaseIdToLink ?? string.Empty;
                 if (!(string.IsNullOrEmpty(item.DownloadUrl) || item.DownloadUrl.Equals(Dataconstant.DownloadUrlNotFound)))
                 {
                     await TriggeringFossologyUploadAndUpdateAdditionalData(item, sw360CreatorService, appSettings);
@@ -411,7 +411,7 @@ namespace LCT.SW360PackageCreator
                 if (!string.IsNullOrEmpty(releaseCreateStatus.ReleaseIdToLink))
                     AddReleaseIdToLink(item, releaseCreateStatus.ReleaseIdToLink);
 
-                item.ReleaseID = releaseCreateStatus?.ReleaseIdToLink ?? string.Empty;
+                item.ReleaseID = releaseCreateStatus.ReleaseIdToLink ?? string.Empty;
                 if (!(string.IsNullOrEmpty(item.DownloadUrl) || item.DownloadUrl.Equals(Dataconstant.DownloadUrlNotFound)))
                 {
                     await TriggeringFossologyUploadAndUpdateAdditionalData(item, sw360CreatorService, appSettings);
@@ -435,8 +435,8 @@ namespace LCT.SW360PackageCreator
                 FossTriggerStatus fossResult = await sw360CreatorService.TriggerFossologyProcess(item.ReleaseID, sw360link);
                 if (!string.IsNullOrEmpty(fossResult?.Links?.Self?.Href))
                 {
-                    Logger.Debug($"{fossResult?.Content?.Message}");
-                    uploadId = await CheckFossologyProcessStatus(fossResult?.Links?.Self?.Href, sw360CreatorService);
+                    Logger.Debug($"{fossResult.Content?.Message}");
+                    uploadId = await CheckFossologyProcessStatus(fossResult.Links?.Self?.Href, sw360CreatorService);
                 }
 
             }
@@ -455,7 +455,7 @@ namespace LCT.SW360PackageCreator
                 CheckFossologyProcess fossResult = await sw360CreatorService.CheckFossologyProcessStatus(link);
                 if (!string.IsNullOrEmpty(fossResult?.FossologyProcessInfo?.ExternalTool))
                 {
-                    uploadId = fossResult?.FossologyProcessInfo?.ProcessSteps[0]?.ProcessStepIdInTool;
+                    uploadId = fossResult.FossologyProcessInfo?.ProcessSteps[0]?.ProcessStepIdInTool;
                 }
             }
             catch (AggregateException ex)
