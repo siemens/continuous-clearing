@@ -34,7 +34,7 @@ namespace LCT.SW360PackageCreator
             }
             catch (AggregateException ex)
             {
-                LogExceptionHandling.GenericExceptions(ex, "SW360");
+                LogExceptionHandling.AggregateException(ex, "SW360");
             }
 
         }

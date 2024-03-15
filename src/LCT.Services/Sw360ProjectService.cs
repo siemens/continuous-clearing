@@ -57,7 +57,7 @@ namespace LCT.Services
             }
             catch (AggregateException ex)
             {
-                LogExceptionHandling.GenericExceptions(ex,"SW360");
+                LogExceptionHandling.AggregateException(ex,"SW360");
             }
             return httpStatus;
         }

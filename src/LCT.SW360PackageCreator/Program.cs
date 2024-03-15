@@ -49,9 +49,8 @@ namespace LCT.SW360PackageCreator
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
             ISW360ApicommunicationFacade sW360ApicommunicationFacade;
             ISw360ProjectService sw360ProjectService= Getsw360ProjectServiceObject(appSettings, out sW360ApicommunicationFacade);
-            await CreatorValidator.ValidateAppSettings(appSettings, sw360ProjectService);
-
             string FolderPath = InitiateLogger(appSettings);
+            await CreatorValidator.ValidateAppSettings(appSettings, sw360ProjectService);            
 
             Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Package creator >>>>>====================", null);
             Logger.Logger.Log(null, Level.Notice, $"\nStart of Package creator execution : {DateTime.Now}", null);

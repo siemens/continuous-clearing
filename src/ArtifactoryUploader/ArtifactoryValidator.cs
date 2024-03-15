@@ -43,7 +43,7 @@ namespace LCT.ArtifactoryUploader
             }
             catch (AggregateException ex)
             {
-                LogExceptionHandling.GenericExceptions(ex, "JFROG");
+                LogExceptionHandling.AggregateException(ex, "JFROG");
             }
         }
     }

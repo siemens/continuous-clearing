@@ -50,7 +50,7 @@ namespace LCT.APICommunications
             }
             catch (AggregateException ex)
             {
-                LogExceptionHandling.GenericExceptions(ex, "JFROG");
+                LogExceptionHandling.AggregateException(ex, "JFROG");
             }
             return responseMessage;
         }
@@ -71,7 +71,7 @@ namespace LCT.APICommunications
             }
             catch (AggregateException ex)
             {
-                LogExceptionHandling.GenericExceptions(ex, "JFROG");
+                LogExceptionHandling.AggregateException(ex, "JFROG");
             }
             return responseMessage;
         }
@@ -92,7 +92,7 @@ namespace LCT.APICommunications
             }
             catch (AggregateException ex)
             {
-                LogExceptionHandling.GenericExceptions(ex, "JFROG");
+                LogExceptionHandling.AggregateException(ex, "JFROG");
             }
             return responseMessage;
         }
@@ -111,7 +111,7 @@ namespace LCT.APICommunications
             }
             catch (AggregateException ex)
             {
-                LogExceptionHandling.GenericExceptions(ex, "JFROG");
+                LogExceptionHandling.AggregateException(ex, "JFROG");
             }
             return responseMessage;
         }
@@ -133,7 +133,7 @@ namespace LCT.APICommunications
             }
             catch (AggregateException ex)
             {
-                LogExceptionHandling.GenericExceptions(ex, "JFROG");
+                LogExceptionHandling.AggregateException(ex, "JFROG");
             }
 
         }

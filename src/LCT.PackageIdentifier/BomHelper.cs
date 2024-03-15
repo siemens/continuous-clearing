@@ -175,7 +175,7 @@ namespace LCT.PackageIdentifier
             }
             catch (InvalidOperationException ex)
             {
-                LogExceptionHandling.GenericExceptions(ex,"JFROG");
+                LogExceptionHandling.InvalidOperationException(ex,"JFROG");
             }
             return aqlResultList;
         }

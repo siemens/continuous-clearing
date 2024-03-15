@@ -52,11 +52,11 @@ namespace LCT.Services
             }
             catch (InvalidOperationException ex)
             {
-                LogExceptionHandling.GenericExceptions(ex, "JFROG");
+                LogExceptionHandling.InvalidOperationException(ex, "JFROG");
             }
             catch (TaskCanceledException ex)
             {
-                LogExceptionHandling.GenericExceptions(ex, "JFROG");
+                LogExceptionHandling.TaskCanceledException(ex, "JFROG");
             }
             return aqlResult;
         }
@@ -81,11 +81,11 @@ namespace LCT.Services
             }
             catch (InvalidOperationException invalidOperationExcep)
             {
-                LogExceptionHandling.GenericExceptions(invalidOperationExcep, "JFROG");
+                LogExceptionHandling.InvalidOperationException(invalidOperationExcep, "JFROG");
             }
             catch (TaskCanceledException taskCancelledException)
             {
-                LogExceptionHandling.GenericExceptions(taskCancelledException, "JFROG");
+                LogExceptionHandling.TaskCanceledException(taskCancelledException, "JFROG");
             }
             return aqlResult;
         }

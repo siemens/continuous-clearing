@@ -4,6 +4,7 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using CycloneDX.Models.Vulnerabilities;
 using LCT.APICommunications;
 using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.Foss;
@@ -117,9 +118,19 @@ namespace LCT.Services
             }
             catch (HttpRequestException ex)
             {
-                Logger.Logger.Log(null, Level.Error, $"\tTriggering the FossologyProcess is failed due to {ex.StatusCode} : {ex.Message}", null);
+                
+                if (500 <= Convert.ToInt32(ex.StatusCode) && Convert.ToInt32(ex.StatusCode) <= 599)
+                {
+                    Logger.Logger.Log(null, Level.Error, $"\tThe exception may arise because  fossology is currently unresponsive:{ex.Message} Please try again later", null);                    
+                }
+                else 
+                {
+                    Logger.Logger.Log(null, Level.Error, $"\tThe exception may be caused by an incorrect or missing token for  fossology :{ex.Message} Please ensure that a valid token is provided and try again", null);
+
+                }
 
             }
+           
 
             return fossTriggerStatus;
 
