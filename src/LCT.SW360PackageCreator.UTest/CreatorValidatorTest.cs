@@ -12,7 +12,6 @@ using System;
 using System.IO;
 using LCT.Common;
 using System.Threading.Tasks;
-using System.Net.Http;
 
 namespace SW360ComponentCreator.UTest
 {
@@ -29,11 +28,11 @@ namespace SW360ComponentCreator.UTest
         public async Task ValidateAppSettings_TestPositive()
         {
             //Arrange
-            HttpResponseMessage responseMessage = new HttpResponseMessage();
+            string projectName = "Test";
             var CommonAppSettings = new CommonAppSettings();
             CommonAppSettings.SW360ProjectName = "Test";
             mockISw360ProjectService.Setup(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<String>(), It.IsAny<string>()))
-                .ReturnsAsync(responseMessage);
+                .ReturnsAsync(projectName);
 
             //Act
             await CreatorValidator.ValidateAppSettings(CommonAppSettings, mockISw360ProjectService.Object);
@@ -46,11 +45,10 @@ namespace SW360ComponentCreator.UTest
         public void ValidateAppSettings_TestNegative()
         {
             //Arrange
-            HttpResponseMessage responseMessage= new HttpResponseMessage();
             string projectName = null;
             var CommonAppSettings = new CommonAppSettings();
             mockISw360ProjectService.Setup(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(responseMessage);
+                .ReturnsAsync(projectName);
 
             //Act
 

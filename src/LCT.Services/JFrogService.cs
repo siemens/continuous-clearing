@@ -15,9 +15,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using log4net.Core;
-using LCT.Common;
-
+using System.IO;
 
 namespace LCT.Services
 {
@@ -36,28 +34,34 @@ namespace LCT.Services
 
         public async Task<IList<AqlResult>> GetInternalComponentDataByRepo(string repoName)
         {
-            HttpResponseMessage? httpResponseMessage = null;
+            HttpResponseMessage httpResponseMessage = null;
             IList<AqlResult> aqlResult = new List<AqlResult>();
+
             try
             {
                 httpResponseMessage = await m_JFrogApiCommunicationFacade.GetInternalComponentDataByRepo(repoName);
-                httpResponseMessage.EnsureSuccessStatusCode();
+                if (httpResponseMessage == null || !httpResponseMessage.IsSuccessStatusCode)
+                {
+                    return new List<AqlResult>();
+                }
+
                 string stringData = httpResponseMessage.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
                 var aqlResponse = JsonConvert.DeserializeObject<AqlResponse>(stringData);
                 aqlResult = aqlResponse?.Results ?? new List<AqlResult>();
             }
-            catch (HttpRequestException ex)
+            catch (HttpRequestException httpException)
             {
-                LogExceptionHandling.HttpException(ex, httpResponseMessage,"JFROG");
+                Logger.Debug(httpException);
             }
-            catch (InvalidOperationException ex)
+            catch (InvalidOperationException invalidOperationExcep)
             {
-                LogExceptionHandling.GenericExceptions(ex, "JFROG");
+                Logger.Debug(invalidOperationExcep);
             }
-            catch (TaskCanceledException ex)
+            catch (TaskCanceledException taskCancelledException)
             {
-                LogExceptionHandling.GenericExceptions(ex, "JFROG");
+                Logger.Debug(taskCancelledException);
             }
+
             return aqlResult;
         }
 
@@ -77,16 +81,17 @@ namespace LCT.Services
             }
             catch (HttpRequestException httpException)
             {
-                LogExceptionHandling.HttpException(httpException, httpResponseMessage, "JFROG");
+                Logger.Debug(httpException);
             }
             catch (InvalidOperationException invalidOperationExcep)
             {
-                LogExceptionHandling.GenericExceptions(invalidOperationExcep, "JFROG");
+                Logger.Debug(invalidOperationExcep);
             }
             catch (TaskCanceledException taskCancelledException)
             {
-                LogExceptionHandling.GenericExceptions(taskCancelledException, "JFROG");
+                Logger.Debug(taskCancelledException);
             }
+
             return aqlResult;
         }
 

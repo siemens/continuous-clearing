@@ -40,7 +40,7 @@ namespace LCT.APICommunications.UTest
             JfrogApicommunication jfrogApicommunication = new NpmJfrogApiCommunication("", "", repoCredentials, 100);
 
             //Assert
-            Assert.ThrowsAsync<InvalidDataException>(() => { jfrogApicommunication.UpdatePackagePropertiesInJfrog("", "", new UploadArgs()); return Task.CompletedTask; });
+            Assert.ThrowsAsync<InvalidOperationException>(() => { jfrogApicommunication.UpdatePackagePropertiesInJfrog("", "", new UploadArgs()); return Task.CompletedTask; });
         }
 
         [Test]
