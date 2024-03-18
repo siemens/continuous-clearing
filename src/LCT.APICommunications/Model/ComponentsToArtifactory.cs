@@ -4,8 +4,6 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using System.Net.Http;
-
 namespace LCT.APICommunications.Model
 {
 
@@ -32,8 +30,5 @@ namespace LCT.APICommunications.Model
         public bool DryRun { get; set; } = true;
         public string Purl { get; set; }
         public string JfrogPackageName { get;set; }
-        public string OperationType { get; set; }
-        public string DryRunSuffix { get; set; }
-        public HttpResponseMessage ResponseMessage { get; set; }
     }
 }
