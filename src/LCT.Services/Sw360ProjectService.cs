@@ -77,7 +77,7 @@ namespace LCT.Services
                 Logger.Debug($"GetProjectReleasesByProjectIdFromSw360():Success StatusCode:{projectResponsebyId.StatusCode} " +
               $"& ReasonPhrase :{projectResponsebyId.ReasonPhrase}");
 
-                string result = projectResponsebyId.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
+                string result = projectResponsebyId?.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
                 var projectReleases = JsonConvert.DeserializeObject<ProjectReleases>(result);
                 var sw360LinkedReleases = projectReleases?.LinkedReleases ?? new List<Sw360LinkedRelease>();
                 foreach (Sw360LinkedRelease sw360Release in sw360LinkedReleases)

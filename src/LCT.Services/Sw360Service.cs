@@ -315,14 +315,14 @@ namespace LCT.Services
             //checking for release existance with name and version
             bool isReleaseAvailable = false;
             Sw360Releases sw360Release =
-                sw360Releases.FirstOrDefault(x => x.Name?.Trim().ToLowerInvariant() == component?.Name?.Trim().ToLowerInvariant()
-                && x.Version?.Trim().ToLowerInvariant() == component?.Version?.Trim().ToLowerInvariant());
+                sw360Releases.FirstOrDefault(x => x.Name?.Trim()?.ToLowerInvariant() == component?.Name?.Trim()?.ToLowerInvariant()
+                && x.Version?.Trim()?.ToLowerInvariant() == component?.Version?.Trim()?.ToLowerInvariant());
 
             if (sw360Release == null && component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
             {
-                string debianVersion = $"{component?.Version?.Trim().ToLowerInvariant() ?? string.Empty}.debian";
-                sw360Release = sw360Releases.FirstOrDefault(x => x.Name?.Trim().ToLowerInvariant() == component?.Name?.Trim().ToLowerInvariant()
-                && x.Version?.Trim().ToLowerInvariant() == debianVersion);
+                string debianVersion = $"{component?.Version?.Trim()?.ToLowerInvariant() ?? string.Empty}.debian";
+                sw360Release = sw360Releases.FirstOrDefault(x => x.Name?.Trim()?.ToLowerInvariant() == component?.Name?.Trim()?.ToLowerInvariant()
+                && x.Version?.Trim()?.ToLowerInvariant() == debianVersion);
             }
 
             if (sw360Release != null)
@@ -362,7 +362,7 @@ namespace LCT.Services
             //checking for component existance with name 
             bool isComponentAvailable = false;
             Sw360Components sw360Component =
-                sw360Components.FirstOrDefault(x => x.Name?.Trim().ToLowerInvariant() == component?.Name?.Trim().ToLowerInvariant());
+                sw360Components.FirstOrDefault(x => x.Name?.Trim()?.ToLowerInvariant() == component?.Name?.Trim()?.ToLowerInvariant());
             if (sw360Component != null)
             {
                 availableComponentList.Add(new Components()
