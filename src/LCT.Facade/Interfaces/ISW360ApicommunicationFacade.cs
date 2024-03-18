@@ -34,7 +34,7 @@ namespace LCT.Facade.Interfaces
         Task<string> GetReleaseByCompoenentName(string componentName);
         Task<HttpResponseMessage> CreateRelease(Releases createReleaseContent);
         Task<HttpResponseMessage> CreateComponent(CreateComponent createComponentContent);
-        Task<HttpResponseMessage> LinkReleasesToProject(string[] releaseidArray, string sw360ProjectId);
+        Task<HttpResponseMessage> LinkReleasesToProject(HttpContent httpContent, string sw360ProjectId);
         Task<HttpResponseMessage> UpdateRelease(string releaseId, HttpContent httpContent);
         Task<HttpResponseMessage> UpdateComponent(string componentId, HttpContent httpContent);
         string AttachComponentSourceToSW360(AttachReport attachReport);

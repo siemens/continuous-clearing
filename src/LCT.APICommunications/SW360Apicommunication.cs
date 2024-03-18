@@ -177,15 +177,11 @@ namespace LCT.APICommunications
             return await httpClient.GetAsync(releaseLink);
         }
 
-        public async Task<HttpResponseMessage> LinkReleasesToProject(string[] releaseidArray, string sw360ProjectId)
+        public async Task<HttpResponseMessage> LinkReleasesToProject(HttpContent httpContent, string sw360ProjectId)
         {
             HttpClient httpClient = GetHttpClient();
             string url = $"{sw360ProjectsApi}/{sw360ProjectId}/{ApiConstant.Releases}";
-
-            string releaseidList = JsonConvert.SerializeObject(releaseidArray);
-            HttpContent content = new StringContent(releaseidList, Encoding.UTF8, "application/json");
-
-            return await httpClient.PostAsync(url, content);
+            return await httpClient.PostAsync(url, httpContent);
         }
 
         public async Task<HttpResponseMessage> UpdateLinkedRelease(string projectId, string releaseId, UpdateLinkedRelease updateLinkedRelease)

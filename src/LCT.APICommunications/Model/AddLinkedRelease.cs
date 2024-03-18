@@ -4,21 +4,18 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using Newtonsoft.Json;
+
 namespace LCT.APICommunications.Model
 {
-    /// <summary>
-    /// The ReleasesLinked info class
-    /// </summary>
+
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-    public class ReleaseLinked
+    public class AddLinkedRelease
     {
-        public string Name { get; set; } = string.Empty;
+        [JsonProperty("releaseRelation")]
+        public string ReleaseRelation { get; set; }
 
-        public string Version { get; set; } = string.Empty;
-
-        public string ReleaseId { get; set; } = string.Empty;
-
-        public string Comment { get; set; } = string.Empty;
-        public string Relation {  get; set; } = string.Empty;
+        [JsonProperty("comment")]
+        public string Comment { get; set; }
     }
 }
