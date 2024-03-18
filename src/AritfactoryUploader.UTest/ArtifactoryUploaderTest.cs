@@ -21,7 +21,6 @@ using LCT.Facade;
 using LCT.Services.Interface;
 using LCT.Services;
 using UnitTestUtilities;
-using LCT.ArtifactoryUploader.Model;
 
 namespace AritfactoryUploader.UTest
 {
@@ -43,7 +42,6 @@ namespace AritfactoryUploader.UTest
                 JFrogApi = UTParams.JFrogURL
             };
             ArtfactoryUploader.jFrogService = GetJfrogService(appSettings);
-            DisplayPackagesInfo displayPackagesInfo = PackageUploadHelper.GetComponentsToBePackages();
             var componentsToArtifactory = new ComponentsToArtifactory
             {
                 Name = "html5lib",
@@ -63,9 +61,9 @@ namespace AritfactoryUploader.UTest
                 Purl = "pkg:pypi/html5lib@1.1",
                 JfrogPackageName = "html5lib-1.1-py2.py3-none-any.whl"
             };
-            
+
             //Act
-            var responseMessage = await ArtfactoryUploader.UploadPackageToRepo(componentsToArtifactory, 100, displayPackagesInfo);
+            var responseMessage = await ArtfactoryUploader.UploadPackageToRepo(componentsToArtifactory, 100);
             Assert.AreEqual(HttpStatusCode.NotFound, responseMessage.StatusCode);
             Assert.AreEqual("Package Not Found", responseMessage.ReasonPhrase);
 
