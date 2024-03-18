@@ -8,6 +8,8 @@ using LCT.Services.Interface;
 using System.IO;
 using System.Threading.Tasks;
 using LCT.Common;
+using System.Net.Http;
+using System;
 
 
 namespace LCT.SW360PackageCreator
@@ -19,16 +21,22 @@ namespace LCT.SW360PackageCreator
     {
         public static async Task ValidateAppSettings(CommonAppSettings appSettings, ISw360ProjectService sw360ProjectService)
         {
-            string sw360ProjectName = await sw360ProjectService.GetProjectNameByProjectIDFromSW360(appSettings.SW360ProjectID, appSettings.SW360ProjectName);
 
-            if (string.IsNullOrEmpty(sw360ProjectName))
+            var response = new HttpResponseMessage();
+            try
             {
-                throw new InvalidDataException($"Invalid Project Id - {appSettings.SW360ProjectID}");
+                response = await sw360ProjectService.GetProjectNameByProjectIDFromSW360(appSettings.SW360ProjectID, appSettings.SW360ProjectName);
+                response.EnsureSuccessStatusCode();
             }
-            else
+            catch (HttpRequestException ex)
             {
-                appSettings.SW360ProjectName = sw360ProjectName;
+                LogExceptionHandling.HttpException(ex, response, "SW360");
             }
+            catch (AggregateException ex)
+            {
+                LogExceptionHandling.GenericExceptions(ex, "SW360");
+            }
+
         }
     }
 }

@@ -6,6 +6,7 @@
 
 using LCT.APICommunications.Model;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace LCT.Services.Interface
@@ -21,7 +22,7 @@ namespace LCT.Services.Interface
         /// <param name="projectId">projectId</param>
         /// <param name="projectName">projectName</param>
         /// <returns>string</returns>
-        Task<string> GetProjectNameByProjectIDFromSW360(string projectId, string projectName);
+        Task<HttpResponseMessage> GetProjectNameByProjectIDFromSW360(string projectId, string projectName);
 
         Task<List<ReleaseLinked>> GetAlreadyLinkedReleasesByProjectId(string projectId);
     }

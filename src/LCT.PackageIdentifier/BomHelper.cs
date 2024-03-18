@@ -13,10 +13,12 @@ using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
 using log4net.Core;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -160,15 +162,21 @@ namespace LCT.PackageIdentifier
         public async Task<List<AqlResult>> GetListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService)
         {
             List<AqlResult> aqlResultList = new();
-            if (repoList != null && repoList.Length > 0)
+            try
             {
-                foreach (var repo in repoList)
+                if (repoList != null && repoList.Length > 0)
                 {
-                    var test = await jFrogService.GetInternalComponentDataByRepo(repo) ?? new List<AqlResult>();
-                    aqlResultList.AddRange(test);
+                    foreach (var repo in repoList)
+                    {
+                        var test = await jFrogService.GetInternalComponentDataByRepo(repo) ?? new List<AqlResult>();
+                        aqlResultList.AddRange(test);
+                    }
                 }
             }
-
+            catch (InvalidOperationException ex)
+            {
+                LogExceptionHandling.GenericExceptions(ex,"JFROG");
+            }
             return aqlResultList;
         }
 

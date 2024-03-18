@@ -13,6 +13,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using LCT.Common;
+using System.Net.Http;
 
 namespace PackageIdentifier.UTest
 {
@@ -28,12 +29,17 @@ namespace PackageIdentifier.UTest
         {
             //Arrange
             string projectName = "Test";
+            HttpResponseMessage responseMessage = new HttpResponseMessage()
+            {
+                StatusCode = System.Net.HttpStatusCode.OK
+
+            };
             var CommonAppSettings = new CommonAppSettings(mockIFolderAction.Object)
             {
                 SW360ProjectName = "Test"
             };
-            mockISw360ProjectService.Setup(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<String>(), It.IsAny<string>()))
-                .ReturnsAsync(projectName);
+            mockISw360ProjectService.Setup(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(responseMessage);
 
             mockIFileOperations.Setup(x => x.ValidateFilePath(It.IsAny<string>()))
                 .Callback((string message) => { })
@@ -55,13 +61,17 @@ namespace PackageIdentifier.UTest
         public Task ValidateAppSettings_ProvidedProjectID_ReturnsInvalidDataException()
         {
             //Arrange
-            string projectName = null;
+            HttpResponseMessage responseMessage = new HttpResponseMessage()
+            {
+                StatusCode = System.Net.HttpStatusCode.NotFound
+
+            };
             var CommonAppSettings = new CommonAppSettings(mockIFolderAction.Object)
             {
                 SW360ProjectName = "Test"
             };
             mockISw360ProjectService.Setup(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(projectName);
+                .ReturnsAsync(responseMessage);
 
             mockIFileOperations.Setup(x => x.ValidateFilePath(It.IsAny<string>()))
                 .Callback((string message) => { })

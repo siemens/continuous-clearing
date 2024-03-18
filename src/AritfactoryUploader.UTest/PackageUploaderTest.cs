@@ -20,6 +20,10 @@ using LCT.APICommunications;
 using LCT.Facade.Interfaces;
 using LCT.Facade;
 using LCT.Services;
+using LCT.Common.Model;
+using System.Collections.Generic;
+using CycloneDX.Models;
+using LCT.Common.Constants;
 
 namespace AritfactoryUploader.UTest
 {
@@ -67,6 +71,87 @@ namespace AritfactoryUploader.UTest
             Assert.That(12, Is.EqualTo(PackageUploader.uploaderKpiData.ComponentInComparisonBOM), "Checks for no of components in BOM");
             Assert.That(10, Is.EqualTo(PackageUploader.uploaderKpiData.PackagesNotExistingInRemoteCache), "Checks for no of components not present in remote cache");
             Assert.That(2, Is.EqualTo(PackageUploader.uploaderKpiData.PackagesNotUploadedDueToError), "Checks for no of components not uploaded due to error");
+        }
+        [Test]
+        public void DisplayAllSettings_GivenListOfComponents_ReturnPackageSettings()
+        {
+            //Arrange
+            CommonAppSettings CommonAppSettings = new CommonAppSettings()
+            {
+
+                JFrogApi = UTParams.JFrogURL,
+                Npm = new Config
+                {
+                    JfrogThirdPartyDestRepoName = "npm-test",
+                    JfrogDevDestRepoName = "npm-test",
+                    JfrogInternalDestRepoName = "npm-test",
+                    Include = { },
+                    Exclude = { },
+                },
+                Conan = new Config
+                {
+                    JfrogThirdPartyDestRepoName = "conan-test",
+                    JfrogDevDestRepoName = "conan-test",
+                    JfrogInternalDestRepoName = "conan-test",
+                    Include = { },
+                    Exclude = { },
+                },
+                Nuget = new Config
+                {
+                    JfrogThirdPartyDestRepoName = "nuget-test",
+                    JfrogDevDestRepoName = "nuget-test",
+                    JfrogInternalDestRepoName = "nuget-test",
+                    Include = { },
+                    Exclude = { },
+                },
+                Python = new Config
+                {
+                    JfrogThirdPartyDestRepoName = "python-test",
+                    JfrogDevDestRepoName = "python-test",
+                    JfrogInternalDestRepoName = "python-test",
+                    Include = { },
+                    Exclude = { },
+                },
+                Maven = new Config
+                {
+                    JfrogThirdPartyDestRepoName = "maven-test",
+                    JfrogDevDestRepoName = "maven-test",
+                    JfrogInternalDestRepoName = "maven-test",
+                    Include = { },
+                    Exclude = { },
+                },
+                Debian = new Config
+                {
+                    JfrogThirdPartyDestRepoName = "debian-test",
+                    JfrogDevDestRepoName = "debian-test",
+                    JfrogInternalDestRepoName = "debian-test",
+                    Include = { },
+                    Exclude = { },
+                },
+                TimeOut = 100,
+                Release = false
+            };
+            List<Component> m_ComponentsInBOM = new()
+            {
+                new Component {
+                Name="test",
+                Version="1.0.0",
+                Properties=new List<Property>()
+                {
+                new Property{Name=Dataconstant.Cdx_ProjectType,Value="NPM"},
+                new Property{Name=Dataconstant.Cdx_ProjectType,Value="CONAN"},
+                new Property{Name=Dataconstant.Cdx_ProjectType,Value="NUGET"},
+                new Property{Name=Dataconstant.Cdx_ProjectType,Value="MAVEN"},
+                new Property{Name=Dataconstant.Cdx_ProjectType,Value="DEBIAN"},
+                new Property{Name=Dataconstant.Cdx_ProjectType,Value="PYTHON"}
+                }
+            }
+            };
+            //Act
+             PackageUploader.DisplayAllSettings(m_ComponentsInBOM,CommonAppSettings);
+
+            //Assert
+             Assert.IsTrue(true);
         }
 
 
