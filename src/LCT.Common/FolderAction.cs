@@ -118,7 +118,7 @@ namespace LCT.Common
             return isZiped;
         }
 
-        private static void CopyAll(DirectoryInfo source, DirectoryInfo target)
+        private void CopyAll(DirectoryInfo source, DirectoryInfo target)
         {
             Logger.Debug("FolderAction.CopyAll():Start");
 

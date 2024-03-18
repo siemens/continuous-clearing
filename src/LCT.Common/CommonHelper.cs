@@ -64,7 +64,7 @@ namespace LCT.Common
             string result = string.IsNullOrWhiteSpace(value) ? string.Empty : value;
             if (result.Contains(separator))
             {
-                result = result[(result.LastIndexOf(separator) + separator.Length)..];
+                result = result?[(result.LastIndexOf(separator) + separator.Length)..];
             }
 
             return result;

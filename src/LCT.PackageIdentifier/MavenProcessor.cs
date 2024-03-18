@@ -52,11 +52,11 @@ namespace LCT.PackageIdentifier
 
                     if (componentsForBOM.Count == 0)
                     {
-                        componentsForBOM.AddRange(bomList.Components);
+                        componentsForBOM.AddRange(bomList?.Components);
                     }
                     else
                     {
-                        componentsToBOM.AddRange(bomList.Components);
+                        componentsToBOM.AddRange(bomList?.Components);
                     }
 
                     if (bomList.Dependencies != null)

@@ -230,7 +230,7 @@ namespace LCT.Services
 
             if (response.Content != null)
             {
-                string responseString = response.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
+                string responseString = response?.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
                 var responseData = JsonConvert.DeserializeObject<Releases>(responseString);
                 string href = responseData?.Links?.Self?.Href ?? string.Empty;
                 releaseId = CommonHelper.GetSubstringOfLastOccurance(href, "/");
