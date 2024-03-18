@@ -21,7 +21,6 @@ namespace LCT.Common
     {
         private readonly IFolderAction folderAction;
         private readonly IFileOperations _fileOperations;
-
         public static string PackageUrlApi { get; set; } = $"https://www.nuget.org/api/v2/package/";
         public static string SourceURLNugetApi { get; set; } = $"https://api.nuget.org/v3-flatcontainer/";
         public static string SourceURLMavenApi { get; set; } = $"https://repo.maven.apache.org/maven2/";
