@@ -29,14 +29,9 @@ namespace LCT.Common
             {
                 Logger.Logger.Log(null, Level.Error, $"The exception may be caused by an incorrect projectid or missing token for {exceptionSource} , Please ensure that a valid token is provided and try again:{ex.Message}", null);
                 
-            }
-            else if (500 <= Convert.ToInt32(responce.StatusCode) && Convert.ToInt32(responce.StatusCode) <= 599)
-            {
-                Logger.Logger.Log(null, Level.Error, $"The exception may arise because {exceptionSource} , is currently unresponsive. Please try again later:{ex.Message}", null);
-                
-            }
+            }          
 
-        }
+        }        
 
         public static void AggregateException(AggregateException ex, string exceptionSource)
         {

@@ -53,15 +53,15 @@ namespace LCT.Services
             }
             catch (HttpRequestException httpException)
             {
-                ExceptionHandling.HttpException(httpException, httpResponseMessage, "JFROG");
+                Logger.Debug(httpException);
             }
             catch (InvalidOperationException invalidOperationExcep)
             {
-                ExceptionHandling.InvalidOperationException(invalidOperationExcep, "JFROG");
+                Logger.Debug(invalidOperationExcep);
             }
             catch (TaskCanceledException taskCancelledException)
             {
-                ExceptionHandling.TaskCancelledException(taskCancelledException, "JFROG");
+                Logger.Debug(taskCancelledException);
             }
 
             return aqlResult;
@@ -83,15 +83,15 @@ namespace LCT.Services
             }
             catch (HttpRequestException httpException)
             {
-                ExceptionHandling.HttpException(httpException, httpResponseMessage, "JFROG");
+                Logger.Debug(httpException);
             }
             catch (InvalidOperationException invalidOperationExcep)
             {
-                ExceptionHandling.InvalidOperationException(invalidOperationExcep, "JFROG");
+                Logger.Debug(invalidOperationExcep);
             }
             catch (TaskCanceledException taskCancelledException)
             {
-                ExceptionHandling.TaskCancelledException(taskCancelledException, "JFROG");
+                Logger.Debug(taskCancelledException);
             }
 
             return aqlResult;
