@@ -45,7 +45,7 @@ namespace LCT.PackageIdentifier
 
             if (!m_Verbose && CommonHelper.IsAzureDevOpsDebugEnabled())
                 m_Verbose = true;
-            ISettingsManager settingsManager = new SettingsManager();
+            ISettingsManager settingsManager = new SettingsManager("Identifer");
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
 
             string FolderPath = LogFolderInitialisation(appSettings);

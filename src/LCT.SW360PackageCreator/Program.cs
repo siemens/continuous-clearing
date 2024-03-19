@@ -45,7 +45,7 @@ namespace LCT.SW360PackageCreator
             if (!m_Verbose && CommonHelper.IsAzureDevOpsDebugEnabled())
                 m_Verbose = true;
 
-            ISettingsManager settingsManager = new SettingsManager();
+            ISettingsManager settingsManager = new SettingsManager("Creator");
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
             ISW360ApicommunicationFacade sW360ApicommunicationFacade;
             ISw360ProjectService sw360ProjectService= Getsw360ProjectServiceObject(appSettings, out sW360ApicommunicationFacade);
