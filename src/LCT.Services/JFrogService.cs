@@ -15,9 +15,6 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.IO;
-using LCT.Common;
-using System.Net.Mail;
 
 namespace LCT.Services
 {
