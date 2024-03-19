@@ -11,6 +11,7 @@ using System.IO;
 using LCT.Common;
 using LCT.Common.Model;
 using LCT.Common.Constants;
+using Moq;
 
 namespace PackageIdentifier.UTest
 {
@@ -24,7 +25,9 @@ namespace PackageIdentifier.UTest
             int expectednoofcomponents = 8;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            DebianProcessor DebianProcessor = new DebianProcessor();
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+
+            DebianProcessor DebianProcessor = new DebianProcessor(cycloneDXBomParser.Object);
             string[] Includes = { "*_Debian.cdx.json" };
             CommonAppSettings appSettings = new CommonAppSettings()
             {
@@ -48,8 +51,10 @@ namespace PackageIdentifier.UTest
             //Arrange
             int expectednoofcomponents = 4;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+
             string OutFolder = Path.GetDirectoryName(exePath);
-            DebianProcessor DebianProcessor = new DebianProcessor();
+            DebianProcessor DebianProcessor = new DebianProcessor(cycloneDXBomParser.Object);
             string[] Includes = { "CycloneDX_Debian.cdx.json" };
             CommonAppSettings appSettings = new CommonAppSettings()
             {
@@ -73,7 +78,9 @@ namespace PackageIdentifier.UTest
             int duplicateComponents = 1;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            DebianProcessor DebianProcessor = new DebianProcessor();
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+
+            DebianProcessor DebianProcessor = new DebianProcessor(cycloneDXBomParser.Object);
             string[] Includes = { "*_Debian.cdx.json" };
 
             CommonAppSettings appSettings = new CommonAppSettings()
@@ -98,7 +105,9 @@ namespace PackageIdentifier.UTest
             string sourceName = "adduser" + "_" + "3.118";
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            DebianProcessor DebianProcessor = new DebianProcessor();
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+
+            DebianProcessor DebianProcessor = new DebianProcessor(cycloneDXBomParser.Object);
             string[] Includes = { "SourceDetails_Cyclonedx.cdx.json" };
 
             CommonAppSettings appSettings = new CommonAppSettings()
@@ -123,7 +132,9 @@ namespace PackageIdentifier.UTest
             int expectednoofcomponents = 5;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            DebianProcessor DebianProcessor = new DebianProcessor();
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+
+            DebianProcessor DebianProcessor = new DebianProcessor(cycloneDXBomParser.Object);
             string[] Includes = { "CycloneDX_Debian.cdx.json", "SBOMTemplate_Debian.cdx.json" };
             string packagefilepath = OutFolder + @"\PackageIdentifierUTTestFiles";
 
@@ -149,7 +160,9 @@ namespace PackageIdentifier.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            DebianProcessor DebianProcessor = new DebianProcessor();
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+
+            DebianProcessor DebianProcessor = new DebianProcessor(cycloneDXBomParser.Object);
             string[] Includes = { "CycloneDX_Debian.cdx.json", "SBOMTemplate_Debian.cdx.json" };
             string packagefilepath = OutFolder + @"\PackageIdentifierUTTestFiles";
 

@@ -12,6 +12,7 @@ using LCT.Common.Model;
 using System.Collections.Generic;
 using CycloneDX.Models;
 using LCT.Common.Constants;
+using Moq;
 
 namespace LCT.PackageIdentifier.UTest
 {
@@ -37,7 +38,8 @@ namespace LCT.PackageIdentifier.UTest
                 Npm = new Config() { Include = Includes, Exclude = Excludes }
             };
 
-            NpmProcessor NpmProcessor = new NpmProcessor();
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            NpmProcessor NpmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
 
             //Act
             NpmProcessor.ParsePackageFile(appSettings);
@@ -63,8 +65,8 @@ namespace LCT.PackageIdentifier.UTest
                 RemoveDevDependency = true,
                 Npm = new Config() { Include = Includes, Exclude = Excludes }
             };
-
-            NpmProcessor NpmProcessor = new NpmProcessor();
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            NpmProcessor NpmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
 
             //Act
             Bom bom=NpmProcessor.ParsePackageFile(appSettings);
@@ -94,7 +96,9 @@ namespace LCT.PackageIdentifier.UTest
 
 
             };
-            NpmProcessor NpmProcessor = new NpmProcessor();
+
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            NpmProcessor NpmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
 
             //Act
             NpmProcessor.ParsePackageFile(appSettings);
@@ -110,7 +114,8 @@ namespace LCT.PackageIdentifier.UTest
             int expectednoofcomponents = 5;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            NpmProcessor npmProcessor = new NpmProcessor();
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
             string[] Includes = { "*_NPM.cdx.json" };
             CommonAppSettings appSettings = new CommonAppSettings()
             {
@@ -134,7 +139,8 @@ namespace LCT.PackageIdentifier.UTest
             int expectednoofcomponents = 4;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            NpmProcessor npmProcessor = new NpmProcessor();
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
             string[] Includes = { "CycloneDX2_NPM.cdx.json", "SBOMTemplate_Npm.cdx.json" };
             string packagefilepath = OutFolder + @"\PackageIdentifierUTTestFiles";
 
@@ -160,7 +166,8 @@ namespace LCT.PackageIdentifier.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            NpmProcessor npmProcessor = new NpmProcessor();
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
             string[] Includes = { "CycloneDX2_NPM.cdx.json" };
             string packagefilepath = OutFolder + @"\PackageIdentifierUTTestFiles";
 

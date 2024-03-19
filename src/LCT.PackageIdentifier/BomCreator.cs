@@ -101,30 +101,30 @@ namespace LCT.PackageIdentifier
         private async Task<Bom> CallPackageParser(CommonAppSettings appSettings)
         {
             IParser parser;
-
+            ICycloneDXBomParser cycloneDXBomParser = new CycloneDXBomParser();
 
             switch (appSettings.ProjectType.ToUpperInvariant())
             {
                 case "NPM":
-                    parser = new NpmProcessor();
+                    parser = new NpmProcessor(cycloneDXBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 case "NUGET":
-                    parser = new NugetProcessor();
+                    parser = new NugetProcessor(cycloneDXBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 case "MAVEN":
-                    parser = new MavenProcessor();
+                    parser = new MavenProcessor(cycloneDXBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 case "DEBIAN":
-                    parser = new DebianProcessor();
+                    parser = new DebianProcessor(cycloneDXBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 case "ALPINE":
-                    parser = new AlpineProcessor();
+                    parser = new AlpineProcessor(cycloneDXBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 case "PYTHON":
-                    parser = new PythonProcessor();
+                    parser = new PythonProcessor(cycloneDXBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 case "CONAN":
-                    parser = new ConanProcessor();
+                    parser = new ConanProcessor(cycloneDXBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 default:
                     Logger.Error($"GenerateBom():Invalid ProjectType - {appSettings.ProjectType}");

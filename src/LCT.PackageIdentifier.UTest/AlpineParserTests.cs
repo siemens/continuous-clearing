@@ -10,6 +10,7 @@ using LCT.Common;
 using NUnit.Framework;
 using System.IO;
 using LCT.Common.Constants;
+using Moq;
 
 namespace LCT.PackageIdentifier.UTest
 {
@@ -23,7 +24,9 @@ namespace LCT.PackageIdentifier.UTest
             int expectednoofcomponents = 4;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            AlpineProcessor alpineProcessor = new AlpineProcessor();
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+
+            AlpineProcessor alpineProcessor = new AlpineProcessor(cycloneDXBomParser.Object);
             string[] Includes = { "*_Alpine.cdx.json" };
             CommonAppSettings appSettings = new CommonAppSettings()
             {
@@ -48,7 +51,9 @@ namespace LCT.PackageIdentifier.UTest
             int expectednoofcomponents = 4;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            AlpineProcessor alpineProcessor = new AlpineProcessor();
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+
+            AlpineProcessor alpineProcessor = new AlpineProcessor(cycloneDXBomParser.Object);
             string[] Includes = { "CycloneDX_Alpine.cdx.json" };
             CommonAppSettings appSettings = new CommonAppSettings()
             {
@@ -72,7 +77,9 @@ namespace LCT.PackageIdentifier.UTest
             int duplicateComponents = 4;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            AlpineProcessor alpineProcessor = new AlpineProcessor();
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+
+            AlpineProcessor alpineProcessor = new AlpineProcessor(cycloneDXBomParser.Object);
             string[] Includes = { "*_Alpine.cdx.json" };
 
             CommonAppSettings appSettings = new CommonAppSettings()
@@ -97,7 +104,9 @@ namespace LCT.PackageIdentifier.UTest
             string sourceName = "alpine-baselayout" + "_" + "3.4.3-r1";
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            AlpineProcessor alpineProcessor = new AlpineProcessor();
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+
+            AlpineProcessor alpineProcessor = new AlpineProcessor(cycloneDXBomParser.Object);
             string[] Includes = { "AlpineSourceDetails_Cyclonedx.cdx.json" };
 
             CommonAppSettings appSettings = new CommonAppSettings()
@@ -122,7 +131,9 @@ namespace LCT.PackageIdentifier.UTest
             int expectednoofcomponents = 5;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            AlpineProcessor alpineProcessor = new AlpineProcessor();
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+
+            AlpineProcessor alpineProcessor = new AlpineProcessor(cycloneDXBomParser.Object);
             string[] Includes = { "CycloneDX_Alpine.cdx.json", "SBOMTemplate_Alpine.cdx.json" };
             string packagefilepath = OutFolder + @"\PackageIdentifierUTTestFiles";
 
@@ -148,7 +159,9 @@ namespace LCT.PackageIdentifier.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            AlpineProcessor alpineProcessor = new AlpineProcessor();
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+
+            AlpineProcessor alpineProcessor = new AlpineProcessor(cycloneDXBomParser.Object);
             string[] Includes = { "CycloneDX_Alpine.cdx.json", "SBOMTemplate_Alpine.cdx.json" };
             string packagefilepath = OutFolder + @"\PackageIdentifierUTTestFiles";
 

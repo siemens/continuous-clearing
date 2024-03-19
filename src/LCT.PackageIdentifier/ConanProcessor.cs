@@ -33,16 +33,13 @@ namespace LCT.PackageIdentifier
     {
         #region fields
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        readonly CycloneDXBomParser cycloneDXBomParser;
+        private readonly ICycloneDXBomParser _cycloneDXBomParser;
         #endregion
 
         #region constructor
-        public ConanProcessor()
+        public ConanProcessor(ICycloneDXBomParser cycloneDXBomParser)
         {
-            if (cycloneDXBomParser == null)
-            {
-                cycloneDXBomParser = new CycloneDXBomParser();
-            }
+            _cycloneDXBomParser = cycloneDXBomParser;
         }
         #endregion
 
@@ -182,7 +179,7 @@ namespace LCT.PackageIdentifier
                 else if (filepath.EndsWith(FileConstant.CycloneDXFileExtension) && !filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
-                    bom = cycloneDXBomParser.ParseCycloneDXBom(filepath);
+                    bom = _cycloneDXBomParser.ParseCycloneDXBom(filepath);
                     CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
                     componentsForBOM.AddRange(bom.Components);
                     GetDetailsforManuallyAddedComp(componentsForBOM);
@@ -208,7 +205,7 @@ namespace LCT.PackageIdentifier
             {
                 //Adding Template Component Details
                 Bom templateDetails;
-                templateDetails = ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
+                templateDetails = ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
                 CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
                 SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
             }

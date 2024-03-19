@@ -27,7 +27,8 @@ namespace PackageIdentifier.UTest
         readonly PythonProcessor pythonProcessor;
         public PythonParserTests()
         {
-            pythonProcessor = new PythonProcessor();
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            pythonProcessor = new PythonProcessor(cycloneDXBomParser.Object);
         }
         [Test]
         public void ParseCycloneDXFile_GivenAMultipleInputFilePath_ReturnsCounts()
@@ -211,7 +212,8 @@ namespace PackageIdentifier.UTest
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("cachy");
 
             // Act
-            PythonProcessor pyProcessor = new PythonProcessor();
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            PythonProcessor pyProcessor = new PythonProcessor(cycloneDXBomParser.Object);
             var actual = await pyProcessor.IdentificationOfInternalComponents(
                 component, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -246,9 +248,10 @@ namespace PackageIdentifier.UTest
             mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("cachy");
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             // Act
-            PythonProcessor pyProcessor = new PythonProcessor();
+            PythonProcessor pyProcessor = new PythonProcessor(cycloneDXBomParser.Object);
             var actual = await pyProcessor.IdentificationOfInternalComponents(
                 component, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -284,9 +287,10 @@ namespace PackageIdentifier.UTest
             mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("html5lib");
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             // Act
-            PythonProcessor pyProcessor = new PythonProcessor();
+            PythonProcessor pyProcessor = new PythonProcessor(cycloneDXBomParser.Object);
             var actual = await pyProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -322,9 +326,10 @@ namespace PackageIdentifier.UTest
             mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("html5lib");
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             // Act
-            PythonProcessor pyProcessor = new PythonProcessor();
+            PythonProcessor pyProcessor = new PythonProcessor(cycloneDXBomParser.Object);
             var actual = await pyProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
