@@ -6,6 +6,7 @@
 
 using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
+using LCT.Common;
 using LCT.Common.Model;
 using log4net;
 using Newtonsoft.Json;
@@ -105,11 +106,17 @@ namespace LCT.APICommunications
             {
 
                 result = await httpClient.GetAsync(projectsByTagUrl);
+                result.EnsureSuccessStatusCode();
+            }
+            catch (HttpRequestException ex)
+            {
+                ExceptionHandling.HttpException(ex,result,"SW360");
+                Environment.Exit(-1);
             }
             catch (TaskCanceledException ex)
             {
                 Logger.Debug($"{ex.Message}");
-                Logger.Error("A timeout error is thrown from SW360 server,Please wait for sometime and re run the pipeline again");
+                ExceptionHandling.TaskCancelledException(ex, "SW360");
                 Environment.Exit(-1);
 
             }

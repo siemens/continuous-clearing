@@ -16,6 +16,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using LCT.Common;
+using System.Net.Mail;
 
 namespace LCT.Services
 {
@@ -51,15 +53,15 @@ namespace LCT.Services
             }
             catch (HttpRequestException httpException)
             {
-                Logger.Debug(httpException);
+                ExceptionHandling.HttpException(httpException, httpResponseMessage, "JFROG");
             }
             catch (InvalidOperationException invalidOperationExcep)
             {
-                Logger.Debug(invalidOperationExcep);
+                ExceptionHandling.InvalidOperationException(invalidOperationExcep, "JFROG");
             }
             catch (TaskCanceledException taskCancelledException)
             {
-                Logger.Debug(taskCancelledException);
+                ExceptionHandling.TaskCancelledException(taskCancelledException, "JFROG");
             }
 
             return aqlResult;
@@ -81,15 +83,15 @@ namespace LCT.Services
             }
             catch (HttpRequestException httpException)
             {
-                Logger.Debug(httpException);
+                ExceptionHandling.HttpException(httpException, httpResponseMessage, "JFROG");
             }
             catch (InvalidOperationException invalidOperationExcep)
             {
-                Logger.Debug(invalidOperationExcep);
+                ExceptionHandling.InvalidOperationException(invalidOperationExcep, "JFROG");
             }
             catch (TaskCanceledException taskCancelledException)
             {
-                Logger.Debug(taskCancelledException);
+                ExceptionHandling.TaskCancelledException(taskCancelledException, "JFROG");
             }
 
             return aqlResult;
