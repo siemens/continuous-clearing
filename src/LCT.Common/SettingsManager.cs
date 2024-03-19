@@ -14,7 +14,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading;
 
 namespace LCT.Common
 {
@@ -216,7 +215,7 @@ namespace LCT.Common
             List<string> uploaderReqParameters = new List<string>()
             {
                 "JFrogApi",
-                "PackageFilePath",
+                "BomFilePath",
                 "ArtifactoryUploadApiKey",
             };
 

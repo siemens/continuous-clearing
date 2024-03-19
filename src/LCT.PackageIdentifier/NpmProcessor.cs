@@ -23,10 +23,8 @@ using System.Reflection;
 using System.Security;
 using System.Threading.Tasks;
 
-
 namespace LCT.PackageIdentifier
 {
-
     /// <summary>
     /// Parses the NPM Packages
     /// </summary>
