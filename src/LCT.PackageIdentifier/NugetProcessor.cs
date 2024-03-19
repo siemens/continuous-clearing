@@ -31,11 +31,11 @@ namespace LCT.PackageIdentifier
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
-        readonly CycloneDXBomParser cycloneDXBomParser;
+        private readonly ICycloneDXBomParser _cycloneDXBomParser;
 
-        public NugetProcessor()
+        public NugetProcessor(ICycloneDXBomParser cycloneDXBomParser)
         {
-            cycloneDXBomParser = new CycloneDXBomParser();
+            _cycloneDXBomParser = cycloneDXBomParser;
         }
 
         #region public methods
@@ -374,7 +374,7 @@ namespace LCT.PackageIdentifier
                     if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                     {
                         Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
-                        bom = cycloneDXBomParser.ParseCycloneDXBom(filepath);
+                        bom = _cycloneDXBomParser.ParseCycloneDXBom(filepath);
                         CycloneDXBomParser.CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
                         componentsForBOM.AddRange(bom.Components);
                         CommonHelper.GetDetailsforManuallyAdded(componentsForBOM, listComponentForBOM);
@@ -409,7 +409,7 @@ namespace LCT.PackageIdentifier
             {
                 //Adding Template Component Details
                 Bom templateDetails;
-                templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
+                templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
                 CycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
                 SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
             }

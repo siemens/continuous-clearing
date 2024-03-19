@@ -15,14 +15,11 @@ using LCT.Services.Interface;
 using log4net;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using Tommy;
 using Component = CycloneDX.Models.Component;
 
@@ -33,11 +30,11 @@ namespace LCT.PackageIdentifier
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
 
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        readonly CycloneDXBomParser cycloneDXBomParser;
+        private readonly ICycloneDXBomParser _cycloneDXBomParser;
 
-        public PythonProcessor()
+        public PythonProcessor(ICycloneDXBomParser cycloneDXBomParser)
         {
-            cycloneDXBomParser = new CycloneDXBomParser();
+            _cycloneDXBomParser = cycloneDXBomParser;
         }
 
         public Bom ParsePackageFile(CommonAppSettings appSettings)
@@ -63,7 +60,7 @@ namespace LCT.PackageIdentifier
             Bom templateDetails = new Bom();
             if (File.Exists(appSettings.CycloneDxSBomTemplatePath) && appSettings.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
-                templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
+                templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
                 CycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
             }
 
@@ -163,7 +160,7 @@ namespace LCT.PackageIdentifier
         private List<PythonPackage> ExtractDetailsFromJson(string filePath, CommonAppSettings appSettings, ref List<Dependency> dependencies)
         {
             List<PythonPackage> PythonPackages = new List<PythonPackage>();
-            Bom bom = cycloneDXBomParser.ParseCycloneDXBom(filePath);
+            Bom bom = _cycloneDXBomParser.ParseCycloneDXBom(filePath);
             CycloneDXBomParser.CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
 
             foreach (var componentsInfo in bom.Components)

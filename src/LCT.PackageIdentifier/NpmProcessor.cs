@@ -31,7 +31,7 @@ namespace LCT.PackageIdentifier
     public class NpmProcessor : CycloneDXBomParser, IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        readonly CycloneDXBomParser cycloneDXBomParser;
+        private readonly ICycloneDXBomParser _cycloneDXBomParser;
         private const string Bundled = "bundled";
         private const string Dependencies = "dependencies";
         private const string Dev = "dev";
@@ -40,12 +40,9 @@ namespace LCT.PackageIdentifier
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
         private const string Requires = "requires";
 
-        public NpmProcessor()
+        public NpmProcessor(ICycloneDXBomParser cycloneDXBomParser)
         {
-            if (cycloneDXBomParser == null)
-            {
-                cycloneDXBomParser = new CycloneDXBomParser();
-            }
+            _cycloneDXBomParser = cycloneDXBomParser;
         }
 
         public Bom ParsePackageFile(CommonAppSettings appSettings)
@@ -381,7 +378,7 @@ namespace LCT.PackageIdentifier
             if (File.Exists(appSettings.CycloneDxSBomTemplatePath) && appSettings.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
                 Bom templateDetails;
-                templateDetails = ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
+                templateDetails = ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
                 CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
                 //Adding Template Component Details
                 SbomTemplate.AddComponentDetails(componentsForBOM, templateDetails);
