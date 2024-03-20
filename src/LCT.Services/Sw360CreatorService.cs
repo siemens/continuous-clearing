@@ -117,7 +117,7 @@ namespace LCT.Services
             }
             catch (HttpRequestException ex)
             {
-                Logger.Logger.Log(null, Level.Error, $"\tTriggering the FossologyProcess is failed due to {ex.StatusCode} : {ex.Message}", null);
+                ExceptionHandling.FossologyException(ex);             
 
             }
 
