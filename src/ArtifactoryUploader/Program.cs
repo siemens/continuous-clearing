@@ -39,9 +39,11 @@ namespace ArtifactoryUploader
             if (!m_Verbose && CommonHelper.IsAzureDevOpsDebugEnabled())
                 m_Verbose = true;
 
-            ISettingsManager settingsManager = new SettingsManager("Uploader");
+            ISettingsManager settingsManager = new SettingsManager();
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
             string FolderPath = InitiateLogger(appSettings);
+
+            settingsManager.CheckRequiredArgsToRun(appSettings, "Uploader");
 
             Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Artifactory Uploader >>>>>====================", null);
             Logger.Logger.Log(null, Level.Notice, $"\nStart of Artifactory Uploader execution: {DateTime.Now}", null);

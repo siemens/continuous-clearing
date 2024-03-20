@@ -24,12 +24,6 @@ namespace LCT.Common
     {
         public string BasePath { get; private set; } = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private readonly string _currentExe;
-
-        public SettingsManager(string currentExe)
-        {
-            _currentExe = currentExe;
-        }
 
         /// <summary>
         /// Reads the Configuration from input args and json setting file
@@ -72,10 +66,6 @@ namespace LCT.Common
                 Logger.Debug($"ReadConfiguration(): {nameof(appSettings)} is null");
 
                 throw new InvalidDataException(nameof(appSettings));
-            }
-            else
-            {
-                CheckRequiredArgsToRun(appSettings as CommonAppSettings, _currentExe);
             }
 
             Logger.Debug($"ReadConfiguration():End");
@@ -121,22 +111,22 @@ namespace LCT.Common
             return settingsFilePath;
         }
 
-        private void CheckRequiredArgsToRun(CommonAppSettings commonAppSettings, string runningExe)
+        public void CheckRequiredArgsToRun(CommonAppSettings appSettings, string currentExe)
         {
-            Type type = commonAppSettings.GetType();
+            Type type = appSettings.GetType();
             PropertyInfo[] properties = type.GetProperties();
 
-            if (runningExe == "Identifer")
+            if (currentExe == "Identifer")
             {
-                CheckRequiredArgsToRunPackageIdentifier(commonAppSettings, properties);
+                CheckRequiredArgsToRunPackageIdentifier(appSettings, properties);
             }
-            else if (runningExe == "Creator")
+            else if (currentExe == "Creator")
             {
-                CheckRequiredArgsToRunComponentCreator(commonAppSettings, properties);
+                CheckRequiredArgsToRunComponentCreator(appSettings, properties);
             }
             else
             {
-                CheckRequiredArgsToRunArtifactoryUploader(commonAppSettings, properties);
+                CheckRequiredArgsToRunArtifactoryUploader(appSettings, properties);
             }
         }
 
@@ -149,7 +139,6 @@ namespace LCT.Common
             {
                 "SW360ProjectID",
                 "Sw360Token",
-                "SW360AuthTokenType",
                 "SW360URL",
                 "JFrogApi",
                 "PackageFilePath",
@@ -165,14 +154,14 @@ namespace LCT.Common
 
                 if (string.IsNullOrWhiteSpace(value))
                 {
-                    missingParameters.Append(key + " ");
+                    missingParameters.Append(key + "\n");
                 }
             }
 
             if (!string.IsNullOrWhiteSpace(missingParameters.ToString()))
             {
-                //LogExceptionHandling.ArgumentException(null, missingParameters.ToString());
-                //Logger.Logger.Log(null, Level.Error, $"\t CheckRequiredArgsToRunPackageIdentifier : Missing parameters {missingParameters} ", null);
+                ExceptionHandling.ArgumentException(missingParameters.ToString());
+                Environment.Exit(-1);
             }
         }
 
@@ -185,7 +174,6 @@ namespace LCT.Common
             {
                 "SW360ProjectID",
                 "Sw360Token",
-                "SW360AuthTokenType",
                 "SW360URL",
                 "BomFilePath"
             };
@@ -202,8 +190,8 @@ namespace LCT.Common
 
             if (!string.IsNullOrWhiteSpace(missingParameters.ToString()))
             {
-                //LogExceptionHandling.ArgumentException(null, missingParameters.ToString());
-                //Logger.Logger.Log(null, Level.Error, $"\t CheckRequiredArgsToRunSw360PackageCreator : Missing parameters {missingParameters} ", null);
+                ExceptionHandling.ArgumentException(missingParameters.ToString());
+                Environment.Exit(-1);
             }
         }
 
@@ -231,8 +219,8 @@ namespace LCT.Common
 
             if (!string.IsNullOrWhiteSpace(missingParameters.ToString()))
             {
-                //LogExceptionHandling.ArgumentException(null, missingParameters.ToString());
-                //Logger.Logger.Log(null, Level.Error, $"\t CheckRequiredArgsToRunArtifactoryUploader : Missing parameters {missingParameters} ", null);
+                ExceptionHandling.ArgumentException(missingParameters.ToString());
+                Environment.Exit(-1);
             }
         }
 

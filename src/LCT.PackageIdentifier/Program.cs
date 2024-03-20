@@ -45,10 +45,12 @@ namespace LCT.PackageIdentifier
 
             if (!m_Verbose && CommonHelper.IsAzureDevOpsDebugEnabled())
                 m_Verbose = true;
-            ISettingsManager settingsManager = new SettingsManager("Identifer");
+            ISettingsManager settingsManager = new SettingsManager();
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
 
             string FolderPath = LogFolderInitialisation(appSettings);
+
+            settingsManager.CheckRequiredArgsToRun(appSettings, "Identifer");
 
             Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Package Identifier >>>>>====================", null);
             Logger.Logger.Log(null, Level.Notice, $"\nStart of Package Identifier execution: {DateTime.Now}", null);

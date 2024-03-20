@@ -45,13 +45,15 @@ namespace LCT.SW360PackageCreator
             if (!m_Verbose && CommonHelper.IsAzureDevOpsDebugEnabled())
                 m_Verbose = true;
 
-            ISettingsManager settingsManager = new SettingsManager("Creator");
+            ISettingsManager settingsManager = new SettingsManager();
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
             ISW360ApicommunicationFacade sW360ApicommunicationFacade;
             ISw360ProjectService sw360ProjectService= Getsw360ProjectServiceObject(appSettings, out sW360ApicommunicationFacade);
             
             string FolderPath = InitiateLogger(appSettings);
             await CreatorValidator.ValidateAppSettings(appSettings, sw360ProjectService);
+
+            settingsManager.CheckRequiredArgsToRun(appSettings, "Creator");
 
             Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Package creator >>>>>====================", null);
             Logger.Logger.Log(null, Level.Notice, $"\nStart of Package creator execution : {DateTime.Now}", null);
