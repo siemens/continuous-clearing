@@ -185,6 +185,10 @@ namespace LCT.PackageIdentifier
                 {
                     Logger.Logger.Log(null, Level.Error, $"Check the provided JFrog server details..", null);
                 }
+                else
+                {
+                    Logger.Logger.Log(null, Level.Error, $"JFrog Connection was not successfull check the server status.", null);
+                }
             }
             return false;
         }
