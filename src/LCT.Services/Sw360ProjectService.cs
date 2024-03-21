@@ -56,19 +56,20 @@ namespace LCT.Services
                 {
                     var projectInfo = JsonConvert.DeserializeObject<ProjectReleases>(result);
                     sw360ProjectName = projectInfo?.Name;
+
                 }
             }
             catch (HttpRequestException ex)
             {
-                Environment.ExitCode = -1;
                 Logger.Error($"Failed to connect SW360 : {ex.Message}");
                 Logger.Debug($"GetProjectNameByProjectIDFromSW360()", ex);
+                Environment.ExitCode = -1;
             }
             catch (AggregateException ex)
             {
-                Environment.ExitCode = -1;
                 Logger.Error($"Failed to connect SW360 : {ex.Message}");
                 Logger.Debug($"GetProjectNameByProjectIDFromSW360()", ex);
+                Environment.ExitCode = -1;
             }
 
             return sw360ProjectName;
@@ -99,7 +100,7 @@ namespace LCT.Services
                     {
                         Comment = sw360Release.Comment,
                         ReleaseId = CommonHelper.GetSubstringOfLastOccurance(releaseUrl, "/"),
-                        Relation= sw360Release.Relation
+                        Relation = sw360Release.Relation
                     };
                     alreadyLinkedReleases.Add(releaseLinked);
                 }

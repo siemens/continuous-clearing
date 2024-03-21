@@ -118,24 +118,8 @@ namespace LCT.Common
 
             if (currentExe == "Identifer")
             {
-                CheckRequiredArgsToRunPackageIdentifier(appSettings, properties);
-            }
-            else if (currentExe == "Creator")
-            {
-                CheckRequiredArgsToRunComponentCreator(appSettings, properties);
-            }
-            else
-            {
-                CheckRequiredArgsToRunArtifactoryUploader(appSettings, properties);
-            }
-        }
-
-        private static void CheckRequiredArgsToRunPackageIdentifier(CommonAppSettings appSettings, PropertyInfo[] properties)
-        {
-            StringBuilder missingParameters = new StringBuilder();
-
-            //Required parameters to run Package Identifier
-            List<string> identifierReqParameters = new List<string>()
+                //Required parameters to run Package Identifier
+                List<string> identifierReqParameters = new List<string>()
             {
                 "SW360ProjectID",
                 "Sw360Token",
@@ -147,73 +131,44 @@ namespace LCT.Common
                 "InternalRepoList",
                 "ProjectType"
             };
-
-            foreach (string key in identifierReqParameters)
-            {
-                string value = properties.First(x => x.Name == key)?.GetValue(appSettings)?.ToString();
-
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    missingParameters.Append(key + "\n");
-                }
+                CheckForMissingParameter(appSettings, properties, identifierReqParameters);
             }
-
-            if (!string.IsNullOrWhiteSpace(missingParameters.ToString()))
+            else if (currentExe == "Creator")
             {
-                ExceptionHandling.ArgumentException(missingParameters.ToString());
-                Environment.Exit(-1);
-            }
-        }
-
-        private static void CheckRequiredArgsToRunComponentCreator(CommonAppSettings appSettings, PropertyInfo[] properties)
-        {
-            StringBuilder missingParameters = new StringBuilder();
-
-            //Required parameters to run SW360Component Creator
-            List<string> creatorReqParameters = new List<string>()
+                //Required parameters to run SW360Component Creator
+                List<string> creatorReqParameters = new List<string>()
             {
                 "SW360ProjectID",
                 "Sw360Token",
                 "SW360URL",
                 "BomFilePath"
             };
-
-            foreach (string key in creatorReqParameters)
-            {
-                string value = properties.First(x => x.Name == key)?.GetValue(appSettings)?.ToString();
-
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    missingParameters.Append(key + " ");
-                }
+                CheckForMissingParameter(appSettings, properties, creatorReqParameters);
             }
-
-            if (!string.IsNullOrWhiteSpace(missingParameters.ToString()))
+            else
             {
-                ExceptionHandling.ArgumentException(missingParameters.ToString());
-                Environment.Exit(-1);
-            }
-        }
-
-        private static void CheckRequiredArgsToRunArtifactoryUploader(CommonAppSettings appSettings, PropertyInfo[] properties)
-        {
-            StringBuilder missingParameters = new StringBuilder();
-
-            //Required parameters to run Artifactory Uploader
-            List<string> uploaderReqParameters = new List<string>()
+                //Required parameters to run Artifactory Uploader
+                List<string> uploaderReqParameters = new List<string>()
             {
                 "JFrogApi",
                 "BomFilePath",
                 "ArtifactoryUploadApiKey",
             };
+                CheckForMissingParameter(appSettings, properties, uploaderReqParameters);
+            }
+        }
 
-            foreach (string key in uploaderReqParameters)
+        private static void CheckForMissingParameter(CommonAppSettings appSettings, PropertyInfo[] properties, List<string> reqParameters)
+        {
+            StringBuilder missingParameters = new StringBuilder();
+
+            foreach (string key in reqParameters)
             {
                 string value = properties.First(x => x.Name == key)?.GetValue(appSettings)?.ToString();
 
                 if (string.IsNullOrWhiteSpace(value))
                 {
-                    missingParameters.Append(key + " ");
+                    missingParameters.Append(key + "\n");
                 }
             }
 

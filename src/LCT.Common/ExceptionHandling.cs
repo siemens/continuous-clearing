@@ -45,7 +45,8 @@ namespace LCT.Common
 
         public static void ArgumentException( string message)
         {
-            Logger.Logger.Log(null, Level.Error, $"Missing Arguments: Please provide the below arguments via inline or in the appSettings.json file to proceed.\n{message}", null);
+            Logger.Logger.Log(null, Level.Error, $"Missing Arguments: Please provide the below arguments via inline or in the appSettings.json file to proceed.", null);
+            Logger.Logger.Log(null, Level.Warn, $"{message}", null);
         }
         public static void TaskCancelledException(TaskCanceledException ex, string exceptionSource)
         {
