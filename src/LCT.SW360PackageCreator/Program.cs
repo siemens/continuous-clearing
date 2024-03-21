@@ -51,6 +51,7 @@ namespace LCT.SW360PackageCreator
             ISw360ProjectService sw360ProjectService= Getsw360ProjectServiceObject(appSettings, out sW360ApicommunicationFacade);
             
             string FolderPath = InitiateLogger(appSettings);
+            settingsManager.CheckRequiredArgsToRun(appSettings, "Creator");
             await CreatorValidator.ValidateAppSettings(appSettings, sw360ProjectService);
 
             Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Package creator >>>>>====================", null);

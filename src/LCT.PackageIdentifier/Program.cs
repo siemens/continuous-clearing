@@ -50,6 +50,8 @@ namespace LCT.PackageIdentifier
 
             string FolderPath = LogFolderInitialisation(appSettings);
 
+            settingsManager.CheckRequiredArgsToRun(appSettings, "Identifer");
+
             Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Package Identifier >>>>>====================", null);
             Logger.Logger.Log(null, Level.Notice, $"\nStart of Package Identifier execution: {DateTime.Now}", null);
 

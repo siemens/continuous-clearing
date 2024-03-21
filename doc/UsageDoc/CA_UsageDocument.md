@@ -207,36 +207,20 @@ Currently LTA support is not provided for SBOM, hence until that is implemented 
           * Input file repository should contain **conan.lock** file. 
 		  
     
-      - **Project Type :**  **Debian** 
+      - **Project Type :**  **Debian & Alpine** 
        
    	      **Note** : below steps is required only if you have `tar` file to process , otherwise you can keep `CycloneDx.json` file in the InputDirectory.
           *  Create `InputImage` directory for keeping `tar` images and `InputDirectory` for resulted file storing .
 
           *  Run the command given below by replacing the place holder values (i.e., path to input image directory, path to input directory and file name of the Debian image to be cleared) with actual values.
             
-              **Example**:   `docker run --rm -v <path/to/InputImageDirectory>:/tmp/InputImages -v <path/to/InputDirectory>:/tmp/OutputFiles ghcr.io/siemens/continuous-clearing ./syft packages /tmp/InputImages/<fileNameofthedebianImageTobeCleared.tar> -o cyclonedx-json --file "/tmp/OutputFiles/output.json"`
+              **Example**:   `docker run --rm -v <path/to/InputImageDirectory>:/tmp/InputImages -v <path/to/InputDirectory>:/tmp/OutputFiles ghcr.io/siemens/continuous-clearing ./syft packages /tmp/InputImages/<fileNameoftheImageTobeCleared.tar> -o cyclonedx-json --file "/tmp/OutputFiles/output.json"`
            
            
              After successful execution, `output.json` (_CycloneDX.json_) file will be created in specified directory
            
              ![image.png](../usagedocimg/output.PNG)
            
-             Resulted `output.json` file will be having the list of installed packages  and the same file will be used as  an input to `Continuous clearing tool - Bom creator` as an argument(`--packagefilepath`). The remaining process is same as other project types.
-      - **Project Type :**  **Alpine** 
-
-   	      **Note** : below steps is required only if you have `tar` file to process , otherwise you can keep `CycloneDx.json` file in the InputDirectory.
-   	`       
-          *  Create `InputImage` directory for keeping `tar` images and `InputDirectory` for resulted file storing .
-
-          *  Run the command given below by replacing the place holder values (i.e., path to input image directory, path to input directory and file name of the Alpine image to be cleared) with actual values.
-
-              **Example**:   `docker run --rm -v <path/to/InputImageDirectory>:/tmp/InputImages -v <path/to/InputDirectory>:/tmp/OutputFiles ghcr.io/siemens/continuous-clearing ./syft packages /tmp/InputImages/<fileNameoftheAlpineImageTobeCleared.tar> -o cyclonedx-json --file "/tmp/OutputFiles/output.json"`
-
-
-             After successful execution, `output.json` (_CycloneDX.json_) file will be created in specified directory
-
-             ![image.png](../usagedocimg/output.PNG)
-
              Resulted `output.json` file will be having the list of installed packages  and the same file will be used as  an input to `Continuous clearing tool - Bom creator` as an argument(`--packagefilepath`). The remaining process is same as other project types.
 
 ### **Configuring the Continuous Clearing Tool**
@@ -253,7 +237,7 @@ Currently LTA support is not provided for SBOM, hence until that is implemented 
  
 ```
 {
-  "CaVersion": "4.0.0",
+  "CaVersion": "6.2.0",
   "TimeOut": 200,
   "ProjectType": "<Insert ProjectType>",
   "SW360ProjectName": "<Insert SW360 Project Name>",
@@ -563,4 +547,4 @@ For reporting any bug or enhancement and for your feedbacks click [here](https:/
 - SW360 API Guide : [https://www.eclipse.org/sw360/docs/development/restapi/dev-rest-api/](https://www.eclipse.org/sw360/docs/development/restapi/dev-rest-api/)
 - FOSSology API Guide: [https://www.fossology.org/get-started/basic-rest-api-calls/](https://www.fossology.org/get-started/basic-rest-api-calls/)
 
-Copyright © Siemens AG ▪ 2023
+Copyright © Siemens AG ▪ 2024

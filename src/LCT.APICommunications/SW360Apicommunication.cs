@@ -104,13 +104,12 @@ namespace LCT.APICommunications
             string projectsByTagUrl = $"{sw360ProjectsApi}/{projectId}";
             try
             {
-
                 result = await httpClient.GetAsync(projectsByTagUrl);
                 result.EnsureSuccessStatusCode();
             }
             catch (HttpRequestException ex)
             {
-                ExceptionHandling.HttpException(ex,result,"SW360");
+                ExceptionHandling.HttpException(ex, result, "SW360");
                 Environment.Exit(-1);
             }
             catch (TaskCanceledException ex)

@@ -9,9 +9,11 @@ using log4net;
 using log4net.Core;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.Diagnostics;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Text;
 
 namespace LCT.Common
 {
@@ -107,6 +109,74 @@ namespace LCT.Common
             }
 
             return settingsFilePath;
+        }
+
+        public void CheckRequiredArgsToRun(CommonAppSettings appSettings, string currentExe)
+        {
+            Type type = appSettings.GetType();
+            PropertyInfo[] properties = type.GetProperties();
+
+            if (currentExe == "Identifer")
+            {
+                //Required parameters to run Package Identifier
+                List<string> identifierReqParameters = new List<string>()
+            {
+                "SW360ProjectID",
+                "Sw360Token",
+                "SW360URL",
+                "JFrogApi",
+                "PackageFilePath",
+                "BomFolderPath",
+                "ArtifactoryUploadApiKey",
+                "InternalRepoList",
+                "ProjectType"
+            };
+                CheckForMissingParameter(appSettings, properties, identifierReqParameters);
+            }
+            else if (currentExe == "Creator")
+            {
+                //Required parameters to run SW360Component Creator
+                List<string> creatorReqParameters = new List<string>()
+            {
+                "SW360ProjectID",
+                "Sw360Token",
+                "SW360URL",
+                "BomFilePath"
+            };
+                CheckForMissingParameter(appSettings, properties, creatorReqParameters);
+            }
+            else
+            {
+                //Required parameters to run Artifactory Uploader
+                List<string> uploaderReqParameters = new List<string>()
+            {
+                "JFrogApi",
+                "BomFilePath",
+                "ArtifactoryUploadApiKey",
+            };
+                CheckForMissingParameter(appSettings, properties, uploaderReqParameters);
+            }
+        }
+
+        private static void CheckForMissingParameter(CommonAppSettings appSettings, PropertyInfo[] properties, List<string> reqParameters)
+        {
+            StringBuilder missingParameters = new StringBuilder();
+
+            foreach (string key in reqParameters)
+            {
+                string value = properties.First(x => x.Name == key)?.GetValue(appSettings)?.ToString();
+
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    missingParameters.Append(key + "\n");
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(missingParameters.ToString()))
+            {
+                ExceptionHandling.ArgumentException(missingParameters.ToString());
+                Environment.Exit(-1);
+            }
         }
 
     }
