@@ -42,23 +42,23 @@
       "Components": null,
       "Properties": [
         {
-          "Name": "internal",
+          "Name": "internal:siemens:clearing:development",
           "Value": "false"
         },
         {
-          "Name": "ArtifactoryRepoName",
+          "Name": "internal:siemens:clearing:repo-name",
           "Value": "siparty-release-nuget-egll"
         },
         {
-          "Name": "ProjectType",
+          "Name": "internal:siemens:clearing:project-type",
           "Value": "NUGET"
         },
         {
-          "Name": "ApprovedStatus",
+          "Name": "internal:siemens:clearing:clearing-state",
           "Value": "APPROVED"
         },
         {
-          "Name": "ReleaseLink",
+          "Name": "internal:siemens:clearing:sw360:release-url",
           "Value": "http://localhost:8090/resource/api/releases/48fe0619e8f64cc3a5c1563bf15e6240"
         }
       ],
@@ -87,23 +87,23 @@
       "Components": null,
       "Properties": [
         {
-          "Name": "internal",
+          "Name": "internal:siemens:clearing:development",
           "Value": "false"
         },
         {
-          "Name": "ArtifactoryRepoName",
+          "Name": "internal:siemens:clearing:repo-name",
           "Value": "siparty-release-nuget-egll"
         },
         {
-          "Name": "ProjectType",
+          "Name": "internal:siemens:clearing:project-type",
           "Value": "NUGET"
         },
         {
-          "Name": "ApprovedStatus",
+          "Name": "internal:siemens:clearing:clearing-state",
           "Value": "Not Available"
         },
         {
-          "Name": "ReleaseLink",
+          "Name": "internal:siemens:clearing:sw360:release-url",
           "Value": "http://localhost:8090/resource/api/releases/eb5f54a94a544138a86bc423d66a4bb1"
         }
       ],

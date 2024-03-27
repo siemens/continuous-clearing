@@ -24,7 +24,7 @@ namespace LCT.Services.Interface
         Task<ReleaseCreateStatus> CreateReleaseForComponent(
             ComparisonBomData componentInfo, string componentId, Dictionary<string, string> attachmentUrlList);
 
-        Task<bool> LinkReleasesToProject(List<string> releasesTobeLinked, List<string> manuallyLinkedReleases, string sw360ProjectId);
+        Task<bool> LinkReleasesToProject(List<ReleaseLinked> releasesTobeLinked, List<ReleaseLinked> manuallyLinkedReleases, string sw360ProjectId);
 
         Task<string> GetReleaseIDofComponent(string componentName, string componentVersion, string componentid);
 

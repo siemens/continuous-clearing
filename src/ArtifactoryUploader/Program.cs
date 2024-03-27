@@ -43,6 +43,8 @@ namespace ArtifactoryUploader
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
             string FolderPath = InitiateLogger(appSettings);
 
+            settingsManager.CheckRequiredArgsToRun(appSettings, "Uploader");
+
             Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Artifactory Uploader >>>>>====================", null);
             Logger.Logger.Log(null, Level.Notice, $"\nStart of Artifactory Uploader execution: {DateTime.Now}", null);
 
@@ -53,12 +55,13 @@ namespace ArtifactoryUploader
 
 
 
-            Logger.Logger.Log(null, Level.Notice, $"Input Parameters used in Artifactory Uploader:\n\t" +
-                $"BomFilePath\t\t --> {appSettings.BomFilePath}\n\t" +
-                $"JFrogUrl\t\t --> {appSettings.JFrogApi}\n\t" +
-                $"Artifactory User\t --> {appSettings.ArtifactoryUploadUser}\n\t" +
-                $"Release\t\t\t --> {appSettings.Release}\n\t" +
-                $"LogFolderPath\t\t --> {Path.GetFullPath(FolderPath)}", null);
+            Logger.Logger.Log(null, Level.Info, $"Input Parameters used in Artifactory Uploader:\n\t", null);
+            Logger.Logger.Log(null, Level.Notice, $"\tBomFilePath:\t\t  {appSettings.BomFilePath}\n\t" +
+                $"JFrogUrl:\t\t {appSettings.JFrogApi}\n\t" +
+                $"Artifactory User:\t {appSettings.ArtifactoryUploadUser}\n\t" +
+                $"Artifactory Token:\t {appSettings.ArtifactoryUploadApiKey}\n\t" +
+                $"Release:\t\t {appSettings.Release}\n\t" +
+                $"LogFolderPath:\t\t {Path.GetFullPath(FolderPath)}\n", null);
 
             //Validator method to check token validity
             ArtifactoryCredentials artifactoryCredentials = new ArtifactoryCredentials()

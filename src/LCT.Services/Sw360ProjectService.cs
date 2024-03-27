@@ -56,19 +56,20 @@ namespace LCT.Services
                 {
                     var projectInfo = JsonConvert.DeserializeObject<ProjectReleases>(result);
                     sw360ProjectName = projectInfo?.Name;
+
                 }
             }
             catch (HttpRequestException ex)
             {
-                Environment.ExitCode = -1;
                 Logger.Error($"Failed to connect SW360 : {ex.Message}");
                 Logger.Debug($"GetProjectNameByProjectIDFromSW360()", ex);
+                Environment.ExitCode = -1;
             }
             catch (AggregateException ex)
             {
-                Environment.ExitCode = -1;
                 Logger.Error($"Failed to connect SW360 : {ex.Message}");
                 Logger.Debug($"GetProjectNameByProjectIDFromSW360()", ex);
+                Environment.ExitCode = -1;
             }
 
             return sw360ProjectName;
@@ -89,7 +90,7 @@ namespace LCT.Services
                 Logger.Debug($"GetProjectReleasesByProjectIdFromSw360():Success StatusCode:{projectResponsebyId.StatusCode} " +
               $"& ReasonPhrase :{projectResponsebyId.ReasonPhrase}");
 
-                string result = projectResponsebyId?.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
+                string result = projectResponsebyId.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
                 var projectReleases = JsonConvert.DeserializeObject<ProjectReleases>(result);
                 var sw360LinkedReleases = projectReleases?.LinkedReleases ?? new List<Sw360LinkedRelease>();
                 foreach (Sw360LinkedRelease sw360Release in sw360LinkedReleases)
@@ -98,7 +99,8 @@ namespace LCT.Services
                     ReleaseLinked releaseLinked = new ReleaseLinked
                     {
                         Comment = sw360Release.Comment,
-                        ReleaseId = CommonHelper.GetSubstringOfLastOccurance(releaseUrl, "/")
+                        ReleaseId = CommonHelper.GetSubstringOfLastOccurance(releaseUrl, "/"),
+                        Relation = sw360Release.Relation
                     };
                     alreadyLinkedReleases.Add(releaseLinked);
                 }

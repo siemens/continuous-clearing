@@ -23,10 +23,8 @@ using System.Reflection;
 using System.Security;
 using System.Threading.Tasks;
 
-
 namespace LCT.PackageIdentifier
 {
-
     /// <summary>
     /// Parses the NPM Packages
     /// </summary>
@@ -104,7 +102,7 @@ namespace LCT.PackageIdentifier
                     var pacakages = jsonDeserialized["packages"];
                     if (pacakages?.Children() != null)
                     {
-                        IEnumerable<JProperty> depencyComponentList = pacakages?.Children().OfType<JProperty>();
+                        IEnumerable<JProperty> depencyComponentList = pacakages.Children().OfType<JProperty>();
                         GetPackagesForBom(filepath, ref bundledComponents, ref lstComponentForBOM,
                             ref noOfDevDependent, depencyComponentList);
                     }
@@ -181,7 +179,7 @@ namespace LCT.PackageIdentifier
 
                 components.Description = folderPath;
                 components.Version = Convert.ToString(properties[Version]);
-                components.Author = prop?.Value[Dependencies]?.ToString();
+                components.Author = prop.Value[Dependencies]?.ToString();
                 components.Purl = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
                 components.BomRef = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
 

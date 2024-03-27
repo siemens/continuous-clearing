@@ -6,6 +6,7 @@
 
 using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
+using LCT.Common;
 using LCT.Common.Model;
 using log4net;
 using Newtonsoft.Json;
@@ -103,13 +104,18 @@ namespace LCT.APICommunications
             string projectsByTagUrl = $"{sw360ProjectsApi}/{projectId}";
             try
             {
-
                 result = await httpClient.GetAsync(projectsByTagUrl);
+                result.EnsureSuccessStatusCode();
+            }
+            catch (HttpRequestException ex)
+            {
+                ExceptionHandling.HttpException(ex, result, "SW360");
+                Environment.Exit(-1);
             }
             catch (TaskCanceledException ex)
             {
                 Logger.Debug($"{ex.Message}");
-                Logger.Error("A timeout error is thrown from SW360 server,Please wait for sometime and re run the pipeline again");
+                ExceptionHandling.TaskCancelledException(ex, "SW360");
                 Environment.Exit(-1);
 
             }
@@ -177,15 +183,11 @@ namespace LCT.APICommunications
             return await httpClient.GetAsync(releaseLink);
         }
 
-        public async Task<HttpResponseMessage> LinkReleasesToProject(string[] releaseidArray, string sw360ProjectId)
+        public async Task<HttpResponseMessage> LinkReleasesToProject(HttpContent httpContent, string sw360ProjectId)
         {
             HttpClient httpClient = GetHttpClient();
             string url = $"{sw360ProjectsApi}/{sw360ProjectId}/{ApiConstant.Releases}";
-
-            string releaseidList = JsonConvert.SerializeObject(releaseidArray);
-            HttpContent content = new StringContent(releaseidList, Encoding.UTF8, "application/json");
-
-            return await httpClient.PostAsync(url, content);
+            return await httpClient.PostAsync(url, httpContent);
         }
 
         public async Task<HttpResponseMessage> UpdateLinkedRelease(string projectId, string releaseId, UpdateLinkedRelease updateLinkedRelease)

@@ -8,6 +8,7 @@ using LCT.APICommunications;
 using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.AQL;
+using LCT.ArtifactoryUploader.Model;
 using LCT.Services.Interface;
 using log4net;
 using System;
@@ -28,7 +29,7 @@ namespace LCT.ArtifactoryUploader
         private static string srcRepoName = Environment.GetEnvironmentVariable("JfrogSrcRepo");
         public static IJFrogService jFrogService { get; set; }
 
-        public static async Task<HttpResponseMessage> UploadPackageToRepo(ComponentsToArtifactory component, int timeout)
+        public static async Task<HttpResponseMessage> UploadPackageToRepo(ComponentsToArtifactory component, int timeout, DisplayPackagesInfo displayPackagesInfo)
         {
             Logger.Debug("Starting UploadPackageToArtifactory method");
             string operationType = component.PackageType == PackageType.ClearedThirdParty || component.PackageType == PackageType.Development ? "copy" : "move";
@@ -77,8 +78,7 @@ namespace LCT.ArtifactoryUploader
                     return responsemessage;
                 }
 
-                Logger.Info($"Successful{dryRunSuffix} {operationType} package {component.PackageName}-{component.Version}" +
-                                    $" from {component.SrcRepoName} to {component.DestRepoName}");
+                await PackageUploadHelper.JfrogFoundPackagesAsync(component, displayPackagesInfo, operationType, responsemessage, dryRunSuffix);
 
             }
             catch (HttpRequestException ex)

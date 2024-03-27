@@ -46,6 +46,7 @@ namespace LCT.Common.Constants
         public const string SourceUrlNotFound = "Source URL not found";
         public const string PackageUrlNotFound = "Package URL not found";
         public const string LinkedByCATool = "Linked by CA Tool";
+        public const string LinkedByCAToolReleaseRelation = "UNKNOWN";
         public const string ReleaseAttachmentComment = "Attached by CA Tool";
         public const char ForwardSlash = '/';
         public const string SourceURLSuffix = "/srcfiles?fileinfo=1";

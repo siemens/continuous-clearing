@@ -140,11 +140,13 @@ namespace LCT.Services.UTest
       // Arrange
       HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.InternalServerError);
       Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-      sw360ApiCommMock.Setup(x => x.LinkReleasesToProject(It.IsAny<string[]>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
+      sw360ApiCommMock.Setup(x => x.LinkReleasesToProject(It.IsAny<HttpContent>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
       ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object);
 
       // Act
-      bool isLinked = await sw360CreatorService.LinkReleasesToProject(new List<string> { "1000000" }, new List<string> { "2000000" }, "fgjk53657989u09ipoklyiutr");
+      var releasesToBeLinked = new List<ReleaseLinked> { new ReleaseLinked { Name = "GitVersion.CommandLine", Version = "5.3.6", ReleaseId = "5e71f9fc2bf9438e9f20a94dddcc6a0f", Comment = "Linked by CA Tool", Relation = "UNKNOWN" } };
+      var manuallyLinkedReleases = new List<ReleaseLinked> { new ReleaseLinked { Name = "", Version = "", ReleaseId = "b565b2cc63fd4cff8f4e68fa1b5d5bd3", Comment = "", Relation = "CONTAINED" } };
+      bool isLinked = await sw360CreatorService.LinkReleasesToProject(releasesToBeLinked, manuallyLinkedReleases, "fgjk53657989u09ipoklyiutr");
 
       // Assert
       Assert.That(isLinked, Is.False, "Linking Release failed");
@@ -155,12 +157,14 @@ namespace LCT.Services.UTest
     {
       // Arrange
       Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-      sw360ApiCommMock.Setup(x => x.LinkReleasesToProject(It.IsAny<string[]>(), It.IsAny<string>())).Throws<HttpRequestException>();
+      sw360ApiCommMock.Setup(x => x.LinkReleasesToProject(It.IsAny<HttpContent>(), It.IsAny<string>())).Throws<HttpRequestException>();
       ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object);
 
       // Act
 
-      bool isLinked = await sw360CreatorService.LinkReleasesToProject(new List<string> { "1000000" }, new List<string> { "2000000" }, "fgjk53657989u09ipoklyiutr");
+      var releasesToBeLinked = new List<ReleaseLinked> { new ReleaseLinked { Name = "GitVersion.CommandLine", Version = "5.3.6", ReleaseId = "5e71f9fc2bf9438e9f20a94dddcc6a0f", Comment = "Linked by CA Tool", Relation = "UNKNOWN" } };
+      var manuallyLinkedReleases = new List<ReleaseLinked> { new ReleaseLinked { Name = "", Version = "", ReleaseId = "b565b2cc63fd4cff8f4e68fa1b5d5bd3", Comment = "", Relation = "CONTAINED" } };
+      bool isLinked = await sw360CreatorService.LinkReleasesToProject(releasesToBeLinked, manuallyLinkedReleases, "fgjk53657989u09ipoklyiutr");
 
       // Assert
       Assert.That(isLinked, Is.False, "Linking Release failed");
@@ -171,11 +175,13 @@ namespace LCT.Services.UTest
     {
       // Arrange
       Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-      sw360ApiCommMock.Setup(x => x.LinkReleasesToProject(It.IsAny<string[]>(), It.IsAny<string>())).Throws<AggregateException>();
+      sw360ApiCommMock.Setup(x => x.LinkReleasesToProject(It.IsAny<HttpContent>(), It.IsAny<string>())).Throws<AggregateException>();
       ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object);
 
       // Act
-      bool isLinked = await sw360CreatorService.LinkReleasesToProject(new List<string> { "1000000" }, new List<string> { "2000000" }, "fgjk53657989u09ipoklyiutr");
+      var releasesToBeLinked = new List<ReleaseLinked> { new ReleaseLinked { Name = "GitVersion.CommandLine", Version = "5.3.6", ReleaseId = "5e71f9fc2bf9438e9f20a94dddcc6a0f", Comment = "Linked by CA Tool", Relation = "UNKNOWN" } };
+      var manuallyLinkedReleases = new List<ReleaseLinked> { new ReleaseLinked { Name = "", Version = "", ReleaseId = "b565b2cc63fd4cff8f4e68fa1b5d5bd3", Comment = "", Relation = "CONTAINED" } };
+      bool isLinked = await sw360CreatorService.LinkReleasesToProject(releasesToBeLinked, manuallyLinkedReleases, "fgjk53657989u09ipoklyiutr");
 
       // Assert
       Assert.That(isLinked, Is.False, "Linking Release failed");
@@ -187,73 +193,17 @@ namespace LCT.Services.UTest
       // Arrange
       HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK);
       Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-      sw360ApiCommMock.Setup(x => x.LinkReleasesToProject(It.IsAny<string[]>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
+      sw360ApiCommMock.Setup(x => x.LinkReleasesToProject(It.IsAny<HttpContent>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
       sw360ApiCommMock.Setup(x => x.UpdateLinkedRelease(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<UpdateLinkedRelease>())).ReturnsAsync(httpResponseMessage);
       ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object);
 
       // Act
-      bool isLinked = await sw360CreatorService.LinkReleasesToProject(new List<string> { "1000000" }, new List<string> { "2000000" }, "fgjk53657989u09ipoklyiutr");
+      var releasesToBeLinked = new List<ReleaseLinked> { new ReleaseLinked { Name = "GitVersion.CommandLine", Version = "5.3.6", ReleaseId = "5e71f9fc2bf9438e9f20a94dddcc6a0f", Comment = "Linked by CA Tool", Relation = "UNKNOWN" } };
+      var manuallyLinkedReleases = new List<ReleaseLinked> { new ReleaseLinked { Name = "", Version = "", ReleaseId = "b565b2cc63fd4cff8f4e68fa1b5d5bd3", Comment = "", Relation = "CONTAINED" } };
+      bool isLinked = await sw360CreatorService.LinkReleasesToProject(releasesToBeLinked, manuallyLinkedReleases, "fgjk53657989u09ipoklyiutr");
 
       // Assert
       Assert.That(isLinked, Is.True, "Linking Release success");
-    }
-
-
-    [Test]
-    public async Task LinkReleasesToProject_InputParamsValidation_Success()
-    {
-      // Arrange
-      string[] totalReleasesToBeLinked = new string[] { "1000000", "2000000" };
-      string linkToProjectId = "fgjk53657989u09ipoklyiutr";
-      HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK);
-      Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-      sw360ApiCommMock.Setup(x => x.LinkReleasesToProject(It.IsAny<string[]>(), It.IsAny<string>()))
-          .Callback<string[], string>((newlyLinked, projectId) => { totalReleasesToBeLinked = newlyLinked; linkToProjectId = projectId; })
-          .ReturnsAsync(httpResponseMessage);
-
-      sw360ApiCommMock.Setup(x => x.UpdateLinkedRelease(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<UpdateLinkedRelease>()))
-          .ReturnsAsync(httpResponseMessage);
-      ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object);
-
-      // Act
-      bool isLinked = await sw360CreatorService.LinkReleasesToProject(new List<string> { "1000000" }, new List<string> { "2000000" }, "fgjk53657989u09ipoklyiutr");
-
-      // Assert
-      Assert.That(isLinked, Is.True, "Linking Release success");
-    }
-
-    [Test]
-    public async Task LinkReleasesToProject_HttpRequestException_OnUpdateOfLinkedReleaseComment_LinkingFailed()
-    {
-      // Arrange
-      HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK);
-      Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-      sw360ApiCommMock.Setup(x => x.LinkReleasesToProject(It.IsAny<string[]>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
-      sw360ApiCommMock.Setup(x => x.UpdateLinkedRelease(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<UpdateLinkedRelease>())).Throws<HttpRequestException>();
-      ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object);
-
-      // Act
-      bool isLinked = await sw360CreatorService.LinkReleasesToProject(new List<string> { "1000000" }, new List<string> { "2000000" }, "fgjk53657989u09ipoklyiutr");
-
-      // Assert
-      Assert.That(isLinked, Is.False, "Linking Release success, comment update is failed");
-    }
-
-    [Test]
-    public async Task LinkReleasesToProject_AggregateException_OnUpdateOfLinkedReleaseComment_Linkingfailed()
-    {
-      // Arrange
-      HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK);
-      Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-      sw360ApiCommMock.Setup(x => x.LinkReleasesToProject(It.IsAny<string[]>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
-      sw360ApiCommMock.Setup(x => x.UpdateLinkedRelease(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<UpdateLinkedRelease>())).Throws<AggregateException>();
-      ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object);
-
-      // Act
-      bool isLinked = await sw360CreatorService.LinkReleasesToProject(new List<string> { "1000000" }, new List<string> { "2000000" }, "fgjk53657989u09ipoklyiutr");
-
-      // Assert
-      Assert.That(isLinked, Is.False, "Linking Release failed");
     }
 
     [TestCase]

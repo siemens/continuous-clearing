@@ -88,14 +88,14 @@ namespace LCT.Facade
             return m_sw360ApiCommunication.GetReleaseByLink(releaseLink);
         }
 
-        public async Task<HttpResponseMessage> LinkReleasesToProject(string[] releaseidArray, string sw360ProjectId)
+        public async Task<HttpResponseMessage> LinkReleasesToProject(HttpContent httpContent, string sw360ProjectId)
         {
             if (m_TestMode)
             {
                 return new HttpResponseMessage(HttpStatusCode.OK);
             }
 
-            return await m_sw360ApiCommunication.LinkReleasesToProject(releaseidArray, sw360ProjectId);
+            return await m_sw360ApiCommunication.LinkReleasesToProject(httpContent, sw360ProjectId);
         }
 
         public async Task<HttpResponseMessage> CreateComponent(CreateComponent createComponentContent)
