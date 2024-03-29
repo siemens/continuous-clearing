@@ -58,7 +58,8 @@ namespace LCT.PackageIdentifier
             }
 
             Bom templateDetails = new Bom();
-            if (File.Exists(appSettings.CycloneDxSBomTemplatePath) && appSettings.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+            if (File.Exists(appSettings.CycloneDxSBomTemplatePath) 
+                && appSettings.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
                 templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
                 CycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
@@ -265,7 +266,8 @@ namespace LCT.PackageIdentifier
             return listComponentForBOM;
         }
 
-        private static Bom RemoveExcludedComponents(CommonAppSettings appSettings, Bom cycloneDXBOM)
+        private static Bom RemoveExcludedComponents(CommonAppSettings appSettings,
+            Bom cycloneDXBOM)
         {
             List<Component> componentForBOM = cycloneDXBOM.Components.ToList();
             int noOfExcludedComponents = 0;

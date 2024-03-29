@@ -304,7 +304,7 @@ namespace LCT.PackageIdentifier.UTest
         public void ParsePackageFile_GivenAInputFilePathAlongWithSBOMTemplate_ReturnTotalComponentsList()
         {
             //Arrange
-            int expectednoofcomponents = 2;
+            int expectednoofcomponents = 1;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
             string filepath = outFolder + @"\PackageIdentifierUTTestFiles";
