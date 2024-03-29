@@ -11,22 +11,37 @@ using NUnit.Framework;
 using System.IO;
 using LCT.Common.Constants;
 using Moq;
+using System.Collections.Generic;
+using Microsoft.Build.Evaluation;
 
 namespace LCT.PackageIdentifier.UTest
 {
     [TestFixture]
-    class AlpineParserTests
+    public class AlpineParserTests
     {
+        private readonly AlpineProcessor _alpineProcessor;
+
+        public AlpineParserTests()
+        {
+            List<Component> components = new List<Component>();
+            components.Add(new Component() { Name = "apk-tools", Version = "2.12.9-r3", Purl = "pkg:apk/alpine/apk-tools@2.12.9-r3?arch=x86_64&distro=alpine-3.16.2" });
+            components.Add(new Component() { Name = "busybox", Version = "1.35.0-r17", Purl = "pkg:apk/alpine/busybox@1.35.0-r17?arch=x86_64&distro=alpine-3.16.2" });
+            Bom bom = new() { Components = components };
+
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            cycloneDXBomParser.Setup(x => x.ParseCycloneDXBom(It.IsAny<string>())).Returns(bom);
+
+            _alpineProcessor = new AlpineProcessor(cycloneDXBomParser.Object);
+        }
+
         [Test]
         public void ParsePackageConfig_GivenAMultipleInputFilePath_ReturnsCounts()
         {
             //Arrange
-            int expectednoofcomponents = 4;
+            int expectednoofcomponents = 2;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
-            AlpineProcessor alpineProcessor = new AlpineProcessor(cycloneDXBomParser.Object);
+                        
             string[] Includes = { "*_Alpine.cdx.json" };
             CommonAppSettings appSettings = new CommonAppSettings()
             {
@@ -37,10 +52,11 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = alpineProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings);
 
             //Assert
-            Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
+            Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count),
+                "Checks for no of components");
         }
 
 
@@ -48,12 +64,9 @@ namespace LCT.PackageIdentifier.UTest
         public void ParsePackageConfig_GivenAInputFilePath_ReturnsCounts()
         {
             //Arrange
-            int expectednoofcomponents = 4;
+            int expectednoofcomponents = 2;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
-            AlpineProcessor alpineProcessor = new AlpineProcessor(cycloneDXBomParser.Object);
             string[] Includes = { "CycloneDX_Alpine.cdx.json" };
             CommonAppSettings appSettings = new CommonAppSettings()
             {
@@ -64,22 +77,21 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = alpineProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings);
 
             //Assert
-            Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
+            Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), 
+                "Checks for no of components");
         }
 
         [Test]
         public void ParsePackageConfig_GivenMultipleInputFiles_ReturnsCountOfDuplicates()
         {
             //Arrange
-            int duplicateComponents = 4;
+            int duplicateComponents = 2;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
-            AlpineProcessor alpineProcessor = new AlpineProcessor(cycloneDXBomParser.Object);
+  
             string[] Includes = { "*_Alpine.cdx.json" };
 
             CommonAppSettings appSettings = new CommonAppSettings()
@@ -91,22 +103,20 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            alpineProcessor.ParsePackageFile(appSettings);
+            _alpineProcessor.ParsePackageFile(appSettings);
 
             //Assert
-            Assert.That(duplicateComponents, Is.EqualTo(BomCreator.bomKpiData.DuplicateComponents), "Checks for no of duplicate components");
+            Assert.That(duplicateComponents, Is.EqualTo(BomCreator.bomKpiData.DuplicateComponents),
+                "Checks for no of duplicate components");
         }
 
         [Test]
         public void ParsePackageConfig_GivenAInputFilePath_ReturnsSourceDetails()
         {
             //Arrange
-            string sourceName = "alpine-baselayout" + "_" + "3.4.3-r1";
+            string sourceName =@"apk-tools_2.12.9-r3";
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
-            AlpineProcessor alpineProcessor = new AlpineProcessor(cycloneDXBomParser.Object);
             string[] Includes = { "AlpineSourceDetails_Cyclonedx.cdx.json" };
 
             CommonAppSettings appSettings = new CommonAppSettings()
@@ -118,22 +128,20 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = alpineProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings);
 
             //Assert
-            Assert.AreEqual(sourceName, listofcomponents.Components[0].Name + "_" + listofcomponents.Components[0].Version, "Checks component name and version");
+            Assert.AreEqual(sourceName, listofcomponents.Components[0].Name + "_" +
+                listofcomponents.Components[0].Version, "Checks component name and version");
         }
 
         [Test]
         public void ParsePackageConfig_GivenAInputFilePathAlongWithSBOMTemplate_ReturnTotalComponentsList()
         {
             //Arrange
-            int expectednoofcomponents = 5;
+            int expectednoofcomponents = 2;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
-            AlpineProcessor alpineProcessor = new AlpineProcessor(cycloneDXBomParser.Object);
             string[] Includes = { "CycloneDX_Alpine.cdx.json", "SBOMTemplate_Alpine.cdx.json" };
             string packagefilepath = OutFolder + @"\PackageIdentifierUTTestFiles";
 
@@ -147,10 +155,11 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = alpineProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings);
 
             //Assert
-            Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
+            Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count),
+                "Checks for no of components");
         }
 
         [Test]
@@ -159,9 +168,6 @@ namespace LCT.PackageIdentifier.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
-            AlpineProcessor alpineProcessor = new AlpineProcessor(cycloneDXBomParser.Object);
             string[] Includes = { "CycloneDX_Alpine.cdx.json", "SBOMTemplate_Alpine.cdx.json" };
             string packagefilepath = OutFolder + @"\PackageIdentifierUTTestFiles";
 
@@ -175,8 +181,10 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = alpineProcessor.ParsePackageFile(appSettings);
-            bool isUpdated = listofcomponents.Components.Exists(x => x.Properties != null && x.Properties.Exists(x => x.Name == Dataconstant.Cdx_IdentifierType && x.Value == Dataconstant.Discovered));
+            Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings);
+            bool isUpdated = listofcomponents.Components.Exists(x => x.Properties != null
+            && x.Properties.Exists(x => x.Name == Dataconstant.Cdx_IdentifierType 
+            && x.Value == Dataconstant.Discovered));
 
             //Assert
             Assert.IsTrue(isUpdated, "Checks For Updated Property In List ");

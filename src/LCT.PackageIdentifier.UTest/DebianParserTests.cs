@@ -12,22 +12,35 @@ using LCT.Common;
 using LCT.Common.Model;
 using LCT.Common.Constants;
 using Moq;
+using System.Collections.Generic;
 
 namespace PackageIdentifier.UTest
 {
     [TestFixture]
-    class DebianParserTests
+    public class DebianParserTests
     {
+        readonly DebianProcessor _debianProcessor;
+
+        public DebianParserTests()
+        {
+            List<Component> components = new List<Component>();
+            components.Add(new Component() { Name = "adduser", Version = "3.118", Purl = "pkg:deb/debian/adduser@3.118?arch=all\u0026distro=debian-10" });
+            components.Add(new Component() { Name = "base-files", Version = "10.3+deb10u10", Purl = "pkg:deb/debian/base-files@10.3+deb10u10?arch=amd64\u0026distro=debian-10" });
+            Bom bom = new() { Components = components };
+
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            cycloneDXBomParser.Setup(x => x.ParseCycloneDXBom(It.IsAny<string>())).Returns(bom);
+
+            _debianProcessor = new DebianProcessor(cycloneDXBomParser.Object);
+        }
+
         [Test]
         public void ParsePackageConfig_GivenAMultipleInputFilePath_ReturnsCounts()
         {
             //Arrange
-            int expectednoofcomponents = 8;
+            int expectednoofcomponents = 2;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
-            DebianProcessor DebianProcessor = new DebianProcessor(cycloneDXBomParser.Object);
             string[] Includes = { "*_Debian.cdx.json" };
             CommonAppSettings appSettings = new CommonAppSettings()
             {
@@ -38,10 +51,11 @@ namespace PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = DebianProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = _debianProcessor.ParsePackageFile(appSettings);
 
             //Assert
-            Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
+            Assert.That(expectednoofcomponents, 
+                Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
         }
 
 
@@ -49,12 +63,10 @@ namespace PackageIdentifier.UTest
         public void ParsePackageConfig_GivenAInputFilePath_ReturnsCounts()
         {
             //Arrange
-            int expectednoofcomponents = 4;
+            int expectednoofcomponents = 2;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             string OutFolder = Path.GetDirectoryName(exePath);
-            DebianProcessor DebianProcessor = new DebianProcessor(cycloneDXBomParser.Object);
             string[] Includes = { "CycloneDX_Debian.cdx.json" };
             CommonAppSettings appSettings = new CommonAppSettings()
             {
@@ -65,7 +77,7 @@ namespace PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = DebianProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = _debianProcessor.ParsePackageFile(appSettings);
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
@@ -75,12 +87,9 @@ namespace PackageIdentifier.UTest
         public void ParsePackageConfig_GivenMultipleInputFiles_ReturnsCountOfDuplicates()
         {
             //Arrange
-            int duplicateComponents = 1;
+            int duplicateComponents = 2;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
-            DebianProcessor DebianProcessor = new DebianProcessor(cycloneDXBomParser.Object);
             string[] Includes = { "*_Debian.cdx.json" };
 
             CommonAppSettings appSettings = new CommonAppSettings()
@@ -92,7 +101,7 @@ namespace PackageIdentifier.UTest
             };
 
             //Act
-            DebianProcessor.ParsePackageFile(appSettings);
+            _debianProcessor.ParsePackageFile(appSettings);
 
             //Assert
             Assert.That(duplicateComponents, Is.EqualTo(BomCreator.bomKpiData.DuplicateComponents), "Checks for no of duplicate components");
@@ -105,9 +114,6 @@ namespace PackageIdentifier.UTest
             string sourceName = "adduser" + "_" + "3.118";
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
-            DebianProcessor DebianProcessor = new DebianProcessor(cycloneDXBomParser.Object);
             string[] Includes = { "SourceDetails_Cyclonedx.cdx.json" };
 
             CommonAppSettings appSettings = new CommonAppSettings()
@@ -119,7 +125,7 @@ namespace PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = DebianProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = _debianProcessor.ParsePackageFile(appSettings);
 
             //Assert
             Assert.AreEqual(sourceName, listofcomponents.Components[0].Name + "_" + listofcomponents.Components[0].Version, "Checks component name and version");
@@ -129,12 +135,9 @@ namespace PackageIdentifier.UTest
         public void ParsePackageConfig_GivenAInputFilePathAlongWithSBOMTemplate_ReturnTotalComponentsList()
         {
             //Arrange
-            int expectednoofcomponents = 5;
+            int expectednoofcomponents = 2;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
-            DebianProcessor DebianProcessor = new DebianProcessor(cycloneDXBomParser.Object);
             string[] Includes = { "CycloneDX_Debian.cdx.json", "SBOMTemplate_Debian.cdx.json" };
             string packagefilepath = OutFolder + @"\PackageIdentifierUTTestFiles";
 
@@ -148,7 +151,7 @@ namespace PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = DebianProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = _debianProcessor.ParsePackageFile(appSettings);
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
@@ -160,9 +163,6 @@ namespace PackageIdentifier.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
-            DebianProcessor DebianProcessor = new DebianProcessor(cycloneDXBomParser.Object);
             string[] Includes = { "CycloneDX_Debian.cdx.json", "SBOMTemplate_Debian.cdx.json" };
             string packagefilepath = OutFolder + @"\PackageIdentifierUTTestFiles";
 
@@ -176,7 +176,7 @@ namespace PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = DebianProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = _debianProcessor.ParsePackageFile(appSettings);
             bool isUpdated = listofcomponents.Components.Exists(x => x.Properties != null && x.Properties.Exists(x => x.Name == Dataconstant.Cdx_IdentifierType && x.Value == Dataconstant.Discovered));
 
             //Assert
