@@ -30,9 +30,15 @@ namespace LCT.PackageIdentifier
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static readonly BomKpiData bomKpiData = new();
         ComponentIdentification componentData;
+        private readonly ICycloneDXBomParser CycloneDXBomParser;
 
         public IJFrogService JFrogService { get; set; }
         public IBomHelper BomHelper { get; set; }
+
+        public BomCreator(ICycloneDXBomParser cycloneDXBomParser)
+        {
+            CycloneDXBomParser = cycloneDXBomParser;
+        }
 
         public async Task GenerateBom(CommonAppSettings appSettings, IBomHelper bomHelper, IFileOperations fileOperations)
         {
@@ -101,30 +107,29 @@ namespace LCT.PackageIdentifier
         private async Task<Bom> CallPackageParser(CommonAppSettings appSettings)
         {
             IParser parser;
-            ICycloneDXBomParser cycloneDXBomParser = new CycloneDXBomParser();
 
             switch (appSettings.ProjectType.ToUpperInvariant())
             {
                 case "NPM":
-                    parser = new NpmProcessor(cycloneDXBomParser);
+                    parser = new NpmProcessor(CycloneDXBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 case "NUGET":
-                    parser = new NugetProcessor(cycloneDXBomParser);
+                    parser = new NugetProcessor(CycloneDXBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 case "MAVEN":
-                    parser = new MavenProcessor(cycloneDXBomParser);
+                    parser = new MavenProcessor(CycloneDXBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 case "DEBIAN":
-                    parser = new DebianProcessor(cycloneDXBomParser);
+                    parser = new DebianProcessor(CycloneDXBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 case "ALPINE":
-                    parser = new AlpineProcessor(cycloneDXBomParser);
+                    parser = new AlpineProcessor(CycloneDXBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 case "PYTHON":
-                    parser = new PythonProcessor(cycloneDXBomParser);
+                    parser = new PythonProcessor(CycloneDXBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 case "CONAN":
-                    parser = new ConanProcessor(cycloneDXBomParser);
+                    parser = new ConanProcessor(CycloneDXBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 default:
                     Logger.Error($"GenerateBom():Invalid ProjectType - {appSettings.ProjectType}");
