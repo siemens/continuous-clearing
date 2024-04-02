@@ -11,14 +11,12 @@ using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
-using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
-using System.Xml;
 
 namespace LCT.PackageIdentifier
 {
@@ -28,11 +26,11 @@ namespace LCT.PackageIdentifier
     public class AlpineProcessor : IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        readonly CycloneDXBomParser cycloneDXBomParser;
+        private readonly ICycloneDXBomParser _cycloneDXBomParser;
 
-        public AlpineProcessor()
+        public AlpineProcessor(ICycloneDXBomParser cycloneDXBomParser)
         {
-            cycloneDXBomParser = new CycloneDXBomParser();
+            _cycloneDXBomParser = cycloneDXBomParser;
         }
 
         #region public method
@@ -64,7 +62,7 @@ namespace LCT.PackageIdentifier
             if (File.Exists(appSettings.CycloneDxSBomTemplatePath) && appSettings.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
                 Bom templateDetails;
-                templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
+                templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
                 CycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
                 //Adding Template Component Details & MetaData
                 SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
@@ -122,7 +120,7 @@ namespace LCT.PackageIdentifier
 
         private void ExtractDetailsForJson(string filePath, ref List<AlpinePackage> alpinePackages, List<Dependency> dependenciesForBOM)
         {
-            Bom bom = cycloneDXBomParser.ParseCycloneDXBom(filePath);
+            Bom bom = _cycloneDXBomParser.ParseCycloneDXBom(filePath);
             foreach (var componentsInfo in bom.Components)
             {
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;

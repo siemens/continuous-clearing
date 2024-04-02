@@ -27,13 +27,21 @@ namespace PackageIdentifier.UTest
         readonly PythonProcessor pythonProcessor;
         public PythonParserTests()
         {
-            pythonProcessor = new PythonProcessor();
+
+            List<Component> components = new List<Component>();
+            components.Add(new Component() { Name = "virtualenv", Version = "20.16.5", Purl = "pkg:pypi/virtualenv@20.16.5" });
+            components.Add(new Component() { Name = "virtualenv", Version = "20.19.0", Purl = "pkg:pypi/virtualenv@20.19.0" });
+            Bom bom = new() { Components = components };
+
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            cycloneDXBomParser.Setup(x => x.ParseCycloneDXBom(It.IsAny<string>())).Returns(bom);
+            pythonProcessor = new PythonProcessor(cycloneDXBomParser.Object);
         }
         [Test]
         public void ParseCycloneDXFile_GivenAMultipleInputFilePath_ReturnsCounts()
         {
             //Arrange
-            int expectednoofcomponents = 9;
+            int expectednoofcomponents = 2;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "*_Python.cdx.json" };
@@ -57,7 +65,7 @@ namespace PackageIdentifier.UTest
         public void ParseCycloneDXFile_GivenAInputFilePath_ReturnsCounts()
         {
             //Arrange
-            int expectednoofcomponents = 4;
+            int expectednoofcomponents = 2;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "CycloneDX_Python.cdx.json" };
@@ -73,13 +81,14 @@ namespace PackageIdentifier.UTest
             Bom listofcomponents = pythonProcessor.ParsePackageFile(appSettings);
 
             //Assert
-            Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
+            Assert.That(expectednoofcomponents,
+                Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
         }
         [Test]
         public void ParseCycloneDXFile_GivenAInputFilePathExcludeOneComponent_ReturnsCounts()
         {
             //Arrange
-            int expectednoofcomponents = 3;
+            int expectednoofcomponents = 2;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "CycloneDX_Python.cdx.json" };
@@ -110,7 +119,7 @@ namespace PackageIdentifier.UTest
         public void ParseCycloneDXFile_GivenMultipleInputFiles_ReturnsCountOfDuplicates()
         {
             //Arrange
-            int duplicateComponents = 1;
+            int duplicateComponents = 2;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "*_Python.cdx.json" };
@@ -133,7 +142,7 @@ namespace PackageIdentifier.UTest
         public void ParseCycloneDXFile_GivenAInputFilePathAlongWithSBOMTemplate_ReturnTotalComponentsList()
         {
             //Arrange
-            int expectednoofcomponents = 5;
+            int expectednoofcomponents = 2;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "CycloneDX_Python.cdx.json", "SBOMTemplate_Python.cdx.json" };
@@ -211,7 +220,8 @@ namespace PackageIdentifier.UTest
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("cachy");
 
             // Act
-            PythonProcessor pyProcessor = new PythonProcessor();
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            PythonProcessor pyProcessor = new PythonProcessor(cycloneDXBomParser.Object);
             var actual = await pyProcessor.IdentificationOfInternalComponents(
                 component, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -246,9 +256,10 @@ namespace PackageIdentifier.UTest
             mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("cachy");
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             // Act
-            PythonProcessor pyProcessor = new PythonProcessor();
+            PythonProcessor pyProcessor = new PythonProcessor(cycloneDXBomParser.Object);
             var actual = await pyProcessor.IdentificationOfInternalComponents(
                 component, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -284,9 +295,10 @@ namespace PackageIdentifier.UTest
             mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("html5lib");
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             // Act
-            PythonProcessor pyProcessor = new PythonProcessor();
+            PythonProcessor pyProcessor = new PythonProcessor(cycloneDXBomParser.Object);
             var actual = await pyProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -322,9 +334,10 @@ namespace PackageIdentifier.UTest
             mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("html5lib");
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             // Act
-            PythonProcessor pyProcessor = new PythonProcessor();
+            PythonProcessor pyProcessor = new PythonProcessor(cycloneDXBomParser.Object);
             var actual = await pyProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 

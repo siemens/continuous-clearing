@@ -80,8 +80,8 @@ namespace LCT.PackageIdentifier
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);
 
-
-            IBomCreator bomCreator = new BomCreator();
+            ICycloneDXBomParser cycloneDXBomParser = new CycloneDXBomParser();
+            IBomCreator bomCreator = new BomCreator(cycloneDXBomParser);
             bomCreator.JFrogService = GetJfrogService(appSettings);
             bomCreator.BomHelper = new BomHelper();
 
