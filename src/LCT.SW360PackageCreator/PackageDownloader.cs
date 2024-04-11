@@ -10,7 +10,6 @@ using LCT.SW360PackageCreator.Interfaces;
 using System;
 using System.Threading.Tasks;
 using log4net;
-using log4net.Core;
 using System.Reflection;
 using LCT.Common.Constants;
 using System.IO;
