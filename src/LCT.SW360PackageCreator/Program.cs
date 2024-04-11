@@ -15,7 +15,6 @@ using LCT.Services.Interface;
 using LCT.SW360PackageCreator.Interfaces;
 using log4net;
 using log4net.Core;
-using NuGet.Protocol.Plugins;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

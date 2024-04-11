@@ -10,6 +10,7 @@ using log4net;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Linq;
 
 namespace LCT.SW360PackageCreator
 {
@@ -80,20 +81,18 @@ namespace LCT.SW360PackageCreator
 
         private string GetRepoName(string url)
         {
+            string repoUrl = string.Empty;
             if (string.IsNullOrWhiteSpace(url))
             {
                 return string.Empty;
             }
 
-            foreach (string repoUrl in m_RepoUrlList)
-            {
-                if (url.Contains(repoUrl))
-                {
-                    return repoUrl;
-                }
-            }
+            repoUrl = (from string repoUrl2 in m_RepoUrlList
+                             where url.Contains(repoUrl2)
+                             select repoUrl2).FirstOrDefault();
 
-            return string.Empty;
+
+            return repoUrl;
         }
     }
 }
