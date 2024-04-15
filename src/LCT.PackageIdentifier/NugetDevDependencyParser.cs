@@ -251,16 +251,8 @@ namespace LCT.PackageIdentifier
                     depPackage = (existingDependency as NuGetComponent)!;
                 }
                 else
-                {
-                    if (depPackage.Version.StartsWith(Dataconstant.OpenSquareBracket) && depPackage.Version.EndsWith(Dataconstant.CloseBracket))
-                    {
-                        //Do nothing
-                    }
-                    else
-                    {
-                        components.Add(depPackage.Id, depPackage);
-                    }
-
+                {                   
+                    components.Add(depPackage.Id, depPackage);                 
                 }
 
                 if (!component.Dependencies.Contains(depPackage))

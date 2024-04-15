@@ -400,7 +400,8 @@ namespace LCT.PackageIdentifier
             }
 
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = listComponentForBOM.Count;
-            listComponentForBOM = KeepUniqueNonDevComponents(listComponentForBOM);
+            listComponentForBOM = RemoveDuplicateComponents(listComponentForBOM);
+            listComponentForBOM = KeepUniqueNonDevComponents(listComponentForBOM, BomCreator.bomKpiData.ComponentsinPackageLockJsonFile);
             BomCreator.bomKpiData.DevDependentComponents = listComponentForBOM.Count(s => s.Properties[0].Value == "true");
             bom.Components = listComponentForBOM;
 
@@ -414,6 +415,22 @@ namespace LCT.PackageIdentifier
             }
 
             bom = RemoveExcludedComponents(appSettings, bom);
+        }
+
+        private static List<Component> RemoveDuplicateComponents(List<Component> listComponentForBOM)
+        {
+            List<Component> RemoveList = new List<Component>();
+            
+                foreach (var component in listComponentForBOM)
+                { 
+                    if (component.Version.StartsWith(Dataconstant.OpenSquareBracket) && component.Version.EndsWith(Dataconstant.CloseBracket))
+                    {
+                    RemoveList.Add(component);
+                    }
+                }            
+            listComponentForBOM.RemoveAll(item => RemoveList.Contains(item));
+            return listComponentForBOM;
+
         }
 
         private static void ConvertToCycloneDXModel(List<Component> listComponentForBOM, List<NugetPackage> listofComponents, List<Dependency> dependencies)
@@ -468,9 +485,9 @@ namespace LCT.PackageIdentifier
             dependencies.Add(dependency);
         }
 
-        private static List<Component> KeepUniqueNonDevComponents(List<Component> listComponentForBOM)
+        private static List<Component> KeepUniqueNonDevComponents(List<Component> listComponentForBOM,int ComponentsinPackageLockJsonFile)
         {
-            Dictionary<string, Component> keyValuePairs = new Dictionary<string, Component>();
+            Dictionary<string, Component> keyValuePairs = new Dictionary<string, Component>();            
             foreach (var component in listComponentForBOM)
             {
                 if (!keyValuePairs.ContainsKey(component.Purl))
@@ -487,8 +504,10 @@ namespace LCT.PackageIdentifier
                         keyValuePairs.Add(component.Purl, component);
                     }
                 }
+                
             }
-            BomCreator.bomKpiData.DuplicateComponents = listComponentForBOM.Count - keyValuePairs.Values.Count;
+            BomCreator.bomKpiData.DuplicateComponents = ComponentsinPackageLockJsonFile - keyValuePairs.Values.Count;            
+
             return keyValuePairs.Values.ToList();
         }
 
