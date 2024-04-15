@@ -263,7 +263,7 @@ namespace LCT.PackageIdentifier
                 {
                     depPackage.Ancestors.Add(component);
                 }
-            }            
+            }
         }
 
         private static void GetLocalPackageHashes(NuGetComponent nuGetComponent, LockFile assetFile, LockFileTargetLibrary lockFileTargetLibrary)
