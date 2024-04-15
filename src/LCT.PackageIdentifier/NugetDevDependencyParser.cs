@@ -19,6 +19,8 @@ using System.Security.Cryptography;
 using LCT.PackageIdentifier.Model.NugetModel;
 using System.Text.Json;
 using System.Runtime.InteropServices;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
+using LCT.Common.Constants;
 
 namespace LCT.PackageIdentifier
 {
@@ -232,7 +234,7 @@ namespace LCT.PackageIdentifier
                 return;
             }
 
-            GetDependencies(library, component, components);
+            GetDependencies(library, component, components);            
         }
 
         private static void GetDependencies(LockFileTargetLibrary library, NuGetComponent component, IDictionary<string, BuildInfoComponent> components)
@@ -251,7 +253,15 @@ namespace LCT.PackageIdentifier
                 }
                 else
                 {
-                    components.Add(depPackage.Id, depPackage);
+                    if (depPackage.Version.StartsWith(Dataconstant.OpenSquareBracket) && depPackage.Version.EndsWith(Dataconstant.CloseBracket))
+                    {
+                        //Do nothing
+                    }
+                    else
+                    {
+                        components.Add(depPackage.Id, depPackage);
+                    }
+
                 }
 
                 if (!component.Dependencies.Contains(depPackage))
@@ -264,6 +274,7 @@ namespace LCT.PackageIdentifier
                     depPackage.Ancestors.Add(component);
                 }
             }
+            
         }
 
         private static void GetLocalPackageHashes(NuGetComponent nuGetComponent, LockFile assetFile, LockFileTargetLibrary lockFileTargetLibrary)
