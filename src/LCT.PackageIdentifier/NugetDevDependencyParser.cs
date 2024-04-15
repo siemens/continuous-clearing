@@ -19,7 +19,6 @@ using System.Security.Cryptography;
 using LCT.PackageIdentifier.Model.NugetModel;
 using System.Text.Json;
 using System.Runtime.InteropServices;
-using LCT.Common.Constants;
 
 namespace LCT.PackageIdentifier
 {
@@ -251,8 +250,8 @@ namespace LCT.PackageIdentifier
                     depPackage = (existingDependency as NuGetComponent)!;
                 }
                 else
-                {                   
-                    components.Add(depPackage.Id, depPackage);                 
+                {
+                    components.Add(depPackage.Id, depPackage);
                 }
 
                 if (!component.Dependencies.Contains(depPackage))
