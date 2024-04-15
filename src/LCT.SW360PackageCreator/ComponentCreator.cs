@@ -303,7 +303,7 @@ namespace LCT.SW360PackageCreator
         {
             var manuallyLinkedReleases = new List<ReleaseLinked>(alreadyLinkedReleases);
             manuallyLinkedReleases.RemoveAll(x => string.Compare(x.Comment, Dataconstant.LinkedByCATool, StringComparison.OrdinalIgnoreCase) == 0);
-
+            await Task.Yield();
             return manuallyLinkedReleases;
         }
 
@@ -324,6 +324,7 @@ namespace LCT.SW360PackageCreator
                     release.Relation = linkedRelease.Relation;
                 }
             }
+            await Task.Yield();
         }
 
         private async Task CreateComponentAndRealease(ICreatorHelper creatorHelper,

@@ -5,39 +5,28 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Security.Policy;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
-using System.Xml.Linq;
-using JetBrains.Annotations;
-using LCT.APICommunications.Model.Foss;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Model;
 using LCT.SW360PackageCreator.Interfaces;
 using LCT.SW360PackageCreator.Model;
 using log4net;
-using Microsoft.PowerShell.Commands;
-using Microsoft.Web.Administration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using YamlDotNet.Core;
-using YamlDotNet.Core.Tokens;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
-using System.Management.Automation.Runspaces;
-using NuGet.ProjectModel;
 
 namespace LCT.SW360PackageCreator
 {
