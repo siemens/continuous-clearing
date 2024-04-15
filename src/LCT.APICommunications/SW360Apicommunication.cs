@@ -107,11 +107,6 @@ namespace LCT.APICommunications
                 result = await httpClient.GetAsync(projectsByTagUrl);
                 result.EnsureSuccessStatusCode();
             }
-            catch (HttpRequestException ex)
-            {
-                ExceptionHandling.HttpException(ex, result, "SW360");
-                Environment.Exit(-1);
-            }
             catch (TaskCanceledException ex)
             {
                 Logger.Debug($"{ex.Message}");
@@ -119,6 +114,12 @@ namespace LCT.APICommunications
                 Environment.Exit(-1);
 
             }
+            catch (HttpRequestException ex)
+            {
+                ExceptionHandling.HttpException(ex, result, "SW360");
+                Environment.Exit(-1);
+            }
+            
             return result;
         }
 

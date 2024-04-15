@@ -59,6 +59,10 @@ namespace LCT.Services
 
                 }
             }
+            catch (TaskCanceledException ex)
+            {
+                ExceptionHandling.TaskCancelledException(ex, "SW360");
+            }
             catch (HttpRequestException ex)
             {
                 Logger.Error($"Failed to connect SW360 : {ex.Message}");
@@ -105,15 +109,18 @@ namespace LCT.Services
                     alreadyLinkedReleases.Add(releaseLinked);
                 }
             }
-            catch (HttpRequestException ex)
+            catch (TaskCanceledException ex)
             {
-                Logger.Error($"alreadyLinkedReleases()", ex);
+                ExceptionHandling.TaskCancelledException(ex, "SW360");
             }
             catch (AggregateException ex)
             {
                 Logger.Error($"alreadyLinkedReleases()", ex);
             }
-
+            catch (HttpRequestException ex)
+            {
+                Logger.Error($"alreadyLinkedReleases()", ex);
+            }
             return alreadyLinkedReleases;
         }
     }

@@ -19,15 +19,22 @@ namespace LCT.SW360PackageCreator
     {
         public static async Task ValidateAppSettings(CommonAppSettings appSettings, ISw360ProjectService sw360ProjectService)
         {
-            string sw360ProjectName = await sw360ProjectService.GetProjectNameByProjectIDFromSW360(appSettings.SW360ProjectID, appSettings.SW360ProjectName);
+            try
+            {
+                string sw360ProjectName = await sw360ProjectService.GetProjectNameByProjectIDFromSW360(appSettings.SW360ProjectID, appSettings.SW360ProjectName);
 
-            if (string.IsNullOrEmpty(sw360ProjectName))
-            {
-                throw new InvalidDataException($"Invalid Project Id - {appSettings.SW360ProjectID}");
+                if (string.IsNullOrEmpty(sw360ProjectName))
+                {
+                    throw new InvalidDataException($"Invalid Project Id - {appSettings.SW360ProjectID}");
+                }
+                else
+                {
+                    appSettings.SW360ProjectName = sw360ProjectName;
+                }
             }
-            else
+            catch (TaskCanceledException ex)
             {
-                appSettings.SW360ProjectName = sw360ProjectName;
+                ExceptionHandling.TaskCancelledException(ex, "SW360");
             }
         }
     }
