@@ -283,6 +283,7 @@ namespace LCT.APICommunications
             HttpClient httpClient = GetHttpClient();
             string url = $"{sw360ComponentApi}{ApiConstant.ComponentNameUrl}{componentName}";
             return await httpClient.GetStringAsync(url);
+
         }
         public async Task<HttpResponseMessage> GetComponentUsingName(string componentName)
         {
