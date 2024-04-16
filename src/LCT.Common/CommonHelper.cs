@@ -49,8 +49,8 @@ namespace LCT.Common
                     {
                         name = $"{component.Group}/{component.Name}";
                     }
-                    if (excludedcomponent.Length > 0 && (Regex.IsMatch(name.ToLowerInvariant(), WildcardToRegex(excludedcomponent[0].ToLowerInvariant()))) ||
-                        (component.Version.ToLowerInvariant().Contains(excludedcomponent[1].ToLowerInvariant())))
+                    if (excludedcomponent.Length > 0 && (Regex.IsMatch(name.ToLowerInvariant(), WildcardToRegex(excludedcomponent[0].ToLowerInvariant()))) &&
+                        (component.Version.ToLowerInvariant().Contains(excludedcomponent[1].ToLowerInvariant())|| excludedcomponent[1].ToLowerInvariant() == "*"))
                     {
                         noOfExcludedComponents++;
                         ExcludedList.Add(component);
