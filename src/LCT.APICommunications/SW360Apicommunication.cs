@@ -71,7 +71,6 @@ namespace LCT.APICommunications
                 Logger.Debug($"{ex.Message}");
                 Logger.Error("A timeout error is thrown from SW360 server,Please wait for sometime and re run the pipeline again");
                 Environment.Exit(-1);
-
             }
             return result;
         }
@@ -135,7 +134,6 @@ namespace LCT.APICommunications
                 Logger.Debug($"{ex.Message}");
                 Logger.Error("A timeout error is thrown from SW360 server,Please wait for sometime and re run the pipeline again");
                 Environment.Exit(-1);
-
             }
             return result;
         }

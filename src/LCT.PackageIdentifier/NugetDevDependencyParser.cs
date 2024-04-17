@@ -249,10 +249,9 @@ namespace LCT.PackageIdentifier
                 {
                     depPackage = (existingDependency as NuGetComponent)!;
                 }
-                else
-                {
-                    components.Add(depPackage.Id, depPackage);
-                }
+
+                //Dependencies or not adding as a componenst since it's just a
+                //self-declaration of a component what that main component requires
 
                 if (!component.Dependencies.Contains(depPackage))
                 {
