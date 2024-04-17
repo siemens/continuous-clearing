@@ -45,7 +45,6 @@ namespace LCT.PackageIdentifier
             List<Component> listComponentForBOM = new List<Component>();
             Bom bom = new Bom();
             int totalComponentsIdentified = 0;
-            int noOfExcludedComponents = 0;
 
             ParsingInputFileForBOM(appSettings, ref listComponentForBOM, ref bom);
             totalComponentsIdentified = listComponentForBOM.Count;
