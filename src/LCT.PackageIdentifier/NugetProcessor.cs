@@ -412,8 +412,9 @@ namespace LCT.PackageIdentifier
                 CycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
                 SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
             }
-
-            bom = RemoveExcludedComponents(appSettings, bom);
+       
+                bom = RemoveExcludedComponents(appSettings, bom);
+            
         }
 
         private static void ConvertToCycloneDXModel(List<Component> listComponentForBOM, List<NugetPackage> listofComponents, List<Dependency> dependencies)
@@ -512,11 +513,6 @@ namespace LCT.PackageIdentifier
 
         private static void CheckForMultipleVersions(CommonAppSettings appSettings, ref List<Component> listComponentForBOM, ref int noOfExcludedComponents, List<Component> componentsWithMultipleVersions)
         {
-            if (appSettings.Nuget.ExcludedComponents != null)
-            {
-                listComponentForBOM = CommonHelper.RemoveExcludedComponents(listComponentForBOM, appSettings.Nuget.ExcludedComponents, ref noOfExcludedComponents);
-                BomCreator.bomKpiData.ComponentsExcluded += noOfExcludedComponents;
-            }
 
             if (componentsWithMultipleVersions.Count != 0)
             {

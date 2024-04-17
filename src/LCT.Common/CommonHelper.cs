@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace LCT.Common
 {
@@ -24,6 +25,7 @@ namespace LCT.Common
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static string ProjectSummaryLink { get; set; }
 
+        #region public
         public static bool IsAzureDevOpsDebugEnabled()
         {
             string azureDevOpsDebug = System.Environment.GetEnvironmentVariable("System.Debug");
@@ -47,8 +49,8 @@ namespace LCT.Common
                     {
                         name = $"{component.Group}/{component.Name}";
                     }
-
-                    if (name.ToLowerInvariant() == excludedcomponent[0].ToLowerInvariant() && excludedcomponent.Length > 0 && (component.Version.ToLowerInvariant() == excludedcomponent[1].ToLowerInvariant() || excludedcomponent[1].ToLowerInvariant() == "*"))
+                    if (excludedcomponent.Length > 0 && (Regex.IsMatch(name.ToLowerInvariant(), WildcardToRegex(excludedcomponent[0].ToLowerInvariant()))) &&
+                        (component.Version.ToLowerInvariant().Contains(excludedcomponent[1].ToLowerInvariant())|| excludedcomponent[1].ToLowerInvariant() == "*"))
                     {
                         noOfExcludedComponents++;
                         ExcludedList.Add(component);
@@ -145,12 +147,6 @@ namespace LCT.Common
             }
         }
 
-        private static string Sw360URL(string sw360Env, string releaseId)
-        {
-            string sw360URL = $"{sw360Env}{"/group/guest/components/-/component/release/detailRelease/"}{releaseId}";
-            return sw360URL;
-        }
-
         public static void WriteComponentsWithoutDownloadURLToKpi(List<ComparisonBomData> componentInfo, List<Components> lstReleaseNotCreated, string sw360URL)
         {
             const string Name = "Name";
@@ -242,7 +238,23 @@ namespace LCT.Common
                 listComponentForBOM.Add(component);
             }
         }
+        #endregion
 
-        
+        #region private
+        private static string WildcardToRegex(string wildcard)
+        {
+            return "^" + Regex.Escape(wildcard).Replace("\\*", ".*") + "$";
+        }
+
+        private static string Sw360URL(string sw360Env, string releaseId)
+        {
+            string sw360URL = $"{sw360Env}{"/group/guest/components/-/component/release/detailRelease/"}{releaseId}";
+            return sw360URL;
+        }
+        #endregion
     }
 }
+
+
+
+
