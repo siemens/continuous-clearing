@@ -55,7 +55,7 @@ namespace LCT.SW360PackageCreator
 
             Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Package creator >>>>>====================", null);
             Logger.Logger.Log(null, Level.Notice, $"\nStart of Package creator execution : {DateTime.Now}", null);
-            if (appSettings.ProjectType.ToUpperInvariant() == "ALPINE")
+            if (appSettings.ProjectType?.ToUpperInvariant() == "ALPINE")
             { 
                 Logger.Error($"\nPlease note that the Alpine feature is currently in preview state. This means it's available for testing and evaluation purposes. While functional, it may not yet include all planned features and could encounter occasional issues. Your feedback during this preview phase is appreciated as we work towards its official release. Thank you for exploring Alpine with us.");
             }

@@ -59,6 +59,14 @@ namespace LCT.Services
             {
                 Sw360ServiceStopWatch.Start();
                 string responseBody = await m_SW360ApiCommunicationFacade.GetReleases();
+
+                if(string.IsNullOrWhiteSpace(responseBody))
+                {
+                    Logger.Debug($"GetAvailableReleasesInSw360():");
+                    Logger.Error("SW360 server is not accessible,Please wait for sometime and re run the pipeline again");
+                    Environment.ExitCode = -1;
+                }
+
                 Sw360ServiceStopWatch.Stop();
                 Logger.Debug($"GetAvailableReleasesInSw360():Time taken to in GetReleases() call" +
                     $"-{TimeSpan.FromMilliseconds(Sw360ServiceStopWatch.ElapsedMilliseconds).TotalSeconds}");
@@ -72,8 +80,15 @@ namespace LCT.Services
             }
             catch (HttpRequestException ex)
             {
+                Logger.Debug($"GetAvailableReleasesInSw360():", ex);
+                Logger.Error("SW360 server is not accessible,Please wait for sometime and re run the pipeline again");
                 Environment.ExitCode = -1;
-                Logger.Error($"GetAvailableReleasesInSw360():", ex);
+            }
+            catch (InvalidOperationException ex)
+            {
+                Logger.Debug($"GetAvailableReleasesInSw360():", ex);
+                Logger.Error("SW360 server is not accessible,Please wait for sometime and re run the pipeline again");
+                Environment.ExitCode = -1;
             }
 
             return availableComponentsList;
