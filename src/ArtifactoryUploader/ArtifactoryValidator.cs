@@ -20,8 +20,6 @@ namespace LCT.ArtifactoryUploader
 {
     public class ArtifactoryValidator
     {
-        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         private readonly NpmJfrogApiCommunication JfrogApiCommunication;
 
         public ArtifactoryValidator(NpmJfrogApiCommunication jfrogApiCommunication)

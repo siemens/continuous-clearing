@@ -350,19 +350,6 @@ namespace LCT.Services
             return releaseid ?? string.Empty;
         }
 
-        private async Task UpdateLinkedReleaseComment(string projectId, List<string> releaseIDList)
-        {
-            UpdateLinkedRelease updateLinkedRelease = new UpdateLinkedRelease() { Comment = Dataconstant.LinkedByCATool };
-            foreach (string releaseId in releaseIDList)
-            {
-                var updateResponse = await m_SW360ApiCommunicationFacade.UpdateLinkedRelease(projectId, releaseId, updateLinkedRelease);
-                if (!updateResponse.IsSuccessStatusCode)
-                {
-                    Logger.Debug($"UpdateLinkedReleaseComment() : Updating comment to linked release id -{releaseId} of preoject - {projectId} is failed.");
-                }
-            }
-        }
-
         private static string GetReleaseIdFromResponse(string componentName, string componentVersion, string releaseid, string responseBody)
         {
             var responseData = JsonConvert.DeserializeObject<ReleaseIdOfComponent>(responseBody);
