@@ -199,7 +199,7 @@ namespace LCT.PackageIdentifier
         }
 
 
-        private void GetComponentsForBom(string filepath, CommonAppSettings appSettings,
+        private static void GetComponentsForBom(string filepath, CommonAppSettings appSettings,
             ref List<BundledComponents> bundledComponents, ref List<Component> lstComponentForBOM,
             ref int noOfDevDependent, IEnumerable<JProperty> depencyComponentList)
         {

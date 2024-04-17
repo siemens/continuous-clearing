@@ -307,7 +307,7 @@ namespace LCT.SW360PackageCreator
             return manuallyLinkedReleases;
         }
 
-        private async Task<List<ReleaseLinked>> GetAlreadyLinkedReleasesByProjectId(string projectId, ISw360ProjectService sw360ProjectService)
+        private static async Task<List<ReleaseLinked>> GetAlreadyLinkedReleasesByProjectId(string projectId, ISw360ProjectService sw360ProjectService)
         {
             List<ReleaseLinked> alreadyLinkedReleases = await sw360ProjectService.GetAlreadyLinkedReleasesByProjectId(projectId);
             return alreadyLinkedReleases;
