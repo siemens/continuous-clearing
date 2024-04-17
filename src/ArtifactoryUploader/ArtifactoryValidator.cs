@@ -14,13 +14,12 @@ using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Net;
+using System;
 
 namespace LCT.ArtifactoryUploader
 {
     public class ArtifactoryValidator
     {
-        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         private readonly NpmJfrogApiCommunication JfrogApiCommunication;
 
         public ArtifactoryValidator(NpmJfrogApiCommunication jfrogApiCommunication)
@@ -30,13 +29,18 @@ namespace LCT.ArtifactoryUploader
 
         public async Task ValidateArtifactoryCredentials(CommonAppSettings appSettings)
         {
-            HttpResponseMessage responseMessage = await JfrogApiCommunication.GetApiKey();
-
-            if (responseMessage.StatusCode != HttpStatusCode.OK)
+            HttpResponseMessage responseMessage = new HttpResponseMessage();
+            try
             {
-                Logger.Error("Artifactory Token entered is invalid!");
-                throw new InvalidDataException($"Invalid Artifactory Token");
+                responseMessage = await JfrogApiCommunication.GetApiKey();
+                responseMessage.EnsureSuccessStatusCode();
             }
+            catch(HttpRequestException ex)
+            {
+                ExceptionHandling.HttpException(ex,responseMessage, "Artifactory");
+                Environment.Exit(-1);
+            }
+           
         }
     }
 }

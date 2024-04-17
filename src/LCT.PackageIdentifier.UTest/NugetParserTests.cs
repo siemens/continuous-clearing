@@ -179,8 +179,8 @@ namespace PackageIdentifier.UTest
             string csprojfilepath = outFolder + @"\PackageIdentifierUTTestFiles";
             string[] Excludes = null;
 
-            CycloneDX.Models.Bom bom = new CycloneDX.Models.Bom();
-            bom.Components = new List<CycloneDX.Models.Component>();
+            Bom bom = new Bom();
+            bom.Components = new List<Component>();
             CommonAppSettings CommonAppSettings = new CommonAppSettings()
             {
                 PackageFilePath = csprojfilepath,
@@ -188,7 +188,7 @@ namespace PackageIdentifier.UTest
             };
 
             //Act
-            CycloneDX.Models.Bom updatedBom = NugetProcessor.RemoveExcludedComponents(CommonAppSettings, bom);
+            Bom updatedBom = NugetProcessor.RemoveExcludedComponents(CommonAppSettings, bom);
 
             //Assert
             Assert.AreEqual(0, updatedBom.Components.Count, "Zero component exculded");
@@ -222,9 +222,10 @@ namespace PackageIdentifier.UTest
             mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations");
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             // Act
-            NugetProcessor nugetProcessor = new NugetProcessor();
+            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object);
             var actual = await nugetProcessor.IdentificationOfInternalComponents(
                 component, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -261,7 +262,8 @@ namespace PackageIdentifier.UTest
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations");
 
             // Act
-            NugetProcessor nugetProcessor = new NugetProcessor();
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object);
             var actual = await nugetProcessor.IdentificationOfInternalComponents(component, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
             // Assert
@@ -298,9 +300,10 @@ namespace PackageIdentifier.UTest
             mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations/common");
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             // Act
-            NugetProcessor nugetProcessor = new NugetProcessor();
+            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object);
             var actual = await nugetProcessor.IdentificationOfInternalComponents(
                 componentIdentification, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -322,7 +325,7 @@ namespace PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
             CommonAppSettings appSettings = new();
-            appSettings.Nuget = new LCT.Common.Model.Config() { JfrogNugetRepoList = reooListArr };
+            appSettings.Nuget = new Config() { JfrogNugetRepoList = reooListArr };
             AqlResult aqlResult = new()
             {
                 Name = "animations-common-1.0.0.nupkg",
@@ -337,9 +340,10 @@ namespace PackageIdentifier.UTest
             mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations/common");
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             // Act
-            NugetProcessor nugetProcessor = new NugetProcessor();
+            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object);
             var actual = await nugetProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -376,9 +380,10 @@ namespace PackageIdentifier.UTest
             mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations");
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             // Act
-            NugetProcessor nugetProcessor = new NugetProcessor();
+            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object);
             var actual = await nugetProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -415,9 +420,10 @@ namespace PackageIdentifier.UTest
             mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations");
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             // Act
-            NugetProcessor nugetProcessor = new NugetProcessor();
+            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object);
             var actual = await nugetProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -454,9 +460,10 @@ namespace PackageIdentifier.UTest
             mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations");
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             // Act
-            NugetProcessor nugetProcessor = new NugetProcessor();
+            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object);
             var actual = await nugetProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -493,9 +500,10 @@ namespace PackageIdentifier.UTest
             mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations");
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             // Act
-            NugetProcessor nugetProcessor = new NugetProcessor();
+            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object);
             var actual = await nugetProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -533,9 +541,10 @@ namespace PackageIdentifier.UTest
             mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations");
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             // Act
-            NugetProcessor nugetProcessor = new NugetProcessor();
+            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object);
             var actual = await nugetProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -564,9 +573,10 @@ namespace PackageIdentifier.UTest
                 PackageFilePath = packagefilepath,
                 Nuget = config
             };
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             //Act
-            Bom listofcomponents = new NugetProcessor().ParsePackageFile(appSettings);
+            Bom listofcomponents = new NugetProcessor(cycloneDXBomParser.Object).ParsePackageFile(appSettings);
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
@@ -593,11 +603,14 @@ namespace PackageIdentifier.UTest
                 PackageFilePath = packagefilepath,
                 Nuget = config
             };
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+
 
             //Act
-            Bom listofcomponents = new NugetProcessor().ParsePackageFile(appSettings);
-
-            var IsDevDependency = listofcomponents.Components.Find(a => a.Name == "SonarAnalyzer.CSharp").Properties[0].Value;
+            Bom listofcomponents = new NugetProcessor(cycloneDXBomParser.Object).ParsePackageFile(appSettings);
+            var IsDevDependency = 
+                listofcomponents.Components.Find(a => a.Name == "SonarAnalyzer.CSharp")
+                .Properties[0].Value;
 
             //Assert
             Assert.That(IsDev, Is.EqualTo(IsDevDependency), "Checks if Dev Dependency Component or not");

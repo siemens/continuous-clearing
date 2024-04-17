@@ -24,11 +24,11 @@ namespace LCT.PackageIdentifier
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
-        readonly CycloneDXBomParser cycloneDXBomParser;
+        private readonly ICycloneDXBomParser _cycloneDXBomParser;
 
-        public MavenProcessor()
+        public MavenProcessor(ICycloneDXBomParser cycloneDXBomParser)
         {
-            cycloneDXBomParser = new CycloneDXBomParser();
+            _cycloneDXBomParser = cycloneDXBomParser;
         }
 
         public Bom ParsePackageFile(CommonAppSettings appSettings)
@@ -52,11 +52,11 @@ namespace LCT.PackageIdentifier
 
                     if (componentsForBOM.Count == 0)
                     {
-                        componentsForBOM.AddRange(bomList?.Components);
+                        componentsForBOM.AddRange(bomList.Components);
                     }
                     else
                     {
-                        componentsToBOM.AddRange(bomList?.Components);
+                        componentsToBOM.AddRange(bomList.Components);
                     }
 
                     if (bomList.Dependencies != null)
@@ -70,7 +70,7 @@ namespace LCT.PackageIdentifier
             {
                 //Adding Template Component Details
                 Bom templateDetails;
-                templateDetails = ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
+                templateDetails = ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
                 CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
                 SbomTemplate.AddComponentDetails(componentsForBOM, templateDetails);
             }

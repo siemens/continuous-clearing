@@ -31,11 +31,11 @@ namespace LCT.PackageIdentifier
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
-        readonly CycloneDXBomParser cycloneDXBomParser;
+        private readonly ICycloneDXBomParser _cycloneDXBomParser;
 
-        public NugetProcessor()
+        public NugetProcessor(ICycloneDXBomParser cycloneDXBomParser)
         {
-            cycloneDXBomParser = new CycloneDXBomParser();
+            _cycloneDXBomParser = cycloneDXBomParser;
         }
 
         #region public methods
@@ -45,7 +45,6 @@ namespace LCT.PackageIdentifier
             List<Component> listComponentForBOM = new List<Component>();
             Bom bom = new Bom();
             int totalComponentsIdentified = 0;
-            int noOfExcludedComponents = 0;
 
             ParsingInputFileForBOM(appSettings, ref listComponentForBOM, ref bom);
             totalComponentsIdentified = listComponentForBOM.Count;
@@ -59,7 +58,7 @@ namespace LCT.PackageIdentifier
             var componentsWithMultipleVersions = listComponentForBOM.GroupBy(s => s.Name)
                               .Where(g => g.Count() > 1).SelectMany(g => g).ToList();
 
-            CheckForMultipleVersions(appSettings, ref listComponentForBOM, ref noOfExcludedComponents, componentsWithMultipleVersions);
+            CheckForMultipleVersions(appSettings, componentsWithMultipleVersions);
 
             Logger.Debug($"ParsePackageFile():End");
             bom.Components = listComponentForBOM;
@@ -374,7 +373,7 @@ namespace LCT.PackageIdentifier
                     if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                     {
                         Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
-                        bom = cycloneDXBomParser.ParseCycloneDXBom(filepath);
+                        bom = _cycloneDXBomParser.ParseCycloneDXBom(filepath);
                         CycloneDXBomParser.CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
                         componentsForBOM.AddRange(bom.Components);
                         CommonHelper.GetDetailsforManuallyAdded(componentsForBOM, listComponentForBOM);
@@ -408,12 +407,13 @@ namespace LCT.PackageIdentifier
             {
                 //Adding Template Component Details
                 Bom templateDetails;
-                templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
+                templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
                 CycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
                 SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
             }
-
-            bom = RemoveExcludedComponents(appSettings, bom);
+       
+                bom = RemoveExcludedComponents(appSettings, bom);
+            
         }
 
         private static void ConvertToCycloneDXModel(List<Component> listComponentForBOM, List<NugetPackage> listofComponents, List<Dependency> dependencies)
@@ -510,13 +510,8 @@ namespace LCT.PackageIdentifier
         }
 
 
-        private static void CheckForMultipleVersions(CommonAppSettings appSettings, ref List<Component> listComponentForBOM, ref int noOfExcludedComponents, List<Component> componentsWithMultipleVersions)
+        private static void CheckForMultipleVersions(CommonAppSettings appSettings, List<Component> componentsWithMultipleVersions)
         {
-            if (appSettings.Nuget.ExcludedComponents != null)
-            {
-                listComponentForBOM = CommonHelper.RemoveExcludedComponents(listComponentForBOM, appSettings.Nuget.ExcludedComponents, ref noOfExcludedComponents);
-                BomCreator.bomKpiData.ComponentsExcluded += noOfExcludedComponents;
-            }
 
             if (componentsWithMultipleVersions.Count != 0)
             {

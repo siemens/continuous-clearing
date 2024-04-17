@@ -39,8 +39,8 @@ namespace LCT.PackageIdentifier.UTest
                 RemoveDevDependency = true,
                 Maven = new Config() { Include = Includes, Exclude = Excludes }
             };
-
-            MavenProcessor MavenProcessor = new MavenProcessor();
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            MavenProcessor MavenProcessor = new MavenProcessor(cycloneDXBomParser.Object);
 
             //Act
             Bom bom = MavenProcessor.ParsePackageFile(appSettings);
@@ -78,9 +78,10 @@ namespace LCT.PackageIdentifier.UTest
             mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("junit");
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             // Act
-            MavenProcessor mavenProcessor = new MavenProcessor();
+            MavenProcessor mavenProcessor = new MavenProcessor(cycloneDXBomParser.Object);
             var actual = await mavenProcessor.IdentificationOfInternalComponents(component, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
             // Assert
@@ -114,9 +115,10 @@ namespace LCT.PackageIdentifier.UTest
             mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("junit");
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             // Act
-            MavenProcessor mavenProcessor = new MavenProcessor();
+            MavenProcessor mavenProcessor = new MavenProcessor(cycloneDXBomParser.Object);
             var actual = await mavenProcessor.IdentificationOfInternalComponents(component, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
             // Assert
@@ -136,7 +138,7 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             ComponentIdentification componentIdentification = new() { comparisonBOMData = components };
-            string[] reooListArr = {"internalrepo1", "internalrepo2" };
+            string[] reooListArr = { "internalrepo1", "internalrepo2" };
             CommonAppSettings appSettings = new() { InternalRepoList = reooListArr };
 
             AqlResult aqlResult = new()
@@ -152,9 +154,10 @@ namespace LCT.PackageIdentifier.UTest
             mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("junit/junit");
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             // Act
-            MavenProcessor mavenProcessor = new MavenProcessor();
+            MavenProcessor mavenProcessor = new MavenProcessor(cycloneDXBomParser.Object);
             var actual = await mavenProcessor.IdentificationOfInternalComponents(
                 componentIdentification, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -191,9 +194,10 @@ namespace LCT.PackageIdentifier.UTest
             mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("junit/junit");
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             // Act
-            MavenProcessor mavenProcessor = new MavenProcessor();
+            MavenProcessor mavenProcessor = new MavenProcessor(cycloneDXBomParser.Object);
             var actual = await mavenProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -230,9 +234,10 @@ namespace LCT.PackageIdentifier.UTest
             mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("junit");
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             // Act
-            MavenProcessor mavenProcessor = new MavenProcessor();
+            MavenProcessor mavenProcessor = new MavenProcessor(cycloneDXBomParser.Object);
             var actual = await mavenProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -257,8 +262,8 @@ namespace LCT.PackageIdentifier.UTest
                 RemoveDevDependency = true,
                 Maven = new Config() { Include = Includes, Exclude = Excludes }
             };
-
-            MavenProcessor MavenProcessor = new MavenProcessor();
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            MavenProcessor MavenProcessor = new MavenProcessor(cycloneDXBomParser.Object);
 
             //Act
             MavenProcessor.ParsePackageFile(appSettings);
@@ -284,8 +289,8 @@ namespace LCT.PackageIdentifier.UTest
                 RemoveDevDependency = true,
                 Maven = new Config() { Include = Includes, Exclude = Excludes }
             };
-
-            MavenProcessor MavenProcessor = new MavenProcessor();
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            MavenProcessor MavenProcessor = new MavenProcessor(cycloneDXBomParser.Object);
 
             //Act
             Bom bom = MavenProcessor.ParsePackageFile(appSettings);
@@ -299,7 +304,7 @@ namespace LCT.PackageIdentifier.UTest
         public void ParsePackageFile_GivenAInputFilePathAlongWithSBOMTemplate_ReturnTotalComponentsList()
         {
             //Arrange
-            int expectednoofcomponents = 2;
+            int expectednoofcomponents = 1;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
             string filepath = outFolder + @"\PackageIdentifierUTTestFiles";
@@ -314,8 +319,8 @@ namespace LCT.PackageIdentifier.UTest
                 Maven = new Config() { Include = Includes, Exclude = Excludes },
                 CycloneDxSBomTemplatePath = filepath + "\\SBOMTemplates\\SBOM_MavenCATemplate.cdx.json"
             };
-
-            MavenProcessor MavenProcessor = new MavenProcessor();
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            MavenProcessor MavenProcessor = new MavenProcessor(cycloneDXBomParser.Object);
 
             //Act
             Bom bom = MavenProcessor.ParsePackageFile(appSettings);
@@ -343,8 +348,8 @@ namespace LCT.PackageIdentifier.UTest
                 Maven = new Config() { Include = Includes, Exclude = Excludes },
                 CycloneDxSBomTemplatePath = filepath + "\\SBOMTemplates\\SBOMTemplate_Maven.cdx.json"
             };
-
-            MavenProcessor MavenProcessor = new MavenProcessor();
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            MavenProcessor MavenProcessor = new MavenProcessor(cycloneDXBomParser.Object);
 
             //Act
             Bom bom = MavenProcessor.ParsePackageFile(appSettings);

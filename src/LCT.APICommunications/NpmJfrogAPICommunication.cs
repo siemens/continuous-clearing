@@ -5,6 +5,7 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.APICommunications.Model;
+using LCT.Common;
 using log4net;
 using System;
 using System.Net.Http;
@@ -61,14 +62,14 @@ namespace LCT.APICommunications
             {
                 HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
                 result = await httpClient.GetAsync(component.PackageInfoApiUrl);
+                result.EnsureSuccessStatusCode();
             }
             catch (TaskCanceledException ex)
             {
                 Logger.Debug($"{ex.Message}");
-                Logger.Error("A timeout error is thrown from Jfrog server,Please wait for sometime and re run the pipeline again");
+                ExceptionHandling.TaskCancelledException(ex,"Jfrog");                
                 Environment.Exit(-1);
-
-            }
+            }           
             return result;
         }
 

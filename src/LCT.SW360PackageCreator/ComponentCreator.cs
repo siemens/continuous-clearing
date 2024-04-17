@@ -225,10 +225,14 @@ namespace LCT.SW360PackageCreator
             {
                 await CreateComponent(creatorHelper, sw360CreatorService, parsedBomData, sw360Url, appSettings);
             }
+            var alreadyLinkedReleases = await GetAlreadyLinkedReleasesByProjectId(appSettings.SW360ProjectID, sw360ProjectService);
 
-            var manuallyLinkedReleases = await GetManuallyLinkedReleasesFromProject(appSettings, sw360ProjectService);
+            var manuallyLinkedReleases = await GetManuallyLinkedReleasesFromProject(alreadyLinkedReleases);
 
-            var releasesFoundInCbom = ReleasesFoundInCbom.Select(x => x.ReleaseId).ToList();
+            await UpdateSBOMReleasesWithSw360Info(alreadyLinkedReleases);
+
+            var releasesFoundInCbom = ReleasesFoundInCbom.ToList();
+
             // Linking releases to the project
             await sw360CreatorService.LinkReleasesToProject(releasesFoundInCbom, manuallyLinkedReleases, appSettings.SW360ProjectID);
 
@@ -295,13 +299,32 @@ namespace LCT.SW360PackageCreator
             }
         }
 
-        private static async Task<List<string>> GetManuallyLinkedReleasesFromProject(CommonAppSettings appSettings, ISw360ProjectService sw360ProjectService)
+        private static async Task<List<ReleaseLinked>> GetManuallyLinkedReleasesFromProject(List<ReleaseLinked> alreadyLinkedReleases)
         {
-            List<ReleaseLinked> alreadyLinkedReleases = await sw360ProjectService.GetAlreadyLinkedReleasesByProjectId(appSettings.SW360ProjectID);
-            alreadyLinkedReleases.RemoveAll(x => string.Compare(x.Comment, Dataconstant.LinkedByCATool, StringComparison.OrdinalIgnoreCase) == 0);
-            var manuallyLinkedReleaseIds = alreadyLinkedReleases.Select(x => x.ReleaseId).ToList();
+            var manuallyLinkedReleases = new List<ReleaseLinked>(alreadyLinkedReleases);
+            manuallyLinkedReleases.RemoveAll(x => string.Compare(x.Comment, Dataconstant.LinkedByCATool, StringComparison.OrdinalIgnoreCase) == 0);
+            await Task.Yield();
+            return manuallyLinkedReleases;
+        }
 
-            return manuallyLinkedReleaseIds;
+        private static async Task<List<ReleaseLinked>> GetAlreadyLinkedReleasesByProjectId(string projectId, ISw360ProjectService sw360ProjectService)
+        {
+            List<ReleaseLinked> alreadyLinkedReleases = await sw360ProjectService.GetAlreadyLinkedReleasesByProjectId(projectId);
+            return alreadyLinkedReleases;
+        }
+
+        private async Task UpdateSBOMReleasesWithSw360Info(List<ReleaseLinked> alreadyLinkedReleases)
+        {
+            foreach (var release in ReleasesFoundInCbom)
+            {
+                var linkedRelease = alreadyLinkedReleases.FirstOrDefault(r => r.ReleaseId == release.ReleaseId);
+                if (linkedRelease != null)
+                {
+                    release.Comment = linkedRelease.Comment;
+                    release.Relation = linkedRelease.Relation;
+                }
+            }
+            await Task.Yield();
         }
 
         private async Task CreateComponentAndRealease(ICreatorHelper creatorHelper,
@@ -341,7 +364,7 @@ namespace LCT.SW360PackageCreator
                 if (!string.IsNullOrEmpty(createdStatus.ReleaseStatus.ReleaseIdToLink))
                     AddReleaseIdToLink(item, createdStatus.ReleaseStatus.ReleaseIdToLink);
 
-                item.ReleaseID = createdStatus?.ReleaseStatus?.ReleaseIdToLink ?? string.Empty;
+                item.ReleaseID = createdStatus.ReleaseStatus?.ReleaseIdToLink ?? string.Empty;
                 if (!(string.IsNullOrEmpty(item.DownloadUrl) || item.DownloadUrl.Equals(Dataconstant.DownloadUrlNotFound)))
                 {
                     await TriggeringFossologyUploadAndUpdateAdditionalData(item, sw360CreatorService, appSettings);
@@ -411,7 +434,7 @@ namespace LCT.SW360PackageCreator
                 if (!string.IsNullOrEmpty(releaseCreateStatus.ReleaseIdToLink))
                     AddReleaseIdToLink(item, releaseCreateStatus.ReleaseIdToLink);
 
-                item.ReleaseID = releaseCreateStatus?.ReleaseIdToLink ?? string.Empty;
+                item.ReleaseID = releaseCreateStatus.ReleaseIdToLink ?? string.Empty;
                 if (!(string.IsNullOrEmpty(item.DownloadUrl) || item.DownloadUrl.Equals(Dataconstant.DownloadUrlNotFound)))
                 {
                     await TriggeringFossologyUploadAndUpdateAdditionalData(item, sw360CreatorService, appSettings);
@@ -435,8 +458,8 @@ namespace LCT.SW360PackageCreator
                 FossTriggerStatus fossResult = await sw360CreatorService.TriggerFossologyProcess(item.ReleaseID, sw360link);
                 if (!string.IsNullOrEmpty(fossResult?.Links?.Self?.Href))
                 {
-                    Logger.Debug($"{fossResult?.Content?.Message}");
-                    uploadId = await CheckFossologyProcessStatus(fossResult?.Links?.Self?.Href, sw360CreatorService);
+                    Logger.Debug($"{fossResult.Content?.Message}");
+                    uploadId = await CheckFossologyProcessStatus(fossResult.Links?.Self?.Href, sw360CreatorService);
                 }
 
             }
@@ -455,7 +478,7 @@ namespace LCT.SW360PackageCreator
                 CheckFossologyProcess fossResult = await sw360CreatorService.CheckFossologyProcessStatus(link);
                 if (!string.IsNullOrEmpty(fossResult?.FossologyProcessInfo?.ExternalTool))
                 {
-                    uploadId = fossResult?.FossologyProcessInfo?.ProcessSteps[0]?.ProcessStepIdInTool;
+                    uploadId = fossResult.FossologyProcessInfo?.ProcessSteps[0]?.ProcessStepIdInTool;
                 }
             }
             catch (AggregateException ex)

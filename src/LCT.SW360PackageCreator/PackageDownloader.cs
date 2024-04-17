@@ -10,7 +10,6 @@ using LCT.SW360PackageCreator.Interfaces;
 using System;
 using System.Threading.Tasks;
 using log4net;
-using log4net.Core;
 using System.Reflection;
 using LCT.Common.Constants;
 using System.IO;
@@ -146,7 +145,7 @@ namespace LCT.SW360PackageCreator
             const int timeOutMs = 200 * 60 * 1000;
             var processResult = ProcessAsyncHelper.RunAsync(p.StartInfo, timeOutMs);
             Result result = processResult?.Result ?? new Result();
-            Logger.Debug($"GetCorrectVersion:{gitCommand}:{result?.ExitCode}, output:{result?.StdOut}, Error:{result?.StdErr}");
+            Logger.Debug($"GetCorrectVersion:{gitCommand}:{result.ExitCode}, output:{result?.StdOut}, Error:{result.StdErr}");
             return result;
         }
 

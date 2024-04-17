@@ -7,7 +7,6 @@
 using CycloneDX.Json;
 using CycloneDX.Models;
 using LCT.Common.Constants;
-using LCT.Common.Model;
 using log4net;
 using log4net.Core;
 using Newtonsoft.Json;
@@ -82,14 +81,16 @@ namespace LCT.Common
             foreach (var component in bom.ToList())
             {
                 if (!string.IsNullOrEmpty(component.Name) && !string.IsNullOrEmpty(component.Version)
-                    && !string.IsNullOrEmpty(component.Purl) && component.Purl.Contains(Dataconstant.PurlCheck()[projectType.ToUpper()]))
+                    && !string.IsNullOrEmpty(component.Purl) && 
+                    component.Purl.Contains(Dataconstant.PurlCheck()[projectType.ToUpper()]))
                 {
                     //Taking Valid Components for perticular projects
                 }
                 else
                 {
                     bom.Remove(component);
-                    Logger.Debug("CheckValidComponenstForProjectType(): Not valid Component / Purl ID " + component.Purl + " for Project Type :" + projectType);
+                    Logger.Debug("CheckValidComponenstForProjectType(): " +
+                        "Not valid Component / Purl ID " + component.Purl + " for Project Type :" + projectType);
                 }
             }
         }

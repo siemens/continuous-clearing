@@ -5,7 +5,6 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using System.Collections.Generic;
 
 namespace LCT.Common
 {
@@ -15,5 +14,6 @@ namespace LCT.Common
     public interface ICycloneDXBomParser
     {
         public Bom ParseCycloneDXBom(string filePath);
+
     }
 }

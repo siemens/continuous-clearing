@@ -7,7 +7,6 @@
 using LCT.Common.Model;
 using LCT.SW360PackageCreator;
 using LCT.SW360PackageCreator.Interfaces;
-using Moq;
 using NUnit.Framework;
 using System.IO;
 using System.Threading.Tasks;

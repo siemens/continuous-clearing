@@ -23,17 +23,15 @@ using System.Reflection;
 using System.Security;
 using System.Threading.Tasks;
 
-
 namespace LCT.PackageIdentifier
 {
-
     /// <summary>
     /// Parses the NPM Packages
     /// </summary>
     public class NpmProcessor : CycloneDXBomParser, IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        readonly CycloneDXBomParser cycloneDXBomParser;
+        private readonly ICycloneDXBomParser _cycloneDXBomParser;
         private const string Bundled = "bundled";
         private const string Dependencies = "dependencies";
         private const string Dev = "dev";
@@ -42,12 +40,9 @@ namespace LCT.PackageIdentifier
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
         private const string Requires = "requires";
 
-        public NpmProcessor()
+        public NpmProcessor(ICycloneDXBomParser cycloneDXBomParser)
         {
-            if (cycloneDXBomParser == null)
-            {
-                cycloneDXBomParser = new CycloneDXBomParser();
-            }
+            _cycloneDXBomParser = cycloneDXBomParser;
         }
 
         public Bom ParsePackageFile(CommonAppSettings appSettings)
@@ -104,7 +99,7 @@ namespace LCT.PackageIdentifier
                     var pacakages = jsonDeserialized["packages"];
                     if (pacakages?.Children() != null)
                     {
-                        IEnumerable<JProperty> depencyComponentList = pacakages?.Children().OfType<JProperty>();
+                        IEnumerable<JProperty> depencyComponentList = pacakages.Children().OfType<JProperty>();
                         GetPackagesForBom(filepath, ref bundledComponents, ref lstComponentForBOM,
                             ref noOfDevDependent, depencyComponentList);
                     }
@@ -181,7 +176,7 @@ namespace LCT.PackageIdentifier
 
                 components.Description = folderPath;
                 components.Version = Convert.ToString(properties[Version]);
-                components.Author = prop?.Value[Dependencies]?.ToString();
+                components.Author = prop.Value[Dependencies]?.ToString();
                 components.Purl = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
                 components.BomRef = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
 
@@ -204,7 +199,7 @@ namespace LCT.PackageIdentifier
         }
 
 
-        private void GetComponentsForBom(string filepath, CommonAppSettings appSettings,
+        private static void GetComponentsForBom(string filepath, CommonAppSettings appSettings,
             ref List<BundledComponents> bundledComponents, ref List<Component> lstComponentForBOM,
             ref int noOfDevDependent, IEnumerable<JProperty> depencyComponentList)
         {
@@ -383,7 +378,7 @@ namespace LCT.PackageIdentifier
             if (File.Exists(appSettings.CycloneDxSBomTemplatePath) && appSettings.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
                 Bom templateDetails;
-                templateDetails = ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
+                templateDetails = ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
                 CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
                 //Adding Template Component Details
                 SbomTemplate.AddComponentDetails(componentsForBOM, templateDetails);
