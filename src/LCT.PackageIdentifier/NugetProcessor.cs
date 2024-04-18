@@ -43,25 +43,14 @@ namespace LCT.PackageIdentifier
         {
             Logger.Debug($"ParsePackageFile():Start");
             List<Component> listComponentForBOM = new List<Component>();
-            Bom bom = new Bom();
-            int totalComponentsIdentified = 0;
+            Bom bom = new Bom();            
 
             ParsingInputFileForBOM(appSettings, ref listComponentForBOM, ref bom);
-            totalComponentsIdentified = listComponentForBOM.Count;
-
-            listComponentForBOM = listComponentForBOM.Distinct(new ComponentEqualityComparer()).ToList();
-            if (BomCreator.bomKpiData.DuplicateComponents == 0)
-            {
-                BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - listComponentForBOM.Count;
-            }
-
-            var componentsWithMultipleVersions = listComponentForBOM.GroupBy(s => s.Name)
-                              .Where(g => g.Count() > 1).SelectMany(g => g).ToList();
+            var componentsWithMultipleVersions = bom.Components.GroupBy(s => s.Name).Where(g => g.Count() > 1).SelectMany(g => g).ToList();
 
             CheckForMultipleVersions(appSettings, componentsWithMultipleVersions);
 
             Logger.Debug($"ParsePackageFile():End");
-            bom.Components = listComponentForBOM;
             return bom;
         }
 
@@ -362,6 +351,7 @@ namespace LCT.PackageIdentifier
             List<string> configFiles;
             List<Component> componentsForBOM = new List<Component>();
             List<Dependency> dependencies = new List<Dependency>();
+            int totalComponentsIdentified = 0;
 
             configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Nuget);
 
@@ -399,7 +389,13 @@ namespace LCT.PackageIdentifier
             }
 
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = listComponentForBOM.Count;
+            totalComponentsIdentified = listComponentForBOM.Count;                        
             listComponentForBOM = KeepUniqueNonDevComponents(listComponentForBOM);
+            listComponentForBOM = listComponentForBOM.Distinct(new ComponentEqualityComparer()).ToList();
+            if (BomCreator.bomKpiData.DuplicateComponents == 0)
+            {
+                BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - listComponentForBOM.Count;
+            }
             BomCreator.bomKpiData.DevDependentComponents = listComponentForBOM.Count(s => s.Properties[0].Value == "true");
             bom.Components = listComponentForBOM;
 
@@ -411,9 +407,8 @@ namespace LCT.PackageIdentifier
                 CycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
                 SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
             }
-       
-                bom = RemoveExcludedComponents(appSettings, bom);
             
+            bom = RemoveExcludedComponents(appSettings, bom);            
         }
 
         private static void ConvertToCycloneDXModel(List<Component> listComponentForBOM, List<NugetPackage> listofComponents, List<Dependency> dependencies)
