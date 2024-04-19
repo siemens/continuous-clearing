@@ -61,10 +61,11 @@ namespace LCT.ArtifactoryUploader
             fileOperations.WriteContentToFile(m_ComponentsInBOM, bomGenerationPath, FileConstant.BomFileName, appSettings.SW360ProjectName);
 
             // write kpi info to console table 
-            PackageUploadHelper.WriteCreatorKpiDataToConsole(uploaderKpiData);
             if (Program.UploaderStopWatch != null)
                 uploaderKpiData.TimeTakenByComponentCreator =
                 TimeSpan.FromMilliseconds(Program.UploaderStopWatch.ElapsedMilliseconds).TotalSeconds;
+            PackageUploadHelper.WriteCreatorKpiDataToConsole(uploaderKpiData);
+            
             Logger.Debug($"UploadPackageToArtifactory():End");
 
             // set the error code
