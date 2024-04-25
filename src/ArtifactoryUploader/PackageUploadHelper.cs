@@ -173,7 +173,7 @@ namespace LCT.ArtifactoryUploader
 
                 foreach (var jfrogFoundPackage in JfrogFoundPackages)
                 {
-                    Logger.Info($"Successful{jfrogFoundPackage.DryRunSuffix} {jfrogFoundPackage.OperationType} package {jfrogFoundPackage.PackageName}-{jfrogFoundPackage.Version}" +
+                    Logger.Info($"Successful{jfrogFoundPackage.DryRunSuffix} {jfrogFoundPackage.OperationType} package {jfrogFoundPackage.Name}-{jfrogFoundPackage.Version}" +
                    $" from {jfrogFoundPackage.SrcRepoName} to {jfrogFoundPackage.DestRepoName}");
 
                     if (jfrogFoundPackage.ResponseMessage.ReasonPhrase == ApiConstant.ErrorInUpload)

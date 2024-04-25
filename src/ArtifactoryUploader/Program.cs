@@ -53,13 +53,10 @@ namespace ArtifactoryUploader
             else
                 Logger.Logger.Log(null, Level.Alert, $"Artifactory Uploader is running in dry-run mode, no packages will be moved \n", null);
 
-
-
             Logger.Logger.Log(null, Level.Info, $"Input Parameters used in Artifactory Uploader:\n\t", null);
-            Logger.Logger.Log(null, Level.Notice, $"\tBomFilePath:\t\t  {appSettings.BomFilePath}\n\t" +
+            Logger.Logger.Log(null, Level.Notice, $"\tBomFilePath:\t\t {appSettings.BomFilePath}\n\t" +
                 $"JFrogUrl:\t\t {appSettings.JFrogApi}\n\t" +
                 $"Artifactory User:\t {appSettings.ArtifactoryUploadUser}\n\t" +
-                $"Artifactory Token:\t {appSettings.ArtifactoryUploadApiKey}\n\t" +
                 $"Release:\t\t {appSettings.Release}\n\t" +
                 $"LogFolderPath:\t\t {Path.GetFullPath(FolderPath)}\n", null);
 
@@ -69,14 +66,14 @@ namespace ArtifactoryUploader
                 ApiKey = appSettings.ArtifactoryUploadApiKey,
                 Email = appSettings.ArtifactoryUploadUser
             };
-            NpmJfrogApiCommunication jfrogCommunication = new NpmJfrogApiCommunication(appSettings.JFrogApi, appSettings.JfrogNpmSrcRepo, artifactoryCredentials,appSettings.TimeOut);
+            NpmJfrogApiCommunication jfrogCommunication = new NpmJfrogApiCommunication(appSettings.JFrogApi, appSettings.JfrogNpmSrcRepo, artifactoryCredentials, appSettings.TimeOut);
             ArtifactoryValidator artifactoryValidator = new(jfrogCommunication);
             await artifactoryValidator.ValidateArtifactoryCredentials(appSettings);
 
             //Uploading Package to artifactory
             PackageUploadHelper.jFrogService = GetJfrogService(appSettings);
             await PackageUploader.UploadPackageToArtifactory(appSettings);
-            
+
 
             Logger.Logger.Log(null, Level.Notice, $"End of Artifactory Uploader execution : {DateTime.Now}\n", null);
         }
