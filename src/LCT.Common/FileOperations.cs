@@ -50,13 +50,13 @@ namespace LCT.Common
         {
             try
             {
-                Logger.Debug($"WriteContentToFile():folderpath-{folderPath},fileNameWithExtension-{fileNameWithExtension}," +
+                Logger.Debug($"WriteContentToFile():Path of the Bom file-{folderPath},Name of the Bom file with extention-{fileNameWithExtension}," +
                     $"projectName-{projectName}");
                 string jsonString = JsonConvert.SerializeObject(dataToWrite, Formatting.Indented);
                 string fileName = $"{projectName}_{fileNameWithExtension}";
 
                 string filePath = Path.Combine(folderPath, fileName);
-                Logger.Debug($"filePath-{filePath}");
+                Logger.Debug($"full path of bom file-{filePath}");
 
                 BackupTheGivenFile(folderPath, fileName);
                 File.WriteAllText(filePath, jsonString);
@@ -77,7 +77,7 @@ namespace LCT.Common
                 Logger.Debug($"WriteContentToFile():Error:", e);
                 return "failure";
             }
-            Logger.Debug($"WriteContentToFile():End");
+            Logger.Debug($"WriteContentToFile():completed the writing components data in bom file");
             return "success";
 
         }
@@ -135,7 +135,7 @@ namespace LCT.Common
         {
             try
             {
-                Logger.Debug($"WriteContentToCycloneDXFile():folderpath-{filePath}");
+                Logger.Debug($"WriteContentToCycloneDXFile():Path of the CycloneDXFile-{filePath}");
                 string jsonString = JsonConvert.SerializeObject(dataToWrite, Formatting.Indented);
                 string filename = Path.GetFileName(fileNameWithExtension);
                 filePath = $"{filePath}\\{filename}";
@@ -159,7 +159,7 @@ namespace LCT.Common
                 Logger.Debug($"WriteContentToCycloneDXFile():Error:", e);
                 return "failure";
             }
-            Logger.Debug($"WriteContentToCycloneDXFile():End");
+            Logger.Debug($"WriteContentToCycloneDXFile():completed the writing all data in CycloneDXfile");
             return "success";
 
         }
@@ -168,7 +168,7 @@ namespace LCT.Common
         {
             string oldFile = Path.Combine(folderPath, fileName);
             string newFile = string.Format("{0}/{1:MM-dd-yyyy_HHmm_ss}_Backup_{2}", folderPath, DateTime.Now, fileName);
-            Logger.Debug($"BackupTheGivenFile():oldFile{oldFile},newFile{newFile}");
+            Logger.Debug($"BackupTheGivenFile():Path of backup file with file name{oldFile},path of new file with file name {newFile}");
             try
             {
                 if (File.Exists(oldFile))

@@ -66,7 +66,7 @@ namespace LCT.ArtifactoryUploader
                 TimeSpan.FromMilliseconds(Program.UploaderStopWatch.ElapsedMilliseconds).TotalSeconds;
             PackageUploadHelper.WriteCreatorKpiDataToConsole(uploaderKpiData);
             
-            Logger.Debug($"UploadPackageToArtifactory():End");
+            Logger.Debug($"UploadPackageToArtifactory():Uploading packages to artifactory Ended");
 
             // set the error code
             if (uploaderKpiData.PackagesNotUploadedDueToError > 0 || uploaderKpiData.PackagesNotExistingInRemoteCache > 0)

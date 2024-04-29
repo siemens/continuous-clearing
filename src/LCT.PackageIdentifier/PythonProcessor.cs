@@ -39,6 +39,7 @@ namespace LCT.PackageIdentifier
 
         public Bom ParsePackageFile(CommonAppSettings appSettings)
         {
+            Logger.Debug($"ParsePackageFile():Start Reading input package files for {appSettings.ProjectType} components");
             List<string> configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Python);
             List<PythonPackage> listofComponents = new List<PythonPackage>();
             Bom bom = new Bom();
@@ -76,6 +77,7 @@ namespace LCT.PackageIdentifier
             //Adding Template Component Details & MetaData
             SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
             bom = RemoveExcludedComponents(appSettings, bom);
+            Logger.Debug($"ParsePackageFile():Completed identifying {appSettings.ProjectType} components through given input package files");
             return bom;
         }
 

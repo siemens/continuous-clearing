@@ -47,6 +47,7 @@ namespace LCT.PackageIdentifier
 
         public Bom ParsePackageFile(CommonAppSettings appSettings)
         {
+            Logger.Debug($"ParsePackageFile():Start Reading input package files for {appSettings.ProjectType} components");
             List<Component> componentsForBOM = new List<Component>();
             Bom bom = new Bom();
             List<Dependency> dependencies = new List<Dependency>();
@@ -70,7 +71,7 @@ namespace LCT.PackageIdentifier
             }
             bom.Components = componentsForBOM;
             bom.Dependencies = dependencies;
-            Logger.Debug($"ParsePackageFile():End");
+            Logger.Debug($"ParsePackageFile():Completed identifying {appSettings.ProjectType} components through given input package files");
             return bom;
         }
 

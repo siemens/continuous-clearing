@@ -362,7 +362,7 @@ namespace LCT.SW360PackageCreator
         /// <returns>string</returns>
         public async Task<string> GetSourceUrlForNugetPackage(string componentName, string componenVersion)
         {
-            Logger.Debug($"URLHelper.GetSourceUrlForNugetPackage():Start");
+            Logger.Debug($"URLHelper.GetSourceUrlForNugetPackage():Get sourceurl of Nugetpackage");
             string name = componentName.ToLowerInvariant();
             string version = componenVersion.ToLowerInvariant();
             string nuspecURL = $"{CommonAppSettings.SourceURLNugetApi}{name}/{version}/{name}.nuspec";
@@ -378,7 +378,7 @@ namespace LCT.SW360PackageCreator
         /// <returns>string</returns>
         public string GetSourceUrlForNpmPackage(string componentName, string version)
         {
-            Logger.Debug($"GetSourceUrl():Start");
+            Logger.Debug($"GetSourceUrl():Get sourceurl of Npmpackage ");
 
             string npmViewCommandToGetUrl = String.Empty;
             Logger.Debug($"GetSourceUrl():{npmViewCommandToGetUrl}");
@@ -416,7 +416,7 @@ namespace LCT.SW360PackageCreator
             GithubUrl = repo.IdentifyRepoURLForGit(sourceUrl, componentName);
 
             Logger.Debug($"GetSourceUrl():Release Name : {componentName}@{version}, NPM view Output:{result?.StdOut},  Error  : {result?.StdErr}");
-            Logger.Debug($"GetSourceUrl():End");
+            Logger.Debug($"GetSourceUrl():Identified sourceurl of Npmpackage");
 
             return GithubUrl;
         }
@@ -783,7 +783,7 @@ namespace LCT.SW360PackageCreator
         /// <returns>string</returns>
         public async Task<string> GetSourceUrlForPythonPackage(string componentName, string componenVersion)
         {
-            Logger.Debug($"URLHelper.GetSourceUrlForPythonPackage():Start");
+            Logger.Debug($"URLHelper.GetSourceUrlForPythonPackage():Get sourceurl of Pythonpackage");
             string name = componentName.ToLowerInvariant();
             string version = componenVersion.ToLowerInvariant();
             var response = await GetResponseFromPyPiOrg(name, version);

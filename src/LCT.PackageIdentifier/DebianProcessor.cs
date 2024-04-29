@@ -40,6 +40,7 @@ namespace LCT.PackageIdentifier
 
         public Bom ParsePackageFile(CommonAppSettings appSettings)
         {
+            Logger.Debug($"ParsePackageFile():Start Reading input package files for {appSettings.ProjectType} components");
             List<string> configFiles;
             List<DebianPackage> listofComponents = new List<DebianPackage>();
             Bom bom = new Bom();
@@ -73,6 +74,7 @@ namespace LCT.PackageIdentifier
             }
 
             bom = RemoveExcludedComponents(appSettings, bom);
+            Logger.Debug($"ParsePackageFile():Completed identifying {appSettings.ProjectType} components through given input package files");
             return bom;
         }
 

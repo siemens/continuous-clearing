@@ -260,7 +260,7 @@ namespace LCT.SW360PackageCreator
             //write list of components which are not linked
             CommonHelper.WriteComponentsNotLinkedListInConsole(ComponentsNotLinked);
 
-            Logger.Debug($"CreateComponentInSw360():End");
+            Logger.Debug($"CreateComponentInSw360():Components created in SW360");
         }
 
         private async Task CreateComponent(ICreatorHelper creatorHelper,

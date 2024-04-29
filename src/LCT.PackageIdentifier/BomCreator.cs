@@ -42,7 +42,7 @@ namespace LCT.PackageIdentifier
 
         public async Task GenerateBom(CommonAppSettings appSettings, IBomHelper bomHelper, IFileOperations fileOperations)
         {
-            Logger.Debug($"GenerateBom():Start");
+            Logger.Debug($"GenerateBom():Application Started for creating {appSettings.ProjectType} bom file");
             Bom listOfComponentsToBom;
 
             // Calls package parser
@@ -78,7 +78,7 @@ namespace LCT.PackageIdentifier
             //Writes internal component ist to kpi
 
             bomHelper.WriteInternalComponentsListToKpi(componentData.internalComponents);
-            Logger.Debug($"GenerateBom():End");
+            Logger.Debug($"GenerateBom():Generated {appSettings.ProjectType} bom file created with components");
         }
 
         private static void WritecontentsToBOM(CommonAppSettings appSettings, BomKpiData bomKpiData, Bom listOfComponentsToBom)

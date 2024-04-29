@@ -41,7 +41,7 @@ namespace LCT.PackageIdentifier
         #region public methods
         public Bom ParsePackageFile(CommonAppSettings appSettings)
         {
-            Logger.Debug($"ParsePackageFile():Start");
+            Logger.Debug($"ParsePackageFile():Start Reading input package files for {appSettings.ProjectType} components");
             List<Component> listComponentForBOM = new List<Component>();
             Bom bom = new Bom();            
 
@@ -50,7 +50,7 @@ namespace LCT.PackageIdentifier
 
             CheckForMultipleVersions(appSettings, componentsWithMultipleVersions);
 
-            Logger.Debug($"ParsePackageFile():End");
+            Logger.Debug($"ParsePackageFile():Completed identifying {appSettings.ProjectType} components through given input package files");
             return bom;
         }
 
@@ -357,7 +357,7 @@ namespace LCT.PackageIdentifier
 
             foreach (string filepath in configFiles)
             {
-                Logger.Debug($"ParsingInputFileForBOM():FileName: " + filepath);
+                Logger.Debug($"ParsingInputFileForBOM():Parsing {appSettings.ProjectType} input filename: " + filepath);
                 if (filepath.EndsWith(FileConstant.CycloneDXFileExtension))
                 {
                     if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))

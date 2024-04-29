@@ -36,7 +36,7 @@ namespace LCT.SW360PackageCreator
         /// <returns>string</returns>
         string IRepository.IdentifyRepoURLForGit(string url, string componentName)
         {
-            Logger.Debug($"Repository.IdentifyRepoURLForGitHub():Start");
+            Logger.Debug($"Repository.IdentifyRepoURLForGitHub():Starting identify Repo URL for {componentName}");
             string downloadUrl = string.Empty;
             string repoName = GetRepoName(url);
 
@@ -58,13 +58,13 @@ namespace LCT.SW360PackageCreator
                 Logger.Error($"Repository.IdentifyRepoURLForGitHub():{componentName}-{url}", ex);
             }
 
-            Logger.Debug($"Repository.IdentifyRepoURLForGitHub():End");
+            Logger.Debug($"Repository.IdentifyRepoURLForGitHub():completed identifying Repo URL for {componentName}");
             return downloadUrl;
         }
 
         public string FormGitCloneUrl(string url, string componentName, string version)
         {
-            Logger.Debug($"FormGitCloneUrl():Start");
+            Logger.Debug($"FormGitCloneUrl():Finding Git clone url for {componentName}-{version}");
             string downloadUrl = Dataconstant.DownloadUrlNotFound;
 
             if (string.IsNullOrEmpty(url) || url == Dataconstant.SourceUrlNotFound)
@@ -75,7 +75,7 @@ namespace LCT.SW360PackageCreator
             string cloneUrl = url.TrimEnd('/');
             downloadUrl = $"{cloneUrl}.git";
 
-            Logger.Debug($"FormGitCloneUrl():End");
+            Logger.Debug($"FormGitCloneUrl():Completed finding Git clone url for {componentName}-{version}");
             return downloadUrl;
         }
 

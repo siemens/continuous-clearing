@@ -40,7 +40,7 @@ namespace LCT.ArtifactoryUploader
         private static bool SetWarningCode;
         public static Bom GetComponentListFromComparisonBOM(string comparisionBomFilePath)
         {
-            Logger.Debug("Starting GetComponentListFromComparisonBOM() method");
+            Logger.Debug("Starting get component list from comparison BOM file for uploading packages");
             Bom componentsToBoms = null;
             try
             {
@@ -61,12 +61,13 @@ namespace LCT.ArtifactoryUploader
                 throw new JsonReaderException();
 
             }
+            Logger.Debug("Ended component list identified from comparison BOM file for uploading packages");
             return componentsToBoms;
         }
 
         public async static Task<List<ComponentsToArtifactory>> GetComponentsToBeUploadedToArtifactory(List<Component> comparisonBomData, CommonAppSettings appSettings, DisplayPackagesInfo displayPackagesInfo)
         {
-            Logger.Debug("Starting GetComponentsToBeUploadedToArtifactory() method");
+            Logger.Debug("Starting get components for uploading to Jfrog artifactory");
             List<ComponentsToArtifactory> componentsToBeUploaded = new List<ComponentsToArtifactory>();
 
             foreach (var item in comparisonBomData)
@@ -115,7 +116,7 @@ namespace LCT.ArtifactoryUploader
                     await AddUnknownPackagesAsync(item, displayPackagesInfo);
                 }               
             }
-            Logger.Debug("Ending GetComponentsToBeUploadedToArtifactory() method");
+            Logger.Debug("Ended get components for uploading to jfrog artifactory");
             return componentsToBeUploaded;
         }
 
@@ -711,7 +712,7 @@ namespace LCT.ArtifactoryUploader
 
         public static async Task UploadingThePackages(List<ComponentsToArtifactory> componentsToUpload, int timeout, DisplayPackagesInfo displayPackagesInfo)
         {
-            Logger.Debug("Starting UploadingThePackages() method");
+            Logger.Debug("Starting uploading the packages to Jfrog artifactory");
             foreach (var item in componentsToUpload)
             {
                 await PackageUploadToArtifactory(PackageUploader.uploaderKpiData, item, timeout, displayPackagesInfo);
@@ -723,7 +724,7 @@ namespace LCT.ArtifactoryUploader
                 Logger.Debug("Setting ExitCode to 2");
             }
 
-            Logger.Debug("Ending UploadingThePackages() method");
+            Logger.Debug("Ended uploading the packages to Jfrog artifactory");
             Program.UploaderStopWatch?.Stop();
         }
 
