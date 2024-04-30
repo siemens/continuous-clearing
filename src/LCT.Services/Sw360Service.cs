@@ -427,7 +427,7 @@ namespace LCT.Services
 
         private async Task<bool> CheckReleaseExistenceByExternalId(Components componentToBomData)
         {
-            Logger.Debug($"CheckReleaseExistenceByExternalId():  start : Release name - {componentToBomData.Name}, version - {componentToBomData.Version}");
+            Logger.Debug($"CheckReleaseExistenceByExternalId():  Get Release Data by useing ExternalId : Release name - {componentToBomData.Name}, version - {componentToBomData.Version}");
             Releasestatus releaseStatus = new Releasestatus();
 
             try
