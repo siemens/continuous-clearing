@@ -400,7 +400,7 @@ namespace LCT.Services
 
         private string AttachSourcesToReleasesCreated(string releaseId, Dictionary<string, string> attachmentUrlList)
         {
-            Logger.Debug($"AttachSourcesToReleasesCreated(): start");
+            Logger.Debug($"AttachSourcesToReleasesCreated():start attach component source to SW360");
 
             string attachmentApiUrl = string.Empty;
             foreach (var attachmenturl in attachmentUrlList)
@@ -416,7 +416,7 @@ namespace LCT.Services
                 attachmentApiUrl = m_SW360ApiCommunicationFacade.AttachComponentSourceToSW360(attachReport);
             }
 
-            Logger.Debug($"AttachSourcesToReleasesCreated(): end");
+            Logger.Debug($"AttachSourcesToReleasesCreated():Attach component source to SW360 ended");
             return attachmentApiUrl;
         }
 
