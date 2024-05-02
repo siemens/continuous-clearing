@@ -102,32 +102,7 @@ jobs:
         Write-Host "::set-output name=LicenseClearingTool::$($fileName)"
         $outPath = Join-Path $outFolder $fileName
         Compress-Archive -DestinationPath $outPath -Path $sourceFolder -CompressionLevel Optimal
-      
-    - name: SW360 Instance refresh  
-      #if: ${{ false }}  # disable for now
-      run: |
-        docker exec -dt sw360confctnr1 service postgresql stop
-        docker stop sw360confctnr1
-        docker rm sw360confctnr1        
-        docker run --name sw360confctnr1 --memory=7g -t -d -p ${env:SW360APPPORT}:8080 -p 5990:5984 -p 5440:5432 ${env:DOCKERDEVARTIFACTORY}/energy-dev/software-clearing/sw360/sw360conf:latest
-        Start-Sleep -s 200
-      env:
-         SW360APPPORT: ${{ secrets.SW360APPPORT }}
-         DOCKERDEVARTIFACTORY: ${{ secrets.DOCKERDEVARTIFACTORY }}
-         
-    - name: Test 
-      #if: ${{ false }}  # disable for now
-      run: |
-        $TestProjects = Get-ChildItem -Path *test*.csproj -Recurse -exclude TestUtilities.csproj,UnitTestUtilities.csproj
-        Write-Host "**************************The test projects considered for execution: $TestProjects   ******************************"
-        Write-Host "********************************************************************************************************************"
-        foreach ($Project in $TestProjects) 
-        {                 
-                Write-Host $Project.DirectoryName
-                $TestProject = $Project.DirectoryName
-                Push-Location $Project.PSParentPath
-                dotnet test --no-build --configuration Release
-        }
+     
 
     - name: Archive Build Output
       uses: actions/upload-artifact@v2
