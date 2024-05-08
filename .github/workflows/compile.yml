@@ -51,7 +51,7 @@ jobs:
         
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.3.1
-      if: ${{ success() || failure() }}
+      if: ${{ false }}  # disable for now
   
       
     - name: update appSettingsSW360IntegrationTest.json
