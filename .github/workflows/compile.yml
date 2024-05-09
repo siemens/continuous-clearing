@@ -57,6 +57,12 @@ jobs:
       uses: microsoft/setup-msbuild@v1.3.1
       if: ${{ false }}  # disable for now
 
+    - name: Restore Packages
+      run: dotnet restore src\LicenseClearingTool.sln 
+    
+    - name: Build
+      run: msbuild -m -t:Rebuild -p:Configuration=Release -bl:continous-clearing.binlog -noconlog src\LicenseClearingTool.sln
+
     - name: Build the Docker image
       id: builddocker
       #if: ${{ false }}  # disable for now
@@ -95,11 +101,7 @@ jobs:
         FOSSYAPPPORT: ${{ secrets.FOSSYAPPPORT }}
         JFROGURL: ${{ secrets.JFROGURL }}
         
-    - name: Restore Packages
-      run: dotnet restore src\LicenseClearingTool.sln 
-    
-    - name: Build
-      run: msbuild -m -t:Rebuild -p:Configuration=Release -bl:continous-clearing.binlog -noconlog src\LicenseClearingTool.sln
+   
     
     - name: Archive Build Log
       uses: actions/upload-artifact@v2
