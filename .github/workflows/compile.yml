@@ -8,11 +8,7 @@ on:
 jobs:
 
   build:
-    runs-on:  ubuntu-latest
-    container:
-       image: mcr.microsoft.com/dotnet/sdk:6.0-bullseye-slim-amd64
-       options: --platform linux/amd64
-    
+    runs-on:  windows-latest
   
     defaults:
       run:
@@ -62,6 +58,9 @@ jobs:
     
     - name: Build
       run: msbuild -m -t:Rebuild -p:Configuration=Release -bl:continous-clearing.binlog -noconlog src\LicenseClearingTool.sln
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
 
     - name: Build the Docker image
       id: builddocker
