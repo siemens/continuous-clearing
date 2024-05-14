@@ -39,6 +39,14 @@ jobs:
       env: 
         ACTIONS_ALLOW_UNSECURE_COMMANDS: TRUE
 
+    - name: Install PowerShell
+      run :
+         sudo apt-get update
+         sudo apt-get install- -y powershell
+
+    - name: Verifyu PowerShell installation
+      run: pwsh --version
+
     - name: get SemVer   
       if: ${{ false }}  # disable for now
       id: gitversion
