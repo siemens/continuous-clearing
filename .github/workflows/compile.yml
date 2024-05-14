@@ -28,7 +28,8 @@ jobs:
       env: 
         ACTIONS_ALLOW_UNSECURE_COMMANDS: TRUE
     
-    - name: Determine Version      
+    - name: Determine Version   
+      if: ${{ false }}  # disable for now
       uses: gittools/actions/gitversion/execute@v0.10.2
       with:
         useConfigFile: true        
