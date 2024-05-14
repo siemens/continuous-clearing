@@ -64,7 +64,7 @@ jobs:
 
     - name: Restore Packages
       #if: ${{ false }}  # disable for now
-      run: dotnet restore src\LicenseClearingTool.sln 
+      run: dotnet restore src/LicenseClearingTool.sln 
     
     - name: Build
       if: ${{ false }}  # disable for now
