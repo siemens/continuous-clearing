@@ -20,13 +20,6 @@ jobs:
       docker-LicenseClearingTool: ${{ steps.builddocker.outputs.docker-LicenseClearingTool }}
       
     steps:
-    - uses: actions/checkout@v4
-    - name: Install from PSGallery
-      shell: pwsh
-      run: |
-          Set-PSRepository PSGallery -InstallationPolicy Trusted
-          Install-Module SqlServer, PSScriptAnalyzer
-    
     - name: Setup Version      
       uses: gittools/actions/gitversion/setup@v0.10.2
       with:
@@ -50,6 +43,13 @@ jobs:
         $fileName = "dummy-v$($env:GitVersion_SemVer)"
         echo "SemVerMMP: v$($env:GitVersion_MajorMinorPatch)"
         Write-Host "Filename: '$fileName'" 
+
+    - uses: actions/checkout@v4
+    - name: Install from PSGallery
+      shell: pwsh
+      run: |
+          Set-PSRepository PSGallery -InstallationPolicy Trusted
+          Install-Module SqlServer, PSScriptAnalyzer
         
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.3.1
