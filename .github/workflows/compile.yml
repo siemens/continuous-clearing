@@ -4,14 +4,15 @@ on:
  push:
  pull_request:
 
+
 jobs:
+
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latset
   
     defaults:
       run:
-        working-directory: 
-    outputs:
+        working-directory: .
       semver: ${{ steps.gitversion.outputs.semver }}
       LicenseClearingTool: ${{ steps.packageBuildResults.outputs.LicenseClearingTool }}  
       nupkg-LicenseClearingTool: ${{ steps.createNupkg.outputs.nupkg-LicenseClearingTool }}
