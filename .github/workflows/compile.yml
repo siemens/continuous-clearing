@@ -40,30 +40,6 @@ jobs:
         useConfigFile: true        
       env: 
         ACTIONS_ALLOW_UNSECURE_COMMANDS: TRUE
-
-    - name: Setup Version      
-      uses: gittools/actions/gitversion/setup@v0.10.2
-      with:
-        versionSpec: '5.12.0'
-      env: 
-        ACTIONS_ALLOW_UNSECURE_COMMANDS: TRUE
-    
-    - name: Determine Version      
-      uses: gittools/actions/gitversion/execute@v0.10.2
-      with:
-        useConfigFile: true        
-      env: 
-        ACTIONS_ALLOW_UNSECURE_COMMANDS: TRUE
-  
-    - name: Install PowerShell
-      uses: actions/setup-powershell@v1
-      with:
-        version: 7.1.3
-        
-    - name: Run PowerShell script
-      shell: pwsh
-      run: |
-        Write-Host "Hello, World!
         
     - name: get SemVer   
       if: ${{ false }}  # disable for now
@@ -95,6 +71,7 @@ jobs:
         docker build . --file Dockerfile --tag ${{ github.repository }}:continuous-clearing-v6.2.0
         docker save ${{ github.repository }}:continuous-clearing-v6.2.0 -o continuous-clearing-v6.2.0.tar
         Write-Host "::set-output name=docker-LicenseClearingTool::continuous-clearing-v6.2.0.tar"
+        
     - name: Archive docker image      
       #if: ${{ false }}  # disable for now
       uses: actions/upload-artifact@v2
