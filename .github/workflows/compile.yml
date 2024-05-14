@@ -8,7 +8,9 @@ on:
 jobs:
 
   build:
-    runs-on:  ubuntu-latest
+    runs-on:  widnows-latest
+    container:
+      image: ubuntu:latest
   
     defaults:
       run:
@@ -44,7 +46,7 @@ jobs:
          sudo apt-get update
          sudo apt-get install- -y powershell
 
-    - name: Verifyu PowerShell installation
+    - name: Verify PowerShell installation
       run: pwsh --version
 
     - name: get SemVer   
