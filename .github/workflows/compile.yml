@@ -41,7 +41,7 @@ jobs:
       env: 
         ACTIONS_ALLOW_UNSECURE_COMMANDS: TRUE
 
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v3
     - name: Install from PSGallery
       shell: pwsh
       run: |
