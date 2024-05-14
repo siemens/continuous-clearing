@@ -34,6 +34,13 @@ jobs:
         useConfigFile: true        
       env: 
         ACTIONS_ALLOW_UNSECURE_COMMANDS: TRUE
+
+    - uses: actions/checkout@v4
+    - name: Install from PSGallery
+      shell: pwsh
+      run: |
+          Set-PSRepository PSGallery -InstallationPolicy Trusted
+          Install-Module SqlServer, PSScriptAnalyzer
         
     - name: get SemVer   
       if: ${{ false }}  # disable for now
@@ -44,13 +51,6 @@ jobs:
         $fileName = "dummy-v$($env:GitVersion_SemVer)"
         echo "SemVerMMP: v$($env:GitVersion_MajorMinorPatch)"
         Write-Host "Filename: '$fileName'" 
-
-    - uses: actions/checkout@v4
-    - name: Install from PSGallery
-      shell: pwsh
-      run: |
-          Set-PSRepository PSGallery -InstallationPolicy Trusted
-          Install-Module SqlServer, PSScriptAnalyzer
         
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.3.1
