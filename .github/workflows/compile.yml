@@ -65,9 +65,6 @@ jobs:
       if: ${{ false }}  # disable for now
       run: msbuild -m -t:Rebuild -p:Configuration=Release -bl:continous-clearing.binlog -noconlog src\LicenseClearingTool.sln
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
-
     - name: Build the Docker image
       id: builddocker
       #if: ${{ false }}  # disable for now
