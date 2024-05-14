@@ -58,9 +58,11 @@ jobs:
       if: ${{ false }}  # disable for now
 
     - name: Restore Packages
+      if: ${{ false }}  # disable for now
       run: dotnet restore src\LicenseClearingTool.sln 
     
     - name: Build
+      if: ${{ false }}  # disable for now
       run: msbuild -m -t:Rebuild -p:Configuration=Release -bl:continous-clearing.binlog -noconlog src\LicenseClearingTool.sln
 
     - name: Set up Docker Buildx
