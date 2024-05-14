@@ -40,7 +40,7 @@ jobs:
         ACTIONS_ALLOW_UNSECURE_COMMANDS: TRUE
 
     - name: get SemVer   
-      #if: ${{ false }}  # disable for now
+      if: ${{ false }}  # disable for now
       id: gitversion
       run: |
         echo "SemVer: v$($env:GitVersion_SemVer)" 
@@ -51,7 +51,7 @@ jobs:
         
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.3.1
-      #if: ${{ false }}  # disable for now
+      if: ${{ false }}  # disable for now
 
     - name: Restore Packages
       run: dotnet restore src\LicenseClearingTool.sln 
