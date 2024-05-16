@@ -9,6 +9,7 @@ using LCT.APICommunications;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Interface;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.PackageIdentifier.Model.NugetModel;
@@ -500,22 +501,16 @@ namespace LCT.PackageIdentifier
             }
             else
             {
-                Logger.Warn("No Proper input files found for Nuget package types.");
+                Logger.Warn($"Input file NOT_FOUND :{filepath}");
             }
         }
 
 
         private static void CheckForMultipleVersions(CommonAppSettings appSettings, List<Component> componentsWithMultipleVersions)
         {
-
             if (componentsWithMultipleVersions.Count != 0)
             {
-                Logger.Warn($"Multiple versions detected :\n");
-                foreach (var item in componentsWithMultipleVersions)
-                {
-                    item.Description = !string.IsNullOrEmpty(appSettings.CycloneDxSBomTemplatePath) ? appSettings.CycloneDxSBomTemplatePath : item.Description;
-                    Logger.Warn($"Component Name : {item.Name}\nComponent Version : {item.Version}\nPackage Found in : {item.Description}\n");
-                }
+                CommonHelper.CreateFileForMultipleVersions(componentsWithMultipleVersions,appSettings);
             }
         }
 

@@ -12,7 +12,7 @@ using LCT.APICommunications.Model.AQL;
 using LCT.ArtifactoryUploader.Model;
 using LCT.Common;
 using LCT.Common.Constants;
-using LCT.Services;
+using LCT.Common.Interface;
 using LCT.Services.Interface;
 using log4net;
 using Newtonsoft.Json;
@@ -20,7 +20,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
@@ -156,8 +155,8 @@ namespace LCT.ArtifactoryUploader
         {
             if (unknownPackages.Any() || JfrogNotFoundPackages.Any() || SucessfullPackages.Any() || JfrogFoundPackages.Any())
             {
-                Logger.Info("\n" + name + "\n");
-                DisplayErrorForUnknownPackages(unknownPackages);
+                Logger.Info("\n" + name + ":\n");
+                DisplayErrorForUnknownPackages(unknownPackages,name);
                 DisplayErrorForJfrogFoundPackages(JfrogFoundPackages);
                 DisplayErrorForJfrogPackages(JfrogNotFoundPackages);
                 DisplayErrorForSucessfullPackages(SucessfullPackages);
@@ -172,9 +171,7 @@ namespace LCT.ArtifactoryUploader
             {
 
                 foreach (var jfrogFoundPackage in JfrogFoundPackages)
-                {
-                    Logger.Info($"Successful{jfrogFoundPackage.DryRunSuffix} {jfrogFoundPackage.OperationType} package {jfrogFoundPackage.Name}-{jfrogFoundPackage.Version}" +
-                   $" from {jfrogFoundPackage.SrcRepoName} to {jfrogFoundPackage.DestRepoName}");
+                {                 
 
                     if (jfrogFoundPackage.ResponseMessage.ReasonPhrase == ApiConstant.ErrorInUpload)
                     {
@@ -184,6 +181,11 @@ namespace LCT.ArtifactoryUploader
                     {
                         Logger.Error($"Package {jfrogFoundPackage.Name}-{jfrogFoundPackage.Version} not found in {jfrogFoundPackage.SrcRepoName}, Upload Failed!!");
                     }
+                    else
+                    {
+                        Logger.Info($"Successful{jfrogFoundPackage.DryRunSuffix} {jfrogFoundPackage.OperationType} package {jfrogFoundPackage.Name}-{jfrogFoundPackage.Version}" +
+                                          $" from {jfrogFoundPackage.SrcRepoName} to {jfrogFoundPackage.DestRepoName}");
+                    }                   
 
                 }
                 Logger.Info("\n");
@@ -206,19 +208,50 @@ namespace LCT.ArtifactoryUploader
 
             }
         }
-        private static void DisplayErrorForUnknownPackages(List<ComponentsToArtifactory> unknownPackages)
+        private static void DisplayErrorForUnknownPackages(List<ComponentsToArtifactory> unknownPackages,string name)
         {
 
             if (unknownPackages.Any())
             {
-
+                ListOfComponentValues componentValues = new ListOfComponentValues();
+                componentValues.PackageProperties = new List<ComponentValues>();
                 foreach (var unknownPackage in unknownPackages)
-                {
-                    Logger.Warn($"Package {unknownPackage.Name}-{unknownPackage.Version} is not in report approved state,hence artifactory upload will not be done!");
+                {                   
+                    ComponentValues componentData= new ComponentValues();
+                    componentData.Name = unknownPackage.Name;
+                    componentData.version= unknownPackage.Version;
+                    componentValues.PackageProperties.Add(componentData);
                 }
-                Logger.Info("\n");
+                IFileOperations fileOperations = new FileOperations();                
+                string localPathforartifactory = GettPathForArtifactoryUpload();
+                fileOperations.WriteContentToFile(componentValues.PackageProperties, localPathforartifactory,
+       FileConstant.artifactoryReportNotApproved, name);
+                Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {localPathforartifactory}{name}_{FileConstant.artifactoryReportNotApproved}\n");
 
             }
+        }
+
+        public static string GettPathForArtifactoryUpload()
+        {
+            string localPathforartifactory = string.Empty;
+            try
+            {
+                localPathforartifactory = $"{Directory.GetParent(Directory.GetCurrentDirectory())}\\ClearingTool\\ArtifactoryFiles\\";
+                if (!Directory.Exists(localPathforartifactory))
+                {
+                    localPathforartifactory = Directory.CreateDirectory(localPathforartifactory).ToString();
+                }
+            }
+            catch (IOException ex)
+            {
+                Logger.Error($"GetDownloadPathForAlpineRepo() ", ex);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                Logger.Error($"GetDownloadPathForAlpineRepo() ", ex);
+            }
+
+            return localPathforartifactory;
         }
         private static void DisplayErrorForSucessfullPackages(List<ComponentsToArtifactory> SucessfullPackages)
         {
@@ -236,12 +269,12 @@ namespace LCT.ArtifactoryUploader
         }
         public static void DisplayPackageUploadInformation(DisplayPackagesInfo displayPackagesInfo)
         {
-            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesNpm, displayPackagesInfo.JfrogNotFoundPackagesNpm, displayPackagesInfo.SuccessfullPackagesNpm, displayPackagesInfo.JfrogFoundPackagesNpm, "NPM:");
-            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesNuget, displayPackagesInfo.JfrogNotFoundPackagesNuget, displayPackagesInfo.SuccessfullPackagesNuget, displayPackagesInfo.JfrogFoundPackagesNuget, "Nuget:");
-            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesMaven, displayPackagesInfo.JfrogNotFoundPackagesMaven, displayPackagesInfo.SuccessfullPackagesMaven, displayPackagesInfo.JfrogFoundPackagesMaven, "Maven:");
-            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesConan, displayPackagesInfo.JfrogNotFoundPackagesConan, displayPackagesInfo.SuccessfullPackagesConan, displayPackagesInfo.JfrogFoundPackagesConan, "Conan:");
-            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesPython, displayPackagesInfo.JfrogNotFoundPackagesPython, displayPackagesInfo.SuccessfullPackagesPython, displayPackagesInfo.JfrogFoundPackagesPython, "Python:");
-            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesDebian, displayPackagesInfo.JfrogNotFoundPackagesDebian, displayPackagesInfo.SuccessfullPackagesDebian, displayPackagesInfo.JfrogFoundPackagesDebian, "Debian:");
+            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesNpm, displayPackagesInfo.JfrogNotFoundPackagesNpm, displayPackagesInfo.SuccessfullPackagesNpm, displayPackagesInfo.JfrogFoundPackagesNpm, "NPM");
+            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesNuget, displayPackagesInfo.JfrogNotFoundPackagesNuget, displayPackagesInfo.SuccessfullPackagesNuget, displayPackagesInfo.JfrogFoundPackagesNuget, "Nuget");
+            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesMaven, displayPackagesInfo.JfrogNotFoundPackagesMaven, displayPackagesInfo.SuccessfullPackagesMaven, displayPackagesInfo.JfrogFoundPackagesMaven, "Maven");
+            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesConan, displayPackagesInfo.JfrogNotFoundPackagesConan, displayPackagesInfo.SuccessfullPackagesConan, displayPackagesInfo.JfrogFoundPackagesConan, "Conan");
+            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesPython, displayPackagesInfo.JfrogNotFoundPackagesPython, displayPackagesInfo.SuccessfullPackagesPython, displayPackagesInfo.JfrogFoundPackagesPython, "Python");
+            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesDebian, displayPackagesInfo.JfrogNotFoundPackagesDebian, displayPackagesInfo.SuccessfullPackagesDebian, displayPackagesInfo.JfrogFoundPackagesDebian, "Debian");
 
         }
 

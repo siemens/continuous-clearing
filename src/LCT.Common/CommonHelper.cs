@@ -6,6 +6,7 @@
 
 using CycloneDX.Models;
 using LCT.Common.Constants;
+using LCT.Common.Interface;
 using LCT.Common.Model;
 using log4net;
 using log4net.Core;
@@ -237,6 +238,31 @@ namespace LCT.Common
                 component.Properties.Add(identifierType);
                 listComponentForBOM.Add(component);
             }
+        }
+
+        public static void CreateFileForMultipleVersions(List<Component> componentsWithMultipleVersions,CommonAppSettings appSettings)
+        {
+            MultipleVersions multipleVersions = new MultipleVersions();
+            multipleVersions.Multipleversions = new List<MultipleVersionValues>();
+            IFileOperations fileOperations = new FileOperations();
+
+
+            foreach (var item in componentsWithMultipleVersions)
+            {
+                item.Description = !string.IsNullOrEmpty(appSettings.CycloneDxSBomTemplatePath) ? appSettings.CycloneDxSBomTemplatePath : item.Description;                
+
+                MultipleVersionValues multiple = new MultipleVersionValues();
+                multiple.Name = item.Name;
+                multiple.Version = item.Version;
+                multiple.Description = item.Description;
+
+                multipleVersions.Multipleversions.Add(multiple);
+
+            }
+            fileOperations.WriteContentToFile(multipleVersions.Multipleversions, appSettings.BomFolderPath,
+       FileConstant.multipleversionsFileName, appSettings.SW360ProjectName);
+            Logger.Warn($"\nTotal Multiple versions detected {multipleVersions.Multipleversions.Count} and details can be found at {appSettings.BomFolderPath}\\{appSettings.SW360ProjectName}_{FileConstant.multipleversionsFileName}\n");
+            
         }
         #endregion
 

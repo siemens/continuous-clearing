@@ -62,11 +62,7 @@ namespace LCT.PackageIdentifier
 
             if (componentsWithMultipleVersions.Count != 0)
             {
-                Logger.Warn($"Multiple versions detected :\n");
-                foreach (var item in componentsWithMultipleVersions)
-                {
-                    Logger.Warn($"Component Name : {item.Name}\nComponent Version : {item.Version}\nPackage Found in : {item.Description}\n");
-                }
+                CommonHelper.CreateFileForMultipleVersions(componentsWithMultipleVersions, appSettings);
             }
             bom.Components = componentsForBOM;
             bom.Dependencies = dependencies;

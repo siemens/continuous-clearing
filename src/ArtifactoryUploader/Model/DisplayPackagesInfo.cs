@@ -9,8 +9,10 @@ using System.Collections.Generic;
 namespace LCT.ArtifactoryUploader.Model
 {
     /// <summary>
-    /// The Model class for UnkmownPackagesAll
+    /// The Model class for DisplayPackagesInfo
     /// </summary>
+
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class DisplayPackagesInfo
     {
         public List<ComponentsToArtifactory> UnknownPackagesNpm { get; set; }
@@ -38,5 +40,14 @@ namespace LCT.ArtifactoryUploader.Model
         public List<ComponentsToArtifactory> SuccessfullPackagesDebian { get; set; }
         public List<ComponentsToArtifactory> SuccessfullPackagesMaven { get; set; }
 
+    }
+    public class ComponentValues
+    {
+        public string Name { get; set; }
+        public string version { get; set; }
+    }
+    public class ListOfComponentValues
+    {
+        public List<ComponentValues> PackageProperties { get; set;}
     }
 }
