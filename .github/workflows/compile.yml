@@ -57,13 +57,13 @@ jobs:
         $fileName = "dummy-v$($env:GitVersion_SemVer)"
         echo "SemVerMMP: v$($env:GitVersion_MajorMinorPatch)"
         Write-Host "Filename: '$fileName'" 
-        
-    - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v1.3.1
-      if: ${{ false }}  # disable for now
 
     - name: Install MSBuild
-      uses: actions/setup-msbuild@v1
+      uses: actions/setup-msbuild@v1.3.1
+      if: ${{ false }}  # disable for now
+
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.3.1
       if: ${{ false }}  # disable for now
 
     - name: Restore Packages
