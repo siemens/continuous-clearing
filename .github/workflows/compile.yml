@@ -60,11 +60,11 @@ jobs:
 
     - name: Install MSBuild
       uses: actions/setup-msbuild@v1.3.1
-     # if: ${{ false }}  # disable for now
+      if: ${{ false }}  # disable for now
 
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.3.1
-      #if: ${{ false }}  # disable for now
+      if: ${{ false }}  # disable for now
 
     - name: Restore Packages
       #if: ${{ false }}  # disable for now
