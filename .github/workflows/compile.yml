@@ -64,7 +64,7 @@ jobs:
     
     - name: Build
       #if: ${{ false }}  # disable for now
-      run: dotnet -m -t:Rebuild -p:Configuration=Release -bl:continous-clearing.binlog -noconlog src/LicenseClearingTool.sln
+      run: dotnet build -c Release -p:Configuration=Release -bl:continous-clearing.binlog -noconlog src/LicenseClearingTool.sln
 
     - name: Build the Docker image
       id: builddocker
