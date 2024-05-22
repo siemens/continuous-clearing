@@ -230,5 +230,37 @@ namespace LCT.Services.UTest
             // Assert
             Assert.Null(actual);
         }
+        [Test]
+        public async Task GetInternalComponentDataByRepo_ReturnsAqlResultList_WhenResponseIsSuccessful()
+        {
+            // Arrange
+            string repoName = "TestRepo";
+            var aqlResultList = new List<AqlResult> { new AqlResult() };
+
+            // Define the _jFrogApiCommunicationFacadeMock variable
+            var _jFrogApiCommunicationFacadeMock = new Mock<IJfrogAqlApiCommunicationFacade>();
+            _jFrogApiCommunicationFacadeMock.Setup(x => x.GetInternalComponentDataByRepo(It.IsAny<string>()))
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent(JsonConvert.SerializeObject(new AqlResponse
+                    {
+                        Results = aqlResultList
+                    }))
+                });
+
+            // Define the _service variable
+            IJFrogService _service = new JFrogService(_jFrogApiCommunicationFacadeMock.Object);
+
+            // Act
+            var result = await _service.GetInternalComponentDataByRepo(repoName);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOf<List<AqlResult>>(result);
+            Assert.AreEqual(aqlResultList.Count, result.Count);
+        }
     }
 }
+
+
