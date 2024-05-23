@@ -126,7 +126,7 @@ namespace LCT.Common
 
         }
 
-        public static string GetHashForComponent(string input, HashAlgorithm hashAlgorithm)
+        private static string GetHashForComponent(string input, HashAlgorithm hashAlgorithm)
         {
             byte[] byteHash = hashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(input));
             return Convert.ToHexString(byteHash);
