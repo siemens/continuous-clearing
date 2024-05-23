@@ -25,7 +25,7 @@ namespace LCT.PackageIdentifier
     /// <summary>
     /// The DebianProcessor class
     /// </summary>
-    public class DebianProcessor : IParser
+    public class DebianProcessor : CycloneDXBomParser, IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ICycloneDXBomParser _cycloneDXBomParser;
@@ -73,6 +73,7 @@ namespace LCT.PackageIdentifier
             }
 
             bom = RemoveExcludedComponents(appSettings, bom);
+            AddComponentHashes(bom);
             return bom;
         }
 

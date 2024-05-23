@@ -39,7 +39,6 @@ namespace LCT.PackageIdentifier
         private const string Version = "version";
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
         private const string Requires = "requires";
-
         public NpmProcessor(ICycloneDXBomParser cycloneDXBomParser)
         {
             _cycloneDXBomParser = cycloneDXBomParser;
@@ -68,11 +67,14 @@ namespace LCT.PackageIdentifier
                     Logger.Warn($"Component Name : {item.Name}\nComponent Version : {item.Version}\nPackage Found in : {item.Description}\n");
                 }
             }
+
             bom.Components = componentsForBOM;
             bom.Dependencies = dependencies;
+            AddComponentHashes(bom);
             Logger.Debug($"ParsePackageFile():End");
             return bom;
         }
+
 
         public List<Component> ParsePackageLockJson(string filepath, CommonAppSettings appSettings)
         {

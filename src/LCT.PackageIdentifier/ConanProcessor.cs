@@ -68,6 +68,7 @@ namespace LCT.PackageIdentifier
             }
 
             bom.Components = componentsForBOM;
+            AddComponentHashes(bom);
             Logger.Debug($"ParsePackageFile():End");
             return bom;
         }

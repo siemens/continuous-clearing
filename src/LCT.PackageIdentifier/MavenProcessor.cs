@@ -96,6 +96,7 @@ namespace LCT.PackageIdentifier
 
             bom.Components = componentsForBOM;
             bom.Dependencies = dependenciesForBOM;
+            AddComponentHashes(bom);
             BomCreator.bomKpiData.ComponentsInComparisonBOM = bom.Components.Count;
             Logger.Debug($"ParsePackageFile():End");
             return bom;

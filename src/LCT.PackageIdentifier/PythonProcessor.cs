@@ -24,8 +24,8 @@ using Tommy;
 using Component = CycloneDX.Models.Component;
 
 namespace LCT.PackageIdentifier
-{
-    public class PythonProcessor : IParser
+{ 
+    public class PythonProcessor : CycloneDXBomParser, IParser
     {
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
 
@@ -76,6 +76,7 @@ namespace LCT.PackageIdentifier
             //Adding Template Component Details & MetaData
             SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
             bom = RemoveExcludedComponents(appSettings, bom);
+            AddComponentHashes(bom);
             return bom;
         }
 

@@ -23,11 +23,10 @@ namespace LCT.PackageIdentifier
     /// <summary>
     /// The AlpineProcessor class
     /// </summary>
-    public class AlpineProcessor : IParser
+    public class AlpineProcessor : CycloneDXBomParser, IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ICycloneDXBomParser _cycloneDXBomParser;
-
         public AlpineProcessor(ICycloneDXBomParser cycloneDXBomParser)
         {
             _cycloneDXBomParser = cycloneDXBomParser;
@@ -58,7 +57,7 @@ namespace LCT.PackageIdentifier
 
             bom.Components = listComponentForBOM;
             bom.Dependencies = dependenciesForBOM;
-           
+
             if (File.Exists(appSettings.CycloneDxSBomTemplatePath) && appSettings.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
                 Bom templateDetails;
@@ -69,6 +68,7 @@ namespace LCT.PackageIdentifier
             }
 
             bom = RemoveExcludedComponents(appSettings, bom);
+            AddComponentHashes(bom);
             return bom;
         }
 

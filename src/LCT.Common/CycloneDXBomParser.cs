@@ -15,17 +15,21 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
+using static CycloneDX.Models.Component;
 
 namespace LCT.Common
 {
     public class CycloneDXBomParser : ICycloneDXBomParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        public ComponentScope Scope { get; set; }
         public Bom ParseCycloneDXBom(string filePath)
         {
             Bom bom = new Bom();
             string json = string.Empty;
-            Logger.Logger.Log(null, Level.Notice, $"Consuming cyclonedx file data from "+ filePath + "...\n", null);
+            Logger.Logger.Log(null, Level.Notice, $"Consuming cyclonedx file data from " + filePath + "...\n", null);
 
             try
             {
@@ -81,7 +85,7 @@ namespace LCT.Common
             foreach (var component in bom.ToList())
             {
                 if (!string.IsNullOrEmpty(component.Name) && !string.IsNullOrEmpty(component.Version)
-                    && !string.IsNullOrEmpty(component.Purl) && 
+                    && !string.IsNullOrEmpty(component.Purl) &&
                     component.Purl.Contains(Dataconstant.PurlCheck()[projectType.ToUpper()]))
                 {
                     //Taking Valid Components for perticular projects
@@ -93,6 +97,39 @@ namespace LCT.Common
                         "Not valid Component / Purl ID " + component.Purl + " for Project Type :" + projectType);
                 }
             }
+        }
+
+        public  void AddComponentHashes(Bom bom)
+        {
+            foreach (var component in bom.Components)
+            {
+                string input = $"{component.Name}{component.Version}{Scope}{GetType()}";
+                component.Hashes = new List<Hash>
+                {
+                    new Hash
+                    {
+                        Alg = Hash.HashAlgorithm.MD5,
+                        Content = GetHashForComponent(input, MD5.Create())
+                    },
+                    new Hash
+                    {
+                        Alg = Hash.HashAlgorithm.SHA_1,
+                        Content = GetHashForComponent(input, SHA1.Create())
+                    },
+                    new Hash
+                    {
+                        Alg = Hash.HashAlgorithm.SHA_256,
+                        Content = GetHashForComponent(input, SHA256.Create())
+                    }
+                };
+            }
+
+        }
+
+        public static string GetHashForComponent(string input, HashAlgorithm hashAlgorithm)
+        {
+            byte[] byteHash = hashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(input));
+            return Convert.ToHexString(byteHash);
         }
     }
 }
