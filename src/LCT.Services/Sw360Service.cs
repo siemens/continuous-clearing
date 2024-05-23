@@ -61,7 +61,8 @@ namespace LCT.Services
                 string responseBody = await m_SW360ApiCommunicationFacade.GetReleases();
                 if (string.IsNullOrWhiteSpace(responseBody))
                 {
-                    Logger.Warn("Available release list found empty from the SW360 Server!");
+                    Logger.Error("GetAvailableReleasesInSw360(): Release list from the SW360 Server found empty!!");
+                    Environment.Exit(-1);
                 }
 
                 Sw360ServiceStopWatch.Stop();
@@ -70,9 +71,14 @@ namespace LCT.Services
 
                 var modelMappedObject = JsonConvert.DeserializeObject<ComponentsRelease>(responseBody);
 
-                if (modelMappedObject != null)
+                if (modelMappedObject != null && modelMappedObject.Embedded?.Sw360Releases.Count > 0)
                 {
                     availableComponentsList = await GetAvailableComponenentsList(modelMappedObject.Embedded?.Sw360Releases, listOfComponentsToBom);
+                }
+                else
+                {
+                    Logger.Error("Releases list found empty from the SW360 Server!!");
+                    Environment.Exit(-1);
                 }
             }
             catch (HttpRequestException ex)

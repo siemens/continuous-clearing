@@ -127,12 +127,34 @@ namespace LCT.APICommunications
             var result = string.Empty;
             try
             {
-                return await httpClient.GetStringAsync(sw360ReleaseApi);
+                HttpResponseMessage responseMessage = await httpClient.GetAsync(sw360ReleaseApi);
+                if (responseMessage != null && responseMessage.StatusCode.Equals(HttpStatusCode.OK))
+                {
+                    return await responseMessage.Content.ReadAsStringAsync();
+                }
+                else
+                {
+                    Logger.Error("Sw360 server failed to fetch releases, StatusCode:"
+                        + responseMessage?.StatusCode +" & ReasonPharse :"+ responseMessage?.ReasonPhrase);
+                    Environment.Exit(-1);
+                }
             }
             catch (TaskCanceledException ex)
             {
                 Logger.Debug($"{ex.Message}");
-                Logger.Error("A timeout error is thrown from SW360 server,Please wait for sometime and re run the pipeline again");
+                Logger.Error("GetReleases():TaskCanceledException:A timeout error is thrown from SW360 server,Please wait for sometime and re run the pipeline again");
+                Environment.Exit(-1);
+            }
+            catch (HttpRequestException ex)
+            {
+                Logger.Debug($"{ex.Message}");
+                Logger.Error("GetReleases():HttpRequestException:A timeout error is thrown from SW360 server,Please wait for sometime and re run the pipeline again");
+                Environment.Exit(-1);
+            }
+            catch (InvalidOperationException ex)
+            {
+                Logger.Debug($"{ex.Message}");
+                Logger.Error("GetReleases():InvalidOperationException:A timeout error is thrown from SW360 server,Please wait for sometime and re run the pipeline again");
                 Environment.Exit(-1);
             }
             return result;
