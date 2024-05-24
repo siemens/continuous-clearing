@@ -117,7 +117,7 @@ namespace LCT.Services
             }
             catch (HttpRequestException ex)
             {
-                ExceptionHandling.FossologyException(ex);             
+                ExceptionHandling.FossologyException(ex);
 
             }
 
@@ -270,13 +270,30 @@ namespace LCT.Services
                 var finalReleasesToBeLinked = manuallyLinkedReleases.Concat(releasesTobeLinked).Distinct().ToList();
                 Logger.Debug($"No of release Id's to link - {finalReleasesToBeLinked.Count}");
 
+                Dictionary<string, ReleaseLinked> linkedReleasesUniqueDict = new Dictionary<string, ReleaseLinked>();
+                foreach (var release in finalReleasesToBeLinked)
+                {
+                    if (!linkedReleasesUniqueDict.ContainsKey(release.ReleaseId))
+                    {
+                        linkedReleasesUniqueDict.Add(release.ReleaseId, release);
+                    }
+                    else
+                    {
+                        Logger.Warn("Duplicate entries found in finalReleasesToBeLinked: " + release.Name + ":" + release.ReleaseId +
+                            " , with :" + linkedReleasesUniqueDict[release.ReleaseId].Name + ":" + linkedReleasesUniqueDict[release.ReleaseId].ReleaseId);
+                    }
+                }
+
+                // Assigning unique entries
+                finalReleasesToBeLinked = linkedReleasesUniqueDict.Values.ToList();
+
                 Dictionary<string, AddLinkedRelease> linkedReleasesDict = new Dictionary<string, AddLinkedRelease>();
                 linkedReleasesDict = finalReleasesToBeLinked?
                                         .ToDictionary(
                                             releaseLinked => releaseLinked.ReleaseId,
                                             releaseLinked => new AddLinkedRelease()
                                             {
-                                                ReleaseRelation = string.IsNullOrEmpty(releaseLinked.Relation) ? Dataconstant.LinkedByCAToolReleaseRelation 
+                                                ReleaseRelation = string.IsNullOrEmpty(releaseLinked.Relation) ? Dataconstant.LinkedByCAToolReleaseRelation
                                                                     : releaseLinked.Relation,
                                                 Comment = manuallyLinkedReleases.Any(r => r.ReleaseId == releaseLinked.ReleaseId) ? releaseLinked.Comment : Dataconstant.LinkedByCATool
                                             });
