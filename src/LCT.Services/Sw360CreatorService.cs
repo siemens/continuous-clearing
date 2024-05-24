@@ -284,7 +284,7 @@ namespace LCT.Services
                     }
                 }
 
-                // Assigning unique entries
+                // Assigning unique entries from the Dict
                 finalReleasesToBeLinked = linkedReleasesUniqueDict.Values.ToList();
 
                 Dictionary<string, AddLinkedRelease> linkedReleasesDict = new Dictionary<string, AddLinkedRelease>();
