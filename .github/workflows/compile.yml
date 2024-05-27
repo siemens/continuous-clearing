@@ -131,9 +131,8 @@ jobs:
          echo "Creating zip file..."
          cd "$sourceFolder" || exit 1
          zip -r "$GITHUB_WORKSPACE/out/continuous-clearing-v6.2.0.zip" .
-         cd "$(dirname "$GITHUB_WORKSPACE")" || exit 1
-         dir
-         mv "continuous-clearing-v6.2.0.zip" "$outFolder"
+         cd "$(dirname "$GITHUB_WORKSPACE")"
+         mv "$GITHUB_WORKSPACE/out/continuous-clearing-v6.2.0.zip" "$outFolder"
          echo "::set-output name=LicenseClearingTool::$fileName"
      
 
