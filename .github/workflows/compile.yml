@@ -146,6 +146,7 @@ jobs:
     - name: Create Nuget Packages 
       id: createNupkg
       run: |
+        sudo apt-get install -y nuget
         nuget pack CA.nuspec -Version 6.0.0 --output out/LicenseClearingTool
         echo "::set-output name=nupkg-LicenseClearingTool::out/LicenseClearingTool/continuous-clearing.nuspec.6.0.0.nupkg"
         
