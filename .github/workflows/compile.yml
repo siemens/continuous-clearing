@@ -84,6 +84,7 @@ jobs:
   
       
     - name: update appSettingsSW360IntegrationTest.json
+      if: ${{ false }}  # disable for now
       run: |
          chmod +x ./Scripts/json_update.ps1
          ./Scripts/json_update.ps1 -JsonFile 'src\TestUtilities\appSettingsSW360IntegrationTest.json' 
@@ -98,6 +99,7 @@ jobs:
         SW360AUTHKEY: ${{ secrets.SW360AUTHTOKEN }}
       
     - name: update appsettingsUnitTest.json
+      if: ${{ false }}  # disable for now
       run: ./Scripts/json_update_ut.ps1 -JsonFile 'src\UnitTestUtilities\appsettingsUnitTest.json' 
       env:
         SW360HOST: ${{ secrets.SW360HOST }}
