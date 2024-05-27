@@ -110,9 +110,7 @@ namespace LCT.Services
             FossTriggerStatus fossTriggerStatus = null;
             try
             {
-
                 string triggerStatus = await m_SW360ApiCommunicationFacade.TriggerFossologyProcess(releaseId, sw360link);
-
                 fossTriggerStatus = JsonConvert.DeserializeObject<FossTriggerStatus>(triggerStatus);
             }
             catch (HttpRequestException ex)

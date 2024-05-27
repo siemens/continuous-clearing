@@ -234,7 +234,6 @@ namespace NUnitTestProject1
             Assert.That(list.Count > 0);
         }
 
-
         [Test]
         public async Task CycloneDxBomParser_PassingFilePath_ReturnsComponentsExcludingDev()
         {
