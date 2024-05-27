@@ -118,20 +118,22 @@ jobs:
         path: |
           src/*.binlog
           *.binlog    
-    
-    - name: Create zip
-      id: packageBuildResults
+
+    - name: zip
       run: |
-        $sourceFolder = Join-Path $env:GITHUB_WORKSPACE "out" | Join-Path -ChildPath "*"
-        $outFolder = Join-Path $env:GITHUB_WORKSPACE "out" | Join-Path -ChildPath "continuous-clearing" 
-        New-Item -ItemType Directory -Force -Path $outFolder
-        $fileName = "continuous-clearing-v6.2.0.zip"
-        Write-Host "Filename: '$fileName'"
-        Write-Host "sourceFolder: '$sourceFolder'"
-        Write-Host "Outfolder: '$outFolder'"
-        Write-Host "::set-output name=LicenseClearingTool::$($fileName)"
-        $outPath = Join-Path $outFolder $fileName
-        Compress-Archive -DestinationPath $outPath -Path $sourceFolder -CompressionLevel Optimal
+         sourceFolder=$(realpath "$GITHUB_WORKSPACE/out" | sed 's/\/*$//')
+         outFolder="$GITHUB_WORKSPACE/out/continuous-clearing"
+         mkdir -p "$outFolder"
+         fileName="continuous-clearing-v6.2.0.zip"
+         echo "Filename: $fileName"
+         echo "sourceFolder: $sourceFolder"
+         echo "Outfolder: $outFolder"
+         echo "Creating zip file..."
+         cd "$sourceFolder" || exit 1
+         zip -r "$GITHUB_WORKSPACE/out/abc/abc-v6.2.0.zip" .
+         cd "$(dirname "$GITHUB_WORKSPACE")" || exit 1
+         mv "out/abc/abc-v6.2.0.zip" "$outFolder"
+         echo "::set-output name=LicenseClearingTool::$fileName"
      
 
     - name: Archive Build Output
