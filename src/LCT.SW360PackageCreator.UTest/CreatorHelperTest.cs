@@ -19,6 +19,10 @@ using CycloneDX.Models;
 using System.Diagnostics;
 using LCT.Common;
 using Castle.Core.Internal;
+using LCT.Facade.Interfaces;
+using System.Net.Http;
+using System.Net;
+using System.Text;
 
 namespace SW360ComponentCreator.UTest
 {
@@ -167,6 +171,54 @@ namespace SW360ComponentCreator.UTest
 
             //Assert
             Assert.That(data.Count > 0);
+        }
+
+        [Test]
+        public async Task SetContentsForComparisonBOM_ProvidedValidBomDetailsWithSw360InvalidCred_ReturnsEmpty()
+        {
+            //Arrange
+            var debianPatcher = new Mock<IDebianPatcher>();
+            IDictionary<string, IPackageDownloader> _packageDownloderList = new Dictionary<string, IPackageDownloader>
+            {
+                { "DEBIAN", new DebianPackageDownloader(debianPatcher.Object) }
+            };
+            var creatorHelper = new CreatorHelper(_packageDownloderList);
+
+            ReleasesInfo releasesInfo = new ReleasesInfo();
+            releasesInfo.SourceCodeDownloadUrl = "https://snapshot.debian.org/archive/debian/20180915T211528Z/pool/main/a/adduser/adduser_3.118.tar.xz";
+
+            List<Components> componentsAvailableInSw360 = new List<Components>();
+            List<Components> comparisonBomData = new List<Components>
+            {
+                new Components()
+                {
+                    Name = "adduser",
+                    Version = "3.118",
+                    ComponentExternalId = "pkg:deb/debian/adduser?arch=source",
+                    ReleaseExternalId = "pkg:deb/debian/adduser@3.118?arch=source",
+                    SourceUrl = "https://snapshot.debian.org/archive/debian/20180915T211528Z/pool/main/a/adduser/adduser_3.118.tar.xz",
+                    DownloadUrl = "https://snapshot.debian.org/archive/debian/20180915T211528Z/pool/main/a/adduser/adduser_3.118.tar.xz"
+                }
+            };
+            var iSW360Service = new Mock<ISW360Service>();
+
+            //Mocking the Sw360 result as Empty with SuccessCode
+            HttpResponseMessage responseMessage = new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent("", Encoding.UTF8)
+            };
+            var iSW360ApicommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
+            iSW360ApicommunicationFacade.Setup(x => x.GetReleases()).ReturnsAsync(await responseMessage.Content.ReadAsStringAsync());
+
+            iSW360Service.Setup(x => x.GetAvailableReleasesInSw360(comparisonBomData)).ReturnsAsync(componentsAvailableInSw360);
+            iSW360Service.Setup(x => x.GetReleaseDataOfComponent(comparisonBomData[0].ReleaseLink)).ReturnsAsync(releasesInfo);
+
+            //Act
+            var data = await creatorHelper.SetContentsForComparisonBOM(comparisonBomData, iSW360Service.Object);
+
+            //Assert
+            Assert.That(data.Count.Equals(0));
         }
 
         [Test]
