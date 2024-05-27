@@ -84,7 +84,9 @@ jobs:
   
       
     - name: update appSettingsSW360IntegrationTest.json
-      run: ./Scripts/json_update.ps1 -JsonFile 'src\TestUtilities\appSettingsSW360IntegrationTest.json' 
+      run: |
+         chmod +x ./Scripts/json_update.ps1
+         ./Scripts/json_update.ps1 -JsonFile 'src\TestUtilities\appSettingsSW360IntegrationTest.json' 
       env:
         SW360HOST: ${{ secrets.SW360HOST }}
         SW360APPPORT: ${{ secrets.SW360APPPORT }}
