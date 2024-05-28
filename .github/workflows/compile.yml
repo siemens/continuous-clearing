@@ -59,7 +59,9 @@ jobs:
         Write-Host "Filename: '$fileName'" 
 
     - name: Restore NuGet packages
-      run: dotnet restore src/LicenseClearingTool.sln 
+      run: |
+        sudo apt-get install -y nuget
+        dotnet restore src/LicenseClearingTool.sln 
 
     - name: Build
       run: |
