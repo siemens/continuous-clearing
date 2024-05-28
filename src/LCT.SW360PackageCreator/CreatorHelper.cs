@@ -264,7 +264,8 @@ namespace LCT.SW360PackageCreator
                 mapper.ReleaseAttachmentLink = string.Empty;
                 mapper.ReleaseLink = GetReleaseLink(componentsAvailableInSw360, item.Name, item.Version);
 
-                Logger.Debug($"Sw360 avilability status for Name " + mapper.Name + ":" + mapper.ComponentStatus + "-Version " + mapper.Version + ":" + mapper.ReleaseStatus);
+                Logger.Debug($"Sw360 avilability status for Name " + mapper.Name + ":" + mapper.ComponentExternalId + "=" + mapper.ComponentStatus +
+                    "-Version " + mapper.Version + ":" + mapper.ReleaseExternalId + "=" + mapper.ReleaseStatus);
             }
             return mapper;
         }

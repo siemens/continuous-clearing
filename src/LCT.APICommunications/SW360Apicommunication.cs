@@ -134,8 +134,8 @@ namespace LCT.APICommunications
                 }
                 else
                 {
-                    Logger.Error("Sw360 server failed to fetch releases, StatusCode:"
-                        + responseMessage?.StatusCode +" & ReasonPharse :"+ responseMessage?.ReasonPhrase);
+                    Logger.Error("SW360 server is not accessible while getting All Releases,Please wait for sometime and re run the pipeline again." +
+                        " StatusCode:" + responseMessage?.StatusCode + " & ReasonPharse :" + responseMessage?.ReasonPhrase);
                     Environment.Exit(-1);
                 }
             }

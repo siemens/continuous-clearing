@@ -59,12 +59,6 @@ namespace LCT.Services
             {
                 Sw360ServiceStopWatch.Start();
                 string responseBody = await m_SW360ApiCommunicationFacade.GetReleases();
-                if (string.IsNullOrWhiteSpace(responseBody))
-                {
-                    Logger.Error("GetAvailableReleasesInSw360(): Release list from the SW360 Server found empty!!");
-                    Environment.Exit(-1);
-                }
-
                 Sw360ServiceStopWatch.Stop();
                 Logger.Debug($"GetAvailableReleasesInSw360():Time taken to in GetReleases() call" +
                     $"-{TimeSpan.FromMilliseconds(Sw360ServiceStopWatch.ElapsedMilliseconds).TotalSeconds}");
@@ -77,7 +71,8 @@ namespace LCT.Services
                 }
                 else
                 {
-                    Logger.Error("Releases list found empty from the SW360 Server!!");
+                    Logger.Debug("GetAvailableReleasesInSw360() : Releases list found empty from the SW360 Server !!");
+                    Logger.Error("SW360 server is not accessible while getting All Releases,Please wait for sometime and re run the pipeline again");
                     Environment.Exit(-1);
                 }
             }
