@@ -66,18 +66,18 @@ jobs:
       #if: ${{ false }}  # disable for now
       run: |
        sudo apt-get install -y nuget
-       dotnet build -c Release -p:Configuration=Release -bl:continous-clearing.binlog -noconlog src/LicenseClearingTool.sln
+       nuget build -c Release -p:Configuration=Release -bl:continous-clearing.binlog -noconlog src/LicenseClearingTool.sln
 
     - name: Build the Docker image
       id: builddocker
-      #if: ${{ false }}  # disable for now
+      if: ${{ false }}  # disable for now
       run: |
         docker build . --file Dockerfile --tag ${{ github.repository }}:continuous-clearing-v6.2.0
         docker save ${{ github.repository }}:continuous-clearing-v6.2.0 -o continuous-clearing-v6.2.0.tar
         echo "::set-output name=docker-LicenseClearingTool::continuous-clearing-v6.2.0.tar"
         
     - name: Archive docker image      
-      #if: ${{ false }}  # disable for now
+      if: ${{ false }}  # disable for now
       uses: actions/upload-artifact@v2
       with:
         name: docker-continuous-clearing
@@ -165,6 +165,7 @@ jobs:
         docker build . --file Dockerfile --tag ${{ github.repository }}:continuous-clearing-v6.2.0
         docker save ${{ github.repository }}:continuous-clearing-v6.2.0 -o continuous-clearing-v6.2.0.tar
         Write-Host "::set-output name=docker-LicenseClearingTool::continuous-clearing-v6.2.0.tar"
+        
     - name: Archive docker image      
       #if: ${{ false }}  # disable for now
       uses: actions/upload-artifact@v2
