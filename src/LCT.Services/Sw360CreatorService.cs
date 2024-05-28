@@ -285,15 +285,15 @@ namespace LCT.Services
                 // Assigning unique entries from the Dict
                 finalReleasesToBeLinked = linkedReleasesUniqueDict.Values.ToList();
 
-                Dictionary<string, AddLinkedRelease> linkedReleasesDict = new Dictionary<string, AddLinkedRelease>();
-                linkedReleasesDict = finalReleasesToBeLinked?
+                Dictionary<string, AddLinkedRelease> linkedReleasesDict;
+                linkedReleasesDict = finalReleasesToBeLinked
                                         .ToDictionary(
                                             releaseLinked => releaseLinked.ReleaseId,
                                             releaseLinked => new AddLinkedRelease()
                                             {
                                                 ReleaseRelation = string.IsNullOrEmpty(releaseLinked.Relation) ? Dataconstant.LinkedByCAToolReleaseRelation
                                                                     : releaseLinked.Relation,
-                                                Comment = manuallyLinkedReleases.Any(r => r.ReleaseId == releaseLinked.ReleaseId) ? releaseLinked.Comment : Dataconstant.LinkedByCATool
+                                                Comment = manuallyLinkedReleases.Exists(r => r.ReleaseId == releaseLinked.ReleaseId) ? releaseLinked.Comment : Dataconstant.LinkedByCATool
                                             });
 
                 StringContent content = new StringContent(JsonConvert.SerializeObject(linkedReleasesDict), Encoding.UTF8, "application/json");
