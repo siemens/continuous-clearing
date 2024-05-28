@@ -67,7 +67,7 @@ jobs:
       run: |
          dotnet build src/LicenseClearingTool.sln 
          echo "Files in directory:"
-         ls  $GITHUB_WORKSPACE/out/net6.0
+         ls -lrt  $GITHUB_WORKSPACE/out/net6.0
 
     - name: Restore Packages
       if: ${{ false }}  # disable for now
