@@ -47,9 +47,6 @@ jobs:
       run: |
           Set-PSRepository PSGallery -InstallationPolicy Trusted
           Install-Module SqlServer, PSScriptAnalyzer
-
-    - name: Install MSBuild
-      uses: actions/setup-msbuild@v2
         
     - name: get SemVer   
       if: ${{ false }}  # disable for now
@@ -60,6 +57,12 @@ jobs:
         $fileName = "dummy-v$($env:GitVersion_SemVer)"
         echo "SemVerMMP: v$($env:GitVersion_MajorMinorPatch)"
         Write-Host "Filename: '$fileName'" 
+
+    - name: Restore NuGet packages
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build
 
     - name: Restore Packages
       #if: ${{ false }}  # disable for now
