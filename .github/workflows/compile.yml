@@ -64,6 +64,12 @@ jobs:
         dotnet restore src/LicenseClearingTool.sln 
 
     - name: Build
+      uses: actions/setup-dotnet@2
+      with:
+        dotnet-version: 6.0
+        run: dotnet build src/LicenseClearingTool.sln
+
+    - name: Build
       run: |
          dotnet build src/LicenseClearingTool.sln 
          echo "Files in directory:"
