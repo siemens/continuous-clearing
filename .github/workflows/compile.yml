@@ -59,10 +59,10 @@ jobs:
         Write-Host "Filename: '$fileName'" 
 
     - name: Restore NuGet packages
-      run: dotnet restore
+      run: dotnet restore src/LicenseClearingTool.sln 
 
     - name: Build
-      run: dotnet build
+      run: dotnet build src/LicenseClearingTool.sln 
 
     - name: Restore Packages
       #if: ${{ false }}  # disable for now
