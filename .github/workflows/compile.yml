@@ -49,7 +49,7 @@ jobs:
           Install-Module SqlServer, PSScriptAnalyzer
 
     - name: Install MSBuild
-      uses: actions/setup-msbuild@v1
+      uses: actions/setup-msbuild@v2
         
     - name: get SemVer   
       if: ${{ false }}  # disable for now
