@@ -65,11 +65,11 @@ jobs:
       run: dotnet build src/LicenseClearingTool.sln 
 
     - name: Restore Packages
-      #if: ${{ false }}  # disable for now
+      if: ${{ false }}  # disable for now
       run: dotnet restore src/LicenseClearingTool.sln 
     
     - name: Build
-      #if: ${{ false }}  # disable for now
+      if: ${{ false }}  # disable for now
       run: |
        sudo apt-get install -y nuget
        nuget build -c Release -p:Configuration=Release -bl:continous-clearing.binlog -noconlog src/LicenseClearingTool.sln
