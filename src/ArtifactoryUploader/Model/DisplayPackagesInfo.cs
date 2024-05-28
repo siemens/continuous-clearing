@@ -4,6 +4,7 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 using LCT.APICommunications.Model;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 
 namespace LCT.ArtifactoryUploader.Model
@@ -40,14 +41,32 @@ namespace LCT.ArtifactoryUploader.Model
         public List<ComponentsToArtifactory> SuccessfullPackagesDebian { get; set; }
         public List<ComponentsToArtifactory> SuccessfullPackagesMaven { get; set; }
 
-    }
-    public class ComponentValues
+    }    
+
+    public class ProjectResponse
     {
+        [JsonProperty("npm")]
+        public List<JsonComponents> Npm { get; set; }
+        [JsonProperty("nuget")]
+        public List<JsonComponents> Nuget { get; set; }       
+        [JsonProperty("conan")]
+        public List<JsonComponents> Conan { get; set; }
+        [JsonProperty("python")]
+        public List<JsonComponents> Python { get; set; }
+        [JsonProperty("debian")]
+        public List<JsonComponents> Debian { get; set; }
+        [JsonProperty("maven")]
+        public List<JsonComponents> Maven { get; set; }
+
+    }  
+
+    public class JsonComponents
+    {
+        [JsonProperty("name")]
         public string Name { get; set; }
-        public string version { get; set; }
+        [JsonProperty("version")]
+        public string Version { get; set; }
     }
-    public class ListOfComponentValues
-    {
-        public List<ComponentValues> PackageProperties { get; set;}
-    }
+
+    
 }

@@ -24,6 +24,12 @@ using LCT.Facade.Interfaces;
 using LCT.APICommunications.Interfaces;
 using LCT.APICommunications;
 using LCT.APICommunications.Model;
+using Microsoft.Build.Evaluation;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using CycloneDX.Models;
+using Newtonsoft.Json;
 
 namespace LCT.PackageIdentifier
 {
@@ -39,7 +45,7 @@ namespace LCT.PackageIdentifier
         protected Program() { }
 
         static async Task Main(string[] args)
-        {
+        {           
             BomStopWatch = new Stopwatch();
             BomStopWatch.Start();
 
@@ -65,7 +71,15 @@ namespace LCT.PackageIdentifier
 
             // Validate application settings
             await ValidateAppsettingsFile(appSettings);
-
+            string listOfInlude= DisplayInclude(appSettings);
+            string listOfExclude = DisplayExclude(appSettings);
+            string listOfExcludeComponents= DisplayExcludeComponents(appSettings);
+            string listOfInternalRepoList=string.Empty;
+            if (appSettings.InternalRepoList !=null)
+            {
+                listOfInternalRepoList = string.Join(",", appSettings.InternalRepoList?.ToList());
+            }
+            
             Logger.Logger.Log(null, Level.Notice, $"Input Parameters used in Package Identifier:\n\t" +
                 $"PackageFilePath\t\t --> {appSettings.PackageFilePath}\n\t" +
                 $"BomFolderPath\t\t --> {appSettings.BomFolderPath}\n\t" +
@@ -75,8 +89,12 @@ namespace LCT.PackageIdentifier
                 $"SW360ProjectName\t --> {appSettings.SW360ProjectName}\n\t" +
                 $"SW360ProjectID\t\t --> {appSettings.SW360ProjectID}\n\t" +
                 $"ProjectType\t\t --> {appSettings.ProjectType}\n\t" +
-                $"LogFolderPath\t\t --> {Path.GetFullPath(FolderPath)}\n", null);
-
+                $"ProjectType\t\t --> {Path.GetFullPath(FolderPath)}\n\t" +
+                $"InternalRepoList\t --> {listOfInternalRepoList}\n\t" +
+                $"Include\t\t\t --> {listOfInlude}\n\t" +
+                $"Exclude\t\t\t --> {listOfExclude}\n\t" +
+                $"ExcludeComponents\t --> {listOfExcludeComponents}\n", null);            
+            
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);
 
@@ -92,6 +110,8 @@ namespace LCT.PackageIdentifier
             }
             Logger.Logger.Log(null, Level.Notice, $"End of Package Identifier execution : {DateTime.Now}\n", null);
         }
+
+
 
         private static IJFrogService GetJfrogService(CommonAppSettings appSettings)
         {
@@ -119,6 +139,153 @@ namespace LCT.PackageIdentifier
             };
             ISw360ProjectService sw360ProjectService = new Sw360ProjectService(new SW360ApicommunicationFacade(sw360ConnectionSettings));
             await BomValidator.ValidateAppSettings(appSettings, sw360ProjectService);
+        }
+
+        private static string DisplayInclude(CommonAppSettings appSettings)
+        {
+            string totalString = string.Empty;            
+            switch (appSettings.ProjectType.ToUpperInvariant())
+            {
+                case "NPM":
+                    if(appSettings.Npm.Include != null)
+                    {
+                        totalString = string.Join(",", appSettings.Npm.Include?.ToList());
+                    }                    
+                    return totalString;
+                case "NUGET":
+                    if (appSettings.Nuget.Include != null)
+                    {
+                        totalString = string.Join(",", appSettings.Nuget.Include?.ToList());
+                    }
+                    return totalString;
+                case "MAVEN":
+                    if (appSettings.Maven.Include != null)
+                    {
+                        totalString = string.Join(",", appSettings.Maven.Include?.ToList());
+                    }                        
+                    return totalString;
+                case "DEBIAN":
+                    if (appSettings.Debian.Include != null)
+                    {
+                        totalString = string.Join(",", appSettings.Debian.Include?.ToList());
+                    }
+                        
+                    return totalString;
+                case "PYTHON":
+                    if (appSettings.Python.Include != null)
+                    {
+                        totalString = string.Join(",", appSettings.Python.Include?.ToList());
+                    }                        
+                   return totalString;
+                case "CONAN":
+                    if (appSettings.Conan.Include != null)
+                    {
+                        totalString = string.Join(",", appSettings.Conan.Include?.ToList());
+                    }                        
+                     return totalString;
+                default:
+                    Logger.Error($"Invalid ProjectType - {appSettings.ProjectType}");
+                    break;
+            }
+            return totalString;
+        }
+        private static string DisplayExclude(CommonAppSettings appSettings)
+        {
+
+            string totalString = string.Empty;
+            switch (appSettings.ProjectType.ToUpperInvariant())
+            {
+                case "NPM":
+                    if (appSettings.Npm.Exclude != null)
+                    {
+                        totalString = string.Join(",", appSettings.Npm.Exclude?.ToList());
+                    }
+                    return totalString;
+                case "NUGET":
+                    if (appSettings.Nuget.Exclude != null)
+                    {
+                        totalString = string.Join(",", appSettings.Nuget.Exclude?.ToList());
+                    }
+                    return totalString;
+                case "MAVEN":
+                    if (appSettings.Maven.Exclude != null)
+                    {
+                        totalString = string.Join(",", appSettings.Maven.Exclude?.ToList());
+                    }
+                    return totalString;
+                case "DEBIAN":
+                    if (appSettings.Debian.Exclude != null)
+                    {
+                        totalString = string.Join(",", appSettings.Debian.Exclude?.ToList());
+                    }
+                    return totalString;
+                case "PYTHON":
+                    if (appSettings.Python.Exclude != null)
+                    {
+                        totalString = string.Join(",", appSettings.Python.Exclude?.ToList());
+                    }
+                    return totalString;
+                case "CONAN":
+                    if (appSettings.Conan.Exclude != null)
+                    {
+                        totalString = string.Join(",", appSettings.Conan.Exclude?.ToList());
+                    }
+                    return totalString;
+                default:
+                    Logger.Error($"Invalid ProjectType - {appSettings.ProjectType}");
+                    break;
+            }
+            return totalString;
+        }
+
+        private static string DisplayExcludeComponents(CommonAppSettings appSettings)
+        {
+
+            string totalString = string.Empty;
+            switch (appSettings.ProjectType.ToUpperInvariant())
+            {
+                case "NPM":
+                    if (appSettings.Npm.ExcludedComponents != null)
+                    {
+                        totalString = string.Join(",", appSettings.Npm.ExcludedComponents?.ToList());
+                    }
+                    return totalString;
+                case "NUGET":
+                    if (appSettings.Nuget.ExcludedComponents != null)
+                    {
+                        totalString = string.Join(",", appSettings.Nuget.ExcludedComponents?.ToList());
+                    }
+                    return totalString;
+                case "MAVEN":
+                    if (appSettings.Maven.ExcludedComponents != null)
+                    {
+                        totalString = string.Join(",", appSettings.Maven.ExcludedComponents?.ToList());
+                    }
+                    return totalString;
+                case "DEBIAN":
+                    if (appSettings.Debian.ExcludedComponents != null)
+                    {
+                        totalString = string.Join(",", appSettings.Debian.ExcludedComponents?.ToList());
+                    }
+
+                    return totalString;
+                case "PYTHON":
+                    if (appSettings.Python.ExcludedComponents != null)
+                    {
+                        totalString = string.Join(",", appSettings.Python.ExcludedComponents?.ToList());
+                    }
+                    return totalString;
+                case "CONAN":
+                    if (appSettings.Conan.ExcludedComponents != null)
+                    {
+                        totalString = string.Join(",", appSettings.Conan.ExcludedComponents?.ToList());
+                    }
+                    return totalString;
+                default:
+                    Logger.Error($"Invalid ProjectType - {appSettings.ProjectType}");
+                    break;
+            }
+            return totalString;
         }
 
         private static string LogFolderInitialisation(CommonAppSettings appSettings)

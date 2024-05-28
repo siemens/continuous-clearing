@@ -76,10 +76,8 @@ namespace LCT.PackageIdentifier
         private static void CheckingForExcludedFiles(Config config, IFileOperations fileOperations, List<string> allFoundConfigFiles, string configFile)
         {
             if (!IsExcluded(configFile, config.Exclude))
-            {
-                //string currentDirectory = Path.GetDirectoryName(configFile);
-                //Logger.Logger.Log(null, Level.Info, $"    {configFile} ", null);
-                Logger.Info($"    Input file FOUND :{configFile}");
+            {                
+                Logger.Logger.Log(null, Level.Info, $"    Input file FOUND :{configFile}", null);                
                 allFoundConfigFiles.Add(configFile);
                 fileOperations.ValidateFilePath(configFile);
             }

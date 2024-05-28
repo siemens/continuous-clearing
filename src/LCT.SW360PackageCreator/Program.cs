@@ -62,7 +62,6 @@ namespace LCT.SW360PackageCreator
             Logger.Logger.Log(null, Level.Notice, $"Input parameters used in Package Creator:\n\t" +
               $"BomFilePath\t\t --> {appSettings.BomFilePath}\n\t" +
               $"SW360Url\t\t --> {appSettings.SW360URL}\n\t" +
-              $"FossologyUrl\t\t --> {appSettings.Fossologyurl}\n\t" +
               $"SW360AuthTokenType\t --> {appSettings.SW360AuthTokenType}\n\t" +
               $"SW360ProjectName\t --> {appSettings.SW360ProjectName}\n\t" +
               $"SW360ProjectID\t\t --> {appSettings.SW360ProjectID}\n\t" +

@@ -10,11 +10,13 @@ using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
+using LCT.Common.Model;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.PackageIdentifier.Model.NugetModel;
 using LCT.Services.Interface;
 using log4net;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -236,6 +238,50 @@ namespace LCT.PackageIdentifier
                 modifiedBOM.Add(componentVal);
             }
             return modifiedBOM;
+        }
+
+        private static void CreateFileForMultipleVersions(List<Component> componentsWithMultipleVersions, CommonAppSettings appSettings)
+        {
+            MultipleVersions multipleVersions = new MultipleVersions();
+            IFileOperations fileOperations = new FileOperations();
+            string filename = $"{appSettings.BomFolderPath}\\{appSettings.SW360ProjectName}_{FileConstant.multipleversionsFileName}";
+            if (string.IsNullOrEmpty(appSettings.IdentifierBomFilePath))
+            {
+                multipleVersions.Nuget = new List<MultipleVersionValues>();
+                foreach (var nugetPackage in componentsWithMultipleVersions)
+                {
+                    nugetPackage.Description = !string.IsNullOrEmpty(appSettings.CycloneDxSBomTemplatePath) ? appSettings.CycloneDxSBomTemplatePath : nugetPackage.Description;
+
+                    MultipleVersionValues jsonComponents = new MultipleVersionValues();
+                    jsonComponents.ComponentName = nugetPackage.Name;
+                    jsonComponents.ComponentVersion = nugetPackage.Version;
+                    jsonComponents.PackageFoundIn = nugetPackage.Description;
+                    multipleVersions.Nuget.Add(jsonComponents);
+                }
+                fileOperations.WriteContentToMultipleVersionsFile(multipleVersions, appSettings.BomFolderPath, FileConstant.multipleversionsFileName, appSettings.SW360ProjectName);
+                Logger.Warn($"\nTotal Multiple versions detected {multipleVersions.Nuget.Count} and details can be found at {appSettings.BomFolderPath}\\{appSettings.SW360ProjectName}_{FileConstant.multipleversionsFileName}\n");
+            }
+            else
+            {
+                string json = File.ReadAllText(filename);
+                MultipleVersions myDeserializedClass = JsonConvert.DeserializeObject<MultipleVersions>(json);
+                List<MultipleVersionValues> nugetComponents = new List<MultipleVersionValues>();
+                foreach (var nugetPackage in componentsWithMultipleVersions)
+                {
+                    nugetPackage.Description = !string.IsNullOrEmpty(appSettings.CycloneDxSBomTemplatePath) ? appSettings.CycloneDxSBomTemplatePath : nugetPackage.Description;
+
+                    MultipleVersionValues jsonComponents = new MultipleVersionValues();
+                    jsonComponents.ComponentName = nugetPackage.Name;
+                    jsonComponents.ComponentVersion = nugetPackage.Version;
+                    jsonComponents.PackageFoundIn = nugetPackage.Description;
+
+                    nugetComponents.Add(jsonComponents);
+                }                
+                myDeserializedClass.Nuget = nugetComponents;
+
+                fileOperations.WriteContentToMultipleVersionsFile(myDeserializedClass, appSettings.BomFolderPath, FileConstant.multipleversionsFileName, appSettings.SW360ProjectName);
+                Logger.Warn($"\nTotal Multiple versions detected {nugetComponents.Count} and details can be found at {appSettings.BomFolderPath}\\{appSettings.SW360ProjectName}_{FileConstant.multipleversionsFileName}\n");
+            }
         }
 
         private static string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
@@ -510,7 +556,7 @@ namespace LCT.PackageIdentifier
         {
             if (componentsWithMultipleVersions.Count != 0)
             {
-                CommonHelper.CreateFileForMultipleVersions(componentsWithMultipleVersions,appSettings);
+                CreateFileForMultipleVersions(componentsWithMultipleVersions, appSettings);
             }
         }
 

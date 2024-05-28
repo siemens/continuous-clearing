@@ -105,14 +105,14 @@ namespace LCT.ArtifactoryUploader
                     components.CopyPackageApiUrl = GetCopyURL(components);
                     components.MovePackageApiUrl = GetMoveURL(components);
                     components.JfrogPackageName = GetJfrogPackageName(components);
-                   componentsToBeUploaded.Add(components);
+                    componentsToBeUploaded.Add(components);
                 }
                 else
                 {
                     PackageUploader.uploaderKpiData.ComponentNotApproved++;
                     PackageUploader.uploaderKpiData.PackagesNotUploadedToJfrog++;
                     await AddUnknownPackagesAsync(item, displayPackagesInfo);
-                }               
+                }
             }
             Logger.Debug("Ending GetComponentsToBeUploadedToArtifactory() method");
             return componentsToBeUploaded;
@@ -151,12 +151,12 @@ namespace LCT.ArtifactoryUploader
 
         }
 
-        private static void DisplaySortedForeachComponents(List<ComponentsToArtifactory> unknownPackages, List<ComponentsToArtifactory> JfrogNotFoundPackages, List<ComponentsToArtifactory> SucessfullPackages, List<ComponentsToArtifactory> JfrogFoundPackages, string name)
+        private static void DisplaySortedForeachComponents(List<ComponentsToArtifactory> unknownPackages, List<ComponentsToArtifactory> JfrogNotFoundPackages, List<ComponentsToArtifactory> SucessfullPackages, List<ComponentsToArtifactory> JfrogFoundPackages, string name,string filename)
         {
             if (unknownPackages.Any() || JfrogNotFoundPackages.Any() || SucessfullPackages.Any() || JfrogFoundPackages.Any())
             {
                 Logger.Info("\n" + name + ":\n");
-                DisplayErrorForUnknownPackages(unknownPackages,name);
+                DisplayErrorForUnknownPackages(unknownPackages, name, filename);
                 DisplayErrorForJfrogFoundPackages(JfrogFoundPackages);
                 DisplayErrorForJfrogPackages(JfrogNotFoundPackages);
                 DisplayErrorForSucessfullPackages(SucessfullPackages);
@@ -171,7 +171,7 @@ namespace LCT.ArtifactoryUploader
             {
 
                 foreach (var jfrogFoundPackage in JfrogFoundPackages)
-                {                 
+                {
 
                     if (jfrogFoundPackage.ResponseMessage.ReasonPhrase == ApiConstant.ErrorInUpload)
                     {
@@ -185,7 +185,7 @@ namespace LCT.ArtifactoryUploader
                     {
                         Logger.Info($"Successful{jfrogFoundPackage.DryRunSuffix} {jfrogFoundPackage.OperationType} package {jfrogFoundPackage.Name}-{jfrogFoundPackage.Version}" +
                                           $" from {jfrogFoundPackage.SrcRepoName} to {jfrogFoundPackage.DestRepoName}");
-                    }                   
+                    }
 
                 }
                 Logger.Info("\n");
@@ -208,35 +208,250 @@ namespace LCT.ArtifactoryUploader
 
             }
         }
-        private static void DisplayErrorForUnknownPackages(List<ComponentsToArtifactory> unknownPackages,string name)
-        {
-
+        private static void DisplayErrorForUnknownPackages(List<ComponentsToArtifactory> unknownPackages, string name,string filepath)
+        {            
+            ProjectResponse projectResponse = new ProjectResponse();
+            IFileOperations fileOperations = new FileOperations();
+            var filename=Path.Combine(filepath, $"Artifactory_{FileConstant.artifactoryReportNotApproved}");
             if (unknownPackages.Any())
             {
-                ListOfComponentValues componentValues = new ListOfComponentValues();
-                componentValues.PackageProperties = new List<ComponentValues>();
-                foreach (var unknownPackage in unknownPackages)
-                {                   
-                    ComponentValues componentData= new ComponentValues();
-                    componentData.Name = unknownPackage.Name;
-                    componentData.version= unknownPackage.Version;
-                    componentValues.PackageProperties.Add(componentData);
+                if (name.Equals("Npm"))
+                {
+                    GetNotApprovedNpmPackages(unknownPackages,projectResponse,fileOperations,filepath,filename);
                 }
-                IFileOperations fileOperations = new FileOperations();                
-                string localPathforartifactory = GettPathForArtifactoryUpload();
-                fileOperations.WriteContentToFile(componentValues.PackageProperties, localPathforartifactory,
-       FileConstant.artifactoryReportNotApproved, name);
-                Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {localPathforartifactory}{name}_{FileConstant.artifactoryReportNotApproved}\n");
-
+                else if (name.Equals("Nuget"))
+                {
+                    GetNotApprovedNugetPackages(unknownPackages, projectResponse, fileOperations, filepath, filename);
+                }
+                else if (name.Equals("Conan"))
+                {
+                    GetNotApprovedConanPackages(unknownPackages, projectResponse, fileOperations, filepath, filename);
+                }
+                else if (name.Equals("Debian"))
+                {
+                    GetNotApprovedDebianPackages(unknownPackages, projectResponse, fileOperations, filepath, filename);
+                }
+                else if (name.Equals("Maven"))
+                {
+                    GetNotApprovedMavenPackages(unknownPackages, projectResponse, fileOperations, filepath, filename);
+                }
+                else if (name.Equals("Python"))
+                {
+                    GetNotApprovedPythonPackages(unknownPackages, projectResponse, fileOperations, filepath, filename);
+                }
             }
         }
+        private static void GetNotApprovedNpmPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath,string filename)
+        {
+            if (File.Exists(filename))
+            {
+                string json = File.ReadAllText(filename);
+                ProjectResponse myDeserializedClass = JsonConvert.DeserializeObject<ProjectResponse>(json);
+                List<JsonComponents> npmComponents = new List<JsonComponents>();
+                foreach (var npmpackage in unknownPackages)
+                {
+                    JsonComponents jsonComponents = new JsonComponents();
+                    jsonComponents.Name = npmpackage.Name;
+                    jsonComponents.Version = npmpackage.Version;
+                    npmComponents.Add(jsonComponents);
+                }
+                myDeserializedClass.Npm = npmComponents;
+                fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
 
+            }
+            else
+            {
+                projectResponse.Npm = new List<JsonComponents>();
+                foreach (var npmpackage in unknownPackages)
+                {
+                    JsonComponents jsonComponents = new JsonComponents();
+                    jsonComponents.Name = npmpackage.Name;
+                    jsonComponents.Version = npmpackage.Version;
+                    projectResponse.Npm.Add(jsonComponents);
+                }
+                fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
+            }
+            Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n");
+
+        }
+        private static void GetNotApprovedNugetPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
+        {
+            if (File.Exists(filename))
+            {
+                string json = File.ReadAllText(filename);
+
+                ProjectResponse myDeserializedClass = JsonConvert.DeserializeObject<ProjectResponse>(json);
+                List<JsonComponents> nugetComponents = new List<JsonComponents>();
+                foreach (var nugetpackage in unknownPackages)
+                {
+                    JsonComponents jsonComponents = new JsonComponents();
+                    jsonComponents.Name = nugetpackage.Name;
+                    jsonComponents.Version = nugetpackage.Version;
+                    nugetComponents.Add(jsonComponents);
+                }
+                myDeserializedClass.Nuget = nugetComponents;
+                fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
+
+
+            }
+            else
+            {
+                projectResponse.Nuget = new List<JsonComponents>();
+                foreach (var nugetpackage in unknownPackages)
+                {
+                    JsonComponents jsonComponents = new JsonComponents();
+                    jsonComponents.Name = nugetpackage.Name;
+                    jsonComponents.Version = nugetpackage.Version;
+                    projectResponse.Nuget.Add(jsonComponents);
+                }
+                fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
+            }
+            Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n");
+        }
+        private static void GetNotApprovedConanPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
+        {
+            if (File.Exists(filename))
+            {
+                string json = File.ReadAllText(filename);
+
+                ProjectResponse myDeserializedClass = JsonConvert.DeserializeObject<ProjectResponse>(json);
+                List<JsonComponents> conanComponents = new List<JsonComponents>();
+                foreach (var conanpackage in unknownPackages)
+                {
+                    JsonComponents jsonComponents = new JsonComponents();
+                    jsonComponents.Name = conanpackage.Name;
+                    jsonComponents.Version = conanpackage.Version;
+                    conanComponents.Add(jsonComponents);
+                }
+                myDeserializedClass.Conan = conanComponents;
+                fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
+
+
+            }
+            else
+            {
+                projectResponse.Conan = new List<JsonComponents>();
+                foreach (var conanpackage in unknownPackages)
+                {
+                    JsonComponents jsonComponents = new JsonComponents();
+                    jsonComponents.Name = conanpackage.Name;
+                    jsonComponents.Version = conanpackage.Version;
+                    projectResponse.Conan.Add(jsonComponents);
+                }
+                fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
+            }
+            Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n");
+
+        }
+        private static void GetNotApprovedPythonPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
+        {
+            if (File.Exists(filename))
+            {
+                string json = File.ReadAllText(filename);
+
+                ProjectResponse myDeserializedClass = JsonConvert.DeserializeObject<ProjectResponse>(json);
+                List<JsonComponents> pythonComponents = new List<JsonComponents>();
+                foreach (var pythonPackage in unknownPackages)
+                {
+                    JsonComponents jsonComponents = new JsonComponents();
+                    jsonComponents.Name = pythonPackage.Name;
+                    jsonComponents.Version = pythonPackage.Version;
+                    pythonComponents.Add(jsonComponents);
+                }
+                myDeserializedClass.Python = pythonComponents;
+                fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
+
+
+            }
+            else
+            {
+                projectResponse.Python = new List<JsonComponents>();
+                foreach (var pythonPackage in unknownPackages)
+                {
+                    JsonComponents jsonComponents = new JsonComponents();
+                    jsonComponents.Name = pythonPackage.Name;
+                    jsonComponents.Version = pythonPackage.Version;
+                    projectResponse.Python.Add(jsonComponents);
+                }
+                fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
+            }
+            Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n");
+        }
+        private static void GetNotApprovedDebianPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
+        {
+            if (File.Exists(filename))
+            {
+                string json = File.ReadAllText(filename);
+
+                ProjectResponse myDeserializedClass = JsonConvert.DeserializeObject<ProjectResponse>(json);
+                List<JsonComponents> debianComponents = new List<JsonComponents>();
+                foreach (var debianPackage in unknownPackages)
+                {
+                    JsonComponents jsonComponents = new JsonComponents();
+                    jsonComponents.Name = debianPackage.Name;
+                    jsonComponents.Version = debianPackage.Version;
+                    debianComponents.Add(jsonComponents);
+                }
+                myDeserializedClass.Debian = debianComponents;
+                fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
+
+
+            }
+            else
+            {
+                projectResponse.Debian = new List<JsonComponents>();
+                foreach (var debianPackage in unknownPackages)
+                {
+                    JsonComponents jsonComponents = new JsonComponents();
+                    jsonComponents.Name = debianPackage.Name;
+                    jsonComponents.Version = debianPackage.Version;
+                    projectResponse.Debian.Add(jsonComponents);
+                }
+                fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
+            }
+            Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n");
+        }
+        private static void GetNotApprovedMavenPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
+        {
+            if (File.Exists(filename))
+            {
+                string json = File.ReadAllText(filename);
+
+                ProjectResponse myDeserializedClass = JsonConvert.DeserializeObject<ProjectResponse>(json);
+                List<JsonComponents> mavenComponents = new List<JsonComponents>();
+                foreach (var mavenPackage in unknownPackages)
+                {
+                    JsonComponents jsonComponents = new JsonComponents();
+                    jsonComponents.Name = mavenPackage.Name;
+                    jsonComponents.Version = mavenPackage.Version;
+                    mavenComponents.Add(jsonComponents);
+                }
+                myDeserializedClass.Maven = mavenComponents;
+                fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
+
+
+            }
+            else
+            {
+                projectResponse.Maven = new List<JsonComponents>();
+                foreach (var mavenPackage in unknownPackages)
+                {
+                    JsonComponents jsonComponents = new JsonComponents();
+                    jsonComponents.Name = mavenPackage.Name;
+                    jsonComponents.Version = mavenPackage.Version;
+                    projectResponse.Maven.Add(jsonComponents);
+                }
+                fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
+            }
+            Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n");
+        }
         public static string GettPathForArtifactoryUpload()
         {
             string localPathforartifactory = string.Empty;
             try
             {
-                localPathforartifactory = $"{Directory.GetParent(Directory.GetCurrentDirectory())}\\ClearingTool\\ArtifactoryFiles\\";
+                String Todaysdate = DateTime.Now.ToString("dd-MM-yyyy_ss");
+                localPathforartifactory = $"{Directory.GetParent(Directory.GetCurrentDirectory())}\\ClearingTool\\ArtifactoryFiles\\{Todaysdate}\\";
                 if (!Directory.Exists(localPathforartifactory))
                 {
                     localPathforartifactory = Directory.CreateDirectory(localPathforartifactory).ToString();
@@ -244,11 +459,11 @@ namespace LCT.ArtifactoryUploader
             }
             catch (IOException ex)
             {
-                Logger.Error($"GetDownloadPathForAlpineRepo() ", ex);
+                Logger.Error($"GettPathForArtifactoryUpload() ", ex);
             }
             catch (UnauthorizedAccessException ex)
             {
-                Logger.Error($"GetDownloadPathForAlpineRepo() ", ex);
+                Logger.Error($"GettPathForArtifactoryUpload() ", ex);
             }
 
             return localPathforartifactory;
@@ -269,13 +484,15 @@ namespace LCT.ArtifactoryUploader
         }
         public static void DisplayPackageUploadInformation(DisplayPackagesInfo displayPackagesInfo)
         {
-            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesNpm, displayPackagesInfo.JfrogNotFoundPackagesNpm, displayPackagesInfo.SuccessfullPackagesNpm, displayPackagesInfo.JfrogFoundPackagesNpm, "NPM");
-            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesNuget, displayPackagesInfo.JfrogNotFoundPackagesNuget, displayPackagesInfo.SuccessfullPackagesNuget, displayPackagesInfo.JfrogFoundPackagesNuget, "Nuget");
-            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesMaven, displayPackagesInfo.JfrogNotFoundPackagesMaven, displayPackagesInfo.SuccessfullPackagesMaven, displayPackagesInfo.JfrogFoundPackagesMaven, "Maven");
-            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesConan, displayPackagesInfo.JfrogNotFoundPackagesConan, displayPackagesInfo.SuccessfullPackagesConan, displayPackagesInfo.JfrogFoundPackagesConan, "Conan");
-            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesPython, displayPackagesInfo.JfrogNotFoundPackagesPython, displayPackagesInfo.SuccessfullPackagesPython, displayPackagesInfo.JfrogFoundPackagesPython, "Python");
-            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesDebian, displayPackagesInfo.JfrogNotFoundPackagesDebian, displayPackagesInfo.SuccessfullPackagesDebian, displayPackagesInfo.JfrogFoundPackagesDebian, "Debian");
-
+            string localPathforartifactory = GettPathForArtifactoryUpload();          
+            
+            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesNpm, displayPackagesInfo.JfrogNotFoundPackagesNpm, displayPackagesInfo.SuccessfullPackagesNpm, displayPackagesInfo.JfrogFoundPackagesNpm, "Npm", localPathforartifactory);
+            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesNuget, displayPackagesInfo.JfrogNotFoundPackagesNuget, displayPackagesInfo.SuccessfullPackagesNuget, displayPackagesInfo.JfrogFoundPackagesNuget, "Nuget", localPathforartifactory);
+            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesMaven, displayPackagesInfo.JfrogNotFoundPackagesMaven, displayPackagesInfo.SuccessfullPackagesMaven, displayPackagesInfo.JfrogFoundPackagesMaven, "Maven", localPathforartifactory);
+            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesConan, displayPackagesInfo.JfrogNotFoundPackagesConan, displayPackagesInfo.SuccessfullPackagesConan, displayPackagesInfo.JfrogFoundPackagesConan, "Conan", localPathforartifactory);
+            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesPython, displayPackagesInfo.JfrogNotFoundPackagesPython, displayPackagesInfo.SuccessfullPackagesPython, displayPackagesInfo.JfrogFoundPackagesPython, "Python", localPathforartifactory);
+            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesDebian, displayPackagesInfo.JfrogNotFoundPackagesDebian, displayPackagesInfo.SuccessfullPackagesDebian, displayPackagesInfo.JfrogFoundPackagesDebian, "Debian", localPathforartifactory);
+          
         }
 
         private static Task<ComponentsToArtifactory> GetUnknownPackageinfo(Component item)
@@ -312,7 +529,7 @@ namespace LCT.ArtifactoryUploader
 
             ComponentsToArtifactory components = new ComponentsToArtifactory()
             {
-               Name = item.Name,
+                Name = item.Name,
                 Version = item.Version,
 
             };
@@ -527,9 +744,9 @@ namespace LCT.ArtifactoryUploader
                 // Add a wild card to the path end for jFrog AQL query search
                 component.Path = $"{component.Path}/*";
             }
-            else if(component.ComponentType == "DEBIAN")
+            else if (component.ComponentType == "DEBIAN")
             {
-                url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension,"")}*" +
+                url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*" +
                            $"?to=/{component.DestRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*";
             }
             else
@@ -569,7 +786,7 @@ namespace LCT.ArtifactoryUploader
                 // Add a wild card to the path end for jFrog AQL query search
                 component.Path = $"{component.Path}/*";
             }
-            else if(component.ComponentType == "DEBIAN")
+            else if (component.ComponentType == "DEBIAN")
             {
                 url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*" +
                           $"?to=/{component.DestRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*";
@@ -627,7 +844,7 @@ namespace LCT.ArtifactoryUploader
                     break;
 
                 case "DEBIAN":
-                    packageName = $"{component.PackageName}_{component.Version.Replace(ApiConstant.DebianExtension, "")+"*"}";
+                    packageName = $"{component.PackageName}_{component.Version.Replace(ApiConstant.DebianExtension, "") + "*"}";
                     break;
 
                 case "PYTHON":

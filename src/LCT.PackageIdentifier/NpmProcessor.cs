@@ -9,6 +9,8 @@ using LCT.APICommunications;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Interface;
+using LCT.Common.Model;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
@@ -62,7 +64,8 @@ namespace LCT.PackageIdentifier
 
             if (componentsWithMultipleVersions.Count != 0)
             {
-                CommonHelper.CreateFileForMultipleVersions(componentsWithMultipleVersions, appSettings);
+                CreateFileForMultipleVersions(componentsWithMultipleVersions, appSettings);
+
             }
             bom.Components = componentsForBOM;
             bom.Dependencies = dependencies;
@@ -70,7 +73,7 @@ namespace LCT.PackageIdentifier
             return bom;
         }
 
-        public List<Component> ParsePackageLockJson(string filepath, CommonAppSettings appSettings)
+        public static List<Component> ParsePackageLockJson(string filepath, CommonAppSettings appSettings)
         {
             List<BundledComponents> bundledComponents = new List<BundledComponents>();
             List<Component> lstComponentForBOM = new List<Component>();
@@ -127,6 +130,50 @@ namespace LCT.PackageIdentifier
             }
 
             return lstComponentForBOM;
+        }
+
+        private static void CreateFileForMultipleVersions(List<Component> componentsWithMultipleVersions, CommonAppSettings appSettings)
+        {
+            MultipleVersions multipleVersions = new MultipleVersions();
+            IFileOperations fileOperations = new FileOperations();
+            string filename = $"{appSettings.BomFolderPath}\\{appSettings.SW360ProjectName}_{FileConstant.multipleversionsFileName}";
+            if (string.IsNullOrEmpty(appSettings.IdentifierBomFilePath))
+            {
+                multipleVersions.Npm = new List<MultipleVersionValues>();
+                foreach (var npmpackage in componentsWithMultipleVersions)
+                {
+                    npmpackage.Description = !string.IsNullOrEmpty(appSettings.CycloneDxSBomTemplatePath) ? appSettings.CycloneDxSBomTemplatePath : npmpackage.Description;
+
+                    MultipleVersionValues jsonComponents = new MultipleVersionValues();
+                    jsonComponents.ComponentName = npmpackage.Name;
+                    jsonComponents.ComponentVersion = npmpackage.Version;
+                    jsonComponents.PackageFoundIn = npmpackage.Description;
+                    multipleVersions.Npm.Add(jsonComponents);
+                }
+                fileOperations.WriteContentToMultipleVersionsFile(multipleVersions, appSettings.BomFolderPath, FileConstant.multipleversionsFileName, appSettings.SW360ProjectName);
+                Logger.Warn($"\nTotal Multiple versions detected {multipleVersions.Npm.Count} and details can be found at {appSettings.BomFolderPath}\\{appSettings.SW360ProjectName}_{FileConstant.multipleversionsFileName}\n");
+            }
+            else
+            {
+                string json = File.ReadAllText(filename);
+                MultipleVersions myDeserializedClass = JsonConvert.DeserializeObject<MultipleVersions>(json);
+                List<MultipleVersionValues> npmComponents = new List<MultipleVersionValues>();
+                foreach (var npmpackage in componentsWithMultipleVersions)
+                {
+                    npmpackage.Description = !string.IsNullOrEmpty(appSettings.CycloneDxSBomTemplatePath) ? appSettings.CycloneDxSBomTemplatePath : npmpackage.Description;
+
+                    MultipleVersionValues jsonComponents = new MultipleVersionValues();
+                    jsonComponents.ComponentName = npmpackage.Name;
+                    jsonComponents.ComponentVersion = npmpackage.Version;
+                    jsonComponents.PackageFoundIn = npmpackage.Description;
+
+                    npmComponents.Add(jsonComponents);
+                }
+                myDeserializedClass.Npm = npmComponents;
+
+                fileOperations.WriteContentToMultipleVersionsFile(myDeserializedClass, appSettings.BomFolderPath, FileConstant.multipleversionsFileName, appSettings.SW360ProjectName);
+                Logger.Warn($"\nTotal Multiple versions detected {npmComponents.Count} and details can be found at {appSettings.BomFolderPath}\\{appSettings.SW360ProjectName}_{FileConstant.multipleversionsFileName}\n");
+            }
         }
 
         private static void GetPackagesForBom(string filepath, ref List<BundledComponents> bundledComponents, ref List<Component> lstComponentForBOM, ref int noOfDevDependent, IEnumerable<JProperty> depencyComponentList)

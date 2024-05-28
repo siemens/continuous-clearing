@@ -9,6 +9,8 @@ using LCT.APICommunications;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Interface;
+using LCT.Common.Model;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
@@ -60,7 +62,7 @@ namespace LCT.PackageIdentifier
 
             if (componentsWithMultipleVersions.Count != 0)
             {
-                CommonHelper.CreateFileForMultipleVersions(componentsWithMultipleVersions, appSettings);
+                CreateFileForMultipleVersions(componentsWithMultipleVersions, appSettings);
             }
 
             bom.Components = componentsForBOM;
@@ -156,6 +158,49 @@ namespace LCT.PackageIdentifier
         #endregion
 
         #region private methods
+        private static void CreateFileForMultipleVersions(List<Component> componentsWithMultipleVersions, CommonAppSettings appSettings)
+        {
+            MultipleVersions multipleVersions = new MultipleVersions();
+            IFileOperations fileOperations = new FileOperations();
+            string filename = $"{appSettings.BomFolderPath}\\{appSettings.SW360ProjectName}_{FileConstant.multipleversionsFileName}";
+            if (string.IsNullOrEmpty(appSettings.IdentifierBomFilePath))
+            {
+                multipleVersions.Conan = new List<MultipleVersionValues>();
+                foreach (var conanPackage in componentsWithMultipleVersions)
+                {
+                    conanPackage.Description = !string.IsNullOrEmpty(appSettings.CycloneDxSBomTemplatePath) ? appSettings.CycloneDxSBomTemplatePath : conanPackage.Description;
+
+                    MultipleVersionValues jsonComponents = new MultipleVersionValues();
+                    jsonComponents.ComponentName = conanPackage.Name;
+                    jsonComponents.ComponentVersion = conanPackage.Version;
+                    jsonComponents.PackageFoundIn = conanPackage.Description;
+                    multipleVersions.Conan.Add(jsonComponents);
+                }
+                fileOperations.WriteContentToMultipleVersionsFile(multipleVersions, appSettings.BomFolderPath, FileConstant.multipleversionsFileName, appSettings.SW360ProjectName);
+                Logger.Warn($"\nTotal Multiple versions detected {multipleVersions.Conan.Count} and details can be found at {appSettings.BomFolderPath}\\{appSettings.SW360ProjectName}_{FileConstant.multipleversionsFileName}\n");
+            }
+            else
+            {
+                string json = File.ReadAllText(filename);
+                MultipleVersions myDeserializedClass = JsonConvert.DeserializeObject<MultipleVersions>(json);
+                List<MultipleVersionValues> conanComponents = new List<MultipleVersionValues>();
+                foreach (var conanPackage in componentsWithMultipleVersions)
+                {
+                    conanPackage.Description = !string.IsNullOrEmpty(appSettings.CycloneDxSBomTemplatePath) ? appSettings.CycloneDxSBomTemplatePath : conanPackage.Description;
+
+                    MultipleVersionValues jsonComponents = new MultipleVersionValues();
+                    jsonComponents.ComponentName = conanPackage.Name;
+                    jsonComponents.ComponentVersion = conanPackage.Version;
+                    jsonComponents.PackageFoundIn = conanPackage.Description;
+
+                    conanComponents.Add(jsonComponents);
+                }                
+                myDeserializedClass.Conan = conanComponents;
+
+                fileOperations.WriteContentToMultipleVersionsFile(myDeserializedClass, appSettings.BomFolderPath, FileConstant.multipleversionsFileName, appSettings.SW360ProjectName);
+                Logger.Warn($"\nTotal Multiple versions detected {conanComponents.Count} and details can be found at {appSettings.BomFolderPath}\\{appSettings.SW360ProjectName}_{FileConstant.multipleversionsFileName}\n");
+            }
+        }
         private void ParsingInputFileForBOM(CommonAppSettings appSettings, ref Bom bom)
         {
             List<string> configFiles;
