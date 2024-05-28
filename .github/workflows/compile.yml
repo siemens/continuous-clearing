@@ -64,7 +64,7 @@ jobs:
         dotnet restore src/LicenseClearingTool.sln 
 
     - name: Build
-      uses: actions/setup-dotnet@2
+      uses: actions/setup-dotnet@latest
       with:
         dotnet-version: 6.0
         run: dotnet build src/LicenseClearingTool.sln
