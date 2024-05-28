@@ -47,6 +47,9 @@ jobs:
       run: |
           Set-PSRepository PSGallery -InstallationPolicy Trusted
           Install-Module SqlServer, PSScriptAnalyzer
+
+    - name: Install MSBuild
+      uses: actions/setup-msbuild@v1
         
     - name: get SemVer   
       if: ${{ false }}  # disable for now
