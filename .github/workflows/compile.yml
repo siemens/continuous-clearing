@@ -64,7 +64,9 @@ jobs:
     
     - name: Build
       #if: ${{ false }}  # disable for now
-      run: dotnet build -c Release -p:Configuration=Release -bl:continous-clearing.binlog -noconlog src/LicenseClearingTool.sln
+      run: |
+       sudo apt-get install -y nuget
+       dotnet build -c Release -p:Configuration=Release -bl:continous-clearing.binlog -noconlog src/LicenseClearingTool.sln
 
     - name: Build the Docker image
       id: builddocker
@@ -146,7 +148,6 @@ jobs:
     - name: Create Nuget Packages 
       id: createNupkg
       run: |
-        sudo apt-get install -y nuget
         nuget pack CA.nuspec -Version 6.0.0
         echo "::set-output name=nupkg-LicenseClearingTool::out/LicenseClearingTool/continuous-clearing.nuspec.6.0.0.nupkg"
         
