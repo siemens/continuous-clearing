@@ -198,6 +198,7 @@ namespace LCT.SW360PackageCreator
             return downloadPath;
         }
 
+        
         public async Task<List<ComparisonBomData>> SetContentsForComparisonBOM(List<Components> lstComponentForBOM, ISW360Service sw360Service)
         {
             Logger.Debug($"SetContentsForComparisonBOM():Start");
@@ -205,22 +206,23 @@ namespace LCT.SW360PackageCreator
             Logger.Logger.Log(null, Level.Notice, $"Collecting comparison BOM Data...", null);
             componentsAvailableInSw360 = await sw360Service.GetAvailableReleasesInSw360(lstComponentForBOM);
 
-            //Checking before getting status of individual comp details
+            //Checking components count before getting status of individual comp details
             if (componentsAvailableInSw360?.Count > 0)
             {
-                comparisonBomData.Add(await GetComparisionBomItems(lstComponentForBOM, sw360Service));
+                comparisonBomData = await GetComparisionBomItems(lstComponentForBOM, sw360Service);
             }
 
             Logger.Debug($"SetContentsForComparisonBOM():End");
             return comparisonBomData;
         }
 
-        private async Task<ComparisonBomData> GetComparisionBomItems(List<Components> lstComponentForBOM, ISW360Service sw360Service)
+        private async Task<List<ComparisonBomData>> GetComparisionBomItems(List<Components> lstComponentForBOM, ISW360Service sw360Service)
         {
+            List<ComparisonBomData> comparisonBomData = new();
             ComparisonBomData mapper;
-            mapper = new ComparisonBomData();
             foreach (Components item in lstComponentForBOM)
             {
+                mapper = new ComparisonBomData();
                 ReleasesInfo releasesInfo = await GetReleaseInfoFromSw360(item, componentsAvailableInSw360, sw360Service);
                 IRepository repo = new Repository();
 
@@ -266,8 +268,9 @@ namespace LCT.SW360PackageCreator
 
                 Logger.Debug($"Sw360 avilability status for Name " + mapper.Name + ":" + mapper.ComponentExternalId + "=" + mapper.ComponentStatus +
                     "-Version " + mapper.Version + ":" + mapper.ReleaseExternalId + "=" + mapper.ReleaseStatus);
+                comparisonBomData.Add(mapper);
             }
-            return mapper;
+            return comparisonBomData;
         }
 
         private static string GetMavenDownloadUrl(ComparisonBomData mapper, Components item, ReleasesInfo releasesInfo)
