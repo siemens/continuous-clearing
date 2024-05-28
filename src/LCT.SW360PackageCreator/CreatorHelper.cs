@@ -263,7 +263,8 @@ namespace LCT.SW360PackageCreator
                 mapper.FossologyUploadStatus = GetFossologyUploadStatus(mapper.ApprovedStatus);
                 mapper.ReleaseAttachmentLink = string.Empty;
                 mapper.ReleaseLink = GetReleaseLink(componentsAvailableInSw360, item.Name, item.Version);
-                
+
+                Logger.Debug($"Sw360 avilability status for Name " + mapper.Name + ":" + mapper.ComponentStatus + "-Version " + mapper.Version + ":" + mapper.ReleaseStatus);
             }
             return mapper;
         }
