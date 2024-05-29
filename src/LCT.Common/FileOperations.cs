@@ -7,7 +7,6 @@
 using CycloneDX.Models;
 using LCT.Common.Interface;
 using log4net;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -15,8 +14,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security;
-using System.Text.Json.Serialization;
-using System.Text.Json;
 using Newtonsoft.Json.Converters;
 
 namespace LCT.Common
