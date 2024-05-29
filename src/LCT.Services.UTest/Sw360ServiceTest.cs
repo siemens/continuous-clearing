@@ -42,7 +42,7 @@ namespace LCT.Services.UTest
 
             // Act
             ISw360ProjectService sw360Service = new Sw360ProjectService(swApiCommunicationFacade.Object);
-            string sw360ProjectName = await sw360Service.GetProjectNameByProjectIDFromSW360("4aa1165e2d23da3d383692eb9c000a43", "Test");
+            string sw360ProjectName = await sw360Service.GetProjectNameByProjectIDFromSW360("4aa1165e2d23da3d383692eb9c000a43", "Test", projectsMapper);
 
             // Assert
             Assert.AreEqual("Test", sw360ProjectName);

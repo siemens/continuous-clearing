@@ -7,6 +7,7 @@
 using CycloneDX.Models;
 using LCT.Common.Interface;
 using log4net;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security;
+using System.Text.Json.Serialization;
+using System.Text.Json;
+using Newtonsoft.Json.Converters;
 
 namespace LCT.Common
 {
@@ -49,10 +53,9 @@ namespace LCT.Common
         public string WriteContentToFile<T>(T dataToWrite, string folderPath, string fileNameWithExtension, string projectName)
         {
             try
-            {
-                Logger.Debug($"WriteContentToFile():folderpath-{folderPath},fileNameWithExtension-{fileNameWithExtension}," +
-                    $"projectName-{projectName}");
-                string jsonString = JsonConvert.SerializeObject(dataToWrite, Formatting.Indented);
+            {            
+                Logger.Debug($"WriteContentToFile():folderpath-{folderPath},fileNameWithExtension-{fileNameWithExtension}," + $"projectName-{projectName}");               
+                string jsonString = JsonConvert.SerializeObject(dataToWrite, Formatting.Indented, new StringEnumConverter());
                 string fileName = $"{projectName}_{fileNameWithExtension}";
 
                 string filePath = Path.Combine(folderPath, fileName);

@@ -4,6 +4,7 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Services.Interface;
 using System.IO;
@@ -16,9 +17,9 @@ namespace LCT.PackageIdentifier
     /// </summary>
     public static class BomValidator
     {
-        public static async Task ValidateAppSettings(CommonAppSettings appSettings, ISw360ProjectService bomService)
+        public static async Task ValidateAppSettings(CommonAppSettings appSettings, ISw360ProjectService bomService, ProjectReleases projectReleases)
         {
-            string sw360ProjectName = await bomService.GetProjectNameByProjectIDFromSW360(appSettings.SW360ProjectID, appSettings.SW360ProjectName);
+            string sw360ProjectName = await bomService.GetProjectNameByProjectIDFromSW360(appSettings.SW360ProjectID, appSettings.SW360ProjectName,projectReleases);
 
             if (string.IsNullOrEmpty(sw360ProjectName))
             {
