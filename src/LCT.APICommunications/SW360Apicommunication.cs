@@ -141,20 +141,20 @@ namespace LCT.APICommunications
             }
             catch (TaskCanceledException ex)
             {
-                Logger.Debug($"{ex.Message}");
-                Logger.Error("GetReleases():TaskCanceledException:A timeout error is thrown from SW360 server,Please wait for sometime and re run the pipeline again");
+                Logger.Debug($"GetReleases():TaskCanceledException Error : {ex.Message}", ex);
+                Logger.Error("TaskCanceledException error has error while getting all releases from the SW360 server,Please wait for sometime and re run the pipeline again. Error :" + ex.Message);
                 Environment.Exit(-1);
             }
             catch (HttpRequestException ex)
             {
-                Logger.Debug($"{ex.Message}");
-                Logger.Error("GetReleases():HttpRequestException:A timeout error is thrown from SW360 server,Please wait for sometime and re run the pipeline again");
+                Logger.Debug($"GetReleases():HttpRequestException Error : {ex.Message}", ex);
+                Logger.Error("HttpRequestException error has error while getting all releases from the SW360 server,Please wait for sometime and re run the pipeline again. Error :" + ex.Message);
                 Environment.Exit(-1);
             }
             catch (InvalidOperationException ex)
             {
-                Logger.Debug($"{ex.Message}");
-                Logger.Error("GetReleases():InvalidOperationException:A timeout error is thrown from SW360 server,Please wait for sometime and re run the pipeline again");
+                Logger.Debug($"GetReleases():InvalidOperationException Error : {ex.Message}", ex);
+                Logger.Error("InvalidOperationException error has error while getting all releases from the SW360 server,Please wait for sometime and re run the pipeline again. Error :" + ex.Message);
                 Environment.Exit(-1);
             }
             return result;
