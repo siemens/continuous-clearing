@@ -184,7 +184,7 @@ jobs:
         ls  $GITHUB_WORKSPACE/buildoutput
         docker build . --file Dockerfile --tag ${{ github.repository }}:continuous-clearing-v6.2.0
         docker save ${{ github.repository }}:continuous-clearing-v6.2.0 -o continuous-clearing-v6.2.0.tar
-        Write-Host "::set-output name=docker-LicenseClearingTool::continuous-clearing-v6.2.0.tar"
+        echo "::set-output name=docker-LicenseClearingTool::continuous-clearing-v6.2.0.tar"
         
     - name: Archive docker image      
       #if: ${{ false }}  # disable for now
