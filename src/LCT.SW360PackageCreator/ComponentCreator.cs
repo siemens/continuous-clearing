@@ -86,7 +86,7 @@ namespace LCT.SW360PackageCreator
 
                     Components component = await GetSourceUrl(componentsData.Name, componentsData.Version, componentsData.ProjectType, item.BomRef);
                     componentsData.SourceUrl = component.SourceUrl;
-                    
+
                     if (componentsData.ProjectType.ToUpperInvariant() == "ALPINE")
                     {
                         componentsData.AlpineSourceData = component.AlpineSourceData;
@@ -202,7 +202,7 @@ namespace LCT.SW360PackageCreator
                     componentsData.SourceUrl = await UrlHelper.Instance.GetSourceUrlForConanPackage(name, version);
                     break;
                 case "ALPINE":
-                    Components alpComponentData = await UrlHelper.Instance.GetSourceUrlForAlpinePackage(name, version,bomRef);
+                    Components alpComponentData = await UrlHelper.Instance.GetSourceUrlForAlpinePackage(name, version, bomRef);
                     componentsData = alpComponentData;
                     componentsData.ProjectType = projectType;
                     break;
@@ -276,7 +276,7 @@ namespace LCT.SW360PackageCreator
                     await CreateComponentAndRealease(creatorHelper, sw360CreatorService, item, sw360Url, appSettings);
                 }
 
-                if (appSettings.ProjectType.ToUpperInvariant()=="ALPINE")
+                if (appSettings.ProjectType.ToUpperInvariant() == "ALPINE")
                 {
                     string localPathforSourceRepo = UrlHelper.GetDownloadPathForAlpineRepo();
                     if (Directory.GetDirectories(localPathforSourceRepo).Length != 0)

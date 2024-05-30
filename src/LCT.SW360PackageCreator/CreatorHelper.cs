@@ -198,6 +198,7 @@ namespace LCT.SW360PackageCreator
             return downloadPath;
         }
 
+        
         public async Task<List<ComparisonBomData>> SetContentsForComparisonBOM(List<Components> lstComponentForBOM, ISW360Service sw360Service)
         {
             Logger.Debug($"SetContentsForComparisonBOM():Start");
@@ -205,6 +206,19 @@ namespace LCT.SW360PackageCreator
             Logger.Logger.Log(null, Level.Notice, $"Collecting comparison BOM Data...", null);
             componentsAvailableInSw360 = await sw360Service.GetAvailableReleasesInSw360(lstComponentForBOM);
 
+            //Checking components count before getting status of individual comp details
+            if (componentsAvailableInSw360?.Count > 0)
+            {
+                comparisonBomData = await GetComparisionBomItems(lstComponentForBOM, sw360Service);
+            }
+
+            Logger.Debug($"SetContentsForComparisonBOM():End");
+            return comparisonBomData;
+        }
+
+        private async Task<List<ComparisonBomData>> GetComparisionBomItems(List<Components> lstComponentForBOM, ISW360Service sw360Service)
+        {
+            List<ComparisonBomData> comparisonBomData = new();
             ComparisonBomData mapper;
             foreach (Components item in lstComponentForBOM)
             {
@@ -236,11 +250,11 @@ namespace LCT.SW360PackageCreator
                 {
                     mapper.DownloadUrl = GetMavenDownloadUrl(mapper, item, releasesInfo);
                 }
-                else if (!string.IsNullOrEmpty(item.ReleaseExternalId) && 
+                else if (!string.IsNullOrEmpty(item.ReleaseExternalId) &&
                             (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["PYTHON"]) || item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CONAN"]) || item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["ALPINE"])))
                 {
-                    mapper.DownloadUrl = mapper.SourceUrl;                    
-                }                
+                    mapper.DownloadUrl = mapper.SourceUrl;
+                }
                 else
                 {
                     mapper.DownloadUrl = GetComponentDownloadUrl(mapper, item, repo, releasesInfo);
@@ -251,10 +265,11 @@ namespace LCT.SW360PackageCreator
                 mapper.FossologyUploadStatus = GetFossologyUploadStatus(mapper.ApprovedStatus);
                 mapper.ReleaseAttachmentLink = string.Empty;
                 mapper.ReleaseLink = GetReleaseLink(componentsAvailableInSw360, item.Name, item.Version);
+
+                Logger.Debug($"Sw360 avilability status for Name " + mapper.Name + ":" + mapper.ComponentExternalId + "=" + mapper.ComponentStatus +
+                    "-Version " + mapper.Version + ":" + mapper.ReleaseExternalId + "=" + mapper.ReleaseStatus);
                 comparisonBomData.Add(mapper);
             }
-
-            Logger.Debug($"SetContentsForComparisonBOM():End");
             return comparisonBomData;
         }
 
