@@ -8,7 +8,7 @@ on:
 jobs:
 
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
   
     defaults:
       run:
@@ -24,30 +24,21 @@ jobs:
       uses: actions/checkout@v3
       with:
         fetch-depth: 0   
-        
-    - name: Setup Version     
-      if: ${{ false }}  # disable for now
+    
+    - name: Setup Version      
       uses: gittools/actions/gitversion/setup@v0.10.2
       with:
         versionSpec: '5.12.0'
       env: 
         ACTIONS_ALLOW_UNSECURE_COMMANDS: TRUE
     
-    - name: Determine Version   
-      if: ${{ false }}  # disable for now
+    - name: Determine Version      
       uses: gittools/actions/gitversion/execute@v0.10.2
       with:
         useConfigFile: true        
       env: 
         ACTIONS_ALLOW_UNSECURE_COMMANDS: TRUE
 
-    - uses: actions/checkout@v3
-    - name: Install from PSGallery
-      shell: pwsh
-      run: |
-          Set-PSRepository PSGallery -InstallationPolicy Trusted
-          Install-Module SqlServer, PSScriptAnalyzer
-        
     - name: get SemVer   
       if: ${{ false }}  # disable for now
       id: gitversion
@@ -57,56 +48,13 @@ jobs:
         $fileName = "dummy-v$($env:GitVersion_SemVer)"
         echo "SemVerMMP: v$($env:GitVersion_MajorMinorPatch)"
         Write-Host "Filename: '$fileName'" 
-
-    - name: Restore NuGet packages
-      run: |
-        sudo apt-get install -y nuget
-        dotnet restore src/LicenseClearingTool.sln 
-
-    - name: Build
-      uses: actions/setup-dotnet@latest
-      with:
-        dotnet-version: 6.0
-        run: dotnet build src/LicenseClearingTool.sln
-
-    - name: Build
-      run: |
-         dotnet build src/LicenseClearingTool.sln 
-         echo "Files in directory:"
-         ls -lrt  $GITHUB_WORKSPACE/out/net6.0
-
-    - name: Restore Packages
-      if: ${{ false }}  # disable for now
-      run: dotnet restore src/LicenseClearingTool.sln 
-    
-    - name: Build
-      if: ${{ false }}  # disable for now
-      run: |
-       sudo apt-get install -y nuget
-       nuget build -c Release -p:Configuration=Release -bl:continous-clearing.binlog -noconlog src/LicenseClearingTool.sln
-
-    - name: Build the Docker image
-      id: builddocker
-      if: ${{ false }}  # disable for now
-      run: |
-        docker build . --file Dockerfile --tag ${{ github.repository }}:continuous-clearing-v6.2.0
-        docker save ${{ github.repository }}:continuous-clearing-v6.2.0 -o continuous-clearing-v6.2.0.tar
-        echo "::set-output name=docker-LicenseClearingTool::continuous-clearing-v6.2.0.tar"
         
-    - name: Archive docker image      
-      if: ${{ false }}  # disable for now
-      uses: actions/upload-artifact@v2
-      with:
-        name: docker-continuous-clearing
-        path: |
-          *.tar
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.3.1
   
       
     - name: update appSettingsSW360IntegrationTest.json
-      if: ${{ false }}  # disable for now
-      run: |
-         chmod +x ./Scripts/json_update.ps1
-         ./Scripts/json_update.ps1 -JsonFile 'src\TestUtilities\appSettingsSW360IntegrationTest.json' 
+      run: ./Scripts/json_update.ps1 -JsonFile 'src\TestUtilities\appSettingsSW360IntegrationTest.json' 
       env:
         SW360HOST: ${{ secrets.SW360HOST }}
         SW360APPPORT: ${{ secrets.SW360APPPORT }}
@@ -118,7 +66,6 @@ jobs:
         SW360AUTHKEY: ${{ secrets.SW360AUTHTOKEN }}
       
     - name: update appsettingsUnitTest.json
-      if: ${{ false }}  # disable for now
       run: ./Scripts/json_update_ut.ps1 -JsonFile 'src\UnitTestUtilities\appsettingsUnitTest.json' 
       env:
         SW360HOST: ${{ secrets.SW360HOST }}
@@ -127,7 +74,11 @@ jobs:
         FOSSYAPPPORT: ${{ secrets.FOSSYAPPPORT }}
         JFROGURL: ${{ secrets.JFROGURL }}
         
-   
+    - name: Restore Packages
+      run: dotnet restore src\LicenseClearingTool.sln 
+    
+    - name: Build
+      run: msbuild -m -t:Rebuild -p:Configuration=Release -bl:continous-clearing.binlog -noconlog src\LicenseClearingTool.sln
     
     - name: Archive Build Log
       uses: actions/upload-artifact@v2
@@ -137,23 +88,46 @@ jobs:
         path: |
           src/*.binlog
           *.binlog    
-
-    - name: zip
+    
+    - name: Create zip
+      id: packageBuildResults
       run: |
-         sourceFolder=$(realpath "$GITHUB_WORKSPACE/out" | sed 's/\/*$//')
-         outFolder="$GITHUB_WORKSPACE/out/continuous-clearing"
-         mkdir -p "$outFolder"
-         fileName="continuous-clearing-v6.2.0.zip"
-         echo "Filename: $fileName"
-         echo "sourceFolder: $sourceFolder"
-         echo "Outfolder: $outFolder"
-         echo "Creating zip file..."
-         cd "$sourceFolder" || exit 1
-         zip -r "$GITHUB_WORKSPACE/out/continuous-clearing-v6.2.0.zip" .
-         cd "$(dirname "$GITHUB_WORKSPACE")"
-         mv "$GITHUB_WORKSPACE/out/continuous-clearing-v6.2.0.zip" "$outFolder"
-         echo "::set-output name=LicenseClearingTool::$fileName"
-     
+        $sourceFolder = Join-Path $env:GITHUB_WORKSPACE "out" | Join-Path -ChildPath "*"
+        $outFolder = Join-Path $env:GITHUB_WORKSPACE "out" | Join-Path -ChildPath "continuous-clearing" 
+        New-Item -ItemType Directory -Force -Path $outFolder
+        $fileName = "continuous-clearing-v6.2.0.zip"
+        Write-Host "Filename: '$fileName'"
+        Write-Host "sourceFolder: '$sourceFolder'"
+        Write-Host "Outfolder: '$outFolder'"
+        Write-Host "::set-output name=LicenseClearingTool::$($fileName)"
+        $outPath = Join-Path $outFolder $fileName
+        Compress-Archive -DestinationPath $outPath -Path $sourceFolder -CompressionLevel Optimal
+      
+    - name: SW360 Instance refresh  
+      #if: ${{ false }}  # disable for now
+      run: |
+        docker exec -dt sw360confctnr1 service postgresql stop
+        docker stop sw360confctnr1
+        docker rm sw360confctnr1        
+        docker run --name sw360confctnr1 --memory=7g -t -d -p ${env:SW360APPPORT}:8080 -p 5990:5984 -p 5440:5432 ${env:DOCKERDEVARTIFACTORY}/energy-dev/software-clearing/sw360/sw360conf:latest
+        Start-Sleep -s 200
+      env:
+         SW360APPPORT: ${{ secrets.SW360APPPORT }}
+         DOCKERDEVARTIFACTORY: ${{ secrets.DOCKERDEVARTIFACTORY }}
+         
+    - name: Test 
+      #if: ${{ false }}  # disable for now
+      run: |
+        $TestProjects = Get-ChildItem -Path *test*.csproj -Recurse -exclude TestUtilities.csproj,UnitTestUtilities.csproj
+        Write-Host "**************************The test projects considered for execution: $TestProjects   ******************************"
+        Write-Host "********************************************************************************************************************"
+        foreach ($Project in $TestProjects) 
+        {                 
+                Write-Host $Project.DirectoryName
+                $TestProject = $Project.DirectoryName
+                Push-Location $Project.PSParentPath
+                dotnet test --no-build --configuration Release
+        }
 
     - name: Archive Build Output
       uses: actions/upload-artifact@v2
@@ -165,8 +139,8 @@ jobs:
     - name: Create Nuget Packages 
       id: createNupkg
       run: |
-        nuget pack CA.nuspec -Version 6.0.0
-        echo "::set-output name=nupkg-LicenseClearingTool::out/LicenseClearingTool/continuous-clearing.nuspec.6.0.0.nupkg"
+        nuget pack CA.nuspec -Version 6.2.0
+        Write-Host "::set-output name=nupkg-LicenseClearingTool::continuous-clearing.6.2.0.nupkg"
         
     - name: Archive NuGet Packages
       uses: actions/upload-artifact@v2
@@ -176,13 +150,13 @@ jobs:
           *.nupkg
           
     - name: Build the Docker image
-     # id: builddocker
+      id: builddocker
       #if: ${{ false }}  # disable for now
       run: |
         docker build . --file Dockerfile --tag ${{ github.repository }}:continuous-clearing-v6.2.0
         docker save ${{ github.repository }}:continuous-clearing-v6.2.0 -o continuous-clearing-v6.2.0.tar
         Write-Host "::set-output name=docker-LicenseClearingTool::continuous-clearing-v6.2.0.tar"
-        
+
     - name: Archive docker image      
       #if: ${{ false }}  # disable for now
       uses: actions/upload-artifact@v2
