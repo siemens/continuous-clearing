@@ -277,7 +277,7 @@ namespace LCT.Services
                     }
                     else
                     {
-                        Logger.Warn("Duplicate entries found in finalReleasesToBeLinked: " + release.Name + ":" + release.ReleaseId +
+                        Logger.Debug("Duplicate entries found in finalReleasesToBeLinked: " + release.Name + ":" + release.ReleaseId +
                             " , with :" + linkedReleasesUniqueDict[release.ReleaseId].Name + ":" + linkedReleasesUniqueDict[release.ReleaseId].ReleaseId);
                     }
                 }

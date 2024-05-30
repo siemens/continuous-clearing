@@ -65,7 +65,7 @@ namespace LCT.Services
 
                 var modelMappedObject = JsonConvert.DeserializeObject<ComponentsRelease>(responseBody);
 
-                if (modelMappedObject != null && modelMappedObject.Embedded?.Sw360Releases.Count > 0)
+                if (modelMappedObject != null && modelMappedObject.Embedded?.Sw360Releases?.Count > 0)
                 {
                     availableComponentsList = await GetAvailableComponenentsList(modelMappedObject.Embedded?.Sw360Releases, listOfComponentsToBom);
                 }
