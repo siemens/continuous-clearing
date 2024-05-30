@@ -268,8 +268,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} 
-          asset_path: ./${{ needs.build.outputs.docker-LicenseClearingTool }}
-          asset_name: ${{ needs.build.outputs.docker-LicenseClearingTool }}
+          asset_path: ./${{ needs.deploy.outputs.docker-LicenseClearingTool }}
+          asset_name: ${{ needs.deploy.outputs.docker-LicenseClearingTool }}
           asset_content_type: application/zip
           
       - name: Upload ReadmeOSS_nupkg file
