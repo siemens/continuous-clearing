@@ -79,6 +79,12 @@ jobs:
     
     - name: Build
       run: msbuild -m -t:Rebuild -p:Configuration=Release -bl:continous-clearing.binlog -noconlog src\LicenseClearingTool.sln
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+         name: buildoutput
+         path: /out/net6.0
     
     - name: Archive Build Log
       uses: actions/upload-artifact@v2
@@ -158,6 +164,11 @@ jobs:
       uses: actions/checkout@v3
       with:
         fetch-depth: 0  
+
+    - name: Download Build Output
+      uses: actions/download-artifact@v2
+      with:
+          name: buildoutput
       
 
     - name: Build the Docker image
