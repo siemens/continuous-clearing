@@ -27,4 +27,4 @@ RUN apt-get update && \
 ENV PATH="/root/.local/bin:$PATH"
 
 # Copying files from host to current working directory
-COPY /buildoutput/ /app/out
+COPY /github/workspace/buildoutput/ /app/out
