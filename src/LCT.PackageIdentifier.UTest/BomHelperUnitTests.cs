@@ -55,8 +55,11 @@ namespace PackageIdentifier.UTest
                 new()
                 {
                     Path="test/test",
-                    Name="compoenent",
-                    Repo="remote"
+                    Name="Test-1.debian",
+                    Repo="remote",
+                    MD5="7654345676543",
+                    SHA256="65434567",
+                    SHA1="765434567654"
                 }
             };
             mockIProcessor.Setup(x => x.GetJfrogArtifactoryRepoInfo(It.IsAny<CommonAppSettings>(), It.IsAny<ArtifactoryCredentials>(), It.IsAny<Component>(), It.IsAny<string>())).ReturnsAsync(lstComponentForBOM);
