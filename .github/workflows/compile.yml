@@ -104,7 +104,7 @@ jobs:
         Compress-Archive -DestinationPath $outPath -Path $sourceFolder -CompressionLevel Optimal
       
     - name: SW360 Instance refresh  
-      #if: ${{ false }}  # disable for now
+      if: ${{ false }}  # disable for now
       run: |
         docker exec -dt sw360confctnr1 service postgresql stop
         docker stop sw360confctnr1
@@ -167,7 +167,7 @@ jobs:
           
   release:
     if: github.ref == 'refs/heads/main'    
-    runs-on: self-hosted
+    runs-on: windows-latest
     needs: build
   
     steps:
