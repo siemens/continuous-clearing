@@ -79,9 +79,9 @@ jobs:
     
     - name: Build
       run: |
+        msbuild -m -t:Rebuild -p:Configuration=Release -bl:continous-clearing.binlog -noconlog src\LicenseClearingTool.sln
         echo "Files in directory:"
         ls -lrt  $GITHUB_WORKSPACE/out/net6.0
-        msbuild -m -t:Rebuild -p:Configuration=Release -bl:continous-clearing.binlog -noconlog src\LicenseClearingTool.sln
 
     - name: Upload artifact
       uses: actions/upload-artifact@v2
