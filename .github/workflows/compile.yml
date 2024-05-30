@@ -268,7 +268,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} 
-          asset_path: ${{ github.workspace }}/${{ needs.deploy.outputs.docker-LicenseClearingTool }}
+          asset_path: ./${{ needs.deploy.outputs.docker-LicenseClearingTool }}
           asset_name: ${{ needs.deploy.outputs.docker-LicenseClearingTool }}
           asset_content_type: application/zip
           
@@ -278,7 +278,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} 
-          asset_path: ${{ github.workspace }}/ReadmeOSS_continuous-clearing_nupkg.html
+          asset_path: ${{ github.workspace }}\ReadmeOSS_continuous-clearing_nupkg.html
           asset_name: ReadmeOSS_continuous-clearing_nupkg.html
           asset_content_type: text/html
         
@@ -288,6 +288,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} 
-          asset_path: ./ReadmeOSS_continuous-clearing_DockerImage.html
+          asset_path: ${{ github.workspace }}\ReadmeOSS_continuous-clearing_DockerImage.html
           asset_name: ReadmeOSS_continuous-clearing_DockerImage.html
           asset_content_type: text/html
