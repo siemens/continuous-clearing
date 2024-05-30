@@ -245,7 +245,7 @@ jobs:
           asset_name: ${{ needs.build.outputs.nupkg-LicenseClearingTool }}
           asset_content_type: application/zip
         
-      - name: Upload Nupkg
+      - name: Upload Docker
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
