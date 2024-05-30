@@ -81,7 +81,7 @@ jobs:
       run: |
        dotnet build src\LicenseClearingTool.sln
         Write-Host "Files in directory:"
-        dir  $GITHUB_WORKSPACE/out/net6.0
+        dir  $GITHUB_WORKSPACE
 
     - name: Upload artifact
       uses: actions/upload-artifact@v2
