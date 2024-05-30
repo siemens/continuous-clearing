@@ -96,7 +96,14 @@ jobs:
         name: Compile_Solution_log
         path: |
           $env:GITHUB_WORKSPACE/src/*.binlog
-          $env:GITHUB_WORKSPACE/*.binlog    
+          $env:GITHUB_WORKSPACE/*.binlog  
+
+    - name: Archive Build Output
+      uses: actions/upload-artifact@v2
+      with:
+        name: continuous-clearing
+        path: |
+           out/continuous-clearing
     
     - name: Create zip
       id: packageBuildResults
