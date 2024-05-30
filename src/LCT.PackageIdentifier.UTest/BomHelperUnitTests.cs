@@ -76,7 +76,256 @@ namespace PackageIdentifier.UTest
             //Assert           
             Assert.AreEqual(expected.Count, lstComponentForBOM.Count);
         }
+        [TestCase]
+        public async Task GetRepoDetails_GivenProjectTypeAsNpm_ReturnsListOFComponents()
+        {
 
+            //Arrange
+            var lstComponentForBOM = new List<Component>()
+            {
+                new Component()
+                {
+                 Name="Test",
+                 Version="1",
+                }
+            };
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                ArtifactoryUploadApiKey = "testvalue",
+                ProjectType = "NPM",
+                Debian = new Config()
+                {
+                    JfrogDebianRepoList = new string[] { "here" }
+                },
+                JFrogApi = "https://jfrogapi"
+            };
+            List<AqlResult> aqlResultList = new()
+            {
+                new()
+                {
+                    Path="test/test",
+                    Name="Test-1.tgz",
+                    Repo="remote",
+                    MD5="7654345676543",
+                    SHA256="65434567",
+                    SHA1="765434567654"
+                }
+            };
+            mockIProcessor.Setup(x => x.GetJfrogArtifactoryRepoInfo(It.IsAny<CommonAppSettings>(), It.IsAny<ArtifactoryCredentials>(), It.IsAny<Component>(), It.IsAny<string>())).ReturnsAsync(lstComponentForBOM);
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+
+            IParser parser = new DebianProcessor(cycloneDXBomParser.Object);
+            Mock<IJFrogService> jFrogService = new Mock<IJFrogService>();
+            Mock<IBomHelper> bomHelper = new Mock<IBomHelper>();
+            bomHelper.Setup(x => x.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>())).ReturnsAsync(aqlResultList);
+
+            //Act
+            var expected = await parser.GetJfrogRepoDetailsOfAComponent(lstComponentForBOM, appSettings, jFrogService.Object, bomHelper.Object);
+
+            //Assert           
+            Assert.AreEqual(expected.Count, lstComponentForBOM.Count);
+        }
+        [TestCase]
+        public async Task GetRepoDetails_GivenProjectTypeAsNuget_ReturnsListOFComponents()
+        {
+
+            //Arrange
+            var lstComponentForBOM = new List<Component>()
+            {
+                new Component()
+                {
+                 Name="Test",
+                 Version="1",
+                }
+            };
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                ArtifactoryUploadApiKey = "testvalue",
+                ProjectType = "NUGET",
+                Debian = new Config()
+                {
+                    JfrogDebianRepoList = new string[] { "here" }
+                },
+                JFrogApi = "https://jfrogapi"
+            };
+            List<AqlResult> aqlResultList = new()
+            {
+                new()
+                {
+                    Path="test/test",
+                    Name="Test.1.nupkg",
+                    Repo="remote",
+                    MD5="7654345676543",
+                    SHA256="65434567",
+                    SHA1="765434567654"
+                }
+            };
+            mockIProcessor.Setup(x => x.GetJfrogArtifactoryRepoInfo(It.IsAny<CommonAppSettings>(), It.IsAny<ArtifactoryCredentials>(), It.IsAny<Component>(), It.IsAny<string>())).ReturnsAsync(lstComponentForBOM);
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+
+            IParser parser = new DebianProcessor(cycloneDXBomParser.Object);
+            Mock<IJFrogService> jFrogService = new Mock<IJFrogService>();
+            Mock<IBomHelper> bomHelper = new Mock<IBomHelper>();
+            bomHelper.Setup(x => x.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>())).ReturnsAsync(aqlResultList);
+
+            //Act
+            var expected = await parser.GetJfrogRepoDetailsOfAComponent(lstComponentForBOM, appSettings, jFrogService.Object, bomHelper.Object);
+
+            //Assert           
+            Assert.AreEqual(expected.Count, lstComponentForBOM.Count);
+        }
+        [TestCase]
+        public async Task GetRepoDetails_GivenProjectTypeAsPython_ReturnsListOFComponents()
+        {
+
+            //Arrange
+            var lstComponentForBOM = new List<Component>()
+            {
+                new Component()
+                {
+                 Name="Test",
+                 Version="1",
+                }
+            };
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                ArtifactoryUploadApiKey = "testvalue",
+                ProjectType = "PYTHON",
+                Debian = new Config()
+                {
+                    JfrogDebianRepoList = new string[] { "here" }
+                },
+                JFrogApi = "https://jfrogapi"
+            };
+            List<AqlResult> aqlResultList = new()
+            {
+                new()
+                {
+                    Path="test/test",
+                    Name="Test-1.whl",
+                    Repo="remote",
+                    MD5="7654345676543",
+                    SHA256="65434567",
+                    SHA1="765434567654"
+                }
+            };
+            mockIProcessor.Setup(x => x.GetJfrogArtifactoryRepoInfo(It.IsAny<CommonAppSettings>(), It.IsAny<ArtifactoryCredentials>(), It.IsAny<Component>(), It.IsAny<string>())).ReturnsAsync(lstComponentForBOM);
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+
+            IParser parser = new DebianProcessor(cycloneDXBomParser.Object);
+            Mock<IJFrogService> jFrogService = new Mock<IJFrogService>();
+            Mock<IBomHelper> bomHelper = new Mock<IBomHelper>();
+            bomHelper.Setup(x => x.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>())).ReturnsAsync(aqlResultList);
+
+            //Act
+            var expected = await parser.GetJfrogRepoDetailsOfAComponent(lstComponentForBOM, appSettings, jFrogService.Object, bomHelper.Object);
+
+            //Assert           
+            Assert.AreEqual(expected.Count, lstComponentForBOM.Count);
+        }
+        [TestCase]
+        public async Task GetRepoDetails_GivenProjectTypeAsConan_ReturnsListOFComponents()
+        {
+
+            //Arrange
+            var lstComponentForBOM = new List<Component>()
+            {
+                new Component()
+                {
+                 Name="Test",
+                 Version="1",
+                }
+            };
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                ArtifactoryUploadApiKey = "testvalue",
+                ProjectType = "Conan",
+                Debian = new Config()
+                {
+                    JfrogDebianRepoList = new string[] { "here" }
+                },
+                JFrogApi = "https://jfrogapi"
+            };
+            List<AqlResult> aqlResultList = new()
+            {
+                new()
+                {
+                    Path="test/test",
+                    Name="Test-1",
+                    Repo="remote",
+                    MD5="7654345676543",
+                    SHA256="65434567",
+                    SHA1="765434567654"
+                }
+            };
+            mockIProcessor.Setup(x => x.GetJfrogArtifactoryRepoInfo(It.IsAny<CommonAppSettings>(), It.IsAny<ArtifactoryCredentials>(), It.IsAny<Component>(), It.IsAny<string>())).ReturnsAsync(lstComponentForBOM);
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+
+            IParser parser = new DebianProcessor(cycloneDXBomParser.Object);
+            Mock<IJFrogService> jFrogService = new Mock<IJFrogService>();
+            Mock<IBomHelper> bomHelper = new Mock<IBomHelper>();
+            bomHelper.Setup(x => x.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>())).ReturnsAsync(aqlResultList);
+
+            //Act
+            var expected = await parser.GetJfrogRepoDetailsOfAComponent(lstComponentForBOM, appSettings, jFrogService.Object, bomHelper.Object);
+
+            //Assert           
+            Assert.AreEqual(expected.Count, lstComponentForBOM.Count);
+        }
+        [TestCase]
+        public async Task GetRepoDetails_GivenProjectTypeAsMaven_ReturnsListOFComponents()
+        {
+
+            //Arrange
+            var lstComponentForBOM = new List<Component>()
+            {
+                new Component()
+                {
+                 Name="Test",
+                 Version="1",
+                }
+            };
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                ArtifactoryUploadApiKey = "testvalue",
+                ProjectType = "MAVEN",
+                Debian = new Config()
+                {
+                    JfrogDebianRepoList = new string[] { "here" }
+                },
+                JFrogApi = "https://jfrogapi"
+            };
+            List<AqlResult> aqlResultList = new()
+            {
+                new()
+                {
+                    Path="test/test",
+                    Name="Test-1-sources.jar",
+                    Repo="remote",
+                    MD5="7654345676543",
+                    SHA256="65434567",
+                    SHA1="765434567654"
+                }
+            };
+            mockIProcessor.Setup(x => x.GetJfrogArtifactoryRepoInfo(It.IsAny<CommonAppSettings>(), It.IsAny<ArtifactoryCredentials>(), It.IsAny<Component>(), It.IsAny<string>())).ReturnsAsync(lstComponentForBOM);
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+
+            IParser parser = new DebianProcessor(cycloneDXBomParser.Object);
+            Mock<IJFrogService> jFrogService = new Mock<IJFrogService>();
+            Mock<IBomHelper> bomHelper = new Mock<IBomHelper>();
+            bomHelper.Setup(x => x.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>())).ReturnsAsync(aqlResultList);
+
+            //Act
+            var expected = await parser.GetJfrogRepoDetailsOfAComponent(lstComponentForBOM, appSettings, jFrogService.Object, bomHelper.Object);
+
+            //Assert           
+            Assert.AreEqual(expected.Count, lstComponentForBOM.Count);
+        }
 
         [TestCase]
         public void Test_WriteBomKpiDataToConsole()
