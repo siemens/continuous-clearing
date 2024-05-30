@@ -87,7 +87,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
          name: buildoutput
-         path: $env:GITHUB_WORKSPACE\out\net6.0
+         path: $env:GITHUB_WORKSPACE/out/net6.0
     
     - name: Archive Build Log
       uses: actions/upload-artifact@v2
@@ -95,8 +95,8 @@ jobs:
       with:
         name: Compile_Solution_log
         path: |
-          src/*.binlog
-          *.binlog    
+          $env:GITHUB_WORKSPACE/src/*.binlog
+          $env:GITHUB_WORKSPACE/*.binlog    
     
     - name: Create zip
       id: packageBuildResults
