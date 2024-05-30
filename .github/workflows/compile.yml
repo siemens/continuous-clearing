@@ -17,7 +17,6 @@ jobs:
       semver: ${{ steps.gitversion.outputs.semver }}
       LicenseClearingTool: ${{ steps.packageBuildResults.outputs.LicenseClearingTool }}  
       nupkg-LicenseClearingTool: ${{ steps.createNupkg.outputs.nupkg-LicenseClearingTool }}
-      docker-LicenseClearingTool: ${{ steps.builddocker.outputs.docker-LicenseClearingTool }}
       
     steps:
     - name: Checkout
@@ -169,6 +168,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build
+
+    outputs:
+     docker-LicenseClearingTool: ${{ steps.builddocker.outputs.docker-LicenseClearingTool }}
     
     steps:
     - name: Checkout
@@ -184,7 +186,7 @@ jobs:
       
 
     - name: Build the Docker image
-     # id: builddocker
+      id: builddocker
       #if: ${{ false }}  # disable for now
       run: |
         echo "Files in directory:"
