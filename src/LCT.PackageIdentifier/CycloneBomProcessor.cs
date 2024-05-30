@@ -10,6 +10,7 @@ using LCT.Common.Constants;
 using log4net;
 using System.Collections.Generic;
 using System.Reflection;
+using static CycloneDX.Models.ExternalReference;
 
 namespace LCT.PackageIdentifier
 {

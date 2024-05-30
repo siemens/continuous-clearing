@@ -23,7 +23,7 @@ namespace LCT.PackageIdentifier
     /// <summary>
     /// The AlpineProcessor class
     /// </summary>
-    public class AlpineProcessor : CycloneDXBomParser, IParser
+    public class AlpineProcessor :  IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ICycloneDXBomParser _cycloneDXBomParser;
@@ -68,7 +68,6 @@ namespace LCT.PackageIdentifier
             }
 
             bom = RemoveExcludedComponents(appSettings, bom);
-            AddComponentHashes(bom);
             return bom;
         }
 

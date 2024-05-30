@@ -5,6 +5,7 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using LCT.APICommunications;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
@@ -18,6 +19,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace LCT.PackageIdentifier
@@ -25,7 +27,7 @@ namespace LCT.PackageIdentifier
     /// <summary>
     /// The DebianProcessor class
     /// </summary>
-    public class DebianProcessor : CycloneDXBomParser, IParser
+    public class DebianProcessor :  IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ICycloneDXBomParser _cycloneDXBomParser;
@@ -73,7 +75,6 @@ namespace LCT.PackageIdentifier
             }
 
             bom = RemoveExcludedComponents(appSettings, bom);
-            AddComponentHashes(bom);
             return bom;
         }
 
@@ -103,6 +104,8 @@ namespace LCT.PackageIdentifier
             foreach (var component in componentsForBOM)
             {
                 string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper);
+                string jfrogpackageName = $"{component.Name}-{component.Version}{ApiConstant.DebianExtension}";
+                var hashes = aqlResultList.FirstOrDefault(x => x.Name == jfrogpackageName);
                 Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoUrl, Value = repoName };
                 Component componentVal = component;
 
@@ -113,7 +116,29 @@ namespace LCT.PackageIdentifier
                 componentVal.Properties.Add(artifactoryrepo);
                 componentVal.Properties.Add(projectType);
                 componentVal.Description = string.Empty;
+                if (hashes != null)
+                {
+                    componentVal.Hashes = new List<Hash>()
+                {
 
+                new()
+                 {
+                  Alg = Hash.HashAlgorithm.MD5,
+                  Content = hashes.MD5
+                },
+                new()
+                {
+                  Alg = Hash.HashAlgorithm.SHA_1,
+                  Content = hashes.SHA1
+                 },
+                 new()
+                 {
+                  Alg = Hash.HashAlgorithm.SHA_256,
+                  Content = hashes.SHA256
+                  }
+                  };
+
+                }
                 modifiedBOM.Add(componentVal);
             }
 

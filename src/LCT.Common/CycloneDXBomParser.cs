@@ -24,7 +24,6 @@ namespace LCT.Common
     public class CycloneDXBomParser : ICycloneDXBomParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        public ComponentScope Scope { get; set; }
         public Bom ParseCycloneDXBom(string filePath)
         {
             Bom bom = new Bom();
@@ -98,38 +97,6 @@ namespace LCT.Common
                 }
             }
         }
-
-        public  void AddComponentHashes(Bom bom)
-        {
-            foreach (var component in bom.Components)
-            {
-                string input = $"{component.Name}{component.Version}{Scope}{GetType()}";
-                component.Hashes = new List<Hash>
-                {
-                    new Hash
-                    {
-                        Alg = Hash.HashAlgorithm.MD5,
-                        Content = GetHashForComponent(input, MD5.Create())
-                    },
-                    new Hash
-                    {
-                        Alg = Hash.HashAlgorithm.SHA_1,
-                        Content = GetHashForComponent(input, SHA1.Create())
-                    },
-                    new Hash
-                    {
-                        Alg = Hash.HashAlgorithm.SHA_256,
-                        Content = GetHashForComponent(input, SHA256.Create())
-                    }
-                };
-            }
-
-        }
-
-        private static string GetHashForComponent(string input, HashAlgorithm hashAlgorithm)
-        {
-            byte[] byteHash = hashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(input));
-            return Convert.ToHexString(byteHash);
-        }
+     
     }
 }

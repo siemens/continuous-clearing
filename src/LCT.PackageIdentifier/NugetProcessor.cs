@@ -43,13 +43,12 @@ namespace LCT.PackageIdentifier
         {
             Logger.Debug($"ParsePackageFile():Start");
             List<Component> listComponentForBOM = new List<Component>();
-            Bom bom = new Bom();            
+            Bom bom = new Bom();
 
             ParsingInputFileForBOM(appSettings, ref listComponentForBOM, ref bom);
             var componentsWithMultipleVersions = bom.Components.GroupBy(s => s.Name).Where(g => g.Count() > 1).SelectMany(g => g).ToList();
 
             CheckForMultipleVersions(appSettings, componentsWithMultipleVersions);
-            AddComponentHashes(bom);
             Logger.Debug($"ParsePackageFile():End");
             return bom;
         }
@@ -220,7 +219,10 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in componentsForBOM)
             {
+
                 string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper);
+                string jfrogpackageName = $"{component.Name}.{component.Version}{ApiConstant.NugetExtension}";
+                var hashes = aqlResultList.FirstOrDefault(x => x.Name == jfrogpackageName);                         
                 Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoUrl, Value = repoName };
                 Component componentVal = component;
 
@@ -231,7 +233,28 @@ namespace LCT.PackageIdentifier
                 componentVal.Properties.Add(artifactoryrepo);
                 componentVal.Properties.Add(projectType);
                 componentVal.Description = string.Empty;
+                if (hashes!= null)
+                {
+                    componentVal.Hashes = new List<Hash>()
+                {
 
+                new()
+                 {
+                  Alg = Hash.HashAlgorithm.MD5,
+                  Content = hashes.MD5
+                },
+                new()
+                {
+                  Alg = Hash.HashAlgorithm.SHA_1,
+                  Content = hashes.SHA1
+                 },
+                 new()
+                 {
+                  Alg = Hash.HashAlgorithm.SHA_256,
+                  Content = hashes.SHA256
+                  }
+                  };
+                }
                 modifiedBOM.Add(componentVal);
             }
             return modifiedBOM;
@@ -389,7 +412,7 @@ namespace LCT.PackageIdentifier
             }
 
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = listComponentForBOM.Count;
-            totalComponentsIdentified = listComponentForBOM.Count;                        
+            totalComponentsIdentified = listComponentForBOM.Count;
             listComponentForBOM = KeepUniqueNonDevComponents(listComponentForBOM);
             listComponentForBOM = listComponentForBOM.Distinct(new ComponentEqualityComparer()).ToList();
             if (BomCreator.bomKpiData.DuplicateComponents == 0)
@@ -407,8 +430,8 @@ namespace LCT.PackageIdentifier
                 CycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
                 SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
             }
-            
-            bom = RemoveExcludedComponents(appSettings, bom);            
+
+            bom = RemoveExcludedComponents(appSettings, bom);
         }
 
         private static void ConvertToCycloneDXModel(List<Component> listComponentForBOM, List<NugetPackage> listofComponents, List<Dependency> dependencies)
