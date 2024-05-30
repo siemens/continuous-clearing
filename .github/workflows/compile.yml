@@ -137,13 +137,6 @@ jobs:
                 Push-Location $Project.PSParentPath
                 dotnet test --no-build --configuration Release
         }
-
-    - name: Archive Build Output
-      uses: actions/upload-artifact@v2
-      with:
-        name: continuous-clearing
-        path: |
-           out/continuous-clearing
            
     - name: Create Nuget Packages 
       id: createNupkg
@@ -195,7 +188,7 @@ jobs:
     
           
   release:
-    if: github.ref == 'refs/heads/main'    
+    #if: github.ref == 'refs/heads/main'    
     runs-on: windows-latest
     needs: [build, deploy]
   
