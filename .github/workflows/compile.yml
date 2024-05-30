@@ -79,7 +79,7 @@ jobs:
     
     - name: Build
       run: |
-        msbuild -m -t:Rebuild -p:Configuration=Release -bl:continous-clearing.binlog -noconlog src\LicenseClearingTool.sln
+       dotnet build src\LicenseClearingTool.sln
         Write-Host "Files in directory:"
         dir  $GITHUB_WORKSPACE/out/net6.0
 
