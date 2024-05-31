@@ -8,6 +8,7 @@ using CycloneDX.Models;
 using LCT.Common.Interface;
 using log4net;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -52,7 +53,12 @@ namespace LCT.Common
             {
                 Logger.Debug($"WriteContentToFile():folderpath-{folderPath},fileNameWithExtension-{fileNameWithExtension}," +
                     $"projectName-{projectName}");
-                string jsonString = JsonConvert.SerializeObject(dataToWrite, Formatting.Indented);
+
+                string jsonString = JsonConvert.SerializeObject(dataToWrite, new JsonSerializerSettings
+                {
+                    ContractResolver = new CamelCasePropertyNamesContractResolver(),Formatting = Formatting.Indented,NullValueHandling = NullValueHandling.Ignore
+                });
+
                 string fileName = $"{projectName}_{fileNameWithExtension}";
 
                 string filePath = Path.Combine(folderPath, fileName);
