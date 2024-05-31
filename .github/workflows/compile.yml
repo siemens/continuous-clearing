@@ -38,7 +38,7 @@ jobs:
         ACTIONS_ALLOW_UNSECURE_COMMANDS: TRUE
 
     - name: get SemVer   
-      if: ${{ false }}  # disable for now
+      #if: ${{ false }}  # disable for now
       id: gitversion
       run: |
         echo "SemVer: v$($env:GitVersion_SemVer)" 
@@ -49,19 +49,6 @@ jobs:
         
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.3.1
-  
-      
-    - name: update appSettingsSW360IntegrationTest.json
-      run: ./Scripts/json_update.ps1 -JsonFile 'src\TestUtilities\appSettingsSW360IntegrationTest.json' 
-      env:
-        SW360HOST: ${{ secrets.SW360HOST }}
-        SW360APPPORT: ${{ secrets.SW360APPPORT }}
-        FOSSYHOST: ${{ secrets.FOSSYHOST }}
-        FOSSYAPPPORT: ${{ secrets.FOSSYAPPPORT }}
-        USEREMAIL: ${{ secrets.USEREMAIL }}
-        ARTIFACTORYAPIKEY: ${{ secrets.ARTIFACTORYAPIKEY }}
-        JFROGURL: ${{ secrets.JFROGURL }}
-        SW360AUTHKEY: ${{ secrets.SW360AUTHTOKEN }}
       
     - name: update appsettingsUnitTest.json
       run: ./Scripts/json_update_ut.ps1 -JsonFile 'src\UnitTestUtilities\appsettingsUnitTest.json' 
@@ -116,23 +103,11 @@ jobs:
         Write-Host "::set-output name=LicenseClearingTool::$($fileName)"
         $outPath = Join-Path $outFolder $fileName
         Compress-Archive -DestinationPath $outPath -Path $sourceFolder -CompressionLevel Optimal
-      
-    - name: SW360 Instance refresh  
-      if: ${{ false }}  # disable for now
-      run: |
-        docker exec -dt sw360confctnr1 service postgresql stop
-        docker stop sw360confctnr1
-        docker rm sw360confctnr1        
-        docker run --name sw360confctnr1 --memory=7g -t -d -p ${env:SW360APPPORT}:8080 -p 5990:5984 -p 5440:5432 ${env:DOCKERDEVARTIFACTORY}/energy-dev/software-clearing/sw360/sw360conf:latest
-        Start-Sleep -s 200
-      env:
-         SW360APPPORT: ${{ secrets.SW360APPPORT }}
-         DOCKERDEVARTIFACTORY: ${{ secrets.DOCKERDEVARTIFACTORY }}
          
     - name: Test 
-      if: ${{ false }}  # disable for now
+      #if: ${{ false }}  # disable for now
       run: |
-        $TestProjects = Get-ChildItem -Path *test*.csproj -Recurse -exclude TestUtilities.csproj,UnitTestUtilities.csproj
+        $TestProjects = Get-ChildItem -Path *test*.csproj -Recurse -exclude TestUtilities.csproj,UnitTestUtilities.csproj,SW360IntegrationTest.csproj
         Write-Host "**************************The test projects considered for execution: $TestProjects   ******************************"
         Write-Host "********************************************************************************************************************"
         foreach ($Project in $TestProjects) 
@@ -164,7 +139,7 @@ jobs:
         path: |
           *.nupkg
           
-  deploy:
+  build-docker:
     runs-on: ubuntu-latest
     needs: build
 
@@ -206,7 +181,7 @@ jobs:
   release:
     #if: github.ref == 'refs/heads/main'    
     runs-on: windows-latest
-    needs: [build, deploy]
+    needs: [build, build-docker]
   
     steps:
       - name: Checkout
@@ -272,8 +247,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} 
-          asset_path: ./${{ needs.deploy.outputs.docker-LicenseClearingTool }}
-          asset_name: ${{ needs.deploy.outputs.docker-LicenseClearingTool }}
+          asset_path: ./${{ needs.build-docker.outputs.docker-LicenseClearingTool }}
+          asset_name: ${{ needs.build-docker.outputs.docker-LicenseClearingTool }}
           asset_content_type: application/zip
           
       - name: Upload ReadmeOSS_nupkg file
