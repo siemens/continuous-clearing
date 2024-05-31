@@ -210,6 +210,11 @@ jobs:
     needs: [build, deploy]
   
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  
+          
       - name: Download Build Output
         uses: actions/download-artifact@v2
         with:
