@@ -164,7 +164,7 @@ namespace LCT.PackageIdentifier
             MultipleVersions multipleVersions = new MultipleVersions();
             IFileOperations fileOperations = new FileOperations();
             string filename = $"{appSettings.BomFolderPath}\\{appSettings.SW360ProjectName}_{FileConstant.multipleversionsFileName}";
-            if (string.IsNullOrEmpty(appSettings.IdentifierBomFilePath))
+            if (string.IsNullOrEmpty(appSettings.IdentifierBomFilePath) || (!File.Exists(filename)))
             {
                 multipleVersions.Conan = new List<MultipleVersionValues>();
                 foreach (var conanPackage in componentsWithMultipleVersions)
