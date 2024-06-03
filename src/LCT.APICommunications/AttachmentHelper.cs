@@ -8,6 +8,7 @@ using LCT.APICommunications.Model;
 using log4net;
 using Newtonsoft.Json;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 using System.Reflection;
@@ -18,6 +19,7 @@ namespace LCT.APICommunications
     /// <summary>
     /// AttachmentHelper class
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class AttachmentHelper
     {
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);

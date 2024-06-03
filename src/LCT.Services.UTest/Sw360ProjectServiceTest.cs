@@ -22,12 +22,7 @@ namespace LCT.Services.UTest
   [TestFixture]
   public class Sw360ProjectServiceTest
   {
-    [SetUp]
-    public void Setup()
-    {
-      //implement
-    }
-
+    
     [Test]
     public async Task GetProjectNameByProjectIDFromSW360_InvalidSW360Credentials_HttpRequestException_ReturnsProjectNameAsEmpty()
     {
@@ -207,5 +202,57 @@ namespace LCT.Services.UTest
       // Assert
       Assert.That(actual.Count, Is.GreaterThan(0));
     }
-  }
+        [Test]
+        public async Task GetAlreadyLinkedReleasesByProjectId_HttpRequestExceptionThrown_ReturnsEmptyList()
+        {
+            // Arrange
+            Mock<ISW360ApicommunicationFacade> _sw360ApicommunicationFacadeMock = new Mock<ISW360ApicommunicationFacade>();
+
+            _sw360ApicommunicationFacadeMock.Setup(x => x.GetProjectById(It.IsAny<string>())).ThrowsAsync(new HttpRequestException("Request failed"));
+            ISw360ProjectService sw360ProjectService = new Sw360ProjectService(_sw360ApicommunicationFacadeMock.Object);
+
+            // Act
+            List<ReleaseLinked> actual = await sw360ProjectService.GetAlreadyLinkedReleasesByProjectId("projectId");
+
+            // Assert
+            Assert.That(actual, Is.Empty, "GetAlreadyLinkedReleasesByProjectId does not return empty on HttpRequestException");
+        }
+
+        [Test]
+        public async Task GetAlreadyLinkedReleasesByProjectId_AggregateExceptionThrown_ReturnsEmptyList()
+        {
+            // Arrange
+            Mock<ISW360ApicommunicationFacade> _sw360ApicommunicationFacadeMock = new Mock<ISW360ApicommunicationFacade>();
+
+            _sw360ApicommunicationFacadeMock.Setup(x => x.GetProjectById(It.IsAny<string>())).ThrowsAsync(new AggregateException("Aggregate exception"));
+            ISw360ProjectService sw360ProjectService = new Sw360ProjectService(_sw360ApicommunicationFacadeMock.Object);
+
+            // Act
+            List<ReleaseLinked> actual = await sw360ProjectService.GetAlreadyLinkedReleasesByProjectId("projectId");
+
+            // Assert
+            Assert.That(actual, Is.Empty, "GetAlreadyLinkedReleasesByProjectId does not return empty on AggregateException");
+        }
+
+        [Test]
+        public async Task GetAlreadyLinkedReleasesByProjectId_StatusNotOk_ReturnsEmptyList()
+        {
+            // Arrange
+            HttpResponseMessage response = new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest);
+            Mock<ISW360ApicommunicationFacade> _sw360ApicommunicationFacadeMock = new Mock<ISW360ApicommunicationFacade>();
+
+            _sw360ApicommunicationFacadeMock.Setup(x => x.GetProjectById(It.IsAny<string>())).ReturnsAsync(response);
+
+            // Act
+            ISw360ProjectService sw360ProjectService = new Sw360ProjectService(_sw360ApicommunicationFacadeMock.Object);
+
+            List<ReleaseLinked> actual = await sw360ProjectService.GetAlreadyLinkedReleasesByProjectId("projectId");
+
+            // Assert
+            Assert.That(actual, Is.Empty, "GetAlreadyLinkedReleasesByProjectId does not return empty on BadRequest status code");
+        }
+
+        
+    }
 }
+

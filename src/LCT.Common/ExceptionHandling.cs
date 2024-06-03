@@ -7,12 +7,14 @@
 using log4net;
 using log4net.Core;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 
 namespace LCT.Common
 {
+    [ExcludeFromCodeCoverage]
     public class ExceptionHandling
     {
         protected ExceptionHandling() { }
