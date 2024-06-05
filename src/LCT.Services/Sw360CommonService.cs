@@ -54,7 +54,15 @@ namespace LCT.Services
         public async Task<ComponentStatus> GetComponentDataByExternalId(string componentName, string componentExternalId)
         {
             Logger.Debug($"GetComponentDataByExternalId(): Component Name - {componentName}");
-            string externalIdUriString = Uri.EscapeDataString(componentExternalId);
+            string externalIdUriString;
+            if (componentExternalId.Contains(Dataconstant.PurlCheck()["NPM"]))
+            {
+                externalIdUriString = Uri.EscapeDataString(componentExternalId);
+            }
+            else
+            {
+                externalIdUriString = componentExternalId;
+            }
             ComponentStatus sw360components = new ComponentStatus();
             sw360components.isComponentExist = false;
 
@@ -113,7 +121,15 @@ namespace LCT.Services
         public async Task<Releasestatus> GetReleaseDataByExternalId(string releaseName, string releaseVersion, string releaseExternalId)
         {
             Logger.Debug($"GetReleaseDataByExternalId(): Release name - {releaseName}@{releaseVersion}");
-            string externalIdUriString = Uri.EscapeDataString(releaseExternalId);
+            string externalIdUriString;
+            if (releaseExternalId.Contains(Dataconstant.PurlCheck()["NPM"]))
+            {
+                externalIdUriString = Uri.EscapeDataString(releaseExternalId);
+            }
+            else
+            {
+                externalIdUriString = releaseExternalId;
+            }
             Releasestatus releasestatus = new Releasestatus();
 
             releasestatus.isReleaseExist = false;
