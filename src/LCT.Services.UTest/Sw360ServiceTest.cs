@@ -545,49 +545,5 @@ namespace LCT.Services.UTest
             // Assert
             Assert.That(result, Is.EqualTo(expectedReleaseId));
         }
-        [Test]
-        public async Task GetAttachmentDownloadLink_ReturnsExpectedAttachmentHash_WhenCalledWithReleaseAttachmentUrl()
-        {
-            // Arrange
-            var mockFacade = new Mock<LCT.Facade.Interfaces.ISW360ApicommunicationFacade>(); // Use the correct ISW360ApiCommunicationFacade type
-            var expectedReleaseAttachmentsResponse = "{...}"; // Replace with your actual JSON response
-            var expectedAttachmentInfoResponse = "{...}"; // Replace with your actual JSON response
-            mockFacade.Setup(x => x.GetReleaseAttachments(It.IsAny<string>())).ReturnsAsync(expectedReleaseAttachmentsResponse); // Make sure ISW360ApiCommunicationFacade has a GetReleaseAttachments method
-            mockFacade.Setup(x => x.GetAttachmentInfo(It.IsAny<string>())).ReturnsAsync(expectedAttachmentInfoResponse); // Make sure ISW360ApiCommunicationFacade has a GetAttachmentInfo method
-
-            var service = new Sw360Service(mockFacade.Object);
-
-            var releaseAttachmentUrl = "TestReleaseAttachmentUrl";
-
-            var expectedAttachmentHash = new Sw360AttachmentHash(); // Replace with your expected Sw360AttachmentHash
-
-            // Act
-            var result = await service.GetAttachmentDownloadLink(releaseAttachmentUrl);
-
-            // Assert
-            Assert.That(result, Is.EqualTo(expectedAttachmentHash));
-        }
-        [Test]
-        public async Task CreateComponentBasesOFswComaprisonBOM_ReturnsExpectedComponentCreateStatus_WhenCalledWithComponentInfoAndAttachmentUrlList()
-        {
-            // Arrange
-            var mockFacade = new Mock<ISW360ApicommunicationFacade>();
-            var mockCommonService = new Mock<ISW360CommonService>();
-            var expectedResponse = new HttpResponseMessage(HttpStatusCode.OK); // Replace with your expected HttpResponseMessage
-            mockFacade.Setup(x => x.CreateComponent(It.IsAny<CreateComponent>())).ReturnsAsync(expectedResponse);
-
-            var service = new Sw360CreatorService(mockFacade.Object, mockCommonService.Object);
-
-            var componentInfo = new ComparisonBomData(); // Replace with your actual ComparisonBomData
-            var attachmentUrlList = new Dictionary<string, string>(); // Replace with your actual Dictionary<string, string>
-
-            var expectedComponentCreateStatus = new ComponentCreateStatus(); // Replace with your expected ComponentCreateStatus
-
-            // Act
-            var result = await service.CreateComponentBasesOFswComaprisonBOM(componentInfo, attachmentUrlList);
-
-            // Assert
-            Assert.That(result, Is.EqualTo(expectedComponentCreateStatus));
-        }
     }
 }

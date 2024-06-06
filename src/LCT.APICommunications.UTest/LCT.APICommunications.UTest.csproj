@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LCT.APICommunications\LCT.APICommunications.csproj" />
+    <ProjectReference Include="..\UnitTestUtilities\UnitTestUtilities.csproj" />
   </ItemGroup>
 
 </Project>

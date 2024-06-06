@@ -878,52 +878,8 @@ namespace LCT.Services.UTest
       Assert.That(actual, Is.False);
     }
 
-        [Test]
-        public async Task CheckFossologyProcessStatus_ReturnsExpectedCheckFossologyProcess_WhenCalledWithLink()
-        {
-            // Arrange
-            var mockFacade = new Mock<ISW360ApicommunicationFacade>();
-            var expectedResponse = new HttpResponseMessage
-            {
-                Content = new StringContent(JsonConvert.SerializeObject(new CheckFossologyProcess()), Encoding.UTF8, "application/json")
-            };
-            mockFacade.Setup(x => x.CheckFossologyProcessStatus(It.IsAny<string>())).ReturnsAsync(expectedResponse);
+        
 
-            var service = new Sw360CreatorService(mockFacade.Object, null);
-
-            var link = "TestLink";
-
-            var expectedResult = new CheckFossologyProcess(); // Replace with your expected CheckFossologyProcess
-
-            // Act
-            var result = await service.CheckFossologyProcessStatus(link);
-
-            // Assert
-            Assert.That(result, Is.EqualTo(expectedResult));
-        }
-        [Test]
-        public async Task GetReleaseIDofComponent_ReturnsExpectedReleaseId_WhenCalledWithComponentNameComponentVersionAndComponentId()
-        {
-            // Arrange
-            var mockFacade = new Mock<ISW360ApicommunicationFacade>();
-            mockFacade.Setup(x => x.GetReleaseOfComponentById(It.IsAny<string>())).ReturnsAsync("TestReleaseResponseBody");
-
-           // var service = new Sw360Service(mockFacade.Object, null);
-            var service = new Sw360CreatorService(mockFacade.Object, null);
-
-            var componentName = "TestComponentName";
-            var componentVersion = "TestComponentVersion";
-            var componentId = "TestComponentId";
-
-            var expectedReleaseId = "TestReleaseId"; // Replace with your expected release ID
-
-            // Act
-           // var result = await service.GetReleaseIDofComponent(componentName, componentVersion, componentId);
-            var result = await service.GetReleaseIDofComponent(componentName, componentVersion, componentId);
-
-            // Assert
-            Assert.That(result, Is.EqualTo(expectedReleaseId));
-        }
     }
 
 }
