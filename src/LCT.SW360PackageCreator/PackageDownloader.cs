@@ -145,7 +145,7 @@ namespace LCT.SW360PackageCreator
             const int timeOutMs = 200 * 60 * 1000;
             var processResult = ProcessAsyncHelper.RunAsync(p.StartInfo, timeOutMs);
             Result result = processResult?.Result ?? new Result();
-            Logger.Debug($"GetCorrectVersion:{gitCommand}:{result.ExitCode}, output:{result?.StdOut}, Error:{result.StdErr}");
+            Logger.Debug($"GetCorrectVersion:{gitCommand}:{result.ExitCode}, output:{result.StdOut}, Error:{result.StdErr}");
             return result;
         }
 

@@ -127,12 +127,34 @@ namespace LCT.APICommunications
             var result = string.Empty;
             try
             {
-                return await httpClient.GetStringAsync(sw360ReleaseApi);
+                HttpResponseMessage responseMessage = await httpClient.GetAsync(sw360ReleaseApi);
+                if (responseMessage != null && responseMessage.StatusCode.Equals(HttpStatusCode.OK))
+                {
+                    return await responseMessage.Content.ReadAsStringAsync();
+                }
+                else
+                {
+                    Logger.Error("SW360 server is not accessible while getting All Releases,Please wait for sometime and re run the pipeline again." +
+                        " StatusCode:" + responseMessage?.StatusCode + " & ReasonPharse :" + responseMessage?.ReasonPhrase);
+                    Environment.Exit(-1);
+                }
             }
             catch (TaskCanceledException ex)
             {
-                Logger.Debug($"{ex.Message}");
-                Logger.Error("A timeout error is thrown from SW360 server,Please wait for sometime and re run the pipeline again");
+                Logger.Debug($"GetReleases():TaskCanceledException Error : {ex.Message}", ex);
+                Logger.Error("TaskCanceledException error has error while getting all releases from the SW360 server,Please wait for sometime and re run the pipeline again. Error :" + ex.Message);
+                Environment.Exit(-1);
+            }
+            catch (HttpRequestException ex)
+            {
+                Logger.Debug($"GetReleases():HttpRequestException Error : {ex.Message}", ex);
+                Logger.Error("HttpRequestException error has error while getting all releases from the SW360 server,Please wait for sometime and re run the pipeline again. Error :" + ex.Message);
+                Environment.Exit(-1);
+            }
+            catch (InvalidOperationException ex)
+            {
+                Logger.Debug($"GetReleases():InvalidOperationException Error : {ex.Message}", ex);
+                Logger.Error("InvalidOperationException error has error while getting all releases from the SW360 server,Please wait for sometime and re run the pipeline again. Error :" + ex.Message);
                 Environment.Exit(-1);
             }
             return result;
