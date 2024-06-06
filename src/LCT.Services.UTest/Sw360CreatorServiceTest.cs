@@ -1089,10 +1089,68 @@ namespace LCT.Services.UTest
             Assert.IsNotNull(result);
             Assert.AreEqual(string.Empty, result);
         }
-
         
+
+        [Test]
+        public async Task UdpateSW360ReleaseContent_HttpRequestException_ReturnsFalse()
+        {
+            // Arrange
+            var component = new Components
+            {
+                ReleaseId = "releaseId123",
+                Name = "TestComponent",
+                Version = "1.0",
+                UploadId = "uploadId123"
+            };
+            string fossUrl = "http://example.com/fossUrl";
+
+            var mockApiFacade = new Mock<ISW360ApicommunicationFacade>();
+            var mockCommonService = new Mock<ISW360CommonService>();
+
+            var sw360CreatorService = new Sw360CreatorService(mockApiFacade.Object, mockCommonService.Object);
+
+            mockApiFacade.Setup(x => x.UpdateRelease(It.IsAny<string>(), It.IsAny<HttpContent>()))
+                         .ThrowsAsync(new HttpRequestException("Request failed"));
+
+            // Act
+            var result = await sw360CreatorService.UdpateSW360ReleaseContent(component, fossUrl);
+
+            // Assert
+            Assert.IsFalse(result);
+        }
+
+        [Test]
+        public async Task UdpateSW360ReleaseContent_AggregateException_ReturnsFalse()
+        {
+            // Arrange
+            var component = new Components
+            {
+                ReleaseId = "releaseId123",
+                Name = "TestComponent",
+                Version = "1.0",
+                UploadId = "uploadId123"
+            };
+            string fossUrl = "http://example.com/fossUrl";
+
+            var mockApiFacade = new Mock<ISW360ApicommunicationFacade>();
+            var mockCommonService = new Mock<ISW360CommonService>();
+
+            var sw360CreatorService = new Sw360CreatorService(mockApiFacade.Object, mockCommonService.Object);
+
+            mockApiFacade.Setup(x => x.UpdateRelease(It.IsAny<string>(), It.IsAny<HttpContent>()))
+                         .ThrowsAsync(new AggregateException("Request failed"));
+
+            // Act
+            var result = await sw360CreatorService.UdpateSW360ReleaseContent(component, fossUrl);
+
+            // Assert
+            Assert.IsFalse(result);
+        }
+
     }
+
 }
+
 
 
 
