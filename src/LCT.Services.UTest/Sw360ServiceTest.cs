@@ -7,10 +7,8 @@
 using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.Foss;
 using LCT.Common.Model;
-using LCT.Facade;
 using LCT.Facade.Interfaces;
 using LCT.Services.Interface;
-using LCT.Services.Model;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -466,84 +464,6 @@ namespace LCT.Services.UTest
 
             // Assert
             Assert.That(actual.AttachmentLink, Is.Null);
-        }
-        [Test]
-        public async Task GetAvailableReleasesInSw360_ReturnsExpectedComponents_WhenCalledWithListOfComponentsToBom()
-        {
-            // Arrange
-            var mockFacade = new Mock<LCT.Facade.Interfaces.ISW360ApicommunicationFacade>(); // Use the correct ISW360ApiCommunicationFacade type
-            var expectedResponse = "{...}"; // Replace with your actual JSON response
-            mockFacade.Setup(x => x.GetReleases()).ReturnsAsync(expectedResponse); // Make sure ISW360ApiCommunicationFacade has a GetReleases method
-
-            var mockCommonService = new Mock<ISW360CommonService>();
-
-            var service = new Sw360Service(mockFacade.Object, mockCommonService.Object);
-
-            var listOfComponentsToBom = new List<Components>(); // Replace with your actual list of Components
-
-            var expectedComponents = new List<Components>(); // Replace with your expected list of Components
-
-            // Act
-            var result = await service.GetAvailableReleasesInSw360(listOfComponentsToBom);
-
-            // Assert
-            Assert.That(result, Is.EqualTo(expectedComponents));
-        }
-        [Test]
-        public async Task GetReleaseInfoByReleaseId_ReturnsExpectedResponse_WhenCalledWithReleaseLink()
-        {
-            // Arrange
-            var mockFacade = new Mock<LCT.Facade.Interfaces.ISW360ApicommunicationFacade>(); // Use the correct ISW360ApiCommunicationFacade type
-            var expectedResponse = new HttpResponseMessage(); // Replace with your expected HttpResponseMessage
-            mockFacade.Setup(x => x.GetReleaseById(It.IsAny<string>())).ReturnsAsync(expectedResponse); // Make sure ISW360ApiCommunicationFacade has a GetReleaseById method
-
-            var service = new Sw360Service(mockFacade.Object);
-
-            var releaseLink = "TestReleaseLink";
-
-            // Act
-            var result = await service.GetReleaseInfoByReleaseId(releaseLink);
-
-            // Assert
-            Assert.That(result, Is.EqualTo(expectedResponse));
-        }
-
-        [Test]
-        public void GetReleaseInfoByReleaseId_SetsExitCodeAndLogsError_WhenHttpRequestExceptionIsThrown()
-        {
-            // Arrange
-            var mockFacade = new Mock<LCT.Facade.Interfaces.ISW360ApicommunicationFacade>(); // Use the correct ISW360ApiCommunicationFacade type
-            mockFacade.Setup(x => x.GetReleaseById(It.IsAny<string>())).ThrowsAsync(new HttpRequestException()); // Make sure ISW360ApiCommunicationFacade has a GetReleaseById method
-
-            var service = new Sw360Service(mockFacade.Object);
-
-            var releaseLink = "TestReleaseLink";
-
-            // Act and Assert
-            Assert.ThrowsAsync<HttpRequestException>(async () => await service.GetReleaseInfoByReleaseId(releaseLink));
-            Assert.That(Environment.ExitCode, Is.EqualTo(-1));
-            // Verify that Logger.Error was called
-        }
-        [Test]
-        public async Task GetComponentReleaseID_ReturnsExpectedReleaseId_WhenCalledWithComponentNameAndVersion()
-        {
-            // Arrange
-            var mockFacade = new Mock<LCT.Facade.Interfaces.ISW360ApicommunicationFacade>(); // Use the correct ISW360ApiCommunicationFacade type
-            var expectedResponse = "{...}"; // Replace with your actual JSON response
-            mockFacade.Setup(x => x.GetReleaseByCompoenentName(It.IsAny<string>())).ReturnsAsync(expectedResponse); // Make sure ISW360ApiCommunicationFacade has a GetReleaseByCompoenentName method
-
-            var service = new Sw360Service(mockFacade.Object);
-
-            var componentName = "TestComponentName";
-            var version = "TestVersion";
-
-            var expectedReleaseId = "TestReleaseId"; // Replace with your actual release ID
-
-            // Act
-            var result = await service.GetComponentReleaseID(componentName, version);
-
-            // Assert
-            Assert.That(result, Is.EqualTo(expectedReleaseId));
         }
     }
 }
