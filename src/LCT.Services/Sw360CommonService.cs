@@ -216,10 +216,12 @@ namespace LCT.Services
         {
             Dictionary<int, Sw360Releases> releaseCollection = new Dictionary<int, Sw360Releases>();
 
+            Logger.Debug($"GetReleaseExistStatus(): Release Name : {name}");
             foreach (var release in sw360releasesdata)
             {
                 string packageUrl = string.Empty;
                 packageUrl = GetPackageUrlValue(externlaIdKey, release, packageUrl);
+                Logger.Debug($"GetReleaseExistStatus(): Checking against.. : {name} X {release.Name}");
                 try
                 {
                     var purlids = JsonConvert.DeserializeObject<List<string>>(packageUrl);
@@ -243,8 +245,8 @@ namespace LCT.Services
                 }
             }
             Releasestatus releasestatus = new Releasestatus();
-
             releasestatus.sw360Releases = releaseCollection[releaseCollection.Keys.Max()];
+            Logger.Debug($"GetReleaseExistStatus(): Release Name : {name} selected {releasestatus.sw360Releases?.Name} \n");
             releasestatus.isReleaseExist = !string.IsNullOrEmpty(releasestatus.sw360Releases?.ExternalIds?.Package_Url) || !string.IsNullOrEmpty(releasestatus.sw360Releases?.ExternalIds?.Purl_Id);
 
             return releasestatus;
@@ -255,10 +257,12 @@ namespace LCT.Services
         {
             Dictionary<int, Sw360Components> componentCollection = new Dictionary<int, Sw360Components>();
 
+            Logger.Debug($"GetComponentExistStatus(): Component Name : {name}");
             foreach (var componentsData in sw360components)
             {
                 string packageUrl = string.Empty;
                 packageUrl = GetPackageUrlValue(externlaIdKey, componentsData, packageUrl);
+                Logger.Debug($"GetComponentExistStatus(): Component Name : {name} from {packageUrl}");
                 try
                 {
                     var purlids = JsonConvert.DeserializeObject<List<string>>(packageUrl);
@@ -284,6 +288,7 @@ namespace LCT.Services
             ComponentStatus component = new ComponentStatus();
 
             component.Sw360components = componentCollection[componentCollection.Keys.Max()];
+            Logger.Debug($"GetComponentExistStatus(): Component Name : {name} selected {component.Sw360components?.Name} \n");
             component.isComponentExist = !string.IsNullOrEmpty(component.Sw360components?.ExternalIds?.Package_Url) || !string.IsNullOrEmpty(component.Sw360components?.ExternalIds?.Purl_Id);
             return component;
 
