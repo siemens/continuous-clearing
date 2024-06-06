@@ -137,22 +137,7 @@ namespace LCT.Services.UTest
             Assert.That(actual.isReleaseExist, Is.False);
         }
 
-        //[Test]
-        //public async Task GetReleaseIdByComponentId_PassComponentId_ReturnsReleaseId()
-        //{
-        //    // Arrange
-        //    var releaseIdOfComponent = GetReleaseIdOfCompnentObject();
-        //    var releaseIdOfComponentSerialized = JsonConvert.SerializeObject(releaseIdOfComponent);
-        //    sw360ApiCommunicationFacade.Setup(
-        //        x => x.GetReleaseOfComponentById(It.IsAny<string>())).ReturnsAsync(releaseIdOfComponentSerialized);
-
-        //    // Act
-        //    var actual = await sW360CommonService.GetReleaseIdByComponentId("uiweriwfoowefih87398r3ur837489", "1.0.0");
-
-        //    // Assert
-        //    Assert.That(actual, Is.EqualTo("uiweriwfoowefih87398r3ur093u0"));
-        //}
-
+     
         [Test]
         public async Task GetReleaseIdByComponentId_PassComponentId_ThrowsHttpRequestException()
         {
@@ -222,5 +207,66 @@ namespace LCT.Services.UTest
                 { "uiweriwfoowefih87398r3ur093u0", new List<string> { "1.0.0" } }
             };
         }
+        [Test]
+        public async Task GetComponentDataByExternalId_WithValidComponentExternalId_ReturnsComponentStatus()
+        {
+            // Arrange
+            var componentList = CreateComponentList();
+            var componentsModel = new ComponentsModel { Embedded = new ComponentEmbedded { Sw360components = componentList } };
+            var componentsModelSerialized = JsonConvert.SerializeObject(componentsModel);
+            var httpResponseMessage = CreateHttpResponseMessage(componentsModelSerialized);
+
+            sw360ApiCommunicationFacade.Setup(
+                x => x.GetComponentByExternalId(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
+
+            // Act
+            var actual = await sW360CommonService.GetComponentDataByExternalId("zone.js", "pkg:npm/zone.js");
+
+            // Assert
+            Assert.That(actual, Is.Not.Null);
+            Assert.That(actual.isComponentExist, Is.True);
+            Assert.That(actual.Sw360components.Name, Is.EqualTo("Zone.js"));
+        }
+
+        [Test]
+        public async Task GetComponentDataByExternalId_WithEmptyComponentList_ReturnsComponentStatus()
+        {
+            // Arrange
+            var componentsModel = new ComponentsModel { Embedded = new ComponentEmbedded { Sw360components = new List<Sw360Components>() } };
+            var componentsModelSerialized = JsonConvert.SerializeObject(componentsModel);
+            var httpResponseMessage = CreateHttpResponseMessage(componentsModelSerialized);
+
+            sw360ApiCommunicationFacade.Setup(
+                x => x.GetComponentByExternalId(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
+
+            // Act
+            var actual = await sW360CommonService.GetComponentDataByExternalId("zone.js", "pkg:npm/zone.js");
+
+            // Assert
+            Assert.That(actual, Is.Not.Null);
+            Assert.That(actual.isComponentExist, Is.False);
+        }
+
+        [Test]
+        public async Task GetComponentDataByExternalId_WithDifferentExternalIdKey_ReturnsComponentStatus()
+        {
+            // Arrange
+            var componentList = CreateComponentList();
+            var componentsModel = new ComponentsModel { Embedded = new ComponentEmbedded { Sw360components = componentList } };
+            var componentsModelSerialized = JsonConvert.SerializeObject(componentsModel);
+            var httpResponseMessage = CreateHttpResponseMessage(componentsModelSerialized);
+
+            sw360ApiCommunicationFacade.Setup(
+                x => x.GetComponentByExternalId(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
+
+            // Act
+            var actual = await sW360CommonService.GetComponentDataByExternalId("zone.js", "pkg:npm/zone.js?package-url=");
+
+            // Assert
+            Assert.That(actual, Is.Not.Null);
+            Assert.That(actual.isComponentExist, Is.True);
+            Assert.That(actual.Sw360components.Name, Is.EqualTo("Zone.js"));
+        }
+
     }
 }
