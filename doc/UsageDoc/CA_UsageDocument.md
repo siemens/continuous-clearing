@@ -180,7 +180,7 @@ Currently LTA support is not provided for SBOM, hence until that is implemented 
       
       - **Project Type :** **Nuget**
       
-          * .Net core/.Net standard type project's input file repository should contain **package.lock.json** file. If not present do a `dotnet restore --use-lock-file`.
+          * .Net core/.Net standard type project's input file repository should contain **project.assets.json** file. If not present do a `dotnet restore`.
           
           * .Net Framework projects, input file repository should contain a **packages.config** file.
 
