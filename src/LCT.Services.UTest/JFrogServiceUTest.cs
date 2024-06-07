@@ -230,5 +230,70 @@ namespace LCT.Services.UTest
             // Assert
             Assert.Null(actual);
         }
+        [Test]
+        public async Task CheckJFrogConnectivity_Returns_SuccessResponse()
+        {
+            // Arrange
+            HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK);
+
+            Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade = new Mock<IJfrogAqlApiCommunicationFacade>();
+            mockJfrogApiComFacade
+                .Setup(x => x.CheckConnection())
+                .ReturnsAsync(httpResponseMessage);
+
+            // Act
+            IJFrogService jFrogService = new JFrogService(mockJfrogApiComFacade.Object);
+            HttpResponseMessage actualResponse = await jFrogService.CheckJFrogConnectivity();
+
+            // Assert
+            Assert.That(actualResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        }
+
+        [Test]
+        public async Task CheckJFrogConnectivity_Returns_UnsuccessfulResponse()
+        {
+            // Arrange
+            HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.BadRequest);
+
+            Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade = new Mock<IJfrogAqlApiCommunicationFacade>();
+            mockJfrogApiComFacade
+                .Setup(x => x.CheckConnection())
+                .ReturnsAsync(httpResponseMessage);
+
+            // Act
+            IJFrogService jFrogService = new JFrogService(mockJfrogApiComFacade.Object);
+            HttpResponseMessage actualResponse = await jFrogService.CheckJFrogConnectivity();
+
+            // Assert
+            Assert.That(actualResponse.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+        }
+
+        [Test]
+        public async Task CheckJFrogConnectivity_Throws_HttpRequestException()
+        {
+            // Arrange
+            Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade = new Mock<IJfrogAqlApiCommunicationFacade>();
+            mockJfrogApiComFacade
+                .Setup(x => x.CheckConnection())
+                .Throws<HttpRequestException>();
+
+            // Act & Assert
+            IJFrogService jFrogService = new JFrogService(mockJfrogApiComFacade.Object);
+            Assert.ThrowsAsync<HttpRequestException>(async () => await jFrogService.CheckJFrogConnectivity());
+        }
+
+        [Test]
+        public async Task CheckJFrogConnectivity_Throws_TaskCanceledException()
+        {
+            // Arrange
+            Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade = new Mock<IJfrogAqlApiCommunicationFacade>();
+            mockJfrogApiComFacade
+                .Setup(x => x.CheckConnection())
+                .Throws<TaskCanceledException>();
+
+            // Act & Assert
+            IJFrogService jFrogService = new JFrogService(mockJfrogApiComFacade.Object);
+            Assert.ThrowsAsync<TaskCanceledException>(async () => await jFrogService.CheckJFrogConnectivity());
+        }
     }
 }
