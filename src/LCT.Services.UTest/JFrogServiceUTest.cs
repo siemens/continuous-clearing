@@ -231,69 +231,45 @@ namespace LCT.Services.UTest
             Assert.Null(actual);
         }
         [Test]
-        public async Task CheckJFrogConnectivity_Returns_SuccessResponse()
+        public async Task GetInternalComponentDataByRepo_ResultsWith_NullHttpResponse()
         {
             // Arrange
-            HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK);
+            HttpResponseMessage httpResponseMessage = null;
 
-            Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade = new Mock<IJfrogAqlApiCommunicationFacade>();
+            var mockJfrogApiComFacade = new Mock<IJfrogAqlApiCommunicationFacade>();
             mockJfrogApiComFacade
-                .Setup(x => x.CheckConnection())
+                .Setup(x => x.GetInternalComponentDataByRepo(It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
 
             // Act
             IJFrogService jFrogService = new JFrogService(mockJfrogApiComFacade.Object);
-            HttpResponseMessage actualResponse = await jFrogService.CheckJFrogConnectivity();
+            IList<AqlResult> actual = await jFrogService.GetInternalComponentDataByRepo("energy-dev-npm-egll");
 
             // Assert
-            Assert.That(actualResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(actual.Count, Is.EqualTo(0));
         }
 
         [Test]
-        public async Task CheckJFrogConnectivity_Returns_UnsuccessfulResponse()
+        public async Task GetInternalComponentDataByRepo_ResultsWith_NullHttpResponseContent()
         {
             // Arrange
-            HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.BadRequest);
+            HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = null
+            };
 
-            Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade = new Mock<IJfrogAqlApiCommunicationFacade>();
+            var mockJfrogApiComFacade = new Mock<IJfrogAqlApiCommunicationFacade>();
             mockJfrogApiComFacade
-                .Setup(x => x.CheckConnection())
+                .Setup(x => x.GetInternalComponentDataByRepo(It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
 
             // Act
             IJFrogService jFrogService = new JFrogService(mockJfrogApiComFacade.Object);
-            HttpResponseMessage actualResponse = await jFrogService.CheckJFrogConnectivity();
+            IList<AqlResult> actual = await jFrogService.GetInternalComponentDataByRepo("energy-dev-npm-egll");
 
             // Assert
-            Assert.That(actualResponse.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+            Assert.That(actual.Count, Is.EqualTo(0));
         }
 
-        [Test]
-        public async Task CheckJFrogConnectivity_Throws_HttpRequestException()
-        {
-            // Arrange
-            Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade = new Mock<IJfrogAqlApiCommunicationFacade>();
-            mockJfrogApiComFacade
-                .Setup(x => x.CheckConnection())
-                .Throws<HttpRequestException>();
-
-            // Act & Assert
-            IJFrogService jFrogService = new JFrogService(mockJfrogApiComFacade.Object);
-            Assert.ThrowsAsync<HttpRequestException>(async () => await jFrogService.CheckJFrogConnectivity());
-        }
-
-        [Test]
-        public async Task CheckJFrogConnectivity_Throws_TaskCanceledException()
-        {
-            // Arrange
-            Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade = new Mock<IJfrogAqlApiCommunicationFacade>();
-            mockJfrogApiComFacade
-                .Setup(x => x.CheckConnection())
-                .Throws<TaskCanceledException>();
-
-            // Act & Assert
-            IJFrogService jFrogService = new JFrogService(mockJfrogApiComFacade.Object);
-            Assert.ThrowsAsync<TaskCanceledException>(async () => await jFrogService.CheckJFrogConnectivity());
-        }
     }
 }

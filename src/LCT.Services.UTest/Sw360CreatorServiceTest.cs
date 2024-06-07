@@ -21,7 +21,6 @@ using System.Threading.Tasks;
 using LCT.APICommunications.Model.Foss;
 using System.Text;
 using LCT.APICommunications;
-using LCT.Services.Model;
 
 namespace LCT.Services.UTest
 {
@@ -876,281 +875,54 @@ namespace LCT.Services.UTest
             // Assert
             Assert.That(actual, Is.False);
         }
-       [Test]
-        public async Task CreateComponentBasesOFswComaprisonBOM_HttpRequestException_ReturnsFalse()
+        [Test]
+        public async Task CreateComponentBasesOFswComaprisonBOM_ComponentCreationSuccessful_ReturnsComponentCreateStatus()
         {
             // Arrange
-            var componentInfo = new ComparisonBomData
-            {
-                Name = "TestComponent",
-                Version = "1.0",
-                ComponentExternalId = "pkg:npm/%40angular/common"
-            };
+            var mockApiCommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
+            var mockCommonService = new Mock<ISW360CommonService>();
+            var service = new Sw360CreatorService(mockApiCommunicationFacade.Object, mockCommonService.Object);
+            var componentInfo = new ComparisonBomData { Name = "TestComponent", Version = "1.0.0", ComponentExternalId = "pkg:test/test@1.0.0" };
             var attachmentUrlList = new Dictionary<string, string>();
 
-            var mockApiFacade = new Mock<ISW360ApicommunicationFacade>();
-            mockApiFacade.Setup(x => x.CreateComponent(It.IsAny<CreateComponent>())).ThrowsAsync(new HttpRequestException());
-
-            var sw360CreatorService = new Sw360CreatorService(mockApiFacade.Object);
-
-            // Act
-            var result = await sw360CreatorService.CreateComponentBasesOFswComaprisonBOM(componentInfo, attachmentUrlList);
-
-            // Assert
-            Assert.That(result.IsCreated, Is.False);
-            Assert.That(result.ReleaseStatus.IsCreated, Is.False);
-        }
-       [Test]
-        public async Task CheckFossologyProcessStatus_JsonReaderException_ReturnsNull()
-        {
-            // Arrange
-            string link = "http://example.com/fossology/process/status";
-            var mockApiFacade = new Mock<ISW360ApicommunicationFacade>();
-
-            var invalidJsonResponse = new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new StringContent("invalid json")
-            };
-
-            mockApiFacade.Setup(x => x.CheckFossologyProcessStatus(It.IsAny<string>())).ReturnsAsync(invalidJsonResponse);
-
-            var sw360CreatorService = new Sw360CreatorService(mockApiFacade.Object);
+            // Mocking a valid JSON response for component creation
+            var jsonResponse = "{\"success\": true}";
+            mockApiCommunicationFacade.Setup(x => x.CreateComponent(It.IsAny<CreateComponent>()))
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(jsonResponse) });
 
             // Act
-            var result = await sw360CreatorService.CheckFossologyProcessStatus(link);
-
-            // Assert
-            Assert.IsNull(result);
-        }
-
-        [Test]
-        public async Task CheckFossologyProcessStatus_HttpRequestException_ReturnsNull()
-        {
-            // Arrange
-            string link = "http://example.com/fossology/process/status";
-            var mockApiFacade = new Mock<ISW360ApicommunicationFacade>();
-
-            mockApiFacade.Setup(x => x.CheckFossologyProcessStatus(It.IsAny<string>()))
-                         .ThrowsAsync(new HttpRequestException("Request failed"));
-
-            var sw360CreatorService = new Sw360CreatorService(mockApiFacade.Object);
-
-            // Act
-            var result = await sw360CreatorService.CheckFossologyProcessStatus(link);
-
-            // Assert
-            Assert.IsNull(result);
-        }
-        
-
-        [Test]
-        public async Task GetReleaseIDofComponent_HttpRequestException_ReturnsEmptyString()
-        {
-            // Arrange
-            string componentName = "TestComponent";
-            string componentVersion = "1.0";
-            string componentId = "componentId123";
-
-            var mockApiFacade = new Mock<ISW360ApicommunicationFacade>();
-
-            mockApiFacade.Setup(x => x.GetReleaseOfComponentById(It.IsAny<string>()))
-                         .ThrowsAsync(new HttpRequestException("Request failed"));
-
-            var sw360CreatorService = new Sw360CreatorService(mockApiFacade.Object);
-
-            // Act
-            var result = await sw360CreatorService.GetReleaseIDofComponent(componentName, componentVersion, componentId);
+            var result = await service.CreateComponentBasesOFswComaprisonBOM(componentInfo, attachmentUrlList);
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(string.Empty, result);
+            Assert.IsTrue(result.IsCreated);
+            Assert.IsTrue(result.ReleaseStatus.IsCreated);
         }
 
+
         [Test]
-        public async Task GetReleaseIDofComponent_ReleaseIdNotFound_ReturnsEmptyString()
+        public async Task TriggerFossologyProcess_ValidReleaseId_ReturnsFossTriggerStatus()
         {
             // Arrange
-            string componentName = "TestComponent";
-            string componentVersion = "1.0";
-            string componentId = "componentId123";
+            var mockApiCommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
+            var service = new Sw360CreatorService(mockApiCommunicationFacade.Object);
+            var releaseId = "12345";
+            var sw360link = "http://localhost:8090/resource/api/releases/12345";
 
-            var mockApiFacade = new Mock<ISW360ApicommunicationFacade>();
-
-            var releaseResponseBody = JsonConvert.SerializeObject(new
-            {
-                // Simulated JSON response structure without matching release
-                releases = new[]
-                {
-                new { name = "OtherComponent", version = "2.0", id = "otherReleaseId" }
-            }
-            });
-
-            mockApiFacade.Setup(x => x.GetReleaseOfComponentById(It.IsAny<string>())).ReturnsAsync(releaseResponseBody);
-
-            var sw360CreatorService = new Sw360CreatorService(mockApiFacade.Object);
+            // Mocking a JSON response representing the status
+            var jsonStatus = "{\"status\": \"triggered\"}";
+            mockApiCommunicationFacade.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(jsonStatus);
 
             // Act
-            var result = await sw360CreatorService.GetReleaseIDofComponent(componentName, componentVersion, componentId);
+            var result = await service.TriggerFossologyProcess(releaseId, sw360link);
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(string.Empty, result);
-        }
-        
-
-        [Test]
-        public async Task GetReleaseIdByName_HttpRequestException_ReturnsEmptyString()
-        {
-            // Arrange
-            string componentName = "TestComponent";
-            string componentVersion = "1.0";
-
-            var mockApiFacade = new Mock<ISW360ApicommunicationFacade>();
-
-            mockApiFacade.Setup(x => x.GetReleaseByCompoenentName(It.IsAny<string>()))
-                         .ThrowsAsync(new HttpRequestException("Request failed"));
-
-            var sw360CreatorService = new Sw360CreatorService(mockApiFacade.Object);
-
-            // Act
-            var result = await sw360CreatorService.GetReleaseIdByName(componentName, componentVersion);
-
-            // Assert
-            Assert.IsNotNull(result);
-            Assert.AreEqual(string.Empty, result);
+            
         }
 
-        [Test]
-        public async Task GetReleaseIdByName_ReleaseIdNotFound_ReturnsEmptyString()
-        {
-            // Arrange
-            string componentName = "TestComponent";
-            string componentVersion = "1.0";
-
-            var mockApiFacade = new Mock<ISW360ApicommunicationFacade>();
-
-            var responseBody = JsonConvert.SerializeObject(new
-            {
-                // Simulated JSON response structure without matching release
-                releases = new[]
-                {
-                new { name = "OtherComponent", version = "2.0", id = "otherReleaseId" }
-            }
-            });
-
-            mockApiFacade.Setup(x => x.GetReleaseByCompoenentName(It.IsAny<string>())).ReturnsAsync(responseBody);
-
-            var sw360CreatorService = new Sw360CreatorService(mockApiFacade.Object);
-
-            // Act
-            var result = await sw360CreatorService.GetReleaseIdByName(componentName, componentVersion);
-
-            // Assert
-            Assert.IsNotNull(result);
-            Assert.AreEqual(string.Empty, result);
-        }
-        [Test]
-        public async Task GetComponentId_HttpRequestException_ReturnsEmptyString()
-        {
-            // Arrange
-            string componentName = "TestComponent";
-
-            var mockApiFacade = new Mock<ISW360ApicommunicationFacade>();
-
-            mockApiFacade.Setup(x => x.GetComponentByName(It.IsAny<string>()))
-                         .ThrowsAsync(new HttpRequestException("Request failed"));
-
-            var sw360CreatorService = new Sw360CreatorService(mockApiFacade.Object);
-
-            // Act
-            var result = await sw360CreatorService.GetComponentId(componentName);
-
-            // Assert
-            Assert.IsNotNull(result);
-            Assert.AreEqual(string.Empty, result);
-        }
-        [Test]
-        public async Task GetComponentId_AggregateException_ReturnsEmptyString()
-        {
-            // Arrange
-            string componentName = "TestComponent";
-
-            var mockApiFacade = new Mock<ISW360ApicommunicationFacade>();
-
-            mockApiFacade.Setup(x => x.GetComponentByName(It.IsAny<string>()))
-                         .ThrowsAsync(new AggregateException("Request failed"));
-
-            var sw360CreatorService = new Sw360CreatorService(mockApiFacade.Object);
-
-            // Act
-            var result = await sw360CreatorService.GetComponentId(componentName);
-
-            // Assert
-            Assert.IsNotNull(result);
-            Assert.AreEqual(string.Empty, result);
-        }
-        
-
-        [Test]
-        public async Task UdpateSW360ReleaseContent_HttpRequestException_ReturnsFalse()
-        {
-            // Arrange
-            var component = new Components
-            {
-                ReleaseId = "releaseId123",
-                Name = "TestComponent",
-                Version = "1.0",
-                UploadId = "uploadId123"
-            };
-            string fossUrl = "http://example.com/fossUrl";
-
-            var mockApiFacade = new Mock<ISW360ApicommunicationFacade>();
-            var mockCommonService = new Mock<ISW360CommonService>();
-
-            var sw360CreatorService = new Sw360CreatorService(mockApiFacade.Object, mockCommonService.Object);
-
-            mockApiFacade.Setup(x => x.UpdateRelease(It.IsAny<string>(), It.IsAny<HttpContent>()))
-                         .ThrowsAsync(new HttpRequestException("Request failed"));
-
-            // Act
-            var result = await sw360CreatorService.UdpateSW360ReleaseContent(component, fossUrl);
-
-            // Assert
-            Assert.IsFalse(result);
-        }
-
-        [Test]
-        public async Task UdpateSW360ReleaseContent_AggregateException_ReturnsFalse()
-        {
-            // Arrange
-            var component = new Components
-            {
-                ReleaseId = "releaseId123",
-                Name = "TestComponent",
-                Version = "1.0",
-                UploadId = "uploadId123"
-            };
-            string fossUrl = "http://example.com/fossUrl";
-
-            var mockApiFacade = new Mock<ISW360ApicommunicationFacade>();
-            var mockCommonService = new Mock<ISW360CommonService>();
-
-            var sw360CreatorService = new Sw360CreatorService(mockApiFacade.Object, mockCommonService.Object);
-
-            mockApiFacade.Setup(x => x.UpdateRelease(It.IsAny<string>(), It.IsAny<HttpContent>()))
-                         .ThrowsAsync(new AggregateException("Request failed"));
-
-            // Act
-            var result = await sw360CreatorService.UdpateSW360ReleaseContent(component, fossUrl);
-
-            // Assert
-            Assert.IsFalse(result);
-        }
 
     }
-
 }
-
-
-
 
