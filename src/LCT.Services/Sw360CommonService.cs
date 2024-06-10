@@ -23,6 +23,7 @@ namespace LCT.Services
     /// <summary>
     /// The class SW360CommonService provides the common services
     /// </summary>
+    /// [ExcludeFromCodeCoverage]
     public class SW360CommonService : ISW360CommonService
     {
 
