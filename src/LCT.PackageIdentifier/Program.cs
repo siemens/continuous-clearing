@@ -47,7 +47,7 @@ namespace LCT.PackageIdentifier
                 m_Verbose = true;
             ISettingsManager settingsManager = new SettingsManager();
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
-
+            ProjectReleases projectReleases = new ProjectReleases();
             string FolderPath = LogFolderInitialisation(appSettings);
 
             settingsManager.CheckRequiredArgsToRun(appSettings, "Identifer");
@@ -64,7 +64,7 @@ namespace LCT.PackageIdentifier
                 Logger.Logger.Log(null, Level.Alert, $"Package Identifier is running in TEST mode \n", null);
 
             // Validate application settings
-            await ValidateAppsettingsFile(appSettings);
+            await ValidateAppsettingsFile(appSettings,projectReleases);
 
             Logger.Logger.Log(null, Level.Notice, $"Input Parameters used in Package Identifier:\n\t" +
                 $"PackageFilePath\t\t --> {appSettings.PackageFilePath}\n\t" +
@@ -88,7 +88,7 @@ namespace LCT.PackageIdentifier
             //Validating JFrog Settings
             if (await bomCreator.CheckJFrogConnection())
             {
-                await bomCreator.GenerateBom(appSettings, new BomHelper(), new FileOperations());
+                await bomCreator.GenerateBom(appSettings, new BomHelper(), new FileOperations(),projectReleases);
             }
             Logger.Logger.Log(null, Level.Notice, $"End of Package Identifier execution : {DateTime.Now}\n", null);
         }
@@ -107,7 +107,7 @@ namespace LCT.PackageIdentifier
             return jFrogService;
         }
 
-        private static async Task ValidateAppsettingsFile(CommonAppSettings appSettings)
+        private static async Task ValidateAppsettingsFile(CommonAppSettings appSettings, ProjectReleases projectReleases)
         {
             SW360ConnectionSettings sw360ConnectionSettings = new SW360ConnectionSettings()
             {
@@ -118,7 +118,7 @@ namespace LCT.PackageIdentifier
                 Timeout = appSettings.TimeOut
             };
             ISw360ProjectService sw360ProjectService = new Sw360ProjectService(new SW360ApicommunicationFacade(sw360ConnectionSettings));
-            await BomValidator.ValidateAppSettings(appSettings, sw360ProjectService);
+            await BomValidator.ValidateAppSettings(appSettings, sw360ProjectService,projectReleases);
         }
 
         private static string LogFolderInitialisation(CommonAppSettings appSettings)

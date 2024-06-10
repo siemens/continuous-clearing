@@ -32,12 +32,13 @@ namespace LCT.Services.UTest
     public async Task GetProjectNameByProjectIDFromSW360_InvalidSW360Credentials_HttpRequestException_ReturnsProjectNameAsEmpty()
     {
       // Arrange
+      ProjectReleases projectReleases=new ProjectReleases();
       Mock<ISW360ApicommunicationFacade> sw360ApicommunicationFacadeMck = new Mock<ISW360ApicommunicationFacade>();
       sw360ApicommunicationFacadeMck.Setup(x => x.GetProjectById(It.IsAny<string>())).Throws<HttpRequestException>();
       ISw360ProjectService sw360ProjectService = new Sw360ProjectService(sw360ApicommunicationFacadeMck.Object);
 
       // Act
-      var actualProjectName = await sw360ProjectService.GetProjectNameByProjectIDFromSW360("shdjdkhsdfdkfhdhifsodo", "TestProject");
+      var actualProjectName = await sw360ProjectService.GetProjectNameByProjectIDFromSW360("shdjdkhsdfdkfhdhifsodo", "TestProject",projectReleases);
 
       // Assert
       Assert.That(actualProjectName, Is.EqualTo(string.Empty), "GetProjectNameByProjectIDFromSW360 does not return empty on exception");
@@ -46,13 +47,14 @@ namespace LCT.Services.UTest
     [Test]
     public async Task GetProjectNameByProjectIDFromSW360_InvalidSW360Credentials_AggregateException_ReturnsProjectNameAsEmpty()
     {
-      // Arrange
+            // Arrange
+      ProjectReleases projectReleases = new ProjectReleases();
       Mock<ISW360ApicommunicationFacade> sw360ApicommunicationFacadeMck = new Mock<ISW360ApicommunicationFacade>();
       sw360ApicommunicationFacadeMck.Setup(x => x.GetProjectById(It.IsAny<string>())).Throws<AggregateException>();
       ISw360ProjectService sw360ProjectService = new Sw360ProjectService(sw360ApicommunicationFacadeMck.Object);
 
       // Act
-      var actualProjectName = await sw360ProjectService.GetProjectNameByProjectIDFromSW360("shdjdkhsdfdkfhdhifsodo", "TestProject");
+      var actualProjectName = await sw360ProjectService.GetProjectNameByProjectIDFromSW360("shdjdkhsdfdkfhdhifsodo", "TestProject", projectReleases);
 
       // Assert
       Assert.That(actualProjectName, Is.EqualTo(string.Empty), "GetProjectNameByProjectIDFromSW360 does not return empty on exception");
@@ -70,7 +72,7 @@ namespace LCT.Services.UTest
       ISw360ProjectService sw360ProjectService = new Sw360ProjectService(sw360ApicommunicationFacadeMck.Object);
 
       // Act
-      var actualProjectName = await sw360ProjectService.GetProjectNameByProjectIDFromSW360("shdjdkhsdfdkfhdhifsodo", "TestProject");
+      var actualProjectName = await sw360ProjectService.GetProjectNameByProjectIDFromSW360("shdjdkhsdfdkfhdhifsodo", "TestProject",projectsMapper);
 
       // Assert
       Assert.That(actualProjectName, Is.EqualTo(string.Empty), "Project Id not exist");
@@ -93,7 +95,7 @@ namespace LCT.Services.UTest
       ISw360ProjectService sw360ProjectService = new Sw360ProjectService(sw360ApicommunicationFacadeMck.Object);
 
       // Act
-      var actualProjectName = await sw360ProjectService.GetProjectNameByProjectIDFromSW360("2c0a03b6d4edaf1b2ccdf64d0d0004f7", "TestProject");
+      var actualProjectName = await sw360ProjectService.GetProjectNameByProjectIDFromSW360("2c0a03b6d4edaf1b2ccdf64d0d0004f7", "TestProject",projectsMapper);
 
       // Assert
       Assert.That(actualProjectName, Is.EqualTo(expectedName), "Project Id not exist");

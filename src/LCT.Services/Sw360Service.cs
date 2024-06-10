@@ -59,20 +59,21 @@ namespace LCT.Services
             {
                 Sw360ServiceStopWatch.Start();
                 string responseBody = await m_SW360ApiCommunicationFacade.GetReleases();
-                if (string.IsNullOrWhiteSpace(responseBody))
-                {
-                    Logger.Warn("Available release list found empty from the SW360 Server!");
-                }
-
                 Sw360ServiceStopWatch.Stop();
                 Logger.Debug($"GetAvailableReleasesInSw360():Time taken to in GetReleases() call" +
                     $"-{TimeSpan.FromMilliseconds(Sw360ServiceStopWatch.ElapsedMilliseconds).TotalSeconds}");
 
                 var modelMappedObject = JsonConvert.DeserializeObject<ComponentsRelease>(responseBody);
 
-                if (modelMappedObject != null)
+                if (modelMappedObject != null && modelMappedObject.Embedded?.Sw360Releases?.Count > 0)
                 {
                     availableComponentsList = await GetAvailableComponenentsList(modelMappedObject.Embedded?.Sw360Releases, listOfComponentsToBom);
+                }
+                else
+                {
+                    Logger.Debug("GetAvailableReleasesInSw360() : Releases list found empty from the SW360 Server !!");
+                    Logger.Error("SW360 server is not accessible while getting All Releases,Please wait for sometime and re run the pipeline again");
+                    Environment.Exit(-1);
                 }
             }
             catch (HttpRequestException ex)

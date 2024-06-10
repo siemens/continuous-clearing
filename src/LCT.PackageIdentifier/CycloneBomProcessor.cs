@@ -5,11 +5,14 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Common.Constants;
 using log4net;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Security.Policy;
 using static CycloneDX.Models.ExternalReference;
 
 namespace LCT.PackageIdentifier
@@ -19,28 +22,50 @@ namespace LCT.PackageIdentifier
 
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        public static Bom SetMetadataInComparisonBOM(Bom bom, CommonAppSettings appSettings)
+        public static Bom SetMetadataInComparisonBOM(Bom bom, CommonAppSettings appSettings, ProjectReleases projectReleases)
         {
             Logger.Debug("Starting to add metadata info into the BOM");
 
             List<Tool> tools = new List<Tool>();
+            List<Component> components = new List<Component>();
             Tool tool = new Tool
             {
                 Name = "Clearing Automation Tool",
                 Version = appSettings.CaVersion,
-                Vendor = "Siemens AG"
+                Vendor = "Siemens AG",
+                ExternalReferences = new List<ExternalReference>() { new ExternalReference { Url = "https://github.com/siemens/continuous-clearing", Type = ExternalReference.ExternalReferenceType.Website } }
+
             };
             tools.Add(tool);
+            Tool SiemensSBOM = new Tool
+            {
+                Name = "Siemens SBOM",
+                Version = "2.0.0",
+                Vendor = "Siemens AG",
+                ExternalReferences = new List<ExternalReference>() { new ExternalReference { Url = "https://sbom.siemens.io/", Type = ExternalReference.ExternalReferenceType.Website } }
+            };
+            tools.Add(SiemensSBOM);
+            Component component = new Component
+            {
+                Name = appSettings.SW360ProjectName,
+                Version = projectReleases.Version,
+                Type = Component.Classification.Application
+            };
+            components.Add(component);
 
             if (bom.Metadata != null)
             {
                 bom.Metadata.Tools.AddRange(tools);
+                bom.Metadata.Component.Name = component.Name;
+                bom.Metadata.Component.Version = component.Version;
+                bom.Metadata.Component.Type = component.Type;
             }
             else
             {
                 bom.Metadata = new Metadata
                 {
-                    Tools = tools
+                    Tools = tools,
+                    Component = component
                 };
             }
             return bom;

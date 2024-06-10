@@ -4,6 +4,7 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
@@ -48,10 +49,11 @@ namespace LCT.SW360PackageCreator
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
             ISW360ApicommunicationFacade sW360ApicommunicationFacade;
             ISw360ProjectService sw360ProjectService= Getsw360ProjectServiceObject(appSettings, out sW360ApicommunicationFacade);
+            ProjectReleases projectReleases = new ProjectReleases();
             
             string FolderPath = InitiateLogger(appSettings);
             settingsManager.CheckRequiredArgsToRun(appSettings, "Creator");
-            await CreatorValidator.ValidateAppSettings(appSettings, sw360ProjectService);
+            await CreatorValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
 
             Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Package creator >>>>>====================", null);
             Logger.Logger.Log(null, Level.Notice, $"\nStart of Package creator execution : {DateTime.Now}", null);

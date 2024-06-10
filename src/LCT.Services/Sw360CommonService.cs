@@ -54,7 +54,15 @@ namespace LCT.Services
         public async Task<ComponentStatus> GetComponentDataByExternalId(string componentName, string componentExternalId)
         {
             Logger.Debug($"GetComponentDataByExternalId(): Component Name - {componentName}");
-            string externalIdUriString = Uri.EscapeDataString(componentExternalId);
+            string externalIdUriString;
+            if (componentExternalId.Contains(Dataconstant.PurlCheck()["NPM"]))
+            {
+                externalIdUriString = Uri.EscapeDataString(componentExternalId);
+            }
+            else
+            {
+                externalIdUriString = componentExternalId;
+            }
             ComponentStatus sw360components = new ComponentStatus();
             sw360components.isComponentExist = false;
 
@@ -113,7 +121,15 @@ namespace LCT.Services
         public async Task<Releasestatus> GetReleaseDataByExternalId(string releaseName, string releaseVersion, string releaseExternalId)
         {
             Logger.Debug($"GetReleaseDataByExternalId(): Release name - {releaseName}@{releaseVersion}");
-            string externalIdUriString = Uri.EscapeDataString(releaseExternalId);
+            string externalIdUriString;
+            if (releaseExternalId.Contains(Dataconstant.PurlCheck()["NPM"]))
+            {
+                externalIdUriString = Uri.EscapeDataString(releaseExternalId);
+            }
+            else
+            {
+                externalIdUriString = releaseExternalId;
+            }
             Releasestatus releasestatus = new Releasestatus();
 
             releasestatus.isReleaseExist = false;
@@ -200,10 +216,12 @@ namespace LCT.Services
         {
             Dictionary<int, Sw360Releases> releaseCollection = new Dictionary<int, Sw360Releases>();
 
+            Logger.Debug($"GetReleaseExistStatus(): Release Name : {name}");
             foreach (var release in sw360releasesdata)
             {
                 string packageUrl = string.Empty;
                 packageUrl = GetPackageUrlValue(externlaIdKey, release, packageUrl);
+                Logger.Debug($"GetReleaseExistStatus(): Checking against.. : {name} X {release.Name}");
                 try
                 {
                     var purlids = JsonConvert.DeserializeObject<List<string>>(packageUrl);
@@ -227,8 +245,8 @@ namespace LCT.Services
                 }
             }
             Releasestatus releasestatus = new Releasestatus();
-
             releasestatus.sw360Releases = releaseCollection[releaseCollection.Keys.Max()];
+            Logger.Debug($"GetReleaseExistStatus(): Release Name : {name} selected {releasestatus.sw360Releases?.Name} \n");
             releasestatus.isReleaseExist = !string.IsNullOrEmpty(releasestatus.sw360Releases?.ExternalIds?.Package_Url) || !string.IsNullOrEmpty(releasestatus.sw360Releases?.ExternalIds?.Purl_Id);
 
             return releasestatus;
@@ -239,10 +257,12 @@ namespace LCT.Services
         {
             Dictionary<int, Sw360Components> componentCollection = new Dictionary<int, Sw360Components>();
 
+            Logger.Debug($"GetComponentExistStatus(): Component Name : {name}");
             foreach (var componentsData in sw360components)
             {
                 string packageUrl = string.Empty;
                 packageUrl = GetPackageUrlValue(externlaIdKey, componentsData, packageUrl);
+                Logger.Debug($"GetComponentExistStatus(): Component Name : {name} from {packageUrl}");
                 try
                 {
                     var purlids = JsonConvert.DeserializeObject<List<string>>(packageUrl);
@@ -268,6 +288,7 @@ namespace LCT.Services
             ComponentStatus component = new ComponentStatus();
 
             component.Sw360components = componentCollection[componentCollection.Keys.Max()];
+            Logger.Debug($"GetComponentExistStatus(): Component Name : {name} selected {component.Sw360components?.Name} \n");
             component.isComponentExist = !string.IsNullOrEmpty(component.Sw360components?.ExternalIds?.Package_Url) || !string.IsNullOrEmpty(component.Sw360components?.ExternalIds?.Purl_Id);
             return component;
 
