@@ -32,6 +32,7 @@ namespace LCT.Services
     /// <summary>
     /// sw360 services class
     /// </summary>
+    /// [ExcludeFromCodeCoverage]
     public class Sw360Service : ISW360Service
     {
         public static Stopwatch Sw360ServiceStopWatch { get; set; }
