@@ -4,7 +4,6 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Common.Interface;
 using LCT.Services.Interface;
@@ -21,7 +20,7 @@ namespace LCT.PackageIdentifier.Interface
 
         public IBomHelper BomHelper { get; set; }
 
-        public Task GenerateBom(CommonAppSettings appSettings, IBomHelper bomHelper, IFileOperations fileOperations, ProjectReleases projectReleases);
+        public Task GenerateBom(CommonAppSettings appSettings, IBomHelper bomHelper, IFileOperations fileOperations);
 
         public Task<bool> CheckJFrogConnection();
     }

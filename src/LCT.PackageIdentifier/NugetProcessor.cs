@@ -9,14 +9,11 @@ using LCT.APICommunications;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
-using LCT.Common.Interface;
-using LCT.Common.Model;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.PackageIdentifier.Model.NugetModel;
 using LCT.Services.Interface;
 using log4net;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -30,7 +27,7 @@ using System.Xml.Linq;
 
 namespace LCT.PackageIdentifier
 {
-    public class NugetProcessor : CycloneDXBomParser, IParser
+    public class NugetProcessor : IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
@@ -46,12 +43,13 @@ namespace LCT.PackageIdentifier
         {
             Logger.Debug($"ParsePackageFile():Start");
             List<Component> listComponentForBOM = new List<Component>();
-            Bom bom = new Bom();
+            Bom bom = new Bom();            
 
             ParsingInputFileForBOM(appSettings, ref listComponentForBOM, ref bom);
             var componentsWithMultipleVersions = bom.Components.GroupBy(s => s.Name).Where(g => g.Count() > 1).SelectMany(g => g).ToList();
 
             CheckForMultipleVersions(appSettings, componentsWithMultipleVersions);
+
             Logger.Debug($"ParsePackageFile():End");
             return bom;
         }
@@ -222,10 +220,7 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in componentsForBOM)
             {
-
                 string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper);
-                string jfrogpackageName = $"{component.Name}.{component.Version}{ApiConstant.NugetExtension}";
-                var hashes = aqlResultList.FirstOrDefault(x => x.Name == jfrogpackageName);                         
                 Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoUrl, Value = repoName };
                 Component componentVal = component;
 
@@ -236,28 +231,7 @@ namespace LCT.PackageIdentifier
                 componentVal.Properties.Add(artifactoryrepo);
                 componentVal.Properties.Add(projectType);
                 componentVal.Description = string.Empty;
-                if (hashes!= null)
-                {
-                    componentVal.Hashes = new List<Hash>()
-                {
 
-                new()
-                 {
-                  Alg = Hash.HashAlgorithm.MD5,
-                  Content = hashes.MD5
-                },
-                new()
-                {
-                  Alg = Hash.HashAlgorithm.SHA_1,
-                  Content = hashes.SHA1
-                 },
-                 new()
-                 {
-                  Alg = Hash.HashAlgorithm.SHA_256,
-                  Content = hashes.SHA256
-                  }
-                  };
-                }
                 modifiedBOM.Add(componentVal);
             }
             return modifiedBOM;
@@ -415,7 +389,7 @@ namespace LCT.PackageIdentifier
             }
 
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = listComponentForBOM.Count;
-            totalComponentsIdentified = listComponentForBOM.Count;
+            totalComponentsIdentified = listComponentForBOM.Count;                        
             listComponentForBOM = KeepUniqueNonDevComponents(listComponentForBOM);
             listComponentForBOM = listComponentForBOM.Distinct(new ComponentEqualityComparer()).ToList();
             if (BomCreator.bomKpiData.DuplicateComponents == 0)
@@ -433,52 +407,8 @@ namespace LCT.PackageIdentifier
                 CycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
                 SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
             }
-
-            bom = RemoveExcludedComponents(appSettings, bom);
-        }
-
-        private static void CreateFileForMultipleVersions(List<Component> componentsWithMultipleVersions, CommonAppSettings appSettings)
-        {
-            MultipleVersions multipleVersions = new MultipleVersions();
-            IFileOperations fileOperations = new FileOperations();
-            string filename = $"{appSettings.BomFolderPath}\\{appSettings.SW360ProjectName}_{FileConstant.multipleversionsFileName}";
-            if (string.IsNullOrEmpty(appSettings.IdentifierBomFilePath) || (!File.Exists(filename)))
-            {
-                multipleVersions.Nuget = new List<MultipleVersionValues>();
-                foreach (var nugetPackage in componentsWithMultipleVersions)
-                {
-                    nugetPackage.Description = !string.IsNullOrEmpty(appSettings.CycloneDxSBomTemplatePath) ? appSettings.CycloneDxSBomTemplatePath : nugetPackage.Description;
-
-                    MultipleVersionValues jsonComponents = new MultipleVersionValues();
-                    jsonComponents.ComponentName = nugetPackage.Name;
-                    jsonComponents.ComponentVersion = nugetPackage.Version;
-                    jsonComponents.PackageFoundIn = nugetPackage.Description;
-                    multipleVersions.Nuget.Add(jsonComponents);
-                }
-                fileOperations.WriteContentToMultipleVersionsFile(multipleVersions, appSettings.BomFolderPath, FileConstant.multipleversionsFileName, appSettings.SW360ProjectName);
-                Logger.Warn($"\nTotal Multiple versions detected {multipleVersions.Nuget.Count} and details can be found at {appSettings.BomFolderPath}\\{appSettings.SW360ProjectName}_{FileConstant.multipleversionsFileName}\n");
-            }
-            else
-            {
-                string json = File.ReadAllText(filename);
-                MultipleVersions myDeserializedClass = JsonConvert.DeserializeObject<MultipleVersions>(json);
-                List<MultipleVersionValues> nugetComponents = new List<MultipleVersionValues>();
-                foreach (var nugetPackage in componentsWithMultipleVersions)
-                {
-                    nugetPackage.Description = !string.IsNullOrEmpty(appSettings.CycloneDxSBomTemplatePath) ? appSettings.CycloneDxSBomTemplatePath : nugetPackage.Description;
-
-                    MultipleVersionValues jsonComponents = new MultipleVersionValues();
-                    jsonComponents.ComponentName = nugetPackage.Name;
-                    jsonComponents.ComponentVersion = nugetPackage.Version;
-                    jsonComponents.PackageFoundIn = nugetPackage.Description;
-
-                    nugetComponents.Add(jsonComponents);
-                }
-                myDeserializedClass.Nuget = nugetComponents;
-
-                fileOperations.WriteContentToMultipleVersionsFile(myDeserializedClass, appSettings.BomFolderPath, FileConstant.multipleversionsFileName, appSettings.SW360ProjectName);
-                Logger.Warn($"\nTotal Multiple versions detected {nugetComponents.Count} and details can be found at {appSettings.BomFolderPath}\\{appSettings.SW360ProjectName}_{FileConstant.multipleversionsFileName}\n");
-            }
+            
+            bom = RemoveExcludedComponents(appSettings, bom);            
         }
 
         private static void ConvertToCycloneDXModel(List<Component> listComponentForBOM, List<NugetPackage> listofComponents, List<Dependency> dependencies)
@@ -570,7 +500,7 @@ namespace LCT.PackageIdentifier
             }
             else
             {
-                Logger.Warn($"Input file NOT_FOUND :{filepath}");
+                Logger.Warn("No Proper input files found for Nuget package types.");
             }
         }
 
@@ -580,7 +510,12 @@ namespace LCT.PackageIdentifier
 
             if (componentsWithMultipleVersions.Count != 0)
             {
-                CreateFileForMultipleVersions(componentsWithMultipleVersions, appSettings);
+                Logger.Warn($"Multiple versions detected :\n");
+                foreach (var item in componentsWithMultipleVersions)
+                {
+                    item.Description = !string.IsNullOrEmpty(appSettings.CycloneDxSBomTemplatePath) ? appSettings.CycloneDxSBomTemplatePath : item.Description;
+                    Logger.Warn($"Component Name : {item.Name}\nComponent Version : {item.Version}\nPackage Found in : {item.Description}\n");
+                }
             }
         }
 
