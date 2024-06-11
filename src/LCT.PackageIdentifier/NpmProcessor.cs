@@ -174,6 +174,7 @@ namespace LCT.PackageIdentifier
                     components.Name = packageName;
                 }
 
+                components.Type=Component.Classification.Library;
                 components.Description = folderPath;
                 components.Version = Convert.ToString(properties[Version]);
                 components.Author = prop.Value[Dependencies]?.ToString();

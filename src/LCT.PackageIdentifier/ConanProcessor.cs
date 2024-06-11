@@ -328,6 +328,7 @@ namespace LCT.PackageIdentifier
                     components.Name = packageName;
                 }
 
+                components.Type=Component.Classification.Library;
                 components.Purl = $"{ApiConstant.ConanExternalID}{components.Name}@{components.Version}";
                 components.BomRef = $"{ApiConstant.ConanExternalID}{components.Name}@{components.Version}";
                 components.Properties = new List<Property>();

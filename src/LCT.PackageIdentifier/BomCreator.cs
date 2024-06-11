@@ -4,6 +4,7 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using CycloneDX;
 using CycloneDX.Models;
 using LCT.APICommunications.Model;
 using LCT.Common;
@@ -14,11 +15,17 @@ using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
 using log4net.Core;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
+using System.Runtime.Intrinsics.X86;
 using System.Threading.Tasks;
 
 namespace LCT.PackageIdentifier
@@ -39,7 +46,7 @@ namespace LCT.PackageIdentifier
         public BomCreator(ICycloneDXBomParser cycloneDXBomParser)
         {
             CycloneDXBomParser = cycloneDXBomParser;
-        }
+        }        
 
         public async Task GenerateBom(CommonAppSettings appSettings, IBomHelper bomHelper, IFileOperations fileOperations, ProjectReleases projectReleases)
         {
@@ -55,7 +62,7 @@ namespace LCT.PackageIdentifier
             //Get project details for metadata properties
 
             //sets metadata properties
-            listOfComponentsToBom = CycloneBomProcessor.SetMetadataInComparisonBOM(listOfComponentsToBom, appSettings,projectReleases);
+            listOfComponentsToBom = CycloneBomProcessor.SetMetadataInComparisonBOM(listOfComponentsToBom, appSettings, projectReleases);
 
             // Writes Comparison Bom
             Logger.Logger.Log(null, Level.Notice, $"Writing CycloneDX BOM..", null);
@@ -91,113 +98,124 @@ namespace LCT.PackageIdentifier
         private static void WriteContentToCycloneDxBOM(CommonAppSettings appSettings, Bom listOfComponentsToBom, ref BomKpiData bomKpiData)
         {
             IFileOperations fileOperations = new FileOperations();
+           
             if (string.IsNullOrEmpty(appSettings.IdentifierBomFilePath))
             {
-                fileOperations.WriteContentToFile(listOfComponentsToBom, appSettings.BomFolderPath,
-            FileConstant.BomFileName, appSettings.SW360ProjectName);
+               
+                string guid = Guid.NewGuid().ToString();
+                listOfComponentsToBom.SerialNumber = $"urn:uuid:{guid}";
+                listOfComponentsToBom.Version =1;
+                listOfComponentsToBom.Metadata.Timestamp = DateTime.UtcNow;
+                var formattedString = CycloneDX.Json.Serializer.Serialize(listOfComponentsToBom);               
+
+                fileOperations.WriteContentToBomFile(formattedString, appSettings.BomFolderPath,FileConstant.BomFileName, appSettings.SW360ProjectName);
             }
             else
             {
                 listOfComponentsToBom = fileOperations.CombineComponentsFromExistingBOM(listOfComponentsToBom, appSettings.IdentifierBomFilePath);
                 bomKpiData.ComponentsInComparisonBOM = listOfComponentsToBom.Components.Count;
-                fileOperations.WriteContentToFile(listOfComponentsToBom, appSettings.BomFolderPath,
-          FileConstant.BomFileName, appSettings.SW360ProjectName);
+                string guid = Guid.NewGuid().ToString();
+                listOfComponentsToBom.SerialNumber = $"urn:uuid:{guid}";
+                listOfComponentsToBom.Version = 1;                
+                listOfComponentsToBom.Metadata.Timestamp = DateTime.UtcNow;
+                var formattedString = CycloneDX.Json.Serializer.Serialize(listOfComponentsToBom);                
+                fileOperations.WriteContentToBomFile(formattedString, appSettings.BomFolderPath,FileConstant.BomFileName, appSettings.SW360ProjectName);
             }
 
-        }
+}
 
-        private async Task<Bom> CallPackageParser(CommonAppSettings appSettings)
+private async Task<Bom> CallPackageParser(CommonAppSettings appSettings)
+{
+    IParser parser;
+
+    switch (appSettings.ProjectType.ToUpperInvariant())
+    {
+        case "NPM":
+            parser = new NpmProcessor(CycloneDXBomParser);
+            return await ComponentIdentification(appSettings, parser);
+        case "NUGET":
+            parser = new NugetProcessor(CycloneDXBomParser);
+            return await ComponentIdentification(appSettings, parser);
+        case "MAVEN":
+            parser = new MavenProcessor(CycloneDXBomParser);
+            return await ComponentIdentification(appSettings, parser);
+        case "DEBIAN":
+            parser = new DebianProcessor(CycloneDXBomParser);
+            return await ComponentIdentification(appSettings, parser);
+        case "ALPINE":
+            parser = new AlpineProcessor(CycloneDXBomParser);
+            return await ComponentIdentification(appSettings, parser);
+        case "PYTHON":
+            parser = new PythonProcessor(CycloneDXBomParser);
+            return await ComponentIdentification(appSettings, parser);
+        case "CONAN":
+            parser = new ConanProcessor(CycloneDXBomParser);
+            return await ComponentIdentification(appSettings, parser);
+        default:
+            Logger.Error($"GenerateBom():Invalid ProjectType - {appSettings.ProjectType}");
+            break;
+    }
+    return new Bom();
+}
+
+private async Task<Bom> ComponentIdentification(CommonAppSettings appSettings, IParser parser)
+{
+    ComponentIdentification lstOfComponents;
+    List<Component> components;
+    Metadata metadata;
+    Bom bom = new Bom();
+    try
+    {
+        //Parsing the input file
+        bom = parser.ParsePackageFile(appSettings);
+        metadata = bom.Metadata;
+        componentData = new ComponentIdentification()
         {
-            IParser parser;
+            comparisonBOMData = bom.Components,
+            internalComponents = new List<Component>()
+        };
 
-            switch (appSettings.ProjectType.ToUpperInvariant())
-            {
-                case "NPM":
-                    parser = new NpmProcessor(CycloneDXBomParser);
-                    return await ComponentIdentification(appSettings, parser);
-                case "NUGET":
-                    parser = new NugetProcessor(CycloneDXBomParser);
-                    return await ComponentIdentification(appSettings, parser);
-                case "MAVEN":
-                    parser = new MavenProcessor(CycloneDXBomParser);
-                    return await ComponentIdentification(appSettings, parser);
-                case "DEBIAN":
-                    parser = new DebianProcessor(CycloneDXBomParser);
-                    return await ComponentIdentification(appSettings, parser);
-                case "ALPINE":
-                    parser = new AlpineProcessor(CycloneDXBomParser);
-                    return await ComponentIdentification(appSettings, parser);
-                case "PYTHON":
-                    parser = new PythonProcessor(CycloneDXBomParser);
-                    return await ComponentIdentification(appSettings, parser);
-                case "CONAN":
-                    parser = new ConanProcessor(CycloneDXBomParser);
-                    return await ComponentIdentification(appSettings, parser);
-                default:
-                    Logger.Error($"GenerateBom():Invalid ProjectType - {appSettings.ProjectType}");
-                    break;
-            }
-            return new Bom();
-        }
+        //Identification of internal components
+        Logger.Logger.Log(null, Level.Notice, $"Identifying the internal components", null);
+        lstOfComponents = await parser.IdentificationOfInternalComponents(componentData, appSettings, JFrogService, BomHelper);
+        components = lstOfComponents.comparisonBOMData;
 
-        private async Task<Bom> ComponentIdentification(CommonAppSettings appSettings, IParser parser)
+        //Setting the artifactory repo info
+        components = await parser.GetJfrogRepoDetailsOfAComponent(components, appSettings, JFrogService, BomHelper);
+        bom.Components = components;
+        bom.Metadata = metadata;
+    }
+    catch (HttpRequestException ex)
+    {
+        Logger.Debug($"ComponentIdentification: {ex}");
+    }
+    return bom;
+}
+
+public async Task<bool> CheckJFrogConnection()
+{
+    var response = await JFrogService.CheckJFrogConnectivity();
+    if (response != null)
+    {
+        if (response.IsSuccessStatusCode)
         {
-            ComponentIdentification lstOfComponents;
-            List<Component> components;
-            Metadata metadata;
-            Bom bom = new Bom();
-            try
-            {
-                //Parsing the input file
-                bom = parser.ParsePackageFile(appSettings);
-                metadata = bom.Metadata;
-                componentData = new ComponentIdentification()
-                {
-                    comparisonBOMData = bom.Components,
-                    internalComponents = new List<Component>()
-                };
-
-                //Identification of internal components
-                Logger.Logger.Log(null, Level.Notice, $"Identifying the internal components", null);
-                lstOfComponents = await parser.IdentificationOfInternalComponents(componentData, appSettings, JFrogService, BomHelper);
-                components = lstOfComponents.comparisonBOMData;
-
-                //Setting the artifactory repo info
-                components = await parser.GetJfrogRepoDetailsOfAComponent(components, appSettings, JFrogService, BomHelper);
-                bom.Components = components;
-                bom.Metadata = metadata;
-            }
-            catch (HttpRequestException ex)
-            {
-                Logger.Debug($"ComponentIdentification: {ex}");
-            }
-            return bom;
+            Logger.Logger.Log(null, Level.Info, $"JFrog Connection was successfull!!", null);
+            return true;
         }
-
-        public async Task<bool> CheckJFrogConnection()
+        else if (response.StatusCode == HttpStatusCode.Unauthorized)
         {
-            var response = await JFrogService.CheckJFrogConnectivity();
-            if (response != null)
-            {
-                if (response.IsSuccessStatusCode)
-                {
-                    Logger.Logger.Log(null, Level.Info, $"JFrog Connection was successfull!!", null);
-                    return true;
-                }
-                else if (response.StatusCode == HttpStatusCode.Unauthorized)
-                {
-                    Logger.Logger.Log(null, Level.Error, $"Check the JFrog token validity/permission..", null);
-                }
-                else if (response.StatusCode == HttpStatusCode.NotFound)
-                {
-                    Logger.Logger.Log(null, Level.Error, $"Check the provided JFrog server details..", null);
-                }
-                else
-                {
-                    Logger.Logger.Log(null, Level.Error, $"JFrog Connection was not successfull check the server status.", null);
-                }
-            }
-            return false;
+            Logger.Logger.Log(null, Level.Error, $"Check the JFrog token validity/permission..", null);
         }
+        else if (response.StatusCode == HttpStatusCode.NotFound)
+        {
+            Logger.Logger.Log(null, Level.Error, $"Check the provided JFrog server details..", null);
+        }
+        else
+        {
+            Logger.Logger.Log(null, Level.Error, $"JFrog Connection was not successfull check the server status.", null);
+        }
+    }
+    return false;
+}
     }
 }

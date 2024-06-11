@@ -311,7 +311,7 @@ namespace LCT.SW360PackageCreator
                 {
                     new Property { Name = Dataconstant.Cdx_ClearingState, Value = comBom.ApprovedStatus },
                      new Property { Name = Dataconstant.Cdx_ReleaseUrl, Value = comBom.ReleaseLink },
-                     new Property { Name = Dataconstant.Cdx_FossologyUrl, Value = comBom.FossologyLink }
+                     new Property { Name = Dataconstant.Cdx_FossologyUrl, Value = comBom.FossologyLink ?? "" }
                 };
 
                     if (!bom.Components.Exists(x => x.BomRef.Contains(Dataconstant.PurlCheck()["MAVEN"])))

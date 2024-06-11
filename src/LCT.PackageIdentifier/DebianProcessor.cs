@@ -231,6 +231,7 @@ namespace LCT.PackageIdentifier
                     Name = componentsInfo.Name,
                     Version = componentsInfo.Version,
                     PurlID = componentsInfo.Purl,
+                    
                 };
 
                 if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
@@ -278,6 +279,7 @@ namespace LCT.PackageIdentifier
                     Purl = GetReleaseExternalId(prop.Name, prop.Version)
                 };
                 component.BomRef = component.Purl;
+                component.Type=Component.Classification.Library;
 
                 //For Debian projects we will be considering CycloneDX file reading components as Discovered
                 //since it's Discovered from syft Tool

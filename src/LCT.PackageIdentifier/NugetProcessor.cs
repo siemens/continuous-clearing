@@ -418,7 +418,8 @@ namespace LCT.PackageIdentifier
                 Component components = new Component
                 {
                     Name = prop.ID,
-                    Version = prop.Version
+                    Version = prop.Version,
+                    Type=Component.Classification.Library
                 };
 
                 components.Purl = $"{ApiConstant.NugetExternalID}{prop.ID}@{components.Version}";

@@ -139,7 +139,7 @@ namespace LCT.PackageIdentifier
                 dependencies.Add(new Dependency()
                 {
                     Ref = node.Key,
-                    Dependencies = subDependencies.Count == 0 ? null : subDependencies
+                    Dependencies = subDependencies
                 });
             }
         }
@@ -259,6 +259,7 @@ namespace LCT.PackageIdentifier
                     identifierType
                 };
 
+                component.Type=Component.Classification.Library;
                 component.BomRef = component.Purl;
 
                 listComponentForBOM.Add(component);

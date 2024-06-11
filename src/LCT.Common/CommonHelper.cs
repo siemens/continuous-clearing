@@ -9,6 +9,7 @@ using LCT.Common.Constants;
 using LCT.Common.Model;
 using log4net;
 using log4net.Core;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -237,6 +238,31 @@ namespace LCT.Common
                 component.Properties.Add(identifierType);
                 listComponentForBOM.Add(component);
             }
+        }
+        public static string GetBomfileSpecVersion(JObject data)
+        {
+            string newSpecVersion = string.Empty;
+            var specVersionInFile = (string)data["specVersion"];
+            switch (specVersionInFile)
+            {
+                case "1.1":
+                    newSpecVersion = "v1_1";
+                    return newSpecVersion;
+                case "1.2":
+                    newSpecVersion = "v1_2";
+                    return newSpecVersion;
+                case "1.3":
+                    newSpecVersion = "v1_3";
+                    return newSpecVersion;
+                case "1.4":
+                    newSpecVersion = "v1_4";
+                    return newSpecVersion;
+
+                default:
+                    Logger.Error($"Invalid SpecVersion- SpecVersion:{specVersionInFile}");
+                    break;
+            }
+            return newSpecVersion;
         }
         #endregion
 

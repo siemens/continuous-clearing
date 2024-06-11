@@ -9,8 +9,10 @@ using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Common.Constants;
 using log4net;
+using NuGet.Packaging.Signing;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Reflection;
 using System.Security.Policy;
 
@@ -24,9 +26,9 @@ namespace LCT.PackageIdentifier
         public static Bom SetMetadataInComparisonBOM(Bom bom, CommonAppSettings appSettings, ProjectReleases projectReleases)
         {
             Logger.Debug("Starting to add metadata info into the BOM");
-
             List<Tool> tools = new List<Tool>();
             List<Component> components = new List<Component>();
+            List<Property> properties = new();
             Tool tool = new Tool
             {
                 Name = "Clearing Automation Tool",
@@ -50,7 +52,7 @@ namespace LCT.PackageIdentifier
                 Version = projectReleases.Version,
                 Type = Component.Classification.Application
             };
-            components.Add(component);
+            components.Add(component);            
 
             if (bom.Metadata != null)
             {
@@ -64,9 +66,16 @@ namespace LCT.PackageIdentifier
                 bom.Metadata = new Metadata
                 {
                     Tools = tools,
-                    Component = component
+                    Component = component,
                 };
             }
+            Property projectType = new()
+            {
+                Name = "siemens:profile",
+                Value = "clearing"
+            };
+            bom.Metadata.Properties = properties;            
+            bom.Metadata.Properties.Add(projectType);
             return bom;
         }
 
