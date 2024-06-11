@@ -4,7 +4,6 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using CycloneDX;
 using CycloneDX.Models;
 using LCT.APICommunications.Model;
 using LCT.Common;
@@ -15,17 +14,11 @@ using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
 using log4net.Core;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
-using System.Runtime.Intrinsics.X86;
 using System.Threading.Tasks;
 
 namespace LCT.PackageIdentifier

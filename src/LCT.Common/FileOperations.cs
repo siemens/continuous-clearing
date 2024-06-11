@@ -8,14 +8,12 @@ using CycloneDX.Models;
 using LCT.Common.Interface;
 using log4net;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security;
-using Newtonsoft.Json.Linq;
 
 namespace LCT.Common
 {
