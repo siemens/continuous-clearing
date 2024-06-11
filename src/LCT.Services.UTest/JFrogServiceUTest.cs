@@ -270,6 +270,65 @@ namespace LCT.Services.UTest
             // Assert
             Assert.That(actual.Count, Is.EqualTo(0));
         }
+        [Test]
+        public async Task CheckJFrogConnectivity_SuccessfulConnection_ReturnsHttpResponseMessage()
+        {
+            // Arrange
+            HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK);
+            Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade = new Mock<IJfrogAqlApiCommunicationFacade>();
+            mockJfrogApiComFacade
+                .Setup(x => x.CheckConnection())
+                .ReturnsAsync(httpResponseMessage);
+
+            // Act
+            IJFrogService jFrogService = new JFrogService(mockJfrogApiComFacade.Object);
+            HttpResponseMessage actual = await jFrogService.CheckJFrogConnectivity();
+
+            // Assert
+            Assert.NotNull(actual);
+            Assert.AreEqual(HttpStatusCode.OK, actual.StatusCode);
+        }
+
+        [Test]
+        public async Task CheckJFrogConnectivity_UnsuccessfulConnection_ReturnsHttpResponseMessage()
+        {
+            // Arrange
+            HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.BadRequest);
+            Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade = new Mock<IJfrogAqlApiCommunicationFacade>();
+            mockJfrogApiComFacade
+                .Setup(x => x.CheckConnection())
+                .ReturnsAsync(httpResponseMessage);
+
+            // Act
+            IJFrogService jFrogService = new JFrogService(mockJfrogApiComFacade.Object);
+            HttpResponseMessage actual = await jFrogService.CheckJFrogConnectivity();
+
+            // Assert
+            Assert.NotNull(actual);
+            Assert.AreEqual(HttpStatusCode.BadRequest, actual.StatusCode);
+        }
+
+        [Test]
+        public async Task GetInternalComponentDataByRepo_ShouldReturnEmptyList_WhenHttpResponseContentIsNull()
+        {
+            // Arrange
+            HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = null
+            };
+
+            Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade = new Mock<IJfrogAqlApiCommunicationFacade>();
+            mockJfrogApiComFacade
+                .Setup(x => x.GetInternalComponentDataByRepo(It.IsAny<string>()))
+                .ReturnsAsync(httpResponseMessage);
+
+            // Act
+            IJFrogService jFrogService = new JFrogService(mockJfrogApiComFacade.Object);
+            IList<AqlResult> actual = await jFrogService.GetInternalComponentDataByRepo("energy-dev-npm-egll");
+
+            // Assert
+            Assert.That(actual.Count, Is.EqualTo(0));
+        }
 
     }
 }
