@@ -58,7 +58,7 @@ namespace LCT.APICommunications
             StringBuilder query = new();
             query.Append("items.find({\"repo\":\"");
             query.Append($"{repoName}");
-            query.Append("\"}).include(\"repo\", \"path\", \"name\")");
+            query.Append("\"}).include(\"repo\", \"path\", \"name\", \"actual_sha1\",\"actual_md5\",\"sha256\")");
 
             string aqlQueryToBody = query.ToString();
             string uri = $"{DomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}";
