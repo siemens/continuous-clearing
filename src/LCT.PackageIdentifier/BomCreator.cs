@@ -94,30 +94,30 @@ namespace LCT.PackageIdentifier
            
             if (string.IsNullOrEmpty(appSettings.IdentifierBomFilePath))
             {
-               
-                string guid = Guid.NewGuid().ToString();
-                listOfComponentsToBom.SerialNumber = $"urn:uuid:{guid}";
-                listOfComponentsToBom.Version =1;
-                listOfComponentsToBom.Metadata.Timestamp = DateTime.UtcNow;
-                var formattedString = CycloneDX.Json.Serializer.Serialize(listOfComponentsToBom);               
-
+                string formattedString=WritecontentsToBOMFormat(listOfComponentsToBom);
                 fileOperations.WriteContentToBomFile(formattedString, appSettings.BomFolderPath,FileConstant.BomFileName, appSettings.SW360ProjectName);
             }
             else
             {
                 listOfComponentsToBom = fileOperations.CombineComponentsFromExistingBOM(listOfComponentsToBom, appSettings.IdentifierBomFilePath);
                 bomKpiData.ComponentsInComparisonBOM = listOfComponentsToBom.Components.Count;
-                string guid = Guid.NewGuid().ToString();
-                listOfComponentsToBom.SerialNumber = $"urn:uuid:{guid}";
-                listOfComponentsToBom.Version = 1;                
-                listOfComponentsToBom.Metadata.Timestamp = DateTime.UtcNow;
-                var formattedString = CycloneDX.Json.Serializer.Serialize(listOfComponentsToBom);                
+                string formattedString = WritecontentsToBOMFormat(listOfComponentsToBom);
                 fileOperations.WriteContentToBomFile(formattedString, appSettings.BomFolderPath,FileConstant.BomFileName, appSettings.SW360ProjectName);
             }
 
-}
+        }
+        private static string WritecontentsToBOMFormat(Bom listOfComponentsToBom)
+        {
+            string guid = Guid.NewGuid().ToString();
+            listOfComponentsToBom.SerialNumber = $"urn:uuid:{guid}";
+            listOfComponentsToBom.Version = 1;
+            listOfComponentsToBom.Metadata.Timestamp = DateTime.UtcNow;
+            var formattedString = CycloneDX.Json.Serializer.Serialize(listOfComponentsToBom);
 
-private async Task<Bom> CallPackageParser(CommonAppSettings appSettings)
+            return formattedString;
+        }
+
+        private async Task<Bom> CallPackageParser(CommonAppSettings appSettings)
 {
     IParser parser;
 
