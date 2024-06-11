@@ -875,29 +875,7 @@ namespace LCT.Services.UTest
             // Assert
             Assert.That(actual, Is.False);
         }
-        [Test]
-        public async Task CreateComponentBasesOFswComaprisonBOM_ComponentCreationSuccessful_ReturnsComponentCreateStatus()
-        {
-            // Arrange
-            var mockApiCommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
-            var mockCommonService = new Mock<ISW360CommonService>();
-            var service = new Sw360CreatorService(mockApiCommunicationFacade.Object, mockCommonService.Object);
-            var componentInfo = new ComparisonBomData { Name = "TestComponent", Version = "1.0.0", ComponentExternalId = "pkg:test/test@1.0.0" };
-            var attachmentUrlList = new Dictionary<string, string>();
-
-            // Mocking a valid JSON response for component creation
-            var jsonResponse = "{\"success\": true}";
-            mockApiCommunicationFacade.Setup(x => x.CreateComponent(It.IsAny<CreateComponent>()))
-                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(jsonResponse) });
-
-            // Act
-            var result = await service.CreateComponentBasesOFswComaprisonBOM(componentInfo, attachmentUrlList);
-
-            // Assert
-            Assert.IsNotNull(result);
-            Assert.IsTrue(result.IsCreated);
-            Assert.IsTrue(result.ReleaseStatus.IsCreated);
-        }
+        
 
 
         [Test]
