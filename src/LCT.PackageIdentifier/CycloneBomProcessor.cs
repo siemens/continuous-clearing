@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
 using System.Security.Policy;
+using static CycloneDX.Models.ExternalReference;
 
 namespace LCT.PackageIdentifier
 {

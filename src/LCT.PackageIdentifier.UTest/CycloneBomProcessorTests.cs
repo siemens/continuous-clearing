@@ -14,6 +14,7 @@ using NuGet.ContentModel;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
 
 namespace PackageIdentifier.UTest
 {

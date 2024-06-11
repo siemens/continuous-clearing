@@ -22,5 +22,14 @@ namespace LCT.APICommunications.Model.AQL
 
         [JsonProperty("name")]
         public string Name { get; set; }
+
+        [JsonProperty("actual_md5")]
+        public string MD5 { get; set; }
+
+        [JsonProperty("actual_sha1")]
+        public string SHA1 { get; set; }
+
+        [JsonProperty("sha256")]
+        public string SHA256 { get; set; }
     }
 }
