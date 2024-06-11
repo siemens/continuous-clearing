@@ -33,7 +33,6 @@ namespace LCT.Services
     /// <summary>
     /// sw360 component creator service
     /// </summary>
-    /// [ExcludeFromCodeCoverage]
     public class Sw360CreatorService : ISw360CreatorService
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
