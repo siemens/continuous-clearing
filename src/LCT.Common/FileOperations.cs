@@ -8,14 +8,12 @@ using CycloneDX.Models;
 using LCT.Common.Interface;
 using log4net;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security;
-using Newtonsoft.Json.Converters;
 
 namespace LCT.Common
 {
@@ -51,9 +49,10 @@ namespace LCT.Common
         public string WriteContentToFile<T>(T dataToWrite, string folderPath, string fileNameWithExtension, string projectName)
         {
             try
-            {            
-                Logger.Debug($"WriteContentToFile():folderpath-{folderPath},fileNameWithExtension-{fileNameWithExtension}," + $"projectName-{projectName}");               
-                string jsonString = JsonConvert.SerializeObject(dataToWrite, Formatting.Indented, new StringEnumConverter());
+            {
+                Logger.Debug($"WriteContentToFile():folderpath-{folderPath},fileNameWithExtension-{fileNameWithExtension}," +
+                    $"projectName-{projectName}");
+                string jsonString = JsonConvert.SerializeObject(dataToWrite, Formatting.Indented);
                 string fileName = $"{projectName}_{fileNameWithExtension}";
 
                 string filePath = Path.Combine(folderPath, fileName);
@@ -193,81 +192,6 @@ namespace LCT.Common
                 Logger.Error($"Error occurred while generating backup BOM file", ex);
                 Environment.ExitCode = -1;
             }
-        }
-        /// <summary>
-        /// writes the content to the specified file
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="dataToWrite">dataToWrite</param>
-        /// <param name="folderPath">folderPath</param>
-        /// <param name="fileNameWithExtension">fileNameWithExtension</param>
-        /// <param name="projectName">projectName</param>
-        public string WriteContentToReportNotApprovedFile<T>(T dataToWrite, string folderPath, string fileNameWithExtension, string name)
-        {
-            try
-            {
-                Logger.Debug($"WriteContentToReportNotApprovedFile():folderpath-{folderPath},fileNameWithExtension-{fileNameWithExtension}," +
-                    $"Name-{name}");
-                string jsonString = JsonConvert.SerializeObject(dataToWrite, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                string fileName = $"{name}_{fileNameWithExtension}";
-
-                string filePath = Path.Combine(folderPath, fileName);
-                Logger.Debug($"filePath-{filePath}");
-                File.WriteAllText(filePath, jsonString);
-
-            }
-            catch (IOException e)
-            {
-                Logger.Debug($"WriteContentToReportNotApprovedFile():Error:", e);
-                return "failure";
-            }
-            catch (UnauthorizedAccessException e)
-            {
-                Logger.Debug($"WriteContentToReportNotApprovedFile():Error:", e);
-                return "failure";
-            }
-            catch (SecurityException e)
-            {
-                Logger.Debug($"WriteContentToReportNotApprovedFile():Error:", e);
-                return "failure";
-            }
-            Logger.Debug($"WriteContentToReportNotApprovedFile():End");
-            return "success";
-
-        }
-        public string WriteContentToMultipleVersionsFile<T>(T dataToWrite, string folderPath, string fileNameWithExtension, string projectName)
-        {
-            try
-            {
-                Logger.Debug($"WriteContentToMultipleVersionsFile():folderpath-{folderPath},fileNameWithExtension-{fileNameWithExtension}," +
-                    $"projectName-{projectName}");
-                string jsonString = JsonConvert.SerializeObject(dataToWrite, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                string fileName = $"{projectName}_{fileNameWithExtension}";
-
-                string filePath = Path.Combine(folderPath, fileName);
-                Logger.Debug($"filePath-{filePath}");
-                BackupTheGivenFile(folderPath, fileName);
-                File.WriteAllText(filePath, jsonString);
-
-            }
-            catch (IOException e)
-            {
-                Logger.Debug($"WriteContentToMultipleVersionsFile():Error:", e);
-                return "failure";
-            }
-            catch (UnauthorizedAccessException e)
-            {
-                Logger.Debug($"WriteContentToMultipleVersionsFile():Error:", e);
-                return "failure";
-            }
-            catch (SecurityException e)
-            {
-                Logger.Debug($"WriteContentToMultipleVersionsFile():Error:", e);
-                return "failure";
-            }
-            Logger.Debug($"WriteContentToMultipleVersionsFile():End");
-            return "success";
-
         }
     }
 }

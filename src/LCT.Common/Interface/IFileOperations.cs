@@ -41,23 +41,5 @@ namespace LCT.Common.Interface
         /// <param name="dataToWrite">comparisonBOM data</param>
         /// <param name="filePath">filePath</param>
         public string WriteContentToCycloneDXFile<T>(T dataToWrite, string filePath, string fileNameWithExtension);
-
-        /// <summary>
-        /// Writes the given content to the file
-        /// </summary>
-        /// <typeparam name="T">Any type</typeparam>
-        /// <param name="dataToWrite">Data  to write</param>
-        /// <param name="folderPath">Folder path to save the file</param>
-        /// <param name="fileNameWithExtension">File Name with Extension</param>
-        public string WriteContentToReportNotApprovedFile<T>(T dataToWrite, string folderPath, string fileNameWithExtension, string name);
-
-        /// <summary>
-        /// Writes the given content to the file
-        /// </summary>
-        /// <typeparam name="T">Any type</typeparam>
-        /// <param name="dataToWrite">Data  to write</param>
-        /// <param name="folderPath">Folder path to save the file</param>
-        /// <param name="fileNameWithExtension">File Name with Extension</param>
-        public string WriteContentToMultipleVersionsFile<T>(T dataToWrite, string folderPath, string fileNameWithExtension, string projectName);
     }
 }
