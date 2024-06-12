@@ -82,7 +82,7 @@ namespace LCT.Common
             return "success";
 
         }
-        public string WriteContentToBomFile<T>(T dataToWrite, string folderPath, string fileNameWithExtension, string projectName)
+        public string WriteContentToOutputBomFile<T>(T dataToWrite, string folderPath, string fileNameWithExtension, string projectName)
         {
             try
             {

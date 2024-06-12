@@ -94,19 +94,19 @@ namespace LCT.PackageIdentifier
 
             if (string.IsNullOrEmpty(appSettings.IdentifierBomFilePath))
             {
-                string formattedString = WritecontentsToBOMFormat(listOfComponentsToBom);
-                fileOperations.WriteContentToBomFile(formattedString, appSettings.BomFolderPath, FileConstant.BomFileName, appSettings.SW360ProjectName);
+                string formattedString = AddSpecificValuesToBOMFormat(listOfComponentsToBom);
+                fileOperations.WriteContentToOutputBomFile(formattedString, appSettings.BomFolderPath, FileConstant.BomFileName, appSettings.SW360ProjectName);
             }
             else
             {
                 listOfComponentsToBom = fileOperations.CombineComponentsFromExistingBOM(listOfComponentsToBom, appSettings.IdentifierBomFilePath);
                 bomKpiData.ComponentsInComparisonBOM = listOfComponentsToBom.Components.Count;
-                string formattedString = WritecontentsToBOMFormat(listOfComponentsToBom);
-                fileOperations.WriteContentToBomFile(formattedString, appSettings.BomFolderPath, FileConstant.BomFileName, appSettings.SW360ProjectName);
+                string formattedString = AddSpecificValuesToBOMFormat(listOfComponentsToBom);
+                fileOperations.WriteContentToOutputBomFile(formattedString, appSettings.BomFolderPath, FileConstant.BomFileName, appSettings.SW360ProjectName);
             }
 
         }
-        private static string WritecontentsToBOMFormat(Bom listOfComponentsToBom)
+        private static string AddSpecificValuesToBOMFormat(Bom listOfComponentsToBom)
         {
             string guid = Guid.NewGuid().ToString();
             listOfComponentsToBom.SerialNumber = $"urn:uuid:{guid}";
