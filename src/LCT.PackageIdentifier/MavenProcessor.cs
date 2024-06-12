@@ -189,7 +189,7 @@ namespace LCT.PackageIdentifier
                 }
                 componentVal.Properties.Add(artifactoryrepo);
                 componentVal.Properties.Add(projectType);
-                componentVal.Description = string.Empty;
+                componentVal.Description = null;
                 if (hashes != null)
                 {
                     componentVal.Hashes = new List<Hash>()

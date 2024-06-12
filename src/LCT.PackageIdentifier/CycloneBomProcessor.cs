@@ -116,7 +116,7 @@ namespace LCT.PackageIdentifier
             component.Properties.Add(artifactoryrepo);
             component.Properties.Add(projectType);
             component.Properties.Add(isDevelopment);
-            component.Description = string.Empty;
+            component.Description = null;
             componentForBOM.Add(component);
         }
     }
