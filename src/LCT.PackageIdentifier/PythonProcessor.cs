@@ -9,6 +9,7 @@ using LCT.APICommunications;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Model;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
@@ -69,13 +70,13 @@ namespace LCT.PackageIdentifier
             GetDistinctComponentList(ref listofComponents);
             listComponentForBOM = FormComponentReleaseExternalID(listofComponents);
             BomCreator.bomKpiData.DuplicateComponents = initialCount - listComponentForBOM.Count;
-            BomCreator.bomKpiData.ComponentsInComparisonBOM = listComponentForBOM.Count;
-
+            BomCreator.bomKpiData.ComponentsInComparisonBOM = listComponentForBOM.Count;                      
             bom.Components = listComponentForBOM;
             bom.Dependencies = dependencies;
             //Adding Template Component Details & MetaData
             SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
             bom = RemoveExcludedComponents(appSettings, bom);
+            bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
             return bom;
         }
 
@@ -141,7 +142,7 @@ namespace LCT.PackageIdentifier
                     Ref = node.Key,
                     Dependencies = subDependencies
                 });
-            }
+            }            
         }
 
         private static string FormRefFromNodeDetails(KeyValuePair<string, TomlNode> valuePair, List<PythonPackage> PythonPackages)
