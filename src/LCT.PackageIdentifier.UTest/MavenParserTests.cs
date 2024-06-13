@@ -47,7 +47,7 @@ namespace LCT.PackageIdentifier.UTest
 
             //Assert
             Assert.That(bom.Components.Count, Is.EqualTo(1), "Returns the count of components");
-            Assert.That(bom.Dependencies.Count, Is.EqualTo(4), "Returns the count of dependencies");
+            Assert.That(bom.Dependencies.Count, Is.EqualTo(2), "Returns the count of dependencies");
 
         }
 

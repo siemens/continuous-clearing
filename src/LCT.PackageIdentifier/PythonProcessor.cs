@@ -9,6 +9,7 @@ using LCT.APICommunications;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Model;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
@@ -69,13 +70,13 @@ namespace LCT.PackageIdentifier
             GetDistinctComponentList(ref listofComponents);
             listComponentForBOM = FormComponentReleaseExternalID(listofComponents);
             BomCreator.bomKpiData.DuplicateComponents = initialCount - listComponentForBOM.Count;
-            BomCreator.bomKpiData.ComponentsInComparisonBOM = listComponentForBOM.Count;
-
+            BomCreator.bomKpiData.ComponentsInComparisonBOM = listComponentForBOM.Count;                      
             bom.Components = listComponentForBOM;
             bom.Dependencies = dependencies;
             //Adding Template Component Details & MetaData
             SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
             bom = RemoveExcludedComponents(appSettings, bom);
+            bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
             return bom;
         }
 
@@ -139,9 +140,9 @@ namespace LCT.PackageIdentifier
                 dependencies.Add(new Dependency()
                 {
                     Ref = node.Key,
-                    Dependencies = subDependencies.Count == 0 ? null : subDependencies
+                    Dependencies = subDependencies
                 });
-            }
+            }            
         }
 
         private static string FormRefFromNodeDetails(KeyValuePair<string, TomlNode> valuePair, List<PythonPackage> PythonPackages)
@@ -259,6 +260,7 @@ namespace LCT.PackageIdentifier
                     identifierType
                 };
 
+                component.Type=Component.Classification.Library;
                 component.BomRef = component.Purl;
 
                 listComponentForBOM.Add(component);
@@ -365,7 +367,7 @@ namespace LCT.PackageIdentifier
                 }
                 componentVal.Properties.Add(artifactoryrepo);
                 componentVal.Properties.Add(projectType);
-                componentVal.Description = string.Empty;
+                componentVal.Description = null;
                 if (hashes != null)
                 {
                     componentVal.Hashes = new List<Hash>()

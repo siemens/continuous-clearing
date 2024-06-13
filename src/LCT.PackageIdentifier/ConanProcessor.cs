@@ -137,7 +137,7 @@ namespace LCT.PackageIdentifier
                 }
                 componentVal.Properties.Add(artifactoryrepo);
                 componentVal.Properties.Add(projectType);
-                componentVal.Description = string.Empty;
+                componentVal.Description = null;
                 if (hashes!=null)
                 {
                     componentVal.Hashes = new List<Hash>()
@@ -274,9 +274,10 @@ namespace LCT.PackageIdentifier
                 templateDetails = ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
                 CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
                 SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
-            }
+            }            
 
             bom = RemoveExcludedComponents(appSettings, bom);
+            bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
         }
 
         private static List<Component> ParsePackageLockJson(string filepath, ref List<Dependency> dependencies)
@@ -394,6 +395,7 @@ namespace LCT.PackageIdentifier
                     components.Name = packageName;
                 }
 
+                components.Type=Component.Classification.Library;
                 components.Purl = $"{ApiConstant.ConanExternalID}{components.Name}@{components.Version}";
                 components.BomRef = $"{ApiConstant.ConanExternalID}{components.Name}@{components.Version}";
                 components.Properties = new List<Property>();

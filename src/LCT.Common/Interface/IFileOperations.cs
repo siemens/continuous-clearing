@@ -21,6 +21,14 @@ namespace LCT.Common.Interface
         /// <param name="folderPath">Folder path to save the file</param>
         /// <param name="fileNameWithExtension">File Name with Extension</param>
         public string WriteContentToFile<T>(T dataToWrite, string folderPath, string fileNameWithExtension, string projectName);
+        /// <summary>
+        /// Writes the given content to the file
+        /// </summary>
+        /// <typeparam name="T">Any type</typeparam>
+        /// <param name="dataToWrite">Data  to write</param>
+        /// <param name="folderPath">Folder path to save the file</param>
+        /// <param name="fileNameWithExtension">File Name with Extension</param>
+        public string WriteContentToOutputBomFile<T>(T dataToWrite, string folderPath, string fileNameWithExtension, string projectName);
 
         /// <summary>
         /// Validatest the given file path

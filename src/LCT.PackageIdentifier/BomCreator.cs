@@ -55,7 +55,7 @@ namespace LCT.PackageIdentifier
             //Get project details for metadata properties
 
             //sets metadata properties
-            listOfComponentsToBom = CycloneBomProcessor.SetMetadataInComparisonBOM(listOfComponentsToBom, appSettings,projectReleases);
+            listOfComponentsToBom = CycloneBomProcessor.SetMetadataInComparisonBOM(listOfComponentsToBom, appSettings, projectReleases);
 
             // Writes Comparison Bom
             Logger.Logger.Log(null, Level.Notice, $"Writing CycloneDX BOM..", null);
@@ -91,19 +91,30 @@ namespace LCT.PackageIdentifier
         private static void WriteContentToCycloneDxBOM(CommonAppSettings appSettings, Bom listOfComponentsToBom, ref BomKpiData bomKpiData)
         {
             IFileOperations fileOperations = new FileOperations();
+
             if (string.IsNullOrEmpty(appSettings.IdentifierBomFilePath))
             {
-                fileOperations.WriteContentToFile(listOfComponentsToBom, appSettings.BomFolderPath,
-            FileConstant.BomFileName, appSettings.SW360ProjectName);
+                string formattedString = AddSpecificValuesToBOMFormat(listOfComponentsToBom);
+                fileOperations.WriteContentToOutputBomFile(formattedString, appSettings.BomFolderPath, FileConstant.BomFileName, appSettings.SW360ProjectName);
             }
             else
             {
                 listOfComponentsToBom = fileOperations.CombineComponentsFromExistingBOM(listOfComponentsToBom, appSettings.IdentifierBomFilePath);
                 bomKpiData.ComponentsInComparisonBOM = listOfComponentsToBom.Components.Count;
-                fileOperations.WriteContentToFile(listOfComponentsToBom, appSettings.BomFolderPath,
-          FileConstant.BomFileName, appSettings.SW360ProjectName);
+                string formattedString = AddSpecificValuesToBOMFormat(listOfComponentsToBom);
+                fileOperations.WriteContentToOutputBomFile(formattedString, appSettings.BomFolderPath, FileConstant.BomFileName, appSettings.SW360ProjectName);
             }
 
+        }
+        private static string AddSpecificValuesToBOMFormat(Bom listOfComponentsToBom)
+        {
+            string guid = Guid.NewGuid().ToString();
+            listOfComponentsToBom.SerialNumber = $"urn:uuid:{guid}";
+            listOfComponentsToBom.Version = 1;
+            listOfComponentsToBom.Metadata.Timestamp = DateTime.UtcNow;
+            var formattedString = CycloneDX.Json.Serializer.Serialize(listOfComponentsToBom);
+
+            return formattedString;
         }
 
         private async Task<Bom> CallPackageParser(CommonAppSettings appSettings)

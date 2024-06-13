@@ -237,7 +237,7 @@ namespace LCT.Common
                 component.Properties.Add(identifierType);
                 listComponentForBOM.Add(component);
             }
-        }
+        }       
         #endregion
 
         #region private

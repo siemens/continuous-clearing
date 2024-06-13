@@ -68,6 +68,7 @@ namespace LCT.PackageIdentifier
 
             bom.Components = componentsForBOM;
             bom.Dependencies = dependencies;
+            bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
             Logger.Debug($"ParsePackageFile():End");
             return bom;
         }
@@ -218,6 +219,7 @@ namespace LCT.PackageIdentifier
                     components.Name = packageName;
                 }
 
+                components.Type=Component.Classification.Library;
                 components.Description = folderPath;
                 components.Version = Convert.ToString(properties[Version]);
                 components.Author = prop.Value[Dependencies]?.ToString();
@@ -368,7 +370,7 @@ namespace LCT.PackageIdentifier
                 }
                 componentVal.Properties.Add(artifactoryrepo);
                 componentVal.Properties.Add(projectType);
-                componentVal.Description = string.Empty;
+                componentVal.Description = null;
                 if (hashes != null)
                 {
                 componentVal.Hashes = new List<Hash>()

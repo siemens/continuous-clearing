@@ -32,6 +32,7 @@ namespace LCT.PackageIdentifier.UTest
 
             CommonAppSettings appSettings = new CommonAppSettings()
             {
+                BomFolderPath = outFolder,
                 PackageFilePath = filepath,
                 ProjectType = "NPM",
                 RemoveDevDependency = true,
@@ -60,6 +61,7 @@ namespace LCT.PackageIdentifier.UTest
 
             CommonAppSettings appSettings = new CommonAppSettings()
             {
+                BomFolderPath = outFolder,
                 PackageFilePath = filepath,
                 ProjectType = "NPM",
                 RemoveDevDependency = true,
@@ -89,6 +91,7 @@ namespace LCT.PackageIdentifier.UTest
             BomKpiData bomKpiData = new BomKpiData();
             CommonAppSettings appSettings = new CommonAppSettings()
             {
+                BomFolderPath= outFolder,
                 PackageFilePath = filepath,
                 ProjectType = "NPM",
                 RemoveDevDependency = true,
@@ -113,13 +116,14 @@ namespace LCT.PackageIdentifier.UTest
             //Arrange
             int expectednoofcomponents = 5;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string OutFolder = Path.GetDirectoryName(exePath);
+            string outFolder = Path.GetDirectoryName(exePath);
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
             string[] Includes = { "*_NPM.cdx.json" };
             CommonAppSettings appSettings = new CommonAppSettings()
             {
-                PackageFilePath = OutFolder + @"\PackageIdentifierUTTestFiles",
+                BomFolderPath = outFolder,
+                PackageFilePath = outFolder + @"\PackageIdentifierUTTestFiles",
                 ProjectType = "NPM",
                 RemoveDevDependency = true,
                 Npm = new Config() { Include = Includes }
@@ -138,14 +142,15 @@ namespace LCT.PackageIdentifier.UTest
             //Arrange
             int expectednoofcomponents = 3;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string OutFolder = Path.GetDirectoryName(exePath);
+            string outFolder = Path.GetDirectoryName(exePath);
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
             string[] Includes = { "CycloneDX2_NPM.cdx.json", "SBOMTemplate_Npm.cdx.json" };
-            string packagefilepath = OutFolder + @"\PackageIdentifierUTTestFiles";
+            string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles";
 
             CommonAppSettings appSettings = new CommonAppSettings()
             {
+                BomFolderPath = outFolder,
                 PackageFilePath = packagefilepath,
                 ProjectType = "NPM",
                 RemoveDevDependency = true,
@@ -165,14 +170,15 @@ namespace LCT.PackageIdentifier.UTest
         {
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string OutFolder = Path.GetDirectoryName(exePath);
+            string outFolder = Path.GetDirectoryName(exePath);
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
             string[] Includes = { "CycloneDX2_NPM.cdx.json" };
-            string packagefilepath = OutFolder + @"\PackageIdentifierUTTestFiles";
+            string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles";
 
             CommonAppSettings appSettings = new CommonAppSettings()
             {
+                BomFolderPath = outFolder,
                 PackageFilePath = packagefilepath,
                 ProjectType = "NPM",
                 RemoveDevDependency = true,

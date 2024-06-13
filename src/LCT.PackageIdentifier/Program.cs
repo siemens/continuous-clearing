@@ -24,7 +24,9 @@ using LCT.Facade.Interfaces;
 using LCT.APICommunications.Interfaces;
 using LCT.APICommunications;
 using LCT.APICommunications.Model;
+using System.Globalization;
 using System.Linq;
+
 
 namespace LCT.PackageIdentifier
 {
@@ -43,7 +45,7 @@ namespace LCT.PackageIdentifier
         {
             BomStopWatch = new Stopwatch();
             BomStopWatch.Start();
-
+            
             if (!m_Verbose && CommonHelper.IsAzureDevOpsDebugEnabled())
                 m_Verbose = true;
             ISettingsManager settingsManager = new SettingsManager();
