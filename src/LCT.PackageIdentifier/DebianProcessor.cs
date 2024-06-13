@@ -104,8 +104,10 @@ namespace LCT.PackageIdentifier
             foreach (var component in componentsForBOM)
             {
                 string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper);
-                string jfrogpackageName = $"{component.Name}-{component.Version}{ApiConstant.DebianExtension}";
-                var hashes = aqlResultList.FirstOrDefault(x => x.Name == jfrogpackageName);
+                string jfrogpackageName = $"{component.Name}_{component.Version}";
+                var hashes = aqlResultList.FirstOrDefault(x => x.Name.Contains(
+                    jfrogpackageName, StringComparison.OrdinalIgnoreCase));
+           
                 Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoUrl, Value = repoName };
                 Component componentVal = component;
 
