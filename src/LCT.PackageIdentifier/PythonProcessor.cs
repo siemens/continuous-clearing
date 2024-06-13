@@ -353,8 +353,9 @@ namespace LCT.PackageIdentifier
             foreach (var component in componentsForBOM)
             {
                 string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper);
-                string jfrogpackageName = $"{component.Name}-{component.Version}{ApiConstant.PythonExtension}";
-                var hashes = aqlResultList.FirstOrDefault(x => x.Name == jfrogpackageName);
+                string jfrogpackageName = $"{component.Name}-{component.Version}";
+                var hashes = aqlResultList.FirstOrDefault(x => x.Name.Contains(
+                    jfrogpackageName, StringComparison.OrdinalIgnoreCase)&& (x.Name.EndsWith(ApiConstant.PythonExtension)));
                 Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoUrl, Value = repoName };
                 Component componentVal = component;
 
