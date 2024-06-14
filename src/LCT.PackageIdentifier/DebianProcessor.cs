@@ -208,7 +208,7 @@ namespace LCT.PackageIdentifier
                 jfrogcomponentName, StringComparison.OrdinalIgnoreCase));
 
             string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults);
-
+            Logger.Debug($"Repo Name for the package {jfrogcomponentName} is {repoName}");
             string fullName = bomHelper.GetFullNameOfComponent(component);
             string fullNameVersion = $"{fullName}";
 
