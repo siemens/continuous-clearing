@@ -105,8 +105,11 @@ namespace LCT.PackageIdentifier
             foreach (var component in componentsForBOM)
             {
                 string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper);
-                string jfrogpackageName = $"{component.Name}-{component.Version}{ApiConstant.DebianExtension}";
-                var hashes = aqlResultList.FirstOrDefault(x => x.Name == jfrogpackageName);
+                string jfrogpackageName = $"{component.Name}_{component.Version}";
+                Logger.Debug($"Repo Name for the package {jfrogpackageName} is {repoName}");
+                var hashes = aqlResultList.FirstOrDefault(x => x.Name.Contains(
+                    jfrogpackageName, StringComparison.OrdinalIgnoreCase));
+           
                 Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoUrl, Value = repoName };
                 Component componentVal = component;
 
@@ -207,7 +210,7 @@ namespace LCT.PackageIdentifier
                 jfrogcomponentName, StringComparison.OrdinalIgnoreCase));
 
             string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults);
-
+            Logger.Debug($"Repo Name for the package {jfrogcomponentName} is {repoName}");
             string fullName = bomHelper.GetFullNameOfComponent(component);
             string fullNameVersion = $"{fullName}";
 
