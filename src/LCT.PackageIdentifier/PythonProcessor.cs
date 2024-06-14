@@ -24,8 +24,8 @@ using Tommy;
 using Component = CycloneDX.Models.Component;
 
 namespace LCT.PackageIdentifier
-{ 
-    public class PythonProcessor :  IParser
+{
+    public class PythonProcessor : IParser
     {
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
 
@@ -58,7 +58,7 @@ namespace LCT.PackageIdentifier
             }
 
             Bom templateDetails = new Bom();
-            if (File.Exists(appSettings.CycloneDxSBomTemplatePath) 
+            if (File.Exists(appSettings.CycloneDxSBomTemplatePath)
                 && appSettings.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
                 templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
@@ -259,7 +259,7 @@ namespace LCT.PackageIdentifier
                     identifierType
                 };
 
-                component.Type=Component.Classification.Library;
+                component.Type = Component.Classification.Library;
                 component.BomRef = component.Purl;
 
                 listComponentForBOM.Add(component);
@@ -356,7 +356,10 @@ namespace LCT.PackageIdentifier
                 string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper);
                 string jfrogpackageName = $"{component.Name}-{component.Version}{ApiConstant.PythonExtension}";
                 var hashes = aqlResultList.FirstOrDefault(x => x.Name == jfrogpackageName);
+                string jfrogPackageNamaWhlExten = GetJfrogNameOfPypiComponent(component.Name, component.Version, aqlResultList);
                 Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoUrl, Value = repoName };
+                Property siemensDirect = new() { Name = Dataconstant.Cdx_SiemensDirect, Value = "true" };
+                Property siemensName = new() { Name = Dataconstant.Cdx_SiemensDirect, Value = jfrogPackageNamaWhlExten };
                 Component componentVal = component;
 
                 if (componentVal.Properties?.Count == null || componentVal.Properties?.Count <= 0)
@@ -365,6 +368,8 @@ namespace LCT.PackageIdentifier
                 }
                 componentVal.Properties.Add(artifactoryrepo);
                 componentVal.Properties.Add(projectType);
+                componentVal.Properties.Add(siemensDirect);
+                componentVal.Properties.Add(siemensName);
                 componentVal.Description = string.Empty;
                 if (hashes != null)
                 {
@@ -392,6 +397,19 @@ namespace LCT.PackageIdentifier
                 modifiedBOM.Add(componentVal);
             }
             return modifiedBOM;
+        }
+
+        private string GetJfrogNameOfPypiComponent(string name, string version, List<AqlResult> aqlResultList)
+        {
+            string nameVerison = string.Empty;
+            string jfrogcomponentName = $"{name}-{version}";
+            nameVerison = aqlResultList.FirstOrDefault(x => x.Name.Contains(jfrogcomponentName, StringComparison.OrdinalIgnoreCase))?.Name ?? string.Empty;
+            if (string.IsNullOrEmpty(nameVerison))
+            {
+                jfrogcomponentName = $"{name}_{version}";
+                nameVerison = aqlResultList.FirstOrDefault(x => x.Name.Contains(jfrogcomponentName, StringComparison.OrdinalIgnoreCase))?.Name ?? string.Empty;
+            }
+            return nameVerison;
         }
 
         private static string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)

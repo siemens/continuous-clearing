@@ -982,7 +982,9 @@ namespace LCT.ArtifactoryUploader
         {
             var packageType = item.PackageType;
 
-            if (!(item.SrcRepoName.Equals(item.DestRepoName, StringComparison.OrdinalIgnoreCase)) && !item.SrcRepoName.Contains("siparty-release"))
+            if (item.SrcRepoName != null 
+                && !(item.SrcRepoName.Equals(item.DestRepoName, StringComparison.OrdinalIgnoreCase)) 
+                && !item.SrcRepoName.Contains("siparty-release"))
             {
                 if (!(item.SrcRepoName.Contains("Not Found in JFrog")))
                 {

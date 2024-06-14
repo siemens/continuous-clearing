@@ -48,7 +48,7 @@ namespace LCT.SW360PackageCreator
             ListofBomComponents = await GetListOfBomData(bom?.Components ?? new List<Component>(), appSettings);
 
             // Removing Duplicates
-            ListofBomComponents = RemoveDuplicateComponents(ListofBomComponents);
+             ListofBomComponents = RemoveDuplicateComponents(ListofBomComponents);
 
             List<ComparisonBomData> comparisonBomData = await creatorHelper.SetContentsForComparisonBOM(ListofBomComponents, sw360Service);
             return comparisonBomData;

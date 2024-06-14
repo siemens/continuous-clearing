@@ -58,6 +58,9 @@ namespace LCT.Common.Constants
         public const string Cdx_FossologyUrl = "internal:siemens:clearing:fossology:url";
         public const string Cdx_IsDevelopment = "internal:siemens:clearing:development";
         public const string Cdx_IdentifierType = "internal:siemens:clearing:identifier-type";
+        public const string Cdx_JfrogRepoPath = "internal:siemens:clearing:jfrog-repo-path";
+        public const string Cdx_Siemensfilename = "internal:siemens:clearing:siemens:filename";
+        public const string Cdx_SiemensDirect = "internal:siemens:clearing:siemens:direct";
         public const string AlpineSourceURLSuffix = "?ref_type=heads";
 
         public static Dictionary<string, string> PurlCheck()

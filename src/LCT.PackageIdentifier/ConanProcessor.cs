@@ -360,6 +360,11 @@ namespace LCT.PackageIdentifier
                 throw new ArgumentNullException(nameof(nodePackages), "Dependency(requires) node name details not present in the root node.");
             }
 
+            ConanPackage package = nodePackages.Where(x => x.Id=="0").FirstOrDefault();
+            List<string> directDependencies = new List<string>();
+            directDependencies.AddRange(package.Dependencies);
+            directDependencies.AddRange(package.DevDependencies);
+
             // Ignoring the root node as it is the package information node and we are anyways considering all
             // nodes in the lock file.
             foreach (var component in nodePackages.Skip(1))
@@ -393,11 +398,20 @@ namespace LCT.PackageIdentifier
                 {
                     components.Name = packageName;
                 }
-
+                Property siemensFileName = new Property() {
+                    Name = Dataconstant.Cdx_Siemensfilename, Value = component.Reference };
+                var isDirect = directDependencies.Contains(component.Id) ? "true" : "false";
+                Property siemensDirect = new Property()
+                {
+                    Name = Dataconstant.Cdx_SiemensDirect,
+                    Value = isDirect
+                };
                 components.Type=Component.Classification.Library;
                 components.Purl = $"{ApiConstant.ConanExternalID}{components.Name}@{components.Version}";
                 components.BomRef = $"{ApiConstant.ConanExternalID}{components.Name}@{components.Version}";
                 components.Properties = new List<Property>();
+                components.Properties.Add(siemensDirect);
+                components.Properties.Add(siemensFileName);
                 components.Properties.Add(isdev);
                 lstComponentForBOM.Add(components);
             }
@@ -429,7 +443,7 @@ namespace LCT.PackageIdentifier
 
             var aqllist = aqlResultList.FindAll(x => x.Path.Contains(
                 jfrogcomponentPath, StringComparison.OrdinalIgnoreCase));
-
+           
             string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqllist);
 
             return repoName;

@@ -8,7 +8,6 @@ using CycloneDX.Json;
 using CycloneDX.Models;
 using LCT.Common.Constants;
 using log4net;
-using log4net.Core;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -25,7 +24,6 @@ namespace LCT.Common
         {
             Bom bom = new Bom();
             string json = string.Empty;
-            Logger.Logger.Log(null, Level.Notice, $"Consuming cyclonedx file data from " + filePath + "...\n", null);
 
             try
             {

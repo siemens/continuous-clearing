@@ -9,13 +9,8 @@ using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Common.Constants;
 using log4net;
-using NuGet.Packaging.Signing;
-using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Reflection;
-using System.Security.Policy;
-using static CycloneDX.Models.ExternalReference;
 
 namespace LCT.PackageIdentifier
 {
@@ -58,6 +53,7 @@ namespace LCT.PackageIdentifier
             if (bom.Metadata != null)
             {
                 bom.Metadata.Tools.AddRange(tools);
+                bom.Metadata.Component = bom.Metadata.Component?? new Component();
                 bom.Metadata.Component.Name = component.Name;
                 bom.Metadata.Component.Version = component.Version;
                 bom.Metadata.Component.Type = component.Type;

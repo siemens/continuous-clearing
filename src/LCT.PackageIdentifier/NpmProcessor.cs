@@ -17,6 +17,7 @@ using LCT.Services.Interface;
 using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NuGet.Packaging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -180,8 +181,14 @@ namespace LCT.PackageIdentifier
         private static void GetPackagesForBom(string filepath, ref List<BundledComponents> bundledComponents, ref List<Component> lstComponentForBOM, ref int noOfDevDependent, IEnumerable<JProperty> depencyComponentList)
         {
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += depencyComponentList.Count();
-
-            foreach (JProperty prop in depencyComponentList)
+            var prop2 = depencyComponentList.ToList()[0];
+            var parsedContent = JObject.Parse(Convert.ToString(prop2.Value));
+            var dep = parsedContent["dependencies"].ToList();
+            var devDep = parsedContent["devDependencies"].ToList();
+            List<JToken> directDependencies = new List<JToken>();
+            directDependencies.AddRange(dep);
+            directDependencies.AddRange(devDep);
+            foreach (JProperty prop in depencyComponentList.Skip(1))
             {
                 Property isdev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
                 if (string.IsNullOrEmpty(prop.Name))
@@ -218,7 +225,7 @@ namespace LCT.PackageIdentifier
                     components.Name = packageName;
                 }
 
-                components.Type=Component.Classification.Library;
+                components.Type = Component.Classification.Library;
                 components.Description = folderPath;
                 components.Version = Convert.ToString(properties[Version]);
                 components.Author = prop.Value[Dependencies]?.ToString();
@@ -226,13 +233,30 @@ namespace LCT.PackageIdentifier
                 components.BomRef = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
 
                 CheckAndAddToBundleComponents(bundledComponents, prop, components);
+                string isDirect = GetIsDirect(directDependencies, prop);
+                Property siemensDirect = new Property() { Name = Dataconstant.Cdx_SiemensDirect, Value = isDirect };
                 components.Properties = new List<Property>();
                 components.Properties.Add(isdev);
+                components.Properties.Add(siemensDirect);
                 lstComponentForBOM.Add(components);
                 lstComponentForBOM = RemoveBundledComponentFromList(bundledComponents, lstComponentForBOM);
             }
         }
 
+        private static string GetIsDirect(List<JToken> directDependencies, JProperty prop)
+        {
+            string subvalue = CommonHelper.GetSubstringOfLastOccurance(prop.Name, $"node_modules/");
+            foreach (var item in directDependencies)
+            {
+                string value = Convert.ToString(item);
+                if (value.Contains(subvalue))
+                {
+                    return "true";
+                }
+            }
+
+            return "false";
+        }
         private static void CheckAndAddToBundleComponents(List<BundledComponents> bundledComponents, JProperty prop, Component components)
         {
             if (prop.Value[Bundled] != null &&
@@ -242,7 +266,6 @@ namespace LCT.PackageIdentifier
                 bundledComponents.Add(component);
             }
         }
-
 
         private static void GetComponentsForBom(string filepath, CommonAppSettings appSettings,
             ref List<BundledComponents> bundledComponents, ref List<Component> lstComponentForBOM,
@@ -361,6 +384,11 @@ namespace LCT.PackageIdentifier
                 string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper);
                 var hashes = aqlResultList.FirstOrDefault(x => x.Name == jfrogpackageName);
                 Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoUrl, Value = repoName };
+
+                string jfrogRepoPath = string.Empty;
+                AqlResult finalRepoData = GetJfrogArtifactoryRepoDetials(aqlResultList, component, bomhelper, out jfrogRepoPath);
+                Property siemensfileNameProp = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = finalRepoData.Name };
+                Property jfrogRepoPathProp = new() { Name = Dataconstant.Cdx_JfrogRepoPath, Value = jfrogRepoPath };
                 Component componentVal = component;
 
                 if (componentVal.Properties?.Count == null || componentVal.Properties?.Count <= 0)
@@ -369,10 +397,11 @@ namespace LCT.PackageIdentifier
                 }
                 componentVal.Properties.Add(artifactoryrepo);
                 componentVal.Properties.Add(projectType);
+                componentVal.Properties.Add(siemensfileNameProp);
                 componentVal.Description = string.Empty;
                 if (hashes != null)
                 {
-                componentVal.Hashes = new List<Hash>()
+                    componentVal.Hashes = new List<Hash>()
                 {
 
                 new()
@@ -489,7 +518,7 @@ namespace LCT.PackageIdentifier
 
                     dependencyList.Add(dependency);
 
-                    component.Author = " ";
+                    component.Author = null;
 
                 }
             }
@@ -581,6 +610,7 @@ namespace LCT.PackageIdentifier
 
             string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults);
 
+
             string fullName = bomHelper.GetFullNameOfComponent(component);
             string fullNameVersion = $"{fullName}-{component.Version}.tgz";
 
@@ -594,6 +624,51 @@ namespace LCT.PackageIdentifier
             }
 
             return repoName;
+        }
+
+        private static AqlResult GetJfrogArtifactoryRepoDetials(
+            List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper, out string jfrogRepoPath)
+        {
+            AqlResult aqlResult = new AqlResult();
+            jfrogRepoPath = string.Empty;
+            string jfrogcomponentName = $"{component.Name}-{component.Version}.tgz";
+
+            var aqlResults = aqlResultList.FindAll(x => x.Name.Equals(
+                jfrogcomponentName, StringComparison.OrdinalIgnoreCase));
+
+            string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults);
+
+            if (repoName.Equals(NotFoundInRepo, StringComparison.OrdinalIgnoreCase))
+            {
+                string fullName = bomHelper.GetFullNameOfComponent(component);
+                string fullNameVersion = $"{fullName}-{component.Version}.tgz";
+                if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase))
+                {
+                    aqlResults = aqlResultList.FindAll(x => x.Name.Equals(
+                        fullNameVersion, StringComparison.OrdinalIgnoreCase));
+
+                    repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults);
+                }
+            }
+
+            // Forming Jfrog repo Path
+            if (!repoName.Equals(NotFoundInRepo, StringComparison.OrdinalIgnoreCase))
+            {
+                aqlResult = aqlResults.FirstOrDefault(x => x.Repo.Equals(repoName));
+                jfrogRepoPath = GetJfrogRepoPath(aqlResult);
+            }
+
+            return aqlResult;
+        }
+
+        private static string GetJfrogRepoPath(AqlResult aqlResult)
+        {
+            if (string.IsNullOrEmpty(aqlResult.Path) || aqlResult.Path.Equals("."))
+            {
+                return $"{aqlResult.Repo}/{aqlResult.Name}";
+            }
+
+            return $"{aqlResult.Repo}/{aqlResult.Path}/{aqlResult.Name}";
         }
 
         private static List<Component> GetExcludedComponentsList(List<Component> componentsForBOM)

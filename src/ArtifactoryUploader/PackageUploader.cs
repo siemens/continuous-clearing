@@ -41,7 +41,8 @@ namespace LCT.ArtifactoryUploader
 
             DisplayPackagesInfo displayPackagesInfo = PackageUploadHelper.GetComponentsToBePackages();
 
-            List<ComponentsToArtifactory> m_ComponentsToBeUploaded = await PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(m_ComponentsInBOM.Components, appSettings, displayPackagesInfo);
+            List<ComponentsToArtifactory> m_ComponentsToBeUploaded = await PackageUploadHelper
+                .GetComponentsToBeUploadedToArtifactory(m_ComponentsInBOM.Components, appSettings, displayPackagesInfo);
             //Uploading the component to artifactory
 
             uploaderKpiData.PackagesToBeUploaded = m_ComponentsToBeUploaded.Count(x => x.PackageType == PackageType.ClearedThirdParty);
