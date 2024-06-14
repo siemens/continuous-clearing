@@ -105,6 +105,7 @@ namespace LCT.PackageIdentifier
             {
                 string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper);
                 string jfrogpackageName = $"{component.Name}_{component.Version}";
+                Logger.Debug($"Repo Name for the package {jfrogpackageName} is {repoName}");
                 var hashes = aqlResultList.FirstOrDefault(x => x.Name.Contains(
                     jfrogpackageName, StringComparison.OrdinalIgnoreCase));
            
