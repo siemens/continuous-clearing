@@ -344,6 +344,21 @@ namespace LCT.PackageIdentifier
             return false;
         }
 
+
+        private string GetJfrogNameOfPypiComponent(string name, string version, List<AqlResult> aqlResultList)
+        {
+            string nameVerison = string.Empty;
+            string jfrogcomponentName = $"{name}-{version}";
+            nameVerison = aqlResultList.FirstOrDefault(x => x.Name.Contains(jfrogcomponentName, StringComparison.OrdinalIgnoreCase))?.Name ?? string.Empty;
+            if (string.IsNullOrEmpty(nameVerison))
+            {
+                jfrogcomponentName = $"{name}_{version}";
+                nameVerison = aqlResultList.FirstOrDefault(x => x.Name.Contains(jfrogcomponentName, StringComparison.OrdinalIgnoreCase))?.Name ?? string.Empty;
+            }
+            return nameVerison;
+        }
+
+
         public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
             // get the  component list from Jfrog for given repo + internal repo
@@ -358,7 +373,10 @@ namespace LCT.PackageIdentifier
                 string jfrogpackageName = $"{component.Name}-{component.Version}";
                 var hashes = aqlResultList.FirstOrDefault(x => x.Name.Contains(
                     jfrogpackageName, StringComparison.OrdinalIgnoreCase)&& (x.Name.EndsWith(ApiConstant.PythonExtension)));
+                string jfrogPackageNamaWhlExten = GetJfrogNameOfPypiComponent(component.Name, component.Version, aqlResultList);
                 Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoUrl, Value = repoName };
+                Property siemensDirect = new() { Name = Dataconstant.Cdx_SiemensDirect, Value = "true" };
+                Property siemensName = new() { Name = Dataconstant.Cdx_SiemensDirect, Value = jfrogPackageNamaWhlExten };
                 Component componentVal = component;
 
                 if (componentVal.Properties?.Count == null || componentVal.Properties?.Count <= 0)
@@ -367,6 +385,8 @@ namespace LCT.PackageIdentifier
                 }
                 componentVal.Properties.Add(artifactoryrepo);
                 componentVal.Properties.Add(projectType);
+                componentVal.Properties.Add(siemensDirect);
+                componentVal.Properties.Add(siemensName);
                 componentVal.Description = null;
                 if (hashes != null)
                 {

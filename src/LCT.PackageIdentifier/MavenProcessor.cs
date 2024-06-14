@@ -164,9 +164,10 @@ namespace LCT.PackageIdentifier
             }
         }
 
-        public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM, CommonAppSettings appSettings,
-                                                          IJFrogService jFrogService,
-                                                          IBomHelper bomhelper)
+        public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM,
+                                                                           CommonAppSettings appSettings,
+                                                                           IJFrogService jFrogService,
+                                                                           IBomHelper bomhelper)
         {
 
             // get the  component list from Jfrog for given repo + internal repo
@@ -182,6 +183,12 @@ namespace LCT.PackageIdentifier
                 string jfrogpackageName = $"{component.Name}-{component.Version}{ApiConstant.MavenExtension}";
                 var hashes = aqlResultList.FirstOrDefault(x => x.Name == jfrogpackageName);
                 Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoUrl, Value = repoName };
+
+                string jfrogRepoPath = string.Empty;
+                AqlResult finalRepoData = GetJfrogArtifactoryRepoDetials(aqlResultList, component, bomhelper, out jfrogRepoPath);
+                Property siemensfileNameProp = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = finalRepoData?.Name ?? string.Empty };
+                Property jfrogRepoPathProp = new() { Name = Dataconstant.Cdx_JfrogRepoPath, Value = jfrogRepoPath };
+
                 Component componentVal = component;
                 if (componentVal.Properties?.Count == null || componentVal.Properties?.Count <= 0)
                 {
@@ -189,7 +196,8 @@ namespace LCT.PackageIdentifier
                 }
                 componentVal.Properties.Add(artifactoryrepo);
                 componentVal.Properties.Add(projectType);
-                componentVal.Description = null;
+                componentVal.Properties.Add(siemensfileNameProp);
+                componentVal.Description = string.Empty;
                 if (hashes != null)
                 {
                     componentVal.Hashes = new List<Hash>()
@@ -303,6 +311,52 @@ namespace LCT.PackageIdentifier
             }
 
             return repoName;
+        }
+
+
+        private static AqlResult GetJfrogArtifactoryRepoDetials(
+     List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper, out string jfrogRepoPath)
+        {
+            AqlResult aqlResult = new AqlResult();
+            jfrogRepoPath = string.Empty;
+            string jfrogcomponentName = $"{component.Name}-{component.Version}.jar";
+
+            var aqlResults = aqlResultList.FindAll(x => x.Name.Equals(
+                jfrogcomponentName, StringComparison.OrdinalIgnoreCase));
+
+            string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults);
+
+            if (repoName.Equals(NotFoundInRepo, StringComparison.OrdinalIgnoreCase))
+            {
+                string fullName = bomHelper.GetFullNameOfComponent(component);
+                string fullNameVersion = $"{fullName}-{component.Version}.jar";
+                if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase))
+                {
+                    aqlResults = aqlResultList.FindAll(x => x.Name.Equals(
+                        fullNameVersion, StringComparison.OrdinalIgnoreCase));
+
+                    repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults);
+                }
+            }
+
+            // Forming Jfrog repo Path
+            if (!repoName.Equals(NotFoundInRepo, StringComparison.OrdinalIgnoreCase))
+            {
+                aqlResult = aqlResults.FirstOrDefault(x => x.Repo.Equals(repoName));
+                jfrogRepoPath = GetJfrogRepoPath(aqlResult);
+            }
+
+            return aqlResult;
+        }
+
+        private static string GetJfrogRepoPath(AqlResult aqlResult)
+        {
+            if (string.IsNullOrEmpty(aqlResult.Path) || aqlResult.Path.Equals("."))
+            {
+                return $"{aqlResult.Repo}/{aqlResult.Name}";
+            }
+
+            return $"{aqlResult.Repo}/{aqlResult.Path}/{aqlResult.Name}";
         }
     }
 }

@@ -27,7 +27,7 @@ namespace LCT.PackageIdentifier
     /// <summary>
     /// The DebianProcessor class
     /// </summary>
-    public class DebianProcessor :  IParser
+    public class DebianProcessor : IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ICycloneDXBomParser _cycloneDXBomParser;
@@ -104,10 +104,14 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in componentsForBOM)
             {
-                string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper);
+                string jfrogRepoPackageName = string.Empty;
+                string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper, out jfrogRepoPackageName);
+
                 string jfrogpackageName = $"{component.Name}-{component.Version}{ApiConstant.DebianExtension}";
                 var hashes = aqlResultList.FirstOrDefault(x => x.Name == jfrogpackageName);
                 Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoUrl, Value = repoName };
+                Property siemensFileName = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = jfrogRepoPackageName };
+                Property siemensDirect = new() { Name = Dataconstant.Cdx_SiemensDirect, Value = "true" };
                 Component componentVal = component;
 
                 if (componentVal.Properties?.Count == null || componentVal.Properties?.Count <= 0)
@@ -116,7 +120,9 @@ namespace LCT.PackageIdentifier
                 }
                 componentVal.Properties.Add(artifactoryrepo);
                 componentVal.Properties.Add(projectType);
-                componentVal.Description = null;
+                componentVal.Properties.Add(siemensFileName);
+                componentVal.Properties.Add(siemensDirect);
+                componentVal.Description = string.Empty;
                 if (hashes != null)
                 {
                     componentVal.Hashes = new List<Hash>()
@@ -199,30 +205,46 @@ namespace LCT.PackageIdentifier
             bom = ExtractDetailsForJson(filePath, ref debianPackages);
             return debianPackages;
         }
-        private static string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
+        private static string GetArtifactoryRepoName(List<AqlResult> aqlResultList,
+                                                     Component component,
+                                                     IBomHelper bomHelper,
+                                                     out string jfrogRepoPackageName)
         {
-
-            string jfrogcomponentName = $"{component.Name}_{component.Version}";
+            string jfrogcomponentName = GetJfrogcomponentNameVersionCombined(component.Name, component.Version);
             var aqlResults = aqlResultList.FindAll(x => x.Name.Contains(
                 jfrogcomponentName, StringComparison.OrdinalIgnoreCase));
 
+            jfrogRepoPackageName = aqlResultList.FirstOrDefault(x => x.Name.Contains(
+                jfrogcomponentName, StringComparison.OrdinalIgnoreCase)
+            && x.Name.Contains(".deb", StringComparison.OrdinalIgnoreCase))?.Name ?? string.Empty; //todo: update with pkg name after the aqlresults check.
             string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults);
 
-            string fullName = bomHelper.GetFullNameOfComponent(component);
-            string fullNameVersion = $"{fullName}";
-
-            if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase) &&
-                repoName.Equals(NotFoundInRepo, StringComparison.OrdinalIgnoreCase))
+            if (repoName.Equals(NotFoundInRepo, StringComparison.OrdinalIgnoreCase))
             {
-                var aqllist = aqlResultList.FindAll(x => x.Name.Contains(
-                jfrogcomponentName, StringComparison.OrdinalIgnoreCase));
-
-                repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqllist);
+                string fullName = bomHelper.GetFullNameOfComponent(component);
+                string fullNameVersion = GetJfrogcomponentNameVersionCombined(fullName, component.Version);
+                if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase))
+                {
+                    aqlResults = aqlResultList.FindAll(x => x.Name.Contains(
+                    fullNameVersion, StringComparison.OrdinalIgnoreCase));
+                    jfrogRepoPackageName = aqlResultList.FirstOrDefault(x => x.Name.Contains(
+                        jfrogcomponentName, StringComparison.OrdinalIgnoreCase)
+                    && x.Name.Contains(".deb", StringComparison.OrdinalIgnoreCase))?.Name ?? string.Empty;
+                    repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults);
+                }
             }
-
             return repoName;
         }
 
+        private static string GetJfrogcomponentNameVersionCombined(string componentName, string componentVerison)
+        {
+            if (componentVerison.Contains(':'))
+            {
+                var correctVersion = CommonHelper.GetSubstringOfLastOccurance(componentVerison, ":");
+                return $"{componentName}_{correctVersion}";
+            }
+            return $"{componentName}_{componentVerison}";
+        }
 
         private static bool IsInternalDebianComponent(
             List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
@@ -258,7 +280,7 @@ namespace LCT.PackageIdentifier
                     Name = componentsInfo.Name,
                     Version = componentsInfo.Version,
                     PurlID = componentsInfo.Purl,
-                    
+
                 };
 
                 if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
@@ -306,7 +328,7 @@ namespace LCT.PackageIdentifier
                     Purl = GetReleaseExternalId(prop.Name, prop.Version)
                 };
                 component.BomRef = component.Purl;
-                component.Type=Component.Classification.Library;
+                component.Type = Component.Classification.Library;
 
                 //For Debian projects we will be considering CycloneDX file reading components as Discovered
                 //since it's Discovered from syft Tool
