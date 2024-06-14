@@ -230,7 +230,7 @@ namespace LCT.PackageIdentifier
 
                 string jfrogRepoPath = string.Empty;
                 AqlResult finalRepoData = GetJfrogArtifactoryRepoDetials(aqlResultList, component, bomhelper, out jfrogRepoPath);
-                Property siemensfileNameProp = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = finalRepoData.Name };
+                Property siemensfileNameProp = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = jfrogpackageName };
                 Property jfrogRepoPathProp = new() { Name = Dataconstant.Cdx_JfrogRepoPath, Value = jfrogRepoPath };
                 Property siemensDirect = new() { Name = Dataconstant.Cdx_SiemensDirect, Value = "true" };
                 Component componentVal = component;
