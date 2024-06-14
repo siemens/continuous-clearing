@@ -185,8 +185,9 @@ namespace LCT.PackageIdentifier
                 Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoUrl, Value = repoName };
 
                 string jfrogRepoPath = string.Empty;
+                string jfrogcomponentName = $"{component.Name}-{component.Version}.jar";
                 AqlResult finalRepoData = GetJfrogArtifactoryRepoDetials(aqlResultList, component, bomhelper, out jfrogRepoPath);
-                Property siemensfileNameProp = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = finalRepoData?.Name ?? string.Empty };
+                Property siemensfileNameProp = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = jfrogcomponentName };
                 Property jfrogRepoPathProp = new() { Name = Dataconstant.Cdx_JfrogRepoPath, Value = jfrogRepoPath };
 
                 Component componentVal = component;
