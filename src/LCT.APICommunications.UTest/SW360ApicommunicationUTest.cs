@@ -200,8 +200,7 @@ namespace LCT.APICommunications.UTest
                 });
 
             var httpClient = new HttpClient(mockHttpMessageHandler.Object);
-            var sW360Apicommunication = new SW360Apicommunication(connectionSettings); // Assuming your class SW360Apicommunication does not have a constructor that accepts HttpClient
-
+            var sW360Apicommunication = new SW360Apicommunication(connectionSettings); 
 
 
             var httpContent = new StringContent("Test content", Encoding.UTF8, "application/json");
@@ -227,11 +226,9 @@ namespace LCT.APICommunications.UTest
                 });
 
             var httpClient = new HttpClient(mockHttpMessageHandler.Object);
-            var sW360Apicommunication = new SW360Apicommunication(connectionSettings); // Assuming your class SW360Apicommunication does not have a constructor that accepts HttpClient
+            var sW360Apicommunication = new SW360Apicommunication(connectionSettings); 
 
-
-
-            var createComponentContent = new CreateComponent(); // Assuming CreateComponent is a class. Replace with your actual CreateComponent instance.
+            var createComponentContent = new CreateComponent(); 
 
             // Act
             Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.CreateComponent(createComponentContent));
@@ -255,10 +252,7 @@ namespace LCT.APICommunications.UTest
                 });
 
             var httpClient = new HttpClient(mockHttpMessageHandler.Object);
-            var sW360Apicommunication = new SW360Apicommunication(connectionSettings); // Assuming your class SW360Apicommunication does not have a constructor that accepts HttpClient
-
-
-            // Act
+            var sW360Apicommunication = new SW360Apicommunication(connectionSettings); 
             Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.GetComponentByExternalId("TestPurlId"));
 
 
@@ -280,9 +274,7 @@ namespace LCT.APICommunications.UTest
                 });
 
             var httpClient = new HttpClient(mockHttpMessageHandler.Object);
-            var sW360Apicommunication = new SW360Apicommunication(connectionSettings); // Assuming your class SW360Apicommunication does not have a constructor that accepts HttpClient
-
-
+            var sW360Apicommunication = new SW360Apicommunication(connectionSettings); 
             // Act
             Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.GetProjects());
 
@@ -305,7 +297,7 @@ namespace LCT.APICommunications.UTest
                 });
 
             var httpClient = new HttpClient(mockHttpMessageHandler.Object);
-            var sW360Apicommunication = new SW360Apicommunication(connectionSettings); // Assuming your class SW360Apicommunication does not have a constructor that accepts HttpClient
+            var sW360Apicommunication = new SW360Apicommunication(connectionSettings); 
 
 
             // Act
@@ -329,8 +321,7 @@ namespace LCT.APICommunications.UTest
                 });
 
             var httpClient = new HttpClient(mockHttpMessageHandler.Object);
-            var sW360Apicommunication = new SW360Apicommunication(connectionSettings); // Assuming your class SW360Apicommunication does not have a constructor that accepts HttpClient
-
+            var sW360Apicommunication = new SW360Apicommunication(connectionSettings); 
 
             // Act
             Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.GetReleases());
