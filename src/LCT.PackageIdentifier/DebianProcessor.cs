@@ -218,6 +218,7 @@ namespace LCT.PackageIdentifier
                 jfrogcomponentName, StringComparison.OrdinalIgnoreCase)
             && x.Name.Contains(".deb", StringComparison.OrdinalIgnoreCase))?.Name ?? string.Empty; //todo: update with pkg name after the aqlresults check.
             string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults);
+            Logger.Debug($"Repo Name for the package {jfrogcomponentName} is {repoName}");
 
             if (repoName.Equals(NotFoundInRepo, StringComparison.OrdinalIgnoreCase))
             {
