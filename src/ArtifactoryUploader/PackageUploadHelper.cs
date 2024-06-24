@@ -65,7 +65,9 @@ namespace LCT.ArtifactoryUploader
             return componentsToBoms;
         }
 
-        public async static Task<List<ComponentsToArtifactory>> GetComponentsToBeUploadedToArtifactory(List<Component> comparisonBomData, CommonAppSettings appSettings, DisplayPackagesInfo displayPackagesInfo)
+        public async static Task<List<ComponentsToArtifactory>> GetComponentsToBeUploadedToArtifactory(List<Component> comparisonBomData,
+                                                                                                       CommonAppSettings appSettings,
+                                                                                                       DisplayPackagesInfo displayPackagesInfo)
         {
             Logger.Debug("Starting GetComponentsToBeUploadedToArtifactory() method");
             List<ComponentsToArtifactory> componentsToBeUploaded = new List<ComponentsToArtifactory>();
@@ -107,14 +109,14 @@ namespace LCT.ArtifactoryUploader
                     components.CopyPackageApiUrl = GetCopyURL(components);
                     components.MovePackageApiUrl = GetMoveURL(components);
                     components.JfrogPackageName = GetJfrogPackageName(components);
-                   componentsToBeUploaded.Add(components);
+                    componentsToBeUploaded.Add(components);
                 }
                 else
                 {
                     PackageUploader.uploaderKpiData.ComponentNotApproved++;
                     PackageUploader.uploaderKpiData.PackagesNotUploadedToJfrog++;
                     await AddUnknownPackagesAsync(item, displayPackagesInfo);
-                }               
+                }
             }
             Logger.Debug("Ending GetComponentsToBeUploadedToArtifactory() method");
             return componentsToBeUploaded;
@@ -174,7 +176,7 @@ namespace LCT.ArtifactoryUploader
 
                 foreach (var jfrogFoundPackage in JfrogFoundPackages)
                 {
-                   
+
                     if (jfrogFoundPackage.ResponseMessage.ReasonPhrase == ApiConstant.ErrorInUpload)
                     {
                         Logger.Error($"Package {jfrogFoundPackage.Name}-{jfrogFoundPackage.Version} {jfrogFoundPackage.OperationType} Failed!! {jfrogFoundPackage.SrcRepoName} ---> {jfrogFoundPackage.DestRepoName}");
@@ -261,7 +263,7 @@ namespace LCT.ArtifactoryUploader
                 }
                 myDeserializedClass.Npm = npmComponents;
                 fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
-                
+
             }
             else
             {
@@ -286,12 +288,12 @@ namespace LCT.ArtifactoryUploader
                 ProjectResponse myDeserializedClass = JsonConvert.DeserializeObject<ProjectResponse>(json);
                 List<JsonComponents> nugetComponents = new List<JsonComponents>();
                 foreach (var nugetpackage in unknownPackages)
-                {                   
+                {
                     JsonComponents jsonComponents = new JsonComponents();
                     jsonComponents.Name = nugetpackage.Name;
                     jsonComponents.Version = nugetpackage.Version;
                     nugetComponents.Add(jsonComponents);
-                }                
+                }
                 myDeserializedClass.Nuget = nugetComponents;
                 fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
             }
@@ -519,7 +521,13 @@ namespace LCT.ArtifactoryUploader
                 DestRepoName = item.DestRepoName,
                 OperationType = operationType,
                 ResponseMessage = responseMessage,
-                DryRunSuffix = dryRunSuffix
+                DryRunSuffix = dryRunSuffix,
+                ComponentType = item.ComponentType,
+                Purl = item.Purl,
+                ApiKey = item.ApiKey,
+                CopyPackageApiUrl = item.CopyPackageApiUrl,
+                PackageName = item.PackageName,
+                PackageType = item.PackageType,
 
             };
             return Task.FromResult(components);
@@ -530,8 +538,14 @@ namespace LCT.ArtifactoryUploader
 
             ComponentsToArtifactory components = new ComponentsToArtifactory()
             {
-               Name = item.Name,
+                Name = item.Name,
                 Version = item.Version,
+                SrcRepoName = item.SrcRepoName,
+                DestRepoName = item.DestRepoName,
+                SrcRepoPathWithFullName = item.SrcRepoPathWithFullName,
+                Path = item.Path,
+                PackageType = item.PackageType,
+                Purl= item.Purl,
 
             };
             return Task.FromResult(components);
@@ -655,7 +669,6 @@ namespace LCT.ArtifactoryUploader
         }
         private static async Task SucessfullPackagesAsync(ComponentsToArtifactory item, DisplayPackagesInfo displayPackagesInfo)
         {
-
             if (item.ComponentType == "NPM")
             {
 
@@ -745,9 +758,9 @@ namespace LCT.ArtifactoryUploader
                 // Add a wild card to the path end for jFrog AQL query search
                 component.Path = $"{component.Path}/*";
             }
-            else if(component.ComponentType == "DEBIAN")
+            else if (component.ComponentType == "DEBIAN")
             {
-                url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension,"")}*" +
+                url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*" +
                            $"?to=/{component.DestRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*";
             }
             else
@@ -787,7 +800,7 @@ namespace LCT.ArtifactoryUploader
                 // Add a wild card to the path end for jFrog AQL query search
                 component.Path = $"{component.Path}/*";
             }
-            else if(component.ComponentType == "DEBIAN")
+            else if (component.ComponentType == "DEBIAN")
             {
                 url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*" +
                           $"?to=/{component.DestRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*";
@@ -845,7 +858,7 @@ namespace LCT.ArtifactoryUploader
                     break;
 
                 case "DEBIAN":
-                    packageName = $"{component.PackageName}_{component.Version.Replace(ApiConstant.DebianExtension, "")+"*"}";
+                    packageName = $"{component.PackageName}_{component.Version.Replace(ApiConstant.DebianExtension, "") + "*"}";
                     break;
 
                 case "PYTHON":
@@ -978,7 +991,10 @@ namespace LCT.ArtifactoryUploader
             Program.UploaderStopWatch?.Stop();
         }
 
-        private static async Task PackageUploadToArtifactory(UploaderKpiData uploaderKpiData, ComponentsToArtifactory item, int timeout, DisplayPackagesInfo displayPackagesInfo)
+        private static async Task PackageUploadToArtifactory(UploaderKpiData uploaderKpiData,
+                                                             ComponentsToArtifactory item,
+                                                             int timeout,
+                                                             DisplayPackagesInfo displayPackagesInfo)
         {
             var packageType = item.PackageType;
             if (item.SrcRepoName != null
@@ -1164,6 +1180,192 @@ namespace LCT.ArtifactoryUploader
             }
         }
 
+        internal static async Task<Bom> UpdateJfrogRepoPathForSucessfullyUploadedItems(Bom m_ComponentsInBOM,
+                                                                            DisplayPackagesInfo displayPackagesInfo)
+        {
+            // Get details of sucessfully uploaded packages
+            List<ComponentsToArtifactory> uploadedPackages = GetUploadePackageDetails(displayPackagesInfo);
+
+            // Get the details of all the dest repo names from jfrog at once
+            List<string> destRepoNames = uploadedPackages.Select(x => x.DestRepoName)?.Distinct()?.ToList() ?? new List<string>();
+            List<AqlResult> jfrogPackagesListAql = await GetJfrogRepoInfoForAllTypePackages(destRepoNames);
+
+            // Update the repo path
+            List<Component> bomComponents = UpdateJfroRepoPathProperty(m_ComponentsInBOM, uploadedPackages, jfrogPackagesListAql);
+            m_ComponentsInBOM.Components = bomComponents;
+            return m_ComponentsInBOM;
+
+        }
+
+        private static List<Component> UpdateJfroRepoPathProperty(Bom m_ComponentsInBOM,
+                                                                  List<ComponentsToArtifactory> uploadedPackages,
+                                                                  List<AqlResult> jfrogPackagesListAql)
+        {
+            List<Component> bomComponents = m_ComponentsInBOM.Components;
+            foreach (var component in bomComponents)
+            {
+                // check component exists in upload list
+                var package = uploadedPackages.FirstOrDefault(x => x.Name.Contains($"{component.Name}")
+                 && x.Version.Contains($"{component.Version}") && x.Purl.Contains(component.Purl));
+
+                // if component not exists in upload list move to nect item in the loop
+                if (package == null) { continue; }
+
+                // get jfrog details of a component from the aqlresult set
+                string packageNameEXtension = GetPackageNameExtensionBasedOnComponentType(package);
+                AqlResult jfrogData = GetJfrogInfoOfThePackageUploaded(jfrogPackagesListAql, package, packageNameEXtension);
+
+                // if package not exists in jfrog list move to nect item in the loop
+                if (jfrogData == null) { continue; }
+
+                // Get path and update the component with new repo path property
+                string newRepoPath = GetJfrogRepoPath(jfrogData) ?? Dataconstant.JfrogRepoPathNotFound;
+                Property repoPathProperty = new() { Name = Dataconstant.Cdx_JfrogRepoPath, Value = newRepoPath };
+                if (component.Properties == null)
+                {
+                    component.Properties = new List<Property> { };
+                    component.Properties.Add(repoPathProperty);
+                    continue;
+                }
+
+                if (component.Properties.Exists(x => x.Name.Equals(Dataconstant.Cdx_JfrogRepoPath, StringComparison.OrdinalIgnoreCase)))
+                {
+                    component
+                        .Properties
+                        .Find(x => x.Name.Equals(Dataconstant.Cdx_JfrogRepoPath, StringComparison.OrdinalIgnoreCase))
+                        .Value = newRepoPath;
+                    continue;
+                }
+
+                // if repo path property not exists
+                component.Properties.Add(repoPathProperty);
+            }
+
+            return bomComponents;
+        }
+
+        private static AqlResult GetJfrogInfoOfThePackageUploaded(List<AqlResult> jfrogPackagesListAql, ComponentsToArtifactory package, string packageNameEXtension)
+        {
+            string pkgType = package.ComponentType ?? string.Empty;
+            if (pkgType.Equals("CONAN", StringComparison.OrdinalIgnoreCase))
+            {
+                return jfrogPackagesListAql.FirstOrDefault(x => x.Path.Contains(package.Name)
+                                                 && x.Path.Contains(package.Version)
+                                                 && x.Name.Contains($"package.{packageNameEXtension}"));
+            }
+            return jfrogPackagesListAql.FirstOrDefault(x => x.Path.Contains(package.Name)
+                                                 && x.Name.Contains(package.Version)
+                                                 && x.Name.Contains(packageNameEXtension));
+        }
+
+        private static string GetJfrogRepoPath(AqlResult aqlResult)
+        {
+            if (string.IsNullOrEmpty(aqlResult.Path) || aqlResult.Path.Equals("."))
+            {
+                return $"{aqlResult.Repo}/{aqlResult.Name}";
+            }
+            return $"{aqlResult.Repo}/{aqlResult.Path}/{aqlResult.Name}";
+        }
+
+        private static string GetPackageNameExtensionBasedOnComponentType(ComponentsToArtifactory package)
+        {
+            string packageNameEXtension = string.Empty;
+            if (package.ComponentType.Equals("NPM", StringComparison.OrdinalIgnoreCase))
+            {
+                packageNameEXtension = ".tgz";
+            }
+            if (package.ComponentType.Equals("NUGET", StringComparison.OrdinalIgnoreCase))
+            {
+                packageNameEXtension = ".nupkg";
+            }
+            if (package.ComponentType.Equals("MAVEN", StringComparison.OrdinalIgnoreCase))
+            {
+                packageNameEXtension = ".jar";
+            }
+            if (package.ComponentType.Equals("DEBIAN", StringComparison.OrdinalIgnoreCase))
+            {
+                packageNameEXtension = ".deb";
+            }
+            if (package.ComponentType.Equals("PYTHON", StringComparison.OrdinalIgnoreCase))
+            {
+                packageNameEXtension = ".whl";
+            }
+            if (package.ComponentType.Equals("CONAN", StringComparison.OrdinalIgnoreCase))
+            {
+                packageNameEXtension = "package.tgz";
+            }
+
+            return packageNameEXtension;
+        }
+
+        private static async Task<List<AqlResult>> GetJfrogRepoInfoForAllTypePackages(List<string> destRepoNames)
+        {
+            if (destRepoNames != null && destRepoNames.Count > 0)
+            {
+                foreach (var repo in destRepoNames)
+                {
+                    var result = await jFrogService.GetInternalComponentDataByRepo(repo) ?? new List<AqlResult>();
+                    aqlResultList.AddRange(result);
+                }
+            }
+
+            return aqlResultList;
+        }
+
+        private static List<ComponentsToArtifactory> GetUploadePackageDetails(DisplayPackagesInfo displayPackagesInfo)
+        {
+            List<ComponentsToArtifactory> uploadedPackages = new List<ComponentsToArtifactory>();
+
+            foreach (var item in displayPackagesInfo.JfrogFoundPackagesConan)
+            {
+                if (item.ResponseMessage?.StatusCode == HttpStatusCode.OK)
+                {
+                    uploadedPackages.Add(item);
+                }
+            }
+
+            foreach (var item in displayPackagesInfo.JfrogFoundPackagesMaven)
+            {
+                if (item.ResponseMessage?.StatusCode == HttpStatusCode.OK)
+                {
+                    uploadedPackages.Add(item);
+                }
+            }
+
+            foreach (var item in displayPackagesInfo.JfrogFoundPackagesNpm)
+            {
+                if (item.ResponseMessage?.StatusCode == HttpStatusCode.OK)
+                {
+                    uploadedPackages.Add(item);
+                }
+            }
+
+            foreach (var item in displayPackagesInfo.JfrogFoundPackagesNuget)
+            {
+                if (item.ResponseMessage?.StatusCode == HttpStatusCode.OK)
+                {
+                    uploadedPackages.Add(item);
+                }
+            }
+
+            foreach (var item in displayPackagesInfo.JfrogFoundPackagesPython)
+            {
+                if (item.ResponseMessage?.StatusCode == HttpStatusCode.OK)
+                {
+                    uploadedPackages.Add(item);
+                }
+            }
+
+            foreach (var item in displayPackagesInfo.JfrogFoundPackagesDebian)
+            {
+                if (item.ResponseMessage?.StatusCode == HttpStatusCode.OK)
+                {
+                    uploadedPackages.Add(item);
+                }
+            }
+
+            return uploadedPackages;
+        }
     }
 
 }

@@ -58,7 +58,13 @@ namespace LCT.ArtifactoryUploader
             var fileOperations = new FileOperations();
             string bomGenerationPath = Path.GetDirectoryName(appSettings.BomFilePath);
             PackageUploadHelper.UpdateBomArtifactoryRepoUrl(ref m_ComponentsInBOM, m_ComponentsToBeUploaded);
-            fileOperations.WriteContentToFile(m_ComponentsInBOM, bomGenerationPath, FileConstant.BomFileName, appSettings.SW360ProjectName);
+
+            //update Jfrog Repo Path For Sucessfully Uploaded Items
+            m_ComponentsInBOM = await PackageUploadHelper.UpdateJfrogRepoPathForSucessfullyUploadedItems(m_ComponentsInBOM, displayPackagesInfo);
+
+            // wrtite final out put in the json file
+            fileOperations.WriteContentToFile(m_ComponentsInBOM, bomGenerationPath, 
+                FileConstant.BomFileName, appSettings.SW360ProjectName);
 
             // write kpi info to console table 
             if (Program.UploaderStopWatch != null)
@@ -74,7 +80,6 @@ namespace LCT.ArtifactoryUploader
                 Environment.ExitCode = 2;
                 Logger.Debug("Setting ExitCode to 2");
             }
-
         }
         public static void DisplayAllSettings(List<Component> m_ComponentsInBOM, CommonAppSettings appSettings)
         {

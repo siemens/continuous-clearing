@@ -16,6 +16,7 @@ using log4net;
 using log4net.Core;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
@@ -167,7 +168,7 @@ namespace LCT.PackageIdentifier
                     comparisonBOMData = bom.Components,
                     internalComponents = new List<Component>()
                 };
-
+                
                 //Identification of internal components
                 Logger.Logger.Log(null, Level.Notice, $"Identifying the internal components", null);
                 lstOfComponents = await parser.IdentificationOfInternalComponents(componentData, appSettings, JFrogService, BomHelper);

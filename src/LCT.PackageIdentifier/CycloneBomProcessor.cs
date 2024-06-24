@@ -108,10 +108,28 @@ namespace LCT.PackageIdentifier
                 Value = "false"
             };
 
+            Property isDirect = new()
+            {
+                Name = Dataconstant.Cdx_SiemensDirect,
+                Value = "true"
+            };
+            Property filname = new()
+            {
+                Name = Dataconstant.Cdx_Siemensfilename,
+                Value = Dataconstant.PackageNameNotFoundInJfrog
+            };
+            Property jfrogRepoPathProperty = new()
+            {
+                Name = Dataconstant.Cdx_JfrogRepoPath,
+                Value = Dataconstant.JfrogRepoPathNotFound
+            };
             component.Properties.Add(internalType);
             component.Properties.Add(artifactoryrepo);
             component.Properties.Add(projectType);
             component.Properties.Add(isDevelopment);
+            component.Properties.Add(isDirect);
+            component.Properties.Add(filname);
+            component.Properties.Add(jfrogRepoPathProperty);
             component.Description = null;
             componentForBOM.Add(component);
         }

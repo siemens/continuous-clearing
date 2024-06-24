@@ -87,7 +87,7 @@ namespace LCT.PackageIdentifier
             componentsForBOM = ListOfComponents.Distinct(new ComponentEqualityComparer()).ToList();
 
             BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - componentsForBOM.Count;
-            
+
 
             if (appSettings.Maven.ExcludedComponents != null)
             {
@@ -100,7 +100,34 @@ namespace LCT.PackageIdentifier
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
             BomCreator.bomKpiData.ComponentsInComparisonBOM = bom.Components.Count;
             Logger.Debug($"ParsePackageFile():End");
+
+            if (bom != null)
+            {
+                AddSiemensDirectProperty(ref bom);
+            }
+
             return bom;
+        }
+
+        private void AddSiemensDirectProperty(ref Bom bom)
+        {
+            List<string> mavenDirectDependencies = new List<string>();
+            mavenDirectDependencies.AddRange(bom.Dependencies?.Select(x => x.Ref)?.ToList() ?? new List<string>());
+            var bomComponentsList = bom.Components;
+            foreach (var component in bomComponentsList)
+            {
+                Property siemensDirect = new() { Name = Dataconstant.Cdx_SiemensDirect, Value = "false" };
+                if (mavenDirectDependencies.Exists(x => x.Contains(component.Name) && x.Contains(component.Version)))
+                {
+                    siemensDirect.Value = "true";
+                }
+
+                component.Properties ??= new List<Property>();
+                bool isPropExists = component.Properties.Exists(x => x.Name.Equals(Dataconstant.Cdx_SiemensDirect));
+                if (!isPropExists) { component.Properties.Add(siemensDirect); }
+            }
+
+            bom.Components = bomComponentsList;
         }
 
         public static void DevDependencyIdentificationLogic(List<Component> componentsForBOM, List<Component> componentsToBOM, ref List<Component> ListOfComponents)
@@ -178,17 +205,15 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in componentsForBOM)
             {
-
-                string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper);
                 string jfrogpackageName = $"{component.Name}-{component.Version}{ApiConstant.MavenExtension}";
                 var hashes = aqlResultList.FirstOrDefault(x => x.Name == jfrogpackageName);
-                Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoUrl, Value = repoName };
 
                 string jfrogRepoPath = string.Empty;
                 string jfrogcomponentName = $"{component.Name}-{component.Version}.jar";
                 AqlResult finalRepoData = GetJfrogArtifactoryRepoDetials(aqlResultList, component, bomhelper, out jfrogRepoPath);
-                Property siemensfileNameProp = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = jfrogcomponentName };
+                Property siemensfileNameProp = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = finalRepoData?.Name ?? Dataconstant.PackageNameNotFoundInJfrog };
                 Property jfrogRepoPathProp = new() { Name = Dataconstant.Cdx_JfrogRepoPath, Value = jfrogRepoPath };
+                Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoUrl, Value = finalRepoData.Repo };
 
                 Component componentVal = component;
                 if (componentVal.Properties?.Count == null || componentVal.Properties?.Count <= 0)
@@ -198,6 +223,7 @@ namespace LCT.PackageIdentifier
                 componentVal.Properties.Add(artifactoryrepo);
                 componentVal.Properties.Add(projectType);
                 componentVal.Properties.Add(siemensfileNameProp);
+                componentVal.Properties.Add(jfrogRepoPathProp);
                 componentVal.Description = null;
                 if (hashes != null)
                 {
@@ -290,36 +316,13 @@ namespace LCT.PackageIdentifier
             return false;
         }
 
-        private static string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
-        {
-            string jfrogcomponentName = $"{component.Name}-{component.Version}";
-
-            var aqlResults = aqlResultList.FindAll(x => x.Name.Contains(
-                jfrogcomponentName, StringComparison.OrdinalIgnoreCase));
-
-            string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults);
-
-            string fullName = bomHelper.GetFullNameOfComponent(component);
-            string fullNameVersion = $"{fullName}-{component.Version}";
-
-            if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase) &&
-                repoName.Equals(NotFoundInRepo, StringComparison.OrdinalIgnoreCase))
-            {
-                var aqllist = aqlResultList.FindAll(x => x.Name.Contains(
-                    fullNameVersion, StringComparison.OrdinalIgnoreCase));
-
-                repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqllist);
-            }
-
-            return repoName;
-        }
-
-
-        private static AqlResult GetJfrogArtifactoryRepoDetials(
-     List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper, out string jfrogRepoPath)
+        private static AqlResult GetJfrogArtifactoryRepoDetials(List<AqlResult> aqlResultList,
+                                                                Component component,
+                                                                IBomHelper bomHelper,
+                                                                out string jfrogRepoPath)
         {
             AqlResult aqlResult = new AqlResult();
-            jfrogRepoPath = string.Empty;
+            jfrogRepoPath = Dataconstant.JfrogRepoPathNotFound;
             string jfrogcomponentName = $"{component.Name}-{component.Version}.jar";
 
             var aqlResults = aqlResultList.FindAll(x => x.Name.Equals(
@@ -346,7 +349,7 @@ namespace LCT.PackageIdentifier
                 aqlResult = aqlResults.FirstOrDefault(x => x.Repo.Equals(repoName));
                 jfrogRepoPath = GetJfrogRepoPath(aqlResult);
             }
-
+            aqlResult.Repo ??= repoName;
             return aqlResult;
         }
 
