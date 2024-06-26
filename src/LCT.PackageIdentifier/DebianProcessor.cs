@@ -140,7 +140,6 @@ namespace LCT.PackageIdentifier
                 var hashes = aqlResultList.FirstOrDefault(x => x.Name == jfrogpackageName);
                 Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoUrl, Value = repoName };
                 Property jfrogFileNameProperty = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = jfrogRepoPackageName };
-                Property directDepProperty = new() { Name = Dataconstant.Cdx_SiemensDirect, Value = "true" };
                 Property jfrogRepoPathProperty = new() { Name = Dataconstant.Cdx_JfrogRepoPath, Value = jfrogRepoPath };
                 Component componentVal = component;
 
@@ -151,7 +150,6 @@ namespace LCT.PackageIdentifier
                 componentVal.Properties.Add(artifactoryrepo);
                 componentVal.Properties.Add(projectType);
                 componentVal.Properties.Add(jfrogFileNameProperty);
-                componentVal.Properties.Add(directDepProperty);
                 componentVal.Properties.Add(jfrogRepoPathProperty);
                 componentVal.Description = null;
                 if (hashes != null)
