@@ -25,8 +25,6 @@ namespace LCT.Common
         {
             Bom bom = new Bom();
             string json = string.Empty;
-            Logger.Logger.Log(null, Level.Notice, $"Consuming cyclonedx file data from " + filePath + "...\n", null);
-
             try
             {
                 json = File.ReadAllText(filePath);

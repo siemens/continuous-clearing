@@ -45,6 +45,8 @@ namespace LCT.Common.Constants
         public const string DownloadUrlNotFound = "Component Download Url not Found!";
         public const string SourceUrlNotFound = "Source URL not found";
         public const string PackageUrlNotFound = "Package URL not found";
+        public const string PackageNameNotFoundInJfrog = "Package name not found in Jfrog";
+        public const string JfrogRepoPathNotFound = "Jfrog repo path not found";
         public const string LinkedByCATool = "Linked by CA Tool";
         public const string LinkedByCAToolReleaseRelation = "UNKNOWN";
         public const string ReleaseAttachmentComment = "Attached by CA Tool";
@@ -59,6 +61,9 @@ namespace LCT.Common.Constants
         public const string Cdx_IsDevelopment = "internal:siemens:clearing:development";
         public const string Cdx_IdentifierType = "internal:siemens:clearing:identifier-type";
         public const string AlpineSourceURLSuffix = "?ref_type=heads";
+        public const string Cdx_JfrogRepoPath = "internal:siemens:clearing:jfrog-repo-path";
+        public const string Cdx_Siemensfilename = "internal:siemens:clearing:siemens:filename";
+        public const string Cdx_SiemensDirect = "internal:siemens:clearing:siemens:direct";
 
         public static Dictionary<string, string> PurlCheck()
         {

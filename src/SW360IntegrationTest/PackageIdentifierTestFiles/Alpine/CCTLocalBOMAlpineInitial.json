@@ -2,36 +2,50 @@
   "BomFormat": "CycloneDX",
   "SpecVersion": 4,
   "SpecVersionString": "1.4",
-  "SerialNumber": "urn:uuid:80ef8e07-0343-46e3-898e-1eb298abd180",
+  "SerialNumber": "urn:uuid:11149d5b-a371-42df-a81d-39d7e4d338ee",
   "Version": 1,
   "NonNullableVersion": 1,
   "Metadata": {
-    "Timestamp": "2023-09-27T09:39:34Z",
+    "Timestamp": "2024-06-22T11:03:18Z",
     "Tools": [
-      {
-        "Vendor": "anchore",
-        "Name": "syft",
-        "Version": "0.89.0",
-        "Hashes": null
-      },
       {
         "Vendor": "Siemens AG",
         "Name": "Clearing Automation Tool",
-        "Version": "3.1.2",
-        "Hashes": null
+        "Version": "6.1.0",
+        "Hashes": null,
+        "ExternalReferences": [
+          {
+            "Url": "https://github.com/siemens/continuous-clearing",
+            "Type": 3,
+            "Comment": null
+          }
+        ]
+      },
+      {
+        "Vendor": "Siemens AG",
+        "Name": "Siemens SBOM",
+        "Version": "2.0.0",
+        "Hashes": null,
+        "ExternalReferences": [
+          {
+            "Url": "https://sbom.siemens.io/",
+            "Type": 3,
+            "Comment": null
+          }
+        ]
       }
     ],
     "Authors": null,
     "Component": {
-      "Type": 7,
+      "Type": 1,
       "MimeType": null,
-      "BomRef": "1d098408640ab242",
+      "BomRef": null,
       "Supplier": null,
       "Author": null,
       "Publisher": null,
       "Group": null,
-      "Name": "alpine",
-      "Version": "sha256:c5c5fda71656f28e49ac9c5416b3643eaa6a108a8093151d6d1afc9463be8e33",
+      "Name": "Test",
+      "Version": "1.0",
       "Description": null,
       "Scope": null,
       "Hashes": null,
@@ -46,7 +60,13 @@
       "Evidence": null
     },
     "Manufacture": null,
-    "Supplier": null
+    "Supplier": null,
+    "Properties": [
+      {
+        "Name": "siemens:profile",
+        "Value": "clearing"
+      }
+    ]
   },
   "Components": [
     {
