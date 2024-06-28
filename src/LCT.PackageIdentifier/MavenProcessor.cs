@@ -55,7 +55,7 @@ namespace LCT.PackageIdentifier
                     }
                     else
                     {
-                        Logger.Error("No components found in the BOM file : " + filepath);
+                        Logger.Warn("No components found in the BOM file : " + filepath);
                         continue;
                     }
 
