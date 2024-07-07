@@ -66,7 +66,7 @@ namespace SW360IntegrationTest.Debian
 
             // Expected
             ComponentJsonParsor expected = new ComponentJsonParsor();
-            expected.Read(CCTLocalBomTestFile);
+            expected.GeneratedRead(CCTLocalBomTestFile);
 
             // Actual
             string generatedBOM = OutFolder + $"\\..\\BOMs\\Debian\\{testParameters.SW360ProjectName}_Bom.cdx.json";
