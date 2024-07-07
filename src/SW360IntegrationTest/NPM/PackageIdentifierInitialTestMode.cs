@@ -64,7 +64,7 @@ namespace SW360IntegrationTest.NPM
 
             // Expected
             ComponentJsonParsor expected = new ComponentJsonParsor();
-            expected.Read(CCTLocalBomTestFile);
+            expected.GeneratedRead(CCTLocalBomTestFile);
 
             // Actual
             string generatedBOM = OutFolder + $"\\..\\BOMs\\{testParameters.SW360ProjectName}_Bom.cdx.json";
@@ -74,7 +74,7 @@ namespace SW360IntegrationTest.NPM
 
                 ComponentJsonParsor actual = new ComponentJsonParsor();
 
-                actual.Read(generatedBOM);
+                actual.GeneratedRead(generatedBOM);
 
                 foreach (var item in expected.Components)
                 {

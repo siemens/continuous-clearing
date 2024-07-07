@@ -26,9 +26,9 @@ namespace SW360IntegrationTest.Maven
 
             CCTLocalBomTestFile = OutFolder + @"..\..\..\src\SW360IntegrationTest\PackageIdentifierTestFiles\Maven\CCTLocalBOMMavenInitial.json";
 
-            if (!Directory.Exists(OutFolder + @"\..\BOMs"))
+            if (!Directory.Exists(OutFolder + @"\..\BOMs\Maven"))
             {
-                Directory.CreateDirectory(OutFolder + @"\..\BOMs");
+                Directory.CreateDirectory(OutFolder + @"\..\BOMs\Maven");
             }
             testParameters = new TestParamNuget();
         }
@@ -37,7 +37,7 @@ namespace SW360IntegrationTest.Maven
         public void RunBOMCreatorexe_ProvidedPackageJsonFilePath_ReturnsSuccess()
         {
             string packagejsonPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest1stIterationData\Maven";
-            string bomPath = OutFolder + @"\..\BOMs";
+            string bomPath = OutFolder + @"\..\BOMs\Maven";
 
             // Test BOM Creator ran with exit code 0
             Assert.AreEqual(0, TestHelper.RunBOMCreatorExe(new string[]{
@@ -64,16 +64,16 @@ namespace SW360IntegrationTest.Maven
 
             // Expected
             ComponentJsonParsor expected = new ComponentJsonParsor();
-            expected.Read(CCTLocalBomTestFile);
+            expected.GeneratedRead(CCTLocalBomTestFile);
 
             // Actual
-            string generatedBOM = OutFolder + $"\\..\\BOMs\\{testParameters.SW360ProjectName}_Bom.cdx.json";
+            string generatedBOM = OutFolder + $"\\..\\BOMs\\Maven\\{testParameters.SW360ProjectName}_Bom.cdx.json";
             if (File.Exists(generatedBOM))
             {
                 fileExist = true;
 
                 ComponentJsonParsor actual = new ComponentJsonParsor();
-                actual.Read(generatedBOM);
+                actual.GeneratedRead(generatedBOM);
 
                 foreach (var item in expected.Components)
                 {

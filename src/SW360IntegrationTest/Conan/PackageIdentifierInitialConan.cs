@@ -19,9 +19,9 @@ namespace SW360IntegrationTest.Conan
 
             CCTLocalBomTestFile = OutFolder + @"..\..\..\src\SW360IntegrationTest\PackageIdentifierTestFiles\Conan\CCTLocalBOMConanInitial.json";
 
-            if (!Directory.Exists(OutFolder + @"\..\BOMs"))
+            if (!Directory.Exists(OutFolder + @"\..\BOMs\Conan"))
             {
-                Directory.CreateDirectory(OutFolder + @"\..\BOMs");
+                Directory.CreateDirectory(OutFolder + @"\..\BOMs\Conan");
             }
             testParameters = new TestParamConan();
         }
@@ -29,7 +29,7 @@ namespace SW360IntegrationTest.Conan
         public void RunBOMCreatorexe_ProvidedPackageJsonFilePath_ReturnsSuccess()
         {
             string packagejsonPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest1stIterationData\Conan";
-            string bomPath = OutFolder + @"\..\BOMs";
+            string bomPath = OutFolder + @"\..\BOMs\Conan";
 
             // Test BOM Creator ran with exit code 0
             Assert.AreEqual(0, TestHelper.RunBOMCreatorExe(new string[]{
@@ -55,16 +55,16 @@ namespace SW360IntegrationTest.Conan
 
             // Expected
             ComponentJsonParsor expected = new ComponentJsonParsor();
-            expected.Read(CCTLocalBomTestFile);
+            expected.GeneratedRead(CCTLocalBomTestFile);
 
             // Actual
-            string generatedBOM = OutFolder + $"\\..\\BOMs\\{testParameters.SW360ProjectName}_Bom.cdx.json";
+            string generatedBOM = OutFolder + $"\\..\\BOMs\\Conan\\{testParameters.SW360ProjectName}_Bom.cdx.json";
             if (File.Exists(generatedBOM))
             {
                 fileExist = true;
 
                 ComponentJsonParsor actual = new ComponentJsonParsor();
-                actual.Read(generatedBOM);
+                actual.GeneratedRead(generatedBOM);
 
                 foreach (var item in expected.Components)
                 {

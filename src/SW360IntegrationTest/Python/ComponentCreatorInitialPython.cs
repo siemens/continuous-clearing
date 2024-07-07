@@ -33,7 +33,7 @@ namespace SW360IntegrationTest.Python
             {
                 OutFolder = TestHelper.OutFolder;
                 string packagejsonPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest1stIterationData\Python";
-                string bomPath = OutFolder + @"\..\BOMs";
+                string bomPath = OutFolder + @"\..\BOMs\Python";
                 TestHelper.RunBOMCreatorExe(new string[]{
                 TestConstant.PackageFilePath, packagejsonPath,
                 TestConstant.BomFolderPath, bomPath,
@@ -42,6 +42,7 @@ namespace SW360IntegrationTest.Python
                 TestConstant.SW360URL, testParameters.SW360URL,
                 TestConstant.SW360ProjectID, testParameters.SW360ProjectID,
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
+                TestConstant.JFrogApiURL, testParameters.JfrogApi,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
                 TestConstant.ProjectType,"PYTHON",
                 TestConstant.Mode,""});
@@ -51,7 +52,7 @@ namespace SW360IntegrationTest.Python
         [Test, Order(1)]
         public void ComponentCreatorExe_ProvidedBOMFilePath_ReturnsSuccess()
         {
-            string bomPath = OutFolder + $"\\..\\BOMs\\{testParameters.SW360ProjectName}_Bom.cdx.json";
+            string bomPath = OutFolder + $"\\..\\BOMs\\Python\\{testParameters.SW360ProjectName}_Bom.cdx.json";
             // Assert
             // Check exit is normal
             int returnValue = TestHelper.RunComponentCreatorExe(new string[] {
@@ -72,15 +73,15 @@ namespace SW360IntegrationTest.Python
             // Expected
             bool filecheck = false;
             ComponentJsonParsor expected = new ComponentJsonParsor();
-            expected.Read(CCTComparisonBomTestFile);
+            expected.GeneratedRead(CCTComparisonBomTestFile);
 
             // Actual
-            string generatedBOM = OutFolder + $"\\..\\BOMs\\{testParameters.SW360ProjectName}_Bom.cdx.json";
+            string generatedBOM = OutFolder + $"\\..\\BOMs\\Python\\{testParameters.SW360ProjectName}_Bom.cdx.json";
             if (File.Exists(generatedBOM))
             {
                 filecheck = true;
                 ComponentJsonParsor actual = new ComponentJsonParsor();
-                actual.Read(generatedBOM);
+                actual.GeneratedRead(generatedBOM);
 
                 foreach (var item in expected.Components)
                 {

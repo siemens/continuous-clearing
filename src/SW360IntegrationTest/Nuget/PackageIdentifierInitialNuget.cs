@@ -72,7 +72,7 @@ namespace SW360IntegrationTest.Nuget
                 fileExist = true;
 
                 ComponentJsonParsor actual = new ComponentJsonParsor();
-                actual.Read(generatedBOM);
+                actual.GeneratedRead(generatedBOM);
 
                 foreach (var item in expected.Components)
                 {

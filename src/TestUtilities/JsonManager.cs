@@ -5,6 +5,7 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using LCT.APICommunications.Model.Foss;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -22,6 +23,24 @@ namespace TestUtilities
             try
             {
                 Bom components = JsonConvert.DeserializeObject<Bom>(json);
+
+                foreach (var item in components.Components)
+                {
+                    Components.Add(item);
+                }
+
+            }
+            catch (JsonReaderException)
+            {
+                // do nothing
+            }
+        }
+        public void GeneratedRead(string path)
+        {
+            string json = File.ReadAllText(path);
+            try
+            {
+                Bom components = CycloneDX.Json.Serializer.Deserialize(json);
 
                 foreach (var item in components.Components)
                 {

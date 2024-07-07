@@ -132,6 +132,10 @@ namespace LCT.APICommunications
                 {
                     return await responseMessage.Content.ReadAsStringAsync();
                 }
+                else if (responseMessage != null && responseMessage.StatusCode.Equals(HttpStatusCode.NoContent))
+                {
+                    return await responseMessage.Content?.ReadAsStringAsync()?? string.Empty;
+                }
                 else
                 {
                     Logger.Error("SW360 server is not accessible while getting All Releases,Please wait for sometime and re run the pipeline again." +

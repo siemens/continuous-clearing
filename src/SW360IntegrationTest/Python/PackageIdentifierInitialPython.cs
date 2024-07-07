@@ -26,9 +26,9 @@ namespace SW360IntegrationTest.Python
 
             CCTLocalBomTestFile = OutFolder + @"..\..\..\src\SW360IntegrationTest\PackageIdentifierTestFiles\Python\CCTLocalBOMPythonInitial.json";
 
-            if (!Directory.Exists(OutFolder + @"\..\BOMs"))
+            if (!Directory.Exists(OutFolder + @"\..\BOMs\Python"))
             {
-                Directory.CreateDirectory(OutFolder + @"\..\BOMs");
+                Directory.CreateDirectory(OutFolder + @"\..\BOMs\Python");
             }
             testParameters = new TestParamNuget();
         }
@@ -37,7 +37,7 @@ namespace SW360IntegrationTest.Python
         public void RunBOMCreatorexe_ProvidedPackageJsonFilePath_ReturnsSuccess()
         {
             string packagejsonPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest1stIterationData\Python";
-            string bomPath = OutFolder + @"\..\BOMs";
+            string bomPath = OutFolder + @"\..\BOMs\Python";
 
             // Test BOM Creator ran with exit code 0
             Assert.AreEqual(0, TestHelper.RunBOMCreatorExe(new string[]{
@@ -62,16 +62,16 @@ namespace SW360IntegrationTest.Python
 
             // Expected
             ComponentJsonParsor expected = new ComponentJsonParsor();
-            expected.Read(CCTLocalBomTestFile);
+            expected.GeneratedRead(CCTLocalBomTestFile);
 
             // Actual
-            string generatedBOM = OutFolder + $"\\..\\BOMs\\{testParameters.SW360ProjectName}_Bom.cdx.json";
+            string generatedBOM = OutFolder + $"\\..\\BOMs\\Python\\{testParameters.SW360ProjectName}_Bom.cdx.json";
             if (File.Exists(generatedBOM))
             {
                 fileExist = true;
 
                 ComponentJsonParsor actual = new ComponentJsonParsor();
-                actual.Read(generatedBOM);
+                actual.GeneratedRead(generatedBOM);
 
                 foreach (var item in expected.Components)
                 {

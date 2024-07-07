@@ -35,7 +35,7 @@ namespace SW360IntegrationTest.Alpine
             {
                 OutFolder = TestHelper.OutFolder;
                 string packagejsonPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest1stIterationData\Alpine";
-                string bomPath = OutFolder + @"\..\BOMs";
+                string bomPath = OutFolder + @"\..\BOMs\Alpine";
                 TestHelper.RunBOMCreatorExe(new string[]{
                 TestConstant.PackageFilePath, packagejsonPath,
                 TestConstant.BomFolderPath, bomPath,
@@ -54,7 +54,7 @@ namespace SW360IntegrationTest.Alpine
         [Test, Order(1)]
         public void ComponentCreatorExe_ProvidedBOMFilePath_ReturnsSuccess()
         {
-            string bomPath = OutFolder + $"\\..\\BOMs\\{testParameters.SW360ProjectName}_Bom.cdx.json";
+            string bomPath = OutFolder + $"\\..\\BOMs\\Alpine\\{testParameters.SW360ProjectName}_Bom.cdx.json";
             // Assert
             // Check exit is normal
             Assert.AreEqual(0, TestHelper.RunComponentCreatorExe(new string[] {
@@ -75,16 +75,16 @@ namespace SW360IntegrationTest.Alpine
 
             // Expected
             ComponentJsonParsor expected = new ComponentJsonParsor();
-            expected.Read(CCTComparisonBomTestFile);
+            expected.GeneratedRead(CCTComparisonBomTestFile);
 
             // Actual
-            string generatedBOM = OutFolder + $"\\..\\BOMs\\{testParameters.SW360ProjectName}_Bom.cdx.json";
+            string generatedBOM = OutFolder + $"\\..\\BOMs\\Alpine\\{testParameters.SW360ProjectName}_Bom.cdx.json";
             if (File.Exists(generatedBOM))
             {
 
                 filecheck = true;
                 ComponentJsonParsor actual = new ComponentJsonParsor();
-                actual.Read(generatedBOM);
+                actual.GeneratedRead(generatedBOM);
 
                 foreach (var item in expected.Components)
                 {

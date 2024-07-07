@@ -75,7 +75,7 @@ namespace SW360IntegrationTest.Nuget
 
             // Expected
             ComponentJsonParsor expected = new ComponentJsonParsor();
-            expected.Read(CCTComparisonBomTestFile);
+            expected.GeneratedRead(CCTComparisonBomTestFile);
 
             // Actual
             string generatedBOM = OutFolder + $"\\..\\BOMs\\{testParameters.SW360ProjectName}_Bom.cdx.json";
@@ -84,7 +84,7 @@ namespace SW360IntegrationTest.Nuget
 
                 filecheck = true;
                 ComponentJsonParsor actual = new ComponentJsonParsor();
-                actual.Read(generatedBOM);
+                actual.GeneratedRead(generatedBOM);
 
                 foreach (var item in expected.Components)
                 {
