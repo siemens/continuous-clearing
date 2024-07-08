@@ -65,7 +65,7 @@ namespace LCT.ArtifactoryUploader
             string formattedString = AddSpecificValuesToBOMFormat(m_ComponentsInBOM);
 
             // wrtite final out put in the json file
-            fileOperations.WriteContentToOutputBomFile(m_ComponentsInBOM, bomGenerationPath, 
+            fileOperations.WriteContentToOutputBomFile(formattedString, bomGenerationPath, 
                 FileConstant.BomFileName, appSettings.SW360ProjectName);
 
             // write kpi info to console table 

@@ -82,8 +82,8 @@
           "value": "Jfrog repo path not found"
         },
         {
-          "Name": "internal:siemens:clearing:clearing-state",
-          "Value": "NEW_CLEARING"
+          "name": "internal:siemens:clearing:clearing-state",
+          "value": "NEW_CLEARING"
         },
         {
           "name": "internal:siemens:clearing:sw360:release-url",
@@ -135,8 +135,8 @@
           "value": "Jfrog repo path not found"
         },
         {
-          "Name": "internal:siemens:clearing:clearing-state",
-          "Value": "NEW_CLEARING"
+          "name": "internal:siemens:clearing:clearing-state",
+          "value": "NEW_CLEARING"
         },
         {
           "name": "internal:siemens:clearing:sw360:release-url",
