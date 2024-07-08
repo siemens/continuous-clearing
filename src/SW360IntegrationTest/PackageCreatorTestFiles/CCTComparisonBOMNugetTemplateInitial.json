@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.4",
-  "serialNumber": "urn:uuid:f97c0c9b-ad55-49bd-a0ad-845f7c0b3b3e",
+  "serialNumber": "urn:uuid:6cdf02ad-b1f2-4f4b-b46f-176ad93005ee",
   "version": 1,
   "metadata": {
-    "timestamp": "2024-07-06T22:05:52Z",
+    "timestamp": "2024-07-08T13:56:05Z",
     "tools": [
       {
         "vendor": "Siemens AG",
@@ -90,6 +90,18 @@
         },
         {
           "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": ""
+        },
+        {
+          "name": "internal:siemens:clearing:clearing-state",
+          "value": "Not Available"
+        },
+        {
+          "name": "internal:siemens:clearing:sw360:release-url",
+          "value": "http://localhost:8090/resource/api/releases/509a83e0188f4293830e94aefc917b1c"
+        },
+        {
+          "name": "internal:siemens:clearing:fossology:url",
           "value": ""
         }
       ]
@@ -185,6 +197,18 @@
         },
         {
           "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": ""
+        },
+        {
+          "name": "internal:siemens:clearing:clearing-state",
+          "value": "NEW_CLEARING"
+        },
+        {
+          "name": "internal:siemens:clearing:sw360:release-url",
+          "value": "http://localhost:8090/resource/api/releases/4406f59fd3b8494293060e3feafa6992"
+        },
+        {
+          "name": "internal:siemens:clearing:fossology:url",
           "value": ""
         }
       ]

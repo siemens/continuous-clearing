@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.4",
-  "serialNumber": "urn:uuid:1bab741c-7f90-4cd7-a8c6-8b9146d49a2f",
+  "serialNumber": "urn:uuid:90e057bd-e809-412e-9412-267683355dcb",
   "version": 1,
   "metadata": {
-    "timestamp": "2024-07-06T15:28:06Z",
+    "timestamp": "2024-07-08T12:58:48Z",
     "tools": [
       {
         "vendor": "Siemens AG",
@@ -47,20 +47,6 @@
       "bom-ref": "pkg:pypi/html5lib@1.1",
       "name": "html5lib",
       "version": "1.1",
-      "hashes": [
-        {
-          "alg": "MD5",
-          "content": "167ff642c4754015d78b21117a752342"
-        },
-        {
-          "alg": "SHA-1",
-          "content": "188a3653a14d2b7df7f4a64381355ef5e747b1b6"
-        },
-        {
-          "alg": "SHA-256",
-          "content": "0d78f8fde1c230e99fe37986a60526d7049ed4bf8a9fadbad5f00e22e58e041d"
-        }
-      ],
       "purl": "pkg:pypi/html5lib@1.1",
       "properties": [
         {
@@ -81,19 +67,31 @@
         },
         {
           "name": "internal:siemens:clearing:repo-name",
-          "value": "org1-pythonhosted-pypi-remote-cache"
+          "value": "Not Found in JFrogRepo"
         },
         {
           "name": "internal:siemens:clearing:project-type",
-          "value": "Python"
+          "value": "PYTHON"
         },
         {
           "name": "internal:siemens:clearing:siemens:filename",
-          "value": "html5lib-1.1-py2.py3-none-any.whl"
+          "value": "Package name not found in Jfrog"
         },
         {
           "name": "internal:siemens:clearing:jfrog-repo-path",
-          "value": "org1-pythonhosted-pypi-remote-cache/6c/dd/a834df6482147d48e225a49515aabc28974ad5a4ca3215c18a882565b028/html5lib-1.1-py2.py3-none-any.whl"
+          "value": "Jfrog repo path not found"
+        },
+        {
+          "name": "internal:siemens:clearing:clearing-state",
+          "value": "Not Available"
+        },
+        {
+          "name": "internal:siemens:clearing:sw360:release-url",
+          "value": "http://localhost:8090/resource/api/releases/6ed76a1c3457471bac0114f955011da2"
+        },
+        {
+          "name": "internal:siemens:clearing:fossology:url",
+          "value": ""
         }
       ]
     },
@@ -126,7 +124,7 @@
         },
         {
           "name": "internal:siemens:clearing:project-type",
-          "value": "Python"
+          "value": "PYTHON"
         },
         {
           "name": "internal:siemens:clearing:siemens:filename",
@@ -135,6 +133,18 @@
         {
           "name": "internal:siemens:clearing:jfrog-repo-path",
           "value": "Jfrog repo path not found"
+        },
+        {
+          "name": "internal:siemens:clearing:clearing-state",
+          "value": "Not Available"
+        },
+        {
+          "name": "internal:siemens:clearing:sw360:release-url",
+          "value": "http://localhost:8090/resource/api/releases/75bd82f5a1e24bf3bac1b267ac14258d"
+        },
+        {
+          "name": "internal:siemens:clearing:fossology:url",
+          "value": ""
         }
       ]
     },
@@ -143,20 +153,6 @@
       "bom-ref": "pkg:pypi/beautifulsoup4@4.11.1",
       "name": "beautifulsoup4",
       "version": "4.11.1",
-      "hashes": [
-        {
-          "alg": "MD5",
-          "content": "08cda1831119ea9e9386215da237bf49"
-        },
-        {
-          "alg": "SHA-1",
-          "content": "5823dfdfc01f91bff9832f143ffe6c675b1f780b"
-        },
-        {
-          "alg": "SHA-256",
-          "content": "58d5c3d29f5a36ffeb94f02f0d786cd53014cf9b3b3951d42e0080d8a9498d30"
-        }
-      ],
       "purl": "pkg:pypi/beautifulsoup4@4.11.1",
       "properties": [
         {
@@ -177,19 +173,31 @@
         },
         {
           "name": "internal:siemens:clearing:repo-name",
-          "value": "org1-pythonhosted-pypi-remote-cache"
+          "value": "Not Found in JFrogRepo"
         },
         {
           "name": "internal:siemens:clearing:project-type",
-          "value": "Python"
+          "value": "PYTHON"
         },
         {
           "name": "internal:siemens:clearing:siemens:filename",
-          "value": "beautifulsoup4-4.11.1.tar.gz"
+          "value": "Package name not found in Jfrog"
         },
         {
           "name": "internal:siemens:clearing:jfrog-repo-path",
-          "value": "org1-pythonhosted-pypi-remote-cache/packages/source/b/beautifulsoup4/beautifulsoup4-4.11.1.tar.gz"
+          "value": "Jfrog repo path not found"
+        },
+        {
+          "name": "internal:siemens:clearing:clearing-state",
+          "value": "Not Available"
+        },
+        {
+          "name": "internal:siemens:clearing:sw360:release-url",
+          "value": "http://localhost:8090/resource/api/releases/09a399df5a0b41af827a4244a39df742"
+        },
+        {
+          "name": "internal:siemens:clearing:fossology:url",
+          "value": ""
         }
       ]
     },
@@ -222,7 +230,7 @@
         },
         {
           "name": "internal:siemens:clearing:project-type",
-          "value": "Python"
+          "value": "PYTHON"
         },
         {
           "name": "internal:siemens:clearing:siemens:filename",
@@ -231,6 +239,18 @@
         {
           "name": "internal:siemens:clearing:jfrog-repo-path",
           "value": "Jfrog repo path not found"
+        },
+        {
+          "name": "internal:siemens:clearing:clearing-state",
+          "value": "Not Available"
+        },
+        {
+          "name": "internal:siemens:clearing:sw360:release-url",
+          "value": "http://localhost:8090/resource/api/releases/f5785fc444d14027881a12276e5e59f8"
+        },
+        {
+          "name": "internal:siemens:clearing:fossology:url",
+          "value": ""
         }
       ]
     }

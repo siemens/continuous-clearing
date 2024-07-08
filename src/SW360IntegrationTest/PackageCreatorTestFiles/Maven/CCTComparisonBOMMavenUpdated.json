@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.4",
-  "serialNumber": "urn:uuid:82fd899a-71a7-4c21-91fa-45a6bdc99b00",
+  "serialNumber": "urn:uuid:b7b3d78c-3b44-41c4-a7d2-1f4be11916bc",
   "version": 1,
   "metadata": {
-    "timestamp": "2024-07-06T23:58:28Z",
+    "timestamp": "2024-07-08T12:54:44Z",
     "tools": [
       {
         "vendor": "Siemens AG",
@@ -146,6 +146,18 @@
         {
           "name": "internal:siemens:clearing:jfrog-repo-path",
           "value": "Jfrog repo path not found"
+        },
+        {
+          "name": "internal:siemens:clearing:clearing-state",
+          "value": "Not Available"
+        },
+        {
+          "name": "internal:siemens:clearing:sw360:release-url",
+          "value": "http://localhost:8090/resource/api/releases/cfeb5c55ad2742b8ac56507ea969a237"
+        },
+        {
+          "name": "internal:siemens:clearing:fossology:url",
+          "value": ""
         }
       ]
     },
@@ -258,6 +270,18 @@
         {
           "name": "internal:siemens:clearing:jfrog-repo-path",
           "value": "Jfrog repo path not found"
+        },
+        {
+          "name": "internal:siemens:clearing:clearing-state",
+          "value": "Not Available"
+        },
+        {
+          "name": "internal:siemens:clearing:sw360:release-url",
+          "value": "http://localhost:8090/resource/api/releases/d4c4ae4b4a394f0aaab3a975c3345992"
+        },
+        {
+          "name": "internal:siemens:clearing:fossology:url",
+          "value": ""
         }
       ]
     },
@@ -347,6 +371,18 @@
         {
           "name": "internal:siemens:clearing:jfrog-repo-path",
           "value": "Jfrog repo path not found"
+        },
+        {
+          "name": "internal:siemens:clearing:clearing-state",
+          "value": "Not Available"
+        },
+        {
+          "name": "internal:siemens:clearing:sw360:release-url",
+          "value": "http://localhost:8090/resource/api/releases/9628c57c366741eda3c4effc4c76c955"
+        },
+        {
+          "name": "internal:siemens:clearing:fossology:url",
+          "value": ""
         }
       ]
     }

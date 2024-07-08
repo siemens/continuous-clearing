@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.4",
-  "serialNumber": "urn:uuid:303e7ca9-b977-4799-afa1-88672820655b",
+  "serialNumber": "urn:uuid:c5d86610-3513-41c3-abe6-6eeca868ac4f",
   "version": 1,
   "metadata": {
-    "timestamp": "2024-07-06T22:41:45Z",
+    "timestamp": "2024-07-08T12:57:36Z",
     "tools": [
       {
         "vendor": "Siemens AG",
@@ -77,6 +77,18 @@
         {
           "name": "internal:siemens:clearing:jfrog-repo-path",
           "value": "Jfrog repo path not found"
+        },
+        {
+          "name": "internal:siemens:clearing:clearing-state",
+          "value": "Not Available"
+        },
+        {
+          "name": "internal:siemens:clearing:sw360:release-url",
+          "value": "http://localhost:8090/resource/api/releases/4350f812fc774bce851afc84975740f4"
+        },
+        {
+          "name": "internal:siemens:clearing:fossology:url",
+          "value": ""
         }
       ]
     },
@@ -114,6 +126,18 @@
         {
           "name": "internal:siemens:clearing:jfrog-repo-path",
           "value": "Jfrog repo path not found"
+        },
+        {
+          "name": "internal:siemens:clearing:clearing-state",
+          "value": "Not Available"
+        },
+        {
+          "name": "internal:siemens:clearing:sw360:release-url",
+          "value": "http://localhost:8090/resource/api/releases/15797ebabf9b433cb865d57efb1afdb3"
+        },
+        {
+          "name": "internal:siemens:clearing:fossology:url",
+          "value": ""
         }
       ]
     },
@@ -151,6 +175,18 @@
         {
           "name": "internal:siemens:clearing:jfrog-repo-path",
           "value": "Jfrog repo path not found"
+        },
+        {
+          "name": "internal:siemens:clearing:clearing-state",
+          "value": "Not Available"
+        },
+        {
+          "name": "internal:siemens:clearing:sw360:release-url",
+          "value": "http://localhost:8090/resource/api/releases/077dea8471024c639d012a90a2a1cb7f"
+        },
+        {
+          "name": "internal:siemens:clearing:fossology:url",
+          "value": ""
         }
       ]
     },
@@ -188,6 +224,18 @@
         {
           "name": "internal:siemens:clearing:jfrog-repo-path",
           "value": "Jfrog repo path not found"
+        },
+        {
+          "name": "internal:siemens:clearing:clearing-state",
+          "value": "Not Available"
+        },
+        {
+          "name": "internal:siemens:clearing:sw360:release-url",
+          "value": "http://localhost:8090/resource/api/releases/207eca13950447c99366e7717b8181ab"
+        },
+        {
+          "name": "internal:siemens:clearing:fossology:url",
+          "value": ""
         }
       ]
     }
