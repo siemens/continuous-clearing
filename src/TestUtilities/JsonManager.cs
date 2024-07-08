@@ -37,7 +37,7 @@ namespace TestUtilities
         }
         public void GeneratedRead(string path)
         {
-            string json = File.ReadAllText(path);
+            var json = File.ReadAllText(path);
             try
             {
                 Bom components = CycloneDX.Json.Serializer.Deserialize(json);

@@ -33,7 +33,7 @@ namespace SW360IntegrationTest.Debian
             {
                 OutFolder = TestHelper.OutFolder;
                 string packagejsonPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest1stIterationData\Debian";
-                string bomPath = OutFolder + @"\..\BOMs\Debian";
+                string bomPath = OutFolder + @"\..\BOMs";
                 TestHelper.RunBOMCreatorExe(new string[]{
                 TestConstant.PackageFilePath, packagejsonPath,
                 TestConstant.BomFolderPath, bomPath,
@@ -52,7 +52,7 @@ namespace SW360IntegrationTest.Debian
         [Test, Order(1)]
         public void ComponentCreatorExe_ProvidedBOMFilePath_ReturnsSuccess()
         {
-            string bomPath = OutFolder + $"\\..\\BOMs\\Debian\\{testParameters.SW360ProjectName}_Bom.cdx.json";
+            string bomPath = OutFolder + $"\\..\\BOMs\\{testParameters.SW360ProjectName}_Bom.cdx.json";
             // Assert
             // Check exit is normal
             Assert.AreEqual(0, TestHelper.RunComponentCreatorExe(new string[] {
@@ -76,7 +76,7 @@ namespace SW360IntegrationTest.Debian
             expected.GeneratedRead(CCTComparisonBomTestFile);
 
             // Actual
-            string generatedBOM = OutFolder + $"\\..\\BOMs\\Debian\\{testParameters.SW360ProjectName}_Bom.cdx.json";
+            string generatedBOM = OutFolder + $"\\..\\BOMs\\{testParameters.SW360ProjectName}_Bom.cdx.json";
             if (File.Exists(generatedBOM))
             {
 

@@ -238,7 +238,9 @@ namespace LCT.SW360PackageCreator
 
             // update comparison bom data
             bom = await creatorHelper.GetUpdatedComponentsDetails(ListofBomComponents, UpdatedCompareBomData, sw360Service, bom);
-            fileOperations.WriteContentToFile(bom, bomGenerationPath,
+
+            string formattedString = AddSpecificValuesToBOMFormat(bom);
+            fileOperations.WriteContentToOutputBomFile(formattedString, bomGenerationPath,
                 FileConstant.BomFileName, appSettings.SW360ProjectName);
 
             // write download url not found list into .json file
@@ -263,6 +265,16 @@ namespace LCT.SW360PackageCreator
             Logger.Debug($"CreateComponentInSw360():End");
         }
 
+        private static string AddSpecificValuesToBOMFormat(Bom listOfComponentsToBom)
+        {
+            string guid = Guid.NewGuid().ToString();
+            listOfComponentsToBom.SerialNumber = $"urn:uuid:{guid}";
+            listOfComponentsToBom.Version = 1;
+            listOfComponentsToBom.Metadata.Timestamp = DateTime.UtcNow;
+            var formattedString = CycloneDX.Json.Serializer.Serialize(listOfComponentsToBom);
+
+            return formattedString;
+        }
         private async Task CreateComponent(ICreatorHelper creatorHelper,
             ISw360CreatorService sw360CreatorService, List<ComparisonBomData> componentsToBoms,
             string sw360Url, CommonAppSettings appSettings)

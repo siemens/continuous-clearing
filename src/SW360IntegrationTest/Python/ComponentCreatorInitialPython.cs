@@ -33,7 +33,7 @@ namespace SW360IntegrationTest.Python
             {
                 OutFolder = TestHelper.OutFolder;
                 string packagejsonPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest1stIterationData\Python";
-                string bomPath = OutFolder + @"\..\BOMs\Python";
+                string bomPath = OutFolder + @"\..\BOMs";
                 TestHelper.RunBOMCreatorExe(new string[]{
                 TestConstant.PackageFilePath, packagejsonPath,
                 TestConstant.BomFolderPath, bomPath,
@@ -52,7 +52,7 @@ namespace SW360IntegrationTest.Python
         [Test, Order(1)]
         public void ComponentCreatorExe_ProvidedBOMFilePath_ReturnsSuccess()
         {
-            string bomPath = OutFolder + $"\\..\\BOMs\\Python\\{testParameters.SW360ProjectName}_Bom.cdx.json";
+            string bomPath = OutFolder + $"\\..\\BOMs\\{testParameters.SW360ProjectName}_Bom.cdx.json";
             // Assert
             // Check exit is normal
             int returnValue = TestHelper.RunComponentCreatorExe(new string[] {
@@ -76,7 +76,7 @@ namespace SW360IntegrationTest.Python
             expected.GeneratedRead(CCTComparisonBomTestFile);
 
             // Actual
-            string generatedBOM = OutFolder + $"\\..\\BOMs\\Python\\{testParameters.SW360ProjectName}_Bom.cdx.json";
+            string generatedBOM = OutFolder + $"\\..\\BOMs\\{testParameters.SW360ProjectName}_Bom.cdx.json";
             if (File.Exists(generatedBOM))
             {
                 filecheck = true;
