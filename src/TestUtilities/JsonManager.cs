@@ -19,24 +19,6 @@ namespace TestUtilities
         public List< Component> Components { get; } = new List<Component>();
         public void Read(string path)
         {
-            string json = File.ReadAllText(path);
-            try
-            {
-                Bom components = JsonConvert.DeserializeObject<Bom>(json);
-
-                foreach (var item in components.Components)
-                {
-                    Components.Add(item);
-                }
-
-            }
-            catch (JsonReaderException)
-            {
-                // do nothing
-            }
-        }
-        public void GeneratedRead(string path)
-        {
             var json = File.ReadAllText(path);
             try
             {
@@ -53,5 +35,6 @@ namespace TestUtilities
                 // do nothing
             }
         }
+        
     }
 }

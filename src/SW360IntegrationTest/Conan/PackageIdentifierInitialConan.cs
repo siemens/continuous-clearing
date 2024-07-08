@@ -55,7 +55,7 @@ namespace SW360IntegrationTest.Conan
 
             // Expected
             ComponentJsonParsor expected = new ComponentJsonParsor();
-            expected.GeneratedRead(CCTLocalBomTestFile);
+            expected.Read(CCTLocalBomTestFile);
 
             // Actual
             string generatedBOM = OutFolder + $"\\..\\BOMs\\{testParameters.SW360ProjectName}_Bom.cdx.json";
@@ -64,7 +64,7 @@ namespace SW360IntegrationTest.Conan
                 fileExist = true;
 
                 ComponentJsonParsor actual = new ComponentJsonParsor();
-                actual.GeneratedRead(generatedBOM);
+                actual.Read(generatedBOM);
 
                 foreach (var item in expected.Components)
                 {

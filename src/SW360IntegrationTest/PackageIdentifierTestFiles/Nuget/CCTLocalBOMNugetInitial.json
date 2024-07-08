@@ -1,278 +1,293 @@
-// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
-//
-//  SPDX-License-Identifier: MIT
-
-// --------------------------------------------------------------------------------------------------------------------
 {
-  "BomFormat": "CycloneDX",
-  "SpecVersion": 4,
-  "SpecVersionString": "1.4",
-  "SerialNumber": "urn:uuid:11149d5b-a371-42df-a81d-39d7e4d338ee",
-  "Version": 1,
-  "NonNullableVersion": 1,
-  "Metadata": {
-    "Timestamp": "2024-06-22T11:03:18Z",
-    "Tools": [
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.4",
+  "serialNumber": "urn:uuid:0e862bd9-65f2-4bde-8033-bb441e0e02e2",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2024-07-08T16:49:00Z",
+    "tools": [
       {
-        "Vendor": "Siemens AG",
-        "Name": "Clearing Automation Tool",
-        "Version": "6.1.0",
-        "Hashes": null,
-        "ExternalReferences": [
+        "vendor": "Siemens AG",
+        "name": "Clearing Automation Tool",
+        "version": "6.1.0",
+        "externalReferences": [
           {
-            "Url": "https://github.com/siemens/continuous-clearing",
-            "Type": 3,
-            "Comment": null
+            "url": "https://github.com/siemens/continuous-clearing",
+            "type": "website"
           }
         ]
       },
       {
-        "Vendor": "Siemens AG",
-        "Name": "Siemens SBOM",
-        "Version": "2.0.0",
-        "Hashes": null,
-        "ExternalReferences": [
+        "vendor": "Siemens AG",
+        "name": "Siemens SBOM",
+        "version": "2.0.0",
+        "externalReferences": [
           {
-            "Url": "https://sbom.siemens.io/",
-            "Type": 3,
-            "Comment": null
+            "url": "https://sbom.siemens.io/",
+            "type": "website"
           }
         ]
       }
     ],
-    "Authors": null,
-    "Component": {
-      "Type": 1,
-      "MimeType": null,
-      "BomRef": null,
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": null,
-      "Name": "Test",
-      "Version": "1.0",
-      "Description": null,
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": null,
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Evidence": null
+    "component": {
+      "type": "application",
+      "name": "Test",
+      "version": "1.0"
     },
-    "Manufacture": null,
-    "Supplier": null,
-    "Properties": [
+    "properties": [
       {
-        "Name": "siemens:profile",
-        "Value": "clearing"
+        "name": "siemens:profile",
+        "value": "clearing"
       }
     ]
   },
-  "Components": [
+  "components": [
     {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:nuget/Newtonsoft.Json@12.0.3",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": null,
-      "Name": "Newtonsoft.Json",
-      "Version": "12.0.3",
-      "Description": null,
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:nuget/Newtonsoft.Json@12.0.3",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
+      "type": "library",
+      "bom-ref": "pkg:nuget/Newtonsoft.Json@12.0.3",
+      "name": "Newtonsoft.Json",
+      "version": "12.0.3",
+      "purl": "pkg:nuget/Newtonsoft.Json@12.0.3",
+      "properties": [
         {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrog"
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NUGET"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": ""
         }
-      ],
-      "Evidence": null
+      ]
     },
     {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:nuget/System.Buffers@4.5.1",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": null,
-      "Name": "System.Buffers",
-      "Version": "4.5.1",
-      "Description": null,
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:nuget/System.Buffers@4.5.1",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
+      "type": "library",
+      "bom-ref": "pkg:nuget/System.Buffers@4.5.1",
+      "name": "System.Buffers",
+      "version": "4.5.1",
+      "purl": "pkg:nuget/System.Buffers@4.5.1",
+      "properties": [
         {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrog"
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NUGET"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": ""
         }
-      ],
-      "Evidence": null
+      ]
     },
     {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:nuget/System.Memory@4.5.4",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": null,
-      "Name": "System.Memory",
-      "Version": "4.5.4",
-      "Description": null,
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:nuget/System.Memory@4.5.4",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
+      "type": "library",
+      "bom-ref": "pkg:nuget/System.Memory@4.5.4",
+      "name": "System.Memory",
+      "version": "4.5.4",
+      "purl": "pkg:nuget/System.Memory@4.5.4",
+      "properties": [
         {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrog"
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NUGET"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": ""
         }
-      ],
-      "Evidence": null
+      ]
     },
     {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:nuget/System.Numerics.Vectors@4.5.0",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": null,
-      "Name": "System.Numerics.Vectors",
-      "Version": "4.5.0",
-      "Description": null,
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:nuget/System.Numerics.Vectors@4.5.0",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
+      "type": "library",
+      "bom-ref": "pkg:nuget/System.Numerics.Vectors@4.5.0",
+      "name": "System.Numerics.Vectors",
+      "version": "4.5.0",
+      "purl": "pkg:nuget/System.Numerics.Vectors@4.5.0",
+      "properties": [
         {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrog"
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NUGET"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": ""
         }
-      ],
-      "Evidence": null
+      ]
     },
     {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:nuget/System.Threading.Tasks.Extensions@4.5.4",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": null,
-      "Name": "System.Threading.Tasks.Extensions",
-      "Version": "4.5.4",
-      "Description": null,
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:nuget/System.Threading.Tasks.Extensions@4.5.4",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
+      "type": "library",
+      "bom-ref": "pkg:nuget/System.Threading.Tasks.Extensions@4.5.4",
+      "name": "System.Threading.Tasks.Extensions",
+      "version": "4.5.4",
+      "purl": "pkg:nuget/System.Threading.Tasks.Extensions@4.5.4",
+      "properties": [
         {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrog"
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NUGET"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": ""
         }
-      ],
-      "Evidence": null
+      ]
     },
     {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:nuget/System.ValueTuple@4.5.0",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": null,
-      "Name": "System.ValueTuple",
-      "Version": "4.5.0",
-      "Description": null,
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:nuget/System.ValueTuple@4.5.0",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
+      "type": "library",
+      "bom-ref": "pkg:nuget/System.ValueTuple@4.5.0",
+      "name": "System.ValueTuple",
+      "version": "4.5.0",
+      "purl": "pkg:nuget/System.ValueTuple@4.5.0",
+      "properties": [
         {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrog"
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NUGET"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": ""
         }
-      ],
-      "Evidence": null
+      ]
     }
   ],
-  "Compositions": null
+  "dependencies": []
 }
