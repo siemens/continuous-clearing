@@ -39,24 +39,22 @@ namespace LCT.Services
         /// <param name="projectId">projectId</param>
         /// <param name="projectName">projectName</param>
         /// <returns>string</returns>
-        public async Task<string> GetProjectNameByProjectIDFromSW360(string projectId, string projectName)
+        public async Task<ProjectReleases> GetProjectNameByProjectIDFromSW360(string projectId, string projectName)
         {
-            string sw360ProjectName = string.Empty;
+            ProjectReleases projectReleases = null;
 
             try
             {
                 var response = await m_SW360ApiCommunicationFacade.GetProjectById(projectId);
                 if (response == null || !response.IsSuccessStatusCode)
                 {
-                    return string.Empty;
+                    return projectReleases;
                 }
-
                 string result = response.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
+                
                 if (!string.IsNullOrEmpty(result))
                 {
-                    var projectInfo = JsonConvert.DeserializeObject<ProjectReleases>(result);
-                    sw360ProjectName = projectInfo?.Name;
-
+                    projectReleases = JsonConvert.DeserializeObject<ProjectReleases>(result);
                 }
             }
             catch (HttpRequestException ex)
@@ -72,7 +70,7 @@ namespace LCT.Services
                 Environment.ExitCode = -1;
             }
 
-            return sw360ProjectName;
+            return projectReleases;
         }
 
         public async Task<List<ReleaseLinked>> GetAlreadyLinkedReleasesByProjectId(string projectId)

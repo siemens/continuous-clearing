@@ -12,6 +12,7 @@ using System;
 using System.IO;
 using LCT.Common;
 using System.Threading.Tasks;
+using LCT.APICommunications.Model;
 
 namespace SW360ComponentCreator.UTest
 {
@@ -28,11 +29,12 @@ namespace SW360ComponentCreator.UTest
         public async Task ValidateAppSettings_TestPositive()
         {
             //Arrange
-            string projectName = "Test";
+            ProjectReleases projectReleases = new ProjectReleases();
+            projectReleases.Name = "Test";
             var CommonAppSettings = new CommonAppSettings();
             CommonAppSettings.SW360ProjectName = "Test";
             mockISw360ProjectService.Setup(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<String>(), It.IsAny<string>()))
-                .ReturnsAsync(projectName);
+                .ReturnsAsync(projectReleases);
 
             //Act
             await CreatorValidator.ValidateAppSettings(CommonAppSettings, mockISw360ProjectService.Object);
@@ -45,12 +47,11 @@ namespace SW360ComponentCreator.UTest
         public void ValidateAppSettings_TestNegative()
         {
             //Arrange
-            string projectName = null;
+            ProjectReleases projectReleases = new ProjectReleases();
+            projectReleases.Name = null;
             var CommonAppSettings = new CommonAppSettings();
             mockISw360ProjectService.Setup(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(projectName);
-
-            //Act
+                .ReturnsAsync(projectReleases);
 
             //Assert
             Assert.ThrowsAsync<InvalidDataException>(() => CreatorValidator.ValidateAppSettings(CommonAppSettings, mockISw360ProjectService.Object));

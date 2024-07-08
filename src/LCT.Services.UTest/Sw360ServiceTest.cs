@@ -42,10 +42,10 @@ namespace LCT.Services.UTest
 
             // Act
             ISw360ProjectService sw360Service = new Sw360ProjectService(swApiCommunicationFacade.Object);
-            string sw360ProjectName = await sw360Service.GetProjectNameByProjectIDFromSW360("4aa1165e2d23da3d383692eb9c000a43", "Test");
+            ProjectReleases projectReleases = await sw360Service.GetProjectNameByProjectIDFromSW360("4aa1165e2d23da3d383692eb9c000a43", "Test");
 
             // Assert
-            Assert.AreEqual("Test", sw360ProjectName);
+            Assert.AreEqual("Test", projectReleases.Name);
         }
 
 
@@ -60,7 +60,7 @@ namespace LCT.Services.UTest
             componentRelease.Embedded = new ReleaseEmbedded();
             Mock<ISW360ApicommunicationFacade> swApiCommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
             swApiCommunicationFacade.Setup(x => x.GetReleases()).ReturnsAsync(string.Empty);
-
+                
             // Act
             ISW360Service sW360Service = new Sw360Service(swApiCommunicationFacade.Object);
             var result = await sW360Service.GetAvailableReleasesInSw360(components);

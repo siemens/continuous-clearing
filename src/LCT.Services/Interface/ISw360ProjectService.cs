@@ -21,7 +21,7 @@ namespace LCT.Services.Interface
         /// <param name="projectId">projectId</param>
         /// <param name="projectName">projectName</param>
         /// <returns>string</returns>
-        Task<string> GetProjectNameByProjectIDFromSW360(string projectId, string projectName);
+        Task<ProjectReleases> GetProjectNameByProjectIDFromSW360(string projectId, string projectName);
 
         Task<List<ReleaseLinked>> GetAlreadyLinkedReleasesByProjectId(string projectId);
     }

@@ -13,6 +13,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using LCT.Common;
+using LCT.APICommunications.Model;
 
 namespace PackageIdentifier.UTest
 {
@@ -27,13 +28,14 @@ namespace PackageIdentifier.UTest
         public async Task ValidateAppSettings_ProvidedProjectID_ReturnsProjectName()
         {
             //Arrange
-            string projectName = "Test";
+            ProjectReleases projectReleases = new ProjectReleases();
+            projectReleases.Name = "Test";
             var CommonAppSettings = new CommonAppSettings(mockIFolderAction.Object)
             {
                 SW360ProjectName = "Test"
             };
             mockISw360ProjectService.Setup(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<String>(), It.IsAny<string>()))
-                .ReturnsAsync(projectName);
+                .ReturnsAsync(projectReleases);
 
             mockIFileOperations.Setup(x => x.ValidateFilePath(It.IsAny<string>()))
                 .Callback((string message) => { })
@@ -55,13 +57,14 @@ namespace PackageIdentifier.UTest
         public Task ValidateAppSettings_ProvidedProjectID_ReturnsInvalidDataException()
         {
             //Arrange
-            string projectName = null;
+            ProjectReleases projectReleases = new ProjectReleases();
+            projectReleases.Name = "";
             var CommonAppSettings = new CommonAppSettings(mockIFolderAction.Object)
             {
                 SW360ProjectName = "Test"
             };
             mockISw360ProjectService.Setup(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(projectName);
+                .ReturnsAsync(projectReleases);
 
             mockIFileOperations.Setup(x => x.ValidateFilePath(It.IsAny<string>()))
                 .Callback((string message) => { })
