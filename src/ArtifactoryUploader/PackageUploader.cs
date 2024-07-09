@@ -62,7 +62,7 @@ namespace LCT.ArtifactoryUploader
             //update Jfrog Repo Path For Sucessfully Uploaded Items
             m_ComponentsInBOM = await PackageUploadHelper.UpdateJfrogRepoPathForSucessfullyUploadedItems(m_ComponentsInBOM, displayPackagesInfo);
 
-            string formattedString = AddSpecificValuesToBOMFormat(m_ComponentsInBOM);
+            string formattedString = CommonHelper.AddSpecificValuesToBOMFormat(m_ComponentsInBOM);
 
             // wrtite final out put in the json file
             fileOperations.WriteContentToOutputBomFile(formattedString, bomGenerationPath, 
@@ -127,17 +127,7 @@ namespace LCT.ArtifactoryUploader
             }
 
         }
-
-        private static string AddSpecificValuesToBOMFormat(Bom listOfComponentsToBom)
-        {
-            string guid = Guid.NewGuid().ToString();
-            listOfComponentsToBom.SerialNumber = $"urn:uuid:{guid}";
-            listOfComponentsToBom.Version = 1;
-            listOfComponentsToBom.Metadata.Timestamp = DateTime.UtcNow;
-            var formattedString = CycloneDX.Json.Serializer.Serialize(listOfComponentsToBom);
-
-            return formattedString;
-        }
+                
         private static void PackageSettings(Config project)
         {
             string includeList = string.Empty;

@@ -95,28 +95,18 @@ namespace LCT.PackageIdentifier
 
             if (string.IsNullOrEmpty(appSettings.IdentifierBomFilePath))
             {
-                string formattedString = AddSpecificValuesToBOMFormat(listOfComponentsToBom);
+                string formattedString = CommonHelper.AddSpecificValuesToBOMFormat(listOfComponentsToBom);
                 fileOperations.WriteContentToOutputBomFile(formattedString, appSettings.BomFolderPath, FileConstant.BomFileName, appSettings.SW360ProjectName);
             }
             else
             {
                 listOfComponentsToBom = fileOperations.CombineComponentsFromExistingBOM(listOfComponentsToBom, appSettings.IdentifierBomFilePath);
                 bomKpiData.ComponentsInComparisonBOM = listOfComponentsToBom.Components.Count;
-                string formattedString = AddSpecificValuesToBOMFormat(listOfComponentsToBom);
+                string formattedString = CommonHelper.AddSpecificValuesToBOMFormat(listOfComponentsToBom);
                 fileOperations.WriteContentToOutputBomFile(formattedString, appSettings.BomFolderPath, FileConstant.BomFileName, appSettings.SW360ProjectName);
             }
 
-        }
-        private static string AddSpecificValuesToBOMFormat(Bom listOfComponentsToBom)
-        {
-            string guid = Guid.NewGuid().ToString();
-            listOfComponentsToBom.SerialNumber = $"urn:uuid:{guid}";
-            listOfComponentsToBom.Version = 1;
-            listOfComponentsToBom.Metadata.Timestamp = DateTime.UtcNow;
-            var formattedString = CycloneDX.Json.Serializer.Serialize(listOfComponentsToBom);
-
-            return formattedString;
-        }
+        }       
 
         private async Task<Bom> CallPackageParser(CommonAppSettings appSettings)
         {
