@@ -62,11 +62,7 @@ namespace LCT.Services
                 Sw360ServiceStopWatch.Stop();
                 Logger.Debug($"GetAvailableReleasesInSw360():Time taken to in GetReleases() call" +
                     $"-{TimeSpan.FromMilliseconds(Sw360ServiceStopWatch.ElapsedMilliseconds).TotalSeconds}");
-
-                if (string.IsNullOrEmpty(responseBody))
-                {
-                    return availableComponentsList;
-                }
+                
                 var modelMappedObject = JsonConvert.DeserializeObject<ComponentsRelease>(responseBody);
 
                 if (modelMappedObject != null && modelMappedObject.Embedded?.Sw360Releases?.Count > 0)
