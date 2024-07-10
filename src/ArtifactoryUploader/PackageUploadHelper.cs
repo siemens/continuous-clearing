@@ -48,7 +48,7 @@ namespace LCT.ArtifactoryUploader
                 if (File.Exists(comparisionBomFilePath))
                 {
                     string json = File.ReadAllText(comparisionBomFilePath);
-                    componentsToBoms = JsonConvert.DeserializeObject<Bom>(json);
+                    componentsToBoms = CycloneDX.Json.Serializer.Deserialize(json);
                 }
                 else
                 {

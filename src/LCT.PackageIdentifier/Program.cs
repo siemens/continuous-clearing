@@ -178,6 +178,12 @@ namespace LCT.PackageIdentifier
                         totalString = string.Join(",", appSettings.Conan.Include?.ToList());
                     }
                     return totalString;
+                case "ALPINE":
+                    if (appSettings.Npm.Include != null)
+                    {
+                        totalString = string.Join(",", appSettings.Npm.Include?.ToList());
+                    }
+                    return totalString;
                 default:
                     Logger.Error($"Invalid ProjectType - {appSettings.ProjectType}");
                     break;
@@ -224,6 +230,12 @@ namespace LCT.PackageIdentifier
                     if (appSettings.Conan.Exclude != null)
                     {
                         totalString = string.Join(",", appSettings.Conan.Exclude?.ToList());
+                    }
+                    return totalString;
+                case "ALPINE":
+                    if (appSettings.Npm.Include != null)
+                    {
+                        totalString = string.Join(",", appSettings.Npm.Include?.ToList());
                     }
                     return totalString;
                 default:
@@ -274,6 +286,12 @@ namespace LCT.PackageIdentifier
                     if (appSettings.Conan.ExcludedComponents != null)
                     {
                         totalString = string.Join(",", appSettings.Conan.ExcludedComponents?.ToList());
+                    }
+                    return totalString;
+                case "ALPINE":
+                    if (appSettings.Npm.Include != null)
+                    {
+                        totalString = string.Join(",", appSettings.Npm.Include?.ToList());
                     }
                     return totalString;
                 default:

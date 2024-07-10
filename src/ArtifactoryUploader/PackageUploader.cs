@@ -62,8 +62,10 @@ namespace LCT.ArtifactoryUploader
             //update Jfrog Repo Path For Sucessfully Uploaded Items
             m_ComponentsInBOM = await PackageUploadHelper.UpdateJfrogRepoPathForSucessfullyUploadedItems(m_ComponentsInBOM, displayPackagesInfo);
 
+            string formattedString = CommonHelper.AddSpecificValuesToBOMFormat(m_ComponentsInBOM);
+
             // wrtite final out put in the json file
-            fileOperations.WriteContentToFile(m_ComponentsInBOM, bomGenerationPath, 
+            fileOperations.WriteContentToOutputBomFile(formattedString, bomGenerationPath, 
                 FileConstant.BomFileName, appSettings.SW360ProjectName);
 
             // write kpi info to console table 
@@ -125,7 +127,7 @@ namespace LCT.ArtifactoryUploader
             }
 
         }
-
+                
         private static void PackageSettings(Config project)
         {
             string includeList = string.Empty;

@@ -320,6 +320,7 @@ namespace LCT.PackageIdentifier
                 components.Author = prop.Value[Requires]?.ToString();
                 components.Purl = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
                 components.BomRef = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
+                components.Type =Component.Classification.Library;
                 components.Properties = new List<Property>();
                 components.Properties.Add(isdev);
                 lstComponentForBOM.Add(components);
