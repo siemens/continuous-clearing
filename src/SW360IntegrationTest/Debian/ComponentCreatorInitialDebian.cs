@@ -32,7 +32,7 @@ namespace SW360IntegrationTest.Debian
             if (!TestHelper.BOMCreated)
             {
                 OutFolder = TestHelper.OutFolder;
-                string packagejsonPath = OutFolder + @"\..\..\TestFiles\DebianTestFile\SystemTest1stIterationData\Debian";
+                string packagejsonPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest1stIterationData\Debian";
                 string bomPath = OutFolder + @"\..\BOMs";
                 TestHelper.RunBOMCreatorExe(new string[]{
                 TestConstant.PackageFilePath, packagejsonPath,

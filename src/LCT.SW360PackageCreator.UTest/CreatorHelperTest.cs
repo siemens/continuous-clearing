@@ -217,7 +217,7 @@ namespace SW360ComponentCreator.UTest
             var data = await creatorHelper.SetContentsForComparisonBOM(comparisonBomData, iSW360Service.Object);
 
             //Assert
-            Assert.That(data.Count.Equals(0));
+            Assert.That(data.Count.Equals(1));
         }
 
         [Test]

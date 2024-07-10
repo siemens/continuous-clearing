@@ -237,7 +237,18 @@ namespace LCT.Common
                 component.Properties.Add(identifierType);
                 listComponentForBOM.Add(component);
             }
-        }       
+        }
+
+        public static string AddSpecificValuesToBOMFormat(Bom listOfComponentsToBom)
+        {
+            string guid = Guid.NewGuid().ToString();
+            listOfComponentsToBom.SerialNumber = $"urn:uuid:{guid}";
+            listOfComponentsToBom.Version = 1;
+            listOfComponentsToBom.Metadata.Timestamp = DateTime.UtcNow;
+            var formattedString = CycloneDX.Json.Serializer.Serialize(listOfComponentsToBom);
+
+            return formattedString;
+        }
         #endregion
 
         #region private
