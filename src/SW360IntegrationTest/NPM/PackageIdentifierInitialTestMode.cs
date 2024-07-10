@@ -55,33 +55,38 @@ namespace SW360IntegrationTest.NPM
             string componentName = "samplecomponent";
             string componentVersion = "1.0.0";
             string componentType = "OSS";
+            HttpResponseMessage componentCheck = await httpClient.GetAsync(TestConstant.Sw360ReleaseApi);
 
             // Act
-            var componentResponse = await httpClient.PostAsync(TestConstant.Sw360ComponentApi, new StringContent(JsonConvert.SerializeObject(new
+            //string componentCheckText = await componentCheck.Content.ReadAsStringAsync();
+            if (componentCheck != null && componentCheck.StatusCode.Equals(HttpStatusCode.NoContent)) 
             {
-                name = componentName,
-                version = componentVersion,
-                componentType = componentType
-            }), Encoding.UTF8, "application/json"));
-
-            if (componentResponse.StatusCode == HttpStatusCode.Created)
-            {
-                string componentResponseText = await componentResponse.Content.ReadAsStringAsync();
-                var componentJsonObject = JObject.Parse(componentResponseText);
-                var componentId = componentJsonObject["_links"]["self"]["href"].ToString().Split('/').Last();
-
-                var releaseResponse = await httpClient.PostAsync(TestConstant.Sw360ReleaseApi, new StringContent(JsonConvert.SerializeObject(new
+                var componentResponse = await httpClient.PostAsync(TestConstant.Sw360ComponentApi, new StringContent(JsonConvert.SerializeObject(new
                 {
                     name = componentName,
                     version = componentVersion,
-                    componentType = componentType,
-                    componentId = componentId,
-                    ClearingState = "NEW_CLEARING",
+                    componentType = componentType
                 }), Encoding.UTF8, "application/json"));
-            }
 
-            // Assert
-            Assert.AreEqual(HttpStatusCode.Created, componentResponse.StatusCode);
+                if (componentResponse.StatusCode == HttpStatusCode.Created)
+                {
+                    string componentResponseText = await componentResponse.Content.ReadAsStringAsync();
+                    var componentJsonObject = JObject.Parse(componentResponseText);
+                    var componentId = componentJsonObject["_links"]["self"]["href"].ToString().Split('/').Last();
+
+                    var releaseResponse = await httpClient.PostAsync(TestConstant.Sw360ReleaseApi, new StringContent(JsonConvert.SerializeObject(new
+                    {
+                        name = componentName,
+                        version = componentVersion,
+                        componentType = componentType,
+                        componentId = componentId,
+                        ClearingState = "NEW_CLEARING",
+                    }), Encoding.UTF8, "application/json"));
+                }
+
+                // Assert
+                Assert.AreEqual(HttpStatusCode.Created, componentResponse.StatusCode);
+            }   
         }
 
         [Test, Order(2)]
