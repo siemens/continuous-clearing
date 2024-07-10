@@ -33,7 +33,7 @@ namespace AritfactoryUploader.UTest
             //Act
             Bom componentList = PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath);
             // Assert
-            Assert.That(12, Is.EqualTo(componentList.Components.Count), "Checks for no of components");
+            Assert.That(6, Is.EqualTo(componentList.Components.Count), "Checks for no of components");
         }
 
         [Test]
@@ -54,7 +54,7 @@ namespace AritfactoryUploader.UTest
             string comparisonBOMPath = outFolder + @"\ArtifactoryUTTestFiles\ComparisonBOM.json";
 
             //Act && Assert
-            Assert.Throws<JsonReaderException>(() => PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath));
+            Assert.Throws<System.Text.Json.JsonException>(() => PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath));
         }
 
 
@@ -158,8 +158,8 @@ namespace AritfactoryUploader.UTest
             {
                 new ComponentsToArtifactory()
                 {
-                    Purl = "pkg:npm/%40angular/animations@11.0.4",
-                    DestRepoName = "siparty-release-npm-egll",
+                    Purl = "pkg:npm/rxjs@6.5.4",
+                    DestRepoName = "org1-npmjs-npm-remote",
                     DryRun = false,
                 }
             };
@@ -168,8 +168,8 @@ namespace AritfactoryUploader.UTest
             PackageUploadHelper.UpdateBomArtifactoryRepoUrl(ref bom, components);
 
             //Assert
-            var repoUrl = bom.Components.First(x => x.Properties[1].Name == "internal:siemens:clearing:repo-name").Properties[1].Value;
-            Assert.AreEqual("siparty-release-npm-egll", repoUrl);
+            var repoUrl = bom.Components.First(x => x.Properties[3].Name == "internal:siemens:clearing:repo-name").Properties[3].Value;
+            Assert.AreEqual("org1-npmjs-npm-remote", repoUrl);
         }
 
         [Test]
@@ -184,8 +184,8 @@ namespace AritfactoryUploader.UTest
             {
                 new ComponentsToArtifactory()
                 {
-                    Purl = "pkg:npm/%40angular/animations@11.0.4",
-                    DestRepoName = "siparty-release-npm-egll",
+                    Purl = "pkg:npm/rxjs@6.5.4",
+                    DestRepoName = "org1-npmjs-npm-remote",
                 }
             };
 
@@ -193,8 +193,8 @@ namespace AritfactoryUploader.UTest
             PackageUploadHelper.UpdateBomArtifactoryRepoUrl(ref bom, components);
 
             //Assert
-            var repoUrl = bom.Components.First(x => x.Properties[1].Name == "internal:siemens:clearing:repo-name").Properties[1].Value;
-            Assert.AreNotEqual("siparty-release-npm-egll", repoUrl);
+            var repoUrl = bom.Components.First(x => x.Properties[3].Name == "internal:siemens:clearing:repo-name").Properties[3].Value;
+            Assert.AreNotEqual("org1-npmjs-npm-remote", repoUrl);
         }
 
         private static List<Component> GetComponentList()
