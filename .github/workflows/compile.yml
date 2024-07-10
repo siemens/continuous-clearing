@@ -66,13 +66,13 @@ jobs:
       run: |
        dotnet build src\LicenseClearingTool.sln
         Write-Host "Files in directory:"
-        dir  $env:GITHUB_WORKSPACE\out\net6.0
+        dir  $env:GITHUB_WORKSPACE\out\net8.0
 
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
          name: buildoutput
-         path: ${{ github.workspace }}/out/net6.0
+         path: ${{ github.workspace }}/out/net8.0
     
     - name: Archive Build Log
       uses: actions/upload-artifact@v2
