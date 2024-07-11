@@ -243,7 +243,7 @@ namespace LCT.PackageIdentifier
             }
         }
 
-        private static string GetIsDirect(List<JToken> directDependencies, JProperty prop)
+        public static string GetIsDirect(List<JToken> directDependencies, JProperty prop)
         {
             string subvalue = CommonHelper.GetSubstringOfLastOccurance(prop.Name, $"node_modules/");
             foreach (var item in directDependencies)

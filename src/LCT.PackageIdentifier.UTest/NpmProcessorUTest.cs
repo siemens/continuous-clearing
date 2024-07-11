@@ -11,6 +11,7 @@ using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using Moq;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -259,6 +260,49 @@ namespace LCT.PackageIdentifier.UTest
             Assert.That(expectedDependencyList.Count, Is.EqualTo(dependencyList.Count));
 
 
+        }
+
+
+        [Test]
+        public void GetIsDirect_ShouldReturnTrue_WhenDirectDependencyExists()
+        {
+            // Arrange
+            var directDependencies = new List<JToken> { "directDependency1", "directDependency2" };
+            var prop = new JProperty("node_modules/directDependency1");
+
+            // Act
+            var result = NpmProcessor.GetIsDirect(directDependencies, prop);
+
+            // Assert
+            Assert.AreEqual("true", result);
+        }
+
+        [Test]
+        public void GetIsDirect_ShouldReturnFalse_WhenDirectDependencyDoesNotExist()
+        {
+            // Arrange
+            var directDependencies = new List<JToken> { "directDependency1", "directDependency2" };
+            var prop = new JProperty("node_modules/indirectDependency");
+
+            // Act
+            var result = NpmProcessor.GetIsDirect(directDependencies, prop);
+
+            // Assert
+            Assert.AreEqual("false", result);
+        }
+
+        [Test]
+        public void GetIsDirect_ShouldReturnFalse_WhenDirectDependenciesIsEmpty()
+        {
+            // Arrange
+            var directDependencies = new List<JToken>();
+            var prop = new JProperty("node_modules/directDependency");
+
+            // Act
+            var result = NpmProcessor.GetIsDirect(directDependencies, prop);
+
+            // Assert
+            Assert.AreEqual("false", result);
         }
     }
 }

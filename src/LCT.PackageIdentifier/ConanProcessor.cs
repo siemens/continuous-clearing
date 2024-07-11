@@ -449,7 +449,7 @@ namespace LCT.PackageIdentifier
             return false;
         }
 
-        private static string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component, out string jfrogRepoPath)
+        public string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component, out string jfrogRepoPath)
         {
             string jfrogcomponentPath = $"{component.Name}/{component.Version}";
             jfrogRepoPath = Dataconstant.JfrogRepoPathNotFound;

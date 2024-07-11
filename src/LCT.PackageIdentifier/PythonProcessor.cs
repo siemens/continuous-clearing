@@ -84,7 +84,7 @@ namespace LCT.PackageIdentifier
             return bom;
         }
 
-        private void AddSiemensDirectProperty(ref Bom bom)
+        public void AddSiemensDirectProperty(ref Bom bom)
         {
             List<string> pythonDirectDependencies = new List<string>();
             pythonDirectDependencies.AddRange(bom.Dependencies?.Select(x => x.Ref)?.ToList() ?? new List<string>());

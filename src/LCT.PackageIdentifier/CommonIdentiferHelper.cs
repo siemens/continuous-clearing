@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace LCT.PackageIdentifier
 {
-    internal static class CommonIdentiferHelper
+    public static class CommonIdentiferHelper
     {
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
         public static string GetRepodetailsFromPerticularOrder(List<AqlResult> aqlResults)

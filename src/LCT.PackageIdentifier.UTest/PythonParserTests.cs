@@ -382,6 +382,141 @@ namespace PackageIdentifier.UTest
             //Assert  Need to change this after python package clearence implementaion
             Assert.True(listofcomponents.Components.Count == 0 || listofcomponents.Components.Count == 4);
         }
+
+        [Test]
+        public void AddSiemensDirectProperty_ShouldAddProperty_WhenPythonDirectDependenciesExist()
+        {
+            // Arrange
+            var bom = new Bom
+            {
+                Dependencies = new List<Dependency>
+                {
+                    new Dependency { Ref = "package1@1.0.0" },
+                    new Dependency { Ref = "package2@2.0.0" }
+                },
+                Components = new List<Component>
+                {
+                    new Component { Name = "component1", Version = "1.0.0" },
+                    new Component { Name = "component2", Version = "2.0.0" }
+                }
+            };
+
+            var pythonDirectDependencies = new List<string>
+            {
+                "component1@1.0.0",
+                "component2@2.0.0"
+            };
+
+            var expectedProperties = new List<Property>
+            {
+                new Property { Name = Dataconstant.Cdx_SiemensDirect, Value = "true" },
+                new Property { Name = Dataconstant.Cdx_SiemensDirect, Value = "true" }
+            };
+
+            var pythonProcessor = new PythonProcessor(null);
+
+            // Act
+            pythonProcessor.AddSiemensDirectProperty(ref bom);
+
+            // Assert
+            Assert.AreEqual(expectedProperties[0].Name, bom.Components[0].Properties[0].Name);
+            Assert.AreEqual(expectedProperties[0].Name, bom.Components[1].Properties[0].Name);
+        }
+
+        [Test]
+        public void AddSiemensDirectProperty_ShouldNotAddProperty_WhenPythonDirectDependenciesDoNotExist()
+        {
+            // Arrange
+            var bom = new Bom
+            {
+                Dependencies = new List<Dependency>
+                {
+                    new Dependency { Ref = "package1@1.0.0" },
+                    new Dependency { Ref = "package2@2.0.0" }
+                },
+                Components = new List<Component>
+                {
+                    new Component { Name = "component1", Version = "1.0.0" },
+                    new Component { Name = "component2", Version = "2.0.0" }
+                }
+            };
+
+            var pythonDirectDependencies = new List<string>
+            {
+                "component3@3.0.0",
+                "component4@4.0.0"
+            };
+
+            var expectedProperties = new List<Property>
+            {
+                new Property { Name = Dataconstant.Cdx_SiemensDirect, Value = "false" },
+                new Property { Name = Dataconstant.Cdx_SiemensDirect, Value = "false" }
+            };
+
+            var pythonProcessor = new PythonProcessor(null);
+
+            // Act
+            pythonProcessor.AddSiemensDirectProperty(ref bom);
+
+            // Assert
+            Assert.AreEqual(expectedProperties[0].Name, bom.Components[0].Properties[0].Name);
+            Assert.AreEqual(expectedProperties[0].Name, bom.Components[1].Properties[0].Name);
+        }
+
+        [Test]
+        public void AddSiemensDirectProperty_ShouldNotAddProperty_WhenPropertiesAlreadyExist()
+        {
+            // Arrange
+            var bom = new Bom
+            {
+                Dependencies = new List<Dependency>
+                {
+                    new Dependency { Ref = "package1@1.0.0" },
+                    new Dependency { Ref = "package2@2.0.0" }
+                },
+                Components = new List<Component>
+                {
+                    new Component
+                    {
+                        Name = "component1",
+                        Version = "1.0.0",
+                        Properties = new List<Property>
+                        {
+                            new Property { Name = Dataconstant.Cdx_SiemensDirect, Value = "true" }
+                        }
+                    },
+                    new Component
+                    {
+                        Name = "component2",
+                        Version = "2.0.0",
+                        Properties = new List<Property>
+                        {
+                            new Property { Name = Dataconstant.Cdx_SiemensDirect, Value = "true" }
+                        }
+                    }
+                }
+            };
+
+            var pythonDirectDependencies = new List<string>
+            {
+                "component1@1.0.0",
+                "component2@2.0.0"
+            };
+
+            var expectedProperties = new List<Property>
+            {
+                new Property { Name = Dataconstant.Cdx_SiemensDirect, Value = "true" }
+            };
+
+            var pythonProcessor = new PythonProcessor(null);
+
+            // Act
+            pythonProcessor.AddSiemensDirectProperty(ref bom);
+
+            // Assert
+            Assert.AreEqual(expectedProperties[0].Name, bom.Components[0].Properties[0].Name);
+            Assert.AreEqual(expectedProperties[0].Name, bom.Components[1].Properties[0].Name);
+        }
     }
 }
 

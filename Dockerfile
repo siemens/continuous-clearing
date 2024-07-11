@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 # Get parent image as latest debian patch of bullseye
-FROM mcr.microsoft.com/dotnet/sdk:6.0-bullseye-slim-amd64
+FROM mcr.microsoft.com/dotnet/sdk:8.0-bookworm-slim AS build
 WORKDIR /app/out
 
 # Creating required directories
@@ -27,4 +27,4 @@ RUN apt-get update && \
 ENV PATH="/root/.local/bin:$PATH"
 
 # Copying files from host to current working directory
-COPY /buildoutput/ /app/out
+COPY /out/net8.0 /app/out
