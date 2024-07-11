@@ -234,7 +234,7 @@ namespace LCT.PackageIdentifier
             bom = ExtractDetailsForJson(filePath, ref debianPackages);
             return debianPackages;
         }
-        private static string GetArtifactoryRepoName(List<AqlResult> aqlResultList,
+        public string GetArtifactoryRepoName(List<AqlResult> aqlResultList,
                                                      Component component,
                                                      IBomHelper bomHelper,
                                                      out string jfrogRepoPackageName,
@@ -281,7 +281,7 @@ namespace LCT.PackageIdentifier
             return repoName;
         }
 
-        private static string GetJfrogRepoPath(AqlResult aqlResult)
+        private string GetJfrogRepoPath(AqlResult aqlResult)
         {
             if (string.IsNullOrEmpty(aqlResult.Path) || aqlResult.Path.Equals("."))
             {
@@ -291,7 +291,7 @@ namespace LCT.PackageIdentifier
             return $"{aqlResult.Repo}/{aqlResult.Path}/{aqlResult.Name}";
         }
 
-        private static string GetJfrogcomponentNameVersionCombined(string componentName, string componentVerison)
+        private string GetJfrogcomponentNameVersionCombined(string componentName, string componentVerison)
         {
             if (componentVerison.Contains(':'))
             {

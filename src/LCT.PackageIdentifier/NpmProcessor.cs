@@ -604,7 +604,7 @@ namespace LCT.PackageIdentifier
             return false;
         }
 
-        private static AqlResult GetJfrogArtifactoryRepoDetials(List<AqlResult> aqlResultList,
+        public AqlResult GetJfrogArtifactoryRepoDetials(List<AqlResult> aqlResultList,
                                                                 Component component,
                                                                 IBomHelper bomHelper,
                                                                 out string jfrogRepoPath)
@@ -642,7 +642,7 @@ namespace LCT.PackageIdentifier
             return aqlResult;
         }
 
-        private static string GetJfrogRepoPath(AqlResult aqlResult)
+        public string GetJfrogRepoPath(AqlResult aqlResult)
         {
             if (string.IsNullOrEmpty(aqlResult.Path) || aqlResult.Path.Equals("."))
             {

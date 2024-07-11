@@ -117,7 +117,7 @@ namespace LCT.PackageIdentifier
             return bom;
         }
 
-        private void AddSiemensDirectProperty(ref Bom bom)
+        public void AddSiemensDirectProperty(ref Bom bom)
         {
             List<string> mavenDirectDependencies = new List<string>();
             mavenDirectDependencies.AddRange(bom.Dependencies?.Select(x => x.Ref)?.ToList() ?? new List<string>());
