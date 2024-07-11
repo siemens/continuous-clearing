@@ -27,6 +27,372 @@ namespace PackageIdentifier.UTest
     [TestFixture]
     public class NugetParserTests
     {
+        private Mock<IBomHelper> _mockBomHelper;
+        private NugetProcessor _nugetProcessor;
+        private ICycloneDXBomParser _cycloneDXBomParser;
+        [SetUp]
+        public void Setup()
+        {
+            _mockBomHelper = new Mock<IBomHelper>();
+            _cycloneDXBomParser = new Mock<ICycloneDXBomParser>().Object;
+            _nugetProcessor = new NugetProcessor(_cycloneDXBomParser);
+        }
+
+        [Test]
+        public void GetJfrogRepoPath_WhenPathIsEmpty_ReturnsRepoAndName()
+        {
+            // Arrange
+            var aqlResult = new AqlResult
+            {
+                Repo = "my-repo",
+                Name = "my-package",
+                Path = ""
+            };
+            var nugetProcessor = new NugetProcessor(_cycloneDXBomParser);
+
+            // Act
+            var result = nugetProcessor.GetJfrogRepoPath(aqlResult);
+
+            // Assert
+            Assert.AreEqual("my-repo/my-package", result);
+        }
+
+        [Test]
+        public void GetJfrogRepoPath_WhenPathIsDot_ReturnsRepoAndName()
+        {
+            // Arrange
+            var aqlResult = new AqlResult
+            {
+                Repo = "my-repo",
+                Name = "my-package",
+                Path = "."
+            };
+            var nugetProcessor = new NugetProcessor(_cycloneDXBomParser);
+
+            // Act
+            var result = nugetProcessor.GetJfrogRepoPath(aqlResult);
+
+            // Assert
+            Assert.AreEqual("my-repo/my-package", result);
+        }
+
+        [Test]
+        public void GetJfrogRepoPath_WhenPathIsNotEmpty_ReturnsRepoPathAndName()
+        {
+            // Arrange
+            var aqlResult = new AqlResult
+            {
+                Repo = "my-repo",
+                Name = "my-package",
+                Path = "my-folder"
+            };
+            var nugetProcessor = new NugetProcessor(_cycloneDXBomParser);
+
+            // Act
+            var result = nugetProcessor.GetJfrogRepoPath(aqlResult);
+
+            // Assert
+            Assert.AreEqual("my-repo/my-folder/my-package", result);
+        }
+
+        [Test]
+        public void GetJfrogArtifactoryRepoDetials_WhenAqlResultListIsEmpty_ShouldReturnEmptyAqlResult()
+        {
+            // Arrange
+            List<AqlResult> aqlResultList = new List<AqlResult>();
+            Component component = new Component();
+            string jfrogRepoPath;
+
+            // Act
+            var result = _nugetProcessor.GetJfrogArtifactoryRepoDetials(aqlResultList, component, _mockBomHelper.Object, out jfrogRepoPath);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Not Found in JFrogRepo", result.Repo);
+            Assert.AreEqual(string.Empty, jfrogRepoPath);
+        }
+
+        [Test]
+        public void GetJfrogArtifactoryRepoDetials_WhenAqlResultListContainsMatchingComponentName_ShouldReturnAqlResultWithMatchingRepo()
+        {
+            // Arrange
+            List<AqlResult> aqlResultList = new List<AqlResult>
+            {
+                new AqlResult { Name = "Component-1.0.0.nupkg", Repo = "Repo1",Path = "path/to" },
+                new AqlResult { Name = "Component-2.0.0.nupkg", Repo = "Repo2" , Path = "path/to"}
+            };
+            Component component = new Component { Name = "Component", Version = "1.0.0" };
+            string jfrogRepoPath;
+
+            // Act
+            var result = _nugetProcessor.GetJfrogArtifactoryRepoDetials(aqlResultList, component, _mockBomHelper.Object, out jfrogRepoPath);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Repo1", result.Repo);
+            Assert.AreEqual("Repo1/path/to/Component-1.0.0.nupkg", jfrogRepoPath);
+        }
+
+        [Test]
+        public void GetJfrogArtifactoryRepoDetials_WhenAqlResultListDoesNotContainMatchingComponentName_ShouldReturnAqlResultWithNotFoundInRepo()
+        {
+            // Arrange
+            List<AqlResult> aqlResultList = new List<AqlResult>
+            {
+                new AqlResult { Name = "Component-1.0.0.nupkg", Repo = "Repo1" },
+                new AqlResult { Name = "Component-2.0.0.nupkg", Repo = "Repo2" }
+            };
+            Component component = new Component { Name = "Component", Version = "3.0.0" };
+            string jfrogRepoPath;
+
+            // Act
+            var result = _nugetProcessor.GetJfrogArtifactoryRepoDetials(aqlResultList, component, _mockBomHelper.Object, out jfrogRepoPath);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Not Found in JFrogRepo", result.Repo);
+            Assert.AreEqual(string.Empty, jfrogRepoPath);
+        }
+
+        [Test]
+        public void GetJfrogArtifactoryRepoDetials_WhenAqlResultListContainsFullNameVersion_ShouldReturnAqlResultWithMatchingRepo()
+        {
+            // Arrange
+            List<AqlResult> aqlResultList = new List<AqlResult>
+            {
+                new AqlResult { Name = "Component-1.0.0.nupkg", Repo = "Repo1", Path="path/to" },
+                new AqlResult { Name = "Component-2.0.0.nupkg", Repo = "Repo2", Path= "path/to" }
+            };
+            Component component = new Component { Name = "Component", Version = "1.0.0" };
+            _mockBomHelper.Setup(x => x.GetFullNameOfComponent(component)).Returns("Component");
+            string jfrogRepoPath;
+
+            // Act
+            var result = _nugetProcessor.GetJfrogArtifactoryRepoDetials(aqlResultList, component, _mockBomHelper.Object, out jfrogRepoPath);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Repo1", result.Repo);
+            Assert.AreEqual("Repo1/path/to/Component-1.0.0.nupkg", jfrogRepoPath);
+        }
+
+        [Test]
+        public void AddSiemensDirectProperty_ShouldAddSiemensDirectProperty_WhenDirectDependencyExists()
+        {
+            // Arrange
+            var bom = new Bom
+            {
+                Components = new List<Component>
+                {
+                    new Component
+                    {
+                        Name = "Component1",
+                        Version = "1.0.0"
+                    },
+                    new Component
+                    {
+                        Name = "Component2",
+                        Version = "2.0.0"
+                    }
+                }
+            };
+
+            var nugetDirectDependencies = new List<string>
+            {
+                "Component1:1.0.0",
+                "Component2:2.0.0"
+            };
+
+            NugetDevDependencyParser.NugetDirectDependencies = nugetDirectDependencies;
+
+            var expectedBom = new Bom
+            {
+                Components = new List<Component>
+                {
+                    new Component
+                    {
+                        Name = "Component1",
+                        Version = "1.0.0",
+                        Properties = new List<Property>
+                        {
+                            new Property
+                            {
+                                Name = Dataconstant.Cdx_SiemensDirect,
+                                Value = "true"
+                            }
+                        }
+                    },
+                    new Component
+                    {
+                        Name = "Component2",
+                        Version = "2.0.0",
+                        Properties = new List<Property>
+                        {
+                            new Property
+                            {
+                                Name = Dataconstant.Cdx_SiemensDirect,
+                                Value = "true"
+                            }
+                        }
+                    }
+                }
+            };
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            var nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object);
+
+            // Act
+            nugetProcessor.AddSiemensDirectProperty(ref bom);
+
+            // Assert
+            Assert.AreEqual(expectedBom.Components.Count, bom.Components.Count);
+            Assert.AreEqual(Dataconstant.Cdx_SiemensDirect, bom.Components[0].Properties[0].Name);
+            Assert.AreEqual("true", bom.Components[0].Properties[0].Value);
+        }
+
+        [Test]
+        public void AddSiemensDirectProperty_ShouldNotAddSiemensDirectProperty_WhenDirectDependencyDoesNotExist()
+        {
+            // Arrange
+            var bom = new Bom
+            {
+                Components = new List<Component>
+                {
+                    new Component
+                    {
+                        Name = "Component1",
+                        Version = "1.0.0"
+                    },
+                    new Component
+                    {
+                        Name = "Component2",
+                        Version = "2.0.0"
+                    }
+                }
+            };
+
+            var nugetDirectDependencies = new List<string>
+            {
+                "Component3:3.0.0",
+                "Component4:4.0.0"
+            };
+
+            NugetDevDependencyParser.NugetDirectDependencies = nugetDirectDependencies;
+
+            var expectedBom = new Bom
+            {
+                Components = new List<Component>
+                {
+                    new Component
+                    {
+                        Name = "Component1",
+                        Version = "1.0.0"
+                    },
+                    new Component
+                    {
+                        Name = "Component2",
+                        Version = "2.0.0"
+                    }
+                }
+            };
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            var nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object);
+
+            // Act
+            nugetProcessor.AddSiemensDirectProperty(ref bom);
+
+            // Assert
+            // Assert
+            Assert.AreEqual(expectedBom.Components.Count, bom.Components.Count);
+            Assert.AreEqual(Dataconstant.Cdx_SiemensDirect, bom.Components[0].Properties[0].Name);
+            Assert.AreEqual("false", bom.Components[0].Properties[0].Value);
+        }
+
+        [Test]
+        public void AddSiemensDirectProperty_ShouldAddSiemensDirectProperty_WhenPropertyDoesNotExist()
+        {
+            // Arrange
+            var bom = new Bom
+            {
+                Components = new List<Component>
+                {
+                    new Component
+                    {
+                        Name = "Component1",
+                        Version = "1.0.0"
+                    },
+                    new Component
+                    {
+                        Name = "Component2",
+                        Version = "2.0.0",
+                        Properties = new List<Property>
+                        {
+                            new Property
+                            {
+                                Name = "SomeProperty",
+                                Value = "SomeValue"
+                            }
+                        }
+                    }
+                }
+            };
+
+            var nugetDirectDependencies = new List<string>
+            {
+                "Component1:1.0.0",
+                "Component2:2.0.0"
+            };
+
+            NugetDevDependencyParser.NugetDirectDependencies = nugetDirectDependencies;
+
+            var expectedBom = new Bom
+            {
+                Components = new List<Component>
+                {
+                    new Component
+                    {
+                        Name = "Component1",
+                        Version = "1.0.0",
+                        Properties = new List<Property>
+                        {
+                            new Property
+                            {
+                                Name = Dataconstant.Cdx_SiemensDirect,
+                                Value = "true"
+                            }
+                        }
+                    },
+                    new Component
+                    {
+                        Name = "Component2",
+                        Version = "2.0.0",
+                        Properties = new List<Property>
+                        {
+                            new Property
+                            {
+                                Name = "SomeProperty",
+                                Value = "SomeValue"
+                            },
+                            new Property
+                            {
+                                Name = Dataconstant.Cdx_SiemensDirect,
+                                Value = "true"
+                            }
+                        }
+                    }
+                }
+            };
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            var nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object);
+
+            // Act
+            nugetProcessor.AddSiemensDirectProperty(ref bom);
+
+            // Assert
+            Assert.AreEqual(expectedBom.Components.Count, bom.Components.Count);
+            Assert.AreEqual(Dataconstant.Cdx_SiemensDirect, bom.Components[0].Properties[0].Name);
+            Assert.AreEqual("true", bom.Components[0].Properties[0].Value);
+        }
+
         [TestCase]
         public void ParsePackageConfig_GivenAInputFilePath_ReturnsSuccess()
         {

@@ -269,7 +269,7 @@ namespace LCT.PackageIdentifier
             return modifiedBOM;
         }
 
-        private static AqlResult GetJfrogArtifactoryRepoDetials(List<AqlResult> aqlResultList,
+        public AqlResult GetJfrogArtifactoryRepoDetials(List<AqlResult> aqlResultList,
                                              Component component,
                                              IBomHelper bomHelper, out string jfrogRepoPath)
         {
@@ -316,7 +316,7 @@ namespace LCT.PackageIdentifier
             return aqlResult;
         }
 
-        private static string GetJfrogRepoPath(AqlResult aqlResult)
+        public string GetJfrogRepoPath(AqlResult aqlResult)
         {
             if (string.IsNullOrEmpty(aqlResult.Path) || aqlResult.Path.Equals("."))
             {
@@ -487,7 +487,7 @@ namespace LCT.PackageIdentifier
             }
         }
 
-        private void AddSiemensDirectProperty(ref Bom bom)
+        public void AddSiemensDirectProperty(ref Bom bom)
         {
             var bomComponentsList = bom.Components;
             foreach (var component in bomComponentsList)

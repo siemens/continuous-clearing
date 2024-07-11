@@ -23,11 +23,11 @@ using Newtonsoft.Json.Linq;
 
 namespace LCT.PackageIdentifier
 {
-    internal class NugetDevDependencyParser
+    public class NugetDevDependencyParser
     {
         private static NugetDevDependencyParser instance = null;
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        internal static List<string> NugetDirectDependencies = new List<string>();
+        public static List<string> NugetDirectDependencies = new List<string>();
 
         private NugetDevDependencyParser()
         {
