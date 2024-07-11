@@ -62,7 +62,7 @@ namespace LCT.ArtifactoryUploader
             //update Jfrog Repo Path For Sucessfully Uploaded Items
             m_ComponentsInBOM = await PackageUploadHelper.UpdateJfrogRepoPathForSucessfullyUploadedItems(m_ComponentsInBOM, displayPackagesInfo);
 
-            string formattedString = CommonHelper.AddSpecificValuesToBOMFormat(m_ComponentsInBOM);
+            var formattedString = CycloneDX.Json.Serializer.Serialize(m_ComponentsInBOM);
 
             // wrtite final out put in the json file
             fileOperations.WriteContentToOutputBomFile(formattedString, bomGenerationPath, 
