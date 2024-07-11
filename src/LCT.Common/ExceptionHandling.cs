@@ -25,7 +25,7 @@ namespace LCT.Common
                 Logger.Logger.Log(null, Level.Error, $"The exception may be caused by an incorrect projectid or missing token for {exceptionSource} , Please ensure that a valid token is provided and try again:{ex.Message}", null);
 
             }
-            else if (500 <= Convert.ToInt32(ex.StatusCode) && Convert.ToInt32(ex.StatusCode) <= 599)
+            else if ((500 <= Convert.ToInt32(ex.StatusCode) && Convert.ToInt32(ex.StatusCode) <= 599) || ex.StatusCode == null)
             {
                 Logger.Logger.Log(null, Level.Error, $"The exception may arise because  {exceptionSource} is currently unresponsive:{ex.Message} Please try again later", null);
             }
@@ -43,7 +43,7 @@ namespace LCT.Common
             }
         }
 
-        public static void ArgumentException( string message)
+        public static void ArgumentException(string message)
         {
             Logger.Logger.Log(null, Level.Error, $"Missing Arguments: Please provide the below arguments via inline or in the appSettings.json file to proceed.", null);
             Logger.Logger.Log(null, Level.Warn, $"{message}", null);
