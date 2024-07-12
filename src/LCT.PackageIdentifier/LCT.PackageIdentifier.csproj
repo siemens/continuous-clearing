@@ -3,7 +3,8 @@
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<TargetFramework>net6.0</TargetFramework>
-		<AssemblyName>PackageIdentifier</AssemblyName>
+		<AssemblyName>PackageIdentifier</AssemblyName>    
+    <Version>7.0.0</Version>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

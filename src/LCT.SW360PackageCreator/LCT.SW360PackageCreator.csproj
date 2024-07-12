@@ -5,6 +5,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <AssemblyName>SW360PackageCreator</AssemblyName>
     <RootNamespace>LCT.SW360PackageCreator</RootNamespace>
+    <Version>7.0.0</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

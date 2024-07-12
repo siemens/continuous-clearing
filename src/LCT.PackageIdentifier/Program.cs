@@ -42,7 +42,7 @@ namespace LCT.PackageIdentifier
         protected Program() { }
 
         static async Task Main(string[] args)
-        {
+        {           
             BomStopWatch = new Stopwatch();
             BomStopWatch.Start();
             
@@ -52,9 +52,8 @@ namespace LCT.PackageIdentifier
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
             ProjectReleases projectReleases = new ProjectReleases();
             string FolderPath = LogFolderInitialisation(appSettings);
-
-            settingsManager.CheckRequiredArgsToRun(appSettings, "Identifer");
-
+            CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
+            settingsManager.CheckRequiredArgsToRun(appSettings, "Identifer");           
             Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Package Identifier >>>>>====================", null);
             Logger.Logger.Log(null, Level.Notice, $"\nStart of Package Identifier execution: {DateTime.Now}", null);
 
@@ -78,6 +77,8 @@ namespace LCT.PackageIdentifier
             }
 
             Logger.Logger.Log(null, Level.Notice, $"Input Parameters used in Package Identifier:\n\t" +
+                $"CaToolVersion\t\t --> {caToolInformation.CatoolVersion}\n\t" +
+                $"CaToolRunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
                 $"PackageFilePath\t\t --> {appSettings.PackageFilePath}\n\t" +
                 $"BomFolderPath\t\t --> {appSettings.BomFolderPath}\n\t" +
                 $"SBOMTemplateFilePath\t --> {appSettings.CycloneDxSBomTemplatePath}\n\t" +
@@ -104,9 +105,18 @@ namespace LCT.PackageIdentifier
             //Validating JFrog Settings
             if (await bomCreator.CheckJFrogConnection())
             {
-                await bomCreator.GenerateBom(appSettings, new BomHelper(), new FileOperations(),projectReleases);
+                await bomCreator.GenerateBom(appSettings, new BomHelper(), new FileOperations(),projectReleases, caToolInformation);
             }
             Logger.Logger.Log(null, Level.Notice, $"End of Package Identifier execution : {DateTime.Now}\n", null);
+        }
+
+        private static CatoolInfo GetCatoolVersionFromProjectfile()
+        {
+            CatoolInfo catoolInfo = new CatoolInfo();
+            var versionFromProj = Assembly.GetExecutingAssembly().GetName().Version;
+            catoolInfo.CatoolVersion = $"{versionFromProj.Major}.{versionFromProj.Minor}.{versionFromProj.Build}";
+            catoolInfo.CatoolRunningLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            return catoolInfo;
         }
 
         private static IJFrogService GetJfrogService(CommonAppSettings appSettings)

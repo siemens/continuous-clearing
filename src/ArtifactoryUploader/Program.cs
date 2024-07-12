@@ -23,6 +23,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using LCT.Common.Model;
 
 namespace ArtifactoryUploader
 {
@@ -44,6 +45,7 @@ namespace ArtifactoryUploader
             string FolderPath = InitiateLogger(appSettings);
 
             settingsManager.CheckRequiredArgsToRun(appSettings, "Uploader");
+            CatoolInfo caToolVersion = GetCatoolVersionFromProjectfile();
 
             Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Artifactory Uploader >>>>>====================", null);
             Logger.Logger.Log(null, Level.Notice, $"\nStart of Artifactory Uploader execution: {DateTime.Now}", null);
@@ -55,6 +57,8 @@ namespace ArtifactoryUploader
 
             Logger.Logger.Log(null, Level.Info, $"Input Parameters used in Artifactory Uploader:\n\t", null);
             Logger.Logger.Log(null, Level.Notice, $"\tBomFilePath:\t\t {appSettings.BomFilePath}\n\t" +
+                $"CaToolVersion\t\t --> {caToolVersion.CatoolVersion}\n\t" +
+                $"CaToolRunningPath\t --> {caToolVersion.CatoolRunningLocation}\n\t" +
                 $"JFrogUrl:\t\t {appSettings.JFrogApi}\n\t" +
                 $"Release:\t\t {appSettings.Release}\n\t" +
                 $"LogFolderPath:\t\t {Path.GetFullPath(FolderPath)}\n", null);
@@ -75,6 +79,15 @@ namespace ArtifactoryUploader
 
 
             Logger.Logger.Log(null, Level.Notice, $"End of Artifactory Uploader execution : {DateTime.Now}\n", null);
+        }
+
+        private static CatoolInfo GetCatoolVersionFromProjectfile()
+        {
+            CatoolInfo catoolInfo = new CatoolInfo();
+            var versionFromProj = Assembly.GetExecutingAssembly().GetName().Version;
+            catoolInfo.CatoolVersion = $"{versionFromProj.Major}.{versionFromProj.Minor}.{versionFromProj.Build}";
+            catoolInfo.CatoolRunningLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            return catoolInfo;
         }
 
         private static string InitiateLogger(CommonAppSettings appSettings)
