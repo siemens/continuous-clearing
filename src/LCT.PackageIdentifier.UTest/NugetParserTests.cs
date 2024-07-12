@@ -793,7 +793,7 @@ namespace PackageIdentifier.UTest
             var actual = await nugetProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
-            var reponameActual = actual.First(x => x.Properties[0].Name == "internal:siemens:clearing:repo-name").Properties[0].Value;
+            var reponameActual = actual.First(x => x.Properties[0].Name == "internal:siemens:clearing:jfrog-repo-name").Properties[0].Value;
 
             Assert.That(reponameActual, Is.EqualTo(aqlResult.Repo));
         }
@@ -833,7 +833,7 @@ namespace PackageIdentifier.UTest
             var actual = await nugetProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
-            var reponameActual = actual.First(x => x.Properties[0].Name == "internal:siemens:clearing:repo-name").Properties[0].Value;
+            var reponameActual = actual.First(x => x.Properties[0].Name == "internal:siemens:clearing:jfrog-repo-name").Properties[0].Value;
 
             Assert.That("Not Found in JFrogRepo", Is.EqualTo(reponameActual));
         }
@@ -873,7 +873,7 @@ namespace PackageIdentifier.UTest
             var actual = await nugetProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
-            var reponameActual = actual.First(x => x.Properties[0].Name == "internal:siemens:clearing:repo-name").Properties[0].Value;
+            var reponameActual = actual.First(x => x.Properties[0].Name == "internal:siemens:clearing:jfrog-repo-name").Properties[0].Value;
 
 
             Assert.That("internalrepo1", Is.EqualTo(reponameActual));
@@ -914,7 +914,7 @@ namespace PackageIdentifier.UTest
             var actual = await nugetProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
-            var reponameActual = actual.First(x => x.Properties[0].Name == "internal:siemens:clearing:repo-name").Properties[0].Value;
+            var reponameActual = actual.First(x => x.Properties[0].Name == "internal:siemens:clearing:jfrog-repo-name").Properties[0].Value;
 
             Assert.That("Not Found in JFrogRepo", Is.EqualTo(reponameActual));
         }

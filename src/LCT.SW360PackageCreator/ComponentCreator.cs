@@ -239,7 +239,8 @@ namespace LCT.SW360PackageCreator
             // update comparison bom data
             bom = await creatorHelper.GetUpdatedComponentsDetails(ListofBomComponents, UpdatedCompareBomData, sw360Service, bom);
 
-            string formattedString = CommonHelper.AddSpecificValuesToBOMFormat(bom);
+            var formattedString = CycloneDX.Json.Serializer.Serialize(bom);
+            
             fileOperations.WriteContentToOutputBomFile(formattedString, bomGenerationPath,
                 FileConstant.BomFileName, appSettings.SW360ProjectName);
 

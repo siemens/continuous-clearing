@@ -58,7 +58,7 @@ namespace SW360IntegrationTest.NPM
             HttpResponseMessage componentCheck = await httpClient.GetAsync(TestConstant.Sw360ReleaseApi);
 
             // Act
-            //string componentCheckText = await componentCheck.Content.ReadAsStringAsync();
+            
             if (componentCheck != null && componentCheck.StatusCode.Equals(HttpStatusCode.NoContent)) 
             {
                 var componentResponse = await httpClient.PostAsync(TestConstant.Sw360ComponentApi, new StringContent(JsonConvert.SerializeObject(new

@@ -168,7 +168,7 @@ namespace AritfactoryUploader.UTest
             PackageUploadHelper.UpdateBomArtifactoryRepoUrl(ref bom, components);
 
             //Assert
-            var repoUrl = bom.Components.First(x => x.Properties[3].Name == "internal:siemens:clearing:repo-name").Properties[3].Value;
+            var repoUrl = bom.Components.First(x => x.Properties[3].Name == "internal:siemens:clearing:jfrog-repo-name").Properties[3].Value;
             Assert.AreEqual("org1-npmjs-npm-remote", repoUrl);
         }
 
@@ -193,7 +193,7 @@ namespace AritfactoryUploader.UTest
             PackageUploadHelper.UpdateBomArtifactoryRepoUrl(ref bom, components);
 
             //Assert
-            var repoUrl = bom.Components.First(x => x.Properties[3].Name == "internal:siemens:clearing:repo-name").Properties[3].Value;
+            var repoUrl = bom.Components.First(x => x.Properties[3].Name == "internal:siemens:clearing:jfrog-repo-name").Properties[3].Value;
             Assert.AreNotEqual("org1-npmjs-npm-remote", repoUrl);
         }
 
