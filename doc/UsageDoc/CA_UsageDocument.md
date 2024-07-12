@@ -237,7 +237,7 @@ Currently LTA support is not provided for SBOM, hence until that is implemented 
  
 ```
 {
-  "CaVersion": "6.2.0",
+  "CaVersion": "",
   "TimeOut": 200,
   "ProjectType": "<Insert ProjectType>",
   "SW360ProjectName": "<Insert SW360 Project Name>",
