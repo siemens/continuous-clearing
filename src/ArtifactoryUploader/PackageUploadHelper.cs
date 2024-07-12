@@ -87,7 +87,7 @@ namespace LCT.ArtifactoryUploader
                         ComponentType = GetComponentType(item),
                         PackageType = packageType,
                         DryRun = !appSettings.Release,
-                        SrcRepoName = item.Properties.Find(s => s.Name == Dataconstant.Cdx_ArtifactoryRepoUrl)?.Value,
+                        SrcRepoName = item.Properties.Find(s => s.Name == Dataconstant.Cdx_ArtifactoryRepoName)?.Value,
                         DestRepoName = GetDestinationRepo(item, appSettings),
                         ApiKey = appSettings.ArtifactoryUploadApiKey,
                         Email = appSettings.ArtifactoryUploadUser,
@@ -954,7 +954,7 @@ namespace LCT.ArtifactoryUploader
             if (item.Purl.Contains("pypi", StringComparison.OrdinalIgnoreCase))
             {
                 // get the  component list from Jfrog for given repo
-                aqlResultList = await GetListOfComponentsFromRepo(new string[] { item.Properties.Find(x => x.Name == Dataconstant.Cdx_ArtifactoryRepoUrl)?.Value }, jFrogService);
+                aqlResultList = await GetListOfComponentsFromRepo(new string[] { item.Properties.Find(x => x.Name == Dataconstant.Cdx_ArtifactoryRepoName)?.Value }, jFrogService);
                 if (aqlResultList.Count > 0)
                 {
                     return GetArtifactoryRepoName(aqlResultList, item);
@@ -962,7 +962,7 @@ namespace LCT.ArtifactoryUploader
             }
             else if (item.Purl.Contains("conan", StringComparison.OrdinalIgnoreCase))
             {
-                var aqlConanResultList = await GetListOfComponentsFromRepo(new string[] { item.Properties.Find(x => x.Name == Dataconstant.Cdx_ArtifactoryRepoUrl)?.Value }, jFrogService);
+                var aqlConanResultList = await GetListOfComponentsFromRepo(new string[] { item.Properties.Find(x => x.Name == Dataconstant.Cdx_ArtifactoryRepoName)?.Value }, jFrogService);
 
                 if (aqlConanResultList.Count > 0)
                 {
@@ -1175,7 +1175,7 @@ namespace LCT.ArtifactoryUploader
                 var bomComponent = bom.Components.Find(x => x.Purl.Equals(component.Purl, StringComparison.OrdinalIgnoreCase));
                 if (component.DestRepoName != null && !component.DryRun)
                 {
-                    bomComponent.Properties.First(x => x.Name == Dataconstant.Cdx_ArtifactoryRepoUrl).Value = component.DestRepoName;
+                    bomComponent.Properties.First(x => x.Name == Dataconstant.Cdx_ArtifactoryRepoName).Value = component.DestRepoName;
                 }
             }
         }

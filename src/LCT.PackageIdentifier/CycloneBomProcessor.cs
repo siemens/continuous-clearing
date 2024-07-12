@@ -92,7 +92,7 @@ namespace LCT.PackageIdentifier
 
             Property artifactoryrepo = new()
             {
-                Name = Dataconstant.Cdx_ArtifactoryRepoUrl,
+                Name = Dataconstant.Cdx_ArtifactoryRepoName,
                 Value = repo
             };
 

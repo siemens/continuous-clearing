@@ -76,7 +76,7 @@
           "value": "false"
         },
         {
-          "name": "internal:siemens:clearing:repo-name",
+          "name": "internal:siemens:clearing:jfrog-repo-name",
           "value": "siparty-release-npm-egll"
         },
         {
@@ -128,7 +128,7 @@
           "value": "false"
         },
         {
-          "name": "internal:siemens:clearing:repo-name",
+          "name": "internal:siemens:clearing:jfrog-repo-name",
           "value": "org1-npmjs-npm-remote-cache"
         },
         {
@@ -180,7 +180,7 @@
           "value": "false"
         },
         {
-          "name": "internal:siemens:clearing:repo-name",
+          "name": "internal:siemens:clearing:jfrog-repo-name",
           "value": "org1-npmjs-npm-remote-cache"
         },
         {
@@ -231,7 +231,7 @@
           "value": "false"
         },
         {
-          "name": "internal:siemens:clearing:repo-name",
+          "name": "internal:siemens:clearing:jfrog-repo-name",
           "value": "siparty-release-npm-egll"
         },
         {
@@ -282,7 +282,7 @@
           "value": "false"
         },
         {
-          "name": "internal:siemens:clearing:repo-name",
+          "name": "internal:siemens:clearing:jfrog-repo-name",
           "value": "org1-npmjs-npm-remote-cache"
         },
         {
@@ -334,7 +334,7 @@
           "value": "false"
         },
         {
-          "name": "internal:siemens:clearing:repo-name",
+          "name": "internal:siemens:clearing:jfrog-repo-name",
           "value": "org1-npmjs-npm-remote-cache"
         },
         {

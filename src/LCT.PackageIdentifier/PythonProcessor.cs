@@ -407,7 +407,7 @@ namespace LCT.PackageIdentifier
                 var hashes = aqlResultList.FirstOrDefault(x => x.Name.Contains(
                     jfrogpackageName, StringComparison.OrdinalIgnoreCase) && (x.Name.EndsWith(ApiConstant.PythonExtension)));
 
-                Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoUrl, Value = repoName };
+                Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = repoName };
                 Property fileNameProperty = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = jfrogPackageNameWhlExten };
                 Property jfrogRepoPathProperty = new() { Name = Dataconstant.Cdx_JfrogRepoPath, Value = jfrogRepoPath };
                 Component componentVal = component;

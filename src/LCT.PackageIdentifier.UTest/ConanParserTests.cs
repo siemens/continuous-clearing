@@ -203,7 +203,7 @@ namespace PackageIdentifier.UTest
             ConanProcessor conanProcessor = new ConanProcessor(cycloneDXBomParser.Object);
             var actual = await conanProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
-            var reponameActual = actual.First(x => x.Properties[0].Name == "internal:siemens:clearing:repo-name").Properties[0].Value;
+            var reponameActual = actual.First(x => x.Properties[0].Name == "internal:siemens:clearing:jfrog-repo-name").Properties[0].Value;
 
             // Assert
             Assert.That(actual, Is.Not.Null);
@@ -245,7 +245,7 @@ namespace PackageIdentifier.UTest
             var actual = await conanProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
-            var reponameActual = actual.First(x => x.Properties[0].Name == "internal:siemens:clearing:repo-name").Properties[0].Value;
+            var reponameActual = actual.First(x => x.Properties[0].Name == "internal:siemens:clearing:jfrog-repo-name").Properties[0].Value;
 
             Assert.That("Not Found in JFrogRepo", Is.EqualTo(reponameActual));
         }

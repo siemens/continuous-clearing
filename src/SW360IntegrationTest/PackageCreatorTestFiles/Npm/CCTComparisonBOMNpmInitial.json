@@ -62,7 +62,7 @@
           "value": "false"
         },
         {
-          "name": "internal:siemens:clearing:repo-name",
+          "name": "internal:siemens:clearing:jfrog-repo-name",
           "value": "Not Found in JFrogRepo"
         },
         {
@@ -112,7 +112,7 @@
           "value": "false"
         },
         {
-          "name": "internal:siemens:clearing:repo-name",
+          "name": "internal:siemens:clearing:jfrog-repo-name",
           "value": "Not Found in JFrogRepo"
         },
         {
@@ -162,7 +162,7 @@
           "value": "false"
         },
         {
-          "name": "internal:siemens:clearing:repo-name",
+          "name": "internal:siemens:clearing:jfrog-repo-name",
           "value": "Not Found in JFrogRepo"
         },
         {
@@ -199,7 +199,7 @@
           "value": "false"
         },
         {
-          "name": "internal:siemens:clearing:repo-name",
+          "name": "internal:siemens:clearing:jfrog-repo-name",
           "value": "Not Found in JFrogRepo"
         },
         {
@@ -236,7 +236,7 @@
           "value": "false"
         },
         {
-          "name": "internal:siemens:clearing:repo-name",
+          "name": "internal:siemens:clearing:jfrog-repo-name",
           "value": "Not Found in JFrogRepo"
         },
         {
@@ -274,7 +274,7 @@
           "value": "false"
         },
         {
-          "name": "internal:siemens:clearing:repo-name",
+          "name": "internal:siemens:clearing:jfrog-repo-name",
           "value": "Not Found in JFrogRepo"
         },
         {

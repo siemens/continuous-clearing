@@ -130,7 +130,7 @@ namespace LCT.PackageIdentifier
                 string jfrogpackageName = $"{component.Name}/{component.Version}";
                 Logger.Debug($"Repo Name for the package {jfrogpackageName} is {repoName}");
                 var hashes = aqlResultList.FirstOrDefault(x => x.Path.Contains(jfrogpackageName, StringComparison.OrdinalIgnoreCase));
-                Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoUrl, Value = repoName };
+                Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = repoName };
                 Property jfrogRepoPathProperty = new() { Name = Dataconstant.Cdx_JfrogRepoPath, Value = jfrogRepoPath };
                 Component componentVal = component;
 
