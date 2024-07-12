@@ -179,9 +179,9 @@ namespace LCT.PackageIdentifier
                     }
                     return totalString;
                 case "ALPINE":
-                    if (appSettings.Npm.Include != null)
+                    if (appSettings.Alpine.Include != null)
                     {
-                        totalString = string.Join(",", appSettings.Npm.Include?.ToList());
+                        totalString = string.Join(",", appSettings.Alpine.Include?.ToList());
                     }
                     return totalString;
                 default:
@@ -233,9 +233,9 @@ namespace LCT.PackageIdentifier
                     }
                     return totalString;
                 case "ALPINE":
-                    if (appSettings.Npm.Include != null)
+                    if (appSettings.Alpine.Include != null)
                     {
-                        totalString = string.Join(",", appSettings.Npm.Include?.ToList());
+                        totalString = string.Join(",", appSettings.Alpine.Include?.ToList());
                     }
                     return totalString;
                 default:
@@ -289,9 +289,9 @@ namespace LCT.PackageIdentifier
                     }
                     return totalString;
                 case "ALPINE":
-                    if (appSettings.Npm.Include != null)
+                    if (appSettings.Alpine.Include != null)
                     {
-                        totalString = string.Join(",", appSettings.Npm.Include?.ToList());
+                        totalString = string.Join(",", appSettings.Alpine.Include?.ToList());
                     }
                     return totalString;
                 default:

@@ -181,8 +181,8 @@ namespace LCT.PackageIdentifier
         private static void GetPackagesForBom(string filepath, ref List<BundledComponents> bundledComponents, ref List<Component> lstComponentForBOM, ref int noOfDevDependent, IEnumerable<JProperty> depencyComponentList)
         {
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += depencyComponentList.Count();
-            var prop2 = depencyComponentList.ToList()[0];
-            var parsedContent = JObject.Parse(Convert.ToString(prop2.Value));
+            var property2 = depencyComponentList.ToList()[0];
+            var parsedContent = JObject.Parse(Convert.ToString(property2.Value));
             var dep = parsedContent["dependencies"].ToList();
             var devDep = parsedContent["devDependencies"].ToList();
             List<JToken> directDependencies = new List<JToken>();

@@ -183,13 +183,13 @@ namespace LCT.PackageIdentifier
         {
             var readValue = File.ReadAllText(filePath);
             JObject serializedContent = JObject.Parse(readValue);
-            JToken projectFramoworks = serializedContent["project"]["frameworks"];
-            if (projectFramoworks == null && !projectFramoworks.HasValues)
+            JToken projectFramworks = serializedContent["project"]["frameworks"];
+            if (projectFramworks == null && !projectFramworks.HasValues)
             {
                 return;
             }
 
-            IEnumerable<JProperty> listChilds = projectFramoworks.Children().OfType<JProperty>() ?? new List<JProperty>();
+            IEnumerable<JProperty> listChilds = projectFramworks.Children().OfType<JProperty>() ?? new List<JProperty>();
             //check has values
             if (listChilds != null && listChilds.ToList()[0].HasValues)
             {

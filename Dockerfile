@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 # Get parent image as latest debian patch of bullseye
-FROM mcr.microsoft.com/dotnet/sdk:8.0-bookworm-slim AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0-bookworm-slim
 WORKDIR /app/out
 
 # Creating required directories

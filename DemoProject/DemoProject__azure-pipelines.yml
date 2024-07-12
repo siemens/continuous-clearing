@@ -23,7 +23,7 @@ jobs:
     displayName: 'Clearing-Package Identifier'
     inputs:
       script: |
-        $(Build.SourcesDirectory)\Continuous-Clearing\out\net6.0\PackageIdentifier.exe --packageFilePath "$(Build.SourcesDirectory)\DemoProject\NPMProject" --bomFolderPath "$(Build.SourcesDirectory)\DemoProject\NPMProject" --sw360Token <SW360AUTHTOKEN)>  --projectType <ProjectType> --sw360Url <sw360Url> --sW360AuthTokenType Bearer --artifactoryuploadApiKey <JFROGARTIFACTORYTOKEN>) --JfrogApi <JfrogUrl>
+        $(Build.SourcesDirectory)\Continuous-Clearing\out\net8.0\PackageIdentifier.exe --packageFilePath "$(Build.SourcesDirectory)\DemoProject\NPMProject" --bomFolderPath "$(Build.SourcesDirectory)\DemoProject\NPMProject" --sw360Token <SW360AUTHTOKEN)>  --projectType <ProjectType> --sw360Url <sw360Url> --sW360AuthTokenType Bearer --artifactoryuploadApiKey <JFROGARTIFACTORYTOKEN>) --JfrogApi <JfrogUrl>
       workingDirectory: 'DemoProject\NPMProject'
       failOnStderr: true
 
@@ -31,7 +31,7 @@ jobs:
     displayName: 'Clearing-SW360 Package Creator'
     inputs:
       script: |
-        $(Build.SourcesDirectory)\Continuous-Clearing\out\net6.0\SW360PackageCreator.exe  --bomFilePath "$(Build.SourcesDirectory)\DemoProject\NPMProject\$(SW360PROJNAME)_Bom.cdx.json"  --sw360Token <sw360token> --sW360ProjectID <ProjectId> --sW360AuthTokenType Bearer --fossologyUrl <FossURL>
+        $(Build.SourcesDirectory)\Continuous-Clearing\out\net8.0\SW360PackageCreator.exe  --bomFilePath "$(Build.SourcesDirectory)\DemoProject\NPMProject\$(SW360PROJNAME)_Bom.cdx.json"  --sw360Token <sw360token> --sW360ProjectID <ProjectId> --sW360AuthTokenType Bearer --fossologyUrl <FossURL>
       workingDirectory: 'DemoProject\NPMProject'
       failOnStderr: true
 
