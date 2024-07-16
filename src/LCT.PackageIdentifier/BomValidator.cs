@@ -35,7 +35,7 @@ namespace LCT.PackageIdentifier
                 Logger.Debug($"ValidateAppSettings() : Sw360 project "+ projectReleases.Name +" is in " + projectReleases.clearingState +" state.");
                 Environment.Exit(-1);
             }
-            else  
+            else
             {
                 appSettings.SW360ProjectName = projectReleases.Name;
             }
