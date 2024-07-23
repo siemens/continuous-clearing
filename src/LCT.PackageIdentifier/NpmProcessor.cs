@@ -89,8 +89,9 @@ namespace LCT.PackageIdentifier
                 // multi level dependency check
                 if (dependencies?.Children() != null)
                 {
+                    List<JToken> directDependenciesList = GetDirectDependenciesList(filepath);
                     IEnumerable<JProperty> depencyComponentList = dependencies.Children().OfType<JProperty>();
-                    GetComponentsForBom(filepath, appSettings, ref bundledComponents, ref lstComponentForBOM, ref noOfDevDependent, depencyComponentList);
+                    GetComponentsForBom(filepath, appSettings, ref bundledComponents, ref lstComponentForBOM, ref noOfDevDependent, depencyComponentList, directDependenciesList);
                 }
 
                 // the below logic for angular 16+version due to package-lock.json file format change
@@ -131,6 +132,20 @@ namespace LCT.PackageIdentifier
             }
 
             return lstComponentForBOM;
+        }
+
+        private List<JToken> GetDirectDependenciesList(string filepath)
+        {
+            string directoryName = Path.GetDirectoryName(filepath);
+            string packageJsonPath = $"{directoryName}\\{FileConstant.PackageJsonFileName}";
+            string jsonContent = File.ReadAllText(filepath);
+            var jsonDeserialized = JObject.Parse(jsonContent);
+            List<JToken> dependencies = jsonDeserialized[Dependencies]?.ToList() ?? new List<JToken>();
+            List<JToken> devDependencies = jsonDeserialized["devDependencies"]?.ToList() ?? new List<JToken>();
+            List<JToken> directDependencies = new List<JToken>();
+            directDependencies.AddRange(dependencies);
+            directDependencies.AddRange(devDependencies);
+            return directDependencies;
         }
 
         private static void CreateFileForMultipleVersions(List<Component> componentsWithMultipleVersions, CommonAppSettings appSettings)
@@ -183,8 +198,8 @@ namespace LCT.PackageIdentifier
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += depencyComponentList.Count();
             var property2 = depencyComponentList.ToList()[0];
             var parsedContent = JObject.Parse(Convert.ToString(property2.Value));
-            var dep = parsedContent["dependencies"].ToList();
-            var devDep = parsedContent["devDependencies"].ToList();
+            List<JToken> dep = parsedContent["dependencies"]?.ToList() ?? new List<JToken>();
+            List<JToken> devDep = parsedContent["devDependencies"]?.ToList() ?? new List<JToken>();
             List<JToken> directDependencies = new List<JToken>();
             directDependencies.AddRange(dep);
             directDependencies.AddRange(devDep);
@@ -248,7 +263,7 @@ namespace LCT.PackageIdentifier
             string subvalue = CommonHelper.GetSubstringOfLastOccurance(prop.Name, $"node_modules/");
             foreach (var item in directDependencies)
             {
-                string value = Convert.ToString(item);
+                string value = Convert.ToString(item) ?? string.Empty;
                 if (value.Contains(subvalue))
                 {
                     return "true";
@@ -271,7 +286,7 @@ namespace LCT.PackageIdentifier
 
         private static void GetComponentsForBom(string filepath, CommonAppSettings appSettings,
             ref List<BundledComponents> bundledComponents, ref List<Component> lstComponentForBOM,
-            ref int noOfDevDependent, IEnumerable<JProperty> depencyComponentList)
+            ref int noOfDevDependent, IEnumerable<JProperty> depencyComponentList , List<JToken> directDependenciesList)
         {
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += depencyComponentList.Count();
 
@@ -296,7 +311,8 @@ namespace LCT.PackageIdentifier
                 IEnumerable<JProperty> subDependencyComponentList = prop.Value[Dependencies]?.OfType<JProperty>();
                 if (subDependencyComponentList != null)
                 {
-                    GetComponentsForBom(filepath, appSettings, ref bundledComponents, ref lstComponentForBOM, ref noOfDevDependent, subDependencyComponentList);
+                    GetComponentsForBom(filepath, appSettings, ref bundledComponents, ref lstComponentForBOM,
+                                        ref noOfDevDependent, subDependencyComponentList, directDependenciesList);
                 }
 
                 GetBundledComponents(prop.Value[Dependencies], ref bundledComponents);
@@ -320,9 +336,12 @@ namespace LCT.PackageIdentifier
                 components.Author = prop.Value[Requires]?.ToString();
                 components.Purl = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
                 components.BomRef = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
-                components.Type =Component.Classification.Library;
+                components.Type = Component.Classification.Library;
+                string isDirect = GetIsDirect(directDependenciesList, prop);
+                Property siemensDirect = new Property() { Name = Dataconstant.Cdx_SiemensDirect, Value = isDirect };
                 components.Properties = new List<Property>();
                 components.Properties.Add(isdev);
+                components.Properties.Add(siemensDirect);
                 lstComponentForBOM.Add(components);
                 lstComponentForBOM = RemoveBundledComponentFromList(bundledComponents, lstComponentForBOM);
             }

@@ -46,8 +46,9 @@ namespace LCT.Common.Constants
         public static readonly string ContainerDir = Path.Combine(@"/app/opt/PatchedFiles");
         public const string DockerImage = "ghcr.io/siemens/continuous-clearing";
         public static readonly string DockerCMDTool = Path.Combine(@"/bin/bash");
+        public const string PackageJsonFileName = "package.json";
         public const string appSettingFileName = "appSettings.json";
-        public const string CycloneDXFileExtension = ".cdx.json"; 
+        public const string CycloneDXFileExtension = ".cdx.json";
         public const string SBOMTemplateFileExtension = "CATemplate.cdx.json";
         public const string NugetAssetFile = "project.assets.json";
         public const string multipleversionsFileName = "Multipleversions.json";
