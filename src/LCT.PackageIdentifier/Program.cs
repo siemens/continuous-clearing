@@ -107,8 +107,8 @@ namespace LCT.PackageIdentifier
             }
             Logger.Logger.Log(null, Level.Notice, $"End of Package Identifier execution : {DateTime.Now}\n", null);
             string logFilePath = Path.GetFullPath(Path.Combine(FolderPath, FileConstant.BomCreatorLog));
-            //PublishLogfiles(logFilePath);
-            PublishSampleZipFolder();
+            PublishLogfiles(logFilePath);
+            //PublishSampleZipFolder();
         }
 
         public static void PublishSampleZipFolder()
@@ -142,49 +142,49 @@ namespace LCT.PackageIdentifier
             Console.WriteLine($"##vso[artifact.upload containerfolder={containerFolder};artifactname={artifactName}]{Path.GetFullPath(sampleZipFilePath)}");
         }
 
-        //public static void PublishLogfiles(string logFolderPath)
-        //{
-        //    try
-        //    {
-        //        // Ensure the log file exists
-        //        if (!File.Exists(logFolderPath))
-        //        {
-        //            throw new FileNotFoundException($"Log file not found: {logFolderPath}");
-        //        }
+        public static void PublishLogfiles(string logFolderPath)
+        {
+            try
+            {
+                //// Ensure the log file exists
+                //if (!File.Exists(logFolderPath))
+                //{
+                //    throw new FileNotFoundException($"Log file not found: {logFolderPath}");
+                //}
 
-        //        // Create a temporary folder for the zip file
-        //        string tempFolderPath = Path.Combine(Path.GetTempPath(), "LogTemp");
-        //        Directory.CreateDirectory(tempFolderPath);
+                //// Create a temporary folder for the zip file
+                //string tempFolderPath = Path.Combine(Path.GetTempPath(), "LogTemp");
+                //Directory.CreateDirectory(tempFolderPath);
 
-        //        // Prepare zip file path
-        //        string zipFilePath = Path.Combine(tempFolderPath, "Log.zip");
+                //// Prepare zip file path
+                //string zipFilePath = Path.Combine(tempFolderPath, "Log.zip");
 
-        //        // Delete existing zip file if it exists
-        //        if (File.Exists(zipFilePath))
-        //        {
-        //            File.Delete(zipFilePath);
-        //        }
+                //// Delete existing zip file if it exists
+                //if (File.Exists(zipFilePath))
+                //{
+                //    File.Delete(zipFilePath);
+                //}
 
-        //        // Create a new zip archive
-        //        using (ZipArchive archive = ZipFile.Open(zipFilePath, ZipArchiveMode.Create))
-        //        {
-        //            // Add the log file to the zip archive
-        //            archive.CreateEntryFromFile(logFolderPath, Path.GetFileName(logFolderPath));
-        //        }
+                //// Create a new zip archive
+                //using (ZipArchive archive = ZipFile.Open(zipFilePath, ZipArchiveMode.Create))
+                //{
+                //    // Add the log file to the zip archive
+                //    archive.CreateEntryFromFile(logFolderPath, Path.GetFileName(logFolderPath));
+                //}
 
-        //        // Define Azure DevOps/VSTS artifact upload parameters
-        //        string containerFolder = "Container"; // Replace with your desired container folder
-        //        string artifactName = "MyArtifact"; // Replace with your artifact name
+                // Define Azure DevOps/VSTS artifact upload parameters
+                string containerFolder = "Container"; // Replace with your desired container folder
+                string artifactName = "MyArtifact"; // Replace with your artifact name
 
-        //        // Output the artifact upload command
-        //        Console.WriteLine($"##vso[artifact.upload containerfolder={containerFolder};artifactname={artifactName}]{Path.GetFullPath(zipFilePath)}");
+                // Output the artifact upload command
+                Console.WriteLine($"##vso[artifact.upload containerfolder={containerFolder};artifactname={artifactName}]{Path.GetFullPath(logFolderPath)}");
 
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine(ex.ToString());
-        //    }
-        //}
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
         public static string GetZipFolderPath()
         {
             string localPathforSourceRepo = string.Empty;
