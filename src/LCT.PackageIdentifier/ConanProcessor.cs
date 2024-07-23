@@ -246,15 +246,14 @@ namespace LCT.PackageIdentifier
                     AddingIdentifierType(components, "PackageFile");
                     componentsForBOM.AddRange(components);
                 }
-                else if (filepath.EndsWith(FileConstant.CycloneDXFileExtension) && !filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                else if (filepath.EndsWith(FileConstant.CycloneDXFileExtension) 
+                    && !filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
                     bom = _cycloneDXBomParser.ParseCycloneDXBom(filepath);
                     CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
+                    GetDetailsforManuallyAddedComp(bom.Components);
                     componentsForBOM.AddRange(bom.Components);
-                    GetDetailsforManuallyAddedComp(componentsForBOM);// todo: this step should come before
-                                                                     // merging the manually added components
-                                                                     // to discoverd
                 }
             }
 
@@ -273,11 +272,13 @@ namespace LCT.PackageIdentifier
                 bom.Dependencies = dependencies;
             }
 
-            if (File.Exists(appSettings.CycloneDxSBomTemplatePath) && appSettings.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+            if (File.Exists(appSettings.CycloneDxSBomTemplatePath) 
+                && appSettings.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
                 //Adding Template Component Details
                 Bom templateDetails;
-                templateDetails = ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
+                templateDetails = ExtractSBOMDetailsFromTemplate(
+                    _cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
                 CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
                 SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
             }
