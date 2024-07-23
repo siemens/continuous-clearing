@@ -26,8 +26,6 @@ using LCT.APICommunications;
 using LCT.APICommunications.Model;
 using System.Linq;
 using System.IO.Compression;
-using System.DirectoryServices.ActiveDirectory;
-using System.Drawing.Drawing2D;
 
 
 namespace LCT.PackageIdentifier
@@ -110,8 +108,8 @@ namespace LCT.PackageIdentifier
             Logger.Logger.Log(null, Level.Notice, $"End of Package Identifier execution : {DateTime.Now}\n", null);
            
             string logFilePath = Path.GetFullPath(Path.Combine(FolderPath, FileConstant.BomCreatorLog));
-            PublishLogfiles(logFilePath);
-            //PublishSampleZipFolder();
+            //PublishLogfiles(logFilePath);
+            PublishSampleZipFolder();
         }
 
         public static void PublishSampleZipFolder()
@@ -123,26 +121,30 @@ namespace LCT.PackageIdentifier
                 Directory.CreateDirectory(zipFolderPath);
             }
 
-            // Create a sample zip file
-            string sampleZipFilePath = Path.Combine(zipFolderPath, "sample.zip");
-            if (File.Exists(sampleZipFilePath))
-            {
-                File.Delete(sampleZipFilePath);
-            }
-            using (ZipArchive archive = ZipFile.Open(sampleZipFilePath, ZipArchiveMode.Create))
-            {
-                // Add a sample file to the zip archive
-                string sampleFilePath = Path.Combine(zipFolderPath, "sample.txt");
-                File.WriteAllText(sampleFilePath, "This is a sample file.");
-                archive.CreateEntryFromFile(sampleFilePath, "sample.txt");
-            }
+            string sampleFilePath = Path.Combine(zipFolderPath, "sample.txt");
+            File.WriteAllText(sampleFilePath, "This is a sample file.");
+
+
+            //// Create a sample zip file
+            //string sampleZipFilePath = Path.Combine(zipFolderPath, "sample.zip");
+            //if (File.Exists(sampleZipFilePath))
+            //{
+            //    File.Delete(sampleZipFilePath);
+            //}
+            //using (ZipArchive archive = ZipFile.Open(sampleZipFilePath, ZipArchiveMode.Create))
+            //{
+            //    // Add a sample file to the zip archive
+            //    string sampleFilePath = Path.Combine(zipFolderPath, "sample.txt");
+            //    File.WriteAllText(sampleFilePath, "This is a sample file.");
+            //    archive.CreateEntryFromFile(sampleFilePath, "sample.txt");
+            //}
 
             // Define Azure DevOps/VSTS artifact upload parameters
             string containerFolder = "Container"; // Replace with your desired container folder
             string artifactName = "MyArtifact"; // Replace with your artifact name
 
             // Output the artifact upload command
-            Console.WriteLine($"##vso[artifact.upload containerfolder={containerFolder};artifactname={artifactName}]{Path.GetFullPath(sampleZipFilePath)}");
+            Console.WriteLine($"##vso[artifact.upload containerfolder={containerFolder};artifactname={artifactName}]{Path.GetFullPath(sampleFilePath)}");
         }
 
         public static void PublishLogfiles(string logFolderPath)
@@ -178,9 +180,9 @@ namespace LCT.PackageIdentifier
                 // Define Azure DevOps/VSTS artifact upload parameters
                 string containerFolder = "Container"; // Replace with your desired container folder
                 string artifactName = "MyArtifact"; // Replace with your artifact name
-                string filepath = "$(Build.SourcesDirectory)/Logs/PacakgeIdentifier.log";
+                
                 // Output the artifact upload command
-                Console.WriteLine($"##vso[artifact.upload containerfolder={containerFolder};artifactname={artifactName}]{filepath}");
+                Console.WriteLine($"##vso[artifact.upload containerfolder={containerFolder};artifactname={artifactName}]{Path.GetFullPath(logFolderPath)}");
 
             }
             catch (Exception ex)
