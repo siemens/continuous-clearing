@@ -26,6 +26,8 @@ using LCT.APICommunications;
 using LCT.APICommunications.Model;
 using System.Linq;
 using System.IO.Compression;
+using System.DirectoryServices.ActiveDirectory;
+using System.Drawing.Drawing2D;
 
 
 namespace LCT.PackageIdentifier
@@ -106,6 +108,7 @@ namespace LCT.PackageIdentifier
                 await bomCreator.GenerateBom(appSettings, new BomHelper(), new FileOperations(),projectReleases);
             }
             Logger.Logger.Log(null, Level.Notice, $"End of Package Identifier execution : {DateTime.Now}\n", null);
+           
             string logFilePath = Path.GetFullPath(Path.Combine(FolderPath, FileConstant.BomCreatorLog));
             PublishLogfiles(logFilePath);
             //PublishSampleZipFolder();
@@ -175,9 +178,9 @@ namespace LCT.PackageIdentifier
                 // Define Azure DevOps/VSTS artifact upload parameters
                 string containerFolder = "Container"; // Replace with your desired container folder
                 string artifactName = "MyArtifact"; // Replace with your artifact name
-
+                string filepath = "$(Build.SourcesDirectory)/Logs/PacakgeIdentifier.log";
                 // Output the artifact upload command
-                Console.WriteLine($"##vso[artifact.upload containerfolder={containerFolder};artifactname={artifactName}]{Path.GetFullPath(logFolderPath)}");
+                Console.WriteLine($"##vso[artifact.upload containerfolder={containerFolder};artifactname={artifactName}]{filepath}");
 
             }
             catch (Exception ex)
