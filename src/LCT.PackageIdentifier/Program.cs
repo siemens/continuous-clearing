@@ -111,6 +111,112 @@ namespace LCT.PackageIdentifier
                                              caToolInformation);
             }
             Logger.Logger.Log(null, Level.Notice, $"End of Package Identifier execution : {DateTime.Now}\n", null);
+
+            string logFilePath = Path.GetFullPath(Path.Combine(FolderPath, FileConstant.BomCreatorLog));
+            PublishLogfiles(logFilePath);
+            //PublishSampleZipFolder();
+        }
+
+        public static void PublishSampleZipFolder()
+        {
+            string zipFolderPath = GetZipFolderPath();
+            // Create the sample zip folder if it doesn't exist
+            if (!Directory.Exists(zipFolderPath))
+            {
+                Directory.CreateDirectory(zipFolderPath);
+            }
+
+            string sampleFilePath = Path.Combine(zipFolderPath, "sample.txt");
+            File.WriteAllText(sampleFilePath, "This is a sample file.");
+
+
+            //// Create a sample zip file
+            //string sampleZipFilePath = Path.Combine(zipFolderPath, "sample.zip");
+            //if (File.Exists(sampleZipFilePath))
+            //{
+            //    File.Delete(sampleZipFilePath);
+            //}
+            //using (ZipArchive archive = ZipFile.Open(sampleZipFilePath, ZipArchiveMode.Create))
+            //{
+            //    // Add a sample file to the zip archive
+            //    string sampleFilePath = Path.Combine(zipFolderPath, "sample.txt");
+            //    File.WriteAllText(sampleFilePath, "This is a sample file.");
+            //    archive.CreateEntryFromFile(sampleFilePath, "sample.txt");
+            //}
+
+            // Define Azure DevOps/VSTS artifact upload parameters
+            string containerFolder = "Container"; // Replace with your desired container folder
+            string artifactName = "MyArtifact"; // Replace with your artifact name
+
+            // Output the artifact upload command
+            Console.WriteLine($"##vso[artifact.upload containerfolder={containerFolder};artifactname={artifactName}]{Path.GetFullPath(sampleFilePath)}");
+        }
+
+        public static void PublishLogfiles(string logFolderPath)
+        {
+            try
+            {
+                //// Ensure the log file exists
+                //if (!File.Exists(logFolderPath))
+                //{
+                //    throw new FileNotFoundException($"Log file not found: {logFolderPath}");
+                //}
+
+                //// Create a temporary folder for the zip file
+                //string tempFolderPath = Path.Combine(Path.GetTempPath(), "LogTemp");
+                //Directory.CreateDirectory(tempFolderPath);
+
+                //// Prepare zip file path
+                //string zipFilePath = Path.Combine(tempFolderPath, "Log.zip");
+
+                //// Delete existing zip file if it exists
+                //if (File.Exists(zipFilePath))
+                //{
+                //    File.Delete(zipFilePath);
+                //}
+
+                //// Create a new zip archive
+                //using (ZipArchive archive = ZipFile.Open(zipFilePath, ZipArchiveMode.Create))
+                //{
+                //    // Add the log file to the zip archive
+                //    archive.CreateEntryFromFile(logFolderPath, Path.GetFileName(logFolderPath));
+                //}
+
+                // Define Azure DevOps/VSTS artifact upload parameters
+                string containerFolder = "Container"; // Replace with your desired container folder
+                string artifactName = "MyArtifact"; // Replace with your artifact name
+                string logfilderpath = "D:\\agentAz\\_work\\4\\s\\Continuous-Clearing-CI_CD\\out\\Logs\\PacakgeIdentifier.log";
+                // Output the artifact upload command
+                Console.WriteLine($"##vso[artifact.upload containerfolder={containerFolder};artifactname={artifactName}]{logfilderpath}");
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+
+        public static string GetZipFolderPath()
+        {
+            string localPathforSourceRepo = string.Empty;
+            try
+            {
+                localPathforSourceRepo = $"{Directory.GetParent(Directory.GetCurrentDirectory())}\\Logszipfolder\\";
+                if (!Directory.Exists(localPathforSourceRepo))
+                {
+                    localPathforSourceRepo = Directory.CreateDirectory(localPathforSourceRepo).ToString();
+                }
+            }
+            catch (IOException ex)
+            {
+                Logger.Error($"GetZipfilePath() ", ex);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                Logger.Error($"GetZipfilePath() ", ex);
+            }
+
+            return localPathforSourceRepo;
         }
 
         private static CatoolInfo GetCatoolVersionFromProjectfile()
