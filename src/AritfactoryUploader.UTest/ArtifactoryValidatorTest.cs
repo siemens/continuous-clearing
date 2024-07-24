@@ -55,33 +55,5 @@ namespace AritfactoryUploader.UTest
             //Assert
             jfrogCommunicationMck.Verify(x => x.GetApiKey(), Times.AtLeastOnce);
         }
-
-        [Test]
-        public void ValidateArtifactoryCredentials_InputAppsettings_ThrowsInvalidDataException()
-        {
-            //Arrange
-            JfrogKey jfrogKey = new JfrogKey() { ApiKey = "tyyteye" };
-            HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.Unauthorized)
-            {
-                Content = new ObjectContent<JfrogKey>(jfrogKey, new JsonMediaTypeFormatter(), "application/some-format")
-            };
-            CommonAppSettings appSettings = new CommonAppSettings()
-            {
-                ArtifactoryUploadApiKey = "gegeg",
-                ArtifactoryUploadUser = "user@test.com"
-            };
-            ArtifactoryCredentials artifactoryCredentials = new ArtifactoryCredentials()
-            {
-                ApiKey = "tyyteye",
-                Email = "user@test.com"
-            };
-            Mock<NpmJfrogApiCommunication> jfrogCommunicationMck = new Mock<NpmJfrogApiCommunication>(UTParams.JFrogURL, "test", artifactoryCredentials, 100);
-            ArtifactoryValidator artifactoryValidator = new ArtifactoryValidator(jfrogCommunicationMck.Object);
-            jfrogCommunicationMck.Setup(x => x.GetApiKey()).ReturnsAsync(httpResponseMessage);
-
-            // due to environment .exit the below method will not return anything , it wil break there 
-            // assert will not pass al;ways
-            // Assert.ThrowsAsync<InvalidDataException>(async () => await artifactoryValidator.ValidateArtifactoryCredentials(appSettings))
-        }
     }
 }
