@@ -24,7 +24,144 @@ namespace PackageIdentifier.UTest
     public class BomHelperUnitTests
     {
         private readonly Mock<IProcessor> mockIProcessor = new Mock<IProcessor>();
-  
+        private BomHelper _bomHelper;
+
+        [SetUp]
+        public void Setup()
+        {
+            _bomHelper = new BomHelper();
+        }
+
+        [Test]
+        public void GetFullNameOfComponent_WithGroup_ReturnsFullName()
+        {
+            // Arrange
+            var component = new Component
+            {
+                Group = "com.example",
+                Name = "my-component"
+            };
+
+            // Act
+            var fullName = _bomHelper.GetFullNameOfComponent(component);
+
+            // Assert
+            Assert.AreEqual("com.example/my-component", fullName);
+        }
+
+        [Test]
+        public void GetFullNameOfComponent_WithoutGroup_ReturnsName()
+        {
+            // Arrange
+            var component = new Component
+            {
+                Name = "my-component"
+            };
+
+            // Act
+            var fullName = _bomHelper.GetFullNameOfComponent(component);
+
+            // Assert
+            Assert.AreEqual("my-component", fullName);
+        }
+
+        [Test]
+        public async Task GetListOfComponentsFromRepo_WhenRepoListIsNull_ReturnsEmptyList()
+        {
+            // Arrange
+            string[] repoList = null;
+            var jFrogServiceMock = new Mock<IJFrogService>();
+            var bomHelper = new BomHelper();
+
+            // Act
+            var result = await bomHelper.GetListOfComponentsFromRepo(repoList, jFrogServiceMock.Object);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsEmpty(result);
+        }
+
+        [Test]
+        public async Task GetListOfComponentsFromRepo_WhenRepoListIsEmpty_ReturnsEmptyList()
+        {
+            // Arrange
+            string[] repoList = new string[0];
+            var jFrogServiceMock = new Mock<IJFrogService>();
+            var bomHelper = new BomHelper();
+
+            // Act
+            var result = await bomHelper.GetListOfComponentsFromRepo(repoList, jFrogServiceMock.Object);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsEmpty(result);
+        }
+
+        [Test]
+        public async Task GetListOfComponentsFromRepo_WhenJFrogServiceReturnsNull_ReturnsEmptyList()
+        {
+            // Arrange
+            string[] repoList = new string[] { "repo1", "repo2" };
+            var jFrogServiceMock = new Mock<IJFrogService>();
+            jFrogServiceMock.Setup(x => x.GetInternalComponentDataByRepo(It.IsAny<string>())).ReturnsAsync((List<AqlResult>)null);
+            var bomHelper = new BomHelper();
+
+            // Act
+            var result = await bomHelper.GetListOfComponentsFromRepo(repoList, jFrogServiceMock.Object);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsEmpty(result);
+        }
+
+        [Test]
+        public async Task GetListOfComponentsFromRepo_WhenJFrogServiceReturnsEmptyList_ReturnsEmptyList()
+        {
+            // Arrange
+            string[] repoList = new string[] { "repo1", "repo2" };
+            var jFrogServiceMock = new Mock<IJFrogService>();
+            jFrogServiceMock.Setup(x => x.GetInternalComponentDataByRepo(It.IsAny<string>())).ReturnsAsync(new List<AqlResult>());
+            var bomHelper = new BomHelper();
+
+            // Act
+            var result = await bomHelper.GetListOfComponentsFromRepo(repoList, jFrogServiceMock.Object);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsEmpty(result);
+        }
+
+        [Test]
+        public async Task GetListOfComponentsFromRepo_WhenJFrogServiceReturnsNonEmptyList_ReturnsCombinedList()
+        {
+            // Arrange
+            string[] repoList = new string[] { "repo1", "repo2" };
+            var jFrogServiceMock = new Mock<IJFrogService>();
+            var aqlResultList1 = new List<AqlResult>()
+            {
+                new AqlResult { Name = "Component1", Path="path/value1", Repo="repo1"},
+                new AqlResult { Name = "Component2", Path="path/value2", Repo="repo1"}
+            };
+            var aqlResultList2 = new List<AqlResult>()
+            {
+                new AqlResult { Name = "Component3", Path="path/value3", Repo="repo2" },
+                new AqlResult { Name = "Component4", Path = "path/value4", Repo = "repo2" }
+            };
+            jFrogServiceMock.Setup(x => x.GetInternalComponentDataByRepo("repo1")).ReturnsAsync(aqlResultList1);
+            jFrogServiceMock.Setup(x => x.GetInternalComponentDataByRepo("repo2")).ReturnsAsync(aqlResultList2);
+            var bomHelper = new BomHelper();
+
+            // Act
+            var result = await bomHelper.GetListOfComponentsFromRepo(repoList, jFrogServiceMock.Object);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(4, result.Count);
+            Assert.Contains(aqlResultList1[0], result);
+            Assert.Contains(aqlResultList1[1], result);
+            Assert.Contains(aqlResultList2[0], result);
+            Assert.Contains(aqlResultList2[1], result);
+        }
 
         [TestCase]
         public async Task GetRepoDetails_GivenProjectTypeAsDebian_ReturnsListOFComponents()

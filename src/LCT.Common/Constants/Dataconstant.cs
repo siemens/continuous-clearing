@@ -45,12 +45,14 @@ namespace LCT.Common.Constants
         public const string DownloadUrlNotFound = "Component Download Url not Found!";
         public const string SourceUrlNotFound = "Source URL not found";
         public const string PackageUrlNotFound = "Package URL not found";
+        public const string PackageNameNotFoundInJfrog = "Package name not found in Jfrog";
+        public const string JfrogRepoPathNotFound = "Jfrog repo path not found";
         public const string LinkedByCATool = "Linked by CA Tool";
         public const string LinkedByCAToolReleaseRelation = "UNKNOWN";
         public const string ReleaseAttachmentComment = "Attached by CA Tool";
         public const char ForwardSlash = '/';
         public const string SourceURLSuffix = "/srcfiles?fileinfo=1";
-        public const string Cdx_ArtifactoryRepoUrl = "internal:siemens:clearing:repo-name";
+        public const string Cdx_ArtifactoryRepoName = "internal:siemens:clearing:jfrog-repo-name";
         public const string Cdx_ProjectType = "internal:siemens:clearing:project-type";
         public const string Cdx_ClearingState = "internal:siemens:clearing:clearing-state";
         public const string Cdx_IsInternal = "internal:siemens:clearing:is-internal";
@@ -59,6 +61,9 @@ namespace LCT.Common.Constants
         public const string Cdx_IsDevelopment = "internal:siemens:clearing:development";
         public const string Cdx_IdentifierType = "internal:siemens:clearing:identifier-type";
         public const string AlpineSourceURLSuffix = "?ref_type=heads";
+        public const string Cdx_JfrogRepoPath = "internal:siemens:clearing:jfrog-repo-path";
+        public const string Cdx_Siemensfilename = "internal:siemens:clearing:siemens:filename";
+        public const string Cdx_SiemensDirect = "internal:siemens:clearing:siemens:direct";
 
         public static Dictionary<string, string> PurlCheck()
         {

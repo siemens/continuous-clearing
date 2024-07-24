@@ -1,8 +1,8 @@
-REM SPDX-FileCopyrightText: 2023 Siemens AG
+REM SPDX-FileCopyrightText: 2024 Siemens AG
 REM SPDX-License-Identifier: MIT
 
 @ECHO OFF
-pushd %~dp0\LicenseClearingTool.3.0.0
+pushd %~dp0\LicenseClearingTool.7.0.0
 echo "Starting Package Identifier"
 cmd.exe /c Package Identifier.exe --packageFilePath ..\NPMProject --bomFolderPath ..\BOM --sw360Token <sw360token> --sW360ProjectID <ProjectId> --sW360AuthTokenType Bearer --artifactoryuploadApiKey <artifactoryuploadApiKey> --projectType <ProjectType> --JfrogApi <JfrogUrl> --sw360Url <sw360Url>
 

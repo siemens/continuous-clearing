@@ -6,10 +6,22 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Http.Headers;
+using System.Net.Http;
+using System.Net;
+using System.Text;
+using System.Threading.Tasks;
 using TestUtilities;
+using LCT.APICommunications;
+using LCT.APICommunications.Model;
+using LCT.Common;
+using Newtonsoft.Json.Linq;
+using System.Linq;
+using LCT.Common.Constants;
 
 namespace SW360IntegrationTest.NPM
 {
@@ -34,6 +46,50 @@ namespace SW360IntegrationTest.NPM
         }
 
         [Test, Order(1)]
+        public async Task CreateComponent_AfterSuccessfulExeRun_ReturnsSuccess()
+        {
+            // Arrange
+            using var httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(testParameters.SW360AuthTokenType, testParameters.SW360AuthTokenValue);
+            string componentName = "samplecomponent";
+            string componentVersion = "1.0.0";
+            string componentType = "OSS";
+            HttpResponseMessage componentCheck = await httpClient.GetAsync(TestConstant.Sw360ReleaseApi);
+
+            // Act
+            
+            if (componentCheck != null && componentCheck.StatusCode.Equals(HttpStatusCode.NoContent)) 
+            {
+                var componentResponse = await httpClient.PostAsync(TestConstant.Sw360ComponentApi, new StringContent(JsonConvert.SerializeObject(new
+                {
+                    name = componentName,
+                    version = componentVersion,
+                    componentType = componentType
+                }), Encoding.UTF8, "application/json"));
+
+                if (componentResponse.StatusCode == HttpStatusCode.Created)
+                {
+                    string componentResponseText = await componentResponse.Content.ReadAsStringAsync();
+                    var componentJsonObject = JObject.Parse(componentResponseText);
+                    var componentId = componentJsonObject["_links"]["self"]["href"].ToString().Split('/').Last();
+
+                    var releaseResponse = await httpClient.PostAsync(TestConstant.Sw360ReleaseApi, new StringContent(JsonConvert.SerializeObject(new
+                    {
+                        name = componentName,
+                        version = componentVersion,
+                        componentType = componentType,
+                        componentId = componentId,
+                        ClearingState = "NEW_CLEARING",
+                    }), Encoding.UTF8, "application/json"));
+                }
+
+                // Assert
+                Assert.AreEqual(HttpStatusCode.Created, componentResponse.StatusCode);
+            }   
+        }
+
+        [Test, Order(2)]
         public void TestBOMCreatorexe()
         {
             string packagjsonPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest1stIterationData";
@@ -57,7 +113,7 @@ namespace SW360IntegrationTest.NPM
         }
 
 
-        [Test, Order(2)]
+        [Test, Order(3)]
         public void TestLocalBOMCreation()
         {
             bool fileExist = false;

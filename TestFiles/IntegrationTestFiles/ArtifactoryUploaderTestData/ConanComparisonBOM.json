@@ -1,145 +1,153 @@
 {
-  "BomFormat": "CycloneDX",
-  "SpecVersion": 4,
-  "SpecVersionString": "1.4",
-  "SerialNumber": null,
-  "Version": null,
-  "Metadata": {
-    "Tools": [
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.4",
+  "serialNumber": "urn:uuid:3e407ffb-8ef0-4b06-bcdb-bdbe12dcd2a7",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2024-07-06T03:57:03Z",
+    "tools": [
       {
-        "Vendor": "Siemens AG",
-        "Name": "Clearing Automation Tool",
-        "Version": "5.0.0",
-        "Hashes": null
+        "vendor": "Siemens AG",
+        "name": "Clearing Automation Tool",
+        "version": "6.1.0",
+        "externalReferences": [
+          {
+            "url": "https://github.com/siemens/continuous-clearing",
+            "type": "website"
+          }
+        ]
+      },
+      {
+        "vendor": "Siemens AG",
+        "name": "Siemens SBOM",
+        "version": "2.0.0",
+        "externalReferences": [
+          {
+            "url": "https://sbom.siemens.io/",
+            "type": "website"
+          }
+        ]
       }
     ],
-    "Authors": null,
-    "Component": null,
-    "Manufacture": null,
-    "Supplier": null
+    "component": {
+      "type": "application",
+      "name": "Test",
+      "version": "1.0"
+    },
+    "properties": [
+      {
+        "name": "siemens:profile",
+        "value": "clearing"
+      }
+    ]
   },
-  "Components": [
+  "components": [
     {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:conan/protobuf@3.21.9",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": null,
-      "Name": "protobuf",
-      "Version": "3.21.9",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:conan/protobuf@3.21.9",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
+      "type": "library",
+      "bom-ref": "pkg:conan/protobuf@3.21.9",
+      "name": "protobuf",
+      "version": "3.21.9",
+      "purl": "pkg:conan/protobuf@3.21.9",
+      "properties": [
         {
-          "Name": "internal:siemens:clearing:development",
-          "Value": "false"
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:identifier-type",
-          "Value": "Discovered"
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
         },
         {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "true"
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "rapidjson/1.1.0-csc-01@siemens-energy/stable#6d624490b731387491675eebeff7ab66"
         },
         {
-          "Name": "internal:siemens:clearing:repo-name",
-          "Value": "energy-dev-conan-egll"
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
         },
         {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "CONAN"
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "true"
         },
         {
-          "Name": "internal:siemens:clearing:sw360:release-url",
-          "Value": "http://md2pdvnc.ad001.siemens.net:8095/resource/api/releases/e13e0e564b004ef4adabbd01bf0b93ce"
+          "name": "internal:siemens:clearing:repo-name",
+          "value": "energy-dev-conan-egll"
         },
         {
-          "Name": "internal:siemens:clearing:fossology:url",
-          "Value": null
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Conan"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        },
+        {
+          "name": "internal:siemens:clearing:clearing-state",
+          "value": "NEW_CLEARING"
+        },
+        {
+          "name": "internal:siemens:clearing:sw360:release-url",
+          "value": "http://localhost:8090/resource/api/releases/6ed76a1c3457471bac0114f955011da2"
+        },
+        {
+          "name": "internal:siemens:clearing:fossology:url",
+          "value": ""
         }
-      ],
-      "Evidence": null
+      ]
     },
     {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:conan/zlib@1.2.11",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": null,
-      "Name": "zlib",
-      "Version": "1.2.11",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:conan/zlib@1.2.11",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
+      "type": "library",
+      "bom-ref": "pkg:conan/zlib@1.2.11",
+      "name": "zlib",
+      "version": "1.2.11",
+      "purl": "pkg:conan/zlib@1.2.11",
+      "properties": [
         {
-          "Name": "internal:siemens:clearing:development",
-          "Value": "false"
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:identifier-type",
-          "Value": "Discovered"
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
         },
         {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
         },
         {
-          "Name": "internal:siemens:clearing:repo-name",
-          "Value": "Not Found in JFrogRepo"
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
         },
         {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "CONAN"
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "true"
         },
         {
-          "Name": "internal:siemens:clearing:clearing-state",
-          "Value": "NEW_CLEARING"
+          "name": "internal:siemens:clearing:repo-name",
+          "value": "Not Found in JFrogRepo"
         },
         {
-          "Name": "internal:siemens:clearing:sw360:release-url",
-          "Value": "http://md2pdvnc.ad001.siemens.net:8095/resource/api/releases/701403e53f254fc5a074e24fd867be2c"
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Conan"
         },
         {
-          "Name": "internal:siemens:clearing:fossology:url",
-          "Value": null
-        }
-      ],
-      "Evidence": null
-    }
-  ],
-  "Dependencies": [
-    {
-      "Ref": "pkg:conan/protobuf@3.21.9",
-      "Dependencies": [
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        },
         {
-          "Ref": "pkg:conan/zlib@1.2.11",
-          "Dependencies": null
+          "name": "internal:siemens:clearing:clearing-state",
+          "value": "NEW_CLEARING"
+        },
+        {
+          "name": "internal:siemens:clearing:sw360:release-url",
+          "value": "http://md2pdvnc.ad001.siemens.net:8095/resource/api/releases/701403e53f254fc5a074e24fd867be2c"
+        },
+        {
+          "name": "internal:siemens:clearing:fossology:url",
+          "value": ""
         }
       ]
     }
   ],
-  "Compositions": null
+  "dependencies": []
 }

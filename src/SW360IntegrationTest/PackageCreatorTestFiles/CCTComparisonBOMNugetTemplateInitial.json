@@ -1,209 +1,227 @@
 {
-  "BomFormat": "CycloneDX",
-  "SpecVersion": 4,
-  "SpecVersionString": "1.4",
-  "SerialNumber": null,
-  "Version": null,
-  "Metadata": {
-    "Tools": [
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.4",
+  "serialNumber": "urn:uuid:6cdf02ad-b1f2-4f4b-b46f-176ad93005ee",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2024-07-08T13:56:05Z",
+    "tools": [
       {
-        "Vendor": "Siemens AG",
-        "Name": "Clearing Automation Tool",
-        "Version": "3.1.1",
-        "Hashes": null
+        "vendor": "Siemens AG",
+        "name": "Clearing Automation Tool",
+        "version": "6.1.0",
+        "externalReferences": [
+          {
+            "url": "https://github.com/siemens/continuous-clearing",
+            "type": "website"
+          }
+        ]
+      },
+      {
+        "vendor": "Siemens AG",
+        "name": "Siemens SBOM",
+        "version": "2.0.0",
+        "externalReferences": [
+          {
+            "url": "https://sbom.siemens.io/",
+            "type": "website"
+          }
+        ]
       }
     ],
-    "Authors": null,
-    "Component": null,
-    "Manufacture": null,
-    "Supplier": null
+    "component": {
+      "type": "application",
+      "name": "Test",
+      "version": "1.0"
+    },
+    "properties": [
+      {
+        "name": "siemens:profile",
+        "value": "clearing"
+      }
+    ]
   },
-  "Components": [
+  "components": [
     {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:nuget/Newtonsoft.Json@13.0.3",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": null,
-      "Name": "Newtonsoft.Json",
-      "Version": "13.0.3",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": [
+      "type": "library",
+      "bom-ref": "pkg:nuget/Newtonsoft.Json@13.0.3",
+      "name": "Newtonsoft.Json",
+      "version": "13.0.3",
+      "licenses": [
         {
-          "License": {
-            "Id": "GPL-2.0-only",
-            "Text": null,
-            "Url": null
-          },
-          "Expression": null
+          "license": {
+            "id": "GPL-2.0-only"
+          }
         }
       ],
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:nuget/Newtonsoft.Json@13.0.3",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
+      "purl": "pkg:nuget/Newtonsoft.Json@13.0.3",
+      "properties": [
         {
-          "Name": "syft:package:foundBy",
-          "Value": "Testing Properties"
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:development",
-          "Value": "false"
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "TemplateUpdated"
         },
         {
-          "Name": "internal:siemens:clearing:identifier-type",
-          "Value": "TemplateUpdated"
+          "name": "syft:package:foundBy",
+          "value": "Testing Properties"
         },
         {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
         },
         {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrogRepo"
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "NUGET"
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
         },
         {
-          "Name": "internal:siemens:clearing:clearing-state",
-          "Value": "NEW_CLEARING"
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NUGET"
         },
         {
-          "Name": "internal:siemens:clearing:sw360:release-url",
-          "Value": "http://md2pdvnc:8095/resource/api/releases/6f8bff1c96844644a13b6cac7e899a1b"
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
         },
         {
-          "Name": "internal:siemens:clearing:fossology:url",
-          "Value": null
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": ""
+        },
+        {
+          "name": "internal:siemens:clearing:clearing-state",
+          "value": "Not Available"
+        },
+        {
+          "name": "internal:siemens:clearing:sw360:release-url",
+          "value": "http://localhost:8090/resource/api/releases/509a83e0188f4293830e94aefc917b1c"
+        },
+        {
+          "name": "internal:siemens:clearing:fossology:url",
+          "value": ""
         }
-      ],
-      "Evidence": null
+      ]
     },
     {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:nuget/SonarAnalyzer.CSharp@9.5.0.73987",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": null,
-      "Name": "SonarAnalyzer.CSharp",
-      "Version": "9.5.0.73987",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:nuget/SonarAnalyzer.CSharp@9.5.0.73987",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
+      "type": "library",
+      "bom-ref": "pkg:nuget/SonarAnalyzer.CSharp@9.5.0.73987",
+      "name": "SonarAnalyzer.CSharp",
+      "version": "9.5.0.73987",
+      "purl": "pkg:nuget/SonarAnalyzer.CSharp@9.5.0.73987",
+      "properties": [
         {
-          "Name": "internal:siemens:clearing:development",
-          "Value": "true"
+          "name": "internal:siemens:clearing:development",
+          "value": "true"
         },
         {
-          "Name": "internal:siemens:clearing:identifier-type",
-          "Value": "Discovered"
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
         },
         {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
         },
         {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrogRepo"
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "NUGET"
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NUGET"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": ""
         }
-      ],
-      "Evidence": null
+      ]
     },
     {
-      "Type": 3,
-      "MimeType": null,
-      "BomRef": "pkg:nuget/System.Memory@4.5.4",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": "",
-      "Group": null,
-      "Name": "System.Memory",
-      "Version": "4.5.4",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": [
+      "type": "library",
+      "bom-ref": "pkg:nuget/System.Memory@4.5.4",
+      "publisher": "",
+      "name": "System.Memory",
+      "version": "4.5.4",
+      "licenses": [
         {
-          "License": {
-            "Id": "GPL-2.0-only",
-            "Text": null,
-            "Url": null
-          },
-          "Expression": null
+          "license": {
+            "id": "GPL-2.0-only"
+          }
         }
       ],
-      "Copyright": null,
-      "Cpe": "",
-      "Purl": "pkg:nuget/System.Memory@4.5.4",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
+      "cpe": "",
+      "purl": "pkg:nuget/System.Memory@4.5.4",
+      "properties": [
         {
-          "Name": "syft:package:foundBy",
-          "Value": "Testing Properties"
+          "name": "syft:package:foundBy",
+          "value": "Testing Properties"
         },
         {
-          "Name": "internal:siemens:clearing:identifier-type",
-          "Value": "TemplateAdded"
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "TemplateAdded"
         },
         {
-          "Name": "internal:siemens:clearing:development",
-          "Value": "false"
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrogRepo"
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "NUGET"
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
         },
         {
-          "Name": "internal:siemens:clearing:clearing-state",
-          "Value": "NEW_CLEARING"
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NUGET"
         },
         {
-          "Name": "internal:siemens:clearing:sw360:release-url",
-          "Value": "http://md2pdvnc:8095/resource/api/releases/ddfed57dd34e48d0b4dd5fa078fcb51e"
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
         },
         {
-          "Name": "internal:siemens:clearing:fossology:url",
-          "Value": null
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": ""
+        },
+        {
+          "name": "internal:siemens:clearing:clearing-state",
+          "value": "NEW_CLEARING"
+        },
+        {
+          "name": "internal:siemens:clearing:sw360:release-url",
+          "value": "http://localhost:8090/resource/api/releases/4406f59fd3b8494293060e3feafa6992"
+        },
+        {
+          "name": "internal:siemens:clearing:fossology:url",
+          "value": ""
         }
-      ],
-      "Evidence": null
+      ]
     }
   ],
-  "Compositions": null
+  "dependencies": [
+    {
+      "ref": "pkg:nuget/Newtonsoft.Json@13.0.3",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:nuget/SonarAnalyzer.CSharp@9.5.0.73987",
+      "dependsOn": []
+    }
+  ]
 }

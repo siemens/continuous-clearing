@@ -112,7 +112,7 @@ namespace PackageIdentifier.UTest
             List<Property> expectedpropList = new List<Property>()
             {
                 new Property(){ Name = Dataconstant.Cdx_ProjectType,Value = "NPM"},
-                 new Property(){ Name = Dataconstant.Cdx_ArtifactoryRepoUrl,Value = repo},
+                 new Property(){ Name = Dataconstant.Cdx_ArtifactoryRepoName,Value = repo},
                  new Property(){ Name = Dataconstant.Cdx_IsInternal,Value = "false"},
 
             };
