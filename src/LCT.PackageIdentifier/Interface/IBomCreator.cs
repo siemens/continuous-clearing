@@ -7,6 +7,7 @@
 using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Common.Interface;
+using LCT.Common.Model;
 using LCT.Services.Interface;
 using System.Threading.Tasks;
 
@@ -21,7 +22,8 @@ namespace LCT.PackageIdentifier.Interface
 
         public IBomHelper BomHelper { get; set; }
 
-        public Task GenerateBom(CommonAppSettings appSettings, IBomHelper bomHelper, IFileOperations fileOperations, ProjectReleases projectReleases);
+        public Task GenerateBom(CommonAppSettings appSettings, IBomHelper bomHelper, IFileOperations fileOperations,
+                                ProjectReleases projectReleases, CatoolInfo caToolInformation);
 
         public Task<bool> CheckJFrogConnection();
     }

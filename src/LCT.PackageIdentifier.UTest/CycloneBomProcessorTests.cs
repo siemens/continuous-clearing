@@ -39,8 +39,9 @@ namespace PackageIdentifier.UTest
             {
                 CaVersion = "1.2.3"
             };
+            CatoolInfo caToolInformation = new CatoolInfo() { CatoolVersion = "6.0.0", CatoolRunningLocation="" };
             //Act
-            Bom files = CycloneBomProcessor.SetMetadataInComparisonBOM(bom, appSettings, projectReleases);
+            Bom files = CycloneBomProcessor.SetMetadataInComparisonBOM(bom, appSettings, projectReleases, caToolInformation);
 
             //Assert
             Assert.That(2, Is.EqualTo(files.Metadata.Tools.Count), "Returns bom with metadata ");
@@ -92,9 +93,10 @@ namespace PackageIdentifier.UTest
                 Version = projectReleases.Version,
                 Type = Component.Classification.Application
             };
-           
+
+            CatoolInfo caToolInformation = new CatoolInfo() { CatoolVersion = "6.0.0", CatoolRunningLocation = "" };
             //Act
-            Bom files = CycloneBomProcessor.SetMetadataInComparisonBOM(bom, appSettings, projectReleases);
+            Bom files = CycloneBomProcessor.SetMetadataInComparisonBOM(bom, appSettings, projectReleases, caToolInformation);
 
             //Assert
             Assert.That(tools.Name, Is.EqualTo(files.Metadata.Tools[1].Name), "Returns bom with metadata tools");
