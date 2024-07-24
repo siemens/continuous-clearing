@@ -9,6 +9,7 @@ using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
+using LCT.Common.Model;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
@@ -16,7 +17,6 @@ using log4net;
 using log4net.Core;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
@@ -42,7 +42,11 @@ namespace LCT.PackageIdentifier
             CycloneDXBomParser = cycloneDXBomParser;
         }
 
-        public async Task GenerateBom(CommonAppSettings appSettings, IBomHelper bomHelper, IFileOperations fileOperations, ProjectReleases projectReleases)
+        public async Task GenerateBom(CommonAppSettings appSettings,
+                                      IBomHelper bomHelper,
+                                      IFileOperations fileOperations,
+                                      ProjectReleases projectReleases,
+                                       CatoolInfo caToolInformation)
         {
             Logger.Debug($"GenerateBom():Start");
             Bom listOfComponentsToBom;
@@ -56,7 +60,10 @@ namespace LCT.PackageIdentifier
             //Get project details for metadata properties
 
             //sets metadata properties
-            listOfComponentsToBom = CycloneBomProcessor.SetMetadataInComparisonBOM(listOfComponentsToBom, appSettings, projectReleases);
+            listOfComponentsToBom = CycloneBomProcessor.SetMetadataInComparisonBOM(listOfComponentsToBom,
+                                                                                   appSettings,
+                                                                                   projectReleases,
+                                                                                   caToolInformation);
 
             // Writes Comparison Bom
             Logger.Logger.Log(null, Level.Notice, $"Writing CycloneDX BOM..", null);

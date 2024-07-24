@@ -8,6 +8,7 @@ using CycloneDX.Models;
 using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Model;
 using log4net;
 using System.Collections.Generic;
 using System.Reflection;
@@ -19,7 +20,10 @@ namespace LCT.PackageIdentifier
 
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        public static Bom SetMetadataInComparisonBOM(Bom bom, CommonAppSettings appSettings, ProjectReleases projectReleases)
+        public static Bom SetMetadataInComparisonBOM(Bom bom,
+                                                     CommonAppSettings appSettings,
+                                                     ProjectReleases projectReleases,
+                                                     CatoolInfo caToolInformation)
         {
             Logger.Debug("Starting to add metadata info into the BOM");
             List<Tool> tools = new List<Tool>();
@@ -28,7 +32,7 @@ namespace LCT.PackageIdentifier
             Tool tool = new Tool
             {
                 Name = "Clearing Automation Tool",
-                Version = appSettings.CaVersion,
+                Version = caToolInformation.CatoolVersion,
                 Vendor = "Siemens AG",
                 ExternalReferences = new List<ExternalReference>() { new ExternalReference { Url = "https://github.com/siemens/continuous-clearing", Type = ExternalReference.ExternalReferenceType.Website } }
 
