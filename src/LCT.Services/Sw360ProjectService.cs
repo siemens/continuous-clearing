@@ -58,7 +58,8 @@ namespace LCT.Services
                     sw360ProjectName = projectInfo?.Name;
                     projectReleases.Name=projectInfo?.Name;
                     projectReleases.Version=projectInfo?.Version;
-
+                    projectReleases.state = projectInfo?.state;
+                    projectReleases.clearingState = projectInfo?.clearingState;
                 }
             }
             catch (HttpRequestException ex)
