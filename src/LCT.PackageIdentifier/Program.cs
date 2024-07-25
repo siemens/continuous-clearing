@@ -117,7 +117,8 @@ namespace LCT.PackageIdentifier
             string outputPath = GetOutputPath(fullPath);
 
             string logFilePath = Path.Combine(outputPath, FileConstant.BomCreatorLog);
-            PublishLogfiles(logFilePath);
+            string addPathLog= Path.Combine(logFilePath, "Logs");
+            PublishLogfiles(addPathLog);
             //PublishSampleZipFolder();
         }
 
