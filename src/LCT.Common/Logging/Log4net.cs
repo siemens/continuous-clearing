@@ -26,13 +26,14 @@ namespace LCT.Common
         public static ILoggerRepository LoggerRepository { get; set; }
 
         public static string CatoolLogPath { get; set; }
+        public static string CatoolCurrentDirectory { get; set; }
 
         public static void Init(string logFileName, string logFolder, bool verbose)
         {
             LoggerRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
             XmlConfigurator.Configure(LoggerRepository, new FileInfo(GetDefaultLogConfigFile()));
             string outPath = Directory.GetParent(Directory.GetCurrentDirectory()).FullName;
-            string logPath = CatoolLogPath = Path.Combine(outPath,logFolder, logFileName);
+            string logPath = CatoolLogPath = Path.Combine(CatoolCurrentDirectory, logFolder, logFileName);
 
             if (LoggerRepository is Hierarchy rootRepo)
             {
