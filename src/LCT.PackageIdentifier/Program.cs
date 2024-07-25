@@ -53,7 +53,6 @@ namespace LCT.PackageIdentifier
             ProjectReleases projectReleases = new ProjectReleases();
             string FolderPath = LogFolderInitialisation(appSettings);
 
-            string dir = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) ?? string.Empty;
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             settingsManager.CheckRequiredArgsToRun(appSettings, "Identifer");
 
@@ -90,7 +89,7 @@ namespace LCT.PackageIdentifier
                 $"SW360ProjectName\t --> {appSettings.SW360ProjectName}\n\t" +
                 $"SW360ProjectID\t\t --> {appSettings.SW360ProjectID}\n\t" +
                 $"ProjectType\t\t --> {appSettings.ProjectType}\n\t" +
-                $"LogFolderPath\t\t --> {Path.GetFullPath(Log4Net.CatoolLogPath)}\n\t" +
+                $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t" +
                 $"InternalRepoList\t --> {listOfInternalRepoList}\n\t" +
                 $"Include\t\t\t --> {listOfInlude}\n\t" +
                 $"Exclude\t\t\t --> {listOfExclude}\n\t" +
@@ -119,7 +118,8 @@ namespace LCT.PackageIdentifier
             string logFilePath = Path.Combine(outputPath, "Logs");
             string addPathLog = Path.Combine(logFilePath, FileConstant.BomCreatorLog);
             
-            PublishLogfiles(addPathLog);
+            //PublishLogfiles(addPathLog);
+            PublishLogfiles(Log4Net.CatoolLogPath);
             //PublishSampleZipFolder();
         }
 
