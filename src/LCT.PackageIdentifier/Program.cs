@@ -149,10 +149,10 @@ namespace LCT.PackageIdentifier
                 // Define Azure DevOps/VSTS artifact upload parameters
                 string containerFolder = "Container"; // Replace with your desired container folder
                 string artifactName = "MyArtifact"; // Replace with your artifact name
-                string logFilePath = Path.GetFullPath(Log4Net.CatoolLogPath);
+                //string logFilePath = Path.GetFullPath(Log4Net.CatoolLogPath);
                 
                 // Output the artifact upload command
-                Console.WriteLine($"##vso[artifact.upload containerfolder={containerFolder};artifactname={artifactName}]{logFilePath}");
+                Console.WriteLine($"##vso[artifact.upload containerfolder={containerFolder};artifactname={artifactName}]{logFolderPath}");
                 
 
             }
