@@ -53,6 +53,7 @@ namespace LCT.PackageIdentifier
             ProjectReleases projectReleases = new ProjectReleases();
             string FolderPath = LogFolderInitialisation(appSettings);
 
+            string dir = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) ?? string.Empty;
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             settingsManager.CheckRequiredArgsToRun(appSettings, "Identifer");
 
@@ -112,12 +113,33 @@ namespace LCT.PackageIdentifier
             }
             Logger.Logger.Log(null, Level.Notice, $"End of Package Identifier execution : {DateTime.Now}\n", null);
 
-            string logFilePath = Path.GetFullPath(Path.Combine(FolderPath, FileConstant.BomCreatorLog));
+            string fullPath = caToolInformation.CatoolRunningLocation;
+            string outputPath = GetOutputPath(fullPath);
+
+            string logFilePath = Path.Combine(outputPath, FileConstant.BomCreatorLog);
             PublishLogfiles(logFilePath);
             //PublishSampleZipFolder();
         }
 
-        
+        private static string GetOutputPath(string fullPath)
+        {
+            // Normalize the path to handle any inconsistencies in formatting
+            fullPath = Path.GetFullPath(fullPath);
+
+            // Find the index of the last occurrence of "out" in the path
+            int lastIndex = fullPath.LastIndexOf("\\out\\", StringComparison.OrdinalIgnoreCase);
+
+            if (lastIndex != -1)
+            {
+                // Extract the path up to and including "out"
+                string outputPath = fullPath.Substring(0, lastIndex + "\\out\\".Length);
+                return outputPath;
+            }
+            else
+            {
+                throw new ArgumentException("Path does not contain 'out' directory.");
+            }
+        }
 
         public static void PublishLogfiles(string logFolderPath)
         {
