@@ -116,8 +116,9 @@ namespace LCT.PackageIdentifier
             string fullPath = caToolInformation.CatoolRunningLocation;
             string outputPath = GetOutputPath(fullPath);
 
-            string logFilePath = Path.Combine(outputPath, FileConstant.BomCreatorLog);
-            string addPathLog= Path.Combine(logFilePath, "Logs");
+            string logFilePath = Path.Combine(outputPath, "Logs");
+            string addPathLog = Path.Combine(logFilePath, FileConstant.BomCreatorLog);
+            
             PublishLogfiles(addPathLog);
             //PublishSampleZipFolder();
         }
