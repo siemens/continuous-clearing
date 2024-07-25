@@ -155,39 +155,15 @@ namespace LCT.PackageIdentifier
         public static void PublishLogfiles(string logFolderPath)
         {
             try
-            {
-                //// Ensure the log file exists
-                //if (!File.Exists(logFolderPath))
-                //{
-                //    throw new FileNotFoundException($"Log file not found: {logFolderPath}");
-                //}
-
-                //// Create a temporary folder for the zip file
-                //string tempFolderPath = Path.Combine(Path.GetTempPath(), "LogTemp");
-                //Directory.CreateDirectory(tempFolderPath);
-
-                //// Prepare zip file path
-                //string zipFilePath = Path.Combine(tempFolderPath, "Log.zip");
-
-                //// Delete existing zip file if it exists
-                //if (File.Exists(zipFilePath))
-                //{
-                //    File.Delete(zipFilePath);
-                //}
-
-                //// Create a new zip archive
-                //using (ZipArchive archive = ZipFile.Open(zipFilePath, ZipArchiveMode.Create))
-                //{
-                //    // Add the log file to the zip archive
-                //    archive.CreateEntryFromFile(logFolderPath, Path.GetFileName(logFolderPath));
-                //}
+            {               
 
                 // Define Azure DevOps/VSTS artifact upload parameters
                 string containerFolder = "Container"; // Replace with your desired container folder
                 string artifactName = "MyArtifact"; // Replace with your artifact name
-                string logfilderpath = "D:\\agentAz\\_work\\4\\s\\Continuous-Clearing-CI_CD\\out\\Logs\\PacakgeIdentifier.log";
+                //string logfilderpath = "D:\\agentAz\\_work\\4\\s\\Continuous-Clearing-CI_CD\\out\\Logs\\PacakgeIdentifier.log";
                 // Output the artifact upload command
-                Console.WriteLine($"##vso[artifact.upload containerfolder={containerFolder};artifactname={artifactName}]{logfilderpath}");
+                Console.WriteLine($"##vso[artifact.upload containerfolder={containerFolder};artifactname={artifactName}]{logFolderPath}");
+                //Console.WriteLine($"##vso[artifact.upload containerfolder={containerFolder};artifactname={artifactName}]{logfilderpath}");
 
             }
             catch (Exception ex)
