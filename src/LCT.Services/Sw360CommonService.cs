@@ -121,15 +121,6 @@ namespace LCT.Services
         public async Task<Releasestatus> GetReleaseDataByExternalId(string releaseName, string releaseVersion, string releaseExternalId)
         {
             Logger.Debug($"GetReleaseDataByExternalId(): Release name - {releaseName}@{releaseVersion}");
-            string externalIdUriString;
-            if (releaseExternalId.Contains(Dataconstant.PurlCheck()["NPM"]))
-            {
-                externalIdUriString = Uri.EscapeDataString(releaseExternalId);
-            }
-            else
-            {
-                externalIdUriString = releaseExternalId;
-            }
             Releasestatus releasestatus = new Releasestatus();
 
             releasestatus.isReleaseExist = false;
@@ -138,10 +129,20 @@ namespace LCT.Services
             {
                 foreach (string externalIdKey in externalIdKeyList)
                 {
-                    HttpResponseMessage httpResponseComponent = await m_SW360ApiCommunicationFacade.GetReleaseByExternalId(externalIdUriString, externalIdKey);
+                    HttpResponseMessage httpResponseComponent = await m_SW360ApiCommunicationFacade.GetReleaseByExternalId(releaseExternalId, externalIdKey);
                     var responseContent = httpResponseComponent?.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
                     var componentsRelease = JsonConvert.DeserializeObject<ComponentsRelease>(responseContent);
                     var sw360releasesdata = componentsRelease?.Embedded?.Sw360Releases ?? new List<Sw360Releases>();
+
+                    //It's for Local Sw360 servers,making an API call with EscapeDataString..
+                    if (sw360releasesdata.Count == 0 && releaseExternalId.Contains(Dataconstant.PurlCheck()["NPM"]))
+                    {
+                        releaseExternalId = Uri.EscapeDataString(releaseExternalId);
+                        httpResponseComponent = await m_SW360ApiCommunicationFacade.GetReleaseByExternalId(releaseExternalId, externalIdKey);
+                        responseContent = httpResponseComponent?.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
+                        componentsRelease = JsonConvert.DeserializeObject<ComponentsRelease>(responseContent);
+                        sw360releasesdata = componentsRelease?.Embedded?.Sw360Releases ?? new List<Sw360Releases>();
+                    }
 
                     if (sw360releasesdata.Count > 0)
                     {
