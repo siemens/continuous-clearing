@@ -89,7 +89,7 @@ namespace LCT.PackageIdentifier
                 $"SW360ProjectName\t --> {appSettings.SW360ProjectName}\n\t" +
                 $"SW360ProjectID\t\t --> {appSettings.SW360ProjectID}\n\t" +
                 $"ProjectType\t\t --> {appSettings.ProjectType}\n\t" +
-                $"LogFolderPath\t\t --> {Path.GetFullPath(FolderPath)}\n\t" +
+                $"LogFolderPath\t\t --> {Path.GetFullPath(Log4Net.CatoolLogPath)}\n\t" +
                 $"InternalRepoList\t --> {listOfInternalRepoList}\n\t" +
                 $"Include\t\t\t --> {listOfInlude}\n\t" +
                 $"Exclude\t\t\t --> {listOfExclude}\n\t" +
@@ -117,40 +117,7 @@ namespace LCT.PackageIdentifier
             //PublishSampleZipFolder();
         }
 
-        public static void PublishSampleZipFolder()
-        {
-            string zipFolderPath = GetZipFolderPath();
-            // Create the sample zip folder if it doesn't exist
-            if (!Directory.Exists(zipFolderPath))
-            {
-                Directory.CreateDirectory(zipFolderPath);
-            }
-
-            string sampleFilePath = Path.Combine(zipFolderPath, "sample.txt");
-            File.WriteAllText(sampleFilePath, "This is a sample file.");
-
-
-            //// Create a sample zip file
-            //string sampleZipFilePath = Path.Combine(zipFolderPath, "sample.zip");
-            //if (File.Exists(sampleZipFilePath))
-            //{
-            //    File.Delete(sampleZipFilePath);
-            //}
-            //using (ZipArchive archive = ZipFile.Open(sampleZipFilePath, ZipArchiveMode.Create))
-            //{
-            //    // Add a sample file to the zip archive
-            //    string sampleFilePath = Path.Combine(zipFolderPath, "sample.txt");
-            //    File.WriteAllText(sampleFilePath, "This is a sample file.");
-            //    archive.CreateEntryFromFile(sampleFilePath, "sample.txt");
-            //}
-
-            // Define Azure DevOps/VSTS artifact upload parameters
-            string containerFolder = "Container"; // Replace with your desired container folder
-            string artifactName = "MyArtifact"; // Replace with your artifact name
-
-            // Output the artifact upload command
-            Console.WriteLine($"##vso[artifact.upload containerfolder={containerFolder};artifactname={artifactName}]{Path.GetFullPath(sampleFilePath)}");
-        }
+        
 
         public static void PublishLogfiles(string logFolderPath)
         {
@@ -160,10 +127,11 @@ namespace LCT.PackageIdentifier
                 // Define Azure DevOps/VSTS artifact upload parameters
                 string containerFolder = "Container"; // Replace with your desired container folder
                 string artifactName = "MyArtifact"; // Replace with your artifact name
-                //string logfilderpath = "D:\\agentAz\\_work\\4\\s\\Continuous-Clearing-CI_CD\\out\\Logs\\PacakgeIdentifier.log";
+                string logFilePath = Path.GetFullPath(Log4Net.CatoolLogPath);
+                
                 // Output the artifact upload command
-                Console.WriteLine($"##vso[artifact.upload containerfolder={containerFolder};artifactname={artifactName}]{logFolderPath}");
-                //Console.WriteLine($"##vso[artifact.upload containerfolder={containerFolder};artifactname={artifactName}]{logfilderpath}");
+                Console.WriteLine($"##vso[artifact.upload containerfolder={containerFolder};artifactname={artifactName}]{logFilePath}");
+                
 
             }
             catch (Exception ex)

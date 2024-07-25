@@ -23,12 +23,15 @@ namespace LCT.Common
     public static class Log4Net
     {
         public static ILoggerRepository LoggerRepository { get; set; }
+
+        public static string CatoolLogPath { get; set; }
+
         public static void Init(string logFileName, string logFolder, bool verbose)
         {
             LoggerRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
             XmlConfigurator.Configure(LoggerRepository, new FileInfo(GetDefaultLogConfigFile()));
 
-            string logPath = Path.Combine(logFolder, logFileName);
+            string logPath = CatoolLogPath = Path.Combine(logFolder, logFileName);
 
             if (LoggerRepository is Hierarchy rootRepo)
             {
