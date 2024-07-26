@@ -17,7 +17,6 @@ using TestUtilities;
 
 namespace SW360IntegrationTest.Alpine
 {
-    [TestFixture, Order(26)]
     class ComponentCreatorInitialAlpine
     {
         private string CCTComparisonBomTestFile { get; set; }
@@ -51,7 +50,6 @@ namespace SW360IntegrationTest.Alpine
             }
         }
 
-        [Test, Order(1)]
         public void ComponentCreatorExe_ProvidedBOMFilePath_ReturnsSuccess()
         {
             string bomPath = OutFolder + $"\\..\\BOMs\\{testParameters.SW360ProjectName}_Bom.cdx.json";
@@ -68,7 +66,7 @@ namespace SW360IntegrationTest.Alpine
                 TestConstant.Mode,""}),
             "Test to run component creator EXE execution");
         }
-        [Test, Order(2)]
+
         public void TestComparisionBOMUpdation()
         {
             bool filecheck = false;
@@ -105,7 +103,7 @@ namespace SW360IntegrationTest.Alpine
             }
             Assert.IsTrue(filecheck, "Comparison BOM not exist");
         }
-        [Test, Order(3)]
+
         public async Task ComponentCreation_AfterSuccessfulExeRun_ReturnsSuccess()
         {
             //Setting the httpclient
@@ -130,7 +128,7 @@ namespace SW360IntegrationTest.Alpine
             Assert.AreEqual(expectedcomponentType, componentType, "Test if the component version is correct");
         }
 
-        [Test, Order(4)]
+
         public async Task ReleaseCreation__AfterSuccessfulExeRun_ReturnsClearingStateAsNewClearing()
         {
             //Setting the httpclient

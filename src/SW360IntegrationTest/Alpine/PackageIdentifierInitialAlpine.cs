@@ -14,7 +14,6 @@ using CycloneDX.Models;
 
 namespace SW360IntegrationTest.Alpine
 {
-    [TestFixture, Order(27)]
     public class PackageIdentifierInitialAlpine
     {
         private string CCTLocalBomTestFile { get; set; }
@@ -35,7 +34,6 @@ namespace SW360IntegrationTest.Alpine
             testParameters = new TestParamAlpine();
         }
 
-        [Test, Order(1)]
         public void RunBOMCreatorexe_ProvidedPackageJsonFilePath_ReturnsSuccess()
         {
             string packagejsonPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest1stIterationData\Alpine";
@@ -59,7 +57,6 @@ namespace SW360IntegrationTest.Alpine
 
 
 
-        [Test, Order(2)]
         public void LocalBOMCreation_AfterSuccessfulExeRun_ReturnsSuccess()
         {
             bool fileExist = false;
