@@ -31,9 +31,9 @@ namespace LCT.Common.Constants
         public const string PackageLockFileName = "package-lock.json";
         public const string PackageConfigFileName = "packages.config";
         public const string PackageLockJonFileName = "packages.lock.json";
-        public const string LogFolder = "..\\Logs";
-        public const string ComponentCreatorLog = "PacakgeCreator.log";
-        public const string BomCreatorLog = "PacakgeIdentifier.log";
+        public const string LogFolder = "Logs";
+        public const string ComponentCreatorLog = "PackageCreator.log";
+        public const string BomCreatorLog = "PackageIdentifier.log";
         public const string FossologyUploaderLog = "FossologyUploader.log";
         public const string ArtifactoryUploaderLog = "ArtifactoryUploader.log";
         public const string XzFileExtension = ".tar.xz";

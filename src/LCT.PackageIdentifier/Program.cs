@@ -36,6 +36,7 @@ namespace LCT.PackageIdentifier
     public class Program
     {
         private static bool m_Verbose = false;
+
         public static Stopwatch BomStopWatch { get; set; }
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -51,9 +52,10 @@ namespace LCT.PackageIdentifier
             ISettingsManager settingsManager = new SettingsManager();
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
             ProjectReleases projectReleases = new ProjectReleases();
+            CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
+            Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
             string FolderPath = LogFolderInitialisation(appSettings);
 
-            CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             settingsManager.CheckRequiredArgsToRun(appSettings, "Identifer");
 
             Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Package Identifier >>>>>====================", null);
@@ -89,7 +91,7 @@ namespace LCT.PackageIdentifier
                 $"SW360ProjectName\t --> {appSettings.SW360ProjectName}\n\t" +
                 $"SW360ProjectID\t\t --> {appSettings.SW360ProjectID}\n\t" +
                 $"ProjectType\t\t --> {appSettings.ProjectType}\n\t" +
-                $"LogFolderPath\t\t --> {Path.GetFullPath(FolderPath)}\n\t" +
+                $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t" +
                 $"InternalRepoList\t --> {listOfInternalRepoList}\n\t" +
                 $"Include\t\t\t --> {listOfInlude}\n\t" +
                 $"Exclude\t\t\t --> {listOfExclude}\n\t" +
@@ -111,6 +113,32 @@ namespace LCT.PackageIdentifier
                                              caToolInformation);
             }
             Logger.Logger.Log(null, Level.Notice, $"End of Package Identifier execution : {DateTime.Now}\n", null);
+
+            // publish logs and bom file to pipeline artifact
+            PublishFilesToArtifact();
+
+        }
+
+        public static void PublishFilesToArtifact()
+        {
+            try
+            {               
+
+                // Define Azure DevOps/VSTS artifact upload parameters
+                string containerFolder = "Container"; // Replace with your desired container folder
+                string artifactName = "catoolPackageIdentifier"; // Replace with your artifact name
+                //string logFilePath = Path.GetFullPath(Log4Net.CatoolLogPath);
+                
+                // Output the artifact upload command
+                Console.WriteLine($"##vso[artifact.upload containerfolder={containerFolder};artifactname={artifactName}]{Log4Net.CatoolLogPath}");
+                Console.WriteLine($"##vso[artifact.upload containerfolder={containerFolder};artifactname={artifactName}]{FileOperations.CatoolBomFilePath}");
+                
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
         }
 
         private static CatoolInfo GetCatoolVersionFromProjectfile()

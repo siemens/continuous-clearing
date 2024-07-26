@@ -50,11 +50,14 @@ namespace LCT.SW360PackageCreator
             ISW360ApicommunicationFacade sW360ApicommunicationFacade;
             ISw360ProjectService sw360ProjectService= Getsw360ProjectServiceObject(appSettings, out sW360ApicommunicationFacade);
             ProjectReleases projectReleases = new ProjectReleases();
-            
+            CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
+
+            Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
+
+
             string FolderPath = InitiateLogger(appSettings);
             settingsManager.CheckRequiredArgsToRun(appSettings, "Creator");
             await CreatorValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
-            CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
 
             Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Package creator >>>>>====================", null);
             Logger.Logger.Log(null, Level.Notice, $"\nStart of Package creator execution : {DateTime.Now}", null);
@@ -80,6 +83,31 @@ namespace LCT.SW360PackageCreator
             await InitiatePackageCreatorProcess(appSettings, sw360ProjectService, sW360ApicommunicationFacade);
 
             Logger.Logger.Log(null, Level.Notice, $"End of Package Creator execution: {DateTime.Now}\n", null);
+            // publish logs and bom file to pipeline artifact
+            PublishFilesToArtifact();
+
+        }
+
+        public static void PublishFilesToArtifact()
+        {
+            try
+            {
+
+                // Define Azure DevOps/VSTS artifact upload parameters
+                string containerFolder = "Container"; // Replace with your desired container folder
+                string artifactName = "catoolPacakgeCreator"; // Replace with your artifact name
+                                                //string logFilePath = Path.GetFullPath(Log4Net.CatoolLogPath);
+
+                // Output the artifact upload command
+                Console.WriteLine($"##vso[artifact.upload containerfolder={containerFolder};artifactname={artifactName}]{Log4Net.CatoolLogPath}");
+                Console.WriteLine($"##vso[artifact.upload containerfolder={containerFolder};artifactname={artifactName}]{FileOperations.CatoolBomFilePath}");
+
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
         }
 
         private static CatoolInfo GetCatoolVersionFromProjectfile()

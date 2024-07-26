@@ -23,6 +23,7 @@ namespace LCT.Common
     public class FileOperations : IFileOperations
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        public static string CatoolBomFilePath { get; set; }
 
         public void ValidateFilePath(string filePath)
         {
@@ -90,7 +91,7 @@ namespace LCT.Common
         
                 string fileName = $"{projectName}_{fileNameWithExtension}";
 
-                string filePath = Path.Combine(folderPath, fileName);
+                string filePath = CatoolBomFilePath =  Path.Combine(folderPath, fileName);
                 Logger.Debug($"filePath-{filePath}");
 
                 BackupTheGivenFile(folderPath, fileName);
