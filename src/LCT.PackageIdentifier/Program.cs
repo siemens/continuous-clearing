@@ -126,7 +126,7 @@ namespace LCT.PackageIdentifier
 
                 // Define Azure DevOps/VSTS artifact upload parameters
                 string containerFolder = "Container"; // Replace with your desired container folder
-                string artifactName = "catoolPackageIdentifier"; // Replace with your artifact name
+                string artifactName = "catool"; // Replace with your artifact name
                 //string logFilePath = Path.GetFullPath(Log4Net.CatoolLogPath);
                 
                 // Output the artifact upload command
