@@ -17,7 +17,8 @@ namespace LCT.ArtifactPublisher
         public string CatoolBomFilePath { get; set; }
         public const string LogArtifactFolderName = "ContinuousClearing_Log";
         public const string BomArtifactFolderName = "ContinuousClearing_Bom";
-        public const string ContainerFolderName = "Container";
+        public const string LogContainerFolderName = "Container_Log";
+        public const string BomContainerFolderName = "Container_Bom";
 
         /// <summary>
         /// constructor method of artifact publisher class, initializes the params
@@ -38,7 +39,7 @@ namespace LCT.ArtifactPublisher
             try
             {
                 // Output the artifact upload command
-                Console.WriteLine($"##vso[artifact.upload containerfolder={ContainerFolderName};artifactname={LogArtifactFolderName}]{CatoolLogPath}");
+                Console.WriteLine($"##vso[artifact.upload containerfolder={LogContainerFolderName};artifactname={LogArtifactFolderName}]{CatoolLogPath}");
             }
             catch (IOException ex)
             {
@@ -55,7 +56,7 @@ namespace LCT.ArtifactPublisher
             {
                 if (!string.IsNullOrEmpty(CatoolBomFilePath) && File.Exists(CatoolBomFilePath))
                 {
-                    Console.WriteLine($"##vso[artifact.upload containerfolder={ContainerFolderName};artifactname={BomArtifactFolderName}]{CatoolBomFilePath}");
+                    Console.WriteLine($"##vso[artifact.upload containerfolder={BomContainerFolderName};artifactname={BomArtifactFolderName}]{CatoolBomFilePath}");
                 }
             }
             catch (IOException ex)
