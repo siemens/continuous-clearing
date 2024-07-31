@@ -33,7 +33,7 @@ namespace LCT.PackageIdentifier
             {
                 Logger.Error($"Provided Sw360 project is not in active state ,Please make sure you added the correct project details that is in active state..");
                 Logger.Debug($"ValidateAppSettings() : Sw360 project " + projectReleases.Name + " is in " + projectReleases.clearingState + " state.");
-                Environment.Exit(-1);
+                CommonHelper.CallEnvironmentExit(-1);
             }
             else
             {

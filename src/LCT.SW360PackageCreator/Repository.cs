@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
+using LCT.Common;
 
 namespace LCT.SW360PackageCreator
 {
@@ -54,7 +55,7 @@ namespace LCT.SW360PackageCreator
             }
             catch (ArgumentOutOfRangeException ex)
             {
-                Environment.ExitCode = -1;
+                CommonHelper.CallEnvironmentExit(-1);
                 Logger.Error($"Repository.IdentifyRepoURLForGitHub():{componentName}-{url}", ex);
             }
 

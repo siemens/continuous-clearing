@@ -117,17 +117,17 @@ namespace LCT.PackageIdentifier
             }
             catch (JsonReaderException ex)
             {
-                Environment.ExitCode = -1;
+                CommonHelper.CallEnvironmentExit(-1);
                 Logger.Error($"ParsePackageFile():", ex);
             }
             catch (IOException ex)
             {
-                Environment.ExitCode = -1;
+                CommonHelper.CallEnvironmentExit(-1);
                 Logger.Error($"ParsePackageFile():", ex);
             }
             catch (SecurityException ex)
             {
-                Environment.ExitCode = -1;
+                CommonHelper.CallEnvironmentExit(-1);
                 Logger.Error($"ParsePackageFile():", ex);
             }
 

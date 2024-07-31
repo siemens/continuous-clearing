@@ -24,6 +24,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using LCT.Common.Model;
+using LCT.ArtifactPublisher;
 
 namespace ArtifactoryUploader
 {
@@ -42,6 +43,7 @@ namespace ArtifactoryUploader
 
             ISettingsManager settingsManager = new SettingsManager();
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
+            // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
 
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
@@ -83,30 +85,9 @@ namespace ArtifactoryUploader
 
             Logger.Logger.Log(null, Level.Notice, $"End of Artifactory Uploader execution : {DateTime.Now}\n", null);
             // publish logs and bom file to pipeline artifact
-            PublishFilesToArtifact();
 
-        }
+            CommonHelper.PublishFilesToArtifact();
 
-        public static void PublishFilesToArtifact()
-        {
-            try
-            {
-
-                // Define Azure DevOps/VSTS artifact upload parameters
-                string containerFolder = "Container"; // Replace with your desired container folder
-                string artifactName = "catool"; // Replace with your artifact name
-                                                //string logFilePath = Path.GetFullPath(Log4Net.CatoolLogPath);
-
-                // Output the artifact upload command
-                Console.WriteLine($"##vso[artifact.upload containerfolder={containerFolder};artifactname={artifactName}]{Log4Net.CatoolLogPath}");
-                Console.WriteLine($"##vso[artifact.upload containerfolder={containerFolder};artifactname={artifactName}]{FileOperations.CatoolBomFilePath}");
-
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
         }
 
         private static CatoolInfo GetCatoolVersionFromProjectfile()

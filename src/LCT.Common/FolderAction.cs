@@ -43,13 +43,13 @@ namespace LCT.Common
             catch (IOException ex)
             {
                 isCopied = false;
-                Environment.ExitCode = -1;
+                CommonHelper.CallEnvironmentExit(-1);
                 Logger.Error("FolderAction.CopyToTargetDirectory():", ex);
             }
             catch (SecurityException ex)
             {
                 isCopied = false;
-                Environment.ExitCode = -1;
+                CommonHelper.CallEnvironmentExit(-1);
                 Logger.Error("FolderAction.CopyToTargetDirectory():", ex);
             }
 

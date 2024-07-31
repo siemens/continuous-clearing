@@ -66,13 +66,13 @@ namespace LCT.Services
             {
                 Logger.Error($"Failed to connect SW360 : {ex.Message}");
                 Logger.Debug($"GetProjectNameByProjectIDFromSW360()", ex);
-                Environment.ExitCode = -1;
+                CommonHelper.CallEnvironmentExit(-1);
             }
             catch (AggregateException ex)
             {
                 Logger.Error($"Failed to connect SW360 : {ex.Message}");
                 Logger.Debug($"GetProjectNameByProjectIDFromSW360()", ex);
-                Environment.ExitCode = -1;
+                CommonHelper.CallEnvironmentExit(-1);
             }
 
             return sw360ProjectName;

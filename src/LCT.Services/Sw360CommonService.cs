@@ -199,12 +199,12 @@ namespace LCT.Services
             catch (HttpRequestException e)
             {
                 Logger.Error("GetReleaseIdByComponentId():", e);
-                Environment.ExitCode = -1;
+                CommonHelper.CallEnvironmentExit(-1);
             }
             catch (AggregateException e)
             {
                 Logger.Error("GetReleaseIdByComponentId():", e);
-                Environment.ExitCode = -1;
+                CommonHelper.CallEnvironmentExit(-1);
             }
 
             return releaseId;

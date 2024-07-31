@@ -26,6 +26,7 @@ using LCT.APICommunications;
 using LCT.APICommunications.Model;
 using System.Globalization;
 using System.Linq;
+using LCT.ArtifactPublisher;
 
 
 namespace LCT.PackageIdentifier
@@ -46,12 +47,13 @@ namespace LCT.PackageIdentifier
         {
             BomStopWatch = new Stopwatch();
             BomStopWatch.Start();
-            
+
             if (!m_Verbose && CommonHelper.IsAzureDevOpsDebugEnabled())
                 m_Verbose = true;
             ISettingsManager settingsManager = new SettingsManager();
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
             ProjectReleases projectReleases = new ProjectReleases();
+            // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
             string FolderPath = LogFolderInitialisation(appSettings);
@@ -70,7 +72,7 @@ namespace LCT.PackageIdentifier
                 Logger.Logger.Log(null, Level.Alert, $"Package Identifier is running in TEST mode \n", null);
 
             // Validate application settings
-            await ValidateAppsettingsFile(appSettings,projectReleases);
+            await ValidateAppsettingsFile(appSettings, projectReleases);
             string listOfInlude = DisplayInclude(appSettings);
             string listOfExclude = DisplayExclude(appSettings);
             string listOfExcludeComponents = DisplayExcludeComponents(appSettings);
@@ -115,30 +117,8 @@ namespace LCT.PackageIdentifier
             Logger.Logger.Log(null, Level.Notice, $"End of Package Identifier execution : {DateTime.Now}\n", null);
 
             // publish logs and bom file to pipeline artifact
-            PublishFilesToArtifact();
+            CommonHelper.PublishFilesToArtifact();
 
-        }
-
-        public static void PublishFilesToArtifact()
-        {
-            try
-            {               
-
-                // Define Azure DevOps/VSTS artifact upload parameters
-                string containerFolder = "Container"; // Replace with your desired container folder
-                string artifactName = "catool"; // Replace with your artifact name
-                //string logFilePath = Path.GetFullPath(Log4Net.CatoolLogPath);
-                
-                // Output the artifact upload command
-                Console.WriteLine($"##vso[artifact.upload containerfolder={containerFolder};artifactname={artifactName}]{Log4Net.CatoolLogPath}");
-                Console.WriteLine($"##vso[artifact.upload containerfolder={containerFolder};artifactname={artifactName}]{FileOperations.CatoolBomFilePath}");
-                
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
         }
 
         private static CatoolInfo GetCatoolVersionFromProjectfile()
@@ -175,7 +155,7 @@ namespace LCT.PackageIdentifier
                 Timeout = appSettings.TimeOut
             };
             ISw360ProjectService sw360ProjectService = new Sw360ProjectService(new SW360ApicommunicationFacade(sw360ConnectionSettings));
-            await BomValidator.ValidateAppSettings(appSettings, sw360ProjectService,projectReleases);
+            await BomValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
         }
         private static string DisplayInclude(CommonAppSettings appSettings)
         {

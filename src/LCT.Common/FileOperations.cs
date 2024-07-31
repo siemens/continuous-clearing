@@ -166,12 +166,12 @@ namespace LCT.Common
             }
             catch (IOException e)
             {
-                Environment.ExitCode = -1;
+                CommonHelper.CallEnvironmentExit(-1);
                 Logger.Error($"Error:Invalid path entered,Please check if the comparison BOM  path entered is correct", e);
             }
             catch (UnauthorizedAccessException e)
             {
-                Environment.ExitCode = -1;
+                CommonHelper.CallEnvironmentExit(-1);
                 Logger.Error($"Error:Invalid path entered,Please check if the comparison BOM path entered is correct", e);
             }            
             return comparisonData;
@@ -225,17 +225,17 @@ namespace LCT.Common
             catch (IOException ex)
             {
                 Logger.Error($"Error occurred while generating backup BOM file", ex);
-                Environment.ExitCode = -1;
+                CommonHelper.CallEnvironmentExit(-1);
             }
             catch (NotSupportedException ex)
             {
                 Logger.Error($"Error occurred while generating backup BOM file", ex);
-                Environment.ExitCode = -1;
+                CommonHelper.CallEnvironmentExit(-1);
             }
             catch (UnauthorizedAccessException ex)
             {
                 Logger.Error($"Error occurred while generating backup BOM file", ex);
-                Environment.ExitCode = -1;
+                CommonHelper.CallEnvironmentExit(-1);
             }
         } 
         

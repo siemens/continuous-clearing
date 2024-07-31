@@ -5,6 +5,7 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using LCT.ArtifactPublisher;
 using LCT.Common.Constants;
 using LCT.Common.Model;
 using log4net;
@@ -50,7 +51,7 @@ namespace LCT.Common
                         name = $"{component.Group}/{component.Name}";
                     }
                     if (excludedcomponent.Length > 0 && (Regex.IsMatch(name.ToLowerInvariant(), WildcardToRegex(excludedcomponent[0].ToLowerInvariant()))) &&
-                        (component.Version.ToLowerInvariant().Contains(excludedcomponent[1].ToLowerInvariant())|| excludedcomponent[1].ToLowerInvariant() == "*"))
+                        (component.Version.ToLowerInvariant().Contains(excludedcomponent[1].ToLowerInvariant()) || excludedcomponent[1].ToLowerInvariant() == "*"))
                     {
                         noOfExcludedComponents++;
                         ExcludedList.Add(component);
@@ -155,7 +156,7 @@ namespace LCT.Common
             if (componentInfo.Count > 0 || lstReleaseNotCreated.Count > 0)
             {
                 Logger.Logger.Log(null, Level.Alert, "Action Item required by the user:\n", null);
-                Environment.ExitCode = 2;
+                CallEnvironmentExit(2);
             }
 
             if (componentInfo.Count > 0)
@@ -201,7 +202,7 @@ namespace LCT.Common
 
             if (components.Count > 0)
             {
-                Environment.ExitCode = 2;
+                CallEnvironmentExit(2);
                 Logger.Logger.Log(null, Level.Alert, "* Components Not linked to project :", null);
                 Logger.Logger.Log(null, Level.Alert, " Can be linked manually OR Check the Logs AND RE-Run", null);
                 Logger.Logger.Log(null, Level.Alert, $"{"=",5}{string.Join("", Enumerable.Repeat("=", 98)),5}", null);
@@ -249,6 +250,32 @@ namespace LCT.Common
 
             return formattedString;
         }
+
+        public static void CallEnvironmentExit(int code)
+        {
+            if (code == -1)
+            {
+                PublishFilesToArtifact();
+                EnvironmentExit(code);
+            }
+            else
+            {
+                EnvironmentExit(code);
+            }
+        }
+
+        public static void EnvironmentExit(int exitCode)
+        {
+            Environment.Exit(exitCode);
+        }
+
+        public static void PublishFilesToArtifact()
+        {
+            Publish artifactPublisher = new Publish(Log4Net.CatoolLogPath, FileOperations.CatoolBomFilePath);
+            artifactPublisher.UploadLogs();
+            artifactPublisher.UploadBom();
+        }
+
         #endregion
 
         #region private
