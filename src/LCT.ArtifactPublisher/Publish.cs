@@ -53,7 +53,7 @@ namespace LCT.ArtifactPublisher
         {
             try
             {
-                if (!string.IsNullOrEmpty(CatoolBomFilePath) && Directory.Exists(CatoolBomFilePath))
+                if (!string.IsNullOrEmpty(CatoolBomFilePath) && File.Exists(CatoolBomFilePath))
                 {
                     Console.WriteLine($"##vso[artifact.upload containerfolder={ContainerFolderName};artifactname={BomArtifactFolderName}]{CatoolBomFilePath}");
                 }
