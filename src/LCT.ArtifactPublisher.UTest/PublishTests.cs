@@ -23,7 +23,7 @@ namespace LCT.ArtifactPublisher.UTest
         public void UploadLogs_SuccessfullyUploadsLogs()
         {
             // Arrange
-            string expectedCommand = $"##vso[artifact.upload containerfolder={Publish.ContainerFolderName};" +
+            string expectedCommand = $"##vso[artifact.upload containerfolder={Publish.LogContainerFolderName};" +
                 $"artifactname={Publish.LogArtifactFolderName}]{_publish?.CatoolLogPath}";
 
             // Act
