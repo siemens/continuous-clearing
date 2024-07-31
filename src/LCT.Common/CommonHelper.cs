@@ -253,8 +253,12 @@ namespace LCT.Common
 
         public static void CallEnvironmentExit(int code)
         {
-            PublishFilesToArtifact();
+            if (code == -1)
+            {
+                EnvironmentExit(code);
+            }
             EnvironmentExit(code);
+            PublishFilesToArtifact();
         }
 
         public static void EnvironmentExit(int exitCode)
