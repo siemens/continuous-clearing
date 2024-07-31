@@ -257,8 +257,9 @@ namespace LCT.Common
             {
                 EnvironmentExit(code);
             }
-            EnvironmentExit(code);
             PublishFilesToArtifact();
+            EnvironmentExit(code);
+
         }
 
         public static void EnvironmentExit(int exitCode)
