@@ -37,8 +37,7 @@ namespace LCT.ArtifactPublisher
             try
             {
                 // Output the artifact upload command
-                Console.WriteLine($"##vso[artifact.upload containerfolder={ContainerFolderName};" +
-                    $"artifactname={ArtifactName}]{CatoolLogPath}");
+                Console.WriteLine($"##vso[artifact.upload containerfolder={ContainerFolderName};artifactname={ArtifactName}]{CatoolLogPath}");
             }
             catch (IOException ex)
             {
@@ -53,12 +52,14 @@ namespace LCT.ArtifactPublisher
         {
             try
             {
-                var directoryName = Path.GetDirectoryName(CatoolBomFilePath)?? string.Empty;
-                var files = Directory.GetFiles(directoryName, "", SearchOption.AllDirectories);
-                foreach (var item in files)
+                if (!string.IsNullOrEmpty(CatoolBomFilePath) && Directory.Exists(CatoolBomFilePath))
                 {
-                    Console.WriteLine($"##vso[artifact.upload containerfolder={ContainerFolderName};" +
-    $"artifactname={ArtifactName}]{item}");
+                    var directoryName = Path.GetDirectoryName(CatoolBomFilePath) ?? string.Empty;
+                    var files = Directory.GetFiles(directoryName, "", SearchOption.AllDirectories);
+                    foreach (var item in files)
+                    {
+                        Console.WriteLine($"##vso[artifact.upload containerfolder={ContainerFolderName};artifactname={ArtifactName}]{item}");
+                    }
                 }
             }
             catch (IOException ex)
