@@ -255,11 +255,10 @@ namespace LCT.Common
         {
             if (code == -1)
             {
+                Publish artifactPublisher = new Publish(Log4Net.CatoolLogPath, FileOperations.CatoolBomFilePath);
+                artifactPublisher.UploadLogs();
                 EnvironmentExit(code);
             }
-            PublishFilesToArtifact();
-            EnvironmentExit(code);
-
         }
 
         public static void EnvironmentExit(int exitCode)
