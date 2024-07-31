@@ -1,8 +1,10 @@
-﻿
-using System;
-using System.IO;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2024 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+
 using NUnit.Framework;
-using LCT.ArtifactPublisher;
 
 namespace LCT.ArtifactPublisher.UTest
 {
@@ -22,7 +24,7 @@ namespace LCT.ArtifactPublisher.UTest
         {
             // Arrange
             string expectedCommand = $"##vso[artifact.upload containerfolder={Publish.ContainerFolderName};" +
-                $"artifactname={Publish.ArtifactName}]{_publish?.CatoolLogPath}";
+                $"artifactname={Publish.LogArtifactFolderName}]{_publish?.CatoolLogPath}";
 
             // Act
             using (StringWriter sw = new StringWriter())
