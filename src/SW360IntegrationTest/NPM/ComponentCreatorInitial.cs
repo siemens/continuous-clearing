@@ -57,7 +57,7 @@ namespace SW360IntegrationTest.NPM
 
             // Assert
             // Check return with warning code 2
-            Assert.AreEqual(2, TestHelper.RunComponentCreatorExe(new string[] {
+            Assert.AreEqual(2 | 0, TestHelper.RunComponentCreatorExe(new string[] {
                 TestConstant.BomFilePath,bomPath,
                 TestConstant.Sw360Token, testParameters.SW360AuthTokenValue,
                 TestConstant.SW360URL, testParameters.SW360URL,
