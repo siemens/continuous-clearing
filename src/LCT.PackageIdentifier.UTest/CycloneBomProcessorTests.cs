@@ -99,8 +99,8 @@ namespace PackageIdentifier.UTest
             Bom files = CycloneBomProcessor.SetMetadataInComparisonBOM(bom, appSettings, projectReleases, caToolInformation);
 
             //Assert
-            Assert.That(tools.Name, Is.EqualTo(files.Metadata.Tools[1].Name), "Returns bom with metadata tools");
-            Assert.That(SiemensSBOM.Name, Is.EqualTo(files.Metadata.Tools[2].Name), "Returns bom with metadata tools");
+            Assert.That(tools.Name, Is.EqualTo(files.Metadata.Tools[0].Name), "Returns bom with metadata tools");
+            Assert.That(SiemensSBOM.Name, Is.EqualTo(files.Metadata.Tools[1].Name), "Returns bom with metadata tools");
             Assert.That(component.Name, Is.EqualTo(files.Metadata.Component.Name), "Returns bom with metadata component ");
             Assert.That(component.Version, Is.EqualTo(files.Metadata.Component.Version), "Returns bom with metadata component ");
             Assert.That(component.Type, Is.EqualTo(files.Metadata.Component.Type), "Returns bom with metadata component ");

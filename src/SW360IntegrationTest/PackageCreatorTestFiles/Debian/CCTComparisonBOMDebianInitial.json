@@ -27,28 +27,6 @@
             "type": "website"
           }
         ]
-      },
-      {
-        "vendor": "Siemens AG",
-        "name": "Clearing Automation Tool",
-        "version": "6.1.0",
-        "externalReferences": [
-          {
-            "url": "https://github.com/siemens/continuous-clearing",
-            "type": "website"
-          }
-        ]
-      },
-      {
-        "vendor": "Siemens AG",
-        "name": "Siemens SBOM",
-        "version": "2.0.0",
-        "externalReferences": [
-          {
-            "url": "https://sbom.siemens.io/",
-            "type": "website"
-          }
-        ]
       }
     ],
     "component": {
