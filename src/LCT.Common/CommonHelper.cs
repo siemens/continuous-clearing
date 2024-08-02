@@ -259,6 +259,10 @@ namespace LCT.Common
                 artifactPublisher.UploadLogs();
                 EnvironmentExit(code);
             }
+            else
+            {
+                EnvironmentExit(code);
+            }
         }
 
         public static void EnvironmentExit(int exitCode)
