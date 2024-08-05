@@ -262,6 +262,7 @@ namespace LCT.Common
             else
             {
                 EnvironmentExit(code);
+                PublishFilesToArtifact();
             }
         }
 
