@@ -13,20 +13,20 @@ namespace LCT.Common.UTest
 {
     public class CommonHelperTest
     {
-        [Test]
-        [Ignore("Reason for envirnment exit code is 2")]
-        public void WriteComponentsNotLinkedListInConsole_PassingList_ReturnSuccess()
-        {
-            //Arrange
-            List<Components> ComponentsNotLinked = new List<Components>();
-            ComponentsNotLinked.Add(new Components());
+        //This test case ignore due to environment exit comes in the method
+        //[Test]        
+        //public void WriteComponentsNotLinkedListInConsole_PassingList_ReturnSuccess()
+        //{
+        //    //Arrange
+        //    List<Components> ComponentsNotLinked = new List<Components>();
+        //    ComponentsNotLinked.Add(new Components());
 
-            //Act
-            CommonHelper.WriteComponentsNotLinkedListInConsole(ComponentsNotLinked);
-            
-            //Assert
-            Assert.IsTrue(true);
-        }
+        //    //Act
+        //    CommonHelper.WriteComponentsNotLinkedListInConsole(ComponentsNotLinked);
+
+        //    //Assert
+        //    Assert.IsTrue(true);
+        //}
 
         [Test]
         public void RemoveExcludedComponents_PassingList_ReturnSuccess()
