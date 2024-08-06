@@ -26,18 +26,44 @@ namespace LCT.PackageIdentifier
                                                      CatoolInfo caToolInformation)
         {
             Logger.Debug("Starting to add metadata info into the BOM");
-            List<Tool> tools = new List<Tool>();
-            List<Component> components = new List<Component>();
-            List<Property> properties = new();
+            Metadata metadata = new Metadata
+            {
+                Tools = new List<Tool>(),
+                Properties = new List<Property>()
+            };
+
+            SetMetaDataToolsValues(metadata, caToolInformation);
+
+            Component component = new Component
+            {
+                Name = appSettings.SW360ProjectName,
+                Version = projectReleases.Version,
+                Type = Component.Classification.Application
+            };
+            metadata.Component = component;
+
+            Property projectType = new Property
+            {
+                Name = "siemens:profile",
+                Value = "clearing"
+            };
+            metadata.Properties.Add(projectType);
+
+            bom.Metadata = metadata;
+            return bom;
+        }
+
+        public static void SetMetaDataToolsValues(Metadata metadata, CatoolInfo caToolInformation)
+        {
             Tool tool = new Tool
             {
                 Name = "Clearing Automation Tool",
                 Version = caToolInformation.CatoolVersion,
                 Vendor = "Siemens AG",
                 ExternalReferences = new List<ExternalReference>() { new ExternalReference { Url = "https://github.com/siemens/continuous-clearing", Type = ExternalReference.ExternalReferenceType.Website } }
-
             };
-            tools.Add(tool);
+            metadata.Tools.Add(tool);
+
             Tool SiemensSBOM = new Tool
             {
                 Name = "Siemens SBOM",
@@ -45,41 +71,8 @@ namespace LCT.PackageIdentifier
                 Vendor = "Siemens AG",
                 ExternalReferences = new List<ExternalReference>() { new ExternalReference { Url = "https://sbom.siemens.io/", Type = ExternalReference.ExternalReferenceType.Website } }
             };
-            tools.Add(SiemensSBOM);
-            Component component = new Component
-            {
-                Name = appSettings.SW360ProjectName,
-                Version = projectReleases.Version,
-                Type = Component.Classification.Application
-            };
-            components.Add(component);            
-
-            if (bom.Metadata != null)
-            {
-                bom.Metadata.Tools.AddRange(tools);
-                bom.Metadata.Component = bom.Metadata.Component ?? new Component();
-                bom.Metadata.Component.Name = component.Name;
-                bom.Metadata.Component.Version = component.Version;
-                bom.Metadata.Component.Type = component.Type;
-            }
-            else
-            {
-                bom.Metadata = new Metadata
-                {
-                    Tools = tools,
-                    Component = component,
-                };
-            }
-            Property projectType = new()
-            {
-                Name = "siemens:profile",
-                Value = "clearing"
-            };
-            bom.Metadata.Properties = properties;            
-            bom.Metadata.Properties.Add(projectType);
-            return bom;
+            metadata.Tools.Add(SiemensSBOM);
         }
-
         public static void SetProperties(CommonAppSettings appSettings, Component component, ref List<Component> componentForBOM, string repo = "Not Found in JFrogRepo")
         {
             List<Property> propList = new();
