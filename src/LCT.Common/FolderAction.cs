@@ -43,12 +43,14 @@ namespace LCT.Common
             catch (IOException ex)
             {
                 isCopied = false;
+                CommonHelper.PublishFilesToArtifact();
                 Environment.ExitCode = -1;
                 Logger.Error("FolderAction.CopyToTargetDirectory():", ex);
             }
             catch (SecurityException ex)
             {
                 isCopied = false;
+                CommonHelper.PublishFilesToArtifact();
                 Environment.ExitCode = -1;
                 Logger.Error("FolderAction.CopyToTargetDirectory():", ex);
             }

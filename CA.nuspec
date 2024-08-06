@@ -42,6 +42,9 @@
     <file src="out\net8.0\LCT.APICommunications.deps.json" target="tools\LCT.APICommunications.deps.json"/>
     <file src="out\net8.0\LCT.APICommunications.dll" target="tools\LCT.APICommunications.dll"/>
     <file src="out\net8.0\LCT.APICommunications.pdb" target="tools\LCT.APICommunications.pdb"/>
+    <file src="out\net8.0\LCT.ArtifactPublisher.deps.json" target="tools\LCT.ArtifactPublisher.deps.json"/>
+    <file src="out\net8.0\LCT.ArtifactPublisher.dll" target="tools\LCT.ArtifactPublisher.dll"/>
+    <file src="out\net8.0\LCT.ArtifactPublisher.pdb" target="tools\LCT.ArtifactPublisher.pdb"/>
     <file src="out\net8.0\LCT.Common.deps.json" target="tools\LCT.Common.deps.json"/>
     <file src="out\net8.0\LCT.Common.dll" target="tools\LCT.Common.dll"/>
     <file src="out\net8.0\LCT.Common.pdb" target="tools\LCT.Common.pdb"/>

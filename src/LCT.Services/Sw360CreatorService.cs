@@ -86,6 +86,7 @@ namespace LCT.Services
                 {
                     componentCreateStatus.IsCreated = false;
                     componentCreateStatus.ReleaseStatus.IsCreated = false;
+                    CommonHelper.PublishFilesToArtifact();
                     Environment.ExitCode = -1;
                     Logger.Debug($"CreateComponent():Component Name -{componentInfo.Name}- " +
                    $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
@@ -96,6 +97,7 @@ namespace LCT.Services
             catch (HttpRequestException e)
             {
                 Logger.Error($"CreateComponent():", e);
+                CommonHelper.PublishFilesToArtifact();
                 Environment.ExitCode = -1;
                 componentCreateStatus.IsCreated = false;
                 componentCreateStatus.ReleaseStatus.IsCreated = false;
@@ -179,6 +181,7 @@ namespace LCT.Services
                 else
                 {
                     createStatus.IsCreated = false;
+                    CommonHelper.PublishFilesToArtifact();
                     Environment.ExitCode = -1;
                     Logger.Debug($"CreateReleaseForComponent():Component Name -{componentInfo.Name}{componentInfo.Version}- " +
                    $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
@@ -192,6 +195,7 @@ namespace LCT.Services
             catch (HttpRequestException e)
             {
                 Logger.Error($"CreateReleaseForComponent():", e);
+                CommonHelper.PublishFilesToArtifact();
                 Environment.ExitCode = -1;
                 createStatus.IsCreated = false;
             }
@@ -301,6 +305,7 @@ namespace LCT.Services
                 var response = await m_SW360ApiCommunicationFacade.LinkReleasesToProject(content, sw360ProjectId);
                 if (!response.IsSuccessStatusCode)
                 {
+                    CommonHelper.PublishFilesToArtifact();
                     Environment.ExitCode = -1;
                     Logger.Error($"LinkReleasesToProject() : Linking releases to project Id {sw360ProjectId} is failed.");
                     return false;
@@ -310,12 +315,14 @@ namespace LCT.Services
             catch (HttpRequestException ex)
             {
                 Logger.Error($"LinkReleasesToProject():", ex);
+                CommonHelper.PublishFilesToArtifact();
                 Environment.ExitCode = -1;
                 return false;
             }
             catch (AggregateException ex)
             {
                 Logger.Error($"LinkReleasesToProject():", ex);
+                CommonHelper.PublishFilesToArtifact();
                 Environment.ExitCode = -1;
                 return false;
             }
@@ -332,6 +339,7 @@ namespace LCT.Services
             catch (HttpRequestException e)
             {
                 Logger.Error("GetReleaseIDofComponent():", e);
+                CommonHelper.PublishFilesToArtifact();
                 Environment.ExitCode = -1;
             }
 
@@ -354,6 +362,7 @@ namespace LCT.Services
             catch (HttpRequestException e)
             {
                 Logger.Error("GetReleaseIdByName():", e);
+                CommonHelper.PublishFilesToArtifact();
                 Environment.ExitCode = -1;
             }
 
@@ -402,11 +411,13 @@ namespace LCT.Services
             catch (HttpRequestException e)
             {
                 Logger.Error($"GetComponentId():", e);
+                CommonHelper.PublishFilesToArtifact();
                 Environment.ExitCode = -1;
             }
             catch (AggregateException e)
             {
                 Logger.Error($"GetComponentId():", e);
+                CommonHelper.PublishFilesToArtifact();
                 Environment.ExitCode = -1;
             }
             return ComponentId;
@@ -463,12 +474,14 @@ namespace LCT.Services
             catch (HttpRequestException ex)
             {
                 Logger.Error($"UpdateExternalIdForRelease(): {ex}");
+                CommonHelper.PublishFilesToArtifact();
                 Environment.ExitCode = -1;
                 return false;
             }
             catch (AggregateException ex)
             {
                 Logger.Error($"UpdateExternalIdForRelease(): {ex}");
+                CommonHelper.PublishFilesToArtifact();
                 Environment.ExitCode = -1;
                 return false;
             }
@@ -574,12 +587,14 @@ namespace LCT.Services
             catch (HttpRequestException ex)
             {
                 Logger.Error($"UpdateExternalIdForRelease(): {ex}");
+                CommonHelper.PublishFilesToArtifact();
                 Environment.ExitCode = -1;
                 return false;
             }
             catch (AggregateException ex)
             {
                 Logger.Error($"UpdateExternalIdForRelease(): {ex}");
+                CommonHelper.PublishFilesToArtifact();
                 Environment.ExitCode = -1;
                 return false;
             }

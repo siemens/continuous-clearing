@@ -8,7 +8,6 @@
 using CycloneDX.Models;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using System.Collections.Generic;
 using System.IO;
 using System.Net.Http.Headers;
 using System.Net.Http;
@@ -16,12 +15,8 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using TestUtilities;
-using LCT.APICommunications;
-using LCT.APICommunications.Model;
-using LCT.Common;
 using Newtonsoft.Json.Linq;
 using System.Linq;
-using LCT.Common.Constants;
 
 namespace SW360IntegrationTest.NPM
 {

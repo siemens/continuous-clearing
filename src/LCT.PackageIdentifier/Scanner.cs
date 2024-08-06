@@ -66,7 +66,7 @@ namespace LCT.PackageIdentifier
             if (allFoundConfigFiles.Count == 0)
             {
                 Logger.Error("   Provided package file path do not contain valid input files.");
-                Environment.Exit(-1);
+                CommonHelper.CallEnvironmentExit(-1);
             }
 
            

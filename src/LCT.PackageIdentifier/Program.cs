@@ -26,6 +26,7 @@ using LCT.APICommunications;
 using LCT.APICommunications.Model;
 using System.Globalization;
 using System.Linq;
+using LCT.ArtifactPublisher;
 
 
 namespace LCT.PackageIdentifier
@@ -36,6 +37,7 @@ namespace LCT.PackageIdentifier
     public class Program
     {
         private static bool m_Verbose = false;
+
         public static Stopwatch BomStopWatch { get; set; }
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -45,15 +47,17 @@ namespace LCT.PackageIdentifier
         {
             BomStopWatch = new Stopwatch();
             BomStopWatch.Start();
-            
+
             if (!m_Verbose && CommonHelper.IsAzureDevOpsDebugEnabled())
                 m_Verbose = true;
             ISettingsManager settingsManager = new SettingsManager();
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
             ProjectReleases projectReleases = new ProjectReleases();
+            // do not change the order of getting ca tool information
+            CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
+            Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
             string FolderPath = LogFolderInitialisation(appSettings);
 
-            CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             settingsManager.CheckRequiredArgsToRun(appSettings, "Identifer");
 
             Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Package Identifier >>>>>====================", null);
@@ -68,7 +72,7 @@ namespace LCT.PackageIdentifier
                 Logger.Logger.Log(null, Level.Alert, $"Package Identifier is running in TEST mode \n", null);
 
             // Validate application settings
-            await ValidateAppsettingsFile(appSettings,projectReleases);
+            await ValidateAppsettingsFile(appSettings, projectReleases);
             string listOfInlude = DisplayInclude(appSettings);
             string listOfExclude = DisplayExclude(appSettings);
             string listOfExcludeComponents = DisplayExcludeComponents(appSettings);
@@ -89,7 +93,7 @@ namespace LCT.PackageIdentifier
                 $"SW360ProjectName\t --> {appSettings.SW360ProjectName}\n\t" +
                 $"SW360ProjectID\t\t --> {appSettings.SW360ProjectID}\n\t" +
                 $"ProjectType\t\t --> {appSettings.ProjectType}\n\t" +
-                $"LogFolderPath\t\t --> {Path.GetFullPath(FolderPath)}\n\t" +
+                $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t" +
                 $"InternalRepoList\t --> {listOfInternalRepoList}\n\t" +
                 $"Include\t\t\t --> {listOfInlude}\n\t" +
                 $"Exclude\t\t\t --> {listOfExclude}\n\t" +
@@ -111,6 +115,10 @@ namespace LCT.PackageIdentifier
                                              caToolInformation);
             }
             Logger.Logger.Log(null, Level.Notice, $"End of Package Identifier execution : {DateTime.Now}\n", null);
+
+            // publish logs and bom file to pipeline artifact
+            CommonHelper.PublishFilesToArtifact();
+
         }
 
         private static CatoolInfo GetCatoolVersionFromProjectfile()
@@ -147,7 +155,7 @@ namespace LCT.PackageIdentifier
                 Timeout = appSettings.TimeOut
             };
             ISw360ProjectService sw360ProjectService = new Sw360ProjectService(new SW360ApicommunicationFacade(sw360ConnectionSettings));
-            await BomValidator.ValidateAppSettings(appSettings, sw360ProjectService,projectReleases);
+            await BomValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
         }
         private static string DisplayInclude(CommonAppSettings appSettings)
         {

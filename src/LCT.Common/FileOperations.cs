@@ -23,6 +23,7 @@ namespace LCT.Common
     public class FileOperations : IFileOperations
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        public static string CatoolBomFilePath { get; set; }
 
         public void ValidateFilePath(string filePath)
         {
@@ -90,7 +91,7 @@ namespace LCT.Common
         
                 string fileName = $"{projectName}_{fileNameWithExtension}";
 
-                string filePath = Path.Combine(folderPath, fileName);
+                string filePath = CatoolBomFilePath =  Path.Combine(folderPath, fileName);
                 Logger.Debug($"filePath-{filePath}");
 
                 BackupTheGivenFile(folderPath, fileName);
@@ -165,11 +166,13 @@ namespace LCT.Common
             }
             catch (IOException e)
             {
+                CommonHelper.PublishFilesToArtifact();
                 Environment.ExitCode = -1;
                 Logger.Error($"Error:Invalid path entered,Please check if the comparison BOM  path entered is correct", e);
             }
             catch (UnauthorizedAccessException e)
             {
+                CommonHelper.PublishFilesToArtifact();
                 Environment.ExitCode = -1;
                 Logger.Error($"Error:Invalid path entered,Please check if the comparison BOM path entered is correct", e);
             }            
@@ -224,16 +227,19 @@ namespace LCT.Common
             catch (IOException ex)
             {
                 Logger.Error($"Error occurred while generating backup BOM file", ex);
+                CommonHelper.PublishFilesToArtifact();
                 Environment.ExitCode = -1;
             }
             catch (NotSupportedException ex)
             {
                 Logger.Error($"Error occurred while generating backup BOM file", ex);
+                CommonHelper.PublishFilesToArtifact();
                 Environment.ExitCode = -1;
             }
             catch (UnauthorizedAccessException ex)
             {
                 Logger.Error($"Error occurred while generating backup BOM file", ex);
+                CommonHelper.PublishFilesToArtifact();
                 Environment.ExitCode = -1;
             }
         } 

@@ -9,7 +9,6 @@ using System.IO;
 using System.Threading.Tasks;
 using LCT.Common;
 using LCT.APICommunications.Model;
-using System;
 using log4net;
 using System.Reflection;
 
@@ -34,7 +33,7 @@ namespace LCT.SW360PackageCreator
             {
                 Logger.Error($"Provided Sw360 project is not in active state ,Please make sure you added the correct project details that is in active state..");
                 Logger.Debug($"ValidateAppSettings() : Sw360 project " + projectReleases.Name + " is in " + projectReleases.clearingState + " state.");
-                Environment.Exit(-1);
+                CommonHelper.CallEnvironmentExit(-1);
             }
             else
             {

@@ -73,20 +73,20 @@ namespace LCT.Services
                 {
                     Logger.Debug("GetAvailableReleasesInSw360() : Releases list found empty from the SW360 Server !!");
                     Logger.Error("SW360 server is not accessible while getting All Releases,Please wait for sometime and re run the pipeline again");
-                    Environment.Exit(-1);
+                    CommonHelper.CallEnvironmentExit(-1);
                 }
             }
             catch (HttpRequestException ex)
             {
                 Logger.Debug($"GetAvailableReleasesInSw360():", ex);
                 Logger.Error("SW360 server is not accessible,Please wait for sometime and re run the pipeline again");
-                Environment.Exit(-1);
+                CommonHelper.CallEnvironmentExit(-1);
             }
             catch (InvalidOperationException ex)
             {
                 Logger.Debug($"GetAvailableReleasesInSw360():", ex);
                 Logger.Error("SW360 server is not accessible,Please wait for sometime and re run the pipeline again");
-                Environment.Exit(-1);
+                CommonHelper.CallEnvironmentExit(-1);
             }
 
             return availableComponentsList;
@@ -109,6 +109,7 @@ namespace LCT.Services
             }
             catch (AggregateException e)
             {
+                CommonHelper.PublishFilesToArtifact();
                 Environment.ExitCode = -1;
                 Logger.Error($"GetComponentsClearingStatus():", e);
             }
@@ -127,6 +128,7 @@ namespace LCT.Services
             }
             catch (HttpRequestException ex)
             {
+                CommonHelper.PublishFilesToArtifact();
                 Environment.ExitCode = -1;
                 Logger.Error($"GetReleaseInfoByReleaseId():", ex);
             }
@@ -364,6 +366,7 @@ namespace LCT.Services
             }
             catch (HttpRequestException ex)
             {
+                CommonHelper.PublishFilesToArtifact();
                 Environment.ExitCode = -1;
                 Logger.Error($"GetAvailableComponenentsListFromSw360():", ex);
             }
