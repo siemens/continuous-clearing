@@ -109,7 +109,8 @@ namespace LCT.Services
             }
             catch (AggregateException e)
             {
-                CommonHelper.CallEnvironmentExit(-1);
+                CommonHelper.PublishFilesToArtifact();
+                Environment.ExitCode = -1;
                 Logger.Error($"GetComponentsClearingStatus():", e);
             }
 
@@ -127,7 +128,8 @@ namespace LCT.Services
             }
             catch (HttpRequestException ex)
             {
-                CommonHelper.CallEnvironmentExit(-1);
+                CommonHelper.PublishFilesToArtifact();
+                Environment.ExitCode = -1;
                 Logger.Error($"GetReleaseInfoByReleaseId():", ex);
             }
 
@@ -364,7 +366,8 @@ namespace LCT.Services
             }
             catch (HttpRequestException ex)
             {
-                CommonHelper.CallEnvironmentExit(-1);
+                CommonHelper.PublishFilesToArtifact();
+                Environment.ExitCode = -1;
                 Logger.Error($"GetAvailableComponenentsListFromSw360():", ex);
             }
             return componentsList;

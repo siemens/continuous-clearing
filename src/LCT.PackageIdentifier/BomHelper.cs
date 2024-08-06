@@ -172,7 +172,6 @@ namespace LCT.PackageIdentifier
             return aqlResultList;
         }
 
-
         #endregion
     }
 }

@@ -562,7 +562,8 @@ namespace LCT.SW360PackageCreator
             }
             else
             {
-                CommonHelper.CallEnvironmentExit(-1);
+                CommonHelper.PublishFilesToArtifact();
+                Environment.ExitCode = -1;
                 Logger.Fatal($"Linking release to the project is failed. " +
                             $"Release version - {item.Version} not found under this component - {item.Name}. ");
                 Logger.Error($"Linking release to the project is failed. " +

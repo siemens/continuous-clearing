@@ -315,17 +315,20 @@ namespace LCT.PackageIdentifier
             }
             catch (JsonReaderException ex)
             {
-                CommonHelper.CallEnvironmentExit(-1);
+                CommonHelper.PublishFilesToArtifact();
+                Environment.ExitCode = -1;
                 Logger.Error($"ParsePackageFile():", ex);
             }
             catch (IOException ex)
             {
-                CommonHelper.CallEnvironmentExit(-1);
+                CommonHelper.PublishFilesToArtifact();
+                Environment.ExitCode = -1;
                 Logger.Error($"ParsePackageFile():", ex);
             }
             catch (SecurityException ex)
             {
-                CommonHelper.CallEnvironmentExit(-1);
+                CommonHelper.PublishFilesToArtifact();
+                Environment.ExitCode = -1;
                 Logger.Error($"ParsePackageFile():", ex);
             }
 
