@@ -305,7 +305,7 @@ namespace LCT.APICommunications.UTest
 
         }
         [Test]
-        public async Task Geteleases_ReturnsContent_WhenResponseIsOk()
+        public async Task GetReleases_ReturnsContent_WhenResponseIsOk()
         {
             // Arrange
             var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
