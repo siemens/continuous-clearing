@@ -87,23 +87,22 @@ namespace LCT.Common.UTests
             Assert.AreEqual(1, comparisonData.Components.Count);
         }
 
+       
+        [Test]
+        public void CombineComponentsFromExistingBOM_WhenFilepathIsWrong_ReturnsFailure()
+        {
+            //Arrange
+            Bom bom = new Bom();
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string filePath = outFolder + @"\LCT.Common.UTests\Source";
+            var fileOperations = new FileOperations();
 
-        //This test case ignore due to environment exit comes in the method
-        //[Test]        
-        //public void CombineComponentsFromExistingBOM_WhenFilepathIsWrong_ReturnsFailure()
-        //{
-        //    //Arrange
-        //    Bom bom = new Bom();
-        //    string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-        //    string outFolder = Path.GetDirectoryName(exePath);
-        //    string filePath = outFolder + @"\LCT.Common.UTests\Source";
-        //    var fileOperations = new FileOperations();
+            //Act
+            Bom comparisonData = fileOperations.CombineComponentsFromExistingBOM(bom, filePath);
 
-        //    //Act
-        //    Bom comparisonData = fileOperations.CombineComponentsFromExistingBOM(bom, filePath);
-
-        //    //Assert
-        //    Assert.AreEqual(null, comparisonData.Components);
-        //}
+            //Assert
+            Assert.AreEqual(null, comparisonData.Components);
+        }
     }
 }
