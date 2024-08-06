@@ -79,7 +79,8 @@ namespace LCT.ArtifactoryUploader
             // set the error code
             if (uploaderKpiData.PackagesNotUploadedDueToError > 0 || uploaderKpiData.PackagesNotExistingInRemoteCache > 0)
             {
-                CommonHelper.CallEnvironmentExit(2);
+                CommonHelper.PublishFilesToArtifact();
+                Environment.Exit(2);
                 Logger.Debug("Setting ExitCode to 2");
             }
         }

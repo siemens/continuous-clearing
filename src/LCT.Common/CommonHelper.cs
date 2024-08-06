@@ -156,7 +156,8 @@ namespace LCT.Common
             if (componentInfo.Count > 0 || lstReleaseNotCreated.Count > 0)
             {
                 Logger.Logger.Log(null, Level.Alert, "Action Item required by the user:\n", null);
-                CallEnvironmentExit(2);
+                PublishFilesToArtifact();
+                Environment.Exit(2);
             }
 
             if (componentInfo.Count > 0)
@@ -202,7 +203,8 @@ namespace LCT.Common
 
             if (components.Count > 0)
             {
-                CallEnvironmentExit(2);
+                PublishFilesToArtifact();
+                Environment.Exit(2);
                 Logger.Logger.Log(null, Level.Alert, "* Components Not linked to project :", null);
                 Logger.Logger.Log(null, Level.Alert, " Can be linked manually OR Check the Logs AND RE-Run", null);
                 Logger.Logger.Log(null, Level.Alert, $"{"=",5}{string.Join("", Enumerable.Repeat("=", 98)),5}", null);
@@ -257,11 +259,6 @@ namespace LCT.Common
             {
                 Publish artifactPublisher = new Publish(Log4Net.CatoolLogPath, FileOperations.CatoolBomFilePath);
                 artifactPublisher.UploadLogs();
-                EnvironmentExit(code);
-            }
-            else
-            {
-                PublishFilesToArtifact();
                 EnvironmentExit(code);
             }
         }

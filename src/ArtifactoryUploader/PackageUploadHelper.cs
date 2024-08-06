@@ -983,7 +983,8 @@ namespace LCT.ArtifactoryUploader
 
             if (SetWarningCode)
             {
-                CommonHelper.CallEnvironmentExit(2);
+                CommonHelper.PublishFilesToArtifact();
+                Environment.Exit(2);
                 Logger.Debug("Setting ExitCode to 2");
             }
 

@@ -42,7 +42,8 @@ namespace LCT.Common
             {
                 Logger.Debug($"Argument Count : {args.Length}");
                 DisplayHelp();
-                CommonHelper.CallEnvironmentExit(0);
+                CommonHelper.PublishFilesToArtifact();
+                Environment.Exit(0);
             }
             string settingsFilePath = GetConfigFilePathFromArgs(args, jsonSettingsFileName);
             Logger.Logger.Log(null, Level.Notice, $"Settings File: {settingsFilePath}", null);
