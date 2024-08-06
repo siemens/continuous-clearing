@@ -305,6 +305,7 @@ namespace LCT.APICommunications.UTest
 
         }
         [Test]
+
         public async Task GetReleases_ReturnsContent_WhenResponseIsOk()
         {
             // Arrange
