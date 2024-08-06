@@ -38,8 +38,12 @@ namespace LCT.ArtifactPublisher
         {
             try
             {
-                // Output the artifact upload command
-                Console.WriteLine($"##vso[artifact.upload containerfolder={LogContainerFolderName};artifactname={LogArtifactFolderName}]{CatoolLogPath}");
+                if (!string.IsNullOrEmpty(CatoolLogPath) && File.Exists(CatoolLogPath))
+                {
+                    // Output the artifact upload command
+                    Console.WriteLine($"##vso[artifact.upload containerfolder={LogContainerFolderName};artifactname={LogArtifactFolderName}]{CatoolLogPath}");
+                }
+                    
             }
             catch (IOException ex)
             {
