@@ -2,8 +2,7 @@
 // SPDX-FileCopyrightText: 2024 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
-// -------------------------------------------------------------------------------------------------------------------- 
-
+// --------------------------------------------------------------------------------------------------------------------
 
 using LCT.APICommunications.Model;
 using LCT.Facade.Interfaces;
@@ -19,224 +18,255 @@ using System.Threading.Tasks;
 
 namespace LCT.Services.UTest
 {
-  /// <summary>
-  /// The Sw360CommonServiceTest class
-  /// </summary>
-  [TestFixture]
-  internal class Sw360CommonServiceTest
-  {
-    [Test]
-    public async Task GetComponentDataByExternalId_PassComponentInfo_ReturnsComponentStatus()
+    /// <summary>
+    /// The Sw360CommonServiceTest class
+    /// </summary>
+    [TestFixture]
+    internal class Sw360CommonServiceTest
     {
-      // Arrange
-      Self self = new();
-      Links links = new();
-      Sw360Components sw360Components = new();
-      var componentList = new List<Sw360Components>();
-      ComponentEmbedded componentEmbedded = new();
+        private Mock<ISW360ApicommunicationFacade> sw360ApiCommunicationFacade;
+        private ISW360CommonService sW360CommonService;
 
-      self.Href = "http://localhost:8090/resource/api/components/uiweriwfoowefih87398r3ur093u0";
-      links.Self = self;
-      sw360Components.Name = "Zone.js";
-      sw360Components.Links = links;
-      sw360Components.ExternalIds = new ExternalIds() { Package_Url = "pkg:npm/zone.js" };
-      componentList.Add(sw360Components);
-      componentEmbedded.Sw360components = componentList;
+        [SetUp]
+        public void SetUp()
+        {
+            sw360ApiCommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
+            sW360CommonService = new SW360CommonService(sw360ApiCommunicationFacade.Object);
+        }
 
-      ComponentsModel componentsModel = new ComponentsModel();
-      componentsModel.Embedded = componentEmbedded;
+        [Test]
+        public async Task GetComponentDataByExternalId_PassComponentInfo_ReturnsComponentStatus()
+        {
+            // Arrange
+            var componentList = CreateComponentList();
+            var componentsModel = new ComponentsModel { Embedded = new ComponentEmbedded { Sw360components = componentList } };
+            var componentsModelSerialized = JsonConvert.SerializeObject(componentsModel);
+            var httpResponseMessage = CreateHttpResponseMessage(componentsModelSerialized);
 
-      var componentsModelSerialized = JsonConvert.SerializeObject(componentsModel);
-      HttpResponseMessage httpResponseMessage = new HttpResponseMessage();
-      var content = new StringContent(componentsModelSerialized, Encoding.UTF8, "application/json");
-      httpResponseMessage.Content = content;
+            sw360ApiCommunicationFacade.Setup(
+                x => x.GetComponentByExternalId(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
 
-      Mock<ISW360ApicommunicationFacade> sw360ApiCommunicationFacade = new();
-      sw360ApiCommunicationFacade.Setup(
-          x => x.GetComponentByExternalId(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
+            // Act
+            var actual = await sW360CommonService.GetComponentDataByExternalId("zone.js", "pkg:npm/zone.js");
 
-      // Act
-      ISW360CommonService sW360CommonService = new SW360CommonService(sw360ApiCommunicationFacade.Object);
-      var actual = await sW360CommonService.GetComponentDataByExternalId("zone.js", "pkg:npm/zone.js");
+            // Assert
+            Assert.That(actual, Is.Not.Null);
+            Assert.That(actual.isComponentExist, Is.True);
+            Assert.That(actual.Sw360components.Name, Is.EqualTo("Zone.js"));
+        }
 
-      // Assert
-      Assert.That(actual, Is.Not.Null);
+        [Test]
+        public async Task GetComponentDataByExternalId_PassComponentInfo_ThrowsHttpRequestException()
+        {
+            // Arrange
+            sw360ApiCommunicationFacade.Setup(
+                x => x.GetComponentByExternalId(It.IsAny<string>(), It.IsAny<string>())).Throws<HttpRequestException>();
+
+            // Act
+            var actual = await sW360CommonService.GetComponentDataByExternalId("zone.js", "pkg:npm/zone.js");
+
+            // Assert
+            Assert.That(actual, Is.Not.Null);
+            Assert.That(actual.isComponentExist, Is.False);
+        }
+
+        [Test]
+        public async Task GetComponentDataByExternalId_PassComponentInfo_ThrowsAggregateException()
+        {
+            // Arrange
+            sw360ApiCommunicationFacade.Setup(
+                x => x.GetComponentByExternalId(It.IsAny<string>(), It.IsAny<string>())).Throws<AggregateException>();
+
+            // Act
+            var actual = await sW360CommonService.GetComponentDataByExternalId("zone.js", "pkg:npm/zone.js");
+
+            // Assert
+            Assert.That(actual, Is.Not.Null);
+            Assert.That(actual.isComponentExist, Is.False);
+        }
+
+        [Test]
+        public async Task GetReleaseDataByExternalId_PassReleaseInfo_ReturnsReleaseStatus()
+        {
+            // Arrange
+            var releaseList = CreateReleaseList();
+            var componentsRelease = new ComponentsRelease { Embedded = new ReleaseEmbedded { Sw360Releases = releaseList } };
+            var componentsReleaseSerialized = JsonConvert.SerializeObject(componentsRelease);
+            var httpResponseMessage = CreateHttpResponseMessage(componentsReleaseSerialized);
+
+            sw360ApiCommunicationFacade.Setup(
+                x => x.GetReleaseByExternalId(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
+
+            // Act
+            var actual = await sW360CommonService.GetReleaseDataByExternalId("zone.js", "1.0.0", "pkg:npm/zone.js@1.0.0");
+
+            // Assert
+            Assert.That(actual, Is.Not.Null);
+            Assert.That(actual.isReleaseExist, Is.True);
+            Assert.That(actual.sw360Releases.Name, Is.EqualTo("Zone.js"));
+            Assert.That(actual.sw360Releases.Version, Is.EqualTo("1.0.0"));
+        }
+
+        [Test]
+        public async Task GetReleaseDataByExternalId_PassReleaseInfo_ThrowsHttpRequestException()
+        {
+            // Arrange
+            sw360ApiCommunicationFacade.Setup(
+                x => x.GetReleaseByExternalId(It.IsAny<string>(), It.IsAny<string>())).Throws<HttpRequestException>();
+
+            // Act
+            var actual = await sW360CommonService.GetReleaseDataByExternalId("zone.js", "1.0.0", "pkg:npm/zone.js@1.0.0");
+
+            // Assert
+            Assert.That(actual, Is.Not.Null);
+            Assert.That(actual.isReleaseExist, Is.False);
+        }
+
+        [Test]
+        public async Task GetReleaseDataByExternalId_PassReleaseInfo_ThrowsAggregateException()
+        {
+            // Arrange
+            sw360ApiCommunicationFacade.Setup(
+                x => x.GetReleaseByExternalId(It.IsAny<string>(), It.IsAny<string>())).Throws<AggregateException>();
+
+            // Act
+            var actual = await sW360CommonService.GetReleaseDataByExternalId("zone.js", "1.0.0", "pkg:npm/zone.js@1.0.0");
+
+            // Assert
+            Assert.That(actual, Is.Not.Null);
+            Assert.That(actual.isReleaseExist, Is.False);
+        }
+
+     
+        [Test]
+        public async Task GetReleaseIdByComponentId_PassComponentId_ThrowsHttpRequestException()
+        {
+            // Arrange
+            sw360ApiCommunicationFacade.Setup(
+                x => x.GetReleaseOfComponentById(It.IsAny<string>())).Throws<HttpRequestException>();
+
+            // Act
+            var actual = await sW360CommonService.GetReleaseIdByComponentId("uiweriwfoowefih87398r3ur837489", "1.0.0");
+
+            // Assert
+            Assert.That(actual, Is.Empty);
+        }
+
+        [Test]
+        public async Task GetReleaseIdByComponentId_PassComponentId_ThrowsAggregateException()
+        {
+            // Arrange
+            sw360ApiCommunicationFacade.Setup(
+                x => x.GetReleaseOfComponentById(It.IsAny<string>())).Throws<AggregateException>();
+
+            // Act
+            var actual = await sW360CommonService.GetReleaseIdByComponentId("uiweriwfoowefih87398r3ur837489", "1.0.0");
+
+            // Assert
+            Assert.That(actual, Is.Empty);
+        }
+
+        private static List<Sw360Components> CreateComponentList()
+        {
+            var self = new Self { Href = "http://localhost:8090/resource/api/components/uiweriwfoowefih87398r3ur093u0" };
+            var links = new Links { Self = self };
+            var sw360Components = new Sw360Components
+            {
+                Name = "Zone.js",
+                Links = links,
+                ExternalIds = new ExternalIds { Package_Url = "pkg:npm/zone.js" }
+            };
+            return new List<Sw360Components> { sw360Components };
+        }
+
+        private static List<Sw360Releases> CreateReleaseList()
+        {
+            var self = new Self { Href = "http://localhost:8090/resource/api/releases/uiweriwfoowefih87398r3ur093u0" };
+            var links = new Links { Self = self };
+            var sw360Releases = new Sw360Releases
+            {
+                Name = "Zone.js",
+                Version = "1.0.0",
+                Links = links,
+                ExternalIds = new ExternalIds { Package_Url = "pkg:npm/zone.js@1.0.0" }
+            };
+            return new List<Sw360Releases> { sw360Releases };
+        }
+
+        private static HttpResponseMessage CreateHttpResponseMessage(string content)
+        {
+            return new HttpResponseMessage
+            {
+                Content = new StringContent(content, Encoding.UTF8, "application/json")
+            };
+        }
+
+        private static Dictionary<string, List<string>> GetReleaseIdOfCompnentObject()
+        {
+            return new Dictionary<string, List<string>> {
+                { "uiweriwfoowefih87398r3ur093u0", new List<string> { "1.0.0" } }
+            };
+        }
+        [Test]
+        public async Task GetComponentDataByExternalId_WithValidComponentExternalId_ReturnsComponentStatus()
+        {
+            // Arrange
+            var componentList = CreateComponentList();
+            var componentsModel = new ComponentsModel { Embedded = new ComponentEmbedded { Sw360components = componentList } };
+            var componentsModelSerialized = JsonConvert.SerializeObject(componentsModel);
+            var httpResponseMessage = CreateHttpResponseMessage(componentsModelSerialized);
+
+            sw360ApiCommunicationFacade.Setup(
+                x => x.GetComponentByExternalId(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
+
+            // Act
+            var actual = await sW360CommonService.GetComponentDataByExternalId("zone.js", "pkg:npm/zone.js");
+
+            // Assert
+            Assert.That(actual, Is.Not.Null);
+            Assert.That(actual.isComponentExist, Is.True);
+            Assert.That(actual.Sw360components.Name, Is.EqualTo("Zone.js"));
+        }
+
+        [Test]
+        public async Task GetComponentDataByExternalId_WithEmptyComponentList_ReturnsComponentStatus()
+        {
+            // Arrange
+            var componentsModel = new ComponentsModel { Embedded = new ComponentEmbedded { Sw360components = new List<Sw360Components>() } };
+            var componentsModelSerialized = JsonConvert.SerializeObject(componentsModel);
+            var httpResponseMessage = CreateHttpResponseMessage(componentsModelSerialized);
+
+            sw360ApiCommunicationFacade.Setup(
+                x => x.GetComponentByExternalId(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
+
+            // Act
+            var actual = await sW360CommonService.GetComponentDataByExternalId("zone.js", "pkg:npm/zone.js");
+
+            // Assert
+            Assert.That(actual, Is.Not.Null);
+            Assert.That(actual.isComponentExist, Is.False);
+        }
+
+        [Test]
+        public async Task GetComponentDataByExternalId_WithDifferentExternalIdKey_ReturnsComponentStatus()
+        {
+            // Arrange
+            var componentList = CreateComponentList();
+            var componentsModel = new ComponentsModel { Embedded = new ComponentEmbedded { Sw360components = componentList } };
+            var componentsModelSerialized = JsonConvert.SerializeObject(componentsModel);
+            var httpResponseMessage = CreateHttpResponseMessage(componentsModelSerialized);
+
+            sw360ApiCommunicationFacade.Setup(
+                x => x.GetComponentByExternalId(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
+
+            // Act
+            var actual = await sW360CommonService.GetComponentDataByExternalId("zone.js", "pkg:npm/zone.js?package-url=");
+
+            // Assert
+            Assert.That(actual, Is.Not.Null);
+            Assert.That(actual.isComponentExist, Is.True);
+            Assert.That(actual.Sw360components.Name, Is.EqualTo("Zone.js"));
+        }
+
     }
-
-    [Test]
-    public async Task GetComponentDataByExternalId_PassComponentInfo_ThrowsHttpRequestException()
-    {
-      // Arrange
-      Mock<ISW360ApicommunicationFacade> sw360ApiCommunicationFacade = new();
-      sw360ApiCommunicationFacade.Setup(
-          x => x.GetComponentByExternalId(It.IsAny<string>(), It.IsAny<string>())).Throws<HttpRequestException>();
-
-      // Act
-      ISW360CommonService sW360CommonService = new SW360CommonService(sw360ApiCommunicationFacade.Object);
-      var actual = await sW360CommonService.GetComponentDataByExternalId("zone.js", "pkg:npm/zone.js");
-
-      // Assert
-      Assert.That(actual, Is.Not.Null);
-    }
-
-    [Test]
-    public async Task GetComponentDataByExternalId_PassComponentInfo_ThrowsAggregateException()
-    {
-      // Arrange
-      Mock<ISW360ApicommunicationFacade> sw360ApiCommunicationFacade = new();
-      sw360ApiCommunicationFacade.Setup(
-          x => x.GetComponentByExternalId(It.IsAny<string>(), It.IsAny<string>())).Throws<AggregateException>();
-
-      // Act
-      ISW360CommonService sW360CommonService = new SW360CommonService(sw360ApiCommunicationFacade.Object);
-      var actual = await sW360CommonService.GetComponentDataByExternalId("zone.js", "pkg:npm/zone.js");
-
-      // Assert
-      Assert.That(actual, Is.Not.Null);
-    }
-
-    [Test]
-    public async Task GetReleaseDataByExternalId_PassReleaseInfo_ReturnsReleaseStatus()
-    {
-      // Arrange
-      Self self = new();
-      Links links = new();
-      Sw360Releases sw360Releases = new();
-      var releaseList = new List<Sw360Releases>();
-      ReleaseEmbedded releaseEmbedded = new();
-
-      self.Href = "http://localhost:8090/resource/api/releases/uiweriwfoowefih87398r3ur093u0";
-      links.Self = self;
-      sw360Releases.Name = "Zone.js";
-      sw360Releases.Version = "1.0.0";
-      sw360Releases.Links = links;
-      sw360Releases.ExternalIds = new ExternalIds() { Package_Url = "pkg:npm/zone.js@1.0.0" };
-      releaseList.Add(sw360Releases);
-      releaseEmbedded.Sw360Releases = releaseList;
-
-      ComponentsRelease componentsRelease = new ComponentsRelease();
-      componentsRelease.Embedded = releaseEmbedded;
-
-      var componentsReleaseSerialized = JsonConvert.SerializeObject(componentsRelease);
-      HttpResponseMessage httpResponseMessage = new HttpResponseMessage();
-      var content = new StringContent(componentsReleaseSerialized, Encoding.UTF8, "application/json");
-      httpResponseMessage.Content = content;
-
-      Mock<ISW360ApicommunicationFacade> sw360ApiCommunicationFacade = new();
-      sw360ApiCommunicationFacade.Setup(
-          x => x.GetReleaseByExternalId(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
-
-      // Act
-      ISW360CommonService sW360CommonService = new SW360CommonService(sw360ApiCommunicationFacade.Object);
-      var actual = await sW360CommonService.GetReleaseDataByExternalId("zone.js", "1.0.0", "pkg:npm/zone.js@1.0.0");
-
-      // Assert
-      Assert.That(actual, Is.Not.Null);
-    }
-
-    [Test]
-    public async Task GetReleaseDataByExternalId_PassReleaseInfo_ThrowsHttpRequestException()
-    {
-      // Arrange
-
-      Mock<ISW360ApicommunicationFacade> sw360ApiCommunicationFacade = new();
-      sw360ApiCommunicationFacade.Setup(
-          x => x.GetReleaseByExternalId(It.IsAny<string>(), It.IsAny<string>())).Throws<HttpRequestException>();
-
-      // Act
-      ISW360CommonService sW360CommonService = new SW360CommonService(sw360ApiCommunicationFacade.Object);
-      var actual = await sW360CommonService.GetReleaseDataByExternalId("zone.js", "1.0.0", "pkg:npm/zone.js@1.0.0");
-
-      // Assert
-      Assert.That(actual, Is.Not.Null);
-    }
-
-    [Test]
-    public async Task GetReleaseDataByExternalId_PassReleaseInfo_ThrowsHttpAggregateException()
-    {
-      // Arrange
-
-      Mock<ISW360ApicommunicationFacade> sw360ApiCommunicationFacade = new();
-      sw360ApiCommunicationFacade.Setup(
-          x => x.GetReleaseByExternalId(It.IsAny<string>(), It.IsAny<string>())).Throws<AggregateException>();
-
-      // Act
-      ISW360CommonService sW360CommonService = new SW360CommonService(sw360ApiCommunicationFacade.Object);
-      var actual = await sW360CommonService.GetReleaseDataByExternalId("zone.js", "1.0.0", "pkg:npm/zone.js@1.0.0");
-
-      // Assert
-      Assert.That(actual, Is.Not.Null);
-    }
-
-    [Test]
-    public async Task GetReleaseIdByComponentId_PassComponentId_ReturnsReleaseId()
-    {
-      ReleaseIdOfComponent releaseIdOfComponent = GetReleaseIdOfCompnentObject();
-      var releaseIdOfComponentSerialized = JsonConvert.SerializeObject(releaseIdOfComponent);
-      Mock<ISW360ApicommunicationFacade> sw360ApiCommunicationFacade = new();
-      sw360ApiCommunicationFacade.Setup(
-          x => x.GetReleaseOfComponentById(It.IsAny<string>())).ReturnsAsync(releaseIdOfComponentSerialized);
-
-      // Act
-      ISW360CommonService sW360CommonService = new SW360CommonService(sw360ApiCommunicationFacade.Object);
-      var actual = await sW360CommonService.GetReleaseIdByComponentId("uiweriwfoowefih87398r3ur837489", "1.0.0");
-
-      // Assert
-      Assert.That("uiweriwfoowefih87398r3ur093u0", Is.EqualTo(actual));
-    }
-
-    [Test]
-    public async Task GetReleaseIdByComponentId_PassComponentId_ThrowsHttpRequestException()
-    {
-      // Arrange
-      Mock<ISW360ApicommunicationFacade> sw360ApiCommunicationFacade = new();
-      sw360ApiCommunicationFacade.Setup(
-          x => x.GetReleaseOfComponentById(It.IsAny<string>())).Throws<HttpRequestException>();
-
-      // Act
-      ISW360CommonService sW360CommonService = new SW360CommonService(sw360ApiCommunicationFacade.Object);
-      var actual = await sW360CommonService.GetReleaseIdByComponentId("uiweriwfoowefih87398r3ur837489", "1.0.0");
-
-      // Assert
-      Assert.That("uiweriwfoowefih87398r3ur093u0", Is.Not.EqualTo(actual));
-    }
-
-    [Test]
-    public async Task GetReleaseIdByComponentId_PassComponentId_ThrowsAggregateException()
-    {
-      // Arrange
-      Mock<ISW360ApicommunicationFacade> sw360ApiCommunicationFacade = new();
-      sw360ApiCommunicationFacade.Setup(
-          x => x.GetReleaseOfComponentById(It.IsAny<string>())).Throws<AggregateException>();
-
-      // Act
-      ISW360CommonService sW360CommonService = new SW360CommonService(sw360ApiCommunicationFacade.Object);
-      var actual = await sW360CommonService.GetReleaseIdByComponentId("uiweriwfoowefih87398r3ur837489", "1.0.0");
-
-      // Assert
-      Assert.That("uiweriwfoowefih87398r3ur093u0", Is.Not.EqualTo(actual));
-    }
-
-    private static ReleaseIdOfComponent GetReleaseIdOfCompnentObject()
-    {
-      // Arrange
-      ReleaseIdOfComponent releaseIdOfComponent = new();
-
-      Self self = new();
-      Links links = new();
-      Sw360Releases sw360Releases = new();
-      var releaseList = new List<Sw360Releases>();
-      ReleaseEmbedded releaseEmbedded = new();
-
-      self.Href = "http://localhost:8090/resource/api/releases/uiweriwfoowefih87398r3ur093u0";
-      links.Self = self;
-      sw360Releases.Name = "Zone.js";
-      sw360Releases.Version = "1.0.0";
-      sw360Releases.Links = links;
-      releaseList.Add(sw360Releases);
-      releaseEmbedded.Sw360Releases = releaseList;
-      releaseIdOfComponent.Embedded = releaseEmbedded;
-      return releaseIdOfComponent;
-    }
-  }
 }

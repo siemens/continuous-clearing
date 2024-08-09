@@ -25,6 +25,9 @@ namespace LCT.Services.UTest
     internal class Sw360ServiceTest
     {
 
+        private Mock<ISW360ApicommunicationFacade> _mockSW360ApiCommunicationFacade;
+        private Sw360Service _sw360Service;
+         private Mock<ISW360ApicommunicationFacade> _mockFacade;
         [Test]
         public async Task GetProjectNameByProjectIDFromSW360_ProvidedProjectIdReturnsProjectName()
         {
@@ -465,5 +468,183 @@ namespace LCT.Services.UTest
             // Assert
             Assert.That(actual.AttachmentLink, Is.Null);
         }
+        [Test]
+        public async Task GetComponentReleaseID_Success()
+        {
+            // Arrange
+            string componentName = "ComponentName";
+            string version = "1.0";
+            string mockApiResponse = "{\"_embedded\":{\"sw360:releases\":[{\"name\":\"ComponentName\",\"version\":\"1.0\",\"_links\":{\"self\":{\"href\":\"http://example.com/release/123\"}}}]}}";
+
+            Mock<ISW360ApicommunicationFacade> swApiCommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
+            swApiCommunicationFacade.Setup(x => x.GetReleaseByCompoenentName(componentName)).ReturnsAsync(mockApiResponse);
+
+            ISW360Service sW360Service = new Sw360Service(swApiCommunicationFacade.Object);
+
+            // Act
+            string releaseId = await sW360Service.GetComponentReleaseID(componentName, version);
+
+            // Assert
+            Assert.AreEqual("123", releaseId);
+        }
+
+        [Test]
+        public async Task GetComponentReleaseID_HttpRequestException_ReturnsEmptyString()
+        {
+            // Arrange
+            string componentName = "ComponentName";
+            string version = "1.0";
+
+            Mock<ISW360ApicommunicationFacade> swApiCommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
+            swApiCommunicationFacade.Setup(x => x.GetReleaseByCompoenentName(componentName)).ThrowsAsync(new HttpRequestException());
+
+            ISW360Service sW360Service = new Sw360Service(swApiCommunicationFacade.Object);
+
+            // Act
+            string releaseId = await sW360Service.GetComponentReleaseID(componentName, version);
+
+            // Assert
+            Assert.AreEqual("", releaseId);
+        }
+        [Test]
+        public async Task GetReleaseInfoByReleaseId_ForInvalidReleaseLink_ReturnsNotFoundStatusCode()
+        {
+            // Arrange
+            string releaseId = "http://localhost:8090/resource/api/releases/invalidReleaseId";
+            Mock<ISW360ApicommunicationFacade> swApiCommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
+            HttpResponseMessage httpResponse = new HttpResponseMessage(HttpStatusCode.NotFound);
+            swApiCommunicationFacade.Setup(x => x.GetReleaseById(It.IsAny<string>())).ReturnsAsync(httpResponse);
+
+            // Act
+            ISW360Service sW360Service = new Sw360Service(swApiCommunicationFacade.Object);
+            HttpResponseMessage responseMessage = await sW360Service.GetReleaseInfoByReleaseId(releaseId);
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.NotFound, responseMessage.StatusCode);
+        }
+        [Test]
+        public async Task GetComponentReleaseID_ShouldReturnReleaseId_WhenComponentExists()
+        {
+            // Arrange
+            string componentName = "TestComponent";
+            string version = "1.0";
+            string response = @"{
+                ""_embedded"": {
+                    ""sw360Releases"": [
+                        {
+                            ""name"": ""TestComponent"",
+                            ""version"": ""1.0"",
+                            ""links"": {
+                                ""self"": {
+                                    ""href"": ""/releases/123""
+                                }
+                            }
+                        }
+                    ]
+                }
+            }";
+            _mockSW360ApiCommunicationFacade.Setup(x => x.GetReleaseByCompoenentName(componentName)).ReturnsAsync(response);
+
+            // Act
+            string releaseId = await _sw360Service.GetComponentReleaseID(componentName, version);
+
+            // Assert
+            Assert.AreEqual("123", releaseId);
+        }
+
+        [Test]
+        public async Task GetComponentReleaseID_ShouldReturnEmptyString_WhenComponentDoesNotExist()
+        {
+            // Arrange
+            string componentName = "TestComponent";
+            string version = "1.0";
+            string response = @"{
+                ""_embedded"": {
+                    ""sw360Releases"": []
+                }
+            }";
+            _mockSW360ApiCommunicationFacade.Setup(x => x.GetReleaseByCompoenentName(componentName)).ReturnsAsync(response);
+
+            // Act
+            string releaseId = await _sw360Service.GetComponentReleaseID(componentName, version);
+
+            // Assert
+            Assert.AreEqual("", releaseId);
+        }
+
+        [Test]
+        public async Task GetComponentReleaseID_ShouldReturnEmptyString_WhenHttpRequestFails()
+        {
+            // Arrange
+            string componentName = "TestComponent";
+            string version = "1.0";
+            _mockSW360ApiCommunicationFacade.Setup(x => x.GetReleaseByCompoenentName(componentName)).ThrowsAsync(new HttpRequestException());
+
+            // Act
+            string releaseId = await _sw360Service.GetComponentReleaseID(componentName, version);
+
+            // Assert
+            Assert.AreEqual("", releaseId);
+        }
+        [Test]
+        public async Task GetAttachmentDownloadLink_WhenReleaseAttachmentUrlIsNullOrWhiteSpace_ReturnsEmptyAttachmentHash()
+        {
+            // Arrange
+            string releaseAttachmentUrl = "";
+
+            // Act
+            var result = await _sw360Service.GetAttachmentDownloadLink(releaseAttachmentUrl);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("", result.AttachmentLink);
+            Assert.AreEqual("", result.SourceDownloadUrl);
+            Assert.IsTrue(result.isAttachmentSourcenotAvailableInSw360);
+        }
+
+        [Test]
+        public async Task GetAttachmentDownloadLink_WhenReleaseAttachmentUrlThrowsHttpRequestException_ReturnsEmptyAttachmentHash()
+        {
+            // Arrange
+            string releaseAttachmentUrl = "https://example.com/release/attachments";
+
+            _mockSW360ApiCommunicationFacade.Setup(x => x.GetReleaseAttachments(releaseAttachmentUrl))
+                .ThrowsAsync(new HttpRequestException());
+
+            // Act
+            var result = await _sw360Service.GetAttachmentDownloadLink(releaseAttachmentUrl);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("", result.AttachmentLink);
+            Assert.AreEqual("", result.SourceDownloadUrl);
+            Assert.IsTrue(result.isAttachmentSourcenotAvailableInSw360);
+        }
+        [Test]
+        public async Task GetAttachmentDownloadLink_WhenReleaseAttachmentUrlThrowsAggregateException_ReturnsEmptyAttachmentHash()
+        {
+            // Arrange
+            string releaseAttachmentUrl = "https://example.com/release/attachments";
+
+            _mockSW360ApiCommunicationFacade.Setup(x => x.GetReleaseAttachments(releaseAttachmentUrl))
+                .ThrowsAsync(new AggregateException());
+
+            // Act
+            var result = await _sw360Service.GetAttachmentDownloadLink(releaseAttachmentUrl);
+
+            // Assert
+            Assert.IsNotNull(result);
+            if (result != null)
+            {
+                Assert.AreEqual("", result.AttachmentLink ?? ""); // Handle null property
+                Assert.AreEqual("", result.SourceDownloadUrl ?? ""); // Handle null property
+                Assert.IsTrue(result.isAttachmentSourcenotAvailableInSw360);
+            }
+        }
+
+
     }
 }
+
+
+
