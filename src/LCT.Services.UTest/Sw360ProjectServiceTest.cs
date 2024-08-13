@@ -174,40 +174,89 @@ namespace LCT.Services.UTest
 
       // Assert
       Assert.That(actual.Count, Is.EqualTo(expected.Count), "GetProjectLinkedReleasesByProjectId does not return empty on exception");
+        }
+
+        [Test]
+        public async Task GetAlreadyLinkedReleasesByProjectId_PassProjectId_SuccessFullyReturnsReleaseLinked()
+        {
+            // Arrange
+            Self self = new Self() { Href = "http://md2pdvnc:8095/resource/api/releases/ff8d19674e737371be578cafec0c663e" };
+            Links links = new Links() { Self = self };
+
+            Sw360Releases sw360Releases = new Sw360Releases() { Name = "tslib", Version = "2.2.0", Links = links };
+            Sw360LinkedRelease sw360LinkedRelease = new Sw360LinkedRelease();
+            sw360LinkedRelease.Release = "http://md2pdvnc:8095/resource/api/releases/ff8d19674e737371be578cafec0c663e";
+            List<Sw360LinkedRelease> sw360LinkedReleases = new List<Sw360LinkedRelease>();
+            sw360LinkedReleases.Add(sw360LinkedRelease);
+            ProjectReleases projectReleases = new ProjectReleases();
+            projectReleases.Embedded =
+                new ReleaseEmbedded() { Sw360Releases = new List<Sw360Releases>() { sw360Releases } };
+            projectReleases.LinkedReleases = sw360LinkedReleases;
+
+
+            List<ReleaseLinked> expected = new List<ReleaseLinked>();
+            HttpResponseMessage httpResponseMessage = new HttpResponseMessage(System.Net.HttpStatusCode.OK);
+            httpResponseMessage.Content = new ObjectContent<ProjectReleases>(projectReleases, new JsonMediaTypeFormatter(), "application/some-format");
+
+            Mock<ISW360ApicommunicationFacade> sW360ApicommunicationFacadeMck = new Mock<ISW360ApicommunicationFacade>();
+            sW360ApicommunicationFacadeMck.Setup(x => x.GetProjectById(It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
+            ISw360ProjectService sw360ProjectService = new Sw360ProjectService(sW360ApicommunicationFacadeMck.Object);
+
+            // Act
+            List<ReleaseLinked> actual = await sw360ProjectService.GetAlreadyLinkedReleasesByProjectId("shdjdkhsdfdkfhdhifsodo");
+
+
+            // Assert
+            Assert.That(actual.Count, Is.GreaterThan(0));
+        }
+        [Test]
+        public async Task GetAlreadyLinkedReleasesByProjectId_HttpRequestExceptionThrown_ReturnsEmptyList()
+        {
+            // Arrange
+            Mock<ISW360ApicommunicationFacade> _sw360ApicommunicationFacadeMock = new Mock<ISW360ApicommunicationFacade>();
+
+            _sw360ApicommunicationFacadeMock.Setup(x => x.GetProjectById(It.IsAny<string>())).ThrowsAsync(new HttpRequestException("Request failed"));
+            ISw360ProjectService sw360ProjectService = new Sw360ProjectService(_sw360ApicommunicationFacadeMock.Object);
+
+            // Act
+            List<ReleaseLinked> actual = await sw360ProjectService.GetAlreadyLinkedReleasesByProjectId("projectId");
+
+            // Assert
+            Assert.That(actual, Is.Empty, "GetAlreadyLinkedReleasesByProjectId does not return empty on HttpRequestException");
+        }
+
+        [Test]
+        public async Task GetAlreadyLinkedReleasesByProjectId_AggregateExceptionThrown_ReturnsEmptyList()
+        {
+            // Arrange
+            Mock<ISW360ApicommunicationFacade> _sw360ApicommunicationFacadeMock = new Mock<ISW360ApicommunicationFacade>();
+
+            _sw360ApicommunicationFacadeMock.Setup(x => x.GetProjectById(It.IsAny<string>())).ThrowsAsync(new AggregateException("Aggregate exception"));
+            ISw360ProjectService sw360ProjectService = new Sw360ProjectService(_sw360ApicommunicationFacadeMock.Object);
+
+            // Act
+            List<ReleaseLinked> actual = await sw360ProjectService.GetAlreadyLinkedReleasesByProjectId("projectId");
+
+            // Assert
+            Assert.That(actual, Is.Empty, "GetAlreadyLinkedReleasesByProjectId does not return empty on AggregateException");
+        }
+
+        [Test]
+        public async Task GetAlreadyLinkedReleasesByProjectId_StatusNotOk_ReturnsEmptyList()
+        {
+            // Arrange
+            HttpResponseMessage response = new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest);
+            Mock<ISW360ApicommunicationFacade> _sw360ApicommunicationFacadeMock = new Mock<ISW360ApicommunicationFacade>();
+
+            _sw360ApicommunicationFacadeMock.Setup(x => x.GetProjectById(It.IsAny<string>())).ReturnsAsync(response);
+
+            // Act
+            ISw360ProjectService sw360ProjectService = new Sw360ProjectService(_sw360ApicommunicationFacadeMock.Object);
+
+            List<ReleaseLinked> actual = await sw360ProjectService.GetAlreadyLinkedReleasesByProjectId("projectId");
+
+            // Assert
+            Assert.That(actual, Is.Empty, "GetAlreadyLinkedReleasesByProjectId does not return empty on BadRequest status code");
+        }
     }
-
-    [Test]
-    public async Task GetAlreadyLinkedReleasesByProjectId_PassProjectId_SuccessFullyReturnsReleaseLinked()
-    {
-      // Arrange
-      Self self = new Self() { Href = "http://md2pdvnc:8095/resource/api/releases/ff8d19674e737371be578cafec0c663e" };
-      Links links = new Links() { Self = self };
-
-      Sw360Releases sw360Releases = new Sw360Releases() { Name = "tslib", Version = "2.2.0", Links = links };
-      Sw360LinkedRelease sw360LinkedRelease = new Sw360LinkedRelease();
-      sw360LinkedRelease.Release = "http://md2pdvnc:8095/resource/api/releases/ff8d19674e737371be578cafec0c663e";
-      List<Sw360LinkedRelease> sw360LinkedReleases = new List<Sw360LinkedRelease>();
-      sw360LinkedReleases.Add(sw360LinkedRelease);
-      ProjectReleases projectReleases = new ProjectReleases();
-      projectReleases.Embedded =
-          new ReleaseEmbedded() { Sw360Releases = new List<Sw360Releases>() { sw360Releases } };
-      projectReleases.LinkedReleases = sw360LinkedReleases;
-
-
-      List<ReleaseLinked> expected = new List<ReleaseLinked>();
-      HttpResponseMessage httpResponseMessage = new HttpResponseMessage(System.Net.HttpStatusCode.OK);
-      httpResponseMessage.Content = new ObjectContent<ProjectReleases>(projectReleases, new JsonMediaTypeFormatter(), "application/some-format");
-
-      Mock<ISW360ApicommunicationFacade> sW360ApicommunicationFacadeMck = new Mock<ISW360ApicommunicationFacade>();
-      sW360ApicommunicationFacadeMck.Setup(x => x.GetProjectById(It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
-      ISw360ProjectService sw360ProjectService = new Sw360ProjectService(sW360ApicommunicationFacadeMck.Object);
-
-      // Act
-      List<ReleaseLinked> actual = await sw360ProjectService.GetAlreadyLinkedReleasesByProjectId("shdjdkhsdfdkfhdhifsodo");
-
-
-      // Assert
-      Assert.That(actual.Count, Is.GreaterThan(0));
-    }
-  }
 }

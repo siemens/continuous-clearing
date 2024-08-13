@@ -4,8 +4,12 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using LCT.APICommunications.Model;
 using LCT.Common.Model;
+using Moq.Protected;
+using Moq;
 using Newtonsoft.Json;
+using System.Net;
 using System.Text;
 
 namespace LCT.APICommunications.UTest
@@ -148,12 +152,179 @@ namespace LCT.APICommunications.UTest
             HttpContent httpContent;
             var jsonString = JsonConvert.SerializeObject("");
             httpContent = new StringContent(jsonString, Encoding.UTF8, "application/json");
-            
+
             //Arrange
             SW360Apicommunication sW360Apicommunication = new SW360Apicommunication(connectionSettings);
 
             //Assert
             Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.UpdateComponent("", httpContent));
+        }
+        [Test]
+        public async Task GetComponentByName_ReturnsExpectedString_WhenResponseIsOk()
+        {
+            // Arrange
+            var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+            mockHttpMessageHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent("Test content"),
+                });
+
+            var httpClient = new HttpClient(mockHttpMessageHandler.Object);
+            var sW360Apicommunication = new SW360Apicommunication(connectionSettings);
+
+
+
+            // Act
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.GetComponentByName("TestComponentName"));
+
+        }
+        [Test]
+        public async Task UpdateRelease_ReturnsHttpResponseMessage_WhenResponseIsOk()
+        {
+            // Arrange
+            var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+            mockHttpMessageHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                });
+
+            var httpClient = new HttpClient(mockHttpMessageHandler.Object);
+            var sW360Apicommunication = new SW360Apicommunication(connectionSettings);
+
+
+            var httpContent = new StringContent("Test content", Encoding.UTF8, "application/json");
+
+            // Act
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.UpdateRelease("TestReleaseId", httpContent));
+
+
+        }
+        [Test]
+        public async Task CreateComponent_ReturnsHttpResponseMessage_WhenCalledWithCreateComponentContent()
+        {
+            // Arrange
+            var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+            mockHttpMessageHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                });
+
+            var httpClient = new HttpClient(mockHttpMessageHandler.Object);
+            var sW360Apicommunication = new SW360Apicommunication(connectionSettings);
+
+            var createComponentContent = new CreateComponent();
+
+            // Act
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.CreateComponent(createComponentContent));
+
+
+        }
+        [Test]
+        public async Task GetComponentByExternalId_ReturnsHttpResponseMessage_WhenResponseIsOk()
+        {
+            // Arrange
+            var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+            mockHttpMessageHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent("Test content"),
+                });
+
+            var httpClient = new HttpClient(mockHttpMessageHandler.Object);
+            var sW360Apicommunication = new SW360Apicommunication(connectionSettings);
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.GetComponentByExternalId("TestPurlId"));
+
+
+        }
+        [Test]
+        public async Task GetProjects_ReturnsContent_WhenResponseIsOk()
+        {
+            // Arrange
+            var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+            mockHttpMessageHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent("Test content"),
+                });
+
+            var httpClient = new HttpClient(mockHttpMessageHandler.Object);
+            var sW360Apicommunication = new SW360Apicommunication(connectionSettings);
+            // Act
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.GetProjects());
+
+
+        }
+        [Test]
+        public async Task GetComponentByName_ReturnsContent_WhenCalledWithComponentName()
+        {
+            // Arrange
+            var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+            mockHttpMessageHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent("Test content"),
+                });
+
+            var httpClient = new HttpClient(mockHttpMessageHandler.Object);
+            var sW360Apicommunication = new SW360Apicommunication(connectionSettings);
+
+
+            // Act
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.GetComponentByName("TestComponent"));
+
+        }
+        [Test]
+        public async Task GetReleases_ReturnsContent_WhenResponseIsOk()
+        {
+            // Arrange
+            var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+            mockHttpMessageHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent("Test content"),
+                });
+
+            var httpClient = new HttpClient(mockHttpMessageHandler.Object);
+            var sW360Apicommunication = new SW360Apicommunication(connectionSettings);
+
+            // Act
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.GetReleases());
         }
     }
 }
