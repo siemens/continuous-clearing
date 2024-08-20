@@ -49,6 +49,7 @@ namespace LCT.Common.Constants
         public const string JfrogRepoPathNotFound = "Jfrog repo path not found";
         public const string LinkedByCATool = "Linked by CA Tool";
         public const string LinkedByCAToolReleaseRelation = "UNKNOWN";
+        public const string LinkedByCAToolReleaseRelationContained = "CONTAINED";
         public const string ReleaseAttachmentComment = "Attached by CA Tool";
         public const char ForwardSlash = '/';
         public const string SourceURLSuffix = "/srcfiles?fileinfo=1";
