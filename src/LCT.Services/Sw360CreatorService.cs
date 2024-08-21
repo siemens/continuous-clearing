@@ -295,7 +295,7 @@ namespace LCT.Services
                                             releaseLinked => releaseLinked.ReleaseId,
                                             releaseLinked => new AddLinkedRelease()
                                             {
-                                                ReleaseRelation = string.IsNullOrEmpty(releaseLinked.Relation) ? Dataconstant.LinkedByCAToolReleaseRelation
+                                                ReleaseRelation = string.IsNullOrEmpty(releaseLinked.Relation) ? Dataconstant.LinkedByCAToolReleaseRelationContained
                                                                     : releaseLinked.Relation,
                                                 Comment = manuallyLinkedReleases.Exists(r => r.ReleaseId == releaseLinked.ReleaseId) ? releaseLinked.Comment : Dataconstant.LinkedByCATool
                                             });
