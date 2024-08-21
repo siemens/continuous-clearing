@@ -14,6 +14,7 @@ RUN mkdir /opt/DebianImageClearing && \
 
 # Installing required packages
 # Installing syft:v0.90.0
+# Installing specific version of openjdk
 RUN apt-get update && \
     apt-get -y install --no-install-recommends nodejs npm && \
     apt-get -y install --no-install-recommends git && \
