@@ -561,8 +561,7 @@ namespace LCT.SW360PackageCreator
                 ReleasesFoundInCbom.Add(new ReleaseLinked() { Name = item.Name, Version = item.Version, ReleaseId = releaseIdToLink });
             }
             else
-            {
-                CommonHelper.PublishFilesToArtifact();
+            {                
                 Environment.ExitCode = -1;
                 Logger.Fatal($"Linking release to the project is failed. " +
                             $"Release version - {item.Version} not found under this component - {item.Name}. ");

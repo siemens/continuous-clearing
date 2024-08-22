@@ -55,7 +55,6 @@ namespace LCT.SW360PackageCreator
             }
             catch (ArgumentOutOfRangeException ex)
             {
-                CommonHelper.PublishFilesToArtifact();
                 Environment.ExitCode = -1;
                 Logger.Error($"Repository.IdentifyRepoURLForGitHub():{componentName}-{url}", ex);
             }
