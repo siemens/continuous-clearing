@@ -165,14 +165,12 @@ namespace LCT.Common
 
             }
             catch (IOException e)
-            {
-                CommonHelper.PublishFilesToArtifact();
+            {                
                 Environment.ExitCode = -1;
                 Logger.Error($"Error:Invalid path entered,Please check if the comparison BOM  path entered is correct", e);
             }
             catch (UnauthorizedAccessException e)
-            {
-                CommonHelper.PublishFilesToArtifact();
+            {                
                 Environment.ExitCode = -1;
                 Logger.Error($"Error:Invalid path entered,Please check if the comparison BOM path entered is correct", e);
             }            
@@ -227,19 +225,16 @@ namespace LCT.Common
             catch (IOException ex)
             {
                 Logger.Error($"Error occurred while generating backup BOM file", ex);
-                CommonHelper.PublishFilesToArtifact();
                 Environment.ExitCode = -1;
             }
             catch (NotSupportedException ex)
             {
                 Logger.Error($"Error occurred while generating backup BOM file", ex);
-                CommonHelper.PublishFilesToArtifact();
                 Environment.ExitCode = -1;
             }
             catch (UnauthorizedAccessException ex)
             {
                 Logger.Error($"Error occurred while generating backup BOM file", ex);
-                CommonHelper.PublishFilesToArtifact();
                 Environment.ExitCode = -1;
             }
         } 
