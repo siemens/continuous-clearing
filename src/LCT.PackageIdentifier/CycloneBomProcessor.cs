@@ -11,6 +11,7 @@ using LCT.Common.Constants;
 using LCT.Common.Model;
 using log4net;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace LCT.PackageIdentifier
@@ -25,7 +26,7 @@ namespace LCT.PackageIdentifier
                                                      ProjectReleases projectReleases,
                                                      CatoolInfo caToolInformation)
         {
-            Logger.Debug("Starting to add metadata info into the BOM");
+            Logger.Debug("Starting to add metadata info into the BOM");            
             Metadata metadata = new Metadata
             {
                 Tools = new List<Tool>(),
@@ -38,7 +39,7 @@ namespace LCT.PackageIdentifier
             {
                 Name = appSettings.SW360ProjectName,
                 Version = projectReleases.Version,
-                Type = Component.Classification.Application
+                Type = appSettings.ProjectType.ToUpperInvariant().Contains("DEBIAN",System.StringComparison.OrdinalIgnoreCase) || appSettings.ProjectType.ToUpperInvariant().Contains("ALPINE", System.StringComparison.OrdinalIgnoreCase) ? Component.Classification.Container : Component.Classification.Application
             };
             metadata.Component = component;
 
@@ -51,7 +52,7 @@ namespace LCT.PackageIdentifier
 
             bom.Metadata = metadata;
             return bom;
-        }
+        }        
 
         public static void SetMetaDataToolsValues(Metadata metadata, CatoolInfo caToolInformation)
         {
