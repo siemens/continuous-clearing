@@ -11,7 +11,6 @@ using LCT.Common.Constants;
 using LCT.Common.Model;
 using log4net;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 namespace LCT.PackageIdentifier
