@@ -38,7 +38,7 @@ namespace LCT.PackageIdentifier
             {
                 Name = appSettings.SW360ProjectName,
                 Version = projectReleases.Version,
-                Type = appSettings.ProjectType.ToUpperInvariant().Contains("DEBIAN",System.StringComparison.OrdinalIgnoreCase) || appSettings.ProjectType.ToUpperInvariant().Contains("ALPINE", System.StringComparison.OrdinalIgnoreCase) ? Component.Classification.Container : Component.Classification.Application
+                Type = appSettings.ProjectType.ToUpperInvariant().Equals("DEBIAN") || appSettings.ProjectType.ToUpperInvariant().Equals("ALPINE") ? Component.Classification.Container : Component.Classification.Application
             };
             metadata.Component = component;
 
