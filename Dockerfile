@@ -30,5 +30,5 @@ RUN apt-get update && \
 ENV PATH="/root/.local/bin:$PATH"
 
 # Copying files from host to current working directory
-COPY /out/net8.0 /app/out
-# COPY /buildoutput/ /app/out
+# COPY /out/net8.0 /app/out
+ COPY /buildoutput/ /app/out
