@@ -21,8 +21,7 @@ RUN apt-get update && \
     apt-get -y install --no-install-recommends maven && \
     apt-get -y install --no-install-recommends curl && \
     apt-get -y install --no-install-recommends dpkg-dev && \    
-    curl -o openjdk-17-jre-headless_17.0.9+9-1~deb12u1_amd64.deb https://snapshot.debian.org/archive/debian-security/20231105T195436Z/pool/updates/main/o/openjdk-17/openjdk-17-jre-headless_17.0.9+9-1~deb12u1_amd64.deb && \
-    dpkg -i openjdk-17-jre-headless_17.0.9+9-1~deb12u1_amd64.deb && \    
+    apt-get remove -y python3.11 && \    
     curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /opt/DebianImageClearing v0.90.0 && \
     rm -rf /var/lib/apt/lists/* && \
     rm -rf archive.tar.gz
