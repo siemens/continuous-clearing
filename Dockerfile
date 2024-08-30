@@ -21,7 +21,7 @@ RUN apt-get update && \
     apt-get -y install --no-install-recommends maven && \
     apt-get -y install --no-install-recommends curl && \
     apt-get -y install --no-install-recommends dpkg-dev && \    
-    apt-get remove -y python3.11 && \ 
+    dpkg -r --force-depends python3.11 && \ 
     curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /opt/DebianImageClearing v0.90.0
 
 RUN apt-get update && \
