@@ -37,7 +37,8 @@ namespace PackageIdentifier.UTest
             };
             CommonAppSettings appSettings = new CommonAppSettings()
             {
-                CaVersion = "1.2.3"
+                CaVersion = "1.2.3",
+                ProjectType="NPM",
             };
             CatoolInfo caToolInformation = new CatoolInfo() { CatoolVersion = "6.0.0", CatoolRunningLocation="" };
             //Act
@@ -73,6 +74,7 @@ namespace PackageIdentifier.UTest
             {
                 CaVersion = "1.2.3",
                 SW360ProjectName = "Test",
+                ProjectType = "NPM",
             };
 
             Tool tools = new Tool()

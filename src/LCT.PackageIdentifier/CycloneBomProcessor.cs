@@ -25,7 +25,7 @@ namespace LCT.PackageIdentifier
                                                      ProjectReleases projectReleases,
                                                      CatoolInfo caToolInformation)
         {
-            Logger.Debug("Starting to add metadata info into the BOM");
+            Logger.Debug("Starting to add metadata info into the BOM");            
             Metadata metadata = new Metadata
             {
                 Tools = new List<Tool>(),
@@ -38,7 +38,7 @@ namespace LCT.PackageIdentifier
             {
                 Name = appSettings.SW360ProjectName,
                 Version = projectReleases.Version,
-                Type = Component.Classification.Application
+                Type = appSettings.ProjectType.ToUpperInvariant().Equals("DEBIAN") || appSettings.ProjectType.ToUpperInvariant().Equals("ALPINE") ? Component.Classification.Container : Component.Classification.Application
             };
             metadata.Component = component;
 
@@ -51,7 +51,7 @@ namespace LCT.PackageIdentifier
 
             bom.Metadata = metadata;
             return bom;
-        }
+        }        
 
         public static void SetMetaDataToolsValues(Metadata metadata, CatoolInfo caToolInformation)
         {
