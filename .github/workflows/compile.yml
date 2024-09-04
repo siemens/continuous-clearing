@@ -69,13 +69,13 @@ jobs:
         dir  $env:GITHUB_WORKSPACE\out\net8.0
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
          name: buildoutput
          path: ${{ github.workspace }}/out/net8.0
     
     - name: Archive Build Log
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       if: ${{ success() || failure() }}
       with:
         name: Compile_Solution_log
@@ -84,7 +84,7 @@ jobs:
           $env:GITHUB_WORKSPACE/*.binlog  
 
     - name: Archive Build Output
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: continuous-clearing
         path: |
@@ -120,7 +120,7 @@ jobs:
 
 
     - name: Archive Build Output
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: continuous-clearing
         path: |
@@ -133,7 +133,7 @@ jobs:
         Write-Host "::set-output name=nupkg-LicenseClearingTool::continuous-clearing.7.0.0.nupkg"
         
     - name: Archive NuGet Packages
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: nuget-continuous-clearing
         path: |
@@ -170,7 +170,7 @@ jobs:
         
     - name: Archive docker image      
       #if: ${{ false }}  # disable for now
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: docker-continuous-clearing
         path: |
