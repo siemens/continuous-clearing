@@ -39,7 +39,7 @@ namespace LCT.Services
         /// <param name="projectId">projectId</param>
         /// <param name="projectName">projectName</param>
         /// <returns>string</returns>
-        public async Task<string> GetProjectNameByProjectIDFromSW360(string projectId, string projectName)
+        public async Task<string> GetProjectNameByProjectIDFromSW360(string projectId, string projectName, ProjectReleases projectReleases)
         {
             string sw360ProjectName = string.Empty;
 
@@ -56,7 +56,10 @@ namespace LCT.Services
                 {
                     var projectInfo = JsonConvert.DeserializeObject<ProjectReleases>(result);
                     sw360ProjectName = projectInfo?.Name;
-
+                    projectReleases.Name=projectInfo?.Name;
+                    projectReleases.Version=projectInfo?.Version;
+                    projectReleases.state = projectInfo?.state;
+                    projectReleases.clearingState = projectInfo?.clearingState;
                 }
             }
             catch (HttpRequestException ex)

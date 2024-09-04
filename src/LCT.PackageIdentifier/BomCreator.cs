@@ -5,9 +5,11 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
+using LCT.Common.Model;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
@@ -40,7 +42,11 @@ namespace LCT.PackageIdentifier
             CycloneDXBomParser = cycloneDXBomParser;
         }
 
-        public async Task GenerateBom(CommonAppSettings appSettings, IBomHelper bomHelper, IFileOperations fileOperations)
+        public async Task GenerateBom(CommonAppSettings appSettings,
+                                      IBomHelper bomHelper,
+                                      IFileOperations fileOperations,
+                                      ProjectReleases projectReleases,
+                                       CatoolInfo caToolInformation)
         {
             Logger.Debug($"GenerateBom():Start");
             Bom listOfComponentsToBom;
@@ -51,9 +57,13 @@ namespace LCT.PackageIdentifier
                 $"= {listOfComponentsToBom.Components.Count}", null);
 
             bomKpiData.ComponentsInComparisonBOM = listOfComponentsToBom.Components.Count;
+            //Get project details for metadata properties
 
             //sets metadata properties
-            listOfComponentsToBom = CycloneBomProcessor.SetMetadataInComparisonBOM(listOfComponentsToBom, appSettings);
+            listOfComponentsToBom = CycloneBomProcessor.SetMetadataInComparisonBOM(listOfComponentsToBom,
+                                                                                   appSettings,
+                                                                                   projectReleases,
+                                                                                   caToolInformation);
 
             // Writes Comparison Bom
             Logger.Logger.Log(null, Level.Notice, $"Writing CycloneDX BOM..", null);
@@ -89,20 +99,21 @@ namespace LCT.PackageIdentifier
         private static void WriteContentToCycloneDxBOM(CommonAppSettings appSettings, Bom listOfComponentsToBom, ref BomKpiData bomKpiData)
         {
             IFileOperations fileOperations = new FileOperations();
+
             if (string.IsNullOrEmpty(appSettings.IdentifierBomFilePath))
             {
-                fileOperations.WriteContentToFile(listOfComponentsToBom, appSettings.BomFolderPath,
-            FileConstant.BomFileName, appSettings.SW360ProjectName);
+                string formattedString = CommonHelper.AddSpecificValuesToBOMFormat(listOfComponentsToBom);
+                fileOperations.WriteContentToOutputBomFile(formattedString, appSettings.BomFolderPath, FileConstant.BomFileName, appSettings.SW360ProjectName);
             }
             else
             {
                 listOfComponentsToBom = fileOperations.CombineComponentsFromExistingBOM(listOfComponentsToBom, appSettings.IdentifierBomFilePath);
                 bomKpiData.ComponentsInComparisonBOM = listOfComponentsToBom.Components.Count;
-                fileOperations.WriteContentToFile(listOfComponentsToBom, appSettings.BomFolderPath,
-          FileConstant.BomFileName, appSettings.SW360ProjectName);
+                string formattedString = CommonHelper.AddSpecificValuesToBOMFormat(listOfComponentsToBom);
+                fileOperations.WriteContentToOutputBomFile(formattedString, appSettings.BomFolderPath, FileConstant.BomFileName, appSettings.SW360ProjectName);
             }
 
-        }
+        }       
 
         private async Task<Bom> CallPackageParser(CommonAppSettings appSettings)
         {
@@ -154,7 +165,7 @@ namespace LCT.PackageIdentifier
                     comparisonBOMData = bom.Components,
                     internalComponents = new List<Component>()
                 };
-
+                
                 //Identification of internal components
                 Logger.Logger.Log(null, Level.Notice, $"Identifying the internal components", null);
                 lstOfComponents = await parser.IdentificationOfInternalComponents(componentData, appSettings, JFrogService, BomHelper);

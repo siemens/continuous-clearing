@@ -6,14 +6,8 @@
 
 using LCT.Common;
 using LCT.APICommunications;
-using LCT.ArtifactoryUploader.Model;
-using log4net;
-using Newtonsoft.Json;
-using System.IO;
 using System.Net.Http;
-using System.Reflection;
 using System.Threading.Tasks;
-using System.Net;
 using System;
 
 namespace LCT.ArtifactoryUploader
@@ -38,9 +32,8 @@ namespace LCT.ArtifactoryUploader
             catch(HttpRequestException ex)
             {
                 ExceptionHandling.HttpException(ex,responseMessage, "Artifactory");
-                Environment.Exit(-1);
+                CommonHelper.CallEnvironmentExit(-1);
             }
-           
         }
     }
 }

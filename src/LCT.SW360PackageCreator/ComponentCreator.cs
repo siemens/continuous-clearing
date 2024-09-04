@@ -238,7 +238,10 @@ namespace LCT.SW360PackageCreator
 
             // update comparison bom data
             bom = await creatorHelper.GetUpdatedComponentsDetails(ListofBomComponents, UpdatedCompareBomData, sw360Service, bom);
-            fileOperations.WriteContentToFile(bom, bomGenerationPath,
+
+            var formattedString = CycloneDX.Json.Serializer.Serialize(bom);
+            
+            fileOperations.WriteContentToOutputBomFile(formattedString, bomGenerationPath,
                 FileConstant.BomFileName, appSettings.SW360ProjectName);
 
             // write download url not found list into .json file
@@ -262,7 +265,7 @@ namespace LCT.SW360PackageCreator
 
             Logger.Debug($"CreateComponentInSw360():End");
         }
-
+               
         private async Task CreateComponent(ICreatorHelper creatorHelper,
             ISw360CreatorService sw360CreatorService, List<ComparisonBomData> componentsToBoms,
             string sw360Url, CommonAppSettings appSettings)
@@ -505,7 +508,7 @@ namespace LCT.SW360PackageCreator
         {
             if (item.ComponentStatus == Dataconstant.Available && item.ReleaseStatus == Dataconstant.Available)
             {
-                Logger.Logger.Log(null, Level.Notice, $"Release exists : Name - {item.Name} , version - {item.Version}", null);
+                Logger.Logger.Log(null, Level.Notice, $"Release exists in SW360 : Name - {item.Name} , version - {item.Version}", null);
                 string releaseLink = item.ReleaseLink ?? string.Empty;
                 string releaseId = CommonHelper.GetSubstringOfLastOccurance(releaseLink, "/");
                 if (!string.IsNullOrWhiteSpace(releaseId))
@@ -558,7 +561,7 @@ namespace LCT.SW360PackageCreator
                 ReleasesFoundInCbom.Add(new ReleaseLinked() { Name = item.Name, Version = item.Version, ReleaseId = releaseIdToLink });
             }
             else
-            {
+            {                
                 Environment.ExitCode = -1;
                 Logger.Fatal($"Linking release to the project is failed. " +
                             $"Release version - {item.Version} not found under this component - {item.Name}. ");

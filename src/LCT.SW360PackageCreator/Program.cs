@@ -4,6 +4,7 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
@@ -48,10 +49,15 @@ namespace LCT.SW360PackageCreator
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
             ISW360ApicommunicationFacade sW360ApicommunicationFacade;
             ISw360ProjectService sw360ProjectService= Getsw360ProjectServiceObject(appSettings, out sW360ApicommunicationFacade);
-            
+            ProjectReleases projectReleases = new ProjectReleases();
+            // do not change the order of getting ca tool information
+            CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
+            Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
+
+
             string FolderPath = InitiateLogger(appSettings);
             settingsManager.CheckRequiredArgsToRun(appSettings, "Creator");
-            await CreatorValidator.ValidateAppSettings(appSettings, sw360ProjectService);
+            await CreatorValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
 
             Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Package creator >>>>>====================", null);
             Logger.Logger.Log(null, Level.Notice, $"\nStart of Package creator execution : {DateTime.Now}", null);
@@ -60,9 +66,10 @@ namespace LCT.SW360PackageCreator
                 Logger.Logger.Log(null, Level.Alert, $"Package creator is running in TEST mode \n", null);
 
             Logger.Logger.Log(null, Level.Notice, $"Input parameters used in Package Creator:\n\t" +
+              $"CaToolVersion\t\t --> {caToolInformation.CatoolVersion}\n\t" +
+              $"CaToolRunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
               $"BomFilePath\t\t --> {appSettings.BomFilePath}\n\t" +
               $"SW360Url\t\t --> {appSettings.SW360URL}\n\t" +
-              $"FossologyUrl\t\t --> {appSettings.Fossologyurl}\n\t" +
               $"SW360AuthTokenType\t --> {appSettings.SW360AuthTokenType}\n\t" +
               $"SW360ProjectName\t --> {appSettings.SW360ProjectName}\n\t" +
               $"SW360ProjectID\t\t --> {appSettings.SW360ProjectID}\n\t" +
@@ -76,6 +83,18 @@ namespace LCT.SW360PackageCreator
             await InitiatePackageCreatorProcess(appSettings, sw360ProjectService, sW360ApicommunicationFacade);
 
             Logger.Logger.Log(null, Level.Notice, $"End of Package Creator execution: {DateTime.Now}\n", null);
+            
+            // publish logs and bom file to pipeline artifact
+            CommonHelper.PublishFilesToArtifact();
+        }
+
+        private static CatoolInfo GetCatoolVersionFromProjectfile()
+        {
+            CatoolInfo catoolInfo = new CatoolInfo();
+            var versionFromProj = Assembly.GetExecutingAssembly().GetName().Version;
+            catoolInfo.CatoolVersion = $"{versionFromProj.Major}.{versionFromProj.Minor}.{versionFromProj.Build}";
+            catoolInfo.CatoolRunningLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            return catoolInfo;
         }
 
         private static ISw360ProjectService Getsw360ProjectServiceObject(CommonAppSettings appSettings, out ISW360ApicommunicationFacade sW360ApicommunicationFacade)

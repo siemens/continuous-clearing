@@ -5,8 +5,10 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Model;
 using log4net;
 using System.Collections.Generic;
 using System.Reflection;
@@ -18,33 +20,59 @@ namespace LCT.PackageIdentifier
 
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        public static Bom SetMetadataInComparisonBOM(Bom bom, CommonAppSettings appSettings)
+        public static Bom SetMetadataInComparisonBOM(Bom bom,
+                                                     CommonAppSettings appSettings,
+                                                     ProjectReleases projectReleases,
+                                                     CatoolInfo caToolInformation)
         {
             Logger.Debug("Starting to add metadata info into the BOM");
-
-            List<Tool> tools = new List<Tool>();
-            Tool tool = new Tool
+            Metadata metadata = new Metadata
             {
-                Name = "Clearing Automation Tool",
-                Version = appSettings.CaVersion,
-                Vendor = "Siemens AG"
+                Tools = new List<Tool>(),
+                Properties = new List<Property>()
             };
-            tools.Add(tool);
 
-            if (bom.Metadata != null)
+            SetMetaDataToolsValues(metadata, caToolInformation);
+
+            Component component = new Component
             {
-                bom.Metadata.Tools.AddRange(tools);
-            }
-            else
+                Name = appSettings.SW360ProjectName,
+                Version = projectReleases.Version,
+                Type = Component.Classification.Application
+            };
+            metadata.Component = component;
+
+            Property projectType = new Property
             {
-                bom.Metadata = new Metadata
-                {
-                    Tools = tools
-                };
-            }
+                Name = "siemens:profile",
+                Value = "clearing"
+            };
+            metadata.Properties.Add(projectType);
+
+            bom.Metadata = metadata;
             return bom;
         }
 
+        public static void SetMetaDataToolsValues(Metadata metadata, CatoolInfo caToolInformation)
+        {
+            Tool tool = new Tool
+            {
+                Name = "Clearing Automation Tool",
+                Version = caToolInformation.CatoolVersion,
+                Vendor = "Siemens AG",
+                ExternalReferences = new List<ExternalReference>() { new ExternalReference { Url = "https://github.com/siemens/continuous-clearing", Type = ExternalReference.ExternalReferenceType.Website } }
+            };
+            metadata.Tools.Add(tool);
+
+            Tool SiemensSBOM = new Tool
+            {
+                Name = "Siemens SBOM",
+                Version = "2.0.0",
+                Vendor = "Siemens AG",
+                ExternalReferences = new List<ExternalReference>() { new ExternalReference { Url = "https://sbom.siemens.io/", Type = ExternalReference.ExternalReferenceType.Website } }
+            };
+            metadata.Tools.Add(SiemensSBOM);
+        }
         public static void SetProperties(CommonAppSettings appSettings, Component component, ref List<Component> componentForBOM, string repo = "Not Found in JFrogRepo")
         {
             List<Property> propList = new();
@@ -61,7 +89,7 @@ namespace LCT.PackageIdentifier
 
             Property artifactoryrepo = new()
             {
-                Name = Dataconstant.Cdx_ArtifactoryRepoUrl,
+                Name = Dataconstant.Cdx_ArtifactoryRepoName,
                 Value = repo
             };
 
@@ -77,11 +105,29 @@ namespace LCT.PackageIdentifier
                 Value = "false"
             };
 
+            Property isDirect = new()
+            {
+                Name = Dataconstant.Cdx_SiemensDirect,
+                Value = "true"
+            };
+            Property filname = new()
+            {
+                Name = Dataconstant.Cdx_Siemensfilename,
+                Value = Dataconstant.PackageNameNotFoundInJfrog
+            };
+            Property jfrogRepoPathProperty = new()
+            {
+                Name = Dataconstant.Cdx_JfrogRepoPath,
+                Value = Dataconstant.JfrogRepoPathNotFound
+            };
             component.Properties.Add(internalType);
             component.Properties.Add(artifactoryrepo);
             component.Properties.Add(projectType);
             component.Properties.Add(isDevelopment);
-            component.Description = string.Empty;
+            component.Properties.Add(isDirect);
+            component.Properties.Add(filname);
+            component.Properties.Add(jfrogRepoPathProperty);
+            component.Description = null;
             componentForBOM.Add(component);
         }
     }

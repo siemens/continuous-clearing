@@ -198,7 +198,7 @@ namespace LCT.SW360PackageCreator
             return downloadPath;
         }
 
-        
+
         public async Task<List<ComparisonBomData>> SetContentsForComparisonBOM(List<Components> lstComponentForBOM, ISW360Service sw360Service)
         {
             Logger.Debug($"SetContentsForComparisonBOM():Start");
@@ -207,10 +207,7 @@ namespace LCT.SW360PackageCreator
             componentsAvailableInSw360 = await sw360Service.GetAvailableReleasesInSw360(lstComponentForBOM);
 
             //Checking components count before getting status of individual comp details
-            if (componentsAvailableInSw360?.Count > 0)
-            {
-                comparisonBomData = await GetComparisionBomItems(lstComponentForBOM, sw360Service);
-            }
+            comparisonBomData = await GetComparisionBomItems(lstComponentForBOM, sw360Service);
 
             Logger.Debug($"SetContentsForComparisonBOM():End");
             return comparisonBomData;
@@ -311,7 +308,7 @@ namespace LCT.SW360PackageCreator
                 {
                     new Property { Name = Dataconstant.Cdx_ClearingState, Value = comBom.ApprovedStatus },
                      new Property { Name = Dataconstant.Cdx_ReleaseUrl, Value = comBom.ReleaseLink },
-                     new Property { Name = Dataconstant.Cdx_FossologyUrl, Value = comBom.FossologyLink }
+                     new Property { Name = Dataconstant.Cdx_FossologyUrl, Value = comBom.FossologyLink ?? "" }
                 };
 
                     if (!bom.Components.Exists(x => x.BomRef.Contains(Dataconstant.PurlCheck()["MAVEN"])))

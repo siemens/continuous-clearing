@@ -237,7 +237,7 @@ Currently LTA support is not provided for SBOM, hence until that is implemented 
  
 ```
 {
-  "CaVersion": "6.2.0",
+  "CaVersion": "",
   "TimeOut": 200,
   "ProjectType": "<Insert ProjectType>",
   "SW360ProjectName": "<Insert SW360 Project Name>",
@@ -445,7 +445,7 @@ Continuous Clearing Tool can be executed as container or as binaries,
 <summary>Binary execution</summary>
 
 ### Prerequisite
-1. .NET 6 runtime [https://dotnet.microsoft.com/download/dotnet-core/6.0](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
+1. .NET 8 runtime [https://dotnet.microsoft.com/download/dotnet-core/8.0](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
 2. Node.js and Git latest
 
 

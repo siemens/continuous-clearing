@@ -1,269 +1,267 @@
-// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
-//
-//  SPDX-License-Identifier: MIT
-
-// --------------------------------------------------------------------------------------------------------------------
 {
-  "BomFormat": "CycloneDX",
-  "SpecVersion": 4,
-  "SpecVersionString": "1.4",
-  "SerialNumber": null,
-  "Version": null,
-  "Metadata": {
-    "Tools": [
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.4",
+  "serialNumber": "urn:uuid:c5d86610-3513-41c3-abe6-6eeca868ac4f",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2024-07-08T12:57:36Z",
+    "tools": [
       {
-        "Vendor": "Siemens AG",
-        "Name": "Clearing Automation Tool",
-        "Version": "3.1.1",
-        "Hashes": null
+        "vendor": "Siemens AG",
+        "name": "Clearing Automation Tool",
+        "version": "6.1.0",
+        "externalReferences": [
+          {
+            "url": "https://github.com/siemens/continuous-clearing",
+            "type": "website"
+          }
+        ]
+      },
+      {
+        "vendor": "Siemens AG",
+        "name": "Siemens SBOM",
+        "version": "2.0.0",
+        "externalReferences": [
+          {
+            "url": "https://sbom.siemens.io/",
+            "type": "website"
+          }
+        ]
       }
     ],
-    "Authors": null,
-    "Component": null,
-    "Manufacture": null,
-    "Supplier": null
+    "component": {
+      "type": "application",
+      "name": "Test",
+      "version": "1.0"
+    },
+    "properties": [
+      {
+        "name": "siemens:profile",
+        "value": "clearing"
+      }
+    ]
   },
-  "Components": [
+  "components": [
     {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:npm/%40angular/common@9.1.12",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": "@angular",
-      "Name": "common",
-      "Version": "9.1.12",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:npm/%40angular/common@9.1.12",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
+      "type": "null",
+      "bom-ref": "pkg:npm/%40angular/common@9.1.12",
+      "group": "@angular",
+      "name": "common",
+      "version": "9.1.12",
+      "purl": "pkg:npm/%40angular/common@9.1.12",
+      "properties": [
         {
-          "Name": "internal:siemens:clearing:development",
-          "Value": "false"
-        },
-		{
-          "Name": "internal:siemens:clearing:identifier-type",
-          "Value": "Discovered"
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
         },
         {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "org1-npmjs-npm-remote-cache"
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
         },
         {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "NPM"
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:clearing-state",
-          "Value": "Not Available"
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
         },
         {
-          "Name": "internal:siemens:clearing:sw360:release-url",
-          "Value": "http://localhost:8090/resource/api/releases/598fc00fd6d542379988db11a01312e7"
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NPM"
         },
         {
-          "Name": "internal:siemens:clearing:fossology:url",
-          "Value": null
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        },
+        {
+          "name": "internal:siemens:clearing:clearing-state",
+          "value": "Not Available"
+        },
+        {
+          "name": "internal:siemens:clearing:sw360:release-url",
+          "value": "http://localhost:8090/resource/api/releases/4350f812fc774bce851afc84975740f4"
+        },
+        {
+          "name": "internal:siemens:clearing:fossology:url",
+          "value": ""
         }
-      ],
-      "Evidence": null
+      ]
     },
     {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:npm/rxjs@6.5.5",
-      "Supplier": null,
-      "Author": "",
-      "Publisher": null,
-      "Group": null,
-      "Name": "rxjs",
-      "Version": "6.5.5",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:npm/rxjs@6.5.5",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
+      "type": "null",
+      "bom-ref": "pkg:npm/rxjs@6.5.5",
+      "name": "rxjs",
+      "version": "6.5.5",
+      "purl": "pkg:npm/rxjs@6.5.5",
+      "properties": [
         {
-          "Name": "internal:siemens:clearing:development",
-          "Value": "false"
-        },
-		{
-          "Name": "internal:siemens:clearing:identifier-type",
-          "Value": "Discovered"
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
         },
         {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "siparty-release-npm-egll"
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
         },
         {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "NPM"
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:clearing-state",
-          "Value": "Not Available"
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
         },
         {
-          "Name": "internal:siemens:clearing:sw360:release-url",
-          "Value": "http://localhost:8090/resource/api/releases/3bd208ca8bec416db94255f46515341b"
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NPM"
         },
         {
-          "Name": "internal:siemens:clearing:fossology:url",
-          "Value": null
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        },
+        {
+          "name": "internal:siemens:clearing:clearing-state",
+          "value": "Not Available"
+        },
+        {
+          "name": "internal:siemens:clearing:sw360:release-url",
+          "value": "http://localhost:8090/resource/api/releases/15797ebabf9b433cb865d57efb1afdb3"
+        },
+        {
+          "name": "internal:siemens:clearing:fossology:url",
+          "value": ""
         }
-      ],
-      "Evidence": null
+      ]
     },
     {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:npm/tslib@1.13.0",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": null,
-      "Name": "tslib",
-      "Version": "1.13.0",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:npm/tslib@1.13.0",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
+      "type": "null",
+      "bom-ref": "pkg:npm/tslib@1.13.0",
+      "name": "tslib",
+      "version": "1.13.0",
+      "purl": "pkg:npm/tslib@1.13.0",
+      "properties": [
         {
-          "Name": "internal:siemens:clearing:development",
-          "Value": "false"
-        },
-		{
-          "Name": "internal:siemens:clearing:identifier-type",
-          "Value": "Discovered"
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
         },
         {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "siparty-release-npm-egll"
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
         },
         {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "NPM"
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:clearing-state",
-          "Value": "Not Available"
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
         },
         {
-          "Name": "internal:siemens:clearing:sw360:release-url",
-          "Value": "http://localhost:8090/resource/api/releases/3fa522520dc6462da46a85dc4929a4b2"
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NPM"
         },
         {
-          "Name": "internal:siemens:clearing:fossology:url",
-          "Value": null
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        },
+        {
+          "name": "internal:siemens:clearing:clearing-state",
+          "value": "Not Available"
+        },
+        {
+          "name": "internal:siemens:clearing:sw360:release-url",
+          "value": "http://localhost:8090/resource/api/releases/077dea8471024c639d012a90a2a1cb7f"
+        },
+        {
+          "name": "internal:siemens:clearing:fossology:url",
+          "value": ""
         }
-      ],
-      "Evidence": null
+      ]
     },
     {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:npm/zone.js@0.10.3",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": null,
-      "Name": "zone.js",
-      "Version": "0.10.3",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:npm/zone.js@0.10.3",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
+      "type": "null",
+      "bom-ref": "pkg:npm/zone.js@0.10.3",
+      "name": "zone.js",
+      "version": "0.10.3",
+      "purl": "pkg:npm/zone.js@0.10.3",
+      "properties": [
         {
-          "Name": "internal:siemens:clearing:development",
-          "Value": "false"
-        },
-		{
-          "Name": "internal:siemens:clearing:identifier-type",
-          "Value": "Discovered"
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
         },
         {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "siparty-release-npm-egll"
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
         },
         {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "NPM"
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:clearing-state",
-          "Value": "Not Available"
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
         },
         {
-          "Name": "internal:siemens:clearing:sw360:release-url",
-          "Value": "http://localhost:8090/resource/api/releases/6fff327ff2ec4575be1fc889c58f51b3"
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NPM"
         },
         {
-          "Name": "internal:siemens:clearing:fossology:url",
-          "Value": null
-        }
-      ],
-      "Evidence": null
-    }
-  ],
-  "Dependencies": [
-    {
-      "Ref": "pkg:npm/rxjs@6.5.5",
-      "Dependencies": [
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
         {
-          "Ref": "pkg:npm/tslib@^1.9.0",
-          "Dependencies": null
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        },
+        {
+          "name": "internal:siemens:clearing:clearing-state",
+          "value": "Not Available"
+        },
+        {
+          "name": "internal:siemens:clearing:sw360:release-url",
+          "value": "http://localhost:8090/resource/api/releases/207eca13950447c99366e7717b8181ab"
+        },
+        {
+          "name": "internal:siemens:clearing:fossology:url",
+          "value": ""
         }
       ]
     }
   ],
-  "Compositions": null
+  "dependencies": [
+    {
+      "ref": "pkg:npm/rxjs@6.5.5",
+      "dependsOn": [
+        "pkg:npm/tslib@^1.9.0"
+      ]
+    }
+  ]
 }

@@ -2,7 +2,7 @@
 # Build and test ASP.NET Core projects targeting the full .NET Framework.
 # Add steps that publish symbols, save build artifacts, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
-# SPDX-FileCopyrightText: 2023 Siemens AG
+# SPDX-FileCopyrightText: 2024 Siemens AG
 # SPDX-License-Identifier: MIT
 
 resources:
@@ -55,7 +55,7 @@ stages:
       inputs:
         SourceFolder: '$(Build.SourcesDirectory)'
         Contents: 'appSettings*.json'
-        TargetFolder: '$(Build.SourcesDirectory)\Continuous-Clearing\out\net6.0'
+        TargetFolder: '$(Build.SourcesDirectory)\Continuous-Clearing\out\net8.0'
         OverWrite: true
         
     - task: CmdLine@2
@@ -63,7 +63,7 @@ stages:
       displayName: 'PackageIdentifier'
       inputs:
         script: |
-          $(Build.SourcesDirectory)\Continuous-Clearing\out\net6.0\PackageIdentifier.exe  --packageFilePath "<debpackageOutfilepath>" --bomFolderPath "$(Build.SourcesDirectory)\GridEdge" --sw360Token <SW360AUTHTOKEN> --sW360ProjectID <projectid> --sW360AuthTokenType Bearer --artifactoryuploadApiKey <JFRogApitoken> --projectType DEBIAN
+          $(Build.SourcesDirectory)\Continuous-Clearing\out\net8.0\PackageIdentifier.exe  --packageFilePath "<debpackageOutfilepath>" --bomFolderPath "$(Build.SourcesDirectory)\GridEdge" --sw360Token <SW360AUTHTOKEN> --sW360ProjectID <projectid> --sW360AuthTokenType Bearer --artifactoryuploadApiKey <JFRogApitoken> --projectType DEBIAN
         workingDirectory: $(Build.SourcesDirectory)
       continueOnError: true
     - task: CmdLine@2
@@ -71,7 +71,7 @@ stages:
       displayName: 'component creator'
       inputs:
         script: |
-          $(Build.SourcesDirectory)\Continuous-Clearing\out\net6.0\SW360PackageCreator.exe  --bomFilePath "$(Build.SourcesDirectory)\GridEdge\$(SW360PROJNAME)_Bom.cdx.json" --sw360Token <SW360AUTHTOKEN> --sW360ProjectID <ProjectId> --sW360AuthTokenType Bearer --fossologyUrl <FossURL>
+          $(Build.SourcesDirectory)\Continuous-Clearing\out\net8.0\SW360PackageCreator.exe  --bomFilePath "$(Build.SourcesDirectory)\GridEdge\$(SW360PROJNAME)_Bom.cdx.json" --sw360Token <SW360AUTHTOKEN> --sW360ProjectID <ProjectId> --sW360AuthTokenType Bearer --fossologyUrl <FossURL>
         workingDirectory: $(Build.SourcesDirectory)
       continueOnError: true
 

@@ -9,6 +9,8 @@ using LCT.APICommunications;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Interface;
+using LCT.Common.Model;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
@@ -60,11 +62,7 @@ namespace LCT.PackageIdentifier
 
             if (componentsWithMultipleVersions.Count != 0)
             {
-                Logger.Warn($"Multiple versions detected :\n");
-                foreach (var item in componentsWithMultipleVersions)
-                {
-                    Logger.Warn($"Component Name : {item.Name}\nComponent Version : {item.Version}\nPackage Found in : {item.Description}\n");
-                }
+                CreateFileForMultipleVersions(componentsWithMultipleVersions, appSettings);
             }
 
             bom.Components = componentsForBOM;
@@ -127,8 +125,13 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in componentsForBOM)
             {
-                string repoName = GetArtifactoryRepoName(aqlResultList, component);
-                Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoUrl, Value = repoName };
+                string jfrogRepoPath = Dataconstant.JfrogRepoPathNotFound;
+                string repoName = GetArtifactoryRepoName(aqlResultList, component, out jfrogRepoPath);
+                string jfrogpackageName = $"{component.Name}/{component.Version}";
+                Logger.Debug($"Repo Name for the package {jfrogpackageName} is {repoName}");
+                var hashes = aqlResultList.FirstOrDefault(x => x.Path.Contains(jfrogpackageName, StringComparison.OrdinalIgnoreCase));
+                Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = repoName };
+                Property jfrogRepoPathProperty = new() { Name = Dataconstant.Cdx_JfrogRepoPath, Value = jfrogRepoPath };
                 Component componentVal = component;
 
                 if (componentVal.Properties?.Count == null || componentVal.Properties?.Count <= 0)
@@ -137,8 +140,31 @@ namespace LCT.PackageIdentifier
                 }
                 componentVal.Properties.Add(artifactoryrepo);
                 componentVal.Properties.Add(projectType);
-                componentVal.Description = string.Empty;
+                componentVal.Properties.Add(jfrogRepoPathProperty);
+                componentVal.Description = null;
+                if (hashes != null)
+                {
+                    componentVal.Hashes = new List<Hash>()
+                {
 
+                new()
+                 {
+                  Alg = Hash.HashAlgorithm.MD5,
+                  Content = hashes.MD5
+                },
+                new()
+                {
+                  Alg = Hash.HashAlgorithm.SHA_1,
+                  Content = hashes.SHA1
+                 },
+                 new()
+                 {
+                  Alg = Hash.HashAlgorithm.SHA_256,
+                  Content = hashes.SHA256
+                  }
+                  };
+
+                }
                 modifiedBOM.Add(componentVal);
             }
 
@@ -160,6 +186,50 @@ namespace LCT.PackageIdentifier
         #endregion
 
         #region private methods
+
+        private static void CreateFileForMultipleVersions(List<Component> componentsWithMultipleVersions, CommonAppSettings appSettings)
+        {
+            MultipleVersions multipleVersions = new MultipleVersions();
+            IFileOperations fileOperations = new FileOperations();
+            string filename = $"{appSettings.BomFolderPath}\\{appSettings.SW360ProjectName}_{FileConstant.multipleversionsFileName}";
+            if (string.IsNullOrEmpty(appSettings.IdentifierBomFilePath) || (!File.Exists(filename)))
+            {
+                multipleVersions.Conan = new List<MultipleVersionValues>();
+                foreach (var conanPackage in componentsWithMultipleVersions)
+                {
+                    conanPackage.Description = !string.IsNullOrEmpty(appSettings.CycloneDxSBomTemplatePath) ? appSettings.CycloneDxSBomTemplatePath : conanPackage.Description;
+
+                    MultipleVersionValues jsonComponents = new MultipleVersionValues();
+                    jsonComponents.ComponentName = conanPackage.Name;
+                    jsonComponents.ComponentVersion = conanPackage.Version;
+                    jsonComponents.PackageFoundIn = conanPackage.Description;
+                    multipleVersions.Conan.Add(jsonComponents);
+                }
+                fileOperations.WriteContentToMultipleVersionsFile(multipleVersions, appSettings.BomFolderPath, FileConstant.multipleversionsFileName, appSettings.SW360ProjectName);
+                Logger.Warn($"\nTotal Multiple versions detected {multipleVersions.Conan.Count} and details can be found at {appSettings.BomFolderPath}\\{appSettings.SW360ProjectName}_{FileConstant.multipleversionsFileName}\n");
+            }
+            else
+            {
+                string json = File.ReadAllText(filename);
+                MultipleVersions myDeserializedClass = JsonConvert.DeserializeObject<MultipleVersions>(json);
+                List<MultipleVersionValues> conanComponents = new List<MultipleVersionValues>();
+                foreach (var conanPackage in componentsWithMultipleVersions)
+                {
+                    conanPackage.Description = !string.IsNullOrEmpty(appSettings.CycloneDxSBomTemplatePath) ? appSettings.CycloneDxSBomTemplatePath : conanPackage.Description;
+
+                    MultipleVersionValues jsonComponents = new MultipleVersionValues();
+                    jsonComponents.ComponentName = conanPackage.Name;
+                    jsonComponents.ComponentVersion = conanPackage.Version;
+                    jsonComponents.PackageFoundIn = conanPackage.Description;
+
+                    conanComponents.Add(jsonComponents);
+                }
+                myDeserializedClass.Conan = conanComponents;
+
+                fileOperations.WriteContentToMultipleVersionsFile(myDeserializedClass, appSettings.BomFolderPath, FileConstant.multipleversionsFileName, appSettings.SW360ProjectName);
+                Logger.Warn($"\nTotal Multiple versions detected {conanComponents.Count} and details can be found at {appSettings.BomFolderPath}\\{appSettings.SW360ProjectName}_{FileConstant.multipleversionsFileName}\n");
+            }
+        }
         private void ParsingInputFileForBOM(CommonAppSettings appSettings, ref Bom bom)
         {
             List<string> configFiles;
@@ -176,13 +246,14 @@ namespace LCT.PackageIdentifier
                     AddingIdentifierType(components, "PackageFile");
                     componentsForBOM.AddRange(components);
                 }
-                else if (filepath.EndsWith(FileConstant.CycloneDXFileExtension) && !filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                else if (filepath.EndsWith(FileConstant.CycloneDXFileExtension) 
+                    && !filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
                     bom = _cycloneDXBomParser.ParseCycloneDXBom(filepath);
                     CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
+                    GetDetailsforManuallyAddedComp(bom.Components);
                     componentsForBOM.AddRange(bom.Components);
-                    GetDetailsforManuallyAddedComp(componentsForBOM);
                 }
             }
 
@@ -201,16 +272,19 @@ namespace LCT.PackageIdentifier
                 bom.Dependencies = dependencies;
             }
 
-            if (File.Exists(appSettings.CycloneDxSBomTemplatePath) && appSettings.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+            if (File.Exists(appSettings.CycloneDxSBomTemplatePath) 
+                && appSettings.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
                 //Adding Template Component Details
                 Bom templateDetails;
-                templateDetails = ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
+                templateDetails = ExtractSBOMDetailsFromTemplate(
+                    _cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
                 CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
                 SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
             }
 
             bom = RemoveExcludedComponents(appSettings, bom);
+            bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
         }
 
         private static List<Component> ParsePackageLockJson(string filepath, ref List<Dependency> dependencies)
@@ -294,6 +368,11 @@ namespace LCT.PackageIdentifier
                 throw new ArgumentNullException(nameof(nodePackages), "Dependency(requires) node name details not present in the root node.");
             }
 
+            ConanPackage package = nodePackages.Where(x => x.Id == "0").FirstOrDefault();
+            List<string> directDependencies = new List<string>();
+            if (package.Dependencies != null) { directDependencies.AddRange(package.Dependencies); }
+            if (package.DevDependencies != null) { directDependencies.AddRange(package.DevDependencies); }
+
             // Ignoring the root node as it is the package information node and we are anyways considering all
             // nodes in the lock file.
             foreach (var component in nodePackages.Skip(1))
@@ -328,10 +407,25 @@ namespace LCT.PackageIdentifier
                     components.Name = packageName;
                 }
 
+                Property siemensFileName = new Property()
+                {
+                    Name = Dataconstant.Cdx_Siemensfilename,
+                    Value = component.Reference
+                };
+                var isDirect = directDependencies.Contains(component.Id) ? "true" : "false";
+                Property siemensDirect = new Property()
+                {
+                    Name = Dataconstant.Cdx_SiemensDirect,
+                    Value = isDirect
+                };
+
+                components.Type = Component.Classification.Library;
                 components.Purl = $"{ApiConstant.ConanExternalID}{components.Name}@{components.Version}";
                 components.BomRef = $"{ApiConstant.ConanExternalID}{components.Name}@{components.Version}";
                 components.Properties = new List<Property>();
                 components.Properties.Add(isdev);
+                components.Properties.Add(siemensDirect);
+                components.Properties.Add(siemensFileName);
                 lstComponentForBOM.Add(components);
             }
         }
@@ -356,10 +450,15 @@ namespace LCT.PackageIdentifier
             return false;
         }
 
-        private static string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component)
+        public string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component, out string jfrogRepoPath)
         {
             string jfrogcomponentPath = $"{component.Name}/{component.Version}";
-
+            jfrogRepoPath = Dataconstant.JfrogRepoPathNotFound;
+            var conanPackagePath = aqlResultList.FirstOrDefault(x => x.Path.Contains(jfrogcomponentPath) && x.Name.Contains("package.tgz"));
+            if (conanPackagePath != null)
+            {
+                jfrogRepoPath = $"{conanPackagePath.Repo}/{conanPackagePath.Path}/{conanPackagePath.Name};";
+            }
             var aqllist = aqlResultList.FindAll(x => x.Path.Contains(
                 jfrogcomponentPath, StringComparison.OrdinalIgnoreCase));
 
@@ -439,6 +538,7 @@ namespace LCT.PackageIdentifier
         {
             foreach (var component in componentsForBOM)
             {
+                // todo: check existence of property and add new
                 component.Properties = new List<Property>();
                 Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
                 Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.ManullayAdded };

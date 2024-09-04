@@ -34,7 +34,6 @@ namespace TestUtilities
             proc.StartInfo.RedirectStandardOutput = true;
             proc.StartInfo.RedirectStandardError = true;
             proc.StartInfo.WorkingDirectory = Environment.CurrentDirectory;
-
             proc.Start();
             // To avoid deadlocks, always read the output stream first and then wait. 
             proc.StandardOutput.ReadToEnd();
@@ -48,6 +47,10 @@ namespace TestUtilities
             if (proc.ExitCode == 0)
             {
                 BOMCreated = true;
+            }
+            if (proc.ExitCode < 0) {
+                Console.WriteLine(proc.StartInfo.FileName);
+                Console.WriteLine(proc.StartInfo.Arguments);
             }
 
                 return proc.ExitCode;
@@ -69,6 +72,11 @@ namespace TestUtilities
             Console.WriteLine(proc.StandardOutput.ReadToEnd());
 #endif
             proc.WaitForExit();
+            if (proc.ExitCode < 0)
+            {
+                Console.WriteLine(proc.StartInfo.FileName);
+                Console.WriteLine(proc.StartInfo.Arguments);
+            }
             return proc.ExitCode;
         }
 
@@ -88,6 +96,11 @@ namespace TestUtilities
             Console.WriteLine(proc.StandardOutput.ReadToEnd());
 #endif
             proc.WaitForExit();
+            if (proc.ExitCode < 0)
+            {
+                Console.WriteLine(proc.StartInfo.FileName);
+                Console.WriteLine(proc.StartInfo.Arguments);
+            }
             return proc.ExitCode;
         }
 

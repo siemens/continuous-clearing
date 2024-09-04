@@ -5,6 +5,7 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.APICommunications.Model;
+using LCT.Common;
 using log4net;
 using System;
 using System.Net.Http;
@@ -66,7 +67,7 @@ namespace LCT.APICommunications
             {
                 Logger.Debug($"{ex.Message}");
                 Logger.Error("A timeout error is thrown from Jfrog server,Please wait for sometime and re run the pipeline again");
-                Environment.Exit(-1);
+                CommonHelper.CallEnvironmentExit(-1);
 
             }
             return result;

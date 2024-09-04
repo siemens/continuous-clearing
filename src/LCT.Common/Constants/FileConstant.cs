@@ -31,9 +31,9 @@ namespace LCT.Common.Constants
         public const string PackageLockFileName = "package-lock.json";
         public const string PackageConfigFileName = "packages.config";
         public const string PackageLockJonFileName = "packages.lock.json";
-        public const string LogFolder = "..\\Logs";
-        public const string ComponentCreatorLog = "PacakgeCreator.log";
-        public const string BomCreatorLog = "PacakgeIdentifier.log";
+        public const string LogFolder = "Logs";
+        public const string ComponentCreatorLog = "PackageCreator.log";
+        public const string BomCreatorLog = "PackageIdentifier.log";
         public const string FossologyUploaderLog = "FossologyUploader.log";
         public const string ArtifactoryUploaderLog = "ArtifactoryUploader.log";
         public const string XzFileExtension = ".tar.xz";
@@ -46,9 +46,12 @@ namespace LCT.Common.Constants
         public static readonly string ContainerDir = Path.Combine(@"/app/opt/PatchedFiles");
         public const string DockerImage = "ghcr.io/siemens/continuous-clearing";
         public static readonly string DockerCMDTool = Path.Combine(@"/bin/bash");
+        public const string PackageJsonFileName = "package.json";
         public const string appSettingFileName = "appSettings.json";
-        public const string CycloneDXFileExtension = ".cdx.json"; 
+        public const string CycloneDXFileExtension = ".cdx.json";
         public const string SBOMTemplateFileExtension = "CATemplate.cdx.json";
         public const string NugetAssetFile = "project.assets.json";
+        public const string multipleversionsFileName = "Multipleversions.json";
+        public const string artifactoryReportNotApproved = "ReportNotApproved.json";
     }
 }

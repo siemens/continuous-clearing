@@ -7,10 +7,12 @@
 using CycloneDX.Models;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
+using LCT.Common.Constants;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using Moq;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -20,6 +22,55 @@ namespace LCT.PackageIdentifier.UTest
     [TestFixture]
     internal class NpmProcessorUTest
     {
+        [Test]
+        public void GetJfrogArtifactoryRepoDetials_RepoPathFound_ReturnsAqlResultWithRepoPath()
+        {
+            // Arrange
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            var aqlResultList = new List<AqlResult>
+            {
+                new AqlResult { Name = "component-1.0.0.tgz", Repo = "repo1", Path="path/to" },
+                new AqlResult { Name = "component-2.0.0.tgz", Repo = "repo2", Path="path/to" }
+            };
+            var component = new Component { Name = "component", Version = "1.0.0" };
+            var bomHelperMock = new Mock<IBomHelper>();
+            var expectedRepoPath = "repo1/path/to/component-1.0.0.tgz";
+
+            var npmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
+
+            // Act
+            var result = npmProcessor.GetJfrogArtifactoryRepoDetials(aqlResultList, component, bomHelperMock.Object, out string repoPath);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.AreEqual("repo1", result.Repo);
+            Assert.AreEqual(expectedRepoPath, repoPath);
+        }
+
+        [Test]
+        public void GetJfrogArtifactoryRepoDetials_RepoPathNotFound_ReturnsAqlResultWithNotFoundRepo()
+        {
+            // Arrange
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            var aqlResultList = new List<AqlResult>
+            {
+                new AqlResult { Name = "component-1.0.0.tgz", Repo = "repo1" },
+                new AqlResult { Name = "component-2.0.0.tgz", Repo = "repo2" }
+            };
+            var component = new Component { Name = "component", Version = "3.0.0" };
+            var bomHelperMock = new Mock<IBomHelper>();
+
+            var npmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
+
+            // Act
+            var result = npmProcessor.GetJfrogArtifactoryRepoDetials(aqlResultList, component, bomHelperMock.Object, out string repoPath);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.AreEqual("Not Found in JFrogRepo", result.Repo);
+            Assert.AreEqual(Dataconstant.JfrogRepoPathNotFound, repoPath);
+        }
+
         [Test]
         public async Task IdentificationOfInternalComponents_ReturnsComponentData_Successfully()
         {
@@ -259,6 +310,49 @@ namespace LCT.PackageIdentifier.UTest
             Assert.That(expectedDependencyList.Count, Is.EqualTo(dependencyList.Count));
 
 
+        }
+
+
+        [Test]
+        public void GetIsDirect_ShouldReturnTrue_WhenDirectDependencyExists()
+        {
+            // Arrange
+            var directDependencies = new List<JToken> { "directDependency1", "directDependency2" };
+            var prop = new JProperty("node_modules/directDependency1");
+
+            // Act
+            var result = NpmProcessor.GetIsDirect(directDependencies, prop);
+
+            // Assert
+            Assert.AreEqual("true", result);
+        }
+
+        [Test]
+        public void GetIsDirect_ShouldReturnFalse_WhenDirectDependencyDoesNotExist()
+        {
+            // Arrange
+            var directDependencies = new List<JToken> { "directDependency1", "directDependency2" };
+            var prop = new JProperty("node_modules/indirectDependency");
+
+            // Act
+            var result = NpmProcessor.GetIsDirect(directDependencies, prop);
+
+            // Assert
+            Assert.AreEqual("false", result);
+        }
+
+        [Test]
+        public void GetIsDirect_ShouldReturnFalse_WhenDirectDependenciesIsEmpty()
+        {
+            // Arrange
+            var directDependencies = new List<JToken>();
+            var prop = new JProperty("node_modules/directDependency");
+
+            // Act
+            var result = NpmProcessor.GetIsDirect(directDependencies, prop);
+
+            // Assert
+            Assert.AreEqual("false", result);
         }
     }
 }
