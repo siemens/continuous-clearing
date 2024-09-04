@@ -153,7 +153,7 @@ jobs:
         fetch-depth: 0  
 
     - name: Download Build Output
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4
       with:
           name: buildoutput
           path: ${{ github.workspace }}/buildoutput
@@ -190,17 +190,17 @@ jobs:
           fetch-depth: 0  
           
       - name: Download Build Output
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: continuous-clearing
 
       - name: Download NuGet Package
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: nuget-continuous-clearing
       
       - name: Download Docker image
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: docker-continuous-clearing
           
