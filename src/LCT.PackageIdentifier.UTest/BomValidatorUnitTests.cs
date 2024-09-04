@@ -13,6 +13,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using LCT.Common;
+using LCT.APICommunications.Model;
 
 namespace PackageIdentifier.UTest
 {
@@ -28,11 +29,12 @@ namespace PackageIdentifier.UTest
         {
             //Arrange
             string projectName = "Test";
+            ProjectReleases projectReleases = new ProjectReleases();
             var CommonAppSettings = new CommonAppSettings(mockIFolderAction.Object)
             {
                 SW360ProjectName = "Test"
             };
-            mockISw360ProjectService.Setup(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<String>(), It.IsAny<string>()))
+            mockISw360ProjectService.Setup(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<String>(), It.IsAny<string>(), projectReleases))
                 .ReturnsAsync(projectName);
 
             mockIFileOperations.Setup(x => x.ValidateFilePath(It.IsAny<string>()))
@@ -45,10 +47,10 @@ namespace PackageIdentifier.UTest
             CommonAppSettings.PackageFilePath = "";
 
             //Act
-            await BomValidator.ValidateAppSettings(CommonAppSettings, mockISw360ProjectService.Object);
+            await BomValidator.ValidateAppSettings(CommonAppSettings, mockISw360ProjectService.Object, projectReleases);
 
             //Assert
-            mockISw360ProjectService.Verify(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<string>(), It.IsAny<string>()), Times.AtLeastOnce);
+            mockISw360ProjectService.Verify(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<string>(), It.IsAny<string>(), projectReleases), Times.AtLeastOnce);
 
         }
         [TestCase]
@@ -56,11 +58,12 @@ namespace PackageIdentifier.UTest
         {
             //Arrange
             string projectName = null;
+            ProjectReleases projectReleases = new ProjectReleases();
             var CommonAppSettings = new CommonAppSettings(mockIFolderAction.Object)
             {
                 SW360ProjectName = "Test"
             };
-            mockISw360ProjectService.Setup(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<string>(), It.IsAny<string>()))
+            mockISw360ProjectService.Setup(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<string>(), It.IsAny<string>(),projectReleases))
                 .ReturnsAsync(projectName);
 
             mockIFileOperations.Setup(x => x.ValidateFilePath(It.IsAny<string>()))
@@ -72,7 +75,7 @@ namespace PackageIdentifier.UTest
                 .Verifiable();
 
             //Act && Assert
-            Assert.ThrowsAsync<InvalidDataException>(async () => await BomValidator.ValidateAppSettings(CommonAppSettings, mockISw360ProjectService.Object));
+            Assert.ThrowsAsync<InvalidDataException>(async () => await BomValidator.ValidateAppSettings(CommonAppSettings, mockISw360ProjectService.Object, projectReleases));
             return Task.CompletedTask;
         }
     }

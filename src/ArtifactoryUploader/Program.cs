@@ -23,6 +23,8 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using LCT.Common.Model;
+using LCT.ArtifactPublisher;
 
 namespace ArtifactoryUploader
 {
@@ -41,6 +43,11 @@ namespace ArtifactoryUploader
 
             ISettingsManager settingsManager = new SettingsManager();
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
+            // do not change the order of getting ca tool information
+            CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
+
+            Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
+
             string FolderPath = InitiateLogger(appSettings);
 
             settingsManager.CheckRequiredArgsToRun(appSettings, "Uploader");
@@ -55,8 +62,9 @@ namespace ArtifactoryUploader
 
             Logger.Logger.Log(null, Level.Info, $"Input Parameters used in Artifactory Uploader:\n\t", null);
             Logger.Logger.Log(null, Level.Notice, $"\tBomFilePath:\t\t {appSettings.BomFilePath}\n\t" +
+                $"CaToolVersion\t\t {caToolInformation.CatoolVersion}\n\t" +
+                $"CaToolRunningPath\t {caToolInformation.CatoolRunningLocation}\n\t" +
                 $"JFrogUrl:\t\t {appSettings.JFrogApi}\n\t" +
-                $"Artifactory User:\t {appSettings.ArtifactoryUploadUser}\n\t" +
                 $"Release:\t\t {appSettings.Release}\n\t" +
                 $"LogFolderPath:\t\t {Path.GetFullPath(FolderPath)}\n", null);
 
@@ -76,6 +84,19 @@ namespace ArtifactoryUploader
 
 
             Logger.Logger.Log(null, Level.Notice, $"End of Artifactory Uploader execution : {DateTime.Now}\n", null);
+            // publish logs and bom file to pipeline artifact
+
+            CommonHelper.PublishFilesToArtifact();
+
+        }
+
+        private static CatoolInfo GetCatoolVersionFromProjectfile()
+        {
+            CatoolInfo catoolInfo = new CatoolInfo();
+            var versionFromProj = Assembly.GetExecutingAssembly().GetName().Version;
+            catoolInfo.CatoolVersion = $"{versionFromProj.Major}.{versionFromProj.Minor}.{versionFromProj.Build}";
+            catoolInfo.CatoolRunningLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            return catoolInfo;
         }
 
         private static string InitiateLogger(CommonAppSettings appSettings)

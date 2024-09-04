@@ -14,6 +14,7 @@ using log4net.Repository.Hierarchy;
 using log4net.Core;
 using log4net.Appender;
 using System;
+using LCT.Common.Constants;
 
 namespace LCT.Common
 {
@@ -23,12 +24,15 @@ namespace LCT.Common
     public static class Log4Net
     {
         public static ILoggerRepository LoggerRepository { get; set; }
+
+        public static string CatoolLogPath { get; set; }
+        public static string CatoolCurrentDirectory { get; set; }
+
         public static void Init(string logFileName, string logFolder, bool verbose)
         {
             LoggerRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
             XmlConfigurator.Configure(LoggerRepository, new FileInfo(GetDefaultLogConfigFile()));
-
-            string logPath = Path.Combine(logFolder, logFileName);
+            string logPath = CatoolLogPath = Path.Combine(CatoolCurrentDirectory, logFolder, logFileName);
 
             if (LoggerRepository is Hierarchy rootRepo)
             {

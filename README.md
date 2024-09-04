@@ -175,7 +175,7 @@ nuget pack CA.nuspec
 # Contribute
 
 Improvements are always welcome! Feel free to log a bug, write a suggestion or
-contribute code via merge request. To build and test the solution locally you should have .NET Core 6 installed. All details are listed in our contribution guide.
+contribute code via merge request. To build and test the solution locally you should have .NET 8 installed. All details are listed in our contribution guide.
 See  [CONTRIBUTING.md](CONTRIBUTING.md).
 
 # License
@@ -186,5 +186,5 @@ Third-party software components list:
 - [ReadmeOSS_continuous-clearing_nupkg](https://htmlpreview.github.io/?https://github.com/siemens/continuous-clearing/blob/main/ReadmeOSS_continuous-clearing_nupkg.html)
 - [ReadmeOSS_continuous-clearing_DockerImage](https://htmlpreview.github.io/?https://github.com/siemens/continuous-clearing/blob/main/ReadmeOSS_continuous-clearing_DockerImage.html)
     
-Copyright 2023 Siemens AG
+Copyright 2024 Siemens AG
 

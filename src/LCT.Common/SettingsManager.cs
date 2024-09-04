@@ -42,6 +42,7 @@ namespace LCT.Common
             {
                 Logger.Debug($"Argument Count : {args.Length}");
                 DisplayHelp();
+                CommonHelper.PublishFilesToArtifact();
                 Environment.Exit(0);
             }
             string settingsFilePath = GetConfigFilePathFromArgs(args, jsonSettingsFileName);
@@ -175,7 +176,7 @@ namespace LCT.Common
             if (!string.IsNullOrWhiteSpace(missingParameters.ToString()))
             {
                 ExceptionHandling.ArgumentException(missingParameters.ToString());
-                Environment.Exit(-1);
+                CommonHelper.CallEnvironmentExit(-1);
             }
         }
 

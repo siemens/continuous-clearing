@@ -18,7 +18,7 @@ We welcome contributions in several forms, e.g.
       Clone the repository from <CA_Project_RepoLink>
 
 2. Software dependencies -
-     Visual Studio 2022, .NET Core 6
+     Visual Studio 2022, .NET 8
 	
 ## Pull Request Process
 

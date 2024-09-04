@@ -1,205 +1,259 @@
-// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
-//
-//  SPDX-License-Identifier: MIT
-
-// --------------------------------------------------------------------------------------------------------------------
 {
-  "BomFormat": "CycloneDX",
-  "SpecVersion": 4,
-  "SpecVersionString": "1.4",
-  "SerialNumber": null,
-  "Version": null,
-  "Metadata": {
-    "Tools": [
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.4",
+  "serialNumber": "urn:uuid:d2d0a930-3595-4c0d-b554-3883fb23da07",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2024-06-27T18:04:37Z",
+    "tools": [
       {
-        "Vendor": "Siemens AG",
-        "Name": "Clearing Automation Tool",
-        "Version": "3.1.1",
-        "Hashes": null
+        "vendor": "Siemens AG",
+        "name": "Clearing Automation Tool",
+        "version": "6.1.0",
+        "externalReferences": [
+          {
+            "url": "https://github.com/siemens/continuous-clearing",
+            "type": "website"
+          }
+        ]
+      },
+      {
+        "vendor": "Siemens AG",
+        "name": "Siemens SBOM",
+        "version": "2.0.0",
+        "externalReferences": [
+          {
+            "url": "https://sbom.siemens.io/",
+            "type": "website"
+          }
+        ]
       }
     ],
-    "Authors": null,
-    "Component": null,
-    "Manufacture": null,
-    "Supplier": null
+    "component": {
+      "type": "application",
+      "name": "Test",
+      "version": "1.0"
+    },
+    "properties": [
+      {
+        "name": "siemens:profile",
+        "value": "clearing"
+      }
+    ]
   },
-  "Components": [
+  "components": [
     {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:npm/%40angular/common@9.1.12",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": "@angular",
-      "Name": "common",
-      "Version": "9.1.12",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:npm/%40angular/common@9.1.12",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
+      "type": "null",
+      "bom-ref": "pkg:npm/%40angular/common@9.1.12",
+      "group": "@angular",
+      "name": "common",
+      "version": "9.1.12",
+      "hashes": [
         {
-          "Name": "internal:siemens:clearing:development",
-          "Value": "false"
+          "alg": "MD5",
+          "content": "e9201eb7291b0a88ba9da8f1f895425d"
         },
         {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
+          "alg": "SHA-1",
+          "content": "731701fae63ae8e2ee2ce00e7d51f458ecd00c7c"
         },
         {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "org1-npmjs-npm-remote-cache"
-        },
-        {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "NPM"
+          "alg": "SHA-256",
+          "content": "c07fffb9776ec0aca9d89b9984f343c0faa0af82171bd1195d6b04ec53e159df"
         }
       ],
-      "Evidence": null
+      "purl": "pkg:npm/%40angular/common@9.1.12",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "org1-npmjs-npm-remote-cache"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NPM"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "common-9.1.12.tgz"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "org1-npmjs-npm-remote-cache/@angular/common/-/common-9.1.12.tgz"
+        }
+      ]
     },
     {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:npm/rxjs@6.5.5",
-      "Supplier": null,
-      "Author": "",
-      "Publisher": null,
-      "Group": null,
-      "Name": "rxjs",
-      "Version": "6.5.5",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:npm/rxjs@6.5.5",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
+      "type": "null",
+      "bom-ref": "pkg:npm/rxjs@6.5.5",
+      "name": "rxjs",
+      "version": "6.5.5",
+      "hashes": [
         {
-          "Name": "internal:siemens:clearing:development",
-          "Value": "false"
+          "alg": "MD5",
+          "content": "993412dfccf059a031ff615621384077"
         },
         {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
+          "alg": "SHA-1",
+          "content": "c5c884e3094c8cfee31bf27eb87e54ccfc87f9ec"
         },
         {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "siparty-release-npm-egll"
-        },
-        {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "NPM"
+          "alg": "SHA-256",
+          "content": "d136dfc5700dc6d9cdb70c0fee0a4f0e2c9fe4dc2c0d76a12d84d90407e29f78"
         }
       ],
-      "Evidence": null
+      "purl": "pkg:npm/rxjs@6.5.5",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "siparty-release-npm-egll"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NPM"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "rxjs-6.5.5.tgz"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "siparty-release-npm-egll/rxjs/-/rxjs-6.5.5.tgz"
+        }
+      ]
     },
     {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:npm/tslib@1.13.0",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": null,
-      "Name": "tslib",
-      "Version": "1.13.0",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:npm/tslib@1.13.0",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
+      "type": "null",
+      "bom-ref": "pkg:npm/tslib@1.13.0",
+      "name": "tslib",
+      "version": "1.13.0",
+      "hashes": [
         {
-          "Name": "internal:siemens:clearing:development",
-          "Value": "false"
+          "alg": "MD5",
+          "content": "7d5d44c4b9cf8ffb14fd4ed71e051ecd"
         },
         {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
+          "alg": "SHA-1",
+          "content": "c881e13cc7015894ed914862d276436fa9a47043"
         },
         {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "siparty-release-npm-egll"
-        },
-        {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "NPM"
+          "alg": "SHA-256",
+          "content": "112833e1b1c8893896c48b7642d8d404f6dce769da77f1c3cb5b01fe23309b45"
         }
       ],
-      "Evidence": null
+      "purl": "pkg:npm/tslib@1.13.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "siparty-release-npm-egll"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NPM"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "tslib-1.13.0.tgz"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "siparty-release-npm-egll/tslib/-/tslib-1.13.0.tgz"
+        }
+      ]
     },
     {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:npm/zone.js@0.10.3",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": null,
-      "Name": "zone.js",
-      "Version": "0.10.3",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:npm/zone.js@0.10.3",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
+      "type": "null",
+      "bom-ref": "pkg:npm/zone.js@0.10.3",
+      "name": "zone.js",
+      "version": "0.10.3",
+      "hashes": [
         {
-          "Name": "internal:siemens:clearing:development",
-          "Value": "false"
+          "alg": "MD5",
+          "content": "bfb27f0c09a4b50f91c273561ba4baff"
         },
         {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
+          "alg": "SHA-1",
+          "content": "3e5e4da03c607c9dcd92e37dd35687a14a140c16"
         },
         {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "siparty-release-npm-egll"
-        },
-        {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "NPM"
+          "alg": "SHA-256",
+          "content": "256953918ae6b8ac3eb18c257b14390dd80859b2b0dd72263cd7e06423164d0a"
         }
       ],
-      "Evidence": null
-    }
-  ],
-  "Dependencies": [
-    {
-      "Ref": "pkg:npm/rxjs@6.5.5",
-      "Dependencies": [
+      "purl": "pkg:npm/zone.js@0.10.3",
+      "properties": [
         {
-          "Ref": "pkg:npm/tslib@^1.9.0",
-          "Dependencies": null
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "siparty-release-npm-egll"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NPM"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "zone.js-0.10.3.tgz"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "siparty-release-npm-egll/zone.js/-/zone.js-0.10.3.tgz"
         }
       ]
     }
   ],
-  "Compositions": null
+  "dependencies": [
+    {
+      "ref": "pkg:npm/rxjs@6.5.5",
+      "dependsOn": [
+        "pkg:npm/tslib@^1.9.0"
+      ]
+    }
+  ]
 }

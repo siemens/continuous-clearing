@@ -23,6 +23,12 @@ namespace LCT.APICommunications.Model
         [JsonProperty("version")]
         public string Version { get; set; }
 
+        [JsonProperty("state")]
+        public string state { get; set; }
+
+        [JsonProperty("clearingState")]
+        public string clearingState { get; set; }
+
         [JsonProperty("_embedded")]
         public ReleaseEmbedded Embedded { get; set; }
 

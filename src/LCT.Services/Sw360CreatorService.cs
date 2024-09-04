@@ -85,7 +85,7 @@ namespace LCT.Services
                 else
                 {
                     componentCreateStatus.IsCreated = false;
-                    componentCreateStatus.ReleaseStatus.IsCreated = false;
+                    componentCreateStatus.ReleaseStatus.IsCreated = false;                    
                     Environment.ExitCode = -1;
                     Logger.Debug($"CreateComponent():Component Name -{componentInfo.Name}- " +
                    $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
@@ -95,7 +95,7 @@ namespace LCT.Services
             }
             catch (HttpRequestException e)
             {
-                Logger.Error($"CreateComponent():", e);
+                Logger.Error($"CreateComponent():", e);                
                 Environment.ExitCode = -1;
                 componentCreateStatus.IsCreated = false;
                 componentCreateStatus.ReleaseStatus.IsCreated = false;
@@ -179,6 +179,7 @@ namespace LCT.Services
                 else
                 {
                     createStatus.IsCreated = false;
+                    
                     Environment.ExitCode = -1;
                     Logger.Debug($"CreateReleaseForComponent():Component Name -{componentInfo.Name}{componentInfo.Version}- " +
                    $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
@@ -291,7 +292,7 @@ namespace LCT.Services
                                             releaseLinked => releaseLinked.ReleaseId,
                                             releaseLinked => new AddLinkedRelease()
                                             {
-                                                ReleaseRelation = string.IsNullOrEmpty(releaseLinked.Relation) ? Dataconstant.LinkedByCAToolReleaseRelation
+                                                ReleaseRelation = string.IsNullOrEmpty(releaseLinked.Relation) ? Dataconstant.LinkedByCAToolReleaseRelationContained
                                                                     : releaseLinked.Relation,
                                                 Comment = manuallyLinkedReleases.Exists(r => r.ReleaseId == releaseLinked.ReleaseId) ? releaseLinked.Comment : Dataconstant.LinkedByCATool
                                             });
@@ -301,6 +302,7 @@ namespace LCT.Services
                 var response = await m_SW360ApiCommunicationFacade.LinkReleasesToProject(content, sw360ProjectId);
                 if (!response.IsSuccessStatusCode)
                 {
+                    
                     Environment.ExitCode = -1;
                     Logger.Error($"LinkReleasesToProject() : Linking releases to project Id {sw360ProjectId} is failed.");
                     return false;

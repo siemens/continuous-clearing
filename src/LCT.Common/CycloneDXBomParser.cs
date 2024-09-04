@@ -25,8 +25,6 @@ namespace LCT.Common
         {
             Bom bom = new Bom();
             string json = string.Empty;
-            Logger.Logger.Log(null, Level.Notice, $"Consuming cyclonedx file data from "+ filePath + "...\n", null);
-
             try
             {
                 json = File.ReadAllText(filePath);
@@ -81,7 +79,7 @@ namespace LCT.Common
             foreach (var component in bom.ToList())
             {
                 if (!string.IsNullOrEmpty(component.Name) && !string.IsNullOrEmpty(component.Version)
-                    && !string.IsNullOrEmpty(component.Purl) && 
+                    && !string.IsNullOrEmpty(component.Purl) &&
                     component.Purl.Contains(Dataconstant.PurlCheck()[projectType.ToUpper()]))
                 {
                     //Taking Valid Components for perticular projects
@@ -94,5 +92,6 @@ namespace LCT.Common
                 }
             }
         }
+
     }
 }

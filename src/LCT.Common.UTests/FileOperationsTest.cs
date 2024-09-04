@@ -87,6 +87,7 @@ namespace LCT.Common.UTests
             Assert.AreEqual(1, comparisonData.Components.Count);
         }
 
+       
         [Test]
         public void CombineComponentsFromExistingBOM_WhenFilepathIsWrong_ReturnsFailure()
         {

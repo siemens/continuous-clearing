@@ -1,631 +1,410 @@
-// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
-//
-//  SPDX-License-Identifier: MIT
-
-// --------------------------------------------------------------------------------------------------------------------
 {
-  "BomFormat": "CycloneDX",
-  "SpecVersion": 4,
-  "SpecVersionString": "1.4",
-  "SerialNumber": null,
-  "Version": null,
-  "Metadata": {
-    "Tools": [
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.4",
+  "serialNumber": "urn:uuid:fe6bfc03-6e58-4ee4-bbe3-b1dc8fd73ad5",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2024-07-08T14:06:17Z",
+    "tools": [
       {
-        "Vendor": "Siemens AG",
-        "Name": "Clearing Automation Tool",
-        "Version": "3.1.1",
-        "Hashes": null
+        "vendor": "Siemens AG",
+        "name": "Clearing Automation Tool",
+        "version": "6.1.0",
+        "externalReferences": [
+          {
+            "url": "https://github.com/siemens/continuous-clearing",
+            "type": "website"
+          }
+        ]
+      },
+      {
+        "vendor": "Siemens AG",
+        "name": "Siemens SBOM",
+        "version": "2.0.0",
+        "externalReferences": [
+          {
+            "url": "https://sbom.siemens.io/",
+            "type": "website"
+          }
+        ]
       }
     ],
-    "Authors": null,
-    "Component": null,
-    "Manufacture": null,
-    "Supplier": null
+    "component": {
+      "type": "application",
+      "name": "Test",
+      "version": "1.0"
+    },
+    "properties": [
+      {
+        "name": "siemens:profile",
+        "value": "clearing"
+      }
+    ]
   },
-  "Components": [
+  "components": [
     {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:npm/rxjs@6.5.4",
-      "Supplier": null,
-      "Author": "",
-      "Publisher": null,
-      "Group": null,
-      "Name": "rxjs",
-      "Version": "6.5.4",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:npm/rxjs@6.5.4",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
+      "type": "null",
+      "bom-ref": "pkg:npm/rxjs@6.5.4",
+      "name": "rxjs",
+      "version": "6.5.4",
+      "purl": "pkg:npm/rxjs@6.5.4",
+      "properties": [
         {
-          "Name": "internal:siemens:clearing:development",
-          "Value": "false"
-        },
-		{
-          "Name": "internal:siemens:clearing:identifier-type",
-          "Value": "Discovered"
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
         },
         {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "siparty-release-npm-egll"
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
         },
         {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "NPM"
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:clearing-state",
-          "Value": "Not Available"
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
         },
         {
-          "Name": "internal:siemens:clearing:sw360:release-url",
-          "Value": "http://localhost:8090/resource/api/releases/4274aeb91a1c443dbc94c1b2525e4507"
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NPM"
         },
         {
-          "Name": "internal:siemens:clearing:fossology:url",
-          "Value": null
-        }
-      ],
-      "Evidence": null
-    },
-    {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:npm/%40angular-devkit/architect@0.901.10",
-      "Supplier": null,
-      "Author": "",
-      "Publisher": null,
-      "Group": "@angular-devkit",
-      "Name": "architect",
-      "Version": "0.901.10",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:npm/%40angular-devkit/architect@0.901.10",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
-        {
-          "Name": "internal:siemens:clearing:development",
-          "Value": "false"
-        },
-		{
-          "Name": "internal:siemens:clearing:identifier-type",
-          "Value": "Discovered"
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
         },
         {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
         },
         {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "org1-npmjs-npm-remote-cache"
+          "name": "internal:siemens:clearing:clearing-state",
+          "value": "NEW_CLEARING"
         },
         {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "NPM"
+          "name": "internal:siemens:clearing:sw360:release-url",
+          "value": "http://localhost:8090/resource/api/releases/40974a6aa73b4a6da2ca7de533c66b28"
         },
         {
-          "Name": "internal:siemens:clearing:clearing-state",
-          "Value": "Not Available"
-        },
-        {
-          "Name": "internal:siemens:clearing:sw360:release-url",
-          "Value": "http://localhost:8090/resource/api/releases/43695ed108034b87aed19b31c0b19938"
-        },
-        {
-          "Name": "internal:siemens:clearing:fossology:url",
-          "Value": null
-        }
-      ],
-      "Evidence": null
-    },
-    {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:npm/%40angular-devkit/build-angular@0.901.10",
-      "Supplier": null,
-      "Author": "",
-      "Publisher": null,
-      "Group": "@angular-devkit",
-      "Name": "build-angular",
-      "Version": "0.901.10",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:npm/%40angular-devkit/build-angular@0.901.10",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
-        {
-          "Name": "internal:siemens:clearing:development",
-          "Value": "true"
-        },
-		{
-          "Name": "internal:siemens:clearing:identifier-type",
-          "Value": "Discovered"
-        },
-        {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
-        },
-        {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "org1-npmjs-npm-remote-cache"
-        },
-        {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "NPM"
-        }
-      ],
-      "Evidence": null
-    },
-    {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:npm/tslib@1.11.1",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": null,
-      "Name": "tslib",
-      "Version": "1.11.1",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:npm/tslib@1.11.1",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
-        {
-          "Name": "internal:siemens:clearing:development",
-          "Value": "true"
-        },
-		{
-          "Name": "internal:siemens:clearing:identifier-type",
-          "Value": "Discovered"
-        },
-        {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
-        },
-        {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "siparty-release-npm-egll"
-        },
-        {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "NPM"
-        }
-      ],
-      "Evidence": null
-    },
-    {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:npm/typescript@3.6.5",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": null,
-      "Name": "typescript",
-      "Version": "3.6.5",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:npm/typescript@3.6.5",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
-        {
-          "Name": "internal:siemens:clearing:development",
-          "Value": "true"
-        },
-		{
-          "Name": "internal:siemens:clearing:identifier-type",
-          "Value": "Discovered"
-        },
-        {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
-        },
-        {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "org1-npmjs-npm-remote-cache"
-        },
-        {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "NPM"
-        }
-      ],
-      "Evidence": null
-    },
-    {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:npm/%40angular-devkit/build-optimizer@0.901.10",
-      "Supplier": null,
-      "Author": "",
-      "Publisher": null,
-      "Group": "@angular-devkit",
-      "Name": "build-optimizer",
-      "Version": "0.901.10",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:npm/%40angular-devkit/build-optimizer@0.901.10",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
-        {
-          "Name": "internal:siemens:clearing:development",
-          "Value": "true"
-        },
-		{
-          "Name": "internal:siemens:clearing:identifier-type",
-          "Value": "Discovered"
-        },
-        {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
-        },
-        {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "org1-npmjs-npm-remote-cache"
-        },
-        {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "NPM"
-        }
-      ],
-      "Evidence": null
-    }
-  ],
-  "Dependencies": [
-    {
-      "Ref": "pkg:npm/rxjs@6.5.4",
-      "Dependencies": [
-        {
-          "Ref": "pkg:npm/tslib@^1.9.0",
-          "Dependencies": null
+          "name": "internal:siemens:clearing:fossology:url",
+          "value": ""
         }
       ]
     },
     {
-      "Ref": "pkg:npm/%40angular-devkit/architect@0.901.10",
-      "Dependencies": [
+      "type": "null",
+      "bom-ref": "pkg:npm/%40angular-devkit/architect@0.901.10",
+      "group": "@angular-devkit",
+      "name": "architect",
+      "version": "0.901.10",
+      "purl": "pkg:npm/%40angular-devkit/architect@0.901.10",
+      "properties": [
         {
-          "Ref": "pkg:npm/%40angular-devkit/core@9.1.10",
-          "Dependencies": null
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
         },
         {
-          "Ref": "pkg:npm/rxjs@6.5.4",
-          "Dependencies": null
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NPM"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        },
+        {
+          "name": "internal:siemens:clearing:clearing-state",
+          "value": "NEW_CLEARING"
+        },
+        {
+          "name": "internal:siemens:clearing:sw360:release-url",
+          "value": "http://localhost:8090/resource/api/releases/b058f9706e9d4b02905946c1ae01b40a"
+        },
+        {
+          "name": "internal:siemens:clearing:fossology:url",
+          "value": ""
         }
       ]
     },
     {
-      "Ref": "pkg:npm/rxjs@6.5.4",
-      "Dependencies": [
+      "type": "null",
+      "bom-ref": "pkg:npm/%40angular-devkit/build-angular@0.901.10",
+      "group": "@angular-devkit",
+      "name": "build-angular",
+      "version": "0.901.10",
+      "purl": "pkg:npm/%40angular-devkit/build-angular@0.901.10",
+      "properties": [
         {
-          "Ref": "pkg:npm/tslib@^1.9.0",
-          "Dependencies": null
+          "name": "internal:siemens:clearing:development",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NPM"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
         }
       ]
     },
     {
-      "Ref": "pkg:npm/%40angular-devkit/build-angular@0.901.10",
-      "Dependencies": [
+      "type": "null",
+      "bom-ref": "pkg:npm/tslib@1.11.1",
+      "name": "tslib",
+      "version": "1.11.1",
+      "purl": "pkg:npm/tslib@1.11.1",
+      "properties": [
         {
-          "Ref": "pkg:npm/%40angular-devkit/architect@0.901.10",
-          "Dependencies": null
+          "name": "internal:siemens:clearing:development",
+          "value": "true"
         },
         {
-          "Ref": "pkg:npm/%40angular-devkit/build-optimizer@0.901.10",
-          "Dependencies": null
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
         },
         {
-          "Ref": "pkg:npm/%40angular-devkit/build-webpack@0.901.10",
-          "Dependencies": null
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
         },
         {
-          "Ref": "pkg:npm/%40angular-devkit/core@9.1.10",
-          "Dependencies": null
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
         },
         {
-          "Ref": "pkg:npm/%40babel/core@7.9.0",
-          "Dependencies": null
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
         },
         {
-          "Ref": "pkg:npm/%40babel/generator@7.9.3",
-          "Dependencies": null
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NPM"
         },
         {
-          "Ref": "pkg:npm/%40babel/preset-env@7.9.0",
-          "Dependencies": null
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
         },
         {
-          "Ref": "pkg:npm/%40babel/template@7.8.6",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/%40jsdevtools/coverage-istanbul-loader@3.0.3",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/%40ngtools/webpack@9.1.10",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/ajv@6.12.0",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/autoprefixer@9.7.4",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/babel-loader@8.0.6",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/browserslist@^4.9.1",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/cacache@15.0.0",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/caniuse-lite@^1.0.30001032",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/circular-dependency-plugin@5.2.0",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/copy-webpack-plugin@6.0.3",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/core-js@3.6.4",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/css-loader@3.5.1",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/cssnano@4.1.10",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/file-loader@6.0.0",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/find-cache-dir@3.3.1",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/glob@7.1.6",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/jest-worker@25.1.0",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/karma-source-map-support@1.4.0",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/less@3.11.3",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/less-loader@5.0.0",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/license-webpack-plugin@2.1.4",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/loader-utils@2.0.0",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/mini-css-extract-plugin@0.9.0",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/minimatch@3.0.4",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/open@7.0.3",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/parse5@4.0.0",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/postcss@7.0.27",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/postcss-import@12.0.1",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/postcss-loader@3.0.0",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/raw-loader@4.0.0",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/regenerator-runtime@0.13.5",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/rimraf@3.0.2",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/rollup@2.1.0",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/rxjs@6.5.4",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/sass@1.26.3",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/sass-loader@8.0.2",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/semver@7.1.3",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/source-map@0.7.3",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/source-map-loader@0.2.4",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/speed-measure-webpack-plugin@1.3.1",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/style-loader@1.1.3",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/stylus@0.54.7",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/stylus-loader@3.0.2",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/terser@4.6.10",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/terser-webpack-plugin@3.0.3",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/tree-kill@1.2.2",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/webpack@4.42.0",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/webpack-dev-middleware@3.7.2",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/webpack-dev-server@3.11.0",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/webpack-merge@4.2.2",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/webpack-sources@1.4.3",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/webpack-subresource-integrity@1.4.0",
-          "Dependencies": null
-        },
-        {
-          "Ref": "pkg:npm/worker-plugin@4.0.3",
-          "Dependencies": null
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
         }
       ]
     },
     {
-      "Ref": "pkg:npm/%40angular-devkit/build-optimizer@0.901.10",
-      "Dependencies": [
+      "type": "null",
+      "bom-ref": "pkg:npm/typescript@3.6.5",
+      "name": "typescript",
+      "version": "3.6.5",
+      "purl": "pkg:npm/typescript@3.6.5",
+      "properties": [
         {
-          "Ref": "pkg:npm/loader-utils@2.0.0",
-          "Dependencies": null
+          "name": "internal:siemens:clearing:development",
+          "value": "true"
         },
         {
-          "Ref": "pkg:npm/source-map@0.7.3",
-          "Dependencies": null
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
         },
         {
-          "Ref": "pkg:npm/tslib@1.11.1",
-          "Dependencies": null
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
         },
         {
-          "Ref": "pkg:npm/typescript@3.6.5",
-          "Dependencies": null
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
         },
         {
-          "Ref": "pkg:npm/webpack-sources@1.4.3",
-          "Dependencies": null
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NPM"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "null",
+      "bom-ref": "pkg:npm/%40angular-devkit/build-optimizer@0.901.10",
+      "group": "@angular-devkit",
+      "name": "build-optimizer",
+      "version": "0.901.10",
+      "purl": "pkg:npm/%40angular-devkit/build-optimizer@0.901.10",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NPM"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
         }
       ]
     }
   ],
-  "Compositions": null
+  "dependencies": [
+    {
+      "ref": "pkg:npm/rxjs@6.5.4",
+      "dependsOn": [
+        "pkg:npm/tslib@^1.9.0"
+      ]
+    },
+    {
+      "ref": "pkg:npm/%40angular-devkit/architect@0.901.10",
+      "dependsOn": [
+        "pkg:npm/%40angular-devkit/core@9.1.10",
+        "pkg:npm/rxjs@6.5.4"
+      ]
+    },
+    {
+      "ref": "pkg:npm/%40angular-devkit/build-angular@0.901.10",
+      "dependsOn": [
+        "pkg:npm/%40angular-devkit/architect@0.901.10",
+        "pkg:npm/%40angular-devkit/build-optimizer@0.901.10",
+        "pkg:npm/%40angular-devkit/build-webpack@0.901.10",
+        "pkg:npm/%40angular-devkit/core@9.1.10",
+        "pkg:npm/%40babel/core@7.9.0",
+        "pkg:npm/%40babel/generator@7.9.3",
+        "pkg:npm/%40babel/preset-env@7.9.0",
+        "pkg:npm/%40babel/template@7.8.6",
+        "pkg:npm/%40jsdevtools/coverage-istanbul-loader@3.0.3",
+        "pkg:npm/%40ngtools/webpack@9.1.10",
+        "pkg:npm/ajv@6.12.0",
+        "pkg:npm/autoprefixer@9.7.4",
+        "pkg:npm/babel-loader@8.0.6",
+        "pkg:npm/browserslist@^4.9.1",
+        "pkg:npm/cacache@15.0.0",
+        "pkg:npm/caniuse-lite@^1.0.30001032",
+        "pkg:npm/circular-dependency-plugin@5.2.0",
+        "pkg:npm/copy-webpack-plugin@6.0.3",
+        "pkg:npm/core-js@3.6.4",
+        "pkg:npm/css-loader@3.5.1",
+        "pkg:npm/cssnano@4.1.10",
+        "pkg:npm/file-loader@6.0.0",
+        "pkg:npm/find-cache-dir@3.3.1",
+        "pkg:npm/glob@7.1.6",
+        "pkg:npm/jest-worker@25.1.0",
+        "pkg:npm/karma-source-map-support@1.4.0",
+        "pkg:npm/less@3.11.3",
+        "pkg:npm/less-loader@5.0.0",
+        "pkg:npm/license-webpack-plugin@2.1.4",
+        "pkg:npm/loader-utils@2.0.0",
+        "pkg:npm/mini-css-extract-plugin@0.9.0",
+        "pkg:npm/minimatch@3.0.4",
+        "pkg:npm/open@7.0.3",
+        "pkg:npm/parse5@4.0.0",
+        "pkg:npm/postcss@7.0.27",
+        "pkg:npm/postcss-import@12.0.1",
+        "pkg:npm/postcss-loader@3.0.0",
+        "pkg:npm/raw-loader@4.0.0",
+        "pkg:npm/regenerator-runtime@0.13.5",
+        "pkg:npm/rimraf@3.0.2",
+        "pkg:npm/rollup@2.1.0",
+        "pkg:npm/rxjs@6.5.4",
+        "pkg:npm/sass@1.26.3",
+        "pkg:npm/sass-loader@8.0.2",
+        "pkg:npm/semver@7.1.3",
+        "pkg:npm/source-map@0.7.3",
+        "pkg:npm/source-map-loader@0.2.4",
+        "pkg:npm/speed-measure-webpack-plugin@1.3.1",
+        "pkg:npm/style-loader@1.1.3",
+        "pkg:npm/stylus@0.54.7",
+        "pkg:npm/stylus-loader@3.0.2",
+        "pkg:npm/terser@4.6.10",
+        "pkg:npm/terser-webpack-plugin@3.0.3",
+        "pkg:npm/tree-kill@1.2.2",
+        "pkg:npm/webpack@4.42.0",
+        "pkg:npm/webpack-dev-middleware@3.7.2",
+        "pkg:npm/webpack-dev-server@3.11.0",
+        "pkg:npm/webpack-merge@4.2.2",
+        "pkg:npm/webpack-sources@1.4.3",
+        "pkg:npm/webpack-subresource-integrity@1.4.0",
+        "pkg:npm/worker-plugin@4.0.3"
+      ]
+    },
+    {
+      "ref": "pkg:npm/%40angular-devkit/build-optimizer@0.901.10",
+      "dependsOn": [
+        "pkg:npm/loader-utils@2.0.0",
+        "pkg:npm/source-map@0.7.3",
+        "pkg:npm/tslib@1.11.1",
+        "pkg:npm/typescript@3.6.5",
+        "pkg:npm/webpack-sources@1.4.3"
+      ]
+    }
+  ]
 }

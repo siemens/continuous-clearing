@@ -19,13 +19,15 @@ using System.Security.Cryptography;
 using LCT.PackageIdentifier.Model.NugetModel;
 using System.Text.Json;
 using System.Runtime.InteropServices;
+using Newtonsoft.Json.Linq;
 
 namespace LCT.PackageIdentifier
 {
-    internal class NugetDevDependencyParser
+    public class NugetDevDependencyParser
     {
         private static NugetDevDependencyParser instance = null;
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        public static List<string> NugetDirectDependencies = new List<string>();
 
         private NugetDevDependencyParser()
         {
@@ -132,9 +134,12 @@ namespace LCT.PackageIdentifier
             bool isTestProject;
             try
             {
-                IDictionary<string, BuildInfoComponent> components = container.Components;
+                IDictionary<string, BuildInfoComponent> components =
+                    container.Components;
                 LockFileFormat assetFileReader = new();
                 LockFile assetFile = assetFileReader.Read(filePath);
+                GetDirectDependencies(filePath);
+
                 if (assetFile.PackageSpec != null)
                 {
                     if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -171,6 +176,41 @@ namespace LCT.PackageIdentifier
             {
                 Logger.Debug($"ParseJsonFile():InvalidProjectFileException : ", ex);
                 Logger.Warn($"InvalidProjectFileException : While parsing project asset file : " + filePath + " Error : " + ex.Message + "\n");
+            }
+        }
+
+        private static void GetDirectDependencies(string filePath)
+        {
+            var readValue = File.ReadAllText(filePath);
+            JObject serializedContent = JObject.Parse(readValue);
+            JToken projectFramworks = serializedContent["project"]["frameworks"];
+            if (projectFramworks == null && !projectFramworks.HasValues)
+            {
+                return;
+            }
+
+            IEnumerable<JProperty> listChilds = projectFramworks.Children().OfType<JProperty>() ?? new List<JProperty>();
+            //check has values
+            if (listChilds != null && listChilds.ToList()[0].HasValues)
+            {
+                JToken projectDependencies = listChilds.ToList()[0].Value["dependencies"];
+                if (projectDependencies == null)
+                {
+                    return;
+                }
+                List<JProperty> directDepCollection =  new List<JProperty>();
+
+                if (projectDependencies.HasValues)
+                {
+                    directDepCollection = projectDependencies.Children().OfType<JProperty>()?.ToList() ?? new List<JProperty>();
+                }
+                foreach (var child in directDepCollection)
+                {
+                    if (!NugetDirectDependencies.Contains(child.Name + " " + child.Value["version"]))
+                    {
+                        NugetDirectDependencies.Add(child.Name + " " + child.Value["version"]);
+                    }
+                }
             }
         }
 

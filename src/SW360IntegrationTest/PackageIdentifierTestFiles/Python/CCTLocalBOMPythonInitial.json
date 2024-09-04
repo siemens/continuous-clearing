@@ -1,204 +1,239 @@
 {
-  "BomFormat": "CycloneDX",
-  "SpecVersion": 4,
-  "SpecVersionString": "1.4",
-  "SerialNumber": null,
-  "Version": null,
-  "Metadata": {
-    "Tools": [
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.4",
+  "serialNumber": "urn:uuid:1bab741c-7f90-4cd7-a8c6-8b9146d49a2f",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2024-07-06T15:28:06Z",
+    "tools": [
       {
-        "Vendor": "Siemens AG",
-        "Name": "Clearing Automation Tool",
-        "Version": "4.0.0",
-        "Hashes": null
+        "vendor": "Siemens AG",
+        "name": "Clearing Automation Tool",
+        "version": "6.1.0",
+        "externalReferences": [
+          {
+            "url": "https://github.com/siemens/continuous-clearing",
+            "type": "website"
+          }
+        ]
+      },
+      {
+        "vendor": "Siemens AG",
+        "name": "Siemens SBOM",
+        "version": "2.0.0",
+        "externalReferences": [
+          {
+            "url": "https://sbom.siemens.io/",
+            "type": "website"
+          }
+        ]
       }
     ],
-    "Authors": null,
-    "Component": null,
-    "Manufacture": null,
-    "Supplier": null
+    "component": {
+      "type": "application",
+      "name": "Test",
+      "version": "1.0"
+    },
+    "properties": [
+      {
+        "name": "siemens:profile",
+        "value": "clearing"
+      }
+    ]
   },
-  "Components": [
+  "components": [
     {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:pypi/html5lib@1.1",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": null,
-      "Name": "html5lib",
-      "Version": "1.1",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:pypi/html5lib@1.1",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
+      "type": "library",
+      "bom-ref": "pkg:pypi/html5lib@1.1",
+      "name": "html5lib",
+      "version": "1.1",
+      "hashes": [
         {
-          "Name": "internal:siemens:clearing:development",
-          "Value": "false"
+          "alg": "MD5",
+          "content": "167ff642c4754015d78b21117a752342"
         },
         {
-          "Name": "internal:siemens:clearing:identifier-type",
-          "Value": "ManuallyAdded"
+          "alg": "SHA-1",
+          "content": "188a3653a14d2b7df7f4a64381355ef5e747b1b6"
         },
         {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
-        },
-        {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrogRepo"
-        },
-        {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "PYTHON"
+          "alg": "SHA-256",
+          "content": "0d78f8fde1c230e99fe37986a60526d7049ed4bf8a9fadbad5f00e22e58e041d"
         }
       ],
-      "Evidence": null
+      "purl": "pkg:pypi/html5lib@1.1",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "ManuallyAdded"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "org1-pythonhosted-pypi-remote-cache"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Python"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "html5lib-1.1-py2.py3-none-any.whl"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "org1-pythonhosted-pypi-remote-cache/6c/dd/a834df6482147d48e225a49515aabc28974ad5a4ca3215c18a882565b028/html5lib-1.1-py2.py3-none-any.whl"
+        }
+      ]
     },
     {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:pypi/attrs@22.1.0",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": null,
-      "Name": "attrs",
-      "Version": "22.1.0",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:pypi/attrs@22.1.0",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
+      "type": "library",
+      "bom-ref": "pkg:pypi/attrs@22.1.0",
+      "name": "attrs",
+      "version": "22.1.0",
+      "purl": "pkg:pypi/attrs@22.1.0",
+      "properties": [
         {
-          "Name": "internal:siemens:clearing:development",
-          "Value": "false"
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:identifier-type",
-          "Value": "ManuallyAdded"
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "ManuallyAdded"
         },
         {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrogRepo"
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "PYTHON"
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Python"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
         }
-      ],
-      "Evidence": null
+      ]
     },
     {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:pypi/beautifulsoup4@4.11.1",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": null,
-      "Name": "beautifulsoup4",
-      "Version": "4.11.1",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:pypi/beautifulsoup4@4.11.1",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
+      "type": "library",
+      "bom-ref": "pkg:pypi/beautifulsoup4@4.11.1",
+      "name": "beautifulsoup4",
+      "version": "4.11.1",
+      "hashes": [
         {
-          "Name": "internal:siemens:clearing:development",
-          "Value": "false"
+          "alg": "MD5",
+          "content": "08cda1831119ea9e9386215da237bf49"
         },
         {
-          "Name": "internal:siemens:clearing:identifier-type",
-          "Value": "ManuallyAdded"
+          "alg": "SHA-1",
+          "content": "5823dfdfc01f91bff9832f143ffe6c675b1f780b"
         },
         {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
-        },
-        {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrogRepo"
-        },
-        {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "PYTHON"
+          "alg": "SHA-256",
+          "content": "58d5c3d29f5a36ffeb94f02f0d786cd53014cf9b3b3951d42e0080d8a9498d30"
         }
       ],
-      "Evidence": null
+      "purl": "pkg:pypi/beautifulsoup4@4.11.1",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "ManuallyAdded"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "org1-pythonhosted-pypi-remote-cache"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Python"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "beautifulsoup4-4.11.1.tar.gz"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "org1-pythonhosted-pypi-remote-cache/packages/source/b/beautifulsoup4/beautifulsoup4-4.11.1.tar.gz"
+        }
+      ]
     },
     {
-      "Type": 0,
-      "MimeType": null,
-      "BomRef": "pkg:pypi/certifi@2022.6.15",
-      "Supplier": null,
-      "Author": null,
-      "Publisher": null,
-      "Group": null,
-      "Name": "certifi",
-      "Version": "2022.6.15",
-      "Description": "",
-      "Scope": null,
-      "Hashes": null,
-      "Licenses": null,
-      "Copyright": null,
-      "Cpe": null,
-      "Purl": "pkg:pypi/certifi@2022.6.15",
-      "Swid": null,
-      "Modified": null,
-      "Pedigree": null,
-      "Components": null,
-      "Properties": [
+      "type": "library",
+      "bom-ref": "pkg:pypi/certifi@2022.6.15",
+      "name": "certifi",
+      "version": "2022.6.15",
+      "purl": "pkg:pypi/certifi@2022.6.15",
+      "properties": [
         {
-          "Name": "internal:siemens:clearing:development",
-          "Value": "false"
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:identifier-type",
-          "Value": "ManuallyAdded"
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "ManuallyAdded"
         },
         {
-          "Name": "internal:siemens:clearing:is-internal",
-          "Value": "false"
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:repo-url",
-          "Value": "Not Found in JFrogRepo"
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
         },
         {
-          "Name": "internal:siemens:clearing:project-type",
-          "Value": "PYTHON"
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Python"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
         }
-      ],
-      "Evidence": null
+      ]
     }
   ],
-  "Compositions": null
+  "dependencies": []
 }

@@ -22,6 +22,94 @@ namespace LCT.PackageIdentifier.UTest
 {
     public class MavenParserTests
     {
+        private MavenProcessor _mavenProcessor;
+
+        [SetUp]
+        public void Setup()
+        {
+            _mavenProcessor = new MavenProcessor(Mock.Of<ICycloneDXBomParser>());
+        }
+
+        [Test]
+        public void AddSiemensDirectProperty_ShouldAddProperty_WhenMavenDirectDependencyExists()
+        {
+            // Arrange
+            var bom = new Bom
+            {
+                Components = new List<Component>
+                {
+                    new Component
+                    {
+                        Name = "Component1",
+                        Version = "1.0.0"
+                    },
+                    new Component
+                    {
+                        Name = "Component2",
+                        Version = "2.0.0"
+                    }
+                },
+                Dependencies = new List<Dependency>
+                {
+                    new Dependency
+                    {
+                        Ref = "Component1:1.0.0"
+                    },
+                    new Dependency
+                    {
+                        Ref = "Component2:2.0.0"
+                    }
+                }
+            };
+
+            // Act
+            _mavenProcessor.AddSiemensDirectProperty(ref bom);
+
+            // Assert
+            Assert.AreEqual("true", bom.Components[0].Properties[0].Value);
+            Assert.AreEqual("true", bom.Components[1].Properties[0].Value);
+        }
+
+        [Test]
+        public void AddSiemensDirectProperty_ShouldNotAddProperty_WhenMavenDirectDependencyDoesNotExist()
+        {
+            // Arrange
+            var bom = new Bom
+            {
+                Components = new List<Component>
+                {
+                    new Component
+                    {
+                        Name = "Component1",
+                        Version = "1.0.0"
+                    },
+                    new Component
+                    {
+                        Name = "Component2",
+                        Version = "2.0.0"
+                    }
+                },
+                Dependencies = new List<Dependency>
+                {
+                    new Dependency
+                    {
+                        Ref = "Component3:3.0.0"
+                    },
+                    new Dependency
+                    {
+                        Ref = "Component4:4.0.0"
+                    }
+                }
+            };
+
+            // Act
+            _mavenProcessor.AddSiemensDirectProperty(ref bom);
+
+            // Assert
+            Assert.AreEqual("false", bom.Components[0].Properties[0].Value);
+            Assert.AreEqual("false", bom.Components[1].Properties[0].Value);
+        }
+
         [Test]
         public void ParsePackageFile_PackageLockWithDuplicateComponents_ReturnsCountOfDuplicates()
         {
@@ -47,7 +135,7 @@ namespace LCT.PackageIdentifier.UTest
 
             //Assert
             Assert.That(bom.Components.Count, Is.EqualTo(1), "Returns the count of components");
-            Assert.That(bom.Dependencies.Count, Is.EqualTo(4), "Returns the count of dependencies");
+            Assert.That(bom.Dependencies.Count, Is.EqualTo(2), "Returns the count of dependencies");
 
         }
 

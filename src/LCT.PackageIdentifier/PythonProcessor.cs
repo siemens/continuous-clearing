@@ -58,7 +58,7 @@ namespace LCT.PackageIdentifier
             }
 
             Bom templateDetails = new Bom();
-            if (File.Exists(appSettings.CycloneDxSBomTemplatePath) 
+            if (File.Exists(appSettings.CycloneDxSBomTemplatePath)
                 && appSettings.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
                 templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
@@ -70,13 +70,41 @@ namespace LCT.PackageIdentifier
             listComponentForBOM = FormComponentReleaseExternalID(listofComponents);
             BomCreator.bomKpiData.DuplicateComponents = initialCount - listComponentForBOM.Count;
             BomCreator.bomKpiData.ComponentsInComparisonBOM = listComponentForBOM.Count;
-
             bom.Components = listComponentForBOM;
             bom.Dependencies = dependencies;
             //Adding Template Component Details & MetaData
             SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
             bom = RemoveExcludedComponents(appSettings, bom);
+            bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
+
+            if (bom != null)
+            {
+                AddSiemensDirectProperty(ref bom);
+            }
             return bom;
+        }
+
+        public void AddSiemensDirectProperty(ref Bom bom)
+        {
+            List<string> pythonDirectDependencies = new List<string>();
+            pythonDirectDependencies.AddRange(bom.Dependencies?.Select(x => x.Ref)?.ToList() ?? new List<string>());
+            var bomComponentsList = bom.Components;
+            foreach (var component in bomComponentsList)
+            {
+                Property siemensDirect = new() { Name = Dataconstant.Cdx_SiemensDirect, Value = "false" };
+                if (pythonDirectDependencies.Exists(x => x.Contains(component.Name) && x.Contains(component.Version)))
+                {
+                    siemensDirect.Value = "true";
+                }
+
+                component.Properties ??= new List<Property>();
+                bool isPropExists = component.Properties.Exists(
+                    x => x.Name.Equals(Dataconstant.Cdx_SiemensDirect));
+
+                if (!isPropExists) { component.Properties.Add(siemensDirect); }
+            }
+
+            bom.Components = bomComponentsList;
         }
 
         #region Private Methods
@@ -139,7 +167,7 @@ namespace LCT.PackageIdentifier
                 dependencies.Add(new Dependency()
                 {
                     Ref = node.Key,
-                    Dependencies = subDependencies.Count == 0 ? null : subDependencies
+                    Dependencies = subDependencies
                 });
             }
         }
@@ -259,6 +287,7 @@ namespace LCT.PackageIdentifier
                     identifierType
                 };
 
+                component.Type = Component.Classification.Library;
                 component.BomRef = component.Purl;
 
                 listComponentForBOM.Add(component);
@@ -342,6 +371,25 @@ namespace LCT.PackageIdentifier
             return false;
         }
 
+
+        private static string GetJfrogNameOfPypiComponent(string name, string version, List<AqlResult> aqlResultList)
+        {
+            string nameVerison = string.Empty;
+            string jfrogcomponentName = $"{name}-{version}";
+            nameVerison = aqlResultList.FirstOrDefault(x => x.Name.Contains(
+                jfrogcomponentName, StringComparison.OrdinalIgnoreCase))?.Name ?? string.Empty;
+            if (string.IsNullOrEmpty(nameVerison))
+            {
+                jfrogcomponentName = $"{name}_{version}";
+                nameVerison = aqlResultList.FirstOrDefault(x => x.Name.Contains(
+                    jfrogcomponentName, StringComparison.OrdinalIgnoreCase))?.Name ?? string.Empty;
+            }
+
+            if (string.IsNullOrEmpty(nameVerison)) { nameVerison = Dataconstant.PackageNameNotFoundInJfrog; }
+            return nameVerison;
+        }
+
+
         public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
             // get the  component list from Jfrog for given repo + internal repo
@@ -352,8 +400,16 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in componentsForBOM)
             {
-                string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper);
-                Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoUrl, Value = repoName };
+                string jfrogPackageNameWhlExten = Dataconstant.PackageNameNotFoundInJfrog;
+                string jfrogRepoPath = Dataconstant.JfrogRepoPathNotFound;
+                string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper, out jfrogPackageNameWhlExten, out jfrogRepoPath);
+                string jfrogpackageName = $"{component.Name}-{component.Version}";
+                var hashes = aqlResultList.FirstOrDefault(x => x.Name.Contains(
+                    jfrogpackageName, StringComparison.OrdinalIgnoreCase) && (x.Name.EndsWith(ApiConstant.PythonExtension)));
+
+                Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = repoName };
+                Property fileNameProperty = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = jfrogPackageNameWhlExten };
+                Property jfrogRepoPathProperty = new() { Name = Dataconstant.Cdx_JfrogRepoPath, Value = jfrogRepoPath };
                 Component componentVal = component;
 
                 if (componentVal.Properties?.Count == null || componentVal.Properties?.Count <= 0)
@@ -362,39 +418,91 @@ namespace LCT.PackageIdentifier
                 }
                 componentVal.Properties.Add(artifactoryrepo);
                 componentVal.Properties.Add(projectType);
-                componentVal.Description = string.Empty;
+                componentVal.Properties.Add(fileNameProperty);
+                componentVal.Properties.Add(jfrogRepoPathProperty);
+                componentVal.Description = null;
+                if (hashes != null)
+                {
+                    componentVal.Hashes = new List<Hash>()
+                {
 
+                new()
+                 {
+                  Alg = Hash.HashAlgorithm.MD5,
+                  Content = hashes.MD5
+                },
+                new()
+                {
+                  Alg = Hash.HashAlgorithm.SHA_1,
+                  Content = hashes.SHA1
+                 },
+                 new()
+                 {
+                  Alg = Hash.HashAlgorithm.SHA_256,
+                  Content = hashes.SHA256
+                  }
+                  };
+
+                }
                 modifiedBOM.Add(componentVal);
             }
             return modifiedBOM;
         }
 
-        private static string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
+        private static string GetArtifactoryRepoName(List<AqlResult> aqlResultList,
+                                                     Component component,
+                                                     IBomHelper bomHelper,
+                                                     out string jfrogPackageName,
+                                                     out string jfrogRepoPath)
         {
-            string jfrogcomponentName = $"{component.Name}-{component.Version}{FileConstant.TargzFileExtension}";
+            jfrogPackageName = Dataconstant.PackageNameNotFoundInJfrog;
+            jfrogRepoPath = Dataconstant.JfrogRepoPathNotFound;
+            string jfrogPackageNameWhlExten = GetJfrogNameOfPypiComponent(
+                component.Name, component.Version, aqlResultList);
 
             var aqlResults = aqlResultList.FindAll(x => x.Name.Equals(
-                jfrogcomponentName, StringComparison.OrdinalIgnoreCase));
+                jfrogPackageNameWhlExten, StringComparison.OrdinalIgnoreCase));
+            jfrogPackageName = jfrogPackageNameWhlExten;
 
             string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults);
 
-            string fullName = bomHelper.GetFullNameOfComponent(component);
-            string fullNameVersion = $"{fullName}-{component.Version}";
-
-            if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase) &&
-                repoName.Equals(NotFoundInRepo, StringComparison.OrdinalIgnoreCase))
+            if (repoName.Equals(NotFoundInRepo, StringComparison.OrdinalIgnoreCase))
             {
-                var aqllist = aqlResultList.FindAll(x => x.Name.Contains(
-                    fullNameVersion, StringComparison.OrdinalIgnoreCase)
-                && (x.Name.EndsWith(ApiConstant.PythonExtension)
-                || x.Name.EndsWith(FileConstant.TargzFileExtension)));
+                string fullName = bomHelper.GetFullNameOfComponent(component);
+                string fullNameVersion = GetJfrogNameOfPypiComponent(fullName, component.Version, aqlResultList);
+                if (!fullNameVersion.Equals(jfrogPackageNameWhlExten, StringComparison.OrdinalIgnoreCase))
+                {
+                    var aqllist = aqlResultList.FindAll(x => x.Name.Contains(fullNameVersion, StringComparison.OrdinalIgnoreCase)
+                    && (x.Name.EndsWith(ApiConstant.PythonExtension) || x.Name.EndsWith(FileConstant.TargzFileExtension)));
+                    jfrogPackageName = fullNameVersion;
+                    repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqllist);
+                }
+            }
 
-                repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqllist);
+            // Forming Jfrog repo Path
+            if (!repoName.Equals(NotFoundInRepo, StringComparison.OrdinalIgnoreCase))
+            {
+                var aqlResult = aqlResults.FirstOrDefault(x => x.Repo.Equals(repoName));
+                jfrogRepoPath = GetJfrogRepoPath(aqlResult);
+            }
+
+            if (string.IsNullOrEmpty(jfrogPackageName))
+            {
+                jfrogPackageName = Dataconstant.PackageNameNotFoundInJfrog;
             }
 
             return repoName;
         }
 
+        private static string GetJfrogRepoPath(AqlResult aqlResult)
+        {
+            if (string.IsNullOrEmpty(aqlResult.Path) || aqlResult.Path.Equals("."))
+            {
+                return $"{aqlResult.Repo}/{aqlResult.Name}";
+            }
+
+            return $"{aqlResult.Repo}/{aqlResult.Path}/{aqlResult.Name}";
+        }
         #endregion
     }
 }

@@ -24,6 +24,10 @@ using LCT.Facade.Interfaces;
 using LCT.APICommunications.Interfaces;
 using LCT.APICommunications;
 using LCT.APICommunications.Model;
+using System.Globalization;
+using System.Linq;
+using LCT.ArtifactPublisher;
+
 
 namespace LCT.PackageIdentifier
 {
@@ -33,6 +37,7 @@ namespace LCT.PackageIdentifier
     public class Program
     {
         private static bool m_Verbose = false;
+
         public static Stopwatch BomStopWatch { get; set; }
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -47,7 +52,10 @@ namespace LCT.PackageIdentifier
                 m_Verbose = true;
             ISettingsManager settingsManager = new SettingsManager();
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
-
+            ProjectReleases projectReleases = new ProjectReleases();
+            // do not change the order of getting ca tool information
+            CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
+            Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
             string FolderPath = LogFolderInitialisation(appSettings);
 
             settingsManager.CheckRequiredArgsToRun(appSettings, "Identifer");
@@ -64,9 +72,19 @@ namespace LCT.PackageIdentifier
                 Logger.Logger.Log(null, Level.Alert, $"Package Identifier is running in TEST mode \n", null);
 
             // Validate application settings
-            await ValidateAppsettingsFile(appSettings);
+            await ValidateAppsettingsFile(appSettings, projectReleases);
+            string listOfInlude = DisplayInclude(appSettings);
+            string listOfExclude = DisplayExclude(appSettings);
+            string listOfExcludeComponents = DisplayExcludeComponents(appSettings);
+            string listOfInternalRepoList = string.Empty;
+            if (appSettings.InternalRepoList != null)
+            {
+                listOfInternalRepoList = string.Join(",", appSettings.InternalRepoList?.ToList());
+            }
 
             Logger.Logger.Log(null, Level.Notice, $"Input Parameters used in Package Identifier:\n\t" +
+                $"CaToolVersion\t\t --> {caToolInformation.CatoolVersion}\n\t" +
+                $"CaToolRunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
                 $"PackageFilePath\t\t --> {appSettings.PackageFilePath}\n\t" +
                 $"BomFolderPath\t\t --> {appSettings.BomFolderPath}\n\t" +
                 $"SBOMTemplateFilePath\t --> {appSettings.CycloneDxSBomTemplatePath}\n\t" +
@@ -75,7 +93,12 @@ namespace LCT.PackageIdentifier
                 $"SW360ProjectName\t --> {appSettings.SW360ProjectName}\n\t" +
                 $"SW360ProjectID\t\t --> {appSettings.SW360ProjectID}\n\t" +
                 $"ProjectType\t\t --> {appSettings.ProjectType}\n\t" +
-                $"LogFolderPath\t\t --> {Path.GetFullPath(FolderPath)}", null);
+                $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t" +
+                $"InternalRepoList\t --> {listOfInternalRepoList}\n\t" +
+                $"Include\t\t\t --> {listOfInlude}\n\t" +
+                $"Exclude\t\t\t --> {listOfExclude}\n\t" +
+                $"ExcludeComponents\t --> {listOfExcludeComponents}\n", null);
+
 
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);
@@ -88,9 +111,23 @@ namespace LCT.PackageIdentifier
             //Validating JFrog Settings
             if (await bomCreator.CheckJFrogConnection())
             {
-                await bomCreator.GenerateBom(appSettings, new BomHelper(), new FileOperations());
+                await bomCreator.GenerateBom(appSettings, new BomHelper(), new FileOperations(), projectReleases,
+                                             caToolInformation);
             }
             Logger.Logger.Log(null, Level.Notice, $"End of Package Identifier execution : {DateTime.Now}\n", null);
+
+            // publish logs and bom file to pipeline artifact
+            CommonHelper.PublishFilesToArtifact();
+
+        }
+
+        private static CatoolInfo GetCatoolVersionFromProjectfile()
+        {
+            CatoolInfo catoolInfo = new CatoolInfo();
+            var versionFromProj = Assembly.GetExecutingAssembly().GetName().Version;
+            catoolInfo.CatoolVersion = $"{versionFromProj.Major}.{versionFromProj.Minor}.{versionFromProj.Build}";
+            catoolInfo.CatoolRunningLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            return catoolInfo;
         }
 
         private static IJFrogService GetJfrogService(CommonAppSettings appSettings)
@@ -107,7 +144,7 @@ namespace LCT.PackageIdentifier
             return jFrogService;
         }
 
-        private static async Task ValidateAppsettingsFile(CommonAppSettings appSettings)
+        private static async Task ValidateAppsettingsFile(CommonAppSettings appSettings, ProjectReleases projectReleases)
         {
             SW360ConnectionSettings sw360ConnectionSettings = new SW360ConnectionSettings()
             {
@@ -118,7 +155,171 @@ namespace LCT.PackageIdentifier
                 Timeout = appSettings.TimeOut
             };
             ISw360ProjectService sw360ProjectService = new Sw360ProjectService(new SW360ApicommunicationFacade(sw360ConnectionSettings));
-            await BomValidator.ValidateAppSettings(appSettings, sw360ProjectService);
+            await BomValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
+        }
+        private static string DisplayInclude(CommonAppSettings appSettings)
+        {
+            string totalString = string.Empty;
+            switch (appSettings.ProjectType.ToUpperInvariant())
+            {
+                case "NPM":
+                    if (appSettings.Npm.Include != null)
+                    {
+                        totalString = string.Join(",", appSettings.Npm.Include?.ToList());
+                    }
+                    return totalString;
+                case "NUGET":
+                    if (appSettings.Nuget.Include != null)
+                    {
+                        totalString = string.Join(",", appSettings.Nuget.Include?.ToList());
+                    }
+                    return totalString;
+                case "MAVEN":
+                    if (appSettings.Maven.Include != null)
+                    {
+                        totalString = string.Join(",", appSettings.Maven.Include?.ToList());
+                    }
+                    return totalString;
+                case "DEBIAN":
+                    if (appSettings.Debian.Include != null)
+                    {
+                        totalString = string.Join(",", appSettings.Debian.Include?.ToList());
+                    }
+
+                    return totalString;
+                case "PYTHON":
+                    if (appSettings.Python.Include != null)
+                    {
+                        totalString = string.Join(",", appSettings.Python.Include?.ToList());
+                    }
+                    return totalString;
+                case "CONAN":
+                    if (appSettings.Conan.Include != null)
+                    {
+                        totalString = string.Join(",", appSettings.Conan.Include?.ToList());
+                    }
+                    return totalString;
+                case "ALPINE":
+                    if (appSettings.Alpine.Include != null)
+                    {
+                        totalString = string.Join(",", appSettings.Alpine.Include?.ToList());
+                    }
+                    return totalString;
+                default:
+                    Logger.Error($"Invalid ProjectType - {appSettings.ProjectType}");
+                    break;
+            }
+            return totalString;
+        }
+        private static string DisplayExclude(CommonAppSettings appSettings)
+        {
+
+            string totalString = string.Empty;
+            switch (appSettings.ProjectType.ToUpperInvariant())
+            {
+                case "NPM":
+                    if (appSettings.Npm.Exclude != null)
+                    {
+                        totalString = string.Join(",", appSettings.Npm.Exclude?.ToList());
+                    }
+                    return totalString;
+                case "NUGET":
+                    if (appSettings.Nuget.Exclude != null)
+                    {
+                        totalString = string.Join(",", appSettings.Nuget.Exclude?.ToList());
+                    }
+                    return totalString;
+                case "MAVEN":
+                    if (appSettings.Maven.Exclude != null)
+                    {
+                        totalString = string.Join(",", appSettings.Maven.Exclude?.ToList());
+                    }
+                    return totalString;
+                case "DEBIAN":
+                    if (appSettings.Debian.Exclude != null)
+                    {
+                        totalString = string.Join(",", appSettings.Debian.Exclude?.ToList());
+                    }
+                    return totalString;
+                case "PYTHON":
+                    if (appSettings.Python.Exclude != null)
+                    {
+                        totalString = string.Join(",", appSettings.Python.Exclude?.ToList());
+                    }
+                    return totalString;
+                case "CONAN":
+                    if (appSettings.Conan.Exclude != null)
+                    {
+                        totalString = string.Join(",", appSettings.Conan.Exclude?.ToList());
+                    }
+                    return totalString;
+                case "ALPINE":
+                    if (appSettings.Alpine.Include != null)
+                    {
+                        totalString = string.Join(",", appSettings.Alpine.Include?.ToList());
+                    }
+                    return totalString;
+                default:
+                    Logger.Error($"Invalid ProjectType - {appSettings.ProjectType}");
+                    break;
+            }
+            return totalString;
+        }
+
+        private static string DisplayExcludeComponents(CommonAppSettings appSettings)
+        {
+
+            string totalString = string.Empty;
+            switch (appSettings.ProjectType.ToUpperInvariant())
+            {
+                case "NPM":
+                    if (appSettings.Npm.ExcludedComponents != null)
+                    {
+                        totalString = string.Join(",", appSettings.Npm.ExcludedComponents?.ToList());
+                    }
+                    return totalString;
+                case "NUGET":
+                    if (appSettings.Nuget.ExcludedComponents != null)
+                    {
+                        totalString = string.Join(",", appSettings.Nuget.ExcludedComponents?.ToList());
+                    }
+                    return totalString;
+                case "MAVEN":
+                    if (appSettings.Maven.ExcludedComponents != null)
+                    {
+                        totalString = string.Join(",", appSettings.Maven.ExcludedComponents?.ToList());
+                    }
+                    return totalString;
+                case "DEBIAN":
+                    if (appSettings.Debian.ExcludedComponents != null)
+                    {
+                        totalString = string.Join(",", appSettings.Debian.ExcludedComponents?.ToList());
+                    }
+
+                    return totalString;
+                case "PYTHON":
+                    if (appSettings.Python.ExcludedComponents != null)
+                    {
+                        totalString = string.Join(",", appSettings.Python.ExcludedComponents?.ToList());
+                    }
+                    return totalString;
+                case "CONAN":
+                    if (appSettings.Conan.ExcludedComponents != null)
+                    {
+                        totalString = string.Join(",", appSettings.Conan.ExcludedComponents?.ToList());
+                    }
+                    return totalString;
+                case "ALPINE":
+                    if (appSettings.Alpine.Include != null)
+                    {
+                        totalString = string.Join(",", appSettings.Alpine.Include?.ToList());
+                    }
+                    return totalString;
+                default:
+                    Logger.Error($"Invalid ProjectType - {appSettings.ProjectType}");
+                    break;
+            }
+            return totalString;
         }
 
         private static string LogFolderInitialisation(CommonAppSettings appSettings)

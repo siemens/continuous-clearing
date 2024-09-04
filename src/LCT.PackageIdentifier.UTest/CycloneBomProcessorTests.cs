@@ -5,12 +5,16 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Model;
 using LCT.PackageIdentifier;
+using NuGet.ContentModel;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
 
 namespace PackageIdentifier.UTest
 {
@@ -21,6 +25,7 @@ namespace PackageIdentifier.UTest
         public void SetMetadataInComparisonBOM_GivenBOMWithEmptyMetadata_FillsInMetadataInfoInBOM()
         {
             //Arrange
+            ProjectReleases projectReleases = new ProjectReleases();
             Bom bom = new Bom()
             {
                 Metadata = null,
@@ -34,24 +39,29 @@ namespace PackageIdentifier.UTest
             {
                 CaVersion = "1.2.3"
             };
+            CatoolInfo caToolInformation = new CatoolInfo() { CatoolVersion = "6.0.0", CatoolRunningLocation="" };
             //Act
-            Bom files = CycloneBomProcessor.SetMetadataInComparisonBOM(bom, appSettings);
+            Bom files = CycloneBomProcessor.SetMetadataInComparisonBOM(bom, appSettings, projectReleases, caToolInformation);
 
             //Assert
-            Assert.That(1, Is.EqualTo(files.Metadata.Tools.Count), "Returns bom with metadata ");
+            Assert.That(2, Is.EqualTo(files.Metadata.Tools.Count), "Returns bom with metadata ");
 
         }
         [Test]
         public void SetMetadataInComparisonBOM_GivenBOMWithMetadata_AddsNewMetadataInfoInBOM()
         {
             //Arrange
+            ProjectReleases projectReleases = new ProjectReleases();            
+            projectReleases.Version= "1.0";
+            
             Bom bom = new Bom()
             {
                 Metadata = new Metadata()
                 {
-                    Tools = new List<Tool>(){
-                    new Tool(){
-                        Name = "Existing Data",Version = "1.0.",Vendor = "AG"} }
+                    Tools = new List<Tool>() {
+                        new Tool() {
+                            Name = "Existing Data", Version = "1.0.", Vendor = "AG" } },
+                    Component = new Component()
                 },
                 Components = new List<Component>()
             {
@@ -61,7 +71,8 @@ namespace PackageIdentifier.UTest
             };
             CommonAppSettings appSettings = new CommonAppSettings()
             {
-                CaVersion = "1.2.3"
+                CaVersion = "1.2.3",
+                SW360ProjectName = "Test",
             };
 
             Tool tools = new Tool()
@@ -70,12 +81,29 @@ namespace PackageIdentifier.UTest
                 Version = "1.0.17",
                 Vendor = "Siemens AG"
             };
+            Tool SiemensSBOM = new Tool
+            {
+                Name = "Siemens SBOM",
+                Version = "2.0.0",
+                Vendor = "Siemens AG",                
+            };
+            Component component = new Component
+            {
+                Name = appSettings.SW360ProjectName,
+                Version = projectReleases.Version,
+                Type = Component.Classification.Application
+            };
+
+            CatoolInfo caToolInformation = new CatoolInfo() { CatoolVersion = "6.0.0", CatoolRunningLocation = "" };
             //Act
-            Bom files = CycloneBomProcessor.SetMetadataInComparisonBOM(bom, appSettings);
+            Bom files = CycloneBomProcessor.SetMetadataInComparisonBOM(bom, appSettings, projectReleases, caToolInformation);
 
             //Assert
-            Assert.That(tools.Name, Is.EqualTo(files.Metadata.Tools[1].Name), "Returns bom with metadata ");
-
+            Assert.That(tools.Name, Is.EqualTo(files.Metadata.Tools[0].Name), "Returns bom with metadata tools");
+            Assert.That(SiemensSBOM.Name, Is.EqualTo(files.Metadata.Tools[1].Name), "Returns bom with metadata tools");
+            Assert.That(component.Name, Is.EqualTo(files.Metadata.Component.Name), "Returns bom with metadata component ");
+            Assert.That(component.Version, Is.EqualTo(files.Metadata.Component.Version), "Returns bom with metadata component ");
+            Assert.That(component.Type, Is.EqualTo(files.Metadata.Component.Type), "Returns bom with metadata component ");
         }
         [Test]
         public void SetProperties_GivenComponent_SetsPropertiesInBOM()
@@ -86,7 +114,7 @@ namespace PackageIdentifier.UTest
             List<Property> expectedpropList = new List<Property>()
             {
                 new Property(){ Name = Dataconstant.Cdx_ProjectType,Value = "NPM"},
-                 new Property(){ Name = Dataconstant.Cdx_ArtifactoryRepoUrl,Value = repo},
+                 new Property(){ Name = Dataconstant.Cdx_ArtifactoryRepoName,Value = repo},
                  new Property(){ Name = Dataconstant.Cdx_IsInternal,Value = "false"},
 
             };

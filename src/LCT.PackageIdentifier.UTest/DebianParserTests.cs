@@ -13,6 +13,9 @@ using LCT.Common.Model;
 using LCT.Common.Constants;
 using Moq;
 using System.Collections.Generic;
+using LCT.PackageIdentifier.Interface;
+using LCT.Services.Interface;
+using LCT.APICommunications.Model.AQL;
 
 namespace PackageIdentifier.UTest
 {
@@ -20,6 +23,88 @@ namespace PackageIdentifier.UTest
     public class DebianParserTests
     {
         readonly DebianProcessor _debianProcessor;
+
+        private DebianProcessor _mdebianProcessor;
+        private Mock<IBomHelper> _mockBomHelper;
+        private Mock<IJFrogService> _mockJFrogService;
+        private Mock<ICycloneDXBomParser> _mockCycloneDXBomParser;
+
+        [SetUp]
+        public void Setup()
+        {
+            _mockBomHelper = new Mock<IBomHelper>();
+            _mockJFrogService = new Mock<IJFrogService>();
+            _mockCycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            _mdebianProcessor = new DebianProcessor(_mockCycloneDXBomParser.Object);
+        }
+
+
+        [Test]
+        public void GetArtifactoryRepoName_WithValidComponent_ReturnsRepoName()
+        {
+            // Arrange
+            var aqlResultList = new List<AqlResult>
+            {
+                new AqlResult { Name = "component_1.deb", Repo = "repo1" },
+                new AqlResult { Name = "component_2.deb", Repo = "repo2" }
+            };
+            var component = new Component { Name = "component", Version = "1" };
+            string jfrogRepoPackageName;
+            string jfrogRepoPath;
+            _mockBomHelper.Setup(x => x.GetFullNameOfComponent(component)).Returns("component_1.deb");
+
+            // Act
+            var repoName = _debianProcessor.GetArtifactoryRepoName(aqlResultList, component, _mockBomHelper.Object, out jfrogRepoPackageName, out jfrogRepoPath);
+
+            // Assert
+            Assert.AreEqual("repo1", repoName);
+            Assert.AreEqual("component_1.deb", jfrogRepoPackageName);
+            Assert.AreEqual("repo1/component_1.deb", jfrogRepoPath);
+        }
+
+        [Test]
+        public void GetArtifactoryRepoName_WithInvalidComponent_ReturnsNotFoundInRepo()
+        {
+            // Arrange
+            var aqlResultList = new List<AqlResult>
+            {
+                new AqlResult { Name = "component_1.deb", Repo = "repo1" },
+                new AqlResult { Name = "component_2.deb", Repo = "repo2" }
+            };
+            var component = new Component { Name = "invalid_component", Version = "1.0" };
+            string jfrogRepoPackageName;
+            string jfrogRepoPath;
+
+            // Act
+            var repoName = _debianProcessor.GetArtifactoryRepoName(aqlResultList, component, _mockBomHelper.Object, out jfrogRepoPackageName, out jfrogRepoPath);
+
+            // Assert
+            Assert.AreEqual("Not Found in JFrogRepo", repoName);
+            Assert.AreEqual("Package name not found in Jfrog", jfrogRepoPackageName);
+            Assert.AreEqual("Jfrog repo path not found", jfrogRepoPath);
+        }
+
+        [Test]
+        public void GetArtifactoryRepoName_WithFullNameVersionMismatch_ReturnsRepoName()
+        {
+            // Arrange
+            var aqlResultList = new List<AqlResult>
+            {
+                new AqlResult { Name = "full_name_component_1.deb", Repo = "repo1" },
+                new AqlResult { Name = "component_2.deb", Repo = "repo2" }
+            };
+            var component = new Component { Name = "component", Version = "2" };
+            string jfrogRepoPackageName;
+            string jfrogRepoPath;
+
+            // Act
+            var repoName = _debianProcessor.GetArtifactoryRepoName(aqlResultList, component, _mockBomHelper.Object, out jfrogRepoPackageName, out jfrogRepoPath);
+
+            // Assert
+            Assert.AreEqual("repo2", repoName);
+            Assert.AreEqual("component_2.deb", jfrogRepoPackageName);
+            Assert.AreEqual("repo2/component_2.deb", jfrogRepoPath);
+        }
 
         public DebianParserTests()
         {

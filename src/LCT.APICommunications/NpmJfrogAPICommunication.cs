@@ -67,8 +67,8 @@ namespace LCT.APICommunications
             catch (TaskCanceledException ex)
             {
                 Logger.Debug($"{ex.Message}");
-                ExceptionHandling.TaskCancelledException(ex,"Jfrog");                
-                Environment.Exit(-1);
+                ExceptionHandling.TaskCancelledException(ex,"Jfrog");
+                CommonHelper.CallEnvironmentExit(-1);
             }           
             return result;
         }

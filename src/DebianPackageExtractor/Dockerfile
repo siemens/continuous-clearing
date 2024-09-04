@@ -1,6 +1,6 @@
 #
 # <copyright company="Siemens AG">
-#   Copyright (C) Siemens AG 2023. All rights reserved. 
+#   Copyright (C) Siemens AG 2024. All rights reserved. 
 # </copyright>
 # <license>MIT</license>
 #

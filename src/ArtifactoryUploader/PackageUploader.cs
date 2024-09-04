@@ -58,7 +58,15 @@ namespace LCT.ArtifactoryUploader
             var fileOperations = new FileOperations();
             string bomGenerationPath = Path.GetDirectoryName(appSettings.BomFilePath);
             PackageUploadHelper.UpdateBomArtifactoryRepoUrl(ref m_ComponentsInBOM, m_ComponentsToBeUploaded);
-            fileOperations.WriteContentToFile(m_ComponentsInBOM, bomGenerationPath, FileConstant.BomFileName, appSettings.SW360ProjectName);
+
+            //update Jfrog Repo Path For Sucessfully Uploaded Items
+            m_ComponentsInBOM = await PackageUploadHelper.UpdateJfrogRepoPathForSucessfullyUploadedItems(m_ComponentsInBOM, displayPackagesInfo);
+
+            var formattedString = CycloneDX.Json.Serializer.Serialize(m_ComponentsInBOM);
+
+            // wrtite final out put in the json file
+            fileOperations.WriteContentToOutputBomFile(formattedString, bomGenerationPath, 
+                FileConstant.BomFileName, appSettings.SW360ProjectName);
 
             // write kpi info to console table 
             if (Program.UploaderStopWatch != null)
@@ -70,11 +78,10 @@ namespace LCT.ArtifactoryUploader
 
             // set the error code
             if (uploaderKpiData.PackagesNotUploadedDueToError > 0 || uploaderKpiData.PackagesNotExistingInRemoteCache > 0)
-            {
+            {                
                 Environment.ExitCode = 2;
                 Logger.Debug("Setting ExitCode to 2");
             }
-
         }
         public static void DisplayAllSettings(List<Component> m_ComponentsInBOM, CommonAppSettings appSettings)
         {
@@ -120,18 +127,26 @@ namespace LCT.ArtifactoryUploader
             }
 
         }
-
+                
         private static void PackageSettings(Config project)
         {
+            string includeList = string.Empty;
+            string excludeList = string.Empty;
+            if (project.Include != null)
+            {
+                includeList = string.Join(",", project.Include?.ToList());
+            }
+            if (project.Exclude != null)
+            {
+                excludeList = string.Join(",", project.Exclude?.ToList());
+            }
 
-            Logger.Logger.Log(null, Level.Notice, $"\tDEVDEP_REPO_NAME:\t`{project.JfrogDevDestRepoName}`\n\t" +
-             $"THIRD_PARTY_REPO_NAME:\t`{project.JfrogThirdPartyDestRepoName}`\n\t" +
-             $"INTERNAL_REPO_NAME:\t`{project.JfrogInternalDestRepoName}`\n\t" +
-             $"Config:\n\t" +
-             $"Include: \t", null);
-            project.Include?.ToList().ForEach(x => Logger.Logger.Log(null, Level.Notice, $"\t\t\t\t`{x}`\t", null));
-            Logger.Logger.Log(null, Level.Notice, $"\tExclude:", null);
-            project.Exclude?.ToList().ForEach(x => Logger.Logger.Log(null, Level.Notice, $"\t\t\t\t`{x}`\n\t", null));
+            Logger.Logger.Log(null, Level.Notice, $"\tDEVDEP_REPO_NAME:\t{project.JfrogDevDestRepoName}\n\t" +
+              $"THIRD_PARTY_REPO_NAME:\t{project.JfrogThirdPartyDestRepoName}\n\t" +
+              $"INTERNAL_REPO_NAME:\t{project.JfrogInternalDestRepoName}\n\t" +
+              $"Config:\n\t" +
+              $"Exclude:\t\t{excludeList}\n\t" +
+              $"Include: \t\t{includeList}\n", null);
         }
     }
 }
