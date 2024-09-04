@@ -5,7 +5,6 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
@@ -57,7 +56,6 @@ namespace LCT.PackageIdentifier
                 $"= {listOfComponentsToBom.Components.Count}", null);
 
             bomKpiData.ComponentsInComparisonBOM = listOfComponentsToBom.Components.Count;
-            //Get project details for metadata properties
 
             //sets metadata properties
             listOfComponentsToBom = CycloneBomProcessor.SetMetadataInComparisonBOM(listOfComponentsToBom,

@@ -130,23 +130,15 @@ namespace LCT.ArtifactoryUploader
                 
         private static void PackageSettings(Config project)
         {
-            string includeList = string.Empty;
-            string excludeList = string.Empty;
-            if (project.Include != null)
-            {
-                includeList = string.Join(",", project.Include?.ToList());
-            }
-            if (project.Exclude != null)
-            {
-                excludeList = string.Join(",", project.Exclude?.ToList());
-            }
 
-            Logger.Logger.Log(null, Level.Notice, $"\tDEVDEP_REPO_NAME:\t{project.JfrogDevDestRepoName}\n\t" +
-              $"THIRD_PARTY_REPO_NAME:\t{project.JfrogThirdPartyDestRepoName}\n\t" +
-              $"INTERNAL_REPO_NAME:\t{project.JfrogInternalDestRepoName}\n\t" +
-              $"Config:\n\t" +
-              $"Exclude:\t\t{excludeList}\n\t" +
-              $"Include: \t\t{includeList}\n", null);
+            Logger.Logger.Log(null, Level.Notice, $"\tDEVDEP_REPO_NAME:\t`{project.JfrogDevDestRepoName}`\n\t" +
+             $"THIRD_PARTY_REPO_NAME:\t`{project.JfrogThirdPartyDestRepoName}`\n\t" +
+             $"INTERNAL_REPO_NAME:\t`{project.JfrogInternalDestRepoName}`\n\t" +
+             $"Config:\n\t" +
+             $"Include: \t", null);
+            project.Include?.ToList().ForEach(x => Logger.Logger.Log(null, Level.Notice, $"\t\t\t\t`{x}`\t", null));
+            Logger.Logger.Log(null, Level.Notice, $"\tExclude:", null);
+            project.Exclude?.ToList().ForEach(x => Logger.Logger.Log(null, Level.Notice, $"\t\t\t\t`{x}`\n\t", null));
         }
     }
 }

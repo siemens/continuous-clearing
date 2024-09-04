@@ -49,7 +49,7 @@ namespace LCT.PackageIdentifier
                $" - {rootPath}");
             }
 
-            Logger.Logger.Log(null, Level.Notice, $"Directory Location: Packages are read from the below locations:", null);
+            Logger.Logger.Log(null, Level.Notice, $"\n \n Directory Location: Packages are read from the below locations:  \n", null);
             foreach (string includePattern in config.Include)
             {
                 foundConfigFiles = Directory.GetFiles(rootPath, includePattern, SearchOption.AllDirectories);
@@ -65,11 +65,11 @@ namespace LCT.PackageIdentifier
 
             if (allFoundConfigFiles.Count == 0)
             {
-                Logger.Error("   Provided package file path do not contain valid input files.");
+                Logger.Error("Provided package file path do not contain valid input files.");
                 CommonHelper.CallEnvironmentExit(-1);
             }
 
-           
+            Logger.Logger.Log(null, Level.Notice, $"\n----------------------------------------------------", null);
             return allFoundConfigFiles;
 
         }
@@ -78,7 +78,8 @@ namespace LCT.PackageIdentifier
         {
             if (!IsExcluded(configFile, config.Exclude))
             {
-                Logger.Logger.Log(null, Level.Info, $"    Input file FOUND :{configFile}", null);
+                string currentDirectory = Path.GetDirectoryName(configFile);
+                Logger.Logger.Log(null, Level.Info, $"  {currentDirectory} \n", null);
 
                 allFoundConfigFiles.Add(configFile);
                 fileOperations.ValidateFilePath(configFile);

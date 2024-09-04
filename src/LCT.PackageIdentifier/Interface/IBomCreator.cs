@@ -4,7 +4,6 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Common.Interface;
 using LCT.Common.Model;

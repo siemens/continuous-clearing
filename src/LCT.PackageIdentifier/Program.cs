@@ -52,7 +52,7 @@ namespace LCT.PackageIdentifier
                 m_Verbose = true;
             ISettingsManager settingsManager = new SettingsManager();
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
-            ProjectReleases projectReleases = new ProjectReleases();
+
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
@@ -99,7 +99,6 @@ namespace LCT.PackageIdentifier
                 $"Exclude\t\t\t --> {listOfExclude}\n\t" +
                 $"ExcludeComponents\t --> {listOfExcludeComponents}\n", null);
 
-
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);
 
@@ -144,7 +143,7 @@ namespace LCT.PackageIdentifier
             return jFrogService;
         }
 
-        private static async Task ValidateAppsettingsFile(CommonAppSettings appSettings, ProjectReleases projectReleases)
+        private static async Task ValidateAppsettingsFile(CommonAppSettings appSettings)
         {
             SW360ConnectionSettings sw360ConnectionSettings = new SW360ConnectionSettings()
             {
@@ -157,34 +156,6 @@ namespace LCT.PackageIdentifier
             ISw360ProjectService sw360ProjectService = new Sw360ProjectService(new SW360ApicommunicationFacade(sw360ConnectionSettings));
             await BomValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
         }
-        private static string DisplayInclude(CommonAppSettings appSettings)
-        {
-            string totalString = string.Empty;
-            switch (appSettings.ProjectType.ToUpperInvariant())
-            {
-                case "NPM":
-                    if (appSettings.Npm.Include != null)
-                    {
-                        totalString = string.Join(",", appSettings.Npm.Include?.ToList());
-                    }
-                    return totalString;
-                case "NUGET":
-                    if (appSettings.Nuget.Include != null)
-                    {
-                        totalString = string.Join(",", appSettings.Nuget.Include?.ToList());
-                    }
-                    return totalString;
-                case "MAVEN":
-                    if (appSettings.Maven.Include != null)
-                    {
-                        totalString = string.Join(",", appSettings.Maven.Include?.ToList());
-                    }
-                    return totalString;
-                case "DEBIAN":
-                    if (appSettings.Debian.Include != null)
-                    {
-                        totalString = string.Join(",", appSettings.Debian.Include?.ToList());
-                    }
 
                     return totalString;
                 case "PYTHON":

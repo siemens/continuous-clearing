@@ -4,7 +4,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using CycloneDX.Models;
-using LCT.APICommunications;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
@@ -49,6 +48,16 @@ namespace LCT.PackageIdentifier
                 if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     Bom bomList = ParseCycloneDXBom(filepath);
+                    if (bomList?.Components != null)
+                    {
+                        CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
+                    }
+                    else
+                    {
+                        Logger.Warn("No components found in the BOM file : " + filepath);
+                        continue;
+                    }
+
                     if (bomList?.Components != null)
                     {
                         CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
@@ -213,8 +222,6 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in componentsForBOM)
             {
-                string jfrogpackageName = $"{component.Name}-{component.Version}{ApiConstant.MavenExtension}";
-                var hashes = aqlResultList.FirstOrDefault(x => x.Name == jfrogpackageName);
 
                 string jfrogRepoPath = string.Empty;
                 string jfrogcomponentName = $"{component.Name}-{component.Version}.jar";
@@ -233,29 +240,7 @@ namespace LCT.PackageIdentifier
                 componentVal.Properties.Add(siemensfileNameProp);
                 componentVal.Properties.Add(jfrogRepoPathProp);
                 componentVal.Description = null;
-                if (hashes != null)
-                {
-                    componentVal.Hashes = new List<Hash>()
-                {
 
-                new()
-                 {
-                  Alg = Hash.HashAlgorithm.MD5,
-                  Content = hashes.MD5
-                },
-                new()
-                {
-                  Alg = Hash.HashAlgorithm.SHA_1,
-                  Content = hashes.SHA1
-                 },
-                 new()
-                 {
-                  Alg = Hash.HashAlgorithm.SHA_256,
-                  Content = hashes.SHA256
-                  }
-                  };
-
-                }
                 modifiedBOM.Add(componentVal);
             }
 

@@ -5,7 +5,6 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using LCT.APICommunications;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
@@ -19,7 +18,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace LCT.PackageIdentifier
@@ -136,8 +134,6 @@ namespace LCT.PackageIdentifier
                 string jfrogRepoPath = Dataconstant.JfrogRepoPathNotFound;
                 string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper, out jfrogRepoPackageName, out jfrogRepoPath);
 
-                string jfrogpackageName = $"{component.Name}-{component.Version}{ApiConstant.DebianExtension}";
-                var hashes = aqlResultList.FirstOrDefault(x => x.Name == jfrogpackageName);
                 Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = repoName };
                 Property jfrogFileNameProperty = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = jfrogRepoPackageName };
                 Property jfrogRepoPathProperty = new() { Name = Dataconstant.Cdx_JfrogRepoPath, Value = jfrogRepoPath };
@@ -152,29 +148,7 @@ namespace LCT.PackageIdentifier
                 componentVal.Properties.Add(jfrogFileNameProperty);
                 componentVal.Properties.Add(jfrogRepoPathProperty);
                 componentVal.Description = null;
-                if (hashes != null)
-                {
-                    componentVal.Hashes = new List<Hash>()
-                {
 
-                new()
-                 {
-                  Alg = Hash.HashAlgorithm.MD5,
-                  Content = hashes.MD5
-                },
-                new()
-                {
-                  Alg = Hash.HashAlgorithm.SHA_1,
-                  Content = hashes.SHA1
-                 },
-                 new()
-                 {
-                  Alg = Hash.HashAlgorithm.SHA_256,
-                  Content = hashes.SHA256
-                  }
-                  };
-
-                }
                 modifiedBOM.Add(componentVal);
             }
 

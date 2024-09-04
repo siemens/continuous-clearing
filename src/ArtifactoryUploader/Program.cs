@@ -65,6 +65,7 @@ namespace ArtifactoryUploader
                 $"CaToolVersion\t\t {caToolInformation.CatoolVersion}\n\t" +
                 $"CaToolRunningPath\t {caToolInformation.CatoolRunningLocation}\n\t" +
                 $"JFrogUrl:\t\t {appSettings.JFrogApi}\n\t" +
+                $"Artifactory User:\t {appSettings.ArtifactoryUploadUser}\n\t" +
                 $"Release:\t\t {appSettings.Release}\n\t" +
                 $"LogFolderPath:\t\t {Path.GetFullPath(FolderPath)}\n", null);
 

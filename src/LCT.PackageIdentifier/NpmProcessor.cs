@@ -9,8 +9,6 @@ using LCT.APICommunications;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
-using LCT.Common.Interface;
-using LCT.Common.Model;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
@@ -41,6 +39,7 @@ namespace LCT.PackageIdentifier
         private const string Version = "version";
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
         private const string Requires = "requires";
+
         public NpmProcessor(ICycloneDXBomParser cycloneDXBomParser)
         {
             _cycloneDXBomParser = cycloneDXBomParser;
@@ -63,9 +62,12 @@ namespace LCT.PackageIdentifier
 
             if (componentsWithMultipleVersions.Count != 0)
             {
-                CreateFileForMultipleVersions(componentsWithMultipleVersions, appSettings);
+                Logger.Warn($"Multiple versions detected :\n");
+                foreach (var item in componentsWithMultipleVersions)
+                {
+                    Logger.Warn($"Component Name : {item.Name}\nComponent Version : {item.Version}\nPackage Found in : {item.Description}\n");
+                }
             }
-
             bom.Components = componentsForBOM;
             bom.Dependencies = dependencies;
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
@@ -73,8 +75,7 @@ namespace LCT.PackageIdentifier
             return bom;
         }
 
-
-        public List<Component> ParsePackageLockJson(string filepath, CommonAppSettings appSettings)
+        public static List<Component> ParsePackageLockJson(string filepath, CommonAppSettings appSettings)
         {
             List<BundledComponents> bundledComponents = new List<BundledComponents>();
             List<Component> lstComponentForBOM = new List<Component>();
@@ -402,8 +403,6 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in componentsForBOM)
             {
-                string jfrogpackageName = $"{component.Name}-{component.Version}{ApiConstant.NpmExtension}";
-                var hashes = aqlResultList.FirstOrDefault(x => x.Name == jfrogpackageName);
 
                 string jfrogRepoPath = string.Empty;
                 AqlResult finalRepoData = GetJfrogArtifactoryRepoDetials(aqlResultList, component, bomhelper, out jfrogRepoPath);
@@ -426,24 +425,6 @@ namespace LCT.PackageIdentifier
                     componentVal.Hashes = new List<Hash>()
                 {
 
-                new()
-                 {
-                  Alg = Hash.HashAlgorithm.MD5,
-                  Content = hashes.MD5
-                },
-                new()
-                {
-                  Alg = Hash.HashAlgorithm.SHA_1,
-                  Content = hashes.SHA1
-                 },
-                 new()
-                 {
-                  Alg = Hash.HashAlgorithm.SHA_256,
-                  Content = hashes.SHA256
-                  }
-                  };
-
-                }
                 modifiedBOM.Add(componentVal);
             }
 

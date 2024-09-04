@@ -421,29 +421,7 @@ namespace LCT.PackageIdentifier
                 componentVal.Properties.Add(fileNameProperty);
                 componentVal.Properties.Add(jfrogRepoPathProperty);
                 componentVal.Description = null;
-                if (hashes != null)
-                {
-                    componentVal.Hashes = new List<Hash>()
-                {
 
-                new()
-                 {
-                  Alg = Hash.HashAlgorithm.MD5,
-                  Content = hashes.MD5
-                },
-                new()
-                {
-                  Alg = Hash.HashAlgorithm.SHA_1,
-                  Content = hashes.SHA1
-                 },
-                 new()
-                 {
-                  Alg = Hash.HashAlgorithm.SHA_256,
-                  Content = hashes.SHA256
-                  }
-                  };
-
-                }
                 modifiedBOM.Add(componentVal);
             }
             return modifiedBOM;

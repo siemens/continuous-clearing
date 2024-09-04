@@ -4,7 +4,6 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Services.Interface;
 using System;
@@ -23,7 +22,7 @@ namespace LCT.PackageIdentifier
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static async Task ValidateAppSettings(CommonAppSettings appSettings, ISw360ProjectService bomService, ProjectReleases projectReleases)
         {
-            string sw360ProjectName = await bomService.GetProjectNameByProjectIDFromSW360(appSettings.SW360ProjectID, appSettings.SW360ProjectName,projectReleases);
+            string sw360ProjectName = await bomService.GetProjectNameByProjectIDFromSW360(appSettings.SW360ProjectID, appSettings.SW360ProjectName);
 
             if (string.IsNullOrEmpty(sw360ProjectName))
             {

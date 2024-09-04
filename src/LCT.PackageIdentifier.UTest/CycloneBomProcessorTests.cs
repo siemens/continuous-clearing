@@ -5,16 +5,12 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Common.Constants;
-using LCT.Common.Model;
 using LCT.PackageIdentifier;
-using NuGet.ContentModel;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
-using System.Security.Cryptography;
 
 namespace PackageIdentifier.UTest
 {
@@ -25,7 +21,6 @@ namespace PackageIdentifier.UTest
         public void SetMetadataInComparisonBOM_GivenBOMWithEmptyMetadata_FillsInMetadataInfoInBOM()
         {
             //Arrange
-            ProjectReleases projectReleases = new ProjectReleases();
             Bom bom = new Bom()
             {
                 Metadata = null,
@@ -44,24 +39,20 @@ namespace PackageIdentifier.UTest
             Bom files = CycloneBomProcessor.SetMetadataInComparisonBOM(bom, appSettings, projectReleases, caToolInformation);
 
             //Assert
-            Assert.That(2, Is.EqualTo(files.Metadata.Tools.Count), "Returns bom with metadata ");
+            Assert.That(1, Is.EqualTo(files.Metadata.Tools.Count), "Returns bom with metadata ");
 
         }
         [Test]
         public void SetMetadataInComparisonBOM_GivenBOMWithMetadata_AddsNewMetadataInfoInBOM()
         {
             //Arrange
-            ProjectReleases projectReleases = new ProjectReleases();            
-            projectReleases.Version= "1.0";
-            
             Bom bom = new Bom()
             {
                 Metadata = new Metadata()
                 {
-                    Tools = new List<Tool>() {
-                        new Tool() {
-                            Name = "Existing Data", Version = "1.0.", Vendor = "AG" } },
-                    Component = new Component()
+                    Tools = new List<Tool>(){
+                    new Tool(){
+                        Name = "Existing Data",Version = "1.0.",Vendor = "AG"} }
                 },
                 Components = new List<Component>()
             {
@@ -71,8 +62,7 @@ namespace PackageIdentifier.UTest
             };
             CommonAppSettings appSettings = new CommonAppSettings()
             {
-                CaVersion = "1.2.3",
-                SW360ProjectName = "Test",
+                CaVersion = "1.2.3"
             };
 
             Tool tools = new Tool()

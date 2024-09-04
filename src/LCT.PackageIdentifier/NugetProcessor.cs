@@ -9,14 +9,11 @@ using LCT.APICommunications;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
-using LCT.Common.Interface;
-using LCT.Common.Model;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.PackageIdentifier.Model.NugetModel;
 using LCT.Services.Interface;
 using log4net;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -30,7 +27,7 @@ using System.Xml.Linq;
 
 namespace LCT.PackageIdentifier
 {
-    public class NugetProcessor : CycloneDXBomParser, IParser
+    public class NugetProcessor : IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
@@ -46,7 +43,7 @@ namespace LCT.PackageIdentifier
         {
             Logger.Debug($"ParsePackageFile():Start");
             List<Component> listComponentForBOM = new List<Component>();
-            Bom bom = new Bom();
+            Bom bom = new Bom();            
 
             ParsingInputFileForBOM(appSettings, ref listComponentForBOM, ref bom);
             var componentsWithMultipleVersions = bom.Components.GroupBy(s => s.Name).Where(g => g.Count() > 1).SelectMany(g => g).ToList();
@@ -247,23 +244,6 @@ namespace LCT.PackageIdentifier
                     componentVal.Hashes = new List<Hash>()
                 {
 
-                new()
-                 {
-                  Alg = Hash.HashAlgorithm.MD5,
-                  Content = hashes.MD5
-                },
-                new()
-                {
-                  Alg = Hash.HashAlgorithm.SHA_1,
-                  Content = hashes.SHA1
-                 },
-                 new()
-                 {
-                  Alg = Hash.HashAlgorithm.SHA_256,
-                  Content = hashes.SHA256
-                  }
-                  };
-                }
                 modifiedBOM.Add(componentVal);
             }
             return modifiedBOM;
@@ -452,7 +432,7 @@ namespace LCT.PackageIdentifier
             }
 
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = listComponentForBOM.Count;
-            totalComponentsIdentified = listComponentForBOM.Count;
+            totalComponentsIdentified = listComponentForBOM.Count;                        
             listComponentForBOM = KeepUniqueNonDevComponents(listComponentForBOM);
             listComponentForBOM = listComponentForBOM.Distinct(
                 new ComponentEqualityComparer()).ToList();
@@ -478,8 +458,8 @@ namespace LCT.PackageIdentifier
                     templateDetails.Components, appSettings.ProjectType);
                 SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
             }
-
-            bom = RemoveExcludedComponents(appSettings, bom);
+            
+            bom = RemoveExcludedComponents(appSettings, bom);            
 
             if (bom != null)
             {
@@ -649,7 +629,7 @@ namespace LCT.PackageIdentifier
             }
             else
             {
-                Logger.Warn($"Input file NOT_FOUND :{filepath}");
+                Logger.Warn("No Proper input files found for Nuget package types.");
             }
         }
 
@@ -659,7 +639,12 @@ namespace LCT.PackageIdentifier
 
             if (componentsWithMultipleVersions.Count != 0)
             {
-                CreateFileForMultipleVersions(componentsWithMultipleVersions, appSettings);
+                Logger.Warn($"Multiple versions detected :\n");
+                foreach (var item in componentsWithMultipleVersions)
+                {
+                    item.Description = !string.IsNullOrEmpty(appSettings.CycloneDxSBomTemplatePath) ? appSettings.CycloneDxSBomTemplatePath : item.Description;
+                    Logger.Warn($"Component Name : {item.Name}\nComponent Version : {item.Version}\nPackage Found in : {item.Description}\n");
+                }
             }
         }
 
