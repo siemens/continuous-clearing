@@ -76,12 +76,15 @@ namespace ArtifactoryUploader
             };
             NpmJfrogApiCommunication jfrogCommunication = new NpmJfrogApiCommunication(appSettings.JFrogApi, appSettings.JfrogNpmSrcRepo, artifactoryCredentials, appSettings.TimeOut);
             ArtifactoryValidator artifactoryValidator = new(jfrogCommunication);
-            await artifactoryValidator.ValidateArtifactoryCredentials(appSettings);
+            var isValid = await artifactoryValidator.ValidateArtifactoryCredentials(appSettings);
+            if (isValid == -1)
+            {
+                CommonHelper.CallEnvironmentExit(-1);
+            }
 
             //Uploading Package to artifactory
             PackageUploadHelper.jFrogService = GetJfrogService(appSettings);
             await PackageUploader.UploadPackageToArtifactory(appSettings);
-
 
             Logger.Logger.Log(null, Level.Notice, $"End of Artifactory Uploader execution : {DateTime.Now}\n", null);
             // publish logs and bom file to pipeline artifact

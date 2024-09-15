@@ -7,13 +7,13 @@
 using ArtifactoryUploader;
 using CycloneDX.Models;
 using LCT.APICommunications;
+using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.AQL;
 using LCT.ArtifactoryUploader.Model;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
-using LCT.Services;
 using LCT.Services.Interface;
 using log4net;
 using Newtonsoft.Json;
@@ -21,7 +21,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
@@ -1026,6 +1025,7 @@ namespace LCT.ArtifactoryUploader
             const string dryRunSuffix = null;
             string operationType = item.PackageType == PackageType.ClearedThirdParty || item.PackageType == PackageType.Development ? "copy" : "move";
             ArtfactoryUploader.jFrogService = jFrogService;
+            ArtfactoryUploader.JFrogApiCommInstance = GetJfrogApiCommInstance(item, timeout);
             HttpResponseMessage responseMessage = await ArtfactoryUploader.UploadPackageToRepo(item, timeout, displayPackagesInfo);
 
             if (responseMessage.StatusCode == HttpStatusCode.OK && !item.DryRun)
@@ -1051,6 +1051,25 @@ namespace LCT.ArtifactoryUploader
             {
                 // do nothing
             }
+        }
+
+        private static IJFrogApiCommunication GetJfrogApiCommInstance(ComponentsToArtifactory component, int timeout)
+        {
+
+            ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials()
+            {
+                ApiKey = component.ApiKey,
+                Email = component.Email
+            };
+
+            // Initialize JFrog API communication based on Component Type
+            IJFrogApiCommunication jfrogApicommunication = component.ComponentType?.ToUpperInvariant() switch
+            {
+                "MAVEN" => new MavenJfrogApiCommunication(component.JfrogApi, component.SrcRepoName, repoCredentials, timeout),
+                "PYTHON" => new PythonJfrogApiCommunication(component.JfrogApi, component.SrcRepoName, repoCredentials, timeout),
+                _ => new NpmJfrogApiCommunication(component.JfrogApi, component.SrcRepoName, repoCredentials, timeout)
+            };
+            return jfrogApicommunication;
         }
 
         public static void WriteCreatorKpiDataToConsole(UploaderKpiData uploaderKpiData)

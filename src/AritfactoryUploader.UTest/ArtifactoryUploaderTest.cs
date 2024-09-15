@@ -7,11 +7,9 @@
 using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
 using Moq;
-using Newtonsoft.Json;
 using System.Net;
 using LCT.ArtifactoryUploader;
 using System.Net.Http;
-using System;
 using NUnit.Framework;
 using System.Threading.Tasks;
 using LCT.APICommunications;
@@ -22,6 +20,7 @@ using LCT.Services.Interface;
 using LCT.Services;
 using UnitTestUtilities;
 using LCT.ArtifactoryUploader.Model;
+using LCT.APICommunications.Model.AQL;
 
 namespace AritfactoryUploader.UTest
 {
@@ -96,6 +95,118 @@ namespace AritfactoryUploader.UTest
                 new JfrogAqlApiCommunicationFacade(jfrogAqlApiCommunication);
             IJFrogService jFrogService = new JFrogService(jFrogApiCommunicationFacade);
             return jFrogService;
+        }
+
+        [Test]
+        public async Task UploadPackageToRepo_WhenPackageInfoIsNull_ReturnsNotFoundResponse()
+        {
+            // Arrange
+            var component = new ComponentsToArtifactory();
+            component.SrcRepoName = "";
+            component.DestRepoName = "";
+            component.JfrogPackageName = "";
+            component.Path = "";
+            var timeout = 10000;
+            var displayPackagesInfo = new DisplayPackagesInfo();
+            var jFrogServiceMock = new Mock<IJFrogService>();
+            jFrogServiceMock.Setup(x => x.GetPackageInfo(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync((AqlResult)null);
+            ArtfactoryUploader.jFrogService = jFrogServiceMock.Object;
+            // Act
+            var response = await ArtfactoryUploader.UploadPackageToRepo(component, timeout, displayPackagesInfo);
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+            Assert.AreEqual(ApiConstant.PackageNotFound, response.ReasonPhrase);
+        }
+
+        [Test]
+        public async Task UploadPackageToRepo_WhenPackageTypeIsClearedThirdPartyOrDevelopment_CallsCopyFromRemoteRepo()
+        {
+            // Arrange
+            var component = new ComponentsToArtifactory
+            {
+                PackageType = PackageType.ClearedThirdParty,
+                ApiKey = "apiKey",
+                Email = "test@example.com"
+            };
+            component.SrcRepoName = "";
+            component.DestRepoName = "";
+            component.JfrogPackageName = "";
+            component.Path = "";
+            var timeout = 10000;
+            var displayPackagesInfo = new DisplayPackagesInfo();
+            var jFrogServiceMock = new Mock<IJFrogService>();
+            var jfrogApicommunicationMock = new Mock<IJFrogApiCommunication>();
+            jFrogServiceMock.Setup(x => x.GetPackageInfo(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new AqlResult());
+            jfrogApicommunicationMock.Setup(x => x.CopyFromRemoteRepo(It.IsAny<ComponentsToArtifactory>()))
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK));
+            ArtfactoryUploader.jFrogService = jFrogServiceMock.Object;
+            ArtfactoryUploader.JFrogApiCommInstance = jfrogApicommunicationMock.Object;
+            // Act
+            var response = await ArtfactoryUploader.UploadPackageToRepo(component, timeout, displayPackagesInfo);
+
+            // Assert
+            jfrogApicommunicationMock.Verify(x => x.CopyFromRemoteRepo(component), Times.Once);
+            //Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Test]
+        public async Task UploadPackageToRepo_WhenPackageTypeIsInternal_CallsMoveFromRepo()
+        {
+            // Arrange
+            var component = new ComponentsToArtifactory
+            {
+                PackageType = PackageType.Internal,
+                ApiKey = "apiKey",
+                Email = "test@example.com"
+            };
+            component.SrcRepoName = "";
+            component.DestRepoName = "";
+            component.JfrogPackageName = "";
+            component.Path = "";
+            var timeout = 10000;
+            var displayPackagesInfo = new DisplayPackagesInfo();
+            var jFrogServiceMock = new Mock<IJFrogService>();
+            var jfrogApicommunicationMock = new Mock<IJFrogApiCommunication>();
+            jFrogServiceMock.Setup(x => x.GetPackageInfo(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new AqlResult());
+            jfrogApicommunicationMock.Setup(x => x.MoveFromRepo(It.IsAny<ComponentsToArtifactory>()))
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK));
+            ArtfactoryUploader.jFrogService = jFrogServiceMock.Object;
+            ArtfactoryUploader.JFrogApiCommInstance = jfrogApicommunicationMock.Object;
+            // Act
+            var response = await ArtfactoryUploader.UploadPackageToRepo(component, timeout, displayPackagesInfo);
+
+            // Assert
+            jfrogApicommunicationMock.Verify(x => x.MoveFromRepo(component), Times.Once);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Test]
+        public async Task UploadPackageToRepo_WhenPackageTypeIsNotSupported_ReturnsNotFoundResponse()
+        {
+            // Arrange
+            var component = new ComponentsToArtifactory
+            {
+                PackageType = PackageType.Unknown,
+                ApiKey = "apiKey",
+                Email = "test@example.com"
+            };
+            component.SrcRepoName = "";
+            component.DestRepoName = "";
+            component.JfrogPackageName = "";
+            component.Path = "";
+            var timeout = 10000;
+            var displayPackagesInfo = new DisplayPackagesInfo();
+            var jFrogServiceMock = new Mock<IJFrogService>();
+            ArtfactoryUploader.jFrogService = jFrogServiceMock.Object;
+            // Act
+            var response = await ArtfactoryUploader.UploadPackageToRepo(component, timeout, displayPackagesInfo);
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
         }
     }
 }

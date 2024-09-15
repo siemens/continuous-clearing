@@ -15,7 +15,7 @@ namespace LCT.Common
 {
     public class ExceptionHandling
     {
-        protected ExceptionHandling() { }
+        public ExceptionHandling() { }
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public static void HttpException(HttpRequestException ex, HttpResponseMessage response, string exceptionSource)
@@ -48,6 +48,7 @@ namespace LCT.Common
             Logger.Logger.Log(null, Level.Error, $"Missing Arguments: Please provide the below arguments via inline or in the appSettings.json file to proceed.", null);
             Logger.Logger.Log(null, Level.Warn, $"{message}", null);
         }
+
         public static void TaskCancelledException(TaskCanceledException ex, string exceptionSource)
         {
             Logger.Logger.Log(null, Level.Error, $"A timeout error is thrown from {exceptionSource} server,Please wait for sometime and re run the pipeline again:{ex.Message}", null);
