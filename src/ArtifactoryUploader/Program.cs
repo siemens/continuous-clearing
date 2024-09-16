@@ -24,10 +24,11 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using LCT.Common.Model;
-using LCT.ArtifactPublisher;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ArtifactoryUploader
 {
+    [ExcludeFromCodeCoverage]
     public static class Program
     {
         private static bool m_Verbose = false;
