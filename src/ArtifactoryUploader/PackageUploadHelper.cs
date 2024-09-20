@@ -167,7 +167,7 @@ namespace LCT.ArtifactoryUploader
 
         }
 
-        private static void DisplayErrorForJfrogFoundPackages(List<ComponentsToArtifactory> JfrogFoundPackages)
+        public static void DisplayErrorForJfrogFoundPackages(List<ComponentsToArtifactory> JfrogFoundPackages)
         {
 
             if (JfrogFoundPackages.Any())
@@ -196,7 +196,7 @@ namespace LCT.ArtifactoryUploader
             }
         }
 
-        private static void DisplayErrorForJfrogPackages(List<ComponentsToArtifactory> JfrogNotFoundPackages)
+        public static void DisplayErrorForJfrogPackages(List<ComponentsToArtifactory> JfrogNotFoundPackages)
         {
 
             if (JfrogNotFoundPackages.Any())

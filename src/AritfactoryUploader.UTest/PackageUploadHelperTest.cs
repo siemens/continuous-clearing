@@ -17,6 +17,7 @@ using UnitTestUtilities;
 using System.Threading.Tasks;
 using System.Linq;
 using LCT.ArtifactoryUploader.Model;
+using LCT.APICommunications;
 
 namespace AritfactoryUploader.UTest
 {
@@ -140,7 +141,7 @@ namespace AritfactoryUploader.UTest
             };
 
             //Act
-            List<ComponentsToArtifactory> uploadList =await PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(componentLists, appSettings, displayPackagesInfo);
+            List<ComponentsToArtifactory> uploadList = await PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(componentLists, appSettings, displayPackagesInfo);
 
             // Assert
             Assert.That(0, Is.EqualTo(uploadList.Count), "Checks for components to upload to be zero");
@@ -195,6 +196,52 @@ namespace AritfactoryUploader.UTest
             //Assert
             var repoUrl = bom.Components.First(x => x.Properties[3].Name == "internal:siemens:clearing:jfrog-repo-name").Properties[3].Value;
             Assert.AreNotEqual("org1-npmjs-npm-remote", repoUrl);
+        }
+
+        [Test]
+        public void DisplayErrorForJfrogPackages_GivenJfrogNotFoundPackages_ResultsSucess()
+        {
+            // Arrange
+            ComponentsToArtifactory componentsToArtifactory = new ComponentsToArtifactory();
+            componentsToArtifactory.Name = "Test";
+            componentsToArtifactory.Version = "0.12.3";
+            List<ComponentsToArtifactory> JfrogNotFoundPackages = new() { componentsToArtifactory };
+            // Act
+
+            PackageUploadHelper.DisplayErrorForJfrogPackages(JfrogNotFoundPackages);
+
+            // Assert
+        }
+
+        [Test]
+        public void DisplayErrorForJfrogFoundPackages_GivenJfrogNotFoundPackages_ResultsSucess()
+        {
+            // Arrange
+            ComponentsToArtifactory componentsToArtifactory = new ComponentsToArtifactory();
+            componentsToArtifactory.Name = "Test";
+            componentsToArtifactory.Version = "0.12.3";
+            componentsToArtifactory.ResponseMessage = new System.Net.Http.HttpResponseMessage()
+            { ReasonPhrase = ApiConstant.ErrorInUpload };
+
+            ComponentsToArtifactory componentsToArtifactory2 = new ComponentsToArtifactory();
+            componentsToArtifactory2.Name = "Test2";
+            componentsToArtifactory2.Version = "0.12.32";
+            componentsToArtifactory2.ResponseMessage = new System.Net.Http.HttpResponseMessage()
+            { ReasonPhrase = ApiConstant.PackageNotFound };
+
+            ComponentsToArtifactory componentsToArtifactory3 = new ComponentsToArtifactory();
+            componentsToArtifactory3.Name = "Test3";
+            componentsToArtifactory3.Version = "0.12.33";
+            componentsToArtifactory3.ResponseMessage = new System.Net.Http.HttpResponseMessage()
+            { ReasonPhrase = "error" };
+
+            List<ComponentsToArtifactory> JfrogNotFoundPackages = new() {
+                componentsToArtifactory, componentsToArtifactory2, componentsToArtifactory3 };
+            // Act
+
+            PackageUploadHelper.DisplayErrorForJfrogFoundPackages(JfrogNotFoundPackages);
+
+            // Assert
         }
 
         private static List<Component> GetComponentList()

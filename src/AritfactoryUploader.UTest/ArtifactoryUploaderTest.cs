@@ -145,11 +145,10 @@ namespace AritfactoryUploader.UTest
             ArtfactoryUploader.jFrogService = jFrogServiceMock.Object;
             ArtfactoryUploader.JFrogApiCommInstance = jfrogApicommunicationMock.Object;
             // Act
-            var response = await ArtfactoryUploader.UploadPackageToRepo(component, timeout, displayPackagesInfo);
+            _= await ArtfactoryUploader.UploadPackageToRepo(component, timeout, displayPackagesInfo);
 
             // Assert
             jfrogApicommunicationMock.Verify(x => x.CopyFromRemoteRepo(component), Times.Once);
-            //Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         }
 
         [Test]
