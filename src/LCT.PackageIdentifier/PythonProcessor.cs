@@ -125,14 +125,21 @@ namespace LCT.PackageIdentifier
 
             foreach (TomlNode node in tomlTable["package"])
             {
+                if(!string.IsNullOrWhiteSpace(node["category"].ToString()))
+                {
+                    var cc = node["category"].ToString();
+                    var ccc= node["Malavika"].ToString();
+                    bool val = (node["category"].ToString() != "main" && node["category"].ToString() != "Tommy.TomlLazy");
+                }
                 PythonPackage pythonPackage = new()
                 {
                     Name = node["name"].ToString(),
                     Version = node["version"].ToString(),
                     PurlID = Dataconstant.PurlCheck()["PYTHON"] + "/" + node["name"].ToString() + "@" + node["version"].ToString(),
-                    Isdevdependent = node["category"].ToString() != "main",
+                    Isdevdependent = (node["category"].ToString() != "main" && node["category"].ToString() != "Tommy.TomlLazy"),
                     FoundType = Dataconstant.Discovered
                 };
+                //tod: get the input file that will work
 
                 if (pythonPackage.Isdevdependent)
                     BomCreator.bomKpiData.DevDependentComponents++;
