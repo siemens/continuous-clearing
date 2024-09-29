@@ -20,7 +20,6 @@ using CycloneDX.Models;
 using System.Threading.Tasks;
 using System.Linq;
 using LCT.Common.Constants;
-using Markdig.Extensions.Yaml;
 
 namespace PackageIdentifier.UTest
 {

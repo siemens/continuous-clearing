@@ -11,6 +11,7 @@ using System.Collections.Generic;
 
 namespace LCT.Common.UTest
 {
+    [TestFixture]
     public class CommonHelperTest
     {
        

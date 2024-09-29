@@ -6,6 +6,7 @@
 
 namespace LCT.APICommunications.UTest
 {
+    [TestFixture]
     public class FileInfoExtensionsUTest
     {
         [SetUp]

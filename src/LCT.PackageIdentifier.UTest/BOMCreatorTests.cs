@@ -13,73 +13,70 @@ using System.Xml;
 
 namespace PackageIdentifier.UTest
 {
-    public class Tests
+    [TestFixture]
+    public class BOMCreatorTest
     {
-        [TestFixture]
-        public class BOMCreatorTest
+        [Test]
+        public void WriteCycloneDXBOMToJSONFile_InputCycloneDxFile_ReturnsNoneEmptyArray()
         {
-            [Test]
-            public void WriteCycloneDXBOMToJSONFile_InputCycloneDxFile_ReturnsNoneEmptyArray()
-            {
-                string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-                string outFolder = Path.GetDirectoryName(exePath);
-                string CCTComparisonBomTestFile = outFolder + @"\PackageIdentifierUTTestFiles\CycloneDX_Debian.cdx.json";
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string CCTComparisonBomTestFile = outFolder + @"\PackageIdentifierUTTestFiles\CycloneDX_Debian.cdx.json";
 
-                string json = "";
-                if (File.Exists(CCTComparisonBomTestFile))
+            string json = "";
+            if (File.Exists(CCTComparisonBomTestFile))
+            {
+
+                json = File.ReadAllText(CCTComparisonBomTestFile);
+
+            }
+            dynamic array = JsonConvert.DeserializeObject(json);
+            Assert.IsNotNull(array);
+            Assert.IsNotEmpty(array);
+        }
+
+
+        [Test]
+        public void WriteToConfigurationFile()
+        {
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string filepath = outFolder + @"\PackageIdentifierUTTestFiles\SW360ProjectInfo.xml";
+
+            string expectedproject_id = "42e86178b3b4fe8b8623788052002a6c";
+            string expectedprojectname = "CCT";
+            string project_id = "", project_name = "";
+            if (File.Exists(filepath))
+            {
+
+                XmlDocument doc = new XmlDocument();
+                doc.Load(filepath);
+                XmlNodeList nodes = doc.DocumentElement.SelectNodes("/ProjectInfo");
+                foreach (XmlNode node in nodes)
                 {
-
-                    json = File.ReadAllText(CCTComparisonBomTestFile);
-
+                    project_id = node.SelectSingleNode("ProjectId").InnerText;
+                    project_name = node.SelectSingleNode("ProjectName").InnerText;
                 }
-                dynamic array = JsonConvert.DeserializeObject(json);
-                Assert.IsNotNull(array);
-                Assert.IsNotEmpty(array);
+
+                Assert.AreEqual(expectedproject_id, project_id);
+                Assert.AreEqual(expectedprojectname, project_name);
             }
+        }
 
+        [Test]
+        public void GetProjectSummaryLink_ProvidedProjectId_ReturnsSW360Url()
+        {
+            //Arrange
 
-            [Test]
-            public void WriteToConfigurationFile()
-            {
-                string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-                string outFolder = Path.GetDirectoryName(exePath);
-                string filepath = outFolder + @"\PackageIdentifierUTTestFiles\SW360ProjectInfo.xml";
+            BomHelper bomHelper = new BomHelper();
+            string url = "http:localhost:8090";
+            string expected = $"{url}{ApiConstant.Sw360ProjectUrlApiSuffix}12345";
+            //Act
+            string actual = bomHelper.GetProjectSummaryLink("12345", url);
 
-                string expectedproject_id = "42e86178b3b4fe8b8623788052002a6c";
-                string expectedprojectname = "CCT";
-                string project_id = "", project_name = "";
-                if (File.Exists(filepath))
-                {
+            //Assert
+            Assert.That(expected, Is.EqualTo(actual), "Checks the project url");
 
-                    XmlDocument doc = new XmlDocument();
-                    doc.Load(filepath);
-                    XmlNodeList nodes = doc.DocumentElement.SelectNodes("/ProjectInfo");
-                    foreach (XmlNode node in nodes)
-                    {
-                        project_id = node.SelectSingleNode("ProjectId").InnerText;
-                        project_name = node.SelectSingleNode("ProjectName").InnerText;
-                    }
-
-                    Assert.AreEqual(expectedproject_id, project_id);
-                    Assert.AreEqual(expectedprojectname, project_name);
-                }
-            }
-
-            [Test]
-            public void GetProjectSummaryLink_ProvidedProjectId_ReturnsSW360Url()
-            {
-                //Arrange
-
-                BomHelper bomHelper = new BomHelper();
-                string url = "http:localhost:8090";
-                string expected = $"{url}{ApiConstant.Sw360ProjectUrlApiSuffix}12345";
-                //Act
-                string actual = bomHelper.GetProjectSummaryLink("12345", url);
-
-                //Assert
-                Assert.That(expected, Is.EqualTo(actual), "Checks the project url");
-
-            }
         }
     }
 }

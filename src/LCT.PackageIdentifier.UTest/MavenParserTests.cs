@@ -20,6 +20,7 @@ using LCT.Common.Constants;
 
 namespace LCT.PackageIdentifier.UTest
 {
+    [TestFixture]
     public class MavenParserTests
     {
         private MavenProcessor _mavenProcessor;

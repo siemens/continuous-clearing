@@ -31,6 +31,7 @@ using UnitTestUtilities;
 
 namespace NUnitTestProject1
 {
+    [TestFixture]
     public class ComponentCreatorTest
     {
         [SetUp]

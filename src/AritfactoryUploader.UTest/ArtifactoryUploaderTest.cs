@@ -24,6 +24,7 @@ using LCT.APICommunications.Model.AQL;
 
 namespace AritfactoryUploader.UTest
 {
+    [TestFixture]
     public class ArtifactoryUploader
     {
         [SetUp]

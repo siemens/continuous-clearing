@@ -27,6 +27,7 @@ using System.Collections.Generic;
 
 namespace AritfactoryUploader.UTest
 {
+    [TestFixture]
     public class PackageUploaderTest
     {
         [Test]

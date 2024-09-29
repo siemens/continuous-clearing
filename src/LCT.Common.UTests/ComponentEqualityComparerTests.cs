@@ -9,6 +9,7 @@ using NUnit.Framework;
 
 namespace LCT.Common.UTests
 {
+    [TestFixture]
     public class ComponentEqualityComparerTests
     {
         [SetUp]

@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 
 namespace LCT.SW360PackageCreator.UTest
 {
+
+    [TestFixture]
     class AlpinePackageDownloaderTest
     {
         [TestCase]

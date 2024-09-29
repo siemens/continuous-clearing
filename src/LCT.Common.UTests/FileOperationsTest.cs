@@ -11,6 +11,7 @@ using System.IO;
 
 namespace LCT.Common.UTests
 {
+    [TestFixture]
     public class FileOperationsTest
     {
         [SetUp]

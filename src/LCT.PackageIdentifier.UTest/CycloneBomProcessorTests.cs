@@ -10,14 +10,13 @@ using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Model;
 using LCT.PackageIdentifier;
-using NuGet.ContentModel;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
-using System.Security.Cryptography;
 
 namespace PackageIdentifier.UTest
 {
+    [TestFixture]
     public class CycloneBomProcessorTests
     {
 

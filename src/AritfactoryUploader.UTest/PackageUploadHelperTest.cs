@@ -9,7 +9,6 @@ using CycloneDX.Models;
 using LCT.APICommunications.Model;
 using LCT.ArtifactoryUploader;
 using LCT.Common.Constants;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
@@ -21,6 +20,7 @@ using LCT.APICommunications;
 
 namespace AritfactoryUploader.UTest
 {
+    [TestFixture]
     public class PackageUploadHelperTest
     {
 
