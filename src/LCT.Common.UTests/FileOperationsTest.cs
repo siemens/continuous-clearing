@@ -9,7 +9,7 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
 
-namespace LCT.Common.UTests
+namespace LCT.Common.UTest
 {
     [TestFixture]
     public class FileOperationsTest

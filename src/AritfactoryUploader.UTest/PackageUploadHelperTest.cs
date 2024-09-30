@@ -17,6 +17,12 @@ using System.Threading.Tasks;
 using System.Linq;
 using LCT.ArtifactoryUploader.Model;
 using LCT.APICommunications;
+using System.Net.Http;
+using System.Net;
+using LCT.APICommunications.Model.AQL;
+using LCT.Services.Interface;
+using Moq;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace AritfactoryUploader.UTest
 {
@@ -316,6 +322,263 @@ namespace AritfactoryUploader.UTest
             comp4.Properties.Add(prop3);
             componentLists.Add(comp4);
             return componentLists;
+        }
+
+        [Test]
+        public void GetUploadPackageDetails_CoversAllScenarios()
+        {
+            // Arrange
+            DisplayPackagesInfo displayPackagesInfo = new DisplayPackagesInfo()
+            {
+                JfrogFoundPackagesConan = new List<ComponentsToArtifactory>()
+                {
+                    new ComponentsToArtifactory()
+                    {
+                        ResponseMessage = new HttpResponseMessage()
+                        {
+                            StatusCode = HttpStatusCode.OK
+                        }
+                    }
+                },
+                JfrogFoundPackagesMaven = new List<ComponentsToArtifactory>()
+                {
+                    new ComponentsToArtifactory()
+                    {
+                        ResponseMessage = new HttpResponseMessage()
+                        {
+                            StatusCode = HttpStatusCode.OK
+                        }
+                    }
+                },
+                JfrogFoundPackagesNpm = new List<ComponentsToArtifactory>()
+                {
+                    new ComponentsToArtifactory()
+                    {
+                        ResponseMessage = new HttpResponseMessage()
+                        {
+                            StatusCode = HttpStatusCode.OK
+                        }
+                    }
+                },
+                JfrogFoundPackagesNuget = new List<ComponentsToArtifactory>()
+                {
+                    new ComponentsToArtifactory()
+                    {
+                        ResponseMessage = new HttpResponseMessage()
+                        {
+                            StatusCode = HttpStatusCode.OK
+                        }
+                    }
+                },
+                JfrogFoundPackagesPython = new List<ComponentsToArtifactory>()
+                {
+                    new ComponentsToArtifactory()
+                    {
+                        ResponseMessage = new HttpResponseMessage()
+                        {
+                            StatusCode = HttpStatusCode.OK
+                        }
+                    }
+                },
+                JfrogFoundPackagesDebian = new List<ComponentsToArtifactory>()
+                {
+                    new ComponentsToArtifactory()
+                    {
+                        ResponseMessage = new HttpResponseMessage()
+                        {
+                            StatusCode = HttpStatusCode.OK
+                        }
+                    }
+                }
+            };
+
+            // Act
+            List<ComponentsToArtifactory> uploadedPackages = PackageUploadHelper.GetUploadePackageDetails(displayPackagesInfo);
+
+            // Assert
+            Assert.AreEqual(6, uploadedPackages.Count);
+        }
+
+        [Test]
+        public async Task GetSrcRepoDetailsForPyPiOrConanPackages_WhenPypiRepoExists_ReturnsArtifactoryRepoName()
+        {
+            // Arrange
+            Property prop1 = new Property
+            {
+                Name = Dataconstant.Cdx_ArtifactoryRepoName,
+                Value = "Reponame"
+            };
+            List<Property> properties = new List<Property>() { prop1 };
+            var item = new Component
+            {
+                Purl = "pypi://example-package",
+                Properties = properties,
+                Name = "pypi component",
+                Version = "1.0.0"
+            };
+
+            //GetInternalComponentDataByRepo
+            var aqlResultList = new List<AqlResult>
+            {
+                new AqlResult
+                {
+                    Repo = "pypi-repo",
+                    Path = "path/to/package",
+                    Name = "pypi component-1.0.0",
+                }
+            };
+            var jFrogServiceMock = new Mock<IJFrogService>();
+            jFrogServiceMock.Setup(x => x.GetInternalComponentDataByRepo(It.IsAny<string>())).ReturnsAsync(aqlResultList);
+            PackageUploadHelper.jFrogService = jFrogServiceMock.Object;
+
+            // Act
+            var result = await PackageUploadHelper.GetSrcRepoDetailsForPyPiOrConanPackages(item);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("pypi-repo", result.Repo);
+            Assert.AreEqual("path/to/package", result.Path);
+        }
+
+        [Test]
+        public async Task GetSrcRepoDetailsForPyPiOrConanPackages_WhenConanRepoExists_ReturnsArtifactoryRepoName()
+        {
+            // Arrange
+            Property prop1 = new Property
+            {
+                Name = Dataconstant.Cdx_ArtifactoryRepoName,
+                Value = "Reponame"
+            };
+            List<Property> properties = new List<Property>() { prop1 };
+
+            var item = new Component
+            {
+                Purl = "conan://example-package",
+                Properties = properties,
+                Name = "conan component",
+                Version = "1.0.0"
+            };
+
+            var aqlResultList = new List<AqlResult>
+            {
+                new AqlResult
+                {
+                    Repo = "conan-repo",
+                    Path = "path/to/conan component/1.0.0",
+                    Name = "conan component-1.0.0",
+                }
+            };
+
+            var jFrogServiceMock = new Mock<IJFrogService>();
+            jFrogServiceMock.Setup(x => x.GetInternalComponentDataByRepo(It.IsAny<string>())).ReturnsAsync(aqlResultList);
+            PackageUploadHelper.jFrogService = jFrogServiceMock.Object;
+
+            // Act
+            var result = await PackageUploadHelper.GetSrcRepoDetailsForPyPiOrConanPackages(item);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("conan-repo", result.Repo);
+            Assert.AreEqual("path/to/conan component/1.0.0", result.Path);
+        }
+
+        [Test]
+        public async Task GetSrcRepoDetailsForPyPiOrConanPackages_WhenNoRepoExists_ReturnsNull()
+        {
+            // Arrange
+            var item = new Component
+            {
+                Purl = "unknown://example-package"
+            };
+            var jFrogServiceMock = new Mock<IJFrogService>();
+            PackageUploadHelper.jFrogService = jFrogServiceMock.Object;
+
+            // Act
+            var result = await PackageUploadHelper.GetSrcRepoDetailsForPyPiOrConanPackages(item);
+
+            // Assert
+            Assert.IsNull(result);
+        }
+
+        [Test]
+        [TestCase("NPM", ".tgz")]
+        [TestCase("NUGET", ".nupkg")]
+        [TestCase("MAVEN", ".jar")]
+        [TestCase("DEBIAN", ".deb")]
+        [TestCase("PYTHON", ".whl")]
+        [TestCase("CONAN", "package.tgz")]
+        public void GetPkgeNameExtensionBasedOnComponentType_GivenType_ReturnsPkgNameExtension(string type, string extension)
+        {
+            // Arrange
+            var package = new ComponentsToArtifactory();
+            package.ComponentType = type;
+            // Act
+            var actualExtension = PackageUploadHelper.GetPackageNameExtensionBasedOnComponentType(package);
+            // Assert
+            Assert.AreEqual(extension, actualExtension);
+        }
+
+        [Test]
+        public void GetJfrogApiCommInstance_GivenComponent_ReturnsJfrogApiCommunicationInstance()
+        {
+            // Arrange
+            var component = new ComponentsToArtifactory
+            {
+                ComponentType = "MAVEN",
+                JfrogApi = "https://api.jfrog.com",
+                SrcRepoName = "maven-repo",
+                ApiKey = "api-key",
+                Email = "test@example.com"
+            };
+            var timeout = 5000;
+
+            // Act
+            var result = PackageUploadHelper.GetJfrogApiCommInstance(component, timeout);
+
+            // Assert
+            Assert.IsInstanceOf<MavenJfrogApiCommunication>(result);
+        }
+
+        [Test]
+        public void GetJfrogApiCommInstance_GivenComponentWithPythonType_ReturnsJfrogApiCommunicationInstance()
+        {
+            // Arrange
+            var component = new ComponentsToArtifactory
+            {
+                ComponentType = "PYTHON",
+                JfrogApi = "https://api.jfrog.com",
+                SrcRepoName = "python-repo",
+                ApiKey = "api-key",
+                Email = "test@example.com"
+            };
+            var timeout = 5000;
+
+            // Act
+            var result = PackageUploadHelper.GetJfrogApiCommInstance(component, timeout);
+
+            // Assert
+            Assert.IsInstanceOf<PythonJfrogApiCommunication>(result);
+        }
+
+        [Test]
+        public void GetJfrogApiCommInstance_GivenComponentWithUnknownType_ReturnsJfrogApiCommunicationInstance()
+        {
+            // Arrange
+            var component = new ComponentsToArtifactory
+            {
+                ComponentType = "UNKNOWN",
+                JfrogApi = "https://api.jfrog.com",
+                SrcRepoName = "unknown-repo",
+                ApiKey = "api-key",
+                Email = "test@example.com"
+            };
+            var timeout = 5000;
+
+            // Act
+            var result = PackageUploadHelper.GetJfrogApiCommInstance(component, timeout);
+
+            // Assert
+            Assert.IsInstanceOf<NpmJfrogApiCommunication>(result);
         }
     }
 }

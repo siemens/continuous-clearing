@@ -7,7 +7,7 @@
 using CycloneDX.Models;
 using NUnit.Framework;
 
-namespace LCT.Common.UTests
+namespace LCT.Common.UTest
 {
     [TestFixture]
     public class ComponentEqualityComparerTests

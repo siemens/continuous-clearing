@@ -179,6 +179,15 @@ namespace LCT.Common
                 CommonHelper.CallEnvironmentExit(-1);
             }
         }
+        public static bool IsAzureDevOpsDebugEnabled()
+        {
+            string azureDevOpsDebug = Environment.GetEnvironmentVariable("System.Debug") ?? string.Empty;
+            if (bool.TryParse(azureDevOpsDebug, out bool systemDebugEnabled) && systemDebugEnabled)
+            {
+                return true;
+            }
+            return false;
+        }
 
     }
 

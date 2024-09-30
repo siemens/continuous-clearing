@@ -948,7 +948,7 @@ namespace LCT.ArtifactoryUploader
             return string.Empty;
         }
 
-        private async static Task<AqlResult> GetSrcRepoDetailsForPyPiOrConanPackages(Component item)
+        public async static Task<AqlResult> GetSrcRepoDetailsForPyPiOrConanPackages(Component item)
         {
             if (item.Purl.Contains("pypi", StringComparison.OrdinalIgnoreCase))
             {
@@ -1053,7 +1053,7 @@ namespace LCT.ArtifactoryUploader
             }
         }
 
-        private static IJFrogApiCommunication GetJfrogApiCommInstance(ComponentsToArtifactory component, int timeout)
+        public static IJFrogApiCommunication GetJfrogApiCommInstance(ComponentsToArtifactory component, int timeout)
         {
 
             ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials()
@@ -1155,7 +1155,7 @@ namespace LCT.ArtifactoryUploader
             }
         }
 
-        private static async Task<List<AqlResult>> GetListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService)
+        public static async Task<List<AqlResult>> GetListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService)
         {
             if (repoList != null && repoList.Length > 0)
             {
@@ -1287,7 +1287,7 @@ namespace LCT.ArtifactoryUploader
             return $"{aqlResult.Repo}/{aqlResult.Path}/{aqlResult.Name}";
         }
 
-        private static string GetPackageNameExtensionBasedOnComponentType(ComponentsToArtifactory package)
+        public static string GetPackageNameExtensionBasedOnComponentType(ComponentsToArtifactory package)
         {
             string packageNameEXtension = string.Empty;
             if (package.ComponentType.Equals("NPM", StringComparison.OrdinalIgnoreCase))
@@ -1332,7 +1332,7 @@ namespace LCT.ArtifactoryUploader
             return aqlResultList;
         }
 
-        private static List<ComponentsToArtifactory> GetUploadePackageDetails(DisplayPackagesInfo displayPackagesInfo)
+        public static List<ComponentsToArtifactory> GetUploadePackageDetails(DisplayPackagesInfo displayPackagesInfo)
         {
             List<ComponentsToArtifactory> uploadedPackages = new List<ComponentsToArtifactory>();
 
