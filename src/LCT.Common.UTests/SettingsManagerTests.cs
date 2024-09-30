@@ -4,6 +4,8 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using Moq;
+using Moq.Protected;
 using NUnit.Framework;
 using System;
 using System.IO;
@@ -74,6 +76,5 @@ namespace LCT.Common.UTest
             // Assert
             Assert.That(result, Is.False);
         }
-
     }
 }

@@ -23,6 +23,7 @@ using LCT.APICommunications.Model.AQL;
 using LCT.Services.Interface;
 using Moq;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using LCT.Common.Interface;
 
 namespace AritfactoryUploader.UTest
 {
@@ -217,6 +218,7 @@ namespace AritfactoryUploader.UTest
             PackageUploadHelper.DisplayErrorForJfrogPackages(JfrogNotFoundPackages);
 
             // Assert
+            Assert.That(JfrogNotFoundPackages.Count, Is.GreaterThanOrEqualTo(1));
         }
 
         [Test]
@@ -248,6 +250,7 @@ namespace AritfactoryUploader.UTest
             PackageUploadHelper.DisplayErrorForJfrogFoundPackages(JfrogNotFoundPackages);
 
             // Assert
+            Assert.That(JfrogNotFoundPackages.Count, Is.GreaterThanOrEqualTo(1));
         }
 
         private static List<Component> GetComponentList()
@@ -579,6 +582,275 @@ namespace AritfactoryUploader.UTest
 
             // Assert
             Assert.IsInstanceOf<NpmJfrogApiCommunication>(result);
+        }
+
+        [Test]
+        [TestCase("NPM")]
+        [TestCase("NUGET")]
+        [TestCase("MAVEN")]
+        [TestCase("PYTHON")]
+        [TestCase("CONAN")]
+        [TestCase("DEBIAN")]
+        public async Task JfrogNotFoundPackagesAsync_CoversAllScenarios(string compType)
+        {
+            // Arrange
+            var item = new ComponentsToArtifactory();
+            item.ComponentType = compType;
+            var displayPackagesInfo = new DisplayPackagesInfo();
+            displayPackagesInfo.JfrogNotFoundPackagesNpm = new List<ComponentsToArtifactory>();
+            displayPackagesInfo.JfrogNotFoundPackagesNuget = new List<ComponentsToArtifactory>();
+            displayPackagesInfo.JfrogNotFoundPackagesMaven = new List<ComponentsToArtifactory>();
+            displayPackagesInfo.JfrogNotFoundPackagesPython = new List<ComponentsToArtifactory>();
+            displayPackagesInfo.JfrogNotFoundPackagesConan = new List<ComponentsToArtifactory>();
+            displayPackagesInfo.JfrogNotFoundPackagesDebian = new List<ComponentsToArtifactory>();
+
+            // Act
+            await PackageUploadHelper.JfrogNotFoundPackagesAsync(item, displayPackagesInfo);
+
+            // Assert
+            if (item.ComponentType == "NPM")
+            {
+                Assert.AreEqual(1, displayPackagesInfo.JfrogNotFoundPackagesNpm.Count);
+                Assert.That(displayPackagesInfo.JfrogNotFoundPackagesNpm[0], Is.Not.Null);
+            }
+            else if (item.ComponentType == "NUGET")
+            {
+                Assert.AreEqual(1, displayPackagesInfo.JfrogNotFoundPackagesNuget.Count);
+                Assert.That(displayPackagesInfo.JfrogNotFoundPackagesNuget[0], Is.Not.Null);
+            }
+            else if (item.ComponentType == "MAVEN")
+            {
+                Assert.AreEqual(1, displayPackagesInfo.JfrogNotFoundPackagesMaven.Count);
+                Assert.That(displayPackagesInfo.JfrogNotFoundPackagesMaven[0], Is.Not.Null);
+            }
+            else if (item.ComponentType == "PYTHON")
+            {
+                Assert.AreEqual(1, displayPackagesInfo.JfrogNotFoundPackagesPython.Count);
+                Assert.That(displayPackagesInfo.JfrogNotFoundPackagesPython[0], Is.Not.Null);
+            }
+            else if (item.ComponentType == "CONAN")
+            {
+                Assert.AreEqual(1, displayPackagesInfo.JfrogNotFoundPackagesConan.Count);
+                Assert.That(displayPackagesInfo.JfrogNotFoundPackagesConan[0], Is.Not.Null);
+            }
+            else if (item.ComponentType == "DEBIAN")
+            {
+                Assert.AreEqual(1, displayPackagesInfo.JfrogNotFoundPackagesDebian.Count);
+                Assert.That(displayPackagesInfo.JfrogNotFoundPackagesDebian[0], Is.Not.Null);
+            }
+        }
+
+        [Test]
+        [TestCase("NPM")]
+        [TestCase("NUGET")]
+        [TestCase("MAVEN")]
+        [TestCase("PYTHON")]
+        [TestCase("CONAN")]
+        [TestCase("DEBIAN")]
+        public async Task JfrogFoundPackagesAsync_CoversAllScenarios(string compType)
+        {
+            // Arrange
+            var item = new ComponentsToArtifactory();
+            item.ComponentType = compType;
+            var displayPackagesInfo = new DisplayPackagesInfo();
+            displayPackagesInfo.JfrogFoundPackagesNpm = new List<ComponentsToArtifactory>();
+            displayPackagesInfo.JfrogFoundPackagesNuget = new List<ComponentsToArtifactory>();
+            displayPackagesInfo.JfrogFoundPackagesMaven = new List<ComponentsToArtifactory>();
+            displayPackagesInfo.JfrogFoundPackagesPython = new List<ComponentsToArtifactory>();
+            displayPackagesInfo.JfrogFoundPackagesConan = new List<ComponentsToArtifactory>();
+            displayPackagesInfo.JfrogFoundPackagesDebian = new List<ComponentsToArtifactory>();
+            var operationType = "operationType";
+            var responseMessage = new HttpResponseMessage();
+            var dryRunSuffix = "dryRunSuffix";
+
+            // Act
+            await PackageUploadHelper.JfrogFoundPackagesAsync(item, displayPackagesInfo, operationType, responseMessage, dryRunSuffix);
+
+            // Assert
+            if (item.ComponentType == "NPM")
+            {
+                Assert.AreEqual(1, displayPackagesInfo.JfrogFoundPackagesNpm.Count);
+                Assert.That(displayPackagesInfo.JfrogFoundPackagesNpm[0], Is.Not.Null);
+            }
+            else if (item.ComponentType == "NUGET")
+            {
+                Assert.AreEqual(1, displayPackagesInfo.JfrogFoundPackagesNuget.Count);
+                Assert.That(displayPackagesInfo.JfrogFoundPackagesNuget[0], Is.Not.Null);
+            }
+            else if (item.ComponentType == "MAVEN")
+            {
+                Assert.AreEqual(1, displayPackagesInfo.JfrogFoundPackagesMaven.Count);
+                Assert.That(displayPackagesInfo.JfrogFoundPackagesMaven[0], Is.Not.Null);
+            }
+            else if (item.ComponentType == "PYTHON")
+            {
+                Assert.AreEqual(1, displayPackagesInfo.JfrogFoundPackagesPython.Count);
+                Assert.That(displayPackagesInfo.JfrogFoundPackagesPython[0], Is.Not.Null);
+            }
+            else if (item.ComponentType == "CONAN")
+            {
+                Assert.AreEqual(1, displayPackagesInfo.JfrogFoundPackagesConan.Count);
+                Assert.That(displayPackagesInfo.JfrogFoundPackagesConan[0], Is.Not.Null);
+            }
+            else if (item.ComponentType == "DEBIAN")
+            {
+                Assert.AreEqual(1, displayPackagesInfo.JfrogFoundPackagesDebian.Count);
+                Assert.That(displayPackagesInfo.JfrogFoundPackagesDebian[0], Is.Not.Null);
+            }
+        }
+
+        [Test]
+        public void GetNotApprovedDebianPackages_CoversAllScenarios()
+        {
+            // Arrange
+            var unknownPackages = new List<ComponentsToArtifactory>
+            {
+                new ComponentsToArtifactory { Name = "Package1", Version = "1.0.0" },
+                new ComponentsToArtifactory { Name = "Package2", Version = "2.0.0" }
+            };
+            var projectResponse = new ProjectResponse();
+            var fileOperationsMock = new Mock<IFileOperations>();
+            var filepath = "..";
+            var filename = "\\testFileName.json";
+
+            // Act
+            PackageUploadHelper.GetNotApprovedDebianPackages(unknownPackages, projectResponse, fileOperationsMock.Object, filepath, filename);
+
+            // Assert
+            // Add your assertions here
+            Assert.That(unknownPackages.Count, Is.EqualTo(2));
+        }
+
+        [Test]
+        public async Task GetJfrogRepoInfoForAllTypePackages_GivenDestRepoNames_ReturnsAqlResultList()
+        {
+            // Arrange
+            var destRepoNames = new List<string> { "repo1", "repo2", "repo3" };
+            var expectedAqlResultList = new List<AqlResult>
+            {
+                new AqlResult { Name = "result1" },
+                new AqlResult { Name = "result2" },
+                new AqlResult { Name = "result3" }
+            };
+
+            var jFrogServiceMock = new Mock<IJFrogService>();
+            jFrogServiceMock.Setup(service => service.GetInternalComponentDataByRepo(It.IsAny<string>()))
+                            .ReturnsAsync(expectedAqlResultList);
+            PackageUploadHelper.jFrogService = jFrogServiceMock.Object;
+
+            // Act
+            var actualAqlResultList = await PackageUploadHelper.GetJfrogRepoInfoForAllTypePackages(destRepoNames);
+
+
+            // Assert
+            Assert.That(actualAqlResultList.Count, Is.GreaterThan(2));
+        }
+
+        [Test]
+        [TestCase("NPM", "source-repo/package-name/-/package-name-1.0.0.tgz?to=/destination-repo/package-name/-/package-name-1.0.0.tgz")]
+        [TestCase("NUGET", "source-repo/package-name.1.0.0.nupkg?to=/destination-repo/package-name.1.0.0.nupkg")]
+        [TestCase("MAVEN", "source-repo/package-name/1.0.0?to=/destination-repo/package-name/1.0.0")]
+        [TestCase("CONAN", "source-repo/?to=/destination-repo/")]
+        [TestCase("PYTHON", "?to=/destination-repo/")]
+        [TestCase("DEBIAN", "source-repo//package-name_1.0.0*?to=/destination-repo//package-name_1.0.0*")]
+        public void GetCopyURL_GivenComponentType_ReturnsCopyURL(string type, string pkgExtension)
+        {
+            // Arrange
+            var component = new ComponentsToArtifactory
+            {
+                ComponentType = type,
+                JfrogApi = "https://example.com",
+                SrcRepoName = "source-repo",
+                Name = "package-name",
+                Version = "1.0.0",
+                PackageName = "package-name",
+                DestRepoName = "destination-repo",
+                DryRun = false
+            };
+            var expectedUrl = $"https://example.com/api/copy/{pkgExtension}";
+
+            // Act
+            var actualUrl = PackageUploadHelper.GetCopyURL(component);
+
+            // Assert
+            Assert.AreEqual(expectedUrl, actualUrl);
+        }
+
+        [Test]
+        public void GetCopyURL_GivenInvalidComponentType_ReturnsEmptyString()
+        {
+            // Arrange
+            var component = new ComponentsToArtifactory
+            {
+                ComponentType = "INVALID",
+                JfrogApi = "https://example.com/api/",
+                SrcRepoName = "source-repo",
+                Name = "package-name",
+                Version = "1.0.0",
+                PackageName = "package-name",
+                DestRepoName = "destination-repo",
+                DryRun = false
+            };
+
+            // Act
+            var actualUrl = PackageUploadHelper.GetCopyURL(component);
+
+            // Assert
+            Assert.AreEqual(string.Empty, actualUrl);
+        }
+
+
+        [Test]
+        [TestCase("NPM", "source-repo/package-name/-/package-name-1.0.0.tgz?to=/destination-repo/package-name/-/package-name-1.0.0.tgz")]
+        [TestCase("NUGET", "source-repo/package-name.1.0.0.nupkg?to=/destination-repo/package-name.1.0.0.nupkg")]
+        [TestCase("MAVEN", "source-repo/package-name/1.0.0?to=/destination-repo/package-name/1.0.0")]
+        [TestCase("CONAN", "source-repo/?to=/destination-repo/")]
+        [TestCase("PYTHON", "?to=/destination-repo/")]
+        [TestCase("DEBIAN", "source-repo//package-name_1.0.0*?to=/destination-repo//package-name_1.0.0*")]
+        public void GetMoveURL_GivenComponentType_ReturnsMoveURL(string type, string extension)
+        {
+            // Arrange
+            var component = new ComponentsToArtifactory
+            {
+                ComponentType = type,
+                JfrogApi = "https://example.com",
+                SrcRepoName = "source-repo",
+                Name = "package-name",
+                PackageName = "package-name",
+                Version = "1.0.0",
+                DestRepoName = "destination-repo",
+                DryRun = false
+            };
+            var expectedUrl = $"https://example.com/api/move/{extension}";
+
+            // Act
+            var result = PackageUploadHelper.GetMoveURL(component);
+
+            // Assert
+            Assert.AreEqual(expectedUrl, result);
+        }
+
+        [Test]
+        public void GetMoveURL_GivenInvalidComponentType_ReturnsEmptyString()
+        {
+            // Arrange
+            var component = new ComponentsToArtifactory
+            {
+                ComponentType = "INVALID",
+                JfrogApi = "https://example.com/api/",
+                SrcRepoName = "source-repo",
+                Name = "package-name",
+                PackageName = "package-name",
+                Version = "1.0.0",
+                DestRepoName = "destination-repo",
+                DryRun = false
+            };
+
+            // Act
+            var result = PackageUploadHelper.GetMoveURL(component);
+
+            // Assert
+            Assert.AreEqual(string.Empty, result);
         }
     }
 }

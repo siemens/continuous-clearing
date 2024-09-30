@@ -379,7 +379,7 @@ namespace LCT.ArtifactoryUploader
             }
             Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n");
         }
-        private static void GetNotApprovedDebianPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
+        public  static void GetNotApprovedDebianPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
         {
             if (File.Exists(filename))
             {
@@ -593,12 +593,11 @@ namespace LCT.ArtifactoryUploader
 
         }
 
-        private static async Task JfrogNotFoundPackagesAsync(ComponentsToArtifactory item, DisplayPackagesInfo displayPackagesInfo)
+        public static async Task JfrogNotFoundPackagesAsync(ComponentsToArtifactory item, DisplayPackagesInfo displayPackagesInfo)
         {
 
             if (item.ComponentType == "NPM")
             {
-
                 ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
                 displayPackagesInfo.JfrogNotFoundPackagesNpm.Add(components);
             }
@@ -635,7 +634,6 @@ namespace LCT.ArtifactoryUploader
 
             if (item.ComponentType == "NPM")
             {
-
                 ComponentsToArtifactory components = await GetPackageinfo(item, operationType, responseMessage, dryRunSuffix);
                 displayPackagesInfo.JfrogFoundPackagesNpm.Add(components);
             }
@@ -727,7 +725,7 @@ namespace LCT.ArtifactoryUploader
             return PackageType.Unknown;
         }
 
-        private static string GetCopyURL(ComponentsToArtifactory component)
+        public static string GetCopyURL(ComponentsToArtifactory component)
         {
             string url = string.Empty;
             if (component.ComponentType == "NPM")
@@ -769,7 +767,7 @@ namespace LCT.ArtifactoryUploader
             return component.DryRun ? $"{url}&dry=1" : url;
         }
 
-        private static string GetMoveURL(ComponentsToArtifactory component)
+        public static string GetMoveURL(ComponentsToArtifactory component)
         {
             string url = string.Empty;
             if (component.ComponentType == "NPM")
@@ -1318,7 +1316,7 @@ namespace LCT.ArtifactoryUploader
             return packageNameEXtension;
         }
 
-        private static async Task<List<AqlResult>> GetJfrogRepoInfoForAllTypePackages(List<string> destRepoNames)
+        public static async Task<List<AqlResult>> GetJfrogRepoInfoForAllTypePackages(List<string> destRepoNames)
         {
             if (destRepoNames != null && destRepoNames.Count > 0)
             {

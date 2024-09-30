@@ -74,7 +74,7 @@ namespace LCT.Common
             return appSettings;
         }
 
-        private static void DisplayHelp()
+        public static void DisplayHelp()
         {
 
             StreamReader sr = new("CLIUsageNpkg.txt");
