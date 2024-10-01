@@ -9,7 +9,7 @@ using LCT.APICommunications.Model.AQL;
 using System.Collections.Generic;
 using LCT.PackageIdentifier;
 
-namespace PackageIdentifier.Tests
+namespace LCT.PackageIdentifier.UTest
 {
     [TestFixture]
     public class CommonIdentiferHelperTests

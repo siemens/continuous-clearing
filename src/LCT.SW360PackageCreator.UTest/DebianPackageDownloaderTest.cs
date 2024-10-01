@@ -14,7 +14,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace SW360ComponentCreator.UTest
+namespace LCT.SW360PackageCreator.UTest
 {
     [TestFixture]
     class DebianPackageDownloaderTest

@@ -11,7 +11,7 @@ using NUnit.Framework;
 using System.IO;
 using System.Xml;
 
-namespace PackageIdentifier.UTest
+namespace LCT.PackageIdentifier.UTest
 {
     [TestFixture]
     public class BOMCreatorTest

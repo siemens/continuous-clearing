@@ -11,7 +11,7 @@ using NUnit.Framework;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace SW360ComponentCreator.UTest
+namespace LCT.SW360PackageCreator.UTest
 {
     [TestFixture]
     public class PackageDownloaderTest

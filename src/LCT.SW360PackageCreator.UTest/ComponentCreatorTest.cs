@@ -31,7 +31,7 @@ using System.Threading.Tasks;
 using UnitTestUtilities;
 
 
-namespace NUnitTestProject1
+namespace LCT.SW360PackageCreator.UTest
 {
     [TestFixture]
     public class ComponentCreatorTest
@@ -563,6 +563,71 @@ namespace NUnitTestProject1
 
             // Assert
             Assert.AreEqual("67890", uploadId);
+        }
+
+        [Test]
+        public async Task TriggerFossologyProcess_ExceptionScenario_ReturnsEmptyUploadId()
+        {
+            // Arrange
+            var item = new ComparisonBomData
+            {
+                ReleaseID = "releaseId"
+            };
+
+            var sw360CreatorServiceMock = new Mock<ISw360CreatorService>();
+            sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()))
+                .ThrowsAsync(new AggregateException());
+
+            // Act
+            var uploadId = await ComponentCreator.TriggerFossologyProcess(item, sw360CreatorServiceMock.Object, new CommonAppSettings());
+
+            // Assert
+            Assert.AreEqual(string.Empty, uploadId);
+        }
+
+        [Test]
+        public async Task TriggerFossologyProcess_NonExceptionScenario_ReturnsUploadId()
+        {
+            // Arrange
+            var item = new ComparisonBomData
+            {
+                ReleaseID = "releaseId"
+            };
+
+            ProcessSteps processSteps = new ProcessSteps
+            {
+                ProcessStepIdInTool = "uploadId"
+            };
+            var steps = new List<ProcessSteps>() { processSteps };
+            var sw360CreatorServiceMock = new Mock<ISw360CreatorService>();
+            sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new FossTriggerStatus
+                {
+                    Links = new Links
+                    {
+                        Self = new Self
+                        {
+                            Href = "fossologyLink"
+                        }
+                    }
+                });
+
+            sw360CreatorServiceMock.Setup(x => x.CheckFossologyProcessStatus(It.IsAny<string>()))
+                .ReturnsAsync(new CheckFossologyProcess
+                {
+                    FossologyProcessInfo = new FossologyProcessInfo
+                    {
+                        ExternalTool = "fossologyTool",
+                        ProcessSteps = steps.ToArray()
+                    }
+                });
+
+
+            // Act
+            var uploadId = await ComponentCreator.TriggerFossologyProcess(item, sw360CreatorServiceMock.Object, new CommonAppSettings());
+
+            // Assert
+            Assert.AreEqual("uploadId", uploadId);
         }
     }
 }

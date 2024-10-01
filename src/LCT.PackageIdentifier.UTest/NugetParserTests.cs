@@ -21,7 +21,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using LCT.Common.Constants;
 
-namespace PackageIdentifier.UTest
+namespace LCT.PackageIdentifier.UTest
 {
     [TestFixture]
     public class NugetParserTests

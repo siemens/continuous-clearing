@@ -14,7 +14,7 @@ using LCT.Common;
 using System.Threading.Tasks;
 using LCT.APICommunications.Model;
 
-namespace SW360ComponentCreator.UTest
+namespace LCT.SW360PackageCreator.UTest
 {
     [TestFixture]
     public class CreatorValidatorTest

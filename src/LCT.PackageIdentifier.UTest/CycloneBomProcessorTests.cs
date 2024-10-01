@@ -14,7 +14,7 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
 
-namespace PackageIdentifier.UTest
+namespace LCT.PackageIdentifier.UTest
 {
     [TestFixture]
     public class CycloneBomProcessorTests

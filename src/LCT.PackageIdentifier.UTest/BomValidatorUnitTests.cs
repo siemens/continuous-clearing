@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 using LCT.Common;
 using LCT.APICommunications.Model;
 
-namespace PackageIdentifier.UTest
+namespace LCT.PackageIdentifier.UTest
 {
     [TestFixture]
     public class BomValidatorUnitTests
