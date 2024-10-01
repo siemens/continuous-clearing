@@ -453,21 +453,19 @@ namespace AritfactoryUploader.UTest
                 Value = "Reponame"
             };
             List<Property> properties = new List<Property>() { prop1 };
-
             var item = new Component
             {
                 Purl = "conan://example-package",
                 Properties = properties,
-                Name = "conan component",
+                Name = "conancomponent",
                 Version = "1.0.0"
             };
-
             var aqlResultList = new List<AqlResult>
             {
                 new AqlResult
                 {
                     Repo = "conan-repo",
-                    Path = "path/to/conan component/1.0.0",
+                    Path = "path/to/conancomponent/1.0.0",
                     Name = "conan component-1.0.0",
                 }
             };
@@ -482,7 +480,7 @@ namespace AritfactoryUploader.UTest
             // Assert
             Assert.IsNotNull(result);
             Assert.AreEqual("conan-repo", result.Repo);
-            Assert.AreEqual("path/to/conan component/1.0.0", result.Path);
+            Assert.AreEqual("path/to/conancomponent/1.0.0", result.Path);
         }
 
         [Test]

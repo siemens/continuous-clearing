@@ -72,6 +72,19 @@ namespace LCT.Common.UTest
             Assert.That(Environment.GetEnvironmentVariable("CI_JOB_ID"), Is.Not.Null);
         }
 
+        [Test]
+        public void GetEnvironment_WhenJobIdEnvironmentVariableNotDefined_ReturnsUnknown()
+        {
+            // Arrange
+            Environment.SetEnvironmentVariable("CI_JOB_ID", null);
+
+            // Act
+            _= RuntimeEnvironment.GetEnvironment();
+
+            // Assert
+            Assert.That(Environment.GetEnvironmentVariable("CI_JOB_ID"), Is.Null);
+        }
+
         private static void SetEnvironmentVariable(string name, string value)
         {
             // Set the environment variable for the duration of the test
