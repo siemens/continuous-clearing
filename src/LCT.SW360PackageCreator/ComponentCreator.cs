@@ -549,12 +549,12 @@ namespace LCT.SW360PackageCreator
             AddReleaseIdToLink(item, releaseId);
         }
 
-        private static string GetCreatedStatus(bool status)
+        public static string GetCreatedStatus(bool status)
         {
             return status ? Dataconstant.NewlyCreated : Dataconstant.NotCreated;
         }
 
-        private void AddReleaseIdToLink(ComparisonBomData item, string releaseIdToLink)
+        public void AddReleaseIdToLink(ComparisonBomData item, string releaseIdToLink)
         {
             if (!string.IsNullOrWhiteSpace(releaseIdToLink))
             {
@@ -570,7 +570,7 @@ namespace LCT.SW360PackageCreator
             }
         }
 
-        private List<Components> RemoveDuplicateComponents(List<Components> components)
+        public List<Components> RemoveDuplicateComponents(List<Components> components)
         {
             // Removes duplicate
             bom.Components = bom.Components?.GroupBy(x => new { x.Name, x.Version }).Select(y => y.First()).ToList();

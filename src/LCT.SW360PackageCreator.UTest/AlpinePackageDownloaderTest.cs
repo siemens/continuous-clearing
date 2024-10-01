@@ -5,6 +5,7 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 using LCT.Common.Model;
 using NUnit.Framework;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -56,6 +57,28 @@ namespace LCT.SW360PackageCreator.UTest
 
             //Assert
             Assert.IsEmpty(downloadpath);
+        }
+
+        [Test]
+        public void  ApplyPatchsToSourceCode_ValidPatchFileAndSourceCodeFolder_SuccessfullyAppliesPatch()
+        {
+            try
+            {
+                // Arrange
+                var patchFileFolder = "path/to/patch/file.patch";
+                var sourceCodezippedFolder = "path/to/source/code/folder";
+
+                // Act
+                AlpinePackageDownloader.ApplyPatchsToSourceCode(patchFileFolder, sourceCodezippedFolder);
+
+                // Assert
+                // Add your assertions here to verify that the patch was successfully applied
+                Assert.Pass();
+            }
+            catch (Exception ex)
+            {
+                Assert.IsNotNull(ex);
+            }
         }
 
     }

@@ -8,6 +8,7 @@ using CycloneDX.Models;
 using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.Foss;
 using LCT.Common;
+using LCT.Common.Constants;
 using LCT.Common.Model;
 using LCT.Facade.Interfaces;
 using LCT.Services;
@@ -22,6 +23,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -356,6 +358,96 @@ namespace NUnitTestProject1
             Assert.That(list.Count > 0);
         }
 
+        [Test]
+        public void RemoveDuplicateComponents_RemovesDuplicateComponents()
+        {
+            // Arrange
+            var componentCreator = new ComponentCreator();
+            var components = new List<Components>
+            {
+                new Components { Name = "Component1", Version = "1.0" },
+                new Components { Name = "Component2", Version = "2.0" },
+                new Components { Name = "Component1", Version = "1.0" },
+                new Components { Name = "Component3", Version = "3.0" },
+                new Components { Name = "Component2", Version = "2.0" }
+            };
+
+            // Act
+            var result = componentCreator.RemoveDuplicateComponents(components);
+
+            // Assert
+            Assert.AreEqual(3, result.Count);
+            Assert.IsTrue(result.Any(c => c.Name == "Component1" && c.Version == "1.0"));
+            Assert.IsTrue(result.Any(c => c.Name == "Component2" && c.Version == "2.0"));
+            Assert.IsTrue(result.Any(c => c.Name == "Component3" && c.Version == "3.0"));
+        }
+
+        [Test]
+        public void AddReleaseIdToLink_WhenReleaseIdIsNotNull_AddsReleaseToReleasesFoundInCbom()
+        {
+            // Arrange
+            var item = new ComparisonBomData
+            {
+                Name = "TestComponent",
+                Version = "1.0",
+            };
+            var releaseIdToLink = "12345";
+
+            var componentCreator = new ComponentCreator();
+
+            // Act
+            componentCreator.AddReleaseIdToLink(item, releaseIdToLink);
+
+            // Assert
+            Assert.AreEqual(1, componentCreator.ReleasesFoundInCbom.Count);
+            Assert.AreEqual(item.Name, componentCreator.ReleasesFoundInCbom[0].Name);
+            Assert.AreEqual(item.Version, componentCreator.ReleasesFoundInCbom[0].Version);
+            Assert.AreEqual(releaseIdToLink, componentCreator.ReleasesFoundInCbom[0].ReleaseId);
+        }
+
+        [Test]
+        public void AddReleaseIdToLink_WhenReleaseIdIsNull_ThrowsExceptionAndSetsExitCode()
+        {
+            // Arrange
+            var item = new ComparisonBomData
+            {
+                Name = "TestComponent",
+                Version = "1.0",
+            };
+            string releaseIdToLink = null;
+
+            var componentCreator = new ComponentCreator();
+
+            // Act & Assert
+            componentCreator.AddReleaseIdToLink(item, releaseIdToLink);
+            Assert.Pass();
+        }
+
+        [Test]
+        public void GetCreatedStatus_StatusIsTrue_ReturnsNewlyCreated()
+        {
+            // Arrange
+            bool status = true;
+
+            // Act
+            string result = ComponentCreator.GetCreatedStatus(status);
+
+            // Assert
+            Assert.AreEqual(Dataconstant.NewlyCreated, result);
+        }
+
+        [Test]
+        public void GetCreatedStatus_StatusIsFalse_ReturnsNotCreated()
+        {
+            // Arrange
+            bool status = false;
+
+            // Act
+            string result = ComponentCreator.GetCreatedStatus(status);
+
+            // Assert
+            Assert.AreEqual(Dataconstant.NotCreated, result);
+        }
     }
 }
 

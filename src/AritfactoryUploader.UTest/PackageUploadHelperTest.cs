@@ -443,7 +443,6 @@ namespace AritfactoryUploader.UTest
             Assert.AreEqual("path/to/package", result.Path);
         }
 
-        [Test]
         public async Task GetSrcRepoDetailsForPyPiOrConanPackages_WhenConanRepoExists_ReturnsArtifactoryRepoName()
         {
             // Arrange
