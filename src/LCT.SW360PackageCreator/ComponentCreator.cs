@@ -468,12 +468,12 @@ namespace LCT.SW360PackageCreator
             }
             catch (AggregateException ex)
             {
-                Logger.Debug($"\tError in TriggerFossologyProcess--{ex}");
+                Logger.DebugFormat("\tError in TriggerFossologyProcess--{0}", ex);
             }
             return uploadId;
         }
 
-        private static async Task<string> CheckFossologyProcessStatus(string link, ISw360CreatorService sw360CreatorService)
+        public static async Task<string> CheckFossologyProcessStatus(string link, ISw360CreatorService sw360CreatorService)
         {
             string uploadId = string.Empty;
             try
@@ -486,12 +486,12 @@ namespace LCT.SW360PackageCreator
             }
             catch (AggregateException ex)
             {
-                Logger.Debug($"\tError in TriggerFossologyProcess--{ex}");
+                Logger.DebugFormat("\tError in TriggerFossologyProcess--{0}",ex);
             }
             return uploadId;
         }
 
-        private static async Task<string> GetComponentId(ComparisonBomData item, ISw360CreatorService sw360CreatorService)
+        public static async Task<string> GetComponentId(ComparisonBomData item, ISw360CreatorService sw360CreatorService)
         {
             string componentId = await sw360CreatorService.GetComponentId(item.Name);
 
@@ -535,7 +535,7 @@ namespace LCT.SW360PackageCreator
             }
         }
 
-        private static bool IsReleaseAttachmentExist(ReleasesInfo releasesInfo)
+        public static bool IsReleaseAttachmentExist(ReleasesInfo releasesInfo)
         {
             var releaseAttachments = releasesInfo?.Embedded?.Sw360attachments ?? new List<Sw360Attachments>();
             return releaseAttachments.Any(x => x.AttachmentType.Equals("SOURCE"));

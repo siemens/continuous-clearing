@@ -164,7 +164,7 @@ namespace NUnitTestProject1
                 SW360URL = "http://localhost:8081/"
             };
             sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(fossTriggerStatus);
-           
+
 
             //Act
             await ComponentCreator.TriggerFossologyProcess(item, sw360CreatorServiceMock.Object, appSettings);
@@ -191,7 +191,7 @@ namespace NUnitTestProject1
                 SW360URL = "http://localhost:8081/"
             };
             sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>())).ThrowsAsync(new AggregateException());
-            
+
 
             //Act
             string value = await ComponentCreator.TriggerFossologyProcess(item, sw360CreatorServiceMock.Object, appSettings);
@@ -276,7 +276,7 @@ namespace NUnitTestProject1
 
 
             //Assert
-            Assert.That(list==null);
+            Assert.That(list == null);
         }
         [Test]
         public async Task CycloneDxBomParser_PassingFilePath_DoesntExcludeDevDependentComponent()
@@ -447,6 +447,122 @@ namespace NUnitTestProject1
 
             // Assert
             Assert.AreEqual(Dataconstant.NotCreated, result);
+        }
+
+        [Test]
+        public void IsReleaseAttachmentExist_Sw360AttachmentsIsNull_ReturnsFalse()
+        {
+            // Arrange
+            ReleasesInfo releasesInfo = new ReleasesInfo
+            {
+                Embedded = new AttachmentEmbedded
+                {
+                    Sw360attachments = null
+                }
+            };
+
+            // Act
+            bool result = ComponentCreator.IsReleaseAttachmentExist(releasesInfo);
+
+            // Assert
+            Assert.IsFalse(result);
+        }
+
+        [Test]
+        public void IsReleaseAttachmentExist_Sw360AttachmentsIsNotNull_ReturnsTrue()
+        {
+            // Arrange
+            ReleasesInfo releasesInfo = new ReleasesInfo
+            {
+                Embedded = new AttachmentEmbedded
+                {
+                    Sw360attachments = new List<Sw360Attachments>
+                    {
+                        new Sw360Attachments
+                        {
+                            AttachmentType = "SOURCE"
+                        }
+                    }
+                }
+            };
+
+            // Act
+            bool result = ComponentCreator.IsReleaseAttachmentExist(releasesInfo);
+
+            // Assert
+            Assert.IsTrue(result);
+        }
+
+        [Test]
+        public async Task GetComponentId_ComponentIdIsNull_ReturnsComponentIdUsingExternalId()
+        {
+            // Arrange
+            var item = new ComparisonBomData
+            {
+                Name = "TestComponent",
+                ComponentExternalId = "TestExternalId"
+            };
+
+            var sw360CreatorServiceMock = new Mock<ISw360CreatorService>();
+            sw360CreatorServiceMock.Setup(s => s.GetComponentId(item.Name)).ReturnsAsync((string)null);
+            sw360CreatorServiceMock.Setup(s => s.GetComponentIdUsingExternalId(item.Name, item.ComponentExternalId)).ReturnsAsync("TestComponentId");
+
+
+            // Act
+            var result = await ComponentCreator.GetComponentId(item, sw360CreatorServiceMock.Object);
+
+            // Assert
+            Assert.AreEqual("TestComponentId", result);
+            sw360CreatorServiceMock.Verify(s => s.GetComponentId(item.Name), Times.Once);
+            sw360CreatorServiceMock.Verify(s => s.GetComponentIdUsingExternalId(item.Name, item.ComponentExternalId), Times.Once);
+        }
+
+        [Test]
+        public async Task CheckFossologyProcessStatus_ExceptionScenario_ReturnsEmptyUploadId()
+        {
+            // Arrange
+            var link = "https://example.com/fossology/process/12345";
+            var sw360CreatorServiceMock = new Mock<ISw360CreatorService>();
+            sw360CreatorServiceMock
+                .Setup(x => x.CheckFossologyProcessStatus(link))
+                .ThrowsAsync(new AggregateException("Error in TriggerFossologyProcess"));
+
+            // Act
+            var uploadId = await ComponentCreator.CheckFossologyProcessStatus(link, sw360CreatorServiceMock.Object);
+
+            // Assert
+            Assert.AreEqual(string.Empty, uploadId);
+        }
+
+        [Test]
+        public async Task CheckFossologyProcessStatus_NonExceptionScenario_ReturnsUploadId()
+        {
+            // Arrange
+            var link = "https://example.com/fossology/process/12345";
+            var sw360CreatorServiceMock = new Mock<ISw360CreatorService>();
+            var processStep = new ProcessSteps
+            {
+                ProcessStepIdInTool = "67890"
+            };
+            var ProcessStepsList = new List<ProcessSteps>() { processStep };
+
+            var fossResult = new CheckFossologyProcess
+            {
+                FossologyProcessInfo = new FossologyProcessInfo
+                {
+                    ExternalTool = "Fossology",
+                    ProcessSteps = [.. ProcessStepsList]
+                }
+            };
+            sw360CreatorServiceMock
+                .Setup(x => x.CheckFossologyProcessStatus(link))
+                .ReturnsAsync(fossResult);
+
+            // Act
+            var uploadId = await ComponentCreator.CheckFossologyProcessStatus(link, sw360CreatorServiceMock.Object);
+
+            // Assert
+            Assert.AreEqual("67890", uploadId);
         }
     }
 }
