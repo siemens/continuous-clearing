@@ -11,7 +11,9 @@ using LCT.SW360PackageCreator.Interfaces;
 using Moq;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace LCT.SW360PackageCreator.UTest
