@@ -18,7 +18,7 @@ using LCT.Common.Model;
 using LCT.Services.Interface;
 using LCT.APICommunications.Model.AQL;
 
-namespace PackageIdentifier.UTest
+namespace LCT.PackageIdentifier.UTest
 {
     [TestFixture]
     public class BomHelperUnitTests

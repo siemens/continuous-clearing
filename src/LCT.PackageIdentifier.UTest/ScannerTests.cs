@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using LCT.Common.Model;
 
-namespace PackageIdentifier.UTest
+namespace LCT.PackageIdentifier.UTest
 {
     [TestFixture]
     public class ScannerTests

@@ -23,8 +23,9 @@ using LCT.Facade.Interfaces;
 using System.Net.Http;
 using System.Net;
 using System.Text;
+using System.IO;
 
-namespace SW360ComponentCreator.UTest
+namespace LCT.SW360PackageCreator.UTest
 {
     [TestFixture]
     class CreatorHelperTest
@@ -403,5 +404,348 @@ namespace SW360ComponentCreator.UTest
             Assert.That(attachmentUrlList.IsNullOrEmpty);
         }
 
+        [Test]
+        [TestCase(Dataconstant.DownloadUrlNotFound, Dataconstant.NotUploaded)]
+        [TestCase("", Dataconstant.Uploaded)]
+        public void Test_ComponentsWithAndWithOutSourceDownloadUrl(string downloadUrl, string fossologyStatus)
+        {
+            // Arrange
+            var creatorKpiData = new CreatorKpiData();
+            var item = new ComparisonBomData();
+            item.DownloadUrl = downloadUrl;
+            item.FossologyUploadStatus = fossologyStatus;
+
+            // Act
+            CreatorHelper.ComponentsWithAndWithOutSourceDownloadUrl(ref creatorKpiData, item);
+
+            // Assert
+            Assert.AreEqual(1, creatorKpiData.ComponentsWithoutSourceDownloadUrl);
+
+            if (item.FossologyUploadStatus == Dataconstant.NotUploaded)
+            {
+                Assert.AreEqual(1, creatorKpiData.ComponentsNotUploadedInFossology);
+            }
+            if (item.FossologyUploadStatus == Dataconstant.Uploaded)
+            {
+                Assert.AreEqual(1, creatorKpiData.ComponentsUploadedInFossology);
+            }
+        }
+
+        [Test]
+        [TestCase("download url")]
+        public void Test_ComponentsWithAndWithOutSourceDownloadUrl(string downloadUrl)
+        {
+            // Arrange
+            var creatorKpiData = new CreatorKpiData();
+            var item = new ComparisonBomData();
+            item.DownloadUrl = downloadUrl;
+
+            // Act
+            CreatorHelper.ComponentsWithAndWithOutSourceDownloadUrl(ref creatorKpiData, item);
+
+            // Assert
+            Assert.AreEqual(1, creatorKpiData.ComponentsWithSourceDownloadUrl);
+        }
+
+        [Test]
+        [TestCase(Dataconstant.PackageUrlNotFound)]
+        public void Test_ComponentsWithAndWithOutPackageDownload_url(string downloadUrl)
+        {
+            // Arrange
+            var creatorKpiData = new CreatorKpiData();
+            var item = new ComparisonBomData();
+            item.DownloadUrl = downloadUrl;
+
+            // Act
+            CreatorHelper.ComponentsWithAndWithOutSourceDownloadUrl(ref creatorKpiData, item);
+
+            // Assert
+            Assert.AreEqual(1, creatorKpiData.ComponentsWithoutPackageUrl);
+        }
+
+        [Test]
+        public void Test_GetReleaseLink_WhenReleaseLinkExists()
+        {
+            // Arrange
+            var componentsAvailableInSw360 = new List<Components>
+            {
+                new Components { Name = "Component1", Version = "1.0", ReleaseLink = "https://example.com/release1" },
+                new Components { Name = "Component2", Version = "2.0", ReleaseLink = "https://example.com/release2" },
+                new Components { Name = "Component3", Version = "3.0", ReleaseLink = "https://example.com/release3" }
+            };
+            var name = "Component2";
+            var version = "2.0";
+            var expectedReleaseLink = "https://example.com/release2";
+
+            // Act
+            var actualReleaseLink = CreatorHelper.GetReleaseLink(componentsAvailableInSw360, name, version);
+
+            // Assert
+            Assert.AreEqual(expectedReleaseLink, actualReleaseLink);
+        }
+
+        [Test]
+        public void Test_GetReleaseLink_WhenReleaseLinkDoesNotExist()
+        {
+            // Arrange
+            var componentsAvailableInSw360 = new List<Components>
+            {
+                new Components { Name = "Component1", Version = "1.0", ReleaseLink = "https://example.com/release1" },
+                new Components { Name = "Component2", Version = "2.0", ReleaseLink = "https://example.com/release2" },
+                new Components { Name = "Component3", Version = "3.0", ReleaseLink = "https://example.com/release3" }
+            };
+            var name = "Component4";
+            var version = "4.0";
+            var expectedReleaseLink = string.Empty;
+
+            // Act
+            var actualReleaseLink = CreatorHelper.GetReleaseLink(componentsAvailableInSw360, name, version);
+
+            // Assert
+            Assert.AreEqual(expectedReleaseLink, actualReleaseLink);
+        }
+
+        [Test]
+        public void Test_GetReleaseLink_WhenReleaseLinkDoesNotExist_versionDebian()
+        {
+            // Arrange
+            var componentsAvailableInSw360 = new List<Components>
+            {
+                new Components { Name = "Component1", Version = "1.0", ReleaseLink = "https://example.com/release1" },
+                new Components { Name = "Component2", Version = "2.0", ReleaseLink = "https://example.com/release2" },
+                new Components { Name = "Component3", Version = "3.0", ReleaseLink = "https://example.com/release3" }
+            };
+            var name = "Component4";
+            var version = "4.0+debian";
+            var expectedReleaseLink = string.Empty;
+
+            // Act
+            var actualReleaseLink = CreatorHelper.GetReleaseLink(componentsAvailableInSw360, name, version);
+
+            // Assert
+            Assert.AreEqual(expectedReleaseLink, actualReleaseLink);
+        }
+
+        [Test]
+        public void Test_GetFossologyUploadStatus_ReturnsCorrectStatus()
+        {
+            // Arrange
+            string componentApprovedStatus = Dataconstant.NotAvailable;
+
+            // Act
+            string result = CreatorHelper.GetFossologyUploadStatus(componentApprovedStatus);
+
+            // Assert
+            Assert.AreEqual(Dataconstant.NotUploaded, result);
+        }
+
+        [Test]
+        public void Test_GetFossologyUploadStatus_ReturnsCorrectStatus_WhenComponentApprovedStatusIsNewClearing()
+        {
+            // Arrange
+            string componentApprovedStatus = Dataconstant.NewClearing;
+
+            // Act
+            string result = CreatorHelper.GetFossologyUploadStatus(componentApprovedStatus);
+
+            // Assert
+            Assert.AreEqual(Dataconstant.NotUploaded, result);
+        }
+
+        [Test]
+        public void Test_GetFossologyUploadStatus_ReturnsCorrectStatus_WhenComponentApprovedStatusIsAlreadyUploaded()
+        {
+            // Arrange
+            string componentApprovedStatus = Dataconstant.AlreadyUploaded;
+
+            // Act
+            string result = CreatorHelper.GetFossologyUploadStatus(componentApprovedStatus);
+
+            // Assert
+            Assert.AreEqual(Dataconstant.AlreadyUploaded, result);
+        }
+
+        [Test]
+        public void Test_GetCreatedStatus_ReturnsCreated()
+        {
+            // Arrange
+            string availabilityStatus = Dataconstant.Available;
+
+            // Act
+            string result = CreatorHelper.GetCreatedStatus(availabilityStatus);
+
+            // Assert
+            Assert.AreEqual(Dataconstant.Created, result);
+        }
+
+        [Test]
+        public void Test_GetCreatedStatus_ReturnsNotCreated()
+        {
+            // Arrange
+            string availabilityStatus = Dataconstant.NotAvailable;
+
+            // Act
+            string result = CreatorHelper.GetCreatedStatus(availabilityStatus);
+
+            // Assert
+            Assert.AreEqual(Dataconstant.NotCreated, result);
+        }
+
+        [Test]
+        public void Test_GetApprovedStatus_ReturnsClearingState_WhenComponentAndReleaseAreAvailable()
+        {
+            // Arrange
+            var componentAvailabelStatus = Dataconstant.Available;
+            var releaseAvailbilityStatus = Dataconstant.Available;
+            var releasesInfo = new ReleasesInfo
+            {
+                ClearingState = "Clearing in progress"
+            };
+
+            // Act
+            var result = CreatorHelper.GetApprovedStatus(componentAvailabelStatus, releaseAvailbilityStatus, releasesInfo);
+
+            // Assert
+            Assert.AreEqual(releasesInfo.ClearingState, result);
+        }
+
+        [Test]
+        public void Test_GetApprovedStatus_ReturnsNotAvailable_WhenComponentIsNotAvailable()
+        {
+            // Arrange
+            var componentAvailabelStatus = Dataconstant.NotAvailable;
+            var releaseAvailbilityStatus = Dataconstant.Available;
+            var releasesInfo = new ReleasesInfo
+            {
+                ClearingState = "Clearing in progress"
+            };
+
+            // Act
+            var result = CreatorHelper.GetApprovedStatus(componentAvailabelStatus, releaseAvailbilityStatus, releasesInfo);
+
+            // Assert
+            Assert.AreEqual(Dataconstant.NotAvailable, result);
+        }
+
+        [Test]
+        public void Test_GetApprovedStatus_ReturnsNotAvailable_WhenReleaseIsNotAvailable()
+        {
+            // Arrange
+            var componentAvailabelStatus = Dataconstant.Available;
+            var releaseAvailbilityStatus = Dataconstant.NotAvailable;
+            var releasesInfo = new ReleasesInfo
+            {
+                ClearingState = "Clearing in progress"
+            };
+
+            // Act
+            var result = CreatorHelper.GetApprovedStatus(componentAvailabelStatus, releaseAvailbilityStatus, releasesInfo);
+
+            // Assert
+            Assert.AreEqual(Dataconstant.NotAvailable, result);
+        }
+
+        [Test]
+        public void Test_GetApprovedStatus_ReturnsNotAvailable_WhenComponentAndReleaseAreNotAvailable()
+        {
+            // Arrange
+            var componentAvailabelStatus = Dataconstant.NotAvailable;
+            var releaseAvailbilityStatus = Dataconstant.NotAvailable;
+            var releasesInfo = new ReleasesInfo
+            {
+                ClearingState = "Clearing in progress"
+            };
+
+            // Act
+            var result = CreatorHelper.GetApprovedStatus(componentAvailabelStatus, releaseAvailbilityStatus, releasesInfo);
+
+            // Assert
+            Assert.AreEqual(Dataconstant.NotAvailable, result);
+        }
+
+        [Test]
+        public void Test_GetComponentDownloadUrl_WhenReleaseExists()
+        {
+            // Arrange
+            var mapper = new ComparisonBomData
+            {
+                ReleaseStatus = Dataconstant.Available
+            };
+            var item = new Components();
+            var repoMock = new Mock<IRepository>();
+            var releasesInfo = new ReleasesInfo
+            {
+                SourceCodeDownloadUrl = "https://example.com/sourcecode"
+            };
+
+            // Act
+            var result = CreatorHelper.GetComponentDownloadUrl(mapper, item, repoMock.Object, releasesInfo);
+
+            // Assert
+            Assert.AreEqual(releasesInfo.SourceCodeDownloadUrl, result);
+        }
+
+        [Test]
+        public void Test_GetMavenDownloadUrl_WhenReleaseExists()
+        {
+            // Arrange
+            var mapper = new ComparisonBomData() { ReleaseStatus= Dataconstant.Available };
+            var item = new Components();
+            var releasesInfo = new ReleasesInfo
+            {
+                SourceCodeDownloadUrl = "https://example.com/sourcecode"
+            };
+
+            // Act
+            var result = CreatorHelper.GetMavenDownloadUrl(mapper, item, releasesInfo);
+
+            // Assert
+            Assert.AreEqual(releasesInfo.SourceCodeDownloadUrl, result);
+        }
+
+        [Test]
+        public void Test_GetMavenDownloadUrl_WhenReleaseDoesNotExist()
+        {
+            // Arrange
+            var mapper = new ComparisonBomData
+            {
+                ReleaseStatus = "NotAvailable"
+            };
+            var item = new Components
+            {
+                Group = "com.example",
+                Name = "example",
+                Version = "1.0.0"
+            };
+            var releasesInfo = new ReleasesInfo();
+
+            // Act
+            var result = CreatorHelper.GetMavenDownloadUrl(mapper, item, releasesInfo);
+
+            // Assert
+            Assert.AreEqual("https://repo.maven.apache.org/maven2/com.example/example/1.0.0/example-1.0.0-sources.jar", result);
+        }
+        [Test]
+        public void Test_GetAttachmentUrlListForMvn()
+        {
+            // Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string localPathforDownload = outFolder + @"..\..\..\src\LCT.SW360PackageCreator.UTest\ComponentCreatorUTFiles\";
+
+            var component = new ComparisonBomData
+            {
+                Name = "TestComponent",
+                Version = "1.0"
+            };
+            var attachmentUrlList = new Dictionary<string, string>();
+
+            // Act
+            CreatorHelper.GetAttachmentUrlListForMvn(localPathforDownload, component, ref attachmentUrlList);
+
+            // Assert
+            Assert.IsTrue(attachmentUrlList.ContainsKey("SOURCE"));
+            Assert.AreEqual($"{localPathforDownload}{component.Name}-{component.Version}-sources.jar", attachmentUrlList["SOURCE"]);
+        }
     }
 }

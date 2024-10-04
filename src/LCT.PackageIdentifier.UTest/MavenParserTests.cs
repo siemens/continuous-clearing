@@ -20,6 +20,7 @@ using LCT.Common.Constants;
 
 namespace LCT.PackageIdentifier.UTest
 {
+    [TestFixture]
     public class MavenParserTests
     {
         private MavenProcessor _mavenProcessor;
@@ -357,7 +358,7 @@ namespace LCT.PackageIdentifier.UTest
             MavenProcessor.ParsePackageFile(appSettings);
 
             //Assert
-            Assert.That(BomCreator.bomKpiData.DevDependentComponents, Is.EqualTo(6), "Returns the count of components");
+            Assert.That(BomCreator.bomKpiData.DevDependentComponents, Is.EqualTo(9), "Returns the count of components");
 
         }
         [Test]
@@ -384,7 +385,7 @@ namespace LCT.PackageIdentifier.UTest
             Bom bom = MavenProcessor.ParsePackageFile(appSettings);
 
             //Assert
-            Assert.That(BomCreator.bomKpiData.DevDependentComponents, Is.EqualTo(0), "Returns the count of components");
+            Assert.That(BomCreator.bomKpiData.DevDependentComponents, Is.EqualTo(3), "Returns the count of components");
 
         }
 

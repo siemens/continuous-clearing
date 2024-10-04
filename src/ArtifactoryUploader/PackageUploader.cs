@@ -120,7 +120,7 @@ namespace LCT.ArtifactoryUploader
                         break;
 
                     default:
-                        Logger.Error($"DiplayAllSettings():Invalid ProjectType - {type}");
+                        Logger.ErrorFormat("DiplayAllSettings():Invalid ProjectType - {0}",type);
                         break;
                 }
 

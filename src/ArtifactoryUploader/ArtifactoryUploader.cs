@@ -28,7 +28,8 @@ namespace LCT.ArtifactoryUploader
         private static string JfrogApi = Environment.GetEnvironmentVariable("JfrogApi");
         private static string srcRepoName = Environment.GetEnvironmentVariable("JfrogSrcRepo");
         public static IJFrogService jFrogService { get; set; }
-
+        public static IJFrogApiCommunication JFrogApiCommInstance { get; set; } 
+       
         public static async Task<HttpResponseMessage> UploadPackageToRepo(ComponentsToArtifactory component, int timeout, DisplayPackagesInfo displayPackagesInfo)
         {
             Logger.Debug("Starting UploadPackageToArtifactory method");
@@ -38,7 +39,6 @@ namespace LCT.ArtifactoryUploader
             HttpResponseMessage responsemessage = new HttpResponseMessage();
             try
             {
-                IJFrogApiCommunication jfrogApicommunication;
 
                 // Package Information
                 var packageInfo = await GetPackageInfoWithRetry(jFrogService, component);
@@ -50,25 +50,11 @@ namespace LCT.ArtifactoryUploader
                     };
                 }
 
-                ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials()
-                {
-                    ApiKey = component.ApiKey,
-                    Email = component.Email
-                };
-
-                // Initialize JFrog API communication based on Component Type
-                jfrogApicommunication = component.ComponentType?.ToUpperInvariant() switch
-                {
-                    "MAVEN" => new MavenJfrogApiCommunication(component.JfrogApi, component.SrcRepoName, repoCredentials, timeout),
-                    "PYTHON" => new PythonJfrogApiCommunication(component.JfrogApi, component.SrcRepoName, repoCredentials, timeout),
-                    _ => new NpmJfrogApiCommunication(component.JfrogApi, component.SrcRepoName, repoCredentials, timeout)
-                };
-
                 // Perform Copy or Move operation
                 responsemessage = component.PackageType switch
                 {
-                    PackageType.ClearedThirdParty or PackageType.Development => await jfrogApicommunication.CopyFromRemoteRepo(component),
-                    PackageType.Internal => await jfrogApicommunication.MoveFromRepo(component),
+                    PackageType.ClearedThirdParty or PackageType.Development => await JFrogApiCommInstance.CopyFromRemoteRepo(component),
+                    PackageType.Internal => await JFrogApiCommInstance.MoveFromRepo(component),
                     _ => new HttpResponseMessage(HttpStatusCode.NotFound)
                 };
 
@@ -83,6 +69,12 @@ namespace LCT.ArtifactoryUploader
 
             }
             catch (HttpRequestException ex)
+            {
+                Logger.Error($"Error has occurred in UploadPackageToArtifactory--{ex}");
+                responsemessage.ReasonPhrase = ApiConstant.ErrorInUpload;
+                return responsemessage;
+            }
+            catch (InvalidOperationException ex)
             {
                 Logger.Error($"Error has occurred in UploadPackageToArtifactory--{ex}");
                 responsemessage.ReasonPhrase = ApiConstant.ErrorInUpload;

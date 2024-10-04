@@ -11,8 +11,6 @@ using TestUtilities;
 
 namespace SW360IntegrationTest.LoadTest
 {
-    [Ignore("Load test need to run separatly")]
-    [TestFixture, Order(11)]
     public class ClearingToolLoadTest
     {
         private string OutFolderPath { get; set; }
@@ -23,8 +21,6 @@ namespace SW360IntegrationTest.LoadTest
             OutFolderPath = TestHelper.OutFolder;
         }
 
-        [Ignore("Load test need to run separatly")]
-        [Test, Order(1)]
         public void PerformanceTestFor130Components()
         {
             //Arrange
@@ -46,8 +42,6 @@ namespace SW360IntegrationTest.LoadTest
                 $"The actual time taken : {stopwatch.Elapsed.Minutes} is not equal to expected,which is 200 min");
         }
 
-        [Ignore("Load test need to run separatly")]
-        [Test, Order(2)]
         public void PerformanceTestFor70Components()
         {
             //Arrange

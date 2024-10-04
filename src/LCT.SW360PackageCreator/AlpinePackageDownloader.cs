@@ -250,7 +250,7 @@ namespace LCT.SW360PackageCreator
             return fullname;
         }
 
-        private static void ApplyPatchsToSourceCode(string patchFileFolder, string sourceCodezippedFolder)
+        public static void ApplyPatchsToSourceCode(string patchFileFolder, string sourceCodezippedFolder)
         {
             Process p = new Process();
             p.StartInfo.RedirectStandardError = true;

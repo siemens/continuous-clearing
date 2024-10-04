@@ -19,6 +19,7 @@ using log4net.Core;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -29,6 +30,7 @@ namespace LCT.SW360PackageCreator
     /// <summary>
     /// Program class
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class Program
     {
         public static Stopwatch CreatorStopWatch { get; set; }
@@ -57,7 +59,11 @@ namespace LCT.SW360PackageCreator
 
             string FolderPath = InitiateLogger(appSettings);
             settingsManager.CheckRequiredArgsToRun(appSettings, "Creator");
-            await CreatorValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
+            int isValid = await CreatorValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
+            if (isValid == -1)
+            {
+                CommonHelper.CallEnvironmentExit(-1);
+            }
 
             Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Package creator >>>>>====================", null);
             Logger.Logger.Log(null, Level.Notice, $"\nStart of Package creator execution : {DateTime.Now}", null);

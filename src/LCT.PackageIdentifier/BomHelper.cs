@@ -13,8 +13,10 @@ using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
 using log4net.Core;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -116,6 +118,9 @@ namespace LCT.PackageIdentifier
             hashCode = result?.StdOut;
             return hashCode?.Trim() ?? string.Empty;
         }
+
+        [Obsolete("not used")]
+        [ExcludeFromCodeCoverage]
         public static Result GetDependencyList(string bomFilePath, string depFilePath)
         {
             bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);

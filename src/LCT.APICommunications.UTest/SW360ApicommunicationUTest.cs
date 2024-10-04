@@ -10,6 +10,7 @@ using System.Text;
 
 namespace LCT.APICommunications.UTest
 {
+    [TestFixture]
     public class SW360ApicommunicationUTest
     {
         readonly SW360ConnectionSettings connectionSettings = new SW360ConnectionSettings();

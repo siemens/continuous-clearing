@@ -24,9 +24,8 @@ using LCT.Facade.Interfaces;
 using LCT.APICommunications.Interfaces;
 using LCT.APICommunications;
 using LCT.APICommunications.Model;
-using System.Globalization;
 using System.Linq;
-using LCT.ArtifactPublisher;
+using System.Diagnostics.CodeAnalysis;
 
 
 namespace LCT.PackageIdentifier
@@ -34,6 +33,7 @@ namespace LCT.PackageIdentifier
     /// <summary>
     /// Program class
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class Program
     {
         private static bool m_Verbose = false;
@@ -155,7 +155,11 @@ namespace LCT.PackageIdentifier
                 Timeout = appSettings.TimeOut
             };
             ISw360ProjectService sw360ProjectService = new Sw360ProjectService(new SW360ApicommunicationFacade(sw360ConnectionSettings));
-            await BomValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
+            int isValid = await BomValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
+            if (isValid == -1)
+            {
+                CommonHelper.CallEnvironmentExit(-1);
+            }
         }
         private static string DisplayInclude(CommonAppSettings appSettings)
         {
