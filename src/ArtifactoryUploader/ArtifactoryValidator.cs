@@ -21,18 +21,19 @@ namespace LCT.ArtifactoryUploader
             JfrogApiCommunication = jfrogApiCommunication;
         }
 
-        public async Task ValidateArtifactoryCredentials(CommonAppSettings appSettings)
+        public async Task<int> ValidateArtifactoryCredentials(CommonAppSettings appSettings)
         {
             HttpResponseMessage responseMessage = new HttpResponseMessage();
             try
             {
                 responseMessage = await JfrogApiCommunication.GetApiKey();
                 responseMessage.EnsureSuccessStatusCode();
+                return 0;
             }
             catch(HttpRequestException ex)
             {
                 ExceptionHandling.HttpException(ex,responseMessage, "Artifactory");
-                CommonHelper.CallEnvironmentExit(-1);
+                return -1;
             }
         }
     }
