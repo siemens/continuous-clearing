@@ -130,9 +130,11 @@ namespace LCT.PackageIdentifier
                     Name = node["name"].ToString(),
                     Version = node["version"].ToString(),
                     PurlID = Dataconstant.PurlCheck()["PYTHON"] + "/" + node["name"].ToString() + "@" + node["version"].ToString(),
-                    Isdevdependent = node["category"].ToString() != "main",
+                    // By Default Tommy.TomlLazy is coming instead of Null or empty
+                    Isdevdependent = (node["category"].ToString() != "main" && node["category"].ToString() != "Tommy.TomlLazy"),
                     FoundType = Dataconstant.Discovered
                 };
+                //tod: get the input file that will work
 
                 if (pythonPackage.Isdevdependent)
                     BomCreator.bomKpiData.DevDependentComponents++;
