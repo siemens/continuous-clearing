@@ -23,37 +23,7 @@ This tool has been  logically split into 3 different executables that enable it 
 
 **_Note: Continuous Clearing Tool internally uses [Syft](https://github.com/anchore/syft) for component detection for debian type projects._**
 
-# SEPP Integration with Continuous Clearing Tool
 
-The Continuous Clearing Tool incorporates SEPP tool functionalities, seamlessly integrated into the Artifactory uploader.
-This integration ensures
-- Software License Clearing is done.
-- No pre-release versions of re-use components are used.
-- Trace-ability is guaranteed
-
-### What is SEPP tool performing currently ?
-
-* Check for third-party packages in artifactory
-* Move internal packages from energy-dev- to energy-release- repos/
-* Clone Git repositories.
-* Export JSON file for Long term Archiving (LTA-Export)
- 
-### What are the existing functionalities of Continuous Clearing Tool ?
- 
-* Check for third party packages
-* Identification of correct source code from github
-* Creating third party components in SW360
-* Triggering source code scan in FOSSology
-* Copy cleared third party components from remote repo to SIPARTY release repo.
-
-### Which functionality of SEPP did Continuous Clearing adapt newly ?
- 
-* Move internal packages from energy-dev-* to energy-release-* repos
-* Copy development dependency packages to siparty-devdep-* repos
- 
-### What happens to SEPP now ?
-
-Currently LTA support is not provided for SBOM, hence until that is implemented SEPP will coexist with continuous clearing tool .Once the implementation is done SEPP will eventually phase out.
 # Package Installation 
 
  ### Install from GitHub Release (Official)
