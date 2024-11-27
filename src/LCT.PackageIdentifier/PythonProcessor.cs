@@ -134,7 +134,6 @@ namespace LCT.PackageIdentifier
                     Isdevdependent = (node["category"].ToString() != "main" && node["category"].ToString() != "Tommy.TomlLazy"),
                     FoundType = Dataconstant.Discovered
                 };
-                //tod: get the input file that will work
 
                 if (pythonPackage.Isdevdependent)
                     BomCreator.bomKpiData.DevDependentComponents++;
