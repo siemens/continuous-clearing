@@ -573,12 +573,12 @@ namespace LCT.ArtifactoryUploader
             else if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "MAVEN")
             {
                 ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
-                displayPackagesInfo.UnknownPackagesPython.Add(components);
+                displayPackagesInfo.UnknownPackagesMaven.Add(components);                
             }
             else if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "PYTHON")
             {
                 ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
-                displayPackagesInfo.UnknownPackagesMaven.Add(components);
+                displayPackagesInfo.UnknownPackagesPython.Add(components);
             }
             else if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "CONAN")
             {
