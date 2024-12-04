@@ -36,18 +36,10 @@ namespace LCT.ArtifactPublisher
         /// </summary>
         public void UploadLogs()
         {
-            try
+            if (!string.IsNullOrEmpty(CatoolLogPath) && File.Exists(CatoolLogPath))
             {
-                if (!string.IsNullOrEmpty(CatoolLogPath) && File.Exists(CatoolLogPath))
-                {
-                    // Output the artifact upload command
-                    Console.WriteLine($"##vso[artifact.upload containerfolder={LogContainerFolderName};artifactname={LogArtifactFolderName}]{CatoolLogPath}");
-                }
-                    
-            }
-            catch (IOException ex)
-            {
-                Console.WriteLine(ex.ToString());
+                // Output the artifact upload command
+                Console.WriteLine($"##vso[artifact.upload containerfolder={LogContainerFolderName};artifactname={LogArtifactFolderName}]{CatoolLogPath}");
             }
         }
 
@@ -56,16 +48,9 @@ namespace LCT.ArtifactPublisher
         /// </summary>
         public void UploadBom()
         {
-            try
+            if (!string.IsNullOrEmpty(CatoolBomFilePath) && File.Exists(CatoolBomFilePath))
             {
-                if (!string.IsNullOrEmpty(CatoolBomFilePath) && File.Exists(CatoolBomFilePath))
-                {
-                    Console.WriteLine($"##vso[artifact.upload containerfolder={BomContainerFolderName};artifactname={BomArtifactFolderName}]{CatoolBomFilePath}");
-                }
-            }
-            catch (IOException ex)
-            {
-                Console.WriteLine(ex.ToString());
+                Console.WriteLine($"##vso[artifact.upload containerfolder={BomContainerFolderName};artifactname={BomArtifactFolderName}]{CatoolBomFilePath}");
             }
         }
     }

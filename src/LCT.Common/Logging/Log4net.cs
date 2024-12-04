@@ -48,7 +48,7 @@ namespace LCT.Common
             }
         }
 
-        private static void ActivateFileAppender(bool verbose, string logPath, IAppender[] appenders)
+        public static void ActivateFileAppender(bool verbose, string logPath, IAppender[] appenders)
         {
             foreach (IAppender appender in appenders)
             {

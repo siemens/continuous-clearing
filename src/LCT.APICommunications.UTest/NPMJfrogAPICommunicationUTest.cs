@@ -9,6 +9,8 @@ using LCT.APICommunications.Model;
 
 namespace LCT.APICommunications.UTest
 {
+
+    [TestFixture]
     public class NPMJfrogAPICommunicationUTest
     {
         [SetUp]

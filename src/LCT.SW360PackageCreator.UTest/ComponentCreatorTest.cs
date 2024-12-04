@@ -8,6 +8,7 @@ using CycloneDX.Models;
 using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.Foss;
 using LCT.Common;
+using LCT.Common.Constants;
 using LCT.Common.Model;
 using LCT.Facade.Interfaces;
 using LCT.Services;
@@ -22,6 +23,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -29,8 +31,9 @@ using System.Threading.Tasks;
 using UnitTestUtilities;
 
 
-namespace NUnitTestProject1
+namespace LCT.SW360PackageCreator.UTest
 {
+    [TestFixture]
     public class ComponentCreatorTest
     {
         [SetUp]
@@ -161,7 +164,7 @@ namespace NUnitTestProject1
                 SW360URL = "http://localhost:8081/"
             };
             sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(fossTriggerStatus);
-           
+
 
             //Act
             await ComponentCreator.TriggerFossologyProcess(item, sw360CreatorServiceMock.Object, appSettings);
@@ -188,7 +191,7 @@ namespace NUnitTestProject1
                 SW360URL = "http://localhost:8081/"
             };
             sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>())).ThrowsAsync(new AggregateException());
-            
+
 
             //Act
             string value = await ComponentCreator.TriggerFossologyProcess(item, sw360CreatorServiceMock.Object, appSettings);
@@ -273,7 +276,7 @@ namespace NUnitTestProject1
 
 
             //Assert
-            Assert.That(list==null);
+            Assert.That(list == null);
         }
         [Test]
         public async Task CycloneDxBomParser_PassingFilePath_DoesntExcludeDevDependentComponent()
@@ -355,6 +358,277 @@ namespace NUnitTestProject1
             Assert.That(list.Count > 0);
         }
 
+        [Test]
+        public void RemoveDuplicateComponents_RemovesDuplicateComponents()
+        {
+            // Arrange
+            var componentCreator = new ComponentCreator();
+            var components = new List<Components>
+            {
+                new Components { Name = "Component1", Version = "1.0" },
+                new Components { Name = "Component2", Version = "2.0" },
+                new Components { Name = "Component1", Version = "1.0" },
+                new Components { Name = "Component3", Version = "3.0" },
+                new Components { Name = "Component2", Version = "2.0" }
+            };
+
+            // Act
+            var result = componentCreator.RemoveDuplicateComponents(components);
+
+            // Assert
+            Assert.AreEqual(3, result.Count);
+            Assert.IsTrue(result.Any(c => c.Name == "Component1" && c.Version == "1.0"));
+            Assert.IsTrue(result.Any(c => c.Name == "Component2" && c.Version == "2.0"));
+            Assert.IsTrue(result.Any(c => c.Name == "Component3" && c.Version == "3.0"));
+        }
+
+        [Test]
+        public void AddReleaseIdToLink_WhenReleaseIdIsNotNull_AddsReleaseToReleasesFoundInCbom()
+        {
+            // Arrange
+            var item = new ComparisonBomData
+            {
+                Name = "TestComponent",
+                Version = "1.0",
+            };
+            var releaseIdToLink = "12345";
+
+            var componentCreator = new ComponentCreator();
+
+            // Act
+            componentCreator.AddReleaseIdToLink(item, releaseIdToLink);
+
+            // Assert
+            Assert.AreEqual(1, componentCreator.ReleasesFoundInCbom.Count);
+            Assert.AreEqual(item.Name, componentCreator.ReleasesFoundInCbom[0].Name);
+            Assert.AreEqual(item.Version, componentCreator.ReleasesFoundInCbom[0].Version);
+            Assert.AreEqual(releaseIdToLink, componentCreator.ReleasesFoundInCbom[0].ReleaseId);
+        }
+
+        [Test]
+        public void AddReleaseIdToLink_WhenReleaseIdIsNull_ThrowsExceptionAndSetsExitCode()
+        {
+            // Arrange
+            var item = new ComparisonBomData
+            {
+                Name = "TestComponent",
+                Version = "1.0",
+            };
+            string releaseIdToLink = null;
+
+            var componentCreator = new ComponentCreator();
+
+            // Act & Assert
+            componentCreator.AddReleaseIdToLink(item, releaseIdToLink);
+            Assert.Pass();
+        }
+
+        [Test]
+        public void GetCreatedStatus_StatusIsTrue_ReturnsNewlyCreated()
+        {
+            // Arrange
+            bool status = true;
+
+            // Act
+            string result = ComponentCreator.GetCreatedStatus(status);
+
+            // Assert
+            Assert.AreEqual(Dataconstant.NewlyCreated, result);
+        }
+
+        [Test]
+        public void GetCreatedStatus_StatusIsFalse_ReturnsNotCreated()
+        {
+            // Arrange
+            bool status = false;
+
+            // Act
+            string result = ComponentCreator.GetCreatedStatus(status);
+
+            // Assert
+            Assert.AreEqual(Dataconstant.NotCreated, result);
+        }
+
+        [Test]
+        public void IsReleaseAttachmentExist_Sw360AttachmentsIsNull_ReturnsFalse()
+        {
+            // Arrange
+            ReleasesInfo releasesInfo = new ReleasesInfo
+            {
+                Embedded = new AttachmentEmbedded
+                {
+                    Sw360attachments = null
+                }
+            };
+
+            // Act
+            bool result = ComponentCreator.IsReleaseAttachmentExist(releasesInfo);
+
+            // Assert
+            Assert.IsFalse(result);
+        }
+
+        [Test]
+        public void IsReleaseAttachmentExist_Sw360AttachmentsIsNotNull_ReturnsTrue()
+        {
+            // Arrange
+            ReleasesInfo releasesInfo = new ReleasesInfo
+            {
+                Embedded = new AttachmentEmbedded
+                {
+                    Sw360attachments = new List<Sw360Attachments>
+                    {
+                        new Sw360Attachments
+                        {
+                            AttachmentType = "SOURCE"
+                        }
+                    }
+                }
+            };
+
+            // Act
+            bool result = ComponentCreator.IsReleaseAttachmentExist(releasesInfo);
+
+            // Assert
+            Assert.IsTrue(result);
+        }
+
+        [Test]
+        public async Task GetComponentId_ComponentIdIsNull_ReturnsComponentIdUsingExternalId()
+        {
+            // Arrange
+            var item = new ComparisonBomData
+            {
+                Name = "TestComponent",
+                ComponentExternalId = "TestExternalId"
+            };
+
+            var sw360CreatorServiceMock = new Mock<ISw360CreatorService>();
+            sw360CreatorServiceMock.Setup(s => s.GetComponentId(item.Name)).ReturnsAsync((string)null);
+            sw360CreatorServiceMock.Setup(s => s.GetComponentIdUsingExternalId(item.Name, item.ComponentExternalId)).ReturnsAsync("TestComponentId");
+
+
+            // Act
+            var result = await ComponentCreator.GetComponentId(item, sw360CreatorServiceMock.Object);
+
+            // Assert
+            Assert.AreEqual("TestComponentId", result);
+            sw360CreatorServiceMock.Verify(s => s.GetComponentId(item.Name), Times.Once);
+            sw360CreatorServiceMock.Verify(s => s.GetComponentIdUsingExternalId(item.Name, item.ComponentExternalId), Times.Once);
+        }
+
+        [Test]
+        public async Task CheckFossologyProcessStatus_ExceptionScenario_ReturnsEmptyUploadId()
+        {
+            // Arrange
+            var link = "https://example.com/fossology/process/12345";
+            var sw360CreatorServiceMock = new Mock<ISw360CreatorService>();
+            sw360CreatorServiceMock
+                .Setup(x => x.CheckFossologyProcessStatus(link))
+                .ThrowsAsync(new AggregateException("Error in TriggerFossologyProcess"));
+
+            // Act
+            var uploadId = await ComponentCreator.CheckFossologyProcessStatus(link, sw360CreatorServiceMock.Object);
+
+            // Assert
+            Assert.AreEqual(string.Empty, uploadId);
+        }
+
+        [Test]
+        public async Task CheckFossologyProcessStatus_NonExceptionScenario_ReturnsUploadId()
+        {
+            // Arrange
+            var link = "https://example.com/fossology/process/12345";
+            var sw360CreatorServiceMock = new Mock<ISw360CreatorService>();
+            var processStep = new ProcessSteps
+            {
+                ProcessStepIdInTool = "67890"
+            };
+            var ProcessStepsList = new List<ProcessSteps>() { processStep };
+
+            var fossResult = new CheckFossologyProcess
+            {
+                FossologyProcessInfo = new FossologyProcessInfo
+                {
+                    ExternalTool = "Fossology",
+                    ProcessSteps = [.. ProcessStepsList]
+                }
+            };
+            sw360CreatorServiceMock
+                .Setup(x => x.CheckFossologyProcessStatus(link))
+                .ReturnsAsync(fossResult);
+
+            // Act
+            var uploadId = await ComponentCreator.CheckFossologyProcessStatus(link, sw360CreatorServiceMock.Object);
+
+            // Assert
+            Assert.AreEqual("67890", uploadId);
+        }
+
+        [Test]
+        public async Task TriggerFossologyProcess_ExceptionScenario_ReturnsEmptyUploadId()
+        {
+            // Arrange
+            var item = new ComparisonBomData
+            {
+                ReleaseID = "releaseId"
+            };
+
+            var sw360CreatorServiceMock = new Mock<ISw360CreatorService>();
+            sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()))
+                .ThrowsAsync(new AggregateException());
+
+            // Act
+            var uploadId = await ComponentCreator.TriggerFossologyProcess(item, sw360CreatorServiceMock.Object, new CommonAppSettings());
+
+            // Assert
+            Assert.AreEqual(string.Empty, uploadId);
+        }
+
+        [Test]
+        public async Task TriggerFossologyProcess_NonExceptionScenario_ReturnsUploadId()
+        {
+            // Arrange
+            var item = new ComparisonBomData
+            {
+                ReleaseID = "releaseId"
+            };
+
+            ProcessSteps processSteps = new ProcessSteps
+            {
+                ProcessStepIdInTool = "uploadId"
+            };
+            var steps = new List<ProcessSteps>() { processSteps };
+            var sw360CreatorServiceMock = new Mock<ISw360CreatorService>();
+            sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new FossTriggerStatus
+                {
+                    Links = new Links
+                    {
+                        Self = new Self
+                        {
+                            Href = "fossologyLink"
+                        }
+                    }
+                });
+
+            sw360CreatorServiceMock.Setup(x => x.CheckFossologyProcessStatus(It.IsAny<string>()))
+                .ReturnsAsync(new CheckFossologyProcess
+                {
+                    FossologyProcessInfo = new FossologyProcessInfo
+                    {
+                        ExternalTool = "fossologyTool",
+                        ProcessSteps = steps.ToArray()
+                    }
+                });
+
+
+            // Act
+            var uploadId = await ComponentCreator.TriggerFossologyProcess(item, sw360CreatorServiceMock.Object, new CommonAppSettings());
+
+            // Assert
+            Assert.AreEqual("uploadId", uploadId);
+        }
     }
 }
 

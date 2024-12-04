@@ -83,5 +83,29 @@ namespace AritfactoryUploader.UTest
             // assert will not pass always
             // Assert.ThrowsAsync<InvalidDataException>(async () => await artifactoryValidator.ValidateArtifactoryCredentials(appSettings))
         }
+
+        [Test]
+        public async Task ValidateArtifactoryCredentials_InputAppsettings_ThrowsHttpRequestException()
+        {
+            // Arrange
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                ArtifactoryUploadApiKey = "tyyteye",
+                ArtifactoryUploadUser = "user@test.com"
+            };
+            ArtifactoryCredentials artifactoryCredentials = new ArtifactoryCredentials()
+            {
+                ApiKey = "tyyteye",
+                Email = "user@test.com"
+            };
+            Mock<NpmJfrogApiCommunication> jfrogCommunicationMck = new Mock<NpmJfrogApiCommunication>(UTParams.JFrogURL, "test", artifactoryCredentials, 100);
+            ArtifactoryValidator artifactoryValidator = new ArtifactoryValidator(jfrogCommunicationMck.Object);
+            jfrogCommunicationMck.Setup(x => x.GetApiKey()).ThrowsAsync(new HttpRequestException());
+
+            // Act and Assert
+            var isvalid= await artifactoryValidator.ValidateArtifactoryCredentials(appSettings);
+            Assert.AreEqual(-1, isvalid);
+
+        }
     }
 }

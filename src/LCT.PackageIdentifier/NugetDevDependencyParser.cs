@@ -189,7 +189,8 @@ namespace LCT.PackageIdentifier
                 return;
             }
 
-            IEnumerable<JProperty> listChilds = projectFramworks.Children().OfType<JProperty>() ?? new List<JProperty>();
+            IEnumerable<JProperty> listChilds = projectFramworks.Children().OfType<JProperty>();
+
             //check has values
             if (listChilds != null && listChilds.ToList()[0].HasValues)
             {

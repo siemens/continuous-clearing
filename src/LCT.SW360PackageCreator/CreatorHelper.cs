@@ -160,7 +160,8 @@ namespace LCT.SW360PackageCreator
             await processResult;
         }
 
-        private static void GetAttachmentUrlListForMvn(string localPathforDownload, ComparisonBomData component, ref Dictionary<string, string> attachmentUrlList)
+        public static void GetAttachmentUrlListForMvn(string localPathforDownload, ComparisonBomData component,
+                                                      ref Dictionary<string, string> attachmentUrlList)
         {
             localPathforDownload = $"{localPathforDownload}{component.Name}-{component.Version}-sources.jar";
 
@@ -270,7 +271,7 @@ namespace LCT.SW360PackageCreator
             return comparisonBomData;
         }
 
-        private static string GetMavenDownloadUrl(ComparisonBomData mapper, Components item, ReleasesInfo releasesInfo)
+        public static string GetMavenDownloadUrl(ComparisonBomData mapper, Components item, ReleasesInfo releasesInfo)
         {
             string sourceURL = string.Empty;
 
@@ -395,7 +396,7 @@ namespace LCT.SW360PackageCreator
             return creatorKpiData;
         }
 
-        private static void ComponentsWithAndWithOutSourceDownloadUrl(ref CreatorKpiData creatorKpiData, ComparisonBomData item)
+        public static void ComponentsWithAndWithOutSourceDownloadUrl(ref CreatorKpiData creatorKpiData, ComparisonBomData item)
         {
             if (item.DownloadUrl == Dataconstant.DownloadUrlNotFound || string.IsNullOrEmpty(item.DownloadUrl))
             {
@@ -558,7 +559,7 @@ namespace LCT.SW360PackageCreator
             return Dataconstant.NotAvailable;
         }
 
-        private static string GetComponentDownloadUrl(ComparisonBomData mapper, Components item, IRepository repo, ReleasesInfo releasesInfo)
+        public static string GetComponentDownloadUrl(ComparisonBomData mapper, Components item, IRepository repo, ReleasesInfo releasesInfo)
         {
             //IF Release already exists in SW360 , tool will not update any field.
             //Hence do not need to find DOWNLOAD URL URL here and this REDUCE the exeuction time
@@ -570,7 +571,7 @@ namespace LCT.SW360PackageCreator
             return repo.FormGitCloneUrl(mapper.SourceUrl, item.Name, item.Version);
         }
 
-        private static string GetApprovedStatus(string componentAvailabelStatus, string releaseAvailbilityStatus, ReleasesInfo releasesInfo)
+        public static string GetApprovedStatus(string componentAvailabelStatus, string releaseAvailbilityStatus, ReleasesInfo releasesInfo)
         {
 
             if (componentAvailabelStatus == Dataconstant.Available && releaseAvailbilityStatus == Dataconstant.Available)
@@ -581,18 +582,18 @@ namespace LCT.SW360PackageCreator
             return Dataconstant.NotAvailable;
         }
 
-        private static string GetCreatedStatus(string availabilityStatus)
+        public static string GetCreatedStatus(string availabilityStatus)
         {
             return availabilityStatus == Dataconstant.Available ? Dataconstant.Created : Dataconstant.NotCreated;
         }
 
-        private static string GetFossologyUploadStatus(string ComponentApprovedStatus)
+        public static string GetFossologyUploadStatus(string ComponentApprovedStatus)
         {
             return (ComponentApprovedStatus == Dataconstant.NotAvailable ||
                      ComponentApprovedStatus == Dataconstant.NewClearing) ? Dataconstant.NotUploaded : Dataconstant.AlreadyUploaded;
         }
 
-        private static string GetReleaseLink(List<Components> componentsAvailableInSw360, string name, string version)
+        public static string GetReleaseLink(List<Components> componentsAvailableInSw360, string name, string version)
         {
             string releaseLink = componentsAvailableInSw360.Where(x => x.Name.Trim().ToLower() == name.Trim().ToLower()
             && x.Version.Trim().ToLower() == version.Trim().ToLower()).Select(x => x.ReleaseLink).FirstOrDefault();

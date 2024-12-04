@@ -12,7 +12,6 @@ using System.IO;
 using LCT.Common.Constants;
 using Moq;
 using System.Collections.Generic;
-using Microsoft.Build.Evaluation;
 
 namespace LCT.PackageIdentifier.UTest
 {

@@ -10,10 +10,13 @@ using LCT.SW360PackageCreator;
 using LCT.SW360PackageCreator.Interfaces;
 using Moq;
 using NUnit.Framework;
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Threading.Tasks;
 
-namespace SW360ComponentCreator.UTest
+namespace LCT.SW360PackageCreator.UTest
 {
     [TestFixture]
     class DebianPackageDownloaderTest
@@ -133,5 +136,64 @@ namespace SW360ComponentCreator.UTest
             Assert.That(string.IsNullOrEmpty(attachmentUrlList));
         }
 
+        //string attachmentJson = outFolder + @"..\..\..\src\LCT.SW360PackageCreator.UTest\ComponentCreatorUTFiles\Attachment.json";
+        // 
+
+        public void GetPatchedFileFromDownloadedFolder_ProvidedPatchURLs_ReturnsEmptyDownloadPath()
+        {
+            //Arrange
+            Result result = new Result()
+            {
+                ExitCode = 0
+            };
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string downloadFolderPath = outFolder + @"..\..\..\src\LCT.SW360PackageCreator.UTest\ComponentCreatorUTFiles";
+            // \adduser_3.118-debian10-combined.tar.bz2";
+
+            //Provided patch URLs for applying patch
+            var lstComparisonBomData = new ComparisonBomData()
+            {
+                Name = "dash",
+                Version = ""
+            };
+            string patchedFilePath = string.Empty;
+            
+            // ACT
+            patchedFilePath = DebianPackageDownloader.GetPatchedFileFromDownloadedFolder(downloadFolderPath);
+
+            // Assert
+            Assert.That(!string.IsNullOrEmpty(patchedFilePath));
+        }
+
+        [TestCase]
+        public void GetPatchedFileFromDownloadedFolder_ProvidedPatchURLs_ThrowsArgumentException()
+        {
+            // Arrange
+            string patchedFilePath = string.Empty;
+
+            // Act
+            patchedFilePath = DebianPackageDownloader.GetPatchedFileFromDownloadedFolder(null);
+            
+            // Assert
+            Assert.That(string.IsNullOrEmpty(patchedFilePath));
+        }
+
+        [TestCase]
+        public void ApplyPatchforComponents_ProvidedPatchURLs_ReturnsEmptyDownloadPath()
+        {
+            //Arrange
+            string actual = string.Empty;
+            Result result = null;
+            Mock<IDebianPatcher> debianPatcher = new Mock<IDebianPatcher>();
+            debianPatcher.Setup(x=>x.ApplyPatch(It.IsAny<ComparisonBomData>(), It.IsAny<string>(),
+                It.IsAny<string>())).Returns(result);
+
+            //Act
+            DebianPackageDownloader debianPackageDownloader = new DebianPackageDownloader(debianPatcher.Object);
+            debianPackageDownloader.ApplyPatchforComponents(new ComparisonBomData() ,string.Empty, string.Empty);
+            //Assert
+            Assert.That(actual!= null);
+        }
     }
 }
