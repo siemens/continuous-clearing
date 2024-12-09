@@ -20,9 +20,8 @@ using CycloneDX.Models;
 using System.Threading.Tasks;
 using System.Linq;
 using LCT.Common.Constants;
-using Markdig.Extensions.Yaml;
 
-namespace PackageIdentifier.UTest
+namespace LCT.PackageIdentifier.UTest
 {
     [TestFixture]
     public class NugetParserTests

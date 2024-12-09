@@ -21,7 +21,7 @@ namespace LCT.PackageIdentifier
     public static class BomValidator
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        public static async Task ValidateAppSettings(CommonAppSettings appSettings, ISw360ProjectService bomService, ProjectReleases projectReleases)
+        public static async Task<int> ValidateAppSettings(CommonAppSettings appSettings, ISw360ProjectService bomService, ProjectReleases projectReleases)
         {
             string sw360ProjectName = await bomService.GetProjectNameByProjectIDFromSW360(appSettings.SW360ProjectID, appSettings.SW360ProjectName,projectReleases);
 
@@ -33,12 +33,13 @@ namespace LCT.PackageIdentifier
             {
                 Logger.Error($"Provided Sw360 project is not in active state ,Please make sure you added the correct project details that is in active state..");
                 Logger.Debug($"ValidateAppSettings() : Sw360 project " + projectReleases.Name + " is in " + projectReleases.clearingState + " state.");
-                CommonHelper.CallEnvironmentExit(-1);
+                return -1;
             }
             else
             {
                 appSettings.SW360ProjectName = sw360ProjectName;
             }
+            return 0;
         }
     }
 }

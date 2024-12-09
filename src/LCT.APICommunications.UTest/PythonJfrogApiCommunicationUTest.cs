@@ -1,12 +1,14 @@
-﻿using LCT.APICommunications.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2024 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+
+using LCT.APICommunications.Model;
 
 namespace LCT.APICommunications.UTest
 {
+    [TestFixture]
     public class PythonJfrogApiCommunicationUTest
     {
         [Test]

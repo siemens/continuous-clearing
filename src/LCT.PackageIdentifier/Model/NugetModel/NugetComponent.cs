@@ -5,9 +5,11 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using PackageUrl;
+using System.Diagnostics.CodeAnalysis;
 
 namespace LCT.PackageIdentifier.Model.NugetModel
 {
+    [ExcludeFromCodeCoverage]
     public class NuGetComponent : BuildInfoComponent
     {
         public NuGetComponent(string id, string version) : base(id, version)

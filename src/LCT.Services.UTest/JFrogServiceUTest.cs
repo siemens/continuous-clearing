@@ -230,5 +230,41 @@ namespace LCT.Services.UTest
             // Assert
             Assert.Null(actual);
         }
+
+        [Test]
+        public async Task GetPackageInfo_ResultsWith_TaskCanceledException()
+        {
+            // Arrange
+            Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade =
+                new Mock<IJfrogAqlApiCommunicationFacade>();
+            mockJfrogApiComFacade
+                .Setup(x => x.GetPackageInfo(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).
+                Throws<TaskCanceledException>();
+
+            // Act
+            IJFrogService jFrogService = new JFrogService(mockJfrogApiComFacade.Object);
+            AqlResult actual = await jFrogService.GetPackageInfo("energy-dev-npm-egll", "saap-api-node-2.26.3-LicenseClearing.16.sha-058fada.tgz", string.Empty);
+
+            // Assert
+            Assert.Null(actual);
+        }
+
+        [Test]
+        public async Task GetPackageInfo_ResultsWith_InvalidOperationException()
+        {
+            // Arrange
+            Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade =
+                new Mock<IJfrogAqlApiCommunicationFacade>();
+            mockJfrogApiComFacade
+                .Setup(x => x.GetPackageInfo(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).
+                Throws<InvalidOperationException>();
+
+            // Act
+            IJFrogService jFrogService = new JFrogService(mockJfrogApiComFacade.Object);
+            AqlResult actual = await jFrogService.GetPackageInfo("energy-dev-npm-egll", "saap-api-node-2.26.3-LicenseClearing.16.sha-058fada.tgz", string.Empty);
+
+            // Assert
+            Assert.Null(actual);
+        }
     }
 }
