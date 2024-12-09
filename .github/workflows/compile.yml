@@ -175,8 +175,6 @@ jobs:
         name: docker-continuous-clearing
         path: |
           *.tar
-
-    
           
   release:
     if: github.ref == 'refs/heads/main'    
