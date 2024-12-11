@@ -685,7 +685,7 @@ namespace LCT.ArtifactoryUploader
             else if (item.ComponentType == "PYTHON")
             {
                 ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                displayPackagesInfo.UnknownPackagesPython.Add(components);
+                displayPackagesInfo.SuccessfullPackagesPython.Add(components);
             }
             else if (item.ComponentType == "CONAN")
             {
