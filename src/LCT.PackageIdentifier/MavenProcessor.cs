@@ -100,6 +100,7 @@ namespace LCT.PackageIdentifier
             if (appSettings.Maven.ExcludedComponents != null)
             {
                 componentsForBOM = CommonHelper.RemoveExcludedComponents(componentsForBOM, appSettings.Maven.ExcludedComponents, ref noOfExcludedComponents);
+                dependenciesForBOM = CommonHelper.RemoveInvalidDependenciesAndReferences(componentsForBOM, dependenciesForBOM);
                 BomCreator.bomKpiData.ComponentsExcluded += noOfExcludedComponents;
             }
 

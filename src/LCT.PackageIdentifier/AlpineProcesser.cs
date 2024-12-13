@@ -75,14 +75,17 @@ namespace LCT.PackageIdentifier
         public static Bom RemoveExcludedComponents(CommonAppSettings appSettings, Bom cycloneDXBOM)
         {
             List<Component> componentForBOM = cycloneDXBOM.Components.ToList();
+            List<Dependency> dependenciesForBOM = cycloneDXBOM.Dependencies.ToList();
             int noOfExcludedComponents = 0;
             if (appSettings.Alpine.ExcludedComponents != null)
             {
                 componentForBOM = CommonHelper.RemoveExcludedComponents(componentForBOM, appSettings.Alpine.ExcludedComponents, ref noOfExcludedComponents);
+                dependenciesForBOM = CommonHelper.RemoveInvalidDependenciesAndReferences(componentForBOM, dependenciesForBOM);
                 BomCreator.bomKpiData.ComponentsExcluded += noOfExcludedComponents;
 
             }
             cycloneDXBOM.Components = componentForBOM;
+            cycloneDXBOM.Dependencies = dependenciesForBOM;
             return cycloneDXBOM;
         }
 
