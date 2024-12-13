@@ -300,7 +300,7 @@ namespace LCT.PackageIdentifier
             Bom cycloneDXBOM)
         {
             List<Component> componentForBOM = cycloneDXBOM.Components.ToList();
-            List<Dependency> dependenciesForBOM = cycloneDXBOM.Dependencies.ToList();
+            List<Dependency> dependenciesForBOM = cycloneDXBOM.Dependencies?.ToList() ?? new List<Dependency>();
             int noOfExcludedComponents = 0;
             if (appSettings.Python.ExcludedComponents != null)
             {
