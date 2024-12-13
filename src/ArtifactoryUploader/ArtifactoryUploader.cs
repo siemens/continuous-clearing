@@ -28,12 +28,12 @@ namespace LCT.ArtifactoryUploader
         private static string JfrogApi = Environment.GetEnvironmentVariable("JfrogApi");
         private static string srcRepoName = Environment.GetEnvironmentVariable("JfrogSrcRepo");
         public static IJFrogService jFrogService { get; set; }
-        public static IJFrogApiCommunication JFrogApiCommInstance { get; set; } 
-       
+        public static IJFrogApiCommunication JFrogApiCommInstance { get; set; }
+
         public static async Task<HttpResponseMessage> UploadPackageToRepo(ComponentsToArtifactory component, int timeout, DisplayPackagesInfo displayPackagesInfo)
         {
             Logger.Debug("Starting UploadPackageToArtifactory method");
-            string operationType = component.PackageType == PackageType.ClearedThirdParty 
+            string operationType = component.PackageType == PackageType.ClearedThirdParty
                 || component.PackageType == PackageType.Development ? "copy" : "move";
             string dryRunSuffix = component.DryRun ? " dry-run" : "";
             HttpResponseMessage responsemessage = new HttpResponseMessage();
@@ -107,26 +107,47 @@ namespace LCT.ArtifactoryUploader
 
         private static async Task<AqlResult> GetPackageInfoWithRetry(IJFrogService jFrogService, ComponentsToArtifactory component)
         {
-            string srcRepoNameLower = component.SrcRepoName.ToLower();
-            string packageNameLower = component.JfrogPackageName.ToLower();
-            string pathLower = component.Path.ToLower();
+            async Task<AqlResult> TryGetPackageInfo(string srcRepo, string packageName, string path)
+                => await jFrogService.GetPackageInfo(srcRepo, packageName, path);
 
-            var packageInfo = await jFrogService.GetPackageInfo(component.SrcRepoName, component.JfrogPackageName, component.Path);
+            var packageInfo = await TryGetPackageInfo(component.SrcRepoName, component.JfrogPackageName, component.Path);
 
-            if (component.ComponentType == "DEBIAN" && packageInfo.Name != component.JfrogPackageName)
+            // Handle DEBIAN package name mismatch
+            if (component.ComponentType == "DEBIAN" && packageInfo?.Name != component.JfrogPackageName)
             {
                 component.CopyPackageApiUrl = component.CopyPackageApiUrl.Replace(component.JfrogPackageName, packageInfo.Name);
             }
+
+            // Retry with lowercase values if packageInfo is still null
             if (packageInfo == null)
             {
-                // Retry with lowercase parameters
-                var lowercasePackageInfo = await jFrogService.GetPackageInfo(srcRepoNameLower, packageNameLower, pathLower);
+                var lowerSrcRepo = component.SrcRepoName.ToLower();
+                var lowerPackageName = component.JfrogPackageName.ToLower();
+                var lowerPath = component.Path.ToLower();
 
-                if (lowercasePackageInfo != null)
+                packageInfo = await TryGetPackageInfo(lowerSrcRepo, lowerPackageName, lowerPath);
+
+                if (packageInfo != null)
                 {
-                    // Update the package API URL
                     component.CopyPackageApiUrl = component.CopyPackageApiUrl.ToLower();
-                    packageInfo = lowercasePackageInfo;
+                }
+            }
+
+            // Retry with wildcard path if still not found
+            // ToDo - A better way would need to be thought of in the future.
+            if (packageInfo == null)
+            {
+                packageInfo = await TryGetPackageInfo(component.SrcRepoName, component.JfrogPackageName, $"{component.Path}*");
+
+                if (packageInfo != null)
+                {
+                    // Build URLs
+                    string BuildUrl(string apiConstant) =>
+                        $"{component.JfrogApi}{apiConstant}{component.SrcRepoName}/{packageInfo.Path}/{packageInfo.Name}" +
+                        $"?to=/{component.DestRepoName}/{packageInfo.Path}/{packageInfo.Name}";
+
+                    component.CopyPackageApiUrl = component.DryRun ? $"{BuildUrl(ApiConstant.CopyPackageApi)}&dry=1" : BuildUrl(ApiConstant.CopyPackageApi);
+                    component.MovePackageApiUrl = component.DryRun ? $"{BuildUrl(ApiConstant.MovePackageApi)}&dry=1" : BuildUrl(ApiConstant.MovePackageApi);
                 }
             }
 
