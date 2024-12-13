@@ -11,25 +11,28 @@ using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace LCT.PackageIdentifier
 {
     /// <summary>
     /// The AlpineProcessor class
     /// </summary>
-    public class AlpineProcessor :  IParser
+    public class AlpineProcessor : IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private readonly ICycloneDXBomParser _cycloneDXBomParser;
-        public AlpineProcessor(ICycloneDXBomParser cycloneDXBomParser)
+        readonly CycloneDXBomParser cycloneDXBomParser;
+
+        public AlpineProcessor()
         {
-            _cycloneDXBomParser = cycloneDXBomParser;
+            cycloneDXBomParser = new CycloneDXBomParser();
         }
 
         #region public method
@@ -61,28 +64,30 @@ namespace LCT.PackageIdentifier
             if (File.Exists(appSettings.CycloneDxSBomTemplatePath) && appSettings.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
                 Bom templateDetails;
-                templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
+                templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
                 CycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
                 //Adding Template Component Details & MetaData
                 SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
             }
 
             bom = RemoveExcludedComponents(appSettings, bom);
-            bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
             return bom;
         }
 
         public static Bom RemoveExcludedComponents(CommonAppSettings appSettings, Bom cycloneDXBOM)
         {
             List<Component> componentForBOM = cycloneDXBOM.Components.ToList();
+            List<Dependency> dependenciesForBOM = cycloneDXBOM.Dependencies.ToList();
             int noOfExcludedComponents = 0;
             if (appSettings.Alpine.ExcludedComponents != null)
             {
                 componentForBOM = CommonHelper.RemoveExcludedComponents(componentForBOM, appSettings.Alpine.ExcludedComponents, ref noOfExcludedComponents);
+                dependenciesForBOM = CommonHelper.RemoveInvalidDependenciesAndReferences(componentForBOM, dependenciesForBOM);
                 BomCreator.bomKpiData.ComponentsExcluded += noOfExcludedComponents;
 
             }
             cycloneDXBOM.Components = componentForBOM;
+            cycloneDXBOM.Dependencies = dependenciesForBOM;
             return cycloneDXBOM;
         }
 
@@ -120,7 +125,7 @@ namespace LCT.PackageIdentifier
 
         private void ExtractDetailsForJson(string filePath, ref List<AlpinePackage> alpinePackages, List<Dependency> dependenciesForBOM)
         {
-            Bom bom = _cycloneDXBomParser.ParseCycloneDXBom(filePath);
+            Bom bom = cycloneDXBomParser.ParseCycloneDXBom(filePath);
             foreach (var componentsInfo in bom.Components)
             {
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;
@@ -187,7 +192,6 @@ namespace LCT.PackageIdentifier
                     Purl = GetReleaseExternalId(prop.Name, prop.Version)
                 };
                 component.BomRef = $"{Dataconstant.PurlCheck()["ALPINE"]}{Dataconstant.ForwardSlash}{prop.Name}@{prop.Version}?{distro}";
-                component.Type=Component.Classification.Library;
                 Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.Discovered };
                 component.Properties = new List<Property> { identifierType };
                 listComponentForBOM.Add(component);

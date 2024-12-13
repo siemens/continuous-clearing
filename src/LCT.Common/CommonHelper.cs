@@ -5,7 +5,6 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using LCT.ArtifactPublisher;
 using LCT.Common.Constants;
 using LCT.Common.Model;
 using log4net;
@@ -14,7 +13,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
 
 namespace LCT.Common
 {
@@ -26,7 +24,6 @@ namespace LCT.Common
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static string ProjectSummaryLink { get; set; }
 
-        #region public
         public static bool IsAzureDevOpsDebugEnabled()
         {
             string azureDevOpsDebug = System.Environment.GetEnvironmentVariable("System.Debug");
@@ -50,8 +47,8 @@ namespace LCT.Common
                     {
                         name = $"{component.Group}/{component.Name}";
                     }
-                    if (excludedcomponent.Length > 0 && (Regex.IsMatch(name.ToLowerInvariant(), WildcardToRegex(excludedcomponent[0].ToLowerInvariant()))) &&
-                        (component.Version.ToLowerInvariant().Contains(excludedcomponent[1].ToLowerInvariant()) || excludedcomponent[1].ToLowerInvariant() == "*"))
+
+                    if (name.ToLowerInvariant() == excludedcomponent[0].ToLowerInvariant() && excludedcomponent.Length > 0 && (component.Version.ToLowerInvariant() == excludedcomponent[1].ToLowerInvariant() || excludedcomponent[1].ToLowerInvariant() == "*"))
                     {
                         noOfExcludedComponents++;
                         ExcludedList.Add(component);
@@ -62,12 +59,26 @@ namespace LCT.Common
             return ComponentList;
         }
 
+        public static List<Dependency> RemoveInvalidDependenciesAndReferences(List<Component> components, List<Dependency> dependencies)
+        {
+            var componentBomRefs = new HashSet<string>(components.Select(c => c.BomRef));
+
+            dependencies.RemoveAll(dep => !componentBomRefs.Contains(dep.Ref));
+
+            foreach (var dep in dependencies)
+            {
+                dep.Dependencies?.RemoveAll(refItem => !componentBomRefs.Contains(refItem.Ref));
+            }
+
+            return dependencies;
+        }
+
         public static string GetSubstringOfLastOccurance(string value, string separator)
         {
             string result = string.IsNullOrWhiteSpace(value) ? string.Empty : value;
             if (result.Contains(separator))
             {
-                result = result[(result.LastIndexOf(separator) + separator.Length)..];
+                result = result?[(result.LastIndexOf(separator) + separator.Length)..];
             }
 
             return result;
@@ -148,6 +159,12 @@ namespace LCT.Common
             }
         }
 
+        private static string Sw360URL(string sw360Env, string releaseId)
+        {
+            string sw360URL = $"{sw360Env}{"/group/guest/components/-/component/release/detailRelease/"}{releaseId}";
+            return sw360URL;
+        }
+
         public static void WriteComponentsWithoutDownloadURLToKpi(List<ComparisonBomData> componentInfo, List<Components> lstReleaseNotCreated, string sw360URL)
         {
             const string Name = "Name";
@@ -156,7 +173,6 @@ namespace LCT.Common
             if (componentInfo.Count > 0 || lstReleaseNotCreated.Count > 0)
             {
                 Logger.Logger.Log(null, Level.Alert, "Action Item required by the user:\n", null);
-                PublishFilesToArtifact();
                 Environment.ExitCode = 2;
             }
 
@@ -203,7 +219,6 @@ namespace LCT.Common
 
             if (components.Count > 0)
             {
-                PublishFilesToArtifact();
                 Environment.ExitCode = 2;
                 Logger.Logger.Log(null, Level.Alert, "* Components Not linked to project :", null);
                 Logger.Logger.Log(null, Level.Alert, " Can be linked manually OR Check the Logs AND RE-Run", null);
@@ -242,56 +257,6 @@ namespace LCT.Common
             }
         }
 
-        public static string AddSpecificValuesToBOMFormat(Bom listOfComponentsToBom)
-        {
-            string guid = Guid.NewGuid().ToString();
-            listOfComponentsToBom.SerialNumber = $"urn:uuid:{guid}";
-            listOfComponentsToBom.Version = 1;
-            listOfComponentsToBom.Metadata.Timestamp = DateTime.UtcNow;
-            var formattedString = CycloneDX.Json.Serializer.Serialize(listOfComponentsToBom);
 
-            return formattedString;
-        }
-
-        public static void CallEnvironmentExit(int code)
-        {
-            if (code == -1)
-            {
-                Publish artifactPublisher = new Publish(Log4Net.CatoolLogPath, FileOperations.CatoolBomFilePath);
-                artifactPublisher.UploadLogs();
-                EnvironmentExit(code);
-            }
-        }
-
-        public static void EnvironmentExit(int exitCode)
-        {
-            Environment.Exit(exitCode);
-        }
-
-        public static void PublishFilesToArtifact()
-        {
-            Publish artifactPublisher = new Publish(Log4Net.CatoolLogPath, FileOperations.CatoolBomFilePath);
-            artifactPublisher.UploadLogs();
-            artifactPublisher.UploadBom();
-        }
-
-        #endregion
-
-        #region private
-        private static string WildcardToRegex(string wildcard)
-        {
-            return "^" + Regex.Escape(wildcard).Replace("\\*", ".*") + "$";
-        }
-
-        private static string Sw360URL(string sw360Env, string releaseId)
-        {
-            string sw360URL = $"{sw360Env}{"/group/guest/components/-/component/release/detailRelease/"}{releaseId}";
-            return sw360URL;
-        }
-        #endregion
     }
 }
-
-
-
-

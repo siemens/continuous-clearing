@@ -5,7 +5,6 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using LCT.APICommunications;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
@@ -19,7 +18,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace LCT.PackageIdentifier
@@ -30,12 +28,12 @@ namespace LCT.PackageIdentifier
     public class DebianProcessor : IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private readonly ICycloneDXBomParser _cycloneDXBomParser;
+        readonly CycloneDXBomParser cycloneDXBomParser;
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
 
-        public DebianProcessor(ICycloneDXBomParser cycloneDXBomParser)
+        public DebianProcessor()
         {
-            _cycloneDXBomParser = cycloneDXBomParser;
+            cycloneDXBomParser = new CycloneDXBomParser();
         }
 
         #region public method
@@ -68,55 +66,29 @@ namespace LCT.PackageIdentifier
             if (File.Exists(appSettings.CycloneDxSBomTemplatePath) && appSettings.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
                 Bom templateDetails;
-                templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
+                templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
                 CycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
                 //Adding Template Component Details & MetaData
                 SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
             }
 
             bom = RemoveExcludedComponents(appSettings, bom);
-            bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
-
-            if (bom != null)
-            {
-                AddSiemensDirectProperty(ref bom);
-            }
-
             return bom;
-        }
-
-        private void AddSiemensDirectProperty(ref Bom bom)
-        {
-            List<string> debianDirectDependencies = new List<string>();
-            debianDirectDependencies.AddRange(bom.Dependencies?.Select(x => x.Ref)?.ToList() ?? new List<string>());
-            var bomComponentsList = bom.Components;
-            foreach (var component in bomComponentsList)
-            {
-                Property siemensDirect = new() { Name = Dataconstant.Cdx_SiemensDirect, Value = "false" };
-                if (debianDirectDependencies.Exists(x => x.Contains(component.Name) && x.Contains(component.Version)))
-                {
-                    siemensDirect.Value = "true";
-                }
-                component.Properties ??= new List<Property>();
-                bool isPropExists = component.Properties.Exists(
-                    x => x.Name.Equals(Dataconstant.Cdx_SiemensDirect));
-
-                if (!isPropExists) { component.Properties.Add(siemensDirect); }
-            }
-
-            bom.Components = bomComponentsList;
         }
 
         public static Bom RemoveExcludedComponents(CommonAppSettings appSettings, Bom cycloneDXBOM)
         {
             List<Component> componentForBOM = cycloneDXBOM.Components.ToList();
+            List<Dependency> dependenciesForBOM = cycloneDXBOM.Dependencies.ToList();
             int noOfExcludedComponents = 0;
             if (appSettings.Debian.ExcludedComponents != null)
             {
                 componentForBOM = CommonHelper.RemoveExcludedComponents(componentForBOM, appSettings.Debian.ExcludedComponents, ref noOfExcludedComponents);
+                dependenciesForBOM = CommonHelper.RemoveInvalidDependenciesAndReferences(componentForBOM, dependenciesForBOM);
                 BomCreator.bomKpiData.ComponentsExcluded += noOfExcludedComponents;
             }
             cycloneDXBOM.Components = componentForBOM;
+            cycloneDXBOM.Dependencies = dependenciesForBOM;
             return cycloneDXBOM;
         }
 
@@ -132,15 +104,8 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in componentsForBOM)
             {
-                string jfrogRepoPackageName = Dataconstant.PackageNameNotFoundInJfrog;
-                string jfrogRepoPath = Dataconstant.JfrogRepoPathNotFound;
-                string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper, out jfrogRepoPackageName, out jfrogRepoPath);
-
-                string jfrogpackageName = $"{component.Name}-{component.Version}{ApiConstant.DebianExtension}";
-                var hashes = aqlResultList.FirstOrDefault(x => x.Name == jfrogpackageName);
-                Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = repoName };
-                Property jfrogFileNameProperty = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = jfrogRepoPackageName };
-                Property jfrogRepoPathProperty = new() { Name = Dataconstant.Cdx_JfrogRepoPath, Value = jfrogRepoPath };
+                string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper);
+                Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoUrl, Value = repoName };
                 Component componentVal = component;
 
                 if (componentVal.Properties?.Count == null || componentVal.Properties?.Count <= 0)
@@ -149,32 +114,8 @@ namespace LCT.PackageIdentifier
                 }
                 componentVal.Properties.Add(artifactoryrepo);
                 componentVal.Properties.Add(projectType);
-                componentVal.Properties.Add(jfrogFileNameProperty);
-                componentVal.Properties.Add(jfrogRepoPathProperty);
-                componentVal.Description = null;
-                if (hashes != null)
-                {
-                    componentVal.Hashes = new List<Hash>()
-                {
+                componentVal.Description = string.Empty;
 
-                new()
-                 {
-                  Alg = Hash.HashAlgorithm.MD5,
-                  Content = hashes.MD5
-                },
-                new()
-                {
-                  Alg = Hash.HashAlgorithm.SHA_1,
-                  Content = hashes.SHA1
-                 },
-                 new()
-                 {
-                  Alg = Hash.HashAlgorithm.SHA_256,
-                  Content = hashes.SHA256
-                  }
-                  };
-
-                }
                 modifiedBOM.Add(componentVal);
             }
 
@@ -234,72 +175,30 @@ namespace LCT.PackageIdentifier
             bom = ExtractDetailsForJson(filePath, ref debianPackages);
             return debianPackages;
         }
-        public string GetArtifactoryRepoName(List<AqlResult> aqlResultList,
-                                                     Component component,
-                                                     IBomHelper bomHelper,
-                                                     out string jfrogRepoPackageName,
-                                                     out string jfrogRepoPath)
+        private static string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
         {
-            jfrogRepoPath = Dataconstant.JfrogRepoPathNotFound;
-            string jfrogcomponentName = GetJfrogcomponentNameVersionCombined(component.Name, component.Version);
+
+            string jfrogcomponentName = $"{component.Name}_{component.Version}";
             var aqlResults = aqlResultList.FindAll(x => x.Name.Contains(
                 jfrogcomponentName, StringComparison.OrdinalIgnoreCase));
 
-            jfrogRepoPackageName = aqlResultList.FirstOrDefault(x => x.Name.Contains(
-                jfrogcomponentName, StringComparison.OrdinalIgnoreCase)
-            && x.Name.Contains(".deb", StringComparison.OrdinalIgnoreCase))?.Name ?? string.Empty;
             string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults);
-            Logger.Debug($"Repo Name for the package {jfrogcomponentName} is {repoName}");
 
-            if (repoName.Equals(NotFoundInRepo, StringComparison.OrdinalIgnoreCase))
-            {
-                string fullName = bomHelper.GetFullNameOfComponent(component);
-                string fullNameVersion = GetJfrogcomponentNameVersionCombined(fullName, component.Version);
-                if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase))
-                {
-                    aqlResults = aqlResultList.FindAll(x => x.Name.Contains(
-                    fullNameVersion, StringComparison.OrdinalIgnoreCase));
-                    jfrogRepoPackageName = aqlResultList.FirstOrDefault(x => x.Name.Contains(
-                        jfrogcomponentName, StringComparison.OrdinalIgnoreCase)
-                    && x.Name.Contains(".deb", StringComparison.OrdinalIgnoreCase))?.Name ?? string.Empty;
-                    repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults);
-                }
-            }
+            string fullName = bomHelper.GetFullNameOfComponent(component);
+            string fullNameVersion = $"{fullName}";
 
-            // Forming Jfrog repo Path
-            if (!repoName.Equals(NotFoundInRepo, StringComparison.OrdinalIgnoreCase))
+            if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase) &&
+                repoName.Equals(NotFoundInRepo, StringComparison.OrdinalIgnoreCase))
             {
-                var aqlResult = aqlResults.FirstOrDefault(x => x.Repo.Equals(repoName));
-                jfrogRepoPath = GetJfrogRepoPath(aqlResult);
-            }
+                var aqllist = aqlResultList.FindAll(x => x.Name.Contains(
+                jfrogcomponentName, StringComparison.OrdinalIgnoreCase));
 
-            if (string.IsNullOrEmpty(jfrogRepoPackageName))
-            {
-                jfrogRepoPackageName = Dataconstant.PackageNameNotFoundInJfrog;
+                repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqllist);
             }
 
             return repoName;
         }
 
-        private string GetJfrogRepoPath(AqlResult aqlResult)
-        {
-            if (string.IsNullOrEmpty(aqlResult.Path) || aqlResult.Path.Equals("."))
-            {
-                return $"{aqlResult.Repo}/{aqlResult.Name}";
-            }
-
-            return $"{aqlResult.Repo}/{aqlResult.Path}/{aqlResult.Name}";
-        }
-
-        private string GetJfrogcomponentNameVersionCombined(string componentName, string componentVerison)
-        {
-            if (componentVerison.Contains(':'))
-            {
-                var correctVersion = CommonHelper.GetSubstringOfLastOccurance(componentVerison, ":");
-                return $"{componentName}_{correctVersion}";
-            }
-            return $"{componentName}_{componentVerison}";
-        }
 
         private static bool IsInternalDebianComponent(
             List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
@@ -325,7 +224,7 @@ namespace LCT.PackageIdentifier
 
         private Bom ExtractDetailsForJson(string filePath, ref List<DebianPackage> debianPackages)
         {
-            Bom bom = _cycloneDXBomParser.ParseCycloneDXBom(filePath);
+            Bom bom = cycloneDXBomParser.ParseCycloneDXBom(filePath);
 
             foreach (var componentsInfo in bom.Components)
             {
@@ -335,7 +234,6 @@ namespace LCT.PackageIdentifier
                     Name = componentsInfo.Name,
                     Version = componentsInfo.Version,
                     PurlID = componentsInfo.Purl,
-
                 };
 
                 if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
@@ -383,7 +281,6 @@ namespace LCT.PackageIdentifier
                     Purl = GetReleaseExternalId(prop.Name, prop.Version)
                 };
                 component.BomRef = component.Purl;
-                component.Type = Component.Classification.Library;
 
                 //For Debian projects we will be considering CycloneDX file reading components as Discovered
                 //since it's Discovered from syft Tool
