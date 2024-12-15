@@ -26,6 +26,7 @@ using LCT.APICommunications;
 using LCT.APICommunications.Model;
 using System.Linq;
 using System.Diagnostics.CodeAnalysis;
+using System.Collections.Generic;
 
 
 namespace LCT.PackageIdentifier
@@ -50,6 +51,8 @@ namespace LCT.PackageIdentifier
 
             if (!m_Verbose && CommonHelper.IsAzureDevOpsDebugEnabled())
                 m_Verbose = true;
+
+            args = PreprocessArguments(args);
             ISettingsManager settingsManager = new SettingsManager();
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
             ProjectReleases projectReleases = new ProjectReleases();
@@ -119,6 +122,49 @@ namespace LCT.PackageIdentifier
             // publish logs and bom file to pipeline artifact
             CommonHelper.PublishFilesToArtifact();
 
+        }
+
+        private static string[] PreprocessArguments(string[] args)
+        {
+            var processedArgs = new List<string>();
+
+            for (int i = 0; i < args.Length; i++)
+            {
+                if (args[i].Equals("--Npm:Exclude", StringComparison.OrdinalIgnoreCase) ||
+                    args[i].Equals("--Nuget:Exclude", StringComparison.OrdinalIgnoreCase) ||
+                    args[i].Equals("--Maven:Exclude", StringComparison.OrdinalIgnoreCase) ||
+                    args[i].Equals("--Debian:Exclude", StringComparison.OrdinalIgnoreCase) ||
+                    args[i].Equals("--Python:Exclude", StringComparison.OrdinalIgnoreCase) ||
+                    args[i].Equals("--Alpine:Exclude", StringComparison.OrdinalIgnoreCase) ||
+                    args[i].Equals("--Npm:ExcludedComponents", StringComparison.OrdinalIgnoreCase) ||
+                    args[i].Equals("--Nuget:ExcludedComponents", StringComparison.OrdinalIgnoreCase) ||
+                    args[i].Equals("--Maven:ExcludedComponents", StringComparison.OrdinalIgnoreCase) ||
+                    args[i].Equals("--Debian:ExcludedComponents", StringComparison.OrdinalIgnoreCase) ||
+                    args[i].Equals("--Python:ExcludedComponents", StringComparison.OrdinalIgnoreCase) ||
+                    args[i].Equals("--Alpine:ExcludedComponents", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (i + 1 < args.Length && !args[i + 1].StartsWith("--"))
+                    {
+                        var values = args[i + 1].Trim('[', ']').Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                        for (int j = 0; j < values.Length; j++)
+                        {
+                            processedArgs.Add($"{args[i]}:{j}");
+                            processedArgs.Add(values[j].Trim());
+                        }
+                        i++; // Skip the next argument as it has been processed
+                    }
+                    else
+                    {
+                        processedArgs.Add(args[i]);
+                    }
+                }
+                else
+                {
+                    processedArgs.Add(args[i]);
+                }
+            }
+
+            return processedArgs.ToArray();
         }
 
         private static CatoolInfo GetCatoolVersionFromProjectfile()
