@@ -508,7 +508,85 @@ Incase your project has both NPM/Nuget components it can be handled by merely ru
 
 4. Once this is done after the dll run you can find that the components from the first run for "**NPM**" and the components from second run for "**NUGET**" will be merged into one BOM file
 
+# Templates
 
+## Azure DevOps
+
+Sample templates for integrating the Continuous Clearing Tool (CCTool) workflow in Azure Pipelines can be found at `templates\azureDevops`.  
+For more details on Azure DevOps templates, refer to the official [Microsoft Documentation](https://learn.microsoft.com/en-us/azure/devops/pipelines/process/templates?view=azure-devops&pivots=templates-includes).
+
+### **Advantages of Running CA Tool via Templates**
+- **Simplified Setup:** Avoids adding manual steps for different CCTool stages.
+- **Consistency and Standardization:** Ensures uniform execution across the organization.
+- **Automated File Uploads:** Handles uploading of logs and BOM files after execution.
+
+---
+
+## Integration
+
+1. **Check-in Templates:** Commit the templates into an Azure DevOps repository.  
+2. **Reference the Repository:** Include the repository in a new pipeline as shown below:
+
+```yaml
+resources:
+  repositories:
+  - repository: Templates_Pipeline
+    type: git
+    name: YourProject/Templates_Pipeline
+```
+:point_right: Note: If the Appsettingsfilepath parameter is not passed, the sample default app settings file is used by the template.
+
+The sample default app settings file is located at `templates\sample-default-app-settings.json` and can be customized as needed.
+
+### Add a New Template Calling Step
+
+#### NuGet Template Example
+
+```yaml
+- template: pipeline-template-step-install-run-cctool-nuget.yml@Templates_Pipeline
+          parameters:
+                sw360url: '$(sw360url)'
+                sw360token: '$(sw360token)'
+                sw360projectID: '$(sw360projectID)'
+                sw360projectName: '$(sw360projectName)' 
+                Sw360AuthTokenType: '$(Sw360AuthTokenType)'
+                projecttype: '$(projecttype)'
+                Artifactorytoken: '$(ARTIFACTORYAPIKEY)'
+                packageFilePath: '$(packageFilePath)'
+                BomFolderPath: '$(BomFolderPath)'
+                bomFilePath: '$(BomFolderPath)/$(sw360projectName)_Bom.cdx.json'
+```
+
+#### Debian Template Example
+
+```yaml
+- template: pipeline-template-step-install-run-cctool-docker.yml@Templates_Pipeline
+          parameters:
+                sw360url: '$(sw360url)'
+                sw360token: '$(sw360token)'
+                sw360projectID: '$(sw360projectID)'
+                sw360projectName: '$(sw360projectName)' 
+                Sw360AuthTokenType: '$(Sw360AuthTokenType)'
+                projecttype: '$(projecttype)'
+                Artifactorytoken: '$(ARTIFACTORYAPIKEY)'
+                packageFilePath: '$(packageFilePath)'
+                BomFolderPath: '$(BomFolderPath)'
+                bomFilePath: '$(BomFolderPath)/$(sw360projectName)_Bom.cdx.json'
+```
+
+### Paramters
+| Name | Description |
+|--|--|
+| `Appsettingsfilepath`| Add the appSetting.json file path |
+| `sw360url`| Provide the Sw360 URL |
+| `sw360token`| Provide the Sw360 Token|
+| `sw360projectID` | Provide the Sw360 ProjectID which you're going to make an entry in Sw360|
+|`sw360projectName`|Provide the Sw360 Project Name|
+|`Sw360AuthTokenType`|Add the Sw360 tokentype either **Token or Bearer**|
+|`projecttype`|Package type NPM/NUGET/DEBIAN/MAVEN/PYTHON|
+|`Artifactorytoken`|JFrog Artifatory token|
+|`packageFilePath`|Path where the input files resides|
+|`BomFolderPath`|Path for creating BOM's files after the run of CCTool|
 
 # Troubleshoot
 1. In case your pipeline takes a lot of time to run(more than 1 hour) when there are many components. It is advisable to increase the pipeline timeout and set it to a minimum of 1 hr.
