@@ -30,6 +30,10 @@
 
 * [How to handle multiple project types in same project](#how-to-handle-multiple-project-types-in-same-project)
 
+* [Templates](#templates)
+
+  * [Azure DevOps](#azure-devops)
+
 * [Troubleshoot](#troubleshoot)
 
 * [Manual Update](#manual-update)
