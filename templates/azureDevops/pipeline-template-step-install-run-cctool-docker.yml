@@ -1,0 +1,155 @@
+parameters:
+- name: sw360projectID
+  default: ''
+
+- name: sw360projectName 
+  default: ''
+
+- name: projecttype
+  default: ''
+
+- name: projecttype2
+  default: ''
+
+- name: IdentifierBomFilePath
+  default: ''
+
+- name: CAtoolversion
+  default: ''
+
+- name: Appsettingsfilepath
+  default: ''
+
+- name: fossologyurl
+  default: ''
+
+- name: sw360url
+  default: ''
+
+- name: sw360token
+  default: ''
+
+- name: sW360AuthTokenType
+  default: ''
+
+- name: Artifactorytoken
+  default: ''
+
+- name: ArtifactoryUploadUser
+  default: ''
+
+- name: JfrogApi
+  default: ''
+
+- name: packageFilePath
+  default: ''
+
+- name: packageFilePath2
+  default: ''
+
+- name: BomFolderPath
+  default: ''
+
+- name: bomFilePath
+  default: '' 
+
+- name: Release
+  default: 'false'
+
+- name: Timeout
+  default: '300' 
+
+steps:
+  ##### CA Tool install #####
+
+  - task: PowerShell@2
+    displayName: CA Tool Install ${{ parameters.CAtoolversion }}
+    inputs:
+      targetType: 'inline'
+      script: | 
+        $Value = "${{ parameters.CAtoolversion }}"
+        if (!($Value)) {   
+          Write-Host "install ca tool latest" 
+          docker pull ghcr.io/siemens/continuous-clearing
+        }
+        else {
+          Write-Host "install ca tool ${{ parameters.CAtoolversion }}" 
+          docker pull ghcr.io/siemens/continuous-clearing:v${{ parameters.CAtoolversion }}
+        }
+
+  ##### Prerequisites for CATool Running.. #####
+  - task: PowerShell@2
+    continueOnError: false
+    displayName: CATool Prerequisites
+    inputs:
+      targetType: 'inline'
+      script: |         
+          ## Creating required directories ##
+          mkdir "$(Build.SourcesDirectory)\Logs_CAtool"
+          mkdir "$(Build.SourcesDirectory)\CAConfig"
+          mkdir "$(Build.SourcesDirectory)\Output"
+          ## Creating required directories ##
+          
+          ## Selecting the AppSetting file ##
+          $appsettings = "${{ parameters.Appsettingsfilepath }}"
+          if (!($appsettings)) {
+            Write-Host "Package Identifier run with Default appsettings.json"
+            $appsettings = "$(Build.SourcesDirectory)\templates\sample-default-app-settings.json"
+          }
+          Write-Host "Selected settings file : $appsettings"
+          ## Selecting the AppSetting file ##
+
+          ## Coping to local directories ##
+          Copy-Item "$appsettings" -Destination "$(Build.SourcesDirectory)\CAConfig"
+          ## Coping to local directories ##
+
+  ##### PacakgeIdentifier #####
+  - task: PowerShell@2
+    displayName: PacakgeIdentifier for ${{ parameters.projecttype }}
+    inputs:
+      targetType: 'inline'
+      script: |   
+          $appSettingappSettingFileName = (Get-ChildItem -Path $(Build.SourcesDirectory)\CAConfig | Select-Object -First 1).Name
+          Write-Host "AppSetting used : $appSettingappSettingFileName"
+          docker run --rm --network="host" -v ${{parameters.packageFilePath}}:/mnt/Input -v ${{parameters.BomFolderPath}}:/mnt/Output -v $(Build.SourcesDirectory)\CAConfig:/etc/CATool -v $(Build.SourcesDirectory)\Logs_CAtool:/var/log ghcr.io/siemens/continuous-clearing dotnet PackageIdentifier.dll --packageFilePath "/mnt/Input" --bomFolderPath "/mnt/Output" --sW360URL "${{ parameters.sw360url }}" --sw360Token "${{ parameters.sw360token }}" --sw360ProjectID "${{ parameters.sw360projectID }}" --sW360ProjectName "{{ parameters.sw360projectName }}" --sW360AuthTokenType "${{ parameters.sW360AuthTokenType }}" --ArtifactoryUploadApiKey "${{ parameters.Artifactorytoken }}" --projectType "${{ parameters.projecttype }}" --fossologyurl "${{ parameters.fossologyurl }}" --JFrogApi "${{ parameters.JFrogApi }}" --settingsfilepath /etc/CATool/$appSettingappSettingFileName --timeOut "${{ parameters.Timeout }}"
+
+  ##### PacakgeIdentifier For Multiple package type #####
+  - ${{ if parameters.IdentifierBomFilePath }}:
+      - task: PowerShell@2
+        displayName: PacakgeIdentifier for ${{ parameters.projecttype2 }}
+        inputs:
+          targetType: 'inline'
+          script: |         
+              $appSettingappSettingFileName = (Get-ChildItem -Path $(Build.SourcesDirectory)\CAConfig | Select-Object -First 1).Name
+              Write-Host "AppSetting used : $appSettingappSettingFileName"
+
+              $IdentifierBomFilePath = Split-Path -Path "${{parameters.IdentifierBomFilePath}}" -Leaf 
+              Write-Host "Identifier Bom FilePath : $IdentifierBomFilePath"
+
+              docker run --rm --network="host" -v ${{parameters.packageFilePath2}}:/mnt/Input -v ${{parameters.BomFolderPath}}:/mnt/Output -v $(Build.SourcesDirectory)\CAConfig:/etc/CATool -v $(Build.SourcesDirectory)\Logs_CAtool:/var/log ghcr.io/siemens/continuous-clearing dotnet PackageIdentifier.dll --packageFilePath "/mnt/Input" --bomFolderPath "/mnt/Output" --identifierBomFilePath "/mnt/Output/$IdentifierBomFilePath" --sW360URL "${{ parameters.sw360url }}" --sw360Token "${{ parameters.sw360token }}" --sw360ProjectID "${{ parameters.sw360projectID }}" --sW360ProjectName "{{ parameters.sw360projectName }}" --sW360AuthTokenType "${{ parameters.sW360AuthTokenType }}" --projectType "${{ parameters.projecttype2 }}" --ArtifactoryUploadApiKey "${{ parameters.Artifactorytoken }}" --fossologyurl "${{ parameters.fossologyurl }}" --JFrogApi "${{ parameters.JFrogApi }}" /etc/CATool/$appSettingappSettingFileName --timeOut "${{ parameters.Timeout }}"
+
+  ##### PacakgeCreator #####
+  - task: PowerShell@2
+    continueOnError: true
+    displayName: PacakgeCreator
+    inputs:
+      targetType: 'inline'
+      script: |         
+          $appSettingappSettingFileName = (Get-ChildItem -Path $(Build.SourcesDirectory)\CAConfig | Select-Object -First 1).Name
+          $BomFileName = "${{ parameters.sw360projectName }}_Bom.cdx.json"
+          Write-Host "AppSetting used : $appSettingappSettingFileName"
+          Write-Host "Bom FileName : $BomFileName"
+          docker run --rm --network="host" -v ${{parameters.packageFilePath}}:/mnt/Input -v ${{parameters.BomFolderPath}}:/mnt/Output -v $(Build.SourcesDirectory)\CAConfig:/etc/CATool -v $(Build.SourcesDirectory)\Logs_CAtool:/var/log ghcr.io/siemens/continuous-clearing dotnet SW360PackageCreator.dll --bomfilePath "/mnt/Output/$BomFileName" --sW360URL "${{ parameters.sw360url }}" --sw360Token "${{ parameters.sw360token }}" --sw360ProjectID "${{ parameters.sw360projectID }}" --sW360ProjectName "{{ parameters.sw360projectName }}" --sW360AuthTokenType "${{ parameters.sW360AuthTokenType }}" --projectType "${{ parameters.projecttype }}" --ArtifactoryUploadApiKey "${{ parameters.Artifactorytoken }}" --fossologyurl "${{ parameters.fossologyurl }}" --settingsfilepath /etc/CATool/$appSettingappSettingFileName --timeOut "${{ parameters.Timeout }}"
+
+  ##### ArtifactoryUploader #####
+  - task: PowerShell@2
+    continueOnError: true
+    displayName: ArtifactoryUploader
+    inputs:
+      targetType: 'inline'
+      script: |     
+          $appSettingappSettingFileName = (Get-ChildItem -Path $(Build.SourcesDirectory)\CAConfig | Select-Object -First 1).Name
+          $BomFileName = "${{ parameters.sw360projectName }}_Bom.cdx.json"
+          Write-Host "AppSetting used : $appSettingappSettingFileName"
+          Write-Host "Bom FileName : $BomFileName"
+          docker run --rm --network="host" -v ${{parameters.packageFilePath}}:/mnt/Input -v ${{parameters.BomFolderPath}}:/mnt/Output -v $(Build.SourcesDirectory)\CAConfig:/etc/CATool -v $(Build.SourcesDirectory)\Logs_CAtool:/var/log ghcr.io/siemens/continuous-clearing dotnet ArtifactoryUploader.dll --bomfilePath "/mnt/Output/$BomFileName" --sW360URL "${{ parameters.sw360url }}" --sw360Token "${{ parameters.sw360token }}" --sw360ProjectID "${{ parameters.sw360projectID }}" --sW360ProjectName "{{ parameters.sw360projectName }}" --sW360AuthTokenType "${{ parameters.sW360AuthTokenType }}" --projectType "${{ parameters.projecttype }}" --ArtifactoryUploadApiKey "${{ parameters.Artifactorytoken }}" --JFrogApi "${{ parameters.JFrogApi }}" --settingsfilepath /etc/CATool/$appSettingappSettingFileName --timeOut "${{ parameters.Timeout }}"
