@@ -238,7 +238,7 @@ namespace LCT.PackageIdentifier
                     BomCreator.bomKpiData.ReleaseRepoComponents++;
                 }
 
-                if (artifactoryrepo.Value == "Not found In Jfrog Repo")
+                if (artifactoryrepo.Value == Dataconstant.PackageNameNotFoundInJfrog || artifactoryrepo.Value == "")
                 {
                     BomCreator.bomKpiData.UnofficialComponents++;
                 }
