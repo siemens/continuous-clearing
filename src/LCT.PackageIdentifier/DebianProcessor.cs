@@ -145,6 +145,23 @@ namespace LCT.PackageIdentifier
                 Property jfrogFileNameProperty = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = jfrogRepoPackageName };
                 Property jfrogRepoPathProperty = new() { Name = Dataconstant.Cdx_JfrogRepoPath, Value = jfrogRepoPath };
                 Component componentVal = component;
+                if (artifactoryrepo.Value == appSettings.Debian.JfrogDevDestRepoName)
+                {
+                    BomCreator.bomKpiData.DevdependencyComponents++;
+                }
+                if (artifactoryrepo.Value == appSettings.Debian.JfrogThirdPartyDestRepoName)
+                {
+                    BomCreator.bomKpiData.ThirdPartyRepoComponents++;
+                }
+                if (artifactoryrepo.Value == appSettings.Debian.JfrogInternalDestRepoName)
+                {
+                    BomCreator.bomKpiData.ReleaseRepoComponents++;
+                }
+
+                if (artifactoryrepo.Value == "Not found In Jfrog Repo")
+                {
+                    BomCreator.bomKpiData.UnofficialComponents++;
+                }
 
                 if (componentVal.Properties?.Count == null || componentVal.Properties?.Count <= 0)
                 {

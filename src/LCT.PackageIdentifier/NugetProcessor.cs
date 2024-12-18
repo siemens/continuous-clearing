@@ -232,7 +232,23 @@ namespace LCT.PackageIdentifier
                 Property siemensfileNameProp = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = finalRepoData?.Name ?? Dataconstant.PackageNameNotFoundInJfrog };
                 Property jfrogRepoPathProp = new() { Name = Dataconstant.Cdx_JfrogRepoPath, Value = jfrogRepoPath };
                 Component componentVal = component;
+                if (artifactoryrepo.Value == appSettings.Nuget.JfrogDevDestRepoName)
+                {
+                    BomCreator.bomKpiData.DevdependencyComponents++;
+                }
+                if (artifactoryrepo.Value == appSettings.Nuget.JfrogThirdPartyDestRepoName)
+                {
+                    BomCreator.bomKpiData.ThirdPartyRepoComponents++;
+                }
+                if (artifactoryrepo.Value == appSettings.Nuget.JfrogInternalDestRepoName)
+                {
+                    BomCreator.bomKpiData.ReleaseRepoComponents++;
+                }
 
+                if (artifactoryrepo.Value == "Not found In Jfrog Repo")
+                {
+                    BomCreator.bomKpiData.UnofficialComponents++;
+                }
                 if (componentVal.Properties?.Count == null || componentVal.Properties?.Count <= 0)
                 {
                     componentVal.Properties = new List<Property>();

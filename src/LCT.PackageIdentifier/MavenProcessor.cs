@@ -225,6 +225,23 @@ namespace LCT.PackageIdentifier
                 Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = finalRepoData.Repo };
 
                 Component componentVal = component;
+                if (artifactoryrepo.Value == appSettings.Maven.JfrogDevDestRepoName)
+                {
+                    BomCreator.bomKpiData.DevdependencyComponents++;
+                }
+                if (artifactoryrepo.Value == appSettings.Maven.JfrogThirdPartyDestRepoName)
+                {
+                    BomCreator.bomKpiData.ThirdPartyRepoComponents++;
+                }
+                if (artifactoryrepo.Value == appSettings.Maven.JfrogInternalDestRepoName)
+                {
+                    BomCreator.bomKpiData.ReleaseRepoComponents++;
+                }
+
+                if (artifactoryrepo.Value == "Not found In Jfrog Repo")
+                {
+                    BomCreator.bomKpiData.UnofficialComponents++;
+                }
                 if (componentVal.Properties?.Count == null || componentVal.Properties?.Count <= 0)
                 {
                     componentVal.Properties = new List<Property>();
