@@ -40,6 +40,19 @@ namespace LCT.ArtifactoryUploader.Model
         public List<ComponentsToArtifactory> SuccessfullPackagesPython { get; set; }
         public List<ComponentsToArtifactory> SuccessfullPackagesDebian { get; set; }
         public List<ComponentsToArtifactory> SuccessfullPackagesMaven { get; set; }
+        public int DevDepCountNuget { get; set; }
+        public int DevDepCountNpm { get; set; }
+        public int DevDepCountConan { get; set; }
+        public int DevDepCountPython { get; set; }
+        public int DevDepCountMaven { get; set; }
+        public int DevDepCountDebian { get; set; }
+        public int ClearedThirdPartyCountNuget { get; set; }
+        public int ClearedThirdPartyCountNpm { get; set; }
+        public int ClearedThirdPartyCountMaven { get; set; }
+        public int ClearedThirdPartyCountConan { get; set; }
+        public int ClearedThirdPartyCountPython { get; set; }
+        public int ClearedThirdPartyCountDebian { get; set; }
+        public int DevDepNuget { get; set; }
 
     }
     public class ProjectResponse
