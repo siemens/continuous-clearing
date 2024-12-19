@@ -245,7 +245,7 @@ namespace LCT.PackageIdentifier
                     BomCreator.bomKpiData.ReleaseRepoComponents++;
                 }
 
-                if (artifactoryrepo.Value == Dataconstant.PackageNameNotFoundInJfrog || artifactoryrepo.Value == "")
+                if (artifactoryrepo.Value == Dataconstant.NotFoundInJFrog || artifactoryrepo.Value == "")
                 {
                     BomCreator.bomKpiData.UnofficialComponents++;
                 }
