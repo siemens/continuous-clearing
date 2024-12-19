@@ -47,6 +47,7 @@ namespace LCT.Common.Constants
         public const string PackageUrlNotFound = "Package URL not found";
         public const string PackageNameNotFoundInJfrog = "Package name not found in Jfrog";
         public const string JfrogRepoPathNotFound = "Jfrog repo path not found";
+        public const string NotFoundInJFrog = "Not Found in JFrogRepo";
         public const string LinkedByCATool = "Linked by CA Tool";
         public const string LinkedByCAToolReleaseRelation = "UNKNOWN";
         public const string LinkedByCAToolReleaseRelationContained = "CONTAINED";
