@@ -43,7 +43,7 @@ namespace LCT.Common.UTest
             list.Add("Debian:Debian");
 
             //Act
-            List<Component> result = CommonHelper.RemoveExcludedComponents(ComponentsForBom, list, ref noOfExcludedComponents);
+            List<Component> result = CommonHelper.FlagExcludedComponentsAsInternal(ComponentsForBom, list, ref noOfExcludedComponents);
 
             //Assert
             Assert.IsTrue(result.Count > 0);
@@ -66,7 +66,7 @@ namespace LCT.Common.UTest
             list.Add("Newton:3.1.3");
 
             //Act
-            CommonHelper.RemoveExcludedComponents(ComponentsForBom, list, ref noOfExcludedComponents);
+            CommonHelper.FlagExcludedComponentsAsInternal(ComponentsForBom, list, ref noOfExcludedComponents);
 
             //Assert            
             Assert.That(noOfExcludedComponents, Is.EqualTo(4), "Returns the count of excluded components");
@@ -273,7 +273,7 @@ namespace LCT.Common.UTest
             int noOfExcludedComponents = 0;
 
             // Act
-            List<Component> result = CommonHelper.RemoveExcludedComponents(componentList, excludedComponents, ref noOfExcludedComponents);
+            List<Component> result = CommonHelper.FlagExcludedComponentsAsInternal(componentList, excludedComponents, ref noOfExcludedComponents);
 
             // Assert
             Assert.AreEqual(1, result.Count);
@@ -296,7 +296,7 @@ namespace LCT.Common.UTest
             int noOfExcludedComponents = 0;
 
             // Act
-            List<Component> result = CommonHelper.RemoveExcludedComponents(componentList, excludedComponents, ref noOfExcludedComponents);
+            List<Component> result = CommonHelper.FlagExcludedComponentsAsInternal(componentList, excludedComponents, ref noOfExcludedComponents);
 
             // Assert
             Assert.AreEqual(3, result.Count);

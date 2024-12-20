@@ -37,8 +37,9 @@ namespace LCT.Common
             return false;
         }
 
-        public static List<Component> RemoveExcludedComponents(List<Component> ComponentList, List<string> ExcludedComponents, ref int noOfExcludedComponents)
+        public static List<Component> FlagExcludedComponentsAsInternal(List<Component> ComponentList, List<string> ExcludedComponents, ref int noOfExcludedComponents)
         {
+            // find the excluded components in the identified list of components
             List<Component> ExcludedList = new List<Component>();
             foreach (string excludedComponent in ExcludedComponents)
             {
@@ -54,11 +55,20 @@ namespace LCT.Common
                         (component.Version.ToLowerInvariant().Contains(excludedcomponent[1].ToLowerInvariant()) || excludedcomponent[1].ToLowerInvariant() == "*"))
                     {
                         noOfExcludedComponents++;
+
+                        // flag excluded component as internal 20:12:2024
+                        Property property = new Property();
+                        property.Name = Dataconstant.Cdx_IsInternal;
+                        property.Value = "true";
+                        if (!component.Properties.Exists(x => x.Name.Equals(property.Name)))
+                        {
+                            component.Properties.Add(property);
+                        }
+
                         ExcludedList.Add(component);
                     }
                 }
             }
-            ComponentList.RemoveAll(item => ExcludedList.Contains(item));
             return ComponentList;
         }
 

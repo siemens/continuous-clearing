@@ -120,7 +120,10 @@ namespace LCT.PackageIdentifier
                 Name = Dataconstant.Cdx_JfrogRepoPath,
                 Value = Dataconstant.JfrogRepoPathNotFound
             };
-            component.Properties.Add(internalType);
+            if (!component.Properties.Exists(x => x.Name.Equals(internalType.Name)))
+            {
+                component.Properties.Add(internalType);
+            }
             component.Properties.Add(artifactoryrepo);
             component.Properties.Add(projectType);
             component.Properties.Add(isDevelopment);
