@@ -108,7 +108,7 @@ namespace LCT.PackageIdentifier
 
                 if (appSettings.Npm.ExcludedComponents != null)
                 {
-                    lstComponentForBOM = CommonHelper.RemoveExcludedComponents(lstComponentForBOM, appSettings.Npm.ExcludedComponents, ref noOfExcludedComponents);
+                    lstComponentForBOM = CommonHelper.FlagExcludedComponentsAsInternal(lstComponentForBOM, appSettings.Npm.ExcludedComponents, ref noOfExcludedComponents);
                     BomCreator.bomKpiData.ComponentsExcluded += noOfExcludedComponents;
 
                 }
@@ -374,13 +374,20 @@ namespace LCT.PackageIdentifier
                 {
                     internalComponents.Add(currentIterationItem);
                     isInternal.Value = "true";
+                    if (!component.Properties.Exists(x => x.Name.Equals(isInternal.Name)))
+                    {
+                        currentIterationItem.Properties.Add(isInternal);
+                    }
                 }
-                else
-                {
-                    isInternal.Value = "false";
+                else {
+                    if (!component.Properties.Exists(x => x.Name.Equals(isInternal.Name)))
+                    {
+                        currentIterationItem.Properties.Add(isInternal);
+                    }
                 }
 
-                currentIterationItem.Properties.Add(isInternal);
+
+                
                 internalComponentStatusUpdatedList.Add(currentIterationItem);
             }
 
@@ -457,7 +464,7 @@ namespace LCT.PackageIdentifier
             int noOfExcludedComponents = 0;
             if (appSettings.Npm.ExcludedComponents != null)
             {
-                componentForBOM = CommonHelper.RemoveExcludedComponents(componentForBOM, appSettings.Npm.ExcludedComponents, ref noOfExcludedComponents);
+                componentForBOM = CommonHelper.FlagExcludedComponentsAsInternal(componentForBOM, appSettings.Npm.ExcludedComponents, ref noOfExcludedComponents);
                 dependenciesForBOM = CommonHelper.RemoveInvalidDependenciesAndReferences(componentForBOM, dependenciesForBOM);
                 BomCreator.bomKpiData.ComponentsExcluded += noOfExcludedComponents;
 
@@ -606,7 +613,7 @@ namespace LCT.PackageIdentifier
 
         private static bool IsInternalNpmComponent(
             List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
-        {
+         {
             string jfrogcomponentName = $"{component.Name}-{component.Version}.tgz";
             if (aqlResultList.Exists(
                 x => x.Name.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase)))

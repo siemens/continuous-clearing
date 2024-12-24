@@ -114,7 +114,7 @@ namespace LCT.PackageIdentifier
             int noOfExcludedComponents = 0;
             if (appSettings.Debian.ExcludedComponents != null)
             {
-                componentForBOM = CommonHelper.RemoveExcludedComponents(componentForBOM, appSettings.Debian.ExcludedComponents, ref noOfExcludedComponents);
+                componentForBOM = CommonHelper.FlagExcludedComponentsAsInternal(componentForBOM, appSettings.Debian.ExcludedComponents, ref noOfExcludedComponents);
                 dependenciesForBOM = CommonHelper.RemoveInvalidDependenciesAndReferences(componentForBOM, dependenciesForBOM);
                 BomCreator.bomKpiData.ComponentsExcluded += noOfExcludedComponents;
             }

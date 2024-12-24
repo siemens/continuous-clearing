@@ -79,7 +79,7 @@ namespace LCT.PackageIdentifier
             int noOfExcludedComponents = 0;
             if (appSettings.Alpine.ExcludedComponents != null)
             {
-                componentForBOM = CommonHelper.RemoveExcludedComponents(componentForBOM, appSettings.Alpine.ExcludedComponents, ref noOfExcludedComponents);
+                componentForBOM = CommonHelper.FlagExcludedComponentsAsInternal(componentForBOM, appSettings.Alpine.ExcludedComponents, ref noOfExcludedComponents);
                 dependenciesForBOM = CommonHelper.RemoveInvalidDependenciesAndReferences(componentForBOM, dependenciesForBOM);
                 BomCreator.bomKpiData.ComponentsExcluded += noOfExcludedComponents;
 

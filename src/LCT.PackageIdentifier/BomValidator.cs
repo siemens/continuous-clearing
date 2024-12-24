@@ -36,7 +36,7 @@ namespace LCT.PackageIdentifier
                 return -1;
             }
             else
-            {
+             {
                 appSettings.SW360ProjectName = sw360ProjectName;
             }
             return 0;

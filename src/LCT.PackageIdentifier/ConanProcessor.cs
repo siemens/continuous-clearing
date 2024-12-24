@@ -528,7 +528,7 @@ namespace LCT.PackageIdentifier
             int noOfExcludedComponents = 0;
             if (appSettings.Conan.ExcludedComponents != null)
             {
-                componentForBOM = CommonHelper.RemoveExcludedComponents(componentForBOM, appSettings.Conan.ExcludedComponents, ref noOfExcludedComponents);
+                componentForBOM = CommonHelper.FlagExcludedComponentsAsInternal(componentForBOM, appSettings.Conan.ExcludedComponents, ref noOfExcludedComponents);
                 dependenciesForBOM = CommonHelper.RemoveInvalidDependenciesAndReferences(componentForBOM, dependenciesForBOM);
                 BomCreator.bomKpiData.ComponentsExcluded += noOfExcludedComponents;
             }
