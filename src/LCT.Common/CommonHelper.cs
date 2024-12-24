@@ -60,9 +60,14 @@ namespace LCT.Common
                         Property property = new Property();
                         property.Name = Dataconstant.Cdx_IsInternal;
                         property.Value = "true";
-                        if (!component.Properties.Exists(x => x.Name.Equals(property.Name)))
+                        if (component.Properties != null
+                            && !component.Properties.Exists(x => x.Name.Equals(property.Name)))
                         {
                             component.Properties.Add(property);
+                        }
+                        else
+                        {
+                            component.Properties = [property];
                         }
 
                         ExcludedList.Add(component);

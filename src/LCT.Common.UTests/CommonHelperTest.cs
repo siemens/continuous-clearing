@@ -16,7 +16,7 @@ namespace LCT.Common.UTest
     [TestFixture]
     public class CommonHelperTest
     {
-       
+
         [Test]
         public void WriteComponentsNotLinkedListInConsole_PassingList_ReturnSuccess()
         {
@@ -276,8 +276,8 @@ namespace LCT.Common.UTest
             List<Component> result = CommonHelper.FlagExcludedComponentsAsInternal(componentList, excludedComponents, ref noOfExcludedComponents);
 
             // Assert
-            Assert.AreEqual(1, result.Count);
-            Assert.IsFalse(result.Any(c => c.Name == "Component1" && c.Version == "1.0"));
+            Assert.AreEqual(3, result.Count);
+            Assert.IsTrue(result.Any(c => c.Name == "Component1" && c.Version == "1.0"));
             Assert.IsTrue(result.Any(c => c.Name == "Component3" && c.Version == "3.0"));
             Assert.AreEqual(2, noOfExcludedComponents);
         }

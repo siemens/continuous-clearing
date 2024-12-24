@@ -90,7 +90,7 @@ namespace LCT.PackageIdentifier.UTest
         public void ParseLockFile_GivenAInputFilePathExcludeComponent_ReturnComponentCount()
         {
             //Arrange
-            int totalComponentsAfterExclusion = 15;
+            int totalComponentsAfterExclusion = 17;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
             string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles";
@@ -113,14 +113,14 @@ namespace LCT.PackageIdentifier.UTest
             Bom listofcomponents = new ConanProcessor(cycloneDXBomParser.Object).ParsePackageFile(appSettings);
 
             //Assert
-            Assert.That(totalComponentsAfterExclusion, Is.EqualTo(listofcomponents.Components.Count), "Checks if the excluded components have been removed");
+            Assert.That(totalComponentsAfterExclusion, Is.EqualTo(listofcomponents.Components.Count), "Checks if the excluded components have not been removed");
         }
 
         [TestCase]
         public void IsDevDependent_GivenListOfDevComponents_ReturnsSuccess()
         {
             //Arrange
-            var conanPackage = new ConanPackage() {Id = "10"};
+            var conanPackage = new ConanPackage() { Id = "10" };
             var buildNodeIds = new List<string> { "10", "11", "12" };
             var noOfDevDependent = 0;
             //Act
@@ -135,13 +135,13 @@ namespace LCT.PackageIdentifier.UTest
         {
             // Arrange
             Component component = new Component()
-            { 
+            {
                 Name = "securitycommunicationmanager",
                 Description = string.Empty,
                 Version = "2.6.5",
                 Purl = "pkg:conan/securitycommunicationmanager@2.6.5"
             };
-            
+
             var components = new List<Component>() { component };
             ComponentIdentification componentIdentification = new() { comparisonBOMData = components };
             string[] repoList = { "internalrepo1", "internalrepo2" };
