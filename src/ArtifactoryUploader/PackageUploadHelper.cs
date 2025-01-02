@@ -951,7 +951,7 @@ namespace LCT.ArtifactoryUploader
             if (item.Purl.Contains("pypi", StringComparison.OrdinalIgnoreCase))
             {
                 // get the  component list from Jfrog for given repo
-                aqlResultList = await GetListOfComponentsFromRepo(new string[] { item.Properties.Find(x => x.Name == Dataconstant.Cdx_ArtifactoryRepoName)?.Value }, jFrogService);
+                aqlResultList = await GetPypiListOfComponentsFromRepo(new string[] { item.Properties.Find(x => x.Name == Dataconstant.Cdx_ArtifactoryRepoName)?.Value }, jFrogService);
                 if (aqlResultList.Count > 0)
                 {
                     return GetArtifactoryRepoName(aqlResultList, item);
@@ -1166,15 +1166,27 @@ namespace LCT.ArtifactoryUploader
 
             return aqlResultList;
         }
+        public static async Task<List<AqlResult>> GetPypiListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService)
+        {
+            if (repoList != null && repoList.Length > 0)
+            {
+                foreach (var repo in repoList)
+                {
+                    var test = await jFrogService.GetPypiInternalComponentDataByRepo(repo) ?? new List<AqlResult>();
+                    aqlResultList.AddRange(test);
+                }
+            }
+
+            return aqlResultList;
+        }
 
         private static AqlResult GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component)
         {
-            string jfrogcomponentName = $"{component.Name}-{component.Version}";
-
-            AqlResult repoName = aqlResultList.Find(x => x.Name.Contains(jfrogcomponentName, StringComparison.OrdinalIgnoreCase));
+            AqlResult repoName = aqlResultList.Find(x => x.properties.Any(p => p.key == "pypi.normalized.name" && p.value == component.Name) && x.properties.Any(p => p.key == "pypi.version" && p.value == component.Version));
 
             return repoName;
         }
+        
 
         private static AqlResult GetArtifactoryRepoNameForConan(List<AqlResult> aqlResultList, Component component)
         {

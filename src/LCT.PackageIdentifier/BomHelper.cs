@@ -176,6 +176,34 @@ namespace LCT.PackageIdentifier
 
             return aqlResultList;
         }
+        public async Task<List<AqlResult>> GetNpmListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService)
+        {
+            List<AqlResult> aqlResultList = new();
+            if (repoList != null && repoList.Length > 0)
+            {
+                foreach (var repo in repoList)
+                {
+                    var test = await jFrogService.GetNpmInternalComponentDataByRepo(repo) ?? new List<AqlResult>();
+                    aqlResultList.AddRange(test);
+                }
+            }
+
+            return aqlResultList;
+        }
+        public async Task<List<AqlResult>> GetPypiListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService)
+        {
+            List<AqlResult> aqlResultList = new();
+            if (repoList != null && repoList.Length > 0)
+            {
+                foreach (var repo in repoList)
+                {
+                    var test = await jFrogService.GetPypiInternalComponentDataByRepo(repo) ?? new List<AqlResult>();
+                    aqlResultList.AddRange(test);
+                }
+            }
+
+            return aqlResultList;
+        }       
 
         #endregion
     }

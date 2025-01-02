@@ -4,6 +4,8 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using LCT.Common;
+using System.ComponentModel;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -20,6 +22,19 @@ namespace LCT.APICommunications.Interfaces
         /// <param name="repoName">repoName</param>
         /// <returns>HttpResponseMessage</returns>
         Task<HttpResponseMessage> GetInternalComponentDataByRepo(string repoName);
+        /// <summary>
+        /// Gets the internal component data based on repo name
+        /// </summary>
+        /// <param name="repoName">repoName</param>
+        /// <returns>HttpResponseMessage</returns>
+        Task<HttpResponseMessage> GetNpmInternalComponentDataByRepo(string repoName);
+        /// <summary>
+        /// Gets the internal component data based on repo name
+        /// </summary>
+        /// <param name="repoName">repoName</param>
+        /// <returns>HttpResponseMessage</returns>
+        Task<HttpResponseMessage> GetPypiInternalComponentDataByRepo(string repoName);
+       
 
         /// <summary>
         /// Gets the package information in the repo, via the name or path

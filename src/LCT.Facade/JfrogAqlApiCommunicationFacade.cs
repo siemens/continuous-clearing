@@ -5,6 +5,7 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.APICommunications.Interfaces;
+using LCT.Common;
 using LCT.Facade.Interfaces;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -43,9 +44,27 @@ namespace LCT.Facade
         /// <returns>HttpResponseMessage</returns>
         public async Task<HttpResponseMessage> GetInternalComponentDataByRepo(string repoName)
         {
-           return await m_jfrogAqlApiCommunication.GetInternalComponentDataByRepo(repoName);
+            return await m_jfrogAqlApiCommunication.GetInternalComponentDataByRepo(repoName);
         }
-
+        /// <summary>
+        /// Gets the Internal Component Data By Repo Name
+        /// </summary>
+        /// <param name="repoName">repoName</param>
+        /// <returns>HttpResponseMessage</returns>
+        public async Task<HttpResponseMessage> GetNpmInternalComponentDataByRepo(string repoName)
+        {
+            return await m_jfrogAqlApiCommunication.GetNpmInternalComponentDataByRepo(repoName);
+        }
+        /// <summary>
+        /// Gets the Internal Component Data By Repo Name
+        /// </summary>
+        /// <param name="repoName">repoName</param>
+        /// <returns>HttpResponseMessage</returns>
+        public async Task<HttpResponseMessage> GetPypiInternalComponentDataByRepo(string repoName)
+        {
+            return await m_jfrogAqlApiCommunication.GetPypiInternalComponentDataByRepo(repoName);
+        }
+       
         /// <summary>
         /// Gets the package information in the repo, via the name or path
         /// </summary>

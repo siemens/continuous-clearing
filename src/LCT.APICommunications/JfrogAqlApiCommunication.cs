@@ -6,6 +6,7 @@
 
 using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
+using LCT.Common;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -58,14 +59,46 @@ namespace LCT.APICommunications
             StringBuilder query = new();
             query.Append("items.find({\"repo\":\"");
             query.Append($"{repoName}");
-            query.Append("\"}).include(\"repo\", \"path\", \"name\", \"actual_sha1\",\"actual_md5\",\"sha256\")");
+            query.Append("\"}).include(\"repo\", \"path\", \"name\",\"name\", \"actual_sha1\",\"actual_md5\",\"sha256\")");
 
             string aqlQueryToBody = query.ToString();
             string uri = $"{DomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}";
             HttpContent httpContent = new StringContent(aqlQueryToBody);
             return await httpClient.PostAsync(uri, httpContent);
         }
+        public async Task<HttpResponseMessage> GetNpmInternalComponentDataByRepo(string repoName)
+        {
+            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
+            TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
+            httpClient.Timeout = timeOutInSec;
 
+            StringBuilder query = new();
+            query.Append("items.find({\"repo\":\"");
+            query.Append($"{repoName}");
+            query.Append("\"}).include(\"repo\", \"path\", \"name\",\"@npm.name\",\"@npm.version\", \"actual_sha1\",\"actual_md5\",\"sha256\")");
+
+            string aqlQueryToBody = query.ToString();
+            string uri = $"{DomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}";
+            HttpContent httpContent = new StringContent(aqlQueryToBody);
+            return await httpClient.PostAsync(uri, httpContent);
+        }
+        public async Task<HttpResponseMessage> GetPypiInternalComponentDataByRepo(string repoName)
+        {
+            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
+            TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
+            httpClient.Timeout = timeOutInSec;
+
+            StringBuilder query = new();
+            query.Append("items.find({\"repo\":\"");
+            query.Append($"{repoName}");
+            query.Append("\"}).include(\"repo\", \"path\", \"name\",\"@pypi.normalized.name\",\"@pypi.version\", \"actual_sha1\",\"actual_md5\",\"sha256\")");
+
+            string aqlQueryToBody = query.ToString();
+            string uri = $"{DomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}";
+            HttpContent httpContent = new StringContent(aqlQueryToBody);
+            return await httpClient.PostAsync(uri, httpContent);
+        }
+       
         /// <summary>
         /// Gets the package information in the repo, via the name or path
         /// </summary>

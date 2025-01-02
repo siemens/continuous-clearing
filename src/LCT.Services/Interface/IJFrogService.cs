@@ -5,6 +5,7 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.APICommunications.Model.AQL;
+using LCT.Common;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -23,6 +24,19 @@ namespace LCT.Services.Interface
         /// <returns>IList<AqlResult></returns>
         public Task<IList<AqlResult>> GetInternalComponentDataByRepo(string repoName);
         /// <summary>
+        /// Gets the internal component data by Repo name
+        /// </summary>
+        /// <param name="repoName">repoName</param>
+        /// <returns>IList<AqlResult></returns>
+        public Task<IList<AqlResult>> GetNpmInternalComponentDataByRepo(string repoName);
+        /// <summary>
+        /// Gets the internal component data by Repo name
+        /// </summary>
+        /// <param name="repoName">repoName</param>
+        /// <returns>IList<AqlResult></returns>
+        public Task<IList<AqlResult>> GetPypiInternalComponentDataByRepo(string repoName);
+       
+        /// <summary>
         /// Gets the package information in the repo, via the name or path
         /// </summary>
         /// <param name="repoName">repoName</param>
@@ -32,6 +46,6 @@ namespace LCT.Services.Interface
 #nullable enable
         public Task<AqlResult?> GetPackageInfo(string repoName, string packageName, string path);
 
-        public Task<HttpResponseMessage> CheckJFrogConnectivity();
+        public Task<HttpResponseMessage> CheckJFrogConnectivity();        
     }
 }
