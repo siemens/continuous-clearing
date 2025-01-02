@@ -27,13 +27,13 @@ namespace LCT.APICommunications.Interfaces
         /// </summary>
         /// <param name="repoName">repoName</param>
         /// <returns>HttpResponseMessage</returns>
-        Task<HttpResponseMessage> GetNpmInternalComponentDataByRepo(string repoName);
+        Task<HttpResponseMessage> GetNpmComponentDataByRepo(string repoName);
         /// <summary>
         /// Gets the internal component data based on repo name
         /// </summary>
         /// <param name="repoName">repoName</param>
         /// <returns>HttpResponseMessage</returns>
-        Task<HttpResponseMessage> GetPypiInternalComponentDataByRepo(string repoName);
+        Task<HttpResponseMessage> GetPypiComponentDataByRepo(string repoName);
        
 
         /// <summary>

@@ -51,18 +51,18 @@ namespace LCT.Facade
         /// </summary>
         /// <param name="repoName">repoName</param>
         /// <returns>HttpResponseMessage</returns>
-        public async Task<HttpResponseMessage> GetNpmInternalComponentDataByRepo(string repoName)
+        public async Task<HttpResponseMessage> GetNpmComponentDataByRepo(string repoName)
         {
-            return await m_jfrogAqlApiCommunication.GetNpmInternalComponentDataByRepo(repoName);
+            return await m_jfrogAqlApiCommunication.GetNpmComponentDataByRepo(repoName);
         }
         /// <summary>
         /// Gets the Internal Component Data By Repo Name
         /// </summary>
         /// <param name="repoName">repoName</param>
         /// <returns>HttpResponseMessage</returns>
-        public async Task<HttpResponseMessage> GetPypiInternalComponentDataByRepo(string repoName)
+        public async Task<HttpResponseMessage> GetPypiComponentDataByRepo(string repoName)
         {
-            return await m_jfrogAqlApiCommunication.GetPypiInternalComponentDataByRepo(repoName);
+            return await m_jfrogAqlApiCommunication.GetPypiComponentDataByRepo(repoName);
         }
        
         /// <summary>

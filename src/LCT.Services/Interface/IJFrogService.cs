@@ -28,13 +28,13 @@ namespace LCT.Services.Interface
         /// </summary>
         /// <param name="repoName">repoName</param>
         /// <returns>IList<AqlResult></returns>
-        public Task<IList<AqlResult>> GetNpmInternalComponentDataByRepo(string repoName);
+        public Task<IList<AqlResult>> GetNpmComponentDataByRepo(string repoName);
         /// <summary>
         /// Gets the internal component data by Repo name
         /// </summary>
         /// <param name="repoName">repoName</param>
         /// <returns>IList<AqlResult></returns>
-        public Task<IList<AqlResult>> GetPypiInternalComponentDataByRepo(string repoName);
+        public Task<IList<AqlResult>> GetPypiComponentDataByRepo(string repoName);
        
         /// <summary>
         /// Gets the package information in the repo, via the name or path

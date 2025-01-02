@@ -1172,8 +1172,8 @@ namespace LCT.ArtifactoryUploader
             {
                 foreach (var repo in repoList)
                 {
-                    var test = await jFrogService.GetPypiInternalComponentDataByRepo(repo) ?? new List<AqlResult>();
-                    aqlResultList.AddRange(test);
+                    var componentRepoData = await jFrogService.GetPypiComponentDataByRepo(repo) ?? new List<AqlResult>();
+                    aqlResultList.AddRange(componentRepoData);
                 }
             }
 

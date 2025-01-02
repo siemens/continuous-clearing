@@ -66,7 +66,7 @@ namespace LCT.APICommunications
             HttpContent httpContent = new StringContent(aqlQueryToBody);
             return await httpClient.PostAsync(uri, httpContent);
         }
-        public async Task<HttpResponseMessage> GetNpmInternalComponentDataByRepo(string repoName)
+        public async Task<HttpResponseMessage> GetNpmComponentDataByRepo(string repoName)
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
             TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
@@ -82,7 +82,7 @@ namespace LCT.APICommunications
             HttpContent httpContent = new StringContent(aqlQueryToBody);
             return await httpClient.PostAsync(uri, httpContent);
         }
-        public async Task<HttpResponseMessage> GetPypiInternalComponentDataByRepo(string repoName)
+        public async Task<HttpResponseMessage> GetPypiComponentDataByRepo(string repoName)
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
             TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);

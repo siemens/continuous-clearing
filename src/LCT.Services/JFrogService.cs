@@ -64,14 +64,14 @@ namespace LCT.Services
 
             return aqlResult;
         }
-        public async Task<IList<AqlResult>> GetNpmInternalComponentDataByRepo(string repoName)
+        public async Task<IList<AqlResult>> GetNpmComponentDataByRepo(string repoName)
         {
             HttpResponseMessage httpResponseMessage = null;
             IList<AqlResult> aqlResult = new List<AqlResult>();
 
             try
             {
-                httpResponseMessage = await m_JFrogApiCommunicationFacade.GetNpmInternalComponentDataByRepo(repoName);
+                httpResponseMessage = await m_JFrogApiCommunicationFacade.GetNpmComponentDataByRepo(repoName);
                 if (httpResponseMessage == null || !httpResponseMessage.IsSuccessStatusCode)
                 {
                     return new List<AqlResult>();
@@ -96,14 +96,14 @@ namespace LCT.Services
 
             return aqlResult;
         }
-        public async Task<IList<AqlResult>> GetPypiInternalComponentDataByRepo(string repoName)
+        public async Task<IList<AqlResult>> GetPypiComponentDataByRepo(string repoName)
         {
             HttpResponseMessage httpResponseMessage = null;
             IList<AqlResult> aqlResult = new List<AqlResult>();
 
             try
             {
-                httpResponseMessage = await m_JFrogApiCommunicationFacade.GetPypiInternalComponentDataByRepo(repoName);
+                httpResponseMessage = await m_JFrogApiCommunicationFacade.GetPypiComponentDataByRepo(repoName);
                 if (httpResponseMessage == null || !httpResponseMessage.IsSuccessStatusCode)
                 {
                     return new List<AqlResult>();
