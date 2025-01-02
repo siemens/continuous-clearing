@@ -44,7 +44,7 @@ namespace LCT.Facade
         /// <returns>HttpResponseMessage</returns>
         public async Task<HttpResponseMessage> GetInternalComponentDataByRepo(string repoName)
         {
-            return await m_jfrogAqlApiCommunication.GetInternalComponentDataByRepo(repoName);
+           return await m_jfrogAqlApiCommunication.GetInternalComponentDataByRepo(repoName);
         }
         /// <summary>
         /// Gets the Internal Component Data By Repo Name
