@@ -27,13 +27,38 @@ namespace LCT.PackageIdentifier.UTest
         {
             // Arrange
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            AqlProperty property1 = new AqlProperty
+            {
+                key = "npm.name",
+                value = "component"
+            };
+
+            AqlProperty property2 = new AqlProperty
+            {
+                key = "npm.version",
+                value = "1.0.0"
+            };
+            AqlProperty prop1 = new AqlProperty
+            {
+                key = "npm.name",
+                value = "component"
+            };
+
+            AqlProperty prop2 = new AqlProperty
+            {
+                key = "npm.version",
+                value = "2.0.0"
+            };
+            List<AqlProperty> propertys = new List<AqlProperty> { property1, property2 };
+            List<AqlProperty> property = new List<AqlProperty> { prop1, prop2 };
             var aqlResultList = new List<AqlResult>
             {
-                new AqlResult { Name = "component-1.0.0.tgz", Repo = "repo1", Path="path/to" },
-                new AqlResult { Name = "component-2.0.0.tgz", Repo = "repo2", Path="path/to" }
+                new AqlResult { Name = "component-1.0.0.tgz", Repo = "repo1", Path="path/to",properties=propertys },
+                new AqlResult { Name = "component-2.0.0.tgz", Repo = "repo2", Path="path/to",properties = property }
             };
-            var component = new Component { Name = "component", Version = "1.0.0" };
             var bomHelperMock = new Mock<IBomHelper>();
+            var component = new Component { Name = "component", Version = "1.0.0" };
+            bomHelperMock.Setup(b => b.GetFullNameOfComponent(component)).Returns("component");
             var expectedRepoPath = "repo1/path/to/component-1.0.0.tgz";
 
             var npmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
@@ -52,13 +77,38 @@ namespace LCT.PackageIdentifier.UTest
         {
             // Arrange
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            AqlProperty property1 = new AqlProperty
+            {
+                key = "npm.name",
+                value = "component"
+            };
+
+            AqlProperty property2 = new AqlProperty
+            {
+                key = "npm.version",
+                value = "1.0.0"
+            };
+            AqlProperty prop1 = new AqlProperty
+            {
+                key = "npm.name",
+                value = "component"
+            };
+
+            AqlProperty prop2 = new AqlProperty
+            {
+                key = "npm.version",
+                value = "2.0.0"
+            };
+            List<AqlProperty> propertys = new List<AqlProperty> { property1, property2 };
+            List<AqlProperty> property = new List<AqlProperty> { prop1, prop2 };
             var aqlResultList = new List<AqlResult>
             {
-                new AqlResult { Name = "component-1.0.0.tgz", Repo = "repo1" },
-                new AqlResult { Name = "component-2.0.0.tgz", Repo = "repo2" }
+                new AqlResult { Name = "component-1.0.0.tgz", Repo = "repo1",properties=propertys },
+                new AqlResult { Name = "component-2.0.0.tgz", Repo = "repo2",properties=property }
             };
             var component = new Component { Name = "component", Version = "3.0.0" };
             var bomHelperMock = new Mock<IBomHelper>();
+            bomHelperMock.Setup(b => b.GetFullNameOfComponent(component)).Returns("component");
 
             var npmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
 
@@ -84,18 +134,30 @@ namespace LCT.PackageIdentifier.UTest
             ComponentIdentification component = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
             CommonAppSettings appSettings = new() { InternalRepoList = reooListArr };
+            AqlProperty prop1 = new AqlProperty
+            {
+                key = "npm.name",
+                value = "animations"
+            };
 
+            AqlProperty prop2 = new AqlProperty
+            {
+                key = "npm.version",
+                value = "1.0.0"
+            };
+            List<AqlProperty> propertys = new List<AqlProperty> { prop1, prop2 };
             AqlResult aqlResult = new()
             {
                 Name = "animations-1.0.0.tgz",
                 Path = "@testfolder/-/folder",
-                Repo = "internalrepo1"
+                Repo = "internalrepo1",
+                properties = propertys
             };
 
             List<AqlResult> results = new List<AqlResult>() { aqlResult };
             Mock<IJFrogService> mockJfrogService = new Mock<IJFrogService>();
             Mock<IBomHelper> mockBomHelper = new Mock<IBomHelper>();
-            mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
+            mockBomHelper.Setup(m => m.GetNpmListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations");
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
@@ -121,18 +183,30 @@ namespace LCT.PackageIdentifier.UTest
             ComponentIdentification component = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
             CommonAppSettings appSettings = new() { InternalRepoList = reooListArr };
+            AqlProperty prop1 = new AqlProperty
+            {
+                key = "npm.name",
+                value = "animations"
+            };
 
+            AqlProperty prop2 = new AqlProperty
+            {
+                key = "npm.version",
+                value = "1.0.0"
+            };
+            List<AqlProperty> propertys = new List<AqlProperty> { prop1, prop2 };
             AqlResult aqlResult = new()
             {
                 Name = "animations-common_license-1.0.0.tgz",
                 Path = "@testfolder/-/folder",
-                Repo = "internalrepo1"
+                Repo = "internalrepo1",
+                properties = propertys
             };
 
             List<AqlResult> results = new List<AqlResult>() { aqlResult };
             Mock<IJFrogService> mockJfrogService = new Mock<IJFrogService>();
             Mock<IBomHelper> mockBomHelper = new Mock<IBomHelper>();
-            mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
+            mockBomHelper.Setup(m => m.GetNpmListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations");
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
@@ -160,18 +234,30 @@ namespace LCT.PackageIdentifier.UTest
             ComponentIdentification componentIdentification = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo1" };
             CommonAppSettings appSettings = new() { InternalRepoList = reooListArr };
+            AqlProperty prop1 = new AqlProperty
+            {
+                key = "npm.name",
+                value = "animations"
+            };
 
+            AqlProperty prop2 = new AqlProperty
+            {
+                key = "npm.version",
+                value = "1.0.0"
+            };
+            List<AqlProperty> propertys = new List<AqlProperty> { prop1, prop2 };
             AqlResult aqlResult = new()
             {
                 Name = "animations-common-1.0.0.tgz",
                 Path = "@testfolder/-/folder",
-                Repo = "internalrepo1"
+                Repo = "internalrepo1",
+                properties = propertys
             };
 
             List<AqlResult> results = new List<AqlResult>() { aqlResult };
             Mock<IJFrogService> mockJfrogService = new Mock<IJFrogService>();
             Mock<IBomHelper> mockBomHelper = new Mock<IBomHelper>();
-            mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
+            mockBomHelper.Setup(m => m.GetNpmListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations/common");
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
@@ -200,18 +286,31 @@ namespace LCT.PackageIdentifier.UTest
             string[] reooListArr = { "internalrepo1", "internalrepo1" };
             CommonAppSettings appSettings = new();
             appSettings.Npm = new Common.Model.Config() { JfrogNpmRepoList = reooListArr };
+            AqlProperty prop1 = new AqlProperty
+            {
+                key = "npm.name",
+                value = "animations"
+            };
+
+            AqlProperty prop2 = new AqlProperty
+            {
+                key = "npm.version",
+                value = "1.0.0"
+            };
+            List<AqlProperty> propertys = new List<AqlProperty> { prop1, prop2 };
             AqlResult aqlResult = new()
             {
                 Name = "animations-common-1.0.0.tgz",
                 Path = "@testfolder/-/folder",
-                Repo = "internalrepo1"
+                Repo = "internalrepo1",
+                properties = propertys
             };
 
             List<AqlResult> results = new List<AqlResult>() { aqlResult };
 
             Mock<IJFrogService> mockJfrogService = new Mock<IJFrogService>();
             Mock<IBomHelper> mockBomHelper = new Mock<IBomHelper>();
-            mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
+            mockBomHelper.Setup(m => m.GetNpmListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations/common");
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
@@ -240,18 +339,31 @@ namespace LCT.PackageIdentifier.UTest
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
             CommonAppSettings appSettings = new();
             appSettings.Npm = new Common.Model.Config() { JfrogNpmRepoList = reooListArr };
+            AqlProperty prop1 = new AqlProperty
+            {
+                key = "npm.name",
+                value = "animations"
+            };
+
+            AqlProperty prop2 = new AqlProperty
+            {
+                key = "npm.version",
+                value = "1.0.0"
+            };
+            List<AqlProperty> propertys = new List<AqlProperty> { prop1, prop2 };
             AqlResult aqlResult = new()
             {
                 Name = "animations-common-1.0.0.tgz",
                 Path = "@testfolder/-/folder",
-                Repo = "internalrepo1"
+                Repo = "internalrepo1",
+                properties = propertys
             };
 
             List<AqlResult> results = new List<AqlResult>() { aqlResult };
 
             Mock<IJFrogService> mockJfrogService = new Mock<IJFrogService>();
             Mock<IBomHelper> mockBomHelper = new Mock<IBomHelper>();
-            mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
+            mockBomHelper.Setup(m => m.GetNpmListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations");
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();

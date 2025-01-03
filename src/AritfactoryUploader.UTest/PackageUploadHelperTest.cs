@@ -419,7 +419,18 @@ namespace AritfactoryUploader.UTest
                 Name = "pypi component",
                 Version = "1.0.0"
             };
+            AqlProperty property1 = new AqlProperty
+            {
+                key = "pypi.normalized.name",
+                value = "pypi component"
+            };
 
+            AqlProperty property2 = new AqlProperty
+            {
+                key = "pypi.version",
+                value = "1.0.0"
+            };
+            List<AqlProperty> propertys = new List<AqlProperty> { property1, property2 };
             //GetInternalComponentDataByRepo
             var aqlResultList = new List<AqlResult>
             {
@@ -428,10 +439,11 @@ namespace AritfactoryUploader.UTest
                     Repo = "pypi-repo",
                     Path = "path/to/package",
                     Name = "pypi component-1.0.0",
+                    properties=propertys,
                 }
             };
             var jFrogServiceMock = new Mock<IJFrogService>();
-            jFrogServiceMock.Setup(x => x.GetInternalComponentDataByRepo(It.IsAny<string>())).ReturnsAsync(aqlResultList);
+            jFrogServiceMock.Setup(x => x.GetPypiComponentDataByRepo(It.IsAny<string>())).ReturnsAsync(aqlResultList);
             PackageUploadHelper.jFrogService = jFrogServiceMock.Object;
 
             // Act

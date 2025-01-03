@@ -619,21 +619,11 @@ namespace LCT.PackageIdentifier
         private static bool IsInternalNpmComponent(
             List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
         {
-            string jfrogcomponentName = $"{component.Name}-{component.Version}.tgz";
-            if (aqlResultList.Exists(
-                x => x.Name.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase)))
+            string jfrogcomponentName = bomHelper.GetFullNameOfComponent(component);
+            if (aqlResultList.Exists(x => x.properties.Any(p => p.key == "npm.name" && p.value == jfrogcomponentName) && x.properties.Any(p => p.key == "npm.version" && p.value == component.Version)))
             {
                 return true;
-            }
-
-            string fullName = bomHelper.GetFullNameOfComponent(component);
-            string fullNameVersion = $"{fullName}-{component.Version}.tgz";
-            if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase)
-                && aqlResultList.Exists(
-                    x => x.Name.Equals(fullNameVersion, StringComparison.OrdinalIgnoreCase)))
-            {
-                return true;
-            }
+            }            
 
             return false;
         }

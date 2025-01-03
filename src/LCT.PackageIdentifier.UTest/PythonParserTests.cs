@@ -204,18 +204,31 @@ namespace LCT.PackageIdentifier.UTest
             ComponentIdentification component = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
             CommonAppSettings appSettings = new() { InternalRepoList = reooListArr };
+            AqlProperty property1 = new AqlProperty
+            {
+                key = "pypi.normalized.name",
+                value = "cachy"
+            };
+
+            AqlProperty property2 = new AqlProperty
+            {
+                key = "pypi.version",
+                value = "0.3.0"
+            };
+            List<AqlProperty> propertys = new List<AqlProperty> { property1, property2 };
 
             AqlResult aqlResult = new()
             {
                 Name = "cachy-0.3.0.tar.gz",
                 Path = "@testfolder/-/folder",
-                Repo = "internalrepo1"
+                Repo = "internalrepo1",
+                properties=propertys
             };
 
             List<AqlResult> results = new List<AqlResult>() { aqlResult };
             Mock<IJFrogService> mockJfrogService = new Mock<IJFrogService>();
             Mock<IBomHelper> mockBomHelper = new Mock<IBomHelper>();
-            mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
+            mockBomHelper.Setup(m => m.GetPypiListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("cachy");
 
@@ -242,18 +255,31 @@ namespace LCT.PackageIdentifier.UTest
             ComponentIdentification component = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
             CommonAppSettings appSettings = new() { InternalRepoList = reooListArr };
+            AqlProperty property1 = new AqlProperty
+            {
+                key = "pypi.normalized.name",
+                value = "cachy"
+            };
+
+            AqlProperty property2 = new AqlProperty
+            {
+                key = "pypi.version",
+                value = "0.3.0"
+            };
+            List<AqlProperty> propertys = new List<AqlProperty> { property1, property2 };
 
             AqlResult aqlResult = new()
             {
                 Name = "cachy-1.3.0.tar.gz",
                 Path = "@testfolder/-/folder",
-                Repo = "internalrepo1"
+                Repo = "internalrepo1",
+                properties=propertys
             };
 
             List<AqlResult> results = new List<AqlResult>() { aqlResult };
             Mock<IJFrogService> mockJfrogService = new Mock<IJFrogService>();
             Mock<IBomHelper> mockBomHelper = new Mock<IBomHelper>();
-            mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
+            mockBomHelper.Setup(m => m.GetPypiListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("cachy");
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
@@ -264,7 +290,7 @@ namespace LCT.PackageIdentifier.UTest
                 component, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
             // Assert
-            Assert.AreEqual("false", actual.comparisonBOMData[0].Properties[0].Value);
+            Assert.AreEqual("true", actual.comparisonBOMData[0].Properties[0].Value);
         }
 
         [Test]
@@ -281,18 +307,31 @@ namespace LCT.PackageIdentifier.UTest
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
             CommonAppSettings appSettings = new();
             appSettings.Python = new Config() { JfrogPythonRepoList = reooListArr };
+            AqlProperty property1 = new AqlProperty
+            {
+                key = "pypi.normalized.name",
+                value = "html5lib"
+            };
+
+            AqlProperty property2 = new AqlProperty
+            {
+                key = "pypi.version",
+                value = "1.1"
+            };
+            List<AqlProperty> propertys = new List<AqlProperty> { property1, property2 };
             AqlResult aqlResult = new()
             {
                 Name = "html5lib-1.1.tar.gz",
                 Path = "@testfolder/-/folder",
-                Repo = "internalrepo1"
+                Repo = "internalrepo1",
+                properties=propertys
             };
 
             List<AqlResult> results = new List<AqlResult>() { aqlResult };
 
             Mock<IJFrogService> mockJfrogService = new Mock<IJFrogService>();
             Mock<IBomHelper> mockBomHelper = new Mock<IBomHelper>();
-            mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
+            mockBomHelper.Setup(m => m.GetPypiListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("html5lib");
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
@@ -320,18 +359,31 @@ namespace LCT.PackageIdentifier.UTest
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
             CommonAppSettings appSettings = new();
             appSettings.Python = new Config() { JfrogPythonRepoList = reooListArr };
+            AqlProperty property1 = new AqlProperty
+            {
+                key = "pypi.normalized.name",
+                value = "html5lib"
+            };
+
+            AqlProperty property2 = new AqlProperty
+            {
+                key = "pypi.version",
+                value = "1.1"
+            };
+            List<AqlProperty> propertys = new List<AqlProperty> { property1, property2 };
             AqlResult aqlResult = new()
             {
                 Name = "html5lib-1.1-py2.py3-none-any.whl",
                 Path = "@testfolder/-/folder",
-                Repo = "internalrepo1"
+                Repo = "internalrepo1",
+                properties=propertys
             };
 
             List<AqlResult> results = new List<AqlResult>() { aqlResult };
 
             Mock<IJFrogService> mockJfrogService = new Mock<IJFrogService>();
             Mock<IBomHelper> mockBomHelper = new Mock<IBomHelper>();
-            mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
+            mockBomHelper.Setup(m => m.GetPypiListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("html5lib");
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();

@@ -20,7 +20,9 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Tommy;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 using Component = CycloneDX.Models.Component;
 
 namespace LCT.PackageIdentifier
@@ -358,20 +360,12 @@ namespace LCT.PackageIdentifier
 
         private static bool IsInternalPythonComponent(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
         {
-            string jfrogcomponentName = $"{component.Name}-{component.Version}{FileConstant.TargzFileExtension}";
-            if (aqlResultList.Exists(x => x.Name.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase)))
+            string jfrogcomponentName = bomHelper.GetFullNameOfComponent(component);
+            if (aqlResultList.Exists(x => x.properties.Any(p => p.key == "pypi.normalized.name" && p.value == jfrogcomponentName) && x.properties.Any(p => p.key == "pypi.version" && p.value == component.Version)))
             {
                 return true;
             }
 
-            string fullName = bomHelper.GetFullNameOfComponent(component);
-            string fullNameVersion = $"{fullName}-{component.Version}";
-            if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase)
-                && aqlResultList.Exists(
-                x => x.Name.Equals(fullNameVersion, StringComparison.OrdinalIgnoreCase) && (x.Name.EndsWith(ApiConstant.PythonExtension) || x.Name.EndsWith(FileConstant.TargzFileExtension))))
-            {
-                return true;
-            }
             return false;
         }
 
@@ -381,14 +375,7 @@ namespace LCT.PackageIdentifier
 
 
             string nameVerison = string.Empty;
-            string jfrogcomponentName = $"{name}-{version}";
-            nameVerison = aqlResultList.FirstOrDefault(x => x.properties.Any(p => p.key == "pypi.normalized.name" && p.value == name) && x.properties.Any(p => p.key == "pypi.version" && p.value == version))?.Name ?? string.Empty;
-            if (string.IsNullOrEmpty(nameVerison))
-            {
-                jfrogcomponentName = $"{name}_{version}";
-                nameVerison = aqlResultList.FirstOrDefault(x => x.properties.Any(p => p.key == "pypi.normalized.name" && p.value == name) && x.properties.Any(p => p.key == "pypi.version" && p.value == version))?.Name ?? string.Empty;
-               
-            }            
+            nameVerison = aqlResultList.FirstOrDefault(x => x.properties.Any(p => p.key == "pypi.normalized.name" && p.value == name) && x.properties.Any(p => p.key == "pypi.version" && p.value == version))?.Name ?? string.Empty;                    
 
             if (string.IsNullOrEmpty(nameVerison)) { nameVerison = Dataconstant.PackageNameNotFoundInJfrog; }
             return nameVerison;
@@ -408,9 +395,8 @@ namespace LCT.PackageIdentifier
                 string jfrogPackageNameWhlExten = Dataconstant.PackageNameNotFoundInJfrog;
                 string jfrogRepoPath = Dataconstant.JfrogRepoPathNotFound;                
                 string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper, out jfrogPackageNameWhlExten, out jfrogRepoPath);
-                string jfrogpackageName = $"{component.Name}-{component.Version}";
-                var hashes = aqlResultList.FirstOrDefault(x => x.Name.Contains(
-                    jfrogpackageName, StringComparison.OrdinalIgnoreCase) && (x.Name.EndsWith(ApiConstant.PythonExtension)));
+                
+                var hashes = aqlResultList.FirstOrDefault(x => x.properties.Any(p => p.key == "pypi.normalized.name" && p.value == component.Name) && x.properties.Any(p => p.key == "pypi.version" && p.value == component.Version));
 
                 Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = repoName };
                 Property fileNameProperty = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = jfrogPackageNameWhlExten };
