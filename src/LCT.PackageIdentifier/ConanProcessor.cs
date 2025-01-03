@@ -133,6 +133,23 @@ namespace LCT.PackageIdentifier
                 Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = repoName };
                 Property jfrogRepoPathProperty = new() { Name = Dataconstant.Cdx_JfrogRepoPath, Value = jfrogRepoPath };
                 Component componentVal = component;
+                if (artifactoryrepo.Value == appSettings.Conan.JfrogDevDestRepoName)
+                {
+                    BomCreator.bomKpiData.DevdependencyComponents++;
+                }
+                if (artifactoryrepo.Value == appSettings.Conan.JfrogThirdPartyDestRepoName)
+                {
+                    BomCreator.bomKpiData.ThirdPartyRepoComponents++;
+                }
+                if (artifactoryrepo.Value == appSettings.Conan.JfrogInternalDestRepoName)
+                {
+                    BomCreator.bomKpiData.ReleaseRepoComponents++;
+                }
+
+                if (artifactoryrepo.Value == Dataconstant.NotFoundInJFrog || artifactoryrepo.Value == "")
+                {
+                    BomCreator.bomKpiData.UnofficialComponents++;
+                }
 
                 if (componentVal.Properties?.Count == null || componentVal.Properties?.Count <= 0)
                 {
