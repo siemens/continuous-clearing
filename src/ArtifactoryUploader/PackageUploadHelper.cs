@@ -1215,7 +1215,7 @@ namespace LCT.ArtifactoryUploader
         private static AqlResult GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component)
         {
             string jfrogpackageName = GetFullNameOfComponent(component);
-            AqlResult repoName = aqlResultList.Find(x => x.properties.Any(p => p.key == "pypi.normalized.name" && p.value == jfrogpackageName) && x.properties.Any(p => p.key == "pypi.version" && p.value == component.Version));
+            AqlResult repoName = aqlResultList.Find(x => x.Properties.Any(p => p.Key == "pypi.normalized.name" && p.Value == jfrogpackageName) && x.Properties.Any(p => p.Key == "pypi.version" && p.Value == component.Version));
 
             return repoName;
         }
@@ -1223,7 +1223,7 @@ namespace LCT.ArtifactoryUploader
         private static AqlResult GetNpmArtifactoryRepoName(List<AqlResult> aqlResultList, Component component)
         {
             string jfrogpackageName = GetFullNameOfComponent(component);
-            AqlResult repoName = aqlResultList.Find(x => x.properties.Any(p => p.key == "npm.name" && p.value == jfrogpackageName) && x.properties.Any(p => p.key == "npm.version" && p.value == component.Version));
+            AqlResult repoName = aqlResultList.Find(x => x.Properties.Any(p => p.Key == "npm.name" && p.Value == jfrogpackageName) && x.Properties.Any(p => p.Key == "npm.version" && p.Value == component.Version));
 
             return repoName;
         }

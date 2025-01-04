@@ -33,13 +33,13 @@ namespace LCT.APICommunications.Model.AQL
         [JsonProperty("sha256")]
         public string SHA256 { get; set; }
 
-        public List<AqlProperty> properties { get; set; }
+        public List<AqlProperty> Properties { get; set; }
 
     }
     public class AqlProperty
     {
-        public string key { get; set; }
-        public string value { get; set; }
+        public string Key { get; set; }
+        public string Value { get; set; }
     }
 
 }

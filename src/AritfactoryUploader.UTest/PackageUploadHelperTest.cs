@@ -412,6 +412,7 @@ namespace AritfactoryUploader.UTest
                 Value = "Reponame"
             };
             List<Property> properties = new List<Property>() { repoNameProperty };
+            await Task.Delay(5000);
             var item = new Component
             {
                 Purl = "pypi://example-package",
@@ -421,14 +422,14 @@ namespace AritfactoryUploader.UTest
             };
             AqlProperty pypiNameProperty = new AqlProperty
             {
-                key = "pypi.normalized.name",
-                value = "pypi component"
+                Key = "pypi.normalized.name",
+                Value = "pypi component"
             };
 
             AqlProperty pypiVersionProperty = new AqlProperty
             {
-                key = "pypi.version",
-                value = "1.0.0"
+                Key = "pypi.version",
+                Value = "1.0.0"
             };
             List<AqlProperty> propertys = new List<AqlProperty> { pypiNameProperty, pypiVersionProperty };
             //GetInternalComponentDataByRepo
@@ -439,7 +440,7 @@ namespace AritfactoryUploader.UTest
                     Repo = "pypi-repo",
                     Path = "path/to/package",
                     Name = "pypi component-1.0.0",
-                    properties=propertys,
+                    Properties=propertys,
                 }
             };
             var jFrogServiceMock = new Mock<IJFrogService>();
@@ -456,7 +457,7 @@ namespace AritfactoryUploader.UTest
             Assert.AreEqual("pypi-repo", result.Repo);
             Assert.AreEqual("path/to/package", result.Path);
         }
-        public async Task GetSrcRepoDetailsForPyPiOrConanPackages_WhenConanRepoExists_ReturnsArtifactoryRepoName()
+        public async static Task GetSrcRepoDetailsForPyPiOrConanPackages_WhenConanRepoExists_ReturnsArtifactoryRepoName()
         {
             // Arrange
             Property reponameProperty = new Property

@@ -416,7 +416,7 @@ namespace LCT.PackageIdentifier
                 
                 string jfrogpackageName= bomhelper.GetFullNameOfComponent(component);
                 
-                var hashes = aqlResultList.FirstOrDefault(x => x.properties.Any(p => p.key == "npm.name" && p.value == jfrogpackageName) && x.properties.Any(p => p.key == "npm.version" && p.value == component.Version));
+                var hashes = aqlResultList.FirstOrDefault(x => x.Properties.Any(p => p.Key == "npm.name" && p.Value == jfrogpackageName) && x.Properties.Any(p => p.Key == "npm.version" && p.Value == component.Version));
                 string jfrogRepoPath = string.Empty;
                 AqlResult finalRepoData = GetJfrogArtifactoryRepoDetials(aqlResultList, component, bomhelper, out jfrogRepoPath);
                 Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = finalRepoData.Repo };
@@ -620,7 +620,7 @@ namespace LCT.PackageIdentifier
             List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
         {
             string jfrogcomponentName = bomHelper.GetFullNameOfComponent(component);
-            if (aqlResultList.Exists(x => x.properties.Any(p => p.key == "npm.name" && p.value == jfrogcomponentName) && x.properties.Any(p => p.key == "npm.version" && p.value == component.Version)))
+            if (aqlResultList.Exists(x => x.Properties.Any(p => p.Key == "npm.name" && p.Value == jfrogcomponentName) && x.Properties.Any(p => p.Key == "npm.version" && p.Value == component.Version)))
             {
                 return true;
             }            
@@ -637,7 +637,7 @@ namespace LCT.PackageIdentifier
             jfrogRepoPath = Dataconstant.JfrogRepoPathNotFound;
             string jfrogpackageName = bomHelper.GetFullNameOfComponent(component);           
 
-            var aqlResults = aqlResultList.FindAll(x => x.properties.Any(p => p.key == "npm.name" && p.value == jfrogpackageName) && x.properties.Any(p => p.key == "npm.version" && p.value == component.Version));
+            var aqlResults = aqlResultList.FindAll(x => x.Properties.Any(p => p.Key == "npm.name" && p.Value == jfrogpackageName) && x.Properties.Any(p => p.Key == "npm.version" && p.Value == component.Version));
 
             string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults);
 

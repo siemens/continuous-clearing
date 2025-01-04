@@ -361,7 +361,7 @@ namespace LCT.PackageIdentifier
         private static bool IsInternalPythonComponent(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
         {
             string jfrogcomponentName = bomHelper.GetFullNameOfComponent(component);
-            if (aqlResultList.Exists(x => x.properties.Any(p => p.key == "pypi.normalized.name" && p.value == jfrogcomponentName) && x.properties.Any(p => p.key == "pypi.version" && p.value == component.Version)))
+            if (aqlResultList.Exists(x => x.Properties.Any(p => p.Key == "pypi.normalized.name" && p.Value == jfrogcomponentName) && x.Properties.Any(p => p.Key == "pypi.version" && p.Value == component.Version)))
             {
                 return true;
             }
@@ -375,7 +375,7 @@ namespace LCT.PackageIdentifier
 
 
             string nameVerison = string.Empty;
-            nameVerison = aqlResultList.FirstOrDefault(x => x.properties.Any(p => p.key == "pypi.normalized.name" && p.value == name) && x.properties.Any(p => p.key == "pypi.version" && p.value == version))?.Name ?? string.Empty;                    
+            nameVerison = aqlResultList.FirstOrDefault(x => x.Properties.Any(p => p.Key == "pypi.normalized.name" && p.Value == name) && x.Properties.Any(p => p.Key == "pypi.version" && p.Value == version))?.Name ?? string.Empty;                    
 
             if (string.IsNullOrEmpty(nameVerison)) { nameVerison = Dataconstant.PackageNameNotFoundInJfrog; }
             return nameVerison;
@@ -396,7 +396,7 @@ namespace LCT.PackageIdentifier
                 string jfrogRepoPath = Dataconstant.JfrogRepoPathNotFound;                
                 string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper, out jfrogPackageNameWhlExten, out jfrogRepoPath);
                 
-                var hashes = aqlResultList.FirstOrDefault(x => x.properties.Any(p => p.key == "pypi.normalized.name" && p.value == component.Name) && x.properties.Any(p => p.key == "pypi.version" && p.value == component.Version));
+                var hashes = aqlResultList.FirstOrDefault(x => x.Properties.Any(p => p.Key == "pypi.normalized.name" && p.Value == component.Name) && x.Properties.Any(p => p.Key == "pypi.version" && p.Value == component.Version));
 
                 Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = repoName };
                 Property fileNameProperty = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = jfrogPackageNameWhlExten };

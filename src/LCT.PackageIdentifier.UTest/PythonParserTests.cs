@@ -206,14 +206,14 @@ namespace LCT.PackageIdentifier.UTest
             CommonAppSettings appSettings = new() { InternalRepoList = reooListArr };
             AqlProperty pypiNameProperty = new AqlProperty
             {
-                key = "pypi.normalized.name",
-                value = "cachy"
+                Key = "pypi.normalized.name",
+                Value = "cachy"
             };
 
             AqlProperty pypiVersionProperty = new AqlProperty
             {
-                key = "pypi.version",
-                value = "0.3.0"
+                Key = "pypi.version",
+                Value = "0.3.0"
             };
             List<AqlProperty> propertys = new List<AqlProperty> { pypiNameProperty, pypiVersionProperty };
 
@@ -222,7 +222,7 @@ namespace LCT.PackageIdentifier.UTest
                 Name = "cachy-0.3.0.tar.gz",
                 Path = "@testfolder/-/folder",
                 Repo = "internalrepo1",
-                properties=propertys
+                Properties=propertys
             };
 
             List<AqlResult> results = new List<AqlResult>() { aqlResult };
@@ -257,14 +257,14 @@ namespace LCT.PackageIdentifier.UTest
             CommonAppSettings appSettings = new() { InternalRepoList = reooListArr };
             AqlProperty pypiNameProperty = new AqlProperty
             {
-                key = "pypi.normalized.name",
-                value = "cachy"
+                Key = "pypi.normalized.name",
+                Value = "cachy"
             };
 
             AqlProperty pypiVersionProperty = new AqlProperty
             {
-                key = "pypi.version",
-                value = "0.3.0"
+                Key = "pypi.version",
+                Value = "0.3.0"
             };
             List<AqlProperty> propertys = new List<AqlProperty> { pypiNameProperty, pypiVersionProperty };
 
@@ -273,7 +273,7 @@ namespace LCT.PackageIdentifier.UTest
                 Name = "cachy-1.3.0.tar.gz",
                 Path = "@testfolder/-/folder",
                 Repo = "internalrepo1",
-                properties=propertys
+                Properties=propertys
             };
 
             List<AqlResult> results = new List<AqlResult>() { aqlResult };
@@ -309,14 +309,14 @@ namespace LCT.PackageIdentifier.UTest
             appSettings.Python = new Config() { JfrogPythonRepoList = reooListArr };
             AqlProperty pypiNameProperty = new AqlProperty
             {
-                key = "pypi.normalized.name",
-                value = "html5lib"
+                Key = "pypi.normalized.name",
+                Value = "html5lib"
             };
 
             AqlProperty pypiVersionProperty = new AqlProperty
             {
-                key = "pypi.version",
-                value = "1.1"
+                Key = "pypi.version",
+                Value = "1.1"
             };
             List<AqlProperty> propertys = new List<AqlProperty> { pypiNameProperty, pypiVersionProperty };
             AqlResult aqlResult = new()
@@ -324,7 +324,7 @@ namespace LCT.PackageIdentifier.UTest
                 Name = "html5lib-1.1.tar.gz",
                 Path = "@testfolder/-/folder",
                 Repo = "internalrepo1",
-                properties=propertys
+                Properties=propertys
             };
 
             List<AqlResult> results = new List<AqlResult>() { aqlResult };
@@ -361,14 +361,14 @@ namespace LCT.PackageIdentifier.UTest
             appSettings.Python = new Config() { JfrogPythonRepoList = reooListArr };
             AqlProperty pypiNameProperty = new AqlProperty
             {
-                key = "pypi.normalized.name",
-                value = "html5lib"
+                Key = "pypi.normalized.name",
+                Value = "html5lib"
             };
 
             AqlProperty pypiVersionProperty = new AqlProperty
             {
-                key = "pypi.version",
-                value = "1.1"
+                Key = "pypi.version",
+                Value = "1.1"
             };
             List<AqlProperty> propertys = new List<AqlProperty> { pypiNameProperty, pypiVersionProperty };
             AqlResult aqlResult = new()
@@ -376,7 +376,7 @@ namespace LCT.PackageIdentifier.UTest
                 Name = "html5lib-1.1-py2.py3-none-any.whl",
                 Path = "@testfolder/-/folder",
                 Repo = "internalrepo1",
-                properties=propertys
+                Properties=propertys
             };
 
             List<AqlResult> results = new List<AqlResult>() { aqlResult };
