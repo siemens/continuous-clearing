@@ -733,8 +733,6 @@ namespace LCT.ArtifactoryUploader
                 url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoPathWithFullName}" +
                $"?to=/{component.DestRepoName}/{component.Path}/{component.PypiOrNpmCompName}";
 
-              //  url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.Name}/-/{component.PackageName}-{component.Version}" +
-              //$"{ApiConstant.NpmExtension}?to=/{component.DestRepoName}/{component.Name}/-/{component.PackageName}-{component.Version}{ApiConstant.NpmExtension}";
             }
             else if (component.ComponentType == "NUGET")
             {
@@ -777,9 +775,7 @@ namespace LCT.ArtifactoryUploader
             {
                 url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoPathWithFullName}" +
               $"?to=/{component.DestRepoName}/{component.Path}/{component.PypiOrNpmCompName}";
-
-              //  url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.Name}/-/{component.PackageName}-{component.Version}" +
-              //$"{ApiConstant.NpmExtension}?to=/{component.DestRepoName}/{component.Name}/-/{component.PackageName}-{component.Version}{ApiConstant.NpmExtension}";
+            
             }
             else if (component.ComponentType == "NUGET")
             {
@@ -827,8 +823,7 @@ namespace LCT.ArtifactoryUploader
                     else
                     {
                         return $"{component.Name}/-";
-                    }
-                    
+                    }                   
 
                 case "CONAN" when aqlResult != null:
                     string path = aqlResult.Path;
