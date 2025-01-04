@@ -107,10 +107,14 @@ namespace LCT.ArtifactoryUploader
 
         private static async Task<AqlResult> GetPackageInfoWithRetry(IJFrogService jFrogService, ComponentsToArtifactory component)
         {
-            async Task<AqlResult> TryGetPackageInfo(string srcRepo, string packageName, string path)
-                => await jFrogService.GetPackageInfo(srcRepo, packageName, path);
+            async Task<AqlResult> TryGetPackageInfo(string srcRepo, string packageName, string path, ComponentsToArtifactory component)
+                => await jFrogService.GetPackageInfo(srcRepo, packageName, path, component);
 
-            var packageInfo = await TryGetPackageInfo(component.SrcRepoName, component.JfrogPackageName, component.Path);
+            
+
+            
+             var  packageInfo = await TryGetPackageInfo(component.SrcRepoName, component.JfrogPackageName, component.Path, component);
+                       
 
             // Handle DEBIAN package name mismatch
             if (component.ComponentType == "DEBIAN" && packageInfo?.Name != component.JfrogPackageName)
@@ -124,8 +128,9 @@ namespace LCT.ArtifactoryUploader
                 var lowerSrcRepo = component.SrcRepoName.ToLower();
                 var lowerPackageName = component.JfrogPackageName.ToLower();
                 var lowerPath = component.Path.ToLower();
+                
 
-                packageInfo = await TryGetPackageInfo(lowerSrcRepo, lowerPackageName, lowerPath);
+                packageInfo = await TryGetPackageInfo(lowerSrcRepo, lowerPackageName, lowerPath, component);
 
                 if (packageInfo != null)
                 {
@@ -137,7 +142,7 @@ namespace LCT.ArtifactoryUploader
             // ToDo - A better way would need to be thought of in the future.
             if (packageInfo == null)
             {
-                packageInfo = await TryGetPackageInfo(component.SrcRepoName, component.JfrogPackageName, $"{component.Path}*");
+                packageInfo = await TryGetPackageInfo(component.SrcRepoName, component.JfrogPackageName, $"{component.Path}*", component);
 
                 if (packageInfo != null)
                 {

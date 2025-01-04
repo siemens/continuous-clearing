@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using LCT.Common;
+using LCT.APICommunications.Model;
 
 namespace LCT.Services
 {
@@ -128,16 +129,16 @@ namespace LCT.Services
 
             return aqlResult;
         }
-        
+
 
 #nullable enable
-        public async Task<AqlResult?> GetPackageInfo(string repoName, string packageName, string path)
+        public async Task<AqlResult?> GetPackageInfo(string repoName, string packageName, string path, ComponentsToArtifactory component)
         {
             HttpResponseMessage? httpResponseMessage = null;
             AqlResult? aqlResult = null;
             try
             {
-                httpResponseMessage = await m_JFrogApiCommunicationFacade.GetPackageInfo(repoName, packageName, path);
+                httpResponseMessage = await m_JFrogApiCommunicationFacade.GetPackageInfo(repoName, packageName, path,component);
                 httpResponseMessage.EnsureSuccessStatusCode();
 
                 string stringData = httpResponseMessage.Content?.ReadAsStringAsync()?.Result ?? string.Empty;

@@ -96,12 +96,12 @@ namespace LCT.ArtifactoryUploader
                     if (aqlResult != null)
                     {
                         components.SrcRepoPathWithFullName = aqlResult.Repo + "/" + aqlResult.Path + "/" + aqlResult.Name;
-                        components.PypiCompName = aqlResult.Name;
+                        components.PypiOrNpmCompName = aqlResult.Name;
                     }
                     else
                     {
                         components.SrcRepoPathWithFullName = string.Empty;
-                        components.PypiCompName = string.Empty;
+                        components.PypiOrNpmCompName = string.Empty;
                     }
 
                     components.Path = GetPackagePath(components, aqlResult);
@@ -730,8 +730,11 @@ namespace LCT.ArtifactoryUploader
             string url = string.Empty;
             if (component.ComponentType == "NPM")
             {
-                url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.Name}/-/{component.PackageName}-{component.Version}" +
-              $"{ApiConstant.NpmExtension}?to=/{component.DestRepoName}/{component.Name}/-/{component.PackageName}-{component.Version}{ApiConstant.NpmExtension}";
+                url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoPathWithFullName}" +
+               $"?to=/{component.DestRepoName}/{component.Path}/{component.PypiOrNpmCompName}";
+
+              //  url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.Name}/-/{component.PackageName}-{component.Version}" +
+              //$"{ApiConstant.NpmExtension}?to=/{component.DestRepoName}/{component.Name}/-/{component.PackageName}-{component.Version}{ApiConstant.NpmExtension}";
             }
             else if (component.ComponentType == "NUGET")
             {
@@ -746,7 +749,7 @@ namespace LCT.ArtifactoryUploader
             else if (component.ComponentType == "PYTHON")
             {
                 url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoPathWithFullName}" +
-               $"?to=/{component.DestRepoName}/{component.PypiCompName}";
+               $"?to=/{component.DestRepoName}/{component.PypiOrNpmCompName}";
             }
             else if (component.ComponentType == "CONAN")
             {
@@ -772,8 +775,11 @@ namespace LCT.ArtifactoryUploader
             string url = string.Empty;
             if (component.ComponentType == "NPM")
             {
-                url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.Name}/-/{component.PackageName}-{component.Version}" +
-              $"{ApiConstant.NpmExtension}?to=/{component.DestRepoName}/{component.Name}/-/{component.PackageName}-{component.Version}{ApiConstant.NpmExtension}";
+                url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoPathWithFullName}" +
+              $"?to=/{component.DestRepoName}/{component.Path}/{component.PypiOrNpmCompName}";
+
+              //  url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.Name}/-/{component.PackageName}-{component.Version}" +
+              //$"{ApiConstant.NpmExtension}?to=/{component.DestRepoName}/{component.Name}/-/{component.PackageName}-{component.Version}{ApiConstant.NpmExtension}";
             }
             else if (component.ComponentType == "NUGET")
             {
@@ -788,7 +794,7 @@ namespace LCT.ArtifactoryUploader
             else if (component.ComponentType == "PYTHON")
             {
                 url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoPathWithFullName}" +
-               $"?to=/{component.DestRepoName}/{component.PypiCompName}";
+               $"?to=/{component.DestRepoName}/{component.PypiOrNpmCompName}";
             }
             else if (component.ComponentType == "CONAN")
             {
@@ -814,7 +820,15 @@ namespace LCT.ArtifactoryUploader
             switch (component.ComponentType)
             {
                 case "NPM":
-                    return $"{component.Name}/-";
+                    if(aqlResult != null)
+                    {
+                        return $"{aqlResult.Path}";
+                    }
+                    else
+                    {
+                        return $"{component.Name}/-";
+                    }
+                    
 
                 case "CONAN" when aqlResult != null:
                     string path = aqlResult.Path;
@@ -847,7 +861,7 @@ namespace LCT.ArtifactoryUploader
             switch (component.ComponentType)
             {
                 case "NPM":
-                    packageName = $"{component.PackageName}-{component.Version}{ApiConstant.NpmExtension}";
+                    packageName = component.PypiOrNpmCompName;
                     break;
 
                 case "NUGET":
@@ -859,7 +873,7 @@ namespace LCT.ArtifactoryUploader
                     break;
 
                 case "PYTHON":
-                    packageName = component.PypiCompName;
+                    packageName = component.PypiOrNpmCompName;
                     break;
 
                 default:
@@ -964,6 +978,15 @@ namespace LCT.ArtifactoryUploader
                 if (aqlConanResultList.Count > 0)
                 {
                     return GetArtifactoryRepoNameForConan(aqlConanResultList, item);
+                }
+            }
+            else if (item.Purl.Contains("npm", StringComparison.OrdinalIgnoreCase))
+            {
+                var aqlNpmResultList = await GetNpmListOfComponentsFromRepo(new string[] { item.Properties.Find(x => x.Name == Dataconstant.Cdx_ArtifactoryRepoName)?.Value }, jFrogService);
+
+                if (aqlNpmResultList.Count > 0)
+                {
+                    return GetNpmArtifactoryRepoName(aqlNpmResultList, item);
                 }
             }
 
@@ -1180,13 +1203,36 @@ namespace LCT.ArtifactoryUploader
             return aqlResultList;
         }
 
+        public static async Task<List<AqlResult>> GetNpmListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService)
+        {
+            if (repoList != null && repoList.Length > 0)
+            {
+                foreach (var repo in repoList)
+                {
+                    var componentRepoData = await jFrogService.GetNpmComponentDataByRepo(repo) ?? new List<AqlResult>();
+                    aqlResultList.AddRange(componentRepoData);
+                }
+            }
+
+            return aqlResultList;
+        }
+
         private static AqlResult GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component)
         {
-            AqlResult repoName = aqlResultList.Find(x => x.properties.Any(p => p.key == "pypi.normalized.name" && p.value == component.Name) && x.properties.Any(p => p.key == "pypi.version" && p.value == component.Version));
+            string jfrogpackageName = GetFullNameOfComponent(component);
+            AqlResult repoName = aqlResultList.Find(x => x.properties.Any(p => p.key == "pypi.normalized.name" && p.value == jfrogpackageName) && x.properties.Any(p => p.key == "pypi.version" && p.value == component.Version));
 
             return repoName;
         }
-        
+
+        private static AqlResult GetNpmArtifactoryRepoName(List<AqlResult> aqlResultList, Component component)
+        {
+            string jfrogpackageName = GetFullNameOfComponent(component);
+            AqlResult repoName = aqlResultList.Find(x => x.properties.Any(p => p.key == "npm.name" && p.value == jfrogpackageName) && x.properties.Any(p => p.key == "npm.version" && p.value == component.Version));
+
+            return repoName;
+        }
+
 
         private static AqlResult GetArtifactoryRepoNameForConan(List<AqlResult> aqlResultList, Component component)
         {
@@ -1198,6 +1244,17 @@ namespace LCT.ArtifactoryUploader
             return repoName;
         }
 
+        private static string GetFullNameOfComponent(Component item)
+        {
+            if (!string.IsNullOrEmpty(item.Group))
+            {
+                return $"{item.Group}/{item.Name}";
+            }
+            else
+            {
+                return item.Name;
+            }
+        }
         public static void UpdateBomArtifactoryRepoUrl(ref Bom bom, List<ComponentsToArtifactory> componentsUploaded)
         {
             foreach (var component in componentsUploaded)

@@ -27,30 +27,30 @@ namespace LCT.PackageIdentifier.UTest
         {
             // Arrange
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-            AqlProperty property1 = new AqlProperty
+            AqlProperty npmNameProperty = new AqlProperty
             {
                 key = "npm.name",
                 value = "component"
             };
 
-            AqlProperty property2 = new AqlProperty
+            AqlProperty npmVersionProperty = new AqlProperty
             {
                 key = "npm.version",
                 value = "1.0.0"
             };
-            AqlProperty prop1 = new AqlProperty
+            AqlProperty npmNamePropert = new AqlProperty
             {
                 key = "npm.name",
                 value = "component"
             };
 
-            AqlProperty prop2 = new AqlProperty
+            AqlProperty npmVersionPropert = new AqlProperty
             {
                 key = "npm.version",
                 value = "2.0.0"
             };
-            List<AqlProperty> propertys = new List<AqlProperty> { property1, property2 };
-            List<AqlProperty> property = new List<AqlProperty> { prop1, prop2 };
+            List<AqlProperty> propertys = new List<AqlProperty> { npmNameProperty, npmVersionProperty };
+            List<AqlProperty> property = new List<AqlProperty> { npmNamePropert, npmVersionPropert };
             var aqlResultList = new List<AqlResult>
             {
                 new AqlResult { Name = "component-1.0.0.tgz", Repo = "repo1", Path="path/to",properties=propertys },
@@ -77,30 +77,30 @@ namespace LCT.PackageIdentifier.UTest
         {
             // Arrange
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-            AqlProperty property1 = new AqlProperty
+            AqlProperty npmNameProperty = new AqlProperty
             {
                 key = "npm.name",
                 value = "component"
             };
 
-            AqlProperty property2 = new AqlProperty
+            AqlProperty npmVersionProperty = new AqlProperty
             {
                 key = "npm.version",
                 value = "1.0.0"
             };
-            AqlProperty prop1 = new AqlProperty
+            AqlProperty npmNamePropert = new AqlProperty
             {
                 key = "npm.name",
                 value = "component"
             };
 
-            AqlProperty prop2 = new AqlProperty
+            AqlProperty npmVersionPropert = new AqlProperty
             {
                 key = "npm.version",
                 value = "2.0.0"
             };
-            List<AqlProperty> propertys = new List<AqlProperty> { property1, property2 };
-            List<AqlProperty> property = new List<AqlProperty> { prop1, prop2 };
+            List<AqlProperty> propertys = new List<AqlProperty> { npmNameProperty, npmVersionProperty };
+            List<AqlProperty> property = new List<AqlProperty> { npmNamePropert, npmVersionPropert };
             var aqlResultList = new List<AqlResult>
             {
                 new AqlResult { Name = "component-1.0.0.tgz", Repo = "repo1",properties=propertys },
@@ -134,18 +134,18 @@ namespace LCT.PackageIdentifier.UTest
             ComponentIdentification component = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
             CommonAppSettings appSettings = new() { InternalRepoList = reooListArr };
-            AqlProperty prop1 = new AqlProperty
+            AqlProperty npmNameProperty = new AqlProperty
             {
                 key = "npm.name",
                 value = "animations"
             };
 
-            AqlProperty prop2 = new AqlProperty
+            AqlProperty npmVersionProperty = new AqlProperty
             {
                 key = "npm.version",
                 value = "1.0.0"
             };
-            List<AqlProperty> propertys = new List<AqlProperty> { prop1, prop2 };
+            List<AqlProperty> propertys = new List<AqlProperty> { npmNameProperty, npmVersionProperty };
             AqlResult aqlResult = new()
             {
                 Name = "animations-1.0.0.tgz",
@@ -183,18 +183,18 @@ namespace LCT.PackageIdentifier.UTest
             ComponentIdentification component = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
             CommonAppSettings appSettings = new() { InternalRepoList = reooListArr };
-            AqlProperty prop1 = new AqlProperty
+            AqlProperty npmNameProperty = new AqlProperty
             {
                 key = "npm.name",
                 value = "animations"
             };
 
-            AqlProperty prop2 = new AqlProperty
+            AqlProperty npmVersionProperty = new AqlProperty
             {
                 key = "npm.version",
                 value = "1.0.0"
             };
-            List<AqlProperty> propertys = new List<AqlProperty> { prop1, prop2 };
+            List<AqlProperty> propertys = new List<AqlProperty> { npmNameProperty, npmVersionProperty };
             AqlResult aqlResult = new()
             {
                 Name = "animations-common_license-1.0.0.tgz",
@@ -234,18 +234,18 @@ namespace LCT.PackageIdentifier.UTest
             ComponentIdentification componentIdentification = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo1" };
             CommonAppSettings appSettings = new() { InternalRepoList = reooListArr };
-            AqlProperty prop1 = new AqlProperty
+            AqlProperty npmNameProperty = new AqlProperty
             {
                 key = "npm.name",
                 value = "animations"
             };
 
-            AqlProperty prop2 = new AqlProperty
+            AqlProperty npmVersionProperty = new AqlProperty
             {
                 key = "npm.version",
                 value = "1.0.0"
             };
-            List<AqlProperty> propertys = new List<AqlProperty> { prop1, prop2 };
+            List<AqlProperty> propertys = new List<AqlProperty> { npmNameProperty, npmVersionProperty };
             AqlResult aqlResult = new()
             {
                 Name = "animations-common-1.0.0.tgz",
@@ -286,18 +286,18 @@ namespace LCT.PackageIdentifier.UTest
             string[] reooListArr = { "internalrepo1", "internalrepo1" };
             CommonAppSettings appSettings = new();
             appSettings.Npm = new Common.Model.Config() { JfrogNpmRepoList = reooListArr };
-            AqlProperty prop1 = new AqlProperty
+            AqlProperty npmNameProperty = new AqlProperty
             {
                 key = "npm.name",
                 value = "animations"
             };
 
-            AqlProperty prop2 = new AqlProperty
+            AqlProperty npmVersionProperty = new AqlProperty
             {
                 key = "npm.version",
                 value = "1.0.0"
             };
-            List<AqlProperty> propertys = new List<AqlProperty> { prop1, prop2 };
+            List<AqlProperty> propertys = new List<AqlProperty> { npmNameProperty, npmVersionProperty };
             AqlResult aqlResult = new()
             {
                 Name = "animations-common-1.0.0.tgz",
@@ -339,18 +339,18 @@ namespace LCT.PackageIdentifier.UTest
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
             CommonAppSettings appSettings = new();
             appSettings.Npm = new Common.Model.Config() { JfrogNpmRepoList = reooListArr };
-            AqlProperty prop1 = new AqlProperty
+            AqlProperty npmNameProperty = new AqlProperty
             {
                 key = "npm.name",
                 value = "animations"
             };
 
-            AqlProperty prop2 = new AqlProperty
+            AqlProperty npmVersionProperty = new AqlProperty
             {
                 key = "npm.version",
                 value = "1.0.0"
             };
-            List<AqlProperty> propertys = new List<AqlProperty> { prop1, prop2 };
+            List<AqlProperty> propertys = new List<AqlProperty> { npmNameProperty, npmVersionProperty };
             AqlResult aqlResult = new()
             {
                 Name = "animations-common-1.0.0.tgz",

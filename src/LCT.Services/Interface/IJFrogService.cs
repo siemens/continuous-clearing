@@ -4,6 +4,7 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using System.Collections.Generic;
@@ -44,7 +45,7 @@ namespace LCT.Services.Interface
         /// <param name="path">repoName</param>
         /// <returns>AqlResult</returns>
 #nullable enable
-        public Task<AqlResult?> GetPackageInfo(string repoName, string packageName, string path);
+        public Task<AqlResult?> GetPackageInfo(string repoName, string packageName, string path, ComponentsToArtifactory component);
 
         public Task<HttpResponseMessage> CheckJFrogConnectivity();        
     }

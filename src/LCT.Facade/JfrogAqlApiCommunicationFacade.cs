@@ -9,6 +9,7 @@ using LCT.Common;
 using LCT.Facade.Interfaces;
 using System.Net.Http;
 using System.Threading.Tasks;
+using LCT.APICommunications.Model;
 
 namespace LCT.Facade
 {
@@ -44,7 +45,7 @@ namespace LCT.Facade
         /// <returns>HttpResponseMessage</returns>
         public async Task<HttpResponseMessage> GetInternalComponentDataByRepo(string repoName)
         {
-           return await m_jfrogAqlApiCommunication.GetInternalComponentDataByRepo(repoName);
+            return await m_jfrogAqlApiCommunication.GetInternalComponentDataByRepo(repoName);
         }
         /// <summary>
         /// Gets the Internal Component Data By Repo Name
@@ -64,7 +65,7 @@ namespace LCT.Facade
         {
             return await m_jfrogAqlApiCommunication.GetPypiComponentDataByRepo(repoName);
         }
-       
+
         /// <summary>
         /// Gets the package information in the repo, via the name or path
         /// </summary>
@@ -72,9 +73,9 @@ namespace LCT.Facade
         /// <param name="packageName">repoName</param>
         /// <param name="path">repoName</param>
         /// <returns>AqlResult</returns>
-        public async Task<HttpResponseMessage> GetPackageInfo(string repoName, string packageName, string path)
+        public async Task<HttpResponseMessage> GetPackageInfo(string repoName, string packageName, string path, ComponentsToArtifactory component)
         {
-            return await m_jfrogAqlApiCommunication.GetPackageInfo(repoName, packageName, path);
-        }
+            return await m_jfrogAqlApiCommunication.GetPackageInfo(repoName, packageName, path,component);
+        }        
     }
 }

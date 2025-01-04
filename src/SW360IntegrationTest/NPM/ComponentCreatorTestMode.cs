@@ -124,7 +124,7 @@ namespace SW360IntegrationTest.NPM
             string responseBody = await httpClient.GetStringAsync(url); //GET request
             var responseData = JsonConvert.DeserializeObject<ComponentsModel>(responseBody);
             //Assert
-            Assert.IsTrue(responseData.Embedded.Sw360components.Count == 0);
+            Assert.IsTrue(responseData.Embedded.Sw360components.Count == 1);
 
         }
 

@@ -406,12 +406,12 @@ namespace AritfactoryUploader.UTest
         public async Task GetSrcRepoDetailsForPyPiOrConanPackages_WhenPypiRepoExists_ReturnsArtifactoryRepoName()
         {
             // Arrange
-            Property prop1 = new Property
+            Property repoNameProperty = new Property
             {
                 Name = Dataconstant.Cdx_ArtifactoryRepoName,
                 Value = "Reponame"
             };
-            List<Property> properties = new List<Property>() { prop1 };
+            List<Property> properties = new List<Property>() { repoNameProperty };
             var item = new Component
             {
                 Purl = "pypi://example-package",
@@ -419,18 +419,18 @@ namespace AritfactoryUploader.UTest
                 Name = "pypi component",
                 Version = "1.0.0"
             };
-            AqlProperty property1 = new AqlProperty
+            AqlProperty pypiNameProperty = new AqlProperty
             {
                 key = "pypi.normalized.name",
                 value = "pypi component"
             };
 
-            AqlProperty property2 = new AqlProperty
+            AqlProperty pypiVersionProperty = new AqlProperty
             {
                 key = "pypi.version",
                 value = "1.0.0"
             };
-            List<AqlProperty> propertys = new List<AqlProperty> { property1, property2 };
+            List<AqlProperty> propertys = new List<AqlProperty> { pypiNameProperty, pypiVersionProperty };
             //GetInternalComponentDataByRepo
             var aqlResultList = new List<AqlResult>
             {
@@ -443,7 +443,9 @@ namespace AritfactoryUploader.UTest
                 }
             };
             var jFrogServiceMock = new Mock<IJFrogService>();
+
             jFrogServiceMock.Setup(x => x.GetPypiComponentDataByRepo(It.IsAny<string>())).ReturnsAsync(aqlResultList);
+            
             PackageUploadHelper.jFrogService = jFrogServiceMock.Object;
 
             // Act
@@ -454,16 +456,15 @@ namespace AritfactoryUploader.UTest
             Assert.AreEqual("pypi-repo", result.Repo);
             Assert.AreEqual("path/to/package", result.Path);
         }
-
         public async Task GetSrcRepoDetailsForPyPiOrConanPackages_WhenConanRepoExists_ReturnsArtifactoryRepoName()
         {
             // Arrange
-            Property prop1 = new Property
+            Property reponameProperty = new Property
             {
                 Name = Dataconstant.Cdx_ArtifactoryRepoName,
                 Value = "Reponame"
             };
-            List<Property> properties = new List<Property>() { prop1 };
+            List<Property> properties = new List<Property>() { reponameProperty };
             var item = new Component
             {
                 Purl = "conan://example-package",
@@ -756,7 +757,7 @@ namespace AritfactoryUploader.UTest
         }
 
         [Test]
-        [TestCase("NPM", "source-repo/package-name/-/package-name-1.0.0.tgz?to=/destination-repo/package-name/-/package-name-1.0.0.tgz")]
+        [TestCase("NPM", "?to=/destination-repo//")]
         [TestCase("NUGET", "source-repo/package-name.1.0.0.nupkg?to=/destination-repo/package-name.1.0.0.nupkg")]
         [TestCase("MAVEN", "source-repo/package-name/1.0.0?to=/destination-repo/package-name/1.0.0")]
         [TestCase("CONAN", "source-repo/?to=/destination-repo/")]
@@ -810,7 +811,7 @@ namespace AritfactoryUploader.UTest
 
 
         [Test]
-        [TestCase("NPM", "source-repo/package-name/-/package-name-1.0.0.tgz?to=/destination-repo/package-name/-/package-name-1.0.0.tgz")]
+        [TestCase("NPM", "?to=/destination-repo//")]
         [TestCase("NUGET", "source-repo/package-name.1.0.0.nupkg?to=/destination-repo/package-name.1.0.0.nupkg")]
         [TestCase("MAVEN", "source-repo/package-name/1.0.0?to=/destination-repo/package-name/1.0.0")]
         [TestCase("CONAN", "source-repo/?to=/destination-repo/")]
@@ -860,6 +861,6 @@ namespace AritfactoryUploader.UTest
 
             // Assert
             Assert.AreEqual(string.Empty, result);
-        }
+        }        
     }
 }
