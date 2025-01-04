@@ -411,8 +411,7 @@ namespace AritfactoryUploader.UTest
                 Name = Dataconstant.Cdx_ArtifactoryRepoName,
                 Value = "Reponame"
             };
-            List<Property> properties = new List<Property>() { repoNameProperty };
-            await Task.Delay(5000);
+            List<Property> properties = new List<Property>() { repoNameProperty };            
             var item = new Component
             {
                 Purl = "pypi://example-package",

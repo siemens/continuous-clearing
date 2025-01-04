@@ -20,9 +20,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using Tommy;
-using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 using Component = CycloneDX.Models.Component;
 
 namespace LCT.PackageIdentifier
