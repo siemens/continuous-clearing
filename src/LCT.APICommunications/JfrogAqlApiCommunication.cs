@@ -6,14 +6,12 @@
 
 using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
-using LCT.Common;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
-using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace LCT.APICommunications
 {
