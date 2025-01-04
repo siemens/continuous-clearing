@@ -977,11 +977,11 @@ namespace LCT.ArtifactoryUploader
             }
             else if (item.Purl.Contains("npm", StringComparison.OrdinalIgnoreCase))
             {
-                var aqlNpmResultList = await GetNpmListOfComponentsFromRepo(new string[] { item.Properties.Find(x => x.Name == Dataconstant.Cdx_ArtifactoryRepoName)?.Value }, jFrogService);
+                aqlResultList = await GetNpmListOfComponentsFromRepo(new string[] { item.Properties.Find(x => x.Name == Dataconstant.Cdx_ArtifactoryRepoName)?.Value }, jFrogService);
 
-                if (aqlNpmResultList.Count > 0)
+                if (aqlResultList.Count > 0)
                 {
-                    return GetNpmArtifactoryRepoName(aqlNpmResultList, item);
+                    return GetNpmArtifactoryRepoName(aqlResultList, item);
                 }
             }
 
@@ -1215,17 +1215,17 @@ namespace LCT.ArtifactoryUploader
         private static AqlResult GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component)
         {
             string jfrogpackageName = GetFullNameOfComponent(component);
-            AqlResult repoName = aqlResultList.Find(x => x.Properties.Any(p => p.Key == "pypi.normalized.name" && p.Value == jfrogpackageName) && x.Properties.Any(p => p.Key == "pypi.version" && p.Value == component.Version));
-
-            return repoName;
+            return aqlResultList.Find(x => x.Properties != null &&
+                                  x.Properties.Any(p => p.Key == "pypi.normalized.name" && p.Value == jfrogpackageName) &&
+                                  x.Properties.Any(p => p.Key == "pypi.version" && p.Value == component.Version));
         }
 
         private static AqlResult GetNpmArtifactoryRepoName(List<AqlResult> aqlResultList, Component component)
         {
             string jfrogpackageName = GetFullNameOfComponent(component);
-            AqlResult repoName = aqlResultList.Find(x => x.Properties.Any(p => p.Key == "npm.name" && p.Value == jfrogpackageName) && x.Properties.Any(p => p.Key == "npm.version" && p.Value == component.Version));
-
-            return repoName;
+            return aqlResultList.Find(x => x.Properties != null &&
+                                   x.Properties.Any(p => p.Key == "npm.name" && p.Value == jfrogpackageName) &&
+                                   x.Properties.Any(p => p.Key == "npm.version" && p.Value == component.Version));
         }
 
 

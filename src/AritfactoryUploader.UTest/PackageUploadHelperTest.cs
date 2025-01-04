@@ -861,6 +861,54 @@ namespace AritfactoryUploader.UTest
 
             // Assert
             Assert.AreEqual(string.Empty, result);
-        }        
+        }
+
+        [Test]
+        public async Task GetSrcRepoDetailsForPyPiOrConanPackages_WhenNpmRepoExists_ReturnsArtifactoryRepoName()
+        {
+            // Arrange
+            var repoNameProperty = new Property
+            {
+                Name = Dataconstant.Cdx_ArtifactoryRepoName,
+                Value = "npm-repo"
+            };
+            var properties = new List<Property> { repoNameProperty };
+            var item = new Component
+            {
+                Purl = "pkg:npm/example-package",
+                Properties = properties,
+                Name = "example-package",
+                Version = "1.0.0"
+            };
+            var aqlResultList = new List<AqlResult>
+        {
+            new AqlResult
+            {
+                Repo = "npm-repo",
+                Path = "path/to/package",
+                Name = "example-package-1.0.0",
+                Properties = new List<AqlProperty>
+                {
+                    new AqlProperty { Key = "npm.name", Value = "example-package" },
+                    new AqlProperty { Key = "npm.version", Value = "1.0.0" }
+                }
+            }
+        };
+
+            var jFrogServiceMock = new Mock<IJFrogService>();
+
+            jFrogServiceMock.Setup(x => x.GetNpmComponentDataByRepo(It.IsAny<string>())).ReturnsAsync(aqlResultList);
+
+            PackageUploadHelper.jFrogService = jFrogServiceMock.Object;
+
+
+            // Act
+            var result = await PackageUploadHelper.GetSrcRepoDetailsForPyPiOrConanPackages(item);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("npm-repo", result.Repo);
+            Assert.AreEqual("path/to/package", result.Path);
+        }
     }
 }
