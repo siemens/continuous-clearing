@@ -449,7 +449,7 @@ namespace AritfactoryUploader.UTest
             PackageUploadHelper.jFrogService = jFrogServiceMock.Object;
 
             // Act
-            var result = await PackageUploadHelper.GetSrcRepoDetailsForPyPiOrConanPackages(item);
+            var result = await PackageUploadHelper.GetSrcRepoDetailsForComponent(item);
 
             // Assert
             Assert.IsNotNull(result);
@@ -487,7 +487,7 @@ namespace AritfactoryUploader.UTest
             PackageUploadHelper.jFrogService = jFrogServiceMock.Object;
 
             // Act
-            var result = await PackageUploadHelper.GetSrcRepoDetailsForPyPiOrConanPackages(item);
+            var result = await PackageUploadHelper.GetSrcRepoDetailsForComponent(item);
 
             // Assert
             Assert.IsNotNull(result);
@@ -507,7 +507,7 @@ namespace AritfactoryUploader.UTest
             PackageUploadHelper.jFrogService = jFrogServiceMock.Object;
 
             // Act
-            var result = await PackageUploadHelper.GetSrcRepoDetailsForPyPiOrConanPackages(item);
+            var result = await PackageUploadHelper.GetSrcRepoDetailsForComponent(item);
 
             // Assert
             Assert.IsNull(result);
@@ -903,7 +903,7 @@ namespace AritfactoryUploader.UTest
 
 
             // Act
-            var result = await PackageUploadHelper.GetSrcRepoDetailsForPyPiOrConanPackages(item);
+            var result = await PackageUploadHelper.GetSrcRepoDetailsForComponent(item);
 
             // Assert
             Assert.IsNotNull(result);

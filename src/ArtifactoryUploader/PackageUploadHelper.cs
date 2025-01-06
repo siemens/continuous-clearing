@@ -76,7 +76,7 @@ namespace LCT.ArtifactoryUploader
                 var packageType = GetPackageType(item);
                 if (packageType != PackageType.Unknown)
                 {
-                    AqlResult aqlResult = await GetSrcRepoDetailsForPyPiOrConanPackages(item);
+                    AqlResult aqlResult = await GetSrcRepoDetailsForComponent(item);
                     ComponentsToArtifactory components = new ComponentsToArtifactory()
                     {
                         Name = !string.IsNullOrEmpty(item.Group) ? $"{item.Group}/{item.Name}" : item.Name,
@@ -955,7 +955,7 @@ namespace LCT.ArtifactoryUploader
             return string.Empty;
         }
 
-        public async static Task<AqlResult> GetSrcRepoDetailsForPyPiOrConanPackages(Component item)
+        public async static Task<AqlResult> GetSrcRepoDetailsForComponent(Component item)
         {
             if (item.Purl.Contains("pypi", StringComparison.OrdinalIgnoreCase))
             {

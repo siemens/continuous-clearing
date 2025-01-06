@@ -45,7 +45,7 @@ namespace LCT.Services.Interface
         /// <param name="path">repoName</param>
         /// <returns>AqlResult</returns>
 #nullable enable
-        public Task<AqlResult?> GetPackageInfo(string repoName, string packageName, string path, ComponentsToArtifactory component);
+        public Task<AqlResult?> GetPackageInfo(ComponentsToArtifactory component);
 
         public Task<HttpResponseMessage> CheckJFrogConnectivity();        
     }

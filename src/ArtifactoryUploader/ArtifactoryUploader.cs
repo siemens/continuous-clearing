@@ -107,13 +107,10 @@ namespace LCT.ArtifactoryUploader
 
         private static async Task<AqlResult> GetPackageInfoWithRetry(IJFrogService jFrogService, ComponentsToArtifactory component)
         {
-            async Task<AqlResult> TryGetPackageInfo(string srcRepo, string packageName, string path, ComponentsToArtifactory component)
-                => await jFrogService.GetPackageInfo(srcRepo, packageName, path, component);
+            async Task<AqlResult> TryGetPackageInfo(ComponentsToArtifactory component)
+                => await jFrogService.GetPackageInfo(component);
 
-            
-
-            
-             var  packageInfo = await TryGetPackageInfo(component.SrcRepoName, component.JfrogPackageName, component.Path, component);
+             var  packageInfo = await TryGetPackageInfo(component);
                        
 
             // Handle DEBIAN package name mismatch
@@ -130,31 +127,13 @@ namespace LCT.ArtifactoryUploader
                 var lowerPath = component.Path.ToLower();
                 
 
-                packageInfo = await TryGetPackageInfo(lowerSrcRepo, lowerPackageName, lowerPath, component);
+                packageInfo = await TryGetPackageInfo(component);
 
                 if (packageInfo != null)
                 {
                     component.CopyPackageApiUrl = component.CopyPackageApiUrl.ToLower();
                 }
-            }
-
-            // Retry with wildcard path if still not found
-            // ToDo - A better way would need to be thought of in the future.
-            if (packageInfo == null)
-            {
-                packageInfo = await TryGetPackageInfo(component.SrcRepoName, component.JfrogPackageName, $"{component.Path}*", component);
-
-                if (packageInfo != null)
-                {
-                    // Build URLs
-                    string BuildUrl(string apiConstant) =>
-                        $"{component.JfrogApi}{apiConstant}{component.SrcRepoName}/{packageInfo.Path}/{packageInfo.Name}" +
-                        $"?to=/{component.DestRepoName}/{packageInfo.Path}/{packageInfo.Name}";
-
-                    component.CopyPackageApiUrl = component.DryRun ? $"{BuildUrl(ApiConstant.CopyPackageApi)}&dry=1" : BuildUrl(ApiConstant.CopyPackageApi);
-                    component.MovePackageApiUrl = component.DryRun ? $"{BuildUrl(ApiConstant.MovePackageApi)}&dry=1" : BuildUrl(ApiConstant.MovePackageApi);
-                }
-            }
+            }          
 
             return packageInfo;
         }

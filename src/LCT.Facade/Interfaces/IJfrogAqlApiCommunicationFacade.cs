@@ -43,7 +43,7 @@ namespace LCT.Facade.Interfaces
         /// <param name="packageName">repoName</param>
         /// <param name="path">repoName</param>
         /// <returns>AqlResult</returns>
-        Task<HttpResponseMessage> GetPackageInfo(string repoName, string packageName, string path, ComponentsToArtifactory component);
+        Task<HttpResponseMessage> GetPackageInfo(ComponentsToArtifactory component);
               
 
         /// <summary>

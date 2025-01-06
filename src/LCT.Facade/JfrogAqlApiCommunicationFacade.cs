@@ -73,9 +73,9 @@ namespace LCT.Facade
         /// <param name="packageName">repoName</param>
         /// <param name="path">repoName</param>
         /// <returns>AqlResult</returns>
-        public async Task<HttpResponseMessage> GetPackageInfo(string repoName, string packageName, string path, ComponentsToArtifactory component)
+        public async Task<HttpResponseMessage> GetPackageInfo(ComponentsToArtifactory component)
         {
-            return await m_jfrogAqlApiCommunication.GetPackageInfo(repoName, packageName, path,component);
+            return await m_jfrogAqlApiCommunication.GetPackageInfo(component);
         }        
     }
 }

@@ -132,13 +132,13 @@ namespace LCT.Services
 
 
 #nullable enable
-        public async Task<AqlResult?> GetPackageInfo(string repoName, string packageName, string path, ComponentsToArtifactory component)
+        public async Task<AqlResult?> GetPackageInfo(ComponentsToArtifactory component)
         {
             HttpResponseMessage? httpResponseMessage = null;
             AqlResult? aqlResult = null;
             try
             {
-                httpResponseMessage = await m_JFrogApiCommunicationFacade.GetPackageInfo(repoName, packageName, path,component);
+                httpResponseMessage = await m_JFrogApiCommunicationFacade.GetPackageInfo(component);
                 httpResponseMessage.EnsureSuccessStatusCode();
 
                 string stringData = httpResponseMessage.Content?.ReadAsStringAsync()?.Result ?? string.Empty;

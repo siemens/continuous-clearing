@@ -70,21 +70,26 @@ namespace LCT.Facade.UTest
         public async Task GetPackageInfoByRepoAndPackageName_GetsPackageInfo_Successfully()
         {
             // Arrange 
-            ComponentsToArtifactory component= new ComponentsToArtifactory();
+            ComponentsToArtifactory component = new ComponentsToArtifactory
+            {
+                SrcRepoName = "org1-nuget-nuget-remote-cache",
+                JfrogPackageName = "System.Numerics.Vectors.4.5.0.nupkg",
+                Path = string.Empty
+            };
+
 
             HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK);
             Mock<IJfrogAqlApiCommunication> mockJfrogAqlApiCommunicationFacade =
                 new Mock<IJfrogAqlApiCommunication>();
             mockJfrogAqlApiCommunicationFacade.
-                Setup(x => x.GetPackageInfo(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), component)).
+                Setup(x => x.GetPackageInfo(component)).
                 ReturnsAsync(httpResponseMessage);
 
             // Act
             JfrogAqlApiCommunicationFacade jfrogAqlApiCommunicationFacade =
                 new JfrogAqlApiCommunicationFacade(mockJfrogAqlApiCommunicationFacade.Object);
             HttpResponseMessage actual =
-                await jfrogAqlApiCommunicationFacade.GetPackageInfo("org1-nuget-nuget-remote-cache", "System.Numerics.Vectors.4.5.0.nupkg", 
-                                            string.Empty, component);
+                await jfrogAqlApiCommunicationFacade.GetPackageInfo(component);
 
             //Assert
             Assert.That(actual.StatusCode, Is.EqualTo(HttpStatusCode.OK));

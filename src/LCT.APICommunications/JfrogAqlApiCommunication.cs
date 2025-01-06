@@ -101,15 +101,12 @@ namespace LCT.APICommunications
         /// <summary>
         /// Gets the package information in the repo, via the name or path
         /// </summary>
-        /// <param name="repoName">repoName</param>
-        /// <param name="packageName">repoName</param>
-        /// <param name="path">repoName</param>
-        /// <returns>AqlResult</returns>
-        public async Task<HttpResponseMessage> GetPackageInfo(string repoName, string packageName = null, string path = null, ComponentsToArtifactory component = null)
+       
+        public async Task<HttpResponseMessage> GetPackageInfo(ComponentsToArtifactory component = null)
         {
-            ValidateParameters(packageName, path);
+            ValidateParameters(component.JfrogPackageName, component.Path);
 
-            var aqlQueryToBody = BuildAqlQuery(repoName, packageName, path,component);
+            var aqlQueryToBody = BuildAqlQuery(component);
 
             string uri = $"{DomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}";
             HttpContent httpContent = new StringContent(aqlQueryToBody);
@@ -133,14 +130,14 @@ namespace LCT.APICommunications
             }
         }
 
-        private static string BuildAqlQuery(string repoName, string packageName, string path, ComponentsToArtifactory component)
+        private static string BuildAqlQuery( ComponentsToArtifactory component)
         {
             
             if (component.ComponentType.Equals("NPM", StringComparison.InvariantCultureIgnoreCase))
             {
                 var queryList = new List<string>
         {
-            $"\"repo\":{{\"$eq\":\"{repoName}\"}}",
+            $"\"repo\":{{\"$eq\":\"{component.SrcRepoName}\"}}",
             $"\"@npm.name\":{{\"$eq\":\"{component.Name}\"}}",
             $"\"@npm.version\":{{\"$eq\":\"{component.Version}\"}}"
         };
@@ -154,7 +151,7 @@ namespace LCT.APICommunications
             {
                 var queryList = new List<string>
         {
-            $"\"repo\":{{\"$eq\":\"{repoName}\"}}",
+            $"\"repo\":{{\"$eq\":\"{component.SrcRepoName}\"}}",
             $"\"@pypi.normalized.name\":{{\"$eq\":\"{component.Name}\"}}",
             $"\"@pypi.version\":{{\"$eq\":\"{component.Version}\"}}"
         };
@@ -169,17 +166,17 @@ namespace LCT.APICommunications
             {
                 var queryList = new List<string>()
             {
-                $"\"repo\":{{\"$eq\":\"{repoName}\"}}"
+                $"\"repo\":{{\"$eq\":\"{component.SrcRepoName}\"}}"
             };
 
-                if (!string.IsNullOrEmpty(path))
+                if (!string.IsNullOrEmpty(component.Path))
                 {
-                    queryList.Add($"\"path\":{{\"$match\":\"{path}\"}}");
+                    queryList.Add($"\"path\":{{\"$match\":\"{component.Path}\"}}");
                 }
 
-                if (!string.IsNullOrEmpty(packageName))
+                if (!string.IsNullOrEmpty(component.JfrogPackageName))
                 {
-                    queryList.Add($"\"name\":{{\"$match\":\"{packageName}\"}}");
+                    queryList.Add($"\"name\":{{\"$match\":\"{component.JfrogPackageName}\"}}");
                 }
 
                 StringBuilder query = new();
