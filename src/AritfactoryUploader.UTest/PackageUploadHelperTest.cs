@@ -459,12 +459,12 @@ namespace AritfactoryUploader.UTest
         public async static Task GetSrcRepoDetailsForPyPiOrConanPackages_WhenConanRepoExists_ReturnsArtifactoryRepoName()
         {
             // Arrange
-            Property reponameProperty = new Property
+            Property prop1 = new Property
             {
                 Name = Dataconstant.Cdx_ArtifactoryRepoName,
                 Value = "Reponame"
             };
-            List<Property> properties = new List<Property>() { reponameProperty };
+            List<Property> properties = new List<Property>() { prop1 };
             var item = new Component
             {
                 Purl = "conan://example-package",
