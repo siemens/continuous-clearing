@@ -51,11 +51,12 @@ namespace LCT.PackageIdentifier
             if (!m_Verbose && CommonHelper.IsAzureDevOpsDebugEnabled())
                 m_Verbose = true;
             ISettingsManager settingsManager = new SettingsManager();
+    
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
             ProjectReleases projectReleases = new ProjectReleases();
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
-            Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
+            Log4Net.CatoolCurrentDirectory = System.IO.Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
             string FolderPath = LogFolderInitialisation(appSettings);
 
             settingsManager.CheckRequiredArgsToRun(appSettings, "Identifer");
@@ -76,22 +77,18 @@ namespace LCT.PackageIdentifier
             string listOfInlude = DisplayInclude(appSettings);
             string listOfExclude = DisplayExclude(appSettings);
             string listOfExcludeComponents = DisplayExcludeComponents(appSettings);
-            string listOfInternalRepoList = string.Empty;
-            if (appSettings.InternalRepoList != null)
-            {
-                listOfInternalRepoList = string.Join(",", appSettings.InternalRepoList?.ToList());
-            }
+            string listOfInternalRepoList = GetInternalRepolist(appSettings);           
 
             Logger.Logger.Log(null, Level.Notice, $"Input Parameters used in Package Identifier:\n\t" +
                 $"CaToolVersion\t\t --> {caToolInformation.CatoolVersion}\n\t" +
                 $"CaToolRunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
-                $"PackageFilePath\t\t --> {appSettings.PackageFilePath}\n\t" +
-                $"BomFolderPath\t\t --> {appSettings.BomFolderPath}\n\t" +
-                $"SBOMTemplateFilePath\t --> {appSettings.CycloneDxSBomTemplatePath}\n\t" +
-                $"SW360Url\t\t --> {appSettings.SW360URL}\n\t" +
-                $"SW360AuthTokenType\t --> {appSettings.SW360AuthTokenType}\n\t" +
-                $"SW360ProjectName\t --> {appSettings.SW360ProjectName}\n\t" +
-                $"SW360ProjectID\t\t --> {appSettings.SW360ProjectID}\n\t" +
+                $"PackageFilePath\t\t --> {appSettings.Directory.InputFolder}\n\t" +
+                $"BomFolderPath\t\t --> {appSettings.Directory.OutputFolder}\n\t" +
+                $"SBOMTemplateFilePath\t --> {appSettings.Directory.CycloneDxSBomTemplatePath}\n\t" +
+                $"SW360Url\t\t --> {appSettings.SW360.URL}\n\t" +
+                $"SW360AuthTokenType\t --> {appSettings.SW360.AuthTokenType}\n\t" +
+                $"SW360ProjectName\t --> {appSettings.SW360.ProjectName}\n\t" +
+                $"SW360ProjectID\t\t --> {appSettings.SW360.ProjectID}\n\t" +
                 $"ProjectType\t\t --> {appSettings.ProjectType}\n\t" +
                 $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t" +
                 $"InternalRepoList\t --> {listOfInternalRepoList}\n\t" +
@@ -134,10 +131,10 @@ namespace LCT.PackageIdentifier
         {
             ArtifactoryCredentials artifactoryUpload = new ArtifactoryCredentials()
             {
-                ApiKey = appSettings.ArtifactoryUploadApiKey
+                ApiKey = appSettings.Jfrog.Token,
             };
             IJfrogAqlApiCommunication jfrogAqlApiCommunication =
-                new JfrogAqlApiCommunication(appSettings.JFrogApi, artifactoryUpload, appSettings.TimeOut);
+                new JfrogAqlApiCommunication(appSettings.Jfrog.URL, artifactoryUpload, appSettings.TimeOut);
             IJfrogAqlApiCommunicationFacade jFrogApiCommunicationFacade =
                 new JfrogAqlApiCommunicationFacade(jfrogAqlApiCommunication);
             IJFrogService jFrogService = new JFrogService(jFrogApiCommunicationFacade);
@@ -148,9 +145,9 @@ namespace LCT.PackageIdentifier
         {
             SW360ConnectionSettings sw360ConnectionSettings = new SW360ConnectionSettings()
             {
-                SW360URL = appSettings.SW360URL,
-                SW360AuthTokenType = appSettings.SW360AuthTokenType,
-                Sw360Token = appSettings.Sw360Token,
+                SW360URL = appSettings.SW360.URL,
+                SW360AuthTokenType = appSettings.SW360.AuthTokenType,
+                Sw360Token = appSettings.SW360.Token,
                 IsTestMode = appSettings.IsTestMode,
                 Timeout = appSettings.TimeOut
             };
@@ -191,10 +188,10 @@ namespace LCT.PackageIdentifier
                     }
 
                     return totalString;
-                case "PYTHON":
-                    if (appSettings.Python.Include != null)
+                case "POETRY":
+                    if (appSettings.Poetry.Include != null)
                     {
-                        totalString = string.Join(",", appSettings.Python.Include?.ToList());
+                        totalString = string.Join(",", appSettings.Poetry.Include?.ToList());
                     }
                     return totalString;
                 case "CONAN":
@@ -245,10 +242,10 @@ namespace LCT.PackageIdentifier
                         totalString = string.Join(",", appSettings.Debian.Exclude?.ToList());
                     }
                     return totalString;
-                case "PYTHON":
-                    if (appSettings.Python.Exclude != null)
+                case "POETRY":
+                    if (appSettings.Poetry.Exclude != null)
                     {
-                        totalString = string.Join(",", appSettings.Python.Exclude?.ToList());
+                        totalString = string.Join(",", appSettings.Poetry.Exclude?.ToList());
                     }
                     return totalString;
                 case "CONAN":
@@ -270,58 +267,67 @@ namespace LCT.PackageIdentifier
             return totalString;
         }
 
+        private static string GetInternalRepolist(CommonAppSettings appSettings)
+        {
+
+            string listOfInternalRepoList = string.Empty;
+            switch (appSettings.ProjectType.ToUpperInvariant())
+            {
+                case "NPM":
+                    if (appSettings.Npm.Artifactory.InternalRepos != null)
+                    {
+                        listOfInternalRepoList = string.Join(",", appSettings.Npm.Artifactory.InternalRepos?.ToList());
+                    }
+                    return listOfInternalRepoList;
+                case "NUGET":
+                    if (appSettings.Nuget.Artifactory.InternalRepos != null)
+                    {
+                        listOfInternalRepoList = string.Join(",", appSettings.Nuget.Artifactory.InternalRepos?.ToList());
+                    }
+                    return listOfInternalRepoList;
+                case "MAVEN":
+                    if (appSettings.Maven.Artifactory.InternalRepos != null)
+                    {
+                        listOfInternalRepoList = string.Join(",", appSettings.Maven.Artifactory.InternalRepos?.ToList());
+                    }
+                    return listOfInternalRepoList;
+                case "DEBIAN":
+                    if (appSettings.Debian.Artifactory.InternalRepos != null)
+                    {
+                        listOfInternalRepoList = string.Join(",", appSettings.Debian.Artifactory.InternalRepos?.ToList());
+                    }
+                    return listOfInternalRepoList;
+                case "POETRY":
+                    if (appSettings.Poetry.Artifactory.InternalRepos != null)
+                    {
+                        listOfInternalRepoList = string.Join(",", appSettings.Poetry.Artifactory.InternalRepos?.ToList());
+                    }
+                    return listOfInternalRepoList;
+                case "CONAN":
+                    if (appSettings.Conan.Artifactory.InternalRepos != null)
+                    {
+                        listOfInternalRepoList = string.Join(",", appSettings.Conan.Artifactory.InternalRepos?.ToList());
+                    }
+                    return listOfInternalRepoList;
+                case "ALPINE":
+                    if (appSettings.Alpine.Artifactory.InternalRepos != null)
+                    {
+                        listOfInternalRepoList = string.Join(",", appSettings.Alpine.Artifactory.InternalRepos?.ToList());
+                    }
+                    return listOfInternalRepoList;
+                default:
+                    Logger.Error($"Invalid ProjectType - {appSettings.ProjectType}");
+                    break;
+            }
+            return listOfInternalRepoList;
+        }
         private static string DisplayExcludeComponents(CommonAppSettings appSettings)
         {
 
             string totalString = string.Empty;
-            switch (appSettings.ProjectType.ToUpperInvariant())
+            if (appSettings.SW360.ExcludeComponents != null)
             {
-                case "NPM":
-                    if (appSettings.Npm.ExcludedComponents != null)
-                    {
-                        totalString = string.Join(",", appSettings.Npm.ExcludedComponents?.ToList());
-                    }
-                    return totalString;
-                case "NUGET":
-                    if (appSettings.Nuget.ExcludedComponents != null)
-                    {
-                        totalString = string.Join(",", appSettings.Nuget.ExcludedComponents?.ToList());
-                    }
-                    return totalString;
-                case "MAVEN":
-                    if (appSettings.Maven.ExcludedComponents != null)
-                    {
-                        totalString = string.Join(",", appSettings.Maven.ExcludedComponents?.ToList());
-                    }
-                    return totalString;
-                case "DEBIAN":
-                    if (appSettings.Debian.ExcludedComponents != null)
-                    {
-                        totalString = string.Join(",", appSettings.Debian.ExcludedComponents?.ToList());
-                    }
-
-                    return totalString;
-                case "PYTHON":
-                    if (appSettings.Python.ExcludedComponents != null)
-                    {
-                        totalString = string.Join(",", appSettings.Python.ExcludedComponents?.ToList());
-                    }
-                    return totalString;
-                case "CONAN":
-                    if (appSettings.Conan.ExcludedComponents != null)
-                    {
-                        totalString = string.Join(",", appSettings.Conan.ExcludedComponents?.ToList());
-                    }
-                    return totalString;
-                case "ALPINE":
-                    if (appSettings.Alpine.Include != null)
-                    {
-                        totalString = string.Join(",", appSettings.Alpine.Include?.ToList());
-                    }
-                    return totalString;
-                default:
-                    Logger.Error($"Invalid ProjectType - {appSettings.ProjectType}");
-                    break;
+                totalString = string.Join(",", appSettings.SW360.ExcludeComponents?.ToList());
             }
             return totalString;
         }

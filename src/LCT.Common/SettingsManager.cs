@@ -72,7 +72,7 @@ namespace LCT.Common
             Logger.Debug($"ReadConfiguration():End");
 
             return appSettings;
-        }
+        }       
 
         public static void DisplayHelp()
         {
@@ -121,17 +121,21 @@ namespace LCT.Common
             {
                 //Required parameters to run Package Identifier
                 List<string> identifierReqParameters = new List<string>()
-            {
-                "SW360ProjectID",
-                "Sw360Token",
-                "SW360URL",
-                "JFrogApi",
-                "PackageFilePath",
-                "BomFolderPath",
-                "ArtifactoryUploadApiKey",
-                "InternalRepoList",
-                "ProjectType"
-            };
+                {
+                    "SW360.ProjectID",
+                    "SW360.Token",
+                    "Jfrog.Token",
+                    "SW360.URL",
+                    "Jfrog.URL",
+                    "Directory.InputFolder",
+                    "Directory.OutputFolder",
+                    "ProjectType"
+                };
+                // Check if ProjectType contains a value and add InternalRepos key accordingly
+                if (!string.IsNullOrWhiteSpace(appSettings.ProjectType))
+                {
+                    identifierReqParameters.Add($"{appSettings.ProjectType}.Artifactory.InternalRepos");
+                }
                 CheckForMissingParameter(appSettings, properties, identifierReqParameters);
             }
             else if (currentExe == "Creator")
@@ -165,7 +169,22 @@ namespace LCT.Common
 
             foreach (string key in reqParameters)
             {
-                string value = properties.First(x => x.Name == key)?.GetValue(appSettings)?.ToString();
+                string[] parts = key.Split('.');
+                object currentObject = appSettings;
+                PropertyInfo property = null;
+
+                foreach (string part in parts)
+                {
+                    if (currentObject == null)
+                    {
+                        break;
+                    }
+
+                    property = currentObject.GetType().GetProperty(part);
+                    currentObject = property?.GetValue(currentObject);
+                }
+
+                string value = currentObject?.ToString();
 
                 if (string.IsNullOrWhiteSpace(value))
                 {

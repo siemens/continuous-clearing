@@ -17,6 +17,7 @@ using log4net;
 using log4net.Core;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
@@ -74,12 +75,12 @@ namespace LCT.PackageIdentifier
             Program.BomStopWatch?.Stop();
             bomKpiData.TimeTakenByBomCreator = Program.BomStopWatch == null ? 0 :
               TimeSpan.FromMilliseconds(Program.BomStopWatch.ElapsedMilliseconds).TotalSeconds;
-            fileOperations.WriteContentToFile(bomKpiData, appSettings.BomFolderPath,
-                FileConstant.BomKpiDataFileName, appSettings.SW360ProjectName);
+            fileOperations.WriteContentToFile(bomKpiData, appSettings.Directory.OutputFolder,
+                FileConstant.BomKpiDataFileName, appSettings.SW360.ProjectName);
 
             // Writes Project Summary Url on CLI
-            string projectURL = bomHelper.GetProjectSummaryLink(appSettings.SW360ProjectID, appSettings.SW360URL);
-            bomKpiData.ProjectSummaryLink = $"Link to the summary page of the configurred project:{appSettings.SW360ProjectName} => {projectURL}\n";
+            string projectURL = bomHelper.GetProjectSummaryLink(appSettings.SW360.ProjectID, appSettings.SW360.URL);
+            bomKpiData.ProjectSummaryLink = $"Link to the summary page of the configurred project:{appSettings.SW360.ProjectName} => {projectURL}\n";
 
             // Writes kpi info to console table
             bomKpiData.InternalComponents = componentData.internalComponents != null ? componentData.internalComponents.Count : 0;
@@ -99,18 +100,18 @@ namespace LCT.PackageIdentifier
         private static void WriteContentToCycloneDxBOM(CommonAppSettings appSettings, Bom listOfComponentsToBom, ref BomKpiData bomKpiData)
         {
             IFileOperations fileOperations = new FileOperations();
-
-            if (string.IsNullOrEmpty(appSettings.IdentifierBomFilePath))
+            string bomFileName = $"{appSettings.SW360.ProjectName}_Bom.cdx.json";
+            if (string.IsNullOrEmpty(appSettings.Directory.BomFilePath))
             {
                 string formattedString = CommonHelper.AddSpecificValuesToBOMFormat(listOfComponentsToBom);
-                fileOperations.WriteContentToOutputBomFile(formattedString, appSettings.BomFolderPath, FileConstant.BomFileName, appSettings.SW360ProjectName);
+                fileOperations.WriteContentToOutputBomFile(formattedString, appSettings.Directory.OutputFolder, FileConstant.BomFileName, appSettings.SW360.ProjectName);
             }
-            else
+            else if(Path.GetFileName(appSettings.Directory.BomFilePath).Equals(bomFileName, StringComparison.OrdinalIgnoreCase))
             {
-                listOfComponentsToBom = fileOperations.CombineComponentsFromExistingBOM(listOfComponentsToBom, appSettings.IdentifierBomFilePath);
+                listOfComponentsToBom = fileOperations.CombineComponentsFromExistingBOM(listOfComponentsToBom, appSettings.Directory.BomFilePath);
                 bomKpiData.ComponentsInComparisonBOM = listOfComponentsToBom.Components.Count;
                 string formattedString = CommonHelper.AddSpecificValuesToBOMFormat(listOfComponentsToBom);
-                fileOperations.WriteContentToOutputBomFile(formattedString, appSettings.BomFolderPath, FileConstant.BomFileName, appSettings.SW360ProjectName);
+                fileOperations.WriteContentToOutputBomFile(formattedString, appSettings.Directory.OutputFolder, FileConstant.BomFileName, appSettings.SW360.ProjectName);
             }
 
         }       
