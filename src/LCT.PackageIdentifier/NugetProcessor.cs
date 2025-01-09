@@ -216,7 +216,10 @@ namespace LCT.PackageIdentifier
                                                           IBomHelper bomhelper)
         {
             // get the  component list from Jfrog for given repo + internal repo
-            string[] repoList = appSettings.Nuget?.Artifactory.InternalRepos.Concat(appSettings.Nuget?.Artifactory.DevRepos).Concat(appSettings.Nuget?.Artifactory.RemoteRepos).ToArray(); 
+            string[] repoList = (appSettings.Nuget?.Artifactory.InternalRepos ?? Array.Empty<string>())
+       .Concat(appSettings.Nuget?.Artifactory.DevRepos ?? Array.Empty<string>())
+       .Concat(appSettings.Nuget?.Artifactory.RemoteRepos ?? Array.Empty<string>())
+       .ToArray();
             List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(repoList, jFrogService);
             Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
             List<Component> modifiedBOM = new List<Component>();
@@ -236,7 +239,7 @@ namespace LCT.PackageIdentifier
                 {
                     BomCreator.bomKpiData.DevdependencyComponents++;
                 }                
-                if (appSettings.Npm.Artifactory.ThirdPartyRepos != null)
+                if (appSettings.Nuget.Artifactory.ThirdPartyRepos != null)
                 {
                     foreach (var thirdPartyRepo in appSettings.Npm.Artifactory.ThirdPartyRepos)
                     {

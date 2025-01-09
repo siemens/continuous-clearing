@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using LCT.PackageIdentifier.Interface;
 using LCT.Services.Interface;
 using LCT.APICommunications.Model.AQL;
+using LCT.Common.Interface;
 
 namespace LCT.PackageIdentifier.UTest
 {
@@ -127,12 +128,18 @@ namespace LCT.PackageIdentifier.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "*_Debian.cdx.json" };
-            CommonAppSettings appSettings = new CommonAppSettings()
+            
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
                 ProjectType = "DEBIAN",
-                RemoveDevDependency = true,
                 Debian = new Config() { Include = Includes },
-                PackageFilePath = OutFolder + @"\PackageIdentifierUTTestFiles"
+                SW360 = new SW360() { IgnoreDevDependency = true },
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                {
+                    InputFolder = OutFolder + @"\PackageIdentifierUTTestFiles"
+                }
             };
 
             //Act
@@ -152,15 +159,20 @@ namespace LCT.PackageIdentifier.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
 
             string OutFolder = Path.GetDirectoryName(exePath);
-            string[] Includes = { "CycloneDX_Debian.cdx.json" };
-            CommonAppSettings appSettings = new CommonAppSettings()
+            string[] Includes = { "CycloneDX_Debian.cdx.json" };            
+            
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                PackageFilePath = OutFolder + @"\PackageIdentifierUTTestFiles",
                 ProjectType = "DEBIAN",
-                RemoveDevDependency = true,
-                Debian = new Config() { Include = Includes }
+                Debian = new Config() { Include = Includes },
+                SW360 = new SW360() { IgnoreDevDependency = true },
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                {
+                    InputFolder = OutFolder + @"\PackageIdentifierUTTestFiles"
+                }
             };
-
             //Act
             Bom listofcomponents = _debianProcessor.ParsePackageFile(appSettings);
 
@@ -175,16 +187,21 @@ namespace LCT.PackageIdentifier.UTest
             int duplicateComponents = 2;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            string[] Includes = { "*_Debian.cdx.json" };
+            string[] Includes = { "*_Debian.cdx.json" };          
+           
 
-            CommonAppSettings appSettings = new CommonAppSettings()
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                PackageFilePath = OutFolder + @"\PackageIdentifierUTTestFiles",
                 ProjectType = "DEBIAN",
-                RemoveDevDependency = true,
-                Debian = new Config() { Include = Includes }
+                Debian = new Config() { Include = Includes },
+                SW360 = new SW360() { IgnoreDevDependency = true },
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                {
+                    InputFolder = OutFolder + @"\PackageIdentifierUTTestFiles"
+                }
             };
-
             //Act
             _debianProcessor.ParsePackageFile(appSettings);
 
@@ -201,12 +218,17 @@ namespace LCT.PackageIdentifier.UTest
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "SourceDetails_Cyclonedx.cdx.json" };
 
-            CommonAppSettings appSettings = new CommonAppSettings()
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                PackageFilePath = OutFolder + @"\PackageIdentifierUTTestFiles",
                 ProjectType = "DEBIAN",
-                RemoveDevDependency = true,
-                Debian = new Config() { Include = Includes }
+                Debian = new Config() { Include = Includes },
+                SW360 = new SW360() { IgnoreDevDependency = true },
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                {
+                    InputFolder = OutFolder + @"\PackageIdentifierUTTestFiles"
+                }
             };
 
             //Act
@@ -225,14 +247,20 @@ namespace LCT.PackageIdentifier.UTest
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "CycloneDX_Debian.cdx.json", "SBOMTemplate_Debian.cdx.json" };
             string packagefilepath = OutFolder + @"\PackageIdentifierUTTestFiles";
+                       
 
-            CommonAppSettings appSettings = new CommonAppSettings()
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                PackageFilePath = packagefilepath,
                 ProjectType = "DEBIAN",
-                RemoveDevDependency = true,
                 Debian = new Config() { Include = Includes },
-                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOM_DebianCATemplate.cdx.json"
+                SW360 = new SW360() { IgnoreDevDependency = true },
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                {
+                    InputFolder = packagefilepath,
+                    CycloneDxSBomTemplatePath= packagefilepath + "\\SBOMTemplates\\SBOM_DebianCATemplate.cdx.json"
+                }
             };
 
             //Act
@@ -249,15 +277,21 @@ namespace LCT.PackageIdentifier.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "CycloneDX_Debian.cdx.json", "SBOMTemplate_Debian.cdx.json" };
-            string packagefilepath = OutFolder + @"\PackageIdentifierUTTestFiles";
+            string packagefilepath = OutFolder + @"\PackageIdentifierUTTestFiles";            
+            
 
-            CommonAppSettings appSettings = new CommonAppSettings()
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                PackageFilePath = packagefilepath,
                 ProjectType = "DEBIAN",
-                RemoveDevDependency = true,
                 Debian = new Config() { Include = Includes },
-                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOMTemplate_Debian.cdx.json",
+                SW360 = new SW360() { IgnoreDevDependency = true },
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                {
+                    InputFolder = packagefilepath,
+                    CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOMTemplate_Debian.cdx.json"
+                }
             };
 
             //Act

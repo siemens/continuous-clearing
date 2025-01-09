@@ -395,7 +395,10 @@ namespace LCT.PackageIdentifier
             CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
             // get the  component list from Jfrog for given repo + internal repo
-            string[] repoList = appSettings.Npm?.Artifactory.InternalRepos.Concat(appSettings.Npm?.Artifactory.DevRepos).Concat(appSettings.Npm?.Artifactory.RemoteRepos).ToArray();
+            string[] repoList = (appSettings.Npm?.Artifactory.InternalRepos ?? Array.Empty<string>())
+        .Concat(appSettings.Npm?.Artifactory.DevRepos ?? Array.Empty<string>())
+        .Concat(appSettings.Npm?.Artifactory.RemoteRepos ?? Array.Empty<string>())
+        .ToArray();
             List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(repoList, jFrogService);
             Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
             List<Component> modifiedBOM = new List<Component>();

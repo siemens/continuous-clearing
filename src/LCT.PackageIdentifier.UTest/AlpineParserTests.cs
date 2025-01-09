@@ -12,6 +12,7 @@ using System.IO;
 using LCT.Common.Constants;
 using Moq;
 using System.Collections.Generic;
+using LCT.Common.Interface;
 
 namespace LCT.PackageIdentifier.UTest
 {
@@ -41,13 +42,19 @@ namespace LCT.PackageIdentifier.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
                         
-            string[] Includes = { "*_Alpine.cdx.json" };
-            CommonAppSettings appSettings = new CommonAppSettings()
+            string[] Includes = { "*_Alpine.cdx.json" };            
+
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
                 ProjectType = "ALPINE",
-                RemoveDevDependency = true,
                 Alpine = new Config() { Include = Includes },
-                PackageFilePath = OutFolder + @"\PackageIdentifierUTTestFiles"
+                SW360 = new SW360() { IgnoreDevDependency = true },
+                Directory = new LCT.Common.Directory(folderAction, fileOperations) 
+                {
+                    InputFolder = OutFolder + @"\PackageIdentifierUTTestFiles"
+                }
             };
 
             //Act
@@ -67,13 +74,18 @@ namespace LCT.PackageIdentifier.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "CycloneDX_Alpine.cdx.json" };
-            CommonAppSettings appSettings = new CommonAppSettings()
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations=new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                PackageFilePath = OutFolder + @"\PackageIdentifierUTTestFiles",
                 ProjectType = "ALPINE",
-                RemoveDevDependency = true,
-                Alpine = new Config() { Include = Includes }
-            };
+                Alpine = new Config() { Include = Includes },
+                SW360=new SW360() { IgnoreDevDependency = true },
+                Directory = new LCT.Common.Directory(folderAction, fileOperations) 
+                {
+                    InputFolder = OutFolder + @"\PackageIdentifierUTTestFiles"
+                }
+            };          
 
             //Act
             Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings);
@@ -90,17 +102,22 @@ namespace LCT.PackageIdentifier.UTest
             int duplicateComponents = 2;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-  
-            string[] Includes = { "*_Alpine.cdx.json" };
 
-            CommonAppSettings appSettings = new CommonAppSettings()
+            string[] Includes = { "*_Alpine.cdx.json" };
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                PackageFilePath = OutFolder + @"\PackageIdentifierUTTestFiles",
                 ProjectType = "ALPINE",
-                RemoveDevDependency = true,
-                Alpine = new Config() { Include = Includes }
+                Alpine = new Config() { Include = Includes },
+                SW360 = new SW360() { IgnoreDevDependency = true },
+                Directory = new LCT.Common.Directory(folderAction, fileOperations) 
+                {
+                    InputFolder = OutFolder + @"\PackageIdentifierUTTestFiles"
+                }
             };
 
+            
             //Act
             _alpineProcessor.ParsePackageFile(appSettings);
 
@@ -118,14 +135,19 @@ namespace LCT.PackageIdentifier.UTest
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "AlpineSourceDetails_Cyclonedx.cdx.json" };
 
-            CommonAppSettings appSettings = new CommonAppSettings()
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                PackageFilePath = OutFolder + @"\PackageIdentifierUTTestFiles",
                 ProjectType = "ALPINE",
-                RemoveDevDependency = true,
-                Alpine = new Config() { Include = Includes }
+                Alpine = new Config() { Include = Includes },
+                SW360 = new SW360() { IgnoreDevDependency = true },
+                Directory = new LCT.Common.Directory(folderAction, fileOperations) 
+                {
+                    InputFolder = OutFolder + @"\PackageIdentifierUTTestFiles"
+                }
             };
-
+            
             //Act
             Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings);
 
@@ -144,14 +166,19 @@ namespace LCT.PackageIdentifier.UTest
             string[] Includes = { "CycloneDX_Alpine.cdx.json", "SBOMTemplate_Alpine.cdx.json" };
             string packagefilepath = OutFolder + @"\PackageIdentifierUTTestFiles";
 
-            CommonAppSettings appSettings = new CommonAppSettings()
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                PackageFilePath = packagefilepath,
                 ProjectType = "ALPINE",
-                RemoveDevDependency = true,
                 Alpine = new Config() { Include = Includes },
-                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOM_AlpineCATemplate.cdx.json"
-            };
+                SW360 = new SW360() { IgnoreDevDependency = true },
+                Directory = new LCT.Common.Directory(folderAction, fileOperations) 
+                {
+                    InputFolder = OutFolder + @"\PackageIdentifierUTTestFiles",
+                    CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOM_AlpineCATemplate.cdx.json"
+                }
+            };            
 
             //Act
             Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings);
@@ -170,15 +197,20 @@ namespace LCT.PackageIdentifier.UTest
             string[] Includes = { "CycloneDX_Alpine.cdx.json", "SBOMTemplate_Alpine.cdx.json" };
             string packagefilepath = OutFolder + @"\PackageIdentifierUTTestFiles";
 
-            CommonAppSettings appSettings = new CommonAppSettings()
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                PackageFilePath = packagefilepath,
                 ProjectType = "ALPINE",
-                RemoveDevDependency = true,
                 Alpine = new Config() { Include = Includes },
-                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOMTemplate_Alpine.cdx.json",
+                SW360 = new SW360() { IgnoreDevDependency = true },
+                Directory = new LCT.Common.Directory(folderAction, fileOperations) 
+                {
+                    InputFolder = packagefilepath,
+                    CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOMTemplate_Alpine.cdx.json"
+                }
             };
-
+            
             //Act
             Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings);
             bool isUpdated = listofcomponents.Components.Exists(x => x.Properties != null

@@ -397,7 +397,10 @@ namespace LCT.PackageIdentifier
         public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
             // get the  component list from Jfrog for given repo + internal repo
-            string[] repoList = appSettings.Poetry?.Artifactory.InternalRepos.Concat(appSettings.Poetry?.Artifactory.DevRepos).Concat(appSettings.Poetry?.Artifactory.RemoteRepos).ToArray();
+            string[] repoList = (appSettings.Poetry?.Artifactory.InternalRepos ?? Array.Empty<string>())
+       .Concat(appSettings.Poetry?.Artifactory.DevRepos ?? Array.Empty<string>())
+       .Concat(appSettings.Poetry?.Artifactory.RemoteRepos ?? Array.Empty<string>())
+       .ToArray();
             List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(repoList, jFrogService);
             Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
             List<Component> modifiedBOM = new List<Component>();

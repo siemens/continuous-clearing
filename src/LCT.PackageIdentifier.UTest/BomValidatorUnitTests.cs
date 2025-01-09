@@ -30,10 +30,8 @@ namespace LCT.PackageIdentifier.UTest
             //Arrange
             string projectName = "Test";
             ProjectReleases projectReleases = new ProjectReleases();
-            var CommonAppSettings = new CommonAppSettings(mockIFolderAction.Object)
-            {
-                SW360ProjectName = "Test"
-            };
+            
+
             mockISw360ProjectService.Setup(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<String>(), It.IsAny<string>(), projectReleases))
                 .ReturnsAsync(projectName);
 
@@ -44,8 +42,17 @@ namespace LCT.PackageIdentifier.UTest
             mockIFolderAction.Setup(x => x.ValidateFolderPath(It.IsAny<string>()))
                 .Callback((string message) => { })
                 .Verifiable();
-            CommonAppSettings.PackageFilePath = "";
-
+            
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            var CommonAppSettings = new CommonAppSettings(mockIFolderAction.Object, mockIFileOperations.Object)
+            {
+                SW360 = new SW360() { ProjectName = "Test" },
+                Directory = new LCT.Common.Directory(mockIFolderAction.Object, mockIFileOperations.Object)
+                {
+                    InputFolder = ""
+                }
+            };
             //Act
             await BomValidator.ValidateAppSettings(CommonAppSettings, mockISw360ProjectService.Object, projectReleases);
 
@@ -60,10 +67,7 @@ namespace LCT.PackageIdentifier.UTest
             //Arrange
             string projectName = null;
             ProjectReleases projectReleases = new ProjectReleases();
-            var CommonAppSettings = new CommonAppSettings(mockIFolderAction.Object)
-            {
-                SW360ProjectName = "Test"
-            };
+            
             mockISw360ProjectService.Setup(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<string>(), It.IsAny<string>(),projectReleases))
                 .ReturnsAsync(projectName);
 
@@ -74,7 +78,16 @@ namespace LCT.PackageIdentifier.UTest
             mockIFolderAction.Setup(x => x.ValidateFolderPath(It.IsAny<string>()))
                 .Callback((string message) => { })
                 .Verifiable();
-
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            var CommonAppSettings = new CommonAppSettings(mockIFolderAction.Object, mockIFileOperations.Object)
+            {
+                SW360 = new SW360() { ProjectName = "Test" },
+                Directory = new LCT.Common.Directory(mockIFolderAction.Object, mockIFileOperations.Object)
+                {
+                    InputFolder = ""
+                }
+            };
             //Act && Assert
             Assert.ThrowsAsync<InvalidDataException>(async () => await BomValidator.ValidateAppSettings(CommonAppSettings, mockISw360ProjectService.Object, projectReleases));
             return Task.CompletedTask;
@@ -87,10 +100,8 @@ namespace LCT.PackageIdentifier.UTest
             string projectName = "Test";
             ProjectReleases projectReleases = new ProjectReleases();
             projectReleases.clearingState = "CLOSED";
-            var CommonAppSettings = new CommonAppSettings(mockIFolderAction.Object)
-            {
-                SW360ProjectName = "Test"
-            };
+           
+            
             mockISw360ProjectService.Setup(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<String>(), It.IsAny<string>(), projectReleases))
                 .ReturnsAsync(projectName);
 
@@ -101,8 +112,17 @@ namespace LCT.PackageIdentifier.UTest
             mockIFolderAction.Setup(x => x.ValidateFolderPath(It.IsAny<string>()))
                 .Callback((string message) => { })
                 .Verifiable();
-            CommonAppSettings.PackageFilePath = "";
 
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            var CommonAppSettings = new CommonAppSettings(mockIFolderAction.Object, mockIFileOperations.Object)
+            {
+                SW360 = new SW360() { ProjectName = "Test" },
+                Directory = new LCT.Common.Directory(mockIFolderAction.Object, mockIFileOperations.Object)
+                {
+                    InputFolder = ""
+                }
+            };
             //Act
             await BomValidator.ValidateAppSettings(CommonAppSettings, mockISw360ProjectService.Object, projectReleases);
 
