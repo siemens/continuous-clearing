@@ -157,7 +157,7 @@ namespace LCT.Common
         }
         public Fossology Fossology { get; set; }
         public bool IgnoreDevDependency { get; set; } = true;
-        public string[] ExcludeComponents { get; set; }
+        public List<string> ExcludeComponents { get; set; }
        
     }
     public class Fossology
