@@ -26,7 +26,9 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
+using static System.Collections.Specialized.BitVector32;
 
 
 namespace LCT.SW360PackageCreator
@@ -218,79 +220,93 @@ namespace LCT.SW360PackageCreator
         private async Task<List<ComparisonBomData>> GetComparisionBomItems(List<Components> lstComponentForBOM, ISW360Service sw360Service)
         {
             List<ComparisonBomData> comparisonBomData = new();
-            ComparisonBomData mapper;
-            foreach (Components item in lstComponentForBOM)
+            //ComparisonBomData mapper;
+
+            Func<Components, CancellationToken, ValueTask> action = async (item, ct) =>
             {
-                mapper = new ComparisonBomData();
-                ReleasesInfo releasesInfo = await GetReleaseInfoFromSw360(item, componentsAvailableInSw360, sw360Service);
-                IRepository repo = new Repository();
-
-                mapper.Name = item.Name;
-                mapper.Group = item.Group;
-                mapper.Version = item.Version;
-                mapper.ComponentExternalId = item.ComponentExternalId;
-                mapper.ReleaseExternalId = item.ReleaseExternalId;
-                mapper.SourceUrl = item.SourceUrl;
-                mapper.DownloadUrl = item.DownloadUrl;
-                mapper.ComponentStatus = GetComponentAvailabilityStatus(componentsAvailableInSw360, item);
-                mapper.ReleaseStatus = IsReleaseAvailable(item.Name, item.Version, item.ReleaseExternalId);
-
-                if(!string.IsNullOrEmpty(mapper.ReleaseExternalId) && mapper.ReleaseStatus == Dataconstant.NotAvailable && string.IsNullOrEmpty(mapper.SourceUrl))
+                try
                 {
-                    if(item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["NPM"]))
-                        {
-                        mapper.SourceUrl = UrlHelper.Instance.GetSourceUrlForNpmPackage(mapper.Name, mapper.Version);
-                    }
-                    else if(item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["NUGET"]))
-                        {
-                        mapper.SourceUrl = await UrlHelper.Instance.GetSourceUrlForNugetPackage(mapper.Name, mapper.Version);
-                    }
-                    else if (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["PYTHON"]))
-                        {
-                        mapper.SourceUrl = await UrlHelper.Instance.GetSourceUrlForPythonPackage(mapper.Name, mapper.Version);
-                    }
-                    else if (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CONAN"]))
-                        {
-                        mapper.SourceUrl = await UrlHelper.Instance.GetSourceUrlForConanPackage(mapper.Name, mapper.Version);
-                    }
-                }
+                    ComparisonBomData mapper = new ComparisonBomData();
+                    ReleasesInfo releasesInfo = await GetReleaseInfoFromSw360(item, componentsAvailableInSw360, sw360Service);
+                    IRepository repo = new Repository();
 
+                    mapper.Name = item.Name;
+                    mapper.Group = item.Group;
+                    mapper.Version = item.Version;
+                    mapper.ComponentExternalId = item.ComponentExternalId;
+                    mapper.ReleaseExternalId = item.ReleaseExternalId;
+                    mapper.SourceUrl = item.SourceUrl;
+                    mapper.DownloadUrl = item.DownloadUrl;
+                    mapper.ComponentStatus = GetComponentAvailabilityStatus(componentsAvailableInSw360, item);
+                    mapper.ReleaseStatus = IsReleaseAvailable(item.Name, item.Version, item.ReleaseExternalId);
 
-                mapper.AlpineSource = item.AlpineSourceData;
-                if (!string.IsNullOrEmpty(item.ReleaseExternalId) && item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
-                {
-                    if ((string.IsNullOrEmpty(item.SourceUrl) || item.SourceUrl == Dataconstant.SourceUrlNotFound) && !string.IsNullOrEmpty(releasesInfo.SourceCodeDownloadUrl))
+                    if (!string.IsNullOrEmpty(mapper.ReleaseExternalId) && mapper.ReleaseStatus == Dataconstant.NotAvailable && string.IsNullOrEmpty(mapper.SourceUrl))
                     {
-                        // If not able to get source details from snapshot.org, try getting source URL from SW360
-                        mapper.SourceUrl = releasesInfo.SourceCodeDownloadUrl;
-                        mapper.DownloadUrl = releasesInfo.SourceCodeDownloadUrl;
+                        if (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["NPM"]))
+                        {
+                            mapper.SourceUrl = UrlHelper.Instance.GetSourceUrlForNpmPackage(mapper.Name, mapper.Version);
+                        }
+                        else if (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["NUGET"]))
+                        {
+                            mapper.SourceUrl = await UrlHelper.Instance.GetSourceUrlForNugetPackage(mapper.Name, mapper.Version);
+                        }
+                        else if (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["PYTHON"]))
+                        {
+                            mapper.SourceUrl = await UrlHelper.Instance.GetSourceUrlForPythonPackage(mapper.Name, mapper.Version);
+                        }
+                        else if (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CONAN"]))
+                        {
+                            mapper.SourceUrl = await UrlHelper.Instance.GetSourceUrlForConanPackage(mapper.Name, mapper.Version);
+                        }
                     }
-                    mapper.PatchURls = item.PatchURLs;
-                }
-                else if (!string.IsNullOrEmpty(item.ReleaseExternalId) && item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["MAVEN"]))
-                {
-                    mapper.DownloadUrl = GetMavenDownloadUrl(mapper, item, releasesInfo);
-                }
-                else if (!string.IsNullOrEmpty(item.ReleaseExternalId) &&
-                            (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["PYTHON"]) || item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CONAN"]) || item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["ALPINE"])))
-                {
-                    mapper.DownloadUrl = mapper.SourceUrl;
-                }
-                else
-                {
-                    mapper.DownloadUrl = GetComponentDownloadUrl(mapper, item, repo, releasesInfo);
-                }
-                mapper.ApprovedStatus = GetApprovedStatus(mapper.ComponentStatus, mapper.ReleaseStatus, releasesInfo);
-                mapper.IsComponentCreated = GetCreatedStatus(mapper.ComponentStatus);
-                mapper.IsReleaseCreated = GetCreatedStatus(mapper.ReleaseStatus);
-                mapper.FossologyUploadStatus = GetFossologyUploadStatus(mapper.ApprovedStatus);
-                mapper.ReleaseAttachmentLink = string.Empty;
-                mapper.ReleaseLink = GetReleaseLink(componentsAvailableInSw360, item.Name, item.Version);
 
-                Logger.Debug($"Sw360 avilability status for Name " + mapper.Name + ":" + mapper.ComponentExternalId + "=" + mapper.ComponentStatus +
-                    "-Version " + mapper.Version + ":" + mapper.ReleaseExternalId + "=" + mapper.ReleaseStatus);
-                comparisonBomData.Add(mapper);
-            }
+
+                    mapper.AlpineSource = item.AlpineSourceData;
+                    if (!string.IsNullOrEmpty(item.ReleaseExternalId) && item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
+                    {
+                        if ((string.IsNullOrEmpty(item.SourceUrl) || item.SourceUrl == Dataconstant.SourceUrlNotFound) && !string.IsNullOrEmpty(releasesInfo.SourceCodeDownloadUrl))
+                        {
+                            // If not able to get source details from snapshot.org, try getting source URL from SW360
+                            mapper.SourceUrl = releasesInfo.SourceCodeDownloadUrl;
+                            mapper.DownloadUrl = releasesInfo.SourceCodeDownloadUrl;
+                        }
+                        mapper.PatchURls = item.PatchURLs;
+                    }
+                    else if (!string.IsNullOrEmpty(item.ReleaseExternalId) && item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["MAVEN"]))
+                    {
+                        mapper.DownloadUrl = GetMavenDownloadUrl(mapper, item, releasesInfo);
+                    }
+                    else if (!string.IsNullOrEmpty(item.ReleaseExternalId) &&
+                                (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["PYTHON"]) || item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CONAN"]) || item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["ALPINE"])))
+                    {
+                        mapper.DownloadUrl = mapper.SourceUrl;
+                    }
+                    else
+                    {
+                        mapper.DownloadUrl = GetComponentDownloadUrl(mapper, item, repo, releasesInfo);
+                    }
+                    mapper.ApprovedStatus = GetApprovedStatus(mapper.ComponentStatus, mapper.ReleaseStatus, releasesInfo);
+                    mapper.IsComponentCreated = GetCreatedStatus(mapper.ComponentStatus);
+                    mapper.IsReleaseCreated = GetCreatedStatus(mapper.ReleaseStatus);
+                    mapper.FossologyUploadStatus = GetFossologyUploadStatus(mapper.ApprovedStatus);
+                    mapper.ReleaseAttachmentLink = string.Empty;
+                    mapper.ReleaseLink = GetReleaseLink(componentsAvailableInSw360, item.Name, item.Version);
+
+                    Logger.Debug($"Sw360 avilability status for Name " + mapper.Name + ":" + mapper.ComponentExternalId + "=" + mapper.ComponentStatus +
+                        "-Version " + mapper.Version + ":" + mapper.ReleaseExternalId + "=" + mapper.ReleaseStatus);
+                    comparisonBomData.Add(mapper);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"GetComparisionBomItems() : Error processing item {item.Name}: {ex.Message}", ex);
+                }
+            };
+
+            var parallelOptions = new ParallelOptions
+            {
+                MaxDegreeOfParallelism = Dataconstant.MaxDegreeOfParallelism
+            };
+            await ProcessAsyncHelper.ProcessItemsAsync(lstComponentForBOM, action, parallelOptions);
             return comparisonBomData;
         }
 

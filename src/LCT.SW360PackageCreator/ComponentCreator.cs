@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 
@@ -58,14 +59,7 @@ namespace LCT.SW360PackageCreator
         private async Task<List<Components>> GetListOfBomData(List<Component> components, CommonAppSettings appSettings)
         {
             List<Components> lstOfBomDataToBeCompared = new List<Components>();
-
-            //Degree for parallel processing for faster execution is set to 4.
-            var parallelOptions = new ParallelOptions
-            {
-                MaxDegreeOfParallelism = 4
-            };
-
-            await Parallel.ForEachAsync(components, parallelOptions, async (item, cancellationToken) =>
+            Func<Component, CancellationToken, ValueTask> action = async (item, ct) =>
             {
                 try
                 {
@@ -115,8 +109,14 @@ namespace LCT.SW360PackageCreator
                 {
                     Logger.Error($"Error processing item {item.Name}: {ex.Message}", ex);
                 }
-            });
+            };
 
+
+            var parallelOptions = new ParallelOptions
+            {
+                MaxDegreeOfParallelism = Dataconstant.MaxDegreeOfParallelism
+            };
+            await ProcessAsyncHelper.ProcessItemsAsync(components, action, parallelOptions);
             return lstOfBomDataToBeCompared;
         }
 

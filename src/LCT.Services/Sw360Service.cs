@@ -25,6 +25,7 @@ using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace LCT.Services
@@ -302,23 +303,36 @@ namespace LCT.Services
                 return availableComponentList;
             }
 
-            foreach (Components component in listOfComponentsToBom)
+            Func<Components, CancellationToken, ValueTask> action = async (component, ct) =>
             {
-                if (await CheckReleaseExistenceByExternalId(component) ||
+                try
+                {
+                    if (await CheckReleaseExistenceByExternalId(component) ||
                        CheckAvailabilityByNameAndVersion(sw360Releases, component))
-                {
-                    Logger.Debug($"GetAvailableComponenentsList():  Release Exist : Release name - {component.Name}, version - {component.Version}");
+                    {
+                        Logger.Debug($"GetAvailableComponenentsList():  Release Exist : Release name - {component.Name}, version - {component.Version}");
+                    }
+                    else if (await CheckComponentExistenceByExternalId(component) ||
+                             CheckAvailabilityByName(sw360ComponentList, component))
+                    {
+                        Logger.Debug($"GetAvailableComponenentsList():  Compoennt Exist : Release name - {component.Name}, version - {component.Version}");
+                    }
+                    else
+                    {
+                        // Do Nothing or to be implemented
+                    }
                 }
-                else if (await CheckComponentExistenceByExternalId(component) ||
-                         CheckAvailabilityByName(sw360ComponentList, component))
+                catch (Exception ex)
                 {
-                    Logger.Debug($"GetAvailableComponenentsList():  Compoennt Exist : Release name - {component.Name}, version - {component.Version}");
+                    Logger.Error($"GetAvailableComponenentsList() : Error processing item {component.Name}: {ex.Message}", ex);
                 }
-                else
-                {
-                    // Do Nothing or to be implemented
-                }
-            }
+            };
+
+            var parallelOptions = new ParallelOptions
+            {
+                MaxDegreeOfParallelism = Dataconstant.MaxDegreeOfParallelism
+            };
+            await ProcessAsyncHelper.ProcessItemsAsync(listOfComponentsToBom, action, parallelOptions);
 
             return availableComponentList;
         }
