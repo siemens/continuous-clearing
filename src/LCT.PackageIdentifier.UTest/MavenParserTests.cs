@@ -488,7 +488,7 @@ namespace LCT.PackageIdentifier.UTest
                 Directory = new LCT.Common.Directory(folderAction, fileOperations)
                 {
                     InputFolder = filepath,
-                    CycloneDxSBomTemplatePath= filepath + "\\SBOMTemplates\\SBOM_MavenCATemplate.cdx.json"
+               
                 }
             };
 
@@ -523,7 +523,7 @@ namespace LCT.PackageIdentifier.UTest
                 Directory = new LCT.Common.Directory(folderAction, fileOperations)
                 {
                     InputFolder = filepath,
-                    CycloneDxSBomTemplatePath = filepath + "\\SBOMTemplates\\SBOMTemplate_Maven.cdx.json"
+                 
                 }
             };
 

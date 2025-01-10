@@ -259,7 +259,7 @@ namespace LCT.PackageIdentifier.UTest
                 Directory = new LCT.Common.Directory(folderAction, fileOperations)
                 {
                     InputFolder = packagefilepath,
-                    CycloneDxSBomTemplatePath= packagefilepath + "\\SBOMTemplates\\SBOM_DebianCATemplate.cdx.json"
+
                 }
             };
 
@@ -290,7 +290,7 @@ namespace LCT.PackageIdentifier.UTest
                 Directory = new LCT.Common.Directory(folderAction, fileOperations)
                 {
                     InputFolder = packagefilepath,
-                    CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOMTemplate_Debian.cdx.json"
+                  
                 }
             };
 

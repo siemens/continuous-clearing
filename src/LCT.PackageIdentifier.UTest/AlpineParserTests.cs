@@ -175,8 +175,7 @@ namespace LCT.PackageIdentifier.UTest
                 SW360 = new SW360() { IgnoreDevDependency = true },
                 Directory = new LCT.Common.Directory(folderAction, fileOperations) 
                 {
-                    InputFolder = OutFolder + @"\PackageIdentifierUTTestFiles",
-                    CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOM_AlpineCATemplate.cdx.json"
+                    InputFolder = OutFolder + @"\PackageIdentifierUTTestFiles",                   
                 }
             };            
 
@@ -206,8 +205,7 @@ namespace LCT.PackageIdentifier.UTest
                 SW360 = new SW360() { IgnoreDevDependency = true },
                 Directory = new LCT.Common.Directory(folderAction, fileOperations) 
                 {
-                    InputFolder = packagefilepath,
-                    CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOMTemplate_Alpine.cdx.json"
+                    InputFolder = packagefilepath                    
                 }
             };
             

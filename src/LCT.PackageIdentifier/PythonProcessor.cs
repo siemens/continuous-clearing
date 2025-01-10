@@ -44,7 +44,7 @@ namespace LCT.PackageIdentifier
             Bom bom = new Bom();
             List<Component> listComponentForBOM;
             List<Dependency> dependencies = new List<Dependency>();
-
+            Bom templateDetails = new Bom();
             foreach (string config in configFiles)
             {
                 if (config.ToLower().EndsWith("poetry.lock"))
@@ -54,16 +54,12 @@ namespace LCT.PackageIdentifier
                 else if (config.EndsWith(FileConstant.CycloneDXFileExtension) && !config.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     listofComponents.AddRange(ExtractDetailsFromJson(config, appSettings, ref dependencies));
+                }else if (config.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                {                    
+                    templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(config));
+                    CycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
                 }
-            }
-
-            Bom templateDetails = new Bom();
-            if (File.Exists(appSettings.Directory.CycloneDxSBomTemplatePath)
-                && appSettings.Directory.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
-            {
-                templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(appSettings.Directory.CycloneDxSBomTemplatePath));
-                CycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
-            }
+            }           
 
             int initialCount = listofComponents.Count;
             GetDistinctComponentList(ref listofComponents);
@@ -203,7 +199,7 @@ namespace LCT.PackageIdentifier
                     PurlID = componentsInfo.Purl,
                 };
 
-                if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["PYTHON"]))
+                if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["POETRY"]))
                 {
                     BomCreator.bomKpiData.DebianComponents++;
                     PythonPackages.Add(package);
@@ -238,7 +234,7 @@ namespace LCT.PackageIdentifier
             version = WebUtility.UrlEncode(version);
             version = version.Replace("%3A", ":");
 
-            return $"{Dataconstant.PurlCheck()["PYTHON"]}{Dataconstant.ForwardSlash}{name}@{version}";
+            return $"{Dataconstant.PurlCheck()["POETRY"]}{Dataconstant.ForwardSlash}{name}@{version}";
         }
 
         private static List<Component> FormComponentReleaseExternalID(List<PythonPackage> listOfComponents)
@@ -400,6 +396,7 @@ namespace LCT.PackageIdentifier
             string[] repoList = (appSettings.Poetry?.Artifactory.InternalRepos ?? Array.Empty<string>())
        .Concat(appSettings.Poetry?.Artifactory.DevRepos ?? Array.Empty<string>())
        .Concat(appSettings.Poetry?.Artifactory.RemoteRepos ?? Array.Empty<string>())
+       .Concat(appSettings.Poetry?.Artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? Array.Empty<string>())
        .ToArray();
             List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(repoList, jFrogService);
             Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };

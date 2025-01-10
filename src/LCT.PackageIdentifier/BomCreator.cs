@@ -18,6 +18,7 @@ using log4net.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
@@ -101,17 +102,24 @@ namespace LCT.PackageIdentifier
         {
             IFileOperations fileOperations = new FileOperations();
             string bomFileName = $"{appSettings.SW360.ProjectName}_Bom.cdx.json";
-            if (string.IsNullOrEmpty(appSettings.Directory.BomFilePath))
+
+            string outputFolderPath = appSettings.Directory.OutputFolder;
+            string[] files = System.IO.Directory.GetFiles(outputFolderPath);
+
+            bool fileExists = files.Length > 0 && files.Any(file => Path.GetFileName(file).Equals(bomFileName, StringComparison.OrdinalIgnoreCase));
+
+            if (fileExists && appSettings.MultipleProjectType)
             {
-                string formattedString = CommonHelper.AddSpecificValuesToBOMFormat(listOfComponentsToBom);
-                fileOperations.WriteContentToOutputBomFile(formattedString, appSettings.Directory.OutputFolder, FileConstant.BomFileName, appSettings.SW360.ProjectName);
-            }
-            else if(Path.GetFileName(appSettings.Directory.BomFilePath).Equals(bomFileName, StringComparison.OrdinalIgnoreCase))
-            {
-                listOfComponentsToBom = fileOperations.CombineComponentsFromExistingBOM(listOfComponentsToBom, appSettings.Directory.BomFilePath);
+                string existingFilePath = files.FirstOrDefault(file => Path.GetFileName(file).Equals(bomFileName, StringComparison.OrdinalIgnoreCase));
+                listOfComponentsToBom = fileOperations.CombineComponentsFromExistingBOM(listOfComponentsToBom, existingFilePath);
                 bomKpiData.ComponentsInComparisonBOM = listOfComponentsToBom.Components.Count;
                 string formattedString = CommonHelper.AddSpecificValuesToBOMFormat(listOfComponentsToBom);
-                fileOperations.WriteContentToOutputBomFile(formattedString, appSettings.Directory.OutputFolder, FileConstant.BomFileName, appSettings.SW360.ProjectName);
+                fileOperations.WriteContentToOutputBomFile(formattedString, outputFolderPath, FileConstant.BomFileName, appSettings.SW360.ProjectName);
+            }
+            else
+            {
+                string formattedString = CommonHelper.AddSpecificValuesToBOMFormat(listOfComponentsToBom);
+                fileOperations.WriteContentToOutputBomFile(formattedString, outputFolderPath, FileConstant.BomFileName, appSettings.SW360.ProjectName);
             }
 
         }       
@@ -137,7 +145,7 @@ namespace LCT.PackageIdentifier
                 case "ALPINE":
                     parser = new AlpineProcessor(CycloneDXBomParser);
                     return await ComponentIdentification(appSettings, parser);
-                case "PYTHON":
+                case "POETRY":
                     parser = new PythonProcessor(CycloneDXBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 case "CONAN":

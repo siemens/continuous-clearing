@@ -131,10 +131,13 @@ namespace LCT.Common
                     "Directory.OutputFolder",
                     "ProjectType"
                 };
-                // Check if ProjectType contains a value and add InternalRepos key accordingly
+                //Check if ProjectType contains a value and add InternalRepos key accordingly
                 if (!string.IsNullOrWhiteSpace(appSettings.ProjectType))
                 {
-                    identifierReqParameters.Add($"{appSettings.ProjectType}.Artifactory.InternalRepos");
+                    if (!appSettings.ProjectType.Equals("ALPINE", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        identifierReqParameters.Add($"{appSettings.ProjectType}.Artifactory.InternalRepos");
+                    }                    
                 }
                 CheckForMissingParameter(appSettings, properties, identifierReqParameters);
             }
@@ -180,15 +183,31 @@ namespace LCT.Common
                         break;
                     }
 
-                    property = currentObject.GetType().GetProperty(part);
+                    property = currentObject.GetType().GetProperty(part, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
                     currentObject = property?.GetValue(currentObject);
                 }
 
-                string value = currentObject?.ToString();
-
-                if (string.IsNullOrWhiteSpace(value))
+                if (currentObject is Array array)
                 {
-                    missingParameters.Append(key + "\n");
+                    if (array.Length == 0 || string.IsNullOrWhiteSpace(array.GetValue(0)?.ToString()))
+                    {
+                        missingParameters.Append(key + "\n");
+                    }
+                }
+                else if (currentObject is IList<object> list)
+                {
+                    if (list.Count == 0 || string.IsNullOrWhiteSpace(list[0]?.ToString()))
+                    {
+                        missingParameters.Append(key + "\n");
+                    }
+                }
+                else
+                {
+                    string value = currentObject?.ToString();
+                    if (string.IsNullOrWhiteSpace(value))
+                    {
+                        missingParameters.Append(key + "\n");
+                    }
                 }
             }
 

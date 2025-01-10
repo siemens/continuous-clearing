@@ -37,7 +37,7 @@ namespace TestUtilities
             FossUrl = s_Config["FossologyURL"];
             SW360ProjectName = s_Config["SW360ProjectName"];
             SW360ProjectID = s_Config["SW360ProjectID"];
-            ProjectType = "NUGET";
+            ProjectType = "Conan";
             RemoveDevDependency = s_Config["RemoveDevDependency"];
             ArtifactoryUploadUser = s_Config["ArtifactoryUploadUser"];
             ArtifactoryUploadApiKey = s_Config["ArtifactoryUploadApiKey"];

@@ -219,6 +219,7 @@ namespace LCT.PackageIdentifier
             string[] repoList = (appSettings.Nuget?.Artifactory.InternalRepos ?? Array.Empty<string>())
        .Concat(appSettings.Nuget?.Artifactory.DevRepos ?? Array.Empty<string>())
        .Concat(appSettings.Nuget?.Artifactory.RemoteRepos ?? Array.Empty<string>())
+       .Concat(appSettings.Nuget?.Artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? Array.Empty<string>())
        .ToArray();
             List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(repoList, jFrogService);
             Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
@@ -452,6 +453,16 @@ namespace LCT.PackageIdentifier
                 {
                     if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                     {
+                        Bom templateDetails;
+                        templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(
+                            _cycloneDXBomParser.ParseCycloneDXBom(filepath));
+                        CycloneDXBomParser.CheckValidComponentsForProjectType(
+                            templateDetails.Components, appSettings.ProjectType);
+                        SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
+                        
+                    }
+                    else
+                    {
                         Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
                         bom = _cycloneDXBomParser.ParseCycloneDXBom(filepath);
                         CycloneDXBomParser.CheckValidComponentsForProjectType(
@@ -497,17 +508,7 @@ namespace LCT.PackageIdentifier
                 listComponentForBOM.Count(s => s.Properties[0].Value == "true");
             bom.Components = listComponentForBOM;
 
-            if (File.Exists(appSettings.Directory.CycloneDxSBomTemplatePath)
-                && appSettings.Directory.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
-            {
-                //Adding Template Component Details
-                Bom templateDetails;
-                templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(
-                    _cycloneDXBomParser.ParseCycloneDXBom(appSettings.Directory.CycloneDxSBomTemplatePath));
-                CycloneDXBomParser.CheckValidComponentsForProjectType(
-                    templateDetails.Components, appSettings.ProjectType);
-                SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
-            }
+           
 
             bom = RemoveExcludedComponents(appSettings, bom);
 
@@ -550,8 +551,6 @@ namespace LCT.PackageIdentifier
                 multipleVersions.Nuget = new List<MultipleVersionValues>();
                 foreach (var nugetPackage in componentsWithMultipleVersions)
                 {
-                    nugetPackage.Description = !string.IsNullOrEmpty(appSettings.Directory.CycloneDxSBomTemplatePath) ? appSettings.Directory.CycloneDxSBomTemplatePath : nugetPackage.Description;
-
                     MultipleVersionValues jsonComponents = new MultipleVersionValues();
                     jsonComponents.ComponentName = nugetPackage.Name;
                     jsonComponents.ComponentVersion = nugetPackage.Version;
@@ -568,8 +567,6 @@ namespace LCT.PackageIdentifier
                 List<MultipleVersionValues> nugetComponents = new List<MultipleVersionValues>();
                 foreach (var nugetPackage in componentsWithMultipleVersions)
                 {
-                    nugetPackage.Description = !string.IsNullOrEmpty(appSettings.Directory.CycloneDxSBomTemplatePath) ? appSettings.Directory.CycloneDxSBomTemplatePath : nugetPackage.Description;
-
                     MultipleVersionValues jsonComponents = new MultipleVersionValues();
                     jsonComponents.ComponentName = nugetPackage.Name;
                     jsonComponents.ComponentVersion = nugetPackage.Version;

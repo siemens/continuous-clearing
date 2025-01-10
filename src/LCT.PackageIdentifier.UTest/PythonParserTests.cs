@@ -174,7 +174,7 @@ namespace LCT.PackageIdentifier.UTest
                 Directory = new LCT.Common.Directory(folderAction, fileOperations)
                 {
                     InputFolder = OutFolder + @"\PackageIdentifierUTTestFiles",
-                    CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOM_PythonCATemplate.cdx.json"
+                 
                 }
             };
 
@@ -204,7 +204,7 @@ namespace LCT.PackageIdentifier.UTest
                 Directory = new LCT.Common.Directory(folderAction, fileOperations)
                 {
                     InputFolder = packagefilepath,
-                    CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOMTemplate_Python.cdx.json"
+                   
                 }
             };
 

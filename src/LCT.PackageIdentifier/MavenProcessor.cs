@@ -33,7 +33,7 @@ namespace LCT.PackageIdentifier
         }
 
         public Bom ParsePackageFile(CommonAppSettings appSettings)
-        {
+        {            
             List<Component> componentsForBOM = new();
             List<Component> componentsToBOM = new();
             List<Component> ListOfComponents = new();
@@ -46,7 +46,14 @@ namespace LCT.PackageIdentifier
 
             foreach (string filepath in configFiles)
             {
-                if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                {
+                    Bom templateDetails;
+                    templateDetails = ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(filepath));
+                    CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
+                    SbomTemplate.AddComponentDetails(componentsForBOM, templateDetails);                    
+                }
+                else
                 {
                     Bom bomList = ParseCycloneDXBom(filepath);
                     if (bomList?.Components != null)
@@ -74,15 +81,7 @@ namespace LCT.PackageIdentifier
                     }
                 }
             }
-
-            if (File.Exists(appSettings.Directory.CycloneDxSBomTemplatePath) && appSettings.Directory.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
-            {
-                //Adding Template Component Details
-                Bom templateDetails;
-                templateDetails = ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(appSettings.Directory.CycloneDxSBomTemplatePath));
-                CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
-                SbomTemplate.AddComponentDetails(componentsForBOM, templateDetails);
-            }
+            
 
             //checking Dev dependency
             DevDependencyIdentificationLogic(componentsForBOM, componentsToBOM, ref ListOfComponents);
@@ -95,7 +94,7 @@ namespace LCT.PackageIdentifier
             componentsForBOM = ListOfComponents.Distinct(new ComponentEqualityComparer()).ToList();
 
             BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - componentsForBOM.Count;
-
+            
 
             if (appSettings.SW360.ExcludeComponents != null)
             {
@@ -210,6 +209,7 @@ namespace LCT.PackageIdentifier
             string[] repoList = (appSettings.Maven?.Artifactory.InternalRepos ?? Array.Empty<string>())
        .Concat(appSettings.Maven?.Artifactory.DevRepos ?? Array.Empty<string>())
        .Concat(appSettings.Maven?.Artifactory.RemoteRepos ?? Array.Empty<string>())
+       .Concat(appSettings.Maven?.Artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? Array.Empty<string>())
        .ToArray();
             List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(repoList, jFrogService);
             Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };

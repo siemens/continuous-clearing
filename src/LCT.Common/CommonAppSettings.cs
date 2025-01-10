@@ -61,6 +61,7 @@ namespace LCT.Common
                 m_ProjectType = value;
             }
         }
+        public bool MultipleProjectType { get; set; } = false;
         public SW360 SW360 { get; set; }
         public Directory Directory { get; set; }
         public Jfrog Jfrog { get; set; }
@@ -212,8 +213,7 @@ namespace LCT.Common
         private readonly IFolderAction folderAction;
         private readonly IFileOperations _fileOperations;
         private string m_InputFolder;
-        private string m_OutputFolder;
-        private string m_BomFilePath;
+        private string m_OutputFolder;       
 
         public Directory(IFolderAction folderAction, IFileOperations fileOperations)
         {
@@ -236,30 +236,7 @@ namespace LCT.Common
                 }
             }
         }
-
-        public string BomFilePath
-        {
-            get
-            {
-                return m_BomFilePath;
-            }
-            set
-            {
-                if (AppDomain.CurrentDomain.FriendlyName.Contains("PackageIdentifier"))
-                {
-                    if (!string.IsNullOrEmpty(value))
-                    {
-                        m_BomFilePath = value;
-                        _fileOperations.ValidateFilePath(m_BomFilePath);
-                    }                    
-                }
-                else
-                {
-                    m_BomFilePath = value;
-                    _fileOperations.ValidateFilePath(m_BomFilePath);
-                }
-            }
-        }
+        
         public string OutputFolder
         {
             get
@@ -280,7 +257,6 @@ namespace LCT.Common
             }
         }
 
-        public string CycloneDxSBomTemplatePath { get; set; }
     }
 
 }

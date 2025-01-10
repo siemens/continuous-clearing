@@ -153,12 +153,11 @@ namespace LCT.PackageIdentifier
             MultipleVersions multipleVersions = new MultipleVersions();
             IFileOperations fileOperations = new FileOperations();
             string filename = $"{appSettings.Directory.OutputFolder}\\{appSettings.SW360.ProjectName}_{FileConstant.multipleversionsFileName}";
-            if (string.IsNullOrEmpty(appSettings.Directory.BomFilePath) || (!File.Exists(filename)))
+            if (string.IsNullOrEmpty(appSettings.Directory.OutputFolder) || (!File.Exists(filename)))
             {
                 multipleVersions.Npm = new List<MultipleVersionValues>();
                 foreach (var npmpackage in componentsWithMultipleVersions)
                 {
-                    npmpackage.Description = !string.IsNullOrEmpty(appSettings.Directory.CycloneDxSBomTemplatePath) ? appSettings.Directory.CycloneDxSBomTemplatePath : npmpackage.Description;
 
                     MultipleVersionValues jsonComponents = new MultipleVersionValues();
                     jsonComponents.ComponentName = npmpackage.Name;
@@ -176,7 +175,6 @@ namespace LCT.PackageIdentifier
                 List<MultipleVersionValues> npmComponents = new List<MultipleVersionValues>();
                 foreach (var npmpackage in componentsWithMultipleVersions)
                 {
-                    npmpackage.Description = !string.IsNullOrEmpty(appSettings.Directory.CycloneDxSBomTemplatePath) ? appSettings.Directory.CycloneDxSBomTemplatePath : npmpackage.Description;
 
                     MultipleVersionValues jsonComponents = new MultipleVersionValues();
                     jsonComponents.ComponentName = npmpackage.Name;
@@ -398,6 +396,7 @@ namespace LCT.PackageIdentifier
             string[] repoList = (appSettings.Npm?.Artifactory.InternalRepos ?? Array.Empty<string>())
         .Concat(appSettings.Npm?.Artifactory.DevRepos ?? Array.Empty<string>())
         .Concat(appSettings.Npm?.Artifactory.RemoteRepos ?? Array.Empty<string>())
+        .Concat(appSettings.Npm?.Artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? Array.Empty<string>())
         .ToArray();
             List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(repoList, jFrogService);
             Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
@@ -508,8 +507,16 @@ namespace LCT.PackageIdentifier
 
                 if (filepath.EndsWith(FileConstant.CycloneDXFileExtension))
                 {
-                    if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                    if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                     {
+                        Bom templateDetails;
+                        templateDetails = ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(filepath));
+                        CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
+                        //Adding Template Component Details
+                        SbomTemplate.AddComponentDetails(componentsForBOM, templateDetails);
+                    }
+                    else
+                    { 
                         Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
                         bom = ParseCycloneDXBom(filepath);
                         bom = RemoveExcludedComponents(appSettings, bom);
@@ -527,15 +534,7 @@ namespace LCT.PackageIdentifier
                     componentsForBOM.AddRange(components);
                 }
             }
-
-            if (File.Exists(appSettings.Directory.CycloneDxSBomTemplatePath) && appSettings.Directory.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
-            {
-                Bom templateDetails;
-                templateDetails = ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(appSettings.Directory.CycloneDxSBomTemplatePath));
-                CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
-                //Adding Template Component Details
-                SbomTemplate.AddComponentDetails(componentsForBOM, templateDetails);
-            }
+           
 
             if (dependencies != null)
             {

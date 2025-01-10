@@ -52,7 +52,8 @@ namespace SW360IntegrationTest.Debian
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
-                TestConstant.ProjectType,"DEBIAN",
+                TestConstant.JfrogDebianInternalRepo,"Debian.test",
+                TestConstant.ProjectType,"Debian",
                 TestConstant.Mode,""}),
                 "Test to run Package Identifier EXE execution");
         }

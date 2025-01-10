@@ -83,8 +83,7 @@ namespace LCT.PackageIdentifier
                 $"CaToolVersion\t\t --> {caToolInformation.CatoolVersion}\n\t" +
                 $"CaToolRunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
                 $"PackageFilePath\t\t --> {appSettings.Directory.InputFolder}\n\t" +
-                $"BomFolderPath\t\t --> {appSettings.Directory.OutputFolder}\n\t" +
-                $"SBOMTemplateFilePath\t --> {appSettings.Directory.CycloneDxSBomTemplatePath}\n\t" +
+                $"BomFolderPath\t\t --> {appSettings.Directory.OutputFolder}\n\t" +                
                 $"SW360Url\t\t --> {appSettings.SW360.URL}\n\t" +
                 $"SW360AuthTokenType\t --> {appSettings.SW360.AuthTokenType}\n\t" +
                 $"SW360ProjectName\t --> {appSettings.SW360.ProjectName}\n\t" +

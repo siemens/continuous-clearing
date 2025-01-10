@@ -46,8 +46,19 @@ namespace LCT.PackageIdentifier
 
             foreach (string filepath in configFiles)
             {
-                Logger.Debug($"ParsePackageFile():FileName: " + filepath);
-                listofComponents.AddRange(ParseCycloneDX(filepath, dependenciesForBOM));
+                if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                {
+                    Bom templateDetails;
+                    templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(filepath));
+                    CycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
+                    //Adding Template Component Details & MetaData
+                    SbomTemplate.AddComponentDetails(bom.Components, templateDetails);                    
+                }
+                else
+                {
+                    Logger.Debug($"ParsePackageFile():FileName: " + filepath);
+                    listofComponents.AddRange(ParseCycloneDX(filepath, dependenciesForBOM));
+                }
             }
 
             int initialCount = listofComponents.Count;
@@ -56,16 +67,7 @@ namespace LCT.PackageIdentifier
             BomCreator.bomKpiData.DuplicateComponents = initialCount - listComponentForBOM.Count;
 
             bom.Components = listComponentForBOM;
-            bom.Dependencies = dependenciesForBOM;
-
-            if (File.Exists(appSettings.Directory.CycloneDxSBomTemplatePath) && appSettings.Directory.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
-            {
-                Bom templateDetails;
-                templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(appSettings.Directory.CycloneDxSBomTemplatePath));
-                CycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
-                //Adding Template Component Details & MetaData
-                SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
-            }
+            bom.Dependencies = dependenciesForBOM;           
 
             bom = RemoveExcludedComponents(appSettings, bom);
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();

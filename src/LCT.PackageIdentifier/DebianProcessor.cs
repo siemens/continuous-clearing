@@ -51,11 +51,20 @@ namespace LCT.PackageIdentifier
 
             foreach (string filepath in configFiles)
             {
-                if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                {
+                    Bom templateDetails;
+                    templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(filepath));
+                    CycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
+                    //Adding Template Component Details & MetaData
+                    SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
+                }
+                else
                 {
                     Logger.Debug($"ParsePackageFile():FileName: " + filepath);
                     var list = ParseCycloneDX(filepath, ref bom);
                     listofComponents.AddRange(list);
+                    
                 }
             }
 
@@ -65,14 +74,7 @@ namespace LCT.PackageIdentifier
             BomCreator.bomKpiData.DuplicateComponents = initialCount - listComponentForBOM.Count;
 
             bom.Components = listComponentForBOM;
-            if (File.Exists(appSettings.Directory.CycloneDxSBomTemplatePath) && appSettings.Directory.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
-            {
-                Bom templateDetails;
-                templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(appSettings.Directory.CycloneDxSBomTemplatePath));
-                CycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
-                //Adding Template Component Details & MetaData
-                SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
-            }
+            
 
             bom = RemoveExcludedComponents(appSettings, bom);
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
@@ -131,6 +133,7 @@ namespace LCT.PackageIdentifier
             string[] repoList = (appSettings.Debian?.Artifactory.InternalRepos ?? Array.Empty<string>())
        .Concat(appSettings.Debian?.Artifactory.DevRepos ?? Array.Empty<string>())
        .Concat(appSettings.Debian?.Artifactory.RemoteRepos ?? Array.Empty<string>())
+       .Concat(appSettings.Debian?.Artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? Array.Empty<string>())
        .ToArray();
             List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(repoList, jFrogService);
             Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };

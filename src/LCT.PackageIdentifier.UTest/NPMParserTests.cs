@@ -181,7 +181,7 @@ namespace LCT.PackageIdentifier.UTest
                 {
                     InputFolder = packagefilepath,
                     OutputFolder = outFolder,
-                    CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOM_NpmCATemplate.cdx.json"
+                 
                 }
             };
 
@@ -214,7 +214,7 @@ namespace LCT.PackageIdentifier.UTest
                 {
                     InputFolder = packagefilepath,
                     OutputFolder = outFolder,
-                    CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOMTemplate_Npm.cdx.json"
+                  
                 }
             };
 
