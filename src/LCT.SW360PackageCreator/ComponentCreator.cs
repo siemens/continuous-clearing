@@ -58,49 +58,64 @@ namespace LCT.SW360PackageCreator
         {
             List<Components> lstOfBomDataToBeCompared = new List<Components>();
 
-            foreach (Component item in components)
+
+            //Degree for parallel processing for faster execution is set to 4
+            var parallelOptions = new ParallelOptions
             {
-                Components componentsData = new Components();
+                MaxDegreeOfParallelism = 4
+            };
 
-                string currName = item.Name;
-                string currVersion = item.Version;
-
-                bool isInternalComponent = GetPackageType(item, ref componentsData);
-
-                if (isInternalComponent)
+            await Parallel.ForEachAsync(components, parallelOptions, async (item, cancellationToken) =>
+            {
+                try
                 {
-                    Logger.Debug($"{item.Name}-{item.Version} found as internal component. ");
-                }
-                else if (componentsData.IsDev == "true" && appSettings.RemoveDevDependency)
-                {
-                    //do nothing
-                }
-                else
-                {
-                    componentsData.DownloadUrl = Dataconstant.DownloadUrlNotFound;
-                    componentsData.Name = GetPackageName(item);
-                    componentsData.Group = item.Group;
-                    componentsData.Version = item.Version;
-                    componentsData.ComponentExternalId = item.Purl.Substring(0, item.Purl.IndexOf('@'));
-                    componentsData.ReleaseExternalId = item.Purl;
+                    Components componentsData = new Components();
+                    string currName = item.Name;
+                    string currVersion = item.Version;
 
-                    Components component = await GetSourceUrl(componentsData.Name, componentsData.Version, componentsData.ProjectType, item.BomRef);
-                    componentsData.SourceUrl = component.SourceUrl;
+                    bool isInternalComponent = GetPackageType(item, ref componentsData);
 
-                    if (componentsData.ProjectType.ToUpperInvariant() == "ALPINE")
+                    if (isInternalComponent)
                     {
-                        componentsData.AlpineSourceData = component.AlpineSourceData;
+                        Logger.Debug($"{item.Name}-{item.Version} found as internal component. ");
                     }
-
-                    if (componentsData.ProjectType.ToUpperInvariant() == "DEBIAN")
+                    else if (componentsData.IsDev == "true" && appSettings.RemoveDevDependency)
                     {
-                        componentsData = component;
+                        //do nothing
                     }
-                    UpdateToLocalBomFile(componentsData, currName, currVersion);
+                    else
+                    {
+                        componentsData.DownloadUrl = Dataconstant.DownloadUrlNotFound;
+                        componentsData.Name = GetPackageName(item);
+                        componentsData.Group = item.Group;
+                        componentsData.Version = item.Version;
+                        componentsData.ComponentExternalId = item.Purl.Substring(0, item.Purl.IndexOf('@'));
+                        componentsData.ReleaseExternalId = item.Purl;
 
-                    lstOfBomDataToBeCompared.Add(componentsData);
+                        //Currently only Alpine and Debian source code is downloading intially for all the packages,
+                        //rest of the packages will be downloaded on demand
+                        Components component = new Components();
+                        if (componentsData.ProjectType.ToUpperInvariant() == "ALPINE")
+                        {
+                            component = await GetSourceUrl(componentsData.Name, componentsData.Version, componentsData.ProjectType, item.BomRef);
+                            componentsData.AlpineSourceData = component.AlpineSourceData;
+                        }
+
+                        if (componentsData.ProjectType.ToUpperInvariant() == "DEBIAN")
+                        {
+                            component = await GetSourceUrl(componentsData.Name, componentsData.Version, componentsData.ProjectType, item.BomRef);
+                            componentsData = component;
+                        }
+                        UpdateToLocalBomFile(componentsData, currName, currVersion);
+
+                        lstOfBomDataToBeCompared.Add(componentsData);
+                    }
                 }
-            }
+                catch (Exception ex)
+                {
+                    Logger.Error($"Error processing item {item.Name}: {ex.Message}", ex);
+                }
+            });
 
             return lstOfBomDataToBeCompared;
         }
@@ -240,7 +255,7 @@ namespace LCT.SW360PackageCreator
             bom = await creatorHelper.GetUpdatedComponentsDetails(ListofBomComponents, UpdatedCompareBomData, sw360Service, bom);
 
             var formattedString = CycloneDX.Json.Serializer.Serialize(bom);
-            
+
             fileOperations.WriteContentToOutputBomFile(formattedString, bomGenerationPath,
                 FileConstant.BomFileName, appSettings.SW360ProjectName);
 
@@ -265,7 +280,7 @@ namespace LCT.SW360PackageCreator
 
             Logger.Debug($"CreateComponentInSw360():End");
         }
-               
+
         private async Task CreateComponent(ICreatorHelper creatorHelper,
             ISw360CreatorService sw360CreatorService, List<ComparisonBomData> componentsToBoms,
             string sw360Url, CommonAppSettings appSettings)
@@ -486,7 +501,7 @@ namespace LCT.SW360PackageCreator
             }
             catch (AggregateException ex)
             {
-                Logger.DebugFormat("\tError in TriggerFossologyProcess--{0}",ex);
+                Logger.DebugFormat("\tError in TriggerFossologyProcess--{0}", ex);
             }
             return uploadId;
         }
@@ -561,7 +576,7 @@ namespace LCT.SW360PackageCreator
                 ReleasesFoundInCbom.Add(new ReleaseLinked() { Name = item.Name, Version = item.Version, ReleaseId = releaseIdToLink });
             }
             else
-            {                
+            {
                 Environment.ExitCode = -1;
                 Logger.Fatal($"Linking release to the project is failed. " +
                             $"Release version - {item.Version} not found under this component - {item.Name}. ");

@@ -27,6 +27,9 @@ using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+using YamlDotNet.Core;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace LCT.SW360PackageCreator
 {
@@ -233,6 +236,28 @@ namespace LCT.SW360PackageCreator
                 mapper.DownloadUrl = item.DownloadUrl;
                 mapper.ComponentStatus = GetComponentAvailabilityStatus(componentsAvailableInSw360, item);
                 mapper.ReleaseStatus = IsReleaseAvailable(item.Name, item.Version, item.ReleaseExternalId);
+
+                if(!string.IsNullOrEmpty(mapper.ReleaseExternalId) && mapper.ReleaseStatus == Dataconstant.NotAvailable && string.IsNullOrEmpty(mapper.SourceUrl))
+                {
+                    if(item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["NPM"]))
+                        {
+                        mapper.SourceUrl = UrlHelper.Instance.GetSourceUrlForNpmPackage(mapper.Name, mapper.Version);
+                    }
+                    else if(item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["NUGET"]))
+                        {
+                        mapper.SourceUrl = await UrlHelper.Instance.GetSourceUrlForNugetPackage(mapper.Name, mapper.Version);
+                    }
+                    else if (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["PYTHON"]))
+                        {
+                        mapper.SourceUrl = await UrlHelper.Instance.GetSourceUrlForPythonPackage(mapper.Name, mapper.Version);
+                    }
+                    else if (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CONAN"]))
+                        {
+                        mapper.SourceUrl = await UrlHelper.Instance.GetSourceUrlForConanPackage(mapper.Name, mapper.Version);
+                    }
+                }
+
+
                 mapper.AlpineSource = item.AlpineSourceData;
                 if (!string.IsNullOrEmpty(item.ReleaseExternalId) && item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
                 {
