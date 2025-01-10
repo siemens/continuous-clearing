@@ -58,7 +58,6 @@ namespace LCT.SW360PackageCreator
         {
             List<Components> lstOfBomDataToBeCompared = new List<Components>();
 
-
             //Degree for parallel processing for faster execution is set to 4
             var parallelOptions = new ParallelOptions
             {

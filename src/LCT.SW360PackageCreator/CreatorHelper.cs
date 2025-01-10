@@ -27,9 +27,7 @@ using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using System.Xml.Linq;
-using YamlDotNet.Core;
-using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
+
 
 namespace LCT.SW360PackageCreator
 {
