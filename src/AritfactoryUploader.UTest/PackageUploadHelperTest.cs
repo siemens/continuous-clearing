@@ -406,12 +406,12 @@ namespace AritfactoryUploader.UTest
         public async Task GetSrcRepoDetailsForPyPiOrConanPackages_WhenPypiRepoExists_ReturnsArtifactoryRepoName()
         {
             // Arrange
-            Property prop1 = new Property
+            Property repoNameProperty = new Property
             {
                 Name = Dataconstant.Cdx_ArtifactoryRepoName,
                 Value = "Reponame"
             };
-            List<Property> properties = new List<Property>() { prop1 };
+            List<Property> properties = new List<Property>() { repoNameProperty };            
             var item = new Component
             {
                 Purl = "pypi://example-package",
@@ -419,7 +419,18 @@ namespace AritfactoryUploader.UTest
                 Name = "pypi component",
                 Version = "1.0.0"
             };
+            AqlProperty pypiNameProperty = new AqlProperty
+            {
+                Key = "pypi.normalized.name",
+                Value = "pypi component"
+            };
 
+            AqlProperty pypiVersionProperty = new AqlProperty
+            {
+                Key = "pypi.version",
+                Value = "1.0.0"
+            };
+            List<AqlProperty> propertys = new List<AqlProperty> { pypiNameProperty, pypiVersionProperty };
             //GetInternalComponentDataByRepo
             var aqlResultList = new List<AqlResult>
             {
@@ -428,22 +439,24 @@ namespace AritfactoryUploader.UTest
                     Repo = "pypi-repo",
                     Path = "path/to/package",
                     Name = "pypi component-1.0.0",
+                    Properties=propertys,
                 }
             };
             var jFrogServiceMock = new Mock<IJFrogService>();
-            jFrogServiceMock.Setup(x => x.GetInternalComponentDataByRepo(It.IsAny<string>())).ReturnsAsync(aqlResultList);
+
+            jFrogServiceMock.Setup(x => x.GetPypiComponentDataByRepo(It.IsAny<string>())).ReturnsAsync(aqlResultList);
+            
             PackageUploadHelper.jFrogService = jFrogServiceMock.Object;
 
             // Act
-            var result = await PackageUploadHelper.GetSrcRepoDetailsForPyPiOrConanPackages(item);
+            var result = await PackageUploadHelper.GetSrcRepoDetailsForComponent(item);
 
             // Assert
             Assert.IsNotNull(result);
             Assert.AreEqual("pypi-repo", result.Repo);
             Assert.AreEqual("path/to/package", result.Path);
         }
-
-        public async Task GetSrcRepoDetailsForPyPiOrConanPackages_WhenConanRepoExists_ReturnsArtifactoryRepoName()
+        public async static Task GetSrcRepoDetailsForPyPiOrConanPackages_WhenConanRepoExists_ReturnsArtifactoryRepoName()
         {
             // Arrange
             Property prop1 = new Property
@@ -474,7 +487,7 @@ namespace AritfactoryUploader.UTest
             PackageUploadHelper.jFrogService = jFrogServiceMock.Object;
 
             // Act
-            var result = await PackageUploadHelper.GetSrcRepoDetailsForPyPiOrConanPackages(item);
+            var result = await PackageUploadHelper.GetSrcRepoDetailsForComponent(item);
 
             // Assert
             Assert.IsNotNull(result);
@@ -494,7 +507,7 @@ namespace AritfactoryUploader.UTest
             PackageUploadHelper.jFrogService = jFrogServiceMock.Object;
 
             // Act
-            var result = await PackageUploadHelper.GetSrcRepoDetailsForPyPiOrConanPackages(item);
+            var result = await PackageUploadHelper.GetSrcRepoDetailsForComponent(item);
 
             // Assert
             Assert.IsNull(result);
@@ -744,7 +757,7 @@ namespace AritfactoryUploader.UTest
         }
 
         [Test]
-        [TestCase("NPM", "source-repo/package-name/-/package-name-1.0.0.tgz?to=/destination-repo/package-name/-/package-name-1.0.0.tgz")]
+        [TestCase("NPM", "?to=/destination-repo//")]
         [TestCase("NUGET", "source-repo/package-name.1.0.0.nupkg?to=/destination-repo/package-name.1.0.0.nupkg")]
         [TestCase("MAVEN", "source-repo/package-name/1.0.0?to=/destination-repo/package-name/1.0.0")]
         [TestCase("CONAN", "source-repo/?to=/destination-repo/")]
@@ -798,7 +811,7 @@ namespace AritfactoryUploader.UTest
 
 
         [Test]
-        [TestCase("NPM", "source-repo/package-name/-/package-name-1.0.0.tgz?to=/destination-repo/package-name/-/package-name-1.0.0.tgz")]
+        [TestCase("NPM", "?to=/destination-repo//")]
         [TestCase("NUGET", "source-repo/package-name.1.0.0.nupkg?to=/destination-repo/package-name.1.0.0.nupkg")]
         [TestCase("MAVEN", "source-repo/package-name/1.0.0?to=/destination-repo/package-name/1.0.0")]
         [TestCase("CONAN", "source-repo/?to=/destination-repo/")]
@@ -848,6 +861,54 @@ namespace AritfactoryUploader.UTest
 
             // Assert
             Assert.AreEqual(string.Empty, result);
+        }
+
+        [Test]
+        public async Task GetSrcRepoDetailsForPyPiOrConanPackages_WhenNpmRepoExists_ReturnsArtifactoryRepoName()
+        {
+            // Arrange
+            var repoNameProperty = new Property
+            {
+                Name = Dataconstant.Cdx_ArtifactoryRepoName,
+                Value = "npm-repo"
+            };
+            var properties = new List<Property> { repoNameProperty };
+            var item = new Component
+            {
+                Purl = "pkg:npm/example-package",
+                Properties = properties,
+                Name = "example-package",
+                Version = "1.0.0"
+            };
+            var aqlResultList = new List<AqlResult>
+        {
+            new AqlResult
+            {
+                Repo = "npm-repo",
+                Path = "path/to/package",
+                Name = "example-package-1.0.0",
+                Properties = new List<AqlProperty>
+                {
+                    new AqlProperty { Key = "npm.name", Value = "example-package" },
+                    new AqlProperty { Key = "npm.version", Value = "1.0.0" }
+                }
+            }
+        };
+
+            var jFrogServiceMock = new Mock<IJFrogService>();
+
+            jFrogServiceMock.Setup(x => x.GetNpmComponentDataByRepo(It.IsAny<string>())).ReturnsAsync(aqlResultList);
+
+            PackageUploadHelper.jFrogService = jFrogServiceMock.Object;
+
+
+            // Act
+            var result = await PackageUploadHelper.GetSrcRepoDetailsForComponent(item);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("npm-repo", result.Repo);
+            Assert.AreEqual("path/to/package", result.Path);
         }
     }
 }

@@ -5,6 +5,7 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace LCT.APICommunications.Model.AQL
 {
@@ -31,5 +32,14 @@ namespace LCT.APICommunications.Model.AQL
 
         [JsonProperty("sha256")]
         public string SHA256 { get; set; }
+
+        public List<AqlProperty> Properties { get; set; }
+
     }
+    public class AqlProperty
+    {
+        public string Key { get; set; }
+        public string Value { get; set; }
+    }
+
 }

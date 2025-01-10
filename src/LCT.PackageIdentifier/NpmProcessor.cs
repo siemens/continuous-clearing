@@ -41,6 +41,7 @@ namespace LCT.PackageIdentifier
         private const string Version = "version";
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
         private const string Requires = "requires";
+        private const string Name = "name";
         public NpmProcessor(ICycloneDXBomParser cycloneDXBomParser)
         {
             _cycloneDXBomParser = cycloneDXBomParser;
@@ -227,7 +228,16 @@ namespace LCT.PackageIdentifier
                 }
 
                 string folderPath = CommonHelper.TrimEndOfString(filepath, $"\\{FileConstant.PackageLockFileName}");
-                string packageName = CommonHelper.GetSubstringOfLastOccurance(prop.Name, $"node_modules/");
+                string packageName=string.Empty;
+                if (properties[Name] != null)
+                {
+                    packageName = Convert.ToString(properties[Name]);                   
+                }
+                else 
+                {
+                    packageName = CommonHelper.GetSubstringOfLastOccurance(prop.Name, $"node_modules/");
+                }
+                
                 string componentName = packageName.StartsWith('@') ? packageName.Replace("@", "%40") : packageName;
 
                 if (packageName.Contains('@'))
@@ -238,7 +248,7 @@ namespace LCT.PackageIdentifier
                 else
                 {
                     components.Name = packageName;
-                }
+                }                
 
                 components.Type = Component.Classification.Library;
                 components.Description = folderPath;
@@ -353,7 +363,7 @@ namespace LCT.PackageIdentifier
         {
             // get the  component list from Jfrog for given repo
             List<AqlResult> aqlResultList =
-                await bomhelper.GetListOfComponentsFromRepo(appSettings.InternalRepoList, jFrogService);
+                await bomhelper.GetNpmListOfComponentsFromRepo(appSettings.InternalRepoList, jFrogService);
 
             // find the components in the list of internal components
             List<Component> internalComponents = new List<Component>();
@@ -396,15 +406,17 @@ namespace LCT.PackageIdentifier
         {
             // get the  component list from Jfrog for given repo + internal repo
             string[] repoList = appSettings.InternalRepoList.Concat(appSettings.Npm?.JfrogNpmRepoList).ToArray();
-            List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(repoList, jFrogService);
+            List<AqlResult> aqlResultList = await bomhelper.GetNpmListOfComponentsFromRepo(repoList, jFrogService);
+           
             Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
             List<Component> modifiedBOM = new List<Component>();
 
             foreach (var component in componentsForBOM)
             {
-                string jfrogpackageName = $"{component.Name}-{component.Version}{ApiConstant.NpmExtension}";
-                var hashes = aqlResultList.FirstOrDefault(x => x.Name == jfrogpackageName);
-
+                
+                string jfrogpackageName= bomhelper.GetFullNameOfComponent(component);
+                
+                var hashes = aqlResultList.FirstOrDefault(x => x.Properties.Any(p => p.Key == "npm.name" && p.Value == jfrogpackageName) && x.Properties.Any(p => p.Key == "npm.version" && p.Value == component.Version));
                 string jfrogRepoPath = string.Empty;
                 AqlResult finalRepoData = GetJfrogArtifactoryRepoDetials(aqlResultList, component, bomhelper, out jfrogRepoPath);
                 Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = finalRepoData.Repo };
@@ -625,21 +637,11 @@ namespace LCT.PackageIdentifier
         private static bool IsInternalNpmComponent(
             List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
         {
-            string jfrogcomponentName = $"{component.Name}-{component.Version}.tgz";
-            if (aqlResultList.Exists(
-                x => x.Name.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase)))
+            string jfrogcomponentName = bomHelper.GetFullNameOfComponent(component);
+            if (aqlResultList.Exists(x => x.Properties.Any(p => p.Key == "npm.name" && p.Value == jfrogcomponentName) && x.Properties.Any(p => p.Key == "npm.version" && p.Value == component.Version)))
             {
                 return true;
-            }
-
-            string fullName = bomHelper.GetFullNameOfComponent(component);
-            string fullNameVersion = $"{fullName}-{component.Version}.tgz";
-            if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase)
-                && aqlResultList.Exists(
-                    x => x.Name.Equals(fullNameVersion, StringComparison.OrdinalIgnoreCase)))
-            {
-                return true;
-            }
+            }            
 
             return false;
         }
@@ -651,25 +653,11 @@ namespace LCT.PackageIdentifier
         {
             AqlResult aqlResult = new AqlResult();
             jfrogRepoPath = Dataconstant.JfrogRepoPathNotFound;
-            string jfrogcomponentName = $"{component.Name}-{component.Version}.tgz";
+            string jfrogpackageName = bomHelper.GetFullNameOfComponent(component);           
 
-            var aqlResults = aqlResultList.FindAll(x => x.Name.Equals(
-                jfrogcomponentName, StringComparison.OrdinalIgnoreCase));
+            var aqlResults = aqlResultList.FindAll(x => x.Properties.Any(p => p.Key == "npm.name" && p.Value == jfrogpackageName) && x.Properties.Any(p => p.Key == "npm.version" && p.Value == component.Version));
 
             string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults);
-
-            if (repoName.Equals(NotFoundInRepo, StringComparison.OrdinalIgnoreCase))
-            {
-                string fullName = bomHelper.GetFullNameOfComponent(component);
-                string fullNameVersion = $"{fullName}-{component.Version}.tgz";
-                if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase))
-                {
-                    aqlResults = aqlResultList.FindAll(x => x.Name.Equals(
-                        fullNameVersion, StringComparison.OrdinalIgnoreCase));
-
-                    repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults);
-                }
-            }
 
             // Forming Jfrog repo Path
             if (!repoName.Equals(NotFoundInRepo, StringComparison.OrdinalIgnoreCase))

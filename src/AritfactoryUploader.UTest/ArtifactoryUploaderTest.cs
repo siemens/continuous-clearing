@@ -54,7 +54,7 @@ namespace AritfactoryUploader.UTest
                 JfrogApi = "https://abc.jfrog.io/artifactory",
                 SrcRepoName = "org1-pythonhosted-pypi-remote-cache",
                 SrcRepoPathWithFullName = "org1-pythonhosted-pypi-remote-cache/6c/dd/a834df6482147d48e225a49515aabc28974ad5a4ca3215c18a882565b028/html5lib-1.1-py2.py3-none-any.whl",
-                PypiCompName = "html5lib-1.1-py2.py3-none-any.whl",
+                PypiOrNpmCompName = "html5lib-1.1-py2.py3-none-any.whl",
                 DestRepoName = "pypi-test",
                 ApiKey = "",
                 Email = "",
@@ -111,7 +111,7 @@ namespace AritfactoryUploader.UTest
             var timeout = 10000;
             var displayPackagesInfo = new DisplayPackagesInfo();
             var jFrogServiceMock = new Mock<IJFrogService>();
-            jFrogServiceMock.Setup(x => x.GetPackageInfo(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+            jFrogServiceMock.Setup(x => x.GetPackageInfo(component))
                 .ReturnsAsync((AqlResult)null);
             ArtfactoryUploader.jFrogService = jFrogServiceMock.Object;
             // Act
@@ -140,7 +140,7 @@ namespace AritfactoryUploader.UTest
             var displayPackagesInfo = new DisplayPackagesInfo();
             var jFrogServiceMock = new Mock<IJFrogService>();
             var jfrogApicommunicationMock = new Mock<IJFrogApiCommunication>();
-            jFrogServiceMock.Setup(x => x.GetPackageInfo(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+            jFrogServiceMock.Setup(x => x.GetPackageInfo(component))
                 .ReturnsAsync(new AqlResult());
             jfrogApicommunicationMock.Setup(x => x.CopyFromRemoteRepo(It.IsAny<ComponentsToArtifactory>()))
                 .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK));
@@ -171,7 +171,7 @@ namespace AritfactoryUploader.UTest
             var displayPackagesInfo = new DisplayPackagesInfo();
             var jFrogServiceMock = new Mock<IJFrogService>();
             var jfrogApicommunicationMock = new Mock<IJFrogApiCommunication>();
-            jFrogServiceMock.Setup(x => x.GetPackageInfo(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+            jFrogServiceMock.Setup(x => x.GetPackageInfo(component))
                 .ReturnsAsync(new AqlResult());
             jfrogApicommunicationMock.Setup(x => x.MoveFromRepo(It.IsAny<ComponentsToArtifactory>()))
                 .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK));
@@ -227,7 +227,7 @@ namespace AritfactoryUploader.UTest
             var displayPackagesInfo = new DisplayPackagesInfo();
             var jFrogServiceMock = new Mock<IJFrogService>();
             var jfrogApicommunicationMock = new Mock<IJFrogApiCommunication>();
-            jFrogServiceMock.Setup(x => x.GetPackageInfo(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+            jFrogServiceMock.Setup(x => x.GetPackageInfo(component))
                 .ThrowsAsync(new HttpRequestException());
             ArtfactoryUploader.jFrogService = jFrogServiceMock.Object;
             ArtfactoryUploader.JFrogApiCommInstance = jfrogApicommunicationMock.Object;
@@ -257,7 +257,7 @@ namespace AritfactoryUploader.UTest
             var displayPackagesInfo = new DisplayPackagesInfo();
             var jFrogServiceMock = new Mock<IJFrogService>();
             var jfrogApicommunicationMock = new Mock<IJFrogApiCommunication>();
-            jFrogServiceMock.Setup(x => x.GetPackageInfo(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+            jFrogServiceMock.Setup(x => x.GetPackageInfo(component))
                 .ThrowsAsync(new InvalidOperationException());
             ArtfactoryUploader.jFrogService = jFrogServiceMock.Object;
             ArtfactoryUploader.JFrogApiCommInstance = jfrogApicommunicationMock.Object;
