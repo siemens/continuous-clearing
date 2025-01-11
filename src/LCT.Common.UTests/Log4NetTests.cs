@@ -196,7 +196,7 @@ namespace LCT.Common.UTest
         {
             // Arrange
             bool verbose = true;
-            string? logPath = null;
+            string logPath = null;
             IAppender[] appenders = [new RollingFileAppender()];
 
             // Act

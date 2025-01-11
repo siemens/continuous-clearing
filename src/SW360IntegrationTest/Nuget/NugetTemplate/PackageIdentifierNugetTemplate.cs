@@ -52,7 +52,6 @@ namespace SW360IntegrationTest.Nuget
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
                 TestConstant.ProjectType,"NUGET",
-                TestConstant.CycloneDxSBomTemplatePath,sbomTemplatePath,
                 TestConstant.Mode,""}),
                 "Test to run  Package Identifier EXE execution");
         }

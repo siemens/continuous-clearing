@@ -40,7 +40,21 @@ namespace LCT.Common
         public static List<Component> RemoveExcludedComponents(List<Component> ComponentList, List<string> ExcludedComponents, ref int noOfExcludedComponents)
         {
             List<Component> ExcludedList = new List<Component>();
-            foreach (string excludedComponent in ExcludedComponents)
+            List<string> ExcludedComponentsFromPurl = ExcludedComponents?.Where(ec => ec.StartsWith("pkg:")).ToList();
+            List<string> otherExcludedComponents = ExcludedComponents?.Where(ec => !ec.StartsWith("pkg:")).ToList();
+
+            foreach (string excludedComponent in ExcludedComponentsFromPurl)
+            {
+                foreach (var component in ComponentList)
+                {
+                    if (component.Purl != null && component.Purl.Equals(excludedComponent, StringComparison.OrdinalIgnoreCase))
+                    {
+                        noOfExcludedComponents++;
+                        ExcludedList.Add(component);
+                    }
+                }
+            }
+            foreach (string excludedComponent in otherExcludedComponents)
             {
                 string[] excludedcomponent = excludedComponent.ToLower().Split(':');
                 foreach (var component in ComponentList)

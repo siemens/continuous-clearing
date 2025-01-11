@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using LCT.Common.Model;
 using LCT.Services.Interface;
 using LCT.APICommunications.Model.AQL;
+using LCT.Common.Interface;
 
 namespace LCT.PackageIdentifier.UTest
 {
@@ -177,15 +178,23 @@ namespace LCT.PackageIdentifier.UTest
                 }
             };
 
-            CommonAppSettings appSettings = new CommonAppSettings()
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                ArtifactoryUploadApiKey = "testvalue",
                 ProjectType = "DEBIAN",
-                Debian = new Config()
+                Debian = new Config
                 {
-                    JfrogDebianRepoList = new string[] { "here" }
+                    Artifactory = new Artifactory
+                    {
+                        RemoteRepos = new string[] { "here" }
+                    }
                 },
-                JFrogApi = "https://jfrogapi"
+                Jfrog = new Jfrog
+                {
+                    Token = "testvalue",
+                    URL = "https://jfrogapi"
+                }
             };
             List<AqlResult> aqlResultList = new()
             {
@@ -227,16 +236,36 @@ namespace LCT.PackageIdentifier.UTest
                 }
             };
 
-            CommonAppSettings appSettings = new CommonAppSettings()
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                ArtifactoryUploadApiKey = "testvalue",
                 ProjectType = "NPM",
-                Debian = new Config()
+                Npm = new Config
                 {
-                    JfrogDebianRepoList = new string[] { "here" }
+                    Artifactory = new Artifactory
+                    {
+                        RemoteRepos = new string[] { "here" }
+                    }
                 },
-                JFrogApi = "https://jfrogapi"
+                Jfrog = new Jfrog
+                {
+                    Token = "testvalue",
+                    URL = "https://jfrogapi"
+                }
             };
+            AqlProperty npmNameProperty = new AqlProperty
+            {
+                Key = "npm.name",
+                Value = "Test"
+            };
+
+            AqlProperty npmVersionProperty = new AqlProperty
+            {
+                Key = "npm.version",
+                Value = "1"
+            };
+            List<AqlProperty> propertys = new List<AqlProperty> { npmNameProperty, npmVersionProperty };
             List<AqlResult> aqlResultList = new()
             {
                 new()
@@ -244,6 +273,7 @@ namespace LCT.PackageIdentifier.UTest
                     Path="test/test",
                     Name="Test-1.tgz",
                     Repo="remote",
+                    Properties=propertys,
                     MD5="7654345676543",
                     SHA256="65434567",
                     SHA1="765434567654"
@@ -252,10 +282,10 @@ namespace LCT.PackageIdentifier.UTest
             mockIProcessor.Setup(x => x.GetJfrogArtifactoryRepoInfo(It.IsAny<CommonAppSettings>(), It.IsAny<ArtifactoryCredentials>(), It.IsAny<Component>(), It.IsAny<string>())).ReturnsAsync(lstComponentForBOM);
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
-            IParser parser = new DebianProcessor(cycloneDXBomParser.Object);
+            IParser parser = new NpmProcessor(cycloneDXBomParser.Object);
             Mock<IJFrogService> jFrogService = new Mock<IJFrogService>();
             Mock<IBomHelper> bomHelper = new Mock<IBomHelper>();
-            bomHelper.Setup(x => x.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>())).ReturnsAsync(aqlResultList);
+            bomHelper.Setup(x => x.GetNpmListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>())).ReturnsAsync(aqlResultList);
 
             //Act
             var expected = await parser.GetJfrogRepoDetailsOfAComponent(lstComponentForBOM, appSettings, jFrogService.Object, bomHelper.Object);
@@ -277,15 +307,23 @@ namespace LCT.PackageIdentifier.UTest
                 }
             };
 
-            CommonAppSettings appSettings = new CommonAppSettings()
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                ArtifactoryUploadApiKey = "testvalue",
-                ProjectType = "NUGET",
-                Debian = new Config()
+                ProjectType = "Nuget",
+                Nuget = new Config
                 {
-                    JfrogDebianRepoList = new string[] { "here" }
+                    Artifactory = new Artifactory
+                    {
+                        RemoteRepos = new string[] { "here" }
+                    }
                 },
-                JFrogApi = "https://jfrogapi"
+                Jfrog = new Jfrog
+                {
+                    Token = "testvalue",
+                    URL = "https://jfrogapi"
+                }
             };
             List<AqlResult> aqlResultList = new()
             {
@@ -302,7 +340,7 @@ namespace LCT.PackageIdentifier.UTest
             mockIProcessor.Setup(x => x.GetJfrogArtifactoryRepoInfo(It.IsAny<CommonAppSettings>(), It.IsAny<ArtifactoryCredentials>(), It.IsAny<Component>(), It.IsAny<string>())).ReturnsAsync(lstComponentForBOM);
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
-            IParser parser = new DebianProcessor(cycloneDXBomParser.Object);
+            IParser parser = new NugetProcessor(cycloneDXBomParser.Object);
             Mock<IJFrogService> jFrogService = new Mock<IJFrogService>();
             Mock<IBomHelper> bomHelper = new Mock<IBomHelper>();
             bomHelper.Setup(x => x.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>())).ReturnsAsync(aqlResultList);
@@ -327,16 +365,36 @@ namespace LCT.PackageIdentifier.UTest
                 }
             };
 
-            CommonAppSettings appSettings = new CommonAppSettings()
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                ArtifactoryUploadApiKey = "testvalue",
-                ProjectType = "PYTHON",
-                Debian = new Config()
+                ProjectType = "POETRY",
+                Poetry = new Config
                 {
-                    JfrogDebianRepoList = new string[] { "here" }
+                    Artifactory = new Artifactory
+                    {
+                        RemoteRepos = new string[] { "here" }
+                    }
                 },
-                JFrogApi = "https://jfrogapi"
+                Jfrog = new Jfrog
+                {
+                    Token = "testvalue",
+                    URL = "https://jfrogapi"
+                }
             };
+            AqlProperty pypiNameProperty = new AqlProperty
+            {
+                Key = "pypi.normalized.name",
+                Value = "Test"
+            };
+
+            AqlProperty pypiVersionProperty = new AqlProperty
+            {
+                Key = "pypi.version",
+                Value = "1"
+            };
+            List<AqlProperty> propertys = new List<AqlProperty> { pypiNameProperty, pypiVersionProperty };
             List<AqlResult> aqlResultList = new()
             {
                 new()
@@ -344,18 +402,20 @@ namespace LCT.PackageIdentifier.UTest
                     Path="test/test",
                     Name="Test-1.whl",
                     Repo="remote",
+                    Properties=propertys,
                     MD5="7654345676543",
                     SHA256="65434567",
                     SHA1="765434567654"
+                    
                 }
             };
             mockIProcessor.Setup(x => x.GetJfrogArtifactoryRepoInfo(It.IsAny<CommonAppSettings>(), It.IsAny<ArtifactoryCredentials>(), It.IsAny<Component>(), It.IsAny<string>())).ReturnsAsync(lstComponentForBOM);
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
-            IParser parser = new DebianProcessor(cycloneDXBomParser.Object);
+            IParser parser = new PythonProcessor(cycloneDXBomParser.Object);
             Mock<IJFrogService> jFrogService = new Mock<IJFrogService>();
             Mock<IBomHelper> bomHelper = new Mock<IBomHelper>();
-            bomHelper.Setup(x => x.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>())).ReturnsAsync(aqlResultList);
+            bomHelper.Setup(x => x.GetPypiListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>())).ReturnsAsync(aqlResultList);
 
             //Act
             var expected = await parser.GetJfrogRepoDetailsOfAComponent(lstComponentForBOM, appSettings, jFrogService.Object, bomHelper.Object);
@@ -377,15 +437,23 @@ namespace LCT.PackageIdentifier.UTest
                 }
             };
 
-            CommonAppSettings appSettings = new CommonAppSettings()
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                ArtifactoryUploadApiKey = "testvalue",
                 ProjectType = "Conan",
-                Debian = new Config()
+                Conan = new Config
                 {
-                    JfrogDebianRepoList = new string[] { "here" }
+                    Artifactory = new Artifactory
+                    {
+                        RemoteRepos = new string[] { "here" }
+                    }
                 },
-                JFrogApi = "https://jfrogapi"
+                Jfrog = new Jfrog
+                {
+                    Token = "testvalue",
+                    URL = "https://jfrogapi"
+                }
             };
             List<AqlResult> aqlResultList = new()
             {
@@ -402,7 +470,7 @@ namespace LCT.PackageIdentifier.UTest
             mockIProcessor.Setup(x => x.GetJfrogArtifactoryRepoInfo(It.IsAny<CommonAppSettings>(), It.IsAny<ArtifactoryCredentials>(), It.IsAny<Component>(), It.IsAny<string>())).ReturnsAsync(lstComponentForBOM);
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
-            IParser parser = new DebianProcessor(cycloneDXBomParser.Object);
+            IParser parser = new ConanProcessor(cycloneDXBomParser.Object);
             Mock<IJFrogService> jFrogService = new Mock<IJFrogService>();
             Mock<IBomHelper> bomHelper = new Mock<IBomHelper>();
             bomHelper.Setup(x => x.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>())).ReturnsAsync(aqlResultList);
@@ -427,15 +495,23 @@ namespace LCT.PackageIdentifier.UTest
                 }
             };
 
-            CommonAppSettings appSettings = new CommonAppSettings()
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                ArtifactoryUploadApiKey = "testvalue",
                 ProjectType = "MAVEN",
-                Debian = new Config()
+                Maven = new Config
                 {
-                    JfrogDebianRepoList = new string[] { "here" }
+                    Artifactory = new Artifactory
+                    {
+                        RemoteRepos = new string[] { "here" }
+                    }
                 },
-                JFrogApi = "https://jfrogapi"
+                Jfrog = new Jfrog
+                {
+                    Token = "testvalue",
+                    URL = "https://jfrogapi"
+                }
             };
             List<AqlResult> aqlResultList = new()
             {
@@ -452,7 +528,7 @@ namespace LCT.PackageIdentifier.UTest
             mockIProcessor.Setup(x => x.GetJfrogArtifactoryRepoInfo(It.IsAny<CommonAppSettings>(), It.IsAny<ArtifactoryCredentials>(), It.IsAny<Component>(), It.IsAny<string>())).ReturnsAsync(lstComponentForBOM);
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
-            IParser parser = new DebianProcessor(cycloneDXBomParser.Object);
+            IParser parser = new MavenProcessor(cycloneDXBomParser.Object);
             Mock<IJFrogService> jFrogService = new Mock<IJFrogService>();
             Mock<IBomHelper> bomHelper = new Mock<IBomHelper>();
             bomHelper.Setup(x => x.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>())).ReturnsAsync(aqlResultList);

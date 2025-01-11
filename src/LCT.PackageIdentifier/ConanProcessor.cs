@@ -75,7 +75,7 @@ namespace LCT.PackageIdentifier
         {
             // get the  component list from Jfrog for given repository
             List<AqlResult> aqlResultList =
-                await bomhelper.GetListOfComponentsFromRepo(appSettings.InternalRepoList, jFrogService);
+                await bomhelper.GetListOfComponentsFromRepo(appSettings.Conan.Artifactory.InternalRepos, jFrogService);
 
             // find the components in the list of internal components
             List<Component> internalComponents = new List<Component>();
@@ -118,7 +118,11 @@ namespace LCT.PackageIdentifier
             CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
             // get the  component list from Jfrog for given repo + internal repo
-            string[] repoList = appSettings.InternalRepoList.Concat(appSettings.Conan?.JfrogConanRepoList).ToArray();
+            string[] repoList = (appSettings.Conan?.Artifactory.InternalRepos ?? Array.Empty<string>())
+       .Concat(appSettings.Conan?.Artifactory.DevRepos ?? Array.Empty<string>())
+       .Concat(appSettings.Conan?.Artifactory.RemoteRepos ?? Array.Empty<string>())
+       .Concat(appSettings.Conan?.Artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? Array.Empty<string>())
+       .ToArray();
             List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(repoList, jFrogService);
             Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
             List<Component> modifiedBOM = new List<Component>();
@@ -133,15 +137,22 @@ namespace LCT.PackageIdentifier
                 Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = repoName };
                 Property jfrogRepoPathProperty = new() { Name = Dataconstant.Cdx_JfrogRepoPath, Value = jfrogRepoPath };
                 Component componentVal = component;
-                if (artifactoryrepo.Value == appSettings.Conan.JfrogDevDestRepoName)
+                if (artifactoryrepo.Value == appSettings.Conan.DevDepRepo)
                 {
                     BomCreator.bomKpiData.DevdependencyComponents++;
                 }
-                if (artifactoryrepo.Value == appSettings.Conan.JfrogThirdPartyDestRepoName)
-                {
-                    BomCreator.bomKpiData.ThirdPartyRepoComponents++;
+                if (appSettings.Conan.Artifactory.ThirdPartyRepos != null)                {
+                    
+                    foreach (var thirdPartyRepo in appSettings.Conan.Artifactory.ThirdPartyRepos)
+                    {
+                        if (artifactoryrepo.Value == thirdPartyRepo.Name)
+                        {
+                            BomCreator.bomKpiData.ThirdPartyRepoComponents++;
+                            break;
+                        }
+                    }
                 }
-                if (artifactoryrepo.Value == appSettings.Conan.JfrogInternalDestRepoName)
+                if (artifactoryrepo.Value == appSettings.Conan.ReleaseRepo)
                 {
                     BomCreator.bomKpiData.ReleaseRepoComponents++;
                 }
@@ -208,22 +219,21 @@ namespace LCT.PackageIdentifier
         {
             MultipleVersions multipleVersions = new MultipleVersions();
             IFileOperations fileOperations = new FileOperations();
-            string filename = $"{appSettings.BomFolderPath}\\{appSettings.SW360ProjectName}_{FileConstant.multipleversionsFileName}";
-            if (string.IsNullOrEmpty(appSettings.IdentifierBomFilePath) || (!File.Exists(filename)))
+            string filename = $"{appSettings.Directory.OutputFolder}\\{appSettings.SW360.ProjectName}_{FileConstant.multipleversionsFileName}";
+            if (string.IsNullOrEmpty(appSettings.Directory.OutputFolder) || (!File.Exists(filename)))
             {
                 multipleVersions.Conan = new List<MultipleVersionValues>();
                 foreach (var conanPackage in componentsWithMultipleVersions)
                 {
-                    conanPackage.Description = !string.IsNullOrEmpty(appSettings.CycloneDxSBomTemplatePath) ? appSettings.CycloneDxSBomTemplatePath : conanPackage.Description;
-
+                 
                     MultipleVersionValues jsonComponents = new MultipleVersionValues();
                     jsonComponents.ComponentName = conanPackage.Name;
                     jsonComponents.ComponentVersion = conanPackage.Version;
                     jsonComponents.PackageFoundIn = conanPackage.Description;
                     multipleVersions.Conan.Add(jsonComponents);
                 }
-                fileOperations.WriteContentToMultipleVersionsFile(multipleVersions, appSettings.BomFolderPath, FileConstant.multipleversionsFileName, appSettings.SW360ProjectName);
-                Logger.Warn($"\nTotal Multiple versions detected {multipleVersions.Conan.Count} and details can be found at {appSettings.BomFolderPath}\\{appSettings.SW360ProjectName}_{FileConstant.multipleversionsFileName}\n");
+                fileOperations.WriteContentToMultipleVersionsFile(multipleVersions, appSettings.Directory.OutputFolder, FileConstant.multipleversionsFileName, appSettings.SW360.ProjectName);
+                Logger.Warn($"\nTotal Multiple versions detected {multipleVersions.Conan.Count} and details can be found at {appSettings.Directory.OutputFolder}\\{appSettings.SW360.ProjectName}_{FileConstant.multipleversionsFileName}\n");
             }
             else
             {
@@ -232,8 +242,7 @@ namespace LCT.PackageIdentifier
                 List<MultipleVersionValues> conanComponents = new List<MultipleVersionValues>();
                 foreach (var conanPackage in componentsWithMultipleVersions)
                 {
-                    conanPackage.Description = !string.IsNullOrEmpty(appSettings.CycloneDxSBomTemplatePath) ? appSettings.CycloneDxSBomTemplatePath : conanPackage.Description;
-
+                  
                     MultipleVersionValues jsonComponents = new MultipleVersionValues();
                     jsonComponents.ComponentName = conanPackage.Name;
                     jsonComponents.ComponentVersion = conanPackage.Version;
@@ -243,8 +252,8 @@ namespace LCT.PackageIdentifier
                 }
                 myDeserializedClass.Conan = conanComponents;
 
-                fileOperations.WriteContentToMultipleVersionsFile(myDeserializedClass, appSettings.BomFolderPath, FileConstant.multipleversionsFileName, appSettings.SW360ProjectName);
-                Logger.Warn($"\nTotal Multiple versions detected {conanComponents.Count} and details can be found at {appSettings.BomFolderPath}\\{appSettings.SW360ProjectName}_{FileConstant.multipleversionsFileName}\n");
+                fileOperations.WriteContentToMultipleVersionsFile(myDeserializedClass, appSettings.Directory.OutputFolder, FileConstant.multipleversionsFileName, appSettings.SW360.ProjectName);
+                Logger.Warn($"\nTotal Multiple versions detected {conanComponents.Count} and details can be found at {appSettings.Directory.OutputFolder}\\{appSettings.SW360.ProjectName}_{FileConstant.multipleversionsFileName}\n");
             }
         }
         private void ParsingInputFileForBOM(CommonAppSettings appSettings, ref Bom bom)
@@ -252,7 +261,7 @@ namespace LCT.PackageIdentifier
             List<string> configFiles;
             List<Dependency> dependencies = new List<Dependency>();
             List<Component> componentsForBOM = new List<Component>();
-            configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Conan);
+            configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Conan);
 
             foreach (string filepath in configFiles)
             {
@@ -272,6 +281,15 @@ namespace LCT.PackageIdentifier
                     GetDetailsforManuallyAddedComp(bom.Components);
                     componentsForBOM.AddRange(bom.Components);
                 }
+                else if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                {
+                    Bom templateDetails;
+                    templateDetails = ExtractSBOMDetailsFromTemplate(
+                        _cycloneDXBomParser.ParseCycloneDXBom(filepath));
+                    CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
+                    SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
+
+                }
             }
 
             int initialCount = componentsForBOM.Count;
@@ -289,16 +307,7 @@ namespace LCT.PackageIdentifier
                 bom.Dependencies = dependencies;
             }
 
-            if (File.Exists(appSettings.CycloneDxSBomTemplatePath) 
-                && appSettings.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
-            {
-                //Adding Template Component Details
-                Bom templateDetails;
-                templateDetails = ExtractSBOMDetailsFromTemplate(
-                    _cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
-                CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
-                SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
-            }
+            
 
             bom = RemoveExcludedComponents(appSettings, bom);
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
@@ -543,9 +552,9 @@ namespace LCT.PackageIdentifier
             List<Component> componentForBOM = cycloneDXBOM.Components.ToList();
             List<Dependency> dependenciesForBOM = cycloneDXBOM.Dependencies?.ToList() ?? new List<Dependency>();
             int noOfExcludedComponents = 0;
-            if (appSettings.Conan.ExcludedComponents != null)
+            if (appSettings.SW360.ExcludeComponents != null)
             {
-                componentForBOM = CommonHelper.RemoveExcludedComponents(componentForBOM, appSettings.Conan.ExcludedComponents, ref noOfExcludedComponents);
+                componentForBOM = CommonHelper.RemoveExcludedComponents(componentForBOM, appSettings.SW360.ExcludeComponents, ref noOfExcludedComponents);
                 dependenciesForBOM = CommonHelper.RemoveInvalidDependenciesAndReferences(componentForBOM, dependenciesForBOM);
                 BomCreator.bomKpiData.ComponentsExcluded += noOfExcludedComponents;
             }

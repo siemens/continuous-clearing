@@ -17,12 +17,16 @@ using log4net;
 using log4net.Core;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.IO;
+
 
 namespace LCT.PackageIdentifier
+
 {
     /// <summary>
     /// BomCreator model
@@ -74,12 +78,12 @@ namespace LCT.PackageIdentifier
             Program.BomStopWatch?.Stop();
             bomKpiData.TimeTakenByBomCreator = Program.BomStopWatch == null ? 0 :
               TimeSpan.FromMilliseconds(Program.BomStopWatch.ElapsedMilliseconds).TotalSeconds;
-            fileOperations.WriteContentToFile(bomKpiData, appSettings.BomFolderPath,
-                FileConstant.BomKpiDataFileName, appSettings.SW360ProjectName);
+            fileOperations.WriteContentToFile(bomKpiData, appSettings.Directory.OutputFolder,
+                FileConstant.BomKpiDataFileName, appSettings.SW360.ProjectName);
 
             // Writes Project Summary Url on CLI
-            string projectURL = bomHelper.GetProjectSummaryLink(appSettings.SW360ProjectID, appSettings.SW360URL);
-            bomKpiData.ProjectSummaryLink = $"Link to the summary page of the configurred project:{appSettings.SW360ProjectName} => {projectURL}\n";
+            string projectURL = bomHelper.GetProjectSummaryLink(appSettings.SW360.ProjectID, appSettings.SW360.URL);
+            bomKpiData.ProjectSummaryLink = $"Link to the summary page of the configurred project:{appSettings.SW360.ProjectName} => {projectURL}\n";
 
             // Writes kpi info to console table
             bomKpiData.InternalComponents = componentData.internalComponents != null ? componentData.internalComponents.Count : 0;
@@ -99,18 +103,24 @@ namespace LCT.PackageIdentifier
         private static void WriteContentToCycloneDxBOM(CommonAppSettings appSettings, Bom listOfComponentsToBom, ref BomKpiData bomKpiData)
         {
             IFileOperations fileOperations = new FileOperations();
+            string bomFileName = $"{appSettings.SW360.ProjectName}_Bom.cdx.json";
+            string outputFolderPath = appSettings.Directory.OutputFolder;
+            string[] files = System.IO.Directory.GetFiles(outputFolderPath);
 
-            if (string.IsNullOrEmpty(appSettings.IdentifierBomFilePath))
+            bool fileExists = files.Length > 0 && files.Any(file => Path.GetFileName(file).Equals(bomFileName, StringComparison.OrdinalIgnoreCase));
+
+            if (fileExists && appSettings.MultipleProjectType)
             {
+                string existingFilePath = files.FirstOrDefault(file => Path.GetFileName(file).Equals(bomFileName, StringComparison.OrdinalIgnoreCase));
+                listOfComponentsToBom = fileOperations.CombineComponentsFromExistingBOM(listOfComponentsToBom, existingFilePath);
+                bomKpiData.ComponentsInComparisonBOM = listOfComponentsToBom.Components.Count;
                 string formattedString = CommonHelper.AddSpecificValuesToBOMFormat(listOfComponentsToBom);
-                fileOperations.WriteContentToOutputBomFile(formattedString, appSettings.BomFolderPath, FileConstant.BomFileName, appSettings.SW360ProjectName);
+                fileOperations.WriteContentToOutputBomFile(formattedString, outputFolderPath, FileConstant.BomFileName, appSettings.SW360.ProjectName);
             }
             else
             {
-                listOfComponentsToBom = fileOperations.CombineComponentsFromExistingBOM(listOfComponentsToBom, appSettings.IdentifierBomFilePath);
-                bomKpiData.ComponentsInComparisonBOM = listOfComponentsToBom.Components.Count;
                 string formattedString = CommonHelper.AddSpecificValuesToBOMFormat(listOfComponentsToBom);
-                fileOperations.WriteContentToOutputBomFile(formattedString, appSettings.BomFolderPath, FileConstant.BomFileName, appSettings.SW360ProjectName);
+                fileOperations.WriteContentToOutputBomFile(formattedString, outputFolderPath, FileConstant.BomFileName, appSettings.SW360.ProjectName);
             }
 
         }       
@@ -136,7 +146,7 @@ namespace LCT.PackageIdentifier
                 case "ALPINE":
                     parser = new AlpineProcessor(CycloneDXBomParser);
                     return await ComponentIdentification(appSettings, parser);
-                case "PYTHON":
+                case "POETRY":
                     parser = new PythonProcessor(CycloneDXBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 case "CONAN":
