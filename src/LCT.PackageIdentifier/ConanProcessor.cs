@@ -219,13 +219,20 @@ namespace LCT.PackageIdentifier
         {
             MultipleVersions multipleVersions = new MultipleVersions();
             IFileOperations fileOperations = new FileOperations();
+            string bomFileName = $"{appSettings.SW360.ProjectName}_Bom.cdx.json";
+            string outputFolderPath = appSettings.Directory.OutputFolder;
+            string[] files = System.IO.Directory.GetFiles(outputFolderPath);
+
+            bool fileExists = files.Length > 0 && files.Any(file => Path.GetFileName(file).Equals(bomFileName, StringComparison.OrdinalIgnoreCase));
+            string bomFullPath= $"{appSettings.Directory.OutputFolder}\\{appSettings.SW360.ProjectName}_Bom.cdx.json";
+
             string filename = $"{appSettings.Directory.OutputFolder}\\{appSettings.SW360.ProjectName}_{FileConstant.multipleversionsFileName}";
-            if (string.IsNullOrEmpty(appSettings.Directory.OutputFolder) || (!File.Exists(filename)))
+            if (fileExists || (!File.Exists(filename)))
             {
                 multipleVersions.Conan = new List<MultipleVersionValues>();
                 foreach (var conanPackage in componentsWithMultipleVersions)
                 {
-                 
+                    conanPackage.Description = !string.IsNullOrEmpty(bomFullPath) ? bomFullPath : conanPackage.Description;
                     MultipleVersionValues jsonComponents = new MultipleVersionValues();
                     jsonComponents.ComponentName = conanPackage.Name;
                     jsonComponents.ComponentVersion = conanPackage.Version;
