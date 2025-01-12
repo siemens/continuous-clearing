@@ -5,6 +5,7 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using JetBrains.Annotations;
 using LCT.APICommunications;
 using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.Foss;
@@ -12,6 +13,7 @@ using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
 using LCT.Common.Model;
+using LCT.Services;
 using LCT.Services.Interface;
 using LCT.Services.Model;
 using LCT.SW360PackageCreator.Interfaces;
@@ -116,6 +118,7 @@ namespace LCT.SW360PackageCreator
             {
                 MaxDegreeOfParallelism = Dataconstant.MaxDegreeOfParallelism
             };
+
             await ProcessAsyncHelper.ProcessItemsAsync(components, action, parallelOptions);
             return lstOfBomDataToBeCompared;
         }
@@ -289,10 +292,35 @@ namespace LCT.SW360PackageCreator
 
             try
             {
-                foreach (ComparisonBomData item in componentsToBoms)
+                List<ComparisonBomData> comparisonBomsForMixed = componentsToBoms.Where(avl => (avl.ComponentStatus == Dataconstant.Available && avl.ReleaseStatus == Dataconstant.NotAvailable)
+                || (avl.ComponentStatus == Dataconstant.NotAvailable && avl.ReleaseStatus == Dataconstant.NotAvailable)).ToList();
+                // Getting the list of components & releases are avilable
+                List<ComparisonBomData> comparisonBomsForAvilables = componentsToBoms.Where(avl=> avl.ComponentStatus == Dataconstant.Available && avl.ReleaseStatus == Dataconstant.Available).ToList();
+
+                foreach (ComparisonBomData item in comparisonBomsForMixed)
                 {
                     await CreateComponentAndRealease(creatorHelper, sw360CreatorService, item, sw360Url, appSettings);
                 }
+
+                //Processing parallely for existing components
+                Func<ComparisonBomData, CancellationToken, ValueTask> action = async (item, ct) =>
+                {
+                    try
+                    {
+                        await ComponentAndReleaseAvailable(item, sw360Url, sw360CreatorService, appSettings);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error($"CreateComponent() : Error processing item {item.Name}: {ex.Message}", ex);
+                    }
+                };
+
+                var parallelOptions = new ParallelOptions
+                {
+                    MaxDegreeOfParallelism = Dataconstant.MaxDegreeOfParallelism
+                };
+                await ProcessAsyncHelper.ProcessItemsAsync(comparisonBomsForAvilables, action, parallelOptions);
+
 
                 if (appSettings.ProjectType.ToUpperInvariant() == "ALPINE")
                 {
@@ -353,8 +381,6 @@ namespace LCT.SW360PackageCreator
             await CreateComponentAndReleaseWhenNotAvailable(item, sw360CreatorService, creatorHelper, appSettings);
 
             await CreateReleaseWhenNotAvailable(item, sw360CreatorService, creatorHelper, appSettings);
-
-            await ComponentAndReleaseAvailable(item, sw360Url, sw360CreatorService, appSettings);
         }
 
         private async Task CreateComponentAndReleaseWhenNotAvailable(ComparisonBomData item,
