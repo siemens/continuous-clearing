@@ -218,16 +218,11 @@ namespace LCT.PackageIdentifier
         private static void CreateFileForMultipleVersions(List<Component> componentsWithMultipleVersions, CommonAppSettings appSettings)
         {
             MultipleVersions multipleVersions = new MultipleVersions();
-            IFileOperations fileOperations = new FileOperations();
-            string bomFileName = $"{appSettings.SW360.ProjectName}_Bom.cdx.json";
-            string outputFolderPath = appSettings.Directory.OutputFolder;
-            string[] files = System.IO.Directory.GetFiles(outputFolderPath);
-
-            bool fileExists = files.Length > 0 && files.Any(file => Path.GetFileName(file).Equals(bomFileName, StringComparison.OrdinalIgnoreCase));
+            IFileOperations fileOperations = new FileOperations();            
             string bomFullPath= $"{appSettings.Directory.OutputFolder}\\{appSettings.SW360.ProjectName}_Bom.cdx.json";
 
             string filename = $"{appSettings.Directory.OutputFolder}\\{appSettings.SW360.ProjectName}_{FileConstant.multipleversionsFileName}";
-            if (fileExists || (!File.Exists(filename)))
+            if (!File.Exists(filename))
             {
                 multipleVersions.Conan = new List<MultipleVersionValues>();
                 foreach (var conanPackage in componentsWithMultipleVersions)
