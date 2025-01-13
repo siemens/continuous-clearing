@@ -5,6 +5,7 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.ArtifactPublisher.Interface;
+using System.Runtime.InteropServices;
 
 namespace LCT.ArtifactPublisher
 {
@@ -37,9 +38,17 @@ namespace LCT.ArtifactPublisher
         public void UploadLogs()
         {
             if (!string.IsNullOrEmpty(CatoolLogPath) && File.Exists(CatoolLogPath))
-            {
+            { 
                 // Output the artifact upload command
-                Console.WriteLine($"##vso[artifact.upload containerfolder={LogContainerFolderName};artifactname={LogArtifactFolderName}]{CatoolLogPath}");
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    Console.WriteLine($"##vso[artifact.upload containerfolder={LogContainerFolderName};artifactname={LogArtifactFolderName}]{CatoolLogPath}");
+                }
+                else
+                {
+                    Console.WriteLine($"##vso[artifact.upload containerfolder={LogContainerFolderName};artifactname={LogArtifactFolderName}]{CatoolLogPath}");
+                }
+                
             }
         }
 
@@ -50,7 +59,15 @@ namespace LCT.ArtifactPublisher
         {
             if (!string.IsNullOrEmpty(CatoolBomFilePath) && File.Exists(CatoolBomFilePath))
             {
-                Console.WriteLine($"##vso[artifact.upload containerfolder={BomContainerFolderName};artifactname={BomArtifactFolderName}]{CatoolBomFilePath}");
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    Console.WriteLine($"##vso[artifact.upload containerfolder={BomContainerFolderName};artifactname={BomArtifactFolderName}]{CatoolBomFilePath}");
+                }
+                else
+                {
+                    Console.WriteLine($"##vso[artifact.upload containerfolder={BomContainerFolderName};artifactname={BomArtifactFolderName}]{CatoolBomFilePath}");
+                }
+                
             }
         }
     }
