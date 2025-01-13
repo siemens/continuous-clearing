@@ -183,7 +183,7 @@ namespace LCT.Common
                         break;
                     }
 
-                    property = currentObject.GetType().GetProperty(part);
+                    property = currentObject.GetType().GetProperty(part, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
                     currentObject = property?.GetValue(currentObject);
                 }
 
