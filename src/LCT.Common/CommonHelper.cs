@@ -170,7 +170,6 @@ namespace LCT.Common
             if (componentInfo.Count > 0 || lstReleaseNotCreated.Count > 0)
             {
                 Logger.Logger.Log(null, Level.Alert, "Action Item required by the user:\n", null);
-                PublishFilesToArtifact();
                 Environment.ExitCode = 2;
             }
 
