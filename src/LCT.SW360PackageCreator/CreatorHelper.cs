@@ -105,7 +105,7 @@ namespace LCT.SW360PackageCreator
                     downloadPath = await _packageDownloderList["DEBIAN"].DownloadPackage(component, localPathforDownload);
                 }
             }
-            else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["PYTHON"]))
+            else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["POETRY"]))
             {
                 downloadPath = await GetAttachmentUrlList(component, localPathforDownload);
             }
@@ -179,7 +179,7 @@ namespace LCT.SW360PackageCreator
             {
                 string componenetFullName = UrlHelper.GetCorrectFileExtension(component.SourceUrl);
                 string downloadFilePath = $"{localPathforDownload}{componenetFullName}";
-                Directory.CreateDirectory(Path.GetDirectoryName(downloadFilePath));
+                System.IO.Directory.CreateDirectory(Path.GetDirectoryName(downloadFilePath));
 
                 if (!string.IsNullOrEmpty(component.SourceUrl) && !component.SourceUrl.Equals(Dataconstant.SourceUrlNotFound))
                 {
@@ -337,11 +337,11 @@ namespace LCT.SW360PackageCreator
             {
                 if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
                 {
-                    localPathforDownload = $"{Directory.GetParent(Directory.GetCurrentDirectory())}/ClearingTool/DownloadedFiles/";
+                    localPathforDownload = $"{System.IO.Directory.GetParent(System.IO.Directory.GetCurrentDirectory())}/ClearingTool/DownloadedFiles/";
                 }
                 else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["ALPINE"]))
                 {
-                    localPathforDownload = $"{Directory.GetParent(Directory.GetCurrentDirectory())}/ClearingTool/DownloadedFiles/";
+                    localPathforDownload = $"{System.IO.Directory.GetParent(System.IO.Directory.GetCurrentDirectory())}/ClearingTool/DownloadedFiles/";
                 }
                 else
                 {
@@ -447,9 +447,9 @@ namespace LCT.SW360PackageCreator
         {
             SW360ConnectionSettings sw360ConnectionSettings = new SW360ConnectionSettings()
             {
-                SW360URL = appSettings.SW360URL,
-                SW360AuthTokenType = appSettings.SW360AuthTokenType,
-                Sw360Token = appSettings.Sw360Token,
+                SW360URL = appSettings.SW360.URL,
+                SW360AuthTokenType = appSettings.SW360.AuthTokenType,
+                Sw360Token = appSettings.SW360.Token,
                 IsTestMode = appSettings.IsTestMode,
                 Timeout = appSettings.TimeOut
             };
@@ -461,9 +461,9 @@ namespace LCT.SW360PackageCreator
         {
             SW360ConnectionSettings sw360ConnectionSettings = new SW360ConnectionSettings()
             {
-                SW360URL = appSettings.SW360URL,
-                SW360AuthTokenType = appSettings.SW360AuthTokenType,
-                Sw360Token = appSettings.Sw360Token,
+                SW360URL = appSettings.SW360.URL,
+                SW360AuthTokenType = appSettings.SW360.AuthTokenType,
+                Sw360Token = appSettings.SW360.Token,
                 IsTestMode = appSettings.IsTestMode,
                 Timeout = appSettings.TimeOut
             };
@@ -538,7 +538,7 @@ namespace LCT.SW360PackageCreator
             // Removes common components
             sourceNotAvailable.RemoveAll(src => lstReleaseNotCreated.Any(rls => src.Name == rls.Name && src.Version == rls.Version));
 
-            CommonHelper.WriteComponentsWithoutDownloadURLToKpi(sourceNotAvailable, lstReleaseNotCreated, appSetting.SW360URL);
+            CommonHelper.WriteComponentsWithoutDownloadURLToKpi(sourceNotAvailable, lstReleaseNotCreated, appSetting.SW360.URL);
         }
 
         private static string GetComponentAvailabilityStatus(List<Components> componentsAvailable, Components component)

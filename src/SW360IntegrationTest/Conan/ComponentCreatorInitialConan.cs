@@ -35,6 +35,7 @@ namespace SW360IntegrationTest.Conan
                 TestConstant.SW360ProjectID, testParameters.SW360ProjectID,
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
+                TestConstant.JfrogConanInternalRepo,"Conan.test",
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
                 TestConstant.ProjectType, "CONAN",
                 TestConstant.Mode,""
@@ -48,7 +49,7 @@ namespace SW360IntegrationTest.Conan
             // Assert
             // Check exit is normal
             Assert.AreEqual(0, TestHelper.RunComponentCreatorExe(new string[] {
-                TestConstant.BomFilePath,bomPath,
+                TestConstant.PackageFilePath,bomPath,
                 TestConstant.Sw360Token, testParameters.SW360AuthTokenValue,
                 TestConstant.SW360URL, testParameters.SW360URL,
                 TestConstant.SW360AuthTokenType, testParameters.SW360AuthTokenType,

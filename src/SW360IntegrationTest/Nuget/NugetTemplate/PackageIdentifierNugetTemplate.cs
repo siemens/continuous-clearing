@@ -51,6 +51,7 @@ namespace SW360IntegrationTest.Nuget
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
+                TestConstant.JfrogNugetInternalRepo,"Nuget.test",
                 TestConstant.ProjectType,"NUGET",
                 TestConstant.Mode,""}),
                 "Test to run  Package Identifier EXE execution");

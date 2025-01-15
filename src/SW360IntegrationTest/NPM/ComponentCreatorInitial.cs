@@ -44,6 +44,7 @@ namespace SW360IntegrationTest.NPM
                 TestConstant.SW360ProjectID, testParameters.SW360ProjectID,
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
+                TestConstant.JfrogNpmInternalRepo,"Npm.test",
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
                 TestConstant.ProjectType, "NPM",
                 TestConstant.Mode,""});
@@ -58,7 +59,7 @@ namespace SW360IntegrationTest.NPM
             // Assert
             // Check return with warning code 2
             Assert.AreEqual(2 | 0, TestHelper.RunComponentCreatorExe(new string[] {
-                TestConstant.BomFilePath,bomPath,
+                TestConstant.PackageFilePath,bomPath,
                 TestConstant.Sw360Token, testParameters.SW360AuthTokenValue,
                 TestConstant.SW360URL, testParameters.SW360URL,
                 TestConstant.SW360AuthTokenType, testParameters.SW360AuthTokenType,

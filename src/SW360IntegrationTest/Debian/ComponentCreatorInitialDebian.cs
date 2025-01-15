@@ -44,6 +44,7 @@ namespace SW360IntegrationTest.Debian
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
+                TestConstant.JfrogDebianInternalRepo,"Debian.test",
                 TestConstant.ProjectType,"DEBIAN",
                 TestConstant.Mode,""});
             }
@@ -56,7 +57,7 @@ namespace SW360IntegrationTest.Debian
             // Assert
             // Check exit is normal
             Assert.AreEqual(0, TestHelper.RunComponentCreatorExe(new string[] {
-                TestConstant.BomFilePath,bomPath,
+                TestConstant.PackageFilePath,bomPath,
                 TestConstant.Sw360Token, testParameters.SW360AuthTokenValue,
                 TestConstant.SW360URL, testParameters.SW360URL,
                 TestConstant.SW360AuthTokenType, testParameters.SW360AuthTokenType,

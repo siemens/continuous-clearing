@@ -228,11 +228,15 @@ namespace LCT.Common
             }
             set
             {
-                if (!AppDomain.CurrentDomain.FriendlyName.Contains("SW360PackageCreator") &&
-                    !AppDomain.CurrentDomain.FriendlyName.Contains("ArtifactoryUploader"))
+                if (AppDomain.CurrentDomain.FriendlyName.Contains("PackageIdentifier"))
                 {
                     folderAction.ValidateFolderPath(value);
                     m_InputFolder = value;
+                }else if (AppDomain.CurrentDomain.FriendlyName.Contains("SW360PackageCreator") &&
+                    AppDomain.CurrentDomain.FriendlyName.Contains("ArtifactoryUploader"))
+                {
+                    _fileOperations.ValidateFilePath(value);
+                    m_InputFolder= value;
                 }
             }
         }

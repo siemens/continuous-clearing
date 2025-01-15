@@ -54,7 +54,7 @@ namespace LCT.SW360PackageCreator
             ProjectReleases projectReleases = new ProjectReleases();
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
-            Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
+            Log4Net.CatoolCurrentDirectory = System.IO.Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
 
 
             string FolderPath = InitiateLogger(appSettings);
@@ -74,13 +74,14 @@ namespace LCT.SW360PackageCreator
             Logger.Logger.Log(null, Level.Notice, $"Input parameters used in Package Creator:\n\t" +
               $"CaToolVersion\t\t --> {caToolInformation.CatoolVersion}\n\t" +
               $"CaToolRunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
-              $"BomFilePath\t\t --> {appSettings.BomFilePath}\n\t" +
-              $"SW360Url\t\t --> {appSettings.SW360URL}\n\t" +
-              $"SW360AuthTokenType\t --> {appSettings.SW360AuthTokenType}\n\t" +
-              $"SW360ProjectName\t --> {appSettings.SW360ProjectName}\n\t" +
-              $"SW360ProjectID\t\t --> {appSettings.SW360ProjectID}\n\t" +
-              $"EnableFossTrigger\t --> {appSettings.EnableFossTrigger}\n\t" +
-              $"RemoveDevDependency\t --> {appSettings.RemoveDevDependency}\n\t" +
+              $"BomFilePath\t\t --> {appSettings.Directory.InputFolder}\n\t" +
+              $"SW360Url\t\t --> {appSettings.SW360.URL}\n\t" +
+              $"SW360AuthTokenType\t --> {appSettings.SW360.AuthTokenType}\n\t" +
+              $"SW360ProjectName\t --> {appSettings.SW360.ProjectName}\n\t" +
+              $"SW360ProjectID\t\t --> {appSettings.SW360.ProjectID}\n\t" +
+              $"FossologyURL\t\t --> {appSettings.SW360.Fossology.URL}\n\t" +
+              $"EnableFossTrigger\t --> {appSettings.SW360.Fossology.EnableTrigger}\n\t" +
+              $"RemoveDevDependency\t --> {appSettings.SW360.IgnoreDevDependency}\n\t" +
               $"LogFolderPath\t\t --> {Path.GetFullPath(FolderPath)}\n\t", null);
 
             if (appSettings.IsTestMode)
@@ -108,9 +109,9 @@ namespace LCT.SW360PackageCreator
             ISw360ProjectService sw360ProjectService;
             SW360ConnectionSettings sw360ConnectionSettings = new SW360ConnectionSettings()
             {
-                SW360URL = appSettings.SW360URL,
-                SW360AuthTokenType = appSettings.SW360AuthTokenType,
-                Sw360Token = appSettings.Sw360Token,
+                SW360URL = appSettings.SW360.URL,
+                SW360AuthTokenType = appSettings.SW360.AuthTokenType,
+                Sw360Token = appSettings.SW360.Token,
                 IsTestMode = appSettings.IsTestMode,
                 Timeout = appSettings.TimeOut
             };

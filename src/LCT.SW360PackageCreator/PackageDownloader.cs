@@ -56,7 +56,7 @@ namespace LCT.SW360PackageCreator
 
             try
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(downloadPath));
+                System.IO.Directory.CreateDirectory(Path.GetDirectoryName(downloadPath));
             }
             catch (UnauthorizedAccessException ex)
             {

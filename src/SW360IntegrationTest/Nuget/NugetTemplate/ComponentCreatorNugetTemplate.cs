@@ -47,6 +47,7 @@ namespace SW360IntegrationTest.Nuget
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
+                TestConstant.JfrogNugetInternalRepo,"Nuget.test",
                 TestConstant.ProjectType,"NUGET",
                 TestConstant.Mode,""});
             }
@@ -60,7 +61,7 @@ namespace SW360IntegrationTest.Nuget
             // Check exit is normal
 
             int value = TestHelper.RunComponentCreatorExe(new string[] {
-                TestConstant.BomFilePath,bomPath,
+                TestConstant.PackageFilePath,bomPath,
                 TestConstant.Sw360Token, testParameters.SW360AuthTokenValue,
                 TestConstant.SW360URL, testParameters.SW360URL,
                 TestConstant.SW360AuthTokenType, testParameters.SW360AuthTokenType,

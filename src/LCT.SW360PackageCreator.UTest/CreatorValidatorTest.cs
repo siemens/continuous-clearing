@@ -32,7 +32,7 @@ namespace LCT.SW360PackageCreator.UTest
             string projectName = "Test";
             ProjectReleases projectReleases=new ProjectReleases();
             var CommonAppSettings = new CommonAppSettings();
-            CommonAppSettings.SW360ProjectName = "Test";
+            CommonAppSettings.SW360.ProjectName = "Test";
             mockISw360ProjectService.Setup(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<String>(), It.IsAny<string>(), projectReleases))
                 .ReturnsAsync(projectName);
 
@@ -51,7 +51,7 @@ namespace LCT.SW360PackageCreator.UTest
             ProjectReleases projectReleases = new ProjectReleases();
             projectReleases.clearingState = "CLOSED";
             var CommonAppSettings = new CommonAppSettings();
-            CommonAppSettings.SW360ProjectName = "Test";
+            CommonAppSettings.SW360.ProjectName = "Test";
             mockISw360ProjectService.Setup(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<String>(), It.IsAny<string>(), projectReleases))
                 .ReturnsAsync(projectName);
 

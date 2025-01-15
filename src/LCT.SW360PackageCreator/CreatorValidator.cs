@@ -23,11 +23,11 @@ namespace LCT.SW360PackageCreator
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static async Task<int> ValidateAppSettings(CommonAppSettings appSettings, ISw360ProjectService sw360ProjectService, ProjectReleases projectReleases)
         {
-            string sw360ProjectName = await sw360ProjectService.GetProjectNameByProjectIDFromSW360(appSettings.SW360ProjectID, appSettings.SW360ProjectName,projectReleases);
+            string sw360ProjectName = await sw360ProjectService.GetProjectNameByProjectIDFromSW360(appSettings.SW360.ProjectID, appSettings.SW360.ProjectName,projectReleases);
 
             if (string.IsNullOrEmpty(sw360ProjectName))
             {
-                throw new InvalidDataException($"Invalid Project Id - {appSettings.SW360ProjectID}");
+                throw new InvalidDataException($"Invalid Project Id - {appSettings.SW360.ProjectID}");
             }
             else if (projectReleases?.clearingState == "CLOSED")
             {
@@ -37,7 +37,7 @@ namespace LCT.SW360PackageCreator
             }
             else
             {
-                appSettings.SW360ProjectName = sw360ProjectName;
+                appSettings.SW360.ProjectName = sw360ProjectName;
             }
             return 0;
         }

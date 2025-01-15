@@ -58,7 +58,7 @@ namespace LCT.SW360PackageCreator
                 string localPathforSourceRepo = GetDownloadPathForAlpineRepo();
                 string fullPath = Path.Combine(localPathforSourceRepo, "aports");
                 var alpineDistro = GetAlpineDistro(bomRef);
-                if (!Directory.Exists(fullPath))
+                if (!System.IO.Directory.Exists(fullPath))
                 {
                     //Clone AlpineRepository
                     CloneSource(localPathforSourceRepo, alpineDistro, fullPath);
@@ -100,7 +100,7 @@ namespace LCT.SW360PackageCreator
             try
             {
                 var pkgFolderName = localPathforSourceRepo + Dataconstant.ForwardSlash + "aports" + Dataconstant.ForwardSlash + "main" + Dataconstant.ForwardSlash + name;
-                if (Directory.Exists(pkgFolderName))
+                if (System.IO.Directory.Exists(pkgFolderName))
                 {
                     var pkgFilePath = localPathforSourceRepo + Dataconstant.ForwardSlash + "aports" + Dataconstant.ForwardSlash + "main" + Dataconstant.ForwardSlash + name + Dataconstant.ForwardSlash + "APKBUILD";
                     if (File.Exists(pkgFilePath))
@@ -128,7 +128,7 @@ namespace LCT.SW360PackageCreator
             try
             {
                 var pkgFolderName = localPathforSourceRepo + Dataconstant.ForwardSlash + "aports" + Dataconstant.ForwardSlash + "main" + Dataconstant.ForwardSlash + name;
-                if (Directory.Exists(pkgFolderName))
+                if (System.IO.Directory.Exists(pkgFolderName))
                 {
                     pkgFilePath = localPathforSourceRepo + Dataconstant.ForwardSlash + "aports" + Dataconstant.ForwardSlash + "main" + Dataconstant.ForwardSlash + name + Dataconstant.ForwardSlash + "APKBUILD";
                     if (File.Exists(pkgFilePath))
@@ -219,10 +219,10 @@ namespace LCT.SW360PackageCreator
             string localPathforSourceRepo = string.Empty;
             try
             {
-                localPathforSourceRepo = $"{Directory.GetParent(Directory.GetCurrentDirectory())}\\ClearingTool\\DownloadedFiles\\";
-                if(!Directory.Exists(localPathforSourceRepo))
+                localPathforSourceRepo = $"{System.IO.Directory.GetParent(System.IO.Directory.GetCurrentDirectory())}\\ClearingTool\\DownloadedFiles\\";
+                if(!System.IO.Directory.Exists(localPathforSourceRepo))
                 {
-                    localPathforSourceRepo = Directory.CreateDirectory(localPathforSourceRepo).ToString();                    
+                    localPathforSourceRepo = System.IO.Directory.CreateDirectory(localPathforSourceRepo).ToString();                    
                 }
             }
             catch (IOException ex)
@@ -284,7 +284,7 @@ namespace LCT.SW360PackageCreator
                 p.Start();
                 p.WaitForExit();
             }
-            if (Directory.Exists(fullPath))
+            if (System.IO.Directory.Exists(fullPath))
             {
                 CheckoutDistro(alpineDistro, fullPath);
             }
