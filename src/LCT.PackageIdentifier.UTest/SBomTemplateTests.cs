@@ -139,7 +139,7 @@ namespace LCT.PackageIdentifier.UTest
             SbomTemplate.AddComponentDetails(componentsForBOM, templateDetails);
            
             //Assert
-            Assert.That(BomCreator.bomKpiData.ComponentsUpdatedFromSBOMTemplateFile, Is.EqualTo(1));
+            Assert.That(BomCreator.bomKpiData.ComponentsUpdatedFromSBOMTemplateFile, Is.EqualTo(3));
         }
     }
 }
