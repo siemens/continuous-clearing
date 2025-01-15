@@ -47,8 +47,9 @@ namespace LCT.ArtifactPublisher
                 else
                 {
                     Console.WriteLine($"##vso[artifact.upload containerfolder={LogContainerFolderName};artifactname={LogArtifactFolderName}]{CatoolLogPath}");
+                    Thread.Sleep(10000);
                 }
-                
+
             }
         }
 
@@ -66,6 +67,7 @@ namespace LCT.ArtifactPublisher
                 else
                 {
                     Console.WriteLine($"##vso[artifact.upload containerfolder={BomContainerFolderName};artifactname={BomArtifactFolderName}]{CatoolBomFilePath}");
+                    Thread.Sleep(10000);
                 }
                 
             }
