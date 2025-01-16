@@ -46,7 +46,7 @@ namespace LCT.ArtifactPublisher
                 }
                 else
                 {
-                    Console.WriteLine($"##vso[artifact.upload containerfolder={LogContainerFolderName};artifactname={LogArtifactFolderName}]/app/out/appSettings.json");
+                    Console.WriteLine($"##vso[artifact.upload containerfolder={LogContainerFolderName};artifactname={LogArtifactFolderName}]/D/ca_image_delivery/CALog/PackageIdentifier.log");
                     Thread.Sleep(10000);
                 }
 
