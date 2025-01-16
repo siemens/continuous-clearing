@@ -270,7 +270,10 @@ namespace LCT.SW360PackageCreator.UTest
                     new Component() { Name = "newtonsoft",Version="3.1.18",Group="",Purl="pkg:nuget/newtonsoft@3.1.18",Properties = properties },
                 };
 
-            CommonAppSettings CommonAppSettings = new CommonAppSettings();
+            CommonAppSettings CommonAppSettings = new()
+            {
+                SW360 = new SW360()
+            };
             List<ComparisonBomData> comparisonBomData = new List<ComparisonBomData>();
             comparisonBomData.Add(new ComparisonBomData());
             var sw360Service = new Mock<ISW360Service>();
@@ -592,7 +595,7 @@ namespace LCT.SW360PackageCreator.UTest
                 .ThrowsAsync(new AggregateException());
 
             // Act
-            var uploadId = await ComponentCreator.TriggerFossologyProcess(item, sw360CreatorServiceMock.Object, new CommonAppSettings());
+            var uploadId = await ComponentCreator.TriggerFossologyProcess(item, sw360CreatorServiceMock.Object, new CommonAppSettings() { SW360=new SW360()});
 
             // Assert
             Assert.AreEqual(string.Empty, uploadId);
@@ -637,7 +640,7 @@ namespace LCT.SW360PackageCreator.UTest
 
 
             // Act
-            var uploadId = await ComponentCreator.TriggerFossologyProcess(item, sw360CreatorServiceMock.Object, new CommonAppSettings());
+            var uploadId = await ComponentCreator.TriggerFossologyProcess(item, sw360CreatorServiceMock.Object, new CommonAppSettings() { SW360 = new SW360() });
 
             // Assert
             Assert.AreEqual("uploadId", uploadId);
