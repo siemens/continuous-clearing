@@ -265,7 +265,7 @@ namespace LCT.PackageIdentifier.UTest
                 Key = "npm.version",
                 Value = "1"
             };
-            List<AqlProperty> propertys = new List<AqlProperty> { npmNameProperty, npmVersionProperty };
+            List<AqlProperty> npmAqlProperties = new List<AqlProperty> { npmNameProperty, npmVersionProperty };
             List<AqlResult> aqlResultList = new()
             {
                 new()
@@ -273,7 +273,7 @@ namespace LCT.PackageIdentifier.UTest
                     Path="test/test",
                     Name="Test-1.tgz",
                     Repo="remote",
-                    Properties=propertys,
+                    Properties=npmAqlProperties,
                     MD5="7654345676543",
                     SHA256="65434567",
                     SHA1="765434567654"

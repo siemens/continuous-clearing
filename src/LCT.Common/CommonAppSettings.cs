@@ -21,7 +21,7 @@ namespace LCT.Common
     public class CommonAppSettings
     {
         private readonly IFolderAction folderAction;
-        private readonly IFileOperations _fileOperations;
+        private readonly IFileOperations fileOperations;
 
         public static string PackageUrlApi { get; set; } = $"https://www.nuget.org/api/v2/package/";
         public static string SourceURLNugetApi { get; set; } = $"https://api.nuget.org/v3-flatcontainer/";
@@ -37,18 +37,18 @@ namespace LCT.Common
         public CommonAppSettings()
         {
             folderAction = new FolderAction();
-            _fileOperations = new FileOperations();
-            Directory = new Directory(folderAction, _fileOperations);
+            fileOperations = new FileOperations();
+            Directory = new Directory(folderAction, fileOperations);
         }
 
-        public CommonAppSettings(IFolderAction iFolderAction, IFileOperations fileOperations)
+        public CommonAppSettings(IFolderAction iFolderAction, IFileOperations ifileOperations)
         {
             folderAction = iFolderAction;
-            _fileOperations = fileOperations;
-            Directory = new Directory(folderAction, _fileOperations);
+            fileOperations = ifileOperations;
+            Directory = new Directory(folderAction, fileOperations);
         }
 
-        public int TimeOut { get; set; } = 400;
+        public int TimeOut { get; set; } = 200;
         public string ProjectType
         {
             get
@@ -211,14 +211,14 @@ namespace LCT.Common
     public class Directory
     {
         private readonly IFolderAction folderAction;
-        private readonly IFileOperations _fileOperations;
+        private readonly IFileOperations fileOperations;
         private string m_InputFolder;
         private string m_OutputFolder;
 
         public Directory(IFolderAction folderAction, IFileOperations fileOperations)
         {
             this.folderAction = folderAction;
-            this._fileOperations = fileOperations;
+            this.fileOperations = fileOperations;
         }
         public string InputFolder
         {
@@ -232,6 +232,12 @@ namespace LCT.Common
                     !AppDomain.CurrentDomain.FriendlyName.Contains("ArtifactoryUploader"))
                 {
                     folderAction.ValidateFolderPath(value);
+                    m_InputFolder = value;
+                }
+                else if (AppDomain.CurrentDomain.FriendlyName.Contains("SW360PackageCreator") ||
+                    AppDomain.CurrentDomain.FriendlyName.Contains("ArtifactoryUploader"))
+                {
+                    fileOperations.ValidateFilePath(value);
                     m_InputFolder = value;
                 }
             }

@@ -43,35 +43,8 @@ namespace LCT.Common
             List<string> ExcludedComponentsFromPurl = ExcludedComponents?.Where(ec => ec.StartsWith("pkg:")).ToList();
             List<string> otherExcludedComponents = ExcludedComponents?.Where(ec => !ec.StartsWith("pkg:")).ToList();
 
-            foreach (string excludedComponent in ExcludedComponentsFromPurl)
-            {
-                foreach (var component in ComponentList)
-                {
-                    if (component.Purl != null && component.Purl.Equals(excludedComponent, StringComparison.OrdinalIgnoreCase))
-                    {
-                        noOfExcludedComponents++;
-                        ExcludedList.Add(component);
-                    }
-                }
-            }
-            foreach (string excludedComponent in otherExcludedComponents)
-            {
-                string[] excludedcomponent = excludedComponent.ToLower().Split(':');
-                foreach (var component in ComponentList)
-                {
-                    string name = component.Name;
-                    if (!string.IsNullOrEmpty(component.Group) && (component.Group != component.Name))
-                    {
-                        name = $"{component.Group}/{component.Name}";
-                    }
-                    if (excludedcomponent.Length > 0 && (Regex.IsMatch(name.ToLowerInvariant(), WildcardToRegex(excludedcomponent[0].ToLowerInvariant()))) &&
-                        (component.Version.ToLowerInvariant().Contains(excludedcomponent[1].ToLowerInvariant()) || excludedcomponent[1].ToLowerInvariant() == "*"))
-                    {
-                        noOfExcludedComponents++;
-                        ExcludedList.Add(component);
-                    }
-                }
-            }
+            ExcludedList.AddRange(RemoveExcludedComponentsFromPurl(ComponentList, ExcludedComponentsFromPurl, ref noOfExcludedComponents));
+            ExcludedList.AddRange(RemoveOtherExcludedComponents(ComponentList, otherExcludedComponents, ref noOfExcludedComponents));
             ComponentList.RemoveAll(item => ExcludedList.Contains(item));
             return ComponentList;
         }
@@ -302,6 +275,59 @@ namespace LCT.Common
             artifactPublisher.UploadLogs();
             artifactPublisher.UploadBom();
         }
+        public static string[] GetRepoList(CommonAppSettings appSettings)
+        {
+            string[] repoList = null;
+
+            if (appSettings.ProjectType.Equals("CONAN", StringComparison.InvariantCultureIgnoreCase))
+            {
+                repoList = (appSettings.Conan?.Artifactory.InternalRepos ?? Array.Empty<string>())
+       .Concat(appSettings.Conan?.Artifactory.DevRepos ?? Array.Empty<string>())
+       .Concat(appSettings.Conan?.Artifactory.RemoteRepos ?? Array.Empty<string>())
+       .Concat(appSettings.Conan?.Artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? Array.Empty<string>())
+       .ToArray();
+            }else if (appSettings.ProjectType.Equals("NPM", StringComparison.InvariantCultureIgnoreCase))
+            {
+                repoList = (appSettings.Npm?.Artifactory.InternalRepos ?? Array.Empty<string>())
+        .Concat(appSettings.Npm?.Artifactory.DevRepos ?? Array.Empty<string>())
+        .Concat(appSettings.Npm?.Artifactory.RemoteRepos ?? Array.Empty<string>())
+        .Concat(appSettings.Npm?.Artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? Array.Empty<string>())
+        .ToArray();
+            }
+            else if (appSettings.ProjectType.Equals("NUGET", StringComparison.InvariantCultureIgnoreCase))
+            {
+                repoList = (appSettings.Nuget?.Artifactory.InternalRepos ?? Array.Empty<string>())
+       .Concat(appSettings.Nuget?.Artifactory.DevRepos ?? Array.Empty<string>())
+       .Concat(appSettings.Nuget?.Artifactory.RemoteRepos ?? Array.Empty<string>())
+       .Concat(appSettings.Nuget?.Artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? Array.Empty<string>())
+       .ToArray();
+            }
+            else if (appSettings.ProjectType.Equals("POETRY", StringComparison.InvariantCultureIgnoreCase))
+            {
+                repoList = (appSettings.Poetry?.Artifactory.InternalRepos ?? Array.Empty<string>())
+      .Concat(appSettings.Poetry?.Artifactory.DevRepos ?? Array.Empty<string>())
+      .Concat(appSettings.Poetry?.Artifactory.RemoteRepos ?? Array.Empty<string>())
+      .Concat(appSettings.Poetry?.Artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? Array.Empty<string>())
+      .ToArray();
+            }
+            else if (appSettings.ProjectType.Equals("DEBIAN", StringComparison.InvariantCultureIgnoreCase))
+            {
+                repoList = (appSettings.Debian?.Artifactory.InternalRepos ?? Array.Empty<string>())
+         .Concat(appSettings.Debian?.Artifactory.DevRepos ?? Array.Empty<string>())
+         .Concat(appSettings.Debian?.Artifactory.RemoteRepos ?? Array.Empty<string>())
+         .Concat(appSettings.Debian?.Artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? Array.Empty<string>())
+         .ToArray();
+            }
+            else if (appSettings.ProjectType.Equals("MAVEN", StringComparison.InvariantCultureIgnoreCase))
+            {
+                repoList = (appSettings.Maven?.Artifactory.InternalRepos ?? Array.Empty<string>())
+        .Concat(appSettings.Maven?.Artifactory.DevRepos ?? Array.Empty<string>())
+        .Concat(appSettings.Maven?.Artifactory.RemoteRepos ?? Array.Empty<string>())
+        .Concat(appSettings.Maven?.Artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? Array.Empty<string>())
+        .ToArray();
+            }
+            return repoList;
+        }
 
         #endregion
 
@@ -315,6 +341,50 @@ namespace LCT.Common
         {
             string sw360URL = $"{sw360Env}{"/group/guest/components/-/component/release/detailRelease/"}{releaseId}";
             return sw360URL;
+        }
+        private static List<Component> RemoveExcludedComponentsFromPurl(List<Component> ComponentList, List<string> ExcludedComponentsFromPurl, ref int noOfExcludedComponents)
+        {
+            List<Component> ExcludedList = new List<Component>();
+
+            foreach (string excludedComponent in ExcludedComponentsFromPurl)
+            {
+                foreach (var component in ComponentList)
+                {
+                    if (component.Purl != null && component.Purl.Equals(excludedComponent, StringComparison.OrdinalIgnoreCase))
+                    {
+                        noOfExcludedComponents++;
+                        ExcludedList.Add(component);
+                    }
+                }
+            }
+
+            return ExcludedList;
+        }
+
+        private static List<Component> RemoveOtherExcludedComponents(List<Component> ComponentList, List<string> otherExcludedComponents, ref int noOfExcludedComponents)
+        {
+            List<Component> ExcludedList = new List<Component>();
+
+            foreach (string excludedComponent in otherExcludedComponents)
+            {
+                string[] excludedcomponent = excludedComponent.ToLower().Split(':');
+                foreach (var component in ComponentList)
+                {
+                    string name = component.Name;
+                    if (!string.IsNullOrEmpty(component.Group) && (component.Group != component.Name))
+                    {
+                        name = $"{component.Group}/{component.Name}";
+                    }
+                    if (excludedcomponent.Length > 0 && (Regex.IsMatch(name.ToLowerInvariant(), WildcardToRegex(excludedcomponent[0].ToLowerInvariant()))) &&
+                        (component.Version.ToLowerInvariant().Contains(excludedcomponent[1].ToLowerInvariant()) || excludedcomponent[1].ToLowerInvariant() == "*"))
+                    {
+                        noOfExcludedComponents++;
+                        ExcludedList.Add(component);
+                    }
+                }
+            }
+
+            return ExcludedList;
         }
         #endregion
     }

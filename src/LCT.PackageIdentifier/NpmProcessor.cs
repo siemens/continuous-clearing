@@ -404,11 +404,7 @@ namespace LCT.PackageIdentifier
             CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
             // get the  component list from Jfrog for given repo + internal repo
-            string[] repoList = (appSettings.Npm?.Artifactory.InternalRepos ?? Array.Empty<string>())
-        .Concat(appSettings.Npm?.Artifactory.DevRepos ?? Array.Empty<string>())
-        .Concat(appSettings.Npm?.Artifactory.RemoteRepos ?? Array.Empty<string>())
-        .Concat(appSettings.Npm?.Artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? Array.Empty<string>())
-        .ToArray();
+            string[] repoList = CommonHelper.GetRepoList(appSettings);
             List<AqlResult> aqlResultList = await bomhelper.GetNpmListOfComponentsFromRepo(repoList, jFrogService);
            
             Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };

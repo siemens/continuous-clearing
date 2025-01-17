@@ -203,6 +203,7 @@ namespace LCT.PackageIdentifier.UTest
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
+                ProjectType = "Conan",
                 SW360 = new SW360(),
                 Conan = new Config
                 {
@@ -255,6 +256,7 @@ namespace LCT.PackageIdentifier.UTest
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
+                ProjectType="Conan",
                 SW360 = new SW360(),
                 Conan = new Config
                 {
