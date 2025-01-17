@@ -751,6 +751,7 @@ namespace LCT.PackageIdentifier.UTest
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
+                ProjectType = "NUGET",
                 SW360 = new SW360(),
                 Nuget = new Config
                 {
@@ -802,6 +803,7 @@ namespace LCT.PackageIdentifier.UTest
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
+                ProjectType = "NUGET",
                 SW360 = new SW360(),
                 Nuget = new Config
                 {
@@ -853,6 +855,7 @@ namespace LCT.PackageIdentifier.UTest
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
+                ProjectType = "NUGET",
                 SW360 = new SW360(),
                 Nuget = new Config
                 {
@@ -904,6 +907,7 @@ namespace LCT.PackageIdentifier.UTest
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
+                ProjectType = "NUGET",
                 SW360 = new SW360(),
                 Nuget = new Config
                 {
@@ -955,6 +959,7 @@ namespace LCT.PackageIdentifier.UTest
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
+                ProjectType = "NUGET",
                 SW360 = new SW360(),
                 Nuget = new Config
                 {
@@ -1007,6 +1012,7 @@ namespace LCT.PackageIdentifier.UTest
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
+                ProjectType = "NUGET",
                 SW360 = new SW360(),
                 Nuget = new Config
                 {

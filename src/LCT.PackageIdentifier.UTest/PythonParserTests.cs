@@ -359,6 +359,7 @@ namespace LCT.PackageIdentifier.UTest
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
+                ProjectType = "POETRY",
                 SW360 = new SW360(),
                 Poetry = new Config
                 {
@@ -422,6 +423,7 @@ namespace LCT.PackageIdentifier.UTest
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
+                ProjectType = "POETRY",
                 SW360 = new SW360(),
                 Poetry = new Config
                 {

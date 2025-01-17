@@ -313,6 +313,7 @@ namespace LCT.PackageIdentifier.UTest
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
+                ProjectType = "Maven",
                 SW360 = new SW360(),
                 Maven = new Config
                 {
@@ -364,6 +365,7 @@ namespace LCT.PackageIdentifier.UTest
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
+                ProjectType = "Maven",
                 SW360 = new SW360(),
                 Maven = new Config
                 {

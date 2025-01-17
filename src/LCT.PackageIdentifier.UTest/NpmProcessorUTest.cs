@@ -326,6 +326,7 @@ namespace LCT.PackageIdentifier.UTest
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
+                ProjectType = "NPM",
                 SW360 = new SW360(),
                 Npm = new Config
                 {
@@ -390,6 +391,7 @@ namespace LCT.PackageIdentifier.UTest
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
+                ProjectType = "NPM",
                 SW360 = new SW360(),
                 Npm = new Config
                 {

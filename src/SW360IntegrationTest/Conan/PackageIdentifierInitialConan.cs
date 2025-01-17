@@ -42,7 +42,7 @@ namespace SW360IntegrationTest.Conan
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
-                TestConstant.JfrogConanInternalRepo,"Conan.test",
+                TestConstant.JfrogConanInternalRepo,"Conan-test",
                 TestConstant.ProjectType,"Conan",
                 TestConstant.Mode,""}),
                 "Test to run  Package Identifier EXE execution");

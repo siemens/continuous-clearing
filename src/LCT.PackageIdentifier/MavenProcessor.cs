@@ -207,11 +207,7 @@ namespace LCT.PackageIdentifier
         {
 
             // get the  component list from Jfrog for given repo + internal repo
-            string[] repoList = (appSettings.Maven?.Artifactory.InternalRepos ?? Array.Empty<string>())
-       .Concat(appSettings.Maven?.Artifactory.DevRepos ?? Array.Empty<string>())
-       .Concat(appSettings.Maven?.Artifactory.RemoteRepos ?? Array.Empty<string>())
-       .Concat(appSettings.Maven?.Artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? Array.Empty<string>())
-       .ToArray();
+            string[] repoList = CommonHelper.GetRepoList(appSettings);
             List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(repoList, jFrogService);
             Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
             List<Component> modifiedBOM = new List<Component>();
