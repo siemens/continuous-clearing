@@ -17,13 +17,13 @@ namespace LCT.ArtifactoryUploader.Model
     {
         [DisplayName(@"Components in Comparison BOM")]
         public int ComponentInComparisonBOM { get; set; }
-        
+
         [DisplayName(@"Packages in Not Approved State")]
         public int ComponentNotApproved { get; set; }
 
         [DisplayName(@"Packages in Approved State")]
         public int PackagesToBeUploaded { get; set; }
-        
+
         [DisplayName(@"Packages Copied to Siparty Repo")]
         public int PackagesUploadedToJfrog { get; set; }
 
@@ -36,8 +36,8 @@ namespace LCT.ArtifactoryUploader.Model
         [DisplayName(@"Packages Not Actioned Due To Error")]
         public int PackagesNotUploadedDueToError { get; set; }
 
-        [DisplayName(@"Time taken by ComponentCreator")]
-        public double TimeTakenByComponentCreator { get; set; }
+        [DisplayName(@"Time taken by Artifactory Uploader")]
+        public double TimeTakenByArtifactoryUploader { get; set; }
 
         [DisplayName(@"Development Packages to be Copied to Siparty DevDep Repo")]
         public int DevPackagesToBeUploaded { get; set; }

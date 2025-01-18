@@ -11,20 +11,20 @@ using LCT.ArtifactoryUploader;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
-using LCT.Facade.Interfaces;
+using LCT.Common.Model;
 using LCT.Facade;
-using LCT.Services.Interface;
+using LCT.Facade.Interfaces;
 using LCT.Services;
+using LCT.Services.Interface;
 using log4net;
 using log4net.Core;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using LCT.Common.Model;
-using System.Diagnostics.CodeAnalysis;
 
 namespace ArtifactoryUploader
 {
@@ -47,7 +47,7 @@ namespace ArtifactoryUploader
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
 
-            Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
+            Log4Net.CatoolCurrentDirectory = System.IO.Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
 
             string FolderPath = InitiateLogger(appSettings);
 
@@ -56,28 +56,29 @@ namespace ArtifactoryUploader
             Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Artifactory Uploader >>>>>====================", null);
             Logger.Logger.Log(null, Level.Notice, $"\nStart of Artifactory Uploader execution: {DateTime.Now}", null);
 
-            if (appSettings.Release)
+            if (appSettings.Jfrog.DryRun)
                 Logger.Logger.Log(null, Level.Alert, $"Artifactory Uploader is running in release mode !!! \n", null);
             else
                 Logger.Logger.Log(null, Level.Alert, $"Artifactory Uploader is running in dry-run mode, no packages will be moved \n", null);
 
+            var bomFilePath = Path.Combine(appSettings.Directory.OutputFolder, appSettings.SW360.ProjectName + FileConstant.BomFileName);
+
             Logger.Logger.Log(null, Level.Info, $"Input Parameters used in Artifactory Uploader:\n\t", null);
-            Logger.Logger.Log(null, Level.Notice, $"\tBomFilePath:\t\t {appSettings.BomFilePath}\n\t" +
+            Logger.Logger.Log(null, Level.Notice, $"\tBomFilePath:\t\t {bomFilePath}\n\t" +
                 $"CaToolVersion\t\t {caToolInformation.CatoolVersion}\n\t" +
                 $"CaToolRunningPath\t {caToolInformation.CatoolRunningLocation}\n\t" +
-                $"JFrogUrl:\t\t {appSettings.JFrogApi}\n\t" +
-                $"Release:\t\t {appSettings.Release}\n\t" +
+                $"JFrogUrl:\t\t {appSettings.Jfrog.URL}\n\t" +
+                $"Dry-run:\t\t {appSettings.Jfrog.DryRun}\n\t" +
                 $"LogFolderPath:\t\t {Path.GetFullPath(FolderPath)}\n", null);
 
             //Validator method to check token validity
             ArtifactoryCredentials artifactoryCredentials = new ArtifactoryCredentials()
             {
-                ApiKey = appSettings.ArtifactoryUploadApiKey,
-                Email = appSettings.ArtifactoryUploadUser
+                Token = appSettings.Jfrog.Token,
             };
-            NpmJfrogApiCommunication jfrogCommunication = new NpmJfrogApiCommunication(appSettings.JFrogApi, appSettings.JfrogNpmSrcRepo, artifactoryCredentials, appSettings.TimeOut);
-            ArtifactoryValidator artifactoryValidator = new(jfrogCommunication);
-            var isValid = await artifactoryValidator.ValidateArtifactoryCredentials(appSettings);
+            IJfrogAqlApiCommunication jfrogAqlApiCommunication = new JfrogAqlApiCommunication(appSettings.Jfrog.URL, artifactoryCredentials, appSettings.TimeOut);
+            ArtifactoryValidator artifactoryValidator = new(jfrogAqlApiCommunication);
+            var isValid = await artifactoryValidator.ValidateArtifactoryCredentials();
             if (isValid == -1)
             {
                 CommonHelper.CallEnvironmentExit(-1);
@@ -88,7 +89,7 @@ namespace ArtifactoryUploader
             await PackageUploader.UploadPackageToArtifactory(appSettings);
 
             Logger.Logger.Log(null, Level.Notice, $"End of Artifactory Uploader execution : {DateTime.Now}\n", null);
-            // publish logs and bom file to pipeline artifact
+            // publish logs and BOM file to pipeline artifact
 
             CommonHelper.PublishFilesToArtifact();
 
@@ -131,10 +132,10 @@ namespace ArtifactoryUploader
         {
             ArtifactoryCredentials artifactoryUpload = new ArtifactoryCredentials()
             {
-                ApiKey = appSettings.ArtifactoryUploadApiKey
+                Token = appSettings.Jfrog.Token
             };
             IJfrogAqlApiCommunication jfrogAqlApiCommunication =
-                new JfrogAqlApiCommunication(appSettings.JFrogApi, artifactoryUpload, appSettings.TimeOut);
+                new JfrogAqlApiCommunication(appSettings.Jfrog.URL, artifactoryUpload, appSettings.TimeOut);
             IJfrogAqlApiCommunicationFacade jFrogApiCommunicationFacade =
                 new JfrogAqlApiCommunicationFacade(jfrogAqlApiCommunication);
             IJFrogService jFrogService = new JFrogService(jFrogApiCommunicationFacade);

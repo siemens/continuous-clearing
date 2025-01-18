@@ -117,8 +117,7 @@ namespace LCT.APICommunications
         private static HttpClient GetHttpClient(ArtifactoryCredentials credentials)
         {
             HttpClient httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", credentials.ApiKey);
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", credentials.Token);
             return httpClient;
         }
 
