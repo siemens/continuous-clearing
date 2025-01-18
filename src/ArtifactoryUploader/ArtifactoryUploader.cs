@@ -12,7 +12,6 @@ using LCT.ArtifactoryUploader.Model;
 using LCT.Services.Interface;
 using log4net;
 using System;
-using System.Configuration;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
