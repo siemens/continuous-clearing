@@ -33,7 +33,7 @@ namespace LCT.ArtifactoryUploader
         public static async Task UploadPackageToArtifactory(CommonAppSettings appSettings)
         {
             //Reading the CycloneBOM data
-            var bomFilePath = Path.Combine(appSettings.Directory.OutputFolder, appSettings.SW360.ProjectName + FileConstant.BomFileName);
+            var bomFilePath = Path.Combine(appSettings.Directory.OutputFolder, appSettings.SW360.ProjectName + "_" + FileConstant.BomFileName);
             Bom m_ComponentsInBOM = PackageUploadHelper.GetComponentListFromComparisonBOM(bomFilePath);
 
             DisplayAllSettings(m_ComponentsInBOM.Components, appSettings);
@@ -153,8 +153,8 @@ namespace LCT.ArtifactoryUploader
                 $"\tTHIRD_PARTY_REPO_NAME:\t{thirdPartyRepoName}\n" +
                 $"\tRELEASE_REPO_NAME:\t{project.ReleaseRepo}\n" +
                 $"\tConfig:\n" +
-                $"\tExclude:\t\t{excludeList}\n" +
-                $"\tInclude:\t\t{includeList}\n", null);
+                $"\t\tExclude:\t\t{excludeList}\n" +
+                $"\t\tInclude:\t\t{includeList}\n", null);
         }
     }
 }

@@ -86,7 +86,7 @@ namespace LCT.ArtifactoryUploader
                         Purl = item.Purl,
                         ComponentType = GetComponentType(item),
                         PackageType = packageType,
-                        DryRun = !appSettings.Jfrog.DryRun,
+                        DryRun = appSettings.Jfrog.DryRun,
                         SrcRepoName = item.Properties.Find(s => s.Name == Dataconstant.Cdx_ArtifactoryRepoName)?.Value,
                         DestRepoName = GetDestinationRepo(item, appSettings),
                         Token = appSettings.Jfrog.Token,
