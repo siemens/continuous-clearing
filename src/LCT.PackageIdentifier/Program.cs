@@ -4,28 +4,31 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using LCT.APICommunications;
+using LCT.APICommunications.Interfaces;
+using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
+using LCT.Common.Model;
 using LCT.Facade;
+using LCT.Facade.Interfaces;
+using LCT.PackageIdentifier.Interface;
 using LCT.Services;
 using LCT.Services.Interface;
-using LCT.PackageIdentifier.Interface;
 using log4net;
 using log4net.Core;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Reflection;
-using System.Threading.Tasks;
-using System.Runtime.InteropServices;
-using LCT.Common.Model;
-using LCT.Facade.Interfaces;
-using LCT.APICommunications.Interfaces;
-using LCT.APICommunications;
-using LCT.APICommunications.Model;
-using System.Linq;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using Telemetry;
 
 
 namespace LCT.PackageIdentifier
@@ -119,6 +122,72 @@ namespace LCT.PackageIdentifier
             // publish logs and bom file to pipeline artifact
             CommonHelper.PublishFilesToArtifact();
 
+            // Initialize telemetry with CATool version and instrumentation key only if Telemetry is enabled in appsettings
+            if (appSettings.Telemetry == true)
+            {
+                Logger.Logger.Log(null, Level.Notice, $"\nStart of Package Identifier Telemtery execution: {DateTime.Now}", null);
+                Telemetry.Telemetry telemetry = new Telemetry.Telemetry("ApplicationInsights", new Dictionary<string, string>
+            {
+                { "InstrumentationKey", appSettings.ApplicationInsight_InstrumentKey }
+            });
+                try
+                {
+                    telemetry.Initialize("CATool", caToolInformation.CatoolVersion);
+
+                    telemetry.TrackCustomEvent("PackageIdentifierExecution", new Dictionary<string, string>
+            {
+                { "CA Tool Version", caToolInformation.CatoolVersion },
+                { "SW360 Project Name", appSettings.SW360ProjectName },
+                { "SW360 Project ID", appSettings.SW360ProjectID },
+                { "Project Type", appSettings.ProjectType },
+                 { "Hashed User ID", HashUtility.GetHashString(Environment.UserName) },
+                { "Start Time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture) }
+            });
+                    // Track KPI data if available
+                    if (BomCreator.bomKpiData != null)
+                    {
+                        telemetry.TrackCustomEvent("BomKpiDataTelemetry", new Dictionary<string, string>
+                    
+                        {
+                { "Hashed User ID", HashUtility.GetHashString(Environment.UserName) },
+                { "Components In Input File", BomCreator.bomKpiData.ComponentsinPackageLockJsonFile.ToString() },
+                { "Dev Dependent Components", BomCreator.bomKpiData.DevDependentComponents.ToString() },
+                { "Bundled Dependent Components", BomCreator.bomKpiData.BundledComponents.ToString() },
+                { "Total Duplicate Components", BomCreator.bomKpiData.DuplicateComponents.ToString() },
+                { "Internal Components Identified", BomCreator.bomKpiData.InternalComponents.ToString() },
+                { "Components already present in 3rd party repo(s)", BomCreator.bomKpiData.ThirdPartyRepoComponents.ToString() },
+                { "Components already present in devdep repo(s)", BomCreator.bomKpiData.DevdependencyComponents.ToString() },
+                { "Components already present in release repo(s)", BomCreator.bomKpiData.ReleaseRepoComponents.ToString() },
+                { "Components not from official repo(s)", BomCreator.bomKpiData.UnofficialComponents.ToString() },
+                { "Total Components Excluded", BomCreator.bomKpiData.ComponentsExcluded.ToString() },
+                { "Components With SourceURL", BomCreator.bomKpiData.ComponentsWithSourceURL.ToString() },
+                { "Components In Comparison BOM", BomCreator.bomKpiData.ComponentsInComparisonBOM.ToString() },
+                { "Time taken by BOM Creator", BomCreator.bomKpiData.TimeTakenByBomCreator.ToString() },
+                { "Components Added From SBOM Template", BomCreator.bomKpiData.ComponentsinSBOMTemplateFile.ToString() },
+                { "Components Updated From SBOM Template", BomCreator.bomKpiData.ComponentsUpdatedFromSBOMTemplateFile.ToString() },
+                { "Project Summary Link", BomCreator.bomKpiData.ProjectSummaryLink },
+                { "Time stamp", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture) }
+            });
+                    }
+
+                    telemetry.TrackExecutionTime();
+                    Logger.Logger.Log(null, Level.Notice, $"End of Package Identifier Telemetry execution : {DateTime.Now}\n", null);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"An error occurred: {ex.Message}");
+                    telemetry.TrackException(ex, new Dictionary<string, string>
+        {
+            { "Error Time", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture) },
+            { "Stack Trace", ex.StackTrace }
+        });
+                    CommonHelper.CallEnvironmentExit(-1);
+                }
+                finally
+                {
+                    telemetry.Flush(); // Ensure telemetry is sent before application exits
+                }
+            }
         }
 
         private static CatoolInfo GetCatoolVersionFromProjectfile()

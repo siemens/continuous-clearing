@@ -52,6 +52,7 @@
   </ItemGroup>-->
   <ItemGroup>
     <ProjectReference Include="..\LCT.PackageIdentifier\LCT.PackageIdentifier.csproj" />
+    <ProjectReference Include="..\TelemetryHelperClass\Telemetry.csproj" />
     <ProjectReference Include="..\UnitTestUtilities\UnitTestUtilities.csproj" />
   </ItemGroup>
   <ItemGroup>

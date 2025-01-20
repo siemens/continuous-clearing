@@ -57,6 +57,9 @@ namespace LCT.Common
 
 
         public bool RemoveDevDependency { get; set; } = true;
+
+        public bool Telemetry { get; set; } = true;
+        public string ApplicationInsight_InstrumentKey { get; set; }
         public string SW360AuthTokenType { get; set; } = "Bearer";
         public string JFrogApi { get; set; }
         public int TimeOut { get; set; } = 200;
