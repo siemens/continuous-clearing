@@ -5,7 +5,7 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.ArtifactPublisher.Interface;
-using System.Runtime.InteropServices;
+using static LCT.ArtifactPublisher.Publish.RuntimeEnvironment;
 
 namespace LCT.ArtifactPublisher
 {
@@ -37,20 +37,19 @@ namespace LCT.ArtifactPublisher
         /// </summary>
         public void UploadLogs()
         {
-            if (!string.IsNullOrEmpty(CatoolLogPath) && File.Exists(CatoolLogPath))
-            { 
-                // Output the artifact upload command
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            var envType = RuntimeEnvironment.GetEnvironment();
+            if (envType== EnvironmentType.AzurePipeline)
+            {
+                if (!string.IsNullOrEmpty(CatoolLogPath) && File.Exists(CatoolLogPath))
                 {
+                    // Output the artifact upload command
                     Console.WriteLine($"##vso[artifact.upload containerfolder={LogContainerFolderName};artifactname={LogArtifactFolderName}]{CatoolLogPath}");
                 }
-                else
-                {
-                    Console.WriteLine($"##vso[artifact.upload containerfolder={LogContainerFolderName};artifactname={LogArtifactFolderName}]/D/ca_image_delivery/CALog/PackageIdentifier.log");
-                    Thread.Sleep(10000);
-                }
-
+            }else if (envType == EnvironmentType.Unknown)
+            {
+                Console.WriteLine("Uploading of SBOM and the logs are not supported.");
             }
+           
         }
 
         /// <summary>
@@ -58,18 +57,60 @@ namespace LCT.ArtifactPublisher
         /// </summary>
         public void UploadBom()
         {
-            if (!string.IsNullOrEmpty(CatoolBomFilePath) && File.Exists(CatoolBomFilePath))
+            var envType = RuntimeEnvironment.GetEnvironment();
+            if (envType == EnvironmentType.AzurePipeline)
             {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                if (!string.IsNullOrEmpty(CatoolBomFilePath) && File.Exists(CatoolBomFilePath))
                 {
                     Console.WriteLine($"##vso[artifact.upload containerfolder={BomContainerFolderName};artifactname={BomArtifactFolderName}]{CatoolBomFilePath}");
                 }
-                else
+            }
+            else if (envType == EnvironmentType.Unknown)
+            {
+                Console.WriteLine("Uploading of SBOM and the logs are not supported.");
+            }
+           
+        }
+
+        public static class RuntimeEnvironment
+        {
+            public static EnvironmentType GetEnvironment()
+            {
+                // Azure Release Pipeline contains both "Release_ReleaseId" and
+                // "Build_BuildId". Therefore we need to check first for "Release_ReleaseId".
+                // https://docs.microsoft.com/en-us/azure/devops/pipelines/release/variables
+                if (IsEnvironmentVariableDefined("Release_ReleaseId"))
                 {
-                    Console.WriteLine($"##vso[artifact.upload containerfolder={BomContainerFolderName};artifactname={BomArtifactFolderName}]{CatoolBomFilePath}");
-                    Thread.Sleep(10000);
+                    return EnvironmentType.AzureRelease;
                 }
-                
+
+                // https://docs.microsoft.com/en-us/azure/devops/pipelines/build/variables
+                if (IsEnvironmentVariableDefined("Build_BuildId"))
+                {
+                    return EnvironmentType.AzurePipeline;
+                }
+
+                // https://docs.gitlab.com/ce/ci/variables/predefined_variables.html
+                if (IsEnvironmentVariableDefined("CI_JOB_ID"))
+                {
+                    return EnvironmentType.GitLab;
+                }
+
+                return EnvironmentType.Unknown;
+            }
+
+            public static bool IsEnvironmentVariableDefined(string name)
+            {
+                string value = Environment.GetEnvironmentVariable(name) ?? string.Empty;
+                return !string.IsNullOrWhiteSpace(value);
+            }
+
+            public enum EnvironmentType
+            {
+                Unknown = 0,
+                GitLab = 1,
+                AzurePipeline = 2,
+                AzureRelease = 3
             }
         }
     }
