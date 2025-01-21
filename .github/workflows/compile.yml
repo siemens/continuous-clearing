@@ -96,7 +96,7 @@ jobs:
         $sourceFolder = Join-Path $env:GITHUB_WORKSPACE "out" | Join-Path -ChildPath "*"
         $outFolder = Join-Path $env:GITHUB_WORKSPACE "out" | Join-Path -ChildPath "continuous-clearing" 
         New-Item -ItemType Directory -Force -Path $outFolder
-        $fileName = "continuous-clearing-v7.0.1.zip"
+        $fileName = "continuous-clearing-v7.0.2.zip"
         Write-Host "Filename: '$fileName'"
         Write-Host "sourceFolder: '$sourceFolder'"
         Write-Host "Outfolder: '$outFolder'"
@@ -129,7 +129,7 @@ jobs:
     - name: Create Nuget Packages 
       id: createNupkg
       run: |
-        nuget pack CA.nuspec -Version 7.0.1
+        nuget pack CA.nuspec -Version 7.0.2
         Write-Host "::set-output name=nupkg-LicenseClearingTool::continuous-clearing.7.0.1.nupkg"
         
     - name: Archive NuGet Packages
@@ -164,9 +164,9 @@ jobs:
       #if: ${{ false }}  # disable for now
       run: |
         echo "Files in directory:"
-        docker build . --file Dockerfile --tag ${{ github.repository }}:continuous-clearing-v7.0.1
-        docker save ${{ github.repository }}:continuous-clearing-v7.0.1 -o continuous-clearing-v7.0.1.tar
-        echo "::set-output name=docker-LicenseClearingTool::continuous-clearing-v7.0.1.tar"
+        docker build . --file Dockerfile --tag ${{ github.repository }}:continuous-clearing-v7.0.2
+        docker save ${{ github.repository }}:continuous-clearing-v7.0.2 -o continuous-clearing-v7.0.2.tar
+        echo "::set-output name=docker-LicenseClearingTool::continuous-clearing-v7.0.2.tar"
         
     - name: Archive docker image      
       #if: ${{ false }}  # disable for now
@@ -214,8 +214,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
         with:
-          tag_name: v7.0.1
-          release_name: Release v7.0.1
+          tag_name: v7.0.2
+          release_name: Release v7.0.2
           body: |
             ${{ github.event.head_commit.message }}
           draft: true
