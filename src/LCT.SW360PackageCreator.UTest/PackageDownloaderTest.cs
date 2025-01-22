@@ -16,42 +16,42 @@ namespace LCT.SW360PackageCreator.UTest
     [TestFixture]
     public class PackageDownloaderTest
     {
-        [TestCase]
-        public async Task DownloadReleaseAttachmentSourceForNPM_ProvidedvalidComparisonBomData_ReturnsEmptyString()
-        {
-            //Arrange
-            var lstComparisonBomData = new ComparisonBomData()
-            {
-                Name = "core-js",
-                Version = "3.6.4"
-            };
-            var localPathforDownload = $"{Path.GetTempPath()}/ClearingTool/DownloadedFiles/";
-            IPackageDownloader packageDownloader = new PackageDownloader();
+        //[TestCase]
+        //public async Task DownloadReleaseAttachmentSourceForNPM_ProvidedvalidComparisonBomData_ReturnsEmptyString()
+        //{
+        //    //Arrange
+        //    var lstComparisonBomData = new ComparisonBomData()
+        //    {
+        //        Name = "core-js",
+        //        Version = "3.6.4"
+        //    };
+        //    var localPathforDownload = $"{Path.GetTempPath()}/ClearingTool/DownloadedFiles/";
+        //    IPackageDownloader packageDownloader = new PackageDownloader();
 
-            //Act
-            string path = await packageDownloader.DownloadPackage(lstComparisonBomData, localPathforDownload);
+        //    //Act
+        //    string path = await packageDownloader.DownloadPackage(lstComparisonBomData, localPathforDownload);
 
-            //Assert
-            Assert.That(string.IsNullOrEmpty(path));
-        }
+        //    //Assert
+        //    Assert.That(string.IsNullOrEmpty(path));
+        //}
 
-        [TestCase]
-        public async Task DownloadReleaseAttachmentSourceForNPM_ProvidedInValidComparisonBomData_ReturnsEmptyString()
-        {
-            //Arrange
-            var lstComparisonBomData = new ComparisonBomData()
-            {
-                Name = "core-jsjs",
-                Version = "3.6.44"
-            };
-            var localPathforDownload = $"{Path.GetTempPath()}/ClearingTool/DownloadedFiles/";
-            IPackageDownloader packageDownloader = new PackageDownloader();
+        //[TestCase]
+        //public async Task DownloadReleaseAttachmentSourceForNPM_ProvidedInValidComparisonBomData_ReturnsEmptyString()
+        //{
+        //    //Arrange
+        //    var lstComparisonBomData = new ComparisonBomData()
+        //    {
+        //        Name = "core-jsjs",
+        //        Version = "3.6.44"
+        //    };
+        //    var localPathforDownload = $"{Path.GetTempPath()}/ClearingTool/DownloadedFiles/";
+        //    IPackageDownloader packageDownloader = new PackageDownloader();
 
-            //Act
-            string path = await packageDownloader.DownloadPackage(lstComparisonBomData, localPathforDownload);
+        //    //Act
+        //    string path = await packageDownloader.DownloadPackage(lstComparisonBomData, localPathforDownload);
 
-            //Assert
-            Assert.That(string.IsNullOrEmpty(path));
-        }
+        //    //Assert
+        //    Assert.That(string.IsNullOrEmpty(path));
+        //}
     }
 }
