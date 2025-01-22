@@ -318,12 +318,12 @@ namespace LCT.SW360PackageCreator.UTest
             });
             var iSW360Service = new Mock<ISW360Service>();
             iSW360Service.Setup(x => x.GetAvailableReleasesInSw360(comparisonBomData)).ReturnsAsync(componentsAvailableInSw360);
-
+            CreatorKpiData creatorKpiData=new( );
             //Act
-            CreatorKpiData data = creatorHelper.GetCreatorKpiData(updatedCompareBomData);
+            creatorHelper.GetCreatorKpiData(updatedCompareBomData, creatorKpiData);
 
             //Assert
-            Assert.That(data.ComponentsReadFromComparisonBOM > 0);
+            Assert.That(creatorKpiData.ComponentsReadFromComparisonBOM > 0);
         }
 
         [Test]

@@ -14,16 +14,19 @@ using LCT.Facade.Interfaces;
 using LCT.Services;
 using LCT.Services.Interface;
 using LCT.SW360PackageCreator.Interfaces;
+using LCT.SW360PackageCreator.Model;
 using log4net;
 using log4net.Core;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using Telemetry;
 
 namespace LCT.SW360PackageCreator
 {
@@ -85,13 +88,78 @@ namespace LCT.SW360PackageCreator
 
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);
+         
+            // Initialize telemetry with CATool version and instrumentation key only if Telemetry is enabled in appsettings
+            if (appSettings.Telemetry == true)
+            {
+                Logger.Logger.Log(null, Level.Notice, $"\nStart of Package Identifier Telemetry execution: {DateTime.Now}", null);
+                Telemetry.Telemetry telemetry = new Telemetry.Telemetry("ApplicationInsights", new Dictionary<string, string>
+    {
+        { "InstrumentationKey", appSettings.ApplicationInsight_InstrumentKey }
+    });
+                try
+                {
+                    telemetry.Initialize("CATool", caToolInformation.CatoolVersion);
+
+                    telemetry.TrackCustomEvent("PackageCreatorExecution", new Dictionary<string, string>
+        {
+            { "CA Tool Version", caToolInformation.CatoolVersion },
+            { "SW360 Project Name", appSettings.SW360ProjectName },
+            { "SW360 Project ID", appSettings.SW360ProjectID },
+            { "Project Type", appSettings.ProjectType },
+            { "Hashed User ID", HashUtility.GetHashString(Environment.UserName) },
+            { "Start Time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture) }
+        });
+                    // Track KPI data if available
+                    if (ComponentCreator.kpiData != null)
+                    {
+                        telemetry.TrackCustomEvent("CreatorKpiDataTelemetry", new Dictionary<string, string>
+            {
+                { "Hashed User ID", HashUtility.GetHashString(Environment.UserName) },
+                { "Components Read From Comparison BOM", ComponentCreator.kpiData.ComponentsReadFromComparisonBOM.ToString() },
+                { "Components Or Releases Created Newly In SW360", ComponentCreator.kpiData.ComponentsOrReleasesCreatedNewlyInSw360.ToString() },
+                { "Components Or Releases Existing In SW360", ComponentCreator.kpiData.ComponentsOrReleasesExistingInSw360.ToString() },
+                { "Components Without Source Download URL", ComponentCreator.kpiData.ComponentsWithoutSourceDownloadUrl.ToString() },
+                { "Components With Source Download URL", ComponentCreator.kpiData.ComponentsWithSourceDownloadUrl.ToString() },
+                { "Components Or Releases Not Created In SW360", ComponentCreator.kpiData.ComponentsOrReleasesNotCreatedInSw360.ToString() },
+                { "Time Taken By Component Creator", ComponentCreator.kpiData.TimeTakenByComponentCreator.ToString() },
+                { "Components Without Source And Package URL", ComponentCreator.kpiData.ComponentsWithoutSourceAndPackageUrl.ToString() },
+                { "Components Without Package URL", ComponentCreator.kpiData.ComponentsWithoutPackageUrl.ToString() },
+                { "Components Uploaded In FOSSology", ComponentCreator.kpiData.ComponentsUploadedInFossology.ToString() },
+                { "Components Not Uploaded In FOSSology", ComponentCreator.kpiData.ComponentsNotUploadedInFossology.ToString() },
+                { "Total Duplicate And Invalid Components", ComponentCreator.kpiData.TotalDuplicateAndInValidComponents.ToString() },
+                { "Time Stamp", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture) }
+            });
+                    }
+
+                    telemetry.TrackExecutionTime();
+                    Logger.Logger.Log(null, Level.Notice, $"End of Package Creator Telemetry execution : {DateTime.Now}\n", null);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"An error occurred: {ex.Message}");
+                    telemetry.TrackException(ex, new Dictionary<string, string>
+        {
+            { "Error Time", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture) },
+            { "Stack Trace", ex.StackTrace }
+        });
+                    CommonHelper.CallEnvironmentExit(-1);
+                }
+                finally
+                {
+                    telemetry.Flush(); // Ensure telemetry is sent before application exits
+                }
+            }
 
             await InitiatePackageCreatorProcess(appSettings, sw360ProjectService, sW360ApicommunicationFacade);
 
             Logger.Logger.Log(null, Level.Notice, $"End of Package Creator execution: {DateTime.Now}\n", null);
-            
+
             // publish logs and bom file to pipeline artifact
             CommonHelper.PublishFilesToArtifact();
+            
+
+
         }
 
         private static CatoolInfo GetCatoolVersionFromProjectfile()
@@ -121,12 +189,14 @@ namespace LCT.SW360PackageCreator
             return sw360ProjectService;
         }
 
-        private static async Task InitiatePackageCreatorProcess(CommonAppSettings appSettings, ISw360ProjectService sw360ProjectService, ISW360ApicommunicationFacade sW360ApicommunicationFacade)
+        private static async Task InitiatePackageCreatorProcess(CommonAppSettings appSettings, ISw360ProjectService sw360ProjectService,
+            ISW360ApicommunicationFacade sW360ApicommunicationFacade)
         {
             ISW360CommonService sw360CommonService = new SW360CommonService(sW360ApicommunicationFacade);
             ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sW360ApicommunicationFacade, sw360CommonService);
             ISW360Service sw360Service = new Sw360Service(sW360ApicommunicationFacade, sw360CommonService);
             ICycloneDXBomParser cycloneDXBomParser = new CycloneDXBomParser();
+
 
             IDebianPatcher debianPatcher = new DebianPatcher();
             IDictionary<string, IPackageDownloader> _packageDownloderList = new Dictionary<string, IPackageDownloader>
@@ -142,7 +212,7 @@ namespace LCT.SW360PackageCreator
             // parsing the input file
             IComponentCreator componentCreator = new ComponentCreator();
             List<ComparisonBomData> parsedBomData = await componentCreator.CycloneDxBomParser(appSettings, sw360Service, cycloneDXBomParser, creatorHelper);
-
+         
             // initializing Component creation 
             await componentCreator.CreateComponentInSw360(appSettings, sw360CreatorService, sw360Service,
                  sw360ProjectService, new FileOperations(), creatorHelper, parsedBomData);

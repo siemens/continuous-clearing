@@ -18,12 +18,16 @@ using LCT.SW360PackageCreator.Interfaces;
 using LCT.SW360PackageCreator.Model;
 using log4net;
 using log4net.Core;
+using Microsoft.ApplicationInsights.Channel;
+using NuGet.Common;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Telemetry;
 
 namespace LCT.SW360PackageCreator
 {
@@ -33,8 +37,11 @@ namespace LCT.SW360PackageCreator
     public class ComponentCreator : IComponentCreator
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+        public static readonly CreatorKpiData kpiData = new();
         public List<ComparisonBomData> UpdatedCompareBomData { get; set; } = new List<ComparisonBomData>();
         public List<ReleaseLinked> ReleasesFoundInCbom { get; set; } = new List<ReleaseLinked>();
+    
         public List<Components> ComponentsNotLinked { get; set; } = new List<Components>();
         private Bom bom = new Bom();
         private List<Components> ListofBomComponents { get; set; } = new List<Components>();
@@ -250,12 +257,14 @@ namespace LCT.SW360PackageCreator
                 FileConstant.ComponentsWithoutSrcFileName, appSettings.SW360ProjectName);
 
             // write Kpi Data
-            CreatorKpiData kpiData = creatorHelper.GetCreatorKpiData(UpdatedCompareBomData);
+            creatorHelper.GetCreatorKpiData(UpdatedCompareBomData, kpiData);
             fileOperations.WriteContentToFile(kpiData, bomGenerationPath,
                 FileConstant.CreatorKpiDataFileName, appSettings.SW360ProjectName);
 
             // write kpi info to console table 
             creatorHelper.WriteCreatorKpiDataToConsole(kpiData);
+
+          
 
             //write download url not found list to kpi 
             creatorHelper.WriteSourceNotFoundListToConsole(UpdatedCompareBomData, appSettings);
