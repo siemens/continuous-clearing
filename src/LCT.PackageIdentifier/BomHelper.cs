@@ -13,8 +13,10 @@ using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
 using log4net.Core;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -49,6 +51,10 @@ namespace LCT.PackageIdentifier
                 {CommonHelper.Convert(bomKpiData,nameof(bomKpiData.ComponentsExcluded)),bomKpiData.ComponentsExcluded},
                 {CommonHelper.Convert(bomKpiData,nameof(bomKpiData.DuplicateComponents)),bomKpiData.DuplicateComponents},
                 {CommonHelper.Convert(bomKpiData,nameof(bomKpiData.InternalComponents)),bomKpiData.InternalComponents},
+                {CommonHelper.Convert(bomKpiData,nameof(bomKpiData.ThirdPartyRepoComponents)),bomKpiData.ThirdPartyRepoComponents},
+                {CommonHelper.Convert(bomKpiData,nameof(bomKpiData.DevdependencyComponents)),bomKpiData.DevdependencyComponents},
+                {CommonHelper.Convert(bomKpiData,nameof(bomKpiData.ReleaseRepoComponents)),bomKpiData.ReleaseRepoComponents},
+                {CommonHelper.Convert(bomKpiData,nameof(bomKpiData.UnofficialComponents)),bomKpiData.UnofficialComponents},
                 {CommonHelper.Convert(bomKpiData,nameof(bomKpiData.ComponentsinSBOMTemplateFile)),bomKpiData.ComponentsinSBOMTemplateFile},
                 {CommonHelper.Convert(bomKpiData,nameof(bomKpiData.ComponentsUpdatedFromSBOMTemplateFile)),bomKpiData.ComponentsUpdatedFromSBOMTemplateFile},
                 {CommonHelper.Convert(bomKpiData,nameof(bomKpiData.ComponentsInComparisonBOM)),bomKpiData.ComponentsInComparisonBOM }
@@ -116,6 +122,9 @@ namespace LCT.PackageIdentifier
             hashCode = result?.StdOut;
             return hashCode?.Trim() ?? string.Empty;
         }
+
+        [Obsolete("not used")]
+        [ExcludeFromCodeCoverage]
         public static Result GetDependencyList(string bomFilePath, string depFilePath)
         {
             bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
@@ -171,6 +180,34 @@ namespace LCT.PackageIdentifier
 
             return aqlResultList;
         }
+        public async Task<List<AqlResult>> GetNpmListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService)
+        {
+            List<AqlResult> aqlResultList = new();
+            if (repoList != null && repoList.Length > 0)
+            {
+                foreach (var repo in repoList)
+                {
+                    var componentRepoData = await jFrogService.GetNpmComponentDataByRepo(repo) ?? new List<AqlResult>();
+                    aqlResultList.AddRange(componentRepoData);
+                }
+            }
+
+            return aqlResultList;
+        }
+        public async Task<List<AqlResult>> GetPypiListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService)
+        {
+            List<AqlResult> aqlResultList = new();
+            if (repoList != null && repoList.Length > 0)
+            {
+                foreach (var repo in repoList)
+                {
+                    var componentRepoData = await jFrogService.GetPypiComponentDataByRepo(repo) ?? new List<AqlResult>();
+                    aqlResultList.AddRange(componentRepoData);
+                }
+            }
+
+            return aqlResultList;
+        }       
 
         #endregion
     }

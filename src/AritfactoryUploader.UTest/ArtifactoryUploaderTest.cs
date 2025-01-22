@@ -7,11 +7,9 @@
 using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
 using Moq;
-using Newtonsoft.Json;
 using System.Net;
 using LCT.ArtifactoryUploader;
 using System.Net.Http;
-using System;
 using NUnit.Framework;
 using System.Threading.Tasks;
 using LCT.APICommunications;
@@ -22,9 +20,12 @@ using LCT.Services.Interface;
 using LCT.Services;
 using UnitTestUtilities;
 using LCT.ArtifactoryUploader.Model;
+using LCT.APICommunications.Model.AQL;
+using System;
 
 namespace AritfactoryUploader.UTest
 {
+    [TestFixture]
     public class ArtifactoryUploader
     {
         [SetUp]
@@ -53,7 +54,7 @@ namespace AritfactoryUploader.UTest
                 JfrogApi = "https://abc.jfrog.io/artifactory",
                 SrcRepoName = "org1-pythonhosted-pypi-remote-cache",
                 SrcRepoPathWithFullName = "org1-pythonhosted-pypi-remote-cache/6c/dd/a834df6482147d48e225a49515aabc28974ad5a4ca3215c18a882565b028/html5lib-1.1-py2.py3-none-any.whl",
-                PypiCompName = "html5lib-1.1-py2.py3-none-any.whl",
+                PypiOrNpmCompName = "html5lib-1.1-py2.py3-none-any.whl",
                 DestRepoName = "pypi-test",
                 ApiKey = "",
                 Email = "",
@@ -96,6 +97,176 @@ namespace AritfactoryUploader.UTest
                 new JfrogAqlApiCommunicationFacade(jfrogAqlApiCommunication);
             IJFrogService jFrogService = new JFrogService(jFrogApiCommunicationFacade);
             return jFrogService;
+        }
+
+        [Test]
+        public async Task UploadPackageToRepo_WhenPackageInfoIsNull_ReturnsNotFoundResponse()
+        {
+            // Arrange
+            var component = new ComponentsToArtifactory();
+            component.SrcRepoName = "";
+            component.DestRepoName = "";
+            component.JfrogPackageName = "";
+            component.Path = "";
+            var timeout = 10000;
+            var displayPackagesInfo = new DisplayPackagesInfo();
+            var jFrogServiceMock = new Mock<IJFrogService>();
+            jFrogServiceMock.Setup(x => x.GetPackageInfo(component))
+                .ReturnsAsync((AqlResult)null);
+            ArtfactoryUploader.jFrogService = jFrogServiceMock.Object;
+            // Act
+            var response = await ArtfactoryUploader.UploadPackageToRepo(component, timeout, displayPackagesInfo);
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+            Assert.AreEqual(ApiConstant.PackageNotFound, response.ReasonPhrase);
+        }
+
+        [Test]
+        public async Task UploadPackageToRepo_WhenPackageTypeIsClearedThirdPartyOrDevelopment_CallsCopyFromRemoteRepo()
+        {
+            // Arrange
+            var component = new ComponentsToArtifactory
+            {
+                PackageType = PackageType.ClearedThirdParty,
+                ApiKey = "apiKey",
+                Email = "test@example.com"
+            };
+            component.SrcRepoName = "";
+            component.DestRepoName = "";
+            component.JfrogPackageName = "";
+            component.Path = "";
+            var timeout = 10000;
+            var displayPackagesInfo = new DisplayPackagesInfo();
+            var jFrogServiceMock = new Mock<IJFrogService>();
+            var jfrogApicommunicationMock = new Mock<IJFrogApiCommunication>();
+            jFrogServiceMock.Setup(x => x.GetPackageInfo(component))
+                .ReturnsAsync(new AqlResult());
+            jfrogApicommunicationMock.Setup(x => x.CopyFromRemoteRepo(It.IsAny<ComponentsToArtifactory>()))
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK));
+            ArtfactoryUploader.jFrogService = jFrogServiceMock.Object;
+            ArtfactoryUploader.JFrogApiCommInstance = jfrogApicommunicationMock.Object;
+            // Act
+            _= await ArtfactoryUploader.UploadPackageToRepo(component, timeout, displayPackagesInfo);
+
+            // Assert
+            jfrogApicommunicationMock.Verify(x => x.CopyFromRemoteRepo(component), Times.Once);
+        }
+
+        [Test]
+        public async Task UploadPackageToRepo_WhenPackageTypeIsInternal_CallsMoveFromRepo()
+        {
+            // Arrange
+            var component = new ComponentsToArtifactory
+            {
+                PackageType = PackageType.Internal,
+                ApiKey = "apiKey",
+                Email = "test@example.com"
+            };
+            component.SrcRepoName = "";
+            component.DestRepoName = "";
+            component.JfrogPackageName = "";
+            component.Path = "";
+            var timeout = 10000;
+            var displayPackagesInfo = new DisplayPackagesInfo();
+            var jFrogServiceMock = new Mock<IJFrogService>();
+            var jfrogApicommunicationMock = new Mock<IJFrogApiCommunication>();
+            jFrogServiceMock.Setup(x => x.GetPackageInfo(component))
+                .ReturnsAsync(new AqlResult());
+            jfrogApicommunicationMock.Setup(x => x.MoveFromRepo(It.IsAny<ComponentsToArtifactory>()))
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK));
+            ArtfactoryUploader.jFrogService = jFrogServiceMock.Object;
+            ArtfactoryUploader.JFrogApiCommInstance = jfrogApicommunicationMock.Object;
+            // Act
+            var response = await ArtfactoryUploader.UploadPackageToRepo(component, timeout, displayPackagesInfo);
+
+            // Assert
+            jfrogApicommunicationMock.Verify(x => x.MoveFromRepo(component), Times.Once);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Test]
+        public async Task UploadPackageToRepo_WhenPackageTypeIsNotSupported_ReturnsNotFoundResponse()
+        {
+            // Arrange
+            var component = new ComponentsToArtifactory
+            {
+                PackageType = PackageType.Unknown,
+                ApiKey = "apiKey",
+                Email = "test@example.com"
+            };
+            component.SrcRepoName = "";
+            component.DestRepoName = "";
+            component.JfrogPackageName = "";
+            component.Path = "";
+            var timeout = 10000;
+            var displayPackagesInfo = new DisplayPackagesInfo();
+            var jFrogServiceMock = new Mock<IJFrogService>();
+            ArtfactoryUploader.jFrogService = jFrogServiceMock.Object;
+            // Act
+            var response = await ArtfactoryUploader.UploadPackageToRepo(component, timeout, displayPackagesInfo);
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+        }
+        [Test]
+        public async Task UploadPackageToRepo_WhenHttpRequestExceptionOccurs_ReturnsErrorResponse()
+        {
+            // Arrange
+            var component = new ComponentsToArtifactory
+            {
+                PackageType = PackageType.Unknown,
+                ApiKey = "apiKey",
+                Email = "test@example.com"
+            };
+            component.SrcRepoName = "";
+            component.DestRepoName = "";
+            component.JfrogPackageName = "";
+            component.Path = "";
+            var timeout = 10000;
+            var displayPackagesInfo = new DisplayPackagesInfo();
+            var jFrogServiceMock = new Mock<IJFrogService>();
+            var jfrogApicommunicationMock = new Mock<IJFrogApiCommunication>();
+            jFrogServiceMock.Setup(x => x.GetPackageInfo(component))
+                .ThrowsAsync(new HttpRequestException());
+            ArtfactoryUploader.jFrogService = jFrogServiceMock.Object;
+            ArtfactoryUploader.JFrogApiCommInstance = jfrogApicommunicationMock.Object;
+
+            // Act
+            var response = await ArtfactoryUploader.UploadPackageToRepo(component, timeout, displayPackagesInfo);
+
+            // Assert
+            Assert.AreEqual(ApiConstant.ErrorInUpload, response.ReasonPhrase);
+        }
+
+        [Test]
+        public async Task UploadPackageToRepo_WhenInvalidOperationExceptionOccurs_ReturnsErrorResponse()
+        {
+            // Arrange
+            var component = new ComponentsToArtifactory
+            {
+                PackageType = PackageType.Unknown,
+                ApiKey = "apiKey",
+                Email = "test@example.com"
+            };
+            component.SrcRepoName = "";
+            component.DestRepoName = "";
+            component.JfrogPackageName = "";
+            component.Path = "";
+            var timeout = 10000;
+            var displayPackagesInfo = new DisplayPackagesInfo();
+            var jFrogServiceMock = new Mock<IJFrogService>();
+            var jfrogApicommunicationMock = new Mock<IJFrogApiCommunication>();
+            jFrogServiceMock.Setup(x => x.GetPackageInfo(component))
+                .ThrowsAsync(new InvalidOperationException());
+            ArtfactoryUploader.jFrogService = jFrogServiceMock.Object;
+            ArtfactoryUploader.JFrogApiCommInstance = jfrogApicommunicationMock.Object;
+
+            // Act
+            var response = await ArtfactoryUploader.UploadPackageToRepo(component, timeout, displayPackagesInfo);
+
+            // Assert
+            Assert.AreEqual(ApiConstant.ErrorInUpload, response.ReasonPhrase);
         }
     }
 }

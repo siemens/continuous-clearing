@@ -27,6 +27,7 @@ using System.Collections.Generic;
 
 namespace AritfactoryUploader.UTest
 {
+    [TestFixture]
     public class PackageUploaderTest
     {
         [Test]
@@ -74,7 +75,14 @@ namespace AritfactoryUploader.UTest
         }
 
         [Test]
-        public void DisplayAllSettings_GivenListOfComponents_ReturnPackageSettings()
+        [TestCase("NPM")]
+        [TestCase("CONAN")]
+        [TestCase("NUGET")]
+        [TestCase("MAVEN")]
+        [TestCase("DEBIAN")]
+        [TestCase("PYTHON")]
+        [TestCase("tes")]
+        public void DisplayAllSettings_GivenListOfComponents_ReturnPackageSettings(string type)
         {
             //Arrange
             CommonAppSettings CommonAppSettings = new CommonAppSettings()
@@ -139,12 +147,7 @@ namespace AritfactoryUploader.UTest
                 Version="1.0.0",
                 Properties=new List<Property>()
                 {
-                new Property{Name=Dataconstant.Cdx_ProjectType,Value="NPM"},
-                new Property{Name=Dataconstant.Cdx_ProjectType,Value="CONAN"},
-                new Property{Name=Dataconstant.Cdx_ProjectType,Value="NUGET"},
-                new Property{Name=Dataconstant.Cdx_ProjectType,Value="MAVEN"},
-                new Property{Name=Dataconstant.Cdx_ProjectType,Value="DEBIAN"},
-                new Property{Name=Dataconstant.Cdx_ProjectType,Value="PYTHON"}
+                new Property{Name=Dataconstant.Cdx_ProjectType,Value=type}
                 }
             }
             };
@@ -152,7 +155,7 @@ namespace AritfactoryUploader.UTest
             PackageUploader.DisplayAllSettings(m_ComponentsInBOM, CommonAppSettings);
 
             //Assert
-            Assert.IsTrue(true);
+            Assert.Pass();
         }
 
 

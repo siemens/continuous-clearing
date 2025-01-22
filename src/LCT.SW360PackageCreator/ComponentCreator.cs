@@ -468,12 +468,12 @@ namespace LCT.SW360PackageCreator
             }
             catch (AggregateException ex)
             {
-                Logger.Debug($"\tError in TriggerFossologyProcess--{ex}");
+                Logger.DebugFormat("\tError in TriggerFossologyProcess--{0}", ex);
             }
             return uploadId;
         }
 
-        private static async Task<string> CheckFossologyProcessStatus(string link, ISw360CreatorService sw360CreatorService)
+        public static async Task<string> CheckFossologyProcessStatus(string link, ISw360CreatorService sw360CreatorService)
         {
             string uploadId = string.Empty;
             try
@@ -486,12 +486,12 @@ namespace LCT.SW360PackageCreator
             }
             catch (AggregateException ex)
             {
-                Logger.Debug($"\tError in TriggerFossologyProcess--{ex}");
+                Logger.DebugFormat("\tError in TriggerFossologyProcess--{0}",ex);
             }
             return uploadId;
         }
 
-        private static async Task<string> GetComponentId(ComparisonBomData item, ISw360CreatorService sw360CreatorService)
+        public static async Task<string> GetComponentId(ComparisonBomData item, ISw360CreatorService sw360CreatorService)
         {
             string componentId = await sw360CreatorService.GetComponentId(item.Name);
 
@@ -535,7 +535,7 @@ namespace LCT.SW360PackageCreator
             }
         }
 
-        private static bool IsReleaseAttachmentExist(ReleasesInfo releasesInfo)
+        public static bool IsReleaseAttachmentExist(ReleasesInfo releasesInfo)
         {
             var releaseAttachments = releasesInfo?.Embedded?.Sw360attachments ?? new List<Sw360Attachments>();
             return releaseAttachments.Any(x => x.AttachmentType.Equals("SOURCE"));
@@ -549,12 +549,12 @@ namespace LCT.SW360PackageCreator
             AddReleaseIdToLink(item, releaseId);
         }
 
-        private static string GetCreatedStatus(bool status)
+        public static string GetCreatedStatus(bool status)
         {
             return status ? Dataconstant.NewlyCreated : Dataconstant.NotCreated;
         }
 
-        private void AddReleaseIdToLink(ComparisonBomData item, string releaseIdToLink)
+        public void AddReleaseIdToLink(ComparisonBomData item, string releaseIdToLink)
         {
             if (!string.IsNullOrWhiteSpace(releaseIdToLink))
             {
@@ -570,7 +570,7 @@ namespace LCT.SW360PackageCreator
             }
         }
 
-        private List<Components> RemoveDuplicateComponents(List<Components> components)
+        public List<Components> RemoveDuplicateComponents(List<Components> components)
         {
             // Removes duplicate
             bom.Components = bom.Components?.GroupBy(x => new { x.Name, x.Version }).Select(y => y.First()).ToList();

@@ -1,0 +1,126 @@
+{
+    "SW360URL": "https://sw360.mycompany.com/",
+    "SW360ProjectName": "",
+    "SW360ProjectID": "",
+    "Sw360Token": "",
+    "SW360AuthTokenType": "Bearer",
+    "Fossologyurl": "https://fossology.mycompany.com",
+    "JFrogApi": "https://mycompany.jfrog.io/artifactory",
+    "TimeOut": 400,
+    "Release" :false,
+    "EnableFossTrigger": true,
+    "RemoveDevDependency": true,
+    "InternalRepoList": [
+      // Add your jFrog repositories (where you store internal packages) to idenitify if the components are internal
+      "some-repo-pypi",
+      "some-repo-nuget",
+      "some-repo-conan",
+      "some-repo-npm"
+    ],
+
+    "Nuget": {
+      "Include": ["project.assets.json"],
+      "Exclude": ["test"],
+      "JfrogNugetRepoList": [
+        // Add your jFrog repositories to idenitify the location & path of the components
+        "some-repo-nuget",
+        "some--other-repo-nuget"
+      ],
+      "JfrogThirdPartyDestRepoName": "nuget-3rd-party",
+      "JfrogInternalDestRepoName": "nuget-internal",
+      "JfrogDevDestRepoName": "nuget-dev",
+      "ExcludedComponents": [
+      ]
+    },
+
+    "Npm": {
+      "Include": [ "p*-lock.json" ],
+      "Exclude": [ "node_modules"],
+      "JfrogNpmRepoList": [
+        // Add your jFrog repositories to idenitify the location & path of the components
+        "some-repo-npm",
+        "some--other-repo-npm"
+      ],
+      "JfrogThirdPartyDestRepoName": "npm-3rd-party",
+      "JfrogInternalDestRepoName": "npm-internal",
+      "JfrogDevDestRepoName": "npm-dev",
+      "ExcludedComponents": [
+      ]
+    },
+
+    "Debian": {
+      "Include": [ "*.cdx.json" ],
+      "Exclude": [ "node_modules" ],
+      "JfrogDebianRepoList": [
+        // Add your jFrog repositories to idenitify the location & path of the components
+        "some-repo-debian",
+        "some--other-repo-debian"
+      ],
+      "JfrogThirdPartyDestRepoName": "debian-3rd-party",
+      "JfrogInternalDestRepoName": "debian-internal",
+      "JfrogDevDestRepoName": "debian-dev",
+      "ExcludedComponents": [
+      ]
+    },
+
+    "Maven": {
+      "Include": [ "*.cdx.json" ],
+      "Exclude": [ "test" ],
+      "JfrogMavenRepoList": [
+        // Add your jFrog repositories to idenitify the location & path of the components
+        "some-repo-maven",
+        "some--other-repo-maven"
+      ],
+      "JfrogThirdPartyDestRepoName": "maven-3rd-party",
+      "JfrogInternalDestRepoName": "maven-internal",
+      "JfrogDevDestRepoName": "maven-dev",
+      "ExcludedComponents": [
+      ]
+    },
+
+    "Python": {
+      "Include": [ "poetry.lock", "*.cdx.json" ],
+      "Exclude": [],
+      "JfrogPythonRepoList": [
+        // Add your jFrog repositories to idenitify the location & path of the components
+        "some-repo-python",
+        "some--other-repo-python"
+      ],
+      "JfrogThirdPartyDestRepoName": "python-3rd-party",
+      "JfrogInternalDestRepoName": "python-internal",
+      "JfrogDevDestRepoName": "python-dev",
+      "ExcludedComponents": [
+      ]
+    },
+
+    "Conan": {
+      "Include": [ "conan.lock" ],
+      "Exclude": [],
+      "JfrogConanRepoList": [
+        // Add your jFrog repositories to idenitify the location & path of the components
+        "some-repo-conan",
+        "some--other-repo-conan"
+      ],
+      "JfrogThirdPartyDestRepoName": "conan-3rd-party",
+      "JfrogInternalDestRepoName": "conan-internal",
+      "JfrogDevDestRepoName": "conan-dev",
+      "ExcludedComponents": [
+      ]
+    },
+
+    "Alpine": {
+      "Include": [ "*.cdx.json" ],
+      "Exclude": [],
+      "JfrogAlpineRepoList": [
+        // Add your jFrog repositories to idenitify the location & path of the components
+        "some-repo-alpine",
+        "some--other-repo-alpine"
+      ],
+      "JfrogThirdPartyDestRepoName": "alpine-3rd-party",
+      "JfrogInternalDestRepoName": "alpine-internal",
+      "JfrogDevDestRepoName": "alpine-dev",
+      "ExcludedComponents": [
+      ]
+    }
+  }
+  

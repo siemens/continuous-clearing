@@ -33,6 +33,19 @@ namespace LCT.PackageIdentifier.Model
         [DisplayName(@"Internal Components Identified")]
         public int InternalComponents { get; set; }
 
+        [DisplayName(@"Components already present in 3rd party repo(s) ")]
+        public int ThirdPartyRepoComponents { get; set; }
+
+        [DisplayName(@"Components already present in devdep repo(s)")]
+        public int DevdependencyComponents { get; set; }
+
+        [DisplayName(@"Components already present in release repo(s)")]
+        public int ReleaseRepoComponents { get; set; }
+
+        [DisplayName(@"Components not from official repo(s)")]
+        public int UnofficialComponents { get; set; }
+
+
         [DisplayName(@"Total Components Excluded")]
         public int ComponentsExcluded { get; set; }
 

@@ -62,6 +62,20 @@ namespace LCT.Common
             return ComponentList;
         }
 
+        public static List<Dependency> RemoveInvalidDependenciesAndReferences(List<Component> components, List<Dependency> dependencies)
+        {
+            var componentBomRefs = new HashSet<string>(components.Select(c => c.BomRef));
+
+            dependencies.RemoveAll(dep => !componentBomRefs.Contains(dep.Ref));
+
+            foreach (var dep in dependencies)
+            {
+                dep.Dependencies?.RemoveAll(refItem => !componentBomRefs.Contains(refItem.Ref));
+            }
+
+            return dependencies;
+        }
+
         public static string GetSubstringOfLastOccurance(string value, string separator)
         {
             string result = string.IsNullOrWhiteSpace(value) ? string.Empty : value;

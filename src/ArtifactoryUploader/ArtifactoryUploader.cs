@@ -28,6 +28,7 @@ namespace LCT.ArtifactoryUploader
         private static string JfrogApi = Environment.GetEnvironmentVariable("JfrogApi");
         private static string srcRepoName = Environment.GetEnvironmentVariable("JfrogSrcRepo");
         public static IJFrogService jFrogService { get; set; }
+        public static IJFrogApiCommunication JFrogApiCommInstance { get; set; }
 
         public static async Task<HttpResponseMessage> UploadPackageToRepo(ComponentsToArtifactory component, int timeout, DisplayPackagesInfo displayPackagesInfo)
         {
@@ -38,7 +39,6 @@ namespace LCT.ArtifactoryUploader
             HttpResponseMessage responsemessage = new HttpResponseMessage();
             try
             {
-                IJFrogApiCommunication jfrogApicommunication;
 
                 // Package Information
                 var packageInfo = await GetPackageInfoWithRetry(jFrogService, component);
@@ -50,25 +50,11 @@ namespace LCT.ArtifactoryUploader
                     };
                 }
 
-                ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials()
-                {
-                    ApiKey = component.ApiKey,
-                    Email = component.Email
-                };
-
-                // Initialize JFrog API communication based on Component Type
-                jfrogApicommunication = component.ComponentType?.ToUpperInvariant() switch
-                {
-                    "MAVEN" => new MavenJfrogApiCommunication(component.JfrogApi, component.SrcRepoName, repoCredentials, timeout),
-                    "PYTHON" => new PythonJfrogApiCommunication(component.JfrogApi, component.SrcRepoName, repoCredentials, timeout),
-                    _ => new NpmJfrogApiCommunication(component.JfrogApi, component.SrcRepoName, repoCredentials, timeout)
-                };
-
                 // Perform Copy or Move operation
                 responsemessage = component.PackageType switch
                 {
-                    PackageType.ClearedThirdParty or PackageType.Development => await jfrogApicommunication.CopyFromRemoteRepo(component),
-                    PackageType.Internal => await jfrogApicommunication.MoveFromRepo(component),
+                    PackageType.ClearedThirdParty or PackageType.Development => await JFrogApiCommInstance.CopyFromRemoteRepo(component),
+                    PackageType.Internal => await JFrogApiCommInstance.MoveFromRepo(component),
                     _ => new HttpResponseMessage(HttpStatusCode.NotFound)
                 };
 
@@ -83,6 +69,12 @@ namespace LCT.ArtifactoryUploader
 
             }
             catch (HttpRequestException ex)
+            {
+                Logger.Error($"Error has occurred in UploadPackageToArtifactory--{ex}");
+                responsemessage.ReasonPhrase = ApiConstant.ErrorInUpload;
+                return responsemessage;
+            }
+            catch (InvalidOperationException ex)
             {
                 Logger.Error($"Error has occurred in UploadPackageToArtifactory--{ex}");
                 responsemessage.ReasonPhrase = ApiConstant.ErrorInUpload;
@@ -115,28 +107,33 @@ namespace LCT.ArtifactoryUploader
 
         private static async Task<AqlResult> GetPackageInfoWithRetry(IJFrogService jFrogService, ComponentsToArtifactory component)
         {
-            string srcRepoNameLower = component.SrcRepoName.ToLower();
-            string packageNameLower = component.JfrogPackageName.ToLower();
-            string pathLower = component.Path.ToLower();
+            async Task<AqlResult> TryGetPackageInfo(ComponentsToArtifactory component)
+                => await jFrogService.GetPackageInfo(component);
 
-            var packageInfo = await jFrogService.GetPackageInfo(component.SrcRepoName, component.JfrogPackageName, component.Path);
+             var  packageInfo = await TryGetPackageInfo(component);
+                       
 
-            if (component.ComponentType == "DEBIAN" && packageInfo.Name != component.JfrogPackageName)
+            // Handle DEBIAN package name mismatch
+            if (component.ComponentType == "DEBIAN" && packageInfo?.Name != component.JfrogPackageName)
             {
                 component.CopyPackageApiUrl = component.CopyPackageApiUrl.Replace(component.JfrogPackageName, packageInfo.Name);
             }
+
+            // Retry with lowercase values if packageInfo is still null
             if (packageInfo == null)
             {
-                // Retry with lowercase parameters
-                var lowercasePackageInfo = await jFrogService.GetPackageInfo(srcRepoNameLower, packageNameLower, pathLower);
+                var lowerSrcRepo = component.SrcRepoName.ToLower();
+                var lowerPackageName = component.JfrogPackageName.ToLower();
+                var lowerPath = component.Path.ToLower();
+                
 
-                if (lowercasePackageInfo != null)
+                packageInfo = await TryGetPackageInfo(component);
+
+                if (packageInfo != null)
                 {
-                    // Update the package API URL
                     component.CopyPackageApiUrl = component.CopyPackageApiUrl.ToLower();
-                    packageInfo = lowercasePackageInfo;
                 }
-            }
+            }          
 
             return packageInfo;
         }

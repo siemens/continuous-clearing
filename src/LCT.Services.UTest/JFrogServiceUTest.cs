@@ -4,6 +4,7 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.AQL;
 using LCT.Facade.Interfaces;
 using LCT.Services.Interface;
@@ -158,7 +159,12 @@ namespace LCT.Services.UTest
         public async Task GetPackageInfo_GetsPackageInfo_Successfully()
         {
             // Arrange
-
+            ComponentsToArtifactory component= new ComponentsToArtifactory
+            {
+                SrcRepoName = "energy-dev-npm-egll",
+                JfrogPackageName = "saap-api-node-2.26.3-LicenseClearing.16.sha-058fada.tgz",
+                Path = string.Empty
+            };
             AqlResult aqlResult = new AqlResult()
             {
                 Name = "saap-api-node-2.26.3-LicenseClearing.16.sha-058fada.tgz",
@@ -181,12 +187,12 @@ namespace LCT.Services.UTest
             Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade =
                 new Mock<IJfrogAqlApiCommunicationFacade>();
             mockJfrogApiComFacade
-                .Setup(x => x.GetPackageInfo(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .Setup(x => x.GetPackageInfo(component))
                 .ReturnsAsync(httpResponseMessage);
 
             // Act
             IJFrogService jFrogService = new JFrogService(mockJfrogApiComFacade.Object);
-            AqlResult actual = await jFrogService.GetPackageInfo("energy-dev-npm-egll", "saap-api-node-2.26.3-LicenseClearing.16.sha-058fada.tgz", string.Empty);
+            AqlResult actual = await jFrogService.GetPackageInfo(component);
 
             // Assert
             Assert.NotNull(actual);
@@ -196,18 +202,23 @@ namespace LCT.Services.UTest
         public async Task GetPackageInfo_ResultsWith_NoContent()
         {
             // Arrange
-
+            ComponentsToArtifactory component = new ComponentsToArtifactory
+            {
+                SrcRepoName = "energy-dev-npm-egll",
+                JfrogPackageName = "saap-api-node-2.26.3-LicenseClearing.16.sha-058fada.tgz",
+                Path = string.Empty
+            };
             HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.NoContent);
 
             Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade =
                 new Mock<IJfrogAqlApiCommunicationFacade>();
             mockJfrogApiComFacade
-                .Setup(x => x.GetPackageInfo(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .Setup(x => x.GetPackageInfo(component))
                 .ReturnsAsync(httpResponseMessage);
 
             // Act
             IJFrogService jFrogService = new JFrogService(mockJfrogApiComFacade.Object);
-            AqlResult actual = await jFrogService.GetPackageInfo("energy-dev-npm-egll", "saap-api-node-2.26.3-LicenseClearing.16.sha-058fada.tgz", string.Empty);
+            AqlResult actual = await jFrogService.GetPackageInfo(component);
 
             // Assert
             Assert.Null(actual);
@@ -217,15 +228,69 @@ namespace LCT.Services.UTest
         public async Task GetPackageInfo_ResultsWith_HttpRequestException()
         {
             // Arrange
+            ComponentsToArtifactory component = new ComponentsToArtifactory
+            {
+                SrcRepoName = "energy-dev-npm-egll",
+                JfrogPackageName = "saap-api-node-2.26.3-LicenseClearing.16.sha-058fada.tgz",
+                Path = string.Empty
+            };
             Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade =
                 new Mock<IJfrogAqlApiCommunicationFacade>();
             mockJfrogApiComFacade
-                .Setup(x => x.GetPackageInfo(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).
+                .Setup(x => x.GetPackageInfo(component)).
                 Throws<HttpRequestException>();
 
             // Act
             IJFrogService jFrogService = new JFrogService(mockJfrogApiComFacade.Object);
-            AqlResult actual = await jFrogService.GetPackageInfo("energy-dev-npm-egll", "saap-api-node-2.26.3-LicenseClearing.16.sha-058fada.tgz", string.Empty);
+            AqlResult actual = await jFrogService.GetPackageInfo(component);
+
+            // Assert
+            Assert.Null(actual);
+        }
+
+        [Test]
+        public async Task GetPackageInfo_ResultsWith_TaskCanceledException()
+        {
+            // Arrange
+            ComponentsToArtifactory component = new ComponentsToArtifactory
+            {
+                SrcRepoName = "energy-dev-npm-egll",
+                JfrogPackageName = "saap-api-node-2.26.3-LicenseClearing.16.sha-058fada.tgz",
+                Path = string.Empty
+            };
+            Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade =
+                new Mock<IJfrogAqlApiCommunicationFacade>();
+            mockJfrogApiComFacade
+                .Setup(x => x.GetPackageInfo(component)).
+                Throws<TaskCanceledException>();
+
+            // Act
+            IJFrogService jFrogService = new JFrogService(mockJfrogApiComFacade.Object);
+            AqlResult actual = await jFrogService.GetPackageInfo(component);
+
+            // Assert
+            Assert.Null(actual);
+        }
+
+        [Test]
+        public async Task GetPackageInfo_ResultsWith_InvalidOperationException()
+        {
+            // Arrange
+            ComponentsToArtifactory component = new ComponentsToArtifactory
+            {
+                SrcRepoName = "energy-dev-npm-egll",
+                JfrogPackageName = "saap-api-node-2.26.3-LicenseClearing.16.sha-058fada.tgz",
+                Path = string.Empty
+            };
+            Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade =
+                new Mock<IJfrogAqlApiCommunicationFacade>();
+            mockJfrogApiComFacade
+                .Setup(x => x.GetPackageInfo(component)).
+                Throws<InvalidOperationException>();
+
+            // Act
+            IJFrogService jFrogService = new JFrogService(mockJfrogApiComFacade.Object);
+            AqlResult actual = await jFrogService.GetPackageInfo(component);
 
             // Assert
             Assert.Null(actual);
