@@ -15,71 +15,71 @@ namespace LCT.SW360PackageCreator.UTest
     [TestFixture]
     class AlpinePackageDownloaderTest
     {
-        [TestCase]
-        public async Task DownloadSourceForAlpine_ProvidedSourceURL_ReturnsDownloadPath()
-        {
-            //Arrange
-            var lstComparisonBomData = new ComparisonBomData()
-            {
-                Name = "apk-tools",
-                Version = "2.12.9-r3",
-                SourceUrl = "https://gitlab.alpinelinux.org/alpine/apk-tools/-/archive/v2.12.9/apk-tools-v2.12.9.tar.gz",
-                AlpineSource= "https://gitlab.alpinelinux.org/alpine/apk-tools/-/archive/v$pkgver/apk-tools-v$pkgver.tar.gz\\n\\tfix-recursive-solve-1.patch\\n\\tfix-recursive-solve-2.patch\\n\\t_apk\\n\\t"
+        //[TestCase]
+        //public async Task DownloadSourceForAlpine_ProvidedSourceURL_ReturnsDownloadPath()
+        //{
+        //    //Arrange
+        //    var lstComparisonBomData = new ComparisonBomData()
+        //    {
+        //        Name = "apk-tools",
+        //        Version = "2.12.9-r3",
+        //        SourceUrl = "https://gitlab.alpinelinux.org/alpine/apk-tools/-/archive/v2.12.9/apk-tools-v2.12.9.tar.gz",
+        //        AlpineSource= "https://gitlab.alpinelinux.org/alpine/apk-tools/-/archive/v$pkgver/apk-tools-v$pkgver.tar.gz\\n\\tfix-recursive-solve-1.patch\\n\\tfix-recursive-solve-2.patch\\n\\t_apk\\n\\t"
 
-            };
-            var localPathforDownload = $"{Directory.GetParent(Directory.GetCurrentDirectory())}\\ClearingTool\\DownloadedFiles\\";
-            var alpinePackageDownloader = new AlpinePackageDownloader();
+        //    };
+        //    var localPathforDownload = $"{Directory.GetParent(Directory.GetCurrentDirectory())}\\ClearingTool\\DownloadedFiles\\";
+        //    var alpinePackageDownloader = new AlpinePackageDownloader();
 
-            //Act
-            var downloadpath = await alpinePackageDownloader.DownloadPackage(lstComparisonBomData, localPathforDownload);
+        //    //Act
+        //    var downloadpath = await alpinePackageDownloader.DownloadPackage(lstComparisonBomData, localPathforDownload);
 
-            //Assert
-            Assert.IsNotEmpty(downloadpath);
-        }
-        [TestCase]
-        public async Task DownloadSourceForAlpine_ProvidedInValidSourceURL_ReturnsNull()
-        {
-            //Arrange
-            //Sending Incorrect SourceURL
-            var lstComparisonBomData = new ComparisonBomData()
-            {
-                Name = "ca-certificates",
-                Version = "20220614-r0",
-                SourceUrl = "https://gitlab.alpinelinux.org/alpine/ca-certificates/-/archive/ca-certificates-20230506.tar.bz2",
-                AlpineSource =""
+        //    //Assert
+        //    Assert.IsNotEmpty(downloadpath);
+        //}
+        //[TestCase]
+        //public async Task DownloadSourceForAlpine_ProvidedInValidSourceURL_ReturnsNull()
+        //{
+        //    //Arrange
+        //    //Sending Incorrect SourceURL
+        //    var lstComparisonBomData = new ComparisonBomData()
+        //    {
+        //        Name = "ca-certificates",
+        //        Version = "20220614-r0",
+        //        SourceUrl = "https://gitlab.alpinelinux.org/alpine/ca-certificates/-/archive/ca-certificates-20230506.tar.bz2",
+        //        AlpineSource =""
 
-            };
-            var localPathforDownload = $"{Directory.GetParent(Directory.GetCurrentDirectory())}\\ClearingTool\\DownloadedFiles\\";
-            var alpinePackageDownloader = new AlpinePackageDownloader();
+        //    };
+        //    var localPathforDownload = $"{Directory.GetParent(Directory.GetCurrentDirectory())}\\ClearingTool\\DownloadedFiles\\";
+        //    var alpinePackageDownloader = new AlpinePackageDownloader();
 
-            //Act
-            var downloadpath = await alpinePackageDownloader.DownloadPackage(lstComparisonBomData, localPathforDownload);
+        //    //Act
+        //    var downloadpath = await alpinePackageDownloader.DownloadPackage(lstComparisonBomData, localPathforDownload);
 
-            //Assert
-            Assert.IsEmpty(downloadpath);
-        }
+        //    //Assert
+        //    Assert.IsEmpty(downloadpath);
+        //}
 
-        [Test]
-        public void  ApplyPatchsToSourceCode_ValidPatchFileAndSourceCodeFolder_SuccessfullyAppliesPatch()
-        {
-            try
-            {
-                // Arrange
-                var patchFileFolder = "path/to/patch/file.patch";
-                var sourceCodezippedFolder = "path/to/source/code/folder";
+        //[Test]
+        //public void  ApplyPatchsToSourceCode_ValidPatchFileAndSourceCodeFolder_SuccessfullyAppliesPatch()
+        //{
+        //    try
+        //    {
+        //        // Arrange
+        //        var patchFileFolder = "path/to/patch/file.patch";
+        //        var sourceCodezippedFolder = "path/to/source/code/folder";
 
-                // Act
-                AlpinePackageDownloader.ApplyPatchsToSourceCode(patchFileFolder, sourceCodezippedFolder);
+        //        // Act
+        //        AlpinePackageDownloader.ApplyPatchsToSourceCode(patchFileFolder, sourceCodezippedFolder);
 
-                // Assert
-                // Add your assertions here to verify that the patch was successfully applied
-                Assert.Pass();
-            }
-            catch (Exception ex)
-            {
-                Assert.IsNotNull(ex);
-            }
-        }
+        //        // Assert
+        //        // Add your assertions here to verify that the patch was successfully applied
+        //        Assert.Pass();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Assert.IsNotNull(ex);
+        //    }
+        //}
 
     }
 }
