@@ -107,13 +107,13 @@ namespace ArtifactoryUploader
 
                 try
                 {
-                    CommonHelper.InitializeAndTrackEvent(telemetry, TelemetryConstant.ToolName, caToolInformation.CatoolVersion, TelemetryConstant.ArtifactoryUploader
+                    TelemetryHelper.InitializeAndTrackEvent(telemetry, TelemetryConstant.ToolName, caToolInformation.CatoolVersion, TelemetryConstant.ArtifactoryUploader
                                                         , appSettings);
 
                     // Track KPI data if available
                     if (PackageUploader.uploaderKpiData != null)
                     {
-                        CommonHelper.TrackKpiDataTelemetry(telemetry, TelemetryConstant.ArtifactoryUploaderKpiData, PackageUploader.uploaderKpiData);
+                        TelemetryHelper.TrackKpiDataTelemetry(telemetry, TelemetryConstant.ArtifactoryUploaderKpiData, PackageUploader.uploaderKpiData);
                     }
                     telemetry.TrackExecutionTime();
                     
@@ -121,7 +121,7 @@ namespace ArtifactoryUploader
                 catch (Exception ex)
                 {
                     Logger.Error($"An error occurred: {ex.Message}");
-                    CommonHelper.TrackException(telemetry, ex);
+                    TelemetryHelper.TrackException(telemetry, ex);
                     CommonHelper.CallEnvironmentExit(-1);
                 }
                 finally

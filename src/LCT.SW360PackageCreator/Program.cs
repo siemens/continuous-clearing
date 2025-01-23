@@ -101,19 +101,19 @@ namespace LCT.SW360PackageCreator
                 });
                 try
                 {
-                    CommonHelper.InitializeAndTrackEvent(telemetry, TelemetryConstant.ToolName, caToolInformation.CatoolVersion, TelemetryConstant.PackageCreator
+                    TelemetryHelper.InitializeAndTrackEvent(telemetry, TelemetryConstant.ToolName, caToolInformation.CatoolVersion, TelemetryConstant.PackageCreator
                                                         , appSettings);
                     // Track KPI data if available
                     if (ComponentCreator.kpiData != null)
                     {
-                        CommonHelper.TrackKpiDataTelemetry(telemetry, TelemetryConstant.CreatorKpiData, ComponentCreator.kpiData);
+                        TelemetryHelper.TrackKpiDataTelemetry(telemetry, TelemetryConstant.CreatorKpiData, ComponentCreator.kpiData);
                     }
                     telemetry.TrackExecutionTime();
                 }
                 catch (Exception ex)
                 {
                     Logger.Error($"An error occurred: {ex.Message}");
-                    CommonHelper.TrackException(telemetry, ex);
+                    TelemetryHelper.TrackException(telemetry, ex);
                     CommonHelper.CallEnvironmentExit(-1);
                 }
                 finally

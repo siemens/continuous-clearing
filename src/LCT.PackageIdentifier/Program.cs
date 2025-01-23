@@ -132,19 +132,19 @@ namespace LCT.PackageIdentifier
                 });
                 try
                 {
-                    CommonHelper.InitializeAndTrackEvent(telemetry, TelemetryConstant.ToolName, caToolInformation.CatoolVersion, TelemetryConstant.PackageIdentifier
+                    TelemetryHelper.InitializeAndTrackEvent(telemetry, TelemetryConstant.ToolName, caToolInformation.CatoolVersion, TelemetryConstant.PackageIdentifier
                                                         , appSettings);
                     // Track KPI data if available
                     if (BomCreator.bomKpiData != null)
                     {
-                        CommonHelper.TrackKpiDataTelemetry(telemetry, TelemetryConstant.IdentifierKpiData, BomCreator.bomKpiData);
+                        TelemetryHelper.TrackKpiDataTelemetry(telemetry, TelemetryConstant.IdentifierKpiData, BomCreator.bomKpiData);
                     }
                     telemetry.TrackExecutionTime();
                 }
                 catch (Exception ex)
                 {
                     Logger.Error($"An error occurred: {ex.Message}");
-                    CommonHelper.TrackException(telemetry, ex);
+                    TelemetryHelper.TrackException(telemetry, ex);
                     CommonHelper.CallEnvironmentExit(-1);
                 }
                 finally

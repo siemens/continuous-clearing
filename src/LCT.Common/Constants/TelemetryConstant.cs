@@ -17,6 +17,6 @@ namespace LCT.Common.Constants
         public const string IdentifierKpiData = "IdentifierKpiDataTelemetry";
         public const string CreatorKpiData = "CreatorKpiDataTelemetry";
         public const string ArtifactoryUploaderKpiData = "UploaderKpiDataTelemetry";
-        public const string StartLogMessage = "Telemetry for execution has been enabled and is now being tracked.";
+        public const string StartLogMessage = "Telemetry for execution is now enabled and being tracked. You can disable it by using the command-line option --Telemetry=false.";
     }
 }
