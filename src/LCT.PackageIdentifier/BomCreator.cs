@@ -23,6 +23,7 @@ using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.IO;
+using Directory = System.IO.Directory;
 
 
 namespace LCT.PackageIdentifier
@@ -105,7 +106,7 @@ namespace LCT.PackageIdentifier
             IFileOperations fileOperations = new FileOperations();
             string bomFileName = $"{appSettings.SW360.ProjectName}_Bom.cdx.json";
             string outputFolderPath = appSettings.Directory.OutputFolder;
-            string[] files = System.IO.Directory.GetFiles(outputFolderPath);
+            string[] files = Directory.GetFiles(outputFolderPath);
 
             bool fileExists = files.Length > 0 && files.Any(file => Path.GetFileName(file).Equals(bomFileName, StringComparison.OrdinalIgnoreCase));
 
