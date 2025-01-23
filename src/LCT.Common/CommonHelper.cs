@@ -5,7 +5,6 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using LCT.ArtifactPublisher;
 using LCT.Common.Constants;
 using LCT.Common.Model;
 using log4net;
@@ -15,6 +14,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.IO;
+using LCT.Common.Runtime;
 
 namespace LCT.Common
 {
@@ -25,6 +26,10 @@ namespace LCT.Common
     {
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static string ProjectSummaryLink { get; set; }
+        public const string LogArtifactFolderName = "ContinuousClearing_Log";
+        public const string BomArtifactFolderName = "ContinuousClearing_Bom";
+        public const string LogContainerFolderName = "Container_Log";
+        public const string BomContainerFolderName = "Container_Bom";
 
         #region public
         public static bool IsAzureDevOpsDebugEnabled()
@@ -270,8 +275,7 @@ namespace LCT.Common
         {
             if (code == -1)
             {
-                Publish artifactPublisher = new Publish(Log4Net.CatoolLogPath, FileOperations.CatoolBomFilePath);
-                artifactPublisher.UploadLogs();
+                UploadLogs();
                 EnvironmentExit(code);
             }
         }
@@ -283,9 +287,8 @@ namespace LCT.Common
 
         public static void PublishFilesToArtifact()
         {
-            Publish artifactPublisher = new Publish(Log4Net.CatoolLogPath, FileOperations.CatoolBomFilePath);
-            artifactPublisher.UploadLogs();
-            artifactPublisher.UploadBom();
+            UploadLogs();
+            UploadBom();
         }
 
         #endregion
@@ -300,6 +303,38 @@ namespace LCT.Common
         {
             string sw360URL = $"{sw360Env}{"/group/guest/components/-/component/release/detailRelease/"}{releaseId}";
             return sw360URL;
+        }
+        private static void UploadLogs()
+        {
+            EnvironmentType envType = RuntimeEnvironment.GetEnvironment();
+            if (envType == EnvironmentType.AzurePipeline && !string.IsNullOrEmpty(Log4Net.CatoolLogPath) && File.Exists(Log4Net.CatoolLogPath))
+            {
+                Logger.Logger.Log(null, Level.Notice, $"##vso[artifact.upload containerfolder={LogContainerFolderName};artifactname={LogArtifactFolderName}]{Log4Net.CatoolLogPath}", null);
+                //Console.WriteLine($"##vso[artifact.upload containerfolder={LogContainerFolderName};artifactname={LogArtifactFolderName}]{Log4Net.CatoolLogPath}");
+            }
+            else if (envType == EnvironmentType.Unknown)
+            {
+                //Console.WriteLine("Uploading of SBOM and the logs are not supported.");
+                Logger.Logger.Log(null, Level.Notice, $"Uploading of SBOM and the logs are not supported", null);
+            }
+
+        }
+
+        /// <summary>
+        /// Upload the BOM to the pipeline
+        /// </summary>
+        private static void UploadBom()
+        {
+            EnvironmentType envType = RuntimeEnvironment.GetEnvironment();
+            if (envType == EnvironmentType.AzurePipeline && !string.IsNullOrEmpty(FileOperations.CatoolBomFilePath) && File.Exists(FileOperations.CatoolBomFilePath))
+            {
+                Console.WriteLine($"##vso[artifact.upload containerfolder={BomContainerFolderName};artifactname={BomArtifactFolderName}]{FileOperations.CatoolBomFilePath}");
+            }
+            else if (envType == EnvironmentType.Unknown)
+            {
+                Console.WriteLine("Uploading of SBOM and the logs are not supported.");
+            }
+
         }
         #endregion
     }
