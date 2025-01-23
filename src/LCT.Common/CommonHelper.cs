@@ -25,11 +25,7 @@ namespace LCT.Common
     public static class CommonHelper
     {
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        public static string ProjectSummaryLink { get; set; }
-        public const string LogArtifactFolderName = "ContinuousClearing_Log";
-        public const string BomArtifactFolderName = "ContinuousClearing_Bom";
-        public const string LogContainerFolderName = "Container_Log";
-        public const string BomContainerFolderName = "Container_Bom";
+        public static string ProjectSummaryLink { get; set; }        
 
         #region public
         public static bool IsAzureDevOpsDebugEnabled()
@@ -175,6 +171,7 @@ namespace LCT.Common
             if (componentInfo.Count > 0 || lstReleaseNotCreated.Count > 0)
             {
                 Logger.Logger.Log(null, Level.Alert, "Action Item required by the user:\n", null);
+                PublishPipelineArtifacts.PublishFilesToArtifact();
                 Environment.ExitCode = 2;
             }
 
@@ -220,7 +217,8 @@ namespace LCT.Common
             const string Version = "Version";
 
             if (components.Count > 0)
-            {                
+            {
+                PublishPipelineArtifacts.PublishFilesToArtifact();
                 Environment.ExitCode = 2;
                 Logger.Logger.Log(null, Level.Alert, "* Components Not linked to project :", null);
                 Logger.Logger.Log(null, Level.Alert, " Can be linked manually OR Check the Logs AND RE-Run", null);

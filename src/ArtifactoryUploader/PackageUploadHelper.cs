@@ -997,7 +997,8 @@ namespace LCT.ArtifactoryUploader
             }
 
             if (SetWarningCode)
-            {                
+            {
+                PublishPipelineArtifacts.PublishFilesToArtifact();
                 Environment.ExitCode = 2;
                 Logger.Debug("Setting ExitCode to 2");
             }
