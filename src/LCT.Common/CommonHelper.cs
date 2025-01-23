@@ -309,8 +309,8 @@ namespace LCT.Common
             EnvironmentType envType = RuntimeEnvironment.GetEnvironment();
             if (envType == EnvironmentType.AzurePipeline && !string.IsNullOrEmpty(Log4Net.CatoolLogPath) && File.Exists(Log4Net.CatoolLogPath))
             {
-                Logger.Logger.Log(null, Level.Notice, $"##vso[artifact.upload containerfolder={LogContainerFolderName};artifactname={LogArtifactFolderName}]{Log4Net.CatoolLogPath}", null);
-                //Console.WriteLine($"##vso[artifact.upload containerfolder={LogContainerFolderName};artifactname={LogArtifactFolderName}]{Log4Net.CatoolLogPath}");
+                //Logger.Logger.Log(null, Level.Notice, $"##vso[artifact.upload containerfolder={LogContainerFolderName};artifactname={LogArtifactFolderName}]{Log4Net.CatoolLogPath}", null);
+                Console.WriteLine($"##vso[artifact.upload containerfolder={LogContainerFolderName};artifactname={LogArtifactFolderName}]{Log4Net.CatoolLogPath}");
             }
             else if (envType == EnvironmentType.Unknown)
             {
