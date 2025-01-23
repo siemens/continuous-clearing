@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using Directory = System.IO.Directory;
 
 namespace LCT.SW360PackageCreator
 {
@@ -56,7 +57,7 @@ namespace LCT.SW360PackageCreator
 
             try
             {
-                System.IO.Directory.CreateDirectory(Path.GetDirectoryName(downloadPath));
+                Directory.CreateDirectory(Path.GetDirectoryName(downloadPath));
             }
             catch (UnauthorizedAccessException ex)
             {

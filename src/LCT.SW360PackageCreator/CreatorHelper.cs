@@ -27,6 +27,7 @@ using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using Directory = System.IO.Directory;
 
 namespace LCT.SW360PackageCreator
 {
@@ -179,7 +180,7 @@ namespace LCT.SW360PackageCreator
             {
                 string componenetFullName = UrlHelper.GetCorrectFileExtension(component.SourceUrl);
                 string downloadFilePath = $"{localPathforDownload}{componenetFullName}";
-                System.IO.Directory.CreateDirectory(Path.GetDirectoryName(downloadFilePath));
+                Directory.CreateDirectory(Path.GetDirectoryName(downloadFilePath));
 
                 if (!string.IsNullOrEmpty(component.SourceUrl) && !component.SourceUrl.Equals(Dataconstant.SourceUrlNotFound))
                 {
@@ -337,11 +338,11 @@ namespace LCT.SW360PackageCreator
             {
                 if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
                 {
-                    localPathforDownload = $"{System.IO.Directory.GetParent(System.IO.Directory.GetCurrentDirectory())}/ClearingTool/DownloadedFiles/";
+                    localPathforDownload = $"{Directory.GetParent(Directory.GetCurrentDirectory())}/ClearingTool/DownloadedFiles/";
                 }
                 else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["ALPINE"]))
                 {
-                    localPathforDownload = $"{System.IO.Directory.GetParent(System.IO.Directory.GetCurrentDirectory())}/ClearingTool/DownloadedFiles/";
+                    localPathforDownload = $"{Directory.GetParent(Directory.GetCurrentDirectory())}/ClearingTool/DownloadedFiles/";
                 }
                 else
                 {

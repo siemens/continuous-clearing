@@ -16,6 +16,7 @@ using System.Net;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Directory = System.IO.Directory;
 
 namespace LCT.SW360PackageCreator
 {
@@ -143,7 +144,7 @@ namespace LCT.SW360PackageCreator
             {
                 string componenetFullName = GetCorrectFileExtension(SourceUrl);
                 string downloadFilePath = $"{localPathforDownload}{componenetFullName}";
-                System.IO.Directory.CreateDirectory(Path.GetDirectoryName(downloadFilePath));
+                Directory.CreateDirectory(Path.GetDirectoryName(downloadFilePath));
 
                 if (!string.IsNullOrEmpty(SourceUrl) && !component.SourceUrl.Equals(Dataconstant.SourceUrlNotFound))
                 {
@@ -229,9 +230,9 @@ namespace LCT.SW360PackageCreator
         {
             try
             {
-                if (System.IO.Directory.Exists(folderPath))
+                if (Directory.Exists(folderPath))
                 {
-                    System.IO.Directory.Delete(folderPath, true);
+                    Directory.Delete(folderPath, true);
                     Logger.Debug($"DeletePatchedFolder : Folder Name : {Path.GetDirectoryName(folderPath)}, {"Success!!"}");
                 }
             }

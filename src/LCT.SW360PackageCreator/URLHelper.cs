@@ -27,6 +27,7 @@ using Newtonsoft.Json.Linq;
 using YamlDotNet.Core;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
+using Directory = System.IO.Directory;
 
 namespace LCT.SW360PackageCreator
 {
@@ -58,7 +59,7 @@ namespace LCT.SW360PackageCreator
                 string localPathforSourceRepo = GetDownloadPathForAlpineRepo();
                 string fullPath = Path.Combine(localPathforSourceRepo, "aports");
                 var alpineDistro = GetAlpineDistro(bomRef);
-                if (!System.IO.Directory.Exists(fullPath))
+                if (!Directory.Exists(fullPath))
                 {
                     //Clone AlpineRepository
                     CloneSource(localPathforSourceRepo, alpineDistro, fullPath);
@@ -128,7 +129,7 @@ namespace LCT.SW360PackageCreator
             try
             {
                 var pkgFolderName = localPathforSourceRepo + Dataconstant.ForwardSlash + "aports" + Dataconstant.ForwardSlash + "main" + Dataconstant.ForwardSlash + name;
-                if (System.IO.Directory.Exists(pkgFolderName))
+                if (Directory.Exists(pkgFolderName))
                 {
                     pkgFilePath = localPathforSourceRepo + Dataconstant.ForwardSlash + "aports" + Dataconstant.ForwardSlash + "main" + Dataconstant.ForwardSlash + name + Dataconstant.ForwardSlash + "APKBUILD";
                     if (File.Exists(pkgFilePath))
@@ -219,10 +220,10 @@ namespace LCT.SW360PackageCreator
             string localPathforSourceRepo = string.Empty;
             try
             {
-                localPathforSourceRepo = $"{System.IO.Directory.GetParent(System.IO.Directory.GetCurrentDirectory())}\\ClearingTool\\DownloadedFiles\\";
-                if(!System.IO.Directory.Exists(localPathforSourceRepo))
+                localPathforSourceRepo = $"{Directory.GetParent(Directory.GetCurrentDirectory())}\\ClearingTool\\DownloadedFiles\\";
+                if(!Directory.Exists(localPathforSourceRepo))
                 {
-                    localPathforSourceRepo = System.IO.Directory.CreateDirectory(localPathforSourceRepo).ToString();                    
+                    localPathforSourceRepo = Directory.CreateDirectory(localPathforSourceRepo).ToString();                    
                 }
             }
             catch (IOException ex)
@@ -284,7 +285,7 @@ namespace LCT.SW360PackageCreator
                 p.Start();
                 p.WaitForExit();
             }
-            if (System.IO.Directory.Exists(fullPath))
+            if (Directory.Exists(fullPath))
             {
                 CheckoutDistro(alpineDistro, fullPath);
             }

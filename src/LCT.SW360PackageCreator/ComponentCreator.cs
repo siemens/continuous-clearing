@@ -24,6 +24,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Directory = System.IO.Directory;
 
 namespace LCT.SW360PackageCreator
 {
@@ -282,7 +283,7 @@ namespace LCT.SW360PackageCreator
                 if (appSettings.ProjectType.ToUpperInvariant() == "ALPINE")
                 {
                     string localPathforSourceRepo = UrlHelper.GetDownloadPathForAlpineRepo();
-                    if (System.IO.Directory.GetDirectories(localPathforSourceRepo).Length != 0)
+                    if (Directory.GetDirectories(localPathforSourceRepo).Length != 0)
                     {
                         DirectoryInfo di = new DirectoryInfo(localPathforSourceRepo);
                         foreach (DirectoryInfo dir in di.GetDirectories())
