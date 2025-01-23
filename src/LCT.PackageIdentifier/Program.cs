@@ -125,60 +125,26 @@ namespace LCT.PackageIdentifier
             // Initialize telemetry with CATool version and instrumentation key only if Telemetry is enabled in appsettings
             if (appSettings.Telemetry == true)
             {
-                Logger.Logger.Log(null, Level.Notice, $"\nStart of Package Identifier Telemtery execution: {DateTime.Now}", null);
+                Logger.Logger.Log(null, Level.Notice, TelemetryConstant.StartLogMessage, null);
                 Telemetry.Telemetry telemetry = new Telemetry.Telemetry("ApplicationInsights", new Dictionary<string, string>
-            {
-                { "InstrumentationKey", appSettings.ApplicationInsight_InstrumentKey }
-            });
-            try
                 {
-                    telemetry.Initialize("CATool", caToolInformation.CatoolVersion);
-
-                    telemetry.TrackCustomEvent("PackageIdentifierExecution", new Dictionary<string, string>
-                    {
-                        { "CA Tool Version", caToolInformation.CatoolVersion },
-                        { "SW360 Project Name", appSettings.SW360ProjectName },
-                        { "SW360 Project ID", appSettings.SW360ProjectID },
-                        { "Project Type", appSettings.ProjectType },
-                        { "Hashed User ID", HashUtility.GetHashString(Environment.UserName) },
-                        { "Start Time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture) }
-                    });
+                    { "InstrumentationKey", appSettings.ApplicationInsight_InstrumentKey }
+                });
+                try
+                {
+                    CommonHelper.InitializeAndTrackEvent(telemetry, TelemetryConstant.ToolName, caToolInformation.CatoolVersion, TelemetryConstant.PackageIdentifier
+                                                        , appSettings);
                     // Track KPI data if available
                     if (BomCreator.bomKpiData != null)
                     {
-                        telemetry.TrackCustomEvent("BomKpiDataTelemetry", new Dictionary<string, string>
-                        {
-                               { "Hashed User ID", HashUtility.GetHashString(Environment.UserName) },
-                               { "Components In Input File", BomCreator.bomKpiData.ComponentsinPackageLockJsonFile.ToString() },
-                               { "Dev Dependent Components", BomCreator.bomKpiData.DevDependentComponents.ToString() },
-                               { "Bundled Dependent Components", BomCreator.bomKpiData.BundledComponents.ToString() },
-                               { "Total Duplicate Components", BomCreator.bomKpiData.DuplicateComponents.ToString() },
-                               { "Internal Components Identified", BomCreator.bomKpiData.InternalComponents.ToString() },
-                               { "Components already present in 3rd party repo(s)", BomCreator.bomKpiData.ThirdPartyRepoComponents.ToString() },
-                               { "Components already present in devdep repo(s)", BomCreator.bomKpiData.DevdependencyComponents.ToString() },
-                               { "Components already present in release repo(s)", BomCreator.bomKpiData.ReleaseRepoComponents.ToString() },
-                               { "Components not from official repo(s)", BomCreator.bomKpiData.UnofficialComponents.ToString() },
-                               { "Total Components Excluded", BomCreator.bomKpiData.ComponentsExcluded.ToString() },
-                               { "Components With SourceURL", BomCreator.bomKpiData.ComponentsWithSourceURL.ToString() },
-                               { "Components In Comparison BOM", BomCreator.bomKpiData.ComponentsInComparisonBOM.ToString() },
-                               { "Time taken by BOM Creator", BomCreator.bomKpiData.TimeTakenByBomCreator.ToString() },
-                               { "Components Added From SBOM Template", BomCreator.bomKpiData.ComponentsinSBOMTemplateFile.ToString() },
-                               { "Components Updated From SBOM Template", BomCreator.bomKpiData.ComponentsUpdatedFromSBOMTemplateFile.ToString() },
-                               { "Project Summary Link", BomCreator.bomKpiData.ProjectSummaryLink },
-                               { "Time stamp", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture) }
-                        });
+                        CommonHelper.TrackKpiDataTelemetry(telemetry, TelemetryConstant.IdentifierKpiData, BomCreator.bomKpiData);
                     }
                     telemetry.TrackExecutionTime();
-                    Logger.Logger.Log(null, Level.Notice, $"End of Package Identifier Telemetry execution : {DateTime.Now}\n", null);
                 }
                 catch (Exception ex)
                 {
                     Logger.Error($"An error occurred: {ex.Message}");
-                    telemetry.TrackException(ex, new Dictionary<string, string>
-                    {
-                        { "Error Time", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture) },
-                        { "Stack Trace", ex.StackTrace }
-                    });
+                    CommonHelper.TrackException(telemetry, ex);
                     CommonHelper.CallEnvironmentExit(-1);
                 }
                 finally

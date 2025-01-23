@@ -99,7 +99,7 @@ namespace ArtifactoryUploader
             // Initialize telemetry with CATool version and instrumentation key only if Telemetry is enabled in appsettings
             if (appSettings.Telemetry == true)
             {
-                Logger.Logger.Log(null, Level.Notice, $"\nStart of Package Identifier Telemetry execution: {DateTime.Now}", null);
+                Logger.Logger.Log(null, Level.Notice, TelemetryConstant.StartLogMessage, null);
                 Telemetry.Telemetry telemetry = new Telemetry.Telemetry("ApplicationInsights", new Dictionary<string, string>
                 {
                     { "InstrumentationKey", appSettings.ApplicationInsight_InstrumentKey }
@@ -107,40 +107,13 @@ namespace ArtifactoryUploader
 
                 try
                 {
-                    telemetry.Initialize("CATool", caToolInformation.CatoolVersion);
-
-                    telemetry.TrackCustomEvent("ArtifactoryUploaderExecution", new Dictionary<string, string>
-                    {
-                        { "CA Tool Version", caToolInformation.CatoolVersion },
-                        { "SW360 Project Name", appSettings.SW360ProjectName },
-                        { "SW360 Project ID", appSettings.SW360ProjectID },
-                        { "Project Type", appSettings.ProjectType },
-                        { "Hashed User ID", HashUtility.GetHashString(Environment.UserName) },
-                        { "Start Time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture) }
-                    });
+                    CommonHelper.InitializeAndTrackEvent(telemetry, TelemetryConstant.ToolName, caToolInformation.CatoolVersion, TelemetryConstant.ArtifactoryUploader
+                                                        , appSettings);
 
                     // Track KPI data if available
                     if (PackageUploader.uploaderKpiData != null)
                     {
-                        telemetry.TrackCustomEvent("UploaderKpiDataTelemetry", new Dictionary<string, string>
-                        {
-                            { "Hashed User ID", HashUtility.GetHashString(Environment.UserName) },
-                            { "Components In Comparison BOM", PackageUploader.uploaderKpiData.ComponentInComparisonBOM.ToString() },
-                            { "Packages in Not Approved State", PackageUploader.uploaderKpiData .ComponentNotApproved.ToString() },
-                            { "Packages in Approved State", PackageUploader.uploaderKpiData .PackagesToBeUploaded.ToString() },
-                            { "Packages Copied to Siparty Repo", PackageUploader.uploaderKpiData.PackagesUploadedToJfrog.ToString() },
-                            { "Packages Not Copied to Siparty Repo", PackageUploader.uploaderKpiData.PackagesNotUploadedToJfrog.ToString() },
-                            { "Packages Not Existing in Repository", PackageUploader.uploaderKpiData.PackagesNotExistingInRemoteCache.ToString() },
-                            { "Packages Not Actioned Due To Error", PackageUploader.uploaderKpiData.PackagesNotUploadedDueToError.ToString() },
-                            { "Time taken by ComponentCreator", PackageUploader.uploaderKpiData.TimeTakenByComponentCreator.ToString() },
-                            { "Development Packages to be Copied to Siparty DevDep Repo", PackageUploader.uploaderKpiData.DevPackagesToBeUploaded.ToString() },
-                            { "Development Packages Copied to Siparty DevDep Repo", PackageUploader.uploaderKpiData.DevPackagesUploaded.ToString() },
-                            { "Development Packages Not Copied to Siparty DevDep Repo", PackageUploader.uploaderKpiData.DevPackagesNotUploadedToJfrog.ToString() },
-                            { "Internal Packages to be Moved", PackageUploader.uploaderKpiData.InternalPackagesToBeUploaded.ToString() },
-                            { "Internal Packages Moved to Repo", PackageUploader.uploaderKpiData.InternalPackagesUploaded.ToString() },
-                            { "Internal Packages Not Moved to Repo", PackageUploader.uploaderKpiData.InternalPackagesNotUploadedToJfrog.ToString() },
-                            { "Time stamp", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture) }
-                        });
+                        CommonHelper.TrackKpiDataTelemetry(telemetry, TelemetryConstant.ArtifactoryUploaderKpiData, PackageUploader.uploaderKpiData);
                     }
                     telemetry.TrackExecutionTime();
                     Logger.Logger.Log(null, Level.Notice, $"End of Artifactory Uploader Telemetry execution : {DateTime.Now}\n", null);
@@ -148,11 +121,7 @@ namespace ArtifactoryUploader
                 catch (Exception ex)
                 {
                     Logger.Error($"An error occurred: {ex.Message}");
-                    telemetry.TrackException(ex, new Dictionary<string, string>
-                    {
-                        { "Error Time", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture) },
-                        { "Stack Trace", ex.StackTrace }
-                    });
+                    CommonHelper.TrackException(telemetry, ex);
                     CommonHelper.CallEnvironmentExit(-1);
                 }
                 finally

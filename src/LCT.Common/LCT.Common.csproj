@@ -36,6 +36,7 @@
   <ItemGroup>
     <ProjectReference Include="..\LCT.ArtifactPublisher\LCT.ArtifactPublisher.csproj" />
     <ProjectReference Include="..\LCT.CycloneDxProcessor\LCT.CycloneDxProcessor.csproj" />
+    <ProjectReference Include="..\TelemetryHelperClass\Telemetry.csproj" />
   </ItemGroup>
 
   <ItemGroup>

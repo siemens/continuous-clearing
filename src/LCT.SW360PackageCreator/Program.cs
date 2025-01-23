@@ -92,57 +92,26 @@ namespace LCT.SW360PackageCreator
             // Initialize telemetry with CATool version and instrumentation key only if Telemetry is enabled in appsettings
             if (appSettings.Telemetry == true)
             {
-                Logger.Logger.Log(null, Level.Notice, $"\nStart of Package Identifier Telemetry execution: {DateTime.Now}", null);
+                Logger.Logger.Log(null, Level.Notice, TelemetryConstant.StartLogMessage, null);
                 Telemetry.Telemetry telemetry = new Telemetry.Telemetry("ApplicationInsights", new Dictionary<string, string>
-    {
-        { "InstrumentationKey", appSettings.ApplicationInsight_InstrumentKey }
-    });
+                {
+                    { "InstrumentationKey", appSettings.ApplicationInsight_InstrumentKey }
+                });
                 try
                 {
-                    telemetry.Initialize("CATool", caToolInformation.CatoolVersion);
-
-                    telemetry.TrackCustomEvent("PackageCreatorExecution", new Dictionary<string, string>
-        {
-            { "CA Tool Version", caToolInformation.CatoolVersion },
-            { "SW360 Project Name", appSettings.SW360ProjectName },
-            { "SW360 Project ID", appSettings.SW360ProjectID },
-            { "Project Type", appSettings.ProjectType },
-            { "Hashed User ID", HashUtility.GetHashString(Environment.UserName) },
-            { "Start Time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture) }
-        });
+                    CommonHelper.InitializeAndTrackEvent(telemetry, TelemetryConstant.ToolName, caToolInformation.CatoolVersion, TelemetryConstant.PackageCreator
+                                                        , appSettings);
                     // Track KPI data if available
                     if (ComponentCreator.kpiData != null)
                     {
-                        telemetry.TrackCustomEvent("CreatorKpiDataTelemetry", new Dictionary<string, string>
-            {
-                { "Hashed User ID", HashUtility.GetHashString(Environment.UserName) },
-                { "Components Read From Comparison BOM", ComponentCreator.kpiData.ComponentsReadFromComparisonBOM.ToString() },
-                { "Components Or Releases Created Newly In SW360", ComponentCreator.kpiData.ComponentsOrReleasesCreatedNewlyInSw360.ToString() },
-                { "Components Or Releases Existing In SW360", ComponentCreator.kpiData.ComponentsOrReleasesExistingInSw360.ToString() },
-                { "Components Without Source Download URL", ComponentCreator.kpiData.ComponentsWithoutSourceDownloadUrl.ToString() },
-                { "Components With Source Download URL", ComponentCreator.kpiData.ComponentsWithSourceDownloadUrl.ToString() },
-                { "Components Or Releases Not Created In SW360", ComponentCreator.kpiData.ComponentsOrReleasesNotCreatedInSw360.ToString() },
-                { "Time Taken By Component Creator", ComponentCreator.kpiData.TimeTakenByComponentCreator.ToString() },
-                { "Components Without Source And Package URL", ComponentCreator.kpiData.ComponentsWithoutSourceAndPackageUrl.ToString() },
-                { "Components Without Package URL", ComponentCreator.kpiData.ComponentsWithoutPackageUrl.ToString() },
-                { "Components Uploaded In FOSSology", ComponentCreator.kpiData.ComponentsUploadedInFossology.ToString() },
-                { "Components Not Uploaded In FOSSology", ComponentCreator.kpiData.ComponentsNotUploadedInFossology.ToString() },
-                { "Total Duplicate And Invalid Components", ComponentCreator.kpiData.TotalDuplicateAndInValidComponents.ToString() },
-                { "Time Stamp", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture) }
-            });
+                        CommonHelper.TrackKpiDataTelemetry(telemetry, TelemetryConstant.CreatorKpiData, ComponentCreator.kpiData);
                     }
-
                     telemetry.TrackExecutionTime();
-                    Logger.Logger.Log(null, Level.Notice, $"End of Package Creator Telemetry execution : {DateTime.Now}\n", null);
                 }
                 catch (Exception ex)
                 {
                     Logger.Error($"An error occurred: {ex.Message}");
-                    telemetry.TrackException(ex, new Dictionary<string, string>
-        {
-            { "Error Time", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture) },
-            { "Stack Trace", ex.StackTrace }
-        });
+                    CommonHelper.TrackException(telemetry, ex);
                     CommonHelper.CallEnvironmentExit(-1);
                 }
                 finally
