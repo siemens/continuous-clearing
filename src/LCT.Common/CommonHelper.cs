@@ -315,7 +315,7 @@ namespace LCT.Common
             else if (envType == EnvironmentType.Unknown)
             {
                 //Console.WriteLine("Uploading of SBOM and the logs are not supported.");
-                Logger.Logger.Log(null, Level.Notice, $"Uploading of logs is not supported", null);
+                Logger.Logger.Log(null, Level.Notice, $"Uploading of logs is not supported.", null);
             }
 
         }
