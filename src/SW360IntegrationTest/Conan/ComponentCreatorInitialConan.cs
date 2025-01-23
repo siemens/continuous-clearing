@@ -35,7 +35,7 @@ namespace SW360IntegrationTest.Conan
                 TestConstant.SW360ProjectID, testParameters.SW360ProjectID,
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
-                TestConstant.JfrogConanInternalRepo,"Conan.test",
+                TestConstant.JfrogConanInternalRepo,"Conan-test",
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
                 TestConstant.ProjectType, "CONAN",
                 TestConstant.Mode,""

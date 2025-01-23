@@ -44,7 +44,7 @@ namespace SW360IntegrationTest.NPM
                 TestConstant.SW360ProjectID, testParameters.SW360ProjectID,
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
-                TestConstant.JfrogNpmInternalRepo,"Npm.test",
+                TestConstant.JfrogNpmInternalRepo,"Npm-test",
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
                 TestConstant.ProjectType, "NPM",
                 TestConstant.Mode,""});

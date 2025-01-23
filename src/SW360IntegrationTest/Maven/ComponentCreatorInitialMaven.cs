@@ -46,7 +46,7 @@ namespace SW360IntegrationTest.Maven
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
-                TestConstant.JfrogMavenInternalRepo,"Maven.test",
+                TestConstant.JfrogMavenInternalRepo,"Maven-test",
                 TestConstant.ProjectType,"MAVEN",
                 TestConstant.Mode,""});
             }

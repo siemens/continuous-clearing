@@ -44,7 +44,7 @@ namespace SW360IntegrationTest.Nuget
                 TestConstant.SW360ProjectID, testParameters.SW360ProjectID,
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
-                TestConstant.JfrogNugetInternalRepo,"Nuget.test",
+                TestConstant.JfrogNugetInternalRepo,"Nuget-test",
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
                 TestConstant.ProjectType,"NUGET",
                 TestConstant.Mode,""});
