@@ -89,9 +89,9 @@ namespace LCT.SW360PackageCreator
             await InitiatePackageCreatorProcess(appSettings, sw360ProjectService, sW360ApicommunicationFacade);
 
             Logger.Logger.Log(null, Level.Notice, $"End of Package Creator execution: {DateTime.Now}\n", null);
-            
+
             // publish logs and bom file to pipeline artifact
-            CommonHelper.PublishFilesToArtifact();
+            PublishPipelineArtifacts.PublishFilesToArtifact();
         }
 
         private static CatoolInfo GetCatoolVersionFromProjectfile()

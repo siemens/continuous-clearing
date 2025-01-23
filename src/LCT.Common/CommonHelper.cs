@@ -220,8 +220,7 @@ namespace LCT.Common
             const string Version = "Version";
 
             if (components.Count > 0)
-            {
-                PublishFilesToArtifact();
+            {                
                 Environment.ExitCode = 2;
                 Logger.Logger.Log(null, Level.Alert, "* Components Not linked to project :", null);
                 Logger.Logger.Log(null, Level.Alert, " Can be linked manually OR Check the Logs AND RE-Run", null);
@@ -275,7 +274,7 @@ namespace LCT.Common
         {
             if (code == -1)
             {
-                UploadLogs();
+                PublishPipelineArtifacts.UploadLogs();
                 EnvironmentExit(code);
             }
         }
@@ -284,12 +283,7 @@ namespace LCT.Common
         {
             Environment.Exit(exitCode);
         }
-
-        public static void PublishFilesToArtifact()
-        {
-            UploadLogs();
-            UploadBom();
-        }
+        
 
         #endregion
 
@@ -304,39 +298,7 @@ namespace LCT.Common
             string sw360URL = $"{sw360Env}{"/group/guest/components/-/component/release/detailRelease/"}{releaseId}";
             return sw360URL;
         }
-        /// <summary>
-        /// Upload the Logs to the pipeline
-        /// </summary>
-        private static void UploadLogs()
-        {
-            EnvironmentType envType = RuntimeEnvironment.GetEnvironment();
-            if (envType == EnvironmentType.AzurePipeline && !string.IsNullOrEmpty(Log4Net.CatoolLogPath) && File.Exists(Log4Net.CatoolLogPath))
-            {
-                Console.WriteLine($"##vso[artifact.upload containerfolder={LogContainerFolderName};artifactname={LogArtifactFolderName}]{Log4Net.CatoolLogPath}");
-            }
-            else if (envType == EnvironmentType.Unknown)
-            {
-                Logger.Logger.Log(null, Level.Notice, $"Uploading of logs is not supported.", null);
-            }
-
-        }
-
-        /// <summary>
-        /// Upload the BOM to the pipeline
-        /// </summary>
-        private static void UploadBom()
-        {
-            EnvironmentType envType = RuntimeEnvironment.GetEnvironment();
-            if (envType == EnvironmentType.AzurePipeline && !string.IsNullOrEmpty(FileOperations.CatoolBomFilePath) && File.Exists(FileOperations.CatoolBomFilePath))
-            {
-                Console.WriteLine($"##vso[artifact.upload containerfolder={BomContainerFolderName};artifactname={BomArtifactFolderName}]{FileOperations.CatoolBomFilePath}");
-            }
-            else if (envType == EnvironmentType.Unknown)
-            {                
-                Logger.Logger.Log(null, Level.Notice, $"Uploading of SBOM is not supported.", null);
-            }
-
-        }
+        
         #endregion
     }
 }

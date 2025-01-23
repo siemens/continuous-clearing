@@ -42,7 +42,7 @@ namespace LCT.Common
             {
                 Logger.Debug($"Argument Count : {args.Length}");
                 DisplayHelp();
-                CommonHelper.PublishFilesToArtifact();
+                PublishPipelineArtifacts.PublishFilesToArtifact();
                 Environment.Exit(0);
             }
             string settingsFilePath = GetConfigFilePathFromArgs(args, jsonSettingsFileName);
