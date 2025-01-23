@@ -166,8 +166,7 @@ jobs:
         echo "Files in directory:"
         docker build . --file Dockerfile --tag ${{ github.repository }}:continuous-clearing-v7.0.2
         docker save ${{ github.repository }}:continuous-clearing-v7.0.2 -o continuous-clearing-v7.0.2.tar
-        echo "::set-output name=docker-LicenseClearingTool::continuous-clearing-v7.0.2
-        .tar"
+        echo "::set-output name=docker-LicenseClearingTool::continuous-clearing-v7.0.2.tar"
         
     - name: Archive docker image      
       #if: ${{ false }}  # disable for now
