@@ -4,7 +4,7 @@
 <package >
   <metadata>
     <id>continuous-clearing</id>
-    <version>7.0.0</version>
+    <version>7.0.2</version>
     <authors>Siemens AG</authors>
     <owners>continuous-clearing contributors</owners>
     <projectUrl>https://github.com/siemens/continuous-clearing</projectUrl>
