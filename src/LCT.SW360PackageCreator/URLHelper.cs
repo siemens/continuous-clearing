@@ -101,7 +101,7 @@ namespace LCT.SW360PackageCreator
             try
             {
                 var pkgFolderName = localPathforSourceRepo + Dataconstant.ForwardSlash + "aports" + Dataconstant.ForwardSlash + "main" + Dataconstant.ForwardSlash + name;
-                if (System.IO.Directory.Exists(pkgFolderName))
+                if (Directory.Exists(pkgFolderName))
                 {
                     var pkgFilePath = localPathforSourceRepo + Dataconstant.ForwardSlash + "aports" + Dataconstant.ForwardSlash + "main" + Dataconstant.ForwardSlash + name + Dataconstant.ForwardSlash + "APKBUILD";
                     if (File.Exists(pkgFilePath))
