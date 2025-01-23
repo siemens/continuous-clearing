@@ -277,58 +277,31 @@ namespace LCT.Common
         }
         public static string[] GetRepoList(CommonAppSettings appSettings)
         {
-            string[] repoList = null;
+            var projectTypeMappings = new Dictionary<string, Func<Artifactory>>
+        {
+        { "CONAN", () => appSettings.Conan?.Artifactory },
+        { "NPM", () => appSettings.Npm?.Artifactory },
+        { "NUGET", () => appSettings.Nuget?.Artifactory },
+        { "POETRY", () => appSettings.Poetry?.Artifactory },
+        { "DEBIAN", () => appSettings.Debian?.Artifactory },
+        { "MAVEN", () => appSettings.Maven?.Artifactory }
+        };
 
-            if (appSettings.ProjectType.Equals("CONAN", StringComparison.InvariantCultureIgnoreCase))
+            if (projectTypeMappings.TryGetValue(appSettings.ProjectType.ToUpperInvariant(), out var getArtifactory))
             {
-                repoList = (appSettings.Conan?.Artifactory.InternalRepos ?? Array.Empty<string>())
-       .Concat(appSettings.Conan?.Artifactory.DevRepos ?? Array.Empty<string>())
-       .Concat(appSettings.Conan?.Artifactory.RemoteRepos ?? Array.Empty<string>())
-       .Concat(appSettings.Conan?.Artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? Array.Empty<string>())
-       .ToArray();
-            }else if (appSettings.ProjectType.Equals("NPM", StringComparison.InvariantCultureIgnoreCase))
-            {
-                repoList = (appSettings.Npm?.Artifactory.InternalRepos ?? Array.Empty<string>())
-        .Concat(appSettings.Npm?.Artifactory.DevRepos ?? Array.Empty<string>())
-        .Concat(appSettings.Npm?.Artifactory.RemoteRepos ?? Array.Empty<string>())
-        .Concat(appSettings.Npm?.Artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? Array.Empty<string>())
-        .ToArray();
+                var artifactory = getArtifactory();
+                if (artifactory != null)
+                {
+                    return (artifactory.InternalRepos ?? Array.Empty<string>())
+                        .Concat(artifactory.DevRepos ?? Array.Empty<string>())
+                        .Concat(artifactory.RemoteRepos ?? Array.Empty<string>())
+                        .Concat(artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? Array.Empty<string>())
+                        .ToArray();
+                }
             }
-            else if (appSettings.ProjectType.Equals("NUGET", StringComparison.InvariantCultureIgnoreCase))
-            {
-                repoList = (appSettings.Nuget?.Artifactory.InternalRepos ?? Array.Empty<string>())
-       .Concat(appSettings.Nuget?.Artifactory.DevRepos ?? Array.Empty<string>())
-       .Concat(appSettings.Nuget?.Artifactory.RemoteRepos ?? Array.Empty<string>())
-       .Concat(appSettings.Nuget?.Artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? Array.Empty<string>())
-       .ToArray();
-            }
-            else if (appSettings.ProjectType.Equals("POETRY", StringComparison.InvariantCultureIgnoreCase))
-            {
-                repoList = (appSettings.Poetry?.Artifactory.InternalRepos ?? Array.Empty<string>())
-      .Concat(appSettings.Poetry?.Artifactory.DevRepos ?? Array.Empty<string>())
-      .Concat(appSettings.Poetry?.Artifactory.RemoteRepos ?? Array.Empty<string>())
-      .Concat(appSettings.Poetry?.Artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? Array.Empty<string>())
-      .ToArray();
-            }
-            else if (appSettings.ProjectType.Equals("DEBIAN", StringComparison.InvariantCultureIgnoreCase))
-            {
-                repoList = (appSettings.Debian?.Artifactory.InternalRepos ?? Array.Empty<string>())
-         .Concat(appSettings.Debian?.Artifactory.DevRepos ?? Array.Empty<string>())
-         .Concat(appSettings.Debian?.Artifactory.RemoteRepos ?? Array.Empty<string>())
-         .Concat(appSettings.Debian?.Artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? Array.Empty<string>())
-         .ToArray();
-            }
-            else if (appSettings.ProjectType.Equals("MAVEN", StringComparison.InvariantCultureIgnoreCase))
-            {
-                repoList = (appSettings.Maven?.Artifactory.InternalRepos ?? Array.Empty<string>())
-        .Concat(appSettings.Maven?.Artifactory.DevRepos ?? Array.Empty<string>())
-        .Concat(appSettings.Maven?.Artifactory.RemoteRepos ?? Array.Empty<string>())
-        .Concat(appSettings.Maven?.Artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? Array.Empty<string>())
-        .ToArray();
-            }
-            return repoList;
+
+            return Array.Empty<string>();
         }
-
         #endregion
 
         #region private
