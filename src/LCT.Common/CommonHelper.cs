@@ -304,17 +304,18 @@ namespace LCT.Common
             string sw360URL = $"{sw360Env}{"/group/guest/components/-/component/release/detailRelease/"}{releaseId}";
             return sw360URL;
         }
+        /// <summary>
+        /// Upload the Logs to the pipeline
+        /// </summary>
         private static void UploadLogs()
         {
             EnvironmentType envType = RuntimeEnvironment.GetEnvironment();
             if (envType == EnvironmentType.AzurePipeline && !string.IsNullOrEmpty(Log4Net.CatoolLogPath) && File.Exists(Log4Net.CatoolLogPath))
             {
-                //Logger.Logger.Log(null, Level.Notice, $"##vso[artifact.upload containerfolder={LogContainerFolderName};artifactname={LogArtifactFolderName}]{Log4Net.CatoolLogPath}", null);
                 Console.WriteLine($"##vso[artifact.upload containerfolder={LogContainerFolderName};artifactname={LogArtifactFolderName}]{Log4Net.CatoolLogPath}");
             }
             else if (envType == EnvironmentType.Unknown)
             {
-                //Console.WriteLine("Uploading of SBOM and the logs are not supported.");
                 Logger.Logger.Log(null, Level.Notice, $"Uploading of logs is not supported.", null);
             }
 
@@ -331,8 +332,8 @@ namespace LCT.Common
                 Console.WriteLine($"##vso[artifact.upload containerfolder={BomContainerFolderName};artifactname={BomArtifactFolderName}]{FileOperations.CatoolBomFilePath}");
             }
             else if (envType == EnvironmentType.Unknown)
-            {
-                Console.WriteLine("Uploading of SBOM is not supported.");
+            {                
+                Logger.Logger.Log(null, Level.Notice, $"Uploading of SBOM is not supported.", null);
             }
 
         }
