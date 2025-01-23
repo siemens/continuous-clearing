@@ -99,7 +99,7 @@ namespace ArtifactoryUploader
             // Initialize telemetry with CATool version and instrumentation key only if Telemetry is enabled in appsettings
             if (appSettings.Telemetry == true)
             {
-                Logger.Logger.Log(null, Level.Notice, TelemetryConstant.StartLogMessage, null);
+                Logger.Warn( TelemetryConstant.StartLogMessage );
                 Telemetry.Telemetry telemetry = new Telemetry.Telemetry("ApplicationInsights", new Dictionary<string, string>
                 {
                     { "InstrumentationKey", appSettings.ApplicationInsight_InstrumentKey }
@@ -116,7 +116,7 @@ namespace ArtifactoryUploader
                         CommonHelper.TrackKpiDataTelemetry(telemetry, TelemetryConstant.ArtifactoryUploaderKpiData, PackageUploader.uploaderKpiData);
                     }
                     telemetry.TrackExecutionTime();
-                    Logger.Logger.Log(null, Level.Notice, $"End of Artifactory Uploader Telemetry execution : {DateTime.Now}\n", null);
+                    
                 }
                 catch (Exception ex)
                 {

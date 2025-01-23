@@ -88,11 +88,13 @@ namespace LCT.SW360PackageCreator
 
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);
-         
+
+            await InitiatePackageCreatorProcess(appSettings, sw360ProjectService, sW360ApicommunicationFacade);
+
             // Initialize telemetry with CATool version and instrumentation key only if Telemetry is enabled in appsettings
             if (appSettings.Telemetry == true)
             {
-                Logger.Logger.Log(null, Level.Notice, TelemetryConstant.StartLogMessage, null);
+                Logger.Warn( TelemetryConstant.StartLogMessage);
                 Telemetry.Telemetry telemetry = new Telemetry.Telemetry("ApplicationInsights", new Dictionary<string, string>
                 {
                     { "InstrumentationKey", appSettings.ApplicationInsight_InstrumentKey }
@@ -120,7 +122,7 @@ namespace LCT.SW360PackageCreator
                 }
             }
 
-            await InitiatePackageCreatorProcess(appSettings, sw360ProjectService, sW360ApicommunicationFacade);
+            
 
             Logger.Logger.Log(null, Level.Notice, $"End of Package Creator execution: {DateTime.Now}\n", null);
 

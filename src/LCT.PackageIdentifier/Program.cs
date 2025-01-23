@@ -125,7 +125,7 @@ namespace LCT.PackageIdentifier
             // Initialize telemetry with CATool version and instrumentation key only if Telemetry is enabled in appsettings
             if (appSettings.Telemetry == true)
             {
-                Logger.Logger.Log(null, Level.Notice, TelemetryConstant.StartLogMessage, null);
+                Logger.Warn(TelemetryConstant.StartLogMessage);
                 Telemetry.Telemetry telemetry = new Telemetry.Telemetry("ApplicationInsights", new Dictionary<string, string>
                 {
                     { "InstrumentationKey", appSettings.ApplicationInsight_InstrumentKey }
