@@ -227,7 +227,16 @@ namespace LCT.SW360PackageCreator.UTest
                     new Component() { Name = "adduser",Version="3.118",Group="",Purl="pkg:deb/debian/adduser@3.118@arch=source",Properties = properties },
                 };
 
-            CommonAppSettings CommonAppSettings = new CommonAppSettings();
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings CommonAppSettings = new()
+            {
+                SW360 = new SW360() { ProjectName = "Test" },
+                Directory = new Common.Directory(folderAction, fileOperations)
+                {
+                    OutputFolder = @"\Output"
+                }
+            };
             List<ComparisonBomData> comparisonBomData = new List<ComparisonBomData>();
             comparisonBomData.Add(new ComparisonBomData());
             var sw360Service = new Mock<ISW360Service>();
@@ -269,11 +278,18 @@ namespace LCT.SW360PackageCreator.UTest
                 {
                     new Component() { Name = "newtonsoft",Version="3.1.18",Group="",Purl="pkg:nuget/newtonsoft@3.1.18",Properties = properties },
                 };
-
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
             CommonAppSettings CommonAppSettings = new()
             {
-                SW360 = new SW360()
+                SW360 = new SW360() {  ProjectName = "Test" },
+                Directory = new Common.Directory(folderAction, fileOperations)
+                {
+                    OutputFolder = @"\Output"
+                }
             };
+            
+
             List<ComparisonBomData> comparisonBomData = new List<ComparisonBomData>();
             comparisonBomData.Add(new ComparisonBomData());
             var sw360Service = new Mock<ISW360Service>();
@@ -317,8 +333,11 @@ namespace LCT.SW360PackageCreator.UTest
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings commonAppSettings = new CommonAppSettings()
             {
-                SW360 = new SW360() { IgnoreDevDependency= false },
+                SW360 = new SW360() { IgnoreDevDependency= false, ProjectName = "Test" },
                 Directory = new Common.Directory(folderAction, fileOperations)
+                {
+                    OutputFolder = @"\Output"
+                }
             };
             
             List<ComparisonBomData> comparisonBomData = new List<ComparisonBomData>();
@@ -355,8 +374,18 @@ namespace LCT.SW360PackageCreator.UTest
                 {
                     new Component() { Name = "apk-tools",Version="2.12.9-r3",Group="",BomRef="pkg:apk/alpine/alpine-keys@2.4-r1?distro=alpine-3.16.2",Purl="pkg:apk/alpine/apk-tools@2.12.9-r3?arch=source",Properties = properties },
                 };
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            {
 
-            CommonAppSettings CommonAppSettings = new CommonAppSettings();
+                SW360 = new SW360() { ProjectName = "Test" },
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                {
+                    OutputFolder = @"\Output"
+                }
+            };
+            
             List<ComparisonBomData> comparisonBomData = new List<ComparisonBomData>();
             comparisonBomData.Add(new ComparisonBomData());
             var sw360Service = new Mock<ISW360Service>();
@@ -367,7 +396,7 @@ namespace LCT.SW360PackageCreator.UTest
             var cycloneDXBomParser = new ComponentCreator();
 
             //Act
-            var list = await cycloneDXBomParser.CycloneDxBomParser(CommonAppSettings, sw360Service.Object, parser.Object, creatorHelper.Object);
+            var list = await cycloneDXBomParser.CycloneDxBomParser(appSettings, sw360Service.Object, parser.Object, creatorHelper.Object);
 
 
             //Assert

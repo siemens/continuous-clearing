@@ -149,7 +149,7 @@ namespace LCT.Common
                 "SW360.ProjectID",
                 "Sw360.Token",
                 "SW360.URL",
-                "Directory.InputFolder"
+                "Directory.OutputFolder"
             };
                 CheckForMissingParameter(appSettings, properties, creatorReqParameters);
             }

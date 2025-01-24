@@ -71,18 +71,18 @@ namespace LCT.SW360PackageCreator
 
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Alert, $"Package creator is running in TEST mode \n", null);
-
+            var bomFilePath = Path.Combine(appSettings.Directory.OutputFolder, appSettings.SW360.ProjectName + "_" + FileConstant.BomFileName);
             Logger.Logger.Log(null, Level.Notice, $"Input parameters used in Package Creator:\n\t" +
               $"CaToolVersion\t\t --> {caToolInformation.CatoolVersion}\n\t" +
               $"CaToolRunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
-              $"BomFilePath\t\t --> {appSettings.Directory.InputFolder}\n\t" +
+              $"BomFilePath\t\t --> {bomFilePath}\n\t" +
               $"SW360Url\t\t --> {appSettings.SW360.URL}\n\t" +
               $"SW360AuthTokenType\t --> {appSettings.SW360.AuthTokenType}\n\t" +
               $"SW360ProjectName\t --> {appSettings.SW360.ProjectName}\n\t" +
               $"SW360ProjectID\t\t --> {appSettings.SW360.ProjectID}\n\t" +
               $"FossologyURL\t\t --> {appSettings.SW360.Fossology.URL}\n\t" +
               $"EnableFossTrigger\t --> {appSettings.SW360.Fossology.EnableTrigger}\n\t" +
-              $"RemoveDevDependency\t --> {appSettings.SW360.IgnoreDevDependency}\n\t" +
+              $"IgnoreDevDependency\t --> {appSettings.SW360.IgnoreDevDependency}\n\t" +
               $"LogFolderPath\t\t --> {Path.GetFullPath(FolderPath)}\n\t", null);
 
             if (appSettings.IsTestMode)

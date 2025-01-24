@@ -44,7 +44,8 @@ namespace LCT.SW360PackageCreator
         public async Task<List<ComparisonBomData>> CycloneDxBomParser(CommonAppSettings appSettings,
             ISW360Service sw360Service, ICycloneDXBomParser cycloneDXBomParser, ICreatorHelper creatorHelper)
         {
-            bom = cycloneDXBomParser.ParseCycloneDXBom(appSettings.Directory.InputFolder);
+            var bomFilePath = Path.Combine(appSettings.Directory.OutputFolder, appSettings.SW360.ProjectName + "_" + FileConstant.BomFileName);
+            bom = cycloneDXBomParser.ParseCycloneDXBom(bomFilePath);
             TotalComponentsFromPackageIdentifier = bom != null ? bom.Components.Count : 0;
             ListofBomComponents = await GetListOfBomData(bom?.Components ?? new List<Component>(), appSettings);
 
@@ -218,7 +219,7 @@ namespace LCT.SW360PackageCreator
             IFileOperations fileOperations, ICreatorHelper creatorHelper, List<ComparisonBomData> parsedBomData)
         {
             string sw360Url = appSettings.SW360.URL;
-            string bomGenerationPath = Path.GetDirectoryName(appSettings.Directory.InputFolder);
+            string bomGenerationPath = Path.GetDirectoryName(appSettings.Directory.OutputFolder);
             Logger.Debug($"Bom Generation Path - {bomGenerationPath}");
 
             // create component in sw360
