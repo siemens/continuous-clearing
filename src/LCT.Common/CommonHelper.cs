@@ -5,7 +5,6 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using LCT.ArtifactPublisher;
 using LCT.Common.Constants;
 using LCT.Common.Model;
 using log4net;
@@ -15,6 +14,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.IO;
+using LCT.Common.Runtime;
 
 namespace LCT.Common
 {
@@ -24,7 +25,7 @@ namespace LCT.Common
     public static class CommonHelper
     {
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        public static string ProjectSummaryLink { get; set; }
+        public static string ProjectSummaryLink { get; set; }        
 
         #region public
         public static bool IsAzureDevOpsDebugEnabled()
@@ -157,7 +158,7 @@ namespace LCT.Common
             if (componentInfo.Count > 0 || lstReleaseNotCreated.Count > 0)
             {
                 Logger.Logger.Log(null, Level.Alert, "Action Item required by the user:\n", null);
-                PublishFilesToArtifact();
+                PipelineArtifactUploader.UploadArtifacts();
                 Environment.ExitCode = 2;
             }
 
@@ -204,7 +205,7 @@ namespace LCT.Common
 
             if (components.Count > 0)
             {
-                PublishFilesToArtifact();
+                PipelineArtifactUploader.UploadArtifacts();
                 Environment.ExitCode = 2;
                 Logger.Logger.Log(null, Level.Alert, "* Components Not linked to project :", null);
                 Logger.Logger.Log(null, Level.Alert, " Can be linked manually OR Check the Logs AND RE-Run", null);
@@ -258,8 +259,7 @@ namespace LCT.Common
         {
             if (code == -1)
             {
-                Publish artifactPublisher = new Publish(Log4Net.CatoolLogPath, FileOperations.CatoolBomFilePath);
-                artifactPublisher.UploadLogs();
+                PipelineArtifactUploader.UploadLogs();
                 EnvironmentExit(code);
             }
         }
@@ -268,13 +268,7 @@ namespace LCT.Common
         {
             Environment.Exit(exitCode);
         }
-
-        public static void PublishFilesToArtifact()
-        {
-            Publish artifactPublisher = new Publish(Log4Net.CatoolLogPath, FileOperations.CatoolBomFilePath);
-            artifactPublisher.UploadLogs();
-            artifactPublisher.UploadBom();
-        }
+      
         public static string[] GetRepoList(CommonAppSettings appSettings)
         {
             var projectTypeMappings = new Dictionary<string, Func<Artifactory>>
@@ -315,6 +309,7 @@ namespace LCT.Common
             string sw360URL = $"{sw360Env}{"/group/guest/components/-/component/release/detailRelease/"}{releaseId}";
             return sw360URL;
         }
+
         private static List<Component> RemoveExcludedComponentsFromPurl(List<Component> ComponentList, List<string> ExcludedComponentsFromPurl, ref int noOfExcludedComponents)
         {
             List<Component> ExcludedList = new List<Component>();
