@@ -219,7 +219,7 @@ namespace LCT.SW360PackageCreator
             IFileOperations fileOperations, ICreatorHelper creatorHelper, List<ComparisonBomData> parsedBomData)
         {
             string sw360Url = appSettings.SW360.URL;
-            string bomGenerationPath = Path.GetDirectoryName(appSettings.Directory.OutputFolder);
+            string bomGenerationPath = appSettings.Directory.OutputFolder;
             Logger.Debug($"Bom Generation Path - {bomGenerationPath}");
 
             // create component in sw360
