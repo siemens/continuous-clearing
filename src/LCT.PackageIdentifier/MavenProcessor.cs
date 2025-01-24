@@ -42,11 +42,19 @@ namespace LCT.PackageIdentifier
             List<Dependency> dependenciesForBOM = new();
             List<string> configFiles;
 
-            configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Maven);
+            configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Maven);
 
             foreach (string filepath in configFiles)
             {
-                if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                {
+                    //Adding Template Component Details
+                    Bom templateDetails;
+                    templateDetails = ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(filepath));
+                    CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
+                    SbomTemplate.AddComponentDetails(componentsForBOM, templateDetails);
+                }
+                else
                 {
                     Bom bomList = ParseCycloneDXBom(filepath);
                     if (bomList?.Components != null)
@@ -74,15 +82,7 @@ namespace LCT.PackageIdentifier
                     }
                 }
             }
-
-            if (File.Exists(appSettings.CycloneDxSBomTemplatePath) && appSettings.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
-            {
-                //Adding Template Component Details
-                Bom templateDetails;
-                templateDetails = ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
-                CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
-                SbomTemplate.AddComponentDetails(componentsForBOM, templateDetails);
-            }
+            
 
             //checking Dev dependency
             DevDependencyIdentificationLogic(componentsForBOM, componentsToBOM, ref ListOfComponents);
@@ -97,9 +97,9 @@ namespace LCT.PackageIdentifier
             BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - componentsForBOM.Count;
 
 
-            if (appSettings.Maven.ExcludedComponents != null)
+            if (appSettings.SW360.ExcludeComponents != null)
             {
-                componentsForBOM = CommonHelper.RemoveExcludedComponents(componentsForBOM, appSettings.Maven.ExcludedComponents, ref noOfExcludedComponents);
+                componentsForBOM = CommonHelper.RemoveExcludedComponents(componentsForBOM, appSettings.SW360.ExcludeComponents, ref noOfExcludedComponents);
                 dependenciesForBOM = CommonHelper.RemoveInvalidDependenciesAndReferences(componentsForBOM, dependenciesForBOM);
                 BomCreator.bomKpiData.ComponentsExcluded += noOfExcludedComponents;
             }
@@ -207,7 +207,7 @@ namespace LCT.PackageIdentifier
         {
 
             // get the  component list from Jfrog for given repo + internal repo
-            string[] repoList = appSettings.InternalRepoList.Concat(appSettings.Maven?.JfrogMavenRepoList).ToArray();
+            string[] repoList = CommonHelper.GetRepoList(appSettings);
             List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(repoList, jFrogService);
             Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
             List<Component> modifiedBOM = new List<Component>();
@@ -225,15 +225,23 @@ namespace LCT.PackageIdentifier
                 Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = finalRepoData.Repo };
 
                 Component componentVal = component;
-                if (artifactoryrepo.Value == appSettings.Maven.JfrogDevDestRepoName)
+                if (artifactoryrepo.Value == appSettings.Maven.DevDepRepo)
                 {
                     BomCreator.bomKpiData.DevdependencyComponents++;
                 }
-                if (artifactoryrepo.Value == appSettings.Maven.JfrogThirdPartyDestRepoName)
-                {
-                    BomCreator.bomKpiData.ThirdPartyRepoComponents++;
+                if (appSettings.Maven.Artifactory.ThirdPartyRepos != null)
+                {                    
+                    foreach (var thirdPartyRepo in appSettings.Maven.Artifactory.ThirdPartyRepos)
+                    {
+                        if (artifactoryrepo.Value == thirdPartyRepo.Name)
+                        {
+                            BomCreator.bomKpiData.ThirdPartyRepoComponents++;
+                            break;
+                        }
+                    }
+
                 }
-                if (artifactoryrepo.Value == appSettings.Maven.JfrogInternalDestRepoName)
+                if (artifactoryrepo.Value == appSettings.Maven.ReleaseRepo)
                 {
                     BomCreator.bomKpiData.ReleaseRepoComponents++;
                 }
@@ -285,7 +293,7 @@ namespace LCT.PackageIdentifier
         {
 
             // get the  component list from Jfrog for given repo
-            List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(appSettings.InternalRepoList, jFrogService);
+            List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(appSettings.Maven.Artifactory.InternalRepos, jFrogService);
 
             // find the components in the list of internal components
             List<Component> internalComponents = new List<Component>();

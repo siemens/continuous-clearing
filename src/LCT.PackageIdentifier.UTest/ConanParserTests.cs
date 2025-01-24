@@ -7,6 +7,7 @@
 using CycloneDX.Models;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
+using LCT.Common.Interface;
 using LCT.Common.Model;
 using LCT.PackageIdentifier;
 using LCT.PackageIdentifier.Interface;
@@ -33,16 +34,18 @@ namespace LCT.PackageIdentifier.UTest
             string outFolder = Path.GetDirectoryName(exePath);
             string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles";
 
-            string[] Includes = { "conan.lock" };
-            Config config = new Config()
-            {
-                Include = Includes
-            };
+            string[] Includes = { "conan.lock" };            
 
-            CommonAppSettings appSettings = new CommonAppSettings()
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                PackageFilePath = packagefilepath,
-                Conan = config
+                Conan = new Config() { Include = Includes },
+                SW360 = new SW360(),
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                {
+                    InputFolder = packagefilepath
+                }
             };
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
@@ -64,15 +67,17 @@ namespace LCT.PackageIdentifier.UTest
             string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles";
 
             string[] Includes = { "conan.lock" };
-            Config config = new Config()
-            {
-                Include = Includes
-            };
 
-            CommonAppSettings appSettings = new CommonAppSettings()
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                PackageFilePath = packagefilepath,
-                Conan = config
+                Conan = new Config() { Include = Includes },
+                SW360 = new SW360(),
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                {
+                    InputFolder = packagefilepath
+                }
             };
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
@@ -96,16 +101,16 @@ namespace LCT.PackageIdentifier.UTest
             string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles";
 
             string[] Includes = { "conan.lock" };
-            Config config = new Config()
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                Include = Includes,
-                ExcludedComponents = new List<string> { "openldap:2.6.4-shared-ossl3.1", "libcurl:7.87.0-shared-ossl3.1" }
-            };
-
-            CommonAppSettings appSettings = new CommonAppSettings()
-            {
-                PackageFilePath = packagefilepath,
-                Conan = config
+                Conan = new Config() { Include = Includes },
+                SW360 = new SW360() { ExcludeComponents = ["openldap:2.6.4-shared-ossl3.1", "libcurl:7.87.0-shared-ossl3.1"] },
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                {
+                    InputFolder = packagefilepath
+                }
             };
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
@@ -145,7 +150,19 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component };
             ComponentIdentification componentIdentification = new() { comparisonBOMData = components };
             string[] repoList = { "internalrepo1", "internalrepo2" };
-            CommonAppSettings appSettings = new() { InternalRepoList = repoList };
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            {
+                SW360 = new SW360(),
+                Conan = new Config
+                {
+                    Artifactory = new Artifactory
+                    {
+                        InternalRepos = repoList
+                    }
+                }
+            };
 
             AqlResult aqlResult = new()
             {
@@ -182,8 +199,20 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component };
             string[] repoList = { "internalrepo1", "internalrepo2" };
-            CommonAppSettings appSettings = new();
-            appSettings.Conan = new LCT.Common.Model.Config() { JfrogConanRepoList = repoList };
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            {
+                ProjectType = "Conan",
+                SW360 = new SW360(),
+                Conan = new Config
+                {
+                    Artifactory = new Artifactory
+                    {
+                        RemoteRepos = repoList
+                    }
+                }
+            };
             AqlResult aqlResult = new()
             {
                 Name = "index.json",
@@ -223,8 +252,20 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component };
             string[] repoList = { "internalrepo1", "internalrepo2" };
-            CommonAppSettings appSettings = new();
-            appSettings.Conan = new LCT.Common.Model.Config() { JfrogConanRepoList = repoList };
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            {
+                ProjectType="Conan",
+                SW360 = new SW360(),
+                Conan = new Config
+                {
+                    Artifactory = new Artifactory
+                    {
+                        RemoteRepos = repoList
+                    }
+                }
+            };
             AqlResult aqlResult = new()
             {
                 Name = "index.json",
@@ -263,13 +304,17 @@ namespace LCT.PackageIdentifier.UTest
             string[] Includes = { "SBOM_ConanCATemplate.cdx.json" };
             string packagefilepath = OutFolder + @"\PackageIdentifierUTTestFiles";
 
-            CommonAppSettings appSettings = new CommonAppSettings()
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                PackageFilePath = packagefilepath,
-                ProjectType = "CONAN",
-                RemoveDevDependency = true,
+                ProjectType = "CONAN",                
                 Conan = new Config() { Include = Includes },
-                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOM_ConanCATemplate.cdx.json"
+                SW360 = new SW360() { IgnoreDevDependency = true },
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                {
+                    InputFolder = OutFolder + @"\PackageIdentifierUTTestFiles"
+                }
             };
 
             //Act

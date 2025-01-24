@@ -231,7 +231,7 @@ namespace LCT.Services
             {
                 string filePath = $"{Path.GetTempPath()}ClearingTool\\DownloadedFiles/{attachmentHash.SW360AttachmentName}";
                 fileName = $"{filePath}";
-                Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+                System.IO.Directory.CreateDirectory(Path.GetDirectoryName(filePath));
 
                 if (File.Exists(filePath))
                 {
