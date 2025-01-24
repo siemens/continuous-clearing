@@ -27,6 +27,7 @@ using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using Directory = System.IO.Directory;
 
 namespace LCT.SW360PackageCreator
 {
@@ -105,7 +106,7 @@ namespace LCT.SW360PackageCreator
                     downloadPath = await _packageDownloderList["DEBIAN"].DownloadPackage(component, localPathforDownload);
                 }
             }
-            else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["PYTHON"]))
+            else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["POETRY"]))
             {
                 downloadPath = await GetAttachmentUrlList(component, localPathforDownload);
             }
@@ -249,7 +250,7 @@ namespace LCT.SW360PackageCreator
                     mapper.DownloadUrl = GetMavenDownloadUrl(mapper, item, releasesInfo);
                 }
                 else if (!string.IsNullOrEmpty(item.ReleaseExternalId) &&
-                            (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["PYTHON"]) || item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CONAN"]) || item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["ALPINE"])))
+                            (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["POETRY"]) || item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CONAN"]) || item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["ALPINE"])))
                 {
                     mapper.DownloadUrl = mapper.SourceUrl;
                 }
@@ -447,9 +448,9 @@ namespace LCT.SW360PackageCreator
         {
             SW360ConnectionSettings sw360ConnectionSettings = new SW360ConnectionSettings()
             {
-                SW360URL = appSettings.SW360URL,
-                SW360AuthTokenType = appSettings.SW360AuthTokenType,
-                Sw360Token = appSettings.Sw360Token,
+                SW360URL = appSettings.SW360.URL,
+                SW360AuthTokenType = appSettings.SW360.AuthTokenType,
+                Sw360Token = appSettings.SW360.Token,
                 IsTestMode = appSettings.IsTestMode,
                 Timeout = appSettings.TimeOut
             };
@@ -461,9 +462,9 @@ namespace LCT.SW360PackageCreator
         {
             SW360ConnectionSettings sw360ConnectionSettings = new SW360ConnectionSettings()
             {
-                SW360URL = appSettings.SW360URL,
-                SW360AuthTokenType = appSettings.SW360AuthTokenType,
-                Sw360Token = appSettings.Sw360Token,
+                SW360URL = appSettings.SW360.URL,
+                SW360AuthTokenType = appSettings.SW360.AuthTokenType,
+                Sw360Token = appSettings.SW360.Token,
                 IsTestMode = appSettings.IsTestMode,
                 Timeout = appSettings.TimeOut
             };
@@ -538,7 +539,7 @@ namespace LCT.SW360PackageCreator
             // Removes common components
             sourceNotAvailable.RemoveAll(src => lstReleaseNotCreated.Any(rls => src.Name == rls.Name && src.Version == rls.Version));
 
-            CommonHelper.WriteComponentsWithoutDownloadURLToKpi(sourceNotAvailable, lstReleaseNotCreated, appSetting.SW360URL);
+            CommonHelper.WriteComponentsWithoutDownloadURLToKpi(sourceNotAvailable, lstReleaseNotCreated, appSetting.SW360.URL);
         }
 
         private static string GetComponentAvailabilityStatus(List<Components> componentsAvailable, Components component)

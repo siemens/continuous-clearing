@@ -102,10 +102,15 @@ namespace LCT.SW360PackageCreator.UTest
         public void InitializeSw360ProjectService_ForGivenAppSeetings_ReturnsSw360ServiceObject()
         {
             // Arrange
-            CommonAppSettings appSettings = new CommonAppSettings();
-            appSettings.SW360AuthTokenType = "Token";
-            appSettings.Sw360Token = "uifhiopsjfposddkf[fopefp[ld[p[lfffuhdffdkf";
-            appSettings.SW360URL = "http://localhost:8090";
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                SW360 = new SW360()
+                {
+                    AuthTokenType = "Token",
+                    Token = "uifhiopsjfposddkf[fopefp[ld[p[lfffuhdffdkf",
+                    URL = "http://localhost:8090"
+                }
+            };            
 
             // Act
             ISw360ProjectService sw360ProjectService = CreatorHelper.InitializeSw360ProjectService(appSettings);
@@ -118,11 +123,16 @@ namespace LCT.SW360PackageCreator.UTest
         public void InitializeSw360CreatorService_ForGivenAppSettings_ReturnsSw360Creatorervice()
         {
             // Arrange
-            CommonAppSettings appSettings = new CommonAppSettings();
-            appSettings.SW360AuthTokenType = "Token";
-            appSettings.Sw360Token = "uifhiopsjfposddkf[fopefp[ld[p[lfffuhdffdkf";
-            appSettings.SW360URL = "http://localhost:8090";
-
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                SW360=new SW360()
+                {
+                    AuthTokenType= "Token",
+                    Token= "uifhiopsjfposddkf[fopefp[ld[p[lfffuhdffdkf",
+                    URL = "http://localhost:8090"
+                }
+            };
+            
             // Act
             ISw360CreatorService sw360CreatorService = CreatorHelper.InitializeSw360CreatorService(appSettings);
 
@@ -330,10 +340,15 @@ namespace LCT.SW360PackageCreator.UTest
         public void WriteSourceNotFoundListToConsole_GetComparisionBomDatan_ReturnsNothing()
         {
             //Arrange
-            CommonAppSettings appSettings = new CommonAppSettings();
-            appSettings.SW360AuthTokenType = "Token";
-            appSettings.Sw360Token = "uifhiopsjfposddkf[fopefp[ld[p[lfffuhdffdkf";
-            appSettings.SW360URL = "http://localhost:8090";
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                SW360 = new SW360()
+                {
+                    AuthTokenType = "Token",
+                    Token = "uifhiopsjfposddkf[fopefp[ld[p[lfffuhdffdkf",
+                    URL = "http://localhost:8090"
+                }
+            };            
 
             List<ComparisonBomData> compareBomData = new List<ComparisonBomData>();
             compareBomData.Add(new ComparisonBomData()
