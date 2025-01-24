@@ -90,7 +90,7 @@ namespace ArtifactoryUploader
             Logger.Logger.Log(null, Level.Notice, $"End of Artifactory Uploader execution : {DateTime.Now}\n", null);
             // publish logs and bom file to pipeline artifact
 
-            PublishPipelineArtifacts.PublishFilesToArtifact();
+            PipelineArtifactUploader.UploadArtifacts();
 
         }
 

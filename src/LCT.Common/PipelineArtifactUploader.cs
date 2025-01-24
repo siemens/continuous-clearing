@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace LCT.Common
 {
-    public static class PublishPipelineArtifacts
+    public static class PipelineArtifactUploader
     {
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public const string LogArtifactFolderName = "ContinuousClearing_Log";
@@ -15,7 +15,7 @@ namespace LCT.Common
         public const string LogContainerFolderName = "Container_Log";
         public const string BomContainerFolderName = "Container_Bom";
 
-        public static void PublishFilesToArtifact()
+        public static void UploadArtifacts()
         {
             UploadLogs();
             UploadBom();
@@ -33,7 +33,7 @@ namespace LCT.Common
             }
             else if (envType == EnvironmentType.Unknown)
             {
-                Logger.Logger.Log(null, Level.Notice, $"Uploading of logs is not supported.", null);
+                Logger.Logger.Log(null, Level.Warn, $"Uploading of logs is not supported.", null);
             }
 
         }
@@ -50,7 +50,7 @@ namespace LCT.Common
             }
             else if (envType == EnvironmentType.Unknown)
             {
-                Logger.Logger.Log(null, Level.Notice, $"Uploading of SBOM is not supported.", null);
+                Logger.Logger.Log(null, Level.Warn, $"Uploading of SBOM is not supported.", null);
             }
 
         }

@@ -171,7 +171,7 @@ namespace LCT.Common
             if (componentInfo.Count > 0 || lstReleaseNotCreated.Count > 0)
             {
                 Logger.Logger.Log(null, Level.Alert, "Action Item required by the user:\n", null);
-                PublishPipelineArtifacts.PublishFilesToArtifact();
+                PipelineArtifactUploader.UploadArtifacts();
                 Environment.ExitCode = 2;
             }
 
@@ -218,7 +218,7 @@ namespace LCT.Common
 
             if (components.Count > 0)
             {
-                PublishPipelineArtifacts.PublishFilesToArtifact();
+                PipelineArtifactUploader.UploadArtifacts();
                 Environment.ExitCode = 2;
                 Logger.Logger.Log(null, Level.Alert, "* Components Not linked to project :", null);
                 Logger.Logger.Log(null, Level.Alert, " Can be linked manually OR Check the Logs AND RE-Run", null);
@@ -272,7 +272,7 @@ namespace LCT.Common
         {
             if (code == -1)
             {
-                PublishPipelineArtifacts.UploadLogs();
+                PipelineArtifactUploader.UploadLogs();
                 EnvironmentExit(code);
             }
         }
