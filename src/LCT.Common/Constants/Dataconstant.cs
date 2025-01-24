@@ -66,6 +66,7 @@ namespace LCT.Common.Constants
         public const string Cdx_JfrogRepoPath = "internal:siemens:clearing:jfrog-repo-path";
         public const string Cdx_Siemensfilename = "internal:siemens:clearing:siemens:filename";
         public const string Cdx_SiemensDirect = "internal:siemens:clearing:siemens:direct";
+        public const int MaxDegreeOfParallelism = 8;
 
         public static Dictionary<string, string> PurlCheck()
         {

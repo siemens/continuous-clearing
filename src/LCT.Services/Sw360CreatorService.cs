@@ -85,7 +85,7 @@ namespace LCT.Services
                 else
                 {
                     componentCreateStatus.IsCreated = false;
-                    componentCreateStatus.ReleaseStatus.IsCreated = false;                    
+                    componentCreateStatus.ReleaseStatus.IsCreated = false;
                     Environment.ExitCode = -1;
                     Logger.Debug($"CreateComponent():Component Name -{componentInfo.Name}- " +
                    $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
@@ -95,7 +95,7 @@ namespace LCT.Services
             }
             catch (HttpRequestException e)
             {
-                Logger.Error($"CreateComponent():", e);                
+                Logger.Error($"CreateComponent():", e);
                 Environment.ExitCode = -1;
                 componentCreateStatus.IsCreated = false;
                 componentCreateStatus.ReleaseStatus.IsCreated = false;
@@ -179,7 +179,7 @@ namespace LCT.Services
                 else
                 {
                     createStatus.IsCreated = false;
-                    
+
                     Environment.ExitCode = -1;
                     Logger.Debug($"CreateReleaseForComponent():Component Name -{componentInfo.Name}{componentInfo.Version}- " +
                    $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
@@ -302,7 +302,7 @@ namespace LCT.Services
                 var response = await m_SW360ApiCommunicationFacade.LinkReleasesToProject(content, sw360ProjectId);
                 if (!response.IsSuccessStatusCode)
                 {
-                    
+
                     Environment.ExitCode = -1;
                     Logger.Error($"LinkReleasesToProject() : Linking releases to project Id {sw360ProjectId} is failed.");
                     return false;
@@ -464,13 +464,13 @@ namespace LCT.Services
             }
             catch (HttpRequestException ex)
             {
-                Logger.Error($"UpdateExternalIdForRelease(): {ex}");
+                Logger.Debug($"UpdateExternalIdForRelease(): {ex}" + " For Componenet :" + cbomData.Name);
                 Environment.ExitCode = -1;
                 return false;
             }
             catch (AggregateException ex)
             {
-                Logger.Error($"UpdateExternalIdForRelease(): {ex}");
+                Logger.Debug($"UpdateExternalIdForRelease(): {ex}" + " For Componenet :" + cbomData.Name);
                 Environment.ExitCode = -1;
                 return false;
             }
