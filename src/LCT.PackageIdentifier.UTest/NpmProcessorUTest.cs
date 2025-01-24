@@ -8,6 +8,8 @@ using CycloneDX.Models;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Interface;
+using LCT.Common.Model;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
@@ -133,7 +135,19 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             ComponentIdentification component = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            CommonAppSettings appSettings = new() { InternalRepoList = reooListArr };
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            {
+                SW360 = new SW360(),
+                Npm = new Config
+                {
+                    Artifactory = new Artifactory
+                    {
+                        InternalRepos = reooListArr
+                    }
+                }
+            };
             AqlProperty npmNameProperty = new AqlProperty
             {
                 Key = "npm.name",
@@ -182,7 +196,19 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             ComponentIdentification component = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            CommonAppSettings appSettings = new() { InternalRepoList = reooListArr };
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            {
+                SW360 = new SW360(),
+                Npm = new Config
+                {
+                    Artifactory = new Artifactory
+                    {
+                        InternalRepos = reooListArr
+                    }
+                }
+            };
             AqlProperty npmNameProperty = new AqlProperty
             {
                 Key = "npm.name",
@@ -233,7 +259,19 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             ComponentIdentification componentIdentification = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo1" };
-            CommonAppSettings appSettings = new() { InternalRepoList = reooListArr };
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            {
+                SW360 = new SW360(),
+                Npm = new Config
+                {
+                    Artifactory = new Artifactory
+                    {
+                        InternalRepos = reooListArr
+                    }
+                }
+            };
             AqlProperty npmNameProperty = new AqlProperty
             {
                 Key = "npm.name",
@@ -284,8 +322,20 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo1" };
-            CommonAppSettings appSettings = new();
-            appSettings.Npm = new Common.Model.Config() { JfrogNpmRepoList = reooListArr };
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            {
+                ProjectType = "NPM",
+                SW360 = new SW360(),
+                Npm = new Config
+                {
+                    Artifactory = new Artifactory
+                    {
+                        RemoteRepos = reooListArr
+                    }
+                }
+            };
             AqlProperty npmNameProperty = new AqlProperty
             {
                 Key = "npm.name",
@@ -337,8 +387,20 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            CommonAppSettings appSettings = new();
-            appSettings.Npm = new Common.Model.Config() { JfrogNpmRepoList = reooListArr };
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            {
+                ProjectType = "NPM",
+                SW360 = new SW360(),
+                Npm = new Config
+                {
+                    Artifactory = new Artifactory
+                    {
+                        RemoteRepos = reooListArr
+                    }
+                }
+            };
             AqlProperty npmNameProperty = new AqlProperty
             {
                 Key = "npm.name",

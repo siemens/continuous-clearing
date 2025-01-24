@@ -36,8 +36,10 @@ namespace LCT.PackageIdentifier.UTest
             };
             CommonAppSettings appSettings = new CommonAppSettings()
             {
-                CaVersion = "1.2.3"
+                SW360 = new()
+
             };
+            projectReleases.Version = "1.2.3";
             CatoolInfo caToolInformation = new CatoolInfo() { CatoolVersion = "6.0.0", CatoolRunningLocation="" };
             //Act
             Bom files = CycloneBomProcessor.SetMetadataInComparisonBOM(bom, appSettings, projectReleases, caToolInformation);
@@ -70,9 +72,9 @@ namespace LCT.PackageIdentifier.UTest
             };
             CommonAppSettings appSettings = new CommonAppSettings()
             {
-                CaVersion = "1.2.3",
-                SW360ProjectName = "Test",
+                SW360 = new() { ProjectName = "Test" }
             };
+            projectReleases.Version = "1.2.3";
 
             Tool tools = new Tool()
             {
@@ -88,7 +90,7 @@ namespace LCT.PackageIdentifier.UTest
             };
             Component component = new Component
             {
-                Name = appSettings.SW360ProjectName,
+                Name = appSettings.SW360.ProjectName,
                 Version = projectReleases.Version,
                 Type = Component.Classification.Application
             };

@@ -50,7 +50,8 @@ namespace SW360IntegrationTest.Python
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
-                TestConstant.ProjectType,"PYTHON",
+                TestConstant.JfrogPoetryInternalRepo,"Pypi-test",
+                TestConstant.ProjectType,"Poetry",
                 TestConstant.Mode,""}),
                 "Test to run  Package Identifier EXE execution");
         }

@@ -18,6 +18,7 @@ using LCT.Services.Interface;
 using Moq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using LCT.Common.Interface;
 
 namespace LCT.PackageIdentifier.UTest
 {
@@ -45,12 +46,17 @@ namespace LCT.PackageIdentifier.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "*_Python.cdx.json" };
-            CommonAppSettings appSettings = new CommonAppSettings()
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                ProjectType = "PYTHON",
-                RemoveDevDependency = true,
-                Python = new Config() { Include = Includes },
-                PackageFilePath = OutFolder + @"\PackageIdentifierUTTestFiles"
+                ProjectType = "POETRY",
+                Poetry = new Config() { Include = Includes },
+                SW360 = new SW360() { IgnoreDevDependency = true },
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                {
+                    InputFolder = OutFolder + @"\PackageIdentifierUTTestFiles"
+                }
             };
 
             //Act
@@ -69,12 +75,17 @@ namespace LCT.PackageIdentifier.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "CycloneDX_Python.cdx.json" };
-            CommonAppSettings appSettings = new CommonAppSettings()
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                PackageFilePath = OutFolder + @"\PackageIdentifierUTTestFiles",
-                ProjectType = "PYTHON",
-                RemoveDevDependency = true,
-                Python = new Config() { Include = Includes }
+                ProjectType = "POETRY",
+                Poetry = new Config() { Include = Includes },
+                SW360 = new SW360() { IgnoreDevDependency = true },
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                {
+                    InputFolder = OutFolder + @"\PackageIdentifierUTTestFiles"
+                }
             };
 
             //Act
@@ -92,20 +103,19 @@ namespace LCT.PackageIdentifier.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "CycloneDX_Python.cdx.json" };
-            Config config = new Config()
+            List<string> excludeComponents = ["attrs:22.2.0"];
+           
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                Include = Includes,
-                ExcludedComponents = new List<string>()
-                {
-                   "attrs:22.2.0"
+                ProjectType = "POETRY",
+                Poetry = new Config() { Include = Includes },
+                SW360 = new SW360() { IgnoreDevDependency = true, ExcludeComponents = excludeComponents },
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                {                  
+                    InputFolder = OutFolder + @"\PackageIdentifierUTTestFiles"
                 }
-            };
-            CommonAppSettings appSettings = new CommonAppSettings()
-            {
-                PackageFilePath = OutFolder + @"\PackageIdentifierUTTestFiles",
-                ProjectType = "PYTHON",
-                RemoveDevDependency = true,
-                Python = config
             };
 
             //Act
@@ -123,12 +133,18 @@ namespace LCT.PackageIdentifier.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "*_Python.cdx.json" };
-            CommonAppSettings appSettings = new CommonAppSettings()
+
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                PackageFilePath = OutFolder + @"\PackageIdentifierUTTestFiles",
-                ProjectType = "PYTHON",
-                RemoveDevDependency = true,
-                Python = new Config() { Include = Includes }
+                ProjectType = "POETRY",
+                Poetry = new Config() { Include = Includes },
+                SW360 = new SW360() { IgnoreDevDependency = true },
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                {
+                    InputFolder = OutFolder + @"\PackageIdentifierUTTestFiles"
+                }
             };
 
             //Act
@@ -148,13 +164,18 @@ namespace LCT.PackageIdentifier.UTest
             string[] Includes = { "CycloneDX_Python.cdx.json", "SBOMTemplate_Python.cdx.json" };
             string packagefilepath = OutFolder + @"\PackageIdentifierUTTestFiles";
 
-            CommonAppSettings appSettings = new CommonAppSettings()
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                PackageFilePath = packagefilepath,
-                ProjectType = "PYTHON",
-                RemoveDevDependency = true,
-                Python = new Config() { Include = Includes },
-                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOM_PythonCATemplate.cdx.json"
+                ProjectType = "Poetry",
+                Poetry = new Config() { Include = Includes },
+                SW360 = new SW360() { IgnoreDevDependency = true },
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                {
+                    InputFolder = OutFolder + @"\PackageIdentifierUTTestFiles",
+
+                }
             };
 
             //Act
@@ -173,13 +194,18 @@ namespace LCT.PackageIdentifier.UTest
             string[] Includes = { "CycloneDX_Python.cdx.json", "SBOMTemplate_Python.cdx.json" };
             string packagefilepath = OutFolder + @"\PackageIdentifierUTTestFiles";
 
-            CommonAppSettings appSettings = new CommonAppSettings()
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                PackageFilePath = packagefilepath,
-                ProjectType = "PYTHON",
-                RemoveDevDependency = true,
-                Python = new Config() { Include = Includes },
-                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOMTemplate_Python.cdx.json"
+                ProjectType = "Poetry",
+                Poetry = new Config() { Include = Includes },
+                SW360 = new SW360() { IgnoreDevDependency = true },
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                {
+                    InputFolder = packagefilepath,
+
+                }
             };
 
             //Act
@@ -203,7 +229,19 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             ComponentIdentification component = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            CommonAppSettings appSettings = new() { InternalRepoList = reooListArr };
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            {
+                SW360 = new SW360(),
+                Poetry = new Config
+                {
+                    Artifactory = new Artifactory
+                    {
+                        InternalRepos = reooListArr
+                    }
+                }
+            };
             AqlProperty pypiNameProperty = new AqlProperty
             {
                 Key = "pypi.normalized.name",
@@ -254,7 +292,19 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             ComponentIdentification component = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            CommonAppSettings appSettings = new() { InternalRepoList = reooListArr };
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            {
+                SW360 = new SW360(),
+                Poetry = new Config
+                {
+                    Artifactory = new Artifactory
+                    {
+                        InternalRepos = reooListArr
+                    }
+                }
+            };
             AqlProperty pypiNameProperty = new AqlProperty
             {
                 Key = "pypi.normalized.name",
@@ -305,8 +355,20 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            CommonAppSettings appSettings = new();
-            appSettings.Python = new Config() { JfrogPythonRepoList = reooListArr };
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            {
+                ProjectType = "POETRY",
+                SW360 = new SW360(),
+                Poetry = new Config
+                {
+                    Artifactory = new Artifactory
+                    {
+                        RemoteRepos = reooListArr
+                    }
+                }
+            };
             AqlProperty pypiNameProperty = new AqlProperty
             {
                 Key = "pypi.normalized.name",
@@ -357,8 +419,20 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            CommonAppSettings appSettings = new();
-            appSettings.Python = new Config() { JfrogPythonRepoList = reooListArr };
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            {
+                ProjectType = "POETRY",
+                SW360 = new SW360(),
+                Poetry = new Config
+                {
+                    Artifactory = new Artifactory
+                    {
+                        RemoteRepos = reooListArr
+                    }
+                }
+            };
             AqlProperty pypiNameProperty = new AqlProperty
             {
                 Key = "pypi.normalized.name",
@@ -419,13 +493,19 @@ namespace LCT.PackageIdentifier.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            string[] Includes = { "poetry.lock" };
-            CommonAppSettings appSettings = new CommonAppSettings()
-            {
-                PackageFilePath = OutFolder + @"\PackageIdentifierUTTestFiles\PythonTestProject",
-                ProjectType = "PYTHON",
-                RemoveDevDependency = true,
-                Python = new Config() { Include = Includes }
+            string[] Includes = { "poetry.lock" };            
+
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            {                
+                ProjectType = "Poetry",
+                Poetry = new Config() { Include = Includes },
+                SW360 = new SW360() { IgnoreDevDependency = true },
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                {
+                    InputFolder = OutFolder + @"\PackageIdentifierUTTestFiles\PythonTestProject"
+                }
             };
 
             //Act

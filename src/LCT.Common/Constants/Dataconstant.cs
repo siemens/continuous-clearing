@@ -21,7 +21,7 @@ namespace LCT.Common.Constants
         {"NUGET", "pkg:nuget"},
         {"DEBIAN", "pkg:deb/debian"},
         {"MAVEN", "pkg:maven"},
-        {"PYTHON", "pkg:pypi"},
+        {"POETRY", "pkg:pypi"},
         {"CONAN", "pkg:conan"},
         {"ALPINE", "pkg:apk/alpine"},
          };

@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using CycloneDX.Models;
 using LCT.Common.Constants;
 using Moq;
+using LCT.Common.Interface;
 
 namespace LCT.PackageIdentifier.UTest
 {
@@ -30,13 +31,18 @@ namespace LCT.PackageIdentifier.UTest
             string[] Includes = { "p*-lock.json" };
             string[] Excludes = { "node_modules" };
 
-            CommonAppSettings appSettings = new CommonAppSettings()
-            {
-                BomFolderPath = outFolder,
-                PackageFilePath = filepath,
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            {                
                 ProjectType = "NPM",
-                RemoveDevDependency = true,
-                Npm = new Config() { Include = Includes, Exclude = Excludes }
+                Npm = new Config() { Include = Includes, Exclude = Excludes },
+                SW360 = new SW360() { IgnoreDevDependency = true },
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                {
+                    InputFolder = filepath,
+                    OutputFolder = outFolder
+                }
             };
 
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
@@ -59,13 +65,18 @@ namespace LCT.PackageIdentifier.UTest
             string[] Includes = { "p*-lock16.json" };
             string[] Excludes = { "node_modules" };
 
-            CommonAppSettings appSettings = new CommonAppSettings()
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                BomFolderPath = outFolder,
-                PackageFilePath = filepath,
                 ProjectType = "NPM",
-                RemoveDevDependency = true,
-                Npm = new Config() { Include = Includes, Exclude = Excludes }
+                Npm = new Config() { Include = Includes, Exclude = Excludes },
+                SW360 = new SW360() { IgnoreDevDependency = true },
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                {
+                    InputFolder = filepath,
+                    OutputFolder = outFolder
+                }
             };
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             NpmProcessor NpmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
@@ -89,14 +100,19 @@ namespace LCT.PackageIdentifier.UTest
             string[] Includes = { "p*-lock.json" };
             string[] Excludes = { "node_modules" };
             BomKpiData bomKpiData = new BomKpiData();
-            CommonAppSettings appSettings = new CommonAppSettings()
-            {
-                BomFolderPath= outFolder,
-                PackageFilePath = filepath,
-                ProjectType = "NPM",
-                RemoveDevDependency = true,
-                Npm = new Config() { Include = Includes, Exclude = Excludes }
 
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            {                
+                ProjectType = "NPM",
+                Npm = new Config() { Include = Includes, Exclude = Excludes },
+                SW360 = new SW360() { IgnoreDevDependency = true },
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                {
+                    InputFolder = filepath,
+                    OutputFolder = outFolder
+                }
 
             };
 
@@ -120,13 +136,18 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
             string[] Includes = { "*_NPM.cdx.json" };
-            CommonAppSettings appSettings = new CommonAppSettings()
-            {
-                BomFolderPath = outFolder,
-                PackageFilePath = outFolder + @"\PackageIdentifierUTTestFiles",
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            {                
                 ProjectType = "NPM",
-                RemoveDevDependency = true,
-                Npm = new Config() { Include = Includes }
+                Npm = new Config() { Include = Includes },
+                SW360 = new SW360() { IgnoreDevDependency = true },
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                {
+                    InputFolder = outFolder + @"\PackageIdentifierUTTestFiles",
+                    OutputFolder = outFolder
+                }
             };
 
             //Act
@@ -148,14 +169,19 @@ namespace LCT.PackageIdentifier.UTest
             string[] Includes = { "CycloneDX2_NPM.cdx.json", "SBOMTemplate_Npm.cdx.json" };
             string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles";
 
-            CommonAppSettings appSettings = new CommonAppSettings()
-            {
-                BomFolderPath = outFolder,
-                PackageFilePath = packagefilepath,
-                ProjectType = "NPM",
-                RemoveDevDependency = true,
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            {               
+                ProjectType = "NPM",                
                 Npm = new Config() { Include = Includes },
-                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOM_NpmCATemplate.cdx.json"
+                SW360 = new SW360() { IgnoreDevDependency = true },
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                {
+                    InputFolder = packagefilepath,
+                    OutputFolder = outFolder,
+
+                }
             };
 
             //Act
@@ -176,14 +202,19 @@ namespace LCT.PackageIdentifier.UTest
             string[] Includes = { "CycloneDX2_NPM.cdx.json" };
             string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles";
 
-            CommonAppSettings appSettings = new CommonAppSettings()
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                BomFolderPath = outFolder,
-                PackageFilePath = packagefilepath,
-                ProjectType = "NPM",
-                RemoveDevDependency = true,
+                ProjectType = "NPM",                
                 Npm = new Config() { Include = Includes },
-                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOMTemplate_Npm.cdx.json"
+                SW360 = new SW360() { IgnoreDevDependency = true },
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                {
+                    InputFolder = packagefilepath,
+                    OutputFolder = outFolder,
+
+                }
             };
 
             //Act
