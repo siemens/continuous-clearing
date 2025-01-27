@@ -69,7 +69,7 @@ namespace LCT.Common
                 throw new ArgumentException($"Invalid value for folderPath -{folderPath}");
             }
 
-            if (!Directory.Exists(folderPath))
+            if (!System.IO.Directory.Exists(folderPath))
             {
                 throw new DirectoryNotFoundException($"Invalid folder path -{folderPath}");
             }
@@ -124,7 +124,7 @@ namespace LCT.Common
 
             try
             {
-                Directory.CreateDirectory(target.FullName);
+                System.IO.Directory.CreateDirectory(target.FullName);
 
                 // Copy each file into the new directory.
                 foreach (FileInfo fi in source.GetFiles())

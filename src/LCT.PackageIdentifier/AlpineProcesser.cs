@@ -42,12 +42,23 @@ namespace LCT.PackageIdentifier
             List<Component> listComponentForBOM;
             List<Dependency> dependenciesForBOM = new();
 
-            configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Alpine);
+            configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Alpine);
 
             foreach (string filepath in configFiles)
             {
-                Logger.Debug($"ParsePackageFile():FileName: " + filepath);
-                listofComponents.AddRange(ParseCycloneDX(filepath, dependenciesForBOM));
+                if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                {
+                    Bom templateDetails;
+                    templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(filepath));
+                    CycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
+                    //Adding Template Component Details & MetaData
+                    SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
+                }
+                else
+                {
+                    Logger.Debug($"ParsePackageFile():FileName: " + filepath);
+                    listofComponents.AddRange(ParseCycloneDX(filepath, dependenciesForBOM));
+                }
             }
 
             int initialCount = listofComponents.Count;
@@ -57,15 +68,7 @@ namespace LCT.PackageIdentifier
 
             bom.Components = listComponentForBOM;
             bom.Dependencies = dependenciesForBOM;
-
-            if (File.Exists(appSettings.CycloneDxSBomTemplatePath) && appSettings.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
-            {
-                Bom templateDetails;
-                templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
-                CycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
-                //Adding Template Component Details & MetaData
-                SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
-            }
+            
 
             bom = RemoveExcludedComponents(appSettings, bom);
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
@@ -77,9 +80,9 @@ namespace LCT.PackageIdentifier
             List<Component> componentForBOM = cycloneDXBOM.Components.ToList();
             List<Dependency> dependenciesForBOM = cycloneDXBOM.Dependencies?.ToList() ?? new List<Dependency>();
             int noOfExcludedComponents = 0;
-            if (appSettings.Alpine.ExcludedComponents != null)
+            if (appSettings.SW360.ExcludeComponents != null)
             {
-                componentForBOM = CommonHelper.RemoveExcludedComponents(componentForBOM, appSettings.Alpine.ExcludedComponents, ref noOfExcludedComponents);
+                componentForBOM = CommonHelper.RemoveExcludedComponents(componentForBOM, appSettings.SW360.ExcludeComponents, ref noOfExcludedComponents);
                 dependenciesForBOM = CommonHelper.RemoveInvalidDependenciesAndReferences(componentForBOM, dependenciesForBOM);
                 BomCreator.bomKpiData.ComponentsExcluded += noOfExcludedComponents;
 

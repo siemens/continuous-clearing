@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // SPDX-FileCopyrightText: 2024 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
@@ -129,6 +129,9 @@ namespace ArtifactoryUploader
                     telemetry.Flush(); // Ensure telemetry is sent before application exits
                 }
             }
+          
+            PipelineArtifactUploader.UploadArtifacts();
+
 
         }
 

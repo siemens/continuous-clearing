@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net8.0</TargetFramework>
-    <Version>7.0.1</Version>
+    <Version>7.0.2</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -34,7 +34,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\LCT.ArtifactPublisher\LCT.ArtifactPublisher.csproj" />
     <ProjectReference Include="..\LCT.CycloneDxProcessor\LCT.CycloneDxProcessor.csproj" />
     <ProjectReference Include="..\TelemetryHelperClass\Telemetry.csproj" />
   </ItemGroup>

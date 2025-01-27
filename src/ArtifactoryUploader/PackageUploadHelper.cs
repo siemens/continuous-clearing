@@ -998,7 +998,7 @@ namespace LCT.ArtifactoryUploader
 
             if (SetWarningCode)
             {
-                CommonHelper.PublishFilesToArtifact();
+                PipelineArtifactUploader.UploadArtifacts();
                 Environment.ExitCode = 2;
                 Logger.Debug("Setting ExitCode to 2");
             }

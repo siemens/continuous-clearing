@@ -42,7 +42,7 @@ namespace LCT.PackageIdentifier
                 throw new ArgumentException($"Invalid value for the {nameof(rootPath)} - {rootPath}");
             }
 
-            if (!Directory.Exists(rootPath))
+            if (!System.IO.Directory.Exists(rootPath))
             {
                 Logger.Error("Root path does not exist.Provide a valid  path");
                 throw new DirectoryNotFoundException($"The {nameof(rootPath)}  is not found at this path" +
@@ -52,7 +52,7 @@ namespace LCT.PackageIdentifier
             Logger.Logger.Log(null, Level.Notice, $"Directory Location: Packages are read from the below locations:", null);
             foreach (string includePattern in config.Include)
             {
-                foundConfigFiles = Directory.GetFiles(rootPath, includePattern, SearchOption.AllDirectories);
+                foundConfigFiles = System.IO.Directory.GetFiles(rootPath, includePattern, SearchOption.AllDirectories);
 
                 if (foundConfigFiles != null && foundConfigFiles.Length > 0)
                 {

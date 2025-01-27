@@ -29,6 +29,16 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Telemetry;
+using LCT.Common.Model;
+using LCT.Facade.Interfaces;
+using LCT.APICommunications.Interfaces;
+using LCT.APICommunications;
+using LCT.APICommunications.Model;
+using System.Linq;
+using System.Diagnostics.CodeAnalysis;
+using System.Collections.Generic;
+using Directory = System.IO.Directory;
+
 
 
 namespace LCT.PackageIdentifier
@@ -78,23 +88,18 @@ namespace LCT.PackageIdentifier
             await ValidateAppsettingsFile(appSettings, projectReleases);
             string listOfInlude = DisplayInclude(appSettings);
             string listOfExclude = DisplayExclude(appSettings);
-            string listOfExcludeComponents = DisplayExcludeComponents(appSettings);
-            string listOfInternalRepoList = string.Empty;
-            if (appSettings.InternalRepoList != null)
-            {
-                listOfInternalRepoList = string.Join(",", appSettings.InternalRepoList?.ToList());
-            }
+            string listOfExcludeComponents = DisplayExcludeComponents(appSettings);            
+            string listOfInternalRepoList = GetInternalRepolist(appSettings);
 
             Logger.Logger.Log(null, Level.Notice, $"Input Parameters used in Package Identifier:\n\t" +
                 $"CaToolVersion\t\t --> {caToolInformation.CatoolVersion}\n\t" +
                 $"CaToolRunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
-                $"PackageFilePath\t\t --> {appSettings.PackageFilePath}\n\t" +
-                $"BomFolderPath\t\t --> {appSettings.BomFolderPath}\n\t" +
-                $"SBOMTemplateFilePath\t --> {appSettings.CycloneDxSBomTemplatePath}\n\t" +
-                $"SW360Url\t\t --> {appSettings.SW360URL}\n\t" +
-                $"SW360AuthTokenType\t --> {appSettings.SW360AuthTokenType}\n\t" +
-                $"SW360ProjectName\t --> {appSettings.SW360ProjectName}\n\t" +
-                $"SW360ProjectID\t\t --> {appSettings.SW360ProjectID}\n\t" +
+                $"PackageFilePath\t\t --> {appSettings.Directory.InputFolder}\n\t" +
+                $"BomFolderPath\t\t --> {appSettings.Directory.OutputFolder}\n\t" +
+                $"SW360Url\t\t --> {appSettings.SW360.URL}\n\t" +
+                $"SW360AuthTokenType\t --> {appSettings.SW360.AuthTokenType}\n\t" +
+                $"SW360ProjectName\t --> {appSettings.SW360.ProjectName}\n\t" +
+                $"SW360ProjectID\t\t --> {appSettings.SW360.ProjectID}\n\t" +
                 $"ProjectType\t\t --> {appSettings.ProjectType}\n\t" +
                 $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t" +
                 $"InternalRepoList\t --> {listOfInternalRepoList}\n\t" +
@@ -120,7 +125,7 @@ namespace LCT.PackageIdentifier
             Logger.Logger.Log(null, Level.Notice, $"End of Package Identifier execution : {DateTime.Now}\n", null);
 
             // publish logs and bom file to pipeline artifact
-            CommonHelper.PublishFilesToArtifact();
+            PipelineArtifactUploader.UploadArtifacts();
 
             // Initialize telemetry with CATool version and instrumentation key only if Telemetry is enabled in appsettings
             if (appSettings.Telemetry == true)
@@ -167,10 +172,10 @@ namespace LCT.PackageIdentifier
         {
             ArtifactoryCredentials artifactoryUpload = new ArtifactoryCredentials()
             {
-                ApiKey = appSettings.ArtifactoryUploadApiKey
+                ApiKey = appSettings.Jfrog.Token,
             };
             IJfrogAqlApiCommunication jfrogAqlApiCommunication =
-                new JfrogAqlApiCommunication(appSettings.JFrogApi, artifactoryUpload, appSettings.TimeOut);
+                new JfrogAqlApiCommunication(appSettings.Jfrog.URL, artifactoryUpload, appSettings.TimeOut);
             IJfrogAqlApiCommunicationFacade jFrogApiCommunicationFacade =
                 new JfrogAqlApiCommunicationFacade(jfrogAqlApiCommunication);
             IJFrogService jFrogService = new JFrogService(jFrogApiCommunicationFacade);
@@ -181,9 +186,9 @@ namespace LCT.PackageIdentifier
         {
             SW360ConnectionSettings sw360ConnectionSettings = new SW360ConnectionSettings()
             {
-                SW360URL = appSettings.SW360URL,
-                SW360AuthTokenType = appSettings.SW360AuthTokenType,
-                Sw360Token = appSettings.Sw360Token,
+                SW360URL = appSettings.SW360.URL,
+                SW360AuthTokenType = appSettings.SW360.AuthTokenType,
+                Sw360Token = appSettings.SW360.Token,
                 IsTestMode = appSettings.IsTestMode,
                 Timeout = appSettings.TimeOut
             };
@@ -224,10 +229,10 @@ namespace LCT.PackageIdentifier
                     }
 
                     return totalString;
-                case "PYTHON":
-                    if (appSettings.Python.Include != null)
+                case "POETRY":
+                    if (appSettings.Poetry.Include != null)
                     {
-                        totalString = string.Join(",", appSettings.Python.Include?.ToList());
+                        totalString = string.Join(",", appSettings.Poetry.Include?.ToList());
                     }
                     return totalString;
                 case "CONAN":
@@ -278,10 +283,10 @@ namespace LCT.PackageIdentifier
                         totalString = string.Join(",", appSettings.Debian.Exclude?.ToList());
                     }
                     return totalString;
-                case "PYTHON":
-                    if (appSettings.Python.Exclude != null)
+                case "POETRY":
+                    if (appSettings.Poetry.Exclude != null)
                     {
-                        totalString = string.Join(",", appSettings.Python.Exclude?.ToList());
+                        totalString = string.Join(",", appSettings.Poetry.Exclude?.ToList());
                     }
                     return totalString;
                 case "CONAN":
@@ -307,56 +312,42 @@ namespace LCT.PackageIdentifier
         {
 
             string totalString = string.Empty;
-            switch (appSettings.ProjectType.ToUpperInvariant())
+            if (appSettings.SW360.ExcludeComponents != null)
             {
-                case "NPM":
-                    if (appSettings.Npm.ExcludedComponents != null)
-                    {
-                        totalString = string.Join(",", appSettings.Npm.ExcludedComponents?.ToList());
-                    }
-                    return totalString;
-                case "NUGET":
-                    if (appSettings.Nuget.ExcludedComponents != null)
-                    {
-                        totalString = string.Join(",", appSettings.Nuget.ExcludedComponents?.ToList());
-                    }
-                    return totalString;
-                case "MAVEN":
-                    if (appSettings.Maven.ExcludedComponents != null)
-                    {
-                        totalString = string.Join(",", appSettings.Maven.ExcludedComponents?.ToList());
-                    }
-                    return totalString;
-                case "DEBIAN":
-                    if (appSettings.Debian.ExcludedComponents != null)
-                    {
-                        totalString = string.Join(",", appSettings.Debian.ExcludedComponents?.ToList());
-                    }
-
-                    return totalString;
-                case "PYTHON":
-                    if (appSettings.Python.ExcludedComponents != null)
-                    {
-                        totalString = string.Join(",", appSettings.Python.ExcludedComponents?.ToList());
-                    }
-                    return totalString;
-                case "CONAN":
-                    if (appSettings.Conan.ExcludedComponents != null)
-                    {
-                        totalString = string.Join(",", appSettings.Conan.ExcludedComponents?.ToList());
-                    }
-                    return totalString;
-                case "ALPINE":
-                    if (appSettings.Alpine.Include != null)
-                    {
-                        totalString = string.Join(",", appSettings.Alpine.Include?.ToList());
-                    }
-                    return totalString;
-                default:
-                    Logger.Error($"Invalid ProjectType - {appSettings.ProjectType}");
-                    break;
+                totalString = string.Join(",", appSettings.SW360.ExcludeComponents?.ToList());
             }
             return totalString;
+        }
+
+        private static string GetInternalRepolist(CommonAppSettings appSettings)
+        {
+            string listOfInternalRepoList = string.Empty;
+
+            var repoMapping = new Dictionary<string, Func<IEnumerable<string>>>(StringComparer.OrdinalIgnoreCase)
+        {
+        { "NPM", () => appSettings.Npm?.Artifactory.InternalRepos },
+        { "NUGET", () => appSettings.Nuget?.Artifactory.InternalRepos },
+        { "MAVEN", () => appSettings.Maven?.Artifactory.InternalRepos },
+        { "DEBIAN", () => appSettings.Debian?.Artifactory.InternalRepos },
+        { "POETRY", () => appSettings.Poetry?.Artifactory.InternalRepos },
+        { "CONAN", () => appSettings.Conan?.Artifactory.InternalRepos },
+        { "ALPINE", () => appSettings.Alpine?.Artifactory.InternalRepos }
+        };
+
+            if (repoMapping.TryGetValue(appSettings.ProjectType, out var getRepos))
+            {
+                var repos = getRepos();
+                if (repos != null)
+                {
+                    listOfInternalRepoList = string.Join(",", repos);
+                }
+            }
+            else
+            {
+                Logger.Error($"Invalid ProjectType - {appSettings.ProjectType}");
+            }
+
+            return listOfInternalRepoList;
         }
 
         private static string LogFolderInitialisation(CommonAppSettings appSettings)
