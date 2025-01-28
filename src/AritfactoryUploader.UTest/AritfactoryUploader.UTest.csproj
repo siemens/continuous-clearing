@@ -36,7 +36,7 @@
 		<None Update="ArtifactoryUTTestFiles\ComparisonBOM.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="ArtifactoryUTTestFiles\CyclonedxBom.json">
+		<None Update="ArtifactoryUTTestFiles\Test_Bom.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>

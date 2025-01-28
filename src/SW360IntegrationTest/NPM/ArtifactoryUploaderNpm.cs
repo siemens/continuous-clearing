@@ -22,11 +22,9 @@ namespace SW360IntegrationTest.NPM
         public void TestArtifactoryUploaderexe()
         {
             OutFolder = TestHelper.OutFolder;
-            string comparisonBOMPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\ArtifactoryUploaderTestData\NPMComparisonBOM.json";
-
 
             int result = TestHelper.RunArtifactoryUploaderExe(new string[]{
-                TestConstant.BomFilePath, comparisonBOMPath,
+                TestConstant.BomFolderPath, OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\ArtifactoryUploaderTestData\Npm",
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.ArtifactoryUser, testParameters.ArtifactoryUploadUser,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,

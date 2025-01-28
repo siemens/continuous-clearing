@@ -131,7 +131,7 @@ namespace LCT.PackageIdentifier
         {
             ArtifactoryCredentials artifactoryUpload = new ArtifactoryCredentials()
             {
-                ApiKey = appSettings.Jfrog.Token,
+                Token = appSettings.Jfrog.Token,
             };
             IJfrogAqlApiCommunication jfrogAqlApiCommunication =
                 new JfrogAqlApiCommunication(appSettings.Jfrog.URL, artifactoryUpload, appSettings.TimeOut);

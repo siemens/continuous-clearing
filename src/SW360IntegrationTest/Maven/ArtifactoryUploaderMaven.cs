@@ -22,10 +22,11 @@ namespace SW360IntegrationTest.Maven
         public void TestArtifactoryUploaderexe()
         {
             OutFolder = TestHelper.OutFolder;
-            string comparisonBOMPath = OutFolder + @"\..\..\TestFiles\MavenTestFile\ArtifactoryUploaderTestData\MavenComparisonBOM.json";
+            //string comparisonBOMPath = OutFolder + @"\..\..\TestFiles\MavenTestFile\ArtifactoryUploaderTestData\MavenComparisonBOM.json";
 
             int result = TestHelper.RunArtifactoryUploaderExe(new string[]{
-                TestConstant.BomFilePath, comparisonBOMPath,
+                //TestConstant.BomFilePath, comparisonBOMPath,
+                TestConstant.BomFolderPath, OutFolder + @"\..\..\TestFiles\MavenTestFile\ArtifactoryUploaderTestData\Maven",
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.ArtifactoryUser, testParameters.ArtifactoryUploadUser,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
