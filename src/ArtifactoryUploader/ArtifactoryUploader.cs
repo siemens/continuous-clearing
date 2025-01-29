@@ -113,7 +113,7 @@ namespace LCT.ArtifactoryUploader
                 {
                     component.CopyPackageApiUrl = component.CopyPackageApiUrl.ToLower();
                 }
-            }
+            }          
 
             return packageInfo;
         }

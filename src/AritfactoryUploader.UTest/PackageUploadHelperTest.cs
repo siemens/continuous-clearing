@@ -498,6 +498,7 @@ namespace AritfactoryUploader.UTest
 
             jFrogServiceMock.Setup(x => x.GetPypiComponentDataByRepo(It.IsAny<string>())).ReturnsAsync(aqlResultList);
 
+
             PackageUploadHelper.jFrogService = jFrogServiceMock.Object;
 
             // Act
