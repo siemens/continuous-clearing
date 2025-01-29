@@ -13,6 +13,7 @@ using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
+using log4net.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -48,18 +49,10 @@ namespace LCT.PackageIdentifier
             List<Component> listComponentForBOM;
 
             configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Debian);
-
+            List<string> listOfTemplateBomfilePaths = new List<string>();
             foreach (string filepath in configFiles)
             {
-                if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
-                {
-                    Bom templateDetails;
-                    templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(filepath));
-                    CycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
-                    //Adding Template Component Details & MetaData
-                    SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
-                }
-                else
+                if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     Logger.Debug($"ParsePackageFile():FileName: " + filepath);
                     var list = ParseCycloneDX(filepath, ref bom);
@@ -73,7 +66,24 @@ namespace LCT.PackageIdentifier
             BomCreator.bomKpiData.DuplicateComponents = initialCount - listComponentForBOM.Count;
 
             bom.Components = listComponentForBOM;
-           
+            string templateFilePath = string.Empty;
+            if (listOfTemplateBomfilePaths != null && listOfTemplateBomfilePaths.Any())
+            {
+                templateFilePath = listOfTemplateBomfilePaths.First();
+                if (listOfTemplateBomfilePaths.Count > 1)
+                {
+                    Logger.Logger.Log(null, Level.Alert, $"Multiple Template files are given", null);
+                }
+                // Use firstFilePath as needed
+            }
+            if (File.Exists(templateFilePath) && templateFilePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+            {
+                Bom templateDetails;
+                templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(templateFilePath));
+                CycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
+                //Adding Template Component Details & MetaData
+                SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
+            }
 
             bom = RemoveExcludedComponents(appSettings, bom);
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();

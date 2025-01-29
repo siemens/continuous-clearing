@@ -12,6 +12,7 @@ using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
+using log4net.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -43,18 +44,14 @@ namespace LCT.PackageIdentifier
             List<string> configFiles;
 
             configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Maven);
-
+            List<string> listOfTemplateBomfilePaths = new List<string>();
             foreach (string filepath in configFiles)
             {
                 if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
-                    //Adding Template Component Details
-                    Bom templateDetails;
-                    templateDetails = ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(filepath));
-                    CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
-                    SbomTemplate.AddComponentDetails(componentsForBOM, templateDetails);
+                    listOfTemplateBomfilePaths.Add(filepath);
                 }
-                else
+                if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     Bom bomList = ParseCycloneDXBom(filepath);
                     if (bomList?.Components != null)
@@ -82,7 +79,26 @@ namespace LCT.PackageIdentifier
                     }
                 }
             }
-            
+
+            string templateFilePath = string.Empty;
+            if (listOfTemplateBomfilePaths != null && listOfTemplateBomfilePaths.Any())
+            {
+                templateFilePath = listOfTemplateBomfilePaths.First();
+                if (listOfTemplateBomfilePaths.Count > 1)
+                {
+                    Logger.Logger.Log(null, Level.Alert, $"Multiple Template files are given", null);
+                }
+                // Use firstFilePath as needed
+            }
+            if (File.Exists(templateFilePath) && templateFilePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+            {
+                //Adding Template Component Details
+                Bom templateDetails;
+                templateDetails = ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(templateFilePath));
+                CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
+                SbomTemplate.AddComponentDetails(componentsForBOM, templateDetails);
+            }
+
 
             //checking Dev dependency
             DevDependencyIdentificationLogic(componentsForBOM, componentsToBOM, ref ListOfComponents);

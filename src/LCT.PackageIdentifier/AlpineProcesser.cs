@@ -11,6 +11,7 @@ using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
+using log4net.Core;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -71,7 +72,7 @@ namespace LCT.PackageIdentifier
                 templateFilePath = listOfTemplateBomfilePaths.First();
                 if (listOfTemplateBomfilePaths.Count > 1)
                 {
-
+                    Logger.Logger.Log(null, Level.Alert, $"Multiple Template files are given", null);
                 }
                 // Use firstFilePath as needed
             }

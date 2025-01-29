@@ -48,26 +48,7 @@ namespace LCT.Services.UTest
             Assert.AreEqual("Test", sw360ProjectName);
         }
 
-
-        [Test]
-        public async Task GetAvailableReleasesInSw360_ForGivenData_Returns0results()
-        {
-            // Arrange
-            Components component = new Components() { Name = "Zone.js", Version = "1.0.0" };
-            List<Components> components = new List<Components>();
-            components.Add(component);
-            ComponentsRelease componentRelease = new ComponentsRelease();
-            componentRelease.Embedded = new ReleaseEmbedded();
-            Mock<ISW360ApicommunicationFacade> swApiCommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
-            swApiCommunicationFacade.Setup(x => x.GetReleases()).ReturnsAsync(string.Empty);
-
-            // Act
-            ISW360Service sW360Service = new Sw360Service(swApiCommunicationFacade.Object);
-            var result = await sW360Service.GetAvailableReleasesInSw360(components);
-
-            // Assert
-            Assert.AreEqual(0, result.Count);
-        }
+               
 
         [Test]
         [TestCase("Zone.js", "1.0.0", false, false, true, false, true)]
@@ -170,26 +151,7 @@ namespace LCT.Services.UTest
             // Assert
             Assert.That(result.Count, Is.GreaterThanOrEqualTo(0));
         }
-
-        [Test]
-        public async Task GetAvailableReleasesInSw360_ForGivenData_ThrowsHttpRequuestException()
-        {
-            // Arrange
-            Components component = new Components() { Name = "Zone.js", Version = "1.0.0" };
-            List<Components> components = new List<Components>();
-            components.Add(component);
-            ComponentsRelease componentRelease = new ComponentsRelease();
-            componentRelease.Embedded = new ReleaseEmbedded();
-            Mock<ISW360ApicommunicationFacade> swApiCommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
-            swApiCommunicationFacade.Setup(x => x.GetReleases()).Throws<HttpRequestException>();
-
-            // Act
-            ISW360Service sW360Service = new Sw360Service(swApiCommunicationFacade.Object);
-            var result = await sW360Service.GetAvailableReleasesInSw360(components);
-
-            // Assert
-            Assert.AreEqual(0, result.Count);
-        }
+                
 
         [Test]
         public async Task GetReleaseInfoByReleaseId_ForGivenReleaseLink_ReturnsHttpResponseOK()

@@ -13,6 +13,7 @@ using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
+using log4net.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -45,8 +46,13 @@ namespace LCT.PackageIdentifier
             List<Component> listComponentForBOM;
             List<Dependency> dependencies = new List<Dependency>();
             Bom templateDetails = new Bom();
+            List<string> listOfTemplateBomfilePaths = new List<string>();
             foreach (string config in configFiles)
             {
+                if (config.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                {
+                    listOfTemplateBomfilePaths.Add(config);
+                }
                 if (config.ToLower().EndsWith("poetry.lock"))
                 {
                     listofComponents.AddRange(ExtractDetailsForPoetryLockfile(config, dependencies));
@@ -55,14 +61,25 @@ namespace LCT.PackageIdentifier
                 {
                     listofComponents.AddRange(ExtractDetailsFromJson(config, appSettings, ref dependencies));
                 }
-                else if (config.EndsWith(FileConstant.SBOMTemplateFileExtension))
-                {
-                    templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(config));
-                    CycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
-                }
             }
-            
-           
+            string templateFilePath = string.Empty;
+            if (listOfTemplateBomfilePaths != null && listOfTemplateBomfilePaths.Any())
+            {
+                templateFilePath = listOfTemplateBomfilePaths.First();
+                if (listOfTemplateBomfilePaths.Count > 1)
+                {
+                    Logger.Logger.Log(null, Level.Alert, $"Multiple Template files are given", null);
+                }
+                // Use firstFilePath as needed
+            }
+
+            if (File.Exists(templateFilePath)
+                && templateFilePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+            {
+                templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(templateFilePath));
+                CycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
+            }
+
 
             int initialCount = listofComponents.Count;
             GetDistinctComponentList(ref listofComponents);
