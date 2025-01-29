@@ -548,7 +548,7 @@ namespace LCT.PackageIdentifier
                 {
                     Logger.Logger.Log(null, Level.Alert, $"Multiple Template files are given", null);
                 }
-                // Use firstFilePath as needed
+                
             }
             if (File.Exists(templateFilePath) && templateFilePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
