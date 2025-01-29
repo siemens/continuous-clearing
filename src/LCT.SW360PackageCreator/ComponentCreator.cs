@@ -281,18 +281,15 @@ namespace LCT.SW360PackageCreator
                     await CreateComponentAndRealease(creatorHelper, sw360CreatorService, item, sw360Url, appSettings);
                 }
 
-                if (appSettings.ProjectType.ToUpperInvariant() == "ALPINE")
+                string localPathforSourceRepo = UrlHelper.GetDownloadPathForAlpineRepo();
+                if (Directory.GetDirectories(localPathforSourceRepo).Length != 0)
                 {
-                    string localPathforSourceRepo = UrlHelper.GetDownloadPathForAlpineRepo();
-                    if (Directory.GetDirectories(localPathforSourceRepo).Length != 0)
+                    DirectoryInfo di = new DirectoryInfo(localPathforSourceRepo);
+                    foreach (DirectoryInfo dir in di.GetDirectories())
                     {
-                        DirectoryInfo di = new DirectoryInfo(localPathforSourceRepo);
-                        foreach (DirectoryInfo dir in di.GetDirectories())
+                        if (!dir.Name.Equals("aports"))
                         {
-                            if (!dir.Name.Equals("aports"))
-                            {
-                                dir.Delete(true);
-                            }
+                            dir.Delete(true);
                         }
                     }
                 }
