@@ -17,6 +17,7 @@ using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Threading.Tasks;
 using UnitTestUtilities;
+using LCT.APICommunications.Interfaces;
 
 namespace AritfactoryUploader.UTest
 {
@@ -24,88 +25,50 @@ namespace AritfactoryUploader.UTest
     public class ArtifactoryValidatorTest
     {
         [Test]
-        public async Task ValidateArtifactoryCredentials_InputAppsettings_ReturnsIsvalid()
-        {
-            //Arrange
-            JfrogKey jfrogKey = new JfrogKey() { ApiKey = "tyyteye" };
-            HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new ObjectContent<JfrogKey>(jfrogKey, new JsonMediaTypeFormatter(), "application/some-format")
-            };
-            CommonAppSettings appSettings = new CommonAppSettings()
-            {
-                ArtifactoryUploadApiKey = "tyyteye",
-                ArtifactoryUploadUser = "user@test.com"
-            };
-            ArtifactoryCredentials artifactoryCredentials = new ArtifactoryCredentials()
-            {
-                ApiKey = "tyyteye",
-                Email = "user@test.com"
-            };
-            Mock<NpmJfrogApiCommunication> jfrogCommunicationMck = new Mock<NpmJfrogApiCommunication>(UTParams.JFrogURL, "test", artifactoryCredentials, 100);
-            ArtifactoryValidator artifactoryValidator = new ArtifactoryValidator(jfrogCommunicationMck.Object);
-            jfrogCommunicationMck.Setup(x => x.GetApiKey()).ReturnsAsync(httpResponseMessage);
-
-
-
-            //Act
-
-            await artifactoryValidator.ValidateArtifactoryCredentials(appSettings);
-
-            //Assert
-            jfrogCommunicationMck.Verify(x => x.GetApiKey(), Times.AtLeastOnce);
-        }
-
-        [Test]
-        public void ValidateArtifactoryCredentials_InputAppsettings_ThrowsInvalidDataException()
-        {
-            //Arrange
-            JfrogKey jfrogKey = new JfrogKey() { ApiKey = "tyyteye" };
-            HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.Unauthorized)
-            {
-                Content = new ObjectContent<JfrogKey>(jfrogKey, new JsonMediaTypeFormatter(), "application/some-format")
-            };
-            CommonAppSettings appSettings = new CommonAppSettings()
-            {
-                ArtifactoryUploadApiKey = "gegeg",
-                ArtifactoryUploadUser = "user@test.com"
-            };
-            ArtifactoryCredentials artifactoryCredentials = new ArtifactoryCredentials()
-            {
-                ApiKey = "tyyteye",
-                Email = "user@test.com"
-            };
-            Mock<NpmJfrogApiCommunication> jfrogCommunicationMck = new Mock<NpmJfrogApiCommunication>(UTParams.JFrogURL, "test", artifactoryCredentials, 100);
-            ArtifactoryValidator artifactoryValidator = new ArtifactoryValidator(jfrogCommunicationMck.Object);
-            jfrogCommunicationMck.Setup(x => x.GetApiKey()).ReturnsAsync(httpResponseMessage);
-
-            // due to environment .exit the below method will not return anything , it wil break there 
-            // assert will not pass always
-            // Assert.ThrowsAsync<InvalidDataException>(async () => await artifactoryValidator.ValidateArtifactoryCredentials(appSettings))
-        }
-
-        [Test]
-        public async Task ValidateArtifactoryCredentials_InputAppsettings_ThrowsHttpRequestException()
+        public async Task ValidateArtifactoryCredentials_ValidCredentials_ReturnsZero()
         {
             // Arrange
-            CommonAppSettings appSettings = new CommonAppSettings()
-            {
-                ArtifactoryUploadApiKey = "tyyteye",
-                ArtifactoryUploadUser = "user@test.com"
-            };
-            ArtifactoryCredentials artifactoryCredentials = new ArtifactoryCredentials()
-            {
-                ApiKey = "tyyteye",
-                Email = "user@test.com"
-            };
-            Mock<NpmJfrogApiCommunication> jfrogCommunicationMck = new Mock<NpmJfrogApiCommunication>(UTParams.JFrogURL, "test", artifactoryCredentials, 100);
+            HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK);
+            Mock<IJfrogAqlApiCommunication> jfrogCommunicationMck = new Mock<IJfrogAqlApiCommunication>();
+            jfrogCommunicationMck.Setup(x => x.CheckConnection()).ReturnsAsync(httpResponseMessage);
             ArtifactoryValidator artifactoryValidator = new ArtifactoryValidator(jfrogCommunicationMck.Object);
-            jfrogCommunicationMck.Setup(x => x.GetApiKey()).ThrowsAsync(new HttpRequestException());
 
-            // Act and Assert
-            var isvalid= await artifactoryValidator.ValidateArtifactoryCredentials(appSettings);
-            Assert.AreEqual(-1, isvalid);
+            // Act
+            int result = await artifactoryValidator.ValidateArtifactoryCredentials();
 
+            // Assert
+            Assert.AreEqual(0, result);
+        }
+
+        [Test]
+        public async Task ValidateArtifactoryCredentials_InvalidCredentials_ReturnsMinusOne()
+        {
+            // Arrange
+            HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.Unauthorized);
+            Mock<IJfrogAqlApiCommunication> jfrogCommunicationMck = new Mock<IJfrogAqlApiCommunication>();
+            jfrogCommunicationMck.Setup(x => x.CheckConnection()).ReturnsAsync(httpResponseMessage);
+            ArtifactoryValidator artifactoryValidator = new ArtifactoryValidator(jfrogCommunicationMck.Object);
+
+            // Act
+            int result = await artifactoryValidator.ValidateArtifactoryCredentials();
+
+            // Assert
+            Assert.AreEqual(-1, result);
+        }
+
+        [Test]
+        public async Task ValidateArtifactoryCredentials_HttpRequestException_ReturnsMinusOne()
+        {
+            // Arrange
+            Mock<IJfrogAqlApiCommunication> jfrogCommunicationMck = new Mock<IJfrogAqlApiCommunication>();
+            jfrogCommunicationMck.Setup(x => x.CheckConnection()).ThrowsAsync(new HttpRequestException());
+            ArtifactoryValidator artifactoryValidator = new ArtifactoryValidator(jfrogCommunicationMck.Object);
+
+            // Act
+            int result = await artifactoryValidator.ValidateArtifactoryCredentials();
+
+            // Assert
+            Assert.AreEqual(-1, result);
         }
     }
 }

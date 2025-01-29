@@ -23,11 +23,10 @@ namespace SW360IntegrationTest.Nuget
         public void TestArtifactoryUploaderexe()
         {
             OutFolder = TestHelper.OutFolder;
-            string comparisonBOMPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\ArtifactoryUploaderTestData\NugetComparisonBOM.json";
 
             // Test BOM Creator ran with exit code 0
             Assert.AreEqual(0, TestHelper.RunArtifactoryUploaderExe(new string[]{
-                TestConstant.BomFilePath, comparisonBOMPath,
+                TestConstant.BomFolderPath, OutFolder + @"\..\..\TestFiles\MavenTestFile\ArtifactoryUploaderTestData\Nuget",
                 TestConstant.ArtifactoryUser, testParameters.ArtifactoryUploadUser,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
                  TestConstant.JfrogNpmThirdPartyDestRepoName,testParameters.ThirdPartyDestinationRepoName,
