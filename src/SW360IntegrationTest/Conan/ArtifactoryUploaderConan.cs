@@ -15,19 +15,18 @@ namespace SW360IntegrationTest.Conan
         [Test, Order(1)]
         public void TestArtifactoryUploaderexe()
         {
-            OutFolder = TestHelper.OutFolder;
+            OutFolder = TestHelper.OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\ArtifactoryUploaderTestData\Conan";
 
             // Test BOM Creator ran with exit code 0
             int result = TestHelper.RunArtifactoryUploaderExe(new string[]{
-                TestConstant.BomFolderPath, OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\ArtifactoryUploaderTestData\Conan",
+                TestConstant.BomFolderPath, OutFolder,
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
-                TestConstant.ArtifactoryUser, testParameters.ArtifactoryUploadUser,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
                 TestConstant.JfrogConanThirdPartyDestRepoName,testParameters.ThirdPartyDestinationRepoName,
                 TestConstant.JfrogConanDevDestRepoName,testParameters.DevDestinationRepoName,
                 TestConstant.JfrogConanInternalDestRepoName,testParameters.InternalDestinationRepoName,
                 TestConstant.JFrogApiURL,testParameters.JfrogApi,
-                TestConstant.Release, false.ToString()
+                TestConstant.DryRun, false.ToString()
             });
 
             // Test BOM Creator ran with exit code 0 or 2 (Warning)
@@ -39,7 +38,7 @@ namespace SW360IntegrationTest.Conan
         public void ComponentUpload_IsUnsuccessful_AlreadyPresentInDestination_Conan()
         {
             OutFolder = TestHelper.OutFolder;
-            string comparisonBOMPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\ArtifactoryUploaderTestData\ConanComparisonBOM.json";
+            string comparisonBOMPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\ArtifactoryUploaderTestData\Conan\Test_Bom.cdx.json";
             if (File.Exists(comparisonBOMPath))
             {
 
