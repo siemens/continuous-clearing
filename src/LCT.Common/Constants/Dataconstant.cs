@@ -40,6 +40,7 @@ namespace LCT.Common.Constants
         public const string NotUploaded = "Not Uploaded";
         public const string NewClearing = "NEW_CLEARING";
         public const string NotAvailable = "Not Available";
+        public const string NotConfigured = "Not Configured";
         public const string AlreadyUploaded = "Already Uploaded";
         public const string NodeModulePathNotFound = "Node Module Path not Found";
         public const string DownloadUrlNotFound = "Component Download Url not Found!";

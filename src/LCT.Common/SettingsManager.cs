@@ -158,9 +158,9 @@ namespace LCT.Common
                 //Required parameters to run Artifactory Uploader
                 List<string> uploaderReqParameters = new List<string>()
             {
-                "JFrogApi",
-                "BomFilePath",
-                "ArtifactoryUploadApiKey",
+                "Jfrog.URL",
+                "Directory.OutputFolder",
+                "Jfrog.Token",
             };
                 CheckForMissingParameter(appSettings, properties, uploaderReqParameters);
             }

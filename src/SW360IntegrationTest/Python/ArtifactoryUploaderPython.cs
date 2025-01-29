@@ -24,10 +24,9 @@ namespace SW360IntegrationTest.Python
         public void TestArtifactoryUploaderexe()
         {
             OutFolder = TestHelper.OutFolder;
-            string comparisonBOMPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\ArtifactoryUploaderTestData\PythonComparisonBOM.json";
 
             int result = TestHelper.RunArtifactoryUploaderExe(new string[]{
-                TestConstant.BomFilePath, comparisonBOMPath,
+                TestConstant.BomFolderPath, OutFolder + @"\..\..\TestFiles\MavenTestFile\ArtifactoryUploaderTestData\Poetry",
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.ArtifactoryUser, testParameters.ArtifactoryUploadUser,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,

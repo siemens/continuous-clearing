@@ -21,8 +21,7 @@ namespace LCT.APICommunications.Model
         public string SrcRepoPathWithFullName { get; set; }
         public string PypiOrNpmCompName { get; set; }
         public string DestRepoName { get; set; }
-        public string ApiKey { get; set; }
-        public string Email { get; set; }
+        public string Token { get; set; }
         public string PackageInfoApiUrl { get; set; }
         public string CopyPackageApiUrl { get; set; }
         public string MovePackageApiUrl { get; set; }

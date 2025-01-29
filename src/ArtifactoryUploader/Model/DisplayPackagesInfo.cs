@@ -50,7 +50,7 @@ namespace LCT.ArtifactoryUploader.Model
         public List<JsonComponents> Nuget { get; set; }
         [JsonProperty("conan")]
         public List<JsonComponents> Conan { get; set; }
-        [JsonProperty("python")]
+        [JsonProperty("poetry")]
         public List<JsonComponents> Python { get; set; }
         [JsonProperty("debian")]
         public List<JsonComponents> Debian { get; set; }

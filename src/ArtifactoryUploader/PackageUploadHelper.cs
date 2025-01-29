@@ -25,6 +25,7 @@ using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
+using Directory = System.IO.Directory;
 
 namespace LCT.ArtifactoryUploader
 {
@@ -85,12 +86,11 @@ namespace LCT.ArtifactoryUploader
                         Purl = item.Purl,
                         ComponentType = GetComponentType(item),
                         PackageType = packageType,
-                        DryRun = !appSettings.Release,
+                        DryRun = appSettings.Jfrog.DryRun,
                         SrcRepoName = item.Properties.Find(s => s.Name == Dataconstant.Cdx_ArtifactoryRepoName)?.Value,
                         DestRepoName = GetDestinationRepo(item, appSettings),
-                        ApiKey = appSettings.ArtifactoryUploadApiKey,
-                        Email = appSettings.ArtifactoryUploadUser,
-                        JfrogApi = appSettings.JFrogApi,
+                        Token = appSettings.Jfrog.Token,
+                        JfrogApi = appSettings.Jfrog.URL
                     };
 
                     if (aqlResult != null)
@@ -239,7 +239,7 @@ namespace LCT.ArtifactoryUploader
                 {
                     GetNotApprovedMavenPackages(unknownPackages, projectResponse, fileOperations, filepath, filename);
                 }
-                else if (name.Equals("Python"))
+                else if (name.Equals("Poetry"))
                 {
                     GetNotApprovedPythonPackages(unknownPackages, projectResponse, fileOperations, filepath, filename);
                 }
@@ -379,7 +379,7 @@ namespace LCT.ArtifactoryUploader
             }
             Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n");
         }
-        public  static void GetNotApprovedDebianPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
+        public static void GetNotApprovedDebianPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
         {
             if (File.Exists(filename))
             {
@@ -492,7 +492,7 @@ namespace LCT.ArtifactoryUploader
             DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesNuget, displayPackagesInfo.JfrogNotFoundPackagesNuget, displayPackagesInfo.SuccessfullPackagesNuget, displayPackagesInfo.JfrogFoundPackagesNuget, "Nuget", localPathforartifactory);
             DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesMaven, displayPackagesInfo.JfrogNotFoundPackagesMaven, displayPackagesInfo.SuccessfullPackagesMaven, displayPackagesInfo.JfrogFoundPackagesMaven, "Maven", localPathforartifactory);
             DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesConan, displayPackagesInfo.JfrogNotFoundPackagesConan, displayPackagesInfo.SuccessfullPackagesConan, displayPackagesInfo.JfrogFoundPackagesConan, "Conan", localPathforartifactory);
-            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesPython, displayPackagesInfo.JfrogNotFoundPackagesPython, displayPackagesInfo.SuccessfullPackagesPython, displayPackagesInfo.JfrogFoundPackagesPython, "Python", localPathforartifactory);
+            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesPython, displayPackagesInfo.JfrogNotFoundPackagesPython, displayPackagesInfo.SuccessfullPackagesPython, displayPackagesInfo.JfrogFoundPackagesPython, "Poetry", localPathforartifactory);
             DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesDebian, displayPackagesInfo.JfrogNotFoundPackagesDebian, displayPackagesInfo.SuccessfullPackagesDebian, displayPackagesInfo.JfrogFoundPackagesDebian, "Debian", localPathforartifactory);
 
         }
@@ -523,7 +523,7 @@ namespace LCT.ArtifactoryUploader
                 DryRunSuffix = dryRunSuffix,
                 ComponentType = item.ComponentType,
                 Purl = item.Purl,
-                ApiKey = item.ApiKey,
+                Token = item.Token,
                 CopyPackageApiUrl = item.CopyPackageApiUrl,
                 PackageName = item.PackageName,
                 PackageType = item.PackageType,
@@ -544,7 +544,7 @@ namespace LCT.ArtifactoryUploader
                 SrcRepoPathWithFullName = item.SrcRepoPathWithFullName,
                 Path = item.Path,
                 PackageType = item.PackageType,
-                Purl= item.Purl,
+                Purl = item.Purl,
 
             };
             return Task.FromResult(components);
@@ -575,7 +575,7 @@ namespace LCT.ArtifactoryUploader
                 ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
                 displayPackagesInfo.UnknownPackagesMaven.Add(components);
             }
-            else if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "PYTHON")
+            else if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "POETRY")
             {
                 ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
                 displayPackagesInfo.UnknownPackagesPython.Add(components);
@@ -611,7 +611,7 @@ namespace LCT.ArtifactoryUploader
                 ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
                 displayPackagesInfo.JfrogNotFoundPackagesMaven.Add(components);
             }
-            else if (item.ComponentType == "PYTHON")
+            else if (item.ComponentType == "POETRY")
             {
                 ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
                 displayPackagesInfo.JfrogNotFoundPackagesPython.Add(components);
@@ -647,7 +647,7 @@ namespace LCT.ArtifactoryUploader
                 ComponentsToArtifactory components = await GetPackageinfo(item, operationType, responseMessage, dryRunSuffix);
                 displayPackagesInfo.JfrogFoundPackagesMaven.Add(components);
             }
-            else if (item.ComponentType == "PYTHON")
+            else if (item.ComponentType == "POETRY")
             {
                 ComponentsToArtifactory components = await GetPackageinfo(item, operationType, responseMessage, dryRunSuffix);
                 displayPackagesInfo.JfrogFoundPackagesPython.Add(components);
@@ -682,7 +682,7 @@ namespace LCT.ArtifactoryUploader
                 ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
                 displayPackagesInfo.SuccessfullPackagesMaven.Add(components);
             }
-            else if (item.ComponentType == "PYTHON")
+            else if (item.ComponentType == "POETRY")
             {
                 ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
                 displayPackagesInfo.SuccessfullPackagesPython.Add(components);
@@ -744,7 +744,7 @@ namespace LCT.ArtifactoryUploader
                 url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.Name}/{component.Version}" +
                $"?to=/{component.DestRepoName}/{component.Name}/{component.Version}";
             }
-            else if (component.ComponentType == "PYTHON")
+            else if (component.ComponentType == "POETRY")
             {
                 url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoPathWithFullName}" +
                $"?to=/{component.DestRepoName}/{component.PypiOrNpmCompName}";
@@ -775,7 +775,7 @@ namespace LCT.ArtifactoryUploader
             {
                 url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoPathWithFullName}" +
               $"?to=/{component.DestRepoName}/{component.Path}/{component.PypiOrNpmCompName}";
-            
+
             }
             else if (component.ComponentType == "NUGET")
             {
@@ -787,7 +787,7 @@ namespace LCT.ArtifactoryUploader
                 url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.Name}/{component.Version}" +
                $"?to=/{component.DestRepoName}/{component.Name}/{component.Version}";
             }
-            else if (component.ComponentType == "PYTHON")
+            else if (component.ComponentType == "POETRY")
             {
                 url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoPathWithFullName}" +
                $"?to=/{component.DestRepoName}/{component.PypiOrNpmCompName}";
@@ -816,14 +816,14 @@ namespace LCT.ArtifactoryUploader
             switch (component.ComponentType)
             {
                 case "NPM":
-                    if(aqlResult != null)
+                    if (aqlResult != null)
                     {
                         return $"{aqlResult.Path}";
                     }
                     else
                     {
                         return $"{component.Name}/-";
-                    }                   
+                    }
 
                 case "CONAN" when aqlResult != null:
                     string path = aqlResult.Path;
@@ -867,7 +867,7 @@ namespace LCT.ArtifactoryUploader
                     packageName = $"{component.PackageName}_{component.Version.Replace(ApiConstant.DebianExtension, "") + "*"}";
                     break;
 
-                case "PYTHON":
+                case "POETRY":
                     packageName = component.PypiOrNpmCompName;
                     break;
 
@@ -889,17 +889,17 @@ namespace LCT.ArtifactoryUploader
                 switch (componentType.ToLower())
                 {
                     case "npm":
-                        return GetRepoName(packageType, appSettings.Npm.JfrogInternalDestRepoName, appSettings.Npm.JfrogDevDestRepoName, appSettings.Npm.JfrogThirdPartyDestRepoName);
+                        return GetRepoName(packageType, appSettings.Npm.ReleaseRepo, appSettings.Npm.DevDepRepo, appSettings.Npm.Artifactory.ThirdPartyRepos.Where(x => x.Upload.Equals(true)).FirstOrDefault()?.Name);
                     case "nuget":
-                        return GetRepoName(packageType, appSettings.Nuget.JfrogInternalDestRepoName, appSettings.Nuget.JfrogDevDestRepoName, appSettings.Nuget.JfrogThirdPartyDestRepoName);
+                        return GetRepoName(packageType, appSettings.Nuget.ReleaseRepo, appSettings.Nuget.DevDepRepo, appSettings.Nuget.Artifactory.ThirdPartyRepos.Where(x => x.Upload.Equals(true)).FirstOrDefault()?.Name);
                     case "maven":
-                        return GetRepoName(packageType, appSettings.Maven.JfrogInternalDestRepoName, appSettings.Maven.JfrogDevDestRepoName, appSettings.Maven.JfrogThirdPartyDestRepoName);
-                    case "python":
-                        return GetRepoName(packageType, appSettings.Python.JfrogInternalDestRepoName, appSettings.Python.JfrogDevDestRepoName, appSettings.Python.JfrogThirdPartyDestRepoName);
+                        return GetRepoName(packageType, appSettings.Maven.ReleaseRepo, appSettings.Maven.DevDepRepo, appSettings.Maven.Artifactory.ThirdPartyRepos.Where(x => x.Upload.Equals(true)).FirstOrDefault()?.Name);
+                    case "poetry":
+                        return GetRepoName(packageType, appSettings.Poetry.ReleaseRepo, appSettings.Poetry.DevDepRepo, appSettings.Poetry.Artifactory.ThirdPartyRepos.Where(x => x.Upload.Equals(true)).FirstOrDefault()?.Name);
                     case "conan":
-                        return GetRepoName(packageType, appSettings.Conan.JfrogInternalDestRepoName, appSettings.Conan.JfrogDevDestRepoName, appSettings.Conan.JfrogThirdPartyDestRepoName);
+                        return GetRepoName(packageType, appSettings.Conan.ReleaseRepo, appSettings.Conan.DevDepRepo, appSettings.Conan.Artifactory.ThirdPartyRepos.Where(x => x.Upload.Equals(true)).FirstOrDefault()?.Name);
                     case "debian":
-                        return GetRepoName(packageType, appSettings.Debian.JfrogInternalDestRepoName, appSettings.Debian.JfrogDevDestRepoName, appSettings.Debian.JfrogThirdPartyDestRepoName);
+                        return GetRepoName(packageType, appSettings.Debian.ReleaseRepo, appSettings.Debian.DevDepRepo, appSettings.Debian.Artifactory.ThirdPartyRepos.Where(x => x.Upload.Equals(true)).FirstOrDefault()?.Name);
                 }
             }
 
@@ -938,7 +938,7 @@ namespace LCT.ArtifactoryUploader
             }
             else if (item.Purl.Contains("pypi", StringComparison.OrdinalIgnoreCase))
             {
-                return "PYTHON";
+                return "POETRY";
             }
             else if (item.Purl.Contains("conan", StringComparison.OrdinalIgnoreCase))
             {
@@ -1074,15 +1074,14 @@ namespace LCT.ArtifactoryUploader
 
             ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials()
             {
-                ApiKey = component.ApiKey,
-                Email = component.Email
+                Token = component.Token,
             };
 
             // Initialize JFrog API communication based on Component Type
             IJFrogApiCommunication jfrogApicommunication = component.ComponentType?.ToUpperInvariant() switch
             {
                 "MAVEN" => new MavenJfrogApiCommunication(component.JfrogApi, component.SrcRepoName, repoCredentials, timeout),
-                "PYTHON" => new PythonJfrogApiCommunication(component.JfrogApi, component.SrcRepoName, repoCredentials, timeout),
+                "POETRY" => new PythonJfrogApiCommunication(component.JfrogApi, component.SrcRepoName, repoCredentials, timeout),
                 _ => new NpmJfrogApiCommunication(component.JfrogApi, component.SrcRepoName, repoCredentials, timeout)
             };
             return jfrogApicommunication;
@@ -1132,7 +1131,7 @@ namespace LCT.ArtifactoryUploader
 
             Dictionary<string, double> printTimingList = new Dictionary<string, double>()
             {
-                { "Artifactory Uploader",uploaderKpiData.TimeTakenByComponentCreator }
+                { "Artifactory Uploader",uploaderKpiData.TimeTakenByArtifactoryUploader }
             };
 
             CommonHelper.WriteToConsoleTable(printList, printTimingList);
@@ -1368,7 +1367,7 @@ namespace LCT.ArtifactoryUploader
             {
                 packageNameEXtension = ".deb";
             }
-            if (package.ComponentType.Equals("PYTHON", StringComparison.OrdinalIgnoreCase))
+            if (package.ComponentType.Equals("POETRY", StringComparison.OrdinalIgnoreCase))
             {
                 packageNameEXtension = ".whl";
             }
