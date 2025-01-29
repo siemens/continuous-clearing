@@ -9,11 +9,13 @@ using LCT.APICommunications;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Model;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
 using log4net.Core;
+using NuGet.ProjectModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -63,9 +65,12 @@ namespace LCT.PackageIdentifier
                 }
             }
             string templateFilePath = SbomTemplate.GetFilePathForTemplate(listOfTemplateBomfilePaths);
-
-            SbomTemplate.ProcessTemplateFile(templateFilePath, _cycloneDXBomParser, bom.Components, appSettings.ProjectType);
-
+            
+            if (File.Exists(templateFilePath) && templateFilePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+            {
+                templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(templateFilePath));
+                CycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
+            }
 
             int initialCount = listofComponents.Count;
             GetDistinctComponentList(ref listofComponents);
