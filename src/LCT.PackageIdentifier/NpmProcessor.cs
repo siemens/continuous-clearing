@@ -540,16 +540,7 @@ namespace LCT.PackageIdentifier
                     componentsForBOM.AddRange(components);
                 }
             }
-            string templateFilePath = string.Empty;
-            if (listOfTemplateBomfilePaths != null && listOfTemplateBomfilePaths.Any())
-            {
-                templateFilePath = listOfTemplateBomfilePaths.First();
-                if (listOfTemplateBomfilePaths.Count > 1)
-                {
-                    Logger.Logger.Log(null, Level.Alert, $"Multiple Template files are given", null);
-                }
-                
-            }
+            string templateFilePath = SbomTemplate.GetFilePathForTemplate(listOfTemplateBomfilePaths);
             if (File.Exists(templateFilePath) && templateFilePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
                 Bom templateDetails;

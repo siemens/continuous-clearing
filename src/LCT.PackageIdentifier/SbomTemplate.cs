@@ -8,10 +8,12 @@ using CycloneDX.Models;
 using LCT.Common;
 using LCT.Common.Constants;
 using log4net;
-using System;
+using log4net.Core;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System;
 
 namespace LCT.PackageIdentifier
 {
@@ -19,6 +21,28 @@ namespace LCT.PackageIdentifier
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
+        public static void ProcessTemplateFile(string templateFilePath, ICycloneDXBomParser cycloneDXBomParser, List<Component> componentsForBOM, string projectType)
+        {
+            if (File.Exists(templateFilePath) && templateFilePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+            {
+                Bom templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(templateFilePath));
+                CycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, projectType);
+                AddComponentDetails(componentsForBOM, templateDetails);
+            }
+        }
+        public static string GetFilePathForTemplate(List<string> filePaths)
+        {
+            string firstFilePath = string.Empty;
+            if (filePaths != null && filePaths.Any())
+            {
+                firstFilePath = filePaths.First();
+                if (filePaths.Count > 1)
+                {
+                    Logger.Logger.Log(null, Level.Alert, "Multiple Template files are given", null);
+                }
+            }
+            return firstFilePath;
+        }
         public static void AddComponentDetails(List<Component> bom, Bom sbomdDetails)
         {
             if (sbomdDetails.Components == null)

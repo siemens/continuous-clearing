@@ -66,24 +66,8 @@ namespace LCT.PackageIdentifier
             BomCreator.bomKpiData.DuplicateComponents = initialCount - listComponentForBOM.Count;
 
             bom.Components = listComponentForBOM;
-            string templateFilePath = string.Empty;
-            if (listOfTemplateBomfilePaths != null && listOfTemplateBomfilePaths.Any())
-            {
-                templateFilePath = listOfTemplateBomfilePaths.First();
-                if (listOfTemplateBomfilePaths.Count > 1)
-                {
-                    Logger.Logger.Log(null, Level.Alert, $"Multiple Template files are given", null);
-                }
-               
-            }
-            if (File.Exists(templateFilePath) && templateFilePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
-            {
-                Bom templateDetails;
-                templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(templateFilePath));
-                CycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
-                //Adding Template Component Details & MetaData
-                SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
-            }
+            string templateFilePath = SbomTemplate.GetFilePathForTemplate(listOfTemplateBomfilePaths);
+            SbomTemplate.ProcessTemplateFile(templateFilePath, _cycloneDXBomParser, bom.Components, appSettings.ProjectType);
 
             bom = RemoveExcludedComponents(appSettings, bom);
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();

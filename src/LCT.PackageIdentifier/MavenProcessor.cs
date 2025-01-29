@@ -80,24 +80,8 @@ namespace LCT.PackageIdentifier
                 }
             }
 
-            string templateFilePath = string.Empty;
-            if (listOfTemplateBomfilePaths != null && listOfTemplateBomfilePaths.Any())
-            {
-                templateFilePath = listOfTemplateBomfilePaths.First();
-                if (listOfTemplateBomfilePaths.Count > 1)
-                {
-                    Logger.Logger.Log(null, Level.Alert, $"Multiple Template files are given", null);
-                }
-                
-            }
-            if (File.Exists(templateFilePath) && templateFilePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
-            {
-                //Adding Template Component Details
-                Bom templateDetails;
-                templateDetails = ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(templateFilePath));
-                CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
-                SbomTemplate.AddComponentDetails(componentsForBOM, templateDetails);
-            }
+            string templateFilePath = SbomTemplate.GetFilePathForTemplate(listOfTemplateBomfilePaths);
+            SbomTemplate.ProcessTemplateFile(templateFilePath, _cycloneDXBomParser, componentsForBOM, appSettings.ProjectType);
 
 
             //checking Dev dependency
