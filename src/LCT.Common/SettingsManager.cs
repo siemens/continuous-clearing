@@ -42,7 +42,7 @@ namespace LCT.Common
             {
                 Logger.Debug($"Argument Count : {args.Length}");
                 DisplayHelp();
-                CommonHelper.PublishFilesToArtifact();
+                PipelineArtifactUploader.UploadArtifacts();
                 Environment.Exit(0);
             }
             string settingsFilePath = GetConfigFilePathFromArgs(args, jsonSettingsFileName);
@@ -146,10 +146,10 @@ namespace LCT.Common
                 //Required parameters to run SW360Component Creator
                 List<string> creatorReqParameters = new List<string>()
             {
-                "SW360ProjectID",
-                "Sw360Token",
-                "SW360URL",
-                "BomFilePath"
+                "SW360.ProjectID",
+                "Sw360.Token",
+                "SW360.URL",
+                "Directory.OutputFolder"
             };
                 CheckForMissingParameter(appSettings, properties, creatorReqParameters);
             }

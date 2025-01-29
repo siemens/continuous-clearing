@@ -27,6 +27,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
+using Directory = System.IO.Directory;
 
 namespace LCT.PackageIdentifier
 {
@@ -689,7 +690,7 @@ namespace LCT.PackageIdentifier
         private static List<string> GetValidCsprojfile(CommonAppSettings appSettings)
         {
             List<string> allFoundCsprojFiles = new List<string>();
-            string[] foundCsprojFiles = System.IO.Directory.GetFiles(appSettings.Directory.InputFolder, "*.csproj", SearchOption.AllDirectories);
+            string[] foundCsprojFiles = Directory.GetFiles(appSettings.Directory.InputFolder, "*.csproj", SearchOption.AllDirectories);
             if (foundCsprojFiles != null)
             {
                 foreach (string csprojFile in foundCsprojFiles)

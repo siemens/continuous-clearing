@@ -5,7 +5,6 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using LCT.ArtifactPublisher;
 using LCT.Common.Constants;
 using LCT.Common.Model;
 using log4net;
@@ -15,6 +14,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.IO;
+using LCT.Common.Runtime;
 
 namespace LCT.Common
 {
@@ -24,7 +25,7 @@ namespace LCT.Common
     public static class CommonHelper
     {
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        public static string ProjectSummaryLink { get; set; }
+        public static string ProjectSummaryLink { get; set; }        
 
         #region public
         public static bool IsAzureDevOpsDebugEnabled()
@@ -157,7 +158,7 @@ namespace LCT.Common
             if (componentInfo.Count > 0 || lstReleaseNotCreated.Count > 0)
             {
                 Logger.Logger.Log(null, Level.Alert, "Action Item required by the user:\n", null);
-                PublishFilesToArtifact();
+                PipelineArtifactUploader.UploadArtifacts();
                 Environment.ExitCode = 2;
             }
 
@@ -204,7 +205,7 @@ namespace LCT.Common
 
             if (components.Count > 0)
             {
-                PublishFilesToArtifact();
+                PipelineArtifactUploader.UploadArtifacts();
                 Environment.ExitCode = 2;
                 Logger.Logger.Log(null, Level.Alert, "* Components Not linked to project :", null);
                 Logger.Logger.Log(null, Level.Alert, " Can be linked manually OR Check the Logs AND RE-Run", null);
@@ -258,8 +259,7 @@ namespace LCT.Common
         {
             if (code == -1)
             {
-                Publish artifactPublisher = new Publish(Log4Net.CatoolLogPath, FileOperations.CatoolBomFilePath);
-                artifactPublisher.UploadLogs();
+                PipelineArtifactUploader.UploadLogs();
                 EnvironmentExit(code);
             }
         }
@@ -268,67 +268,34 @@ namespace LCT.Common
         {
             Environment.Exit(exitCode);
         }
-
-        public static void PublishFilesToArtifact()
-        {
-            Publish artifactPublisher = new Publish(Log4Net.CatoolLogPath, FileOperations.CatoolBomFilePath);
-            artifactPublisher.UploadLogs();
-            artifactPublisher.UploadBom();
-        }
+      
         public static string[] GetRepoList(CommonAppSettings appSettings)
         {
-            string[] repoList = null;
+            var projectTypeMappings = new Dictionary<string, Func<Artifactory>>
+        {
+        { "CONAN", () => appSettings.Conan?.Artifactory },
+        { "NPM", () => appSettings.Npm?.Artifactory },
+        { "NUGET", () => appSettings.Nuget?.Artifactory },
+        { "POETRY", () => appSettings.Poetry?.Artifactory },
+        { "DEBIAN", () => appSettings.Debian?.Artifactory },
+        { "MAVEN", () => appSettings.Maven?.Artifactory }
+        };
 
-            if (appSettings.ProjectType.Equals("CONAN", StringComparison.InvariantCultureIgnoreCase))
+            if (projectTypeMappings.TryGetValue(appSettings.ProjectType.ToUpperInvariant(), out var getArtifactory))
             {
-                repoList = (appSettings.Conan?.Artifactory.InternalRepos ?? Array.Empty<string>())
-       .Concat(appSettings.Conan?.Artifactory.DevRepos ?? Array.Empty<string>())
-       .Concat(appSettings.Conan?.Artifactory.RemoteRepos ?? Array.Empty<string>())
-       .Concat(appSettings.Conan?.Artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? Array.Empty<string>())
-       .ToArray();
-            }else if (appSettings.ProjectType.Equals("NPM", StringComparison.InvariantCultureIgnoreCase))
-            {
-                repoList = (appSettings.Npm?.Artifactory.InternalRepos ?? Array.Empty<string>())
-        .Concat(appSettings.Npm?.Artifactory.DevRepos ?? Array.Empty<string>())
-        .Concat(appSettings.Npm?.Artifactory.RemoteRepos ?? Array.Empty<string>())
-        .Concat(appSettings.Npm?.Artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? Array.Empty<string>())
-        .ToArray();
+                var artifactory = getArtifactory();
+                if (artifactory != null)
+                {
+                    return (artifactory.InternalRepos ?? Array.Empty<string>())
+                        .Concat(artifactory.DevRepos ?? Array.Empty<string>())
+                        .Concat(artifactory.RemoteRepos ?? Array.Empty<string>())
+                        .Concat(artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? Array.Empty<string>())
+                        .ToArray();
+                }
             }
-            else if (appSettings.ProjectType.Equals("NUGET", StringComparison.InvariantCultureIgnoreCase))
-            {
-                repoList = (appSettings.Nuget?.Artifactory.InternalRepos ?? Array.Empty<string>())
-       .Concat(appSettings.Nuget?.Artifactory.DevRepos ?? Array.Empty<string>())
-       .Concat(appSettings.Nuget?.Artifactory.RemoteRepos ?? Array.Empty<string>())
-       .Concat(appSettings.Nuget?.Artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? Array.Empty<string>())
-       .ToArray();
-            }
-            else if (appSettings.ProjectType.Equals("POETRY", StringComparison.InvariantCultureIgnoreCase))
-            {
-                repoList = (appSettings.Poetry?.Artifactory.InternalRepos ?? Array.Empty<string>())
-      .Concat(appSettings.Poetry?.Artifactory.DevRepos ?? Array.Empty<string>())
-      .Concat(appSettings.Poetry?.Artifactory.RemoteRepos ?? Array.Empty<string>())
-      .Concat(appSettings.Poetry?.Artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? Array.Empty<string>())
-      .ToArray();
-            }
-            else if (appSettings.ProjectType.Equals("DEBIAN", StringComparison.InvariantCultureIgnoreCase))
-            {
-                repoList = (appSettings.Debian?.Artifactory.InternalRepos ?? Array.Empty<string>())
-         .Concat(appSettings.Debian?.Artifactory.DevRepos ?? Array.Empty<string>())
-         .Concat(appSettings.Debian?.Artifactory.RemoteRepos ?? Array.Empty<string>())
-         .Concat(appSettings.Debian?.Artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? Array.Empty<string>())
-         .ToArray();
-            }
-            else if (appSettings.ProjectType.Equals("MAVEN", StringComparison.InvariantCultureIgnoreCase))
-            {
-                repoList = (appSettings.Maven?.Artifactory.InternalRepos ?? Array.Empty<string>())
-        .Concat(appSettings.Maven?.Artifactory.DevRepos ?? Array.Empty<string>())
-        .Concat(appSettings.Maven?.Artifactory.RemoteRepos ?? Array.Empty<string>())
-        .Concat(appSettings.Maven?.Artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? Array.Empty<string>())
-        .ToArray();
-            }
-            return repoList;
+
+            return Array.Empty<string>();
         }
-
         #endregion
 
         #region private
@@ -342,6 +309,7 @@ namespace LCT.Common
             string sw360URL = $"{sw360Env}{"/group/guest/components/-/component/release/detailRelease/"}{releaseId}";
             return sw360URL;
         }
+
         private static List<Component> RemoveExcludedComponentsFromPurl(List<Component> ComponentList, List<string> ExcludedComponentsFromPurl, ref int noOfExcludedComponents)
         {
             List<Component> ExcludedList = new List<Component>();

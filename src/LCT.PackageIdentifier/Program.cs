@@ -26,8 +26,8 @@ using LCT.APICommunications;
 using LCT.APICommunications.Model;
 using System.Linq;
 using System.Diagnostics.CodeAnalysis;
-using Tommy;
 using System.Collections.Generic;
+using Directory = System.IO.Directory;
 
 
 namespace LCT.PackageIdentifier
@@ -57,7 +57,7 @@ namespace LCT.PackageIdentifier
             ProjectReleases projectReleases = new ProjectReleases();
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
-            Log4Net.CatoolCurrentDirectory = System.IO.Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
+            Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
             string FolderPath = LogFolderInitialisation(appSettings);
 
             settingsManager.CheckRequiredArgsToRun(appSettings, "Identifer");
@@ -114,7 +114,7 @@ namespace LCT.PackageIdentifier
             Logger.Logger.Log(null, Level.Notice, $"End of Package Identifier execution : {DateTime.Now}\n", null);
 
             // publish logs and bom file to pipeline artifact
-            CommonHelper.PublishFilesToArtifact();
+            PipelineArtifactUploader.UploadArtifacts();
 
         }
 

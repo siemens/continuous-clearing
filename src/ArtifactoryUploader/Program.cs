@@ -91,7 +91,7 @@ namespace ArtifactoryUploader
             Logger.Logger.Log(null, Level.Notice, $"End of Artifactory Uploader execution : {DateTime.Now}\n", null);
             // publish logs and BOM file to pipeline artifact
 
-            CommonHelper.PublishFilesToArtifact();
+            PipelineArtifactUploader.UploadArtifacts();
 
         }
 
