@@ -541,16 +541,7 @@ namespace LCT.PackageIdentifier
                 }
             }
             string templateFilePath = SbomTemplate.GetFilePathForTemplate(listOfTemplateBomfilePaths);
-            if (File.Exists(templateFilePath) && templateFilePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
-            {
-                Bom templateDetails;
-                templateDetails = ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(templateFilePath));
-                CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
-                //Adding Template Component Details
-                SbomTemplate.AddComponentDetails(componentsForBOM, templateDetails);
-            }
-
-
+            SbomTemplate.ProcessTemplateFile(templateFilePath, _cycloneDXBomParser, componentsForBOM, appSettings.ProjectType);
             if (dependencies != null)
             {
                 GetdependencyDetails(componentsForBOM, dependencies);
