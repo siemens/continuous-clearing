@@ -193,6 +193,7 @@ namespace LCT.Common
         private string m_Token;
 
         public string URL { get; set; }
+
         public string Token
         {
             get
