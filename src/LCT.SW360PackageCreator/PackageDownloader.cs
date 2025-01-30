@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using Directory = System.IO.Directory;
 
 namespace LCT.SW360PackageCreator
 {

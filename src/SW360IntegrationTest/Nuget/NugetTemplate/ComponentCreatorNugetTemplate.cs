@@ -34,8 +34,7 @@ namespace SW360IntegrationTest.Nuget
             {
                 OutFolder = TestHelper.OutFolder;
                 string packagejsonPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest1stIterationData\Nuget-Assets";
-                string bomPath = OutFolder + @"\..\BOMs";
-                string sbomTemplatePath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest1stIterationData\Template-Nuget\Nuget_CATemplate.cdx.json";
+                string bomPath = OutFolder + @"\..\BOMs";                
 
                 TestHelper.RunBOMCreatorExe(new string[]{
                 TestConstant.PackageFilePath, packagejsonPath,
@@ -47,8 +46,8 @@ namespace SW360IntegrationTest.Nuget
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
+                TestConstant.JfrogNugetInternalRepo,"Nuget-test",
                 TestConstant.ProjectType,"NUGET",
-                TestConstant.CycloneDxSBomTemplatePath,sbomTemplatePath,
                 TestConstant.Mode,""});
             }
         }
@@ -56,12 +55,12 @@ namespace SW360IntegrationTest.Nuget
         [Test, Order(1)]
         public void ComponentCreatorExe_ProvidedBOMFilePath_ReturnsSuccess()
         {
-            string bomPath = OutFolder + $"\\..\\BOMs\\{testParameters.SW360ProjectName}_Bom.cdx.json";
+            string bomPath = OutFolder + $"\\..\\BOMs";
             // Assert
             // Check exit is normal
 
             int value = TestHelper.RunComponentCreatorExe(new string[] {
-                TestConstant.BomFilePath,bomPath,
+                TestConstant.BomFolderPath,bomPath,
                 TestConstant.Sw360Token, testParameters.SW360AuthTokenValue,
                 TestConstant.SW360URL, testParameters.SW360URL,
                 TestConstant.SW360AuthTokenType, testParameters.SW360AuthTokenType,

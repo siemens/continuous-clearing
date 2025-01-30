@@ -27,6 +27,7 @@ using Newtonsoft.Json.Linq;
 using YamlDotNet.Core;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
+using Directory = System.IO.Directory;
 
 namespace LCT.SW360PackageCreator
 {

@@ -6,9 +6,11 @@
 
 using LCT.APICommunications.Model;
 using LCT.Common;
+using LCT.Common.Interface;
 using log4net;
 using System;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -18,6 +20,7 @@ namespace LCT.APICommunications
     {
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static int TimeoutInSec { get; set; }
+        private static IEnvironmentHelper environmentHelper;
         public NpmJfrogApiCommunication(string repoDomainName, string srcrepoName, ArtifactoryCredentials repoCredentials, int timeout) : base(repoDomainName, srcrepoName, repoCredentials, timeout)
         {
             TimeoutInSec = timeout;
@@ -28,8 +31,7 @@ namespace LCT.APICommunications
             HttpClient httpClient = new HttpClient();
             TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
             httpClient.Timeout = timeOutInSec;
-            httpClient.DefaultRequestHeaders.Add(ApiConstant.JFrog_API_Header, credentials.ApiKey);
-            httpClient.DefaultRequestHeaders.Add(ApiConstant.Email, credentials.Email);
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", credentials.Token);
             return httpClient;
         }
 
@@ -57,6 +59,7 @@ namespace LCT.APICommunications
         public override async Task<HttpResponseMessage> GetPackageInfo(ComponentsToArtifactory component)
         {
             HttpResponseMessage responseMessage = new HttpResponseMessage();
+            environmentHelper = new EnvironmentHelper();
             var result = responseMessage;
             try
             {
@@ -68,7 +71,7 @@ namespace LCT.APICommunications
             {
                 Logger.Debug($"{ex.Message}");
                 ExceptionHandling.TaskCancelledException(ex,"Jfrog");
-                CommonHelper.CallEnvironmentExit(-1);
+                environmentHelper.CallEnvironmentExit(-1);
             }           
             return result;
         }

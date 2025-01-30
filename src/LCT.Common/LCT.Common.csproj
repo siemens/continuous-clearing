@@ -34,7 +34,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\LCT.ArtifactPublisher\LCT.ArtifactPublisher.csproj" />
     <ProjectReference Include="..\LCT.CycloneDxProcessor\LCT.CycloneDxProcessor.csproj" />
   </ItemGroup>
 

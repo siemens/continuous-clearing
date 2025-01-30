@@ -46,6 +46,7 @@ namespace SW360IntegrationTest.Maven
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
+                TestConstant.JfrogMavenInternalRepo,"Maven-test",
                 TestConstant.ProjectType,"MAVEN",
                 TestConstant.Mode,""});
             }
@@ -54,11 +55,11 @@ namespace SW360IntegrationTest.Maven
         [Test, Order(1)]
         public void ComponentCreatorExe_ProvidedBOMFilePath_ReturnsSuccess()
         {
-            string bomPath = OutFolder + $"\\..\\BOMs\\{testParameters.SW360ProjectName}_Bom.cdx.json";
+            string bomPath = OutFolder + $"\\..\\BOMs";
             // Assert
             // Check exit is normal
             Assert.AreEqual(0, TestHelper.RunComponentCreatorExe(new string[] {
-                TestConstant.BomFilePath,bomPath,
+                TestConstant.BomFolderPath,bomPath,
                 TestConstant.Sw360Token, testParameters.SW360AuthTokenValue,
                 TestConstant.SW360URL, testParameters.SW360URL,
                 TestConstant.SW360AuthTokenType, testParameters.SW360AuthTokenType,

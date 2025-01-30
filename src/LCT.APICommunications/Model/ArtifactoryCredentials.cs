@@ -9,7 +9,6 @@ namespace LCT.APICommunications.Model
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class ArtifactoryCredentials
     {
-        public string ApiKey { get; set; }
-        public string Email { get; set; }
+        public string Token { get; set; }
     }
 }

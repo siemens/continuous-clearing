@@ -8,6 +8,7 @@ using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
 using System;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace LCT.APICommunications
@@ -34,8 +35,7 @@ namespace LCT.APICommunications
             HttpClient httpClient = new HttpClient();
             TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
             httpClient.Timeout = timeOutInSec;
-            httpClient.DefaultRequestHeaders.Add(ApiConstant.JFrog_API_Header, credentials.ApiKey);
-            httpClient.DefaultRequestHeaders.Add(ApiConstant.Email, credentials.Email);
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", credentials.Token);
             return httpClient;
         }
 

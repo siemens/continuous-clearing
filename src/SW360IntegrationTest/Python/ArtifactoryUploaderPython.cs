@@ -23,19 +23,17 @@ namespace SW360IntegrationTest.Python
         [Test, Order(1)]
         public void TestArtifactoryUploaderexe()
         {
-            OutFolder = TestHelper.OutFolder;
-            string comparisonBOMPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\ArtifactoryUploaderTestData\PythonComparisonBOM.json";
+            OutFolder = TestHelper.OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\ArtifactoryUploaderTestData\Poetry";
 
             int result = TestHelper.RunArtifactoryUploaderExe(new string[]{
-                TestConstant.BomFilePath, comparisonBOMPath,
+                TestConstant.BomFolderPath, OutFolder,
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
-                TestConstant.ArtifactoryUser, testParameters.ArtifactoryUploadUser,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
                 TestConstant.JfrogPythonThirdPartyDestRepoName,testParameters.ThirdPartyDestinationRepoName,
                 TestConstant.JfrogPythonDevDestRepoName,testParameters.DevDestinationRepoName,
                 TestConstant.JfrogPythonInternalDestRepoName,testParameters.InternalDestinationRepoName,
                 TestConstant.JFrogApiURL,testParameters.JfrogApi,
-                TestConstant.Release, false.ToString()
+                TestConstant.DryRun, false.ToString()
             });
 
             // Test BOM Creator ran with exit code 0 or 2 (Warning)

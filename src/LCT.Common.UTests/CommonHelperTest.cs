@@ -59,17 +59,20 @@ namespace LCT.Common.UTest
             ComponentsForBom.Add(new Component() { Name = "Debian", Version = "3.1.2" });
             ComponentsForBom.Add(new Component() { Name = "Newton", Version = "3.1.3" });
             ComponentsForBom.Add(new Component() { Name = "Log4t", Version = "3.1.4" });
+            ComponentsForBom.Add(new Component() { Name = "Log4t", Version = "3.1.5",Purl= "pkg:npm/foobar@12.3.1" });
+            ComponentsForBom.Add(new Component() { Name = "Log4t", Version = "3.1.5", Purl = "pkg:npm/foobar@12.3.2" });
             int noOfExcludedComponents = 0;
 
             List<string> list = new List<string>();
             list.Add("Debian:*");
             list.Add("Newton:3.1.3");
+            list.Add("pkg:npm/foobar@12.3.1");
 
             //Act
             CommonHelper.RemoveExcludedComponents(ComponentsForBom, list, ref noOfExcludedComponents);
 
             //Assert            
-            Assert.That(noOfExcludedComponents, Is.EqualTo(4), "Returns the count of excluded components");
+            Assert.That(noOfExcludedComponents, Is.EqualTo(5), "Returns the count of excluded components");
 
         }
 

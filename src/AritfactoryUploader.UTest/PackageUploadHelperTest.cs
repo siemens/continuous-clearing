@@ -24,6 +24,7 @@ using LCT.Services.Interface;
 using Moq;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using LCT.Common.Interface;
+using LCT.Common.Model;
 
 namespace AritfactoryUploader.UTest
 {
@@ -37,7 +38,7 @@ namespace AritfactoryUploader.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string comparisonBOMPath = outFolder + @"\ArtifactoryUTTestFiles\CyclonedxBom.json";
+            string comparisonBOMPath = outFolder + @"\ArtifactoryUTTestFiles\Test_Bom.cdx.json";
             //Act
             Bom componentList = PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath);
             // Assert
@@ -74,19 +75,40 @@ namespace AritfactoryUploader.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
             DisplayPackagesInfo displayPackagesInfo = PackageUploadHelper.GetComponentsToBePackages();
-            CommonAppSettings appSettings = new CommonAppSettings()
+
+            var jFrogServiceMock = new Mock<IJFrogService>();
+            PackageUploadHelper.jFrogService = jFrogServiceMock.Object;
+
+            CommonAppSettings commonAppSettings = new CommonAppSettings();
+            commonAppSettings.Jfrog = new Jfrog()
             {
-                ArtifactoryUploadApiKey = "wfwfwfwfwegwgweg",
-                ArtifactoryUploadUser = "user@account.com",
-                Npm = new LCT.Common.Model.Config { JfrogThirdPartyDestRepoName = "npm-test" },
-                Nuget = new LCT.Common.Model.Config { JfrogThirdPartyDestRepoName = "nuget-test" },
-                JfrogNpmSrcRepo = "remote-cache",
-                JFrogApi = UTParams.JFrogURL,
-                LogFolderPath = outFolder
+                Token = "wfwfwfwfwegwgweg",
+                URL = UTParams.JFrogURL
             };
+            commonAppSettings.Npm = new Config()
+            {
+                Artifactory = new Artifactory()
+                {
+                    ThirdPartyRepos = new List<ThirdPartyRepo>()
+                    {
+                        new() { Name = "npm-test" }
+                    }
+                }
+            };
+            commonAppSettings.Nuget = new Config()
+            {
+                Artifactory = new Artifactory()
+                {
+                    ThirdPartyRepos = new List<ThirdPartyRepo>()
+                    {
+                        new() { Name = "nuget-test" }
+                    }
+                }
+            };
+            commonAppSettings.LogFolderPath = outFolder;
 
             //Act
-            List<ComponentsToArtifactory> uploadList = await PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(componentLists, appSettings, displayPackagesInfo);
+            List<ComponentsToArtifactory> uploadList = await PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(componentLists, commonAppSettings, displayPackagesInfo);
             // Assert
             Assert.That(3, Is.EqualTo(uploadList.Count), "Checks for 2  no of components to upload");
         }
@@ -98,6 +120,10 @@ namespace AritfactoryUploader.UTest
             //Arrange
             List<Component> componentLists = GetComponentList();
             DisplayPackagesInfo displayPackagesInfo = PackageUploadHelper.GetComponentsToBePackages();
+
+            var jFrogServiceMock = new Mock<IJFrogService>();
+            PackageUploadHelper.jFrogService = jFrogServiceMock.Object;
+
             foreach (var component in componentLists)
             {
                 if (component.Name == "@angular/core")
@@ -108,18 +134,38 @@ namespace AritfactoryUploader.UTest
             }
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            CommonAppSettings appSettings = new CommonAppSettings()
+
+            CommonAppSettings commonAppSettings = new CommonAppSettings();
+            commonAppSettings.Jfrog = new Jfrog()
             {
-                ArtifactoryUploadApiKey = "wfwfwfwfwegwgweg",
-                ArtifactoryUploadUser = "user@account.com",
-                Npm = new LCT.Common.Model.Config { JfrogThirdPartyDestRepoName = "npm-test" },
-                Nuget = new LCT.Common.Model.Config { JfrogThirdPartyDestRepoName = "nuget-test" },
-                JFrogApi = UTParams.JFrogURL,
-                LogFolderPath = outFolder
+                Token = "wfwfwfwfwegwgweg",
+                URL = UTParams.JFrogURL
             };
+            commonAppSettings.Npm = new Config()
+            {
+                Artifactory = new Artifactory()
+                {
+                    ThirdPartyRepos = new List<ThirdPartyRepo>()
+                    {
+                        new() { Name = "npm-test" }
+                    }
+                }
+            };
+            commonAppSettings.Nuget = new Config()
+            {
+                Artifactory = new Artifactory()
+                {
+                    ThirdPartyRepos = new List<ThirdPartyRepo>()
+                    {
+                        new() { Name = "nuget-test" }
+                    }
+                }
+            };
+            commonAppSettings.LogFolderPath = outFolder;
+
 
             //Act
-            List<ComponentsToArtifactory> uploadList = await PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(componentLists, appSettings, displayPackagesInfo);
+            List<ComponentsToArtifactory> uploadList = await PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(componentLists, commonAppSettings, displayPackagesInfo);
 
             // Assert
             Assert.That(4, Is.EqualTo(uploadList.Count), "Checks for 3 no of components to upload");
@@ -136,19 +182,25 @@ namespace AritfactoryUploader.UTest
                 component.Properties[1].Value = "NEW_CLEARING";
             }
 
-            CommonAppSettings appSettings = new CommonAppSettings()
+            CommonAppSettings commonAppSettings = new CommonAppSettings();
+            commonAppSettings.Jfrog = new Jfrog()
             {
-                ArtifactoryUploadApiKey = "wfwfwfwfwegwgweg",
-                ArtifactoryUploadUser = "user@account.com",
-                Npm = new LCT.Common.Model.Config
+                Token = "wfwfwfwfwegwgweg",
+                URL = UTParams.JFrogURL
+            };
+            commonAppSettings.Npm = new Config()
+            {
+                Artifactory = new Artifactory()
                 {
-                    JfrogThirdPartyDestRepoName = "nuget-test",
-                },
-                JFrogApi = UTParams.JFrogURL
+                    ThirdPartyRepos = new List<ThirdPartyRepo>()
+                    {
+                        new() { Name = "npm-test" }
+                    }
+                }
             };
 
             //Act
-            List<ComponentsToArtifactory> uploadList = await PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(componentLists, appSettings, displayPackagesInfo);
+            List<ComponentsToArtifactory> uploadList = await PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(componentLists, commonAppSettings, displayPackagesInfo);
 
             // Assert
             Assert.That(0, Is.EqualTo(uploadList.Count), "Checks for components to upload to be zero");
@@ -160,7 +212,7 @@ namespace AritfactoryUploader.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string comparisonBOMPath = outFolder + @"\ArtifactoryUTTestFiles\CyclonedxBom.json";
+            string comparisonBOMPath = outFolder + @"\ArtifactoryUTTestFiles\Test_Bom.cdx.json";
             Bom bom = PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath);
             List<ComponentsToArtifactory> components = new List<ComponentsToArtifactory>()
             {
@@ -186,7 +238,7 @@ namespace AritfactoryUploader.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string comparisonBOMPath = outFolder + @"\ArtifactoryUTTestFiles\CyclonedxBom.json";
+            string comparisonBOMPath = outFolder + @"\ArtifactoryUTTestFiles\Test_Bom.cdx.json";
             Bom bom = PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath);
             List<ComponentsToArtifactory> components = new List<ComponentsToArtifactory>()
             {
@@ -411,7 +463,7 @@ namespace AritfactoryUploader.UTest
                 Name = Dataconstant.Cdx_ArtifactoryRepoName,
                 Value = "Reponame"
             };
-            List<Property> properties = new List<Property>() { repoNameProperty };            
+            List<Property> properties = new List<Property>() { repoNameProperty };
             var item = new Component
             {
                 Purl = "pypi://example-package",
@@ -445,7 +497,8 @@ namespace AritfactoryUploader.UTest
             var jFrogServiceMock = new Mock<IJFrogService>();
 
             jFrogServiceMock.Setup(x => x.GetPypiComponentDataByRepo(It.IsAny<string>())).ReturnsAsync(aqlResultList);
-            
+
+
             PackageUploadHelper.jFrogService = jFrogServiceMock.Object;
 
             // Act
@@ -518,7 +571,7 @@ namespace AritfactoryUploader.UTest
         [TestCase("NUGET", ".nupkg")]
         [TestCase("MAVEN", ".jar")]
         [TestCase("DEBIAN", ".deb")]
-        [TestCase("PYTHON", ".whl")]
+        [TestCase("POETRY", ".whl")]
         [TestCase("CONAN", "package.tgz")]
         public void GetPkgeNameExtensionBasedOnComponentType_GivenType_ReturnsPkgNameExtension(string type, string extension)
         {
@@ -540,8 +593,7 @@ namespace AritfactoryUploader.UTest
                 ComponentType = "MAVEN",
                 JfrogApi = "https://api.jfrog.com",
                 SrcRepoName = "maven-repo",
-                ApiKey = "api-key",
-                Email = "test@example.com"
+                Token = "api-key"
             };
             var timeout = 5000;
 
@@ -558,11 +610,10 @@ namespace AritfactoryUploader.UTest
             // Arrange
             var component = new ComponentsToArtifactory
             {
-                ComponentType = "PYTHON",
+                ComponentType = "POETRY",
                 JfrogApi = "https://api.jfrog.com",
                 SrcRepoName = "python-repo",
-                ApiKey = "api-key",
-                Email = "test@example.com"
+                Token = "api-key"
             };
             var timeout = 5000;
 
@@ -582,8 +633,7 @@ namespace AritfactoryUploader.UTest
                 ComponentType = "UNKNOWN",
                 JfrogApi = "https://api.jfrog.com",
                 SrcRepoName = "unknown-repo",
-                ApiKey = "api-key",
-                Email = "test@example.com"
+                Token = "api-key",
             };
             var timeout = 5000;
 
@@ -598,7 +648,7 @@ namespace AritfactoryUploader.UTest
         [TestCase("NPM")]
         [TestCase("NUGET")]
         [TestCase("MAVEN")]
-        [TestCase("PYTHON")]
+        [TestCase("POETRY")]
         [TestCase("CONAN")]
         [TestCase("DEBIAN")]
         public async Task JfrogNotFoundPackagesAsync_CoversAllScenarios(string compType)
@@ -633,7 +683,7 @@ namespace AritfactoryUploader.UTest
                 Assert.AreEqual(1, displayPackagesInfo.JfrogNotFoundPackagesMaven.Count);
                 Assert.That(displayPackagesInfo.JfrogNotFoundPackagesMaven[0], Is.Not.Null);
             }
-            else if (item.ComponentType == "PYTHON")
+            else if (item.ComponentType == "POETRY")
             {
                 Assert.AreEqual(1, displayPackagesInfo.JfrogNotFoundPackagesPython.Count);
                 Assert.That(displayPackagesInfo.JfrogNotFoundPackagesPython[0], Is.Not.Null);
@@ -654,7 +704,7 @@ namespace AritfactoryUploader.UTest
         [TestCase("NPM")]
         [TestCase("NUGET")]
         [TestCase("MAVEN")]
-        [TestCase("PYTHON")]
+        [TestCase("POETRY")]
         [TestCase("CONAN")]
         [TestCase("DEBIAN")]
         public async Task JfrogFoundPackagesAsync_CoversAllScenarios(string compType)
@@ -692,7 +742,7 @@ namespace AritfactoryUploader.UTest
                 Assert.AreEqual(1, displayPackagesInfo.JfrogFoundPackagesMaven.Count);
                 Assert.That(displayPackagesInfo.JfrogFoundPackagesMaven[0], Is.Not.Null);
             }
-            else if (item.ComponentType == "PYTHON")
+            else if (item.ComponentType == "POETRY")
             {
                 Assert.AreEqual(1, displayPackagesInfo.JfrogFoundPackagesPython.Count);
                 Assert.That(displayPackagesInfo.JfrogFoundPackagesPython[0], Is.Not.Null);
@@ -761,7 +811,7 @@ namespace AritfactoryUploader.UTest
         [TestCase("NUGET", "source-repo/package-name.1.0.0.nupkg?to=/destination-repo/package-name.1.0.0.nupkg")]
         [TestCase("MAVEN", "source-repo/package-name/1.0.0?to=/destination-repo/package-name/1.0.0")]
         [TestCase("CONAN", "source-repo/?to=/destination-repo/")]
-        [TestCase("PYTHON", "?to=/destination-repo/")]
+        [TestCase("POETRY", "?to=/destination-repo/")]
         [TestCase("DEBIAN", "source-repo//package-name_1.0.0*?to=/destination-repo//package-name_1.0.0*")]
         public void GetCopyURL_GivenComponentType_ReturnsCopyURL(string type, string pkgExtension)
         {
@@ -815,7 +865,7 @@ namespace AritfactoryUploader.UTest
         [TestCase("NUGET", "source-repo/package-name.1.0.0.nupkg?to=/destination-repo/package-name.1.0.0.nupkg")]
         [TestCase("MAVEN", "source-repo/package-name/1.0.0?to=/destination-repo/package-name/1.0.0")]
         [TestCase("CONAN", "source-repo/?to=/destination-repo/")]
-        [TestCase("PYTHON", "?to=/destination-repo/")]
+        [TestCase("POETRY", "?to=/destination-repo/")]
         [TestCase("DEBIAN", "source-repo//package-name_1.0.0*?to=/destination-repo//package-name_1.0.0*")]
         public void GetMoveURL_GivenComponentType_ReturnsMoveURL(string type, string extension)
         {

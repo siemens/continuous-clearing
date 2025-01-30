@@ -5,7 +5,6 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using LCT.ArtifactPublisher;
 using LCT.Common.Constants;
 using LCT.Common.Model;
 using log4net;
@@ -15,6 +14,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.IO;
+using LCT.Common.Runtime;
 
 namespace LCT.Common
 {
@@ -24,7 +25,7 @@ namespace LCT.Common
     public static class CommonHelper
     {
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        public static string ProjectSummaryLink { get; set; }
+        public static string ProjectSummaryLink { get; set; }        
 
         #region public
         public static bool IsAzureDevOpsDebugEnabled()
@@ -40,24 +41,11 @@ namespace LCT.Common
         public static List<Component> RemoveExcludedComponents(List<Component> ComponentList, List<string> ExcludedComponents, ref int noOfExcludedComponents)
         {
             List<Component> ExcludedList = new List<Component>();
-            foreach (string excludedComponent in ExcludedComponents)
-            {
-                string[] excludedcomponent = excludedComponent.ToLower().Split(':');
-                foreach (var component in ComponentList)
-                {
-                    string name = component.Name;
-                    if (!string.IsNullOrEmpty(component.Group) && (component.Group != component.Name))
-                    {
-                        name = $"{component.Group}/{component.Name}";
-                    }
-                    if (excludedcomponent.Length > 0 && (Regex.IsMatch(name.ToLowerInvariant(), WildcardToRegex(excludedcomponent[0].ToLowerInvariant()))) &&
-                        (component.Version.ToLowerInvariant().Contains(excludedcomponent[1].ToLowerInvariant()) || excludedcomponent[1].ToLowerInvariant() == "*"))
-                    {
-                        noOfExcludedComponents++;
-                        ExcludedList.Add(component);
-                    }
-                }
-            }
+            List<string> ExcludedComponentsFromPurl = ExcludedComponents?.Where(ec => ec.StartsWith("pkg:")).ToList();
+            List<string> otherExcludedComponents = ExcludedComponents?.Where(ec => !ec.StartsWith("pkg:")).ToList();
+
+            ExcludedList.AddRange(RemoveExcludedComponentsFromPurl(ComponentList, ExcludedComponentsFromPurl, ref noOfExcludedComponents));
+            ExcludedList.AddRange(RemoveOtherExcludedComponents(ComponentList, otherExcludedComponents, ref noOfExcludedComponents));
             ComponentList.RemoveAll(item => ExcludedList.Contains(item));
             return ComponentList;
         }
@@ -170,7 +158,7 @@ namespace LCT.Common
             if (componentInfo.Count > 0 || lstReleaseNotCreated.Count > 0)
             {
                 Logger.Logger.Log(null, Level.Alert, "Action Item required by the user:\n", null);
-                PublishFilesToArtifact();
+                PipelineArtifactUploader.UploadArtifacts();
                 Environment.ExitCode = 2;
             }
 
@@ -217,7 +205,7 @@ namespace LCT.Common
 
             if (components.Count > 0)
             {
-                PublishFilesToArtifact();
+                PipelineArtifactUploader.UploadArtifacts();
                 Environment.ExitCode = 2;
                 Logger.Logger.Log(null, Level.Alert, "* Components Not linked to project :", null);
                 Logger.Logger.Log(null, Level.Alert, " Can be linked manually OR Check the Logs AND RE-Run", null);
@@ -266,29 +254,35 @@ namespace LCT.Common
 
             return formattedString;
         }
-
-        public static void CallEnvironmentExit(int code)
+       
+      
+        public static string[] GetRepoList(CommonAppSettings appSettings)
         {
-            if (code == -1)
+            var projectTypeMappings = new Dictionary<string, Func<Artifactory>>
+        {
+        { "CONAN", () => appSettings.Conan?.Artifactory },
+        { "NPM", () => appSettings.Npm?.Artifactory },
+        { "NUGET", () => appSettings.Nuget?.Artifactory },
+        { "POETRY", () => appSettings.Poetry?.Artifactory },
+        { "DEBIAN", () => appSettings.Debian?.Artifactory },
+        { "MAVEN", () => appSettings.Maven?.Artifactory }
+        };
+
+            if (projectTypeMappings.TryGetValue(appSettings.ProjectType.ToUpperInvariant(), out var getArtifactory))
             {
-                Publish artifactPublisher = new Publish(Log4Net.CatoolLogPath, FileOperations.CatoolBomFilePath);
-                artifactPublisher.UploadLogs();
-                EnvironmentExit(code);
+                var artifactory = getArtifactory();
+                if (artifactory != null)
+                {
+                    return (artifactory.InternalRepos ?? Array.Empty<string>())
+                        .Concat(artifactory.DevRepos ?? Array.Empty<string>())
+                        .Concat(artifactory.RemoteRepos ?? Array.Empty<string>())
+                        .Concat(artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? Array.Empty<string>())
+                        .ToArray();
+                }
             }
-        }
 
-        public static void EnvironmentExit(int exitCode)
-        {
-            Environment.Exit(exitCode);
+            return Array.Empty<string>();
         }
-
-        public static void PublishFilesToArtifact()
-        {
-            Publish artifactPublisher = new Publish(Log4Net.CatoolLogPath, FileOperations.CatoolBomFilePath);
-            artifactPublisher.UploadLogs();
-            artifactPublisher.UploadBom();
-        }
-
         #endregion
 
         #region private
@@ -301,6 +295,51 @@ namespace LCT.Common
         {
             string sw360URL = $"{sw360Env}{"/group/guest/components/-/component/release/detailRelease/"}{releaseId}";
             return sw360URL;
+        }
+
+        private static List<Component> RemoveExcludedComponentsFromPurl(List<Component> ComponentList, List<string> ExcludedComponentsFromPurl, ref int noOfExcludedComponents)
+        {
+            List<Component> ExcludedList = new List<Component>();
+
+            foreach (string excludedComponent in ExcludedComponentsFromPurl)
+            {
+                foreach (var component in ComponentList)
+                {
+                    if (component.Purl != null && component.Purl.Equals(excludedComponent, StringComparison.OrdinalIgnoreCase))
+                    {
+                        noOfExcludedComponents++;
+                        ExcludedList.Add(component);
+                    }
+                }
+            }
+
+            return ExcludedList;
+        }
+
+        private static List<Component> RemoveOtherExcludedComponents(List<Component> ComponentList, List<string> otherExcludedComponents, ref int noOfExcludedComponents)
+        {
+            List<Component> ExcludedList = new List<Component>();
+
+            foreach (string excludedComponent in otherExcludedComponents)
+            {
+                string[] excludedcomponent = excludedComponent.ToLower().Split(':');
+                foreach (var component in ComponentList)
+                {
+                    string name = component.Name;
+                    if (!string.IsNullOrEmpty(component.Group) && (component.Group != component.Name))
+                    {
+                        name = $"{component.Group}/{component.Name}";
+                    }
+                    if (excludedcomponent.Length > 0 && (Regex.IsMatch(name.ToLowerInvariant(), WildcardToRegex(excludedcomponent[0].ToLowerInvariant()))) &&
+                        (component.Version.ToLowerInvariant().Contains(excludedcomponent[1].ToLowerInvariant()) || excludedcomponent[1].ToLowerInvariant() == "*"))
+                    {
+                        noOfExcludedComponents++;
+                        ExcludedList.Add(component);
+                    }
+                }
+            }
+
+            return ExcludedList;
         }
         #endregion
     }

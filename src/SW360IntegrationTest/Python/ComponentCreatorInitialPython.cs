@@ -44,7 +44,8 @@ namespace SW360IntegrationTest.Python
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
-                TestConstant.ProjectType,"PYTHON",
+                TestConstant.JfrogPoetryInternalRepo,"Pypi-test",
+                TestConstant.ProjectType,"POETRY",
                 TestConstant.Mode,""});
             }
         }
@@ -52,11 +53,11 @@ namespace SW360IntegrationTest.Python
         [Test, Order(1)]
         public void ComponentCreatorExe_ProvidedBOMFilePath_ReturnsSuccess()
         {
-            string bomPath = OutFolder + $"\\..\\BOMs\\{testParameters.SW360ProjectName}_Bom.cdx.json";
+            string bomPath = OutFolder + $"\\..\\BOMs";
             // Assert
             // Check exit is normal
             int returnValue = TestHelper.RunComponentCreatorExe(new string[] {
-                TestConstant.BomFilePath,bomPath,
+                TestConstant.BomFolderPath,bomPath,
                 TestConstant.Sw360Token, testParameters.SW360AuthTokenValue,
                 TestConstant.SW360URL, testParameters.SW360URL,
                 TestConstant.SW360AuthTokenType, testParameters.SW360AuthTokenType,

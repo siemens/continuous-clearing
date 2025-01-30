@@ -74,8 +74,8 @@ namespace LCT.Common.UTest
         { 
             //Arrange
             string sourcePath = $"{Path.GetTempPath()}\\SampleFolder";
-            Directory.CreateDirectory(sourcePath);
-            Directory.CreateDirectory(sourcePath +"\\SampleSubFolder");
+            System.IO.Directory.CreateDirectory(sourcePath);
+            System.IO.Directory.CreateDirectory(sourcePath +"\\SampleSubFolder");
             File.WriteAllText(sourcePath + "\\Sample.txt", "");
             string targetPath = $"{Path.GetTempPath()}/targetPath/";
             var folderAction = new FolderAction();
