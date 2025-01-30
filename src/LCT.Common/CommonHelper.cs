@@ -254,20 +254,7 @@ namespace LCT.Common
 
             return formattedString;
         }
-
-        public static void CallEnvironmentExit(int code)
-        {
-            if (code == -1)
-            {
-                PipelineArtifactUploader.UploadLogs();
-                EnvironmentExit(code);
-            }
-        }
-
-        public static void EnvironmentExit(int exitCode)
-        {
-            Environment.Exit(exitCode);
-        }
+       
       
         public static string[] GetRepoList(CommonAppSettings appSettings)
         {

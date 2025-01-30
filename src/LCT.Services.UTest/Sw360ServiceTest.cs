@@ -167,8 +167,10 @@ namespace LCT.Services.UTest
                     .Throws<AggregateException>();
             }
 
+            Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
+            environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));
             // Act
-            ISW360Service sW360Service = new Sw360Service(swApiCommunicationFacade.Object, sw360CommonService.Object);
+            ISW360Service sW360Service = new Sw360Service(swApiCommunicationFacade.Object, sw360CommonService.Object, environmentHelperMock.Object);
             var result = await sW360Service.GetAvailableReleasesInSw360(components);
 
             // Assert

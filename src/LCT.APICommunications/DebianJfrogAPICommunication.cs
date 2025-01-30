@@ -6,6 +6,7 @@
 
 using LCT.APICommunications.Model;
 using LCT.Common;
+using LCT.Common.Interface;
 using log4net;
 using System;
 using System.Net.Http;
@@ -20,6 +21,7 @@ namespace LCT.APICommunications
 
 
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static IEnvironmentHelper environmentHelper;
         private static int TimeoutInSec { get; set; }
         public DebianJfrogAPICommunication(string repoDomainName, string srcrepoName, ArtifactoryCredentials repoCredentials, int timeout) : base(repoDomainName, srcrepoName, repoCredentials, timeout)
         {
@@ -59,6 +61,7 @@ namespace LCT.APICommunications
         public override async Task<HttpResponseMessage> GetPackageInfo(ComponentsToArtifactory component)
         {
             HttpResponseMessage responseMessage = new HttpResponseMessage();
+            environmentHelper = new EnvironmentHelper();
             var result = responseMessage;
             try
             {
@@ -69,7 +72,7 @@ namespace LCT.APICommunications
             {
                 Logger.Debug($"{ex.Message}");
                 Logger.Error("A timeout error is thrown from Jfrog server,Please wait for sometime and re run the pipeline again");
-                CommonHelper.CallEnvironmentExit(-1);
+                environmentHelper.CallEnvironmentExit(-1);
 
             }
             return result;

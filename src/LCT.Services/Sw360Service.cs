@@ -36,22 +36,23 @@ namespace LCT.Services
     public class Sw360Service : ISW360Service
     {
         public static Stopwatch Sw360ServiceStopWatch { get; set; }
-        private readonly IEnvironmentHelper m_environmentHelper;
+        private readonly IEnvironmentHelper environmentHelper;
 
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ISW360ApicommunicationFacade m_SW360ApiCommunicationFacade;
         private readonly ISW360CommonService m_SW360CommonService;
         private static List<Components> availableComponentList = new List<Components>();
-        public Sw360Service(ISW360ApicommunicationFacade sw360ApiCommunicationFacade, IEnvironmentHelper environmentHelper)
+        public Sw360Service(ISW360ApicommunicationFacade sw360ApiCommunicationFacade, IEnvironmentHelper _environmentHelper)
         {
             m_SW360ApiCommunicationFacade = sw360ApiCommunicationFacade;
-            m_environmentHelper = environmentHelper;
+            environmentHelper = _environmentHelper;
         }
 
-        public Sw360Service(ISW360ApicommunicationFacade sw360ApiCommunicationFacade, ISW360CommonService sw360CommonService)
+        public Sw360Service(ISW360ApicommunicationFacade sw360ApiCommunicationFacade, ISW360CommonService sw360CommonService, IEnvironmentHelper _environmentHelper)
         {
             m_SW360ApiCommunicationFacade = sw360ApiCommunicationFacade;
             m_SW360CommonService = sw360CommonService;
+            environmentHelper = _environmentHelper;
         }
 
         public async Task<List<Components>> GetAvailableReleasesInSw360(List<Components> listOfComponentsToBom)
@@ -64,8 +65,7 @@ namespace LCT.Services
                 string responseBody = await m_SW360ApiCommunicationFacade.GetReleases();
                 Sw360ServiceStopWatch.Stop();
                 Logger.Debug($"GetAvailableReleasesInSw360():Time taken to in GetReleases() call" +
-                    $"-{TimeSpan.FromMilliseconds(Sw360ServiceStopWatch.ElapsedMilliseconds).TotalSeconds}");
-                
+                    $"-{TimeSpan.FromMilliseconds(Sw360ServiceStopWatch.ElapsedMilliseconds).TotalSeconds}");                
                 var modelMappedObject = JsonConvert.DeserializeObject<ComponentsRelease>(responseBody);
 
                 if (modelMappedObject != null && modelMappedObject.Embedded?.Sw360Releases?.Count > 0)
@@ -76,20 +76,20 @@ namespace LCT.Services
                 {
                     Logger.Debug("GetAvailableReleasesInSw360() : Releases list found empty from the SW360 Server !!");
                     Logger.Error("SW360 server is not accessible while getting All Releases,Please wait for sometime and re run the pipeline again");
-                    m_environmentHelper.CallEnvironmentExit(-1);
+                    environmentHelper.CallEnvironmentExit(-1);
                 }
             }
             catch (HttpRequestException ex)
             {
                 Logger.Debug($"GetAvailableReleasesInSw360():", ex);
                 Logger.Error("SW360 server is not accessible,Please wait for sometime and re run the pipeline again");
-                m_environmentHelper.CallEnvironmentExit(-1);
+                environmentHelper.CallEnvironmentExit(-1);
             }
             catch (InvalidOperationException ex)
             {
                 Logger.Debug($"GetAvailableReleasesInSw360():", ex);
                 Logger.Error("SW360 server is not accessible,Please wait for sometime and re run the pipeline again");
-                m_environmentHelper.CallEnvironmentExit(-1);
+                environmentHelper.CallEnvironmentExit(-1);
             }
 
             return availableComponentsList;

@@ -17,7 +17,7 @@ namespace LCT.Common
                 EnvironmentExit(code);
             }
         }
-        public static void EnvironmentExit(int exitCode)
+        private static void EnvironmentExit(int exitCode)
         {
             Environment.Exit(exitCode);
         }

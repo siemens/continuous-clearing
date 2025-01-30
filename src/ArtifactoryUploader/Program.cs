@@ -34,6 +34,7 @@ namespace ArtifactoryUploader
         private static bool m_Verbose = false;
         public static Stopwatch UploaderStopWatch { get; set; }
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static IEnvironmentHelper environmentHelper;
         static async Task Main(string[] args)
         {
             UploaderStopWatch = new Stopwatch();
@@ -81,7 +82,8 @@ namespace ArtifactoryUploader
             var isValid = await artifactoryValidator.ValidateArtifactoryCredentials();
             if (isValid == -1)
             {
-                CommonHelper.CallEnvironmentExit(-1);
+                environmentHelper = new EnvironmentHelper();
+                environmentHelper.CallEnvironmentExit(-1);
             }
 
             //Uploading Package to artifactory

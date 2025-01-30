@@ -24,6 +24,7 @@ namespace LCT.PackageIdentifier
     {
 
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static IEnvironmentHelper environmentHelper;
         public static List<string> FileScanner(string rootPath, Config config)
         {
 
@@ -65,8 +66,9 @@ namespace LCT.PackageIdentifier
 
             if (allFoundConfigFiles.Count == 0)
             {
-                Logger.Error("   Provided package file path do not contain valid input files.");
-                CommonHelper.CallEnvironmentExit(-1);
+                environmentHelper = new EnvironmentHelper();
+                Logger.Error("Provided package file path do not contain valid input files.");
+                environmentHelper.CallEnvironmentExit(-1);
             }
 
            
