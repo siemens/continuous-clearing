@@ -6,9 +6,12 @@
 
 using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.Foss;
+using LCT.Common;
+using LCT.Common.Interface;
 using LCT.Common.Model;
 using LCT.Facade.Interfaces;
 using LCT.Services.Interface;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -48,7 +51,27 @@ namespace LCT.Services.UTest
             Assert.AreEqual("Test", sw360ProjectName);
         }
 
-               
+        [Test]
+        public async Task GetAvailableReleasesInSw360_ForGivenData_Returns0results()
+        {
+            // Arrange
+            Components component = new Components() { Name = "Zone.js", Version = "1.0.0" };
+            List<Components> components = new List<Components>();
+            components.Add(component);
+            ComponentsRelease componentRelease = new ComponentsRelease();
+            componentRelease.Embedded = new ReleaseEmbedded();
+            Mock<ISW360ApicommunicationFacade> swApiCommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
+            swApiCommunicationFacade.Setup(x => x.GetReleases()).ReturnsAsync(string.Empty);
+
+            Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
+            environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));
+            // Act
+            ISW360Service sW360Service = new Sw360Service(swApiCommunicationFacade.Object, environmentHelperMock.Object);
+            var result = await sW360Service.GetAvailableReleasesInSw360(components);
+
+            // Assert
+            Assert.AreEqual(0, result.Count);
+        }
 
         [Test]
         [TestCase("Zone.js", "1.0.0", false, false, true, false, true)]
@@ -151,7 +174,29 @@ namespace LCT.Services.UTest
             // Assert
             Assert.That(result.Count, Is.GreaterThanOrEqualTo(0));
         }
-                
+
+        [Test]
+        public async Task GetAvailableReleasesInSw360_ForGivenData_ThrowsHttpRequuestException()
+        {
+            // Arrange
+            Components component = new Components() { Name = "Zone.js", Version = "1.0.0" };
+            List<Components> components = new List<Components>();
+            components.Add(component);
+            ComponentsRelease componentRelease = new ComponentsRelease();
+            componentRelease.Embedded = new ReleaseEmbedded();
+            Mock<ISW360ApicommunicationFacade> swApiCommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
+            swApiCommunicationFacade.Setup(x => x.GetReleases()).Throws<HttpRequestException>();
+
+            Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
+            environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));
+
+            // Act
+            ISW360Service sW360Service = new Sw360Service(swApiCommunicationFacade.Object, environmentHelperMock.Object);
+            var result = await sW360Service.GetAvailableReleasesInSw360(components);
+
+            // Assert
+            Assert.AreEqual(0, result.Count);            
+        }
 
         [Test]
         public async Task GetReleaseInfoByReleaseId_ForGivenReleaseLink_ReturnsHttpResponseOK()
@@ -161,9 +206,10 @@ namespace LCT.Services.UTest
             Mock<ISW360ApicommunicationFacade> swApiCommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
             HttpResponseMessage httpResponse = new HttpResponseMessage(HttpStatusCode.OK);
             swApiCommunicationFacade.Setup(x => x.GetReleaseById(It.IsAny<string>())).ReturnsAsync(httpResponse);
-
+            Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
+            environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));
             // Act
-            ISW360Service sW360Service = new Sw360Service(swApiCommunicationFacade.Object);
+            ISW360Service sW360Service = new Sw360Service(swApiCommunicationFacade.Object, environmentHelperMock.Object);
             HttpResponseMessage responseMessage = await sW360Service.GetReleaseInfoByReleaseId(releaseId);
 
             // Assert
@@ -177,9 +223,11 @@ namespace LCT.Services.UTest
             string releaseId = "http://localhost:8090/resource/api/releases/uiweriwfoowefih87398r3ur093u0";
             Mock<ISW360ApicommunicationFacade> swApiCommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
             swApiCommunicationFacade.Setup(x => x.GetReleaseById(It.IsAny<string>())).Throws<HttpRequestException>();
+            Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
+            environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));
 
             // Act
-            ISW360Service sW360Service = new Sw360Service(swApiCommunicationFacade.Object);
+            ISW360Service sW360Service = new Sw360Service(swApiCommunicationFacade.Object, environmentHelperMock.Object);
             HttpResponseMessage responseMessage = await sW360Service.GetReleaseInfoByReleaseId(releaseId);
 
             // Assert
@@ -201,9 +249,11 @@ namespace LCT.Services.UTest
             HttpResponseMessage httpResponse = new HttpResponseMessage(HttpStatusCode.OK);
             httpResponse.Content = new StringContent(releaseInfoContent);
             swApiCommunicationFacade.Setup(x => x.GetReleaseById(It.IsAny<string>())).ReturnsAsync(httpResponse);
+            Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
+            environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));
 
             // Act
-            ISW360Service sW360Service = new Sw360Service(swApiCommunicationFacade.Object);
+            ISW360Service sW360Service = new Sw360Service(swApiCommunicationFacade.Object, environmentHelperMock.Object);
             releasesInfo = await sW360Service.GetReleaseDataOfComponent(releaseId);
 
             // Assert
@@ -225,9 +275,11 @@ namespace LCT.Services.UTest
             HttpResponseMessage httpResponse = new HttpResponseMessage(HttpStatusCode.OK);
             httpResponse.Content = new StringContent(releaseInfoContent);
             swApiCommunicationFacade.Setup(x => x.GetReleaseById(It.IsAny<string>())).Throws<AggregateException>();
+            Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
+            environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));
 
             // Act
-            ISW360Service sW360Service = new Sw360Service(swApiCommunicationFacade.Object);
+            ISW360Service sW360Service = new Sw360Service(swApiCommunicationFacade.Object, environmentHelperMock.Object);
             releasesInfo = await sW360Service.GetReleaseDataOfComponent(releaseId);
 
             // Assert
@@ -250,9 +302,11 @@ namespace LCT.Services.UTest
             string componentReleaseresponse = JsonConvert.SerializeObject(componentsRelease);
             Mock<ISW360ApicommunicationFacade> swApiCommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
             swApiCommunicationFacade.Setup(x => x.GetReleaseByCompoenentName(It.IsAny<string>())).ReturnsAsync(componentReleaseresponse);
+            Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
+            environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));
 
             // Act
-            ISW360Service sW360Service = new Sw360Service(swApiCommunicationFacade.Object);
+            ISW360Service sW360Service = new Sw360Service(swApiCommunicationFacade.Object, environmentHelperMock.Object);
             string actual = await sW360Service.GetComponentReleaseID("Zone.js", "1.0.0");
 
             // Assert
@@ -265,9 +319,11 @@ namespace LCT.Services.UTest
             // Arrange
             Mock<ISW360ApicommunicationFacade> swApiCommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
             swApiCommunicationFacade.Setup(x => x.GetReleaseByCompoenentName(It.IsAny<string>())).Throws<HttpRequestException>();
+            Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
+            environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));
 
             // Act
-            ISW360Service sW360Service = new Sw360Service(swApiCommunicationFacade.Object);
+            ISW360Service sW360Service = new Sw360Service(swApiCommunicationFacade.Object, environmentHelperMock.Object);
             string actual = await sW360Service.GetComponentReleaseID("Zone.js", "1.0.0");
 
             // Assert
@@ -280,9 +336,11 @@ namespace LCT.Services.UTest
             // Arrange
             Mock<ISW360ApicommunicationFacade> swApiCommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
             swApiCommunicationFacade.Setup(x => x.GetReleaseAttachments(It.IsAny<string>())).Throws<HttpRequestException>();
+            Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
+            environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));
 
             // Act
-            ISW360Service sW360Service = new Sw360Service(swApiCommunicationFacade.Object);
+            ISW360Service sW360Service = new Sw360Service(swApiCommunicationFacade.Object, environmentHelperMock.Object);
             Sw360AttachmentHash actual = await sW360Service.GetAttachmentDownloadLink("Release Attachment Link");
 
             // Assert
@@ -294,10 +352,11 @@ namespace LCT.Services.UTest
         {
             // Arrange
             Mock<ISW360ApicommunicationFacade> swApiCommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
+            Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
+            environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));
 
             // Act
-            ISW360Service sW360Service = new Sw360Service(swApiCommunicationFacade.Object);
-
+            ISW360Service sW360Service = new Sw360Service(swApiCommunicationFacade.Object, environmentHelperMock.Object);
             Sw360AttachmentHash actual = await sW360Service.GetAttachmentDownloadLink("");
 
             // Assert
@@ -328,9 +387,11 @@ namespace LCT.Services.UTest
             Mock<ISW360ApicommunicationFacade> swApiCommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
             swApiCommunicationFacade.Setup(x => x.GetReleaseAttachments(It.IsAny<string>()))
                 .ReturnsAsync(releaseAttachmentDataSerialized);
+            Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
+            environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));
 
             // Act
-            ISW360Service sW360Service = new Sw360Service(swApiCommunicationFacade.Object);
+            ISW360Service sW360Service = new Sw360Service(swApiCommunicationFacade.Object, environmentHelperMock.Object);
             Sw360AttachmentHash actual = await sW360Service.GetAttachmentDownloadLink("https://localhost:8095/resource/api/attachments/68d6186468ea56a072d28944ea0446db");
 
             // Assert
@@ -360,8 +421,11 @@ namespace LCT.Services.UTest
             Mock<ISW360ApicommunicationFacade> swApiCommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
             swApiCommunicationFacade.Setup(x => x.GetReleaseAttachments(It.IsAny<string>()))
                 .ReturnsAsync(releaseAttachmentDataSerialized);
+            Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
+            environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));
+
             // Act
-            ISW360Service sW360Service = new Sw360Service(swApiCommunicationFacade.Object);
+            ISW360Service sW360Service = new Sw360Service(swApiCommunicationFacade.Object, environmentHelperMock.Object);
             Sw360AttachmentHash actual = await sW360Service.GetAttachmentDownloadLink("https://localhost:8095/resource/api/attachments/68d6186468ea56a072d28944ea0446db");
 
             // Assert
@@ -403,9 +467,11 @@ namespace LCT.Services.UTest
             Mock<ISW360ApicommunicationFacade> swApiCommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
             swApiCommunicationFacade.Setup(x => x.GetReleaseAttachments(It.IsAny<string>())).ReturnsAsync(releaseAttachmentDataSerialized);
             swApiCommunicationFacade.Setup(x => x.GetAttachmentInfo(It.IsAny<string>())).ReturnsAsync(attachmentLinkDataSerialized);
+            Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
+            environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));
 
             // Act
-            ISW360Service sW360Service = new Sw360Service(swApiCommunicationFacade.Object);
+            ISW360Service sW360Service = new Sw360Service(swApiCommunicationFacade.Object, environmentHelperMock.Object);
             Sw360AttachmentHash actual = await sW360Service.GetAttachmentDownloadLink("https://localhost:8095/resource/api/attachments/68d6186468ea56a072d28944ea0446db");
 
             // Assert
@@ -418,9 +484,11 @@ namespace LCT.Services.UTest
             // Arrange
             Mock<ISW360ApicommunicationFacade> swApiCommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
             swApiCommunicationFacade.Setup(x => x.GetReleaseAttachments(It.IsAny<string>())).Throws<AggregateException>();
+            Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
+            environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));
 
             // Act
-            ISW360Service sW360Service = new Sw360Service(swApiCommunicationFacade.Object);
+            ISW360Service sW360Service = new Sw360Service(swApiCommunicationFacade.Object, environmentHelperMock.Object);
 
             Sw360AttachmentHash actual = await sW360Service.GetAttachmentDownloadLink("Release Attachment Link");
 
