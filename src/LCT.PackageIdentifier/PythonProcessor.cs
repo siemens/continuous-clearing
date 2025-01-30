@@ -9,10 +9,13 @@ using LCT.APICommunications;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Model;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
+using log4net.Core;
+using NuGet.ProjectModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -45,8 +48,13 @@ namespace LCT.PackageIdentifier
             List<Component> listComponentForBOM;
             List<Dependency> dependencies = new List<Dependency>();
             Bom templateDetails = new Bom();
+            List<string> listOfTemplateBomfilePaths = new List<string>();
             foreach (string config in configFiles)
             {
+                if (config.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                {
+                    listOfTemplateBomfilePaths.Add(config);
+                }
                 if (config.ToLower().EndsWith("poetry.lock"))
                 {
                     listofComponents.AddRange(ExtractDetailsForPoetryLockfile(config, dependencies));
@@ -55,14 +63,8 @@ namespace LCT.PackageIdentifier
                 {
                     listofComponents.AddRange(ExtractDetailsFromJson(config, appSettings, ref dependencies));
                 }
-                else if (config.EndsWith(FileConstant.SBOMTemplateFileExtension))
-                {
-                    templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(config));
-                    CycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
-                }
             }
             
-           
 
             int initialCount = listofComponents.Count;
             GetDistinctComponentList(ref listofComponents);
@@ -71,8 +73,8 @@ namespace LCT.PackageIdentifier
             BomCreator.bomKpiData.ComponentsInComparisonBOM = listComponentForBOM.Count;
             bom.Components = listComponentForBOM;
             bom.Dependencies = dependencies;
-            //Adding Template Component Details & MetaData
-            SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
+            string templateFilePath = SbomTemplate.GetFilePathForTemplate(listOfTemplateBomfilePaths);
+            SbomTemplate.ProcessTemplateFile(templateFilePath, _cycloneDXBomParser, bom.Components, appSettings.ProjectType);           
             bom = RemoveExcludedComponents(appSettings, bom);
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
 

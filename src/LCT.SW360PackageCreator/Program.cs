@@ -37,7 +37,7 @@ namespace LCT.SW360PackageCreator
         public static Stopwatch CreatorStopWatch { get; set; }
         private static bool m_Verbose = false;
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
+        private static IEnvironmentHelper environmentHelper;
         protected Program() { }
 
         static async Task Main(string[] args)
@@ -56,14 +56,14 @@ namespace LCT.SW360PackageCreator
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
-
-
+            
             string FolderPath = InitiateLogger(appSettings);
             settingsManager.CheckRequiredArgsToRun(appSettings, "Creator");
             int isValid = await CreatorValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
             if (isValid == -1)
             {
-                CommonHelper.CallEnvironmentExit(-1);
+                environmentHelper = new EnvironmentHelper();
+                environmentHelper.CallEnvironmentExit(-1);
             }
 
             Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Package creator >>>>>====================", null);
@@ -127,7 +127,8 @@ namespace LCT.SW360PackageCreator
         {
             ISW360CommonService sw360CommonService = new SW360CommonService(sW360ApicommunicationFacade);
             ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sW360ApicommunicationFacade, sw360CommonService);
-            ISW360Service sw360Service = new Sw360Service(sW360ApicommunicationFacade, sw360CommonService);
+            IEnvironmentHelper environmentHelper = new EnvironmentHelper();
+            ISW360Service sw360Service = new Sw360Service(sW360ApicommunicationFacade, sw360CommonService, environmentHelper);
             ICycloneDXBomParser cycloneDXBomParser = new CycloneDXBomParser();
 
             IDebianPatcher debianPatcher = new DebianPatcher();

@@ -34,8 +34,7 @@ namespace SW360IntegrationTest.Nuget
             {
                 OutFolder = TestHelper.OutFolder;
                 string packagejsonPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest1stIterationData\Nuget-Assets";
-                string bomPath = OutFolder + @"\..\BOMs";
-                string sbomTemplatePath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest1stIterationData\Template-Nuget\Nuget_CATemplate.cdx.json";
+                string bomPath = OutFolder + @"\..\BOMs";                
 
                 TestHelper.RunBOMCreatorExe(new string[]{
                 TestConstant.PackageFilePath, packagejsonPath,

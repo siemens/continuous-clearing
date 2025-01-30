@@ -163,21 +163,22 @@ namespace LCT.PackageIdentifier.UTest
             int expectednoofcomponents = 2;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            string[] Includes = { "CycloneDX_Alpine.cdx.json", "SBOMTemplate_Alpine.cdx.json" };
+            string[] Includes = { "CycloneDX_Alpine.cdx.json", "SBOMTemplate_Alpine.cdx.json", "SBOM_AlpineCATemplate.cdx.json" };
             string packagefilepath = OutFolder + @"\PackageIdentifierUTTestFiles";
 
             IFolderAction folderAction = new FolderAction();
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
-            {                
-                ProjectType = "ALPINE",                
+            {
+                ProjectType = "ALPINE",
                 Alpine = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new Common.Directory(folderAction, fileOperations)
                 {
-                    InputFolder = OutFolder + @"\PackageIdentifierUTTestFiles",
+                    InputFolder = packagefilepath
                 }
             };
+            
 
             //Act
             Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings);
@@ -200,20 +201,20 @@ namespace LCT.PackageIdentifier.UTest
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                
-                ProjectType = "ALPINE",                
+                ProjectType = "ALPINE",
                 Alpine = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new Common.Directory(folderAction, fileOperations)
                 {
                     InputFolder = packagefilepath
                 }
             };
+            
 
             //Act
             Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings);
             bool isUpdated = listofcomponents.Components.Exists(x => x.Properties != null
-            && x.Properties.Exists(x => x.Name == Dataconstant.Cdx_IdentifierType 
+            && x.Properties.Exists(x => x.Name == Dataconstant.Cdx_IdentifierType
             && x.Value == Dataconstant.Discovered));
 
             //Assert

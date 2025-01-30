@@ -15,6 +15,7 @@ using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
+using log4net.Core;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -260,9 +261,13 @@ namespace LCT.PackageIdentifier
             List<Dependency> dependencies = new List<Dependency>();
             List<Component> componentsForBOM = new List<Component>();
             configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Conan);
-
+            List<string> listOfTemplateBomfilePaths = new List<string>();
             foreach (string filepath in configFiles)
             {
+                if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                {
+                    listOfTemplateBomfilePaths.Add(filepath);
+                }
                 if (filepath.ToLower().EndsWith("conan.lock"))
                 {
                     Logger.Debug($"ParsingInputFileForBOM():FileName: " + filepath);
@@ -270,7 +275,7 @@ namespace LCT.PackageIdentifier
                     AddingIdentifierType(components, "PackageFile");
                     componentsForBOM.AddRange(components);
                 }
-                else if (filepath.EndsWith(FileConstant.CycloneDXFileExtension) 
+                else if (filepath.EndsWith(FileConstant.CycloneDXFileExtension)
                     && !filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
@@ -278,15 +283,6 @@ namespace LCT.PackageIdentifier
                     CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
                     GetDetailsforManuallyAddedComp(bom.Components);
                     componentsForBOM.AddRange(bom.Components);
-                }
-                else if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
-                {
-                    Bom templateDetails;
-                    templateDetails = ExtractSBOMDetailsFromTemplate(
-                        _cycloneDXBomParser.ParseCycloneDXBom(filepath));
-                    CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
-                    SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
-
                 }
             }
 
@@ -304,8 +300,9 @@ namespace LCT.PackageIdentifier
             {
                 bom.Dependencies = dependencies;
             }
+            string templateFilePath = SbomTemplate.GetFilePathForTemplate(listOfTemplateBomfilePaths);
+            SbomTemplate.ProcessTemplateFile(templateFilePath, _cycloneDXBomParser, bom.Components, appSettings.ProjectType);
 
-            
 
             bom = RemoveExcludedComponents(appSettings, bom);
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();

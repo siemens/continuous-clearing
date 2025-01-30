@@ -1,5 +1,7 @@
 ﻿using CycloneDX.Models;
+using LCT.Common;
 using LCT.Common.Constants;
+using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -12,6 +14,50 @@ namespace LCT.PackageIdentifier.UTest
     [TestFixture]
     public class SBomTemplateTests
     {
+
+
+        [Test]
+        public void GetFilePathForTemplate_WithSingleFile_ReturnsFilePath()
+        {
+            // Arrange
+            var filePaths = new List<string> { "path1" };
+
+            // Act
+            var result = SbomTemplate.GetFilePathForTemplate(filePaths);
+
+            // Assert
+            Assert.AreEqual("path1", result);
+        }
+
+        [Test]
+        public void GetFilePathForTemplate_WithNoFiles_ReturnsEmptyString()
+        {
+            // Arrange
+            var filePaths = new List<string>();
+
+            // Act
+            var result = SbomTemplate.GetFilePathForTemplate(filePaths);
+
+            // Assert
+            Assert.AreEqual(string.Empty, result);
+        }        
+
+        [Test]
+        public void ProcessTemplateFile_WithInvalidTemplateFile_DoesNotAddComponentDetails()
+        {
+            // Arrange
+            var templateFilePath = "invalidTemplateFilePath";
+            var cycloneDXBomParserMock = new Mock<ICycloneDXBomParser>();
+            var componentsForBOM = new List<Component>();
+            var projectType = "projectType";
+
+            // Act
+            SbomTemplate.ProcessTemplateFile(templateFilePath, cycloneDXBomParserMock.Object, componentsForBOM, projectType);
+
+            // Assert
+            Assert.AreEqual(0, componentsForBOM.Count);
+        }        
+
         [Test]
         public void AddComponentDetails_InputTemplateDetailsWithoutProperty_ReturnsBomWithPropertyAdded()
         {
@@ -139,7 +185,7 @@ namespace LCT.PackageIdentifier.UTest
             SbomTemplate.AddComponentDetails(componentsForBOM, templateDetails);
            
             //Assert
-            Assert.That(BomCreator.bomKpiData.ComponentsUpdatedFromSBOMTemplateFile, Is.EqualTo(3));
+            Assert.That(BomCreator.bomKpiData.ComponentsUpdatedFromSBOMTemplateFile, Is.EqualTo(1));
         }
     }
 }

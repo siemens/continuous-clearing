@@ -24,6 +24,7 @@ namespace LCT.Common
     {
         public string BasePath { get; private set; } = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static IEnvironmentHelper environmentHelper;
 
         /// <summary>
         /// Reads the Configuration from input args and json setting file
@@ -213,8 +214,9 @@ namespace LCT.Common
 
             if (!string.IsNullOrWhiteSpace(missingParameters.ToString()))
             {
+                environmentHelper=new EnvironmentHelper();
                 ExceptionHandling.ArgumentException(missingParameters.ToString());
-                CommonHelper.CallEnvironmentExit(-1);
+                environmentHelper.CallEnvironmentExit(-1);
             }
         }
         public static bool IsAzureDevOpsDebugEnabled()

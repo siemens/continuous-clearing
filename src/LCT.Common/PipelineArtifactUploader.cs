@@ -27,13 +27,14 @@ namespace LCT.Common
         public static void UploadLogs()
         {
             EnvironmentType envType = RuntimeEnvironment.GetEnvironment();
+            LogManager.Shutdown();
             if (envType == EnvironmentType.AzurePipeline && !string.IsNullOrEmpty(Log4Net.CatoolLogPath) && File.Exists(Log4Net.CatoolLogPath))
-            {
+            {                
                 Console.WriteLine($"##vso[artifact.upload containerfolder={LogContainerFolderName};artifactname={LogArtifactFolderName}]{Log4Net.CatoolLogPath}");
             }
             else if (envType == EnvironmentType.Unknown)
             {
-                Logger.Logger.Log(null, Level.Alert, $"Uploading of logs is not supported.", null);
+                Logger.Logger.Log(null, Level.Alert, $"Uploading of logs is not supported.", null);                
             }
 
         }

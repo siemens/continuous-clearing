@@ -11,6 +11,7 @@ using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
+using log4net.Core;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -43,22 +44,19 @@ namespace LCT.PackageIdentifier
             List<Dependency> dependenciesForBOM = new();
 
             configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Alpine);
-
+            List<string> listOfTemplateBomfilePaths = new List<string>();
             foreach (string filepath in configFiles)
             {
                 if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
-                    Bom templateDetails;
-                    templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(filepath));
-                    CycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
-                    //Adding Template Component Details & MetaData
-                    SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
+                    listOfTemplateBomfilePaths.Add(filepath);
                 }
                 else
                 {
                     Logger.Debug($"ParsePackageFile():FileName: " + filepath);
                     listofComponents.AddRange(ParseCycloneDX(filepath, dependenciesForBOM));
                 }
+                
             }
 
             int initialCount = listofComponents.Count;
@@ -68,7 +66,9 @@ namespace LCT.PackageIdentifier
 
             bom.Components = listComponentForBOM;
             bom.Dependencies = dependenciesForBOM;
-            
+            string templateFilePath = SbomTemplate.GetFilePathForTemplate(listOfTemplateBomfilePaths);
+
+            SbomTemplate.ProcessTemplateFile(templateFilePath, _cycloneDXBomParser, bom.Components, appSettings.ProjectType);
 
             bom = RemoveExcludedComponents(appSettings, bom);
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();

@@ -42,7 +42,7 @@ namespace LCT.PackageIdentifier
 
         public static Stopwatch BomStopWatch { get; set; }
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
+        private static IEnvironmentHelper environmentHelper;
         protected Program() { }
 
         static async Task Main(string[] args)
@@ -155,7 +155,8 @@ namespace LCT.PackageIdentifier
             int isValid = await BomValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
             if (isValid == -1)
             {
-                CommonHelper.CallEnvironmentExit(-1);
+                environmentHelper=new EnvironmentHelper();
+                environmentHelper.CallEnvironmentExit(-1);
             }
         }
         private static string DisplayInclude(CommonAppSettings appSettings)

@@ -16,6 +16,7 @@ using LCT.PackageIdentifier.Model;
 using LCT.PackageIdentifier.Model.NugetModel;
 using LCT.Services.Interface;
 using log4net;
+using log4net.Core;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -441,22 +442,17 @@ namespace LCT.PackageIdentifier
             int totalComponentsIdentified = 0;
 
             configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Nuget);
-
+            List<string> listOfTemplateBomfilePaths = new List<string>();
             foreach (string filepath in configFiles)
             {
+                if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                {
+                    listOfTemplateBomfilePaths.Add(filepath);
+                }
                 Logger.Debug($"ParsingInputFileForBOM():FileName: " + filepath);
                 if (filepath.EndsWith(FileConstant.CycloneDXFileExtension))
                 {
-                    if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
-                    {
-                        Bom templateDetails;
-                        templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(
-                            _cycloneDXBomParser.ParseCycloneDXBom(filepath));
-                        CycloneDXBomParser.CheckValidComponentsForProjectType(
-                            templateDetails.Components, appSettings.ProjectType);
-                        SbomTemplate.AddComponentDetails(bom.Components, templateDetails);
-                    }
-                    else
+                    if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                     {
                         Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
                         bom = _cycloneDXBomParser.ParseCycloneDXBom(filepath);
@@ -502,7 +498,8 @@ namespace LCT.PackageIdentifier
             BomCreator.bomKpiData.DevDependentComponents =
                 listComponentForBOM.Count(s => s.Properties[0].Value == "true");
             bom.Components = listComponentForBOM;
-            
+            string templateFilePath = SbomTemplate.GetFilePathForTemplate(listOfTemplateBomfilePaths);
+            SbomTemplate.ProcessTemplateFile(templateFilePath, _cycloneDXBomParser, bom.Components, appSettings.ProjectType);
 
             bom = RemoveExcludedComponents(appSettings, bom);
 

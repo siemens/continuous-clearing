@@ -166,7 +166,7 @@ namespace LCT.PackageIdentifier.UTest
             string outFolder = Path.GetDirectoryName(exePath);
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
-            string[] Includes = { "CycloneDX2_NPM.cdx.json", "SBOMTemplate_Npm.cdx.json" };
+            string[] Includes = { "CycloneDX2_NPM.cdx.json", "SBOMTemplate_Npm.cdx.json", "SBOM_NpmCATemplate.cdx.json" };
             string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles";
 
             IFolderAction folderAction = new FolderAction();
