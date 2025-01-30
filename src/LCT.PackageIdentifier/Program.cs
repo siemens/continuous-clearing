@@ -116,6 +116,7 @@ namespace LCT.PackageIdentifier
             }
             Logger.Logger.Log(null, Level.Notice, $"End of Package Identifier execution : {DateTime.Now}\n", null);
 
+            LogManager.Shutdown();
             // publish logs and bom file to pipeline artifact
             CommonHelper.PublishFilesToArtifact();
 
