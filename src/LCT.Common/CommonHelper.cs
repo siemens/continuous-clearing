@@ -44,7 +44,7 @@ namespace LCT.Common
             List<string> ExcludedComponentsFromPurl = ExcludedComponents?.Where(ec => ec.StartsWith("pkg:")).ToList();
             List<string> otherExcludedComponents = ExcludedComponents?.Where(ec => !ec.StartsWith("pkg:")).ToList();
 
-            ExcludedList.AddRange(RemoveExcludedComponentsFromPurl(ComponentList, ExcludedComponentsFromPurl, ref noOfExcludedComponents));
+            ValidateExcludedComponentsFromPurl(ComponentList, ExcludedComponentsFromPurl, ref noOfExcludedComponents);
             ExcludedList.AddRange(RemoveOtherExcludedComponents(ComponentList, otherExcludedComponents, ref noOfExcludedComponents));
             ComponentList.RemoveAll(item => ExcludedList.Contains(item));
             return ComponentList;
@@ -297,25 +297,32 @@ namespace LCT.Common
             return sw360URL;
         }
 
-        private static List<Component> RemoveExcludedComponentsFromPurl(List<Component> ComponentList, List<string> ExcludedComponentsFromPurl, ref int noOfExcludedComponents)
+        private static List<Component> ValidateExcludedComponentsFromPurl(List<Component> ComponentList, List<string> ExcludedComponentsFromPurl, ref int noOfExcludedComponents)
         {
-            List<Component> ExcludedList = new List<Component>();
+
 
             foreach (string excludedComponent in ExcludedComponentsFromPurl)
             {
+                Property excludeProperty = new() { Name = Dataconstant.Cdx_ExcludeComponent, Value = "true" };
                 foreach (var component in ComponentList)
                 {
-                    if (component.Purl != null && component.Purl.Equals(excludedComponent, StringComparison.OrdinalIgnoreCase))
+                    string componentPurl = NormalizePurl(component.Purl);
+                    if (component.Purl != null && componentPurl.Equals(excludedComponent, StringComparison.OrdinalIgnoreCase))
                     {
-                        noOfExcludedComponents++;
-                        ExcludedList.Add(component);
+                        component.Properties.Add(excludeProperty);
                     }
                 }
             }
-
-            return ExcludedList;
+            return ComponentList;
         }
-
+        private static string NormalizePurl(string purl)
+        {
+            if (purl.Contains("%40"))
+            {
+                return purl.Replace("%40", "@");
+            }
+            return purl;
+        }
         private static List<Component> RemoveOtherExcludedComponents(List<Component> ComponentList, List<string> otherExcludedComponents, ref int noOfExcludedComponents)
         {
             List<Component> ExcludedList = new List<Component>();
