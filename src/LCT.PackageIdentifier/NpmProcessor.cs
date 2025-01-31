@@ -204,6 +204,7 @@ namespace LCT.PackageIdentifier
             List<JToken> directDependencies = new List<JToken>();
             directDependencies.AddRange(dep);
             directDependencies.AddRange(devDep);
+            List<string> invalidDependencies = new List<string>();
             foreach (JProperty prop in depencyComponentList.Skip(1))
             {
                 Property isdev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
@@ -228,27 +229,11 @@ namespace LCT.PackageIdentifier
                 }
 
                 string folderPath = CommonHelper.TrimEndOfString(filepath, $"\\{FileConstant.PackageLockFileName}");
-                string packageName=string.Empty;
-                if (properties[Name] != null)
-                {
-                    packageName = Convert.ToString(properties[Name]);                   
-                }
-                else 
-                {
-                    packageName = CommonHelper.GetSubstringOfLastOccurance(prop.Name, $"node_modules/");
-                }
-                
+                string packageName = GetPackageName(properties, prop, invalidDependencies);
+
                 string componentName = packageName.StartsWith('@') ? packageName.Replace("@", "%40") : packageName;
 
-                if (packageName.Contains('@'))
-                {
-                    components.Group = packageName.Split('/')[0];
-                    components.Name = packageName.Split('/')[1];
-                }
-                else
-                {
-                    components.Name = packageName;
-                }                
+                SetComponentGroupAndName(components, packageName);
 
                 components.Type = Component.Classification.Library;
                 components.Description = folderPath;
@@ -266,8 +251,37 @@ namespace LCT.PackageIdentifier
                 lstComponentForBOM.Add(components);
                 lstComponentForBOM = RemoveBundledComponentFromList(bundledComponents, lstComponentForBOM);
             }
+            VerifyInvalidDependencies(invalidDependencies, lstComponentForBOM);
+            RemoveInvalidDependencies(lstComponentForBOM, invalidDependencies);
         }
 
+        private static void SetComponentGroupAndName(Component component, string packageName)
+        {
+            if (packageName.Contains('@'))
+            {
+                component.Group = packageName.Split('/')[0];
+                component.Name = packageName.Split('/')[1];
+            }
+            else
+            {
+                component.Name = packageName;
+            }
+        }
+        private static string GetPackageName(JObject properties, JProperty prop, List<string> invalidDependencies)
+        {
+            string packageName;
+            if (properties[Name] != null)
+            {
+                packageName = Convert.ToString(properties[Name]);
+                string unusedComponentName = CommonHelper.GetSubstringOfLastOccurance(prop.Name, $"node_modules/");
+                invalidDependencies.Add(unusedComponentName);
+            }
+            else
+            {
+                packageName = CommonHelper.GetSubstringOfLastOccurance(prop.Name, $"node_modules/");
+            }
+            return packageName;
+        }
         public static string GetIsDirect(List<JToken> directDependencies, JProperty prop)
         {
             string subvalue = CommonHelper.GetSubstringOfLastOccurance(prop.Name, $"node_modules/");
@@ -283,6 +297,45 @@ namespace LCT.PackageIdentifier
             return "false";
         }
 
+        private static void VerifyInvalidDependencies(List<string> duplicateDependencies, List<Component> lstComponentForBOM)
+        {
+            foreach (var depeItem in duplicateDependencies.ToList())
+            {
+                foreach (var component in lstComponentForBOM)
+                {
+                    if (depeItem == component.Name)
+                    {
+                        duplicateDependencies.Remove(depeItem);
+                        break;
+                    }
+                }
+            }
+        }
+
+        private static void RemoveInvalidDependencies(List<Component> lstComponentForBOM, List<string> duplicateDependencies)
+        {
+            if (duplicateDependencies != null)
+            {
+                foreach (var component in lstComponentForBOM)
+                {
+                    foreach (var depItem in duplicateDependencies)
+                    {
+                        if (component.Author != null)
+                        {
+                            // Parse the Author field, assuming it's in JSON format
+                            JObject authorJson = JObject.Parse(component.Author);
+
+                            // Ensure the exact dependencyName exists in the parsed Author JSON
+                            if (authorJson.ContainsKey(depItem))
+                            {
+                                authorJson.Remove(depItem);
+                            }
+                            component.Author = authorJson.ToString();
+                        }
+                    }
+                }
+            }
+        }
         private static void CheckAndAddToBundleComponents(List<BundledComponents> bundledComponents, JProperty prop, Component components)
         {
             if (prop.Value[Bundled] != null &&
