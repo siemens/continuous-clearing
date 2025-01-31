@@ -44,9 +44,8 @@ namespace LCT.Common
             List<string> ExcludedComponentsFromPurl = ExcludedComponents?.Where(ec => ec.StartsWith("pkg:")).ToList();
             List<string> otherExcludedComponents = ExcludedComponents?.Where(ec => !ec.StartsWith("pkg:")).ToList();
 
-            ValidateExcludedComponentsFromPurl(ComponentList, ExcludedComponentsFromPurl, ref noOfExcludedComponents);
-            ExcludedList.AddRange(RemoveOtherExcludedComponents(ComponentList, otherExcludedComponents, ref noOfExcludedComponents));
-            ComponentList.RemoveAll(item => ExcludedList.Contains(item));
+            AddExcludedComponentsPropertyFromPurl(ComponentList, ExcludedComponentsFromPurl, ref noOfExcludedComponents);
+            AddExcludedComponentsPropertyFromNameAndVersion(ComponentList, otherExcludedComponents, ref noOfExcludedComponents);            
             return ComponentList;
         }
 
@@ -297,7 +296,7 @@ namespace LCT.Common
             return sw360URL;
         }
 
-        private static List<Component> ValidateExcludedComponentsFromPurl(List<Component> ComponentList, List<string> ExcludedComponentsFromPurl, ref int noOfExcludedComponents)
+        private static List<Component> AddExcludedComponentsPropertyFromPurl(List<Component> ComponentList, List<string> ExcludedComponentsFromPurl, ref int noOfExcludedComponents)
         {
 
 
@@ -310,6 +309,7 @@ namespace LCT.Common
                     if (component.Purl != null && componentPurl.Equals(excludedComponent, StringComparison.OrdinalIgnoreCase))
                     {
                         component.Properties.Add(excludeProperty);
+                        noOfExcludedComponents++;
                     }
                 }
             }
@@ -323,10 +323,10 @@ namespace LCT.Common
             }
             return purl;
         }
-        private static List<Component> RemoveOtherExcludedComponents(List<Component> ComponentList, List<string> otherExcludedComponents, ref int noOfExcludedComponents)
+        private static List<Component> AddExcludedComponentsPropertyFromNameAndVersion(List<Component> ComponentList, List<string> otherExcludedComponents, ref int noOfExcludedComponents)
         {
-            List<Component> ExcludedList = new List<Component>();
 
+            Property excludeProperty = new() { Name = Dataconstant.Cdx_ExcludeComponent, Value = "true" };
             foreach (string excludedComponent in otherExcludedComponents)
             {
                 string[] excludedcomponent = excludedComponent.ToLower().Split(':');
@@ -341,12 +341,12 @@ namespace LCT.Common
                         (component.Version.ToLowerInvariant().Contains(excludedcomponent[1].ToLowerInvariant()) || excludedcomponent[1].ToLowerInvariant() == "*"))
                     {
                         noOfExcludedComponents++;
-                        ExcludedList.Add(component);
+                        component.Properties.Add(excludeProperty);
                     }
                 }
             }
 
-            return ExcludedList;
+            return ComponentList;
         }
         #endregion
     }

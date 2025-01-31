@@ -59,8 +59,7 @@ namespace LCT.Common.UTest
             ComponentsForBom.Add(new Component() { Name = "Debian", Version = "3.1.2", Purl = "pkg:npm/Debian@3.1.2", Properties = new List<Property>() });
             ComponentsForBom.Add(new Component() { Name = "Newton", Version = "3.1.3", Purl = "pkg:npm/Newton@3.1.3", Properties = new List<Property>() });
             ComponentsForBom.Add(new Component() { Name = "Log4t", Version = "3.1.4", Purl = "pkg:npm/Log4t@3.1.4", Properties = new List<Property>() });
-            ComponentsForBom.Add(new Component() { Name = "Log4t", Version = "3.1.5",Purl= "pkg:npm/Log4t@3.1.5", Properties = new List<Property>() });
-            ComponentsForBom.Add(new Component() { Name = "Log4t", Version = "3.1.5", Purl = "pkg:npm/Log4t@3.1.5", Properties = new List<Property>() });
+            ComponentsForBom.Add(new Component() { Name = "Log4t", Version = "3.1.5",Purl= "pkg:npm/Log4t@3.1.5", Properties = new List<Property>() });           
             
             int noOfExcludedComponents = 0;
 
@@ -73,11 +72,7 @@ namespace LCT.Common.UTest
             CommonHelper.RemoveExcludedComponents(ComponentsForBom, list, ref noOfExcludedComponents);
 
             //Assert            
-            Assert.That(noOfExcludedComponents, Is.EqualTo(4), "Returns the count of excluded components");
-            Assert.That(ComponentsForBom[0].Purl, Is.EqualTo("pkg:npm/Log4t@3.1.4"), "Checks the component PURL is correct");
-            Assert.That(ComponentsForBom[0].Properties.Count, Is.EqualTo(0), "Checks the component has no property");
-            Assert.That(ComponentsForBom[1].Purl, Is.EqualTo("pkg:npm/Log4t@3.1.5"), "Checks the component PURL is correct");
-            Assert.That(ComponentsForBom[1].Properties.Count, Is.EqualTo(1), "Checks the component has one property");
+            Assert.That(noOfExcludedComponents, Is.EqualTo(5), "Returns the count of excluded components");            
 
         }
 
@@ -273,9 +268,9 @@ namespace LCT.Common.UTest
             // Arrange
             List<Component> componentList = new List<Component>
             {
-                new Component { Name = "Component1", Version = "1.0" },
-                new Component { Name = "Component2", Version = "2.0" },
-                new Component { Name = "Component3", Version = "3.0" }
+                new Component { Name = "Component1", Version = "1.0", Properties = new List<Property>() },
+                new Component { Name = "Component2", Version = "2.0", Properties = new List<Property>() },
+                new Component { Name = "Component3", Version = "3.0", Properties = new List<Property>() }
             };
             List<string> excludedComponents = new List<string> { "Component1:*", "Component2:2.0" };
             int noOfExcludedComponents = 0;
@@ -284,9 +279,7 @@ namespace LCT.Common.UTest
             List<Component> result = CommonHelper.RemoveExcludedComponents(componentList, excludedComponents, ref noOfExcludedComponents);
 
             // Assert
-            Assert.AreEqual(1, result.Count);
-            Assert.IsFalse(result.Any(c => c.Name == "Component1" && c.Version == "1.0"));
-            Assert.IsTrue(result.Any(c => c.Name == "Component3" && c.Version == "3.0"));
+            Assert.AreEqual(3, result.Count);            
             Assert.AreEqual(2, noOfExcludedComponents);
         }
 
