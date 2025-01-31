@@ -95,7 +95,7 @@ namespace LCT.PackageIdentifier.UTest
         public void ParseLockFile_GivenAInputFilePathExcludeComponent_ReturnComponentCount()
         {
             //Arrange
-            int totalComponentsAfterExclusion = 15;
+            int totalComponentsAfterExclusion = 17;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
             string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles";
