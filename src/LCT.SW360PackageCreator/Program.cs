@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Net.Http;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -87,13 +88,84 @@ namespace LCT.SW360PackageCreator
 
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);
-
+            //Validate Fossology Url
+            if (appSettings.SW360.Fossology.EnableTrigger)
+            {
+                if(await FossologyUrlValidation(appSettings))
+                await CreatorValidator.TriggerFossologyValidation(appSettings, sW360ApicommunicationFacade);
+            }
             await InitiatePackageCreatorProcess(appSettings, sw360ProjectService, sW360ApicommunicationFacade);
 
             Logger.Logger.Log(null, Level.Notice, $"End of Package Creator execution: {DateTime.Now}\n", null);
 
             // publish logs and bom file to pipeline artifact
             PipelineArtifactUploader.UploadArtifacts();
+        }
+        public static async Task<bool> FossologyUrlValidation(CommonAppSettings appSettings)
+        {
+
+            string url = appSettings.SW360.Fossology.URL.ToLower();
+            string prodFossUrl = "automation.fossology".ToLower();
+            string stageFossUrl = "stage.fossology".ToLower();
+            environmentHelper = new EnvironmentHelper();
+           
+            if (string.IsNullOrEmpty(appSettings.SW360.Fossology.URL))
+            {
+
+                Logger.Error($"Fossology URL is not provided ,Please make sure to add Fossologyurl in appsettings..");
+                Logger.Debug($"Fossologyurlcheck() : Fossology url not provided in appsettings");
+                environmentHelper.CallEnvironmentExit(-1);
+
+            }
+            else if (Uri.IsWellFormedUriString(appSettings.SW360.Fossology.URL, UriKind.Absolute))
+            {
+                if (url.Contains(prodFossUrl) || url.Contains(stageFossUrl))
+                {
+                    // Send GET request to validate Fossology URL
+                    using (HttpClient client = new HttpClient())
+                    {
+                        try
+                        {
+                            HttpResponseMessage response = await client.GetAsync(new Uri(appSettings.SW360.Fossology.URL));
+                            if (response.IsSuccessStatusCode)
+                            {
+                                // Fossology URL is valid                                   
+                                return true;
+                            }
+                            else
+                            {
+                                // Fossology URL is not valid                                   
+                                Logger.Error($"Fossology URL is not valid ,Please make sure to add valid fossologyurl in appsettings..");
+                                Logger.Debug($"Fossologyurlcheck() : Fossology URL is not valid.");
+                                environmentHelper.CallEnvironmentExit(-1);
+                            }
+                        }
+                        catch (HttpRequestException ex)
+                        {
+                            // Fossology URL is not valid                                   
+                            Logger.Error($"Fossology URL is not working ,Please check once try again....");
+                            Logger.Debug($"Fossologyurlcheck() : Fossology URL is not valid.{ex}");
+                            environmentHelper.CallEnvironmentExit(-1);
+                        }
+
+                    }
+                }
+                else
+                {
+                    Logger.Debug($"Fossologyurlcheck() : Fossology URL is not valid");
+                    Logger.Error($"Fossology URL is not valid ,Please check once try again....");
+                    environmentHelper.CallEnvironmentExit(-1);
+                }
+            }
+            else
+            {
+                Logger.Error($"Fossology URL is not provided ,Please make sure to add fossologyurl in appsettings..");
+                Logger.Debug($"Fossologyurlcheck() : Fossology url not provided in appsettings");
+                environmentHelper.CallEnvironmentExit(-1);
+            }
+
+
+            return false;
         }
 
         private static CatoolInfo GetCatoolVersionFromProjectfile()
@@ -173,6 +245,6 @@ namespace LCT.SW360PackageCreator
             }
 
             return FolderPath;
-        }
+        }       
     }
 }

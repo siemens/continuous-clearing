@@ -65,6 +65,7 @@ namespace SW360IntegrationTest.Maven
                 TestConstant.SW360AuthTokenType, testParameters.SW360AuthTokenType,
                 TestConstant.SW360ProjectID, testParameters.SW360ProjectID,
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
+                TestConstant.FossologyURL, testParameters.FossUrl,
                 TestConstant.Mode,""}),
                 "Test to run Package Creator EXE execution");
         }
