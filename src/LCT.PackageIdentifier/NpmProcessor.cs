@@ -251,8 +251,6 @@ namespace LCT.PackageIdentifier
                 lstComponentForBOM.Add(components);
                 lstComponentForBOM = RemoveBundledComponentFromList(bundledComponents, lstComponentForBOM);
             }
-            VerifyInvalidDependencies(invalidDependencies, lstComponentForBOM);
-            RemoveInvalidDependencies(lstComponentForBOM, invalidDependencies);
         }
 
         private static void SetComponentGroupAndName(Component component, string packageName)
@@ -295,46 +293,6 @@ namespace LCT.PackageIdentifier
             }
 
             return "false";
-        }
-
-        private static void VerifyInvalidDependencies(List<string> duplicateDependencies, List<Component> lstComponentForBOM)
-        {
-            foreach (var depeItem in duplicateDependencies.ToList())
-            {
-                foreach (var component in lstComponentForBOM)
-                {
-                    if (depeItem == component.Name)
-                    {
-                        duplicateDependencies.Remove(depeItem);
-                        break;
-                    }
-                }
-            }
-        }
-
-        private static void RemoveInvalidDependencies(List<Component> lstComponentForBOM, List<string> duplicateDependencies)
-        {
-            if (duplicateDependencies != null)
-            {
-                foreach (var component in lstComponentForBOM)
-                {
-                    foreach (var depItem in duplicateDependencies)
-                    {
-                        if (component.Author != null)
-                        {
-                            // Parse the Author field, assuming it's in JSON format
-                            JObject authorJson = JObject.Parse(component.Author);
-
-                            // Ensure the exact dependencyName exists in the parsed Author JSON
-                            if (authorJson.ContainsKey(depItem))
-                            {
-                                authorJson.Remove(depItem);
-                            }
-                            component.Author = authorJson.ToString();
-                        }
-                    }
-                }
-            }
         }
         private static void CheckAndAddToBundleComponents(List<BundledComponents> bundledComponents, JProperty prop, Component components)
         {
@@ -606,15 +564,27 @@ namespace LCT.PackageIdentifier
             List<Dependency> dependencyList = new();
 
             foreach (var component in componentsForBOM)
-            {
+            {                
                 if ((component.Author?.Split(",")) != null)
                 {
                     List<Dependency> subDependencies = new();
                     foreach (var item in (component.Author?.Split(",")).Where(item => item.Contains(':')))
                     {
                         var componentDetails = item.Split(":");
-                        var name = StringFormat(componentDetails[0]);
-                        var version = StringFormat(componentDetails[1]);
+                        string name;
+                        string version;
+
+                        if (componentDetails.Length >= 3 && componentDetails[2].Contains('@'))
+                        {
+                            var npmDetails = componentDetails[2].Split('@');
+                            name = StringFormat(npmDetails[0]);
+                            version = StringFormat(npmDetails[1]);
+                        }
+                        else
+                        {
+                            name = StringFormat(componentDetails[0]);
+                            version = StringFormat(componentDetails[1]);
+                        }
                         string purlId = $"{ApiConstant.NPMExternalID}{name}@{version}";
                         Dependency dependentList = new Dependency()
                         {
