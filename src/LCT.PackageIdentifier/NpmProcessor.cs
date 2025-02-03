@@ -204,7 +204,7 @@ namespace LCT.PackageIdentifier
             List<JToken> directDependencies = new List<JToken>();
             directDependencies.AddRange(dep);
             directDependencies.AddRange(devDep);
-            List<string> invalidDependencies = new List<string>();
+           
             foreach (JProperty prop in depencyComponentList.Skip(1))
             {
                 Property isdev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
@@ -229,7 +229,7 @@ namespace LCT.PackageIdentifier
                 }
 
                 string folderPath = CommonHelper.TrimEndOfString(filepath, $"\\{FileConstant.PackageLockFileName}");
-                string packageName = GetPackageName(properties, prop, invalidDependencies);
+                string packageName = GetPackageName(properties, prop);
 
                 string componentName = packageName.StartsWith('@') ? packageName.Replace("@", "%40") : packageName;
 
@@ -265,14 +265,12 @@ namespace LCT.PackageIdentifier
                 component.Name = packageName;
             }
         }
-        private static string GetPackageName(JObject properties, JProperty prop, List<string> invalidDependencies)
+        private static string GetPackageName(JObject properties, JProperty prop)
         {
             string packageName;
             if (properties[Name] != null)
             {
-                packageName = Convert.ToString(properties[Name]);
-                string unusedComponentName = CommonHelper.GetSubstringOfLastOccurance(prop.Name, $"node_modules/");
-                invalidDependencies.Add(unusedComponentName);
+                packageName = Convert.ToString(properties[Name]);               
             }
             else
             {
