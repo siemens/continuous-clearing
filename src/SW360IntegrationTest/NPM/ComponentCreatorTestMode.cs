@@ -63,7 +63,6 @@ namespace SW360IntegrationTest.NPM
                 TestConstant.SW360AuthTokenType, testParameters.SW360AuthTokenType,
                 TestConstant.SW360ProjectID, testParameters.SW360ProjectID,
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
-                TestConstant.FossologyURL, testParameters.FossUrl,
                 TestConstant.Mode,"test"
             }),
                 "Test to run Package Creator EXE execution");

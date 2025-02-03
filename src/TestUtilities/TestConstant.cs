@@ -31,8 +31,7 @@ namespace TestUtilities
         public const string Sw360Token = "--SW360:Token";
         public const string BomFilePath = "--Directory:BomFilePath";
         public const string SW360URL = "--SW360:URL";
-        public const string FossologyURL = "--SW360:Fossology:URL";
-        public const string EnableFossologyTrigger = "--SW360:Fossology:EnableTrigger";
+        public const string FossologyURL = "--Fossology:URL";
         public const string SW360AuthTokenType = "--SW360:AuthTokenType";
         public const string SW360ProjectName = "--SW360:ProjectName";
         public const string SW360ProjectID = "--SW360:ProjectID";
