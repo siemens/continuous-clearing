@@ -113,7 +113,7 @@ namespace LCT.SW360PackageCreator
             if (string.IsNullOrEmpty(appSettings.SW360.Fossology.URL))
             {
                 Logger.Error($"Fossology URL is not provided ,Please make sure to add Fossologyurl in appsettings..");
-                Logger.Debug($"Fossologyurlcheck() : Fossology url not provided in appsettings");
+                Logger.Debug($"FossologyUrlValidation() : Fossology url not provided in appsettings");
                 environmentHelper.CallEnvironmentExit(-1);
             }
             else if (Uri.IsWellFormedUriString(appSettings.SW360.Fossology.URL, UriKind.Absolute))
@@ -135,7 +135,7 @@ namespace LCT.SW360PackageCreator
                             {
                                 // Fossology URL is not valid                                   
                                 Logger.Error($"Fossology URL is not valid ,Please make sure to add valid fossologyurl in appsettings..");
-                                Logger.Debug($"Fossologyurlcheck() : Fossology URL is not valid.");
+                                Logger.Debug($"FossologyUrlValidation() : Fossology URL is not valid.");
                                 environmentHelper.CallEnvironmentExit(-1);
                             }
                         }
@@ -143,14 +143,14 @@ namespace LCT.SW360PackageCreator
                         {
                             // Fossology URL is not valid                                   
                             Logger.Error($"Fossology URL is not working ,Please check once try again....");
-                            Logger.Debug($"Fossologyurlcheck() : Fossology URL is not valid.{ex}");
+                            Logger.Debug($"FossologyUrlValidation() : Fossology URL is not valid.{ex}");
                             environmentHelper.CallEnvironmentExit(-1);
                         }
                     }
                 }
                 else
                 {
-                    Logger.Debug($"Fossologyurlcheck() : Fossology URL is not valid");
+                    Logger.Debug($"FossologyUrlValidation() : Fossology URL is not valid");
                     Logger.Error($"Fossology URL is not valid ,Please check once try again....");
                     environmentHelper.CallEnvironmentExit(-1);
                 }
@@ -158,7 +158,7 @@ namespace LCT.SW360PackageCreator
             else
             {
                 Logger.Error($"Fossology URL is not provided ,Please make sure to add fossologyurl in appsettings..");
-                Logger.Debug($"Fossologyurlcheck() : Fossology url not provided in appsettings");
+                Logger.Debug($"FossologyUrlValidation() : Fossology url not provided in appsettings");
                 environmentHelper.CallEnvironmentExit(-1);
             }
             return false;
