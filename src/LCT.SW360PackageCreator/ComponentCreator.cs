@@ -73,7 +73,7 @@ namespace LCT.SW360PackageCreator
                 {
                     Logger.Debug($"{item.Name}-{item.Version} found as internal component. ");
                 }
-                else if (componentsData.IsDev == "true" && appSettings.SW360.IgnoreDevDependency)
+                else if ((componentsData.IsDev == "true" && appSettings.SW360.IgnoreDevDependency)||componentsData.ExcludeComponent == "true")
                 {
                     //do nothing
                 }
@@ -148,14 +148,13 @@ namespace LCT.SW360PackageCreator
         private static bool GetPackageType(Component package, ref Components componentsData)
         {
             bool isInternalComponent = false;
-
+            
             foreach (var property in package.Properties)
             {
                 if (property.Name?.ToLower() == Dataconstant.Cdx_ProjectType.ToLower())
                 {
                     componentsData.ProjectType = property.Value;
                 }
-
                 if (property.Name?.ToLower() == Dataconstant.Cdx_IsInternal.ToLower())
                 {
                     _ = bool.TryParse(property.Value, out isInternalComponent);
@@ -163,6 +162,10 @@ namespace LCT.SW360PackageCreator
                 if (property.Name?.ToLower() == Dataconstant.Cdx_IsDevelopment.ToLower())
                 {
                     componentsData.IsDev = property.Value;
+                }
+                if (property.Name?.ToLower() == Dataconstant.Cdx_ExcludeComponent.ToLower())
+                {
+                    componentsData.ExcludeComponent = property.Value;
                 }
             }
 
