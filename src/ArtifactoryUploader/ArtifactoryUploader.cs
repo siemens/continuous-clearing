@@ -62,7 +62,7 @@ namespace LCT.ArtifactoryUploader
                     return responsemessage;
                 }
 
-                await PackageUploadInformation.JfrogFoundPackagesAsync(component, displayPackagesInfo, operationType, responsemessage, dryRunSuffix);
+                await PackageUploadHelper.JfrogFoundPackagesAsync(component, displayPackagesInfo, operationType, responsemessage, dryRunSuffix);
 
             }
             catch (HttpRequestException ex)

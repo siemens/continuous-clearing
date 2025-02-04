@@ -41,7 +41,7 @@ namespace LCT.ArtifactoryUploader
 
             DisplayPackagesInfo displayPackagesInfo = PackageUploadInformation.GetComponentsToBePackages();
 
-            List<ComponentsToArtifactory> m_ComponentsToBeUploaded = await PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(m_ComponentsInBOM.Components, appSettings, displayPackagesInfo);
+            List<ComponentsToArtifactory> m_ComponentsToBeUploaded = await UploadToArtifactory.GetComponentsToBeUploadedToArtifactory(m_ComponentsInBOM.Components, appSettings, displayPackagesInfo);
             //Uploading the component to artifactory
 
             uploaderKpiData.PackagesToBeUploaded = m_ComponentsToBeUploaded.Count(x => x.PackageType == PackageType.ClearedThirdParty);
@@ -60,7 +60,7 @@ namespace LCT.ArtifactoryUploader
             PackageUploadHelper.UpdateBomArtifactoryRepoUrl(ref m_ComponentsInBOM, m_ComponentsToBeUploaded);
 
             //update Jfrog Repository Path For Successfully Uploaded Items
-            m_ComponentsInBOM = await PackageUploadHelper.UpdateJfrogRepoPathForSucessfullyUploadedItems(m_ComponentsInBOM, displayPackagesInfo);
+            m_ComponentsInBOM = await JfrogRepoUpdater.UpdateJfrogRepoPathForSucessfullyUploadedItems(m_ComponentsInBOM, displayPackagesInfo);
 
             var formattedString = CycloneDX.Json.Serializer.Serialize(m_ComponentsInBOM);
 
