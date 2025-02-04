@@ -103,7 +103,7 @@ namespace LCT.SW360PackageCreator
             PipelineArtifactUploader.UploadArtifacts();
         }
 
-        public static async Task<bool> FossologyUrlValidation(CommonAppSettings appSettings)
+        private static async Task<bool> FossologyUrlValidation(CommonAppSettings appSettings)
         {
             string url = appSettings.SW360.Fossology.URL.ToLower();
             string prodFossUrl = "automation.fossology".ToLower();
