@@ -75,8 +75,8 @@ namespace LCT.PackageIdentifier
 
             // Validate application settings
             await ValidateAppsettingsFile(appSettings, projectReleases);
-            string listOfInlude = DisplayInclude(appSettings);
-            string listOfExclude = DisplayExclude(appSettings);
+            string listOfInlude = DisplayIncludeFiles(appSettings);
+            string listOfExclude = DisplayExcludeFiles(appSettings);
             string listOfExcludeComponents = DisplayExcludeComponents(appSettings);            
             string listOfInternalRepoList = GetInternalRepolist(appSettings);
 
@@ -159,112 +159,62 @@ namespace LCT.PackageIdentifier
                 environmentHelper.CallEnvironmentExit(-1);
             }
         }
-        private static string DisplayInclude(CommonAppSettings appSettings)
+        private static string DisplayIncludeFiles(CommonAppSettings appSettings)
         {
             string totalString = string.Empty;
-            switch (appSettings.ProjectType.ToUpperInvariant())
-            {
-                case "NPM":
-                    if (appSettings.Npm.Include != null)
-                    {
-                        totalString = string.Join(",", appSettings.Npm.Include?.ToList());
-                    }
-                    return totalString;
-                case "NUGET":
-                    if (appSettings.Nuget.Include != null)
-                    {
-                        totalString = string.Join(",", appSettings.Nuget.Include?.ToList());
-                    }
-                    return totalString;
-                case "MAVEN":
-                    if (appSettings.Maven.Include != null)
-                    {
-                        totalString = string.Join(",", appSettings.Maven.Include?.ToList());
-                    }
-                    return totalString;
-                case "DEBIAN":
-                    if (appSettings.Debian.Include != null)
-                    {
-                        totalString = string.Join(",", appSettings.Debian.Include?.ToList());
-                    }
+            var includeMappings = new Dictionary<string, Func<IEnumerable<string>>>(StringComparer.OrdinalIgnoreCase)
+    {
+        { "NPM", () => appSettings.Npm.Include },
+        { "NUGET", () => appSettings.Nuget.Include },
+        { "MAVEN", () => appSettings.Maven.Include },
+        { "DEBIAN", () => appSettings.Debian.Include },
+        { "POETRY", () => appSettings.Poetry.Include },
+        { "CONAN", () => appSettings.Conan.Include },
+        { "ALPINE", () => appSettings.Alpine.Include }
+    };
 
-                    return totalString;
-                case "POETRY":
-                    if (appSettings.Poetry.Include != null)
-                    {
-                        totalString = string.Join(",", appSettings.Poetry.Include?.ToList());
-                    }
-                    return totalString;
-                case "CONAN":
-                    if (appSettings.Conan.Include != null)
-                    {
-                        totalString = string.Join(",", appSettings.Conan.Include?.ToList());
-                    }
-                    return totalString;
-                case "ALPINE":
-                    if (appSettings.Alpine.Include != null)
-                    {
-                        totalString = string.Join(",", appSettings.Alpine.Include?.ToList());
-                    }
-                    return totalString;
-                default:
-                    Logger.Error($"Invalid ProjectType - {appSettings.ProjectType}");
-                    break;
+            if (includeMappings.TryGetValue(appSettings.ProjectType, out var getIncludeList))
+            {
+                var includeList = getIncludeList();
+                if (includeList != null)
+                {
+                    totalString = string.Join(",", includeList);
+                }
             }
+            else
+            {
+                Logger.Error($"Invalid ProjectType - {appSettings.ProjectType}");
+            }
+
             return totalString;
         }
-        private static string DisplayExclude(CommonAppSettings appSettings)
+        private static string DisplayExcludeFiles(CommonAppSettings appSettings)
         {
-
             string totalString = string.Empty;
-            switch (appSettings.ProjectType.ToUpperInvariant())
+            var excludeMappings = new Dictionary<string, Func<IEnumerable<string>>>(StringComparer.OrdinalIgnoreCase)
+    {
+        { "NPM", () => appSettings.Npm.Exclude },
+        { "NUGET", () => appSettings.Nuget.Exclude },
+        { "MAVEN", () => appSettings.Maven.Exclude },
+        { "DEBIAN", () => appSettings.Debian.Exclude },
+        { "POETRY", () => appSettings.Poetry.Exclude },
+        { "CONAN", () => appSettings.Conan.Exclude },
+        { "ALPINE", () => appSettings.Alpine.Exclude }
+    };
+
+            if (excludeMappings.TryGetValue(appSettings.ProjectType, out var getExcludeList))
             {
-                case "NPM":
-                    if (appSettings.Npm.Exclude != null)
-                    {
-                        totalString = string.Join(",", appSettings.Npm.Exclude?.ToList());
-                    }
-                    return totalString;
-                case "NUGET":
-                    if (appSettings.Nuget.Exclude != null)
-                    {
-                        totalString = string.Join(",", appSettings.Nuget.Exclude?.ToList());
-                    }
-                    return totalString;
-                case "MAVEN":
-                    if (appSettings.Maven.Exclude != null)
-                    {
-                        totalString = string.Join(",", appSettings.Maven.Exclude?.ToList());
-                    }
-                    return totalString;
-                case "DEBIAN":
-                    if (appSettings.Debian.Exclude != null)
-                    {
-                        totalString = string.Join(",", appSettings.Debian.Exclude?.ToList());
-                    }
-                    return totalString;
-                case "POETRY":
-                    if (appSettings.Poetry.Exclude != null)
-                    {
-                        totalString = string.Join(",", appSettings.Poetry.Exclude?.ToList());
-                    }
-                    return totalString;
-                case "CONAN":
-                    if (appSettings.Conan.Exclude != null)
-                    {
-                        totalString = string.Join(",", appSettings.Conan.Exclude?.ToList());
-                    }
-                    return totalString;
-                case "ALPINE":
-                    if (appSettings.Alpine.Include != null)
-                    {
-                        totalString = string.Join(",", appSettings.Alpine.Include?.ToList());
-                    }
-                    return totalString;
-                default:
-                    Logger.Error($"Invalid ProjectType - {appSettings.ProjectType}");
-                    break;
+                var excludeList = getExcludeList();
+                if (excludeList != null)
+                {
+                    totalString = string.Join(",", excludeList);
+                }
             }
+            else
+            {
+                Logger.Error($"Invalid ProjectType - {appSettings.ProjectType}");
+            }
+
             return totalString;
         }
 

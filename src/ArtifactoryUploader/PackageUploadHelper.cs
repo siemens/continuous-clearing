@@ -13,7 +13,6 @@ using LCT.APICommunications.Model.AQL;
 using LCT.ArtifactoryUploader.Model;
 using LCT.Common;
 using LCT.Common.Constants;
-using LCT.Common.Interface;
 using LCT.Services.Interface;
 using log4net;
 using Newtonsoft.Json;
@@ -25,7 +24,6 @@ using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
-using Directory = System.IO.Directory;
 
 namespace LCT.ArtifactoryUploader
 {
@@ -114,769 +112,113 @@ namespace LCT.ArtifactoryUploader
                 {
                     PackageUploader.uploaderKpiData.ComponentNotApproved++;
                     PackageUploader.uploaderKpiData.PackagesNotUploadedToJfrog++;
-                    await AddUnknownPackagesAsync(item, displayPackagesInfo);
+                    await PackageUploadInformation.AddUnknownPackagesAsync(item, displayPackagesInfo);
                 }
             }
             Logger.Debug("Ending GetComponentsToBeUploadedToArtifactory() method");
             return componentsToBeUploaded;
         }
 
-        public static DisplayPackagesInfo GetComponentsToBePackages()
-        {
-            DisplayPackagesInfo displayPackagesInfo = new DisplayPackagesInfo();
-            displayPackagesInfo.UnknownPackagesNpm = new List<ComponentsToArtifactory>();
-            displayPackagesInfo.UnknownPackagesNuget = new List<ComponentsToArtifactory>();
-            displayPackagesInfo.UnknownPackagesMaven = new List<ComponentsToArtifactory>();
-            displayPackagesInfo.UnknownPackagesConan = new List<ComponentsToArtifactory>();
-            displayPackagesInfo.UnknownPackagesPython = new List<ComponentsToArtifactory>();
-            displayPackagesInfo.UnknownPackagesDebian = new List<ComponentsToArtifactory>();
-            displayPackagesInfo.JfrogNotFoundPackagesNpm = new List<ComponentsToArtifactory>();
-            displayPackagesInfo.JfrogNotFoundPackagesNuget = new List<ComponentsToArtifactory>();
-            displayPackagesInfo.JfrogNotFoundPackagesPython = new List<ComponentsToArtifactory>();
-            displayPackagesInfo.JfrogNotFoundPackagesMaven = new List<ComponentsToArtifactory>();
-            displayPackagesInfo.JfrogNotFoundPackagesConan = new List<ComponentsToArtifactory>();
-            displayPackagesInfo.JfrogNotFoundPackagesDebian = new List<ComponentsToArtifactory>();
-            displayPackagesInfo.JfrogFoundPackagesNpm = new List<ComponentsToArtifactory>();
-            displayPackagesInfo.JfrogFoundPackagesNuget = new List<ComponentsToArtifactory>();
-            displayPackagesInfo.JfrogFoundPackagesPython = new List<ComponentsToArtifactory>();
-            displayPackagesInfo.JfrogFoundPackagesMaven = new List<ComponentsToArtifactory>();
-            displayPackagesInfo.JfrogFoundPackagesConan = new List<ComponentsToArtifactory>();
-            displayPackagesInfo.JfrogFoundPackagesDebian = new List<ComponentsToArtifactory>();
-            displayPackagesInfo.SuccessfullPackagesNpm = new List<ComponentsToArtifactory>();
-            displayPackagesInfo.SuccessfullPackagesNuget = new List<ComponentsToArtifactory>();
-            displayPackagesInfo.SuccessfullPackagesPython = new List<ComponentsToArtifactory>();
-            displayPackagesInfo.SuccessfullPackagesMaven = new List<ComponentsToArtifactory>();
-            displayPackagesInfo.SuccessfullPackagesConan = new List<ComponentsToArtifactory>();
-            displayPackagesInfo.SuccessfullPackagesDebian = new List<ComponentsToArtifactory>();
-
-
-            return displayPackagesInfo;
-
-        }
-
-        private static void DisplaySortedForeachComponents(List<ComponentsToArtifactory> unknownPackages, List<ComponentsToArtifactory> JfrogNotFoundPackages, List<ComponentsToArtifactory> SucessfullPackages, List<ComponentsToArtifactory> JfrogFoundPackages, string name, string filename)
-        {
-            if (unknownPackages.Any() || JfrogNotFoundPackages.Any() || SucessfullPackages.Any() || JfrogFoundPackages.Any())
-            {
-                Logger.Info("\n" + name + ":\n");
-                DisplayErrorForUnknownPackages(unknownPackages, name, filename);
-                DisplayErrorForJfrogFoundPackages(JfrogFoundPackages);
-                DisplayErrorForJfrogPackages(JfrogNotFoundPackages);
-                DisplayErrorForSucessfullPackages(SucessfullPackages);
-            }
-
-        }
-
-        public static void DisplayErrorForJfrogFoundPackages(List<ComponentsToArtifactory> JfrogFoundPackages)
-        {
-
-            if (JfrogFoundPackages.Any())
-            {
-
-                foreach (var jfrogFoundPackage in JfrogFoundPackages)
-                {
-
-                    if (jfrogFoundPackage.ResponseMessage.ReasonPhrase == ApiConstant.ErrorInUpload)
-                    {
-                        Logger.Error($"Package {jfrogFoundPackage.Name}-{jfrogFoundPackage.Version} {jfrogFoundPackage.OperationType} Failed!! {jfrogFoundPackage.SrcRepoName} ---> {jfrogFoundPackage.DestRepoName}");
-                    }
-                    else if (jfrogFoundPackage.ResponseMessage.ReasonPhrase == ApiConstant.PackageNotFound)
-                    {
-                        Logger.Error($"Package {jfrogFoundPackage.Name}-{jfrogFoundPackage.Version} not found in {jfrogFoundPackage.SrcRepoName}, Upload Failed!!");
-                    }
-                    else
-                    {
-                        Logger.Info($"Successful{jfrogFoundPackage.DryRunSuffix} {jfrogFoundPackage.OperationType} package {jfrogFoundPackage.Name}-{jfrogFoundPackage.Version}" +
-                                          $" from {jfrogFoundPackage.SrcRepoName} to {jfrogFoundPackage.DestRepoName}");
-                    }
-
-                }
-                Logger.Info("\n");
-
-            }
-        }
-
-        public static void DisplayErrorForJfrogPackages(List<ComponentsToArtifactory> JfrogNotFoundPackages)
-        {
-
-            if (JfrogNotFoundPackages.Any())
-            {
-
-                foreach (var jfrogNotFoundPackage in JfrogNotFoundPackages)
-                {
-                    Logger.Warn($"Package {jfrogNotFoundPackage.Name}-{jfrogNotFoundPackage.Version} is not found in jfrog");
-
-                }
-                Logger.Info("\n");
-
-            }
-        }
-
-        private static void DisplayErrorForUnknownPackages(List<ComponentsToArtifactory> unknownPackages, string name, string filepath)
-        {
-            ProjectResponse projectResponse = new ProjectResponse();
-            IFileOperations fileOperations = new FileOperations();
-            var filename = Path.Combine(filepath, $"Artifactory_{FileConstant.artifactoryReportNotApproved}");
-            if (unknownPackages.Any())
-            {
-                if (name.Equals("Npm"))
-                {
-                    GetNotApprovedNpmPackages(unknownPackages, projectResponse, fileOperations, filepath, filename);
-                }
-                else if (name.Equals("Nuget"))
-                {
-                    GetNotApprovedNugetPackages(unknownPackages, projectResponse, fileOperations, filepath, filename);
-                }
-                else if (name.Equals("Conan"))
-                {
-                    GetNotApprovedConanPackages(unknownPackages, projectResponse, fileOperations, filepath, filename);
-                }
-                else if (name.Equals("Debian"))
-                {
-                    GetNotApprovedDebianPackages(unknownPackages, projectResponse, fileOperations, filepath, filename);
-                }
-                else if (name.Equals("Maven"))
-                {
-                    GetNotApprovedMavenPackages(unknownPackages, projectResponse, fileOperations, filepath, filename);
-                }
-                else if (name.Equals("Poetry"))
-                {
-                    GetNotApprovedPythonPackages(unknownPackages, projectResponse, fileOperations, filepath, filename);
-                }
-            }
-        }
-
-        private static void GetNotApprovedNpmPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
-        {
-            if (File.Exists(filename))
-            {
-                string json = File.ReadAllText(filename);
-                ProjectResponse myDeserializedClass = JsonConvert.DeserializeObject<ProjectResponse>(json);
-                List<JsonComponents> npmComponents = new List<JsonComponents>();
-                foreach (var npmpackage in unknownPackages)
-                {
-                    JsonComponents jsonComponents = new JsonComponents();
-                    jsonComponents.Name = npmpackage.Name;
-                    jsonComponents.Version = npmpackage.Version;
-                    npmComponents.Add(jsonComponents);
-                }
-                myDeserializedClass.Npm = npmComponents;
-                fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
-
-            }
-            else
-            {
-                projectResponse.Npm = new List<JsonComponents>();
-                foreach (var npmpackage in unknownPackages)
-                {
-                    JsonComponents jsonComponents = new JsonComponents();
-                    jsonComponents.Name = npmpackage.Name;
-                    jsonComponents.Version = npmpackage.Version;
-                    projectResponse.Npm.Add(jsonComponents);
-                }
-                fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
-            }
-            Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n");
-
-        }
-        private static void GetNotApprovedNugetPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
-        {
-            if (File.Exists(filename))
-            {
-                string json = File.ReadAllText(filename);
-                ProjectResponse myDeserializedClass = JsonConvert.DeserializeObject<ProjectResponse>(json);
-                List<JsonComponents> nugetComponents = new List<JsonComponents>();
-                foreach (var nugetpackage in unknownPackages)
-                {
-                    JsonComponents jsonComponents = new JsonComponents();
-                    jsonComponents.Name = nugetpackage.Name;
-                    jsonComponents.Version = nugetpackage.Version;
-                    nugetComponents.Add(jsonComponents);
-                }
-                myDeserializedClass.Nuget = nugetComponents;
-                fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
-            }
-            else
-            {
-                projectResponse.Nuget = new List<JsonComponents>();
-                foreach (var nugetpackage in unknownPackages)
-                {
-                    JsonComponents jsonComponents = new JsonComponents();
-                    jsonComponents.Name = nugetpackage.Name;
-                    jsonComponents.Version = nugetpackage.Version;
-                    projectResponse.Nuget.Add(jsonComponents);
-                }
-                fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
-            }
-            Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n");
-        }
-        private static void GetNotApprovedConanPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
-        {
-            if (File.Exists(filename))
-            {
-                string json = File.ReadAllText(filename);
-
-                ProjectResponse myDeserializedClass = JsonConvert.DeserializeObject<ProjectResponse>(json);
-                List<JsonComponents> conanComponents = new List<JsonComponents>();
-                foreach (var conanpackage in unknownPackages)
-                {
-                    JsonComponents jsonComponents = new JsonComponents();
-                    jsonComponents.Name = conanpackage.Name;
-                    jsonComponents.Version = conanpackage.Version;
-                    conanComponents.Add(jsonComponents);
-                }
-                myDeserializedClass.Conan = conanComponents;
-                fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
-
-
-            }
-            else
-            {
-                projectResponse.Conan = new List<JsonComponents>();
-                foreach (var conanpackage in unknownPackages)
-                {
-                    JsonComponents jsonComponents = new JsonComponents();
-                    jsonComponents.Name = conanpackage.Name;
-                    jsonComponents.Version = conanpackage.Version;
-                    projectResponse.Conan.Add(jsonComponents);
-                }
-                fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
-            }
-            Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n");
-
-        }
-        private static void GetNotApprovedPythonPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
-        {
-            if (File.Exists(filename))
-            {
-                string json = File.ReadAllText(filename);
-
-                ProjectResponse myDeserializedClass = JsonConvert.DeserializeObject<ProjectResponse>(json);
-                List<JsonComponents> pythonComponents = new List<JsonComponents>();
-                foreach (var pythonPackage in unknownPackages)
-                {
-                    JsonComponents jsonComponents = new JsonComponents();
-                    jsonComponents.Name = pythonPackage.Name;
-                    jsonComponents.Version = pythonPackage.Version;
-                    pythonComponents.Add(jsonComponents);
-                }
-                myDeserializedClass.Python = pythonComponents;
-                fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
-
-
-            }
-            else
-            {
-                projectResponse.Python = new List<JsonComponents>();
-                foreach (var pythonPackage in unknownPackages)
-                {
-                    JsonComponents jsonComponents = new JsonComponents();
-                    jsonComponents.Name = pythonPackage.Name;
-                    jsonComponents.Version = pythonPackage.Version;
-                    projectResponse.Python.Add(jsonComponents);
-                }
-                fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
-            }
-            Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n");
-        }
-        public static void GetNotApprovedDebianPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
-        {
-            if (File.Exists(filename))
-            {
-                string json = File.ReadAllText(filename);
-
-                ProjectResponse myDeserializedClass = JsonConvert.DeserializeObject<ProjectResponse>(json);
-                List<JsonComponents> debianComponents = new List<JsonComponents>();
-                foreach (var debianPackage in unknownPackages)
-                {
-                    JsonComponents jsonComponents = new JsonComponents();
-                    jsonComponents.Name = debianPackage.Name;
-                    jsonComponents.Version = debianPackage.Version;
-                    debianComponents.Add(jsonComponents);
-                }
-                myDeserializedClass.Debian = debianComponents;
-                fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
-
-
-            }
-            else
-            {
-                projectResponse.Debian = new List<JsonComponents>();
-                foreach (var debianPackage in unknownPackages)
-                {
-                    JsonComponents jsonComponents = new JsonComponents();
-                    jsonComponents.Name = debianPackage.Name;
-                    jsonComponents.Version = debianPackage.Version;
-                    projectResponse.Debian.Add(jsonComponents);
-                }
-                fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
-            }
-            Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n");
-        }
-        private static void GetNotApprovedMavenPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
-        {
-            if (File.Exists(filename))
-            {
-                string json = File.ReadAllText(filename);
-
-                ProjectResponse myDeserializedClass = JsonConvert.DeserializeObject<ProjectResponse>(json);
-                List<JsonComponents> mavenComponents = new List<JsonComponents>();
-                foreach (var mavenPackage in unknownPackages)
-                {
-                    JsonComponents jsonComponents = new JsonComponents();
-                    jsonComponents.Name = mavenPackage.Name;
-                    jsonComponents.Version = mavenPackage.Version;
-                    mavenComponents.Add(jsonComponents);
-                }
-                myDeserializedClass.Maven = mavenComponents;
-                fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
-
-
-            }
-            else
-            {
-                projectResponse.Maven = new List<JsonComponents>();
-                foreach (var mavenPackage in unknownPackages)
-                {
-                    JsonComponents jsonComponents = new JsonComponents();
-                    jsonComponents.Name = mavenPackage.Name;
-                    jsonComponents.Version = mavenPackage.Version;
-                    projectResponse.Maven.Add(jsonComponents);
-                }
-                fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
-            }
-            Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n");
-        }
-        public static string GettPathForArtifactoryUpload()
-        {
-            string localPathforartifactory = string.Empty;
-            try
-            {
-                String Todaysdate = DateTime.Now.ToString("dd-MM-yyyy_ss");
-                localPathforartifactory = $"{Directory.GetParent(Directory.GetCurrentDirectory())}\\ClearingTool\\ArtifactoryFiles\\{Todaysdate}\\";
-                if (!Directory.Exists(localPathforartifactory))
-                {
-                    localPathforartifactory = Directory.CreateDirectory(localPathforartifactory).ToString();
-                }
-            }
-            catch (IOException ex)
-            {
-                Logger.Error($"GettPathForArtifactoryUpload() ", ex);
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                Logger.Error($"GettPathForArtifactoryUpload() ", ex);
-            }
-
-            return localPathforartifactory;
-        }
-        private static void DisplayErrorForSucessfullPackages(List<ComponentsToArtifactory> SucessfullPackages)
-        {
-
-            if (SucessfullPackages.Any())
-            {
-
-                foreach (var sucessfullPackage in SucessfullPackages)
-                {
-                    Logger.Info($"Package {sucessfullPackage.Name}-{sucessfullPackage.Version} is already uploaded");
-                }
-                Logger.Info("\n");
-
-            }
-        }
-        public static void DisplayPackageUploadInformation(DisplayPackagesInfo displayPackagesInfo)
-        {
-            string localPathforartifactory = GettPathForArtifactoryUpload();
-
-            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesNpm, displayPackagesInfo.JfrogNotFoundPackagesNpm, displayPackagesInfo.SuccessfullPackagesNpm, displayPackagesInfo.JfrogFoundPackagesNpm, "Npm", localPathforartifactory);
-            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesNuget, displayPackagesInfo.JfrogNotFoundPackagesNuget, displayPackagesInfo.SuccessfullPackagesNuget, displayPackagesInfo.JfrogFoundPackagesNuget, "Nuget", localPathforartifactory);
-            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesMaven, displayPackagesInfo.JfrogNotFoundPackagesMaven, displayPackagesInfo.SuccessfullPackagesMaven, displayPackagesInfo.JfrogFoundPackagesMaven, "Maven", localPathforartifactory);
-            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesConan, displayPackagesInfo.JfrogNotFoundPackagesConan, displayPackagesInfo.SuccessfullPackagesConan, displayPackagesInfo.JfrogFoundPackagesConan, "Conan", localPathforartifactory);
-            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesPython, displayPackagesInfo.JfrogNotFoundPackagesPython, displayPackagesInfo.SuccessfullPackagesPython, displayPackagesInfo.JfrogFoundPackagesPython, "Poetry", localPathforartifactory);
-            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesDebian, displayPackagesInfo.JfrogNotFoundPackagesDebian, displayPackagesInfo.SuccessfullPackagesDebian, displayPackagesInfo.JfrogFoundPackagesDebian, "Debian", localPathforartifactory);
-
-        }
-
-        private static Task<ComponentsToArtifactory> GetUnknownPackageinfo(Component item)
-        {
-
-            ComponentsToArtifactory components = new ComponentsToArtifactory()
-            {
-                Name = item.Name,
-                Version = item.Version
-            };
-            return Task.FromResult(components);
-
-        }
-
-        private static Task<ComponentsToArtifactory> GetPackageinfo(ComponentsToArtifactory item, string operationType, HttpResponseMessage responseMessage, string dryRunSuffix)
-        {
-
-            ComponentsToArtifactory components = new ComponentsToArtifactory()
-            {
-                Name = item.Name,
-                Version = item.Version,
-                SrcRepoName = item.SrcRepoName,
-                DestRepoName = item.DestRepoName,
-                OperationType = operationType,
-                ResponseMessage = responseMessage,
-                DryRunSuffix = dryRunSuffix,
-                ComponentType = item.ComponentType,
-                Purl = item.Purl,
-                Token = item.Token,
-                CopyPackageApiUrl = item.CopyPackageApiUrl,
-                PackageName = item.PackageName,
-                PackageType = item.PackageType,
-
-            };
-            return Task.FromResult(components);
-
-        }
-        private static Task<ComponentsToArtifactory> GetSucessFulPackageinfo(ComponentsToArtifactory item)
-        {
-
-            ComponentsToArtifactory components = new ComponentsToArtifactory()
-            {
-                Name = item.Name,
-                Version = item.Version,
-                SrcRepoName = item.SrcRepoName,
-                DestRepoName = item.DestRepoName,
-                SrcRepoPathWithFullName = item.SrcRepoPathWithFullName,
-                Path = item.Path,
-                PackageType = item.PackageType,
-                Purl = item.Purl,
-
-            };
-            return Task.FromResult(components);
-
-        }
-
-        private static async Task AddUnknownPackagesAsync(Component item, DisplayPackagesInfo displayPackagesInfo)
-        {
-            string GetPropertyValue(string propertyName) =>
-                  item.Properties
-                      .Find(p => p.Name == propertyName)?
-                      .Value?
-                      .ToUpperInvariant();
-
-            if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "NPM")
-            {
-
-                ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
-                displayPackagesInfo.UnknownPackagesNpm.Add(components);
-            }
-            else if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "NUGET")
-            {
-                ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
-                displayPackagesInfo.UnknownPackagesNuget.Add(components);
-            }
-            else if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "MAVEN")
-            {
-                ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
-                displayPackagesInfo.UnknownPackagesMaven.Add(components);
-            }
-            else if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "POETRY")
-            {
-                ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
-                displayPackagesInfo.UnknownPackagesPython.Add(components);
-            }
-            else if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "CONAN")
-            {
-                ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
-                displayPackagesInfo.UnknownPackagesConan.Add(components);
-            }
-            else if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "DEBIAN")
-            {
-                ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
-                displayPackagesInfo.UnknownPackagesDebian.Add(components);
-            }
-
-        }
-
-        public static async Task JfrogNotFoundPackagesAsync(ComponentsToArtifactory item, DisplayPackagesInfo displayPackagesInfo)
-        {
-
-            if (item.ComponentType == "NPM")
-            {
-                ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                displayPackagesInfo.JfrogNotFoundPackagesNpm.Add(components);
-            }
-            else if (item.ComponentType == "NUGET")
-            {
-                ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                displayPackagesInfo.JfrogNotFoundPackagesNuget.Add(components);
-            }
-            else if (item.ComponentType == "MAVEN")
-            {
-                ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                displayPackagesInfo.JfrogNotFoundPackagesMaven.Add(components);
-            }
-            else if (item.ComponentType == "POETRY")
-            {
-                ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                displayPackagesInfo.JfrogNotFoundPackagesPython.Add(components);
-            }
-            else if (item.ComponentType == "CONAN")
-            {
-                ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                displayPackagesInfo.JfrogNotFoundPackagesConan.Add(components);
-            }
-            else if (item.ComponentType == "DEBIAN")
-            {
-                ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                displayPackagesInfo.JfrogNotFoundPackagesDebian.Add(components);
-            }
-
-        }
-
-        public static async Task JfrogFoundPackagesAsync(ComponentsToArtifactory item, DisplayPackagesInfo displayPackagesInfo, string operationType, HttpResponseMessage responseMessage, string dryRunSuffix)
-        {
-
-            if (item.ComponentType == "NPM")
-            {
-                ComponentsToArtifactory components = await GetPackageinfo(item, operationType, responseMessage, dryRunSuffix);
-                displayPackagesInfo.JfrogFoundPackagesNpm.Add(components);
-            }
-            else if (item.ComponentType == "NUGET")
-            {
-                ComponentsToArtifactory components = await GetPackageinfo(item, operationType, responseMessage, dryRunSuffix);
-                displayPackagesInfo.JfrogFoundPackagesNuget.Add(components);
-            }
-            else if (item.ComponentType == "MAVEN")
-            {
-                ComponentsToArtifactory components = await GetPackageinfo(item, operationType, responseMessage, dryRunSuffix);
-                displayPackagesInfo.JfrogFoundPackagesMaven.Add(components);
-            }
-            else if (item.ComponentType == "POETRY")
-            {
-                ComponentsToArtifactory components = await GetPackageinfo(item, operationType, responseMessage, dryRunSuffix);
-                displayPackagesInfo.JfrogFoundPackagesPython.Add(components);
-            }
-            else if (item.ComponentType == "CONAN")
-            {
-                ComponentsToArtifactory components = await GetPackageinfo(item, operationType, responseMessage, dryRunSuffix);
-                displayPackagesInfo.JfrogFoundPackagesConan.Add(components);
-            }
-            else if (item.ComponentType == "DEBIAN")
-            {
-                ComponentsToArtifactory components = await GetPackageinfo(item, operationType, responseMessage, dryRunSuffix);
-                displayPackagesInfo.JfrogFoundPackagesDebian.Add(components);
-            }
-
-        }
-        private static async Task SucessfullPackagesAsync(ComponentsToArtifactory item, DisplayPackagesInfo displayPackagesInfo)
-        {
-            if (item.ComponentType == "NPM")
-            {
-
-                ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                displayPackagesInfo.SuccessfullPackagesNpm.Add(components);
-            }
-            else if (item.ComponentType == "NUGET")
-            {
-                ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                displayPackagesInfo.SuccessfullPackagesNuget.Add(components);
-            }
-            else if (item.ComponentType == "MAVEN")
-            {
-                ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                displayPackagesInfo.SuccessfullPackagesMaven.Add(components);
-            }
-            else if (item.ComponentType == "POETRY")
-            {
-                ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                displayPackagesInfo.SuccessfullPackagesPython.Add(components);
-            }
-            else if (item.ComponentType == "CONAN")
-            {
-                ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                displayPackagesInfo.SuccessfullPackagesConan.Add(components);
-            }
-            else if (item.ComponentType == "DEBIAN")
-            {
-                ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                displayPackagesInfo.SuccessfullPackagesDebian.Add(components);
-            }
-
-        }
-
-
         private static PackageType GetPackageType(Component item)
         {
             string GetPropertyValue(string propertyName) =>
-                    item.Properties
-                        .Find(p => p.Name == propertyName)?
-                        .Value?
-                        .ToUpperInvariant();
+                item.Properties
+                    .Find(p => p.Name == propertyName)?
+                    .Value?
+                    .ToUpperInvariant();
 
-            if (GetPropertyValue(Dataconstant.Cdx_ClearingState) == "APPROVED")
+            var propertyChecks = new Dictionary<string, PackageType>
+    {
+        { Dataconstant.Cdx_ClearingState, PackageType.ClearedThirdParty },
+        { Dataconstant.Cdx_IsInternal, PackageType.Internal },
+        { Dataconstant.Cdx_IsDevelopment, PackageType.Development }
+    };
+
+            foreach (var check in propertyChecks)
             {
-                return PackageType.ClearedThirdParty;
-            }
-            else if (GetPropertyValue(Dataconstant.Cdx_IsInternal) == "TRUE")
-            {
-                return PackageType.Internal;
-            }
-            else if (GetPropertyValue(Dataconstant.Cdx_IsDevelopment) == "TRUE")
-            {
-                return PackageType.Development;
+                if (GetPropertyValue(check.Key) == "TRUE" || (check.Key == Dataconstant.Cdx_ClearingState && GetPropertyValue(check.Key) == "APPROVED"))
+                {
+                    return check.Value;
+                }
             }
 
             return PackageType.Unknown;
         }
-
         public static string GetCopyURL(ComponentsToArtifactory component)
         {
-            string url = string.Empty;
-            if (component.ComponentType == "NPM")
+            string url = component.ComponentType switch
             {
-                url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoPathWithFullName}" +
-               $"?to=/{component.DestRepoName}/{component.Path}/{component.PypiOrNpmCompName}";
+                "NPM" => $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoPathWithFullName}?to=/{component.DestRepoName}/{component.Path}/{component.PypiOrNpmCompName}",
+                "NUGET" => $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.PackageName}.{component.Version}{ApiConstant.NugetExtension}?to=/{component.DestRepoName}/{component.Name}.{component.Version}{ApiConstant.NugetExtension}",
+                "MAVEN" => $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.Name}/{component.Version}?to=/{component.DestRepoName}/{component.Name}/{component.Version}",
+                "POETRY" => $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoPathWithFullName}?to=/{component.DestRepoName}/{component.PypiOrNpmCompName}",
+                "CONAN" => $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.Path}?to=/{component.DestRepoName}/{component.Path}",
+                "DEBIAN" => $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*?to=/{component.DestRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*",
+                _ => string.Empty
+            };
 
-            }
-            else if (component.ComponentType == "NUGET")
+            if (component.ComponentType == "CONAN")
             {
-                url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.PackageName}.{component.Version}" +
-               $"{ApiConstant.NugetExtension}?to=/{component.DestRepoName}/{component.Name}.{component.Version}{ApiConstant.NugetExtension}";
-            }
-            else if (component.ComponentType == "MAVEN")
-            {
-                url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.Name}/{component.Version}" +
-               $"?to=/{component.DestRepoName}/{component.Name}/{component.Version}";
-            }
-            else if (component.ComponentType == "POETRY")
-            {
-                url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoPathWithFullName}" +
-               $"?to=/{component.DestRepoName}/{component.PypiOrNpmCompName}";
-            }
-            else if (component.ComponentType == "CONAN")
-            {
-                url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.Path}" +
-               $"?to=/{component.DestRepoName}/{component.Path}";
-                // Add a wild card to the path end for jFrog AQL query search
                 component.Path = $"{component.Path}/*";
             }
-            else if (component.ComponentType == "DEBIAN")
-            {
-                url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*" +
-                           $"?to=/{component.DestRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*";
-            }
-            else
-            {
-                // Do nothing
-            }
+
             return component.DryRun ? $"{url}&dry=1" : url;
         }
 
         public static string GetMoveURL(ComponentsToArtifactory component)
         {
-            string url = string.Empty;
-            if (component.ComponentType == "NPM")
+            string url = component.ComponentType switch
             {
-                url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoPathWithFullName}" +
-              $"?to=/{component.DestRepoName}/{component.Path}/{component.PypiOrNpmCompName}";
+                "NPM" => $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoPathWithFullName}?to=/{component.DestRepoName}/{component.Path}/{component.PypiOrNpmCompName}",
+                "NUGET" => $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.PackageName}.{component.Version}{ApiConstant.NugetExtension}?to=/{component.DestRepoName}/{component.Name}.{component.Version}{ApiConstant.NugetExtension}",
+                "MAVEN" => $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.Name}/{component.Version}?to=/{component.DestRepoName}/{component.Name}/{component.Version}",
+                "POETRY" => $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoPathWithFullName}?to=/{component.DestRepoName}/{component.PypiOrNpmCompName}",
+                "CONAN" => $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.Path}?to=/{component.DestRepoName}/{component.Path}",
+                "DEBIAN" => $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*?to=/{component.DestRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*",
+                _ => string.Empty
+            };
 
-            }
-            else if (component.ComponentType == "NUGET")
+            if (component.ComponentType == "CONAN")
             {
-                url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.PackageName}.{component.Version}" +
-               $"{ApiConstant.NugetExtension}?to=/{component.DestRepoName}/{component.Name}.{component.Version}{ApiConstant.NugetExtension}";
-            }
-            else if (component.ComponentType == "MAVEN")
-            {
-                url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.Name}/{component.Version}" +
-               $"?to=/{component.DestRepoName}/{component.Name}/{component.Version}";
-            }
-            else if (component.ComponentType == "POETRY")
-            {
-                url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoPathWithFullName}" +
-               $"?to=/{component.DestRepoName}/{component.PypiOrNpmCompName}";
-            }
-            else if (component.ComponentType == "CONAN")
-            {
-                url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.Path}" +
-               $"?to=/{component.DestRepoName}/{component.Path}";
-                // Add a wild card to the path end for jFrog AQL query search
                 component.Path = $"{component.Path}/*";
             }
-            else if (component.ComponentType == "DEBIAN")
-            {
-                url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*" +
-                          $"?to=/{component.DestRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*";
-            }
-            else
-            {
-                // Do nothing
-            }
+
             return component.DryRun ? $"{url}&dry=1" : url;
         }
 
         private static string GetPackagePath(ComponentsToArtifactory component, AqlResult aqlResult)
         {
-            switch (component.ComponentType)
+            return component.ComponentType switch
             {
-                case "NPM":
-                    if (aqlResult != null)
-                    {
-                        return $"{aqlResult.Path}";
-                    }
-                    else
-                    {
-                        return $"{component.Name}/-";
-                    }
-
-                case "CONAN" when aqlResult != null:
-                    string path = aqlResult.Path;
-                    string package = $"{component.Name}/{component.Version}";
-
-                    if (path.Contains(package))
-                    {
-                        int index = path.IndexOf(package);
-                        return path.Substring(0, index + package.Length);
-                    }
-                    else
-                    {
-                        return path;
-                    }
-
-                case "MAVEN":
-                    return $"{component.Name}/{component.Version}";
-
-                case "DEBIAN":
-                    return $"pool/main/{component.Name[0]}/{component.Name}";
-                default:
-                    return string.Empty;
-            }
+                "NPM" => aqlResult != null ? aqlResult.Path : $"{component.Name}/-",
+                "CONAN" when aqlResult != null => GetConanPackagePath(aqlResult.Path, component.Name, component.Version),
+                "MAVEN" => $"{component.Name}/{component.Version}",
+                "DEBIAN" => $"pool/main/{component.Name[0]}/{component.Name}",
+                _ => string.Empty
+            };
         }
 
+        private static string GetConanPackagePath(string path, string name, string version)
+        {
+            string package = $"{name}/{version}";
+            if (path.Contains(package))
+            {
+                int index = path.IndexOf(package);
+                return path.Substring(0, index + package.Length);
+            }
+            return path;
+        }
         private static string GetJfrogPackageName(ComponentsToArtifactory component)
         {
-            string packageName;
+            var packageNameFormats = new Dictionary<string, Func<ComponentsToArtifactory, string>>
+    {
+        { "NPM", c => c.PypiOrNpmCompName },
+        { "NUGET", c => $"{c.PackageName}.{c.Version}{ApiConstant.NugetExtension}" },
+        { "DEBIAN", c => $"{c.PackageName}_{c.Version.Replace(ApiConstant.DebianExtension, "") + "*"}" },
+        { "POETRY", c => c.PypiOrNpmCompName }
+    };
 
-            switch (component.ComponentType)
-            {
-                case "NPM":
-                    packageName = component.PypiOrNpmCompName;
-                    break;
-
-                case "NUGET":
-                    packageName = $"{component.PackageName}.{component.Version}{ApiConstant.NugetExtension}";
-                    break;
-
-                case "DEBIAN":
-                    packageName = $"{component.PackageName}_{component.Version.Replace(ApiConstant.DebianExtension, "") + "*"}";
-                    break;
-
-                case "POETRY":
-                    packageName = component.PypiOrNpmCompName;
-                    break;
-
-                default:
-                    packageName = string.Empty;
-                    break;
-            }
-
-            return packageName;
+            return packageNameFormats.TryGetValue(component.ComponentType, out var formatFunc) ? formatFunc(component) : string.Empty;
         }
 
         private static string GetDestinationRepo(Component item, CommonAppSettings appSettings)
@@ -884,26 +226,22 @@ namespace LCT.ArtifactoryUploader
             var packageType = GetPackageType(item);
             var componentType = GetComponentType(item);
 
-            if (!string.IsNullOrEmpty(componentType))
+            if (string.IsNullOrEmpty(componentType))
             {
-                switch (componentType.ToLower())
-                {
-                    case "npm":
-                        return GetRepoName(packageType, appSettings.Npm.ReleaseRepo, appSettings.Npm.DevDepRepo, appSettings.Npm.Artifactory.ThirdPartyRepos.Where(x => x.Upload.Equals(true)).FirstOrDefault()?.Name);
-                    case "nuget":
-                        return GetRepoName(packageType, appSettings.Nuget.ReleaseRepo, appSettings.Nuget.DevDepRepo, appSettings.Nuget.Artifactory.ThirdPartyRepos.Where(x => x.Upload.Equals(true)).FirstOrDefault()?.Name);
-                    case "maven":
-                        return GetRepoName(packageType, appSettings.Maven.ReleaseRepo, appSettings.Maven.DevDepRepo, appSettings.Maven.Artifactory.ThirdPartyRepos.Where(x => x.Upload.Equals(true)).FirstOrDefault()?.Name);
-                    case "poetry":
-                        return GetRepoName(packageType, appSettings.Poetry.ReleaseRepo, appSettings.Poetry.DevDepRepo, appSettings.Poetry.Artifactory.ThirdPartyRepos.Where(x => x.Upload.Equals(true)).FirstOrDefault()?.Name);
-                    case "conan":
-                        return GetRepoName(packageType, appSettings.Conan.ReleaseRepo, appSettings.Conan.DevDepRepo, appSettings.Conan.Artifactory.ThirdPartyRepos.Where(x => x.Upload.Equals(true)).FirstOrDefault()?.Name);
-                    case "debian":
-                        return GetRepoName(packageType, appSettings.Debian.ReleaseRepo, appSettings.Debian.DevDepRepo, appSettings.Debian.Artifactory.ThirdPartyRepos.Where(x => x.Upload.Equals(true)).FirstOrDefault()?.Name);
-                }
+                return string.Empty;
             }
 
-            return string.Empty;
+            var repoMappings = new Dictionary<string, Func<string>>(StringComparer.OrdinalIgnoreCase)
+    {
+        { "npm", () => GetRepoName(packageType, appSettings.Npm.ReleaseRepo, appSettings.Npm.DevDepRepo, appSettings.Npm.Artifactory.ThirdPartyRepos.FirstOrDefault(x => x.Upload)?.Name) },
+        { "nuget", () => GetRepoName(packageType, appSettings.Nuget.ReleaseRepo, appSettings.Nuget.DevDepRepo, appSettings.Nuget.Artifactory.ThirdPartyRepos.FirstOrDefault(x => x.Upload)?.Name) },
+        { "maven", () => GetRepoName(packageType, appSettings.Maven.ReleaseRepo, appSettings.Maven.DevDepRepo, appSettings.Maven.Artifactory.ThirdPartyRepos.FirstOrDefault(x => x.Upload)?.Name) },
+        { "poetry", () => GetRepoName(packageType, appSettings.Poetry.ReleaseRepo, appSettings.Poetry.DevDepRepo, appSettings.Poetry.Artifactory.ThirdPartyRepos.FirstOrDefault(x => x.Upload)?.Name) },
+        { "conan", () => GetRepoName(packageType, appSettings.Conan.ReleaseRepo, appSettings.Conan.DevDepRepo, appSettings.Conan.Artifactory.ThirdPartyRepos.FirstOrDefault(x => x.Upload)?.Name) },
+        { "debian", () => GetRepoName(packageType, appSettings.Debian.ReleaseRepo, appSettings.Debian.DevDepRepo, appSettings.Debian.Artifactory.ThirdPartyRepos.FirstOrDefault(x => x.Upload)?.Name) }
+    };
+
+            return repoMappings.TryGetValue(componentType, out var getRepoName) ? getRepoName() : string.Empty;
         }
 
         private static string GetRepoName(PackageType packageType, string internalRepo, string developmentRepo, string clearedThirdPartyRepo)
@@ -923,35 +261,24 @@ namespace LCT.ArtifactoryUploader
 
         private static string GetComponentType(Component item)
         {
+            var componentTypeMappings = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+    {
+        { "npm", "NPM" },
+        { "nuget", "NUGET" },
+        { "maven", "MAVEN" },
+        { "pypi", "POETRY" },
+        { "conan", "CONAN" },
+        { "pkg:deb/debian", "DEBIAN" }
+    };
 
-            if (item.Purl.Contains("npm", StringComparison.OrdinalIgnoreCase))
+            foreach (var mapping in componentTypeMappings)
             {
-                return "NPM";
+                if (item.Purl.Contains(mapping.Key, StringComparison.OrdinalIgnoreCase))
+                {
+                    return mapping.Value;
+                }
             }
-            else if (item.Purl.Contains("nuget", StringComparison.OrdinalIgnoreCase))
-            {
-                return "NUGET";
-            }
-            else if (item.Purl.Contains("maven", StringComparison.OrdinalIgnoreCase))
-            {
-                return "MAVEN";
-            }
-            else if (item.Purl.Contains("pypi", StringComparison.OrdinalIgnoreCase))
-            {
-                return "POETRY";
-            }
-            else if (item.Purl.Contains("conan", StringComparison.OrdinalIgnoreCase))
-            {
-                return "CONAN";
-            }
-            else if (item.Purl.Contains("pkg:deb/debian", StringComparison.OrdinalIgnoreCase))
-            {
-                return "DEBIAN";
-            }
-            else
-            {
-                // Do nothing
-            }
+
             return string.Empty;
         }
 
@@ -1025,13 +352,13 @@ namespace LCT.ArtifactoryUploader
                 {
                     uploaderKpiData.PackagesNotExistingInRemoteCache++;
                     item.DestRepoName = null;
-                    await JfrogNotFoundPackagesAsync(item, displayPackagesInfo);
+                    await PackageUploadInformation.JfrogNotFoundPackagesAsync(item, displayPackagesInfo);
                 }
             }
             else
             {
                 IncrementCountersBasedOnPackageType(uploaderKpiData, packageType, true);
-                await SucessfullPackagesAsync(item, displayPackagesInfo);
+                await PackageUploadInformation.SucessfullPackagesAsync(item, displayPackagesInfo);
                 item.DestRepoName = null;
             }
         }
@@ -1050,14 +377,14 @@ namespace LCT.ArtifactoryUploader
             }
             else if (responseMessage.ReasonPhrase == ApiConstant.PackageNotFound)
             {
-                await JfrogFoundPackagesAsync(item, displayPackagesInfo, operationType, responseMessage, dryRunSuffix);
+                await PackageUploadInformation.JfrogFoundPackagesAsync(item, displayPackagesInfo, operationType, responseMessage, dryRunSuffix);
                 IncrementCountersBasedOnPackageType(uploaderKpiData, packageType, false);
                 item.DestRepoName = null;
                 SetWarningCode = true;
             }
             else if (responseMessage.ReasonPhrase == ApiConstant.ErrorInUpload)
             {
-                await JfrogFoundPackagesAsync(item, displayPackagesInfo, operationType, responseMessage, dryRunSuffix);
+                await PackageUploadInformation.JfrogFoundPackagesAsync(item, displayPackagesInfo, operationType, responseMessage, dryRunSuffix);
                 IncrementCountersBasedOnPackageType(uploaderKpiData, packageType, false);
                 item.DestRepoName = null;
                 var responseContent = await responseMessage.Content.ReadAsStringAsync();
@@ -1350,33 +677,17 @@ namespace LCT.ArtifactoryUploader
 
         public static string GetPackageNameExtensionBasedOnComponentType(ComponentsToArtifactory package)
         {
-            string packageNameEXtension = string.Empty;
-            if (package.ComponentType.Equals("NPM", StringComparison.OrdinalIgnoreCase))
-            {
-                packageNameEXtension = ".tgz";
-            }
-            if (package.ComponentType.Equals("NUGET", StringComparison.OrdinalIgnoreCase))
-            {
-                packageNameEXtension = ".nupkg";
-            }
-            if (package.ComponentType.Equals("MAVEN", StringComparison.OrdinalIgnoreCase))
-            {
-                packageNameEXtension = ".jar";
-            }
-            if (package.ComponentType.Equals("DEBIAN", StringComparison.OrdinalIgnoreCase))
-            {
-                packageNameEXtension = ".deb";
-            }
-            if (package.ComponentType.Equals("POETRY", StringComparison.OrdinalIgnoreCase))
-            {
-                packageNameEXtension = ".whl";
-            }
-            if (package.ComponentType.Equals("CONAN", StringComparison.OrdinalIgnoreCase))
-            {
-                packageNameEXtension = "package.tgz";
-            }
+            var packageExtensions = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+    {
+        { "NPM", ".tgz" },
+        { "NUGET", ".nupkg" },
+        { "MAVEN", ".jar" },
+        { "DEBIAN", ".deb" },
+        { "POETRY", ".whl" },
+        { "CONAN", "package.tgz" }
+    };
 
-            return packageNameEXtension;
+            return packageExtensions.TryGetValue(package.ComponentType, out var extension) ? extension : string.Empty;
         }
 
         public static async Task<List<AqlResult>> GetJfrogRepoInfoForAllTypePackages(List<string> destRepoNames)
@@ -1397,51 +708,24 @@ namespace LCT.ArtifactoryUploader
         {
             List<ComponentsToArtifactory> uploadedPackages = new List<ComponentsToArtifactory>();
 
-            foreach (var item in displayPackagesInfo.JfrogFoundPackagesConan)
-            {
-                if (item.ResponseMessage?.StatusCode == HttpStatusCode.OK)
-                {
-                    uploadedPackages.Add(item);
-                }
-            }
+            var allPackages = new List<IEnumerable<ComponentsToArtifactory>>
+    {
+        displayPackagesInfo.JfrogFoundPackagesConan,
+        displayPackagesInfo.JfrogFoundPackagesMaven,
+        displayPackagesInfo.JfrogFoundPackagesNpm,
+        displayPackagesInfo.JfrogFoundPackagesNuget,
+        displayPackagesInfo.JfrogFoundPackagesPython,
+        displayPackagesInfo.JfrogFoundPackagesDebian
+    };
 
-            foreach (var item in displayPackagesInfo.JfrogFoundPackagesMaven)
+            foreach (var packageList in allPackages)
             {
-                if (item.ResponseMessage?.StatusCode == HttpStatusCode.OK)
+                foreach (var item in packageList)
                 {
-                    uploadedPackages.Add(item);
-                }
-            }
-
-            foreach (var item in displayPackagesInfo.JfrogFoundPackagesNpm)
-            {
-                if (item.ResponseMessage?.StatusCode == HttpStatusCode.OK)
-                {
-                    uploadedPackages.Add(item);
-                }
-            }
-
-            foreach (var item in displayPackagesInfo.JfrogFoundPackagesNuget)
-            {
-                if (item.ResponseMessage?.StatusCode == HttpStatusCode.OK)
-                {
-                    uploadedPackages.Add(item);
-                }
-            }
-
-            foreach (var item in displayPackagesInfo.JfrogFoundPackagesPython)
-            {
-                if (item.ResponseMessage?.StatusCode == HttpStatusCode.OK)
-                {
-                    uploadedPackages.Add(item);
-                }
-            }
-
-            foreach (var item in displayPackagesInfo.JfrogFoundPackagesDebian)
-            {
-                if (item.ResponseMessage?.StatusCode == HttpStatusCode.OK)
-                {
-                    uploadedPackages.Add(item);
+                    if (item.ResponseMessage?.StatusCode == HttpStatusCode.OK)
+                    {
+                        uploadedPackages.Add(item);
+                    }
                 }
             }
 
