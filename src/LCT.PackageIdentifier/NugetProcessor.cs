@@ -55,6 +55,7 @@ namespace LCT.PackageIdentifier
 
             CheckForMultipleVersions(appSettings, componentsWithMultipleVersions);
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
+            bom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(bom.Components, bom.Dependencies);
             Logger.Debug($"ParsePackageFile():End");
             return bom;
         }
