@@ -25,7 +25,7 @@ namespace LCT.ArtifactoryUploader
                                                                             DisplayPackagesInfo displayPackagesInfo)
         {
             // Get details of sucessfully uploaded packages
-            List<ComponentsToArtifactory> uploadedPackages = GetUploadePackageDetails(displayPackagesInfo);
+            List<ComponentsToArtifactory> uploadedPackages = PackageUploadInformation.GetUploadePackageDetails(displayPackagesInfo);
 
             // Get the details of all the dest repo names from jfrog at once
             List<string> destRepoNames = uploadedPackages.Select(x => x.DestRepoName)?.Distinct()?.ToList() ?? new List<string>();
@@ -52,7 +52,7 @@ namespace LCT.ArtifactoryUploader
                 if (package == null) { continue; }
 
                 // get jfrog details of a component from the aqlresult set
-                string packageNameEXtension = GetPackageNameExtensionBasedOnComponentType(package);
+                string packageNameEXtension = PackageUploadHelper.GetPackageNameExtensionBasedOnComponentType(package);
                 AqlResult jfrogData = GetJfrogInfoOfThePackageUploaded(jfrogPackagesListAql, package, packageNameEXtension);
 
                 // if package not exists in jfrog list move to nect item in the loop
@@ -103,37 +103,7 @@ namespace LCT.ArtifactoryUploader
             return jfrogPackagesListAql.FirstOrDefault(x => x.Path.Contains(package.Name)
                                                  && x.Name.Contains(package.Version)
                                                  && x.Name.Contains(packageNameEXtension));
-        }
-        public static string GetPackageNameExtensionBasedOnComponentType(ComponentsToArtifactory package)
-        {
-            string packageNameEXtension = string.Empty;
-            if (package.ComponentType.Equals("NPM", StringComparison.OrdinalIgnoreCase))
-            {
-                packageNameEXtension = ".tgz";
-            }
-            if (package.ComponentType.Equals("NUGET", StringComparison.OrdinalIgnoreCase))
-            {
-                packageNameEXtension = ".nupkg";
-            }
-            if (package.ComponentType.Equals("MAVEN", StringComparison.OrdinalIgnoreCase))
-            {
-                packageNameEXtension = ".jar";
-            }
-            if (package.ComponentType.Equals("DEBIAN", StringComparison.OrdinalIgnoreCase))
-            {
-                packageNameEXtension = ".deb";
-            }
-            if (package.ComponentType.Equals("POETRY", StringComparison.OrdinalIgnoreCase))
-            {
-                packageNameEXtension = ".whl";
-            }
-            if (package.ComponentType.Equals("CONAN", StringComparison.OrdinalIgnoreCase))
-            {
-                packageNameEXtension = "package.tgz";
-            }
-
-            return packageNameEXtension;
-        }
+        }        
 
         public static async Task<List<AqlResult>> GetJfrogRepoInfoForAllTypePackages(List<string> destRepoNames)
         {

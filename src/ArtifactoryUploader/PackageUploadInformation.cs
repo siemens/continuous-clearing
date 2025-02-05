@@ -12,6 +12,7 @@ using System.Reflection;
 using LCT.APICommunications;
 using Directory = System.IO.Directory;
 using Newtonsoft.Json;
+using System.Net;
 
 namespace LCT.ArtifactoryUploader
 {
@@ -50,9 +51,63 @@ namespace LCT.ArtifactoryUploader
             return displayPackagesInfo;
 
         }
+        public static List<ComponentsToArtifactory> GetUploadePackageDetails(DisplayPackagesInfo displayPackagesInfo)
+        {
+            List<ComponentsToArtifactory> uploadedPackages = new List<ComponentsToArtifactory>();
+
+            foreach (var item in displayPackagesInfo.JfrogFoundPackagesConan)
+            {
+                if (item.ResponseMessage?.StatusCode == HttpStatusCode.OK)
+                {
+                    uploadedPackages.Add(item);
+                }
+            }
+
+            foreach (var item in displayPackagesInfo.JfrogFoundPackagesMaven)
+            {
+                if (item.ResponseMessage?.StatusCode == HttpStatusCode.OK)
+                {
+                    uploadedPackages.Add(item);
+                }
+            }
+
+            foreach (var item in displayPackagesInfo.JfrogFoundPackagesNpm)
+            {
+                if (item.ResponseMessage?.StatusCode == HttpStatusCode.OK)
+                {
+                    uploadedPackages.Add(item);
+                }
+            }
+
+            foreach (var item in displayPackagesInfo.JfrogFoundPackagesNuget)
+            {
+                if (item.ResponseMessage?.StatusCode == HttpStatusCode.OK)
+                {
+                    uploadedPackages.Add(item);
+                }
+            }
+
+            foreach (var item in displayPackagesInfo.JfrogFoundPackagesPython)
+            {
+                if (item.ResponseMessage?.StatusCode == HttpStatusCode.OK)
+                {
+                    uploadedPackages.Add(item);
+                }
+            }
+
+            foreach (var item in displayPackagesInfo.JfrogFoundPackagesDebian)
+            {
+                if (item.ResponseMessage?.StatusCode == HttpStatusCode.OK)
+                {
+                    uploadedPackages.Add(item);
+                }
+            }
+
+            return uploadedPackages;
+        }
         public static void DisplayPackageUploadInformation(DisplayPackagesInfo displayPackagesInfo)
         {
-            string localPathforartifactory = GettPathForArtifactoryUpload();
+            string localPathforartifactory = ArtfactoryUploader.GettPathForArtifactoryUpload();
 
             DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesNpm, displayPackagesInfo.JfrogNotFoundPackagesNpm, displayPackagesInfo.SuccessfullPackagesNpm, displayPackagesInfo.JfrogFoundPackagesNpm, "Npm", localPathforartifactory);
             DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesNuget, displayPackagesInfo.JfrogNotFoundPackagesNuget, displayPackagesInfo.SuccessfullPackagesNuget, displayPackagesInfo.JfrogFoundPackagesNuget, "Nuget", localPathforartifactory);
@@ -357,28 +412,6 @@ namespace LCT.ArtifactoryUploader
             }
             Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n");
         }
-        public static string GettPathForArtifactoryUpload()
-        {
-            string localPathforartifactory = string.Empty;
-            try
-            {
-                String Todaysdate = DateTime.Now.ToString("dd-MM-yyyy_ss");
-                localPathforartifactory = $"{Directory.GetParent(Directory.GetCurrentDirectory())}\\ClearingTool\\ArtifactoryFiles\\{Todaysdate}\\";
-                if (!Directory.Exists(localPathforartifactory))
-                {
-                    localPathforartifactory = Directory.CreateDirectory(localPathforartifactory).ToString();
-                }
-            }
-            catch (IOException ex)
-            {
-                Logger.Error($"GettPathForArtifactoryUpload() ", ex);
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                Logger.Error($"GettPathForArtifactoryUpload() ", ex);
-            }
-
-            return localPathforartifactory;
-        }
+        
     }
 }

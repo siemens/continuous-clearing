@@ -13,6 +13,7 @@ using LCT.Services.Interface;
 using log4net;
 using System;
 using System.Configuration;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
@@ -116,6 +117,29 @@ namespace LCT.ArtifactoryUploader
             }          
 
             return packageInfo;
+        }
+        public static string GettPathForArtifactoryUpload()
+        {
+            string localPathforartifactory = string.Empty;
+            try
+            {
+                String Todaysdate = DateTime.Now.ToString("dd-MM-yyyy_ss");
+                localPathforartifactory = $"{Directory.GetParent(Directory.GetCurrentDirectory())}\\ClearingTool\\ArtifactoryFiles\\{Todaysdate}\\";
+                if (!Directory.Exists(localPathforartifactory))
+                {
+                    localPathforartifactory = Directory.CreateDirectory(localPathforartifactory).ToString();
+                }
+            }
+            catch (IOException ex)
+            {
+                Logger.Error($"GettPathForArtifactoryUpload() ", ex);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                Logger.Error($"GettPathForArtifactoryUpload() ", ex);
+            }
+
+            return localPathforartifactory;
         }
 
     }

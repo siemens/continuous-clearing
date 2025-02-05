@@ -44,7 +44,23 @@ namespace AritfactoryUploader.UTest
             // Assert
             Assert.That(6, Is.EqualTo(componentList.Components.Count), "Checks for no of components");
         }
-
+        [Test]
+        [TestCase("NPM", ".tgz")]
+        [TestCase("NUGET", ".nupkg")]
+        [TestCase("MAVEN", ".jar")]
+        [TestCase("DEBIAN", ".deb")]
+        [TestCase("POETRY", ".whl")]
+        [TestCase("CONAN", "package.tgz")]
+        public void GetPkgeNameExtensionBasedOnComponentType_GivenType_ReturnsPkgNameExtension(string type, string extension)
+        {
+            // Arrange
+            var package = new ComponentsToArtifactory();
+            package.ComponentType = type;
+            // Act
+            var actualExtension = PackageUploadHelper.GetPackageNameExtensionBasedOnComponentType(package);
+            // Assert
+            Assert.AreEqual(extension, actualExtension);
+        }
         [Test]
         public void GetComponentListFromComparisonBOM_GivenInvalidComparisonBOM_ReturnsException()
         {

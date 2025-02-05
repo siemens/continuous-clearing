@@ -75,7 +75,7 @@ namespace LCT.PackageIdentifier
 
             // Validate application settings
             await ValidateAppsettingsFile(appSettings, projectReleases);
-            string listOfInlude = DisplayInformation.DisplayIncludeFiles(appSettings);
+            string listOfInclude = DisplayInformation.DisplayIncludeFiles(appSettings);
             string listOfExclude = DisplayInformation.DisplayExcludeFiles(appSettings);
             string listOfExcludeComponents = DisplayInformation.DisplayExcludeComponents(appSettings);            
             string listOfInternalRepoList = DisplayInformation.GetInternalRepolist(appSettings);
@@ -92,7 +92,7 @@ namespace LCT.PackageIdentifier
                 $"ProjectType\t\t --> {appSettings.ProjectType}\n\t" +
                 $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t" +
                 $"InternalRepoList\t --> {listOfInternalRepoList}\n\t" +
-                $"Include\t\t\t --> {listOfInlude}\n\t" +
+                $"Include\t\t\t --> {listOfInclude}\n\t" +
                 $"Exclude\t\t\t --> {listOfExclude}\n\t" +
                 $"ExcludeComponents\t --> {listOfExcludeComponents}\n", null);
 

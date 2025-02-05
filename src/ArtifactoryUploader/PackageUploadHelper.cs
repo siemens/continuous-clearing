@@ -58,7 +58,7 @@ namespace LCT.ArtifactoryUploader
             catch (JsonReaderException ex)
             {
 
-                Logger.Error($"Exception occured in reading the comparison BOM: {ex}");
+                Logger.Error($"Exception occurred in reading the comparison BOM: {ex}");
                 throw new JsonReaderException();
 
             }
@@ -226,8 +226,8 @@ namespace LCT.ArtifactoryUploader
 
             if (SetWarningCode)
             {
-                PipelineArtifactUploader.UploadArtifacts();
-                Environment.ExitCode = 2;
+                EnvironmentHelper environmentHelper = new EnvironmentHelper();                
+                environmentHelper.CallEnvironmentExit(2);
                 Logger.Debug("Setting ExitCode to 2");
             }
 
@@ -296,7 +296,36 @@ namespace LCT.ArtifactoryUploader
                 // do nothing
             }
         }
+        public static string GetPackageNameExtensionBasedOnComponentType(ComponentsToArtifactory package)
+        {
+            string packageNameEXtension = string.Empty;
+            if (package.ComponentType.Equals("NPM", StringComparison.OrdinalIgnoreCase))
+            {
+                packageNameEXtension = ".tgz";
+            }
+            if (package.ComponentType.Equals("NUGET", StringComparison.OrdinalIgnoreCase))
+            {
+                packageNameEXtension = ".nupkg";
+            }
+            if (package.ComponentType.Equals("MAVEN", StringComparison.OrdinalIgnoreCase))
+            {
+                packageNameEXtension = ".jar";
+            }
+            if (package.ComponentType.Equals("DEBIAN", StringComparison.OrdinalIgnoreCase))
+            {
+                packageNameEXtension = ".deb";
+            }
+            if (package.ComponentType.Equals("POETRY", StringComparison.OrdinalIgnoreCase))
+            {
+                packageNameEXtension = ".whl";
+            }
+            if (package.ComponentType.Equals("CONAN", StringComparison.OrdinalIgnoreCase))
+            {
+                packageNameEXtension = "package.tgz";
+            }
 
+            return packageNameEXtension;
+        }
         public static IJFrogApiCommunication GetJfrogApiCommInstance(ComponentsToArtifactory component, int timeout)
         {
 

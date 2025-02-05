@@ -8,6 +8,8 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,6 +17,80 @@ namespace AritfactoryUploader.UTest
 {
     public class PackageUploadInformationTest
     {
+        [Test]
+        public void GetUploadPackageDetails_CoversAllScenarios()
+        {
+            // Arrange
+            DisplayPackagesInfo displayPackagesInfo = new DisplayPackagesInfo()
+            {
+                JfrogFoundPackagesConan = new List<ComponentsToArtifactory>()
+                {
+                    new ComponentsToArtifactory()
+                    {
+                        ResponseMessage = new HttpResponseMessage()
+                        {
+                            StatusCode = HttpStatusCode.OK
+                        }
+                    }
+                },
+                JfrogFoundPackagesMaven = new List<ComponentsToArtifactory>()
+                {
+                    new ComponentsToArtifactory()
+                    {
+                        ResponseMessage = new HttpResponseMessage()
+                        {
+                            StatusCode = HttpStatusCode.OK
+                        }
+                    }
+                },
+                JfrogFoundPackagesNpm = new List<ComponentsToArtifactory>()
+                {
+                    new ComponentsToArtifactory()
+                    {
+                        ResponseMessage = new HttpResponseMessage()
+                        {
+                            StatusCode = HttpStatusCode.OK
+                        }
+                    }
+                },
+                JfrogFoundPackagesNuget = new List<ComponentsToArtifactory>()
+                {
+                    new ComponentsToArtifactory()
+                    {
+                        ResponseMessage = new HttpResponseMessage()
+                        {
+                            StatusCode = HttpStatusCode.OK
+                        }
+                    }
+                },
+                JfrogFoundPackagesPython = new List<ComponentsToArtifactory>()
+                {
+                    new ComponentsToArtifactory()
+                    {
+                        ResponseMessage = new HttpResponseMessage()
+                        {
+                            StatusCode = HttpStatusCode.OK
+                        }
+                    }
+                },
+                JfrogFoundPackagesDebian = new List<ComponentsToArtifactory>()
+                {
+                    new ComponentsToArtifactory()
+                    {
+                        ResponseMessage = new HttpResponseMessage()
+                        {
+                            StatusCode = HttpStatusCode.OK
+                        }
+                    }
+                }
+            };
+
+            // Act
+            List<ComponentsToArtifactory> uploadedPackages = PackageUploadInformation.GetUploadePackageDetails(displayPackagesInfo);
+
+            // Assert
+            Assert.AreEqual(6, uploadedPackages.Count);
+        }
         [Test]
         public void GetNotApprovedDebianPackages_CoversAllScenarios()
         {
