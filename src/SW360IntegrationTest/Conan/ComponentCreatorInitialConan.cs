@@ -56,6 +56,7 @@ namespace SW360IntegrationTest.Conan
                 TestConstant.SW360ProjectID, testParameters.SW360ProjectID,
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.FossologyURL, testParameters.FossUrl,
+                TestConstant.EnableFossologyTrigger,testParameters.FossologyTrigger,
                 TestConstant.Mode,""
             }),
                 "Test to run Package Creator EXE execution");

@@ -43,5 +43,6 @@ namespace LCT.Facade.Interfaces
         Task<HttpResponseMessage> UpdateLinkedRelease(string projectId, string releaseId, UpdateLinkedRelease updateLinkedRelease);
         Task<HttpResponseMessage> GetReleaseByExternalId(string purlId,string externalIdKey = "");
         Task<HttpResponseMessage> GetComponentByExternalId(string purlId, string externalIdKey = "");
+        Task<HttpResponseMessage> GetAllReleasesWithAllData(string page, string pageEntries);
     }
 }

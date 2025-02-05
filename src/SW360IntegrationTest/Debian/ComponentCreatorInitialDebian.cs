@@ -65,6 +65,7 @@ namespace SW360IntegrationTest.Debian
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.ProjectType,"DEBIAN",
                 TestConstant.FossologyURL, testParameters.FossUrl,
+                TestConstant.EnableFossologyTrigger,testParameters.FossologyTrigger,
                 TestConstant.Mode,""}),
                 "Test to run component creator EXE execution");
         }

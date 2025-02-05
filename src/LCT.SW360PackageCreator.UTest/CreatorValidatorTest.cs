@@ -17,6 +17,12 @@ using LCT.Facade.Interfaces;
 using LCT.APICommunications.Model.Foss;
 using Newtonsoft.Json;
 using System.Net.Http;
+using LCT.Common.Interface;
+using System.Net;
+using System.Threading;
+using Moq.Protected;
+using System.Security.Policy;
+using System.Reflection;
 
 namespace LCT.SW360PackageCreator.UTest
 {
@@ -24,17 +30,21 @@ namespace LCT.SW360PackageCreator.UTest
     public class CreatorValidatorTest
     {
         public Mock<ISw360ProjectService> mockISw360ProjectService;
-        public Mock<ISW360ApicommunicationFacade> mockISW360ApicommunicationFacade;
-        public Mock<ISW360CommonService> mockISW360CommonService;
-        public Mock<ISw360CreatorService> mockISw360CreatorService;
-        public Mock<ISW360Service> mockISW360Service;
+        private Mock<ISW360ApicommunicationFacade> mockISW360ApicommunicationFacade;
+        private Mock<ISW360Service> mockISW360Service;
+        private Mock<ISw360CreatorService> mockISw360CreatorService;
+        private Mock<IEnvironmentHelper> mockEnvironmentHelper;
+        private Mock<HttpMessageHandler> mockHttpMessageHandler;
+        private HttpClient httpClient;
         public CreatorValidatorTest()
         {
             mockISw360ProjectService = new Mock<ISw360ProjectService>(MockBehavior.Strict);
-            mockISW360ApicommunicationFacade = new Mock<ISW360ApicommunicationFacade>(MockBehavior.Strict);
-            mockISW360CommonService = new Mock<ISW360CommonService>(MockBehavior.Strict);
-            mockISw360CreatorService = new Mock<ISw360CreatorService>(MockBehavior.Strict);
-            mockISW360Service = new Mock<ISW360Service>(MockBehavior.Strict);
+            mockISW360ApicommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
+            mockISW360Service = new Mock<ISW360Service>();
+            mockISw360CreatorService = new Mock<ISw360CreatorService>();
+            mockEnvironmentHelper = new Mock<IEnvironmentHelper>();
+            mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+            httpClient = new HttpClient(mockHttpMessageHandler.Object);
 
         }
         [TestCase]
@@ -105,7 +115,7 @@ namespace LCT.SW360PackageCreator.UTest
             Assert.ThrowsAsync<InvalidDataException>(() => CreatorValidator.ValidateAppSettings(CommonAppSettings, mockISw360ProjectService.Object, projectReleases));
 
         }
-        [TestCase]
+        [Test]
         public async Task TriggerFossologyValidation_TestPositive()
         {
             // Arrange
@@ -116,7 +126,8 @@ namespace LCT.SW360PackageCreator.UTest
                     URL = "https://sw360.example.com"
                 }
             };
-            var responseBody = "{\"_embedded\":{\"sw360:releases\":[{\"_links\":{\"self\":{\"href\":\"https://sw360.example.com/resource/api/releases/123\"}}}]}}";
+
+            var responseBody = "{\"_embedded\":{\"sw360:releases\":[{\"id\":\"a3c5c9d1dd469d668433fb147c01bad2\",\"name\":\"HC-Test Pugixml\",\"version\":\"V1.2\",\"clearingState\":\"APPROVED\",\"_embedded\":{\"sw360:attachments\":[[{\"filename\":\"Protocol_Pugixml - 1.2.doc\"}]]},\"_links\":{\"self\":{\"href\":\"https://sw360.siemens.com/resource/api/releases/a3c5c9d1dd469d668433fb147c01bad2\"}}}]},\"page\":{\"totalPages\":1}}";
             var releasesInfo = new ReleasesInfo
             {
                 Name = "TestRelease",
@@ -133,21 +144,145 @@ namespace LCT.SW360PackageCreator.UTest
                     }
                 }
             };
+
             var triggerStatusResponse = JsonConvert.SerializeObject(fossTriggerStatus);
-            mockISW360ApicommunicationFacade.Setup(x => x.GetReleases()).ReturnsAsync(responseBody);
-            mockISW360Service.Setup(x => x.GetReleaseDataOfComponent(It.IsAny<string>())).ReturnsAsync(releasesInfo);
-            mockISw360CreatorService.Setup(x => x.TriggerFossologyProcessForValidation(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(fossTriggerStatus);
-            mockISW360ApicommunicationFacade.Setup(x => x.GetReleaseById(It.IsAny<string>())).ReturnsAsync(new HttpResponseMessage
+
+            mockISW360ApicommunicationFacade.Setup(x => x.GetAllReleasesWithAllData(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(new HttpResponseMessage
             {
-                Content = new StringContent("{\"Name\":\"TestRelease\",\"Version\":\"1.0\",\"ClearingState\":\"APPROVED\"}")
+                Content = new StringContent(responseBody)
             });
+
             mockISW360ApicommunicationFacade.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(triggerStatusResponse);
+
+            mockISw360CreatorService.Setup(x => x.TriggerFossologyProcessForValidation(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(fossTriggerStatus);
+
             // Act
             await CreatorValidator.TriggerFossologyValidation(appSettings, mockISW360ApicommunicationFacade.Object);
+
             // Assert
-            mockISW360ApicommunicationFacade.Verify(x => x.GetReleases(), Times.Once);
-            mockISW360ApicommunicationFacade.Verify(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            mockISW360ApicommunicationFacade.Verify(x => x.GetAllReleasesWithAllData(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            mockISW360ApicommunicationFacade.Verify(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()), Times.Once);           
         }
+        [Test]
+        public async Task FossologyUrlValidation_ValidUrl_ReturnsTrue()
+        {
+            // Arrange
+           
+
+            var appSettings = new CommonAppSettings()
+            {
+                SW360 = new SW360()
+                {
+                    Fossology = new Fossology()
+                    {
+                        URL = "https://stage.fossology.url"
+                    }
+                }
+            };
+
+            var responseMessage = new HttpResponseMessage(HttpStatusCode.OK);
+            mockHttpMessageHandler
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(responseMessage);
+
+            // Act
+            var result = await CreatorValidator.FossologyUrlValidation(appSettings, httpClient, mockEnvironmentHelper.Object);
+
+            // Assert
+            Assert.IsTrue(result);
+        }
+
+        [Test]
+        public async Task FossologyUrlValidation_InvalidUrl_ReturnsFalse()
+        {
+            // Arrange
+            var appSettings = new CommonAppSettings()
+            {
+                SW360 = new SW360()
+                {
+                    Fossology = new Fossology()
+                    {
+                        URL = "https://invalid.fossology.url"
+                    }
+                }
+            };
+
+            var responseMessage = new HttpResponseMessage(HttpStatusCode.NotFound);
+            mockHttpMessageHandler
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(responseMessage);
+
+            // Act
+            var result = await CreatorValidator.FossologyUrlValidation(appSettings, httpClient, mockEnvironmentHelper.Object);
+
+            // Assert
+            Assert.IsFalse(result);
+        }
+       
+
+        [Test]
+        public async Task FossologyUrlValidation_InvalidUri_ThrowsException()
+        {
+            // Arrange
+            var appSettings = new CommonAppSettings()
+            {
+                SW360 = new SW360()
+                {
+                    Fossology = new Fossology()
+                    {
+                        URL = "invalid_uri"
+                    }
+                }
+            };
+
+            var result = await CreatorValidator.FossologyUrlValidation(appSettings, httpClient, mockEnvironmentHelper.Object);
+
+            // Assert
+            Assert.IsFalse(result);
+        }
+
+        [Test]
+        public async Task FossologyUrlValidation_HttpRequestException_ReturnsFalse()
+        {
+            // Arrange
+            var appSettings = new CommonAppSettings()
+            {
+                SW360 = new SW360()
+                {
+                    Fossology = new Fossology()
+                    {
+                        URL = "https://valid.fossology.url"
+                    }
+                }
+            };
+
+            mockHttpMessageHandler
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ThrowsAsync(new HttpRequestException());
+
+            // Act
+            var result = await CreatorValidator.FossologyUrlValidation(appSettings, httpClient, mockEnvironmentHelper.Object);
+
+            // Assert
+            Assert.IsFalse(result);
+        }
+
+        
 
     }
 }

@@ -40,5 +40,6 @@ namespace LCT.APICommunications.Interfaces
         string AttachComponentSourceToSW360(AttachReport attachReport);
         void DownloadAttachmentUsingWebClient(string attachmentDownloadLink, string fileName);
         Task<HttpResponseMessage> GetComponentDetailsByUrl(string componentLink);
+        Task<HttpResponseMessage> GetAllReleasesWithAllData(string page, string pageEntries);
     }
 }

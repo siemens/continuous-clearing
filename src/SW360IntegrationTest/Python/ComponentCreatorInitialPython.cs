@@ -64,6 +64,7 @@ namespace SW360IntegrationTest.Python
                 TestConstant.SW360ProjectID, testParameters.SW360ProjectID,
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.FossologyURL, testParameters.FossUrl,
+                TestConstant.EnableFossologyTrigger,testParameters.FossologyTrigger,
                 TestConstant.Mode,""});
 
             Assert.IsTrue(returnValue == 0 || returnValue == 2, "Test to run Package Creator EXE execution");

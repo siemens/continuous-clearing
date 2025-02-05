@@ -68,6 +68,8 @@ namespace LCT.Common.Constants
         public const string Cdx_Siemensfilename = "internal:siemens:clearing:siemens:filename";
         public const string Cdx_SiemensDirect = "internal:siemens:clearing:siemens:direct";
         public const string Cdx_ExcludeComponent = "internal:siemens:clearing:sw360:exclude";
+        public const string Production_FossologyURL = "automation.fossology";
+        public const string Stage_FossologyURL = "stage.fossology";
 
         public static Dictionary<string, string> PurlCheck()
         {

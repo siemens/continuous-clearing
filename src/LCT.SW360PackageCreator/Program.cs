@@ -37,8 +37,7 @@ namespace LCT.SW360PackageCreator
     {
         public static Stopwatch CreatorStopWatch { get; set; }
         private static bool m_Verbose = false;
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private static IEnvironmentHelper environmentHelper;
+        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);        
         protected Program() { }
 
         static async Task Main(string[] args)
@@ -50,6 +49,7 @@ namespace LCT.SW360PackageCreator
                 m_Verbose = true;
 
             ISettingsManager settingsManager = new SettingsManager();
+            EnvironmentHelper environmentHelper = new EnvironmentHelper();
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
             ISW360ApicommunicationFacade sW360ApicommunicationFacade;
             ISw360ProjectService sw360ProjectService= Getsw360ProjectServiceObject(appSettings, out sW360ApicommunicationFacade);
@@ -57,13 +57,13 @@ namespace LCT.SW360PackageCreator
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
-            
+           
             string FolderPath = InitiateLogger(appSettings);
             settingsManager.CheckRequiredArgsToRun(appSettings, "Creator");
             int isValid = await CreatorValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
+                        
             if (isValid == -1)
             {
-                environmentHelper = new EnvironmentHelper();
                 environmentHelper.CallEnvironmentExit(-1);
             }
 
@@ -92,7 +92,8 @@ namespace LCT.SW360PackageCreator
             //Validate Fossology Url
             if (appSettings.SW360.Fossology.EnableTrigger)
             {
-                if (await FossologyUrlValidation(appSettings))
+                HttpClient client = new HttpClient();
+                if (await CreatorValidator.FossologyUrlValidation(appSettings,client, environmentHelper))
                     await CreatorValidator.TriggerFossologyValidation(appSettings, sW360ApicommunicationFacade);
             }
             await InitiatePackageCreatorProcess(appSettings, sw360ProjectService, sW360ApicommunicationFacade);
@@ -103,66 +104,7 @@ namespace LCT.SW360PackageCreator
             PipelineArtifactUploader.UploadArtifacts();
         }
 
-        private static async Task<bool> FossologyUrlValidation(CommonAppSettings appSettings)
-        {
-            string url = appSettings.SW360.Fossology.URL.ToLower();
-            string prodFossUrl = "automation.fossology".ToLower();
-            string stageFossUrl = "stage.fossology".ToLower();
-            environmentHelper = new EnvironmentHelper();
-
-            if (string.IsNullOrEmpty(appSettings.SW360.Fossology.URL))
-            {
-                Logger.Error($"Fossology URL is not provided ,Please make sure to add Fossologyurl in appsettings..");
-                Logger.Debug($"FossologyUrlValidation() : Fossology url not provided in appsettings");
-                environmentHelper.CallEnvironmentExit(-1);
-            }
-            else if (Uri.IsWellFormedUriString(appSettings.SW360.Fossology.URL, UriKind.Absolute))
-            {
-                if (url.Contains(prodFossUrl) || url.Contains(stageFossUrl))
-                {
-                    // Send GET request to validate Fossology URL
-                    using (HttpClient client = new HttpClient())
-                    {
-                        try
-                        {
-                            HttpResponseMessage response = await client.GetAsync(new Uri(appSettings.SW360.Fossology.URL));
-                            if (response.IsSuccessStatusCode)
-                            {
-                                // Fossology URL is valid                                   
-                                return true;
-                            }
-                            else
-                            {
-                                // Fossology URL is not valid                                   
-                                Logger.Error($"Fossology URL is not valid ,Please make sure to add valid fossologyurl in appsettings..");
-                                Logger.Debug($"FossologyUrlValidation() : Fossology URL is not valid.");
-                                environmentHelper.CallEnvironmentExit(-1);
-                            }
-                        }
-                        catch (HttpRequestException ex)
-                        {
-                            // Fossology URL is not valid                                   
-                            Logger.Error($"Fossology URL is not working ,Please check once try again....");
-                            Logger.Debug($"FossologyUrlValidation() : Fossology URL is not valid.{ex}");
-                            environmentHelper.CallEnvironmentExit(-1);
-                        }
-                    }
-                }
-                else
-                {
-                    Logger.Debug($"FossologyUrlValidation() : Fossology URL is not valid");
-                    Logger.Error($"Fossology URL is not valid ,Please check once try again....");
-                    environmentHelper.CallEnvironmentExit(-1);
-                }
-            }
-            else
-            {
-                Logger.Error($"Fossology URL is not provided ,Please make sure to add fossologyurl in appsettings..");
-                Logger.Debug($"FossologyUrlValidation() : Fossology url not provided in appsettings");
-                environmentHelper.CallEnvironmentExit(-1);
-            }
-            return false;
-        }
+       
         private static CatoolInfo GetCatoolVersionFromProjectfile()
         {
             CatoolInfo catoolInfo = new CatoolInfo();

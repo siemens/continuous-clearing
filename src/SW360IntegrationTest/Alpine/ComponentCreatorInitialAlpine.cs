@@ -65,6 +65,7 @@ namespace SW360IntegrationTest.Alpine
                 TestConstant.SW360ProjectID, testParameters.SW360ProjectID,
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.ProjectType,"ALPINE",
+                TestConstant.EnableFossologyTrigger,testParameters.FossologyTrigger,
                 TestConstant.FossologyURL, testParameters.FossUrl,
                 TestConstant.Mode,""}),
             "Test to run component creator EXE execution");

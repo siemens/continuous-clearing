@@ -195,5 +195,9 @@ namespace LCT.Facade
         {
             return m_sw360ApiCommunication.GetComponentByExternalId(purlId, externalIdKey);
         }
+        public Task<HttpResponseMessage> GetAllReleasesWithAllData(string page,string pageEntries)
+        {
+            return m_sw360ApiCommunication.GetAllReleasesWithAllData(page, pageEntries);
+        }
     }
 }

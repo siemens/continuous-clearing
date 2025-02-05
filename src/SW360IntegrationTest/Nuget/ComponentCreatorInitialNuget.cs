@@ -66,6 +66,7 @@ namespace SW360IntegrationTest.Nuget
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.ProjectType,"NUGET",
                 TestConstant.FossologyURL, testParameters.FossUrl,
+                TestConstant.EnableFossologyTrigger,testParameters.FossologyTrigger,
                 TestConstant.Mode,""}),
                 "Test to run Package Creator EXE execution");
         }
