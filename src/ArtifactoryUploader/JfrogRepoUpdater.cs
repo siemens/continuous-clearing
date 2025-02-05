@@ -118,59 +118,6 @@ namespace LCT.ArtifactoryUploader
 
             return aqlResultList;
         }
-        public static List<ComponentsToArtifactory> GetUploadePackageDetails(DisplayPackagesInfo displayPackagesInfo)
-        {
-            List<ComponentsToArtifactory> uploadedPackages = new List<ComponentsToArtifactory>();
-
-            foreach (var item in displayPackagesInfo.JfrogFoundPackagesConan)
-            {
-                if (item.ResponseMessage?.StatusCode == HttpStatusCode.OK)
-                {
-                    uploadedPackages.Add(item);
-                }
-            }
-
-            foreach (var item in displayPackagesInfo.JfrogFoundPackagesMaven)
-            {
-                if (item.ResponseMessage?.StatusCode == HttpStatusCode.OK)
-                {
-                    uploadedPackages.Add(item);
-                }
-            }
-
-            foreach (var item in displayPackagesInfo.JfrogFoundPackagesNpm)
-            {
-                if (item.ResponseMessage?.StatusCode == HttpStatusCode.OK)
-                {
-                    uploadedPackages.Add(item);
-                }
-            }
-
-            foreach (var item in displayPackagesInfo.JfrogFoundPackagesNuget)
-            {
-                if (item.ResponseMessage?.StatusCode == HttpStatusCode.OK)
-                {
-                    uploadedPackages.Add(item);
-                }
-            }
-
-            foreach (var item in displayPackagesInfo.JfrogFoundPackagesPython)
-            {
-                if (item.ResponseMessage?.StatusCode == HttpStatusCode.OK)
-                {
-                    uploadedPackages.Add(item);
-                }
-            }
-
-            foreach (var item in displayPackagesInfo.JfrogFoundPackagesDebian)
-            {
-                if (item.ResponseMessage?.StatusCode == HttpStatusCode.OK)
-                {
-                    uploadedPackages.Add(item);
-                }
-            }
-
-            return uploadedPackages;
-        }
+       
     }
 }
