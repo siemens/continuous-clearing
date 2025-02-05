@@ -124,8 +124,8 @@ namespace LCT.SW360PackageCreator
         public static async Task<bool> FossologyUrlValidation(CommonAppSettings appSettings, HttpClient client, IEnvironmentHelper environmentHelper)
         {
             string url = appSettings.SW360.Fossology.URL.ToLower();
-            string prodFossUrl = Dataconstant.Production_FossologyURL.ToLower();
-            string stageFossUrl = Dataconstant.Stage_FossologyURL.ToLower();
+            string prodFossUrl = Dataconstant.Cdx_ProductionFossologyURL.ToLower();
+            string stageFossUrl = Dataconstant.Cdx_StageFossologyURL.ToLower();
 
             if (string.IsNullOrEmpty(appSettings.SW360.Fossology.URL))
             {
