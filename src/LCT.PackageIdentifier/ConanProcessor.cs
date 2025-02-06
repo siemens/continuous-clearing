@@ -552,7 +552,7 @@ namespace LCT.PackageIdentifier
             {
                 componentForBOM = CommonHelper.RemoveExcludedComponents(componentForBOM, appSettings.SW360.ExcludeComponents, ref noOfExcludedComponents);
                 dependenciesForBOM = CommonHelper.RemoveInvalidDependenciesAndReferences(componentForBOM, dependenciesForBOM);
-                BomCreator.bomKpiData.ComponentsExcluded += noOfExcludedComponents;
+                BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents;
             }
             cycloneDXBOM.Components = componentForBOM;
             cycloneDXBOM.Dependencies = dependenciesForBOM;
