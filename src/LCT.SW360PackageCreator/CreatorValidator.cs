@@ -74,10 +74,10 @@ namespace LCT.SW360PackageCreator
                     string response = responseData?.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
                     ReleasesAllDetails releaseResponse = JsonConvert.DeserializeObject<ReleasesAllDetails>(response);
 
-                    validRelease = releaseResponse._embedded.sw360releases
-                        .FirstOrDefault(release => release.clearingState == "APPROVED" &&
-                                                   release._embedded?.sw360attachments != null &&
-                                                   release._embedded.sw360attachments.Any(attachments => attachments.Count != 0));
+                    validRelease = releaseResponse.Embedded.Sw360releases
+                        .FirstOrDefault(release => release.ClearingState == "APPROVED" &&
+                                                   release.AllReleasesEmbedded?.Sw360attachments != null &&
+                                                   release.AllReleasesEmbedded.Sw360attachments.Any(attachments => attachments.Count != 0));
 
                     if (validRelease != null)
                     {
@@ -87,7 +87,7 @@ namespace LCT.SW360PackageCreator
                     {
                         // Check if there are more pages
                         int currentPage = int.Parse(page);
-                        int totalPages = releaseResponse.page.totalPages;
+                        int totalPages = releaseResponse.Page.TotalPages;
                         if (currentPage < totalPages - 1)
                         {
                             page = (currentPage + 1).ToString();
@@ -102,9 +102,9 @@ namespace LCT.SW360PackageCreator
 
                 if (validReleaseFound)
                 {
-                    var releaseUrl = validRelease._links.self.href;
+                    var releaseUrl = validRelease.Links.Self.Href;
                     var releaseId = CommonHelper.GetSubstringOfLastOccurance(releaseUrl, "/");
-                    string sw360link = $"{validRelease.name}:{validRelease.version}:{appSettings.SW360.URL}{ApiConstant.Sw360ReleaseUrlApiSuffix}" +
+                    string sw360link = $"{validRelease.Name}:{validRelease.Version}:{appSettings.SW360.URL}{ApiConstant.Sw360ReleaseUrlApiSuffix}" +
                     $"{releaseId}#/tab-Summary";
                         FossTriggerStatus fossResult = await sw360CreatorService.TriggerFossologyProcessForValidation(releaseId, sw360link);
                     if (!string.IsNullOrEmpty(fossResult?.Links?.Self?.Href))

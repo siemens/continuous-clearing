@@ -7,49 +7,61 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using static LCT.SW360PackageCreator.Model.ReleasesAllDetails;
 
 namespace LCT.SW360PackageCreator.Model
 {
     public class ReleasesAllDetails
     {
         [ExcludeFromCodeCoverage]
-        public Embedded _embedded { get; set; }
-        public Page page { get; set; }
-        public class Embedded
+        [JsonProperty("_embedded")]
+        public AllReleasesEmbedded Embedded { get; set; }
+        [JsonProperty("page")]
+        public Pagination Page { get; set; }
+        public class AllReleasesEmbedded
         {
             [JsonProperty("sw360:releases")]
-            public List<Sw360Release> sw360releases { get; set; }
+            public List<Sw360Release> Sw360releases { get; set; }
 
             [JsonProperty("sw360:attachments")]
-            public List<List<Attachment>> sw360attachments { get; set; }
+            public List<List<Attachment>> Sw360attachments { get; set; }
 
         }
         public class Attachment
         {
-            public string filename { get; set; }
+            [JsonProperty("filename")]
+            public string Filename { get; set; }
 
         }
         public class Links
         {
-            public Self self { get; set; }
+            [JsonProperty("self")]
+            public Self Self { get; set; }
 
         }       
         public class Self
         {
-            public string href { get; set; }
+            [JsonProperty("href")]
+            public string Href { get; set; }
         }
         public class Sw360Release
         {
-            public string name { get; set; }
-            public string version { get; set; }
-            public string clearingState { get; set; }
-            public Links _links { get; set; }
-            public Embedded _embedded { get; set; }
+            [JsonProperty("name")]
+            public string Name { get; set; }
+            [JsonProperty("version")]
+            public string Version { get; set; }
+            [JsonProperty("clearingState")]
+            public string ClearingState { get; set; }
+            [JsonProperty("_links")]
+            public Links Links { get; set; }
+            [JsonProperty("_embedded")]
+            public AllReleasesEmbedded AllReleasesEmbedded { get; set; }
 
         }
-        public class Page
+        public class Pagination
         {
-            public int totalPages { get; set; }
+            [JsonProperty("totalPages")]
+            public int TotalPages { get; set; }
 
         }
     }
