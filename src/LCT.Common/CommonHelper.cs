@@ -156,8 +156,7 @@ namespace LCT.Common
             const string URL = "SW360 Release URL";
             if (componentInfo.Count > 0 || lstReleaseNotCreated.Count > 0)
             {
-                Logger.Logger.Log(null, Level.Alert, "Action Item required by the user:\n", null);
-                PipelineArtifactUploader.UploadArtifacts();
+                Logger.Logger.Log(null, Level.Alert, "Action Item required by the user:\n", null);                
                 Environment.ExitCode = 2;
             }
 
@@ -203,8 +202,7 @@ namespace LCT.Common
             const string Version = "Version";
 
             if (components.Count > 0)
-            {
-                PipelineArtifactUploader.UploadArtifacts();
+            {               
                 Environment.ExitCode = 2;
                 Logger.Logger.Log(null, Level.Alert, "* Components Not linked to project :", null);
                 Logger.Logger.Log(null, Level.Alert, " Can be linked manually OR Check the Logs AND RE-Run", null);

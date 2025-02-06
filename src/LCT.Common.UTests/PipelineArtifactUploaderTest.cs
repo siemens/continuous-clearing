@@ -60,11 +60,11 @@ namespace LCT.Common.UTest
             Environment.SetEnvironmentVariable("Build_BuildId", null); // No pipeline detected
 
             // Act
-            PipelineArtifactUploader.UploadLogs();
-            string output = consoleOutput.ToString();
+            PipelineArtifactUploader.UploadBom();
+            string output = consoleOutput.ToString().Trim();
 
             // Assert
-            Assert.That(output, Is.Empty);
+            Assert.AreEqual("Uploading of SBOM is not supported.", output);
         }
 
         [Test]
