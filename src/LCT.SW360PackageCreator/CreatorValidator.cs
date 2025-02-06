@@ -63,8 +63,8 @@ namespace LCT.SW360PackageCreator
 
             try
             {
-                string page = "0";
-                string pageEntries = "20";
+                int page = 0;
+                int pageEntries = 40;
                 bool validReleaseFound = false;
                 ReleasesAllDetails.Sw360Release validRelease = null;
                 int pageCount = 0;
@@ -74,37 +74,40 @@ namespace LCT.SW360PackageCreator
                     string response = responseData?.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
                     ReleasesAllDetails releaseResponse = JsonConvert.DeserializeObject<ReleasesAllDetails>(response);
 
-                    validRelease = releaseResponse.Embedded.Sw360releases
+                    if (releaseResponse != null)
+                    {
+                        validRelease = releaseResponse?.Embedded?.Sw360releases?
                         .FirstOrDefault(release => release.ClearingState == "APPROVED" &&
                                                    release.AllReleasesEmbedded?.Sw360attachments != null &&
                                                    release.AllReleasesEmbedded.Sw360attachments.Any(attachments => attachments.Count != 0));
 
-                    if (validRelease != null)
-                    {
-                        validReleaseFound = true;
-                    }
-                    else
-                    {
-                        // Check if there are more pages
-                        int currentPage = int.Parse(page);
-                        int totalPages = releaseResponse.Page.TotalPages;
-                        if (currentPage < totalPages - 1)
+                        if (validRelease != null)
                         {
-                            page = (currentPage + 1).ToString();
-                            pageCount++;
+                            validReleaseFound = true;
                         }
                         else
                         {
-                            break; // No more pages to check
+                            int currentPage = page;
+                            int totalPages = (int)(releaseResponse?.Page?.TotalPages);
+                            if (currentPage < totalPages - 1)
+                            {
+                                page = currentPage + 1;
+                                pageCount++;
+                            }
+                            else
+                            {
+                                break; 
+                            }
                         }
                     }
+                    
                 }
 
                 if (validReleaseFound)
                 {
-                    var releaseUrl = validRelease.Links.Self.Href;
+                    var releaseUrl = validRelease?.Links?.Self?.Href;
                     var releaseId = CommonHelper.GetSubstringOfLastOccurance(releaseUrl, "/");
-                    string sw360link = $"{validRelease.Name}:{validRelease.Version}:{appSettings.SW360.URL}{ApiConstant.Sw360ReleaseUrlApiSuffix}" +
+                    string sw360link = $"{validRelease?.Name}:{validRelease?.Version}:{appSettings?.SW360?.URL}{ApiConstant.Sw360ReleaseUrlApiSuffix}" +
                     $"{releaseId}#/tab-Summary";
                     FossTriggerStatus fossResult = await sw360CreatorService.TriggerFossologyProcessForValidation(releaseId, sw360link);
                     if (!string.IsNullOrEmpty(fossResult?.Links?.Self?.Href))
@@ -116,7 +119,7 @@ namespace LCT.SW360PackageCreator
             }
             catch (AggregateException ex)
             {
-                Logger.Debug($"\tError in TriggerFossologyProcess--{ex}");
+                Logger.Debug($"\tError in TriggerFossologyValidation--{ex}");
                 Logger.Error($"Trigger Fossology Process failed.Please check fossology configuration in sw360");
                 environmentHelper.CallEnvironmentExit(-1);
             }

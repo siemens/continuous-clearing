@@ -52,7 +52,7 @@ namespace LCT.SW360PackageCreator.UTest
         {
             //Arrange
             string projectName = "Test";
-            ProjectReleases projectReleases=new ProjectReleases();
+            ProjectReleases projectReleases = new ProjectReleases();
             var CommonAppSettings = new CommonAppSettings()
             {
                 SW360 = new SW360()
@@ -64,7 +64,7 @@ namespace LCT.SW360PackageCreator.UTest
                 .ReturnsAsync(projectName);
 
             //Act
-            await CreatorValidator.ValidateAppSettings(CommonAppSettings, mockISw360ProjectService.Object,projectReleases);
+            await CreatorValidator.ValidateAppSettings(CommonAppSettings, mockISw360ProjectService.Object, projectReleases);
 
             //Assert
             mockISw360ProjectService.Verify(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<string>(), It.IsAny<string>(), projectReleases), Times.AtLeastOnce);
@@ -81,10 +81,10 @@ namespace LCT.SW360PackageCreator.UTest
             {
                 SW360 = new SW360()
                 {
-                   ProjectName= "Test"
+                    ProjectName = "Test"
                 }
             };
-            
+
             mockISw360ProjectService.Setup(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<String>(), It.IsAny<string>(), projectReleases))
                 .ReturnsAsync(projectName);
 
@@ -104,9 +104,9 @@ namespace LCT.SW360PackageCreator.UTest
             ProjectReleases projectReleases = new ProjectReleases();
             var CommonAppSettings = new CommonAppSettings()
             {
-                SW360=new SW360()
+                SW360 = new SW360()
             };
-            mockISw360ProjectService.Setup(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<string>(), It.IsAny<string>(),projectReleases))
+            mockISw360ProjectService.Setup(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<string>(), It.IsAny<string>(), projectReleases))
                 .ReturnsAsync(projectName);
 
             //Act
@@ -147,7 +147,7 @@ namespace LCT.SW360PackageCreator.UTest
 
             var triggerStatusResponse = JsonConvert.SerializeObject(fossTriggerStatus);
 
-            mockISW360ApicommunicationFacade.Setup(x => x.GetAllReleasesWithAllData(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(new HttpResponseMessage
+            mockISW360ApicommunicationFacade.Setup(x => x.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(new HttpResponseMessage
             {
                 Content = new StringContent(responseBody)
             });
@@ -160,14 +160,14 @@ namespace LCT.SW360PackageCreator.UTest
             await CreatorValidator.TriggerFossologyValidation(appSettings, mockISW360ApicommunicationFacade.Object);
 
             // Assert
-            mockISW360ApicommunicationFacade.Verify(x => x.GetAllReleasesWithAllData(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
-            mockISW360ApicommunicationFacade.Verify(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()), Times.Once);           
+            mockISW360ApicommunicationFacade.Verify(x => x.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>()), Times.Once);
+            mockISW360ApicommunicationFacade.Verify(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
         [Test]
         public async Task FossologyUrlValidation_ValidUrl_ReturnsTrue()
         {
             // Arrange
-           
+
 
             var appSettings = new CommonAppSettings()
             {
@@ -228,7 +228,7 @@ namespace LCT.SW360PackageCreator.UTest
             // Assert
             Assert.IsFalse(result);
         }
-       
+
 
         [Test]
         public async Task FossologyUrlValidation_InvalidUri_ThrowsException()
@@ -282,7 +282,7 @@ namespace LCT.SW360PackageCreator.UTest
             Assert.IsFalse(result);
         }
 
-        
+
 
     }
 }

@@ -313,10 +313,9 @@ namespace LCT.APICommunications
             string url = $"{sw360ComponentApi}{ApiConstant.ComponentNameUrl}{componentName}";
             return await httpClient.GetAsync(url);
         }
-        public async Task<HttpResponseMessage> GetAllReleasesWithAllData(string page, string pageEntries)
+        public async Task<HttpResponseMessage> GetAllReleasesWithAllData(int page, int pageEntries)
         {
-            HttpClient httpClient = GetHttpClient();           
-            HttpResponseMessage httpResponseMessage=new HttpResponseMessage();
+            HttpClient httpClient = GetHttpClient();            
             string url = $"{sw360ReleaseApi}?page={page}&allDetails=true&page_entries={pageEntries}";
             return await httpClient.GetAsync(url);           
         }
