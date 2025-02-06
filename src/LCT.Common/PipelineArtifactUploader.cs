@@ -44,8 +44,7 @@ namespace LCT.Common
         /// </summary>
         public static void UploadBom()
         {
-            EnvironmentType envType = RuntimeEnvironment.GetEnvironment();
-            LogManager.Shutdown();
+            EnvironmentType envType = RuntimeEnvironment.GetEnvironment();            
             if (envType == EnvironmentType.AzurePipeline && !string.IsNullOrEmpty(FileOperations.CatoolBomFilePath) && File.Exists(FileOperations.CatoolBomFilePath))
             {
                 Console.WriteLine($"##vso[artifact.upload containerfolder={BomContainerFolderName};artifactname={BomArtifactFolderName}]{FileOperations.CatoolBomFilePath}");
