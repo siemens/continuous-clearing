@@ -36,7 +36,7 @@ namespace LCT.SW360PackageCreator
         private static IEnvironmentHelper environmentHelper;
         public static async Task<int> ValidateAppSettings(CommonAppSettings appSettings, ISw360ProjectService sw360ProjectService, ProjectReleases projectReleases)
         {
-            string sw360ProjectName = await sw360ProjectService.GetProjectNameByProjectIDFromSW360(appSettings.SW360.ProjectID, appSettings.SW360.ProjectName,projectReleases);
+            string sw360ProjectName = await sw360ProjectService.GetProjectNameByProjectIDFromSW360(appSettings.SW360.ProjectID, appSettings.SW360.ProjectName, projectReleases);
 
             if (string.IsNullOrEmpty(sw360ProjectName))
             {
@@ -60,7 +60,7 @@ namespace LCT.SW360PackageCreator
             ISW360CommonService sw360CommonService = new SW360CommonService(sW360ApicommunicationFacade);
             ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sW360ApicommunicationFacade, sw360CommonService);
             ISW360Service sw360Service = new Sw360Service(sW360ApicommunicationFacade, sw360CommonService, environmentHelper);
-            
+
             try
             {
                 string page = "0";
@@ -106,13 +106,13 @@ namespace LCT.SW360PackageCreator
                     var releaseId = CommonHelper.GetSubstringOfLastOccurance(releaseUrl, "/");
                     string sw360link = $"{validRelease.Name}:{validRelease.Version}:{appSettings.SW360.URL}{ApiConstant.Sw360ReleaseUrlApiSuffix}" +
                     $"{releaseId}#/tab-Summary";
-                        FossTriggerStatus fossResult = await sw360CreatorService.TriggerFossologyProcessForValidation(releaseId, sw360link);
+                    FossTriggerStatus fossResult = await sw360CreatorService.TriggerFossologyProcessForValidation(releaseId, sw360link);
                     if (!string.IsNullOrEmpty(fossResult?.Links?.Self?.Href))
-                        {
-                            Logger.Logger.Log(null, Level.Info, $"SW360 Fossology Process validation successfull!!", null);
-                        }
+                    {
+                        Logger.Logger.Log(null, Level.Info, $"SW360 Fossology Process validation successfull!!", null);
+                    }
                 }
-                
+
             }
             catch (AggregateException ex)
             {
@@ -124,8 +124,8 @@ namespace LCT.SW360PackageCreator
         public static async Task<bool> FossologyUrlValidation(CommonAppSettings appSettings, HttpClient client, IEnvironmentHelper environmentHelper)
         {
             string url = appSettings.SW360.Fossology.URL.ToLower();
-            string prodFossUrl = Dataconstant.Cdx_ProductionFossologyURL.ToLower();
-            string stageFossUrl = Dataconstant.Cdx_StageFossologyURL.ToLower();
+            string prodFossUrl = Dataconstant.ProductionFossologyURL.ToLower();
+            string stageFossUrl = Dataconstant.StageFossologyURL.ToLower();
 
             if (string.IsNullOrEmpty(appSettings.SW360.Fossology.URL))
             {
