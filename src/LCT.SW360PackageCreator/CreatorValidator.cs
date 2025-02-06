@@ -77,8 +77,8 @@ namespace LCT.SW360PackageCreator
                     if (releaseResponse != null)
                     {
                         validRelease = releaseResponse?.Embedded?.Sw360releases?
-                        .FirstOrDefault(release => release.ClearingState == "APPROVED" &&
-                                                   release.AllReleasesEmbedded?.Sw360attachments != null &&
+                        .FirstOrDefault(release => release?.ClearingState == "APPROVED" &&
+                                                   release?.AllReleasesEmbedded?.Sw360attachments != null &&
                                                    release.AllReleasesEmbedded.Sw360attachments.Any(attachments => attachments.Count != 0));
 
                         if (validRelease != null)
