@@ -23,6 +23,7 @@ using System.Net.Http;
 using LCT.SW360PackageCreator.Model;
 using System.Linq;
 using LCT.Common.Constants;
+using LCT.Facade;
 
 
 namespace LCT.SW360PackageCreator
@@ -69,10 +70,8 @@ namespace LCT.SW360PackageCreator
                 ReleasesAllDetails.Sw360Release validRelease = null;
                 int pageCount = 0;
                 while (!validReleaseFound && pageCount < 10)
-                {
-                    HttpResponseMessage responseData = await sW360ApicommunicationFacade.GetAllReleasesWithAllData(page, pageEntries);
-                    string response = responseData?.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
-                    ReleasesAllDetails releaseResponse = JsonConvert.DeserializeObject<ReleasesAllDetails>(response);
+                {                    
+                    ReleasesAllDetails releaseResponse = await GetAllReleasesDetails(sW360ApicommunicationFacade,page,pageEntries);
 
                     if (releaseResponse != null)
                     {
@@ -100,13 +99,18 @@ namespace LCT.SW360PackageCreator
                             }
                         }
                     }
-                    
+                    else
+                    {
+                        Logger.Debug($"GetAllReleasesFullDetails():Fossology URl validation Failed");
+                    }
                 }
 
                 if (validReleaseFound)
                 {
                     var releaseUrl = validRelease?.Links?.Self?.Href;
-                    var releaseId = CommonHelper.GetSubstringOfLastOccurance(releaseUrl, "/");
+                    var releaseId=string.Empty;
+                    if (releaseUrl != null)
+                    releaseId = CommonHelper.GetSubstringOfLastOccurance(releaseUrl, "/");
                     string sw360link = $"{validRelease?.Name}:{validRelease?.Version}:{appSettings?.SW360?.URL}{ApiConstant.Sw360ReleaseUrlApiSuffix}" +
                     $"{releaseId}#/tab-Summary";
                     FossTriggerStatus fossResult = await sw360CreatorService.TriggerFossologyProcessForValidation(releaseId, sw360link);
@@ -115,14 +119,46 @@ namespace LCT.SW360PackageCreator
                         Logger.Logger.Log(null, Level.Info, $"SW360 Fossology Process validation successfull!!", null);
                     }
                 }
+                else
+                {
+                    Logger.Debug($"GetAllReleasesFullDetails():Fossology URl validation Failed");                    
+                }
 
             }
             catch (AggregateException ex)
             {
                 Logger.Debug($"\tError in TriggerFossologyValidation--{ex}");
-                Logger.Error($"Trigger Fossology Process failed.Please check fossology configuration in sw360");
+                Logger.Error($"Trigger fossology process failed.Please check fossology configuration in sw360");
                 environmentHelper.CallEnvironmentExit(-1);
             }
+        }
+        private static async Task<ReleasesAllDetails> GetAllReleasesDetails(ISW360ApicommunicationFacade sW360ApicommunicationFacade, int page, int pageEntries)
+        {
+            ReleasesAllDetails releaseResponse = null;
+            try
+            {
+                var responseData = await sW360ApicommunicationFacade.GetAllReleasesWithAllData(page, pageEntries);
+                string response = responseData?.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
+                releaseResponse = JsonConvert.DeserializeObject<ReleasesAllDetails>(response);
+            }
+            catch (HttpRequestException ex)
+            {
+                Logger.Debug($"GetAllReleasesDetails():", ex);               
+            }
+            catch (InvalidOperationException ex)
+            {
+                Logger.Debug($"GetAllReleasesDetails():", ex);                
+            }
+            catch (UriFormatException ex)
+            {
+                Logger.Debug($"GetAllReleasesDetails():", ex);               
+            }
+            catch (TaskCanceledException ex)
+            {
+                Logger.Debug($"GetAllReleasesDetails():", ex);               
+            }
+
+            return releaseResponse;
         }
         public static async Task<bool> FossologyUrlValidation(CommonAppSettings appSettings, HttpClient client, IEnvironmentHelper environmentHelper)
         {
