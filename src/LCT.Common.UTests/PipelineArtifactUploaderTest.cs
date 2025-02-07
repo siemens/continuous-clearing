@@ -60,11 +60,11 @@ namespace LCT.Common.UTest
             Environment.SetEnvironmentVariable("Build_BuildId", null); // No pipeline detected
 
             // Act
-            PipelineArtifactUploader.UploadBom();
-            string output = consoleOutput.ToString().Trim();
+            PipelineArtifactUploader.UploadLogs();
+            string output = consoleOutput.ToString();
 
             // Assert
-            Assert.AreEqual("Uploading of SBOM is not supported.", output);
+            Assert.That(output, Is.Empty);
         }
 
         [Test]
@@ -94,10 +94,10 @@ namespace LCT.Common.UTest
 
             // Act
             PipelineArtifactUploader.UploadBom();
-            string output = consoleOutput.ToString().Trim();
+            string output = consoleOutput.ToString();
 
             // Assert
-            Assert.AreEqual("Uploading of SBOM is not supported.", output);
+            Assert.That(output, Is.Empty);
         }
     }
 }
