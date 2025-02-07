@@ -167,8 +167,6 @@ namespace LCT.SW360PackageCreator.UTest
         public async Task FossologyUrlValidation_ValidUrl_ReturnsTrue()
         {
             // Arrange
-
-
             var appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360()
@@ -179,7 +177,6 @@ namespace LCT.SW360PackageCreator.UTest
                     }
                 }
             };
-
             var responseMessage = new HttpResponseMessage(HttpStatusCode.OK);
             mockHttpMessageHandler
                 .Protected()
@@ -189,7 +186,6 @@ namespace LCT.SW360PackageCreator.UTest
                     ItExpr.IsAny<CancellationToken>()
                 )
                 .ReturnsAsync(responseMessage);
-
             // Act
             var result = await CreatorValidator.FossologyUrlValidation(appSettings, httpClient, mockEnvironmentHelper.Object);
 
