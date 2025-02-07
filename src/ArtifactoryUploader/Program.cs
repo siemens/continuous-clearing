@@ -88,6 +88,8 @@ namespace ArtifactoryUploader
 
             //Uploading Package to artifactory
             PackageUploadHelper.jFrogService = GetJfrogService(appSettings);
+            UploadToArtifactory.jFrogService = GetJfrogService(appSettings);
+            JfrogRepoUpdater.jFrogService = GetJfrogService(appSettings);
             await PackageUploader.UploadPackageToArtifactory(appSettings);
 
             Logger.Logger.Log(null, Level.Notice, $"End of Artifactory Uploader execution : {DateTime.Now}\n", null);
