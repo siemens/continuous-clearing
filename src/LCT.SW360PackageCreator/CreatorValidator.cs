@@ -114,8 +114,8 @@ namespace LCT.SW360PackageCreator
                     $"{releaseId}#/tab-Summary";
                     FossTriggerStatus fossResult = await sw360CreatorService.TriggerFossologyProcessForValidation(releaseId, sw360link);
                     if (!string.IsNullOrEmpty(fossResult?.Links?.Self?.Href))
-                    {
-                        Logger.Logger.Log(null, Level.Info, $"SW360 Fossology Process validation successfull!!", null);
+                    {                        
+                        Logger.Debug($"TriggerFossologyValidation():SW360 Fossology Process validation successfull!!");
                     }
                 }
                 else
