@@ -97,7 +97,7 @@ namespace LCT.Common.UTest
             string output = consoleOutput.ToString();
 
             // Assert
-            Assert.AreEqual(output, "Uploading of SBOM is not supported.\r\n");
+            Assert.That(output, Is.Empty);
         }
     }
 }
