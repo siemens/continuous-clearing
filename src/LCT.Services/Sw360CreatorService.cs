@@ -9,6 +9,7 @@ using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.Foss;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Interface;
 using LCT.Common.Model;
 using LCT.Facade.Interfaces;
 using LCT.Services.Interface;
@@ -38,6 +39,7 @@ namespace LCT.Services
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         readonly ISW360ApicommunicationFacade m_SW360ApiCommunicationFacade;
         readonly ISW360CommonService m_SW360CommonService;
+        private static IEnvironmentHelper environmentHelper;
 
         public Sw360CreatorService(ISW360ApicommunicationFacade sw360ApiCommunicationFacade)
         {
@@ -778,6 +780,41 @@ namespace LCT.Services
             };
 
             return updateRelease;
+        }
+        public async Task<FossTriggerStatus> TriggerFossologyProcessForValidation(string releaseId, string sw360link)
+        {
+            environmentHelper = new EnvironmentHelper();
+            FossTriggerStatus fossTriggerStatus = null;
+            try
+            {
+                string triggerStatus = await m_SW360ApiCommunicationFacade.TriggerFossologyProcess(releaseId, sw360link);
+                fossTriggerStatus = JsonConvert.DeserializeObject<FossTriggerStatus>(triggerStatus);
+            }
+            catch (HttpRequestException ex)
+            {
+                Logger.Debug($"TriggerFossologyProcessForValidation():", ex);
+                Logger.Error($"Fossology process failed.Please check fossology configuration or Token in sw360");
+                environmentHelper.CallEnvironmentExit(-1);
+            }
+            catch (InvalidOperationException ex)
+            {
+                Logger.Debug($"TriggerFossologyProcessForValidation():", ex);
+                Logger.Error($"Fossology process failed.Please check fossology configuration in sw360");
+                environmentHelper.CallEnvironmentExit(-1);
+            }
+            catch (UriFormatException ex)
+            {
+                Logger.Debug($"TriggerFossologyProcessForValidation():", ex);
+                Logger.Error($"Fossology process failed.Please check fossology configuration in sw360");
+                environmentHelper.CallEnvironmentExit(-1);
+            }
+            catch (TaskCanceledException ex)
+            {
+                Logger.Debug($"TriggerFossologyProcessForValidation():", ex);
+                Logger.Error($"Fossology process failed.Please check fossology configuration in sw360");
+                environmentHelper.CallEnvironmentExit(-1);
+            }
+            return fossTriggerStatus;
         }
     }
 }

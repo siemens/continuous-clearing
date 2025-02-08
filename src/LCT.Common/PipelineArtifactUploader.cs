@@ -26,10 +26,10 @@ namespace LCT.Common
         /// </summary>
         public static void UploadLogs()
         {
-            EnvironmentType envType = RuntimeEnvironment.GetEnvironment();
-            LogManager.Shutdown();
+            EnvironmentType envType = RuntimeEnvironment.GetEnvironment();           
             if (envType == EnvironmentType.AzurePipeline && !string.IsNullOrEmpty(Log4Net.CatoolLogPath) && File.Exists(Log4Net.CatoolLogPath))
-            {                
+            {
+                LogManager.Shutdown();
                 Console.WriteLine($"##vso[artifact.upload containerfolder={LogContainerFolderName};artifactname={LogArtifactFolderName}]{Log4Net.CatoolLogPath}");
             }
             else if (envType == EnvironmentType.Unknown)
@@ -44,7 +44,7 @@ namespace LCT.Common
         /// </summary>
         public static void UploadBom()
         {
-            EnvironmentType envType = RuntimeEnvironment.GetEnvironment();
+            EnvironmentType envType = RuntimeEnvironment.GetEnvironment();            
             if (envType == EnvironmentType.AzurePipeline && !string.IsNullOrEmpty(FileOperations.CatoolBomFilePath) && File.Exists(FileOperations.CatoolBomFilePath))
             {
                 Console.WriteLine($"##vso[artifact.upload containerfolder={BomContainerFolderName};artifactname={BomArtifactFolderName}]{FileOperations.CatoolBomFilePath}");

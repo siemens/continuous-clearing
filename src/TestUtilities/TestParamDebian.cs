@@ -23,6 +23,7 @@ namespace TestUtilities
         public string ArtifactoryUploadUser { get; set; }
         public string ArtifactoryUploadApiKey { get; set; }
         public string JfrogApi { get; set; }
+        public string FossologyTrigger { get; set; }
 
         public TestParamDebian()
         {
@@ -37,6 +38,7 @@ namespace TestUtilities
             ArtifactoryUploadApiKey = s_Config["ArtifactoryUploadApiKey"];
             JfrogApi = s_Config["JfrogApi"];
             RemoveDevDependency = s_Config["RemoveDevDependency"];
+            FossologyTrigger = s_Config["EnableFossologyTrigger"];
         }
     }
 }

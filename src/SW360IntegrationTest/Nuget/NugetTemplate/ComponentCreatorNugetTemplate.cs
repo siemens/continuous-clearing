@@ -67,6 +67,8 @@ namespace SW360IntegrationTest.Nuget
                 TestConstant.SW360ProjectID, testParameters.SW360ProjectID,
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.ProjectType,"NUGET",
+                TestConstant.FossologyURL, testParameters.FossUrl,
+                TestConstant.EnableFossologyTrigger,testParameters.FossologyTrigger,
                 TestConstant.Mode,""});
 
             Assert.IsTrue(value == 0 || value == 2,

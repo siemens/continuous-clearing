@@ -28,6 +28,7 @@ namespace TestUtilities
         public string ThirdPartyDestinationRepoName { get; set; }
         public string InternalDestinationRepoName { get; set; }
         public string DevDestinationRepoName { get; set; }
+        public string FossologyTrigger { get; set; }
 
         public TestParamMaven()
         {
@@ -45,6 +46,7 @@ namespace TestUtilities
             ThirdPartyDestinationRepoName = "maven-test";
             InternalDestinationRepoName = "maven-test";
             DevDestinationRepoName = "maven-test";
+            FossologyTrigger = s_Config["EnableFossologyTrigger"];
         }
     }
 }
