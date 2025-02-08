@@ -60,7 +60,7 @@ namespace LCT.Services
             List<Components> availableComponentsList = new List<Components>();
             Sw360ServiceStopWatch = new Stopwatch();
             try
-            {
+            {                
                 Sw360ServiceStopWatch.Start();
                 string responseBody = await m_SW360ApiCommunicationFacade.GetReleases();
                 Sw360ServiceStopWatch.Stop();

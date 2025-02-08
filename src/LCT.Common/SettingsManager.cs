@@ -24,7 +24,7 @@ namespace LCT.Common
     {
         public string BasePath { get; private set; } = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private static IEnvironmentHelper environmentHelper;
+        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
 
         /// <summary>
         /// Reads the Configuration from input args and json setting file
@@ -42,9 +42,8 @@ namespace LCT.Common
             if (args?.Length == 0)
             {
                 Logger.Debug($"Argument Count : {args.Length}");
-                DisplayHelp();
-                PipelineArtifactUploader.UploadArtifacts();
-                Environment.Exit(0);
+                DisplayHelp();                
+                environmentHelper.CallEnvironmentExit(0);
             }
             string settingsFilePath = GetConfigFilePathFromArgs(args, jsonSettingsFileName);
             Logger.Logger.Log(null, Level.Notice, $"Settings File: {settingsFilePath}", null);
@@ -213,8 +212,7 @@ namespace LCT.Common
             }
 
             if (!string.IsNullOrWhiteSpace(missingParameters.ToString()))
-            {
-                environmentHelper=new EnvironmentHelper();
+            {                
                 ExceptionHandling.ArgumentException(missingParameters.ToString());
                 environmentHelper.CallEnvironmentExit(-1);
             }

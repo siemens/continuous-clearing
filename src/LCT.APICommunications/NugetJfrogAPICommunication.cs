@@ -20,7 +20,7 @@ namespace LCT.APICommunications
     {
         private static int TimeoutInSec { get; set; }
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private static IEnvironmentHelper environmentHelper;
+        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
         public NugetJfrogApiCommunication(string repoDomainName, string srcrepoName, ArtifactoryCredentials repoCredentials,int timeout):base(repoDomainName,srcrepoName,repoCredentials,timeout)
         {
             TimeoutInSec = timeout;
@@ -59,7 +59,7 @@ namespace LCT.APICommunications
         public override async Task<HttpResponseMessage> GetPackageInfo(ComponentsToArtifactory component)
         {
             HttpResponseMessage responseMessage = new HttpResponseMessage();
-            environmentHelper = new EnvironmentHelper();
+            
             var result = responseMessage;
             try
             {
