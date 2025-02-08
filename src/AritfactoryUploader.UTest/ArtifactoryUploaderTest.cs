@@ -48,7 +48,7 @@ namespace AritfactoryUploader.UTest
             };
 
             ArtfactoryUploader.jFrogService = GetJfrogService(appSettings);
-            DisplayPackagesInfo displayPackagesInfo = PackageUploadHelper.GetComponentsToBePackages();
+            DisplayPackagesInfo displayPackagesInfo = PackageUploadInformation.GetComponentsToBePackages();
             var componentsToArtifactory = new ComponentsToArtifactory
             {
                 Name = "html5lib",

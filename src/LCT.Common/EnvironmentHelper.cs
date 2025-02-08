@@ -15,6 +15,9 @@ namespace LCT.Common
             {
                 PipelineArtifactUploader.UploadLogs();
                 EnvironmentExit(code);
+            } else if (code == 2)
+            {
+                Environment.ExitCode = 2;
             }
         }
         private static void EnvironmentExit(int exitCode)
