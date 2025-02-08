@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Net.Http;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -38,6 +39,7 @@ namespace LCT.SW360PackageCreator
         private static bool m_Verbose = false;
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
+
         protected Program() { }
 
         static async Task Main(string[] args)
@@ -49,6 +51,7 @@ namespace LCT.SW360PackageCreator
                 m_Verbose = true;
 
             ISettingsManager settingsManager = new SettingsManager();
+            EnvironmentHelper environmentHelper = new EnvironmentHelper();
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
             ISW360ApicommunicationFacade sW360ApicommunicationFacade;
             ISw360ProjectService sw360ProjectService= Getsw360ProjectServiceObject(appSettings, out sW360ApicommunicationFacade);
@@ -56,10 +59,11 @@ namespace LCT.SW360PackageCreator
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
-            
+           
             string FolderPath = InitiateLogger(appSettings);
             settingsManager.CheckRequiredArgsToRun(appSettings, "Creator");
             int isValid = await CreatorValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
+                        
             if (isValid == -1)
             {
                 environmentHelper.CallEnvironmentExit(-1);
@@ -87,6 +91,13 @@ namespace LCT.SW360PackageCreator
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);
 
+            //Validate Fossology Url
+            if (appSettings.SW360.Fossology.EnableTrigger)
+            {
+                HttpClient client = new HttpClient();
+                if (await CreatorValidator.FossologyUrlValidation(appSettings,client, environmentHelper))
+                    await CreatorValidator.TriggerFossologyValidation(appSettings, sW360ApicommunicationFacade);
+            }
             await InitiatePackageCreatorProcess(appSettings, sw360ProjectService, sW360ApicommunicationFacade);
 
             Logger.Logger.Log(null, Level.Notice, $"End of Package Creator execution: {DateTime.Now}\n", null);
@@ -95,6 +106,7 @@ namespace LCT.SW360PackageCreator
             PipelineArtifactUploader.UploadArtifacts();
         }
 
+       
         private static CatoolInfo GetCatoolVersionFromProjectfile()
         {
             CatoolInfo catoolInfo = new CatoolInfo();

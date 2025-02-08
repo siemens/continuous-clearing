@@ -44,5 +44,6 @@ namespace LCT.Services.Interface
         Task<bool> UpdatePurlIdForExistingRelease(ComparisonBomData cbomData, string releaseId, ReleasesInfo releasesInfo = null);
 
         Task<bool> UdpateSW360ReleaseContent(Components component, string fossUrl);
+        Task<FossTriggerStatus> TriggerFossologyProcessForValidation(string releaseId, string sw360link);
     }
 }
