@@ -46,7 +46,7 @@ namespace LCT.PackageIdentifier.Model
         public int UnofficialComponents { get; set; }
 
 
-        [DisplayName(@"Total Components Excluded")]
+        [DisplayName(@"Total InvalidComponents Excluded")]
         public int ComponentsExcluded { get; set; }
 
         [DisplayName(@"Total Components Excluded SW360")]
