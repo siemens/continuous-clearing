@@ -11,9 +11,13 @@ using log4net;
 using log4net.Core;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Telemetry;
+using Component = CycloneDX.Models.Component;
 using System.IO;
 using LCT.Common.Runtime;
 

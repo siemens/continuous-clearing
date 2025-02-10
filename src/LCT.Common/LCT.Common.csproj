@@ -35,6 +35,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LCT.CycloneDxProcessor\LCT.CycloneDxProcessor.csproj" />
+    <ProjectReference Include="..\Telemetry\Telemetry.csproj" />
   </ItemGroup>
 
   <ItemGroup>
