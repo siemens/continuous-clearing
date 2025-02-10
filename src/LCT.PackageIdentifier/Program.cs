@@ -115,6 +115,37 @@ namespace LCT.PackageIdentifier
 
             // publish logs and bom file to pipeline artifact
             PipelineArtifactUploader.UploadArtifacts();
+            // Initialize telemetry with CATool version and instrumentation key only if Telemetry is enabled in appsettings
+            if (appSettings.Telemetry == true)
+            {
+                Logger.Warn(TelemetryConstant.StartLogMessage);
+                Telemetry.Telemetry telemetry = new Telemetry.Telemetry("ApplicationInsights", new Dictionary<string, string>
+                {
+                    { "InstrumentationKey", appSettings.ApplicationInsight_InstrumentKey }
+                });
+                try
+                {
+                    TelemetryHelper.InitializeAndTrackEvent(telemetry, TelemetryConstant.ToolName, caToolInformation.CatoolVersion, TelemetryConstant.PackageIdentifier
+                                                        , appSettings);
+                    // Track KPI data if available
+                    if (BomCreator.bomKpiData != null)
+                    {
+                        TelemetryHelper.TrackKpiDataTelemetry(telemetry, TelemetryConstant.IdentifierKpiData, BomCreator.bomKpiData);
+                    }
+                    telemetry.TrackExecutionTime();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"An error occurred: {ex.Message}");
+                    TelemetryHelper.TrackException(telemetry, ex);
+                    environmentHelper = new EnvironmentHelper();
+                    environmentHelper.CallEnvironmentExit(-1);
+                }
+                finally
+                {
+                    telemetry.Flush(); // Ensure telemetry is sent before application exits
+                }
+            }
 
         }
 

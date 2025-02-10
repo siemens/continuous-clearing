@@ -89,8 +89,45 @@ namespace LCT.SW360PackageCreator
                 Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);
 
             await InitiatePackageCreatorProcess(appSettings, sw360ProjectService, sW360ApicommunicationFacade);
+            // Initialize telemetry with CATool version and instrumentation key only if Telemetry is enabled in appsettings
+            if (appSettings.Telemetry == true)
+            {
+                Logger.Warn(TelemetryConstant.StartLogMessage);
+                Telemetry.Telemetry telemetry = new Telemetry.Telemetry("ApplicationInsights", new Dictionary<string, string>
+                {
+                    { "InstrumentationKey", appSettings.ApplicationInsight_InstrumentKey }
+                });
+                try
+                {
+                    TelemetryHelper.InitializeAndTrackEvent(telemetry, TelemetryConstant.ToolName, caToolInformation.CatoolVersion, TelemetryConstant.PackageCreator
+                                                        , appSettings);
+                    // Track KPI data if available
+                    if (ComponentCreator.kpiData != null)
+                    {
+                        TelemetryHelper.TrackKpiDataTelemetry(telemetry, TelemetryConstant.CreatorKpiData, ComponentCreator.kpiData);
+                    }
+                    telemetry.TrackExecutionTime();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"An error occurred: {ex.Message}");
+                    TelemetryHelper.TrackException(telemetry, ex);
+                    CommonHelper.CallEnvironmentExit(-1);
+                }
+                finally
+                {
+                    telemetry.Flush(); // Ensure telemetry is sent before application exits
+                }
+            }
+
+
 
             Logger.Logger.Log(null, Level.Notice, $"End of Package Creator execution: {DateTime.Now}\n", null);
+
+            // publish logs and bom file to pipeline artifact
+            CommonHelper.PublishFilesToArtifact();
+
+Logger.Logger.Log(null, Level.Notice, $"End of Package Creator execution: {DateTime.Now}\n", null);
 
             // publish logs and bom file to pipeline artifact
             PipelineArtifactUploader.UploadArtifacts();

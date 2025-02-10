@@ -23,6 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\LCT.Common\LCT.Common.csproj" />
     <ProjectReference Include="..\LCT.Services\LCT.Services.csproj" />
+    <ProjectReference Include="..\Telemetry\Telemetry.csproj" />
   </ItemGroup>
 
 </Project>

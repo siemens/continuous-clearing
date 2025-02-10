@@ -25,6 +25,10 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using LCT.ArtifactoryUploader.Model;
+using System.Collections.Generic;
+using System.Globalization;
+using Telemetry;
 
 namespace ArtifactoryUploader
 {
@@ -92,8 +96,41 @@ namespace ArtifactoryUploader
 
             Logger.Logger.Log(null, Level.Notice, $"End of Artifactory Uploader execution : {DateTime.Now}\n", null);
             // publish logs and BOM file to pipeline artifact
+            CommonHelper.PublishFilesToArtifact();
+            // Initialize telemetry with CATool version and instrumentation key only if Telemetry is enabled in appsettings
+            if (appSettings.Telemetry == true)
+            {
+                Logger.Warn(TelemetryConstant.StartLogMessage);
+                Telemetry.Telemetry telemetry = new Telemetry.Telemetry("ApplicationInsights", new Dictionary<string, string>
+                {
 
-            PipelineArtifactUploader.UploadArtifacts();
+            { "InstrumentationKey", appSettings.ApplicationInsight_InstrumentKey }
+                });
+
+                try
+                {
+                    TelemetryHelper.InitializeAndTrackEvent(telemetry, TelemetryConstant.ToolName, caToolInformation.CatoolVersion, TelemetryConstant.ArtifactoryUploader
+                                                        , appSettings);
+
+                    // Track KPI data if available
+                    if (PackageUploader.uploaderKpiData != null)
+                    {
+                        TelemetryHelper.TrackKpiDataTelemetry(telemetry, TelemetryConstant.ArtifactoryUploaderKpiData, PackageUploader.uploaderKpiData);
+                    }
+                    telemetry.TrackExecutionTime();
+
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"An error occurred: {ex.Message}");
+                    TelemetryHelper.TrackException(telemetry, ex);
+                    CommonHelper.CallEnvironmentExit(-1);
+                }
+                finally
+                {
+                    telemetry.Flush(); // Ensure telemetry is sent before application exits
+                }
+            }
 
         }
 

@@ -48,6 +48,28 @@ namespace LCT.Common
             Directory = new Directory(folderAction, fileOperations);
         }
 
+
+
+        private string m_PackageFilePath;
+        private string m_BomFolderPath;
+        private string m_Sw360Token;
+        private string m_SW360ProjectName;
+        private string m_SW360ProjectID;
+        private string m_ArtifactoryApiKey;
+        private string m_SW360URL;
+        private string m_BomFilePath;
+        private string m_FOSSURL;
+        private string m_ArtifactoryUser;
+        private string m_CycloneDxSBomTemplatePath;
+
+
+        public bool RemoveDevDependency { get; set; } = true;
+
+        public bool Telemetry { get; set; } = true;
+        public string ApplicationInsightInstrumentKey { get; set; }
+        public string SW360AuthTokenType { get; set; } = "Bearer";
+        public string JFrogApi { get; set; }
+
         public int TimeOut { get; set; } = 200;
         public string ProjectType
         {
