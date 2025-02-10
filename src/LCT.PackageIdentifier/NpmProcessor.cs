@@ -112,7 +112,7 @@ namespace LCT.PackageIdentifier
                 if (appSettings.SW360.ExcludeComponents != null)
                 {
                     lstComponentForBOM = CommonHelper.RemoveExcludedComponents(lstComponentForBOM, appSettings.SW360.ExcludeComponents, ref noOfExcludedComponents);
-                    BomCreator.bomKpiData.ComponentsExcluded += noOfExcludedComponents;
+                    BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents;
 
                 }
                 BomCreator.bomKpiData.DevDependentComponents += noOfDevDependent;
@@ -508,7 +508,7 @@ namespace LCT.PackageIdentifier
             {
                 componentForBOM = CommonHelper.RemoveExcludedComponents(componentForBOM, appSettings.SW360.ExcludeComponents, ref noOfExcludedComponents);
                 dependenciesForBOM = CommonHelper.RemoveInvalidDependenciesAndReferences(componentForBOM, dependenciesForBOM);
-                BomCreator.bomKpiData.ComponentsExcluded += noOfExcludedComponents;
+                BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents;
 
             }
             cycloneDXBOM.Components = componentForBOM;

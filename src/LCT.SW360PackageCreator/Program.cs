@@ -37,7 +37,9 @@ namespace LCT.SW360PackageCreator
     {
         public static Stopwatch CreatorStopWatch { get; set; }
         private static bool m_Verbose = false;
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);        
+        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
+
         protected Program() { }
 
         static async Task Main(string[] args)
@@ -135,8 +137,7 @@ namespace LCT.SW360PackageCreator
         private static async Task InitiatePackageCreatorProcess(CommonAppSettings appSettings, ISw360ProjectService sw360ProjectService, ISW360ApicommunicationFacade sW360ApicommunicationFacade)
         {
             ISW360CommonService sw360CommonService = new SW360CommonService(sW360ApicommunicationFacade);
-            ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sW360ApicommunicationFacade, sw360CommonService);
-            IEnvironmentHelper environmentHelper = new EnvironmentHelper();
+            ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sW360ApicommunicationFacade, sw360CommonService);            
             ISW360Service sw360Service = new Sw360Service(sW360ApicommunicationFacade, sw360CommonService, environmentHelper);
             ICycloneDXBomParser cycloneDXBomParser = new CycloneDXBomParser();
 

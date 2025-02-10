@@ -39,7 +39,7 @@ namespace LCT.APICommunications
         private readonly string sw360UsersApi;
         private readonly int timeOut;
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private static IEnvironmentHelper environmentHelper;
+        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
         #endregion
 
         #region PUBLIC METHODS
@@ -61,8 +61,7 @@ namespace LCT.APICommunications
 
         public async Task<string> GetProjects()
         {
-            HttpClient httpClient = GetHttpClient();
-            environmentHelper = new EnvironmentHelper();
+            HttpClient httpClient = GetHttpClient();           
             var result = string.Empty;
             try
             {
@@ -100,8 +99,7 @@ namespace LCT.APICommunications
         public async Task<HttpResponseMessage> GetProjectById(string projectId)
         {
             HttpClient httpClient = GetHttpClient();
-            HttpResponseMessage obj = new HttpResponseMessage();
-            environmentHelper = new EnvironmentHelper();
+            HttpResponseMessage obj = new HttpResponseMessage();           
             var result = obj;
             string projectsByTagUrl = $"{sw360ProjectsApi}/{projectId}";
             try
@@ -126,8 +124,7 @@ namespace LCT.APICommunications
 
         public async Task<string> GetReleases()
         {
-            HttpClient httpClient = GetHttpClient();
-            environmentHelper = new EnvironmentHelper();
+            HttpClient httpClient = GetHttpClient();            
             var result = string.Empty;
             try
             {

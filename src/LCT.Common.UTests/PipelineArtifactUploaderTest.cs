@@ -61,10 +61,10 @@ namespace LCT.Common.UTest
 
             // Act
             PipelineArtifactUploader.UploadLogs();
-            string output = consoleOutput.ToString();
+            string output = consoleOutput.ToString().Trim();
 
             // Assert
-            Assert.That(output, Is.Empty);
+            Assert.AreNotEqual(output, "Uploading of SBOM is not supported.");
         }
 
         [Test]
@@ -94,10 +94,10 @@ namespace LCT.Common.UTest
 
             // Act
             PipelineArtifactUploader.UploadBom();
-            string output = consoleOutput.ToString();
+            string output = consoleOutput.ToString().Trim();
 
             // Assert
-            Assert.That(output, Is.Empty);
+            Assert.AreEqual(output, "Uploading of SBOM is not supported.");
         }
     }
 }

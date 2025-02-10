@@ -21,7 +21,7 @@ namespace LCT.APICommunications
 
 
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private static IEnvironmentHelper environmentHelper;
+        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
         private static int TimeoutInSec { get; set; }
         public DebianJfrogAPICommunication(string repoDomainName, string srcrepoName, ArtifactoryCredentials repoCredentials, int timeout) : base(repoDomainName, srcrepoName, repoCredentials, timeout)
         {
@@ -60,8 +60,7 @@ namespace LCT.APICommunications
 
         public override async Task<HttpResponseMessage> GetPackageInfo(ComponentsToArtifactory component)
         {
-            HttpResponseMessage responseMessage = new HttpResponseMessage();
-            environmentHelper = new EnvironmentHelper();
+            HttpResponseMessage responseMessage = new HttpResponseMessage();            
             var result = responseMessage;
             try
             {

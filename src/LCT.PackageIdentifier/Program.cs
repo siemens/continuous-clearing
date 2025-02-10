@@ -42,7 +42,7 @@ namespace LCT.PackageIdentifier
 
         public static Stopwatch BomStopWatch { get; set; }
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private static IEnvironmentHelper environmentHelper;
+        private static IEnvironmentHelper environmentHelper =new EnvironmentHelper();
         protected Program() { }
 
         static async Task Main(string[] args)
@@ -59,7 +59,7 @@ namespace LCT.PackageIdentifier
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
             string FolderPath = LogFolderInitialisation(appSettings);
-
+            
             settingsManager.CheckRequiredArgsToRun(appSettings, "Identifer");
 
             Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Package Identifier >>>>>====================", null);
@@ -155,7 +155,6 @@ namespace LCT.PackageIdentifier
             int isValid = await BomValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
             if (isValid == -1)
             {
-                environmentHelper=new EnvironmentHelper();
                 environmentHelper.CallEnvironmentExit(-1);
             }
         }       
