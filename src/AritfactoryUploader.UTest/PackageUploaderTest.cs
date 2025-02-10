@@ -79,6 +79,8 @@ namespace AritfactoryUploader.UTest
 
             IJFrogService jFrogService = GetJfrogService(commonAppSettings);
             PackageUploadHelper.jFrogService = jFrogService;
+            UploadToArtifactory.jFrogService = jFrogService;
+            ArtfactoryUploader.jFrogService= jFrogService;
 
             Program.UploaderStopWatch = new Stopwatch();
             Program.UploaderStopWatch.Start();
@@ -231,7 +233,6 @@ namespace AritfactoryUploader.UTest
             //Assert
             Assert.Pass();
         }
-
 
 
         private static IJFrogService GetJfrogService(CommonAppSettings appSettings)

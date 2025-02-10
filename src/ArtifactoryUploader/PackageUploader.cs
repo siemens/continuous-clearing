@@ -39,9 +39,9 @@ namespace LCT.ArtifactoryUploader
             DisplayAllSettings(m_ComponentsInBOM.Components, appSettings);
             uploaderKpiData.ComponentInComparisonBOM = m_ComponentsInBOM.Components.Count;
 
-            DisplayPackagesInfo displayPackagesInfo = PackageUploadHelper.GetComponentsToBePackages();
+            DisplayPackagesInfo displayPackagesInfo = PackageUploadInformation.GetComponentsToBePackages();
 
-            List<ComponentsToArtifactory> m_ComponentsToBeUploaded = await PackageUploadHelper.GetComponentsToBeUploadedToArtifactory(m_ComponentsInBOM.Components, appSettings, displayPackagesInfo);
+            List<ComponentsToArtifactory> m_ComponentsToBeUploaded = await UploadToArtifactory.GetComponentsToBeUploadedToArtifactory(m_ComponentsInBOM.Components, appSettings, displayPackagesInfo);
             //Uploading the component to artifactory
 
             uploaderKpiData.PackagesToBeUploaded = m_ComponentsToBeUploaded.Count(x => x.PackageType == PackageType.ClearedThirdParty);
@@ -51,7 +51,7 @@ namespace LCT.ArtifactoryUploader
             await PackageUploadHelper.UploadingThePackages(m_ComponentsToBeUploaded, appSettings.TimeOut, displayPackagesInfo);
 
             //Display packages information 
-            PackageUploadHelper.DisplayPackageUploadInformation(displayPackagesInfo);
+            PackageUploadInformation.DisplayPackageUploadInformation(displayPackagesInfo);
 
 
             //Updating the component's new location
@@ -60,7 +60,7 @@ namespace LCT.ArtifactoryUploader
             PackageUploadHelper.UpdateBomArtifactoryRepoUrl(ref m_ComponentsInBOM, m_ComponentsToBeUploaded);
 
             //update Jfrog Repository Path For Successfully Uploaded Items
-            m_ComponentsInBOM = await PackageUploadHelper.UpdateJfrogRepoPathForSucessfullyUploadedItems(m_ComponentsInBOM, displayPackagesInfo);
+            m_ComponentsInBOM = await JfrogRepoUpdater.UpdateJfrogRepoPathForSucessfullyUploadedItems(m_ComponentsInBOM, displayPackagesInfo);
 
             var formattedString = CycloneDX.Json.Serializer.Serialize(m_ComponentsInBOM);
 
@@ -79,7 +79,8 @@ namespace LCT.ArtifactoryUploader
             // set the error code
             if (uploaderKpiData.PackagesNotUploadedDueToError > 0 || uploaderKpiData.PackagesNotExistingInRemoteCache > 0)
             {
-                Environment.ExitCode = 2;
+                EnvironmentHelper environmentHelper = new EnvironmentHelper();
+                environmentHelper.CallEnvironmentExit(2);
                 Logger.Debug("Setting ExitCode to 2");
             }
         }

@@ -67,6 +67,7 @@ namespace LCT.PackageIdentifier
             }
 
             bom.Components = componentsForBOM;
+            bom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(bom.Components, bom.Dependencies);
             Logger.Debug($"ParsePackageFile():End");
             return bom;
         }

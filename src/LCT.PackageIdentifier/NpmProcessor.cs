@@ -71,6 +71,7 @@ namespace LCT.PackageIdentifier
             bom.Components = componentsForBOM;
             bom.Dependencies = dependencies;
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
+            bom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(bom.Components, bom.Dependencies);
             Logger.Debug($"ParsePackageFile():End");
             return bom;
         }
@@ -204,6 +205,7 @@ namespace LCT.PackageIdentifier
             List<JToken> directDependencies = new List<JToken>();
             directDependencies.AddRange(dep);
             directDependencies.AddRange(devDep);
+           
             foreach (JProperty prop in depencyComponentList.Skip(1))
             {
                 Property isdev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
@@ -228,27 +230,11 @@ namespace LCT.PackageIdentifier
                 }
 
                 string folderPath = CommonHelper.TrimEndOfString(filepath, $"\\{FileConstant.PackageLockFileName}");
-                string packageName=string.Empty;
-                if (properties[Name] != null)
-                {
-                    packageName = Convert.ToString(properties[Name]);                   
-                }
-                else 
-                {
-                    packageName = CommonHelper.GetSubstringOfLastOccurance(prop.Name, $"node_modules/");
-                }
-                
+                string packageName = GetPackageName(properties, prop);
+
                 string componentName = packageName.StartsWith('@') ? packageName.Replace("@", "%40") : packageName;
 
-                if (packageName.Contains('@'))
-                {
-                    components.Group = packageName.Split('/')[0];
-                    components.Name = packageName.Split('/')[1];
-                }
-                else
-                {
-                    components.Name = packageName;
-                }                
+                SetComponentGroupAndName(components, packageName);
 
                 components.Type = Component.Classification.Library;
                 components.Description = folderPath;
@@ -268,6 +254,31 @@ namespace LCT.PackageIdentifier
             }
         }
 
+        private static void SetComponentGroupAndName(Component component, string packageName)
+        {
+            if (packageName.Contains('@'))
+            {
+                component.Group = packageName.Split('/')[0];
+                component.Name = packageName.Split('/')[1];
+            }
+            else
+            {
+                component.Name = packageName;
+            }
+        }
+        private static string GetPackageName(JObject properties, JProperty prop)
+        {
+            string packageName;
+            if (properties[Name] != null)
+            {
+                packageName = Convert.ToString(properties[Name]);               
+            }
+            else
+            {
+                packageName = CommonHelper.GetSubstringOfLastOccurance(prop.Name, $"node_modules/");
+            }
+            return packageName;
+        }
         public static string GetIsDirect(List<JToken> directDependencies, JProperty prop)
         {
             string subvalue = CommonHelper.GetSubstringOfLastOccurance(prop.Name, $"node_modules/");
@@ -282,7 +293,6 @@ namespace LCT.PackageIdentifier
 
             return "false";
         }
-
         private static void CheckAndAddToBundleComponents(List<BundledComponents> bundledComponents, JProperty prop, Component components)
         {
             if (prop.Value[Bundled] != null &&
@@ -553,15 +563,27 @@ namespace LCT.PackageIdentifier
             List<Dependency> dependencyList = new();
 
             foreach (var component in componentsForBOM)
-            {
+            {                
                 if ((component.Author?.Split(",")) != null)
                 {
                     List<Dependency> subDependencies = new();
                     foreach (var item in (component.Author?.Split(",")).Where(item => item.Contains(':')))
                     {
                         var componentDetails = item.Split(":");
-                        var name = StringFormat(componentDetails[0]);
-                        var version = StringFormat(componentDetails[1]);
+                        string name;
+                        string version;
+
+                        if (componentDetails.Length >= 3 && componentDetails[2].Contains('@'))
+                        {
+                            var npmDetails = componentDetails[2].Split('@');
+                            name = StringFormat(npmDetails[0]);
+                            version = StringFormat(npmDetails[1]);
+                        }
+                        else
+                        {
+                            name = StringFormat(componentDetails[0]);
+                            version = StringFormat(componentDetails[1]);
+                        }
                         string purlId = $"{ApiConstant.NPMExternalID}{name}@{version}";
                         Dependency dependentList = new Dependency()
                         {

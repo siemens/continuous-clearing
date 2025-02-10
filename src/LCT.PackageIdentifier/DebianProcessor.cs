@@ -76,7 +76,7 @@ namespace LCT.PackageIdentifier
             {
                 AddSiemensDirectProperty(ref bom);
             }
-
+            bom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(bom.Components, bom.Dependencies);
             return bom;
         }
 

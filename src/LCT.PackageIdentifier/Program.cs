@@ -75,10 +75,10 @@ namespace LCT.PackageIdentifier
 
             // Validate application settings
             await ValidateAppsettingsFile(appSettings, projectReleases);
-            string listOfInlude = DisplayInclude(appSettings);
-            string listOfExclude = DisplayExclude(appSettings);
-            string listOfExcludeComponents = DisplayExcludeComponents(appSettings);            
-            string listOfInternalRepoList = GetInternalRepolist(appSettings);
+            string listOfInclude = DisplayInformation.DisplayIncludeFiles(appSettings);
+            string listOfExclude = DisplayInformation.DisplayExcludeFiles(appSettings);
+            string listOfExcludeComponents = DisplayInformation.DisplayExcludeComponents(appSettings);            
+            string listOfInternalRepoList = DisplayInformation.GetInternalRepolist(appSettings);
 
             Logger.Logger.Log(null, Level.Notice, $"Input Parameters used in Package Identifier:\n\t" +
                 $"CaToolVersion\t\t --> {caToolInformation.CatoolVersion}\n\t" +
@@ -92,7 +92,7 @@ namespace LCT.PackageIdentifier
                 $"ProjectType\t\t --> {appSettings.ProjectType}\n\t" +
                 $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t" +
                 $"InternalRepoList\t --> {listOfInternalRepoList}\n\t" +
-                $"Include\t\t\t --> {listOfInlude}\n\t" +
+                $"Include\t\t\t --> {listOfInclude}\n\t" +
                 $"Exclude\t\t\t --> {listOfExclude}\n\t" +
                 $"ExcludeComponents\t --> {listOfExcludeComponents}\n", null);
 
@@ -189,157 +189,7 @@ namespace LCT.PackageIdentifier
                 environmentHelper=new EnvironmentHelper();
                 environmentHelper.CallEnvironmentExit(-1);
             }
-        }
-        private static string DisplayInclude(CommonAppSettings appSettings)
-        {
-            string totalString = string.Empty;
-            switch (appSettings.ProjectType.ToUpperInvariant())
-            {
-                case "NPM":
-                    if (appSettings.Npm.Include != null)
-                    {
-                        totalString = string.Join(",", appSettings.Npm.Include?.ToList());
-                    }
-                    return totalString;
-                case "NUGET":
-                    if (appSettings.Nuget.Include != null)
-                    {
-                        totalString = string.Join(",", appSettings.Nuget.Include?.ToList());
-                    }
-                    return totalString;
-                case "MAVEN":
-                    if (appSettings.Maven.Include != null)
-                    {
-                        totalString = string.Join(",", appSettings.Maven.Include?.ToList());
-                    }
-                    return totalString;
-                case "DEBIAN":
-                    if (appSettings.Debian.Include != null)
-                    {
-                        totalString = string.Join(",", appSettings.Debian.Include?.ToList());
-                    }
-
-                    return totalString;
-                case "POETRY":
-                    if (appSettings.Poetry.Include != null)
-                    {
-                        totalString = string.Join(",", appSettings.Poetry.Include?.ToList());
-                    }
-                    return totalString;
-                case "CONAN":
-                    if (appSettings.Conan.Include != null)
-                    {
-                        totalString = string.Join(",", appSettings.Conan.Include?.ToList());
-                    }
-                    return totalString;
-                case "ALPINE":
-                    if (appSettings.Alpine.Include != null)
-                    {
-                        totalString = string.Join(",", appSettings.Alpine.Include?.ToList());
-                    }
-                    return totalString;
-                default:
-                    Logger.Error($"Invalid ProjectType - {appSettings.ProjectType}");
-                    break;
-            }
-            return totalString;
-        }
-        private static string DisplayExclude(CommonAppSettings appSettings)
-        {
-
-            string totalString = string.Empty;
-            switch (appSettings.ProjectType.ToUpperInvariant())
-            {
-                case "NPM":
-                    if (appSettings.Npm.Exclude != null)
-                    {
-                        totalString = string.Join(",", appSettings.Npm.Exclude?.ToList());
-                    }
-                    return totalString;
-                case "NUGET":
-                    if (appSettings.Nuget.Exclude != null)
-                    {
-                        totalString = string.Join(",", appSettings.Nuget.Exclude?.ToList());
-                    }
-                    return totalString;
-                case "MAVEN":
-                    if (appSettings.Maven.Exclude != null)
-                    {
-                        totalString = string.Join(",", appSettings.Maven.Exclude?.ToList());
-                    }
-                    return totalString;
-                case "DEBIAN":
-                    if (appSettings.Debian.Exclude != null)
-                    {
-                        totalString = string.Join(",", appSettings.Debian.Exclude?.ToList());
-                    }
-                    return totalString;
-                case "POETRY":
-                    if (appSettings.Poetry.Exclude != null)
-                    {
-                        totalString = string.Join(",", appSettings.Poetry.Exclude?.ToList());
-                    }
-                    return totalString;
-                case "CONAN":
-                    if (appSettings.Conan.Exclude != null)
-                    {
-                        totalString = string.Join(",", appSettings.Conan.Exclude?.ToList());
-                    }
-                    return totalString;
-                case "ALPINE":
-                    if (appSettings.Alpine.Include != null)
-                    {
-                        totalString = string.Join(",", appSettings.Alpine.Include?.ToList());
-                    }
-                    return totalString;
-                default:
-                    Logger.Error($"Invalid ProjectType - {appSettings.ProjectType}");
-                    break;
-            }
-            return totalString;
-        }
-
-        private static string DisplayExcludeComponents(CommonAppSettings appSettings)
-        {
-
-            string totalString = string.Empty;
-            if (appSettings.SW360.ExcludeComponents != null)
-            {
-                totalString = string.Join(",", appSettings.SW360.ExcludeComponents?.ToList());
-            }
-            return totalString;
-        }
-
-        private static string GetInternalRepolist(CommonAppSettings appSettings)
-        {
-            string listOfInternalRepoList = string.Empty;
-
-            var repoMapping = new Dictionary<string, Func<IEnumerable<string>>>(StringComparer.OrdinalIgnoreCase)
-        {
-        { "NPM", () => appSettings.Npm?.Artifactory.InternalRepos },
-        { "NUGET", () => appSettings.Nuget?.Artifactory.InternalRepos },
-        { "MAVEN", () => appSettings.Maven?.Artifactory.InternalRepos },
-        { "DEBIAN", () => appSettings.Debian?.Artifactory.InternalRepos },
-        { "POETRY", () => appSettings.Poetry?.Artifactory.InternalRepos },
-        { "CONAN", () => appSettings.Conan?.Artifactory.InternalRepos },
-        { "ALPINE", () => appSettings.Alpine?.Artifactory.InternalRepos }
-        };
-
-            if (repoMapping.TryGetValue(appSettings.ProjectType, out var getRepos))
-            {
-                var repos = getRepos();
-                if (repos != null)
-                {
-                    listOfInternalRepoList = string.Join(",", repos);
-                }
-            }
-            else
-            {
-                Logger.Error($"Invalid ProjectType - {appSettings.ProjectType}");
-            }
-
-            return listOfInternalRepoList;
-        }
+        }       
 
         private static string LogFolderInitialisation(CommonAppSettings appSettings)
         {

@@ -194,7 +194,8 @@ namespace LCT.Common
             }
             set
             {
-                if (AppDomain.CurrentDomain.FriendlyName.Contains("SW360PackageCreator"))
+                if (!AppDomain.CurrentDomain.FriendlyName.Contains("PackageIdentifier") &&
+                    !AppDomain.CurrentDomain.FriendlyName.Contains("ArtifactoryUploader"))
                 {
                     if (string.IsNullOrEmpty(value))
                     {
