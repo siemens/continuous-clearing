@@ -21,7 +21,7 @@ namespace LCT.SW360PackageCreator.Interfaces
     {
         public Task<List<ComparisonBomData>> SetContentsForComparisonBOM(List<Components> lstComponentForBOM, ISW360Service sw360Service);
         public Task<Dictionary<string, string>> DownloadReleaseAttachmentSource(ComparisonBomData component);
-        public CreatorKpiData GetCreatorKpiData(List<ComparisonBomData> updatedCompareBomData);
+        public CreatorKpiData GetCreatorKpiData(List<ComparisonBomData> updatedCompareBomData,CreatorKpiData creatorKpi);
         public void WriteCreatorKpiDataToConsole(CreatorKpiData creatorKpiData);
         public void WriteSourceNotFoundListToConsole(List<ComparisonBomData> comparisionBomDataList, CommonAppSettings appSetting);
         public List<ComparisonBomData> GetDownloadUrlNotFoundList(List<ComparisonBomData> comparisionBomDataList);
