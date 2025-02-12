@@ -361,9 +361,9 @@ namespace LCT.SW360PackageCreator
             return localPathforDownload;
         }
 
-        public CreatorKpiData GetCreatorKpiData(List<ComparisonBomData> updatedCompareBomData, CreatorKpiData creatorKpi)
+        public CreatorKpiData GetCreatorKpiData(List<ComparisonBomData> updatedCompareBomData, CreatorKpiData creatorKpiData)
         {
-            CreatorKpiData creatorKpiData = new CreatorKpiData
+            creatorKpiData = new CreatorKpiData
             {
                 ComponentsReadFromComparisonBOM = updatedCompareBomData.Count,
                 TotalDuplicateAndInValidComponents = ComponentCreator.TotalComponentsFromPackageIdentifier >= updatedCompareBomData.Count ?
@@ -393,7 +393,7 @@ namespace LCT.SW360PackageCreator
             Program.CreatorStopWatch.Stop();
             creatorKpiData.TimeTakenByComponentCreator =
                 TimeSpan.FromMilliseconds(Program.CreatorStopWatch.ElapsedMilliseconds).TotalSeconds;
-
+            
             return creatorKpiData;
         }
 
