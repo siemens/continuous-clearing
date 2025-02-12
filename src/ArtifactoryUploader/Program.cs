@@ -19,6 +19,7 @@ using LCT.Services.Interface;
 using log4net;
 using log4net.Core;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -89,8 +90,42 @@ namespace ArtifactoryUploader
             PackageUploadHelper.jFrogService = GetJfrogService(appSettings);
             UploadToArtifactory.jFrogService = GetJfrogService(appSettings);
             JfrogRepoUpdater.jFrogService = GetJfrogService(appSettings);
-            await PackageUploader.UploadPackageToArtifactory(appSettings);
+            await PackageUploader.UploadPackageToArtifactory(appSettings);            
 
+            // Initialize telemetry with CATool version and instrumentation key only if Telemetry is enabled in appsettings
+            if (appSettings.Telemetry.Enable == true)
+            {
+                Logger.Warn(TelemetryConstant.StartLogMessage);
+                LCT.Telemetry.Telemetry telemetry = new LCT.Telemetry.Telemetry("ApplicationInsights", new Dictionary<string, string>
+                {
+
+            { "InstrumentationKey", appSettings.Telemetry.ApplicationInsightInstrumentKey }
+                });
+
+                try
+                {
+                    TelemetryHelper.InitializeAndTrackEvent(telemetry, TelemetryConstant.ToolName, caToolInformation.CatoolVersion, TelemetryConstant.ArtifactoryUploader
+                                                        , appSettings);
+
+                    // Track KPI data if available
+                    if (PackageUploader.uploaderKpiData != null)
+                    {
+                        TelemetryHelper.TrackKpiDataTelemetry(telemetry, TelemetryConstant.ArtifactoryUploaderKpiData, PackageUploader.uploaderKpiData);
+                    }
+                    telemetry.TrackExecutionTime();
+
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"An error occurred: {ex.Message}");
+                    TelemetryHelper.TrackException(telemetry, ex);
+                    environmentHelper.CallEnvironmentExit(-1);
+                }
+                finally
+                {
+                    telemetry.Flush(); // Ensure telemetry is sent before application exits
+                }
+            }
             Logger.Logger.Log(null, Level.Notice, $"End of Artifactory Uploader execution : {DateTime.Now}\n", null);
             // publish logs and BOM file to pipeline artifact
 
