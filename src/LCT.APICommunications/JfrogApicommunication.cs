@@ -38,12 +38,21 @@ namespace LCT.APICommunications
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", credentials.Token);
             return httpClient;
         }
-
+        private async Task<HttpResponseMessage> ExecuteWithRetryPolicyAsync(Func<HttpClient, Task<HttpResponseMessage>> httpRequest)
+        {
+            var retryPolicy = APIRetryPolicy.GetRetryPolicy();
+            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
+            return await retryPolicy.ExecuteAsync(() => httpRequest(httpClient));
+        }
         public async Task<HttpResponseMessage> DeletePackageFromJFrogRepo(string repoName, string componentName)
         {
-            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-            string url = $"{DomainName}/{repoName}/{componentName}";
-            return await httpClient.DeleteAsync(url);
+            return await ExecuteWithRetryPolicyAsync(
+               async httpClient =>
+               {
+                   string url = $"{DomainName}/{repoName}/{componentName}";
+                   return await httpClient.DeleteAsync(url);
+               }
+           );
         }
 
         public abstract Task<HttpResponseMessage> GetApiKey();

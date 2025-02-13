@@ -39,9 +39,10 @@ namespace LCT.APICommunications
 
         public async Task<HttpResponseMessage> CheckConnection()
         {
-            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
             string url = $"{DomainName}/api/security/apiKey";
-            return await httpClient.GetAsync(url);
+            return await ExecuteWithRetryPolicyAsync(
+                async httpClient => await httpClient.GetAsync(url)
+            );
         }
 
         /// <summary>
@@ -51,10 +52,6 @@ namespace LCT.APICommunications
         /// <returns></returns>
         public async Task<HttpResponseMessage> GetInternalComponentDataByRepo(string repoName)
         {
-            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-            TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
-            httpClient.Timeout = timeOutInSec;
-
             StringBuilder query = new();
             query.Append("items.find({\"repo\":\"");
             query.Append($"{repoName}");
@@ -63,14 +60,13 @@ namespace LCT.APICommunications
             string aqlQueryToBody = query.ToString();
             string uri = $"{DomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}";
             HttpContent httpContent = new StringContent(aqlQueryToBody);
-            return await httpClient.PostAsync(uri, httpContent);
+
+            return await ExecuteWithRetryPolicyAsync(
+                async httpClient => await httpClient.PostAsync(uri, httpContent)
+            );
         }
         public async Task<HttpResponseMessage> GetNpmComponentDataByRepo(string repoName)
         {
-            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-            TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
-            httpClient.Timeout = timeOutInSec;
-
             StringBuilder query = new();
             query.Append("items.find({\"repo\":\"");
             query.Append($"{repoName}");
@@ -79,14 +75,13 @@ namespace LCT.APICommunications
             string aqlQueryToBody = query.ToString();
             string uri = $"{DomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}";
             HttpContent httpContent = new StringContent(aqlQueryToBody);
-            return await httpClient.PostAsync(uri, httpContent);
+
+            return await ExecuteWithRetryPolicyAsync(
+                async httpClient => await httpClient.PostAsync(uri, httpContent)
+            );
         }
         public async Task<HttpResponseMessage> GetPypiComponentDataByRepo(string repoName)
         {
-            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-            TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
-            httpClient.Timeout = timeOutInSec;
-
             StringBuilder query = new();
             query.Append("items.find({\"repo\":\"");
             query.Append($"{repoName}");
@@ -95,7 +90,10 @@ namespace LCT.APICommunications
             string aqlQueryToBody = query.ToString();
             string uri = $"{DomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}";
             HttpContent httpContent = new StringContent(aqlQueryToBody);
-            return await httpClient.PostAsync(uri, httpContent);
+
+            return await ExecuteWithRetryPolicyAsync(
+                async httpClient => await httpClient.PostAsync(uri, httpContent)
+            );
         }
 
         /// <summary>
@@ -111,16 +109,25 @@ namespace LCT.APICommunications
             string uri = $"{DomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}";
             HttpContent httpContent = new StringContent(aqlQueryToBody);
 
-            return await ExecuteSearchAqlAsync(uri, httpContent);
+            return await ExecuteWithRetryPolicyAsync(
+                async httpClient => await httpClient.PostAsync(uri, httpContent)
+            );
         }
        
         private static HttpClient GetHttpClient(ArtifactoryCredentials credentials)
         {
             HttpClient httpClient = new HttpClient();
+            TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
+            httpClient.Timeout = timeOutInSec;
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", credentials.Token);
             return httpClient;
         }
-
+        private async Task<HttpResponseMessage> ExecuteWithRetryPolicyAsync(Func<HttpClient, Task<HttpResponseMessage>> httpRequest)
+        {
+            var retryPolicy = APIRetryPolicy.GetRetryPolicy();
+            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
+            return await retryPolicy.ExecuteAsync(() => httpRequest(httpClient));
+        }
         private static void ValidateParameters(string packageName, string path)
         {
             if (string.IsNullOrEmpty(packageName) && string.IsNullOrEmpty(path))
@@ -185,16 +192,7 @@ namespace LCT.APICommunications
             
 
             
-        }
-
-        private async Task<HttpResponseMessage> ExecuteSearchAqlAsync(string uri, HttpContent httpContent)
-        {
-            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-            TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
-            httpClient.Timeout = timeOutInSec;
-
-            return await httpClient.PostAsync(uri, httpContent);
-        }
+        }        
 
 
     }

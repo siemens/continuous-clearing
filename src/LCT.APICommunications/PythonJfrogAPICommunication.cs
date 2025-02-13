@@ -31,32 +31,51 @@ namespace LCT.APICommunications
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", credentials.Token);
             return httpClient;
         }
+        private async Task<HttpResponseMessage> ExecuteWithRetryPolicyAsync(Func<HttpClient, Task<HttpResponseMessage>> httpRequest)
+        {
+            var retryPolicy = APIRetryPolicy.GetRetryPolicy();
+            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
+            return await retryPolicy.ExecuteAsync(() => httpRequest(httpClient));
+        }
 
         public override async Task<HttpResponseMessage> GetApiKey()
         {
-            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-            string url = $"{DomainName}/api/security/apiKey";
-            return await httpClient.GetAsync(url);
+            return await ExecuteWithRetryPolicyAsync(
+                async httpClient =>
+                {
+                    string url = $"{DomainName}/api/security/apiKey";
+                    return await httpClient.GetAsync(url);
+                }
+            );
         }
 
         public override async Task<HttpResponseMessage> CopyFromRemoteRepo(ComponentsToArtifactory component)
         {
-            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-            const HttpContent httpContent = null;
-            return await httpClient.PostAsync(component.CopyPackageApiUrl, httpContent);
+            return await ExecuteWithRetryPolicyAsync(
+                async httpClient =>
+                {
+                    const HttpContent httpContent = null;
+                    return await httpClient.PostAsync(component.CopyPackageApiUrl, httpContent);
+                }
+            );
         }
 
         public override async Task<HttpResponseMessage> MoveFromRepo(ComponentsToArtifactory component)
         {
-            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-            const HttpContent httpContent = null;
-            return await httpClient.PostAsync(component.MovePackageApiUrl, httpContent);
+            return await ExecuteWithRetryPolicyAsync(
+                async httpClient =>
+                {
+                    const HttpContent httpContent = null;
+                    return await httpClient.PostAsync(component.MovePackageApiUrl, httpContent);
+                }
+            );
         }
 
         public override async Task<HttpResponseMessage> GetPackageInfo(ComponentsToArtifactory component)
         {
-            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-            return await httpClient.GetAsync(component.PackageInfoApiUrl);
+            return await ExecuteWithRetryPolicyAsync(
+                async httpClient => await httpClient.GetAsync(component.PackageInfoApiUrl)
+            );
         }
         public override void UpdatePackagePropertiesInJfrog(string sw360releaseUrl, string destRepoName, UploadArgs uploadArgs)
         {

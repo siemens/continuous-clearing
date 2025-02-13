@@ -16,6 +16,7 @@ using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
+using LCT.APICommunications;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Model;
@@ -848,33 +849,23 @@ namespace LCT.SW360PackageCreator
         public static async Task<string> DownloadFileAsync(Uri uri, string downloadFilePath)
         {
             string downloadedPath = string.Empty;
+            var retryPolicy = APIRetryPolicy.GetWebExceptionRetryPolicy();
+
             try
             {
-                using (WebClient webClient = new WebClient())
+                await retryPolicy.ExecuteAsync(async () =>
                 {
-                    await webClient.DownloadFileTaskAsync(uri, downloadFilePath);
-                }
+                    using (WebClient webClient = new WebClient())
+                    {
+                        await webClient.DownloadFileTaskAsync(uri, downloadFilePath);
+                    }
+                });
                 downloadedPath = downloadFilePath;
                 Logger.Debug($"DownloadFileFromSnapshotorgAsync:File Name : {Path.GetFileName(downloadFilePath)} ,Downloaded Successfully!!");
             }
             catch (WebException webex)
             {
                 Logger.Debug($"DownloadFileFromSnapshotorgAsync:File Name : {Path.GetFileName(downloadFilePath)},Error {webex}");
-                //Waiting for server to up..
-                await Task.Delay(4000);
-                try
-                {
-                    using (WebClient webClient = new WebClient())
-                    {
-                        await webClient.DownloadFileTaskAsync(uri, downloadFilePath);
-                    }
-                    downloadedPath = downloadFilePath;
-                    Logger.Debug($"DownloadFileFromSnapshotorgAsync:File Name : {Path.GetFileName(downloadFilePath)},Success in retry!!");
-                }
-                catch (WebException)
-                {
-                    Logger.Debug($"DownloadFileFromSnapshotorgAsync:File Name : {Path.GetFileName(downloadFilePath)},Error in retry!!");
-                }
             }
             return downloadedPath;
         }

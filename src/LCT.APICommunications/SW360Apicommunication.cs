@@ -18,6 +18,7 @@ using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Polly;
 
 namespace LCT.APICommunications
 {
@@ -61,11 +62,14 @@ namespace LCT.APICommunications
 
         public async Task<string> GetProjects()
         {
-            HttpClient httpClient = GetHttpClient();           
+            
             var result = string.Empty;
             try
             {
-                result = await httpClient.GetStringAsync(sw360ProjectsApi);
+                HttpResponseMessage response = await ExecuteWithRetryPolicyAsync(
+                   async httpClient => await httpClient.GetAsync(sw360ProjectsApi));
+                response.EnsureSuccessStatusCode();
+                result = await response.Content.ReadAsStringAsync();
             }
             catch (TaskCanceledException ex)
             {
@@ -78,33 +82,38 @@ namespace LCT.APICommunications
 
         public async Task<string> GetSw360Users()
         {
-            HttpClient httpClient = GetHttpClient();
-            return await httpClient.GetStringAsync(sw360UsersApi);
+            HttpResponseMessage response = await ExecuteWithRetryPolicyAsync(
+               async httpClient => await httpClient.GetAsync(sw360UsersApi));
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
         }
 
         public async Task<string> GetProjectsByName(string projectName)
         {
-            HttpClient httpClient = GetHttpClient();
             string projectNameApiUrl = $"{sw360ProjectsApi}{ApiConstant.ComponentNameUrl}{projectName}";
-            return await httpClient.GetStringAsync(projectNameApiUrl);
+            HttpResponseMessage response = await ExecuteWithRetryPolicyAsync(
+                async httpClient => await httpClient.GetAsync(projectNameApiUrl)
+            );
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
         }
 
         public async Task<HttpResponseMessage> GetProjectsByTag(string projectTag)
         {
-            HttpClient httpClient = GetHttpClient();
             string projectsByTagUrl = $"{sw360ProjectByTagApi}{projectTag}";
-            return await httpClient.GetAsync(projectsByTagUrl);
+            return await ExecuteWithRetryPolicyAsync(
+                async httpClient => await httpClient.GetAsync(projectsByTagUrl));
         }
 
         public async Task<HttpResponseMessage> GetProjectById(string projectId)
         {
-            HttpClient httpClient = GetHttpClient();
-            HttpResponseMessage obj = new HttpResponseMessage();           
-            var result = obj;
             string projectsByTagUrl = $"{sw360ProjectsApi}/{projectId}";
+            HttpResponseMessage result = new HttpResponseMessage();
+
             try
             {
-                result = await httpClient.GetAsync(projectsByTagUrl);
+                result = await ExecuteWithRetryPolicyAsync(
+                    async httpClient => await httpClient.GetAsync(projectsByTagUrl));
                 result.EnsureSuccessStatusCode();
             }
             catch (HttpRequestException ex)
@@ -123,12 +132,12 @@ namespace LCT.APICommunications
         }
 
         public async Task<string> GetReleases()
-        {
-            HttpClient httpClient = GetHttpClient();            
+        {                        
             var result = string.Empty;
             try
             {
-                HttpResponseMessage responseMessage = await httpClient.GetAsync(sw360ReleaseApi);
+                HttpResponseMessage responseMessage = await ExecuteWithRetryPolicyAsync(
+                    async httpClient => await httpClient.GetAsync(sw360ReleaseApi));
                 if (responseMessage != null && responseMessage.StatusCode.Equals(HttpStatusCode.OK))
                 {
                     return await responseMessage.Content.ReadAsStringAsync();
@@ -162,94 +171,121 @@ namespace LCT.APICommunications
         }
         public async Task<string> TriggerFossologyProcess(string releaseId, string sw360link)
         {
-            HttpClient httpClient = GetHttpClient();
-            string url = $"{sw360ReleaseApi}/{releaseId}{ApiConstant.FossTriggerAPIPrefix}{sw360link}{ApiConstant.FossTriggerAPISuffix}";
-            return await httpClient.GetStringAsync(url);
+            HttpResponseMessage response = await ExecuteWithRetryPolicyAsync(
+                async httpClient =>
+                {
+                    string url = $"{sw360ReleaseApi}/{releaseId}{ApiConstant.FossTriggerAPIPrefix}{sw360link}{ApiConstant.FossTriggerAPISuffix}";
+                    return await httpClient.GetAsync(url);
+                }
+            );
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
         }
         public async Task<HttpResponseMessage> CheckFossologyProcessStatus(string link)
         {
-            HttpClient httpClient = GetHttpClient();
-            return await httpClient.GetAsync(link);
+            return await ExecuteWithRetryPolicyAsync(
+                 async httpClient => await httpClient.GetAsync(link)
+             );
         }
         public async Task<string> GetComponents()
         {
-            HttpClient httpClient = GetHttpClient();
-            return await httpClient.GetStringAsync(sw360ComponentApi);
+            HttpResponseMessage response = await ExecuteWithRetryPolicyAsync(
+               async httpClient => await httpClient.GetAsync(sw360ComponentApi)
+           );
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
         }
 
         public async Task<HttpResponseMessage> GetReleaseByExternalId(string purlId, string externalIdKey = "")
         {
-            HttpClient httpClient = GetHttpClient();
             string releaseByExternalIdUrl = $"{sw360ReleaseByExternalId}{externalIdKey}{purlId}";
-            return await httpClient.GetAsync(releaseByExternalIdUrl);
+            return await ExecuteWithRetryPolicyAsync(
+                async httpClient => await httpClient.GetAsync(releaseByExternalIdUrl)
+            );
         }
 
         public async Task<HttpResponseMessage> GetComponentByExternalId(string purlId, string externalIdKey = "")
         {
-            HttpClient httpClient = GetHttpClient();
             string componentByExternalIdUrl = $"{sw360ComponentByExternalId}{externalIdKey}{purlId}";
-            return await httpClient.GetAsync(componentByExternalIdUrl);
+            return await ExecuteWithRetryPolicyAsync(
+                async httpClient => await httpClient.GetAsync(componentByExternalIdUrl)
+            );
         }
 
         public async Task<HttpResponseMessage> GetReleaseById(string releaseId)
         {
-            HttpClient httpClient = GetHttpClient();
             string url = $"{sw360ReleaseApi}/{releaseId}";
-            return await httpClient.GetAsync(url);
+            return await ExecuteWithRetryPolicyAsync(
+                async httpClient => await httpClient.GetAsync(url)
+            );
         }
 
         public async Task<HttpResponseMessage> GetReleaseByLink(string releaseLink)
         {
-            HttpClient httpClient = GetHttpClient();
-            return await httpClient.GetAsync(releaseLink);
+            return await ExecuteWithRetryPolicyAsync(
+                async httpClient => await httpClient.GetAsync(releaseLink)
+            );
         }
 
         public async Task<HttpResponseMessage> LinkReleasesToProject(HttpContent httpContent, string sw360ProjectId)
         {
-            HttpClient httpClient = GetHttpClient();
             string url = $"{sw360ProjectsApi}/{sw360ProjectId}/{ApiConstant.Releases}";
-            return await httpClient.PostAsync(url, httpContent);
+            return await ExecuteWithRetryPolicyAsync(
+                async httpClient => await httpClient.PostAsync(url, httpContent)
+            );
         }
 
         public async Task<HttpResponseMessage> UpdateLinkedRelease(string projectId, string releaseId, UpdateLinkedRelease updateLinkedRelease)
         {
-            HttpClient httpClient = GetHttpClient();
             string updateUri = $"{sw360ProjectsApi}/{projectId}/{ApiConstant.Release}/{releaseId}";
             string updateContent = JsonConvert.SerializeObject(updateLinkedRelease);
             HttpContent content = new StringContent(updateContent, Encoding.UTF8, "application/json");
 
-            return await httpClient.PatchAsync(updateUri, content);
+            return await ExecuteWithRetryPolicyAsync(
+                async httpClient => await httpClient.PatchAsync(updateUri, content)
+            );
         }
 
         public async Task<HttpResponseMessage> CreateComponent(CreateComponent createComponentContent)
         {
-            HttpClient httpClient = GetHttpClient();
-            return await httpClient.PostAsJsonAsync(sw360ComponentApi, createComponentContent);
+            return await ExecuteWithRetryPolicyAsync(
+               async httpClient => await httpClient.PostAsJsonAsync(sw360ComponentApi, createComponentContent)
+           );
         }
 
         public async Task<HttpResponseMessage> CreateRelease(Releases createReleaseContent)
         {
-            HttpClient httpClient = GetHttpClient();
-            return await httpClient.PostAsJsonAsync(sw360ReleaseApi, createReleaseContent);
+            return await ExecuteWithRetryPolicyAsync(
+                async httpClient => await httpClient.PostAsJsonAsync(sw360ReleaseApi, createReleaseContent)
+            );
         }
 
         public async Task<string> GetReleaseOfComponentById(string componentId)
         {
-            HttpClient httpClient = GetHttpClient();
             string componentUrl = $"{sw360ComponentApi}/{componentId}";
-            return await httpClient.GetStringAsync(componentUrl);
+            HttpResponseMessage response = await ExecuteWithRetryPolicyAsync(
+                async httpClient => await httpClient.GetAsync(componentUrl)
+            );
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
         }
 
         public async Task<string> GetReleaseAttachments(string releaseAttachmentsUrl)
         {
-            HttpClient httpClient = GetHttpClient();
-            return await httpClient.GetStringAsync(releaseAttachmentsUrl);
+            HttpResponseMessage response = await ExecuteWithRetryPolicyAsync(
+               async httpClient => await httpClient.GetAsync(releaseAttachmentsUrl)
+           );
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
         }
 
         public async Task<string> GetAttachmentInfo(string attachmentUrl)
         {
-            HttpClient httpClient = GetHttpClient();
-            return await httpClient.GetStringAsync(attachmentUrl);
+            HttpResponseMessage response = await ExecuteWithRetryPolicyAsync(
+                async httpClient => await httpClient.GetAsync(attachmentUrl)
+            );
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
         }
 
         public void DownloadAttachmentUsingWebClient(string attachmentDownloadLink, string fileName)
@@ -265,16 +301,18 @@ namespace LCT.APICommunications
 
         public async Task<HttpResponseMessage> UpdateRelease(string releaseId, HttpContent httpContent)
         {
-            HttpClient httpClient = GetHttpClient();
             string releaseApi = $"{sw360ReleaseApi}/{releaseId}";
-            return await httpClient.PatchAsync(releaseApi, httpContent);
+            return await ExecuteWithRetryPolicyAsync(
+                async httpClient => await httpClient.PatchAsync(releaseApi, httpContent)
+            );
         }
 
         public async Task<HttpResponseMessage> UpdateComponent(string componentId, HttpContent httpContent)
         {
-            HttpClient httpClient = GetHttpClient();
             string componentApi = $"{sw360ComponentApi}/{componentId}";
-            return await httpClient.PatchAsync(componentApi, httpContent);
+            return await ExecuteWithRetryPolicyAsync(
+                async httpClient => await httpClient.PatchAsync(componentApi, httpContent)
+            );
         }
 
 
@@ -287,34 +325,43 @@ namespace LCT.APICommunications
 
         public async Task<string> GetReleaseByCompoenentName(string componentName)
         {
-            HttpClient httpClient = GetHttpClient();
             string url = $"{sw360ReleaseNameApi}{componentName}";
-            return await httpClient.GetStringAsync(url);
+            HttpResponseMessage response = await ExecuteWithRetryPolicyAsync(
+                async httpClient => await httpClient.GetAsync(url)
+            );
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
         }
 
         public async Task<HttpResponseMessage> GetComponentDetailsByUrl(string componentLink)
         {
-            HttpClient httpClient = GetHttpClient();
-            return await httpClient.GetAsync(componentLink);
+            return await ExecuteWithRetryPolicyAsync(
+                async httpClient => await httpClient.GetAsync(componentLink)
+            );
         }
 
         public async Task<string> GetComponentByName(string componentName)
         {
-            HttpClient httpClient = GetHttpClient();
             string url = $"{sw360ComponentApi}{ApiConstant.ComponentNameUrl}{componentName}";
-            return await httpClient.GetStringAsync(url);
+            HttpResponseMessage response = await ExecuteWithRetryPolicyAsync(
+                async httpClient => await httpClient.GetAsync(url)
+            );
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
         }
         public async Task<HttpResponseMessage> GetComponentUsingName(string componentName)
         {
-            HttpClient httpClient = GetHttpClient();
             string url = $"{sw360ComponentApi}{ApiConstant.ComponentNameUrl}{componentName}";
-            return await httpClient.GetAsync(url);
+            return await ExecuteWithRetryPolicyAsync(
+                async httpClient => await httpClient.GetAsync(url)
+            );
         }
         public async Task<HttpResponseMessage> GetAllReleasesWithAllData(int page, int pageEntries)
         {
-            HttpClient httpClient = GetHttpClient();            
             string url = $"{sw360ReleaseApi}?page={page}&allDetails=true&page_entries={pageEntries}";
-            return await httpClient.GetAsync(url);           
+            return await ExecuteWithRetryPolicyAsync(
+                async httpClient => await httpClient.GetAsync(url)
+            );
         }
         #endregion
 
@@ -330,6 +377,12 @@ namespace LCT.APICommunications
             httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue(sw360AuthTokenType, sw360AuthToken);
             return httpClient;
+        }
+        private async Task<HttpResponseMessage> ExecuteWithRetryPolicyAsync(Func<HttpClient, Task<HttpResponseMessage>> httpRequest)
+        {
+            var retryPolicy = APIRetryPolicy.GetRetryPolicy();
+            HttpClient httpClient = GetHttpClient();
+            return await retryPolicy.ExecuteAsync(() => httpRequest(httpClient));
         }
 
         #endregion
