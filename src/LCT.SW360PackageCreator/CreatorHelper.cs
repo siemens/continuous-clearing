@@ -361,9 +361,9 @@ namespace LCT.SW360PackageCreator
             return localPathforDownload;
         }
 
-        public CreatorKpiData GetCreatorKpiData(List<ComparisonBomData> updatedCompareBomData, CreatorKpiData creatorKpiData)
+        public CreatorKpiData GetCreatorKpiData(List<ComparisonBomData> updatedCompareBomData)
         {
-            creatorKpiData = new CreatorKpiData
+            CreatorKpiData creatorKpiData = new CreatorKpiData
             {
                 ComponentsReadFromComparisonBOM = updatedCompareBomData.Count,
                 TotalDuplicateAndInValidComponents = ComponentCreator.TotalComponentsFromPackageIdentifier >= updatedCompareBomData.Count ?
