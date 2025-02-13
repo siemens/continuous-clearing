@@ -257,7 +257,8 @@ namespace LCT.SW360PackageCreator
                 FileConstant.ComponentsWithoutSrcFileName, appSettings.SW360.ProjectName);
 
             // write Kpi Data
-            creatorHelper.GetCreatorKpiData(UpdatedCompareBomData, kpiData);
+            CreatorKpiData creatorKpiData=creatorHelper.GetCreatorKpiData (UpdatedCompareBomData);
+            CreatorKpiData kpiData = creatorKpiData;
             fileOperations.WriteContentToFile(kpiData, bomGenerationPath,
                 FileConstant.CreatorKpiDataFileName, appSettings.SW360.ProjectName);
 
