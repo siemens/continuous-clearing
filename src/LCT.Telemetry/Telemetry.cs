@@ -1,4 +1,9 @@
-﻿using System.Diagnostics;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2025 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+using System.Diagnostics;
 using System.Globalization;
 
 /// <summary>

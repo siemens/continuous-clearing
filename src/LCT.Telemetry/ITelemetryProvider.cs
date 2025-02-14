@@ -1,4 +1,9 @@
-﻿namespace LCT.Telemetry
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2025 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+namespace LCT.Telemetry
 {
     public interface ITelemetryProvider
     {
