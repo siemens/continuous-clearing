@@ -18,6 +18,6 @@ namespace LCT.Common.Constants
         public const string CreatorKpiData = "CreatorKpiDataTelemetry";
         public const string ArtifactoryUploaderKpiData = "UploaderKpiDataTelemetry";
         public const string Type = "ApplicationInsights";
-        public const string StartLogMessage = "Telemetry for execution is now enabled and being tracked. You can disable it by using the command-line option --Telemetry:Enable false or via appsettings.";
+        public const string StartLogMessage = "Telemetry tracking is now active for this execution. To turn off telemetry, use the command-line option --Telemetry:Enable false or adjust the settings in your appsettings file.";
     }
 }

@@ -103,7 +103,7 @@ namespace LCT.SW360PackageCreator
             if (appSettings.Telemetry.Enable == true)
             {
                 Logger.Warn(TelemetryConstant.StartLogMessage);
-                Telemetry.Telemetry telemetry = new Telemetry.Telemetry("ApplicationInsights", new Dictionary<string, string>
+                Telemetry.Telemetry telemetry = new Telemetry.Telemetry(TelemetryConstant.Type, new Dictionary<string, string>
                 {
                     { "InstrumentationKey", appSettings.Telemetry.ApplicationInsightInstrumentKey }
                 });

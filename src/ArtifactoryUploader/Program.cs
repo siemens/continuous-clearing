@@ -96,7 +96,7 @@ namespace ArtifactoryUploader
             if (appSettings.Telemetry.Enable == true)
             {
                 Logger.Warn(TelemetryConstant.StartLogMessage);
-                LCT.Telemetry.Telemetry telemetry = new LCT.Telemetry.Telemetry("ApplicationInsights", new Dictionary<string, string>
+                LCT.Telemetry.Telemetry telemetry = new LCT.Telemetry.Telemetry(TelemetryConstant.Type, new Dictionary<string, string>
                 {
 
             { "InstrumentationKey", appSettings.Telemetry.ApplicationInsightInstrumentKey }
