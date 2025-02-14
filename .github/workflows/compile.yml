@@ -115,7 +115,8 @@ jobs:
                 Write-Host $Project.DirectoryName
                 $TestProject = $Project.DirectoryName
                 Push-Location $Project.PSParentPath
-                dotnet test --no-build --configuration Release
+                dotnet add package coverlet.msbuild --version 3.2.0
+                dotnet test --no-build --verbosity diagnostic --configuration Release --logger trx /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=$CoverageReport\$CoverageReportName.xml
         }
 
 
