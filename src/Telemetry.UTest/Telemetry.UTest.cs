@@ -3,7 +3,7 @@ using Microsoft.ApplicationInsights;
 using Moq;
 
 
-namespace Telemetry.UTest
+namespace LCT.Telemetry.UTest
 {
     [TestFixture]
     public class TelemetryTests
