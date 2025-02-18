@@ -29,6 +29,7 @@ namespace TestUtilities
         public string InternalDestinationRepoName { get; set; }
         public string DevDestinationRepoName { get; set; }
         public string FossologyTrigger { get; set; }
+        public string TelemetryEnable { get; set; }
         public TestParamConan()
         {
             SW360AuthTokenType = s_Config["SW360AuthTokenType"];
@@ -46,6 +47,7 @@ namespace TestUtilities
             InternalDestinationRepoName = "conan-test";
             DevDestinationRepoName = "conan-test";
             FossologyTrigger = s_Config["EnableFossologyTrigger"];
+            TelemetryEnable = s_Config["TelemetryEnable"];
         }
     }
 }
