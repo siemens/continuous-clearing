@@ -26,8 +26,11 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
+using static System.Collections.Specialized.BitVector32;
 using Directory = System.IO.Directory;
+
 
 namespace LCT.SW360PackageCreator
 {
@@ -218,265 +221,301 @@ namespace LCT.SW360PackageCreator
         private async Task<List<ComparisonBomData>> GetComparisionBomItems(List<Components> lstComponentForBOM, ISW360Service sw360Service)
         {
             List<ComparisonBomData> comparisonBomData = new();
-            ComparisonBomData mapper;
-            foreach (Components item in lstComponentForBOM)
+            //ComparisonBomData mapper;
+
+            Func<Components, CancellationToken, ValueTask> action = async (item, ct) =>
             {
-                mapper = new ComparisonBomData();
-                ReleasesInfo releasesInfo = await GetReleaseInfoFromSw360(item, componentsAvailableInSw360, sw360Service);
-                IRepository repo = new Repository();
-
-                mapper.Name = item.Name;
-                mapper.Group = item.Group;
-                mapper.Version = item.Version;
-                mapper.ComponentExternalId = item.ComponentExternalId;
-                mapper.ReleaseExternalId = item.ReleaseExternalId;
-                mapper.SourceUrl = item.SourceUrl;
-                mapper.DownloadUrl = item.DownloadUrl;
-                mapper.ComponentStatus = GetComponentAvailabilityStatus(componentsAvailableInSw360, item);
-                mapper.ReleaseStatus = IsReleaseAvailable(item.Name, item.Version, item.ReleaseExternalId);
-                mapper.AlpineSource = item.AlpineSourceData;
-                if (!string.IsNullOrEmpty(item.ReleaseExternalId) && item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
+                try
                 {
-                    if ((string.IsNullOrEmpty(item.SourceUrl) || item.SourceUrl == Dataconstant.SourceUrlNotFound) && !string.IsNullOrEmpty(releasesInfo.SourceCodeDownloadUrl))
+                    ComparisonBomData mapper = new ComparisonBomData();
+                    ReleasesInfo releasesInfo = await GetReleaseInfoFromSw360(item, componentsAvailableInSw360, sw360Service);
+                    IRepository repo = new Repository();
+
+                    mapper.Name = item.Name;
+                    mapper.Group = item.Group;
+                    mapper.Version = item.Version;
+                    mapper.ComponentExternalId = item.ComponentExternalId;
+                    mapper.ReleaseExternalId = item.ReleaseExternalId;
+                    mapper.SourceUrl = item.SourceUrl;
+                    mapper.DownloadUrl = item.DownloadUrl;
+                    mapper.ComponentStatus = GetComponentAvailabilityStatus(componentsAvailableInSw360, item);
+                    mapper.ReleaseStatus = IsReleaseAvailable(item.Name, item.Version, item.ReleaseExternalId);
+
+                    if (!string.IsNullOrEmpty(mapper.ReleaseExternalId) && mapper.ReleaseStatus == Dataconstant.NotAvailable && string.IsNullOrEmpty(mapper.SourceUrl))
                     {
-                        // If not able to get source details from snapshot.org, try getting source URL from SW360
-                        mapper.SourceUrl = releasesInfo.SourceCodeDownloadUrl;
-                        mapper.DownloadUrl = releasesInfo.SourceCodeDownloadUrl;
+                        if (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["NPM"]))
+                        {
+                            mapper.SourceUrl = UrlHelper.Instance.GetSourceUrlForNpmPackage(mapper.Name, mapper.Version);
+                        }
+                        else if (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["NUGET"]))
+                        {
+                            mapper.SourceUrl = await UrlHelper.Instance.GetSourceUrlForNugetPackage(mapper.Name, mapper.Version);
+                        }
+                        else if (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["PYTHON"]))
+                        {
+                            mapper.SourceUrl = await UrlHelper.Instance.GetSourceUrlForPythonPackage(mapper.Name, mapper.Version);
+                        }
+                        else if (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CONAN"]))
+                        {
+                            mapper.SourceUrl = await UrlHelper.Instance.GetSourceUrlForConanPackage(mapper.Name, mapper.Version);
+                        }
                     }
-                    mapper.PatchURls = item.PatchURLs;
-                }
-                else if (!string.IsNullOrEmpty(item.ReleaseExternalId) && item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["MAVEN"]))
-                {
-                    mapper.DownloadUrl = GetMavenDownloadUrl(mapper, item, releasesInfo);
-                }
-                else if (!string.IsNullOrEmpty(item.ReleaseExternalId) &&
-                            (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["POETRY"]) || item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CONAN"]) || item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["ALPINE"])))
-                {
-                    mapper.DownloadUrl = mapper.SourceUrl;
-                }
-                else
-                {
-                    mapper.DownloadUrl = GetComponentDownloadUrl(mapper, item, repo, releasesInfo);
-                }
-                mapper.ApprovedStatus = GetApprovedStatus(mapper.ComponentStatus, mapper.ReleaseStatus, releasesInfo);
-                mapper.IsComponentCreated = GetCreatedStatus(mapper.ComponentStatus);
-                mapper.IsReleaseCreated = GetCreatedStatus(mapper.ReleaseStatus);
-                mapper.FossologyUploadStatus = GetFossologyUploadStatus(mapper.ApprovedStatus);
-                mapper.ReleaseAttachmentLink = string.Empty;
-                mapper.ReleaseLink = GetReleaseLink(componentsAvailableInSw360, item.Name, item.Version);
 
-                Logger.Debug($"Sw360 avilability status for Name " + mapper.Name + ":" + mapper.ComponentExternalId + "=" + mapper.ComponentStatus +
-                    "-Version " + mapper.Version + ":" + mapper.ReleaseExternalId + "=" + mapper.ReleaseStatus);
-                comparisonBomData.Add(mapper);
-            }
+
+                    mapper.AlpineSource = item.AlpineSourceData;
+                    if (!string.IsNullOrEmpty(item.ReleaseExternalId) && item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
+                    {
+                        if ((string.IsNullOrEmpty(item.SourceUrl) || item.SourceUrl == Dataconstant.SourceUrlNotFound) && !string.IsNullOrEmpty(releasesInfo.SourceCodeDownloadUrl))
+                        {
+                            // If not able to get source details from snapshot.org, try getting source URL from SW360
+                            mapper.SourceUrl = releasesInfo.SourceCodeDownloadUrl;
+                            mapper.DownloadUrl = releasesInfo.SourceCodeDownloadUrl;
+                        }
+                        mapper.PatchURls = item.PatchURLs;
+                    }
+                    else if (!string.IsNullOrEmpty(item.ReleaseExternalId) && item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["MAVEN"]))
+                    {
+                        mapper.DownloadUrl = GetMavenDownloadUrl(mapper, item, releasesInfo);
+                    }
+                    else if (!string.IsNullOrEmpty(item.ReleaseExternalId) &&
+                                (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["PYTHON"]) || item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CONAN"]) || item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["ALPINE"])))
+                    {
+                        mapper.DownloadUrl = mapper.SourceUrl;
+                    }
+                    else
+                    {
+                        mapper.DownloadUrl = GetComponentDownloadUrl(mapper, item, repo, releasesInfo);
+                    }
+                    mapper.ApprovedStatus = GetApprovedStatus(mapper.ComponentStatus, mapper.ReleaseStatus, releasesInfo);
+                    mapper.IsComponentCreated = GetCreatedStatus(mapper.ComponentStatus);
+                    mapper.IsReleaseCreated = GetCreatedStatus(mapper.ReleaseStatus);
+                    mapper.FossologyUploadStatus = GetFossologyUploadStatus(mapper.ApprovedStatus);
+                    mapper.ReleaseAttachmentLink = string.Empty;
+                    mapper.ReleaseLink = GetReleaseLink(componentsAvailableInSw360, item.Name, item.Version);
+
+                    Logger.Debug($"Sw360 avilability status for Name " + mapper.Name + ":" + mapper.ComponentExternalId + "=" + mapper.ComponentStatus +
+                        "-Version " + mapper.Version + ":" + mapper.ReleaseExternalId + "=" + mapper.ReleaseStatus);
+                    comparisonBomData.Add(mapper);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"GetComparisionBomItems() : Error processing item {item.Name}: {ex.Message}", ex);
+                }
+            };
+
+            var parallelOptions = new ParallelOptions
+            {
+                MaxDegreeOfParallelism = Dataconstant.MaxDegreeOfParallelism
+            };
+            await ProcessAsyncHelper.ProcessItemsAsync(lstComponentForBOM, action, parallelOptions);
             return comparisonBomData;
         }
 
         public static string GetMavenDownloadUrl(ComparisonBomData mapper, Components item, ReleasesInfo releasesInfo)
-        {
-            string sourceURL = string.Empty;
-
-            //IF Release already exists in SW360 , tool will not update any field.
-            //Hence do not need to find DOWNLOAD URL here and this REDUCE the exeuction time
-
-            if (mapper.ReleaseStatus.Equals(Dataconstant.Available))
             {
-                return releasesInfo?.SourceCodeDownloadUrl ?? string.Empty;
-            }
-            else
-            {
-                sourceURL = $"{CommonAppSettings.SourceURLMavenApi}{item.Group}/{item.Name}/{item.Version}/{item.Name}-{item.Version}-sources.jar";
-            }
-            return sourceURL;
-        }
+                string sourceURL = string.Empty;
 
-        public async Task<Bom> GetUpdatedComponentsDetails(List<Components> ListofBomComponents, List<ComparisonBomData> updatedCompareBomData,
-            ISW360Service sw360Service, Bom bom)
-        {
-            //To get latest ReleaseLinks after component creation
-            Logger.Logger.Log(null, Level.Debug, $"GetUpdatedComponentsDetails", null);
-            componentsAvailableInSw360 = await sw360Service.GetAvailableReleasesInSw360(ListofBomComponents);
+                //IF Release already exists in SW360 , tool will not update any field.
+                //Hence do not need to find DOWNLOAD URL here and this REDUCE the exeuction time
 
-            foreach (ComparisonBomData comBom in updatedCompareBomData)
-            {
-                if (string.IsNullOrEmpty(comBom.ReleaseLink))
+                if (mapper.ReleaseStatus.Equals(Dataconstant.Available))
                 {
-                    comBom.ReleaseLink = GetReleaseLink(componentsAvailableInSw360, comBom.Name, comBom.Version);
+                    return releasesInfo?.SourceCodeDownloadUrl ?? string.Empty;
                 }
-
-                try
+                else
                 {
-                    List<Property> prop = new List<Property>
+                    sourceURL = $"{CommonAppSettings.SourceURLMavenApi}{item.Group}/{item.Name}/{item.Version}/{item.Name}-{item.Version}-sources.jar";
+                }
+                return sourceURL;
+            }
+
+            public async Task<Bom> GetUpdatedComponentsDetails(List<Components> ListofBomComponents, List<ComparisonBomData> updatedCompareBomData,
+                ISW360Service sw360Service, Bom bom)
+            {
+                //To get latest ReleaseLinks after component creation
+                Logger.Logger.Log(null, Level.Debug, $"GetUpdatedComponentsDetails", null);
+                componentsAvailableInSw360 = await sw360Service.GetAvailableReleasesInSw360(ListofBomComponents);
+
+                foreach (ComparisonBomData comBom in updatedCompareBomData)
+                {
+                    if (string.IsNullOrEmpty(comBom.ReleaseLink))
+                    {
+                        comBom.ReleaseLink = GetReleaseLink(componentsAvailableInSw360, comBom.Name, comBom.Version);
+                    }
+
+                    try
+                    {
+                        List<Property> prop = new List<Property>
                 {
                     new Property { Name = Dataconstant.Cdx_ClearingState, Value = comBom.ApprovedStatus },
                      new Property { Name = Dataconstant.Cdx_ReleaseUrl, Value = comBom.ReleaseLink },
                      new Property { Name = Dataconstant.Cdx_FossologyUrl, Value = comBom.FossologyLink ?? "" }
                 };
 
-                    if (!bom.Components.Exists(x => x.BomRef.Contains(Dataconstant.PurlCheck()["MAVEN"])))
+                        if (!bom.Components.Exists(x => x.BomRef.Contains(Dataconstant.PurlCheck()["MAVEN"])))
+                        {
+                            bom.Components.Find(com => string.IsNullOrEmpty(com.Group) ? com.Name == comBom.Name && com.Version.Contains(comBom.Version)
+                            : $"{com.Group}{Dataconstant.ForwardSlash}{com.Name}" == comBom.Name && com.Version.Contains(comBom.Version))?.Properties.AddRange(prop);
+                        }
+                        else
+                        {
+                            bom.Components.Find(com => com.Name == comBom.Name && com.Version.Contains(comBom.Version))?.Properties.AddRange(prop);
+                        }
+                    }
+                    catch (JsonSerializationException ex)
                     {
-                        bom.Components.Find(com => string.IsNullOrEmpty(com.Group) ? com.Name == comBom.Name && com.Version.Contains(comBom.Version)
-                        : $"{com.Group}{Dataconstant.ForwardSlash}{com.Name}" == comBom.Name && com.Version.Contains(comBom.Version))?.Properties.AddRange(prop);
+                        Logger.Debug($"GetUpdatedComponentsDetails() For Component = {comBom.Name} : {ex}");
+                    }
+                }
+                return bom;
+            }
+
+            private static string GetDownloadPathForComponetType(ComparisonBomData component)
+            {
+                string localPathforDownload = string.Empty;
+                try
+                {
+                    if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
+                    {
+                        localPathforDownload = $"{Directory.GetParent(Directory.GetCurrentDirectory())}/ClearingTool/DownloadedFiles/";
+                    }
+                    else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["ALPINE"]))
+                    {
+                        localPathforDownload = $"{Directory.GetParent(Directory.GetCurrentDirectory())}/ClearingTool/DownloadedFiles/";
                     }
                     else
                     {
-                        bom.Components.Find(com => com.Name == comBom.Name && com.Version.Contains(comBom.Version))?.Properties.AddRange(prop);
+                        localPathforDownload = $"{Path.GetTempPath()}/ClearingTool/DownloadedFiles/";
                     }
                 }
-                catch (JsonSerializationException ex)
+                catch (IOException ex)
                 {
-                    Logger.Debug($"GetUpdatedComponentsDetails() For Component = {comBom.Name} : {ex}");
+                    Logger.Error($"GetDownloadPathForComponetType() ", ex);
                 }
-            }
-            return bom;
-        }
-
-        private static string GetDownloadPathForComponetType(ComparisonBomData component)
-        {
-            string localPathforDownload = string.Empty;
-            try
-            {
-                if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
+                catch (UnauthorizedAccessException ex)
                 {
-                    localPathforDownload = $"{Directory.GetParent(Directory.GetCurrentDirectory())}/ClearingTool/DownloadedFiles/";
-                }
-                else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["ALPINE"]))
-                {
-                    localPathforDownload = $"{Directory.GetParent(Directory.GetCurrentDirectory())}/ClearingTool/DownloadedFiles/";
-                }
-                else
-                {
-                    localPathforDownload = $"{Path.GetTempPath()}/ClearingTool/DownloadedFiles/";
-                }
-            }
-            catch (IOException ex)
-            {
-                Logger.Error($"GetDownloadPathForComponetType() ", ex);
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                Logger.Error($"GetDownloadPathForComponetType() ", ex);
-            }
-
-            return localPathforDownload;
-        }
-
-        public CreatorKpiData GetCreatorKpiData(List<ComparisonBomData> updatedCompareBomData)
-        {
-            CreatorKpiData creatorKpiData = new CreatorKpiData
-            {
-                ComponentsReadFromComparisonBOM = updatedCompareBomData.Count,
-                TotalDuplicateAndInValidComponents = ComponentCreator.TotalComponentsFromPackageIdentifier >= updatedCompareBomData.Count ?
-                ComponentCreator.TotalComponentsFromPackageIdentifier - updatedCompareBomData.Count : 0
-            };
-
-            foreach (ComparisonBomData item in updatedCompareBomData)
-            {
-                if (IsComponentNewlyCreated(item))
-                {
-                    creatorKpiData.ComponentsOrReleasesCreatedNewlyInSw360++;
+                    Logger.Error($"GetDownloadPathForComponetType() ", ex);
                 }
 
-                if (IsComponentCreated(item))
+                return localPathforDownload;
+            }
+
+            public CreatorKpiData GetCreatorKpiData(List<ComparisonBomData> updatedCompareBomData)
+            {
+                CreatorKpiData creatorKpiData = new CreatorKpiData
                 {
-                    creatorKpiData.ComponentsOrReleasesExistingInSw360++;
+                    ComponentsReadFromComparisonBOM = updatedCompareBomData.Count,
+                    TotalDuplicateAndInValidComponents = ComponentCreator.TotalComponentsFromPackageIdentifier >= updatedCompareBomData.Count ?
+                    ComponentCreator.TotalComponentsFromPackageIdentifier - updatedCompareBomData.Count : 0
+                };
+
+                foreach (ComparisonBomData item in updatedCompareBomData)
+                {
+                    if (IsComponentNewlyCreated(item))
+                    {
+                        creatorKpiData.ComponentsOrReleasesCreatedNewlyInSw360++;
+                    }
+
+                    if (IsComponentCreated(item))
+                    {
+                        creatorKpiData.ComponentsOrReleasesExistingInSw360++;
+                    }
+
+                    if (IsComponentNotCreated(item))
+                    {
+                        creatorKpiData.ComponentsOrReleasesNotCreatedInSw360++;
+                    }
+
+                    ComponentsWithAndWithOutSourceDownloadUrl(ref creatorKpiData, item);
                 }
 
-                if (IsComponentNotCreated(item))
+                Program.CreatorStopWatch.Stop();
+                creatorKpiData.TimeTakenByComponentCreator =
+                    TimeSpan.FromMilliseconds(Program.CreatorStopWatch.ElapsedMilliseconds).TotalSeconds;
+
+                return creatorKpiData;
+            }
+
+            public static void ComponentsWithAndWithOutSourceDownloadUrl(ref CreatorKpiData creatorKpiData, ComparisonBomData item)
+            {
+                if (item.DownloadUrl == Dataconstant.DownloadUrlNotFound || string.IsNullOrEmpty(item.DownloadUrl))
                 {
-                    creatorKpiData.ComponentsOrReleasesNotCreatedInSw360++;
+                    creatorKpiData.ComponentsWithoutSourceDownloadUrl++;
                 }
 
-                ComponentsWithAndWithOutSourceDownloadUrl(ref creatorKpiData, item);
+                if (item.DownloadUrl != Dataconstant.DownloadUrlNotFound && !string.IsNullOrEmpty(item.DownloadUrl))
+                {
+                    creatorKpiData.ComponentsWithSourceDownloadUrl++;
+                }
+
+                if (item.DownloadUrl == Dataconstant.DownloadUrlNotFound && item.DownloadUrl == Dataconstant.PackageUrlNotFound)
+                {
+                    creatorKpiData.ComponentsWithoutSourceAndPackageUrl++;
+                }
+
+                if (item.DownloadUrl == Dataconstant.PackageUrlNotFound || string.IsNullOrEmpty(item.DownloadUrl))
+                {
+                    creatorKpiData.ComponentsWithoutPackageUrl++;
+                }
+                if (item.FossologyUploadStatus == Dataconstant.NotUploaded)
+                {
+                    creatorKpiData.ComponentsNotUploadedInFossology++;
+                }
+                if (item.FossologyUploadStatus == Dataconstant.Uploaded)
+                {
+                    creatorKpiData.ComponentsUploadedInFossology++;
+                }
             }
 
-            Program.CreatorStopWatch.Stop();
-            creatorKpiData.TimeTakenByComponentCreator =
-                TimeSpan.FromMilliseconds(Program.CreatorStopWatch.ElapsedMilliseconds).TotalSeconds;
-
-            return creatorKpiData;
-        }
-
-        public static void ComponentsWithAndWithOutSourceDownloadUrl(ref CreatorKpiData creatorKpiData, ComparisonBomData item)
-        {
-            if (item.DownloadUrl == Dataconstant.DownloadUrlNotFound || string.IsNullOrEmpty(item.DownloadUrl))
+            private static bool IsComponentNotCreated(ComparisonBomData item)
             {
-                creatorKpiData.ComponentsWithoutSourceDownloadUrl++;
+                return item.IsComponentCreated == Dataconstant.NotCreated || item.IsReleaseCreated == Dataconstant.NotCreated;
             }
 
-            if (item.DownloadUrl != Dataconstant.DownloadUrlNotFound && !string.IsNullOrEmpty(item.DownloadUrl))
+            private static bool IsComponentCreated(ComparisonBomData item)
             {
-                creatorKpiData.ComponentsWithSourceDownloadUrl++;
+                return item.IsComponentCreated == Dataconstant.Created && item.IsReleaseCreated == Dataconstant.Created;
             }
 
-            if (item.DownloadUrl == Dataconstant.DownloadUrlNotFound && item.DownloadUrl == Dataconstant.PackageUrlNotFound)
+            private static bool IsComponentNewlyCreated(ComparisonBomData item)
             {
-                creatorKpiData.ComponentsWithoutSourceAndPackageUrl++;
+                return (item.IsComponentCreated == Dataconstant.NewlyCreated && item.IsReleaseCreated == Dataconstant.NewlyCreated)
+                                    || (item.IsComponentCreated == Dataconstant.Created && item.IsReleaseCreated == Dataconstant.NewlyCreated);
             }
 
-            if (item.DownloadUrl == Dataconstant.PackageUrlNotFound || string.IsNullOrEmpty(item.DownloadUrl))
+            public static ISw360CreatorService InitializeSw360CreatorService(CommonAppSettings appSettings)
             {
-                creatorKpiData.ComponentsWithoutPackageUrl++;
+                SW360ConnectionSettings sw360ConnectionSettings = new SW360ConnectionSettings()
+                {
+                    SW360URL = appSettings.SW360.URL,
+                    SW360AuthTokenType = appSettings.SW360.AuthTokenType,
+                    Sw360Token = appSettings.SW360.Token,
+                    IsTestMode = appSettings.IsTestMode,
+                    Timeout = appSettings.TimeOut
+                };
+                var sw360ApicommunicationFacade = new SW360ApicommunicationFacade(sw360ConnectionSettings);
+                return new Sw360CreatorService(sw360ApicommunicationFacade);
             }
-            if (item.FossologyUploadStatus == Dataconstant.NotUploaded)
+
+            public static ISw360ProjectService InitializeSw360ProjectService(CommonAppSettings appSettings)
             {
-                creatorKpiData.ComponentsNotUploadedInFossology++;
+                SW360ConnectionSettings sw360ConnectionSettings = new SW360ConnectionSettings()
+                {
+                    SW360URL = appSettings.SW360.URL,
+                    SW360AuthTokenType = appSettings.SW360.AuthTokenType,
+                    Sw360Token = appSettings.SW360.Token,
+                    IsTestMode = appSettings.IsTestMode,
+                    Timeout = appSettings.TimeOut
+                };
+                ISW360ApicommunicationFacade sW360ApicommunicationFacade = new SW360ApicommunicationFacade(sw360ConnectionSettings);
+
+                return new Sw360ProjectService(sW360ApicommunicationFacade);
             }
-            if (item.FossologyUploadStatus == Dataconstant.Uploaded)
+
+            public void WriteCreatorKpiDataToConsole(CreatorKpiData creatorKpiData)
             {
-                creatorKpiData.ComponentsUploadedInFossology++;
-            }
-        }
-
-        private static bool IsComponentNotCreated(ComparisonBomData item)
-        {
-            return item.IsComponentCreated == Dataconstant.NotCreated || item.IsReleaseCreated == Dataconstant.NotCreated;
-        }
-
-        private static bool IsComponentCreated(ComparisonBomData item)
-        {
-            return item.IsComponentCreated == Dataconstant.Created && item.IsReleaseCreated == Dataconstant.Created;
-        }
-
-        private static bool IsComponentNewlyCreated(ComparisonBomData item)
-        {
-            return (item.IsComponentCreated == Dataconstant.NewlyCreated && item.IsReleaseCreated == Dataconstant.NewlyCreated)
-                                || (item.IsComponentCreated == Dataconstant.Created && item.IsReleaseCreated == Dataconstant.NewlyCreated);
-        }
-
-        public static ISw360CreatorService InitializeSw360CreatorService(CommonAppSettings appSettings)
-        {
-            SW360ConnectionSettings sw360ConnectionSettings = new SW360ConnectionSettings()
-            {
-                SW360URL = appSettings.SW360.URL,
-                SW360AuthTokenType = appSettings.SW360.AuthTokenType,
-                Sw360Token = appSettings.SW360.Token,
-                IsTestMode = appSettings.IsTestMode,
-                Timeout = appSettings.TimeOut
-            };
-            var sw360ApicommunicationFacade = new SW360ApicommunicationFacade(sw360ConnectionSettings);
-            return new Sw360CreatorService(sw360ApicommunicationFacade);
-        }
-
-        public static ISw360ProjectService InitializeSw360ProjectService(CommonAppSettings appSettings)
-        {
-            SW360ConnectionSettings sw360ConnectionSettings = new SW360ConnectionSettings()
-            {
-                SW360URL = appSettings.SW360.URL,
-                SW360AuthTokenType = appSettings.SW360.AuthTokenType,
-                Sw360Token = appSettings.SW360.Token,
-                IsTestMode = appSettings.IsTestMode,
-                Timeout = appSettings.TimeOut
-            };
-            ISW360ApicommunicationFacade sW360ApicommunicationFacade = new SW360ApicommunicationFacade(sw360ConnectionSettings);
-
-            return new Sw360ProjectService(sW360ApicommunicationFacade);
-        }
-
-        public void WriteCreatorKpiDataToConsole(CreatorKpiData creatorKpiData)
-        {
-            Logger.Warn("Todo: Default component type is OSS. User is expected to manually change the component type from OSS to COTS.");
-            Dictionary<string, int> printList = new Dictionary<string, int>()
+                Logger.Warn("Todo: Default component type is OSS. User is expected to manually change the component type from OSS to COTS.");
+                Dictionary<string, int> printList = new Dictionary<string, int>()
             {
                 {CommonHelper.Convert(creatorKpiData,nameof(creatorKpiData.ComponentsReadFromComparisonBOM)),
                     creatorKpiData.ComponentsReadFromComparisonBOM },
@@ -512,126 +551,126 @@ namespace LCT.SW360PackageCreator
                     creatorKpiData.TotalDuplicateAndInValidComponents}
             };
 
-            Dictionary<string, double> printTimingList = new Dictionary<string, double>()
+                Dictionary<string, double> printTimingList = new Dictionary<string, double>()
             {
                 { "ComponentCreator",creatorKpiData.TimeTakenByComponentCreator }
             };
 
-            CommonHelper.WriteToConsoleTable(printList, printTimingList);
-        }
+                CommonHelper.WriteToConsoleTable(printList, printTimingList);
+            }
 
-        public void WriteSourceNotFoundListToConsole(List<ComparisonBomData> comparisionBomDataList, CommonAppSettings appSetting)
-        {
-            List<ComparisonBomData> sourceNotAvailable = GetDownloadUrlNotFoundList(comparisionBomDataList);
-            foreach (var item in comparisionBomDataList)
+            public void WriteSourceNotFoundListToConsole(List<ComparisonBomData> comparisionBomDataList, CommonAppSettings appSetting)
             {
-                if (item.IsReleaseCreated == Dataconstant.NotCreated || item.IsComponentCreated == Dataconstant.NotCreated)
+                List<ComparisonBomData> sourceNotAvailable = GetDownloadUrlNotFoundList(comparisionBomDataList);
+                foreach (var item in comparisionBomDataList)
                 {
-                    Components releasenotCreated = new Components
+                    if (item.IsReleaseCreated == Dataconstant.NotCreated || item.IsComponentCreated == Dataconstant.NotCreated)
                     {
-                        Name = item.Name,
-                        Version = item.Version
-                    };
-                    lstReleaseNotCreated.Add(releasenotCreated);
+                        Components releasenotCreated = new Components
+                        {
+                            Name = item.Name,
+                            Version = item.Version
+                        };
+                        lstReleaseNotCreated.Add(releasenotCreated);
+                    }
                 }
+
+                // Removes common components
+                sourceNotAvailable.RemoveAll(src => lstReleaseNotCreated.Any(rls => src.Name == rls.Name && src.Version == rls.Version));
+
+                CommonHelper.WriteComponentsWithoutDownloadURLToKpi(sourceNotAvailable, lstReleaseNotCreated, appSetting.SW360.URL);
             }
 
-            // Removes common components
-            sourceNotAvailable.RemoveAll(src => lstReleaseNotCreated.Any(rls => src.Name == rls.Name && src.Version == rls.Version));
-
-            CommonHelper.WriteComponentsWithoutDownloadURLToKpi(sourceNotAvailable, lstReleaseNotCreated, appSetting.SW360.URL);
-        }
-
-        private static string GetComponentAvailabilityStatus(List<Components> componentsAvailable, Components component)
-        {
-            return componentsAvailable.Exists(x => x.Name.ToLowerInvariant() == component.Name.ToLowerInvariant()
-            || x.ComponentExternalId.ToLowerInvariant() == component.ComponentExternalId.ToLowerInvariant()) ? Dataconstant.Available : Dataconstant.NotAvailable;
-        }
-
-        private string IsReleaseAvailable(string componentName, string componentVersion, string releaseExternalId)
-        {
-            if (componentsAvailableInSw360.Exists(
-                x => (x.Name.ToLowerInvariant() == componentName.ToLowerInvariant() && x.Version.ToLowerInvariant() == componentVersion.ToLowerInvariant())
-                || x.ReleaseExternalId.ToLowerInvariant() == releaseExternalId.ToLowerInvariant()))
+            private static string GetComponentAvailabilityStatus(List<Components> componentsAvailable, Components component)
             {
-                return Dataconstant.Available;
+                return componentsAvailable.Exists(x => x.Name.ToLowerInvariant() == component.Name.ToLowerInvariant()
+                || x.ComponentExternalId.ToLowerInvariant() == component.ComponentExternalId.ToLowerInvariant()) ? Dataconstant.Available : Dataconstant.NotAvailable;
             }
 
-            return Dataconstant.NotAvailable;
-        }
-
-        public static string GetComponentDownloadUrl(ComparisonBomData mapper, Components item, IRepository repo, ReleasesInfo releasesInfo)
-        {
-            //IF Release already exists in SW360 , tool will not update any field.
-            //Hence do not need to find DOWNLOAD URL URL here and this REDUCE the exeuction time
-
-            if (mapper.ReleaseStatus.Equals(Dataconstant.Available))
+            private string IsReleaseAvailable(string componentName, string componentVersion, string releaseExternalId)
             {
-                return releasesInfo?.SourceCodeDownloadUrl ?? string.Empty;
-            }
-            return repo.FormGitCloneUrl(mapper.SourceUrl, item.Name, item.Version);
-        }
-
-        public static string GetApprovedStatus(string componentAvailabelStatus, string releaseAvailbilityStatus, ReleasesInfo releasesInfo)
-        {
-
-            if (componentAvailabelStatus == Dataconstant.Available && releaseAvailbilityStatus == Dataconstant.Available)
-            {
-                return releasesInfo?.ClearingState ?? Dataconstant.NotAvailable;
-            }
-
-            return Dataconstant.NotAvailable;
-        }
-
-        public static string GetCreatedStatus(string availabilityStatus)
-        {
-            return availabilityStatus == Dataconstant.Available ? Dataconstant.Created : Dataconstant.NotCreated;
-        }
-
-        public static string GetFossologyUploadStatus(string ComponentApprovedStatus)
-        {
-            return (ComponentApprovedStatus == Dataconstant.NotAvailable ||
-                     ComponentApprovedStatus == Dataconstant.NewClearing) ? Dataconstant.NotUploaded : Dataconstant.AlreadyUploaded;
-        }
-
-        public static string GetReleaseLink(List<Components> componentsAvailableInSw360, string name, string version)
-        {
-            string releaseLink = componentsAvailableInSw360.Where(x => x.Name.Trim().ToLower() == name.Trim().ToLower()
-            && x.Version.Trim().ToLower() == version.Trim().ToLower()).Select(x => x.ReleaseLink).FirstOrDefault();
-
-            if (releaseLink == null)
-            {
-                string debianVersion = version;
-                if (!version?.Contains(".debian") ?? false)
+                if (componentsAvailableInSw360.Exists(
+                    x => (x.Name.ToLowerInvariant() == componentName.ToLowerInvariant() && x.Version.ToLowerInvariant() == componentVersion.ToLowerInvariant())
+                    || x.ReleaseExternalId.ToLowerInvariant() == releaseExternalId.ToLowerInvariant()))
                 {
-                    debianVersion = $"{version}.debian";
-                }
-                else
-                {
-                    debianVersion = version?.Replace(".debian", "");
+                    return Dataconstant.Available;
                 }
 
-                releaseLink = componentsAvailableInSw360.Where(x => x.Name.Trim().ToLower() == name.Trim().ToLower()
-                && x.Version.Trim().ToLower() == debianVersion).Select(x => x.ReleaseLink).FirstOrDefault();
+                return Dataconstant.NotAvailable;
             }
 
-            return releaseLink ?? string.Empty;
-        }
-
-        private static async Task<ReleasesInfo> GetReleaseInfoFromSw360(Components item, List<Components> componentsAvailableInSw360, ISW360Service sw360Service)
-        {
-            ReleasesInfo releasesInfo = new ReleasesInfo();
-
-            Components componentAvailable =
-                componentsAvailableInSw360.FirstOrDefault(x => x.Name.ToLowerInvariant() == item.Name.ToLowerInvariant()
-                && x.Version.ToLowerInvariant() == item.Version.ToLowerInvariant());
-
-            if (componentAvailable != null)
+            public static string GetComponentDownloadUrl(ComparisonBomData mapper, Components item, IRepository repo, ReleasesInfo releasesInfo)
             {
-                return await sw360Service.GetReleaseDataOfComponent(componentAvailable.ReleaseLink);
+                //IF Release already exists in SW360 , tool will not update any field.
+                //Hence do not need to find DOWNLOAD URL URL here and this REDUCE the exeuction time
+
+                if (mapper.ReleaseStatus.Equals(Dataconstant.Available))
+                {
+                    return releasesInfo?.SourceCodeDownloadUrl ?? string.Empty;
+                }
+                return repo.FormGitCloneUrl(mapper.SourceUrl, item.Name, item.Version);
             }
 
-            return releasesInfo;
+            public static string GetApprovedStatus(string componentAvailabelStatus, string releaseAvailbilityStatus, ReleasesInfo releasesInfo)
+            {
+
+                if (componentAvailabelStatus == Dataconstant.Available && releaseAvailbilityStatus == Dataconstant.Available)
+                {
+                    return releasesInfo?.ClearingState ?? Dataconstant.NotAvailable;
+                }
+
+                return Dataconstant.NotAvailable;
+            }
+
+            public static string GetCreatedStatus(string availabilityStatus)
+            {
+                return availabilityStatus == Dataconstant.Available ? Dataconstant.Created : Dataconstant.NotCreated;
+            }
+
+            public static string GetFossologyUploadStatus(string ComponentApprovedStatus)
+            {
+                return (ComponentApprovedStatus == Dataconstant.NotAvailable ||
+                         ComponentApprovedStatus == Dataconstant.NewClearing) ? Dataconstant.NotUploaded : Dataconstant.AlreadyUploaded;
+            }
+
+            public static string GetReleaseLink(List<Components> componentsAvailableInSw360, string name, string version)
+            {
+                string releaseLink = componentsAvailableInSw360.Where(x => x.Name.Trim().ToLower() == name.Trim().ToLower()
+                && x.Version.Trim().ToLower() == version.Trim().ToLower()).Select(x => x.ReleaseLink).FirstOrDefault();
+
+                if (releaseLink == null)
+                {
+                    string debianVersion = version;
+                    if (!version?.Contains(".debian") ?? false)
+                    {
+                        debianVersion = $"{version}.debian";
+                    }
+                    else
+                    {
+                        debianVersion = version?.Replace(".debian", "");
+                    }
+
+                    releaseLink = componentsAvailableInSw360.Where(x => x.Name.Trim().ToLower() == name.Trim().ToLower()
+                    && x.Version.Trim().ToLower() == debianVersion).Select(x => x.ReleaseLink).FirstOrDefault();
+                }
+
+                return releaseLink ?? string.Empty;
+            }
+
+            private static async Task<ReleasesInfo> GetReleaseInfoFromSw360(Components item, List<Components> componentsAvailableInSw360, ISW360Service sw360Service)
+            {
+                ReleasesInfo releasesInfo = new ReleasesInfo();
+
+                Components componentAvailable =
+                    componentsAvailableInSw360.FirstOrDefault(x => x.Name.ToLowerInvariant() == item.Name.ToLowerInvariant()
+                    && x.Version.ToLowerInvariant() == item.Version.ToLowerInvariant());
+
+                if (componentAvailable != null)
+                {
+                    return await sw360Service.GetReleaseDataOfComponent(componentAvailable.ReleaseLink);
+                }
+
+                return releasesInfo;
+            }
         }
     }
-}

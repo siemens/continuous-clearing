@@ -5,6 +5,7 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using JetBrains.Annotations;
 using LCT.APICommunications;
 using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.Foss;
@@ -12,6 +13,7 @@ using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
 using LCT.Common.Model;
+using LCT.Services;
 using LCT.Services.Interface;
 using LCT.Services.Model;
 using LCT.SW360PackageCreator.Interfaces;
@@ -23,8 +25,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Directory = System.IO.Directory;
+
 
 namespace LCT.SW360PackageCreator
 {
@@ -59,51 +63,63 @@ namespace LCT.SW360PackageCreator
         private async Task<List<Components>> GetListOfBomData(List<Component> components, CommonAppSettings appSettings)
         {
             List<Components> lstOfBomDataToBeCompared = new List<Components>();
-
-            foreach (Component item in components)
+            Func<Component, CancellationToken, ValueTask> action = async (item, ct) =>
             {
-                Components componentsData = new Components();
-
-                string currName = item.Name;
-                string currVersion = item.Version;
-
-                bool isInternalComponent = GetPackageType(item, ref componentsData);
-
-                if (isInternalComponent)
+                try
                 {
-                    Logger.Debug($"{item.Name}-{item.Version} found as internal component. ");
-                }
-                else if ((componentsData.IsDev == "true" && appSettings.SW360.IgnoreDevDependency)||componentsData.ExcludeComponent == "true")
-                {
-                    //do nothing
-                }
-                else
-                {
-                    componentsData.DownloadUrl = Dataconstant.DownloadUrlNotFound;
-                    componentsData.Name = GetPackageName(item);
-                    componentsData.Group = item.Group;
-                    componentsData.Version = item.Version;
-                    componentsData.ComponentExternalId = item.Purl.Substring(0, item.Purl.IndexOf('@'));
-                    componentsData.ReleaseExternalId = item.Purl;
+                    Components componentsData = new Components();
+                    string currName = item.Name;
+                    string currVersion = item.Version;
 
-                    Components component = await GetSourceUrl(componentsData.Name, componentsData.Version, componentsData.ProjectType, item.BomRef);
-                    componentsData.SourceUrl = component.SourceUrl;
+                    bool isInternalComponent = GetPackageType(item, ref componentsData);
 
-                    if (componentsData.ProjectType.ToUpperInvariant() == "ALPINE")
+                    if (isInternalComponent)
                     {
-                        componentsData.AlpineSourceData = component.AlpineSourceData;
+                        Logger.Debug($"{item.Name}-{item.Version} found as internal component. ");
                     }
-
-                    if (componentsData.ProjectType.ToUpperInvariant() == "DEBIAN")
+                    else if ((componentsData.IsDev == "true" && appSettings.SW360.IgnoreDevDependency) || componentsData.ExcludeComponent == "true")
                     {
-                        componentsData = component;
+                        //do nothing
                     }
-                    UpdateToLocalBomFile(componentsData, currName, currVersion);
+                    else
+                    {
+                        componentsData.DownloadUrl = Dataconstant.DownloadUrlNotFound;
+                        componentsData.Name = GetPackageName(item);
+                        componentsData.Group = item.Group;
+                        componentsData.Version = item.Version;
+                        componentsData.ComponentExternalId = item.Purl.Substring(0, item.Purl.IndexOf('@'));
+                        componentsData.ReleaseExternalId = item.Purl;
 
-                    lstOfBomDataToBeCompared.Add(componentsData);
+                        Components component = await GetSourceUrl(componentsData.Name, componentsData.Version, componentsData.ProjectType, item.BomRef);
+                        componentsData.SourceUrl = component.SourceUrl;
+
+                        if (componentsData.ProjectType.ToUpperInvariant() == "ALPINE")
+                        {
+                            componentsData.AlpineSourceData = component.AlpineSourceData;
+                        }
+
+                        if (componentsData.ProjectType.ToUpperInvariant() == "DEBIAN")
+                        {
+                            componentsData = component;
+                        }
+                        UpdateToLocalBomFile(componentsData, currName, currVersion);
+
+                        lstOfBomDataToBeCompared.Add(componentsData);
+                    }
                 }
-            }
+                catch (Exception ex)
+                {
+                    Logger.Error($"Error processing item {item.Name}: {ex.Message}", ex);
+                }
+            };
 
+
+            var parallelOptions = new ParallelOptions
+            {
+                MaxDegreeOfParallelism = Dataconstant.MaxDegreeOfParallelism
+            };
+
+            await ProcessAsyncHelper.ProcessItemsAsync(components, action, parallelOptions);
             return lstOfBomDataToBeCompared;
         }
 
@@ -245,7 +261,7 @@ namespace LCT.SW360PackageCreator
             bom = await creatorHelper.GetUpdatedComponentsDetails(ListofBomComponents, UpdatedCompareBomData, sw360Service, bom);
 
             var formattedString = CycloneDX.Json.Serializer.Serialize(bom);
-            
+
             fileOperations.WriteContentToOutputBomFile(formattedString, bomGenerationPath,
                 FileConstant.BomFileName, appSettings.SW360.ProjectName);
 
@@ -270,7 +286,7 @@ namespace LCT.SW360PackageCreator
 
             Logger.Debug($"CreateComponentInSw360():End");
         }
-               
+
         private async Task CreateComponent(ICreatorHelper creatorHelper,
             ISw360CreatorService sw360CreatorService, List<ComparisonBomData> componentsToBoms,
             string sw360Url, CommonAppSettings appSettings)
@@ -279,20 +295,48 @@ namespace LCT.SW360PackageCreator
 
             try
             {
-                foreach (ComparisonBomData item in componentsToBoms)
+                List<ComparisonBomData> comparisonBomsForMixed = componentsToBoms.Where(avl => (avl.ComponentStatus == Dataconstant.Available && avl.ReleaseStatus == Dataconstant.NotAvailable)
+                || (avl.ComponentStatus == Dataconstant.NotAvailable && avl.ReleaseStatus == Dataconstant.NotAvailable)).ToList();
+                // Getting the list of components & releases are avilable
+                List<ComparisonBomData> comparisonBomsForAvilables = componentsToBoms.Where(avl=> avl.ComponentStatus == Dataconstant.Available && avl.ReleaseStatus == Dataconstant.Available).ToList();
+
+                foreach (ComparisonBomData item in comparisonBomsForMixed)
                 {
                     await CreateComponentAndRealease(creatorHelper, sw360CreatorService, item, sw360Url, appSettings);
                 }
 
-                string localPathforSourceRepo = UrlHelper.GetDownloadPathForAlpineRepo();
-                if (Directory.GetDirectories(localPathforSourceRepo).Length != 0)
+                //Processing parallely for existing components
+                Func<ComparisonBomData, CancellationToken, ValueTask> action = async (item, ct) =>
                 {
-                    DirectoryInfo di = new DirectoryInfo(localPathforSourceRepo);
-                    foreach (DirectoryInfo dir in di.GetDirectories())
+                    try
                     {
-                        if (!dir.Name.Equals("aports"))
+                        await ComponentAndReleaseAvailable(item, sw360Url, sw360CreatorService, appSettings);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error($"CreateComponent() : Error processing item {item.Name}: {ex.Message}", ex);
+                    }
+                };
+
+                var parallelOptions = new ParallelOptions
+                {
+                    MaxDegreeOfParallelism = Dataconstant.MaxDegreeOfParallelism
+                };
+                await ProcessAsyncHelper.ProcessItemsAsync(comparisonBomsForAvilables, action, parallelOptions);
+
+
+                if (appSettings.ProjectType.ToUpperInvariant() == "ALPINE")
+                {
+                    string localPathforSourceRepo = UrlHelper.GetDownloadPathForAlpineRepo();
+                    if (Directory.GetDirectories(localPathforSourceRepo).Length != 0)
+                    {
+                        DirectoryInfo di = new DirectoryInfo(localPathforSourceRepo);
+                        foreach (DirectoryInfo dir in di.GetDirectories())
                         {
-                            dir.Delete(true);
+                            if (!dir.Name.Equals("aports"))
+                            {
+                                dir.Delete(true);
+                            }
                         }
                     }
                 }
@@ -340,8 +384,6 @@ namespace LCT.SW360PackageCreator
             await CreateComponentAndReleaseWhenNotAvailable(item, sw360CreatorService, creatorHelper, appSettings);
 
             await CreateReleaseWhenNotAvailable(item, sw360CreatorService, creatorHelper, appSettings);
-
-            await ComponentAndReleaseAvailable(item, sw360Url, sw360CreatorService, appSettings);
         }
 
         private async Task CreateComponentAndReleaseWhenNotAvailable(ComparisonBomData item,
@@ -488,7 +530,7 @@ namespace LCT.SW360PackageCreator
             }
             catch (AggregateException ex)
             {
-                Logger.DebugFormat("\tError in TriggerFossologyProcess--{0}",ex);
+                Logger.DebugFormat("\tError in TriggerFossologyProcess--{0}", ex);
             }
             return uploadId;
         }
@@ -563,7 +605,7 @@ namespace LCT.SW360PackageCreator
                 ReleasesFoundInCbom.Add(new ReleaseLinked() { Name = item.Name, Version = item.Version, ReleaseId = releaseIdToLink });
             }
             else
-            {                
+            {
                 Environment.ExitCode = -1;
                 Logger.Fatal($"Linking release to the project is failed. " +
                             $"Release version - {item.Version} not found under this component - {item.Name}. ");

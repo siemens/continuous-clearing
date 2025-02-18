@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace LCT.Common
@@ -151,6 +152,20 @@ namespace LCT.Common
             }
             return stdErrBuilder;
 
+        }
+
+
+        public static async Task ProcessItemsAsync<T>(IEnumerable<T> items, Func<T, CancellationToken, ValueTask> action, ParallelOptions parallelOptions = null, CancellationToken cancellationToken = default)
+        {
+            if (parallelOptions == null)
+            {
+                parallelOptions = new ParallelOptions();
+            }
+
+            await Parallel.ForEachAsync(items, parallelOptions, async (item, ct) =>
+            {
+                await action(item, ct);
+            });
         }
 
     }
