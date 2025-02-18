@@ -73,5 +73,9 @@ namespace LCT.APICommunications
         public const string PackageNotFound = "Package Not Found";
         public const string ArtifactoryRepoName = "ArtifactoryRepoName";
         public const string JfrogArtifactoryApiSearchAql = $"/api/search/aql";
+        public const int APIRetryCount = 3;
+        public const int APIRetryIntervalFirst = 5; // in seconds
+        public const int APIRetryIntervalSecond = 10; // in seconds
+        public const int APIRetryIntervalThird = 30; // in seconds
     }
 }

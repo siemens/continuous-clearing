@@ -322,7 +322,11 @@ namespace LCT.APICommunications
 
         private HttpClient GetHttpClient()
         {
-            HttpClient httpClient = new HttpClient();
+            var handler = new RetryHttpClientHandler()
+            {
+                InnerHandler = new HttpClientHandler()
+            };
+            var httpClient = new HttpClient(handler);
             TimeSpan timeOutInSec = TimeSpan.FromSeconds(timeOut);
             httpClient.Timeout = timeOutInSec;
             httpClient.DefaultRequestHeaders.Accept.Add(
