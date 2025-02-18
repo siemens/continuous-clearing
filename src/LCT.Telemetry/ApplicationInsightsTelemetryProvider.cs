@@ -1,4 +1,9 @@
-﻿using Microsoft.ApplicationInsights;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2025 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
 

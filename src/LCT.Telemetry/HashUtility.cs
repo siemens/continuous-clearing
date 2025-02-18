@@ -1,4 +1,9 @@
-﻿using System.Security.Cryptography;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2025 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+using System.Security.Cryptography;
 using System.Text;
 
 namespace LCT.Telemetry
