@@ -851,7 +851,7 @@ namespace LCT.SW360PackageCreator
             string downloadedPath = string.Empty;
             try
             {
-                await RetryWebClientHandler.ExecuteWithRetryAsync(async () =>
+                await RetryHttpClientHandler.ExecuteWithRetryAsync(async () =>
                 {
                     using WebClient webClient = new();
                     await webClient.DownloadFileTaskAsync(uri, downloadFilePath);

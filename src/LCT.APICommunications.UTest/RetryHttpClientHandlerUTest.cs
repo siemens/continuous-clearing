@@ -7,6 +7,14 @@ namespace LCT.APICommunications.UTest
 {
     public class RetryHttpClientHandlerUTest
     {
+        private Mock<ILog> _mockLogger;
+
+        [SetUp]
+        public void SetUp()
+        {
+            // Mock the logger
+            _mockLogger = new Mock<ILog>();
+        }
         [Test]
         public async Task SendAsync_ShouldRetry_OnTransientErrors()
         {
@@ -87,7 +95,7 @@ namespace LCT.APICommunications.UTest
                 .ThrowsAsync(new HttpRequestException())
                 .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK));
 
-            var loggerMock = GetLoggerMock();
+            
             var retryHandler = new RetryHttpClientHandler()
             {
                 InnerHandler = handlerMock.Object
@@ -101,10 +109,45 @@ namespace LCT.APICommunications.UTest
             // Assert
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);            
         }
-
-        private static Mock<ILog> GetLoggerMock()
+        [Test]
+        public async Task ExecuteWithRetryAsync_ShouldCompleteSuccessfully_WhenActionSucceedsAfterRetry()
         {
-            return new Mock<ILog>();
+            // Arrange
+            var attempts = 0;
+            var action = new Func<Task>(() =>
+            {
+                attempts++;
+                if (attempts < ApiConstant.APIRetryCount)
+                {
+                    throw new WebException("Temporary error", WebExceptionStatus.Timeout);
+                }
+                return Task.CompletedTask; // Successfully completes after retries
+            });
+
+            // Act
+            await RetryHttpClientHandler.ExecuteWithRetryAsync(action);
+
+            // Assert
+            Assert.AreEqual(ApiConstant.APIRetryCount, attempts, "Action should have been attempted the expected number of times.");
+        }
+
+        [Test]
+        public async Task ExecuteWithRetryAsync_ShouldNotRetry_WhenNoWebExceptionIsThrown()
+        {
+            // Arrange
+            var actionExecuted = false;
+            var action = new Func<Task>(() =>
+            {
+                actionExecuted = true;
+                return Task.CompletedTask;
+            });
+
+            // Act
+            await RetryHttpClientHandler.ExecuteWithRetryAsync(action);
+
+            // Assert
+            Assert.IsTrue(actionExecuted, "Action should have been executed.");
+            _mockLogger.Verify(logger => logger.Debug(It.IsAny<string>()), Times.Never, "Retry should not occur if there is no exception.");
         }
 
     }
