@@ -228,7 +228,7 @@ Currently LTA support is not provided for SBOM, hence until that is implemented 
              Resulted `output.json` file will be having the list of installed packages  and the same file will be used as  an input to `Continuous clearing tool - Bom creator` as an argument(`--packagefilepath`). The remaining process is same as other project types.
 ### **Retry Strategy**
 
-The retry strategy is implemented using the Polly library to handle transient errors such as HTTP request exceptions, task cancellations, and specific HTTP status codes (5xx server errors and 408 Request Timeout). The policy is configured to retry operations up to three times with increasing intervals between attempts (5, 10, and 30 seconds). During each retry attempt, detailed debug information is logged, including the attempt number and the reason for the retry. This approach ensures that network communication is more resilient and reliable by automatically retrying failed requests due to transient issues.
+The retry strategy is implemented using the Polly library to handle transient errors such as HTTP request exceptions, task cancellations, and specific HTTP status codes (5xx server errors and 408 Request Timeout). The policy is configured to retry operations up to three times with increasing intervals between attempts (5, 10, and 30 seconds). This approach ensures that network communication is more resilient and reliable by automatically retrying failed requests due to transient issues.
 ### **Configuring the Continuous Clearing Tool**
 
    Arguments can be provided to the tool in two ways :
