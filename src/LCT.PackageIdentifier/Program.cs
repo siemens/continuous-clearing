@@ -111,36 +111,11 @@ namespace LCT.PackageIdentifier
                 await bomCreator.GenerateBom(appSettings, new BomHelper(), new FileOperations(), projectReleases,
                                              caToolInformation);
             }
-           
-            // Initialize telemetry with CATool version and instrumentation key only if Telemetry is enabled in appsettings
+
             if (appSettings.Telemetry.Enable == true)
             {
-                Logger.Warn(TelemetryConstant.StartLogMessage);
-                Telemetry.Telemetry telemetry = new Telemetry.Telemetry(TelemetryConstant.Type, new Dictionary<string, string>
-                {
-                    { "InstrumentationKey", appSettings.Telemetry.ApplicationInsightInstrumentKey }
-                });
-                try
-                {
-                    TelemetryHelper.InitializeAndTrackEvent(telemetry, TelemetryConstant.ToolName, caToolInformation.CatoolVersion, TelemetryConstant.PackageIdentifier
-                                                        , appSettings);
-                    // Track KPI data if available
-                    if (BomCreator.bomKpiData != null)
-                    {
-                        TelemetryHelper.TrackKpiDataTelemetry(telemetry, TelemetryConstant.IdentifierKpiData, BomCreator.bomKpiData);
-                    }
-                    telemetry.TrackExecutionTime();
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error($"An error occurred: {ex.Message}");
-                    TelemetryHelper.TrackException(telemetry, ex);
-                    environmentHelper.CallEnvironmentExit(-1);
-                }
-                finally
-                {
-                    telemetry.Flush(); // Ensure telemetry is sent before application exits
-                }
+                TelemetryHelper telemetryHelper = new TelemetryHelper(appSettings);
+                telemetryHelper.StartTelemetry(caToolInformation.CatoolVersion, BomCreator.bomKpiData, TelemetryConstant.IdentifierKpiData);
             }
             Logger.Logger.Log(null, Level.Notice, $"End of Package Identifier execution : {DateTime.Now}\n", null);
             // publish logs and bom file to pipeline artifact

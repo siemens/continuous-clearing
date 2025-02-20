@@ -102,32 +102,8 @@ namespace LCT.SW360PackageCreator
             // Initialize telemetry with CATool version and instrumentation key only if Telemetry is enabled in appsettings
             if (appSettings.Telemetry.Enable == true)
             {
-                Logger.Warn(TelemetryConstant.StartLogMessage);
-                Telemetry.Telemetry telemetry = new Telemetry.Telemetry(TelemetryConstant.Type, new Dictionary<string, string>
-                {
-                    { "InstrumentationKey", appSettings.Telemetry.ApplicationInsightInstrumentKey }
-                });
-                try
-                {
-                    TelemetryHelper.InitializeAndTrackEvent(telemetry, TelemetryConstant.ToolName, caToolInformation.CatoolVersion, TelemetryConstant.PackageCreator
-                                                        , appSettings);
-                    // Track KPI data if available
-                    if (ComponentCreator.kpiData != null)
-                    {
-                        TelemetryHelper.TrackKpiDataTelemetry(telemetry, TelemetryConstant.CreatorKpiData, ComponentCreator.kpiData);
-                    }
-                    telemetry.TrackExecutionTime();
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error($"An error occurred: {ex.Message}");
-                    TelemetryHelper.TrackException(telemetry, ex);
-                    environmentHelper.CallEnvironmentExit(-1);
-                }
-                finally
-                {
-                    telemetry.Flush(); // Ensure telemetry is sent before application exits
-                }
+                TelemetryHelper telemetryHelper = new TelemetryHelper(appSettings);
+                telemetryHelper.StartTelemetry(caToolInformation.CatoolVersion, ComponentCreator.kpiData,TelemetryConstant.CreatorKpiData);
             }
             Logger.Logger.Log(null, Level.Notice, $"End of Package Creator execution: {DateTime.Now}\n", null);
 

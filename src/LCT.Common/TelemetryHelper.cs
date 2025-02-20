@@ -3,7 +3,10 @@
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
+using LCT.Common.Constants;
+using LCT.Common.Interface;
 using LCT.Telemetry;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,12 +18,51 @@ namespace LCT.Common
 {
     public class TelemetryHelper
     {
-        public static void InitializeAndTrackEvent(LCT.Telemetry.Telemetry telemetry, string toolName, string toolVersion, string eventName,
+        private readonly ILog Logger;
+        LCT.Telemetry.Telemetry telemetry_;
+        EnvironmentHelper environmentHelper;
+        CommonAppSettings appSettings_;
+
+        public TelemetryHelper(CommonAppSettings appSettings)
+        {
+            environmentHelper = new EnvironmentHelper();
+            Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+            appSettings_ = appSettings ?? new CommonAppSettings();
+
+            telemetry_ = new LCT.Telemetry.Telemetry(TelemetryConstant.Type, new Dictionary<string, string>
+                {
+                { "InstrumentationKey", appSettings.Telemetry.ApplicationInsightInstrumentKey }
+            });
+        }
+
+        public void StartTelemetry<T>(string catoolVersion, T kpiData,string telemetryFor)
+        {
+            // Initialize telemetry with CATool version and instrumentation key only if Telemetry is enabled in appsettings
+            Logger.Warn(TelemetryConstant.StartLogMessage);
+            try
+            {
+                InitializeAndTrackEvent(TelemetryConstant.ToolName, catoolVersion, telemetryFor
+                                                    , appSettings_);
+                TrackKpiDataTelemetry(telemetryFor, kpiData);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"An error occurred: {ex.Message}");
+                TrackException(ex);
+                environmentHelper.CallEnvironmentExit(-1);
+            }
+            finally
+            {
+                telemetry_.Flush(); // Ensure telemetry is sent before application exits
+            }
+        }
+
+        private void InitializeAndTrackEvent(string toolName, string toolVersion, string eventName,
                                                     CommonAppSettings appSettings)
         {
-            telemetry.Initialize(toolName, toolVersion);
+            telemetry_.Initialize(toolName, toolVersion);
 
-            telemetry.TrackCustomEvent(eventName, new Dictionary<string, string>
+            telemetry_.TrackCustomEvent(eventName, new Dictionary<string, string>
             {
                 { "CA Tool Version", toolVersion },
                 { "SW360 Project Name", appSettings.SW360.ProjectName },
@@ -30,8 +72,7 @@ namespace LCT.Common
                 { "Start Time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture) }
             });
         }
-
-        public static void TrackKpiDataTelemetry<T>(LCT.Telemetry.Telemetry telemetry, string eventName, T kpiData)
+        private void TrackKpiDataTelemetry<T>(string eventName, T kpiData)
         {
             var properties = typeof(T).GetProperties();
             var telemetryData = properties.ToDictionary(
@@ -42,10 +83,10 @@ namespace LCT.Common
             telemetryData["Hashed User ID"] = HashUtility.GetHashString(Environment.UserName);
             telemetryData["Time stamp"] = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
 
-            telemetry.TrackCustomEvent(eventName, telemetryData);
+            telemetry_.TrackCustomEvent(eventName, telemetryData);
         }
 
-        public static void TrackException(LCT.Telemetry.Telemetry telemetry, Exception ex)
+        private void TrackException(Exception ex)
         {
             var exceptionData = new Dictionary<string, string>
         {
@@ -53,7 +94,7 @@ namespace LCT.Common
             { "Stack Trace", ex.StackTrace }
         };
 
-            telemetry.TrackException(ex, exceptionData);
+            telemetry_.TrackException(ex, exceptionData);
         }
     }
 }
