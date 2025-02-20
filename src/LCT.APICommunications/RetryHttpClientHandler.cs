@@ -28,6 +28,7 @@ namespace LCT.APICommunications
                     onRetry: (outcome, timespan, attempt, context) =>
                     {
                         Logger.Debug($"Retry attempt {attempt} due to: {(outcome.Exception != null ? outcome.Exception.Message : $"{outcome.Result.StatusCode}")}");
+                        Logger.Warn($"Retry attempt {attempt} will be triggered in {timespan.TotalSeconds} seconds due to: {(outcome.Exception != null ? outcome.Exception.Message : $"{outcome.Result.StatusCode}")}");
                     });
         }
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, System.Threading.CancellationToken cancellationToken)
@@ -45,20 +46,18 @@ namespace LCT.APICommunications
                     GetRetryInterval,
                     onRetry: (exception, timespan, attempt, context) =>
                     {
-                        Logger.Debug($"Retry attempt {attempt} due to: {exception?.Message ?? "No exception"}");
+                        Logger.Debug($"Retry attempt {attempt} due to: {exception?.Message ?? "No exception"}");                        
                     });
 
             await retryPolicy.ExecuteAsync(action);
         }
         private static TimeSpan GetRetryInterval(int attempt)
         {
-            return attempt switch
-            {
-                1 => TimeSpan.FromSeconds(ApiConstant.APIRetryIntervalFirst),  // 1st retry after 5 seconds
-                2 => TimeSpan.FromSeconds(ApiConstant.APIRetryIntervalSecond), // 2nd retry after 10 seconds
-                3 => TimeSpan.FromSeconds(ApiConstant.APIRetryIntervalThird), // 3rd retry after 30 seconds
-                _ => TimeSpan.Zero // Default (not used)
-            };
+            // Define retry intervals as constants or values
+            var retryIntervals = new[] { ApiConstant.APIRetryIntervalFirst, ApiConstant.APIRetryIntervalSecond, ApiConstant.APIRetryIntervalThird }; // Retry intervals for 1st, 2nd, and 3rd attempts
+            if (attempt >= 1 && attempt <= retryIntervals.Length)
+                return TimeSpan.FromSeconds(retryIntervals[attempt - 1]);
+            return TimeSpan.Zero; // Default if out of range
         }
     }
 }
