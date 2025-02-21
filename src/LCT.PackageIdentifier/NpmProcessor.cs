@@ -689,7 +689,7 @@ namespace LCT.PackageIdentifier
             // Forming Jfrog repo Path
             if (!repoName.Equals(NotFoundInRepo, StringComparison.OrdinalIgnoreCase))
             {
-                aqlResult = aqlResults.FirstOrDefault(x => x.Repo.Equals(repoName));
+                aqlResult = aqlResults.FirstOrDefault(x => x.Repo.Equals(repoName)) ?? new AqlResult();
                 jfrogRepoPath = GetJfrogRepoPath(aqlResult);
             }
 

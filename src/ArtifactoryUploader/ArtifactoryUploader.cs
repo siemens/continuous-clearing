@@ -112,7 +112,7 @@ namespace LCT.ArtifactoryUploader
 
                 if (packageInfo != null)
                 {
-                    component.CopyPackageApiUrl = component.CopyPackageApiUrl.ToLower();
+                    component.CopyPackageApiUrl = component.CopyPackageApiUrl.Replace(component.JfrogPackageName, packageInfo.Name);
                 }
             }          
 

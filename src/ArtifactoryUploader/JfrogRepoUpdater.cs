@@ -16,7 +16,7 @@ using LCT.Common.Constants;
 
 namespace LCT.ArtifactoryUploader
 {
-    public class JfrogRepoUpdater
+    public static class JfrogRepoUpdater
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static IJFrogService jFrogService { get; set; }
@@ -28,7 +28,7 @@ namespace LCT.ArtifactoryUploader
             List<ComponentsToArtifactory> uploadedPackages = PackageUploadInformation.GetUploadePackageDetails(displayPackagesInfo);
 
             // Get the details of all the dest repo names from jfrog at once
-            List<string> destRepoNames = uploadedPackages.Select(x => x.DestRepoName)?.Distinct()?.ToList() ?? new List<string>();
+            List<string> destRepoNames = uploadedPackages.Select(x => x.DestRepoName).Distinct().ToList();
             List<AqlResult> jfrogPackagesListAql = await GetJfrogRepoInfoForAllTypePackages(destRepoNames);
 
             // Update the repo path
