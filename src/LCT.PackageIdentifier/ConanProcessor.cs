@@ -390,13 +390,20 @@ namespace LCT.PackageIdentifier
                 throw new ArgumentNullException(nameof(nodePackages), "Dependency(requires) node name details not present in the root node.");
             }
 
-            ConanPackage package = nodePackages.Where(x => x.Id == "0").FirstOrDefault();
+            ConanPackage package = nodePackages.FirstOrDefault(x => x.Id == "0");
             List<string> directDependencies = new List<string>();
-            if (package != null && package.Dependencies != null) { directDependencies.AddRange(package.Dependencies); }
-            if (package.DevDependencies != null) { directDependencies.AddRange(package.DevDependencies); }
+            if (package != null)
+            {
+                if (package.Dependencies != null)
+                {
+                    directDependencies.AddRange(package.Dependencies);
+                }
+                if (package.DevDependencies != null)
+                {
+                    directDependencies.AddRange(package.DevDependencies);
+                }
+            }
 
-            // Ignoring the root node as it is the package information node and we are anyways considering all
-            // nodes in the lock file.
             foreach (var component in nodePackages.Skip(1))
             {
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += 1;
@@ -409,8 +416,6 @@ namespace LCT.PackageIdentifier
                 }
 
                 Component components = new Component();
-
-                // dev components are not ignored and added as a part of SBOM   
                 var buildNodeIds = GetBuildNodeIds(nodePackages);
                 if (IsDevDependency(component, buildNodeIds, ref noOfDevDependent))
                 {
@@ -418,40 +423,31 @@ namespace LCT.PackageIdentifier
                 }
 
                 string packageName = Convert.ToString(component.Reference);
-
                 if (packageName.Contains('/'))
                 {
-                    components.Name = packageName.Split(new char[] { '/', '@' })[0];
-                    components.Version = packageName.Split(new char[] { '/', '@' })[1];
+                    var parts = packageName.Split(new char[] { '/', '@' });
+                    components.Name = parts[0];
+                    components.Version = parts[1];
                 }
                 else
                 {
                     components.Name = packageName;
                 }
 
-                Property siemensFileName = new Property()
-                {
-                    Name = Dataconstant.Cdx_Siemensfilename,
-                    Value = component.Reference
-                };
-                var isDirect = directDependencies.Contains(component.Id) ? "true" : "false";
-                Property siemensDirect = new Property()
-                {
-                    Name = Dataconstant.Cdx_SiemensDirect,
-                    Value = isDirect
-                };
+                components.Properties = new List<Property>
+        {
+            isdev,
+            new Property { Name = Dataconstant.Cdx_Siemensfilename, Value = component.Reference },
+            new Property { Name = Dataconstant.Cdx_SiemensDirect, Value = directDependencies.Contains(component.Id) ? "true" : "false" }
+        };
 
                 components.Type = Component.Classification.Library;
                 components.Purl = $"{ApiConstant.ConanExternalID}{components.Name}@{components.Version}";
                 components.BomRef = $"{ApiConstant.ConanExternalID}{components.Name}@{components.Version}";
-                components.Properties = new List<Property>();
-                components.Properties.Add(isdev);
-                components.Properties.Add(siemensDirect);
-                components.Properties.Add(siemensFileName);
+
                 lstComponentForBOM.Add(components);
             }
         }
-
         private static List<string> GetBuildNodeIds(List<ConanPackage> nodePackages)
         {
             return nodePackages
