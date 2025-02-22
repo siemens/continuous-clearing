@@ -262,6 +262,7 @@ namespace LCT.SW360PackageCreator
                     }
 
 
+
                     mapper.AlpineSource = item.AlpineSourceData;
                     if (!string.IsNullOrEmpty(item.ReleaseExternalId) && item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
                     {
@@ -278,7 +279,7 @@ namespace LCT.SW360PackageCreator
                         mapper.DownloadUrl = GetMavenDownloadUrl(mapper, item, releasesInfo);
                     }
                     else if (!string.IsNullOrEmpty(item.ReleaseExternalId) &&
-                                (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["PYTHON"]) || item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CONAN"]) || item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["ALPINE"])))
+                                (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["POETRY"]) || item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CONAN"]) || item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["ALPINE"])))
                     {
                         mapper.DownloadUrl = mapper.SourceUrl;
                     }

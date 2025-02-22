@@ -5,7 +5,6 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using JetBrains.Annotations;
 using LCT.APICommunications;
 using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.Foss;
@@ -13,7 +12,6 @@ using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
 using LCT.Common.Model;
-using LCT.Services;
 using LCT.Services.Interface;
 using LCT.Services.Model;
 using LCT.SW360PackageCreator.Interfaces;
