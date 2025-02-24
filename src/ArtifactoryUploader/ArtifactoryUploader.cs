@@ -95,12 +95,9 @@ namespace LCT.ArtifactoryUploader
 
 
             // Handle DEBIAN package name mismatch
-            if (component.ComponentType == "DEBIAN" && packageInfo?.Name != component.JfrogPackageName)
+            if (component.ComponentType == "DEBIAN" && packageInfo != null && packageInfo.Name != component.JfrogPackageName)
             {
-                if (packageInfo != null) // Add this null check
-                {
-                    component.CopyPackageApiUrl = component.CopyPackageApiUrl.Replace(component.JfrogPackageName, packageInfo.Name);
-                }
+                component.CopyPackageApiUrl = component.CopyPackageApiUrl.Replace(component.JfrogPackageName, packageInfo.Name);
             }
 
             // Retry with lowercase values if packageInfo is still null

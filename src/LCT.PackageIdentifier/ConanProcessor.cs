@@ -385,13 +385,29 @@ namespace LCT.PackageIdentifier
         private static void GetPackagesForBom(ref List<Component> lstComponentForBOM, ref int noOfDevDependent, List<ConanPackage> nodePackages)
         {
             var rootNode = nodePackages.FirstOrDefault();
-            if (rootNode != null && (!rootNode.Dependencies.Any() || rootNode.Dependencies == null))
+            ValidateRootNode(rootNode, nodePackages);
+
+            var directDependencies = GetDirectDependencies(nodePackages);
+
+            foreach (var component in nodePackages.Skip(1))
+            {
+                ProcessComponent(component, directDependencies, ref lstComponentForBOM, ref noOfDevDependent, nodePackages);
+            }
+        }
+
+        private static void ValidateRootNode(ConanPackage rootNode, List<ConanPackage> nodePackages)
+        {
+            if (rootNode == null || !rootNode.Dependencies.Any())
             {
                 throw new ArgumentNullException(nameof(nodePackages), "Dependency(requires) node name details not present in the root node.");
             }
+        }
 
-            ConanPackage package = nodePackages.FirstOrDefault(x => x.Id == "0");
-            List<string> directDependencies = new List<string>();
+        private static List<string> GetDirectDependencies(List<ConanPackage> nodePackages)
+        {
+            var package = nodePackages.FirstOrDefault(x => x.Id == "0");
+            var directDependencies = new List<string>();
+
             if (package != null)
             {
                 if (package.Dependencies != null)
@@ -404,49 +420,57 @@ namespace LCT.PackageIdentifier
                 }
             }
 
-            foreach (var component in nodePackages.Skip(1))
-            {
-                BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += 1;
-                Property isdev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
+            return directDependencies;
+        }
 
-                if (string.IsNullOrEmpty(component.Reference))
-                {
-                    BomCreator.bomKpiData.ComponentsinPackageLockJsonFile--;
-                    continue;
-                }
-
-                Component components = new Component();
-                var buildNodeIds = GetBuildNodeIds(nodePackages);
-                if (IsDevDependency(component, buildNodeIds, ref noOfDevDependent))
-                {
-                    isdev.Value = "true";
-                }
-
-                string packageName = Convert.ToString(component.Reference);
-                if (packageName.Contains('/'))
-                {
-                    var parts = packageName.Split(new char[] { '/', '@' });
-                    components.Name = parts[0];
-                    components.Version = parts[1];
-                }
-                else
-                {
-                    components.Name = packageName;
-                }
-
-                components.Properties = new List<Property>
+        private static void ProcessComponent(ConanPackage component, List<string> directDependencies, ref List<Component> lstComponentForBOM, ref int noOfDevDependent, List<ConanPackage> nodePackages)
         {
-            isdev,
-            new Property { Name = Dataconstant.Cdx_Siemensfilename, Value = component.Reference },
-            new Property { Name = Dataconstant.Cdx_SiemensDirect, Value = directDependencies.Contains(component.Id) ? "true" : "false" }
-        };
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += 1;
+            var isdev = new Property { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
 
-                components.Type = Component.Classification.Library;
-                components.Purl = $"{ApiConstant.ConanExternalID}{components.Name}@{components.Version}";
-                components.BomRef = $"{ApiConstant.ConanExternalID}{components.Name}@{components.Version}";
-
-                lstComponentForBOM.Add(components);
+            if (string.IsNullOrEmpty(component.Reference))
+            {
+                BomCreator.bomKpiData.ComponentsinPackageLockJsonFile--;
+                return;
             }
+
+            var components = CreateComponent(component, directDependencies, ref noOfDevDependent, nodePackages, isdev);
+            lstComponentForBOM.Add(components);
+        }
+
+        private static Component CreateComponent(ConanPackage component, List<string> directDependencies, ref int noOfDevDependent, List<ConanPackage> nodePackages, Property isdev)
+        {
+            var buildNodeIds = GetBuildNodeIds(nodePackages);
+            if (IsDevDependency(component, buildNodeIds, ref noOfDevDependent))
+            {
+                isdev.Value = "true";
+            }
+
+            var components = new Component();
+            string packageName = Convert.ToString(component.Reference);
+            if (packageName.Contains('/'))
+            {
+                var parts = packageName.Split(new char[] { '/', '@' });
+                components.Name = parts[0];
+                components.Version = parts[1];
+            }
+            else
+            {
+                components.Name = packageName;
+            }
+
+            components.Properties = new List<Property>
+    {
+        isdev,
+        new Property { Name = Dataconstant.Cdx_Siemensfilename, Value = component.Reference },
+        new Property { Name = Dataconstant.Cdx_SiemensDirect, Value = directDependencies.Contains(component.Id) ? "true" : "false" }
+    };
+
+            components.Type = Component.Classification.Library;
+            components.Purl = $"{ApiConstant.ConanExternalID}{components.Name}@{components.Version}";
+            components.BomRef = $"{ApiConstant.ConanExternalID}{components.Name}@{components.Version}";
+
+            return components;
         }
         private static List<string> GetBuildNodeIds(List<ConanPackage> nodePackages)
         {
