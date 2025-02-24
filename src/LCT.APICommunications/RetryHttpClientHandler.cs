@@ -1,6 +1,7 @@
 ﻿using log4net;
 using Polly;
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
@@ -12,6 +13,7 @@ namespace LCT.APICommunications
     {
         private readonly AsyncPolicy<HttpResponseMessage> _retryPolicy;
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private bool _initialRetryLogged = false;
         public RetryHttpClientHandler()
         {
             // Define the retry policy (retry on 5xx, 408, and transient errors)
@@ -28,15 +30,35 @@ namespace LCT.APICommunications
                     onRetry: (outcome, timespan, attempt, context) =>
                     {
                         Logger.Debug($"Retry attempt {attempt} due to: {(outcome.Exception != null ? outcome.Exception.Message : $"{outcome.Result.StatusCode}")}");
-                        Logger.Warn($"Retry attempt {attempt} will be triggered in {timespan.TotalSeconds} seconds due to: {(outcome.Exception != null ? outcome.Exception.Message : $"{outcome.Result.StatusCode}")}");
+                        if (!_initialRetryLogged && context["LogWarnings"] as bool? != false)
+                        {                           
+                            Logger.Warn($"Retry attempt triggered due to: {(outcome.Exception != null ? outcome.Exception.Message : $"{outcome.Result.StatusCode}")}");                            
+                        }
+                        context["RetryAttempt"] = attempt;
+                        _initialRetryLogged = true;
+
                     });
         }
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, System.Threading.CancellationToken cancellationToken)
         {
-            return await _retryPolicy.ExecuteAsync(async () =>
+            var context = new Context
+            {
+                ["LogWarnings"] = !request.Headers.TryGetValues("LogWarnings", out var logWarningsValues) || !bool.TryParse(logWarningsValues.FirstOrDefault(), out var logWarnings) || logWarnings
+            };
+
+            var response = await _retryPolicy.ExecuteAsync(async (ctx) =>
             {
                 return await base.SendAsync(request, cancellationToken); // Pass the request to the next handler (HttpClient)
-            });
+            }, context);
+
+            if (_initialRetryLogged)
+            {
+                var attempt = context.ContainsKey("RetryAttempt") ? context["RetryAttempt"] : 0;
+                Logger.Debug($"Retry attempt successful after {attempt} attempts.");
+                _initialRetryLogged = false;
+            }
+
+            return response;
         }
         public static async Task ExecuteWithRetryAsync(Func<Task> action)
         {
@@ -53,11 +75,10 @@ namespace LCT.APICommunications
         }
         private static TimeSpan GetRetryInterval(int attempt)
         {
-            // Define retry intervals as constants or values
-            var retryIntervals = new[] { ApiConstant.APIRetryIntervalFirst, ApiConstant.APIRetryIntervalSecond, ApiConstant.APIRetryIntervalThird }; // Retry intervals for 1st, 2nd, and 3rd attempts
-            if (attempt >= 1 && attempt <= retryIntervals.Length)
-                return TimeSpan.FromSeconds(retryIntervals[attempt - 1]);
+            if (attempt >= 1 && attempt <= ApiConstant.APIRetryIntervals.Count)
+                return TimeSpan.FromSeconds(ApiConstant.APIRetryIntervals[attempt - 1]);
             return TimeSpan.Zero; // Default if out of range
         }
+
     }
 }
