@@ -52,6 +52,7 @@ namespace SW360IntegrationTest.Debian
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
+                TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
                 TestConstant.JfrogDebianInternalRepo,"Debian-test",
                 TestConstant.ProjectType,"Debian",
                 TestConstant.Mode,""}),

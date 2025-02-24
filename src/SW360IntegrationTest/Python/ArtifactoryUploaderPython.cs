@@ -32,6 +32,7 @@ namespace SW360IntegrationTest.Python
                 TestConstant.JfrogPythonThirdPartyDestRepoName,testParameters.ThirdPartyDestinationRepoName,
                 TestConstant.JfrogPythonDevDestRepoName,testParameters.DevDestinationRepoName,
                 TestConstant.JfrogPythonInternalDestRepoName,testParameters.InternalDestinationRepoName,
+                TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
                 TestConstant.JFrogApiURL,testParameters.JfrogApi,
                 TestConstant.DryRun, false.ToString()
             });

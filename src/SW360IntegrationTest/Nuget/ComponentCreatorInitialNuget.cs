@@ -46,6 +46,7 @@ namespace SW360IntegrationTest.Nuget
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
                 TestConstant.JfrogNugetInternalRepo,"Nuget-test",
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
+                TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
                 TestConstant.ProjectType,"NUGET",
                 TestConstant.Mode,""});
             }
@@ -67,6 +68,7 @@ namespace SW360IntegrationTest.Nuget
                 TestConstant.ProjectType,"NUGET",
                 TestConstant.FossologyURL, testParameters.FossUrl,
                 TestConstant.EnableFossologyTrigger,testParameters.FossologyTrigger,
+                TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
                 TestConstant.Mode,""}),
                 "Test to run Package Creator EXE execution");
         }
