@@ -111,8 +111,13 @@ namespace LCT.PackageIdentifier
                 await bomCreator.GenerateBom(appSettings, new BomHelper(), new FileOperations(), projectReleases,
                                              caToolInformation);
             }
-            Logger.Logger.Log(null, Level.Notice, $"End of Package Identifier execution : {DateTime.Now}\n", null);
 
+            if (appSettings.Telemetry.Enable == true)
+            {
+                TelemetryHelper telemetryHelper = new TelemetryHelper(appSettings);
+                telemetryHelper.StartTelemetry(caToolInformation.CatoolVersion, BomCreator.bomKpiData, TelemetryConstant.IdentifierKpiData);
+            }
+            Logger.Logger.Log(null, Level.Notice, $"End of Package Identifier execution : {DateTime.Now}\n", null);
             // publish logs and bom file to pipeline artifact
             PipelineArtifactUploader.UploadArtifacts();
 

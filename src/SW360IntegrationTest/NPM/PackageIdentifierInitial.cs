@@ -52,6 +52,7 @@ namespace SW360IntegrationTest.NPM
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
                 TestConstant.JfrogNpmInternalRepo,"Npm-test",
                 TestConstant.ProjectType, "Npm",
+                TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
                  TestConstant.Mode,""}),
                 "Test to run Package Identifier EXE execution");
         }

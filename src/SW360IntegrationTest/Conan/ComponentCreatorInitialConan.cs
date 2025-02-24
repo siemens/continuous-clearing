@@ -37,6 +37,7 @@ namespace SW360IntegrationTest.Conan
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
                 TestConstant.JfrogConanInternalRepo,"Conan-test",
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
+                TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
                 TestConstant.ProjectType, "CONAN",
                 TestConstant.Mode,""
                 });
@@ -57,6 +58,7 @@ namespace SW360IntegrationTest.Conan
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.FossologyURL, testParameters.FossUrl,
                 TestConstant.EnableFossologyTrigger,testParameters.FossologyTrigger,
+                TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
                 TestConstant.Mode,""
             }),
                 "Test to run Package Creator EXE execution");

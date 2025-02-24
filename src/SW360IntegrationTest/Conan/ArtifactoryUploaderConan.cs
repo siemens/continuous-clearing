@@ -26,6 +26,7 @@ namespace SW360IntegrationTest.Conan
                 TestConstant.JfrogConanDevDestRepoName,testParameters.DevDestinationRepoName,
                 TestConstant.JfrogConanInternalDestRepoName,testParameters.InternalDestinationRepoName,
                 TestConstant.JFrogApiURL,testParameters.JfrogApi,
+                TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
                 TestConstant.DryRun, false.ToString()
             });
 

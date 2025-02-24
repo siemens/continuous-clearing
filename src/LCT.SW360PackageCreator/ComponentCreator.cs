@@ -34,6 +34,8 @@ namespace LCT.SW360PackageCreator
     public class ComponentCreator : IComponentCreator
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+        public static  CreatorKpiData kpiData = new();
         public List<ComparisonBomData> UpdatedCompareBomData { get; set; } = new List<ComparisonBomData>();
         public List<ReleaseLinked> ReleasesFoundInCbom { get; set; } = new List<ReleaseLinked>();
         public List<Components> ComponentsNotLinked { get; set; } = new List<Components>();
@@ -255,7 +257,7 @@ namespace LCT.SW360PackageCreator
                 FileConstant.ComponentsWithoutSrcFileName, appSettings.SW360.ProjectName);
 
             // write Kpi Data
-            CreatorKpiData kpiData = creatorHelper.GetCreatorKpiData(UpdatedCompareBomData);
+            kpiData =creatorHelper.GetCreatorKpiData (UpdatedCompareBomData);
             fileOperations.WriteContentToFile(kpiData, bomGenerationPath,
                 FileConstant.CreatorKpiDataFileName, appSettings.SW360.ProjectName);
 

@@ -30,6 +30,8 @@ namespace TestUtilities
         public string InternalDestinationRepoName { get; set; }
         public string DevDestinationRepoName { get; set; }
         public string FossologyTrigger { get; set; }
+        public string TelemetryEnable { get; set; }
+
         public TestParam()
         {
             SW360AuthTokenType = s_Config["SW360AuthTokenType"];
@@ -47,6 +49,7 @@ namespace TestUtilities
             InternalDestinationRepoName = "npm-test";
             DevDestinationRepoName = "npm-test";
             FossologyTrigger = s_Config["EnableFossologyTrigger"];
+            TelemetryEnable = s_Config["TelemetryEnable"];
         }
     }
 }

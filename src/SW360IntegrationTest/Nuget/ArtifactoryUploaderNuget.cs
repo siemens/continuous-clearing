@@ -33,6 +33,7 @@ namespace SW360IntegrationTest.Nuget
                 TestConstant.JfrogNugetDevDestRepoName,testParameters.DevDestinationRepoName,
                 TestConstant.JfrogNugetInternalDestRepoName,testParameters.InternalDestinationRepoName,
                 TestConstant.JFrogApiURL,testParameters.JfrogApi,
+                TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
                 TestConstant.DryRun, false.ToString()
             }),
                 "Test to run Artifactory Uploader EXE execution");

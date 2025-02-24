@@ -62,6 +62,7 @@ namespace LCT.Common
             }
         }
         public bool MultipleProjectType { get; set; } = false;
+        public Telemetry Telemetry { get; set; }
         public SW360 SW360 { get; set; }
         public Directory Directory { get; set; }
         public Jfrog Jfrog { get; set; }
@@ -94,6 +95,11 @@ namespace LCT.Common
                 m_LogFolderPath = value;
             }
         }
+    }
+    public class Telemetry
+    {
+        public bool  Enable { get; set; } = true;
+        public string ApplicationInsightInstrumentKey { get; set; }
     }
     public class SW360
     {
