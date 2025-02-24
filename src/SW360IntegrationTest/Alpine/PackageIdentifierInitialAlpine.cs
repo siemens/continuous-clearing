@@ -52,6 +52,7 @@ namespace SW360IntegrationTest.Alpine
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
+                TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
                 TestConstant.ProjectType,"ALPINE",
                 TestConstant.Mode,""}),
                 "Test to run Package Identifier EXE execution");

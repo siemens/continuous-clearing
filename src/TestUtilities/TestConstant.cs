@@ -43,6 +43,7 @@ namespace TestUtilities
         public const string Email = "Email";
         public const string ArtifactoryKey = "--Jfrog:Token";
         public const string ArtifactoryUser = "--artifactoryuploaduser";
+        public const string TelemetryEnable = "--Telemetry:Enable";
 
         public const string JfrogNpmThirdPartyDestRepoName = "--Npm:Artifactory:ThirdPartyRepos:0:Name";
         public const string JfrogNpmInternalRepo = "--Npm:Artifactory:InternalRepos:0";

@@ -31,6 +31,7 @@ namespace SW360IntegrationTest.Maven
                 TestConstant.JfrogMavenDevDestRepoName,testParameters.DevDestinationRepoName,
                 TestConstant.JfrogMavenInternalDestRepoName,testParameters.InternalDestinationRepoName,
                 TestConstant.JFrogApiURL,testParameters.JfrogApi,
+                TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
                 TestConstant.DryRun, false.ToString()
             });
 
