@@ -693,7 +693,10 @@ namespace LCT.PackageIdentifier
                 jfrogRepoPath = GetJfrogRepoPath(aqlResult);
             }
 
-            aqlResult.Repo ??= NotFoundInRepo;
+            if (aqlResult != null)
+            {
+                aqlResult.Repo ??= NotFoundInRepo;
+            }
             return aqlResult;
         }
 

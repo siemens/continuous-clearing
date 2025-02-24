@@ -85,7 +85,7 @@ namespace LCT.SW360PackageCreator
                         else
                         {
                             int currentPage = page;
-                            int totalPages = (int)(releaseResponse?.Page?.TotalPages);
+                            int totalPages = (int)(releaseResponse?.Page?.TotalPages ?? 0);
                             if (currentPage < totalPages - 1)
                             {
                                 page = currentPage + 1;
