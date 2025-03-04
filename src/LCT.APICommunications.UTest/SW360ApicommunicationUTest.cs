@@ -4,8 +4,11 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using LCT.APICommunications.Model;
 using LCT.Common.Model;
 using Newtonsoft.Json;
+using System.Net;
+using System.Security;
 using System.Text;
 
 namespace LCT.APICommunications.UTest
@@ -21,7 +24,126 @@ namespace LCT.APICommunications.UTest
             connectionSettings.Timeout = 5;
             connectionSettings.SW360AuthTokenType = "Token";
         }
+        [Test]
+        public void SW360Apicommunication_TriggerFossologyProcess_ReturnsInvalidOperationException()
+        {
+            // Arrange
+            var releaseId = "12345";
+            var sw360link = "someLink";
 
+            // Act
+            SW360Apicommunication sW360Apicommunication = new SW360Apicommunication(connectionSettings);
+
+            // Assert
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.TriggerFossologyProcess(releaseId, sw360link));
+        }
+        [Test]
+        public void SW360Apicommunication_GetComponentByExternalId_ReturnsInvalidOperationException()
+        {
+            // Arrange
+            var purlId = "12345";
+            var externalIdKey = "someLink";
+
+            // Act
+            SW360Apicommunication sW360Apicommunication = new SW360Apicommunication(connectionSettings);
+
+            // Assert
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.GetComponentByExternalId(purlId, externalIdKey));
+        }
+        [Test]
+        public void SW360Apicommunication_UpdateLinkedRelease_ReturnsInvalidOperationException()
+        {
+            // Arrange
+            var projectId = "12345";
+            var releaseId = "someLink";
+            UpdateLinkedRelease updateLinkedRelease = new UpdateLinkedRelease();
+            // Act
+            SW360Apicommunication sW360Apicommunication = new SW360Apicommunication(connectionSettings);
+
+            // Assert
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.UpdateLinkedRelease(projectId, releaseId, updateLinkedRelease));
+        }
+        [Test]
+        public void SW360Apicommunication_CreateComponent_ReturnsInvalidOperationException()
+        {
+            // Arrange
+            CreateComponent createComponentContent = new CreateComponent();
+
+            // Act
+            SW360Apicommunication sW360Apicommunication = new SW360Apicommunication(connectionSettings);
+
+            // Assert
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.CreateComponent(createComponentContent));
+        }
+        [Test]
+        public void SW360Apicommunication_CreateRelease_ReturnsInvalidOperationException()
+        {
+            // Arrange
+            Releases createReleaseContent = new Releases();
+
+            // Act
+            SW360Apicommunication sW360Apicommunication = new SW360Apicommunication(connectionSettings);
+
+            // Assert
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.CreateRelease(createReleaseContent));
+        }
+        [Test]
+        public void SW360Apicommunication_UpdateRelease_ReturnsInvalidOperationException()
+        {
+            // Arrange
+            var releaseId = "12345";
+            var jsonString = JsonConvert.SerializeObject(new { });
+            var httpContent = new StringContent(jsonString, Encoding.UTF8, "application/json");
+
+            // Act
+            SW360Apicommunication sW360Apicommunication = new SW360Apicommunication(connectionSettings);
+
+            // Assert
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.UpdateRelease(releaseId, httpContent));
+        }        
+
+        [Test]
+        public void SW360Apicommunication_DownloadAttachmentUsingWebClient_ThrowsWebException()
+        {
+            // Arrange
+            var attachmentDownloadLink = "https://example.com/attachment";
+            var fileName = "test-file";
+
+            // Act & Assert
+            Assert.Throws<WebException>(() =>
+                new SW360Apicommunication(connectionSettings).DownloadAttachmentUsingWebClient(attachmentDownloadLink, fileName));
+        }
+        [Test]
+        public void SW360Apicommunication_GetAllReleasesWithAllData_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            var page = 1;
+            var pageEntries = 10;
+
+            // Act
+            SW360Apicommunication sW360Apicommunication = new SW360Apicommunication(connectionSettings);
+
+            // Assert
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.GetAllReleasesWithAllData(page, pageEntries));
+        }
+        
+        [Test]
+        public void SW360Apicommunication_AttachComponentSourceToSW360_ThrowsUriFormatException()
+        {
+            // Arrange
+            AttachReport attachReport = new AttachReport
+            {
+                ReleaseId = "invalid-url",
+                AttachmentFile = "test-file"
+            };
+
+            // Act
+            SW360Apicommunication sW360Apicommunication = new SW360Apicommunication(connectionSettings);
+
+            // Assert
+            Assert.Throws<UriFormatException>(() => sW360Apicommunication.AttachComponentSourceToSW360(attachReport));
+        }
+        
         [Test]
         public void SW360Apicommunication_GetProjects_ReturnsInvalidOperationException()
         {
