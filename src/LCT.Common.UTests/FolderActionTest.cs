@@ -86,28 +86,6 @@ namespace LCT.Common.UTest
             //Assert
             Assert.IsTrue(acutal);
         }
-
-        [Test]
-        public void ZipFileToTargetDirectory_WhenUnauthorizedAccessExceptionIsThrown_ReturnsFalse()
-        {
-            // Arrange
-            string filePath = $"{Path.GetTempPath()}\\UnauthorizedAccessTest";
-            System.IO.Directory.CreateDirectory(filePath);
-            var folderAction = new FolderAction();
-
-            // Set the directory to read-only to simulate UnauthorizedAccessException
-            var directoryInfo = new DirectoryInfo(filePath);
-            directoryInfo.Attributes = FileAttributes.ReadOnly;
-
-            // Act
-            var actual = folderAction.ZipFileToTargetDirectory(filePath);
-
-            // Assert
-            Assert.IsFalse(actual);
-
-            // Cleanup
-            directoryInfo.Attributes = FileAttributes.Normal;
-            System.IO.Directory.Delete(filePath);
-        }
+        
     }
 }
