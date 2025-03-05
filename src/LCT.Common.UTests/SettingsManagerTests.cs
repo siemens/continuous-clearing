@@ -26,7 +26,31 @@ namespace LCT.Common.UTest
         {
             _settingsManager = new SettingsManager();
         }
+        [Test]
+        public void DisplayHelp_ShouldReadAndPrintFileContent()
+        {
+            // Arrange
+            var expectedContent = "This is the content of the CLIUsageNpkg.txt file.";
+            var filePath = "CLIUsageNpkg.txt";
 
+            // Create a temporary file with the expected content
+            File.WriteAllText(filePath, expectedContent);
+
+            // Redirect Console output
+            var consoleOutput = new StringWriter();
+            Console.SetOut(consoleOutput);
+
+            // Act
+            SettingsManager.DisplayHelp();
+
+            // Assert
+            var actualContent = consoleOutput.ToString().Trim();
+            Assert.AreEqual(expectedContent, actualContent);
+
+            // Cleanup
+            Console.SetOut(new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true });
+            File.Delete(filePath);
+        }
         [Test]
         public void ReadConfiguration_WhenArgsIsNull_ShouldThrowInvalidDataException()
         {

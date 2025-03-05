@@ -12,7 +12,7 @@ namespace LCT.Common.UTest
     [TestFixture]
     public class FolderActionTest
     {
-       
+
         [Test]
         public void ValidateFolderPath_WhenFolderPathIsEmpty_ThrowsArgumentException()
         {
@@ -30,7 +30,7 @@ namespace LCT.Common.UTest
             //Assert
             Assert.Throws<System.IO.DirectoryNotFoundException>(() => folderAction.ValidateFolderPath("test"));
         }
-        
+
         [Test]
         public void ZipFileToTargetDirectory_WhenPathIsNotProper_ReturnsFalse()
         {
@@ -63,7 +63,7 @@ namespace LCT.Common.UTest
             var folderAction = new FolderAction();
 
             //Act
-            var acutal = folderAction.CopyToTargetDirectory(sourcePath,targetPath);
+            var acutal = folderAction.CopyToTargetDirectory(sourcePath, targetPath);
 
             //Assert
             Assert.IsTrue(acutal);
@@ -71,11 +71,11 @@ namespace LCT.Common.UTest
 
         [Test]
         public void CopyToTargetDirectory_PassingDirsWithFiles_ReturnSuccess()
-        { 
+        {
             //Arrange
             string sourcePath = $"{Path.GetTempPath()}\\SampleFolder";
             System.IO.Directory.CreateDirectory(sourcePath);
-            System.IO.Directory.CreateDirectory(sourcePath +"\\SampleSubFolder");
+            System.IO.Directory.CreateDirectory(sourcePath + "\\SampleSubFolder");
             File.WriteAllText(sourcePath + "\\Sample.txt", "");
             string targetPath = $"{Path.GetTempPath()}/targetPath/";
             var folderAction = new FolderAction();
@@ -85,6 +85,29 @@ namespace LCT.Common.UTest
 
             //Assert
             Assert.IsTrue(acutal);
+        }
+
+        [Test]
+        public void ZipFileToTargetDirectory_WhenUnauthorizedAccessExceptionIsThrown_ReturnsFalse()
+        {
+            // Arrange
+            string filePath = $"{Path.GetTempPath()}\\UnauthorizedAccessTest";
+            System.IO.Directory.CreateDirectory(filePath);
+            var folderAction = new FolderAction();
+
+            // Set the directory to read-only to simulate UnauthorizedAccessException
+            var directoryInfo = new DirectoryInfo(filePath);
+            directoryInfo.Attributes = FileAttributes.ReadOnly;
+
+            // Act
+            var actual = folderAction.ZipFileToTargetDirectory(filePath);
+
+            // Assert
+            Assert.IsFalse(actual);
+
+            // Cleanup
+            directoryInfo.Attributes = FileAttributes.Normal;
+            System.IO.Directory.Delete(filePath);
         }
     }
 }
