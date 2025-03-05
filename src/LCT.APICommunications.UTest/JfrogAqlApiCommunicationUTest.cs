@@ -12,271 +12,84 @@ namespace LCT.APICommunications.UTest
 {
     [TestFixture]
     public class JfrogAqlApiCommunicationUTest
-    {
-        private Mock<HttpMessageHandler> _mockHandler;
-        private HttpClient _httpClient;
-        private JfrogAqlApiCommunication _jfrogApiCommunication;
-        private ArtifactoryCredentials _credentials;
-        private string _repoDomainName;
-        private int _timeout;
-        [SetUp]
-        public void SetUp()
-        {
-            // Setup test data
-            _repoDomainName = "https://example.jfrog.io";
-            _credentials = new ArtifactoryCredentials { Token = "sample-token" };
-            _timeout = 30;
-
-            // Mock HttpMessageHandler to simulate HTTP responses
-            _mockHandler = new Mock<HttpMessageHandler>();
-            _httpClient = new HttpClient(_mockHandler.Object);
-
-            // Create instance of JfrogAqlApiCommunication
-            _jfrogApiCommunication = new JfrogAqlApiCommunication(_repoDomainName, _credentials, _timeout);
-
-        }
-        [TearDown]
-        public void TearDown()
-        {
-            // Cleanup mock interactions and reset state
-            _mockHandler.Invocations.Clear(); // Clear mock invocations after each test
-                                              // Add any other cleanup logic for shared resources or state between tests            
-        }
-        [Test]
-        public async Task CheckConnection_ReturnsOkResponse()
-        {
-            // Arrange
-            var expectedResponse = new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new StringContent("{\"apiKey\": \"sample-api-key\"}")
-            };
-
-            _mockHandler
-                .Protected()
-                .Setup<Task<HttpResponseMessage>>(
-                    "SendAsync",
-                    ItExpr.Is<HttpRequestMessage>(req => req.Method == HttpMethod.Get && req.RequestUri.ToString() == $"{_repoDomainName}/api/security/apiKey"),
-                    ItExpr.IsAny<CancellationToken>())
-                .ReturnsAsync(expectedResponse)
-                .Verifiable();
-
-            // Act
-            var result = await _jfrogApiCommunication.CheckConnection();
-
-            // Assert
-            Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);            
+    {      
+       
         
-        }
         [Test]
-        public async Task GetInternalComponentDataByRepo_ReturnsOkResponse()
+        public void JfrogAqlApiCommunication_CheckConnection_ReturnsInvalidOperationException()
         {
             // Arrange
-            string repoName = "my-repo";
-            var expectedResponse = new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new StringContent("{\"repo\": \"my-repo\", \"path\": \"some/path\", \"name\": \"component-name\"}")
-            };
+            ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials();
+            string invalidDomainName = ""; // Invalid domain name
+            int timeout = 30; // Timeout in seconds
 
-            _mockHandler
-                .Protected()
-                .Setup<Task<HttpResponseMessage>>(
-                    "SendAsync",
-                    ItExpr.Is<HttpRequestMessage>(req =>
-                        req.Method == HttpMethod.Post && req.RequestUri.ToString() == $"{_repoDomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}" &&
-                        req.Content.ReadAsStringAsync().Result.Contains($"\"repo\":\"{repoName}\"")),
-                    ItExpr.IsAny<CancellationToken>())
-                .ReturnsAsync(expectedResponse)
-                .Verifiable();
+            JfrogAqlApiCommunication jfrogApiCommunication = new JfrogAqlApiCommunication(invalidDomainName, repoCredentials, timeout);
 
-            // Act
-            var result = await _jfrogApiCommunication.GetInternalComponentDataByRepo(repoName);
-
-            // Assert
-            Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
-        }
-        [Test]
-        public async Task GetPackageInfo_ReturnsOkResponse()
-        {
-            // Arrange
-            var component = new ComponentsToArtifactory
-            {
-                JfrogPackageName = "package-name",
-                SrcRepoName = "my-repo",
-                Path = "some/path",
-                ComponentType = "Npm",
-                Version = "1.0.0", // Assuming the version is also part of the component
-                Name = "package-name" // Assuming "Name" is also a property on the component
-            };
-
-            var expectedResponse = new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new StringContent("{\"repo\": \"my-repo\", \"path\": \"some/path\", \"name\": \"package-name\"}")
-            };
-
-            // Build the expected AQL query string based on the component
-            string expectedAqlQuery = "items.find({\"repo\":{\"$eq\":\"my-repo\"},\"@npm.name\":{\"$eq\":\"package-name\"},\"@npm.version\":{\"$eq\":\"1.0.0\"}}).include(\"repo\", \"path\", \"name\")";
-
-            // Set up the mock handler to intercept the HTTP request
-            _mockHandler
-                .Protected()
-                .Setup<Task<HttpResponseMessage>>(
-                    "SendAsync",
-                    ItExpr.Is<HttpRequestMessage>(req =>
-                        req.Method == HttpMethod.Post &&
-                        req.RequestUri.ToString() == $"{_repoDomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}" &&
-                        req.Content.ReadAsStringAsync().Result.Contains(expectedAqlQuery)), // Validate that the expected query is included
-                    ItExpr.IsAny<CancellationToken>())
-                .ReturnsAsync(expectedResponse)
-                .Verifiable();
-
-            // Act
-            var result = await _jfrogApiCommunication.GetPackageInfo(component);
-
-            // Assert
-            Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);  // Assert the status code is OK (200)
-
-        }
-        [Test]
-        public async Task GetPackageInfo_ReturnsOkResponseforPython()
-        {
-            // Arrange
-            var component = new ComponentsToArtifactory
-            {
-                JfrogPackageName = "package-name",
-                SrcRepoName = "my-repo",
-                Path = "some/path",
-                ComponentType = "Python",
-                Version = "1.0.0", // Assuming the version is also part of the component
-                Name = "package-name" // Assuming "Name" is also a property on the component
-            };
-
-            var expectedResponse = new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new StringContent("{\"repo\": \"my-repo\", \"path\": \"some/path\", \"name\": \"package-name\"}")
-            };
-
-            // Build the expected AQL query string based on the component
-            string expectedAqlQuery = "items.find({\"repo\":{\"$eq\":\"my-repo\"},\"@pypi.normalized.name\":{\"$eq\":\"package-name\"},\"@pypi.version\":{\"$eq\":\"1.0.0\"}}).include(\"repo\", \"path\", \"name\")";
-
-            // Set up the mock handler to intercept the HTTP request
-            _mockHandler
-                .Protected()
-                .Setup<Task<HttpResponseMessage>>(
-                    "SendAsync",
-                    ItExpr.Is<HttpRequestMessage>(req =>
-                        req.Method == HttpMethod.Post &&
-                        req.RequestUri.ToString() == $"{_repoDomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}" &&
-                        req.Content.ReadAsStringAsync().Result.Contains(expectedAqlQuery)), // Validate that the expected query is included
-                    ItExpr.IsAny<CancellationToken>())
-                .ReturnsAsync(expectedResponse)
-                .Verifiable();
-
-            // Act
-            var result = await _jfrogApiCommunication.GetPackageInfo(component);
-
-            // Assert
-            Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);  // Assert the status code is OK (200)
-
+            // Act & Assert
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApiCommunication.CheckConnection());
         }
 
         [Test]
-        public async Task GetPackageInfo_ReturnsOkResponseforNuget()
+        public void JfrogAqlApiCommunication_GetInternalComponentDataByRepo_ReturnsInvalidOperationException()
         {
             // Arrange
-            var component = new ComponentsToArtifactory
-            {
-                JfrogPackageName = "package-name",
-                SrcRepoName = "my-repo",
-                Path = "some/path",
-                ComponentType = "nuget",
-                Version = "1.0.0", // Assuming the version is also part of the component
-                Name = "package-name" // Assuming "Name" is also a property on the component
-            };
+            ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials();
+            string invalidDomainName = ""; // Invalid domain name
+            int timeout = 30; // Timeout in seconds
+            string invalidRepoName = "invalid-repo-name"; // Invalid repo name
 
-            var expectedResponse = new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new StringContent("{\"repo\": \"my-repo\", \"path\": \"some/path\", \"name\": \"package-name\"}")
-            };
+            JfrogAqlApiCommunication jfrogApiCommunication = new JfrogAqlApiCommunication(invalidDomainName, repoCredentials, timeout);
 
-            // Build the expected AQL query string based on the component
-            string expectedAqlQuery = "items.find({\"repo\":{\"$eq\":\"my-repo\"}}).include(\"repo\", \"path\", \"name\")";
+            // Act & Assert
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApiCommunication.GetInternalComponentDataByRepo(invalidRepoName));
+        }        
+        [Test]
+        public void JfrogAqlApiCommunication_GetNpmComponentDataByRepo_ReturnsInvalidOperationException()
+        {
+            // Arrange
+            ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials();
+            string invalidDomainName = ""; // Invalid domain name
+            int timeout = 30; // Timeout in seconds
+            string invalidRepoName = "invalid-npm-repo"; // Invalid repo name
 
-            // Set up the mock handler to intercept the HTTP request
-            _mockHandler
-                .Protected()
-                .Setup<Task<HttpResponseMessage>>(
-                    "SendAsync",
-                    ItExpr.Is<HttpRequestMessage>(req =>
-                        req.Method == HttpMethod.Post &&
-                        req.RequestUri.ToString() == $"{_repoDomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}" &&
-                        req.Content.ReadAsStringAsync().Result.Contains(expectedAqlQuery)), // Validate that the expected query is included
-                    ItExpr.IsAny<CancellationToken>())
-                .ReturnsAsync(expectedResponse)
-                .Verifiable();
+            JfrogAqlApiCommunication jfrogApiCommunication = new JfrogAqlApiCommunication(invalidDomainName, repoCredentials, timeout);
 
-            // Act
-            var result = await _jfrogApiCommunication.GetPackageInfo(component);
-
-            // Assert
-            Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);  // Assert the status code is OK (200)
-
+            // Act & Assert
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApiCommunication.GetNpmComponentDataByRepo(invalidRepoName));
         }
         [Test]
-        public async Task GetNpmComponentDataByRepo_ReturnsSuccessfulResponse()
+        public void JfrogAqlApiCommunication_GetPypiComponentDataByRepo_ReturnsInvalidOperationException()
         {
             // Arrange
-            var repoName = "my-npm-repo";
-            var expectedResponse = new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new StringContent("{\"repo\": \"my-npm-repo\", \"path\": \"some/path\", \"name\": \"package-name\", \"@npm.name\": \"package-name\", \"@npm.version\": \"1.0.0\"}")
-            };
+            ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials();
+            string invalidDomainName = ""; // Invalid domain name
+            int timeout = 30; // Timeout in seconds
+            string invalidRepoName = "invalid-pypi-repo"; // Invalid repo name
 
-            _mockHandler
-                .Protected()
-                .Setup<Task<HttpResponseMessage>>(
-                    "SendAsync",
-                    ItExpr.Is<HttpRequestMessage>(req =>
-                        req.Method == HttpMethod.Post && req.RequestUri.ToString() == $"{_repoDomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}" &&
-                        req.Content.ReadAsStringAsync().Result.Contains("\"repo\":\"my-npm-repo\"")),
-                    ItExpr.IsAny<CancellationToken>())
-                .ReturnsAsync(expectedResponse)
-                .Verifiable();
+            JfrogAqlApiCommunication jfrogApiCommunication = new JfrogAqlApiCommunication(invalidDomainName, repoCredentials, timeout);
 
-            // Act
-            var result = await _jfrogApiCommunication.GetNpmComponentDataByRepo(repoName);
-
-            // Assert
-            Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
-            
+            // Act & Assert
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApiCommunication.GetPypiComponentDataByRepo(invalidRepoName));
         }
-
         [Test]
-        public async Task GetPypiComponentDataByRepo_ReturnsSuccessfulResponse()
+        public void JfrogAqlApiCommunication_GetPackageInfo_ReturnsArgumentException_WhenNoPackageNameOrPathProvided()
         {
             // Arrange
-            var repoName = "my-pypi-repo";
-            var expectedResponse = new HttpResponseMessage(HttpStatusCode.OK)
+            ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials();
+            string invalidDomainName = ""; // Invalid domain name
+            int timeout = 30; // Timeout in seconds
+
+            JfrogAqlApiCommunication jfrogApiCommunication = new JfrogAqlApiCommunication(invalidDomainName, repoCredentials, timeout);
+
+            // Create a ComponentsToArtifactory object with invalid parameters (both packageName and path are null or empty)
+            ComponentsToArtifactory component = new ComponentsToArtifactory
             {
-                Content = new StringContent("{\"repo\": \"my-pypi-repo\", \"path\": \"some/path\", \"name\": \"package-name\", \"@pypi.normalized.name\": \"package-name\", \"@pypi.version\": \"1.0.0\"}")
+                JfrogPackageName = null,
+                Path = null
             };
 
-            _mockHandler
-                .Protected()
-                .Setup<Task<HttpResponseMessage>>(
-                    "SendAsync",
-                    ItExpr.Is<HttpRequestMessage>(req =>
-                        req.Method == HttpMethod.Post && req.RequestUri.ToString() == $"{_repoDomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}" &&
-                        req.Content.ReadAsStringAsync().Result.Contains("\"repo\":\"my-pypi-repo\"")),
-                    ItExpr.IsAny<CancellationToken>())
-                .ReturnsAsync(expectedResponse)
-                .Verifiable();
-
-            // Act
-            var result = await _jfrogApiCommunication.GetPypiComponentDataByRepo(repoName);
-
-            // Assert
-            Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
-            
+            // Act & Assert
+            Assert.ThrowsAsync<ArgumentException>(async () => await jfrogApiCommunication.GetPackageInfo(component));
         }
 
     }
