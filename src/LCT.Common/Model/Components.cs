@@ -63,6 +63,11 @@ namespace LCT.Common.Model
         public string IsDev { get; set; }
         [JsonIgnore]
         public string ExcludeComponent { get; set; }
-
+        [JsonProperty("purl")]
+        public string Purl { get; set; }
+        public string PackageLink { get; set; }
+        [JsonIgnore]
+        public string PackageStatus { get; set; }
+        public string PackageName { get; set; }
     }
 }

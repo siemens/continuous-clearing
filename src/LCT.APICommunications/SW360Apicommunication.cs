@@ -37,6 +37,7 @@ namespace LCT.APICommunications
         private readonly string sw360ReleaseByExternalId;
         private readonly string sw360ComponentByExternalId;
         private readonly string sw360UsersApi;
+        private readonly string sw360PackageApi;
         private readonly int timeOut;
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
@@ -56,9 +57,14 @@ namespace LCT.APICommunications
             sw360ComponentByExternalId = $"{sw360ConnectionSettings.SW360URL}{ApiConstant.Sw360ComponentByExternalId}";
             sw360ReleaseByExternalId = $"{sw360ConnectionSettings.SW360URL}{ApiConstant.Sw360ReleaseByExternalId}";
             sw360UsersApi = $"{sw360ConnectionSettings.SW360URL}{ApiConstant.Sw360UsersSuffix}";
+            sw360PackageApi = $"{sw360ConnectionSettings.SW360URL}{ApiConstant.Sw360PackageApiSuffix}";
         }
 
-
+        public async Task<string> GetPackages()
+        {
+            HttpClient httpClient = GetHttpClient();
+            return await httpClient.GetStringAsync(sw360PackageApi);
+        }
         public async Task<string> GetProjects()
         {
             HttpClient httpClient = GetHttpClient();           
@@ -314,7 +320,24 @@ namespace LCT.APICommunications
         {
             HttpClient httpClient = GetHttpClient();            
             string url = $"{sw360ReleaseApi}?page={page}&allDetails=true&page_entries={pageEntries}";
-            return await httpClient.GetAsync(url);           
+            return await httpClient.GetAsync(url);
+        }
+        public async Task<HttpResponseMessage> CreatePackage(CreatePackage createPackageContent)
+        {
+            HttpClient httpClient = GetHttpClient();
+            return await httpClient.PostAsJsonAsync(sw360PackageApi, createPackageContent);
+        }
+        public async Task<HttpResponseMessage> UpdatePackage( HttpContent httpContent, string packageId)
+        {
+            HttpClient httpClient = GetHttpClient();
+            string packageApi = $"{sw360PackageApi}/{packageId}";
+            return await httpClient.PatchAsync(packageApi, httpContent);
+        }
+        public async Task<HttpResponseMessage> LinkPackagesToProject(HttpContent httpContent, string sw360ProjectId)
+        {
+            HttpClient httpClient = GetHttpClient();
+            string url = $"{sw360ProjectsApi}/{sw360ProjectId}/{ApiConstant.LinkPackagesApiSuffix}";
+            return await httpClient.PatchAsync(url, httpContent);
         }
         #endregion
 

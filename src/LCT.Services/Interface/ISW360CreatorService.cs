@@ -4,6 +4,7 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using LCT.APICommunications;
 using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.Foss;
 using LCT.Common.Model;
@@ -45,5 +46,8 @@ namespace LCT.Services.Interface
 
         Task<bool> UdpateSW360ReleaseContent(Components component, string fossUrl);
         Task<FossTriggerStatus> TriggerFossologyProcessForValidation(string releaseId, string sw360link);
+        Task<PackageCreateStatus> CreatePackageBasesOFswComaprisonBOM(ComparisonBomData componentInfo);
+        Task<PackageUpdateStatus> UpdatePackagesWithReleases(ComparisonBomData componentInfo);
+        Task<bool> LinkPackagesToProject(List<PackageLinked> packageListToLinkProject, string sw360ProjectId);
     }
 }

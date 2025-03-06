@@ -34,5 +34,11 @@ namespace LCT.Common.Model
         public string FossologyLink { get; set; }
         public string ReleaseID { get; set; }
         public string AlpineSource { get; set; }
+        public string Purl { get; set; }
+        public string PackageLink { get; set; }
+        public string PackageStatus { get; set; }
+        public string IsPackageCreated { get; set; }
+        public string PackageName { get; set; }
+        public string PackageId { get; set; }
     }
 }

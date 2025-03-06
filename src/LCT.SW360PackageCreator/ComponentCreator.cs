@@ -12,12 +12,14 @@ using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
 using LCT.Common.Model;
+using LCT.Services;
 using LCT.Services.Interface;
 using LCT.Services.Model;
 using LCT.SW360PackageCreator.Interfaces;
 using LCT.SW360PackageCreator.Model;
 using log4net;
 using log4net.Core;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -50,13 +52,11 @@ namespace LCT.SW360PackageCreator
             bom = cycloneDXBomParser.ParseCycloneDXBom(bomFilePath);
             TotalComponentsFromPackageIdentifier = bom != null ? bom.Components.Count : 0;
             ListofBomComponents = await GetListOfBomData(bom?.Components ?? new List<Component>(), appSettings);
-
             // Removing Duplicates
             ListofBomComponents = RemoveDuplicateComponents(ListofBomComponents);
-
             List<ComparisonBomData> comparisonBomData = await creatorHelper.SetContentsForComparisonBOM(ListofBomComponents, sw360Service);
             return comparisonBomData;
-        }
+        }      
 
         private async Task<List<Components>> GetListOfBomData(List<Component> components, CommonAppSettings appSettings)
         {
@@ -83,11 +83,12 @@ namespace LCT.SW360PackageCreator
                 {
                     componentsData.DownloadUrl = Dataconstant.DownloadUrlNotFound;
                     componentsData.Name = GetPackageName(item);
+                    componentsData.PackageName = componentsData.Name;
                     componentsData.Group = item.Group;
                     componentsData.Version = item.Version;
                     componentsData.ComponentExternalId = item.Purl.Substring(0, item.Purl.IndexOf('@'));
                     componentsData.ReleaseExternalId = item.Purl;
-
+                    componentsData.Purl = item.Purl;
                     Components component = await GetSourceUrl(componentsData.Name, componentsData.Version, componentsData.ProjectType, item.BomRef);
                     componentsData.SourceUrl = component.SourceUrl;
 
@@ -226,10 +227,10 @@ namespace LCT.SW360PackageCreator
             string sw360Url = appSettings.SW360.URL;
             string bomGenerationPath = appSettings.Directory.OutputFolder;
             Logger.Debug($"Bom Generation Path - {bomGenerationPath}");
-
-            // create component in sw360
+           
+            // create component and package in sw360
             if (!appSettings.IsTestMode)
-            {
+            {                
                 await CreateComponent(creatorHelper, sw360CreatorService, parsedBomData, sw360Url, appSettings);
             }
             var alreadyLinkedReleases = await GetAlreadyLinkedReleasesByProjectId(appSettings.SW360.ProjectID, sw360ProjectService);
@@ -239,9 +240,13 @@ namespace LCT.SW360PackageCreator
             await UpdateSBOMReleasesWithSw360Info(alreadyLinkedReleases);
 
             var releasesFoundInCbom = ReleasesFoundInCbom.ToList();
-
+            //Update Packages with releases
+            await UpdatePackagesWithReleases(parsedBomData, sw360CreatorService);
+            var packageListToLinkProject=await GetPackagesList(parsedBomData);
             // Linking releases to the project
-            await sw360CreatorService.LinkReleasesToProject(releasesFoundInCbom, manuallyLinkedReleases, appSettings.SW360.ProjectID);
+            await sw360CreatorService.LinkPackagesToProject(packageListToLinkProject, appSettings.SW360.ProjectID);
+            // Linking releases to the project
+            //await sw360CreatorService.LinkReleasesToProject(releasesFoundInCbom, manuallyLinkedReleases, appSettings.SW360.ProjectID);
 
             // update comparison bom data
             bom = await creatorHelper.GetUpdatedComponentsDetails(ListofBomComponents, UpdatedCompareBomData, sw360Service, bom);
@@ -276,8 +281,7 @@ namespace LCT.SW360PackageCreator
         private async Task CreateComponent(ICreatorHelper creatorHelper,
             ISw360CreatorService sw360CreatorService, List<ComparisonBomData> componentsToBoms,
             string sw360Url, CommonAppSettings appSettings)
-        {
-            Logger.Logger.Log(null, Level.Notice, $"No of Unique and Valid components read from Comparison BOM = {componentsToBoms.Count} ", null);
+        {           
 
             try
             {
@@ -333,18 +337,57 @@ namespace LCT.SW360PackageCreator
             }
             await Task.Yield();
         }
-
+        private async Task UpdatePackagesWithReleases(List<ComparisonBomData> parsedBomData, ISw360CreatorService sw360CreatorService)
+        {
+            foreach (var release in parsedBomData)
+            {
+                try
+                {
+                    if (release.PackageStatus == Dataconstant.Available)
+                    {                        
+                        PackageUpdateStatus updatedStatus = await sw360CreatorService.UpdatePackagesWithReleases(release);                       
+                    }
+                    else
+                    {
+                        Logger.Logger.Log(null, Level.Notice, $"Package exists : Name - {release.PackageName} , version - {release.Version}", null);
+                    }
+                }
+                catch (AggregateException ex)
+                {
+                    Logger.Debug($"CreatePackage()", ex);
+                }
+            }
+            await Task.Yield();
+        }
+        private static async Task<List<PackageLinked>> GetPackagesList(List<ComparisonBomData> parsedBomData)
+        {
+            var Packagelist = new List<PackageLinked>();
+            foreach (var item in parsedBomData)
+            {
+                if (!string.IsNullOrEmpty(item.PackageName) && !string.IsNullOrEmpty(item.Version) && !string.IsNullOrEmpty(item.PackageId))
+                {
+                    Packagelist.Add(new PackageLinked
+                    {
+                        PackageName = item.PackageName,
+                        Version = item.Version,                        
+                        PackageId = item.PackageId
+                    });
+                }
+            }            
+            return Packagelist;
+        }
         private async Task CreateComponentAndRealease(ICreatorHelper creatorHelper,
             ISw360CreatorService sw360CreatorService, ComparisonBomData item, string sw360Url, CommonAppSettings appSettings)
         {
             Logger.Debug($"Reading Component Name - {item.Name} , version - {item.Version}");
-
+            
             await CreateComponentAndReleaseWhenNotAvailable(item, sw360CreatorService, creatorHelper, appSettings);
 
             await CreateReleaseWhenNotAvailable(item, sw360CreatorService, creatorHelper, appSettings);
 
             await ComponentAndReleaseAvailable(item, sw360Url, sw360CreatorService, appSettings);
         }
+        
 
         private async Task CreateComponentAndReleaseWhenNotAvailable(ComparisonBomData item,
             ISw360CreatorService sw360CreatorService, ICreatorHelper creatorHelper, CommonAppSettings appSettings)

@@ -4,6 +4,7 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using LCT.APICommunications;
 using LCT.APICommunications.Model;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -44,5 +45,9 @@ namespace LCT.Facade.Interfaces
         Task<HttpResponseMessage> GetReleaseByExternalId(string purlId,string externalIdKey = "");
         Task<HttpResponseMessage> GetComponentByExternalId(string purlId, string externalIdKey = "");
         Task<HttpResponseMessage> GetAllReleasesWithAllData(int page, int pageEntries);
+        Task<string> GetPackages();
+        Task<HttpResponseMessage> CreatePackage(CreatePackage createComponentContent);
+        Task<HttpResponseMessage> UpdatePackage(HttpContent httpContent, string packageId);
+        Task<HttpResponseMessage> LinkPackagesToProject(HttpContent httpContent, string sw360ProjectId);
     }
 }

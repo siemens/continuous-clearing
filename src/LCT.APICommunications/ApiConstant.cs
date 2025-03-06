@@ -48,6 +48,7 @@ namespace LCT.APICommunications
         public const string SOURCE = "SOURCE";
         public const string Email = "Email";
         public const string Oss = "OSS";
+        public const string Library = "LIBRARY";
         public const string POST = "POST";
         public const string Public = "public";
         public const string PurlId = "package-url";
@@ -73,5 +74,7 @@ namespace LCT.APICommunications
         public const string PackageNotFound = "Package Not Found";
         public const string ArtifactoryRepoName = "ArtifactoryRepoName";
         public const string JfrogArtifactoryApiSearchAql = $"/api/search/aql";
+        public const string Sw360PackageApiSuffix = "/resource/api/packages";
+        public const string LinkPackagesApiSuffix = "/link/packages";
     }
 }

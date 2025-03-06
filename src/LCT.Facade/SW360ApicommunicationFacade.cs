@@ -35,7 +35,10 @@ namespace LCT.Facade
             m_sw360ApiCommunication = sw360ApiCommunication;
             m_TestMode = testMode;
         }
-
+        public Task<string> GetPackages()
+        {
+            return m_sw360ApiCommunication.GetPackages();
+        }
         public Task<string> GetProjects()
         {
             return m_sw360ApiCommunication.GetProjects();
@@ -97,7 +100,15 @@ namespace LCT.Facade
 
             return await m_sw360ApiCommunication.LinkReleasesToProject(httpContent, sw360ProjectId);
         }
+        public async Task<HttpResponseMessage> LinkPackagesToProject(HttpContent httpContent, string sw360ProjectId)
+        {
+            if (m_TestMode)
+            {
+                return new HttpResponseMessage(HttpStatusCode.OK);
+            }
 
+            return await m_sw360ApiCommunication.LinkPackagesToProject(httpContent, sw360ProjectId);
+        }
         public async Task<HttpResponseMessage> CreateComponent(CreateComponent createComponentContent)
         {
             if (m_TestMode)
@@ -198,6 +209,24 @@ namespace LCT.Facade
         public Task<HttpResponseMessage> GetAllReleasesWithAllData(int page, int pageEntries)
         {
             return m_sw360ApiCommunication.GetAllReleasesWithAllData(page, pageEntries);
+        }
+        public async Task<HttpResponseMessage> CreatePackage(CreatePackage createPackageContent)
+        {
+            if (m_TestMode)
+            {
+                return new HttpResponseMessage(HttpStatusCode.OK);
+            }
+
+            return await m_sw360ApiCommunication.CreatePackage(createPackageContent);
+        }
+        public async Task<HttpResponseMessage> UpdatePackage(HttpContent httpContent,string packageId)
+        {
+            if (m_TestMode)
+            {
+                return new HttpResponseMessage(HttpStatusCode.OK);
+            }
+
+            return await m_sw360ApiCommunication.UpdatePackage(httpContent,packageId);
         }
     }
 }

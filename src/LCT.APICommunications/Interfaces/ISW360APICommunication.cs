@@ -41,5 +41,9 @@ namespace LCT.APICommunications.Interfaces
         void DownloadAttachmentUsingWebClient(string attachmentDownloadLink, string fileName);
         Task<HttpResponseMessage> GetComponentDetailsByUrl(string componentLink);
         Task<HttpResponseMessage> GetAllReleasesWithAllData(int page, int pageEntries);
+        Task<string> GetPackages();
+        Task<HttpResponseMessage> CreatePackage(CreatePackage createPackageContent);
+        Task<HttpResponseMessage> UpdatePackage(HttpContent httpContent, string packageId);
+        Task<HttpResponseMessage> LinkPackagesToProject(HttpContent httpContent, string sw360ProjectId);
     }
 }

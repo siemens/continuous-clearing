@@ -201,6 +201,76 @@ namespace LCT.Services
 
             return attachmentHash;
         }
+        public async Task<List<Components>> GetAvailablePackagesInSw360(List<Components> listOfComponentsToBom)
+        {
+            List<Components> availablePackagesList = new List<Components>();
+            IList<Sw360Packages> sw360packageList = await GetAvailablePackagesListFromSw360();
+
+            foreach (Components component in listOfComponentsToBom)
+            {
+                if (CheckPackageAvailabilityByPurl(sw360packageList, component, availablePackagesList))
+                {
+                    Logger.Debug($"GetAvailablePackagesList():  Package Exist : Release name - {component.Name}, version - {component.Version}");
+                }
+                else
+                {
+                    // Do Nothing or to be implemented
+                }
+            }
+
+            return availablePackagesList;
+        }       
+        private static bool CheckPackageAvailabilityByPurl(IList<Sw360Packages> sw360Packages, Components component, List<Components> availablePackageList)
+        {
+            //checking for component existance with name 
+            bool isPackageAvailable = false;
+            Sw360Packages sw360Package =
+                sw360Packages.FirstOrDefault(x => x.Purl?.Trim().ToLowerInvariant() == component?.ReleaseExternalId?.Trim().ToLowerInvariant());
+            if (sw360Package != null)
+            {
+                availablePackageList.Add(new Components()
+                {
+                    Name = sw360Package.Name,
+                    Version = sw360Package.Version,
+                    Purl = sw360Package.Purl,
+                    PackageLink = sw360Package.Links?.Self?.Href,
+                    PackageStatus = Dataconstant.Available
+                });
+                isPackageAvailable = true;
+            }
+            return isPackageAvailable;
+        }
+        private static bool CheckPackageByPurl(IList<Sw360Packages> sw360Packages, ComparisonBomData component, List<ComparisonBomData> parsedBomData)
+        {
+            //checking for component existance with name 
+            bool isPackageAvailable = false;
+            Sw360Packages sw360Package =
+                sw360Packages.FirstOrDefault(x => x.Purl?.Trim().ToLowerInvariant() == component?.Purl?.Trim().ToLowerInvariant());
+            if (sw360Package != null)
+            {
+                component.PackageLink = sw360Package.Links?.Self?.Href;
+                component.PackageStatus = Dataconstant.Available;
+                
+                isPackageAvailable = true;
+            }
+            return isPackageAvailable;
+        }
+        private async Task<IList<Sw360Packages>> GetAvailablePackagesListFromSw360()
+        {
+            IList<Sw360Packages> packagesList = new List<Sw360Packages>();
+            try
+            {
+                string responseBody = await m_SW360ApiCommunicationFacade.GetPackages();
+                var componentsDataModel = JsonConvert.DeserializeObject<PackagesModel>(responseBody);
+                packagesList = componentsDataModel?.Embedded?.Sw360packages;
+            }
+            catch (HttpRequestException ex)
+            {
+                Environment.ExitCode = -1;
+                Logger.Error($"GetAvailablePackagesListFromSw360():", ex);
+            }
+            return packagesList;
+        }
 
         private static Sw360AttachmentHash GetReleaseSourceAttachmentLink(IList<Sw360Attachments> sw360attachments)
         {

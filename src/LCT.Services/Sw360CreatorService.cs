@@ -325,6 +325,52 @@ namespace LCT.Services
             }
         }
 
+        public async Task<bool> LinkPackagesToProject(List<PackageLinked> packageListToLinkProject, string sw360ProjectId)
+        {
+            if (packageListToLinkProject.Count <= 0 && packageListToLinkProject.Count <= 0)
+            {
+                Logger.Debug($"No of package Id's to link - 0");
+                return true;
+            }
+            try
+            {
+                // Create a list to store the package IDs
+                List<string> packageIds = new List<string>();
+
+                // Iterate through parsedBomData and add each release.PackageId to the list
+                foreach (var release in packageListToLinkProject)
+                {
+                    if (!string.IsNullOrEmpty(release.PackageId))
+                    {
+                        packageIds.Add(release.PackageId);
+                    }
+                }
+
+                // Serialize the list of package IDs
+                StringContent content = new StringContent(JsonConvert.SerializeObject(packageIds), Encoding.UTF8, "application/json");
+
+                var response = await m_SW360ApiCommunicationFacade.LinkPackagesToProject(content, sw360ProjectId);
+                if (!response.IsSuccessStatusCode)
+                {
+                    
+                    Logger.Error($"LinkPackagesToProject() : Linking releases to project Id {sw360ProjectId} is failed.");
+                    return false;
+                }
+                return true;
+            }
+            catch (HttpRequestException ex)
+            {
+                Logger.Error($"LinkPackagesToProject():", ex);
+               
+                return false;
+            }
+            catch (AggregateException ex)
+            {
+                Logger.Error($"LinkPackagesToProject():", ex);
+                
+                return false;
+            }
+        }
         public async Task<string> GetReleaseIDofComponent(string componentName, string componentVersion, string componentid)
         {
             string releaseIdOfComponent = null;
@@ -815,6 +861,107 @@ namespace LCT.Services
                 environmentHelper.CallEnvironmentExit(-1);
             }
             return fossTriggerStatus;
+        }
+        public async Task<PackageCreateStatus> CreatePackageBasesOFswComaprisonBOM(ComparisonBomData packageInfo)
+        {
+            Logger.Debug($"CreateComponent(): Name-{packageInfo.PackageName},version-{packageInfo.Version}");
+            PackageCreateStatus packageCreateStatus = new PackageCreateStatus
+            {
+                IsCreated = true,
+            };
+
+            try
+            {
+                CreatePackage crt = new CreatePackage
+                {
+                    ComponentType = ApiConstant.Oss,
+                    Name = packageInfo.PackageName,
+                    Version = packageInfo.Version,
+                    Purl = packageInfo.Purl,
+                    PackageType = ApiConstant.Library
+                };
+
+                // create component in sw360
+                HttpResponseMessage response = await m_SW360ApiCommunicationFacade.CreatePackage(crt);
+                response.EnsureSuccessStatusCode();
+                string result = response.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
+                //Component creation Success 
+                if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.Conflict)
+                {
+                    Logger.Debug($"Name - {packageInfo.PackageName},Version - {packageInfo.Version}");
+                    // Deserialize the response to get the href value
+                    var responseData = JsonConvert.DeserializeObject<dynamic>(result);
+                    packageInfo.PackageLink = responseData?._links?.self?.href ?? string.Empty;
+                    packageInfo.PackageId = CommonHelper.GetSubstringOfLastOccurance(packageInfo.PackageLink, "/");
+                    packageInfo.Purl = responseData?.purl ?? string.Empty;
+                    packageInfo.PackageStatus = Dataconstant.Available;
+                }
+                else
+                {
+                    packageCreateStatus.IsCreated = false;
+                    Logger.Debug($"CreateComponent():Component Name -{packageInfo.PackageName}- " +
+                   $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
+                    Logger.Error($"CreateComponent():Component Name -{packageInfo.PackageName}- " +
+                        $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                Logger.Error($"CreatePackage():", ex);
+                packageCreateStatus.IsCreated = false;
+
+            }
+
+            return packageCreateStatus;
+        }
+        public async Task<PackageUpdateStatus> UpdatePackagesWithReleases(ComparisonBomData packageInfo)
+        {
+            Logger.Debug($"UpdatePackagesWithReleases(): Name-{packageInfo.PackageName},version-{packageInfo.Version}");
+            PackageUpdateStatus packageUpdateStatus = new PackageUpdateStatus
+            {
+                IsUpdated = true,
+            };
+
+            try
+            {
+                UpdatePackage crt = new UpdatePackage
+                {
+                    ComponentType = ApiConstant.Oss,
+                    Name = packageInfo.PackageName,
+                    Version = packageInfo.Version,
+                    Purl = packageInfo.Purl,
+                    PackageType = ApiConstant.Library,
+                    ReleaseId=packageInfo.ReleaseID,
+                };
+
+                StringContent content = new StringContent(JsonConvert.SerializeObject(crt), Encoding.UTF8, "application/json");
+                // update package in sw360
+                HttpResponseMessage response = await m_SW360ApiCommunicationFacade.UpdatePackage(content,packageInfo.PackageId);
+                response.EnsureSuccessStatusCode();
+                string result = response.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
+                
+                if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.Conflict)
+                {
+                    Logger.Debug($"Name - {packageInfo.PackageName},Version - {packageInfo.Version}");
+                    
+                }
+                else
+                {
+                    packageUpdateStatus.IsUpdated = false;
+                    Logger.Debug($"UpdatePackagesWithReleases():Package Name -{packageInfo.PackageName}- " +
+                   $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
+                    Logger.Error($"UpdatePackagesWithReleases():Package Name -{packageInfo.PackageName}- " +
+                        $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                Logger.Error($"Update package failed:", ex);
+                packageUpdateStatus.IsUpdated = false;
+
+            }
+
+            return packageUpdateStatus;
         }
     }
 }
