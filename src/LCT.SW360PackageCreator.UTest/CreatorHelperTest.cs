@@ -160,7 +160,8 @@ namespace LCT.SW360PackageCreator.UTest
                 ComponentExternalId = "pkg:deb/debian/adduser?arch=source",
                 ReleaseExternalId = "pkg:deb/debian/adduser@3.118?arch=source",
                 SourceUrl = "https://snapshot.debian.org/archive/debian/20180915T211528Z/pool/main/a/adduser/adduser_3.118.tar.xz",
-                DownloadUrl = "https://snapshot.debian.org/archive/debian/20180915T211528Z/pool/main/a/adduser/adduser_3.118.tar.xz"
+                DownloadUrl = "https://snapshot.debian.org/archive/debian/20180915T211528Z/pool/main/a/adduser/adduser_3.118.tar.xz",
+                Purl= "pkg:deb/debian/adduser@3.118",
             });
 
             List<Components> comparisonBomData = new List<Components>();
@@ -171,12 +172,24 @@ namespace LCT.SW360PackageCreator.UTest
                 ComponentExternalId = "pkg:deb/debian/adduser?arch=source",
                 ReleaseExternalId = "pkg:deb/debian/adduser@3.118?arch=source",
                 SourceUrl = "https://snapshot.debian.org/archive/debian/20180915T211528Z/pool/main/a/adduser/adduser_3.118.tar.xz",
-                DownloadUrl = "https://snapshot.debian.org/archive/debian/20180915T211528Z/pool/main/a/adduser/adduser_3.118.tar.xz"
+                DownloadUrl = "https://snapshot.debian.org/archive/debian/20180915T211528Z/pool/main/a/adduser/adduser_3.118.tar.xz",
+                Purl = "pkg:deb/debian/adduser@3.118",
+            });
+            List<Components> packagesAvailableInSw360 = new List<Components>();
+            packagesAvailableInSw360.Add(new Components()
+            {
+                Name = "adduser",
+                Version = "3.118",
+                ComponentExternalId = "pkg:deb/debian/adduser?arch=source",
+                ReleaseExternalId = "pkg:deb/debian/adduser@3.118?arch=source",
+                SourceUrl = "https://snapshot.debian.org/archive/debian/20180915T211528Z/pool/main/a/adduser/adduser_3.118.tar.xz",
+                DownloadUrl = "https://snapshot.debian.org/archive/debian/20180915T211528Z/pool/main/a/adduser/adduser_3.118.tar.xz",
+                Purl = "pkg:deb/debian/adduser@3.118",
             });
             var iSW360Service = new Mock<ISW360Service>();
             iSW360Service.Setup(x => x.GetAvailableReleasesInSw360(comparisonBomData)).ReturnsAsync(componentsAvailableInSw360);
             iSW360Service.Setup(x => x.GetReleaseDataOfComponent(comparisonBomData[0].ReleaseLink)).ReturnsAsync(releasesInfo);
-
+            iSW360Service.Setup(x => x.GetAvailablePackagesInSw360(comparisonBomData)).ReturnsAsync(packagesAvailableInSw360);
             //Act
             var data = await creatorHelper.SetContentsForComparisonBOM(comparisonBomData, iSW360Service.Object);
 
@@ -208,9 +221,21 @@ namespace LCT.SW360PackageCreator.UTest
                     ComponentExternalId = "pkg:deb/debian/adduser?arch=source",
                     ReleaseExternalId = "pkg:deb/debian/adduser@3.118?arch=source",
                     SourceUrl = "https://snapshot.debian.org/archive/debian/20180915T211528Z/pool/main/a/adduser/adduser_3.118.tar.xz",
-                    DownloadUrl = "https://snapshot.debian.org/archive/debian/20180915T211528Z/pool/main/a/adduser/adduser_3.118.tar.xz"
+                    DownloadUrl = "https://snapshot.debian.org/archive/debian/20180915T211528Z/pool/main/a/adduser/adduser_3.118.tar.xz",
+                    Purl = "pkg:deb/debian/adduser@3.118",
                 }
             };
+            List<Components> packagesAvailableInSw360 = new List<Components>();
+            packagesAvailableInSw360.Add(new Components()
+            {
+                Name = "adduser",
+                Version = "3.118",
+                ComponentExternalId = "pkg:deb/debian/adduser?arch=source",
+                ReleaseExternalId = "pkg:deb/debian/adduser@3.118?arch=source",
+                SourceUrl = "https://snapshot.debian.org/archive/debian/20180915T211528Z/pool/main/a/adduser/adduser_3.118.tar.xz",
+                DownloadUrl = "https://snapshot.debian.org/archive/debian/20180915T211528Z/pool/main/a/adduser/adduser_3.118.tar.xz",
+                Purl = "pkg:deb/debian/adduser@3.118",
+            });
             var iSW360Service = new Mock<ISW360Service>();
 
             //Mocking the Sw360 result as Empty with SuccessCode
@@ -223,7 +248,7 @@ namespace LCT.SW360PackageCreator.UTest
             iSW360ApicommunicationFacade.Setup(x => x.GetReleases()).ReturnsAsync(await responseMessage.Content.ReadAsStringAsync());
             iSW360Service.Setup(x => x.GetAvailableReleasesInSw360(comparisonBomData)).ReturnsAsync(componentsAvailableInSw360);
             iSW360Service.Setup(x => x.GetReleaseDataOfComponent(comparisonBomData[0].ReleaseLink)).ReturnsAsync(releasesInfo);
-
+            iSW360Service.Setup(x => x.GetAvailablePackagesInSw360(comparisonBomData)).ReturnsAsync(packagesAvailableInSw360);
             //Act
             var data = await creatorHelper.SetContentsForComparisonBOM(comparisonBomData, iSW360Service.Object);
 
