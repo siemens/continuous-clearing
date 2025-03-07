@@ -149,12 +149,50 @@ namespace LCT.APICommunications.UTest
             HttpContent httpContent;
             var jsonString = JsonConvert.SerializeObject("");
             httpContent = new StringContent(jsonString, Encoding.UTF8, "application/json");
-            
+
             //Arrange
             SW360Apicommunication sW360Apicommunication = new SW360Apicommunication(connectionSettings);
 
             //Assert
             Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.UpdateComponent("", httpContent));
         }
+        [Test]
+        public void SW360Apicommunication_GetPackages_ReturnsInvalidOperationException()
+        {
+            //Act
+            SW360Apicommunication sW360Apicommunication = new SW360Apicommunication(connectionSettings);
+
+            //Assert
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.GetPackages());
+        }
+        [Test]
+        public void SW360Apicommunication_Updatepackage_ReturnsInvalidOperationException()
+        {
+            //Arrange
+            HttpContent httpContent;
+            var jsonString = JsonConvert.SerializeObject("");
+            httpContent = new StringContent(jsonString, Encoding.UTF8, "application/json");
+
+            //Arrange
+            SW360Apicommunication sW360Apicommunication = new SW360Apicommunication(connectionSettings);
+
+            //Assert
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.UpdatePackage(httpContent, ""));
+        }
+        [Test]
+        public void SW360Apicommunication_LinkPackagesToProject_ReturnsInvalidOperationException()
+        {
+            //Arrange
+            HttpContent httpContent;
+            var jsonString = JsonConvert.SerializeObject("");
+            httpContent = new StringContent(jsonString, Encoding.UTF8, "application/json");
+
+            //Arrange
+            SW360Apicommunication sW360Apicommunication = new SW360Apicommunication(connectionSettings);
+
+            //Assert
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.LinkPackagesToProject(httpContent, ""));
+        }
+
     }
 }

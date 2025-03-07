@@ -115,13 +115,14 @@ namespace LCT.SW360PackageCreator.UTest
             };
             Dictionary<string, string> attachmentURL = new Dictionary<string, string>();
             Mock<ISW360ApicommunicationFacade> sw360ApiCommunicationService = new Mock<ISW360ApicommunicationFacade>();
+            Mock<IEnvironmentHelper> environmentHelper = new Mock<IEnvironmentHelper>();
 
             HttpResponseMessage responseMessage = new HttpResponseMessage()
             {
                 StatusCode = HttpStatusCode.OK
             };
             sw360ApiCommunicationService.Setup(x => x.CreateRelease(It.IsAny<Releases>())).ReturnsAsync(responseMessage);
-            var subjectUnderTest = new Sw360CreatorService(sw360ApiCommunicationService.Object);
+            var subjectUnderTest = new Sw360CreatorService(sw360ApiCommunicationService.Object, environmentHelper.Object);
             var result = subjectUnderTest.CreateReleaseForComponent(packageLockMapper, "811609589f3798e2345634bdd4013a60", attachmentURL);
             Assert.IsNotNull(result);
         }

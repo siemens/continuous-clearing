@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace LCT.APICommunications.Model
 {
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class PackageCreateStatus
     {
         public bool IsCreated { get; set; }

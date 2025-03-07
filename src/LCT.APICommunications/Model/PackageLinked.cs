@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace LCT.APICommunications.Model
 {
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class PackageLinked
     {
         public string PackageName { get; set; } = string.Empty;

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace LCT.APICommunications.Model
 {
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class PackageEmbedded
     {
         [JsonProperty("sw360:packages")]

@@ -142,7 +142,7 @@ namespace LCT.SW360PackageCreator
         private static async Task InitiatePackageCreatorProcess(CommonAppSettings appSettings, ISw360ProjectService sw360ProjectService, ISW360ApicommunicationFacade sW360ApicommunicationFacade)
         {
             ISW360CommonService sw360CommonService = new SW360CommonService(sW360ApicommunicationFacade);
-            ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sW360ApicommunicationFacade, sw360CommonService);            
+            ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sW360ApicommunicationFacade, sw360CommonService, environmentHelper);            
             ISW360Service sw360Service = new Sw360Service(sW360ApicommunicationFacade, sw360CommonService, environmentHelper);
             ICycloneDXBomParser cycloneDXBomParser = new CycloneDXBomParser();
 

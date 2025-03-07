@@ -175,6 +175,16 @@ namespace LCT.SW360PackageCreator.UTest
                 DownloadUrl = "https://snapshot.debian.org/archive/debian/20180915T211528Z/pool/main/a/adduser/adduser_3.118.tar.xz",
                 Purl = "pkg:deb/debian/adduser@3.118",
             });
+            comparisonBomData.Add(new Components()
+            {
+                Name = "@angular-devkit/architect",
+                Version = "0.901.10",
+                ComponentExternalId = "pkg:npm/%40angular-devkit/architect",
+                Purl = "pkg:npm/%40angular-devkit/architect@0.901.10",
+                ReleaseExternalId = "pkg:npm/%40angular-devkit/architect@0.901.10",
+                SourceUrl = "https://snapshot.debian.org/archive/debian/20180915T211528Z/pool/main/a/adduser/adduser_3.118.tar.xz",
+                DownloadUrl = "https://snapshot.debian.org/archive/debian/20180915T211528Z/pool/main/a/adduser/adduser_3.118.tar.xz",
+            });
             List<Components> packagesAvailableInSw360 = new List<Components>();
             packagesAvailableInSw360.Add(new Components()
             {
@@ -186,6 +196,7 @@ namespace LCT.SW360PackageCreator.UTest
                 DownloadUrl = "https://snapshot.debian.org/archive/debian/20180915T211528Z/pool/main/a/adduser/adduser_3.118.tar.xz",
                 Purl = "pkg:deb/debian/adduser@3.118",
             });
+           
             var iSW360Service = new Mock<ISW360Service>();
             iSW360Service.Setup(x => x.GetAvailableReleasesInSw360(comparisonBomData)).ReturnsAsync(componentsAvailableInSw360);
             iSW360Service.Setup(x => x.GetReleaseDataOfComponent(comparisonBomData[0].ReleaseLink)).ReturnsAsync(releasesInfo);

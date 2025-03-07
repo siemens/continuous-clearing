@@ -490,7 +490,8 @@ namespace LCT.SW360PackageCreator
                 Timeout = appSettings.TimeOut
             };
             var sw360ApicommunicationFacade = new SW360ApicommunicationFacade(sw360ConnectionSettings);
-            return new Sw360CreatorService(sw360ApicommunicationFacade);
+            var environmentHelper = new EnvironmentHelper();
+            return new Sw360CreatorService(sw360ApicommunicationFacade, environmentHelper);
         }
 
         public static ISw360ProjectService InitializeSw360ProjectService(CommonAppSettings appSettings)

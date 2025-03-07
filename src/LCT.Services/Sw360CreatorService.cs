@@ -41,15 +41,17 @@ namespace LCT.Services
         readonly ISW360CommonService m_SW360CommonService;
         private static IEnvironmentHelper environmentHelper;
 
-        public Sw360CreatorService(ISW360ApicommunicationFacade sw360ApiCommunicationFacade)
+        public Sw360CreatorService(ISW360ApicommunicationFacade sw360ApiCommunicationFacade,IEnvironmentHelper _environmentHelper)
         {
             m_SW360ApiCommunicationFacade = sw360ApiCommunicationFacade;
+            environmentHelper = _environmentHelper;
         }
 
-        public Sw360CreatorService(ISW360ApicommunicationFacade sw360ApiCommunicationFacade, ISW360CommonService sW360CommonService)
+        public Sw360CreatorService(ISW360ApicommunicationFacade sw360ApiCommunicationFacade, ISW360CommonService sW360CommonService, IEnvironmentHelper _environmentHelper)
         {
             m_SW360ApiCommunicationFacade = sw360ApiCommunicationFacade;
             m_SW360CommonService = sW360CommonService;
+            environmentHelper = _environmentHelper;
         }
 
         public async Task<ComponentCreateStatus> CreateComponentBasesOFswComaprisonBOM(
@@ -333,11 +335,9 @@ namespace LCT.Services
                 return true;
             }
             try
-            {
-                // Create a list to store the package IDs
+            {               
                 List<string> packageIds = new List<string>();
 
-                // Iterate through parsedBomData and add each release.PackageId to the list
                 foreach (var release in packageListToLinkProject)
                 {
                     if (!string.IsNullOrEmpty(release.PackageId))
@@ -346,14 +346,13 @@ namespace LCT.Services
                     }
                 }
 
-                // Serialize the list of package IDs
                 StringContent content = new StringContent(JsonConvert.SerializeObject(packageIds), Encoding.UTF8, "application/json");
 
                 var response = await m_SW360ApiCommunicationFacade.LinkPackagesToProject(content, sw360ProjectId);
                 if (!response.IsSuccessStatusCode)
-                {
-                    
+                {                    
                     Logger.Error($"LinkPackagesToProject() : Linking releases to project Id {sw360ProjectId} is failed.");
+                    environmentHelper.CallEnvironmentExit(-1);
                     return false;
                 }
                 return true;
@@ -361,13 +360,13 @@ namespace LCT.Services
             catch (HttpRequestException ex)
             {
                 Logger.Error($"LinkPackagesToProject():", ex);
-               
+                environmentHelper.CallEnvironmentExit(-1);
                 return false;
             }
             catch (AggregateException ex)
             {
                 Logger.Error($"LinkPackagesToProject():", ex);
-                
+                environmentHelper.CallEnvironmentExit(-1);
                 return false;
             }
         }
@@ -829,7 +828,6 @@ namespace LCT.Services
         }
         public async Task<FossTriggerStatus> TriggerFossologyProcessForValidation(string releaseId, string sw360link)
         {
-            environmentHelper = new EnvironmentHelper();
             FossTriggerStatus fossTriggerStatus = null;
             try
             {
@@ -864,7 +862,7 @@ namespace LCT.Services
         }
         public async Task<PackageCreateStatus> CreatePackageBasesOFswComaprisonBOM(ComparisonBomData packageInfo)
         {
-            Logger.Debug($"CreateComponent(): Name-{packageInfo.PackageName},version-{packageInfo.Version}");
+            Logger.Debug($"CreatePackageBasesOFswComaprisonBOM(): Name-{packageInfo.PackageName},version-{packageInfo.Version}");
             PackageCreateStatus packageCreateStatus = new PackageCreateStatus
             {
                 IsCreated = true,
@@ -899,15 +897,13 @@ namespace LCT.Services
                 else
                 {
                     packageCreateStatus.IsCreated = false;
-                    Logger.Debug($"CreateComponent():Component Name -{packageInfo.PackageName}- " +
-                   $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
-                    Logger.Error($"CreateComponent():Component Name -{packageInfo.PackageName}- " +
-                        $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
+                    Logger.Debug($"CreatePackageBasesOFswComaprisonBOM():Component Name -{packageInfo.PackageName}- " +
+                   $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");                    
                 }
             }
             catch (HttpRequestException ex)
             {
-                Logger.Error($"CreatePackage():", ex);
+                Logger.Debug($"CreatePackageBasesOFswComaprisonBOM():", ex);
                 packageCreateStatus.IsCreated = false;
 
             }
@@ -950,13 +946,12 @@ namespace LCT.Services
                     packageUpdateStatus.IsUpdated = false;
                     Logger.Debug($"UpdatePackagesWithReleases():Package Name -{packageInfo.PackageName}- " +
                    $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
-                    Logger.Error($"UpdatePackagesWithReleases():Package Name -{packageInfo.PackageName}- " +
-                        $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
+                    
                 }
             }
             catch (HttpRequestException ex)
             {
-                Logger.Error($"Update package failed:", ex);
+                Logger.Debug($"UpdatePackagesWithReleases", ex);
                 packageUpdateStatus.IsUpdated = false;
 
             }
