@@ -31,7 +31,30 @@ namespace LCT.APICommunications.UTest
             //Assert
             Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApicommunication.CopyFromRemoteRepo(new ComponentsToArtifactory()));
         }
+        [Test]
+        public void NpmJfrogApiCommunication_MoveFromRepo_ReturnsInvalidOperationException()
+        {
+            //Arrange
+            ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials();
 
+            //Act
+            JfrogApicommunication jfrogApicommunication = new NpmJfrogApiCommunication("", "", repoCredentials, 100);
+
+            //Assert
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApicommunication.MoveFromRepo(new ComponentsToArtifactory()));
+        }
+        [Test]
+        public void NpmJfrogApiCommunication_GetApiKey_ReturnsInvalidOperationException()
+        {
+            //Arrange
+            ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials();
+
+            //Act
+            JfrogApicommunication jfrogApicommunication = new NpmJfrogApiCommunication("", "", repoCredentials, 100);
+
+            //Assert
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApicommunication.GetApiKey());
+        }
         [Test]
         public void NpmJfrogApiCommunication_UpdatePackagePropertiesInJfrog_ReturnsInvalidOperationException()
         {

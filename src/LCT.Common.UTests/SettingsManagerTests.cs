@@ -26,7 +26,7 @@ namespace LCT.Common.UTest
         {
             _settingsManager = new SettingsManager();
         }
-
+        
         [Test]
         public void ReadConfiguration_WhenArgsIsNull_ShouldThrowInvalidDataException()
         {
