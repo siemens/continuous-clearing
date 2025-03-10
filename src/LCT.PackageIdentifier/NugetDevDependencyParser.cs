@@ -184,7 +184,7 @@ namespace LCT.PackageIdentifier
             var readValue = File.ReadAllText(filePath);
             JObject serializedContent = JObject.Parse(readValue);
             JToken projectFramworks = serializedContent["project"]["frameworks"];
-            if (projectFramworks == null && !projectFramworks.HasValues)
+            if (projectFramworks == null || !projectFramworks.HasValues)
             {
                 return;
             }
@@ -203,7 +203,7 @@ namespace LCT.PackageIdentifier
 
                 if (projectDependencies.HasValues)
                 {
-                    directDepCollection = projectDependencies.Children().OfType<JProperty>()?.ToList() ?? new List<JProperty>();
+                    directDepCollection = projectDependencies.Children().OfType<JProperty>().ToList();
                 }
                 foreach (var child in directDepCollection)
                 {
