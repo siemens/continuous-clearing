@@ -27,7 +27,7 @@ namespace LCT.ArtifactoryUploader
             // Get details of sucessfully uploaded packages
             List<ComponentsToArtifactory> uploadedPackages = PackageUploadInformation.GetUploadePackageDetails(displayPackagesInfo);
 
-            // Get the details of all the dest repo names from jfrog at once
+            // Get the details of all the dest repo names from jfrog at once.
             List<string> destRepoNames = uploadedPackages?.Select(x => x.DestRepoName).Distinct().ToList() ?? new List<string>();
             List<AqlResult> jfrogPackagesListAql = await GetJfrogRepoInfoForAllTypePackages(destRepoNames);
 
