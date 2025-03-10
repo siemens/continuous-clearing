@@ -338,7 +338,10 @@ namespace LCT.PackageIdentifier
                 aqlResult = aqlResults.FirstOrDefault(x => x.Repo.Equals(repoName));
                 jfrogRepoPath = GetJfrogRepoPath(aqlResult);
             }
-            aqlResult.Repo ??= repoName;
+            if (aqlResult != null)
+            {
+                aqlResult.Repo ??= repoName;
+            }
             return aqlResult;
         }
 

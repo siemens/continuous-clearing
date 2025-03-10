@@ -31,7 +31,7 @@ namespace LCT.Common
 
             telemetry_ = new LCT.Telemetry.Telemetry(TelemetryConstant.Type, new Dictionary<string, string>
                 {
-                { "InstrumentationKey", appSettings.Telemetry.ApplicationInsightInstrumentKey }
+                { "InstrumentationKey", appSettings?.Telemetry?.ApplicationInsightInstrumentKey ?? string.Empty }
             });
         }
 

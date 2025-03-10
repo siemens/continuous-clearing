@@ -222,7 +222,7 @@ namespace LCT.PackageIdentifier
                 AqlResult finalRepoData = GetJfrogArtifactoryRepoDetials(aqlResultList, component, bomhelper, out jfrogRepoPath);
                 Property siemensfileNameProp = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = finalRepoData?.Name ?? Dataconstant.PackageNameNotFoundInJfrog };
                 Property jfrogRepoPathProp = new() { Name = Dataconstant.Cdx_JfrogRepoPath, Value = jfrogRepoPath };
-                Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = finalRepoData.Repo };
+                Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = finalRepoData?.Repo };
 
                 Component componentVal = component;
                 if (artifactoryrepo.Value == appSettings.Maven.DevDepRepo)
@@ -383,7 +383,10 @@ namespace LCT.PackageIdentifier
                 aqlResult = aqlResults.FirstOrDefault(x => x.Repo.Equals(repoName));
                 jfrogRepoPath = GetJfrogRepoPath(aqlResult);
             }
-            aqlResult.Repo ??= repoName;
+            if (aqlResult != null)
+            {
+                aqlResult.Repo ??= repoName;
+            }
             return aqlResult;
         }
 
