@@ -392,8 +392,18 @@ namespace LCT.PackageIdentifier
 
             ConanPackage package = nodePackages.Where(x => x.Id == "0").FirstOrDefault();
             List<string> directDependencies = new List<string>();
-            if (package.Dependencies != null) { directDependencies.AddRange(package.Dependencies); }
-            if (package.DevDependencies != null) { directDependencies.AddRange(package.DevDependencies); }
+            if (package != null)
+            {
+                if (package.Dependencies != null)
+                {
+                    directDependencies.AddRange(package.Dependencies);
+                }
+
+                if (package.DevDependencies != null)
+                {
+                    directDependencies.AddRange(package.DevDependencies);
+                }
+            }
 
             // Ignoring the root node as it is the package information node and we are anyways considering all
             // nodes in the lock file.
