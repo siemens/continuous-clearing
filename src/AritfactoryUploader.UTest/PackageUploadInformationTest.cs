@@ -12,6 +12,9 @@ using System.Net.Http;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using LCT.Common.Constants;
+using Newtonsoft.Json;
+using System.IO;
 
 namespace AritfactoryUploader.UTest
 {
@@ -157,6 +160,46 @@ namespace AritfactoryUploader.UTest
 
             // Assert
             Assert.That(JfrogNotFoundPackages.Count, Is.GreaterThanOrEqualTo(1));
+        }
+
+        [Test]
+        public void GetNotApprovedDebianPackages_FileExists_ShouldUpdateDebianComponents()
+        {
+            // Arrange
+            var unknownPackages = new List<ComponentsToArtifactory>
+            {
+                new ComponentsToArtifactory { Name = "Package1", Version = "1.0.0" },
+                new ComponentsToArtifactory { Name = "Package2", Version = "2.0.0" }
+            };
+            var projectResponse = new ProjectResponse();
+            var mockFileOperations = new Mock<IFileOperations>();
+            var filepath = Path.GetTempPath();
+            var filename = Path.Combine(filepath, $"Artifactory_{FileConstant.artifactoryReportNotApproved}");
+
+            var existingProjectResponse = new ProjectResponse
+            {
+                Debian = new List<JsonComponents>
+                {
+                    new JsonComponents { Name = "ExistingPackage", Version = "1.0.0" }
+                }
+            };
+            var json = JsonConvert.SerializeObject(existingProjectResponse);
+            File.WriteAllText(filename, json);
+
+            // Act
+            PackageUploadInformation.GetNotApprovedDebianPackages(unknownPackages, projectResponse, mockFileOperations.Object, filepath, filename);
+
+            // Assert
+            mockFileOperations.Verify(m => m.WriteContentToReportNotApprovedFile(It.Is<ProjectResponse>(pr =>
+                pr.Debian.Count == 2 &&
+                pr.Debian[0].Name == "Package1" &&
+                pr.Debian[0].Version == "1.0.0" &&
+                pr.Debian[1].Name == "Package2" &&
+                pr.Debian[1].Version == "2.0.0"
+            ), filepath, FileConstant.artifactoryReportNotApproved, "Artifactory"), Times.Once);
+
+            // Cleanup
+            File.Delete(filename);
         }
     }
 }
