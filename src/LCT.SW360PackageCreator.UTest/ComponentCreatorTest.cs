@@ -16,6 +16,7 @@ using LCT.Services;
 using LCT.Services.Interface;
 using LCT.SW360PackageCreator;
 using LCT.SW360PackageCreator.Interfaces;
+using LCT.SW360PackageCreator.Model;
 using Microsoft.CodeAnalysis.FlowAnalysis;
 using Moq;
 using Moq.Protected;
@@ -41,6 +42,64 @@ namespace LCT.SW360PackageCreator.UTest
         public void Setup()
         {
             // implement here
+        }
+        [Test]
+        public async Task CreateComponentInSw360_ShouldCreateComponentsAndWriteFiles()
+        {
+            // Arrange
+            var folderAction = new Mock<IFolderAction>();
+            var fileOperations = new Mock<IFileOperations>();
+            var appSettings = new CommonAppSettings
+            {
+                SW360 = new SW360
+                {
+                    URL = "http://sw360.example.com",
+                    ProjectID = "projectId",
+                    ProjectName = "projectName"
+                },
+                Directory = new Common.Directory(folderAction.Object, fileOperations.Object)
+                {
+                    OutputFolder = "outputFolder"
+                },
+                Mode = "production" // Ensure IsTestMode is false
+            };
+
+            var parsedBomData = new List<ComparisonBomData>
+            {
+                new ComparisonBomData { Name = "Component1", Version = "1.0.0" }
+            };
+
+            var mockSw360CreatorService = new Mock<ISw360CreatorService>();
+            var mockSw360Service = new Mock<ISW360Service>();
+            var mockSw360ProjectService = new Mock<ISw360ProjectService>();
+            var mockFileOperations = new Mock<IFileOperations>();
+            var mockCreatorHelper = new Mock<ICreatorHelper>();
+
+            var componentCreator = new ComponentCreator();
+
+            mockCreatorHelper.Setup(x => x.GetUpdatedComponentsDetails(It.IsAny<List<Components>>(), It.IsAny<List<ComparisonBomData>>(), It.IsAny<ISW360Service>(), It.IsAny<Bom>()))
+                .ReturnsAsync(new Bom());
+
+            mockCreatorHelper.Setup(x => x.GetDownloadUrlNotFoundList(It.IsAny<List<ComparisonBomData>>()))
+                .Returns(new List<ComparisonBomData>());
+
+            mockCreatorHelper.Setup(x => x.GetCreatorKpiData(It.IsAny<List<ComparisonBomData>>()))
+                .Returns(new CreatorKpiData());
+
+            mockSw360ProjectService.Setup(x => x.GetAlreadyLinkedReleasesByProjectId(It.IsAny<string>()))
+                .ReturnsAsync(new List<ReleaseLinked>());
+
+            mockSw360CreatorService.Setup(x => x.LinkReleasesToProject(It.IsAny<List<ReleaseLinked>>(), It.IsAny<List<ReleaseLinked>>(), It.IsAny<string>()))
+                .ReturnsAsync(true);
+
+            // Act
+            await componentCreator.CreateComponentInSw360(appSettings, mockSw360CreatorService.Object, mockSw360Service.Object, mockSw360ProjectService.Object, mockFileOperations.Object, mockCreatorHelper.Object, parsedBomData);
+
+            // Assert
+            mockFileOperations.Verify(x => x.WriteContentToOutputBomFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);            
+            mockCreatorHelper.Verify(x => x.WriteCreatorKpiDataToConsole(It.IsAny<CreatorKpiData>()), Times.Once);
+            mockCreatorHelper.Verify(x => x.WriteSourceNotFoundListToConsole(It.IsAny<List<ComparisonBomData>>(), It.IsAny<CommonAppSettings>()), Times.Once);
+            mockSw360CreatorService.Verify(x => x.LinkReleasesToProject(It.IsAny<List<ReleaseLinked>>(), It.IsAny<List<ReleaseLinked>>(), It.IsAny<string>()), Times.Once);
         }
 
         [Test]
