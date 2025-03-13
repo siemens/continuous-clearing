@@ -74,5 +74,6 @@ namespace TestUtilities
         public const string NuspecMode = "--NuspecMode";
         public const string JFrogApiURL = "--JFrog:URL";
         public const string DryRun = "--JFrog:DryRun";
+        public const string BasicSBOM = "--BasicSBOM";
     }
 }

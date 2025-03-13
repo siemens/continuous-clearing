@@ -32,7 +32,6 @@ namespace LCT.PackageIdentifier
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-
         #region public methods
 
         public string GetProjectSummaryLink(string projectId, string sw360Url)
@@ -44,23 +43,26 @@ namespace LCT.PackageIdentifier
         public void WriteBomKpiDataToConsole(BomKpiData bomKpiData)
         {
             Dictionary<string, int> printList = new Dictionary<string, int>()
-            {
-                {CommonHelper.Convert(bomKpiData,nameof(bomKpiData.ComponentsinPackageLockJsonFile)),bomKpiData.ComponentsinPackageLockJsonFile },
-                {CommonHelper.Convert(bomKpiData,nameof(bomKpiData.DevDependentComponents)),bomKpiData.DevDependentComponents},
-                {CommonHelper.Convert(bomKpiData,nameof(bomKpiData.BundledComponents)),bomKpiData.BundledComponents},
-                {CommonHelper.Convert(bomKpiData,nameof(bomKpiData.ComponentsExcluded)),bomKpiData.ComponentsExcluded},
-                {CommonHelper.Convert(bomKpiData,nameof(bomKpiData.ComponentsExcludedSW360)),bomKpiData.ComponentsExcludedSW360},
-                {CommonHelper.Convert(bomKpiData,nameof(bomKpiData.DuplicateComponents)),bomKpiData.DuplicateComponents},
-                {CommonHelper.Convert(bomKpiData,nameof(bomKpiData.InternalComponents)),bomKpiData.InternalComponents},
-                {CommonHelper.Convert(bomKpiData,nameof(bomKpiData.ThirdPartyRepoComponents)),bomKpiData.ThirdPartyRepoComponents},
-                {CommonHelper.Convert(bomKpiData,nameof(bomKpiData.DevdependencyComponents)),bomKpiData.DevdependencyComponents},
-                {CommonHelper.Convert(bomKpiData,nameof(bomKpiData.ReleaseRepoComponents)),bomKpiData.ReleaseRepoComponents},
-                {CommonHelper.Convert(bomKpiData,nameof(bomKpiData.UnofficialComponents)),bomKpiData.UnofficialComponents},
-                {CommonHelper.Convert(bomKpiData,nameof(bomKpiData.ComponentsinSBOMTemplateFile)),bomKpiData.ComponentsinSBOMTemplateFile},
-                {CommonHelper.Convert(bomKpiData,nameof(bomKpiData.ComponentsUpdatedFromSBOMTemplateFile)),bomKpiData.ComponentsUpdatedFromSBOMTemplateFile},
-                {CommonHelper.Convert(bomKpiData,nameof(bomKpiData.ComponentsInComparisonBOM)),bomKpiData.ComponentsInComparisonBOM }
-            };
+    {
+        {CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ComponentsinPackageLockJsonFile)), bomKpiData.ComponentsinPackageLockJsonFile },
+        {CommonHelper.Convert(bomKpiData, nameof(bomKpiData.DevDependentComponents)), bomKpiData.DevDependentComponents},
+        {CommonHelper.Convert(bomKpiData, nameof(bomKpiData.BundledComponents)), bomKpiData.BundledComponents},
+        {CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ComponentsExcluded)), bomKpiData.ComponentsExcluded},
+        {CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ComponentsExcludedSW360)), bomKpiData.ComponentsExcludedSW360},
+        {CommonHelper.Convert(bomKpiData, nameof(bomKpiData.DuplicateComponents)), bomKpiData.DuplicateComponents}
 
+    };
+            if (!BomCreator.BasicSBOM)
+            {
+                printList.Add(CommonHelper.Convert(bomKpiData, nameof(bomKpiData.InternalComponents)), bomKpiData.InternalComponents);
+                printList.Add(CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ThirdPartyRepoComponents)), bomKpiData.ThirdPartyRepoComponents);
+                printList.Add(CommonHelper.Convert(bomKpiData, nameof(bomKpiData.DevdependencyComponents)), bomKpiData.DevdependencyComponents);
+                printList.Add(CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ReleaseRepoComponents)), bomKpiData.ReleaseRepoComponents);
+                printList.Add(CommonHelper.Convert(bomKpiData, nameof(bomKpiData.UnofficialComponents)), bomKpiData.UnofficialComponents);
+            }
+            printList.Add(CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ComponentsinSBOMTemplateFile)), bomKpiData.ComponentsinSBOMTemplateFile);
+            printList.Add(CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ComponentsUpdatedFromSBOMTemplateFile)), bomKpiData.ComponentsUpdatedFromSBOMTemplateFile);
+            printList.Add(CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ComponentsInComparisonBOM)), bomKpiData.ComponentsInComparisonBOM);
             Dictionary<string, double> printTimingList = new Dictionary<string, double>()
             {
                 { "PackageIdentifier",bomKpiData.TimeTakenByBomCreator }
@@ -208,7 +210,7 @@ namespace LCT.PackageIdentifier
             }
 
             return aqlResultList;
-        }       
+        }
 
         #endregion
     }

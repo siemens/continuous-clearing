@@ -52,6 +52,7 @@ namespace SW360IntegrationTest.Maven
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
                 TestConstant.JfrogMavenInternalRepo,"Maven-test",
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
+                TestConstant.BasicSBOM, testParameters.BasicSBOM,
                 TestConstant.ProjectType,"Maven",
                 TestConstant.Mode,""}),
                 "Test to run  Package Identifier EXE execution");

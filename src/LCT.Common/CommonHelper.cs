@@ -117,7 +117,7 @@ namespace LCT.Common
             Logger.Info("Summary :\n");
             if (!string.IsNullOrWhiteSpace(ProjectSummaryLink)) { Logger.Info($"{ProjectSummaryLink}"); }
             Logger.Info($"{"=",5}{string.Join("", Enumerable.Repeat("=", 88)),5}");
-            Logger.Info($"{"|",5}{Feature,70} {"|",5} {Count,5} {"|",5}");
+            Logger.Info($"{"|",5}{Feature,-70} {"|",5} {Count,5} {"|",5}");
             Logger.Info($"{"=",5}{string.Join("", Enumerable.Repeat("=", 88)),5}");
             foreach (var item in printData)
             {
@@ -253,8 +253,8 @@ namespace LCT.Common
 
             return formattedString;
         }
-       
-      
+
+
         public static string[] GetRepoList(CommonAppSettings appSettings)
         {
             var projectTypeMappings = new Dictionary<string, Func<Artifactory>>
@@ -281,7 +281,7 @@ namespace LCT.Common
             }
 
             return Array.Empty<string>();
-        }
+        }        
         #endregion
 
         #region private

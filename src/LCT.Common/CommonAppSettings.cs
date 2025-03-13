@@ -62,6 +62,7 @@ namespace LCT.Common
             }
         }
         public bool MultipleProjectType { get; set; } = false;
+        public bool BasicSBOM { get; set; } = true;
         public Telemetry Telemetry { get; set; }
         public SW360 SW360 { get; set; }
         public Directory Directory { get; set; }
@@ -117,7 +118,7 @@ namespace LCT.Common
             {
                 if (string.IsNullOrEmpty(value))
                 {
-                    throw new ArgumentNullException($"Provide a sw360 url - {value}");
+                   
                 }
                 else
                 {
@@ -133,7 +134,6 @@ namespace LCT.Common
             }
             set
             {
-                CommonHelper.CheckNullOrEmpty(nameof(ProjectName), value);
                 m_ProjectName = value;
             }
         }
@@ -145,7 +145,6 @@ namespace LCT.Common
             }
             set
             {
-                CommonHelper.CheckNullOrEmpty(nameof(ProjectID), value);
                 m_ProjectID = value;
             }
         }
@@ -157,8 +156,7 @@ namespace LCT.Common
                 return m_Token;
             }
             set
-            {
-                CommonHelper.CheckNullOrEmpty(nameof(Token), value);
+            {                
                 m_Token = value;
             }
         }

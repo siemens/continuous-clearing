@@ -121,20 +121,23 @@ namespace LCT.Common
             {
                 //Required parameters to run Package Identifier
                 List<string> identifierReqParameters = new List<string>()
-                {
-                    "SW360.ProjectID",
-                    "SW360.Token",
-                    "Jfrog.Token",
-                    "SW360.URL",
-                    "Jfrog.URL",
+                {                    
                     "Directory.InputFolder",
                     "Directory.OutputFolder",
                     "ProjectType"
                 };
+                if (!appSettings.BasicSBOM)
+                {
+                    identifierReqParameters.Add($"SW360.ProjectID");
+                    identifierReqParameters.Add($"SW360.Token");
+                    identifierReqParameters.Add($"Jfrog.Token");
+                    identifierReqParameters.Add($"SW360.URL");
+                    identifierReqParameters.Add($"Jfrog.URL");
+                }
                 //Check if ProjectType contains a value and add InternalRepos key accordingly
                 if (!string.IsNullOrWhiteSpace(appSettings.ProjectType))
                 {
-                    if (!appSettings.ProjectType.Equals("ALPINE", StringComparison.InvariantCultureIgnoreCase))
+                    if (!appSettings.BasicSBOM && !appSettings.ProjectType.Equals("ALPINE", StringComparison.InvariantCultureIgnoreCase))
                     {
                         identifierReqParameters.Add($"{appSettings.ProjectType}.Artifactory.InternalRepos");
                     }

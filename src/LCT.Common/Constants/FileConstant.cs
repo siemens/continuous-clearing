@@ -53,5 +53,6 @@ namespace LCT.Common.Constants
         public const string NugetAssetFile = "project.assets.json";
         public const string multipleversionsFileName = "Multipleversions.json";
         public const string artifactoryReportNotApproved = "ReportNotApproved.json";
+        public const string basicSBOMName = "CycloneDX";
     }
 }

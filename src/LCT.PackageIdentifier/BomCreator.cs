@@ -38,7 +38,7 @@ namespace LCT.PackageIdentifier
         public static readonly BomKpiData bomKpiData = new();
         ComponentIdentification componentData;
         private readonly ICycloneDXBomParser CycloneDXBomParser;
-
+        public static bool BasicSBOM { get; set; }
         public IJFrogService JFrogService { get; set; }
         public IBomHelper BomHelper { get; set; }
 
@@ -55,7 +55,7 @@ namespace LCT.PackageIdentifier
         {
             Logger.Debug($"GenerateBom():Start");
             Bom listOfComponentsToBom;
-
+            BasicSBOM=appSettings.BasicSBOM;
             // Calls package parser
             listOfComponentsToBom = await CallPackageParser(appSettings);
             Logger.Logger.Log(null, Level.Notice, $"No of components added to BOM after removing bundled & excluded components " +
@@ -70,9 +70,10 @@ namespace LCT.PackageIdentifier
                                                                                    projectReleases,
                                                                                    caToolInformation);
 
+            string defaultProjectName=CommonIdentiferHelper.GetDefaultProjectName(appSettings);
             // Writes Comparison Bom
             Logger.Logger.Log(null, Level.Notice, $"Writing CycloneDX BOM..", null);
-            WritecontentsToBOM(appSettings, bomKpiData, listOfComponentsToBom);
+            WritecontentsToBOM(appSettings, bomKpiData, listOfComponentsToBom, defaultProjectName);
             Logger.Logger.Log(null, Level.Notice, $"Writing CycloneDX BOM completed", null);
 
             // Writes Kpi data 
@@ -80,48 +81,53 @@ namespace LCT.PackageIdentifier
             bomKpiData.TimeTakenByBomCreator = Program.BomStopWatch == null ? 0 :
               TimeSpan.FromMilliseconds(Program.BomStopWatch.ElapsedMilliseconds).TotalSeconds;
             fileOperations.WriteContentToFile(bomKpiData, appSettings.Directory.OutputFolder,
-                FileConstant.BomKpiDataFileName, appSettings.SW360.ProjectName);
-
-            // Writes Project Summary Url on CLI
-            string projectURL = bomHelper.GetProjectSummaryLink(appSettings.SW360.ProjectID, appSettings.SW360.URL);
-            bomKpiData.ProjectSummaryLink = $"Link to the summary page of the configurred project:{appSettings.SW360.ProjectName} => {projectURL}\n";
+                FileConstant.BomKpiDataFileName, defaultProjectName);
+            if (!appSettings.BasicSBOM)
+            {
+                // Writes Project Summary Url on CLI
+                string projectURL = bomHelper.GetProjectSummaryLink(appSettings.SW360.ProjectID, appSettings.SW360.URL);
+                bomKpiData.ProjectSummaryLink = $"Link to the summary page of the configured project:{appSettings.SW360.ProjectName} => {projectURL}\n";
+            }           
 
             // Writes kpi info to console table
             bomKpiData.InternalComponents = componentData.internalComponents != null ? componentData.internalComponents.Count : 0;
             bomHelper.WriteBomKpiDataToConsole(bomKpiData);
 
-            //Writes internal component ist to kpi
-
-            bomHelper.WriteInternalComponentsListToKpi(componentData.internalComponents);
+            if (!appSettings.BasicSBOM)
+            {
+                //Writes internal component ist to kpi
+                bomHelper.WriteInternalComponentsListToKpi(componentData.internalComponents);
+            }
+            
             Logger.Debug($"GenerateBom():End");
         }
 
-        private static void WritecontentsToBOM(CommonAppSettings appSettings, BomKpiData bomKpiData, Bom listOfComponentsToBom)
+        private static void WritecontentsToBOM(CommonAppSettings appSettings, BomKpiData bomKpiData, Bom listOfComponentsToBom,string defaultProjectName)
         {
-            WriteContentToCycloneDxBOM(appSettings, listOfComponentsToBom, ref bomKpiData);
+            WriteContentToCycloneDxBOM(appSettings, listOfComponentsToBom, ref bomKpiData, defaultProjectName);
         }
 
-        private static void WriteContentToCycloneDxBOM(CommonAppSettings appSettings, Bom listOfComponentsToBom, ref BomKpiData bomKpiData)
+        private static void WriteContentToCycloneDxBOM(CommonAppSettings appSettings, Bom listOfComponentsToBom, ref BomKpiData bomKpiData, string defaultProjectName)
         {
             IFileOperations fileOperations = new FileOperations();
-            string bomFileName = $"{appSettings.SW360.ProjectName}_Bom.cdx.json";
+            string bomFileName=CommonIdentiferHelper.GetBomFileName(appSettings);
+                        
             string outputFolderPath = appSettings.Directory.OutputFolder;
             string[] files = Directory.GetFiles(outputFolderPath);
 
-            bool fileExists = files.Length > 0 && files.Any(file => Path.GetFileName(file).Equals(bomFileName, StringComparison.OrdinalIgnoreCase));
-
+            bool fileExists = files.Length > 0 && files.Any(file => Path.GetFileName(file).Equals(bomFileName, StringComparison.OrdinalIgnoreCase));                        
             if (fileExists && appSettings.MultipleProjectType)
             {
                 string existingFilePath = files.FirstOrDefault(file => Path.GetFileName(file).Equals(bomFileName, StringComparison.OrdinalIgnoreCase));
                 listOfComponentsToBom = fileOperations.CombineComponentsFromExistingBOM(listOfComponentsToBom, existingFilePath);
                 bomKpiData.ComponentsInComparisonBOM = listOfComponentsToBom.Components.Count;
                 string formattedString = CommonHelper.AddSpecificValuesToBOMFormat(listOfComponentsToBom);
-                fileOperations.WriteContentToOutputBomFile(formattedString, outputFolderPath, FileConstant.BomFileName, appSettings.SW360.ProjectName);
+                fileOperations.WriteContentToOutputBomFile(formattedString, outputFolderPath, FileConstant.BomFileName, defaultProjectName);
             }
             else
             {
                 string formattedString = CommonHelper.AddSpecificValuesToBOMFormat(listOfComponentsToBom);
-                fileOperations.WriteContentToOutputBomFile(formattedString, outputFolderPath, FileConstant.BomFileName, appSettings.SW360.ProjectName);
+                fileOperations.WriteContentToOutputBomFile(formattedString, outputFolderPath, FileConstant.BomFileName, defaultProjectName);
             }
 
         }       
@@ -175,16 +181,18 @@ namespace LCT.PackageIdentifier
                 {
                     comparisonBOMData = bom.Components,
                     internalComponents = new List<Component>()
-                };
-                
-                //Identification of internal components
-                Logger.Logger.Log(null, Level.Notice, $"Identifying the internal components", null);
-                lstOfComponents = await parser.IdentificationOfInternalComponents(componentData, appSettings, JFrogService, BomHelper);
-                components = lstOfComponents.comparisonBOMData;
-
-                //Setting the artifactory repo info
-                components = await parser.GetJfrogRepoDetailsOfAComponent(components, appSettings, JFrogService, BomHelper);
-                bom.Components = components;
+                };                
+               
+                if (!appSettings.BasicSBOM)
+                { 
+                    //Identification of internal components
+                    Logger.Logger.Log(null, Level.Notice, $"Identifying the internal components", null);
+                    lstOfComponents = await parser.IdentificationOfInternalComponents(componentData, appSettings, JFrogService, BomHelper);
+                    components = lstOfComponents.comparisonBOMData;
+                    //Setting the artifactory repo info
+                    components = await parser.GetJfrogRepoDetailsOfAComponent(components, appSettings, JFrogService, BomHelper);
+                    bom.Components = components;
+                }                
                 bom.Metadata = metadata;
             }
             catch (HttpRequestException ex)
@@ -194,30 +202,35 @@ namespace LCT.PackageIdentifier
             return bom;
         }
 
-        public async Task<bool> CheckJFrogConnection()
+        public async Task<bool> CheckJFrogConnection(CommonAppSettings appSettings)
         {
-            var response = await JFrogService.CheckJFrogConnectivity();
-            if (response != null)
+            if (!appSettings.BasicSBOM)
             {
-                if (response.IsSuccessStatusCode)
+                var response = await JFrogService.CheckJFrogConnectivity();
+                if (response != null)
                 {
-                    Logger.Logger.Log(null, Level.Info, $"JFrog Connection was successfull!!", null);
-                    return true;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        Logger.Logger.Log(null, Level.Info, $"JFrog Connection was successfull!!", null);
+                        return true;
+                    }
+                    else if (response.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        Logger.Logger.Log(null, Level.Error, $"Check the JFrog token validity/permission..", null);
+                    }
+                    else if (response.StatusCode == HttpStatusCode.NotFound)
+                    {
+                        Logger.Logger.Log(null, Level.Error, $"Check the provided JFrog server details..", null);
+                    }
+                    else
+                    {
+                        Logger.Logger.Log(null, Level.Error, $"JFrog Connection was not successfull check the server status.", null);
+                    }
                 }
-                else if (response.StatusCode == HttpStatusCode.Unauthorized)
-                {
-                    Logger.Logger.Log(null, Level.Error, $"Check the JFrog token validity/permission..", null);
-                }
-                else if (response.StatusCode == HttpStatusCode.NotFound)
-                {
-                    Logger.Logger.Log(null, Level.Error, $"Check the provided JFrog server details..", null);
-                }
-                else
-                {
-                    Logger.Logger.Log(null, Level.Error, $"JFrog Connection was not successfull check the server status.", null);
-                }
+                return false;
             }
-            return false;
+            return true;
+
         }
     }
 }

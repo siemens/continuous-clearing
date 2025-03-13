@@ -25,7 +25,7 @@ namespace TestUtilities
         public string JfrogApi { get; set; }
         public string FossologyTrigger { get; set; }
         public string TelemetryEnable { get; set; }
-
+        public string BasicSBOM { get; set; }
         public TestParamAlpine()
         {
             SW360AuthTokenType = s_Config["SW360AuthTokenType"];
@@ -41,6 +41,7 @@ namespace TestUtilities
             RemoveDevDependency = s_Config["RemoveDevDependency"];
             FossologyTrigger = s_Config["EnableFossologyTrigger"];
             TelemetryEnable = s_Config["TelemetryEnable"];
+            BasicSBOM = s_Config["BasicSBOM"];
         }
     }
 }

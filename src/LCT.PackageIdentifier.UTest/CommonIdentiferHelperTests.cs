@@ -8,6 +8,8 @@ using NUnit.Framework;
 using LCT.APICommunications.Model.AQL;
 using System.Collections.Generic;
 using LCT.PackageIdentifier;
+using LCT.Common.Constants;
+using LCT.Common;
 
 namespace LCT.PackageIdentifier.UTest
 {
@@ -65,6 +67,71 @@ namespace LCT.PackageIdentifier.UTest
             };
             var result = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults);
             Assert.AreEqual("generic-repo", result);
+        }
+        [Test]
+        public void GetBomFileName_WhenBasicSBOMIsFalse_ReturnsProjectNameBomFileName()
+        {
+            // Arrange
+            var appSettings = new CommonAppSettings
+            {
+                BasicSBOM = false,
+                SW360=new SW360() { ProjectName= "TestProject" }
+            };
+
+            // Act
+            string result = CommonIdentiferHelper.GetBomFileName(appSettings);
+
+            // Assert
+            Assert.AreEqual("TestProject_Bom.cdx.json", result);
+        }
+
+        [Test]
+        public void GetBomFileName_WhenBasicSBOMIsTrue_ReturnsBasicSBOMNameBomFileName()
+        {
+            // Arrange
+            var appSettings = new CommonAppSettings
+            {
+                BasicSBOM = true
+            };
+
+            // Act
+            string result = CommonIdentiferHelper.GetBomFileName(appSettings);
+
+            // Assert
+            Assert.AreEqual($"{FileConstant.basicSBOMName}_Bom.cdx.json", result);
+        }
+
+        [Test]
+        public void GetDefaultProjectName_WhenBasicSBOMIsFalse_ReturnsProjectName()
+        {
+            // Arrange
+            var appSettings = new CommonAppSettings
+            {
+                BasicSBOM = false,
+                SW360 = new SW360() { ProjectName = "TestProject" }
+            };
+
+            // Act
+            string result = CommonIdentiferHelper.GetDefaultProjectName(appSettings);
+
+            // Assert
+            Assert.AreEqual("TestProject", result);
+        }
+
+        [Test]
+        public void GetDefaultProjectName_WhenBasicSBOMIsTrue_ReturnsBasicSBOMName()
+        {
+            // Arrange
+            var appSettings = new CommonAppSettings
+            {
+                BasicSBOM = true
+            };
+
+            // Act
+            string result = CommonIdentiferHelper.GetDefaultProjectName(appSettings);
+
+            // Assert
+            Assert.AreEqual(FileConstant.basicSBOMName, result);
         }
     }
 }

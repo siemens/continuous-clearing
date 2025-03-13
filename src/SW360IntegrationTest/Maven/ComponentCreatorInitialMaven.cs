@@ -48,6 +48,7 @@ namespace SW360IntegrationTest.Maven
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
                 TestConstant.JfrogMavenInternalRepo,"Maven-test",
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
+                TestConstant.BasicSBOM, testParameters.BasicSBOM,
                 TestConstant.ProjectType,"MAVEN",
                 TestConstant.Mode,""});
             }

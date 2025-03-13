@@ -74,28 +74,16 @@ namespace LCT.PackageIdentifier
                 Logger.Logger.Log(null, Level.Alert, $"Package Identifier is running in TEST mode \n", null);
 
             // Validate application settings
-            await ValidateAppsettingsFile(appSettings, projectReleases);
+            if (!appSettings.BasicSBOM)
+            {
+                await ValidateAppsettingsFile(appSettings, projectReleases);
+            }            
             string listOfInclude = DisplayInformation.DisplayIncludeFiles(appSettings);
             string listOfExclude = DisplayInformation.DisplayExcludeFiles(appSettings);
             string listOfExcludeComponents = DisplayInformation.DisplayExcludeComponents(appSettings);            
             string listOfInternalRepoList = DisplayInformation.GetInternalRepolist(appSettings);
 
-            Logger.Logger.Log(null, Level.Notice, $"Input Parameters used in Package Identifier:\n\t" +
-                $"CaToolVersion\t\t --> {caToolInformation.CatoolVersion}\n\t" +
-                $"CaToolRunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
-                $"PackageFilePath\t\t --> {appSettings.Directory.InputFolder}\n\t" +
-                $"BomFolderPath\t\t --> {appSettings.Directory.OutputFolder}\n\t" +
-                $"SW360Url\t\t --> {appSettings.SW360.URL}\n\t" +
-                $"SW360AuthTokenType\t --> {appSettings.SW360.AuthTokenType}\n\t" +
-                $"SW360ProjectName\t --> {appSettings.SW360.ProjectName}\n\t" +
-                $"SW360ProjectID\t\t --> {appSettings.SW360.ProjectID}\n\t" +
-                $"ProjectType\t\t --> {appSettings.ProjectType}\n\t" +
-                $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t" +
-                $"InternalRepoList\t --> {listOfInternalRepoList}\n\t" +
-                $"Include\t\t\t --> {listOfInclude}\n\t" +
-                $"Exclude\t\t\t --> {listOfExclude}\n\t" +
-                $"ExcludeComponents\t --> {listOfExcludeComponents}\n", null);
-
+            DisplayInformation.LogInputParameters(caToolInformation, appSettings, listOfInternalRepoList, listOfInclude, listOfExclude, listOfExcludeComponents);
 
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);
@@ -106,7 +94,7 @@ namespace LCT.PackageIdentifier
             bomCreator.BomHelper = new BomHelper();
 
             //Validating JFrog Settings
-            if (await bomCreator.CheckJFrogConnection())
+            if (await bomCreator.CheckJFrogConnection(appSettings))
             {
                 await bomCreator.GenerateBom(appSettings, new BomHelper(), new FileOperations(), projectReleases,
                                              caToolInformation);
@@ -136,10 +124,10 @@ namespace LCT.PackageIdentifier
         {
             ArtifactoryCredentials artifactoryUpload = new ArtifactoryCredentials()
             {
-                Token = appSettings.Jfrog.Token,
+                Token = appSettings?.Jfrog?.Token,
             };
             IJfrogAqlApiCommunication jfrogAqlApiCommunication =
-                new JfrogAqlApiCommunication(appSettings.Jfrog.URL, artifactoryUpload, appSettings.TimeOut);
+                new JfrogAqlApiCommunication(appSettings?.Jfrog?.URL, artifactoryUpload, appSettings.TimeOut);
             IJfrogAqlApiCommunicationFacade jFrogApiCommunicationFacade =
                 new JfrogAqlApiCommunicationFacade(jfrogAqlApiCommunication);
             IJFrogService jFrogService = new JFrogService(jFrogApiCommunicationFacade);
