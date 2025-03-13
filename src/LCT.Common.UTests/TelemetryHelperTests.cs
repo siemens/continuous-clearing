@@ -32,14 +32,7 @@ namespace LCT.Common.UTest
 
             // Initialize your telemetry service (this will be the class under test)
             telemetryHelper = new TelemetryHelper(appSettings);
-        }
-        [TearDown]
-        public void TearDown()
-        {
-            consoleOutput.Dispose();
-            Console.SetOut(new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true });
-
-        }
+        }        
         [Test]
         public void StartTelemetry_ShouldInitializeAndTrackEvent_WhenTelemetryIsEnabled()
         {
