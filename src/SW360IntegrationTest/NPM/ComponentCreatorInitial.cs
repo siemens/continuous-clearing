@@ -47,7 +47,6 @@ namespace SW360IntegrationTest.NPM
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
                 TestConstant.JfrogNpmInternalRepo,"Npm-test",
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
-                TestConstant.BasicSBOM, testParameters.BasicSBOM,
                 TestConstant.ProjectType, "NPM",
                 TestConstant.Mode,""});
             }

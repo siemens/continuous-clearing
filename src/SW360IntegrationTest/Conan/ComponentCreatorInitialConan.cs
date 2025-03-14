@@ -38,7 +38,6 @@ namespace SW360IntegrationTest.Conan
                 TestConstant.JfrogConanInternalRepo,"Conan-test",
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
-                TestConstant.BasicSBOM, testParameters.BasicSBOM,
                 TestConstant.ProjectType, "CONAN",
                 TestConstant.Mode,""
                 });

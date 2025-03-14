@@ -53,7 +53,6 @@ namespace SW360IntegrationTest.NPM
                 TestConstant.JfrogNpmInternalRepo,"Npm-test",
                 TestConstant.ProjectType, "Npm",
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
-                TestConstant.BasicSBOM, testParameters.BasicSBOM,
                  TestConstant.Mode,""}),
                 "Test to run Package Identifier EXE execution");
         }

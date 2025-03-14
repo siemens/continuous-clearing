@@ -30,8 +30,7 @@ namespace TestUtilities
         public string InternalDestinationRepoName { get; set; }
         public string DevDestinationRepoName { get; set; }
         public string FossologyTrigger { get; set; }
-        public string TelemetryEnable { get; set; }
-        public string BasicSBOM { get; set; }
+        public string TelemetryEnable { get; set; }        
         public string BasicSBOMEnable { get; set; }
 
         public TestParam()
@@ -51,8 +50,7 @@ namespace TestUtilities
             InternalDestinationRepoName = "npm-test";
             DevDestinationRepoName = "npm-test";
             FossologyTrigger = s_Config["EnableFossologyTrigger"];
-            TelemetryEnable = s_Config["TelemetryEnable"];
-            BasicSBOM = s_Config["BasicSBOM"];
+            TelemetryEnable = s_Config["TelemetryEnable"];           
             BasicSBOMEnable = s_Config["BasicSBOMEnable"];
         }
     }

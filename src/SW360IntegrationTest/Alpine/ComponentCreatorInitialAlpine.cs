@@ -47,7 +47,6 @@ namespace SW360IntegrationTest.Alpine
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
-                TestConstant.BasicSBOM, testParameters.BasicSBOM,
                 TestConstant.ProjectType,"ALPINE",
                 TestConstant.Mode,""});
             }
