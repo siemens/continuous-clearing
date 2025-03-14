@@ -1,0 +1,84 @@
+﻿using NUnit.Framework;
+using TestUtilities;
+using System.IO;
+using CycloneDX.Models;
+
+namespace SW360IntegrationTest.Alpine
+{
+    [TestFixture, Order(29)]
+    public class PackageIdentifierBasicSBOMAlpine
+    {
+        private string CCTLocalBomTestFile { get; set; }
+        private string OutFolder { get; set; }
+        TestParamAlpine testParameters;
+
+        [SetUp]
+        public void Setup()
+        {
+            OutFolder = TestHelper.OutFolder;
+
+            CCTLocalBomTestFile = OutFolder + @"..\..\..\src\SW360IntegrationTest\PackageIdentifierTestFiles\Alpine\CCTLocalBOMAlpineInitial.json";
+
+            if (!Directory.Exists(OutFolder + @"\..\BOMs"))
+            {
+                Directory.CreateDirectory(OutFolder + @"\..\BOMs");
+            }
+            testParameters = new TestParamAlpine();
+        }
+
+        [Test, Order(1)]
+        public void RunBOMCreatorexe_ProvidedPackageJsonFilePath_ReturnsSuccess()
+        {
+            string packagejsonPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest1stIterationData\Alpine";
+            string bomPath = OutFolder + @"\..\BOMs";
+
+            // Test BOM Creator ran with exit code 0
+            Assert.AreEqual(0, TestHelper.RunBOMCreatorExe(new string[]{
+                TestConstant.PackageFilePath, packagejsonPath,
+                TestConstant.BomFolderPath, bomPath,
+                TestConstant.BasicSBOM, testParameters.BasicSBOMEnable,
+                TestConstant.ProjectType,"ALPINE",
+                TestConstant.Mode,""}),
+                "Test to run Package Identifier EXE execution");
+        }
+
+        [Test, Order(2)]
+        public void LocalBOMCreation_AfterSuccessfulExeRun_ReturnsSuccess()
+        {
+            bool fileExist = false;
+
+            // Expected
+            ComponentJsonParsor expected = new ComponentJsonParsor();
+            expected.Read(CCTLocalBomTestFile);
+
+            // Actual
+            string generatedBOM = OutFolder + $"\\..\\BOMs\\CycloneDX_Bom.cdx.json";
+            if (File.Exists(generatedBOM))
+            {
+                fileExist = true;
+
+                ComponentJsonParsor actual = new ComponentJsonParsor();
+                actual.Read(generatedBOM);
+
+                foreach (var item in expected.Components)
+                {
+
+                    foreach (var i in actual.Components)
+                    {
+                        if ((i.Name == item.Name) && (i.Version == item.Version))
+                        {
+                            Component component = i;
+                            Assert.AreEqual(item.Name, component.Name);
+                            Assert.AreEqual(item.Version, component.Version);
+                            Assert.AreEqual(item.Purl, component.Purl);
+                            Assert.AreEqual(item.BomRef, component.BomRef);
+                        }
+                    }
+
+                }
+            }
+
+            Assert.IsTrue(fileExist, "Test to BOM file present");
+        }
+    }
+}

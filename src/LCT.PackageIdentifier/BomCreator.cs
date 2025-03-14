@@ -75,7 +75,10 @@ namespace LCT.PackageIdentifier
             Logger.Logger.Log(null, Level.Notice, $"Writing CycloneDX BOM..", null);
             WritecontentsToBOM(appSettings, bomKpiData, listOfComponentsToBom, defaultProjectName);
             Logger.Logger.Log(null, Level.Notice, $"Writing CycloneDX BOM completed", null);
-
+            if (appSettings.BasicSBOM)
+            {
+                Logger.Logger.Log(null, Level.Warn, $"Basic SBOM generated.", null);
+            }
             // Writes Kpi data 
             Program.BomStopWatch?.Stop();
             bomKpiData.TimeTakenByBomCreator = Program.BomStopWatch == null ? 0 :

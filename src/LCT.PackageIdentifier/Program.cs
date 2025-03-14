@@ -100,15 +100,11 @@ namespace LCT.PackageIdentifier
                                              caToolInformation);
             }
 
-            if (appSettings.Telemetry.Enable == true)
+            if (appSettings?.Telemetry?.Enable == true)
             {
                 TelemetryHelper telemetryHelper = new TelemetryHelper(appSettings);
                 telemetryHelper.StartTelemetry(caToolInformation.CatoolVersion, BomCreator.bomKpiData, TelemetryConstant.IdentifierKpiData);
-            }
-            if (appSettings.BasicSBOM)
-            {
-                Logger.Logger.Log(null, Level.Warn, $"Basic SBOM generated.\n", null);
-            }
+            }            
             Logger.Logger.Log(null, Level.Notice, $"End of Package Identifier execution : {DateTime.Now}\n", null);
             // publish logs and bom file to pipeline artifact
             PipelineArtifactUploader.UploadArtifacts();
