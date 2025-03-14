@@ -19,6 +19,11 @@
 		<UseCommonOutputDirectory>true</UseCommonOutputDirectory>
 	</PropertyGroup>
 
+  <PropertyGroup>
+  		<SonarQubeTestProject>false</SonarQubeTestProject>
+	</PropertyGroup>
+
+
 	<ItemGroup>
 		<Compile Remove="PackageIdentifierUTTestFiles\obj\**" />
 		<EmbeddedResource Remove="PackageIdentifierUTTestFiles\obj\**" />
