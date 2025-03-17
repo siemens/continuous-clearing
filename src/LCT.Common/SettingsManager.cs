@@ -45,6 +45,12 @@ namespace LCT.Common
                 CommonHelper.PublishFilesToArtifact();
                 Environment.Exit(0);
             }
+
+            for (int i = 0; i < args.Length; i++)
+            {
+                Console.WriteLine($"##[command]ReadConfiguration(): Arg[{i}]: {args[i]}");
+            }
+            
             string settingsFilePath = GetConfigFilePathFromArgs(args, jsonSettingsFileName);
             Logger.Logger.Log(null, Level.Notice, $"Settings File: {settingsFilePath}", null);
 
