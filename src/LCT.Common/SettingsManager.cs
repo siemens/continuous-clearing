@@ -42,7 +42,7 @@ namespace LCT.Common
             if (args?.Length == 0)
             {
                 Logger.Debug($"Argument Count : {args.Length}");
-                DisplayHelp();                
+                DisplayHelp();
                 environmentHelper.CallEnvironmentExit(0);
             }
             string settingsFilePath = GetConfigFilePathFromArgs(args, jsonSettingsFileName);
@@ -121,23 +121,29 @@ namespace LCT.Common
             {
                 //Required parameters to run Package Identifier
                 List<string> identifierReqParameters = new List<string>()
-                {                    
+                {
                     "Directory.InputFolder",
                     "Directory.OutputFolder",
                     "ProjectType"
                 };
-                if (!appSettings.BasicSBOM)
+
+                if (appSettings.SW360 != null)
                 {
                     identifierReqParameters.Add($"SW360.ProjectID");
                     identifierReqParameters.Add($"SW360.Token");
-                    identifierReqParameters.Add($"Jfrog.Token");
                     identifierReqParameters.Add($"SW360.URL");
+                }
+                if (appSettings.Jfrog != null)
+                {
+                    identifierReqParameters.Add($"Jfrog.Token");
                     identifierReqParameters.Add($"Jfrog.URL");
                 }
+
+
                 //Check if ProjectType contains a value and add InternalRepos key accordingly
                 if (!string.IsNullOrWhiteSpace(appSettings.ProjectType))
                 {
-                    if (!appSettings.BasicSBOM && !appSettings.ProjectType.Equals("ALPINE", StringComparison.InvariantCultureIgnoreCase))
+                    if (appSettings.Jfrog != null && !appSettings.ProjectType.Equals("ALPINE", StringComparison.InvariantCultureIgnoreCase))
                     {
                         identifierReqParameters.Add($"{appSettings.ProjectType}.Artifactory.InternalRepos");
                     }
@@ -215,7 +221,7 @@ namespace LCT.Common
             }
 
             if (!string.IsNullOrWhiteSpace(missingParameters.ToString()))
-            {                
+            {
                 ExceptionHandling.ArgumentException(missingParameters.ToString());
                 environmentHelper.CallEnvironmentExit(-1);
             }

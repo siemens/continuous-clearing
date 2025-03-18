@@ -73,8 +73,7 @@ namespace LCT.PackageIdentifier.UTest
         {
             // Arrange
             var appSettings = new CommonAppSettings
-            {
-                BasicSBOM = false,
+            {                
                 SW360=new SW360() { ProjectName= "TestProject" }
             };
 
@@ -91,14 +90,14 @@ namespace LCT.PackageIdentifier.UTest
             // Arrange
             var appSettings = new CommonAppSettings
             {
-                BasicSBOM = true
+                
             };
 
             // Act
             string result = CommonIdentiferHelper.GetBomFileName(appSettings);
 
             // Assert
-            Assert.AreEqual($"{FileConstant.basicSBOMName}_Bom.cdx.json", result);
+            Assert.AreEqual(FileConstant.basicSBOMName, result);
         }
 
         [Test]
@@ -106,8 +105,7 @@ namespace LCT.PackageIdentifier.UTest
         {
             // Arrange
             var appSettings = new CommonAppSettings
-            {
-                BasicSBOM = false,
+            {                
                 SW360 = new SW360() { ProjectName = "TestProject" }
             };
 
@@ -123,8 +121,7 @@ namespace LCT.PackageIdentifier.UTest
         {
             // Arrange
             var appSettings = new CommonAppSettings
-            {
-                BasicSBOM = true
+            {                
             };
 
             // Act

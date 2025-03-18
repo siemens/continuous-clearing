@@ -94,6 +94,7 @@ Currently LTA support is not provided for SBOM, hence until that is implemented 
 
    - [NPM/NUGET/MAVEN/PYTHON/CONAN](../usagedocimg/packageIdentifiernpmnuget.PNG)
    - [Debian/Alpine](../usagedocimg/packageIdentifierdebianalpine.PNG)
+   - [BasicSBOM](../usagedocimg/PackageIdentifierBasicSBOM.png)
 - SW360 Package Creator
   - [NPM/NUGET/MAVEN/PYTHON/CONAN](../usagedocimg/packageCreatirnpmnuget.PNG)
   - [Debian](../usagedocimg/packagecreatordebian.PNG)
@@ -162,6 +163,8 @@ Currently LTA support is not provided for SBOM, hence until that is implemented 
    > **1. Package Identifier**
       - Processes the input file and generates CycloneDX BOM file. The input file can be package file or a cycloneDx BOM file generated using the standard tool. If there are multiple input files, it can be processed by just passing the path to the directory in the argument
 
+      **Functionality Without Connections:**
+      Ensure that when connections to SW360 and JFrog are not available, the tool generates a basic SBOM accurately, maintaining the core functionalities.      
 
    >**2. SW360 Package Creator**
       - Process the SBOM file(i.e., output of the first dll) and creates the missing components/releases in SW360 and links all the components to the project in the SW360 portal. This exe also triggers the upload of the components to Fossology and automatically updates the clearing state in SW360.

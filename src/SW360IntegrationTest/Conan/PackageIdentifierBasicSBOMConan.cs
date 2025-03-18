@@ -30,12 +30,12 @@ namespace SW360IntegrationTest.Conan
         {
             string packagejsonPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest1stIterationData\Conan";
             string bomPath = OutFolder + @"\..\BOMs";
-
+            string appsettingsFilePath = @"BasicSBOMAppsettingsTest.json";
             // Test BOM Creator ran with exit code 0
             Assert.AreEqual(0, TestHelper.RunBOMCreatorExe(new string[]{
                 TestConstant.PackageFilePath, packagejsonPath,
                 TestConstant.BomFolderPath, bomPath,
-                TestConstant.BasicSBOM, testParameters.BasicSBOMEnable,
+                TestConstant.Appsettings,appsettingsFilePath,
                 TestConstant.ProjectType,"Conan",
                 TestConstant.Mode,""}),
                 "Test to run  Package Identifier EXE execution");

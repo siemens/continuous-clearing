@@ -37,11 +37,12 @@ namespace LCT.PackageIdentifier
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static readonly BomKpiData bomKpiData = new();
         ComponentIdentification componentData;
-        private readonly ICycloneDXBomParser CycloneDXBomParser;
-        public static bool BasicSBOM { get; set; }
+        private readonly ICycloneDXBomParser CycloneDXBomParser;        
         public IJFrogService JFrogService { get; set; }
         public IBomHelper BomHelper { get; set; }
 
+        public static Jfrog jfrog { get; set; } = new Jfrog();
+        public static SW360 sw360 { get; set; } = new SW360();
         public BomCreator(ICycloneDXBomParser cycloneDXBomParser)
         {
             CycloneDXBomParser = cycloneDXBomParser;
@@ -54,8 +55,9 @@ namespace LCT.PackageIdentifier
                                        CatoolInfo caToolInformation)
         {
             Logger.Debug($"GenerateBom():Start");
-            Bom listOfComponentsToBom;
-            BasicSBOM=appSettings.BasicSBOM;
+            Bom listOfComponentsToBom;            
+            jfrog = appSettings.Jfrog;
+            sw360 = appSettings.SW360;
             // Calls package parser
             listOfComponentsToBom = await CallPackageParser(appSettings);
             Logger.Logger.Log(null, Level.Notice, $"No of components added to BOM after removing bundled & excluded components " +
@@ -70,42 +72,42 @@ namespace LCT.PackageIdentifier
                                                                                    projectReleases,
                                                                                    caToolInformation);
 
-            string defaultProjectName=CommonIdentiferHelper.GetDefaultProjectName(appSettings);
+            string defaultProjectName = CommonIdentiferHelper.GetDefaultProjectName(appSettings);
             // Writes Comparison Bom
             Logger.Logger.Log(null, Level.Notice, $"Writing CycloneDX BOM..", null);
             WritecontentsToBOM(appSettings, bomKpiData, listOfComponentsToBom, defaultProjectName);
             Logger.Logger.Log(null, Level.Notice, $"Writing CycloneDX BOM completed", null);
-            if (appSettings.BasicSBOM)
-            {
-                Logger.Logger.Log(null, Level.Warn, $"Basic SBOM generated.", null);
-            }
+            
+            // Log warnings based on appSettings
+            DisplayInformation.LogBomGenerationWarnings(appSettings);
+            
             // Writes Kpi data 
             Program.BomStopWatch?.Stop();
             bomKpiData.TimeTakenByBomCreator = Program.BomStopWatch == null ? 0 :
               TimeSpan.FromMilliseconds(Program.BomStopWatch.ElapsedMilliseconds).TotalSeconds;
             fileOperations.WriteContentToFile(bomKpiData, appSettings.Directory.OutputFolder,
                 FileConstant.BomKpiDataFileName, defaultProjectName);
-            if (!appSettings.BasicSBOM)
+            if (appSettings.SW360 != null)
             {
                 // Writes Project Summary Url on CLI
                 string projectURL = bomHelper.GetProjectSummaryLink(appSettings.SW360.ProjectID, appSettings.SW360.URL);
                 bomKpiData.ProjectSummaryLink = $"Link to the summary page of the configured project:{appSettings.SW360.ProjectName} => {projectURL}\n";
-            }           
+            }
 
             // Writes kpi info to console table
             bomKpiData.InternalComponents = componentData.internalComponents != null ? componentData.internalComponents.Count : 0;
             bomHelper.WriteBomKpiDataToConsole(bomKpiData);
 
-            if (!appSettings.BasicSBOM)
+            if (appSettings.Jfrog != null)
             {
                 //Writes internal component ist to kpi
                 bomHelper.WriteInternalComponentsListToKpi(componentData.internalComponents);
             }
-            
+
             Logger.Debug($"GenerateBom():End");
         }
 
-        private static void WritecontentsToBOM(CommonAppSettings appSettings, BomKpiData bomKpiData, Bom listOfComponentsToBom,string defaultProjectName)
+        private static void WritecontentsToBOM(CommonAppSettings appSettings, BomKpiData bomKpiData, Bom listOfComponentsToBom, string defaultProjectName)
         {
             WriteContentToCycloneDxBOM(appSettings, listOfComponentsToBom, ref bomKpiData, defaultProjectName);
         }
@@ -113,12 +115,12 @@ namespace LCT.PackageIdentifier
         private static void WriteContentToCycloneDxBOM(CommonAppSettings appSettings, Bom listOfComponentsToBom, ref BomKpiData bomKpiData, string defaultProjectName)
         {
             IFileOperations fileOperations = new FileOperations();
-            string bomFileName=CommonIdentiferHelper.GetBomFileName(appSettings);
-                        
+            string bomFileName = CommonIdentiferHelper.GetBomFileName(appSettings);
+
             string outputFolderPath = appSettings.Directory.OutputFolder;
             string[] files = Directory.GetFiles(outputFolderPath);
 
-            bool fileExists = files.Length > 0 && files.Any(file => Path.GetFileName(file).Equals(bomFileName, StringComparison.OrdinalIgnoreCase));                        
+            bool fileExists = files.Length > 0 && files.Any(file => Path.GetFileName(file).Equals(bomFileName, StringComparison.OrdinalIgnoreCase));
             if (fileExists && appSettings.MultipleProjectType)
             {
                 string existingFilePath = files.FirstOrDefault(file => Path.GetFileName(file).Equals(bomFileName, StringComparison.OrdinalIgnoreCase));
@@ -133,7 +135,7 @@ namespace LCT.PackageIdentifier
                 fileOperations.WriteContentToOutputBomFile(formattedString, outputFolderPath, FileConstant.BomFileName, defaultProjectName);
             }
 
-        }       
+        }
 
         private async Task<Bom> CallPackageParser(CommonAppSettings appSettings)
         {
@@ -184,10 +186,10 @@ namespace LCT.PackageIdentifier
                 {
                     comparisonBOMData = bom.Components,
                     internalComponents = new List<Component>()
-                };                
-               
-                if (!appSettings.BasicSBOM)
-                { 
+                };
+
+                if (appSettings.Jfrog != null)
+                {
                     //Identification of internal components
                     Logger.Logger.Log(null, Level.Notice, $"Identifying the internal components", null);
                     lstOfComponents = await parser.IdentificationOfInternalComponents(componentData, appSettings, JFrogService, BomHelper);
@@ -195,8 +197,20 @@ namespace LCT.PackageIdentifier
                     //Setting the artifactory repo info
                     components = await parser.GetJfrogRepoDetailsOfAComponent(components, appSettings, JFrogService, BomHelper);
                     bom.Components = components;
-                }                
+                }
                 bom.Metadata = metadata;
+                if (appSettings.Jfrog==null)
+                {
+                    Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
+                    foreach (var component in bom.Components)
+                    {                        
+                        bool propertyExists = component.Properties.Any(p => p.Name == Dataconstant.Cdx_ProjectType);
+                        if (!propertyExists)
+                        {
+                            component.Properties.Add(projectType);
+                        }
+                    }
+                }
             }
             catch (HttpRequestException ex)
             {
@@ -207,7 +221,7 @@ namespace LCT.PackageIdentifier
 
         public async Task<bool> CheckJFrogConnection(CommonAppSettings appSettings)
         {
-            if (!appSettings.BasicSBOM)
+            if (appSettings.Jfrog != null)
             {
                 var response = await JFrogService.CheckJFrogConnectivity();
                 if (response != null)

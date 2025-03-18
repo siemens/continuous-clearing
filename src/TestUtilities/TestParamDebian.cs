@@ -25,7 +25,6 @@ namespace TestUtilities
         public string JfrogApi { get; set; }
         public string FossologyTrigger { get; set; }
         public string TelemetryEnable { get; set; }
-        public string BasicSBOMEnable { get; set; }
 
         public TestParamDebian()
         {
@@ -42,7 +41,6 @@ namespace TestUtilities
             RemoveDevDependency = s_Config["RemoveDevDependency"];
             FossologyTrigger = s_Config["EnableFossologyTrigger"];
             TelemetryEnable = s_Config["TelemetryEnable"];
-            BasicSBOMEnable = s_Config["BasicSBOMEnable"];
         }
     }
 }

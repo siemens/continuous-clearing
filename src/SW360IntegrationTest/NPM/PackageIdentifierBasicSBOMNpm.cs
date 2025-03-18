@@ -30,13 +30,13 @@ namespace SW360IntegrationTest.NPM
         {
             string packagjsonPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest1stIterationData\Npm";
             string bomPath = OutFolder + @"\..\BOMs";
-
+            string appsettingsFilePath = @"BasicSBOMAppsettingsTest.json";
             // Test BOM Creator ran with exit code 0
             Assert.AreEqual(0, TestHelper.RunBOMCreatorExe(new string[]{
                 TestConstant.PackageFilePath, packagjsonPath,
                 TestConstant.BomFolderPath, bomPath,                
                 TestConstant.ProjectType, "Npm",
-                TestConstant.BasicSBOM, testParameters.BasicSBOMEnable,
+                TestConstant.Appsettings,appsettingsFilePath,
                  TestConstant.Mode,""}),
                 "Test to run Package Identifier EXE execution");
         }

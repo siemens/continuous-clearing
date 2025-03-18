@@ -42,13 +42,13 @@ namespace LCT.PackageIdentifier
         public static string GetBomFileName(CommonAppSettings appSettings)
         {
             string bomFileName;
-            if (!appSettings.BasicSBOM)
+            if (appSettings.SW360!=null)
             {
                 bomFileName = $"{appSettings.SW360.ProjectName}_Bom.cdx.json";
             }
             else
             {
-                bomFileName = $"{FileConstant.basicSBOMName}_Bom.cdx.json";
+                bomFileName = FileConstant.basicSBOMName;
             }
 
             return bomFileName;
@@ -56,7 +56,7 @@ namespace LCT.PackageIdentifier
         public static string GetDefaultProjectName(CommonAppSettings appSettings)
         {
             string projectName;
-            if (!appSettings.BasicSBOM)
+            if (appSettings.SW360 != null)
             {
                 projectName = appSettings.SW360.ProjectName;
             }

@@ -24,8 +24,7 @@ namespace TestUtilities
         public string ArtifactoryUploadApiKey { get; set; }
         public string JfrogApi { get; set; }
         public string FossologyTrigger { get; set; }
-        public string TelemetryEnable { get; set; }        
-        public string BasicSBOMEnable { get; set; }
+        public string TelemetryEnable { get; set; }
         public TestParamAlpine()
         {
             SW360AuthTokenType = s_Config["SW360AuthTokenType"];
@@ -41,7 +40,6 @@ namespace TestUtilities
             RemoveDevDependency = s_Config["RemoveDevDependency"];
             FossologyTrigger = s_Config["EnableFossologyTrigger"];
             TelemetryEnable = s_Config["TelemetryEnable"];
-            BasicSBOMEnable = s_Config["BasicSBOMEnable"];
         }
     }
 }

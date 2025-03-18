@@ -5,36 +5,18 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 {
-  "TimeOut": 400,  
+  "TimeOut": 400,
   "ProjectType": "<Insert ProjectType>",
   "MultipleProjectType": false,
   "Telemetry": {
     "Enable": false,
     "ApplicationInsightInstrumentKey": "" //From Application Insight to enable Telemetry
   },
-  "SW360": {
-    "URL": "<Insert SW360URL>",
-    "ProjectName": "<Insert SW360 Project Name>",
-    "ProjectID": "<Insert SW360 Project Id>",
-    "AuthTokenType": "<Insert SW360TokenType>",
-    "Token": "<Insert SW360Token>",
-    "Fossology": {
-      "URL": "<Insert FossologyURL>",
-      "EnableTrigger": true
-    },
-    "IgnoreDevDependency": true,
-    //Examples pkg:npm/foobar@12.3.1 or foobar:12.3.1,foobar:12.*,foobar:*
-    "ExcludeComponents": []
-  },
+  
   "Directory": {
     "InputFolder": "/PathToInputDirectory", //Input File path. For Docker run set as /mnt/Input
     "OutputFolder": "/PathToOutputDirectory" //Output Bom Folder path. For Docker run set as /mnt/Output    
-  },
-  "Jfrog": {
-    "URL": "<Insert JFrogURL>",
-    "Token": "<Insert Artifactory Token>",
-    "DryRun": false
-  },
+  }, 
   "Npm": {
     "Include": [
       "p*-lock.json",

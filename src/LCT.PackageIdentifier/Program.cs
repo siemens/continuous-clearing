@@ -42,7 +42,7 @@ namespace LCT.PackageIdentifier
 
         public static Stopwatch BomStopWatch { get; set; }
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private static IEnvironmentHelper environmentHelper =new EnvironmentHelper();
+        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
         protected Program() { }
 
         static async Task Main(string[] args)
@@ -59,7 +59,7 @@ namespace LCT.PackageIdentifier
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
             string FolderPath = LogFolderInitialisation(appSettings);
-            
+
             settingsManager.CheckRequiredArgsToRun(appSettings, "Identifer");
 
             Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Package Identifier >>>>>====================", null);
@@ -74,13 +74,13 @@ namespace LCT.PackageIdentifier
                 Logger.Logger.Log(null, Level.Alert, $"Package Identifier is running in TEST mode \n", null);
 
             // Validate application settings
-            if (!appSettings.BasicSBOM)
+            if (appSettings.SW360 != null)
             {
                 await ValidateAppsettingsFile(appSettings, projectReleases);
-            }            
+            }
             string listOfInclude = DisplayInformation.DisplayIncludeFiles(appSettings);
             string listOfExclude = DisplayInformation.DisplayExcludeFiles(appSettings);
-            string listOfExcludeComponents = DisplayInformation.DisplayExcludeComponents(appSettings);            
+            string listOfExcludeComponents = DisplayInformation.DisplayExcludeComponents(appSettings);
             string listOfInternalRepoList = DisplayInformation.GetInternalRepolist(appSettings);
 
             DisplayInformation.LogInputParameters(caToolInformation, appSettings, listOfInternalRepoList, listOfInclude, listOfExclude, listOfExcludeComponents);
@@ -104,7 +104,7 @@ namespace LCT.PackageIdentifier
             {
                 TelemetryHelper telemetryHelper = new TelemetryHelper(appSettings);
                 telemetryHelper.StartTelemetry(caToolInformation.CatoolVersion, BomCreator.bomKpiData, TelemetryConstant.IdentifierKpiData);
-            }            
+            }
             Logger.Logger.Log(null, Level.Notice, $"End of Package Identifier execution : {DateTime.Now}\n", null);
             // publish logs and bom file to pipeline artifact
             PipelineArtifactUploader.UploadArtifacts();
@@ -150,7 +150,7 @@ namespace LCT.PackageIdentifier
             {
                 environmentHelper.CallEnvironmentExit(-1);
             }
-        }       
+        }
 
         private static string LogFolderInitialisation(CommonAppSettings appSettings)
         {

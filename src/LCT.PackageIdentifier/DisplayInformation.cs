@@ -122,22 +122,42 @@ namespace LCT.PackageIdentifier
                 $"PackageFilePath\t\t --> {appSettings.Directory.InputFolder}\n\t" +
                 $"BomFolderPath\t\t --> {appSettings.Directory.OutputFolder}\n\t";
 
-            if (!appSettings.BasicSBOM)
-            {
+                if (appSettings.SW360 != null)
+                {
                 logMessage += $"SW360Url\t\t --> {appSettings.SW360.URL}\n\t" +
-                              $"SW360AuthTokenType\t --> {appSettings.SW360.AuthTokenType}\n\t" +
-                              $"SW360ProjectName\t --> {appSettings.SW360.ProjectName}\n\t" +
-                              $"SW360ProjectID\t\t --> {appSettings.SW360.ProjectID}\n\t" +
-                              $"InternalRepoList\t --> {listOfInternalRepoList}\n\t";
-            }
+                          $"SW360AuthTokenType\t --> {appSettings.SW360.AuthTokenType}\n\t" +
+                          $"SW360ProjectName\t --> {appSettings.SW360.ProjectName}\n\t" +
+                          $"SW360ProjectID\t\t --> {appSettings.SW360.ProjectID}\n\t" +
+                          $"ExcludeComponents\t --> {listOfExcludeComponents}\n\t";
+                }
+                if (appSettings.Jfrog != null)
+                {
+                    logMessage += $"InternalRepoList\t --> {listOfInternalRepoList}\n\t";
+                }
+
 
             logMessage += $"ProjectType\t\t --> {appSettings.ProjectType}\n\t" +
-                          $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t" +                          
+                          $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t" +
                           $"Include\t\t\t --> {listOfInclude}\n\t" +
-                          $"Exclude\t\t\t --> {listOfExclude}\n\t" +
-                          $"ExcludeComponents\t --> {listOfExcludeComponents}\n";
+                          $"Exclude\t\t\t --> {listOfExclude}\n";
+                          
 
             Logger.Logger.Log(null, Level.Notice, logMessage, null);
+        }
+        public static void LogBomGenerationWarnings(CommonAppSettings appSettings)
+        {
+            if (appSettings.SW360 == null && appSettings.Jfrog == null)
+            {
+                Logger.Logger.Log(null, Level.Warn, $"CycloneDX Bom file generated without using SW360 and Jfrog details.", null);
+            }
+            else if (appSettings.SW360 == null)
+            {
+                Logger.Logger.Log(null, Level.Warn, $"CycloneDX Bom file generated without using SW360 details.", null);
+            }
+            else if (appSettings.Jfrog == null)
+            {
+                Logger.Logger.Log(null, Level.Warn, $"CycloneDX Bom file generated without using Jfrog details.", null);
+            }
         }
     }
 }

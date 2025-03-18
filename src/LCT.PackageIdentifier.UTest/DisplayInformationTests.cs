@@ -8,6 +8,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace LCT.PackageIdentifier.UTest
 {
@@ -38,8 +39,7 @@ namespace LCT.PackageIdentifier.UTest
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                ProjectType = "NPM",
-                BasicSBOM = false,
+                ProjectType = "NPM",                
                 SW360 = new SW360()
                 {
                     URL = "http://sw360.url",
@@ -76,12 +76,11 @@ namespace LCT.PackageIdentifier.UTest
                 $"SW360AuthTokenType\t --> {appSettings.SW360.AuthTokenType}\n\t" +
                 $"SW360ProjectName\t --> {appSettings.SW360.ProjectName}\n\t" +
                 $"SW360ProjectID\t\t --> {appSettings.SW360.ProjectID}\n\t" +
-                $"InternalRepoList\t --> {listOfInternalRepoList}\n\t" +
+                $"ExcludeComponents\t --> {listOfExcludeComponents}\n\t" +
                 $"ProjectType\t\t --> {appSettings.ProjectType}\n\t" +
                 $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t" +
                 $"Include\t\t\t --> {listOfInclude}\n\t" +
-                $"Exclude\t\t\t --> {listOfExclude}\n\t" +
-                $"ExcludeComponents\t --> {listOfExcludeComponents}\n";
+                $"Exclude\t\t\t --> {listOfExclude}\n";
 
             var logEvents = memoryAppender.GetEvents();
             Assert.IsNotEmpty(logEvents);
@@ -103,16 +102,56 @@ namespace LCT.PackageIdentifier.UTest
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
                 ProjectType = "NPM",
-                BasicSBOM = true,
-                SW360 = new SW360()
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
                 {
-                    URL = "http://sw360.url",
-                    AuthTokenType = "Bearer",
-                    ProjectName = "ProjectName",
-                    ProjectID = "ProjectID",
-                    ExcludeComponents = new List<string> { "component1", "component2" }
-                },
+                    InputFolder = OutFolder + @"\PackageIdentifierUTTestFiles",
+                    OutputFolder = OutFolder + @"\PackageIdentifierUTTestFiles"
+                }
+                
+            };
+            caToolInformation = new CatoolInfo
+            {
+                CatoolVersion = "1.0.0",
+                CatoolRunningLocation = "runningLocation"
+            };
 
+            memoryAppender = new MemoryAppender();
+            BasicConfigurator.Configure(memoryAppender);
+            // Act
+            DisplayInformation.LogInputParameters(caToolInformation, appSettings, listOfInternalRepoList, listOfInclude, listOfExclude, listOfExcludeComponents);
+
+            // Assert
+            string expectedLogMessage = $"Input Parameters used in Package Identifier:\n\t" +
+                $"CaToolVersion\t\t --> {caToolInformation.CatoolVersion}\n\t" +
+                $"CaToolRunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
+                $"PackageFilePath\t\t --> {appSettings.Directory.InputFolder}\n\t" +
+                $"BomFolderPath\t\t --> {appSettings.Directory.OutputFolder}\n\t" +
+                $"ProjectType\t\t --> {appSettings.ProjectType}\n\t" +
+                $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t" +
+                $"Include\t\t\t --> {listOfInclude}\n\t" +
+                $"Exclude\t\t\t --> {listOfExclude}\n";
+
+            var logEvents = memoryAppender.GetEvents();
+            Assert.IsNotEmpty(logEvents);
+            var actualLogMessage = logEvents[0].RenderedMessage;
+            Assert.AreEqual(expectedLogMessage, actualLogMessage);
+        }
+        [Test]
+        public void LogInputParameters_ShouldLogCorrectMessage_WhenJfrogIsTrue()
+        {
+            // Arrange            
+            string listOfInternalRepoList = "repo1,repo2";
+            string listOfInclude = "include1,include2";
+            string listOfExclude = "exclude1,exclude2";
+            string listOfExcludeComponents = "component1,component2";
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string OutFolder = Path.GetDirectoryName(exePath);
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            {
+                ProjectType = "NPM",
+                Jfrog = new Jfrog(),
                 Directory = new LCT.Common.Directory(folderAction, fileOperations)
                 {
                     InputFolder = OutFolder + @"\PackageIdentifierUTTestFiles",
@@ -136,11 +175,11 @@ namespace LCT.PackageIdentifier.UTest
                 $"CaToolRunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
                 $"PackageFilePath\t\t --> {appSettings.Directory.InputFolder}\n\t" +
                 $"BomFolderPath\t\t --> {appSettings.Directory.OutputFolder}\n\t" +
+                $"InternalRepoList\t --> {listOfInternalRepoList}\n\t" +
                 $"ProjectType\t\t --> {appSettings.ProjectType}\n\t" +
                 $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t" +
                 $"Include\t\t\t --> {listOfInclude}\n\t" +
-                $"Exclude\t\t\t --> {listOfExclude}\n\t" +
-                $"ExcludeComponents\t --> {listOfExcludeComponents}\n";
+                $"Exclude\t\t\t --> {listOfExclude}\n";
 
             var logEvents = memoryAppender.GetEvents();
             Assert.IsNotEmpty(logEvents);
@@ -233,6 +272,75 @@ namespace LCT.PackageIdentifier.UTest
             };
             string result = DisplayInformation.DisplayExcludeComponents(appSettings);
             Assert.AreEqual(string.Empty, result);
+        }
+        [Test]
+        public void LogBomGenerationWarnings_ShouldLogWarning_WhenSW360AndJfrogAreNull()
+        {
+            // Arrange
+            appSettings.SW360 = null;
+            appSettings.Jfrog = null;
+            memoryAppender = new MemoryAppender();
+            BasicConfigurator.Configure(memoryAppender);
+            // Act
+            DisplayInformation.LogBomGenerationWarnings(appSettings);
+
+            // Assert
+            var logEvents = memoryAppender.GetEvents();
+            Assert.IsNotEmpty(logEvents);
+            var logMessage = logEvents.First().RenderedMessage;
+            Assert.AreEqual("CycloneDX Bom file generated without using SW360 and Jfrog details.", logMessage);
+        }
+
+        [Test]
+        public void LogBomGenerationWarnings_ShouldLogWarning_WhenSW360IsNull()
+        {
+            // Arrange
+            appSettings.SW360 = null;
+            appSettings.Jfrog = new Jfrog();
+            memoryAppender = new MemoryAppender();
+            BasicConfigurator.Configure(memoryAppender);
+            // Act
+            DisplayInformation.LogBomGenerationWarnings(appSettings);
+
+            // Assert
+            var logEvents = memoryAppender.GetEvents();
+            Assert.IsNotEmpty(logEvents);
+            var logMessage = logEvents.First().RenderedMessage;
+            Assert.AreEqual("CycloneDX Bom file generated without using SW360 details.", logMessage);
+        }
+
+        [Test]
+        public void LogBomGenerationWarnings_ShouldLogWarning_WhenJfrogIsNull()
+        {
+            // Arrange
+            appSettings.SW360 = new SW360();
+            appSettings.Jfrog = null;
+            memoryAppender = new MemoryAppender();
+            BasicConfigurator.Configure(memoryAppender);
+            // Act
+            DisplayInformation.LogBomGenerationWarnings(appSettings);
+
+            // Assert
+            var logEvents = memoryAppender.GetEvents();
+            Assert.IsNotEmpty(logEvents);
+            var logMessage = logEvents.First().RenderedMessage;
+            Assert.AreEqual("CycloneDX Bom file generated without using Jfrog details.", logMessage);
+        }
+
+        [Test]
+        public void LogBomGenerationWarnings_ShouldNotLogWarning_WhenSW360AndJfrogAreNotNull()
+        {
+            // Arrange
+            appSettings.SW360 = new SW360();
+            appSettings.Jfrog = new Jfrog();
+            memoryAppender = new MemoryAppender();
+            BasicConfigurator.Configure(memoryAppender);
+            // Act
+            DisplayInformation.LogBomGenerationWarnings(appSettings);
+
+            // Assert
+            var logEvents = memoryAppender.GetEvents();
+            Assert.IsEmpty(logEvents);
         }
 
         private void SetupAppSettings(string projectType, string include, string exclude, string repos)

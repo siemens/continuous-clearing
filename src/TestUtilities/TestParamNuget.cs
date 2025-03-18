@@ -34,7 +34,6 @@ namespace TestUtilities
         public string DevDestinationRepoName { get; set; }
         public string FossologyTrigger { get; set; }
         public string TelemetryEnable { get; set; }
-        public string BasicSBOMEnable { get; set; }
 
         public TestParamNuget()
         {
@@ -54,7 +53,6 @@ namespace TestUtilities
             DevDestinationRepoName = "nuget-test";
             FossologyTrigger = s_Config["EnableFossologyTrigger"];
             TelemetryEnable = s_Config["TelemetryEnable"];
-            BasicSBOMEnable = s_Config["BasicSBOMEnable"];
         }
     }
 }
