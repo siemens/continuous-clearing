@@ -4,6 +4,8 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using System.Collections.Generic;
+
 namespace LCT.APICommunications
 {
     /// <summary>
@@ -75,6 +77,8 @@ namespace LCT.APICommunications
         public const string ArtifactoryRepoName = "ArtifactoryRepoName";
         public const string JfrogArtifactoryApiSearchAql = $"/api/search/aql";
         public const string Sw360PackageApiSuffix = "/resource/api/packages";
-        public const string LinkPackagesApiSuffix = "/link/packages";
+        public const string LinkPackagesApiSuffix = "/link/packages";                
+        public static readonly List<int> APIRetryIntervals = [5, 10, 30]; // in seconds
+
     }
 }
