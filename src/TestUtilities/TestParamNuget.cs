@@ -9,9 +9,11 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Diagnostics.CodeAnalysis;
 
 namespace TestUtilities
 {
+    [ExcludeFromCodeCoverage]
     public class TestParamNuget
     {
         static readonly IConfiguration s_Config =

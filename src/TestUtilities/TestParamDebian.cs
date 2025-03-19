@@ -5,9 +5,11 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using Microsoft.Extensions.Configuration;
+using System.Diagnostics.CodeAnalysis;
 
 namespace TestUtilities
 {
+    [ExcludeFromCodeCoverage]
     public class TestParamDebian
     {
         static readonly IConfiguration s_Config = new ConfigurationBuilder().AddJsonFile(@"appSettingsSW360IntegrationTest.json", true, true).Build();
