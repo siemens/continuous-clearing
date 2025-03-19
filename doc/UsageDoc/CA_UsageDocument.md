@@ -94,7 +94,7 @@ Currently LTA support is not provided for SBOM, hence until that is implemented 
 
    - [NPM/NUGET/MAVEN/PYTHON/CONAN](../usagedocimg/packageIdentifiernpmnuget.PNG)
    - [Debian/Alpine](../usagedocimg/packageIdentifierdebianalpine.PNG)
-   - [BasicSBOM](../usagedocimg/PackageIdentifierBasicSBOM.png)
+   - [BasicSBOM](../usagedocimg/PackageIdentifierwithBasicSBOM.png)
 - SW360 Package Creator
   - [NPM/NUGET/MAVEN/PYTHON/CONAN](../usagedocimg/packageCreatirnpmnuget.PNG)
   - [Debian](../usagedocimg/packagecreatordebian.PNG)
