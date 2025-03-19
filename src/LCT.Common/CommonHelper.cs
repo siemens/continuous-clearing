@@ -254,7 +254,6 @@ namespace LCT.Common
             return formattedString;
         }
 
-
         public static string[] GetRepoList(CommonAppSettings appSettings)
         {
             var projectTypeMappings = new Dictionary<string, Func<Artifactory>>
@@ -281,7 +280,7 @@ namespace LCT.Common
             }
 
             return Array.Empty<string>();
-        }        
+        }
         #endregion
 
         #region private

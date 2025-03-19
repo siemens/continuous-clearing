@@ -61,7 +61,7 @@ namespace LCT.Common
                 m_ProjectType = value;
             }
         }
-        public bool MultipleProjectType { get; set; } = false;       
+        public bool MultipleProjectType { get; set; } = false;
         public Telemetry Telemetry { get; set; }
         public SW360 SW360 { get; set; }
         public Directory Directory { get; set; }
@@ -115,14 +115,10 @@ namespace LCT.Common
             }
             set
             {
-                if (string.IsNullOrEmpty(value))
-                {
-                   
-                }
-                else
+                if (!string.IsNullOrEmpty(value))
                 {
                     m_URL = value.TrimEnd(Dataconstant.ForwardSlash);
-                }
+                }                
             }
         }
         public string ProjectName

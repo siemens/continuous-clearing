@@ -198,12 +198,11 @@ namespace LCT.PackageIdentifier
                     components = await parser.GetJfrogRepoDetailsOfAComponent(components, appSettings, JFrogService, BomHelper);
                     bom.Components = components;
                 }
-                bom.Metadata = metadata;
-                if (appSettings.Jfrog==null)
+                else
                 {
                     Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
                     foreach (var component in bom.Components)
-                    {                        
+                    {
                         bool propertyExists = component.Properties.Any(p => p.Name == Dataconstant.Cdx_ProjectType);
                         if (!propertyExists)
                         {
@@ -211,6 +210,7 @@ namespace LCT.PackageIdentifier
                         }
                     }
                 }
+                bom.Metadata = metadata;                
             }
             catch (HttpRequestException ex)
             {
