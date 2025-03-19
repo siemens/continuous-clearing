@@ -89,7 +89,7 @@ namespace LCT.SW360PackageCreator.UTest
             mockSw360ProjectService.Setup(x => x.GetAlreadyLinkedReleasesByProjectId(It.IsAny<string>()))
                 .ReturnsAsync(new List<ReleaseLinked>());
 
-            mockSw360CreatorService.Setup(x => x.LinkReleasesToProject(It.IsAny<List<ReleaseLinked>>(), It.IsAny<List<ReleaseLinked>>(), It.IsAny<string>()))
+            mockSw360CreatorService.Setup(x => x.LinkPackagesToProject(It.IsAny<List<PackageLinked>>(), It.IsAny<string>()))
                 .ReturnsAsync(true);
 
             // Act
@@ -99,7 +99,7 @@ namespace LCT.SW360PackageCreator.UTest
             mockFileOperations.Verify(x => x.WriteContentToOutputBomFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);            
             mockCreatorHelper.Verify(x => x.WriteCreatorKpiDataToConsole(It.IsAny<CreatorKpiData>()), Times.Once);
             mockCreatorHelper.Verify(x => x.WriteSourceNotFoundListToConsole(It.IsAny<List<ComparisonBomData>>(), It.IsAny<CommonAppSettings>()), Times.Once);
-            mockSw360CreatorService.Verify(x => x.LinkReleasesToProject(It.IsAny<List<ReleaseLinked>>(), It.IsAny<List<ReleaseLinked>>(), It.IsAny<string>()), Times.Once);
+            mockSw360CreatorService.Verify(x => x.LinkPackagesToProject(It.IsAny<List<PackageLinked>>(), It.IsAny<string>()), Times.Once);
         }
 
         [Test]
