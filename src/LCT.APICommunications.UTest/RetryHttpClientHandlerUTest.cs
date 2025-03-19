@@ -123,7 +123,7 @@ namespace LCT.APICommunications.UTest
             var action = new Func<Task>(() =>
             {
                 attempts++;
-                if (attempts < ApiConstant.APIRetryCount)
+                if (attempts < ApiConstant.APIRetryIntervals.Count)
                 {
                     throw new WebException("Temporary error", WebExceptionStatus.Timeout);
                 }
@@ -134,7 +134,7 @@ namespace LCT.APICommunications.UTest
             await RetryHttpClientHandler.ExecuteWithRetryAsync(action);
 
             // Assert
-            Assert.AreEqual(ApiConstant.APIRetryCount, attempts, "Action should have been attempted the expected number of times.");
+            Assert.AreEqual(ApiConstant.APIRetryIntervals.Count, attempts, "Action should have been attempted the expected number of times.");
         }
 
         [Test]

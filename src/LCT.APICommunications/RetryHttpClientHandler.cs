@@ -30,7 +30,7 @@ namespace LCT.APICommunications
                     || (int)r.StatusCode >= 500) 
                     && r.StatusCode != HttpStatusCode.Unauthorized
                     && r.StatusCode != HttpStatusCode.Forbidden)
-                .WaitAndRetryAsync(ApiConstant.APIRetryCount,
+                .WaitAndRetryAsync(ApiConstant.APIRetryIntervals.Count,
                      GetRetryInterval,
                     onRetry: (outcome, timespan, attempt, context) =>
                     {
@@ -69,7 +69,7 @@ namespace LCT.APICommunications
         {
             var retryPolicy = Policy
                 .Handle<WebException>()
-                .WaitAndRetryAsync(ApiConstant.APIRetryCount,
+                .WaitAndRetryAsync(ApiConstant.APIRetryIntervals.Count,
                     GetRetryInterval,
                     onRetry: (exception, timespan, attempt, context) =>
                     {
