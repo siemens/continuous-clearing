@@ -25,6 +25,7 @@ namespace TestUtilities
         public string JfrogApi { get; set; }
         public string FossologyTrigger { get; set; }
         public string TelemetryEnable { get; set; }
+
         public TestParamAlpine()
         {
             SW360AuthTokenType = s_Config["SW360AuthTokenType"];

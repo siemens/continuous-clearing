@@ -30,7 +30,7 @@ namespace TestUtilities
         public string InternalDestinationRepoName { get; set; }
         public string DevDestinationRepoName { get; set; }
         public string FossologyTrigger { get; set; }
-        public string TelemetryEnable { get; set; } 
+        public string TelemetryEnable { get; set; }
 
         public TestParam()
         {

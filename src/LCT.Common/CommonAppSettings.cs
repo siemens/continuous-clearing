@@ -118,7 +118,7 @@ namespace LCT.Common
                 if (!string.IsNullOrEmpty(value))
                 {
                     m_URL = value.TrimEnd(Dataconstant.ForwardSlash);
-                }                
+                }
             }
         }
         public string ProjectName
