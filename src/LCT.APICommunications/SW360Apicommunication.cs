@@ -21,6 +21,13 @@ using System.Threading.Tasks;
 
 namespace LCT.APICommunications
 {
+    public static class HttpClientExtensions
+    {
+        public static void SetLogWarnings(this HttpClient client, bool logWarnings)
+        {
+            client.DefaultRequestHeaders.Add("LogWarnings", logWarnings.ToString());
+        }
+    }
     /// <summary>
     /// Communicatest with SW360 API
     /// </summary>
@@ -98,7 +105,7 @@ namespace LCT.APICommunications
 
         public async Task<HttpResponseMessage> GetProjectById(string projectId)
         {
-            HttpClient httpClient = GetHttpClient();
+            HttpClient httpClient = GetHttpClient();            
             HttpResponseMessage obj = new HttpResponseMessage();           
             var result = obj;
             string projectsByTagUrl = $"{sw360ProjectsApi}/{projectId}";
@@ -163,12 +170,14 @@ namespace LCT.APICommunications
         public async Task<string> TriggerFossologyProcess(string releaseId, string sw360link)
         {
             HttpClient httpClient = GetHttpClient();
+            httpClient.SetLogWarnings(false);
             string url = $"{sw360ReleaseApi}/{releaseId}{ApiConstant.FossTriggerAPIPrefix}{sw360link}{ApiConstant.FossTriggerAPISuffix}";
             return await httpClient.GetStringAsync(url);
         }
         public async Task<HttpResponseMessage> CheckFossologyProcessStatus(string link)
         {
             HttpClient httpClient = GetHttpClient();
+            httpClient.SetLogWarnings(false);
             return await httpClient.GetAsync(link);
         }
         public async Task<string> GetComponents()
@@ -187,6 +196,7 @@ namespace LCT.APICommunications
         public async Task<HttpResponseMessage> GetComponentByExternalId(string purlId, string externalIdKey = "")
         {
             HttpClient httpClient = GetHttpClient();
+            httpClient.SetLogWarnings(false);
             string componentByExternalIdUrl = $"{sw360ComponentByExternalId}{externalIdKey}{purlId}";
             return await httpClient.GetAsync(componentByExternalIdUrl);
         }
@@ -194,6 +204,7 @@ namespace LCT.APICommunications
         public async Task<HttpResponseMessage> GetReleaseById(string releaseId)
         {
             HttpClient httpClient = GetHttpClient();
+            httpClient.SetLogWarnings(false);
             string url = $"{sw360ReleaseApi}/{releaseId}";
             return await httpClient.GetAsync(url);
         }
@@ -224,18 +235,21 @@ namespace LCT.APICommunications
         public async Task<HttpResponseMessage> CreateComponent(CreateComponent createComponentContent)
         {
             HttpClient httpClient = GetHttpClient();
+            httpClient.SetLogWarnings(false);
             return await httpClient.PostAsJsonAsync(sw360ComponentApi, createComponentContent);
         }
 
         public async Task<HttpResponseMessage> CreateRelease(Releases createReleaseContent)
         {
             HttpClient httpClient = GetHttpClient();
+            httpClient.SetLogWarnings(false);
             return await httpClient.PostAsJsonAsync(sw360ReleaseApi, createReleaseContent);
         }
 
         public async Task<string> GetReleaseOfComponentById(string componentId)
         {
             HttpClient httpClient = GetHttpClient();
+            httpClient.SetLogWarnings(false);
             string componentUrl = $"{sw360ComponentApi}/{componentId}";
             return await httpClient.GetStringAsync(componentUrl);
         }
@@ -266,6 +280,7 @@ namespace LCT.APICommunications
         public async Task<HttpResponseMessage> UpdateRelease(string releaseId, HttpContent httpContent)
         {
             HttpClient httpClient = GetHttpClient();
+            httpClient.SetLogWarnings(false);
             string releaseApi = $"{sw360ReleaseApi}/{releaseId}";
             return await httpClient.PatchAsync(releaseApi, httpContent);
         }
@@ -301,12 +316,14 @@ namespace LCT.APICommunications
         public async Task<string> GetComponentByName(string componentName)
         {
             HttpClient httpClient = GetHttpClient();
+            httpClient.SetLogWarnings(false);
             string url = $"{sw360ComponentApi}{ApiConstant.ComponentNameUrl}{componentName}";
             return await httpClient.GetStringAsync(url);
         }
         public async Task<HttpResponseMessage> GetComponentUsingName(string componentName)
         {
             HttpClient httpClient = GetHttpClient();
+            httpClient.SetLogWarnings(false);
             string url = $"{sw360ComponentApi}{ApiConstant.ComponentNameUrl}{componentName}";
             return await httpClient.GetAsync(url);
         }
@@ -322,7 +339,11 @@ namespace LCT.APICommunications
 
         private HttpClient GetHttpClient()
         {
-            HttpClient httpClient = new HttpClient();
+            var handler = new RetryHttpClientHandler()
+            {
+                InnerHandler = new HttpClientHandler()
+            };
+            var httpClient = new HttpClient(handler);
             TimeSpan timeOutInSec = TimeSpan.FromSeconds(timeOut);
             httpClient.Timeout = timeOutInSec;
             httpClient.DefaultRequestHeaders.Accept.Add(
