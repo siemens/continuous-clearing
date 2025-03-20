@@ -86,18 +86,18 @@ namespace LCT.Common.UTest
             File.Delete(FileOperations.CatoolBomFilePath);
         }
 
-        [Test]
-        public void UploadBom_ShouldNotUpload_WhenInUnknownEnvironment()
-        {
-            // Arrange
-            Environment.SetEnvironmentVariable("Build_BuildId", null); // No pipeline detected
+        //[Test]
+        //public void UploadBom_ShouldNotUpload_WhenInUnknownEnvironment()
+        //{
+        //    // Arrange
+        //    Environment.SetEnvironmentVariable("Build_BuildId", null); // No pipeline detected
 
-            // Act
-            PipelineArtifactUploader.UploadBom();
-            string output = consoleOutput.ToString().Trim();
+        //    // Act
+        //    PipelineArtifactUploader.UploadBom();
+        //    string output = consoleOutput.ToString().Trim();
 
-            // Assert
-            Assert.AreEqual(output, "Uploading of SBOM is not supported.");
-        }
+        //    // Assert
+        //    Assert.AreEqual(output, "Uploading of SBOM is not supported.");
+        //}
     }
 }

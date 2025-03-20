@@ -54,7 +54,7 @@ namespace SW360IntegrationTest.Nuget
             expected.Read(CCTLocalBomTestFile);
 
             // Actual
-            string generatedBOM = OutFolder + $"\\..\\BOMs\\CycloneDX_Bom.cdx.json";
+            string generatedBOM = OutFolder + $"\\..\\BOMs\\ContinuousClearing.cdx.json";
             if (File.Exists(generatedBOM))
             {
                 fileExist = true;
