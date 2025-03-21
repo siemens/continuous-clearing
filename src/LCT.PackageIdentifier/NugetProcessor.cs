@@ -421,9 +421,9 @@ namespace LCT.PackageIdentifier
             List<Component> componentForBOM = cycloneDXBOM.Components.ToList();
             List<Dependency> dependenciesForBOM = cycloneDXBOM.Dependencies?.ToList() ?? new List<Dependency>();
             int noOfExcludedComponents = 0;
-            if (appSettings.SW360.ExcludeComponents != null)
+            if (appSettings?.SW360?.ExcludeComponents != null)
             {
-                componentForBOM = CommonHelper.RemoveExcludedComponents(componentForBOM, appSettings.SW360.ExcludeComponents, ref noOfExcludedComponents);
+                componentForBOM = CommonHelper.RemoveExcludedComponents(componentForBOM, appSettings?.SW360?.ExcludeComponents, ref noOfExcludedComponents);
                 dependenciesForBOM = CommonHelper.RemoveInvalidDependenciesAndReferences(componentForBOM, dependenciesForBOM);
                 BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents;
 
@@ -540,10 +540,10 @@ namespace LCT.PackageIdentifier
         {
             MultipleVersions multipleVersions = new MultipleVersions();
             IFileOperations fileOperations = new FileOperations();
-           
-            string bomFullPath = $"{appSettings.Directory.OutputFolder}\\{appSettings.SW360.ProjectName}_Bom.cdx.json";
-            string filename = $"{appSettings.Directory.OutputFolder}\\{appSettings.SW360.ProjectName}_{FileConstant.multipleversionsFileName}";
-            if (!File.Exists(filename))
+            string defaultProjectName = CommonIdentiferHelper.GetDefaultProjectName(appSettings);
+            string bomFullPath = $"{appSettings.Directory.OutputFolder}\\{defaultProjectName}_Bom.cdx.json";
+            string filePath = $"{appSettings.Directory.OutputFolder}\\{defaultProjectName}_{FileConstant.multipleversionsFileName}";
+            if (!File.Exists(filePath))
             {
                 multipleVersions.Nuget = new List<MultipleVersionValues>();
                 foreach (var nugetPackage in componentsWithMultipleVersions)
@@ -555,12 +555,12 @@ namespace LCT.PackageIdentifier
                     jsonComponents.PackageFoundIn = nugetPackage.Description;
                     multipleVersions.Nuget.Add(jsonComponents);
                 }
-                fileOperations.WriteContentToMultipleVersionsFile(multipleVersions, appSettings.Directory.OutputFolder, FileConstant.multipleversionsFileName, appSettings.SW360.ProjectName);
-                Logger.Warn($"\nTotal Multiple versions detected {multipleVersions.Nuget.Count} and details can be found at {appSettings.Directory.OutputFolder}\\{appSettings.SW360.ProjectName}_{FileConstant.multipleversionsFileName}\n");
+                fileOperations.WriteContentToMultipleVersionsFile(multipleVersions, appSettings.Directory.OutputFolder, FileConstant.multipleversionsFileName, defaultProjectName);
+                Logger.Warn($"\nTotal Multiple versions detected {multipleVersions.Nuget.Count} and details can be found at {filePath}\n");
             }
             else
             {
-                string json = File.ReadAllText(filename);
+                string json = File.ReadAllText(filePath);
                 MultipleVersions myDeserializedClass = JsonConvert.DeserializeObject<MultipleVersions>(json);
                 List<MultipleVersionValues> nugetComponents = new List<MultipleVersionValues>();
                 foreach (var nugetPackage in componentsWithMultipleVersions)
@@ -574,8 +574,8 @@ namespace LCT.PackageIdentifier
                 }
                 myDeserializedClass.Nuget = nugetComponents;
 
-                fileOperations.WriteContentToMultipleVersionsFile(myDeserializedClass, appSettings.Directory.OutputFolder, FileConstant.multipleversionsFileName, appSettings.SW360.ProjectName);
-                Logger.Warn($"\nTotal Multiple versions detected {nugetComponents.Count} and details can be found at {appSettings.Directory.OutputFolder}\\{appSettings.SW360.ProjectName}_{FileConstant.multipleversionsFileName}\n");
+                fileOperations.WriteContentToMultipleVersionsFile(myDeserializedClass, appSettings.Directory.OutputFolder, FileConstant.multipleversionsFileName, defaultProjectName);
+                Logger.Warn($"\nTotal Multiple versions detected {nugetComponents.Count} and details can be found at {filePath}\n");
             }
         }
 

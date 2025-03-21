@@ -4,6 +4,8 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using log4net.Appender;
+using log4net.Config;
 using NUnit.Framework;
 using System;
 using System.IO;
@@ -14,6 +16,7 @@ namespace LCT.Common.UTest
     public class PipelineArtifactUploaderTests
     {
         private StringWriter consoleOutput;
+        private MemoryAppender memoryAppender;
 
         [SetUp]
         public void SetUp()
@@ -58,13 +61,19 @@ namespace LCT.Common.UTest
         {
             // Arrange
             Environment.SetEnvironmentVariable("Build_BuildId", null); // No pipeline detected
-
+            memoryAppender = new MemoryAppender();
+            BasicConfigurator.Configure(memoryAppender);
             // Act
             PipelineArtifactUploader.UploadLogs();
-            string output = consoleOutput.ToString().Trim();
+
+            string expectedlogmessage = "Uploading of logs is not supported.";
+
+            var logEvents = memoryAppender.GetEvents();
 
             // Assert
-            Assert.AreNotEqual(output, "Uploading of SBOM is not supported.");
+            Assert.IsNotEmpty(logEvents);
+            var actualLogMessage = logEvents[0].RenderedMessage;
+            Assert.AreEqual(expectedlogmessage, actualLogMessage);
         }
 
         [Test]
@@ -91,13 +100,18 @@ namespace LCT.Common.UTest
         {
             // Arrange
             Environment.SetEnvironmentVariable("Build_BuildId", null); // No pipeline detected
-
+            memoryAppender = new MemoryAppender();
+            BasicConfigurator.Configure(memoryAppender);
             // Act
             PipelineArtifactUploader.UploadBom();
-            string output = consoleOutput.ToString().Trim();
+            string expectedlogmessage = "Uploading of SBOM is not supported.";
+
+            var logEvents = memoryAppender.GetEvents();
 
             // Assert
-            Assert.AreEqual(output, "Uploading of SBOM is not supported.");
+            Assert.IsNotEmpty(logEvents);
+            var actualLogMessage = logEvents[0].RenderedMessage;
+            Assert.AreEqual(expectedlogmessage, actualLogMessage);
         }
     }
 }
