@@ -28,13 +28,13 @@ namespace SW360IntegrationTest.NPM
         public void Setup()
         {
             OutFolder = TestHelper.OutFolder;
-            CCTComparisonBomTestFile = OutFolder + @"..\..\..\src\SW360IntegrationTest\PackageCreatorTestFiles\Npm\CCTComparisonBOMNpmInitial.json";
+            CCTComparisonBomTestFile = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "src", "SW360IntegrationTest", "PackageCreatorTestFiles", "Npm", "CCTComparisonBOMNpmInitial.json"));
 
             if (!TestHelper.BOMCreated)
             {
                 OutFolder = TestHelper.OutFolder;
-                string packagjsonPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest1stIterationData\Npm";
-                string bomPath = OutFolder + @"\..\BOMs";
+                string packagjsonPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles", "SystemTest1stIterationData", "Npm"));
+                string bomPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs"));
                 TestHelper.RunBOMCreatorExe(new string[]{
                 TestConstant.PackageFilePath, packagjsonPath,
                 TestConstant.BomFolderPath, bomPath,
@@ -55,7 +55,7 @@ namespace SW360IntegrationTest.NPM
         [Test, Order(1)]
         public void TestComponentCreatorExe()
         {
-            string bomPath = OutFolder + $"\\..\\BOMs";
+            string bomPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs"));
 
             // Assert
             // Check return with warning code 2
@@ -82,7 +82,7 @@ namespace SW360IntegrationTest.NPM
             expected.Read(CCTComparisonBomTestFile);
 
             // Actual
-            string generatedBOM = OutFolder + $"\\..\\BOMs\\{testParameters.SW360ProjectName}_Bom.cdx.json";
+            string generatedBOM = Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs", $"{testParameters.SW360ProjectName}_Bom.cdx.json"));
             if (File.Exists(generatedBOM))
             {
 

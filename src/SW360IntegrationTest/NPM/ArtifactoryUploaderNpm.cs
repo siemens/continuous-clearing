@@ -24,7 +24,7 @@ namespace SW360IntegrationTest.NPM
             OutFolder = TestHelper.OutFolder;
 
             int result = TestHelper.RunArtifactoryUploaderExe(new string[]{
-                TestConstant.BomFolderPath, OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\ArtifactoryUploaderTestData\Npm",
+                TestConstant.BomFolderPath, Path.GetFullPath(Path.Join(OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles", "ArtifactoryUploaderTestData", "Npm")),
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
                 TestConstant.JfrogNpmThirdPartyDestRepoName,testParameters.ThirdPartyDestinationRepoName,
@@ -44,7 +44,7 @@ namespace SW360IntegrationTest.NPM
         public void ComponentUpload_IsUnsuccessful_AlreadyPresentInDestination()
         {
             OutFolder = TestHelper.OutFolder;
-            string comparisonBOMPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\ArtifactoryUploaderTestData\Npm\Test_Bom.cdx.json";
+            string comparisonBOMPath = Path.GetFullPath(Path.Join(OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles", "ArtifactoryUploaderTestData", "Npm", "Test_Bom.cdx.json"));
             if (File.Exists(comparisonBOMPath))
             {
                 ComponentJsonParsor expected = new ComponentJsonParsor();

@@ -23,7 +23,7 @@ namespace SW360IntegrationTest.Python
         [Test, Order(1)]
         public void TestArtifactoryUploaderexe()
         {
-            OutFolder = TestHelper.OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\ArtifactoryUploaderTestData\Poetry";
+            OutFolder = Path.GetFullPath(Path.Combine(TestHelper.OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles", "ArtifactoryUploaderTestData", "Poetry"));
 
             int result = TestHelper.RunArtifactoryUploaderExe(new string[]{
                 TestConstant.BomFolderPath, OutFolder,
