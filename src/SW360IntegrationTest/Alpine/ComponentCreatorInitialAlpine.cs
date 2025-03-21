@@ -29,7 +29,7 @@ namespace SW360IntegrationTest.Alpine
         {
             testParameters = new TestParamAlpine();
             OutFolder = TestHelper.OutFolder;
-            CCTComparisonBomTestFile = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "..", "src", "SW360IntegrationTest", "PackageCreatorTestFiles", "Alpine", "CCTComparisonBOMAlpineInitial.json"));
+            CCTComparisonBomTestFile = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "src", "SW360IntegrationTest", "PackageCreatorTestFiles", "Alpine", "CCTComparisonBOMAlpineInitial.json"));
 
             if (!TestHelper.BOMCreated)
             {

@@ -26,7 +26,7 @@ namespace SW360IntegrationTest.Alpine
         {
             OutFolder = TestHelper.OutFolder;
 
-            CCTLocalBomTestFile = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "..", "src", "SW360IntegrationTest", "PackageIdentifierTestFiles", "Alpine", "CCTLocalBOMAlpineInitial.json"));
+            CCTLocalBomTestFile = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "src", "SW360IntegrationTest", "PackageIdentifierTestFiles", "Alpine", "CCTLocalBOMAlpineInitial.json"));
 
             if (!Directory.Exists(Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs"))))
             {
