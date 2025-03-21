@@ -36,7 +36,7 @@ namespace SW360IntegrationTest.NPM
         [Test, Order(1)]
         public void TestBOMCreatorexe()
         {
-            string packagjsonPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles";
+            string packagjsonPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles"));
             string bomPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs"));
 
             // Test BOM Creator ran with exit code 0
