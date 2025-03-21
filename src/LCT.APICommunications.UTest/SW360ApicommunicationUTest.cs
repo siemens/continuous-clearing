@@ -263,7 +263,15 @@ namespace LCT.APICommunications.UTest
             //Assert
             Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.GetComponentDetailsByUrl(""));
         }
+        [Test]
+        public void SW360Apicommunication_GetComponentByName_ReturnsInvalidOperationException()
+        {
+            //Arrange & Act
+            SW360Apicommunication sW360Apicommunication = new SW360Apicommunication(connectionSettings);
 
+            //Assert
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.GetComponentByName(""));
+        }
         [Test]
         public void SW360Apicommunication_UpdateComponent_ReturnsInvalidOperationException()
         {

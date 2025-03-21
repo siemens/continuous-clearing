@@ -216,11 +216,12 @@ namespace LCT.PackageIdentifier
         private static void CreateFileForMultipleVersions(List<Component> componentsWithMultipleVersions, CommonAppSettings appSettings)
         {
             MultipleVersions multipleVersions = new MultipleVersions();
-            IFileOperations fileOperations = new FileOperations();            
-            string bomFullPath= $"{appSettings.Directory.OutputFolder}\\{appSettings.SW360.ProjectName}_Bom.cdx.json";
+            IFileOperations fileOperations = new FileOperations();
+            string defaultProjectName = CommonIdentiferHelper.GetDefaultProjectName(appSettings);
+            string bomFullPath= $"{appSettings.Directory.OutputFolder}\\{defaultProjectName}_Bom.cdx.json";
 
-            string filename = $"{appSettings.Directory.OutputFolder}\\{appSettings.SW360.ProjectName}_{FileConstant.multipleversionsFileName}";
-            if (!File.Exists(filename))
+            string filePath = $"{appSettings.Directory.OutputFolder}\\{defaultProjectName}_{FileConstant.multipleversionsFileName}";
+            if (!File.Exists(filePath))
             {
                 multipleVersions.Conan = new List<MultipleVersionValues>();
                 foreach (var conanPackage in componentsWithMultipleVersions)
@@ -232,12 +233,12 @@ namespace LCT.PackageIdentifier
                     jsonComponents.PackageFoundIn = conanPackage.Description;
                     multipleVersions.Conan.Add(jsonComponents);
                 }
-                fileOperations.WriteContentToMultipleVersionsFile(multipleVersions, appSettings.Directory.OutputFolder, FileConstant.multipleversionsFileName, appSettings.SW360.ProjectName);
-                Logger.Warn($"\nTotal Multiple versions detected {multipleVersions.Conan.Count} and details can be found at {appSettings.Directory.OutputFolder}\\{appSettings.SW360.ProjectName}_{FileConstant.multipleversionsFileName}\n");
+                fileOperations.WriteContentToMultipleVersionsFile(multipleVersions, appSettings.Directory.OutputFolder, FileConstant.multipleversionsFileName, defaultProjectName);
+                Logger.Warn($"\nTotal Multiple versions detected {multipleVersions.Conan.Count} and details can be found at {filePath}\n");
             }
             else
             {
-                string json = File.ReadAllText(filename);
+                string json = File.ReadAllText(filePath);
                 MultipleVersions myDeserializedClass = JsonConvert.DeserializeObject<MultipleVersions>(json);
                 List<MultipleVersionValues> conanComponents = new List<MultipleVersionValues>();
                 foreach (var conanPackage in componentsWithMultipleVersions)
@@ -252,8 +253,8 @@ namespace LCT.PackageIdentifier
                 }
                 myDeserializedClass.Conan = conanComponents;
 
-                fileOperations.WriteContentToMultipleVersionsFile(myDeserializedClass, appSettings.Directory.OutputFolder, FileConstant.multipleversionsFileName, appSettings.SW360.ProjectName);
-                Logger.Warn($"\nTotal Multiple versions detected {conanComponents.Count} and details can be found at {appSettings.Directory.OutputFolder}\\{appSettings.SW360.ProjectName}_{FileConstant.multipleversionsFileName}\n");
+                fileOperations.WriteContentToMultipleVersionsFile(myDeserializedClass, appSettings.Directory.OutputFolder, FileConstant.multipleversionsFileName, defaultProjectName);
+                Logger.Warn($"\nTotal Multiple versions detected {conanComponents.Count} and details can be found at {filePath}\n");
             }
         }
         private void ParsingInputFileForBOM(CommonAppSettings appSettings, ref Bom bom)
@@ -558,7 +559,7 @@ namespace LCT.PackageIdentifier
             List<Component> componentForBOM = cycloneDXBOM.Components.ToList();
             List<Dependency> dependenciesForBOM = cycloneDXBOM.Dependencies?.ToList() ?? new List<Dependency>();
             int noOfExcludedComponents = 0;
-            if (appSettings.SW360.ExcludeComponents != null)
+            if (appSettings?.SW360?.ExcludeComponents != null)
             {
                 componentForBOM = CommonHelper.RemoveExcludedComponents(componentForBOM, appSettings.SW360.ExcludeComponents, ref noOfExcludedComponents);
                 dependenciesForBOM = CommonHelper.RemoveInvalidDependenciesAndReferences(componentForBOM, dependenciesForBOM);

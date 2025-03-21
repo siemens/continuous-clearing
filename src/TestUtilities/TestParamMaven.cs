@@ -5,9 +5,11 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using Microsoft.Extensions.Configuration;
+using System.Diagnostics.CodeAnalysis;
 
 namespace TestUtilities
 {
+    [ExcludeFromCodeCoverage]
     public class TestParamMaven
     {
         static readonly IConfiguration s_Config =

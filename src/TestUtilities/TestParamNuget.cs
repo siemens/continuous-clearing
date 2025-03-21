@@ -8,10 +8,12 @@
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace TestUtilities
 {
+    [ExcludeFromCodeCoverage]
     public class TestParamNuget
     {
         static readonly IConfiguration s_Config =
