@@ -36,26 +36,27 @@ namespace TestUtilities
             proc.StartInfo.RedirectStandardOutput = true;
             proc.StartInfo.RedirectStandardError = true;
             proc.StartInfo.WorkingDirectory = Environment.CurrentDirectory;
+            proc.StartInfo.CreateNoWindow = true;
+
+            // Capture and print the output in real-time
+            proc.OutputDataReceived += (sender, e) => { if (!string.IsNullOrEmpty(e.Data)) Console.WriteLine("[STDOUT] " + e.Data); };
+            proc.ErrorDataReceived += (sender, e) => { if (!string.IsNullOrEmpty(e.Data)) Console.WriteLine("[STDERR] " + e.Data); };
+
             proc.Start();
-            // To avoid deadlocks, always read the output stream first and then wait. 
-            proc.StandardOutput.ReadToEnd();
 
+            // Start reading the output asynchronously
+            proc.BeginOutputReadLine();
+            proc.BeginErrorReadLine();
 
-#if DEBUG
-            Console.WriteLine(proc.StandardOutput.ReadToEnd());
-#endif
             proc.WaitForExit();
 
-            if (proc.ExitCode == 0)
+            if (proc.ExitCode < 0)
             {
-                BOMCreated = true;
-            }
-            if (proc.ExitCode < 0) {
-                Console.WriteLine(proc.StartInfo.FileName);
-                Console.WriteLine(proc.StartInfo.Arguments);
+                Console.WriteLine("Executable Path: " + proc.StartInfo.FileName);
+                Console.WriteLine("Arguments: " + proc.StartInfo.Arguments);
             }
 
-                return proc.ExitCode;
+            return proc.ExitCode;
         }
 
         public static int RunComponentCreatorExe(string[] args)
@@ -69,17 +70,26 @@ namespace TestUtilities
             proc.StartInfo.RedirectStandardError = true;
             proc.StartInfo.WorkingDirectory = Environment.CurrentDirectory;
 
+            proc.StartInfo.CreateNoWindow = true;
+
+            // Capture and print the output in real-time
+            proc.OutputDataReceived += (sender, e) => { if (!string.IsNullOrEmpty(e.Data)) Console.WriteLine("[STDOUT] " + e.Data); };
+            proc.ErrorDataReceived += (sender, e) => { if (!string.IsNullOrEmpty(e.Data)) Console.WriteLine("[STDERR] " + e.Data); };
+
             proc.Start();
-            proc.StandardOutput.ReadToEnd();
-#if DEBUG
-            Console.WriteLine(proc.StandardOutput.ReadToEnd());
-#endif
+
+            // Start reading the output asynchronously
+            proc.BeginOutputReadLine();
+            proc.BeginErrorReadLine();
+
             proc.WaitForExit();
+
             if (proc.ExitCode < 0)
             {
-                Console.WriteLine(proc.StartInfo.FileName);
-                Console.WriteLine(proc.StartInfo.Arguments);
+                Console.WriteLine("Executable Path: " + proc.StartInfo.FileName);
+                Console.WriteLine("Arguments: " + proc.StartInfo.Arguments);
             }
+
             return proc.ExitCode;
         }
 
@@ -94,17 +104,26 @@ namespace TestUtilities
             proc.StartInfo.RedirectStandardError = true;
             proc.StartInfo.WorkingDirectory = Environment.CurrentDirectory;
 
+            proc.StartInfo.CreateNoWindow = true;
+
+            // Capture and print the output in real-time
+            proc.OutputDataReceived += (sender, e) => { if (!string.IsNullOrEmpty(e.Data)) Console.WriteLine("[STDOUT] " + e.Data); };
+            proc.ErrorDataReceived += (sender, e) => { if (!string.IsNullOrEmpty(e.Data)) Console.WriteLine("[STDERR] " + e.Data); };
+
             proc.Start();
-            proc.StandardOutput.ReadToEnd();
-#if DEBUG
-            Console.WriteLine(proc.StandardOutput.ReadToEnd());
-#endif
+
+            // Start reading the output asynchronously
+            proc.BeginOutputReadLine();
+            proc.BeginErrorReadLine();
+
             proc.WaitForExit();
+
             if (proc.ExitCode < 0)
             {
-                Console.WriteLine(proc.StartInfo.FileName);
-                Console.WriteLine(proc.StartInfo.Arguments);
+                Console.WriteLine("Executable Path: " + proc.StartInfo.FileName);
+                Console.WriteLine("Arguments: " + proc.StartInfo.Arguments);
             }
+
             return proc.ExitCode;
         }
 
