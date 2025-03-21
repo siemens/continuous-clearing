@@ -28,7 +28,8 @@ namespace TestUtilities
         public static int RunBOMCreatorExe(string[] args)
         {
             Process proc = new Process();
-            proc.StartInfo.FileName = OutFolder + @"\PackageIdentifier.exe";
+            string executableName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "PackageIdentifier.exe" : "PackageIdentifier";
+            proc.StartInfo.FileName = Path.Combine(OutFolder, executableName);
             proc.StartInfo.Arguments = GetArguments(args);
             proc.StartInfo.UseShellExecute = false;
             proc.StartInfo.RedirectStandardOutput = true;
@@ -59,7 +60,8 @@ namespace TestUtilities
         public static int RunComponentCreatorExe(string[] args)
         {
             Process proc = new Process();
-            proc.StartInfo.FileName = OutFolder + @"\SW360PackageCreator.exe";
+            string executableName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "SW360PackageCreator.exe" : "SW360PackageCreator";
+            proc.StartInfo.FileName = Path.Combine(OutFolder, executableName);
             proc.StartInfo.Arguments = GetArguments(args);
             proc.StartInfo.UseShellExecute = false;
             proc.StartInfo.RedirectStandardOutput = true;
@@ -83,7 +85,8 @@ namespace TestUtilities
         public static int RunArtifactoryUploaderExe(string[] args)
         {
             Process proc = new Process();
-            proc.StartInfo.FileName = OutFolder + @"\ArtifactoryUploader.exe";
+            string executableName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "ArtifactoryUploader.exe" : "ArtifactoryUploader";
+            proc.StartInfo.FileName = Path.Combine(OutFolder, executableName);
             proc.StartInfo.Arguments = GetArguments(args);
             proc.StartInfo.UseShellExecute = false;
             proc.StartInfo.RedirectStandardOutput = true;
