@@ -32,13 +32,13 @@ namespace SW360IntegrationTest.NPM
         public void Setup()
         {
             OutFolder = TestHelper.OutFolder;
-            CCTComparisonBomTestFile = OutFolder + @"..\..\..\src\SW360IntegrationTest\PackageCreatorTestFiles\Npm\CCTComparisonBOMNpmUpdated.json";
+            CCTComparisonBomTestFile = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "src", "SW360IntegrationTest", "PackageCreatorTestFiles", "Npm", "CCTComparisonBOMNpmUpdated.json"));
 
             if (!TestHelper.BOMCreated)
             {
                 OutFolder = TestHelper.OutFolder;
-                string packagjsonPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest2ndIterationData";
-                string bomPath = OutFolder + @"\..\Set2BOMs";
+                string packagjsonPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles", "SystemTest2ndIterationData"));
+                string bomPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "Set2BOMs"));
                 TestHelper.RunBOMCreatorExe(new string[]{
                 TestConstant.PackageFilePath, packagjsonPath,
                 TestConstant.BomFolderPath, bomPath,
@@ -58,7 +58,7 @@ namespace SW360IntegrationTest.NPM
         [Test, Order(1)]
         public void TestComponentCreatorExe()
         {
-            string bomPath = OutFolder + $"\\..\\Set2BOMs";
+            string bomPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "Set2BOMs"));
             // Assert
             // Check exit is normal
             Assert.AreEqual(0, TestHelper.RunComponentCreatorExe(new string[] {
@@ -85,7 +85,7 @@ namespace SW360IntegrationTest.NPM
             expected.Read(CCTComparisonBomTestFile);
 
             // Actual
-            string generatedBOM = OutFolder + $"\\..\\Set2BOMs\\{testParameters.SW360ProjectName}_Bom.cdx.json";
+            string generatedBOM = Path.GetFullPath(Path.Combine(OutFolder, "..", "Set2BOMs", $"{testParameters.SW360ProjectName}_Bom.cdx.json"));
             if (File.Exists(generatedBOM))
             {
 

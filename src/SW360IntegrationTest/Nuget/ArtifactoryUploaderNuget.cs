@@ -22,7 +22,7 @@ namespace SW360IntegrationTest.Nuget
         [Test, Order(1)]
         public void TestArtifactoryUploaderexe()
         {
-            OutFolder = TestHelper.OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\ArtifactoryUploaderTestData\Nuget";
+            OutFolder = Path.GetFullPath(Path.Combine(TestHelper.OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles", "ArtifactoryUploaderTestData", "Nuget"));
 
             // Test BOM Creator ran with exit code 0
             Assert.AreEqual(0, TestHelper.RunArtifactoryUploaderExe(new string[]{
@@ -43,7 +43,7 @@ namespace SW360IntegrationTest.Nuget
         public void ComponentUpload_IsUnsuccessful_AlreadyPresentInDestination()
         {
             OutFolder = TestHelper.OutFolder;
-            string comparisonBOMPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\ArtifactoryUploaderTestData\Nuget\Test_Bom.cdx.json";
+            string comparisonBOMPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles", "ArtifactoryUploaderTestData", "Nuget", "Test_Bom.cdx.json"));
             if (File.Exists(comparisonBOMPath))
             {
                 ComponentJsonParsor expected = new ComponentJsonParsor();
