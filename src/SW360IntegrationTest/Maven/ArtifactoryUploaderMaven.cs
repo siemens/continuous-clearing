@@ -24,7 +24,7 @@ namespace SW360IntegrationTest.Maven
             OutFolder = TestHelper.OutFolder;
 
             int result = TestHelper.RunArtifactoryUploaderExe(new string[]{
-                TestConstant.BomFolderPath, OutFolder + @"\..\..\TestFiles\MavenTestFile\ArtifactoryUploaderTestData",
+                TestConstant.BomFolderPath, Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "TestFiles", "MavenTestFile", "ArtifactoryUploaderTestData")),
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
                 TestConstant.JfrogMavenThirdPartyDestRepoName,testParameters.ThirdPartyDestinationRepoName,
@@ -44,7 +44,7 @@ namespace SW360IntegrationTest.Maven
         public void ComponentUpload_IsUnsuccessful_AlreadyPresentInDestination()
         {
             OutFolder = TestHelper.OutFolder;
-            string comparisonBOMPath = OutFolder + @"\..\..\TestFiles\MavenTestFile\ArtifactoryUploaderTestData\Test_Bom.cdx.json";
+            string comparisonBOMPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "TestFiles", "MavenTestFile", "ArtifactoryUploaderTestData", "Test_Bom.cdx.json"));
             if (File.Exists(comparisonBOMPath))
             {
                 ComponentJsonParsor expected = new ComponentJsonParsor();

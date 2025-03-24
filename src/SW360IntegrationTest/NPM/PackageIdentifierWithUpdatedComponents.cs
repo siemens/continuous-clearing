@@ -26,19 +26,19 @@ namespace SW360IntegrationTest.NPM
         {
             OutFolder = TestHelper.OutFolder;
 
-            CCTLocalBomTestFile = OutFolder + @"..\..\..\src\SW360IntegrationTest\PackageIdentifierTestFiles\Npm\CCTLocalBOMNpmUpdated.json";
+            CCTLocalBomTestFile = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "src", "SW360IntegrationTest", "PackageIdentifierTestFiles", "Npm", "CCTLocalBOMNpmUpdated.json"));
 
-            if (!Directory.Exists(OutFolder + @"\..\Set2BOMs"))
+            if (!Directory.Exists(Path.GetFullPath(Path.Combine(OutFolder, "..", "Set2BOMs"))))
             {
-                Directory.CreateDirectory(OutFolder + @"\..\Set2BOMs");
+                Directory.CreateDirectory(Path.GetFullPath(Path.Combine(OutFolder, "..", "Set2BOMs")));
             }
         }
 
         [Test, Order(1)]
         public void TestBOMCreatorexe()
         {
-            string packagjsonPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest2ndIterationData ";
-            string bomPath = OutFolder + @"\..\Set2BOMs";
+            string packagjsonPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles", "SystemTest2ndIterationData"));
+            string bomPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "Set2BOMs"));
             // Test BOM Creator ran with exit code 0
             Assert.AreEqual(0, TestHelper.RunBOMCreatorExe(new string[]{
                 TestConstant.PackageFilePath, packagjsonPath,
@@ -67,7 +67,7 @@ namespace SW360IntegrationTest.NPM
             expected.Read(CCTLocalBomTestFile);
 
             // Actual
-            string generatedBOM = OutFolder + $"\\..\\Set2BOMs\\{testParameters.SW360ProjectName}_Bom.cdx.json";
+            string generatedBOM = Path.GetFullPath(Path.Combine(OutFolder, "..", "Set2BOMs", $"{testParameters.SW360ProjectName}_Bom.cdx.json"));
             if (File.Exists(generatedBOM))
             {
 

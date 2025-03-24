@@ -26,11 +26,11 @@ namespace SW360IntegrationTest.Alpine
         {
             OutFolder = TestHelper.OutFolder;
 
-            CCTLocalBomTestFile = OutFolder + @"..\..\..\src\SW360IntegrationTest\PackageIdentifierTestFiles\Alpine\CCTLocalBOMAlpineInitial.json";
+            CCTLocalBomTestFile = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "src", "SW360IntegrationTest", "PackageIdentifierTestFiles", "Alpine", "CCTLocalBOMAlpineInitial.json"));
 
-            if (!Directory.Exists(OutFolder + @"\..\BOMs"))
+            if (!Directory.Exists(Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs"))))
             {
-                Directory.CreateDirectory(OutFolder + @"\..\BOMs");
+                Directory.CreateDirectory(Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs")));
             }
             testParameters = new TestParamAlpine();
         }
@@ -38,8 +38,9 @@ namespace SW360IntegrationTest.Alpine
         [Test, Order(1)]
         public void RunBOMCreatorexe_ProvidedPackageJsonFilePath_ReturnsSuccess()
         {
-            string packagejsonPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest1stIterationData\Alpine";
-            string bomPath = OutFolder + @"\..\BOMs";
+            string packagejsonPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles", "SystemTest1stIterationData", "Alpine"));
+            string bomPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs"));
+
 
             // Test BOM Creator ran with exit code 0
             Assert.AreEqual(0, TestHelper.RunBOMCreatorExe(new string[]{
@@ -70,7 +71,7 @@ namespace SW360IntegrationTest.Alpine
             expected.Read(CCTLocalBomTestFile);
 
             // Actual
-            string generatedBOM = OutFolder + $"\\..\\BOMs\\{testParameters.SW360ProjectName}_Bom.cdx.json";
+            string generatedBOM = Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs", $"{testParameters.SW360ProjectName}_Bom.cdx.json"));
             if (File.Exists(generatedBOM))
             {
                 fileExist = true;
