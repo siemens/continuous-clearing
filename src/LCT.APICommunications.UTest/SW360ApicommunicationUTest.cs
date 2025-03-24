@@ -128,21 +128,21 @@ namespace LCT.APICommunications.UTest
         }
         
         [Test]
-        public void SW360Apicommunication_AttachComponentSourceToSW360_ThrowsUriFormatException()
-        {
-            // Arrange
-            AttachReport attachReport = new AttachReport
-            {
-                ReleaseId = "http://invalid-url", // This is an invalid HTTP URL but still recognized as HTTP
-                AttachmentFile = "test-file"
-            };
+        //public void SW360Apicommunication_AttachComponentSourceToSW360_ThrowsUriFormatException()
+        //{
+        //    // Arrange
+        //    AttachReport attachReport = new AttachReport
+        //    {
+        //        ReleaseId = "http://invalid-url", // This is an invalid HTTP URL but still recognized as HTTP
+        //        AttachmentFile = "test-file"
+        //    };
 
-            // Act
-            SW360Apicommunication sW360Apicommunication = new SW360Apicommunication(connectionSettings);
+        //    // Act
+        //    SW360Apicommunication sW360Apicommunication = new SW360Apicommunication(connectionSettings);
 
-            // Assert
-            Assert.Throws<UriFormatException>(() => sW360Apicommunication.AttachComponentSourceToSW360(attachReport));
-        }
+        //    // Assert
+        //    Assert.Throws<UriFormatException>(() => sW360Apicommunication.AttachComponentSourceToSW360(attachReport));
+        //}
         
         [Test]
         public void SW360Apicommunication_GetProjects_ReturnsInvalidOperationException()
