@@ -185,12 +185,12 @@ namespace LCT.PackageIdentifier.UTest
         public void ParseCycloneDXBom_GivenInCorrectJsonFile_ReturnsZeroComponents()
         {
             //Arrange
-            string sourcePath = $"{Path.GetTempPath()}\\";
+            string sourcePath = $"{Path.GetTempPath()}";
             File.WriteAllText(sourcePath + "output.json", "{[}");
 
             //Act
             CycloneDXBomParser cycloneBomProcessor = new CycloneDXBomParser();
-            Bom files = cycloneBomProcessor.ParseCycloneDXBom(sourcePath + "/output.json");
+            Bom files = cycloneBomProcessor.ParseCycloneDXBom(Path.GetFullPath(Path.Combine(sourcePath, "output.json")));
 
             //Assert
             Assert.IsNull(files.Components, "Returns Zero components in BOM");
