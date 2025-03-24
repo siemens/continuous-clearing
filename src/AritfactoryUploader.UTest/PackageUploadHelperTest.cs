@@ -115,7 +115,7 @@ namespace AritfactoryUploader.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string comparisonBOMPath = outFolder + @"\ArtifactoryUTTestFiles\Test_Bom.cdx.json";
+            string comparisonBOMPath = Path.GetFullPath(Path.Combine(outFolder, "ArtifactoryUTTestFiles", "Test_Bom.cdx.json"));
             Bom bom = PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath);
             List<ComponentsToArtifactory> components = new List<ComponentsToArtifactory>()
             {

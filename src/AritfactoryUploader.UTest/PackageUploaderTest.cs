@@ -74,7 +74,7 @@ namespace AritfactoryUploader.UTest
             commonAppSettings.TimeOut = 100;
             commonAppSettings.SW360 = new SW360()
             {
-                ProjectName = "test"
+                ProjectName = "Test"
             };
 
             IJFrogService jFrogService = GetJfrogService(commonAppSettings);
