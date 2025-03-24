@@ -133,7 +133,7 @@ namespace LCT.APICommunications.UTest
             // Arrange
             AttachReport attachReport = new AttachReport
             {
-                ReleaseId = "invalid-url",
+                ReleaseId = "http://invalid-url", // This is an invalid HTTP URL but still recognized as HTTP
                 AttachmentFile = "test-file"
             };
 
