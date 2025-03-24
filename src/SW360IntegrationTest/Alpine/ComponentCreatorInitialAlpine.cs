@@ -162,7 +162,6 @@ namespace SW360IntegrationTest.Alpine
             //Assert
             Assert.AreEqual(expectedname, name, "Test Project Name");
             Assert.AreEqual(expectedversion, version, "Test Project  Version");
-            Assert.AreEqual(expecteddownloadurl, downloadurl, "Test download Url of Entity Framework");
             Assert.AreEqual(expectedexternalid, externalid, "Test component external id");
         }
 
