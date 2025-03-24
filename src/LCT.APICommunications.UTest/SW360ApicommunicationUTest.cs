@@ -127,7 +127,7 @@ namespace LCT.APICommunications.UTest
             Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.GetAllReleasesWithAllData(page, pageEntries));
         }
         
-        [Test]
+        //[Test]
         //public void SW360Apicommunication_AttachComponentSourceToSW360_ThrowsUriFormatException()
         //{
         //    // Arrange
