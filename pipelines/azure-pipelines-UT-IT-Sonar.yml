@@ -5,7 +5,14 @@
 # -------------------------------------------------------------------------------------------------------------------- 
 
 trigger:
-  - none
+  branches:
+    include:
+      - '*'  # Triggers on each commit to any branch
+
+pr:
+  branches:
+    include:
+      - '*'  # Triggers when a pull request is raised to any branch
 
 variables:
   - group: CONTINUOUS_CLEARING_TOOL_TEST_CONFIG
