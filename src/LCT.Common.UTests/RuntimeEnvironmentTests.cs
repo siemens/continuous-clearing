@@ -25,7 +25,7 @@ namespace LCT.Common.UTest
 
             // Assert
             Assert.That(actualEnvironment, Is.Not.Null);
-            Assert.That(Environment.GetEnvironmentVariable("unknown"), Is.Not.Null);
+            Assert.That(Environment.GetEnvironmentVariable("Unknown"), Is.Not.Null);
         }
 
         [Test]

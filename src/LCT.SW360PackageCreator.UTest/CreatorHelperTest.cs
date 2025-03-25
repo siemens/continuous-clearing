@@ -782,7 +782,7 @@ namespace LCT.SW360PackageCreator.UTest
             // Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string localPathforDownload = outFolder + @"..\..\..\src\LCT.SW360PackageCreator.UTest\ComponentCreatorUTFiles\";
+            string localPathforDownload = Path.GetFullPath(Path.Combine(outFolder, "..", "..", "src", "LCT.SW360PackageCreator.UTest", "ComponentCreatorUTFiles")) + Path.DirectorySeparatorChar;
 
             var component = new ComparisonBomData
             {
