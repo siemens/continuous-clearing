@@ -1,4 +1,10 @@
-﻿using CycloneDX.Models;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2025 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+
+using CycloneDX.Models;
 using NUnit.Framework;
 using System.IO;
 using TestUtilities;

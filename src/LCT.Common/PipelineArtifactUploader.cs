@@ -1,4 +1,10 @@
-﻿using LCT.Common.Runtime;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2025 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+
+using LCT.Common.Runtime;
 using log4net;
 using log4net.Core;
 using System;

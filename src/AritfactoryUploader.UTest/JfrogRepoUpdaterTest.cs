@@ -1,4 +1,10 @@
-﻿using LCT.APICommunications.Model.AQL;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2025 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+
+using LCT.APICommunications.Model.AQL;
 using LCT.ArtifactoryUploader;
 using LCT.Services.Interface;
 using Moq;
