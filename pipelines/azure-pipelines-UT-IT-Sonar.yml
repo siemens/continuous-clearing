@@ -4,15 +4,12 @@
 #  SPDX-License-Identifier: MIT
 # -------------------------------------------------------------------------------------------------------------------- 
 
-trigger:
-  branches:
-    include:
-      - '*'  # Triggers on each commit to any branch
+trigger: none  # Disables triggering on push
 
 pr:
   branches:
     include:
-      - '*'  # Triggers when a pull request is raised to any branch
+      - '*'  # Runs only when a PR is created or updated
 
 variables:
   - group: CONTINUOUS_CLEARING_TOOL_TEST_CONFIG
