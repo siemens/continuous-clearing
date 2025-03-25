@@ -6,9 +6,7 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.APICommunications.Model;
-using LCT.APICommunications.Model.AQL;
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -26,7 +24,7 @@ namespace LCT.APICommunications
         {
             var handler = new RetryHttpClientHandler()
             {
-                InnerHandler = new HttpClientHandler() 
+                InnerHandler = new HttpClientHandler()
             };
             var httpClient = new HttpClient(handler);
             TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);

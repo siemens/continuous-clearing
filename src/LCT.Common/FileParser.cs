@@ -5,7 +5,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using LCT.Common.Interface;
-using System;
 using System.IO;
 using Tommy;
 
@@ -23,7 +22,7 @@ namespace LCT.Common
                 table = TOML.Parse(reader);
                 return table;
             }
-            catch(TomlParseException)
+            catch (TomlParseException)
             {
                 return new TomlTable();
             }

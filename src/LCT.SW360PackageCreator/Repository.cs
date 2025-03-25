@@ -9,9 +9,8 @@ using LCT.SW360PackageCreator.Interfaces;
 using log4net;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Linq;
-using LCT.Common;
+using System.Reflection;
 
 namespace LCT.SW360PackageCreator
 {
@@ -89,8 +88,8 @@ namespace LCT.SW360PackageCreator
             }
 
             repoUrl = (from string repoUrl2 in m_RepoUrlList
-                             where url.Contains(repoUrl2)
-                             select repoUrl2).FirstOrDefault();
+                       where url.Contains(repoUrl2)
+                       select repoUrl2).FirstOrDefault();
 
 
             return repoUrl;

@@ -4,16 +4,15 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using CycloneDX.Models;
+using LCT.Common;
+using LCT.Common.Constants;
+using LCT.Common.Interface;
+using LCT.Common.Model;
 using LCT.PackageIdentifier.Model;
+using Moq;
 using NUnit.Framework;
 using System.IO;
-using LCT.Common;
-using LCT.Common.Model;
-using System.Collections.Generic;
-using CycloneDX.Models;
-using LCT.Common.Constants;
-using Moq;
-using LCT.Common.Interface;
 
 namespace LCT.PackageIdentifier.UTest
 {
@@ -34,7 +33,7 @@ namespace LCT.PackageIdentifier.UTest
             IFolderAction folderAction = new FolderAction();
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
-            {                
+            {
                 ProjectType = "NPM",
                 Npm = new Config() { Include = Includes, Exclude = Excludes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
@@ -82,7 +81,7 @@ namespace LCT.PackageIdentifier.UTest
             NpmProcessor NpmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
 
             //Act
-            Bom bom=NpmProcessor.ParsePackageFile(appSettings);
+            Bom bom = NpmProcessor.ParsePackageFile(appSettings);
 
             //Assert
             Assert.That(10, Is.EqualTo(bom.Components.Count), "Returns the count of components");
@@ -104,7 +103,7 @@ namespace LCT.PackageIdentifier.UTest
             IFolderAction folderAction = new FolderAction();
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
-            {                
+            {
                 ProjectType = "NPM",
                 Npm = new Config() { Include = Includes, Exclude = Excludes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
@@ -139,7 +138,7 @@ namespace LCT.PackageIdentifier.UTest
             IFolderAction folderAction = new FolderAction();
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
-            {                
+            {
                 ProjectType = "NPM",
                 Npm = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
@@ -172,8 +171,8 @@ namespace LCT.PackageIdentifier.UTest
             IFolderAction folderAction = new FolderAction();
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
-            {               
-                ProjectType = "NPM",                
+            {
+                ProjectType = "NPM",
                 Npm = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
                 Directory = new LCT.Common.Directory(folderAction, fileOperations)
@@ -206,7 +205,7 @@ namespace LCT.PackageIdentifier.UTest
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                ProjectType = "NPM",                
+                ProjectType = "NPM",
                 Npm = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
                 Directory = new LCT.Common.Directory(folderAction, fileOperations)

@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CycloneDX.Models;
-using System.IO;
+﻿using CycloneDX.Models;
 using NUnit.Framework;
+using System.IO;
 using TestUtilities;
 
 namespace SW360IntegrationTest.Maven

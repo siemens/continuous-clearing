@@ -4,9 +4,9 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System;
 
 namespace LCT.Common.Model
 {

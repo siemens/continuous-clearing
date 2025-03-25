@@ -15,7 +15,6 @@ using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
-using log4net.Core;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -205,7 +204,7 @@ namespace LCT.PackageIdentifier
             List<JToken> directDependencies = new List<JToken>();
             directDependencies.AddRange(dep);
             directDependencies.AddRange(devDep);
-           
+
             foreach (JProperty prop in depencyComponentList.Skip(1))
             {
                 Property isdev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
@@ -271,7 +270,7 @@ namespace LCT.PackageIdentifier
             string packageName;
             if (properties[Name] != null)
             {
-                packageName = Convert.ToString(properties[Name]);               
+                packageName = Convert.ToString(properties[Name]);
             }
             else
             {
@@ -306,7 +305,7 @@ namespace LCT.PackageIdentifier
 
         private static void GetComponentsForBom(string filepath, CommonAppSettings appSettings,
             ref List<BundledComponents> bundledComponents, ref List<Component> lstComponentForBOM,
-            ref int noOfDevDependent, IEnumerable<JProperty> depencyComponentList , List<JToken> directDependenciesList)
+            ref int noOfDevDependent, IEnumerable<JProperty> depencyComponentList, List<JToken> directDependenciesList)
         {
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += depencyComponentList.Count();
 
@@ -417,15 +416,15 @@ namespace LCT.PackageIdentifier
             // get the  component list from Jfrog for given repo + internal repo
             string[] repoList = CommonHelper.GetRepoList(appSettings);
             List<AqlResult> aqlResultList = await bomhelper.GetNpmListOfComponentsFromRepo(repoList, jFrogService);
-           
+
             Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
             List<Component> modifiedBOM = new List<Component>();
 
             foreach (var component in componentsForBOM)
             {
-                
-                string jfrogpackageName= bomhelper.GetFullNameOfComponent(component);
-                
+
+                string jfrogpackageName = bomhelper.GetFullNameOfComponent(component);
+
                 var hashes = aqlResultList.FirstOrDefault(x => x.Properties.Any(p => p.Key == "npm.name" && p.Value == jfrogpackageName) && x.Properties.Any(p => p.Key == "npm.version" && p.Value == component.Version));
                 string jfrogRepoPath = string.Empty;
                 AqlResult finalRepoData = GetJfrogArtifactoryRepoDetials(aqlResultList, component, bomhelper, out jfrogRepoPath);
@@ -440,7 +439,7 @@ namespace LCT.PackageIdentifier
                 }
                 if (appSettings.Npm.Artifactory.ThirdPartyRepos != null)
                 {
-                    
+
                     foreach (var thirdPartyRepo in appSettings.Npm.Artifactory.ThirdPartyRepos)
                     {
                         if (artifactoryrepo.Value == thirdPartyRepo.Name)
@@ -563,7 +562,7 @@ namespace LCT.PackageIdentifier
             List<Dependency> dependencyList = new();
 
             foreach (var component in componentsForBOM)
-            {                
+            {
                 if ((component.Author?.Split(",")) != null)
                 {
                     List<Dependency> subDependencies = new();
@@ -668,7 +667,7 @@ namespace LCT.PackageIdentifier
             if (aqlResultList.Exists(x => x.Properties.Any(p => p.Key == "npm.name" && p.Value == jfrogcomponentName) && x.Properties.Any(p => p.Key == "npm.version" && p.Value == component.Version)))
             {
                 return true;
-            }            
+            }
 
             return false;
         }
@@ -680,7 +679,7 @@ namespace LCT.PackageIdentifier
         {
             AqlResult aqlResult = new AqlResult();
             jfrogRepoPath = Dataconstant.JfrogRepoPathNotFound;
-            string jfrogpackageName = bomHelper.GetFullNameOfComponent(component);           
+            string jfrogpackageName = bomHelper.GetFullNameOfComponent(component);
 
             var aqlResults = aqlResultList.FindAll(x => x.Properties.Any(p => p.Key == "npm.name" && p.Value == jfrogpackageName) && x.Properties.Any(p => p.Key == "npm.version" && p.Value == component.Version));
 

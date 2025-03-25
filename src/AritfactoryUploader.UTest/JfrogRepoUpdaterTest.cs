@@ -1,17 +1,10 @@
-﻿using LCT.APICommunications.Model;
-using LCT.ArtifactoryUploader.Model;
+﻿using LCT.APICommunications.Model.AQL;
 using LCT.ArtifactoryUploader;
-using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using LCT.APICommunications.Model.AQL;
 using LCT.Services.Interface;
 using Moq;
+using NUnit.Framework;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace AritfactoryUploader.UTest
 {
@@ -41,7 +34,7 @@ namespace AritfactoryUploader.UTest
             // Assert
             Assert.That(actualAqlResultList.Count, Is.GreaterThan(2));
         }
-       
-        
+
+
     }
 }

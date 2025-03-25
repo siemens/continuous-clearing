@@ -5,7 +5,6 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.Common.Model;
-using LCT.SW360PackageCreator;
 using LCT.SW360PackageCreator.Interfaces;
 using NUnit.Framework;
 using System.IO;

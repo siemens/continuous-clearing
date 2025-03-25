@@ -56,7 +56,7 @@ namespace SW360IntegrationTest.LoadTest
 
             TestHelper.RunBOMCreatorExe(new string[] { packageJsonPath, bomPath });
             TestHelper.RunComponentCreatorExe(new string[] { combomJsonPath });
-        
+
 
             stopwatch.Stop();
             Console.WriteLine($"PerformanceTestFor70Components():Total time taken : {stopwatch.Elapsed.Minutes}");

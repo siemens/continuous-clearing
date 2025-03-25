@@ -23,11 +23,11 @@ namespace LCT.APICommunications
         {
             // Define the retry policy (retry on 5xx, 408, and transient errors)
             _retryPolicy = Policy
-                .Handle<HttpRequestException>() 
-                .Or<TaskCanceledException>()    
+                .Handle<HttpRequestException>()
+                .Or<TaskCanceledException>()
                 .OrResult<HttpResponseMessage>(r =>
                     (r.StatusCode == HttpStatusCode.RequestTimeout
-                    || (int)r.StatusCode >= 500) 
+                    || (int)r.StatusCode >= 500)
                     && r.StatusCode != HttpStatusCode.Unauthorized
                     && r.StatusCode != HttpStatusCode.Forbidden)
                 .WaitAndRetryAsync(ApiConstant.APIRetryIntervals.Count,
@@ -36,8 +36,8 @@ namespace LCT.APICommunications
                     {
                         Logger.Debug($"Retry attempt {attempt} due to: {(outcome.Exception != null ? outcome.Exception.Message : $"{outcome.Result.StatusCode}")}");
                         if (!_initialRetryLogged && context["LogWarnings"] as bool? != false)
-                        {                           
-                            Logger.Warn($"Retry attempt triggered due to: {(outcome.Exception != null ? outcome.Exception.Message : $"{outcome.Result.StatusCode}")}");                            
+                        {
+                            Logger.Warn($"Retry attempt triggered due to: {(outcome.Exception != null ? outcome.Exception.Message : $"{outcome.Result.StatusCode}")}");
                         }
                         context["RetryAttempt"] = attempt;
                         _initialRetryLogged = true;
@@ -73,7 +73,7 @@ namespace LCT.APICommunications
                     GetRetryInterval,
                     onRetry: (exception, timespan, attempt, context) =>
                     {
-                        Logger.Debug($"Retry attempt {attempt} due to: {exception?.Message ?? "No exception"}");                        
+                        Logger.Debug($"Retry attempt {attempt} due to: {exception?.Message ?? "No exception"}");
                     });
 
             await retryPolicy.ExecuteAsync(action);

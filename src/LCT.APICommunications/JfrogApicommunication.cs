@@ -22,7 +22,7 @@ namespace LCT.APICommunications
         protected string SourceRepoName { get; set; }
         private static int TimeoutInSec { get; set; }
 
-        protected JfrogApicommunication(string repoDomainName, string srcrepoName, ArtifactoryCredentials artifactoryCredentials,int timeout)
+        protected JfrogApicommunication(string repoDomainName, string srcrepoName, ArtifactoryCredentials artifactoryCredentials, int timeout)
         {
             DomainName = repoDomainName;
             ArtifactoryCredentials = artifactoryCredentials;

@@ -20,6 +20,6 @@ namespace UnitTestUtilities
         public static readonly string SW360URL = config["SW360URL"];
         public static readonly string FossologyURL = config["FossologyURL"];
         public static readonly string JFrogURL = config["JFrogURL"];
-      
+
     }
 }

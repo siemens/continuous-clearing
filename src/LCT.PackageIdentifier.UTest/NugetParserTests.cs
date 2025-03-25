@@ -4,23 +4,22 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using CycloneDX.Models;
+using LCT.APICommunications.Model.AQL;
+using LCT.Common;
+using LCT.Common.Constants;
+using LCT.Common.Interface;
+using LCT.Common.Model;
+using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
+using LCT.Services.Interface;
+using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using LCT.Common;
-using LCT.Common.Model;
-using LCT.PackageIdentifier;
-using LCT.Services.Interface;
-using LCT.PackageIdentifier.Interface;
-using Moq;
-using LCT.APICommunications.Model.AQL;
-using CycloneDX.Models;
-using System.Threading.Tasks;
 using System.Linq;
-using LCT.Common.Constants;
-using LCT.Common.Interface;
+using System.Threading.Tasks;
 
 namespace LCT.PackageIdentifier.UTest
 {
@@ -746,7 +745,7 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            
+
             IFolderAction folderAction = new FolderAction();
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
@@ -1106,7 +1105,7 @@ namespace LCT.PackageIdentifier.UTest
 
             //Act
             Bom listofcomponents = new NugetProcessor(cycloneDXBomParser.Object).ParsePackageFile(appSettings);
-            var IsDevDependency = 
+            var IsDevDependency =
                 listofcomponents.Components.Find(a => a.Name == "SonarAnalyzer.CSharp")
                 .Properties[0].Value;
 

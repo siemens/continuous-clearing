@@ -5,11 +5,10 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.APICommunications.Interfaces;
-using LCT.Common;
+using LCT.APICommunications.Model;
 using LCT.Facade.Interfaces;
 using System.Net.Http;
 using System.Threading.Tasks;
-using LCT.APICommunications.Model;
 
 namespace LCT.Facade
 {
@@ -76,6 +75,6 @@ namespace LCT.Facade
         public async Task<HttpResponseMessage> GetPackageInfo(ComponentsToArtifactory component)
         {
             return await m_jfrogAqlApiCommunication.GetPackageInfo(component);
-        }        
+        }
     }
 }

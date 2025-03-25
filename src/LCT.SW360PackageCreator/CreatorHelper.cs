@@ -393,7 +393,7 @@ namespace LCT.SW360PackageCreator
             Program.CreatorStopWatch.Stop();
             creatorKpiData.TimeTakenByComponentCreator =
                 TimeSpan.FromMilliseconds(Program.CreatorStopWatch.ElapsedMilliseconds).TotalSeconds;
-            
+
             return creatorKpiData;
         }
 

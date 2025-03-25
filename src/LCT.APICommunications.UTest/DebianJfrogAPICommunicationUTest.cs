@@ -6,18 +6,13 @@
 
 
 using LCT.APICommunications.Model;
-using Moq;
-using Moq.Protected;
-using System.Net;
-using System.Net.Http;
-using System.Threading;
 
 namespace LCT.APICommunications.UTest
 {
     [TestFixture]
     public class DebainJfrogAPICommunicationUTest
-    {       
-        
+    {
+
 
         [Test]
         public void DebainJfrogApiCommunication_CopyFromRemoteRepo_ReturnsInvalidOperationException()
@@ -26,7 +21,7 @@ namespace LCT.APICommunications.UTest
             ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials();
 
             //Act
-            JfrogApicommunication jfrogApicommunication = new DebianJfrogAPICommunication("", "", repoCredentials,100);
+            JfrogApicommunication jfrogApicommunication = new DebianJfrogAPICommunication("", "", repoCredentials, 100);
 
             //Assert
             Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApicommunication.CopyFromRemoteRepo(new ComponentsToArtifactory()));
@@ -83,5 +78,5 @@ namespace LCT.APICommunications.UTest
             Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApicommunication.MoveFromRepo(new ComponentsToArtifactory()));
         }
     }
-    
+
 }

@@ -16,8 +16,8 @@ namespace LCT.APICommunications.Model
 
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class ReleaseEmbedded
-  {
-    [JsonProperty("sw360:releases")]
-    public IList<Sw360Releases> Sw360Releases { get; set; }
-  }
+    {
+        [JsonProperty("sw360:releases")]
+        public IList<Sw360Releases> Sw360Releases { get; set; }
+    }
 }

@@ -12,10 +12,8 @@ using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
-using log4net.Core;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -230,7 +228,7 @@ namespace LCT.PackageIdentifier
                     BomCreator.bomKpiData.DevdependencyComponents++;
                 }
                 if (appSettings.Maven.Artifactory.ThirdPartyRepos != null)
-                {                    
+                {
                     foreach (var thirdPartyRepo in appSettings.Maven.Artifactory.ThirdPartyRepos)
                     {
                         if (artifactoryrepo.Value == thirdPartyRepo.Name)

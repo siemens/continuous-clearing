@@ -1,6 +1,6 @@
 ﻿using CycloneDX.Models;
-using System.IO;
 using NUnit.Framework;
+using System.IO;
 using TestUtilities;
 
 namespace SW360IntegrationTest.NPM
@@ -34,7 +34,7 @@ namespace SW360IntegrationTest.NPM
             // Test BOM Creator ran with exit code 0
             Assert.AreEqual(0, TestHelper.RunBOMCreatorExe(new string[]{
                 TestConstant.PackageFilePath, packagjsonPath,
-                TestConstant.BomFolderPath, bomPath,                
+                TestConstant.BomFolderPath, bomPath,
                 TestConstant.ProjectType, "Npm",
                 TestConstant.Appsettings,appsettingsFilePath,
                  TestConstant.Mode,""}),

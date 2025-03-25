@@ -159,7 +159,7 @@ namespace LCT.Services.UTest
         public async Task GetPackageInfo_GetsPackageInfo_Successfully()
         {
             // Arrange
-            ComponentsToArtifactory component= new ComponentsToArtifactory
+            ComponentsToArtifactory component = new ComponentsToArtifactory
             {
                 SrcRepoName = "energy-dev-npm-egll",
                 JfrogPackageName = "saap-api-node-2.26.3-LicenseClearing.16.sha-058fada.tgz",

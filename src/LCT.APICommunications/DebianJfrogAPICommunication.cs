@@ -64,7 +64,7 @@ namespace LCT.APICommunications
 
         public override async Task<HttpResponseMessage> GetPackageInfo(ComponentsToArtifactory component)
         {
-            HttpResponseMessage responseMessage = new HttpResponseMessage();            
+            HttpResponseMessage responseMessage = new HttpResponseMessage();
             var result = responseMessage;
             try
             {

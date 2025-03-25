@@ -4,27 +4,18 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using LCT.Common;
 using CycloneDX.Models;
+using LCT.APICommunications;
 using LCT.APICommunications.Model;
 using LCT.ArtifactoryUploader;
-using LCT.Common.Constants;
+using LCT.ArtifactoryUploader.Model;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
-using UnitTestUtilities;
-using System.Threading.Tasks;
 using System.Linq;
-using LCT.ArtifactoryUploader.Model;
-using LCT.APICommunications;
 using System.Net.Http;
-using System.Net;
-using LCT.APICommunications.Model.AQL;
-using LCT.Services.Interface;
-using Moq;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using LCT.Common.Interface;
-using LCT.Common.Model;
+using System.Threading.Tasks;
 
 namespace AritfactoryUploader.UTest
 {
@@ -132,8 +123,8 @@ namespace AritfactoryUploader.UTest
             //Assert
             var repoUrl = bom.Components.First(x => x.Properties[3].Name == "internal:siemens:clearing:jfrog-repo-name").Properties[3].Value;
             Assert.AreNotEqual("org1-npmjs-npm-remote", repoUrl);
-        }      
-       
+        }
+
 
         [Test]
         public void GetJfrogApiCommInstance_GivenComponent_ReturnsJfrogApiCommunicationInstance()
@@ -308,8 +299,8 @@ namespace AritfactoryUploader.UTest
                 Assert.AreEqual(1, displayPackagesInfo.JfrogFoundPackagesDebian.Count);
                 Assert.That(displayPackagesInfo.JfrogFoundPackagesDebian[0], Is.Not.Null);
             }
-        }       
+        }
 
-       
+
     }
 }

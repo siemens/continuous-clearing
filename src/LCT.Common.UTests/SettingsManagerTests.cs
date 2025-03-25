@@ -4,11 +4,8 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using Moq;
-using Moq.Protected;
 using NUnit.Framework;
 using System;
-using System.IO;
 
 namespace LCT.Common.UTest
 {
@@ -26,7 +23,7 @@ namespace LCT.Common.UTest
         {
             _settingsManager = new SettingsManager();
         }
-        
+
         [Test]
         public void ReadConfiguration_WhenArgsIsNull_ShouldThrowInvalidDataException()
         {
@@ -48,7 +45,7 @@ namespace LCT.Common.UTest
             bool result = SettingsManager.IsAzureDevOpsDebugEnabled();
 
             // Assert
-            Assert.That(result,Is.True);
+            Assert.That(result, Is.True);
         }
 
         [Test]
@@ -61,7 +58,7 @@ namespace LCT.Common.UTest
             bool result = SettingsManager.IsAzureDevOpsDebugEnabled();
 
             // Assert
-            Assert.That(result,Is.False);
+            Assert.That(result, Is.False);
         }
 
         [Test]

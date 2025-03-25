@@ -4,25 +4,22 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using LCT.APICommunications.Model;
+using LCT.APICommunications.Model.Foss;
+using LCT.Common;
+using LCT.Common.Interface;
+using LCT.Facade.Interfaces;
 using LCT.Services.Interface;
-using LCT.SW360PackageCreator;
 using Moq;
+using Moq.Protected;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
 using System.IO;
-using LCT.Common;
-using System.Threading.Tasks;
-using LCT.APICommunications.Model;
-using LCT.Facade.Interfaces;
-using LCT.APICommunications.Model.Foss;
-using Newtonsoft.Json;
-using System.Net.Http;
-using LCT.Common.Interface;
 using System.Net;
+using System.Net.Http;
 using System.Threading;
-using Moq.Protected;
-using System.Security.Policy;
-using System.Reflection;
+using System.Threading.Tasks;
 
 namespace LCT.SW360PackageCreator.UTest
 {

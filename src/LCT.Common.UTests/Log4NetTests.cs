@@ -127,7 +127,7 @@ namespace LCT.Common.UTest
             string expectedPath = Path.Combine(appFolder, "log4net.ansi.config");
 
             // Act
-            _= Log4Net.GetDefaultLogConfigFile();
+            _ = Log4Net.GetDefaultLogConfigFile();
 
             // Assert
             Assert.That(expectedPath, Is.EqualTo(expectedPath));
@@ -141,7 +141,7 @@ namespace LCT.Common.UTest
             string expectedPath = Path.Combine(appFolder, "log4net.color.config");
 
             // Act
-            _= Log4Net.GetDefaultLogConfigFile();
+            _ = Log4Net.GetDefaultLogConfigFile();
 
             // Assert
             Assert.That(expectedPath, Is.Not.Null);

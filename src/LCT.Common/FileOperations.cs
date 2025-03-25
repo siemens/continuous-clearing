@@ -50,11 +50,11 @@ namespace LCT.Common
         public string WriteContentToFile<T>(T dataToWrite, string folderPath, string fileNameWithExtension, string projectName)
         {
             try
-            {            
+            {
                 Logger.Debug($"WriteContentToFile():folderpath-{folderPath},fileNameWithExtension-{fileNameWithExtension}," + $"projectName-{projectName}");
 
                 string jsonString = JsonConvert.SerializeObject(dataToWrite, Formatting.Indented);
-               
+
                 string fileName = $"{projectName}_{fileNameWithExtension}";
 
                 string filePath = Path.Combine(folderPath, fileName);
@@ -88,10 +88,10 @@ namespace LCT.Common
             try
             {
                 Logger.Debug($"WriteContentToBomFile():folderpath-{folderPath},fileNameWithExtension-{fileNameWithExtension}," + $"projectName-{projectName}");
-        
+
                 string fileName = $"{projectName}_{fileNameWithExtension}";
 
-                string filePath = CatoolBomFilePath =  Path.Combine(folderPath, fileName);
+                string filePath = CatoolBomFilePath = Path.Combine(folderPath, fileName);
                 Logger.Debug($"filePath-{filePath}");
 
                 BackupTheGivenFile(folderPath, fileName);
@@ -121,24 +121,24 @@ namespace LCT.Common
         public Bom CombineComponentsFromExistingBOM(Bom components, string filePath)
         {
             Bom comparisonData = new Bom();
-            
+
             try
             {
 
                 if (File.Exists(filePath))
                 {
-                    
-                    StreamReader fileRead = new StreamReader(filePath);                    
-                    var content = fileRead.ReadToEnd();                    
+
+                    StreamReader fileRead = new StreamReader(filePath);
+                    var content = fileRead.ReadToEnd();
                     try
                     {
                         comparisonData = JsonConvert.DeserializeObject<Bom>(content);
                     }
                     catch (JsonSerializationException)
-                    {                       
+                    {
                         comparisonData = CycloneDX.Json.Serializer.Deserialize(content);
                     }
-                    
+
                     fileRead.Close();
                     List<Component> list = new List<Component>(comparisonData.Components.Count + components.Components.Count);
                     list.AddRange(comparisonData.Components);
@@ -165,15 +165,15 @@ namespace LCT.Common
 
             }
             catch (IOException e)
-            {                
+            {
                 Environment.ExitCode = -1;
                 Logger.Error($"Error:Invalid path entered,Please check if the comparison BOM  path entered is correct", e);
             }
             catch (UnauthorizedAccessException e)
-            {                
+            {
                 Environment.ExitCode = -1;
                 Logger.Error($"Error:Invalid path entered,Please check if the comparison BOM path entered is correct", e);
-            }            
+            }
             return comparisonData;
         }
         public string WriteContentToCycloneDXFile<T>(T dataToWrite, string filePath, string fileNameWithExtension)
@@ -237,8 +237,8 @@ namespace LCT.Common
                 Logger.Error($"Error occurred while generating backup BOM file", ex);
                 Environment.ExitCode = -1;
             }
-        } 
-        
+        }
+
         public string WriteContentToReportNotApprovedFile<T>(T dataToWrite, string folderPath, string fileNameWithExtension, string name)
         {
             try

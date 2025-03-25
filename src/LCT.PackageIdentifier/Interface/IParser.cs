@@ -5,11 +5,11 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using LCT.Common;
 using LCT.PackageIdentifier.Model;
+using LCT.Services.Interface;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using LCT.Common;
-using LCT.Services.Interface;
 
 namespace LCT.PackageIdentifier.Interface
 {

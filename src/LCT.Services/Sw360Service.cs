@@ -25,7 +25,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace LCT.Services
@@ -65,7 +64,7 @@ namespace LCT.Services
                 string responseBody = await m_SW360ApiCommunicationFacade.GetReleases();
                 Sw360ServiceStopWatch.Stop();
                 Logger.Debug($"GetAvailableReleasesInSw360():Time taken to in GetReleases() call" +
-                    $"-{TimeSpan.FromMilliseconds(Sw360ServiceStopWatch.ElapsedMilliseconds).TotalSeconds}");                
+                    $"-{TimeSpan.FromMilliseconds(Sw360ServiceStopWatch.ElapsedMilliseconds).TotalSeconds}");
                 var modelMappedObject = JsonConvert.DeserializeObject<ComponentsRelease>(responseBody);
 
                 if (modelMappedObject != null && modelMappedObject.Embedded?.Sw360Releases?.Count > 0)

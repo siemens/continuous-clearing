@@ -5,12 +5,12 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using LCT.Common;
 using LCT.Common.Model;
 using LCT.Services.Interface;
 using LCT.SW360PackageCreator.Model;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using LCT.Common;
 
 namespace LCT.SW360PackageCreator.Interfaces
 {

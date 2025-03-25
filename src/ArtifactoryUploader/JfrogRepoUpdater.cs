@@ -1,18 +1,15 @@
 ﻿using CycloneDX.Models;
-using LCT.APICommunications.Model.AQL;
 using LCT.APICommunications.Model;
+using LCT.APICommunications.Model.AQL;
 using LCT.ArtifactoryUploader.Model;
+using LCT.Common.Constants;
+using LCT.Services.Interface;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Net;
-using LCT.Services;
-using LCT.Services.Interface;
-using log4net;
 using System.Reflection;
-using LCT.Common.Constants;
+using System.Threading.Tasks;
 
 namespace LCT.ArtifactoryUploader
 {
@@ -103,7 +100,7 @@ namespace LCT.ArtifactoryUploader
             return jfrogPackagesListAql.FirstOrDefault(x => x.Path.Contains(package.Name)
                                                  && x.Name.Contains(package.Version)
                                                  && x.Name.Contains(packageNameEXtension));
-        }        
+        }
 
         public static async Task<List<AqlResult>> GetJfrogRepoInfoForAllTypePackages(List<string> destRepoNames)
         {
@@ -118,6 +115,6 @@ namespace LCT.ArtifactoryUploader
 
             return aqlResultList;
         }
-       
+
     }
 }

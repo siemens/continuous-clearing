@@ -5,19 +5,19 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.Common;
+using LCT.Common.Constants;
 using LCT.Common.Model;
 using LCT.SW360PackageCreator.Interfaces;
-using System;
-using System.Threading.Tasks;
-using log4net;
-using System.Reflection;
-using LCT.Common.Constants;
-using System.IO;
 using LCT.SW360PackageCreator.Model;
+using log4net;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using Directory = System.IO.Directory;
 
 namespace LCT.SW360PackageCreator

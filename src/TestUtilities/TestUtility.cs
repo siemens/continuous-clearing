@@ -48,7 +48,7 @@ namespace TestUtilities
             var responsestring = JsonConvert.DeserializeObject<ReleasesInfo>(response);
 
 
-            if ( additionalDataValue.Count != 0)
+            if (additionalDataValue.Count != 0)
             {
                 responsestring.AdditionalData = additionalDataValue;
             }

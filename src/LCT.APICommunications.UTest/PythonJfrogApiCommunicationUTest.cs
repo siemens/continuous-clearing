@@ -5,7 +5,6 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.APICommunications.Model;
-using System.Threading;
 
 namespace LCT.APICommunications.UTest
 {

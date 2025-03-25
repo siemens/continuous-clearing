@@ -5,7 +5,6 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.APICommunications;
-using LCT.PackageIdentifier;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using System.IO;

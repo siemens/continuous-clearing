@@ -65,7 +65,7 @@ namespace LCT.Facade
         {
             return m_sw360ApiCommunication.GetReleases();
         }
-        public Task<string> TriggerFossologyProcess(string releaseId,string sw360link)
+        public Task<string> TriggerFossologyProcess(string releaseId, string sw360link)
         {
             return m_sw360ApiCommunication.TriggerFossologyProcess(releaseId, sw360link);
         }

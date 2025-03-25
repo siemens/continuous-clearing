@@ -1,11 +1,6 @@
-﻿using Microsoft.VisualStudio.TestPlatform.Utilities;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LCT.Common.UTest
 {
@@ -21,7 +16,7 @@ namespace LCT.Common.UTest
             // Initialize real instances of your services
             appSettings = new CommonAppSettings
             {
-                Telemetry=new Telemetry { ApplicationInsightInstrumentKey= "R1WvRUkY0I6Z" },
+                Telemetry = new Telemetry { ApplicationInsightInstrumentKey = "R1WvRUkY0I6Z" },
                 SW360 = new SW360
                 {
                     ProjectName = "ProjectName",
@@ -32,7 +27,7 @@ namespace LCT.Common.UTest
 
             // Initialize your telemetry service (this will be the class under test)
             telemetryHelper = new TelemetryHelper(appSettings);
-        }        
+        }
         [Test]
         public void StartTelemetry_ShouldInitializeAndTrackEvent_WhenTelemetryIsEnabled()
         {

@@ -1,18 +1,17 @@
-﻿using LCT.APICommunications.Model;
+﻿using LCT.APICommunications;
+using LCT.APICommunications.Model;
 using LCT.ArtifactoryUploader.Model;
+using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
-using LCT.Common;
 using log4net;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using LCT.APICommunications;
-using Directory = System.IO.Directory;
-using Newtonsoft.Json;
 using System.Net;
+using System.Reflection;
 
 namespace LCT.ArtifactoryUploader
 {
@@ -412,6 +411,6 @@ namespace LCT.ArtifactoryUploader
             }
             Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n");
         }
-        
+
     }
 }

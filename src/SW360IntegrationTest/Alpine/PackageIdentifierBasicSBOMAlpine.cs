@@ -1,7 +1,7 @@
-﻿using NUnit.Framework;
-using TestUtilities;
+﻿using CycloneDX.Models;
+using NUnit.Framework;
 using System.IO;
-using CycloneDX.Models;
+using TestUtilities;
 
 namespace SW360IntegrationTest.Alpine
 {

@@ -56,8 +56,8 @@ namespace LCT.Services
                 {
                     var projectInfo = JsonConvert.DeserializeObject<ProjectReleases>(result);
                     sw360ProjectName = projectInfo?.Name;
-                    projectReleases.Name=projectInfo?.Name;
-                    projectReleases.Version=projectInfo?.Version;
+                    projectReleases.Name = projectInfo?.Name;
+                    projectReleases.Version = projectInfo?.Version;
                     projectReleases.state = projectInfo?.state;
                     projectReleases.clearingState = projectInfo?.clearingState;
                 }

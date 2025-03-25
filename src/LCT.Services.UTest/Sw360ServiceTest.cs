@@ -6,12 +6,10 @@
 
 using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.Foss;
-using LCT.Common;
 using LCT.Common.Interface;
 using LCT.Common.Model;
 using LCT.Facade.Interfaces;
 using LCT.Services.Interface;
-using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -197,7 +195,7 @@ namespace LCT.Services.UTest
             var result = await sW360Service.GetAvailableReleasesInSw360(components);
 
             // Assert
-            Assert.AreEqual(0, result.Count);            
+            Assert.AreEqual(0, result.Count);
         }
 
         [Test]

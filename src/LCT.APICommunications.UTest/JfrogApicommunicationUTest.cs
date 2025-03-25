@@ -25,7 +25,7 @@ namespace LCT.APICommunications.UTest
             ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials();
 
             //Act
-            IJFrogApiCommunication jfrogApicommunication = new NugetJfrogApiCommunication("", "", repoCredentials,100);
+            IJFrogApiCommunication jfrogApicommunication = new NugetJfrogApiCommunication("", "", repoCredentials, 100);
 
             //Assert
             Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApicommunication.DeletePackageFromJFrogRepo("", ""));

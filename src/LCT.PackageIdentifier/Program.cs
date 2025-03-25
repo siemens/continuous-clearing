@@ -4,29 +4,27 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using LCT.APICommunications;
+using LCT.APICommunications.Interfaces;
+using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
+using LCT.Common.Model;
 using LCT.Facade;
+using LCT.Facade.Interfaces;
+using LCT.PackageIdentifier.Interface;
 using LCT.Services;
 using LCT.Services.Interface;
-using LCT.PackageIdentifier.Interface;
 using log4net;
 using log4net.Core;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
-using System.Threading.Tasks;
 using System.Runtime.InteropServices;
-using LCT.Common.Model;
-using LCT.Facade.Interfaces;
-using LCT.APICommunications.Interfaces;
-using LCT.APICommunications;
-using LCT.APICommunications.Model;
-using System.Linq;
-using System.Diagnostics.CodeAnalysis;
-using System.Collections.Generic;
+using System.Threading.Tasks;
 using Directory = System.IO.Directory;
 
 

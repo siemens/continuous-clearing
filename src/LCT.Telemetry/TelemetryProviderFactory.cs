@@ -3,9 +3,6 @@
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
-using System;
-using System.Collections.Generic;
-
 namespace LCT.Telemetry
 {
     /// <summary>

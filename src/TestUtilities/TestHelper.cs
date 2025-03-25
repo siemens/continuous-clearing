@@ -50,7 +50,7 @@ namespace TestUtilities
 
             proc.WaitForExit();
 
-            if(proc.ExitCode == 0)
+            if (proc.ExitCode == 0)
             {
                 BOMCreated = true;
             }

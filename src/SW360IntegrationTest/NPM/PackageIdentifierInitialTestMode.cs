@@ -7,16 +7,16 @@
 
 using CycloneDX.Models;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using System.IO;
-using System.Net.Http.Headers;
-using System.Net.Http;
+using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using TestUtilities;
-using Newtonsoft.Json.Linq;
-using System.Linq;
 
 namespace SW360IntegrationTest.NPM
 {
@@ -53,8 +53,8 @@ namespace SW360IntegrationTest.NPM
             HttpResponseMessage componentCheck = await httpClient.GetAsync(TestConstant.Sw360ReleaseApi);
 
             // Act
-            
-            if (componentCheck != null && componentCheck.StatusCode.Equals(HttpStatusCode.NoContent)) 
+
+            if (componentCheck != null && componentCheck.StatusCode.Equals(HttpStatusCode.NoContent))
             {
                 var componentResponse = await httpClient.PostAsync(TestConstant.Sw360ComponentApi, new StringContent(JsonConvert.SerializeObject(new
                 {
@@ -81,7 +81,7 @@ namespace SW360IntegrationTest.NPM
 
                 // Assert
                 Assert.AreEqual(HttpStatusCode.Created, componentResponse.StatusCode);
-            }   
+            }
         }
 
         [Test, Order(2)]
@@ -142,7 +142,7 @@ namespace SW360IntegrationTest.NPM
                             Assert.AreEqual(item.BomRef, component.BomRef);
                         }
                     }
-                  
+
                 }
             }
 

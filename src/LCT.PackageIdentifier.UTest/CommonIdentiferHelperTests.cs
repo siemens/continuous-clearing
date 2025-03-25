@@ -4,12 +4,11 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using NUnit.Framework;
 using LCT.APICommunications.Model.AQL;
-using System.Collections.Generic;
-using LCT.PackageIdentifier;
-using LCT.Common.Constants;
 using LCT.Common;
+using LCT.Common.Constants;
+using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace LCT.PackageIdentifier.UTest
 {
@@ -73,8 +72,8 @@ namespace LCT.PackageIdentifier.UTest
         {
             // Arrange
             var appSettings = new CommonAppSettings
-            {                
-                SW360=new SW360() { ProjectName= "TestProject" }
+            {
+                SW360 = new SW360() { ProjectName = "TestProject" }
             };
 
             // Act
@@ -90,7 +89,7 @@ namespace LCT.PackageIdentifier.UTest
             // Arrange
             var appSettings = new CommonAppSettings
             {
-                
+
             };
 
             // Act
@@ -105,7 +104,7 @@ namespace LCT.PackageIdentifier.UTest
         {
             // Arrange
             var appSettings = new CommonAppSettings
-            {                
+            {
                 SW360 = new SW360() { ProjectName = "TestProject" }
             };
 
@@ -121,7 +120,7 @@ namespace LCT.PackageIdentifier.UTest
         {
             // Arrange
             var appSettings = new CommonAppSettings
-            {                
+            {
             };
 
             // Act

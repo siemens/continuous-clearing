@@ -86,6 +86,6 @@ namespace LCT.Common.UTest
             //Assert
             Assert.IsTrue(acutal);
         }
-        
+
     }
 }

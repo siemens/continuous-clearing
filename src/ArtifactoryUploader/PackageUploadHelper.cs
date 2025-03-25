@@ -13,7 +13,6 @@ using LCT.APICommunications.Model.AQL;
 using LCT.ArtifactoryUploader.Model;
 using LCT.Common;
 using LCT.Common.Constants;
-using LCT.Common.Interface;
 using LCT.Services.Interface;
 using log4net;
 using Newtonsoft.Json;
@@ -25,7 +24,6 @@ using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
-using Directory = System.IO.Directory;
 
 namespace LCT.ArtifactoryUploader
 {
@@ -64,7 +62,7 @@ namespace LCT.ArtifactoryUploader
             }
             return componentsToBoms;
         }
-        
+
         private static Task<ComponentsToArtifactory> GetPackageinfo(ComponentsToArtifactory item, string operationType, HttpResponseMessage responseMessage, string dryRunSuffix)
         {
 
@@ -106,7 +104,7 @@ namespace LCT.ArtifactoryUploader
             return Task.FromResult(components);
 
         }
-       
+
 
         public static async Task JfrogNotFoundPackagesAsync(ComponentsToArtifactory item, DisplayPackagesInfo displayPackagesInfo)
         {
@@ -226,7 +224,7 @@ namespace LCT.ArtifactoryUploader
 
             if (SetWarningCode)
             {
-                EnvironmentHelper environmentHelper = new EnvironmentHelper();                
+                EnvironmentHelper environmentHelper = new EnvironmentHelper();
                 environmentHelper.CallEnvironmentExit(2);
                 Logger.Debug("Setting ExitCode to 2");
             }
@@ -427,7 +425,7 @@ namespace LCT.ArtifactoryUploader
             }
         }
 
-      
+
         public static void UpdateBomArtifactoryRepoUrl(ref Bom bom, List<ComponentsToArtifactory> componentsUploaded)
         {
             foreach (var component in componentsUploaded)
@@ -438,8 +436,8 @@ namespace LCT.ArtifactoryUploader
                     bomComponent.Properties.First(x => x.Name == Dataconstant.Cdx_ArtifactoryRepoName).Value = component.DestRepoName;
                 }
             }
-        }      
-               
+        }
+
     }
 
 }

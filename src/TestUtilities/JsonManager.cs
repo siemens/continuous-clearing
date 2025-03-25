@@ -5,7 +5,6 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using LCT.APICommunications.Model.Foss;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -16,7 +15,7 @@ namespace TestUtilities
     [ExcludeFromCodeCoverage]
     public class ComponentJsonParsor
     {
-        public List< Component> Components { get; } = new List<Component>();
+        public List<Component> Components { get; } = new List<Component>();
         public void Read(string path)
         {
             var json = File.ReadAllText(path);
@@ -35,6 +34,6 @@ namespace TestUtilities
                 // do nothing
             }
         }
-        
+
     }
 }

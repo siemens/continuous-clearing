@@ -1,19 +1,17 @@
-﻿using LCT.APICommunications.Model.AQL;
+﻿using CycloneDX.Models;
+using LCT.APICommunications;
 using LCT.APICommunications.Model;
+using LCT.APICommunications.Model.AQL;
 using LCT.ArtifactoryUploader.Model;
 using LCT.Common;
-using CycloneDX.Models;
+using LCT.Common.Constants;
+using LCT.Services.Interface;
+using log4net;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using log4net;
 using System.Reflection;
-using LCT.Common.Constants;
-using LCT.Services;
-using System;
-using LCT.Services.Interface;
-using LCT.APICommunications;
+using System.Threading.Tasks;
 
 namespace LCT.ArtifactoryUploader
 {

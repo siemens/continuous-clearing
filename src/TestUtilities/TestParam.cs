@@ -15,9 +15,9 @@ namespace TestUtilities
         static readonly IConfiguration s_Config =
          new ConfigurationBuilder().AddJsonFile(@"appSettingsSW360IntegrationTest.json", true, true).Build();
 
-        public string SW360AuthTokenType { get; set; } 
-        public string SW360AuthTokenValue { get; set; } 
-        public string SW360URL { get; set; } 
+        public string SW360AuthTokenType { get; set; }
+        public string SW360AuthTokenValue { get; set; }
+        public string SW360URL { get; set; }
         public string FossUrl { get; set; }
         public string SW360ProjectName { get; set; }
         public string SW360ProjectID { get; set; }

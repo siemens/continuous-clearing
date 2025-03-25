@@ -9,7 +9,6 @@ using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Model;
-using LCT.PackageIdentifier;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
@@ -40,7 +39,7 @@ namespace LCT.PackageIdentifier.UTest
 
             };
             projectReleases.Version = "1.2.3";
-            CatoolInfo caToolInformation = new CatoolInfo() { CatoolVersion = "6.0.0", CatoolRunningLocation="" };
+            CatoolInfo caToolInformation = new CatoolInfo() { CatoolVersion = "6.0.0", CatoolRunningLocation = "" };
             //Act
             Bom files = CycloneBomProcessor.SetMetadataInComparisonBOM(bom, appSettings, projectReleases, caToolInformation);
 
@@ -52,9 +51,9 @@ namespace LCT.PackageIdentifier.UTest
         public void SetMetadataInComparisonBOM_GivenBOMWithMetadata_AddsNewMetadataInfoInBOM()
         {
             //Arrange
-            ProjectReleases projectReleases = new ProjectReleases();            
-            projectReleases.Version= "1.0";
-            
+            ProjectReleases projectReleases = new ProjectReleases();
+            projectReleases.Version = "1.0";
+
             Bom bom = new Bom()
             {
                 Metadata = new Metadata()
@@ -86,7 +85,7 @@ namespace LCT.PackageIdentifier.UTest
             {
                 Name = "Siemens SBOM",
                 Version = "2.0.0",
-                Vendor = "Siemens AG",                
+                Vendor = "Siemens AG",
             };
             Component component = new Component
             {
@@ -227,8 +226,8 @@ namespace LCT.PackageIdentifier.UTest
             {
                 Metadata = null,
                 Components = null
-         
-            
+
+
             };
 
             //Act
@@ -236,7 +235,7 @@ namespace LCT.PackageIdentifier.UTest
             Bom files = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(bom);
 
             //Assert
-            Assert.That(0,Is.EqualTo(files.Components.Count), "Returns Zero components in BOM");
+            Assert.That(0, Is.EqualTo(files.Components.Count), "Returns Zero components in BOM");
 
         }
     }

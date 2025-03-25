@@ -4,19 +4,18 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using LCT.APICommunications.Model;
+using LCT.APICommunications.Model.AQL;
 using LCT.Facade.Interfaces;
 using LCT.Services.Interface;
-using System.Net.Http;
-using System.Threading.Tasks;
 using log4net;
-using System.Reflection;
-using LCT.APICommunications.Model.AQL;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using LCT.Common;
-using LCT.APICommunications.Model;
+using System.Net.Http;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace LCT.Services
 {

@@ -164,7 +164,7 @@ namespace LCT.SW360PackageCreator
             return downloadPath;
         }
 
-        public string ApplyPatchforComponents(ComparisonBomData component, string localDownloadPath, string fileName)     
+        public string ApplyPatchforComponents(ComparisonBomData component, string localDownloadPath, string fileName)
         {
             Result result;
             string patchedFile = string.Empty;

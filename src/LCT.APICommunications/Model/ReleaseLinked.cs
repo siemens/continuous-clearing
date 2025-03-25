@@ -19,6 +19,6 @@ namespace LCT.APICommunications.Model
         public string ReleaseId { get; set; } = string.Empty;
 
         public string Comment { get; set; } = string.Empty;
-        public string Relation {  get; set; } = string.Empty;
+        public string Relation { get; set; } = string.Empty;
     }
 }

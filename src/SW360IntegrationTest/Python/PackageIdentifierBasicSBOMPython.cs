@@ -1,6 +1,6 @@
 ﻿using CycloneDX.Models;
-using System.IO;
 using NUnit.Framework;
+using System.IO;
 using TestUtilities;
 
 namespace SW360IntegrationTest.Python

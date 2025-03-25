@@ -9,11 +9,11 @@ using LCT.Common;
 using LCT.Common.Constants;
 using log4net;
 using log4net.Core;
-using System.IO;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
-using System;
 
 namespace LCT.PackageIdentifier
 {

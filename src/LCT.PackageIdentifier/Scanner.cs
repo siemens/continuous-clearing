@@ -60,17 +60,17 @@ namespace LCT.PackageIdentifier
                     foreach (string configFile in foundConfigFiles)
                     {
                         CheckingForExcludedFiles(config, fileOperations, allFoundConfigFiles, configFile);
-                    }                  
-                }             
+                    }
+                }
             }
 
             if (allFoundConfigFiles.Count == 0)
-            {                
+            {
                 Logger.Error("Provided package file path do not contain valid input files.");
                 environmentHelper.CallEnvironmentExit(-1);
             }
 
-           
+
             return allFoundConfigFiles;
 
         }

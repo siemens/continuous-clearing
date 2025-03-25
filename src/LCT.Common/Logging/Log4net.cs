@@ -4,17 +4,16 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using System.IO;
-using log4net;
-using System.Reflection;
-using log4net.Config;
-using log4net.Repository;
 using LCT.Common.Runtime;
-using log4net.Repository.Hierarchy;
-using log4net.Core;
+using log4net;
 using log4net.Appender;
+using log4net.Config;
+using log4net.Core;
+using log4net.Repository;
+using log4net.Repository.Hierarchy;
 using System;
-using LCT.Common.Constants;
+using System.IO;
+using System.Reflection;
 
 namespace LCT.Common
 {
@@ -80,4 +79,3 @@ namespace LCT.Common
     }
 }
 
-       

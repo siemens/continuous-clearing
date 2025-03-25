@@ -6,9 +6,9 @@
 
 using CycloneDX.Models;
 using LCT.APICommunications.Model;
+using LCT.Common;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using LCT.Common;
 
 namespace LCT.PackageIdentifier.Interface
 {

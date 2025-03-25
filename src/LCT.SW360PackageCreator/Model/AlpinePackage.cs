@@ -24,7 +24,7 @@ namespace LCT.SW360PackageCreator.Model
 
         public string DownloadUrl { get; set; }
 
-        public string SourceDataForAlpine {  get; set; }
+        public string SourceDataForAlpine { get; set; }
 
 
     }

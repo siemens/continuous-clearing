@@ -14,8 +14,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using System.IO;
-using LCT.Common.Runtime;
 
 namespace LCT.Common
 {
@@ -25,7 +23,7 @@ namespace LCT.Common
     public static class CommonHelper
     {
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        public static string ProjectSummaryLink { get; set; }        
+        public static string ProjectSummaryLink { get; set; }
 
         #region public
         public static bool IsAzureDevOpsDebugEnabled()
@@ -45,7 +43,7 @@ namespace LCT.Common
             List<string> otherExcludedComponents = ExcludedComponents?.Where(ec => !ec.StartsWith("pkg:")).ToList();
 
             AddExcludedComponentsPropertyFromPurl(ComponentList, ExcludedComponentsFromPurl, ref noOfExcludedComponents);
-            AddExcludedComponentsPropertyFromNameAndVersion(ComponentList, otherExcludedComponents, ref noOfExcludedComponents);            
+            AddExcludedComponentsPropertyFromNameAndVersion(ComponentList, otherExcludedComponents, ref noOfExcludedComponents);
             return ComponentList;
         }
 

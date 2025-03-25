@@ -1,9 +1,5 @@
 ﻿using LCT.Common.Interface;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LCT.Common
 {
@@ -11,11 +7,12 @@ namespace LCT.Common
     {
         public void CallEnvironmentExit(int code)
         {
-            if (code == -1 || code== 0)
+            if (code == -1 || code == 0)
             {
                 PipelineArtifactUploader.UploadLogs();
                 EnvironmentExit(code);
-            } else if (code == 2)
+            }
+            else if (code == 2)
             {
                 Environment.ExitCode = 2;
             }

@@ -1,7 +1,7 @@
-﻿using NUnit.Framework;
-using TestUtilities;
-using CycloneDX.Models;
+﻿using CycloneDX.Models;
+using NUnit.Framework;
 using System.IO;
+using TestUtilities;
 
 namespace SW360IntegrationTest.Conan
 {

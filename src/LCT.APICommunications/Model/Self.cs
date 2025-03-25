@@ -15,8 +15,8 @@ namespace LCT.APICommunications.Model
 
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class Self
-  {
-    [JsonProperty("href")]
-    public string Href { get; set; }
-  }
+    {
+        [JsonProperty("href")]
+        public string Href { get; set; }
+    }
 }
