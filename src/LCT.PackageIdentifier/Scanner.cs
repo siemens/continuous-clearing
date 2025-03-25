@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -60,17 +60,17 @@ namespace LCT.PackageIdentifier
                     foreach (string configFile in foundConfigFiles)
                     {
                         CheckingForExcludedFiles(config, fileOperations, allFoundConfigFiles, configFile);
-                    }                  
-                }             
+                    }
+                }
             }
 
             if (allFoundConfigFiles.Count == 0)
-            {                
+            {
                 Logger.Error("Provided package file path do not contain valid input files.");
                 environmentHelper.CallEnvironmentExit(-1);
             }
 
-           
+
             return allFoundConfigFiles;
 
         }

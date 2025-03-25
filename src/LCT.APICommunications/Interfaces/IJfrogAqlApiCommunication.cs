@@ -1,12 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.APICommunications.Model;
-using LCT.Common;
-using System.ComponentModel;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -35,7 +33,7 @@ namespace LCT.APICommunications.Interfaces
         /// <param name="repoName">repoName</param>
         /// <returns>HttpResponseMessage</returns>
         Task<HttpResponseMessage> GetPypiComponentDataByRepo(string repoName);
-       
+
 
         /// <summary>
         /// Gets the package information in the repo, via the name or path

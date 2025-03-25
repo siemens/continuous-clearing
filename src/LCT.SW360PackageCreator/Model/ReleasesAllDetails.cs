@@ -7,7 +7,6 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using static LCT.SW360PackageCreator.Model.ReleasesAllDetails;
 
 namespace LCT.SW360PackageCreator.Model
 {
@@ -38,7 +37,7 @@ namespace LCT.SW360PackageCreator.Model
             [JsonProperty("self")]
             public Self Self { get; set; }
 
-        }       
+        }
         public class Self
         {
             [JsonProperty("href")]

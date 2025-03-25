@@ -1,23 +1,22 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
 using LCT.APICommunications.Model;
-using LCT.PackageIdentifier;
+using LCT.APICommunications.Model.AQL;
+using LCT.Common;
+using LCT.Common.Interface;
+using LCT.Common.Model;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
+using LCT.Services.Interface;
 using Moq;
 using NUnit.Framework;
 using System.Collections.Generic;
-using LCT.Common;
 using System.Threading.Tasks;
-using LCT.Common.Model;
-using LCT.Services.Interface;
-using LCT.APICommunications.Model.AQL;
-using LCT.Common.Interface;
 
 namespace LCT.PackageIdentifier.UTest
 {
@@ -215,7 +214,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<IJFrogService> jFrogService = new Mock<IJFrogService>();
             Mock<IBomHelper> bomHelper = new Mock<IBomHelper>();
             bomHelper.Setup(x => x.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>())).ReturnsAsync(aqlResultList);
-      
+
             //Act
             var expected = await parser.GetJfrogRepoDetailsOfAComponent(lstComponentForBOM, appSettings, jFrogService.Object, bomHelper.Object);
 
@@ -406,7 +405,7 @@ namespace LCT.PackageIdentifier.UTest
                     MD5="7654345676543",
                     SHA256="65434567",
                     SHA1="765434567654"
-                    
+
                 }
             };
             mockIProcessor.Setup(x => x.GetJfrogArtifactoryRepoInfo(It.IsAny<CommonAppSettings>(), It.IsAny<ArtifactoryCredentials>(), It.IsAny<Component>(), It.IsAny<string>())).ReturnsAsync(lstComponentForBOM);
@@ -573,8 +572,8 @@ namespace LCT.PackageIdentifier.UTest
             string name = "@angular/animations";
             string version = "12.0.0";
 
-        
-            string hashcode= BomHelper.GetHashCodeUsingNpmView(name,version);
+
+            string hashcode = BomHelper.GetHashCodeUsingNpmView(name, version);
             Assert.That(expectedhashcode, Is.EqualTo(hashcode));
         }
     }

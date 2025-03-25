@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -24,7 +24,7 @@ namespace LCT.SW360PackageCreator.UTest
     /// </summary>
     [TestFixture]
     public class UrlHelperTest
-    {  
+    {
         private Mock<HttpMessageHandler> _mockHandler;
         private HttpClient _httpClient;
         private UrlHelper _urlHelper;
@@ -34,10 +34,10 @@ namespace LCT.SW360PackageCreator.UTest
         private string _pkgName = "test-package";
         [SetUp]
         public void SetUp()
-        {            
+        {
             _mockHandler = new Mock<HttpMessageHandler>();
             _httpClient = new HttpClient(_mockHandler.Object);
-            _urlHelper = UrlHelper.Instance; 
+            _urlHelper = UrlHelper.Instance;
             _pkgFilePath = "path_to_pkg_file";
             _sourceData = "https://example.com/$pkgname/$pkgver/$_commit/$_tzcodever";
         }
@@ -243,8 +243,8 @@ namespace LCT.SW360PackageCreator.UTest
 
             // Assert
             Assert.AreEqual(expectedSource, result);
-        }        
-        
+        }
+
         [Test]
         public void GetSourceUrlForAlpine_WithAllCorrectData_ShouldReturnCorrectUrl()
         {
@@ -290,7 +290,7 @@ namespace LCT.SW360PackageCreator.UTest
 
             Assert.AreEqual(expectedUrl, result);
         }
-        
+
         [TearDown]
         public void CleanUp()
         {
@@ -306,8 +306,8 @@ namespace LCT.SW360PackageCreator.UTest
         {
             bool Exists(string path);
             string ReadAllText(string path);
-        }        
+        }
 
-        
+
     }
 }

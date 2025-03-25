@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -15,7 +15,6 @@ using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
-using log4net.Core;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -115,7 +114,7 @@ namespace LCT.PackageIdentifier
             return componentData;
         }
 
-        
+
         public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM,
             CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
@@ -139,8 +138,9 @@ namespace LCT.PackageIdentifier
                 {
                     BomCreator.bomKpiData.DevdependencyComponents++;
                 }
-                if (appSettings.Conan.Artifactory.ThirdPartyRepos != null)                {
-                    
+                if (appSettings.Conan.Artifactory.ThirdPartyRepos != null)
+                {
+
                     foreach (var thirdPartyRepo in appSettings.Conan.Artifactory.ThirdPartyRepos)
                     {
                         if (artifactoryrepo.Value == thirdPartyRepo.Name)
@@ -218,7 +218,7 @@ namespace LCT.PackageIdentifier
             MultipleVersions multipleVersions = new MultipleVersions();
             IFileOperations fileOperations = new FileOperations();
             string defaultProjectName = CommonIdentiferHelper.GetDefaultProjectName(appSettings);
-            string bomFullPath= $"{appSettings.Directory.OutputFolder}\\{defaultProjectName}_Bom.cdx.json";
+            string bomFullPath = $"{appSettings.Directory.OutputFolder}\\{defaultProjectName}_Bom.cdx.json";
 
             string filePath = $"{appSettings.Directory.OutputFolder}\\{defaultProjectName}_{FileConstant.multipleversionsFileName}";
             if (!File.Exists(filePath))
@@ -243,7 +243,7 @@ namespace LCT.PackageIdentifier
                 List<MultipleVersionValues> conanComponents = new List<MultipleVersionValues>();
                 foreach (var conanPackage in componentsWithMultipleVersions)
                 {
-                  
+
                     MultipleVersionValues jsonComponents = new MultipleVersionValues();
                     jsonComponents.ComponentName = conanPackage.Name;
                     jsonComponents.ComponentVersion = conanPackage.Version;

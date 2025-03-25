@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -28,7 +28,7 @@ namespace LCT.Services.Interface
 
         Task<string> GetReleaseIDofComponent(string componentName, string componentVersion, string componentid);
 
-        Task<FossTriggerStatus> TriggerFossologyProcess(string releaseId,string sw360link);
+        Task<FossTriggerStatus> TriggerFossologyProcess(string releaseId, string sw360link);
 
         Task<CheckFossologyProcess> CheckFossologyProcessStatus(string link);
 

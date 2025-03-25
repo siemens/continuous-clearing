@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 
@@ -48,7 +48,7 @@ namespace TestUtilities
             var responsestring = JsonConvert.DeserializeObject<ReleasesInfo>(response);
 
 
-            if ( additionalDataValue.Count != 0)
+            if (additionalDataValue.Count != 0)
             {
                 responsestring.AdditionalData = additionalDataValue;
             }

@@ -1,23 +1,23 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // --------------------------------------------------------------------------------------------------------------------
 
 using CycloneDX.Models;
+using LCT.APICommunications.Model.AQL;
 using LCT.Common;
+using LCT.Common.Constants;
+using LCT.Common.Interface;
 using LCT.Common.Model;
+using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
+using LCT.Services.Interface;
+using Moq;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
-using LCT.APICommunications.Model.AQL;
-using LCT.PackageIdentifier.Interface;
-using LCT.Services.Interface;
-using Moq;
 using System.Threading.Tasks;
-using LCT.Common.Constants;
-using LCT.Common.Interface;
 
 namespace LCT.PackageIdentifier.UTest
 {
@@ -126,7 +126,7 @@ namespace LCT.PackageIdentifier.UTest
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                ProjectType = "MAVEN",               
+                ProjectType = "MAVEN",
                 Maven = new Config() { Include = Includes, Exclude = Excludes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
                 Directory = new LCT.Common.Directory(folderAction, fileOperations)
@@ -513,9 +513,9 @@ namespace LCT.PackageIdentifier.UTest
             IFolderAction folderAction = new FolderAction();
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
-            {                
-                ProjectType = "MAVEN",               
-                Maven = new Config() { Include = Includes, Exclude = Excludes },              
+            {
+                ProjectType = "MAVEN",
+                Maven = new Config() { Include = Includes, Exclude = Excludes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
                 Directory = new LCT.Common.Directory(folderAction, fileOperations)
                 {

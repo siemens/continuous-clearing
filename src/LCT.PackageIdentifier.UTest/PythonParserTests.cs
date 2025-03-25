@@ -1,24 +1,23 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using LCT.PackageIdentifier;
-using NUnit.Framework;
-using System.IO;
-using LCT.Common;
-using LCT.Common.Model;
-using LCT.Common.Constants;
 using LCT.APICommunications.Model.AQL;
+using LCT.Common;
+using LCT.Common.Constants;
+using LCT.Common.Interface;
+using LCT.Common.Model;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using Moq;
+using NUnit.Framework;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
-using LCT.Common.Interface;
 
 namespace LCT.PackageIdentifier.UTest
 {
@@ -104,7 +103,7 @@ namespace LCT.PackageIdentifier.UTest
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "CycloneDX_Python.cdx.json" };
             List<string> excludeComponents = ["attrs:22.2.0"];
-           
+
             IFolderAction folderAction = new FolderAction();
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
@@ -113,7 +112,7 @@ namespace LCT.PackageIdentifier.UTest
                 Poetry = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true, ExcludeComponents = excludeComponents },
                 Directory = new LCT.Common.Directory(folderAction, fileOperations)
-                {                  
+                {
                     InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }
             };
@@ -260,7 +259,7 @@ namespace LCT.PackageIdentifier.UTest
                 Name = "cachy-0.3.0.tar.gz",
                 Path = "@testfolder/-/folder",
                 Repo = "internalrepo1",
-                Properties=propertys
+                Properties = propertys
             };
 
             List<AqlResult> results = new List<AqlResult>() { aqlResult };
@@ -323,7 +322,7 @@ namespace LCT.PackageIdentifier.UTest
                 Name = "cachy-1.3.0.tar.gz",
                 Path = "@testfolder/-/folder",
                 Repo = "internalrepo1",
-                Properties=propertys
+                Properties = propertys
             };
 
             List<AqlResult> results = new List<AqlResult>() { aqlResult };
@@ -386,7 +385,7 @@ namespace LCT.PackageIdentifier.UTest
                 Name = "html5lib-1.1.tar.gz",
                 Path = "@testfolder/-/folder",
                 Repo = "internalrepo1",
-                Properties=propertys
+                Properties = propertys
             };
 
             List<AqlResult> results = new List<AqlResult>() { aqlResult };
@@ -450,7 +449,7 @@ namespace LCT.PackageIdentifier.UTest
                 Name = "html5lib-1.1-py2.py3-none-any.whl",
                 Path = "@testfolder/-/folder",
                 Repo = "internalrepo1",
-                Properties=propertys
+                Properties = propertys
             };
 
             List<AqlResult> results = new List<AqlResult>() { aqlResult };
@@ -493,12 +492,12 @@ namespace LCT.PackageIdentifier.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            string[] Includes = { "poetry.lock" };            
+            string[] Includes = { "poetry.lock" };
 
             IFolderAction folderAction = new FolderAction();
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
-            {                
+            {
                 ProjectType = "Poetry",
                 Poetry = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },

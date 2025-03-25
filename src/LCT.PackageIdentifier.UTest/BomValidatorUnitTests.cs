@@ -1,19 +1,18 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using LCT.APICommunications.Model;
+using LCT.Common;
 using LCT.Common.Interface;
-using LCT.PackageIdentifier;
 using LCT.Services.Interface;
 using Moq;
 using NUnit.Framework;
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using LCT.Common;
-using LCT.APICommunications.Model;
 
 namespace LCT.PackageIdentifier.UTest
 {
@@ -32,7 +31,7 @@ namespace LCT.PackageIdentifier.UTest
             ProjectReleases projectReleases = new ProjectReleases();
             IFolderAction folderAction = new FolderAction();
             IFileOperations fileOperations = new FileOperations();
-           
+
             mockISw360ProjectService.Setup(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<String>(), It.IsAny<string>(), projectReleases))
                 .ReturnsAsync(projectName);
 
@@ -67,8 +66,8 @@ namespace LCT.PackageIdentifier.UTest
             ProjectReleases projectReleases = new ProjectReleases();
             IFolderAction folderAction = new FolderAction();
             IFileOperations fileOperations = new FileOperations();
-           
-            mockISw360ProjectService.Setup(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<string>(), It.IsAny<string>(),projectReleases))
+
+            mockISw360ProjectService.Setup(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<string>(), It.IsAny<string>(), projectReleases))
                 .ReturnsAsync(projectName);
 
             mockIFileOperations.Setup(x => x.ValidateFilePath(It.IsAny<string>()))
@@ -99,7 +98,7 @@ namespace LCT.PackageIdentifier.UTest
             string projectName = "Test";
             ProjectReleases projectReleases = new ProjectReleases();
             projectReleases.clearingState = "CLOSED";
-            
+
             mockISw360ProjectService.Setup(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<String>(), It.IsAny<string>(), projectReleases))
                 .ReturnsAsync(projectName);
 

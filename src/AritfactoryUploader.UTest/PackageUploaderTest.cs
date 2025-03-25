@@ -1,29 +1,29 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using ArtifactoryUploader;
+using CycloneDX.Models;
+using LCT.APICommunications;
+using LCT.APICommunications.Interfaces;
+using LCT.APICommunications.Model;
 using LCT.ArtifactoryUploader;
 using LCT.Common;
+using LCT.Common.Constants;
+using LCT.Common.Model;
+using LCT.Facade;
+using LCT.Facade.Interfaces;
+using LCT.Services;
+using LCT.Services.Interface;
 using NUnit.Framework;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using UnitTestUtilities;
-using LCT.Services.Interface;
-using LCT.APICommunications.Model;
-using LCT.APICommunications.Interfaces;
-using LCT.APICommunications;
-using LCT.Facade.Interfaces;
-using LCT.Facade;
-using LCT.Services;
-using CycloneDX.Models;
-using LCT.Common.Constants;
-using LCT.Common.Model;
-using System.Collections.Generic;
 
 namespace AritfactoryUploader.UTest
 {
@@ -80,7 +80,7 @@ namespace AritfactoryUploader.UTest
             IJFrogService jFrogService = GetJfrogService(commonAppSettings);
             PackageUploadHelper.jFrogService = jFrogService;
             UploadToArtifactory.jFrogService = jFrogService;
-            ArtfactoryUploader.jFrogService= jFrogService;
+            ArtfactoryUploader.jFrogService = jFrogService;
 
             Program.UploaderStopWatch = new Stopwatch();
             Program.UploaderStopWatch.Start();

@@ -1,19 +1,12 @@
 ﻿using LCT.APICommunications.Model;
-using log4net;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Security;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LCT.APICommunications.UTest
 {
     [TestFixture]
     public class AttachmentHelperUTest
-    {        
+    {
         private readonly string _sw360AuthToken = "mockToken";
         private readonly string _sw360AuthTokenType = "Bearer";
         private readonly string _sw360ReleaseApi = "https://api.mock.com/release";
@@ -22,7 +15,7 @@ namespace LCT.APICommunications.UTest
 
         [SetUp]
         public void SetUp()
-        {            
+        {
 
             // Initialize the AttachmentHelper with mock logger.
             _attachmentHelper = new AttachmentHelper(_sw360AuthTokenType, _sw360AuthToken, _sw360ReleaseApi);
@@ -53,7 +46,7 @@ namespace LCT.APICommunications.UTest
 
             // Assert
             Assert.AreEqual("https://api.mock.com/release/123/attachments", result);
-        }        
+        }
 
         [Test]
         public void WriteAttachmentsJSONFile_CreatesValidJSONFile()

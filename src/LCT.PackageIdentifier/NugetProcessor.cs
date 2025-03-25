@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -16,7 +16,6 @@ using LCT.PackageIdentifier.Model;
 using LCT.PackageIdentifier.Model.NugetModel;
 using LCT.Services.Interface;
 using log4net;
-using log4net.Core;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -240,7 +239,7 @@ namespace LCT.PackageIdentifier
                     BomCreator.bomKpiData.DevdependencyComponents++;
                 }
                 if (appSettings.Nuget.Artifactory.ThirdPartyRepos != null)
-                {                   
+                {
                     foreach (var thirdPartyRepo in appSettings.Nuget.Artifactory.ThirdPartyRepos)
                     {
                         if (artifactoryrepo.Value == thirdPartyRepo.Name)

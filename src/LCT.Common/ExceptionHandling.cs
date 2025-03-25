@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -43,7 +43,7 @@ namespace LCT.Common
             }
         }
 
-        public static void ArgumentException( string message)
+        public static void ArgumentException(string message)
         {
             Logger.Logger.Log(null, Level.Error, $"Missing Arguments: Please provide the below arguments via inline or in the appSettings.json file to proceed.", null);
             Logger.Logger.Log(null, Level.Warn, $"{message}", null);

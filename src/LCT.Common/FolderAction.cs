@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -64,7 +64,7 @@ namespace LCT.Common
         /// <param name="folderPath"></param>
         public void ValidateFolderPath(string folderPath)
         {
-            if(string.IsNullOrWhiteSpace(folderPath))
+            if (string.IsNullOrWhiteSpace(folderPath))
             {
                 throw new ArgumentException($"Invalid value for folderPath -{folderPath}");
             }

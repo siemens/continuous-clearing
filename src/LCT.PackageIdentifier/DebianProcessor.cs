@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -13,14 +13,11 @@ using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
-using log4net.Core;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace LCT.PackageIdentifier
@@ -145,7 +142,7 @@ namespace LCT.PackageIdentifier
                     BomCreator.bomKpiData.DevdependencyComponents++;
                 }
                 if (appSettings.Debian.Artifactory.ThirdPartyRepos != null)
-                {                   
+                {
                     foreach (var thirdPartyRepo in appSettings.Debian.Artifactory.ThirdPartyRepos)
                     {
                         if (artifactoryrepo.Value == thirdPartyRepo.Name)

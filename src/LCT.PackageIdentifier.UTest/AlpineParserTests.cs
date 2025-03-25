@@ -1,18 +1,18 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using LCT.Common.Model;
 using LCT.Common;
-using NUnit.Framework;
-using System.IO;
 using LCT.Common.Constants;
-using Moq;
-using System.Collections.Generic;
 using LCT.Common.Interface;
+using LCT.Common.Model;
+using Moq;
+using NUnit.Framework;
+using System.Collections.Generic;
+using System.IO;
 
 namespace LCT.PackageIdentifier.UTest
 {
@@ -78,7 +78,7 @@ namespace LCT.PackageIdentifier.UTest
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                
+
                 ProjectType = "ALPINE",
                 Alpine = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
@@ -92,7 +92,7 @@ namespace LCT.PackageIdentifier.UTest
             Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings);
 
             //Assert
-            Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), 
+            Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count),
                 "Checks for no of components");
         }
 
@@ -108,7 +108,7 @@ namespace LCT.PackageIdentifier.UTest
             IFolderAction folderAction = new FolderAction();
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
-            {               
+            {
                 ProjectType = "ALPINE",
                 Alpine = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
@@ -130,7 +130,7 @@ namespace LCT.PackageIdentifier.UTest
         public void ParsePackageConfig_GivenAInputFilePath_ReturnsSourceDetails()
         {
             //Arrange
-            string sourceName =@"apk-tools_2.12.9-r3";
+            string sourceName = @"apk-tools_2.12.9-r3";
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "AlpineSourceDetails_Cyclonedx.cdx.json" };
@@ -138,7 +138,7 @@ namespace LCT.PackageIdentifier.UTest
             IFolderAction folderAction = new FolderAction();
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
-            {                
+            {
                 ProjectType = "ALPINE",
                 Alpine = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
@@ -178,7 +178,7 @@ namespace LCT.PackageIdentifier.UTest
                     InputFolder = packagefilepath
                 }
             };
-            
+
 
             //Act
             Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings);
@@ -209,7 +209,7 @@ namespace LCT.PackageIdentifier.UTest
                     InputFolder = packagefilepath
                 }
             };
-            
+
 
             //Act
             Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings);

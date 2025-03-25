@@ -1,11 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.APICommunications.Model;
-using LCT.Common;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -44,7 +43,7 @@ namespace LCT.Facade.Interfaces
         /// <param name="path">repoName</param>
         /// <returns>AqlResult</returns>
         Task<HttpResponseMessage> GetPackageInfo(ComponentsToArtifactory component);
-              
+
 
         /// <summary>
         /// Checks connectivity with JFrog server

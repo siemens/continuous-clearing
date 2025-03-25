@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -47,15 +47,15 @@ namespace LCT.PackageIdentifier
         {CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ComponentsinPackageLockJsonFile)), bomKpiData.ComponentsinPackageLockJsonFile },
         {CommonHelper.Convert(bomKpiData, nameof(bomKpiData.DevDependentComponents)), bomKpiData.DevDependentComponents},
         {CommonHelper.Convert(bomKpiData, nameof(bomKpiData.BundledComponents)), bomKpiData.BundledComponents},
-        {CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ComponentsExcluded)), bomKpiData.ComponentsExcluded},        
+        {CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ComponentsExcluded)), bomKpiData.ComponentsExcluded},
         {CommonHelper.Convert(bomKpiData, nameof(bomKpiData.DuplicateComponents)), bomKpiData.DuplicateComponents}
 
     };
-            if (BomCreator.sw360!=null)
+            if (BomCreator.sw360 != null)
             {
                 printList.Add(CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ComponentsExcludedSW360)), bomKpiData.ComponentsExcludedSW360);
             }
-            if (BomCreator.jfrog!=null)
+            if (BomCreator.jfrog != null)
             {
                 printList.Add(CommonHelper.Convert(bomKpiData, nameof(bomKpiData.InternalComponents)), bomKpiData.InternalComponents);
                 printList.Add(CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ThirdPartyRepoComponents)), bomKpiData.ThirdPartyRepoComponents);

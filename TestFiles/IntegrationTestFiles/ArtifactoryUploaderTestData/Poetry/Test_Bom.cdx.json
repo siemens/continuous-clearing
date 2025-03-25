@@ -71,7 +71,7 @@
         },
         {
           "name": "internal:siemens:clearing:project-type",
-          "value": "PYTHON"
+          "value": "POETRY"
         },
         {
           "name": "internal:siemens:clearing:siemens:filename",
@@ -124,7 +124,7 @@
         },
         {
           "name": "internal:siemens:clearing:project-type",
-          "value": "PYTHON"
+          "value": "POETRY"
         },
         {
           "name": "internal:siemens:clearing:siemens:filename",
@@ -177,7 +177,7 @@
         },
         {
           "name": "internal:siemens:clearing:project-type",
-          "value": "PYTHON"
+          "value": "POETRY"
         },
         {
           "name": "internal:siemens:clearing:siemens:filename",
@@ -230,7 +230,7 @@
         },
         {
           "name": "internal:siemens:clearing:project-type",
-          "value": "PYTHON"
+          "value": "POETRY"
         },
         {
           "name": "internal:siemens:clearing:siemens:filename",

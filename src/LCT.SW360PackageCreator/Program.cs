@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -54,16 +54,16 @@ namespace LCT.SW360PackageCreator
             EnvironmentHelper environmentHelper = new EnvironmentHelper();
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
             ISW360ApicommunicationFacade sW360ApicommunicationFacade;
-            ISw360ProjectService sw360ProjectService= Getsw360ProjectServiceObject(appSettings, out sW360ApicommunicationFacade);
+            ISw360ProjectService sw360ProjectService = Getsw360ProjectServiceObject(appSettings, out sW360ApicommunicationFacade);
             ProjectReleases projectReleases = new ProjectReleases();
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
-           
+
             string FolderPath = InitiateLogger(appSettings);
             settingsManager.CheckRequiredArgsToRun(appSettings, "Creator");
             int isValid = await CreatorValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
-                        
+
             if (isValid == -1)
             {
                 environmentHelper.CallEnvironmentExit(-1);
@@ -95,7 +95,7 @@ namespace LCT.SW360PackageCreator
             if (appSettings.SW360.Fossology.EnableTrigger)
             {
                 HttpClient client = new HttpClient();
-                if (await CreatorValidator.FossologyUrlValidation(appSettings,client, environmentHelper))
+                if (await CreatorValidator.FossologyUrlValidation(appSettings, client, environmentHelper))
                     await CreatorValidator.TriggerFossologyValidation(appSettings, sW360ApicommunicationFacade);
             }
             await InitiatePackageCreatorProcess(appSettings, sw360ProjectService, sW360ApicommunicationFacade);
@@ -103,7 +103,7 @@ namespace LCT.SW360PackageCreator
             if (appSettings.Telemetry.Enable == true)
             {
                 TelemetryHelper telemetryHelper = new TelemetryHelper(appSettings);
-                telemetryHelper.StartTelemetry(caToolInformation.CatoolVersion, ComponentCreator.kpiData,TelemetryConstant.CreatorKpiData);
+                telemetryHelper.StartTelemetry(caToolInformation.CatoolVersion, ComponentCreator.kpiData, TelemetryConstant.CreatorKpiData);
             }
             Logger.Logger.Log(null, Level.Notice, $"End of Package Creator execution: {DateTime.Now}\n", null);
 
@@ -111,7 +111,7 @@ namespace LCT.SW360PackageCreator
             PipelineArtifactUploader.UploadArtifacts();
         }
 
-       
+
         private static CatoolInfo GetCatoolVersionFromProjectfile()
         {
             CatoolInfo catoolInfo = new CatoolInfo();
@@ -142,7 +142,7 @@ namespace LCT.SW360PackageCreator
         private static async Task InitiatePackageCreatorProcess(CommonAppSettings appSettings, ISw360ProjectService sw360ProjectService, ISW360ApicommunicationFacade sW360ApicommunicationFacade)
         {
             ISW360CommonService sw360CommonService = new SW360CommonService(sW360ApicommunicationFacade);
-            ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sW360ApicommunicationFacade, sw360CommonService);            
+            ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sW360ApicommunicationFacade, sw360CommonService);
             ISW360Service sw360Service = new Sw360Service(sW360ApicommunicationFacade, sw360CommonService, environmentHelper);
             ICycloneDXBomParser cycloneDXBomParser = new CycloneDXBomParser();
 

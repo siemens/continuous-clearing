@@ -1,11 +1,10 @@
 // --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.APICommunications;
-using LCT.PackageIdentifier;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using System.IO;

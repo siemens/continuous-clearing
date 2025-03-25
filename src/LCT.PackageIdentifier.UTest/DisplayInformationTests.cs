@@ -1,11 +1,9 @@
 ﻿using LCT.Common;
 using LCT.Common.Interface;
 using LCT.Common.Model;
-using log4net;
 using log4net.Appender;
 using log4net.Config;
 using NUnit.Framework;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -24,7 +22,7 @@ namespace LCT.PackageIdentifier.UTest
         {
             appSettings = new CommonAppSettings();
         }
-        
+
         [Test]
         public void LogInputParameters_ShouldLogCorrectMessage_WhenBasicSBOMIsFalse()
         {
@@ -39,7 +37,7 @@ namespace LCT.PackageIdentifier.UTest
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                ProjectType = "NPM",                
+                ProjectType = "NPM",
                 SW360 = new SW360()
                 {
                     URL = "http://sw360.url",
@@ -107,7 +105,7 @@ namespace LCT.PackageIdentifier.UTest
                     InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles")),
                     OutputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }
-                
+
             };
             caToolInformation = new CatoolInfo
             {
