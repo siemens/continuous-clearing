@@ -116,7 +116,7 @@ jobs:
 
     - script: |
         echo "Starting a new sw360 container..."
-        CONTAINER_ID=$(docker run -dit --name sw360 -p $(SW360_PORT):8080 -p 5985:5984 -p 5435:5432 --add-host=host.docker.internal:host-gateway siemens-docker-dev.jfrog.io/energy-dev/software-clearing/sw360/sw360conf:lat)
+        CONTAINER_ID=$(docker run -dit --name sw360 -p $(SW360_PORT):8080 -p 5985:5984 -p 5435:5432 --add-host=host.docker.internal:host-gateway $(SW360_DOCKER_IMAGE))
 
         if [ -z "$CONTAINER_ID" ]; then
             echo "Failed to start sw360 container!"
@@ -129,7 +129,7 @@ jobs:
     
     - script: |
         echo "Starting a new fossology container..."
-        CONTAINER_ID=$(docker run -dit --name fossology -p $(FOSSOLOGY_PORT):80 siemens-docker-dev.jfrog.io/energy-dev/software-clearing/fossy/ng390:latest)
+        CONTAINER_ID=$(docker run -dit --name fossology -p $(FOSSOLOGY_PORT):80 $(FOSSOLOGY_DOCKER_IMAGE))
 
         if [ -z "$CONTAINER_ID" ]; then
             echo "Failed to start fossology container!"
@@ -349,7 +349,7 @@ jobs:
     inputs:
       SonarQube: 'SonarQube'
       scannerMode: 'dotnet'
-      projectKey: 'siemens-energy:Continuous-Clearing:Continuous-Clearing'
+      projectKey: $(SONARQUBE_PROJECT_KEY)
       projectName: 'Clearing_Automation'
       projectVersion: 
       extraProperties: |
