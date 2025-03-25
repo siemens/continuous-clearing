@@ -51,8 +51,8 @@ namespace LCT.PackageIdentifier.UTest
 
                 Directory = new LCT.Common.Directory(folderAction, fileOperations)
                 {
-                    InputFolder = OutFolder + @"\PackageIdentifierUTTestFiles",
-                    OutputFolder = OutFolder + @"\PackageIdentifierUTTestFiles"
+                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles")),
+                    OutputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }
             };
             caToolInformation = new CatoolInfo
@@ -104,8 +104,8 @@ namespace LCT.PackageIdentifier.UTest
                 ProjectType = "NPM",
                 Directory = new LCT.Common.Directory(folderAction, fileOperations)
                 {
-                    InputFolder = OutFolder + @"\PackageIdentifierUTTestFiles",
-                    OutputFolder = OutFolder + @"\PackageIdentifierUTTestFiles"
+                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles")),
+                    OutputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }
                 
             };
@@ -154,8 +154,8 @@ namespace LCT.PackageIdentifier.UTest
                 Jfrog = new Jfrog(),
                 Directory = new LCT.Common.Directory(folderAction, fileOperations)
                 {
-                    InputFolder = OutFolder + @"\PackageIdentifierUTTestFiles",
-                    OutputFolder = OutFolder + @"\PackageIdentifierUTTestFiles"
+                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles")),
+                    OutputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }
             };
             caToolInformation = new CatoolInfo

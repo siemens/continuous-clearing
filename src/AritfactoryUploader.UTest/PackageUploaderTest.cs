@@ -42,7 +42,7 @@ namespace AritfactoryUploader.UTest
             CommonAppSettings commonAppSettings = new CommonAppSettings();
             commonAppSettings.Directory = new LCT.Common.Directory(new FolderAction(), new FileOperations())
             {
-                OutputFolder = outFolder + @"\ArtifactoryUTTestFiles"
+                OutputFolder = Path.GetFullPath(Path.Combine(outFolder, "ArtifactoryUTTestFiles"))
             };
 
             commonAppSettings.Jfrog = new Jfrog()
@@ -74,7 +74,7 @@ namespace AritfactoryUploader.UTest
             commonAppSettings.TimeOut = 100;
             commonAppSettings.SW360 = new SW360()
             {
-                ProjectName = "test"
+                ProjectName = "Test"
             };
 
             IJFrogService jFrogService = GetJfrogService(commonAppSettings);

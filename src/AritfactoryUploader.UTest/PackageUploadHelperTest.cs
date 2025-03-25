@@ -38,7 +38,7 @@ namespace AritfactoryUploader.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string comparisonBOMPath = outFolder + @"\ArtifactoryUTTestFiles\Test_Bom.cdx.json";
+            string comparisonBOMPath = Path.GetFullPath(Path.Combine(outFolder, "ArtifactoryUTTestFiles", "Test_Bom.cdx.json"));
             //Act
             Bom componentList = PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath);
             // Assert
@@ -76,7 +76,7 @@ namespace AritfactoryUploader.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string comparisonBOMPath = outFolder + @"\ArtifactoryUTTestFiles\ComparisonBOM.json";
+            string comparisonBOMPath = Path.GetFullPath(Path.Combine(outFolder, "ArtifactoryUTTestFiles", "ComparisonBOM.json"));
 
             //Act && Assert
             Assert.Throws<System.Text.Json.JsonException>(() => PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath));
@@ -89,7 +89,7 @@ namespace AritfactoryUploader.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string comparisonBOMPath = outFolder + @"\ArtifactoryUTTestFiles\Test_Bom.cdx.json";
+            string comparisonBOMPath = Path.GetFullPath(Path.Combine(outFolder, "ArtifactoryUTTestFiles", "Test_Bom.cdx.json"));
             Bom bom = PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath);
             List<ComponentsToArtifactory> components = new List<ComponentsToArtifactory>()
             {
@@ -115,7 +115,7 @@ namespace AritfactoryUploader.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string comparisonBOMPath = outFolder + @"\ArtifactoryUTTestFiles\Test_Bom.cdx.json";
+            string comparisonBOMPath = Path.GetFullPath(Path.Combine(outFolder, "ArtifactoryUTTestFiles", "Test_Bom.cdx.json"));
             Bom bom = PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath);
             List<ComponentsToArtifactory> components = new List<ComponentsToArtifactory>()
             {

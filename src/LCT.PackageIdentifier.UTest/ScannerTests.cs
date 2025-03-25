@@ -23,7 +23,7 @@ namespace LCT.PackageIdentifier.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string filepath = outFolder + @"\PackageIdentifierUTTestFiles\TestDir";
+            string filepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles", "TestDir"));
             string[] Includes = { "p*-lock.json" };
             string[] Excludes = { "node_modules" };
             Config config = new Config()
@@ -84,7 +84,7 @@ namespace LCT.PackageIdentifier.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string filepath = outFolder + @"\PackageIdentifierUTTestFiles\TestDir";
+            string filepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles", "TestDir"));
             Config config = new Config()
             {
                 Include = null,

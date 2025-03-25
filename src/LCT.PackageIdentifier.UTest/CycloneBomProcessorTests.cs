@@ -153,7 +153,7 @@ namespace LCT.PackageIdentifier.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string BomTestFile = outFolder + @"\PackageIdentifierUTTestFiles\CycloneDX_Debian.cdx.json";
+            string BomTestFile = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles", "CycloneDX_Debian.cdx.json"));
 
             //Act
             CycloneDXBomParser cycloneBomProcessor = new CycloneDXBomParser();
@@ -170,7 +170,7 @@ namespace LCT.PackageIdentifier.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string BomTestFile = outFolder + @"\PackageIdentifierUTTestFiles\Cyclonedx1.json";
+            string BomTestFile = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles", "Cyclonedx1.json"));
 
             //Act
             CycloneDXBomParser cycloneBomProcessor = new CycloneDXBomParser();
@@ -185,12 +185,12 @@ namespace LCT.PackageIdentifier.UTest
         public void ParseCycloneDXBom_GivenInCorrectJsonFile_ReturnsZeroComponents()
         {
             //Arrange
-            string sourcePath = $"{Path.GetTempPath()}\\";
+            string sourcePath = $"{Path.GetTempPath()}";
             File.WriteAllText(sourcePath + "output.json", "{[}");
 
             //Act
             CycloneDXBomParser cycloneBomProcessor = new CycloneDXBomParser();
-            Bom files = cycloneBomProcessor.ParseCycloneDXBom(sourcePath + "/output.json");
+            Bom files = cycloneBomProcessor.ParseCycloneDXBom(Path.GetFullPath(Path.Combine(sourcePath, "output.json")));
 
             //Assert
             Assert.IsNull(files.Components, "Returns Zero components in BOM");
