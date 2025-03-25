@@ -9,8 +9,6 @@ trigger:
 
 variables:
   - group: CONTINUOUS_CLEARING_TOOL_TEST_CONFIG
-  - name: branch_name
-    value: ${{ parameters.branch }}
 
 jobs:
 ######################################################## START Unit Tests ########################################################
@@ -234,7 +232,7 @@ jobs:
 
     - script: |
         SOLUTION_DIR="$(Build.SourcesDirectory)/src"
-        COVERAGE_REPORT="$SOLUTION_DIR/coverage"
+        COVERAGE_REPORT="$(Build.SourcesDirectory)/coverage"
         mkdir -p "$COVERAGE_REPORT"
         TEST_PROJECT_PATH="$SOLUTION_DIR/SW360IntegrationTest/SW360IntegrationTest.csproj"
 
@@ -280,7 +278,7 @@ jobs:
     - task: PublishBuildArtifacts@1
       displayName: 'Publish Integration Test Coverage Report'
       inputs:
-        PathtoPublish: '$(Build.SourcesDirectory)/src/coverage'
+        PathtoPublish: '$(Build.SourcesDirectory)/coverage'
         ArtifactName: 'ITreport'
         publishLocation: 'Container'
 #################################################### END Integration Tests ####################################################
