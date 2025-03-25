@@ -20,10 +20,3 @@ jobs:
         
       - name: Build
         run: dotnet build src\LicenseClearingTool.sln
-        
-      - name: Archive Build Output
-        uses: actions/upload-artifact@v4
-        with:
-          name: continuous-clearing
-          path: |
-            out/continuous-clearing
