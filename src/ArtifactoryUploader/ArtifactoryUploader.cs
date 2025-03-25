@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -12,7 +12,6 @@ using LCT.ArtifactoryUploader.Model;
 using LCT.Services.Interface;
 using log4net;
 using System;
-using System.Configuration;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -114,7 +113,7 @@ namespace LCT.ArtifactoryUploader
                 {
                     component.CopyPackageApiUrl = component.CopyPackageApiUrl.ToLower();
                 }
-            }          
+            }
 
             return packageInfo;
         }

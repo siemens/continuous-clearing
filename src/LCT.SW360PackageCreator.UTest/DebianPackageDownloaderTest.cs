@@ -1,19 +1,15 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.Common;
 using LCT.Common.Model;
-using LCT.SW360PackageCreator;
 using LCT.SW360PackageCreator.Interfaces;
 using Moq;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace LCT.SW360PackageCreator.UTest
@@ -158,7 +154,7 @@ namespace LCT.SW360PackageCreator.UTest
                 Version = ""
             };
             string patchedFilePath = string.Empty;
-            
+
             // ACT
             patchedFilePath = DebianPackageDownloader.GetPatchedFileFromDownloadedFolder(downloadFolderPath);
 
@@ -174,7 +170,7 @@ namespace LCT.SW360PackageCreator.UTest
 
             // Act
             patchedFilePath = DebianPackageDownloader.GetPatchedFileFromDownloadedFolder(null);
-            
+
             // Assert
             Assert.That(string.IsNullOrEmpty(patchedFilePath));
         }
@@ -186,14 +182,14 @@ namespace LCT.SW360PackageCreator.UTest
             string actual = string.Empty;
             Result result = null;
             Mock<IDebianPatcher> debianPatcher = new Mock<IDebianPatcher>();
-            debianPatcher.Setup(x=>x.ApplyPatch(It.IsAny<ComparisonBomData>(), It.IsAny<string>(),
+            debianPatcher.Setup(x => x.ApplyPatch(It.IsAny<ComparisonBomData>(), It.IsAny<string>(),
                 It.IsAny<string>())).Returns(result);
 
             //Act
             DebianPackageDownloader debianPackageDownloader = new DebianPackageDownloader(debianPatcher.Object);
-            debianPackageDownloader.ApplyPatchforComponents(new ComparisonBomData() ,string.Empty, string.Empty);
+            debianPackageDownloader.ApplyPatchforComponents(new ComparisonBomData(), string.Empty, string.Empty);
             //Assert
-            Assert.That(actual!= null);
+            Assert.That(actual != null);
         }
     }
 }

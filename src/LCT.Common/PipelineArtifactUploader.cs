@@ -1,4 +1,10 @@
-﻿using LCT.Common.Runtime;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2025 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+
+using LCT.Common.Runtime;
 using log4net;
 using log4net.Core;
 using System;
@@ -26,7 +32,7 @@ namespace LCT.Common
         /// </summary>
         public static void UploadLogs()
         {
-            EnvironmentType envType = RuntimeEnvironment.GetEnvironment();           
+            EnvironmentType envType = RuntimeEnvironment.GetEnvironment();
             if (envType == EnvironmentType.AzurePipeline && !string.IsNullOrEmpty(Log4Net.CatoolLogPath) && File.Exists(Log4Net.CatoolLogPath))
             {
                 LogManager.Shutdown();
@@ -34,7 +40,7 @@ namespace LCT.Common
             }
             else if (envType == EnvironmentType.Unknown)
             {
-                Logger.Logger.Log(null, Level.Alert, $"Uploading of logs is not supported.", null);                
+                Logger.Logger.Log(null, Level.Alert, $"Uploading of logs is not supported.", null);
             }
 
         }
@@ -44,7 +50,7 @@ namespace LCT.Common
         /// </summary>
         public static void UploadBom()
         {
-            EnvironmentType envType = RuntimeEnvironment.GetEnvironment();            
+            EnvironmentType envType = RuntimeEnvironment.GetEnvironment();
             if (envType == EnvironmentType.AzurePipeline && !string.IsNullOrEmpty(FileOperations.CatoolBomFilePath) && File.Exists(FileOperations.CatoolBomFilePath))
             {
                 Console.WriteLine($"##vso[artifact.upload containerfolder={BomContainerFolderName};artifactname={BomArtifactFolderName}]{FileOperations.CatoolBomFilePath}");

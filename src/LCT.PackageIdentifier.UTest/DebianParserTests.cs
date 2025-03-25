@@ -1,22 +1,21 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using LCT.PackageIdentifier;
-using NUnit.Framework;
-using System.IO;
+using LCT.APICommunications.Model.AQL;
 using LCT.Common;
-using LCT.Common.Model;
 using LCT.Common.Constants;
-using Moq;
-using System.Collections.Generic;
+using LCT.Common.Interface;
+using LCT.Common.Model;
 using LCT.PackageIdentifier.Interface;
 using LCT.Services.Interface;
-using LCT.APICommunications.Model.AQL;
-using LCT.Common.Interface;
+using Moq;
+using NUnit.Framework;
+using System.Collections.Generic;
+using System.IO;
 
 namespace LCT.PackageIdentifier.UTest
 {
@@ -132,7 +131,7 @@ namespace LCT.PackageIdentifier.UTest
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                ProjectType = "DEBIAN",                
+                ProjectType = "DEBIAN",
                 Debian = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
                 Directory = new LCT.Common.Directory(folderAction, fileOperations)
@@ -145,7 +144,7 @@ namespace LCT.PackageIdentifier.UTest
             Bom listofcomponents = _debianProcessor.ParsePackageFile(appSettings);
 
             //Assert
-            Assert.That(expectednoofcomponents, 
+            Assert.That(expectednoofcomponents,
                 Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
         }
 
@@ -252,7 +251,7 @@ namespace LCT.PackageIdentifier.UTest
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                ProjectType = "DEBIAN",                
+                ProjectType = "DEBIAN",
                 Debian = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
                 Directory = new LCT.Common.Directory(folderAction, fileOperations)
@@ -282,7 +281,7 @@ namespace LCT.PackageIdentifier.UTest
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                ProjectType = "DEBIAN",               
+                ProjectType = "DEBIAN",
                 Debian = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
                 Directory = new LCT.Common.Directory(folderAction, fileOperations)

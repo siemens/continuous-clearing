@@ -1,29 +1,27 @@
 // --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using LCT.APICommunications;
 using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
-using Moq;
-using System.Net;
-using LCT.ArtifactoryUploader;
-using System.Net.Http;
-using NUnit.Framework;
-using System.Threading.Tasks;
-using LCT.APICommunications;
-using LCT.Common;
-using LCT.Facade.Interfaces;
-using LCT.Facade;
-using LCT.Services.Interface;
-using LCT.Services;
-using UnitTestUtilities;
-using LCT.ArtifactoryUploader.Model;
 using LCT.APICommunications.Model.AQL;
+using LCT.ArtifactoryUploader;
+using LCT.ArtifactoryUploader.Model;
+using LCT.Common;
+using LCT.Facade;
+using LCT.Facade.Interfaces;
+using LCT.Services;
+using LCT.Services.Interface;
+using Moq;
+using NUnit.Framework;
 using System;
-using LCT.Common.Interface;
-using LCT.Common.Model;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
+using UnitTestUtilities;
 
 namespace AritfactoryUploader.UTest
 {
@@ -35,7 +33,7 @@ namespace AritfactoryUploader.UTest
         {
             // Method intentionally left empty.
         }
- 
+
 
         [Test]
         public async Task UploadPackageToRepo_InputEmptyCreds_ReturnsPackgeNotFound()
@@ -136,7 +134,7 @@ namespace AritfactoryUploader.UTest
             ArtfactoryUploader.jFrogService = jFrogServiceMock.Object;
             ArtfactoryUploader.JFrogApiCommInstance = jfrogApicommunicationMock.Object;
             // Act
-            _= await ArtfactoryUploader.UploadPackageToRepo(component, timeout, displayPackagesInfo);
+            _ = await ArtfactoryUploader.UploadPackageToRepo(component, timeout, displayPackagesInfo);
 
             // Assert
             jfrogApicommunicationMock.Verify(x => x.CopyFromRemoteRepo(component), Times.Once);

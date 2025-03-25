@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -164,7 +164,7 @@ namespace LCT.SW360PackageCreator
             return downloadPath;
         }
 
-        public string ApplyPatchforComponents(ComparisonBomData component, string localDownloadPath, string fileName)     
+        public string ApplyPatchforComponents(ComparisonBomData component, string localDownloadPath, string fileName)
         {
             Result result;
             string patchedFile = string.Empty;

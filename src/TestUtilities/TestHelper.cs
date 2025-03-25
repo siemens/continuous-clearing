@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -50,7 +50,7 @@ namespace TestUtilities
 
             proc.WaitForExit();
 
-            if(proc.ExitCode == 0)
+            if (proc.ExitCode == 0)
             {
                 BOMCreated = true;
             }

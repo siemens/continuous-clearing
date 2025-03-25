@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -20,6 +20,6 @@ namespace UnitTestUtilities
         public static readonly string SW360URL = config["SW360URL"];
         public static readonly string FossologyURL = config["FossologyURL"];
         public static readonly string JFrogURL = config["JFrogURL"];
-      
+
     }
 }

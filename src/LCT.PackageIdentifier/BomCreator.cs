@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -17,12 +17,12 @@ using log4net;
 using log4net.Core;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
-using System.IO;
 using Directory = System.IO.Directory;
 
 
@@ -37,7 +37,7 @@ namespace LCT.PackageIdentifier
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static readonly BomKpiData bomKpiData = new();
         ComponentIdentification componentData;
-        private readonly ICycloneDXBomParser CycloneDXBomParser;        
+        private readonly ICycloneDXBomParser CycloneDXBomParser;
         public IJFrogService JFrogService { get; set; }
         public IBomHelper BomHelper { get; set; }
 
@@ -55,7 +55,7 @@ namespace LCT.PackageIdentifier
                                        CatoolInfo caToolInformation)
         {
             Logger.Debug($"GenerateBom():Start");
-            Bom listOfComponentsToBom;            
+            Bom listOfComponentsToBom;
             jfrog = appSettings.Jfrog;
             sw360 = appSettings.SW360;
             // Calls package parser
@@ -77,10 +77,10 @@ namespace LCT.PackageIdentifier
             Logger.Logger.Log(null, Level.Notice, $"Writing CycloneDX BOM..", null);
             WritecontentsToBOM(appSettings, bomKpiData, listOfComponentsToBom, defaultProjectName);
             Logger.Logger.Log(null, Level.Notice, $"Writing CycloneDX BOM completed", null);
-            
+
             // Log warnings based on appSettings
             DisplayInformation.LogBomGenerationWarnings(appSettings);
-            
+
             // Writes Kpi data 
             Program.BomStopWatch?.Stop();
             bomKpiData.TimeTakenByBomCreator = Program.BomStopWatch == null ? 0 :
@@ -210,7 +210,7 @@ namespace LCT.PackageIdentifier
                         }
                     }
                 }
-                bom.Metadata = metadata;                
+                bom.Metadata = metadata;
             }
             catch (HttpRequestException ex)
             {

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -64,7 +64,7 @@ namespace LCT.APICommunications
 
         public override async Task<HttpResponseMessage> GetPackageInfo(ComponentsToArtifactory component)
         {
-            HttpResponseMessage responseMessage = new HttpResponseMessage();            
+            HttpResponseMessage responseMessage = new HttpResponseMessage();
             var result = responseMessage;
             try
             {

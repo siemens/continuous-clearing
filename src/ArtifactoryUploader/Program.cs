@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -19,7 +19,6 @@ using LCT.Services.Interface;
 using log4net;
 using log4net.Core;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -35,7 +34,7 @@ namespace ArtifactoryUploader
         private static bool m_Verbose = false;
         public static Stopwatch UploaderStopWatch { get; set; }
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private static IEnvironmentHelper environmentHelper= new EnvironmentHelper();
+        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
         static async Task Main(string[] args)
         {
             UploaderStopWatch = new Stopwatch();

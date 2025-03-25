@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -9,7 +9,6 @@ using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Interface;
 using LCT.Common.Model;
-using LCT.PackageIdentifier;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
@@ -34,7 +33,7 @@ namespace LCT.PackageIdentifier.UTest
             string outFolder = Path.GetDirectoryName(exePath);
             string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 
-            string[] Includes = { "conan.lock" };            
+            string[] Includes = { "conan.lock" };
 
             IFolderAction folderAction = new FolderAction();
             IFileOperations fileOperations = new FileOperations();
@@ -125,7 +124,7 @@ namespace LCT.PackageIdentifier.UTest
         public void IsDevDependent_GivenListOfDevComponents_ReturnsSuccess()
         {
             //Arrange
-            var conanPackage = new ConanPackage() {Id = "10"};
+            var conanPackage = new ConanPackage() { Id = "10" };
             var buildNodeIds = new List<string> { "10", "11", "12" };
             var noOfDevDependent = 0;
             //Act
@@ -140,13 +139,13 @@ namespace LCT.PackageIdentifier.UTest
         {
             // Arrange
             Component component = new Component()
-            { 
+            {
                 Name = "securitycommunicationmanager",
                 Description = string.Empty,
                 Version = "2.6.5",
                 Purl = "pkg:conan/securitycommunicationmanager@2.6.5"
             };
-            
+
             var components = new List<Component>() { component };
             ComponentIdentification componentIdentification = new() { comparisonBOMData = components };
             string[] repoList = { "internalrepo1", "internalrepo2" };
@@ -256,7 +255,7 @@ namespace LCT.PackageIdentifier.UTest
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                ProjectType="Conan",
+                ProjectType = "Conan",
                 SW360 = new SW360(),
                 Conan = new Config
                 {
@@ -308,7 +307,7 @@ namespace LCT.PackageIdentifier.UTest
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                ProjectType = "CONAN",                
+                ProjectType = "CONAN",
                 Conan = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
                 Directory = new LCT.Common.Directory(folderAction, fileOperations)

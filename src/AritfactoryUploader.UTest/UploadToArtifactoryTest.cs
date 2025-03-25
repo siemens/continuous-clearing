@@ -1,21 +1,24 @@
-﻿using LCT.APICommunications.Model;
-using LCT.ArtifactoryUploader.Model;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2025 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+
+using CycloneDX.Models;
+using LCT.APICommunications.Model;
+using LCT.APICommunications.Model.AQL;
 using LCT.ArtifactoryUploader;
-using LCT.Common.Model;
+using LCT.ArtifactoryUploader.Model;
 using LCT.Common;
+using LCT.Common.Constants;
+using LCT.Common.Model;
 using LCT.Services.Interface;
 using Moq;
 using NUnit.Framework;
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using UnitTestUtilities;
-using CycloneDX.Models;
-using LCT.Common.Constants;
-using LCT.APICommunications.Model.AQL;
 
 namespace AritfactoryUploader.UTest
 {

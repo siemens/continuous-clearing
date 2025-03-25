@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -101,7 +101,7 @@ namespace LCT.APICommunications
         /// <summary>
         /// Gets the package information in the repo, via the name or path
         /// </summary>
-       
+
         public async Task<HttpResponseMessage> GetPackageInfo(ComponentsToArtifactory component = null)
         {
             ValidateParameters(component.JfrogPackageName, component.Path);
@@ -113,7 +113,7 @@ namespace LCT.APICommunications
 
             return await ExecuteSearchAqlAsync(uri, httpContent);
         }
-       
+
         private static HttpClient GetHttpClient(ArtifactoryCredentials credentials)
         {
             var handler = new RetryHttpClientHandler()
@@ -133,9 +133,9 @@ namespace LCT.APICommunications
             }
         }
 
-        private static string BuildAqlQuery( ComponentsToArtifactory component)
+        private static string BuildAqlQuery(ComponentsToArtifactory component)
         {
-            
+
             if (component.ComponentType.Equals("NPM", StringComparison.InvariantCultureIgnoreCase))
             {
                 var queryList = new List<string>
@@ -186,9 +186,9 @@ namespace LCT.APICommunications
                 query.Append($"items.find({{{string.Join(", ", queryList)}}}).include(\"repo\", \"path\", \"name\").limit(1)");
                 return query.ToString();
             }
-            
 
-            
+
+
         }
 
         private async Task<HttpResponseMessage> ExecuteSearchAqlAsync(string uri, HttpContent httpContent)

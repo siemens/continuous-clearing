@@ -3,11 +3,7 @@ using LCT.Common;
 using LCT.Common.Constants;
 using Moq;
 using NUnit.Framework;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LCT.PackageIdentifier.UTest
 {
@@ -40,7 +36,7 @@ namespace LCT.PackageIdentifier.UTest
 
             // Assert
             Assert.AreEqual(string.Empty, result);
-        }        
+        }
 
         [Test]
         public void ProcessTemplateFile_WithInvalidTemplateFile_DoesNotAddComponentDetails()
@@ -56,13 +52,13 @@ namespace LCT.PackageIdentifier.UTest
 
             // Assert
             Assert.AreEqual(0, componentsForBOM.Count);
-        }        
+        }
 
         [Test]
         public void AddComponentDetails_InputTemplateDetailsWithoutProperty_ReturnsBomWithPropertyAdded()
         {
             //Arrange
-            List<Component> componentsForBOM=new List<Component>();
+            List<Component> componentsForBOM = new List<Component>();
             Bom templateDetails = new Bom();
             Component component1 = new Component();
             component1.Name = "animations";
@@ -90,7 +86,7 @@ namespace LCT.PackageIdentifier.UTest
             component1.Description = string.Empty;
             component1.Version = "1.0.0";
             component1.Properties = new List<Property>();
-           
+
             var components = new List<Component>() { component1 };
             templateDetails.Components = components;
 
@@ -108,7 +104,7 @@ namespace LCT.PackageIdentifier.UTest
             //Arrange
             List<Component> componentsForBOM = new List<Component>();
             Bom templateDetails = new Bom();
-         
+
 
             //Act
             SbomTemplate.AddComponentDetails(componentsForBOM, templateDetails);
@@ -138,7 +134,7 @@ namespace LCT.PackageIdentifier.UTest
             component.Group = "";
             component.Description = string.Empty;
             component.Version = "1.0.0";
-            componentsForBOM.Add(component); 
+            componentsForBOM.Add(component);
 
             //Act
             SbomTemplate.AddComponentDetails(componentsForBOM, templateDetails);
@@ -172,7 +168,7 @@ namespace LCT.PackageIdentifier.UTest
             component.Group = "";
             component.Description = string.Empty;
             component.Version = "1.0.0";
-            component.Properties=new List<Property>()
+            component.Properties = new List<Property>()
                   {
                 new(){Name=Dataconstant.Cdx_IdentifierType,Value=Dataconstant.TemplateAdded}
             };
@@ -183,7 +179,7 @@ namespace LCT.PackageIdentifier.UTest
 
             //Act
             SbomTemplate.AddComponentDetails(componentsForBOM, templateDetails);
-           
+
             //Assert
             Assert.That(BomCreator.bomKpiData.ComponentsUpdatedFromSBOMTemplateFile, Is.EqualTo(1));
         }

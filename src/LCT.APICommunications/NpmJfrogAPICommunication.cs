@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -30,7 +30,7 @@ namespace LCT.APICommunications
         {
             var handler = new RetryHttpClientHandler()
             {
-                InnerHandler = new HttpClientHandler() 
+                InnerHandler = new HttpClientHandler()
             };
             var httpClient = new HttpClient(handler);
             TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
@@ -62,7 +62,7 @@ namespace LCT.APICommunications
 
         public override async Task<HttpResponseMessage> GetPackageInfo(ComponentsToArtifactory component)
         {
-            HttpResponseMessage responseMessage = new HttpResponseMessage();            
+            HttpResponseMessage responseMessage = new HttpResponseMessage();
             var result = responseMessage;
             try
             {
@@ -73,9 +73,9 @@ namespace LCT.APICommunications
             catch (TaskCanceledException ex)
             {
                 Logger.Debug($"{ex.Message}");
-                ExceptionHandling.TaskCancelledException(ex,"Jfrog");
+                ExceptionHandling.TaskCancelledException(ex, "Jfrog");
                 environmentHelper.CallEnvironmentExit(-1);
-            }           
+            }
             return result;
         }
 

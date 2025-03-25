@@ -5,8 +5,8 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using log4net;
-using Moq.Protected;
 using Moq;
+using Moq.Protected;
 using System.Net;
 
 namespace LCT.APICommunications.UTest
@@ -101,7 +101,7 @@ namespace LCT.APICommunications.UTest
                 .ThrowsAsync(new HttpRequestException())
                 .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK));
 
-            
+
             var retryHandler = new RetryHttpClientHandler()
             {
                 InnerHandler = handlerMock.Object
@@ -113,7 +113,7 @@ namespace LCT.APICommunications.UTest
             var response = await httpClient.GetAsync("http://test.com");
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);            
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         }
         [Test]
         public async Task ExecuteWithRetryAsync_ShouldCompleteSuccessfully_WhenActionSucceedsAfterRetry()

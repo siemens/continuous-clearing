@@ -1,16 +1,14 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using System.Collections.Generic;
-using TestUtilities;
-using LCT.Common.Model;
-using System.IO;
-using NUnit.Framework;
 using CycloneDX.Models;
+using NUnit.Framework;
+using System.IO;
+using TestUtilities;
 
 namespace SW360IntegrationTest.Alpine
 {

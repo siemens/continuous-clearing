@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -11,9 +11,7 @@ using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
-using log4net.Core;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -24,7 +22,7 @@ namespace LCT.PackageIdentifier
     /// <summary>
     /// The AlpineProcessor class
     /// </summary>
-    public class AlpineProcessor :  IParser
+    public class AlpineProcessor : IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ICycloneDXBomParser _cycloneDXBomParser;
@@ -56,7 +54,7 @@ namespace LCT.PackageIdentifier
                     Logger.Debug($"ParsePackageFile():FileName: " + filepath);
                     listofComponents.AddRange(ParseCycloneDX(filepath, dependenciesForBOM));
                 }
-                
+
             }
 
             int initialCount = listofComponents.Count;
@@ -193,7 +191,7 @@ namespace LCT.PackageIdentifier
                     Purl = GetReleaseExternalId(prop.Name, prop.Version)
                 };
                 component.BomRef = $"{Dataconstant.PurlCheck()["ALPINE"]}{Dataconstant.ForwardSlash}{prop.Name}@{prop.Version}?{distro}";
-                component.Type=Component.Classification.Library;
+                component.Type = Component.Classification.Library;
                 Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.Discovered };
                 component.Properties = new List<Property> { identifierType };
                 listComponentForBOM.Add(component);

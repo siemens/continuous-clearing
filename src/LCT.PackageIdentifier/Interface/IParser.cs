@@ -1,15 +1,15 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using LCT.Common;
 using LCT.PackageIdentifier.Model;
+using LCT.Services.Interface;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using LCT.Common;
-using LCT.Services.Interface;
 
 namespace LCT.PackageIdentifier.Interface
 {
