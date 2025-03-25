@@ -1,0 +1,26 @@
+name: PR Checks
+
+on:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Setup Version      
+        uses: gittools/actions/gitversion/setup@v0.10.2
+        with:
+          versionSpec: '5.12.0'
+      - name: Restore Packages
+        run: dotnet restore src\LicenseClearingTool.sln
+      - name: Build
+        run: dotnet build src\LicenseClearingTool.sln
+      - name: Upload Build Logs (Debugging)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Compile_Solution_log
+          path: |
+            $env:GITHUB_WORKSPACE/src/*.binlog
+            $env:GITHUB_WORKSPACE/*.binlog
