@@ -8,6 +8,7 @@ using LCT.APICommunications.Model;
 using LCT.Common.Model;
 using Newtonsoft.Json;
 using System.Net;
+using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
 
@@ -126,24 +127,31 @@ namespace LCT.APICommunications.UTest
             // Assert
             Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.GetAllReleasesWithAllData(page, pageEntries));
         }
-        
-        //[Test]
-        //public void SW360Apicommunication_AttachComponentSourceToSW360_ThrowsUriFormatException()
-        //{
-        //    // Arrange
-        //    AttachReport attachReport = new AttachReport
-        //    {
-        //        ReleaseId = "http://invalid-url", // This is an invalid HTTP URL but still recognized as HTTP
-        //        AttachmentFile = "test-file"
-        //    };
 
-        //    // Act
-        //    SW360Apicommunication sW360Apicommunication = new SW360Apicommunication(connectionSettings);
+        [Test]
+        public void SW360Apicommunication_AttachComponentSourceToSW360_ThrowsUriFormatException()
+        {
+            // Arrange
+            AttachReport attachReport = new AttachReport
+            {
+                ReleaseId = "invalid-url",
+                AttachmentFile = "test-file"
+            };
 
-        //    // Assert
-        //    Assert.Throws<UriFormatException>(() => sW360Apicommunication.AttachComponentSourceToSW360(attachReport));
-        //}
-        
+            // Act
+            SW360Apicommunication sW360Apicommunication = new SW360Apicommunication(connectionSettings);
+
+            // Assert
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                Assert.Throws<UriFormatException>(() => sW360Apicommunication.AttachComponentSourceToSW360(attachReport));
+            }
+            else
+            {
+                Assert.Throws<InvalidCastException>(() => sW360Apicommunication.AttachComponentSourceToSW360(attachReport));
+            }
+        }
+
         [Test]
         public void SW360Apicommunication_GetProjects_ReturnsInvalidOperationException()
         {
