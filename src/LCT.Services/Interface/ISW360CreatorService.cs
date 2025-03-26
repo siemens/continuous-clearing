@@ -49,5 +49,6 @@ namespace LCT.Services.Interface
         Task<PackageCreateStatus> CreatePackageBasesOFswComaprisonBOM(ComparisonBomData componentInfo);
         Task<PackageUpdateStatus> UpdatePackagesWithReleases(ComparisonBomData componentInfo);
         Task<bool> LinkPackagesToProject(List<PackageLinked> packageListToLinkProject, string sw360ProjectId);
+        Task<bool> UpdateReleasesToProject(List<ReleaseLinked> releasesTobeLinked, List<ReleaseLinked> manuallyLinkedReleases, string sw360ProjectId);
     }
 }

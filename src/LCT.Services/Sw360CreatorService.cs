@@ -370,6 +370,75 @@ namespace LCT.Services
                 return false;
             }
         }
+        public async Task<bool> UpdateReleasesToProject(List<ReleaseLinked> releasesTobeLinked, List<ReleaseLinked> manuallyLinkedReleases, string sw360ProjectId)
+        {
+            if (manuallyLinkedReleases.Count <= 0 && releasesTobeLinked.Count <= 0)
+            {
+                Logger.Debug($"No of release Id's to link - 0");
+                return true;
+            }
+            try
+            {
+                // Concatenate and remove duplicates from releasesTobeLinked and manuallyLinkedReleases
+                var finalReleasesToBeLinked = manuallyLinkedReleases.Concat(releasesTobeLinked).Distinct().ToList();
+                Logger.Debug($"No of release Id's to link - {finalReleasesToBeLinked.Count}");
+
+                // Create a dictionary to store unique releases
+                Dictionary<string, ReleaseLinked> linkedReleasesUniqueDict = new Dictionary<string, ReleaseLinked>();
+                foreach (var release in finalReleasesToBeLinked)
+                {
+                    if (!linkedReleasesUniqueDict.ContainsKey(release.ReleaseId))
+                    {
+                        linkedReleasesUniqueDict.Add(release.ReleaseId, release);
+                    }
+                    else
+                    {
+                        Logger.Debug("Duplicate entries found in finalReleasesToBeLinked: " + release.Name + ":" + release.ReleaseId +
+                            " , with :" + linkedReleasesUniqueDict[release.ReleaseId].Name + ":" + linkedReleasesUniqueDict[release.ReleaseId].ReleaseId);
+                    }
+                }
+
+                // Assign unique entries from the dictionary to finalReleasesToBeLinked
+                finalReleasesToBeLinked = linkedReleasesUniqueDict.Values.ToList();
+
+                // Loop through each release to send PATCH requests
+                foreach (var release in finalReleasesToBeLinked)
+                {
+                    // Create an AddLinkedRelease object for each release
+                    AddLinkedRelease addLinkedRelease = new AddLinkedRelease
+                    {
+                        ReleaseRelation = string.IsNullOrEmpty(release.Relation) ? Dataconstant.LinkedByCAToolReleaseRelationContained : release.Relation,
+                        Comment = manuallyLinkedReleases.Exists(r => r.ReleaseId == release.ReleaseId) ? release.Comment : Dataconstant.LinkedByCATool
+                    };
+
+                    // Send PATCH request to update the linked release to the project
+                    var response = await m_SW360ApiCommunicationFacade.UpdateLinkedReleaseToProject(sw360ProjectId, release.ReleaseId, addLinkedRelease);
+
+                    // Check if the response indicates failure
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        Environment.ExitCode = -1;
+                        Logger.Error($"UpdateReleasesToProject() : Failed to update release {release.ReleaseId} to project Id {sw360ProjectId}.");
+                        return false;
+                    }
+                }
+
+                // Return true if all releases were successfully updated
+                return true;
+            }
+            catch (HttpRequestException ex)
+            {
+                Logger.Error($"UpdateReleasesToProject():", ex);
+                Environment.ExitCode = -1;
+                return false;
+            }
+            catch (AggregateException ex)
+            {
+                Logger.Error($"UpdateReleasesToProject():", ex);
+                Environment.ExitCode = -1;
+                return false;
+            }
+        }
         public async Task<string> GetReleaseIDofComponent(string componentName, string componentVersion, string componentid)
         {
             string releaseIdOfComponent = null;

@@ -45,5 +45,6 @@ namespace LCT.APICommunications.Interfaces
         Task<HttpResponseMessage> CreatePackage(CreatePackage createPackageContent);
         Task<HttpResponseMessage> UpdatePackage(HttpContent httpContent, string packageId);
         Task<HttpResponseMessage> LinkPackagesToProject(HttpContent httpContent, string sw360ProjectId);
+        Task<HttpResponseMessage> UpdateLinkedReleaseToProject(string projectId, string releaseId, AddLinkedRelease updateLinkedRelease);
     }
 }

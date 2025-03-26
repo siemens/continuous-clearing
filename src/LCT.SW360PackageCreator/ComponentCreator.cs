@@ -245,6 +245,7 @@ namespace LCT.SW360PackageCreator
             var packageListToLinkProject=await GetPackagesList(parsedBomData);
             // Linking releases to the project
             await sw360CreatorService.LinkPackagesToProject(packageListToLinkProject, appSettings.SW360.ProjectID);
+            await sw360CreatorService.UpdateReleasesToProject(releasesFoundInCbom, manuallyLinkedReleases, appSettings.SW360.ProjectID);
             // Linking releases to the project
             //await sw360CreatorService.LinkReleasesToProject(releasesFoundInCbom, manuallyLinkedReleases, appSettings.SW360.ProjectID);
 

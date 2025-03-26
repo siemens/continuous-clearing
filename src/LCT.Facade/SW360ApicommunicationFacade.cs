@@ -228,5 +228,9 @@ namespace LCT.Facade
 
             return await m_sw360ApiCommunication.UpdatePackage(httpContent,packageId);
         }
+        public Task<HttpResponseMessage> UpdateLinkedReleaseToProject(string projectId, string releaseId, AddLinkedRelease updateLinkedRelease)
+        {
+            return m_sw360ApiCommunication.UpdateLinkedReleaseToProject(projectId, releaseId, updateLinkedRelease);
+        }
     }
 }

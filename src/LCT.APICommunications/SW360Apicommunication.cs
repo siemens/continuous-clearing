@@ -342,6 +342,7 @@ namespace LCT.APICommunications
         public async Task<HttpResponseMessage> CreatePackage(CreatePackage createPackageContent)
         {
             HttpClient httpClient = GetHttpClient();
+            httpClient.SetLogWarnings(false);
             return await httpClient.PostAsJsonAsync(sw360PackageApi, createPackageContent);
         }
         public async Task<HttpResponseMessage> UpdatePackage( HttpContent httpContent, string packageId)
@@ -355,6 +356,15 @@ namespace LCT.APICommunications
             HttpClient httpClient = GetHttpClient();
             string url = $"{sw360ProjectsApi}/{sw360ProjectId}/{ApiConstant.LinkPackagesApiSuffix}";
             return await httpClient.PatchAsync(url, httpContent);
+        }
+        public async Task<HttpResponseMessage> UpdateLinkedReleaseToProject(string projectId, string releaseId, AddLinkedRelease updateLinkedRelease)
+        {
+            HttpClient httpClient = GetHttpClient();
+            string updateUri = $"{sw360ProjectsApi}/{projectId}/{ApiConstant.Release}/{releaseId}";
+            string updateContent = JsonConvert.SerializeObject(updateLinkedRelease);
+            HttpContent content = new StringContent(updateContent, Encoding.UTF8, "application/json");
+
+            return await httpClient.PatchAsync(updateUri, content);
         }
         #endregion
 
