@@ -32,3 +32,13 @@ jobs:
         with:
           failOnErrors: false
           helpURL: "https://github.com/conventional-changelog/commitlint/tree/master/%40commitlint/config-conventional"
+
+  pr-title-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ensure PR Title Follows Conventional Commits
+        uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          fail-on-error: false 
