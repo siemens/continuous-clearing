@@ -62,10 +62,13 @@ jobs:
           # Allowed branch name patterns
           if [[ "$BRANCH_NAME" == "development" ]]; then
             echo "::warning::Branch 'development' is allowed but should be used with caution."
+            exit 0
           elif [[ "$BRANCH_NAME" =~ ^(feature|bugfix|hotfix|release|chore|task|docs|test|refactor|ci|experiment)\/[a-zA-Z0-9._-]+$ ]]; then
             echo "✅ Branch name is valid."
+            exit 0
           else
-            echo "::warning::Branch name '$BRANCH_NAME' does not follow naming conventions."
-            echo "⚠️ Allowed prefixes: 'feature/', 'bugfix/', 'hotfix/', 'release/', 'chore/', 'task/', 'docs/', 'test/', 'refactor/', 'ci/', 'experiment/'"
+            echo "::error::Branch name '$BRANCH_NAME' does not follow naming conventions."
+            echo "❌ Allowed prefixes: 'feature/', 'bugfix/', 'hotfix/', 'release/', 'chore/', 'task/', 'docs/', 'test/', 'refactor/', 'ci/', 'experiment/'"
+            exit 1
           fi
 
