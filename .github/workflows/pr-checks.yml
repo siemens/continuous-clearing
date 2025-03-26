@@ -20,3 +20,12 @@ jobs:
         
       - name: Build
         run: dotnet build src\LicenseClearingTool.sln
+
+  commit-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Run Commit Lint
+        uses: wagoid/commitlint-github-action@v6
