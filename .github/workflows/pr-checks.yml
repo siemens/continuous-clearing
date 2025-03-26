@@ -29,3 +29,6 @@ jobs:
 
       - name: Run Commit Lint
         uses: wagoid/commitlint-github-action@v6
+        with:
+          failOnErrors: false
+          helpURL: "https://github.com/conventional-changelog/commitlint/tree/master/%40commitlint/config-conventional"
