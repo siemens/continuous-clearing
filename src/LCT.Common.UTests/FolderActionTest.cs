@@ -86,6 +86,44 @@ namespace LCT.Common.UTest
             //Assert
             Assert.IsTrue(acutal);
         }
+        [Test]
+        public void CopyToTargetDirectory_WhenIOExceptionOccurs_ReturnsFalse()
+        {
+            // Arrange
+            string sourcePath = $"{Path.GetTempPath()}/sourcePath/";
+            string targetPath = $"{Path.GetTempPath()}/targetPath/";
+            var folderAction = new FolderAction();
+
+            // Simulate IOException by creating a file with the same name as the target directory
+            File.WriteAllText(targetPath, "This will cause an IOException");
+
+            // Act
+            var actual = folderAction.CopyToTargetDirectory(sourcePath, targetPath);
+
+            // Assert
+            Assert.IsFalse(actual);
+
+            // Cleanup
+            File.Delete(targetPath);
+        }
+
+        [Test]
+        public void CopyToTargetDirectory_WhenSecurityExceptionOccurs_ReturnsFalse()
+        {
+            // Arrange
+            string sourcePath = $"{Path.GetTempPath()}/sourcePath/";
+            string targetPath = $"{Path.GetTempPath()}/targetPath/";
+            var folderAction = new FolderAction();
+
+            // Simulate SecurityException by using a restricted directory (e.g., root of C drive)
+            string restrictedPath = "C:\\RestrictedPath";
+
+            // Act
+            var actual = folderAction.CopyToTargetDirectory(sourcePath, restrictedPath);
+
+            // Assert
+            Assert.IsFalse(actual);
+        }
 
     }
 }
