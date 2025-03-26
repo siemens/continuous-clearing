@@ -40,3 +40,13 @@ jobs:
         uses: amannn/action-semantic-pull-request@v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  pr-description-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ensure PR Has a Description
+        run: |
+          if [ -z "${{ github.event.pull_request.body }}" ]; then
+            echo "::error::Pull request must have a description."
+            exit 1  # Fails the check
+          fi
