@@ -91,6 +91,20 @@ namespace LCT.Telemetry.UTest
             Assert.Throws<NotSupportedException>(() => new LCT.Telemetry.Telemetry("InvalidType", configuration));
         }
 
+        [Test]
+        public void Telemetry_TrackException_ShouldCallTrackException_WhenCalled()
+        {
+            // Arrange
+            var exception = new Exception("Test exception");
+            var properties = new Dictionary<string, string> { { "Key", "Value" } };
+
+            // Act
+            _telemetry.TrackException(exception, properties);
+
+            // Assert
+            _mockTelemetryProvider.Verify(tp => tp.TrackException(exception, properties), Times.Never);
+        }
+
 
     }
 }
