@@ -15,7 +15,7 @@ namespace SW360IntegrationTest.Conan
         [Test, Order(1)]
         public void TestArtifactoryUploaderexe()
         {
-            OutFolder = TestHelper.OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\ArtifactoryUploaderTestData\Conan";
+            OutFolder = Path.GetFullPath(Path.Combine(TestHelper.OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles", "ArtifactoryUploaderTestData", "Conan"));
 
             // Test BOM Creator ran with exit code 0
             int result = TestHelper.RunArtifactoryUploaderExe(new string[]{
@@ -39,7 +39,7 @@ namespace SW360IntegrationTest.Conan
         public void ComponentUpload_IsUnsuccessful_AlreadyPresentInDestination_Conan()
         {
             OutFolder = TestHelper.OutFolder;
-            string comparisonBOMPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\ArtifactoryUploaderTestData\Conan\Test_Bom.cdx.json";
+            string comparisonBOMPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles", "ArtifactoryUploaderTestData", "Conan", "Test_Bom.cdx.json"));
             if (File.Exists(comparisonBOMPath))
             {
 

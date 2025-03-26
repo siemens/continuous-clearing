@@ -137,7 +137,7 @@ namespace LCT.PackageIdentifier.UTest
                 SW360 = new SW360() { IgnoreDevDependency = true },
                 Directory = new LCT.Common.Directory(folderAction, fileOperations)
                 {
-                    InputFolder = OutFolder + @"\PackageIdentifierUTTestFiles"
+                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }
             };
 
@@ -169,7 +169,7 @@ namespace LCT.PackageIdentifier.UTest
                 SW360 = new SW360() { IgnoreDevDependency = true },
                 Directory = new LCT.Common.Directory(folderAction, fileOperations)
                 {
-                    InputFolder = OutFolder + @"\PackageIdentifierUTTestFiles"
+                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }
             };
 
@@ -198,7 +198,7 @@ namespace LCT.PackageIdentifier.UTest
                 SW360 = new SW360() { IgnoreDevDependency = true },
                 Directory = new LCT.Common.Directory(folderAction, fileOperations)
                 {
-                    InputFolder = OutFolder + @"\PackageIdentifierUTTestFiles"
+                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }
             };
 
@@ -227,7 +227,7 @@ namespace LCT.PackageIdentifier.UTest
                 SW360 = new SW360() { IgnoreDevDependency = true },
                 Directory = new LCT.Common.Directory(folderAction, fileOperations)
                 {
-                    InputFolder = OutFolder + @"\PackageIdentifierUTTestFiles"
+                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }
             };
 
@@ -246,7 +246,7 @@ namespace LCT.PackageIdentifier.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "CycloneDX_Debian.cdx.json", "SBOMTemplate_Debian.cdx.json", "SBOM_DebianCATemplate.cdx.json" };
-            string packagefilepath = OutFolder + @"\PackageIdentifierUTTestFiles";
+            string packagefilepath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"));
 
             IFolderAction folderAction = new FolderAction();
             IFileOperations fileOperations = new FileOperations();
@@ -276,7 +276,7 @@ namespace LCT.PackageIdentifier.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "CycloneDX_Debian.cdx.json", "SBOMTemplate_Debian.cdx.json" };
-            string packagefilepath = OutFolder + @"\PackageIdentifierUTTestFiles";
+            string packagefilepath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"));
 
             IFolderAction folderAction = new FolderAction();
             IFileOperations fileOperations = new FileOperations();

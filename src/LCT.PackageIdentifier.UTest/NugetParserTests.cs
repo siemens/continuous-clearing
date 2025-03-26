@@ -400,7 +400,7 @@ namespace LCT.PackageIdentifier.UTest
             int expectednoofcomponents = 7;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles\packages.config";
+            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles", "packages.config"));
 
             IFolderAction folderAction = new FolderAction();
             IFileOperations fileOperations = new FileOperations();
@@ -410,7 +410,7 @@ namespace LCT.PackageIdentifier.UTest
                 SW360 = new SW360(),
                 Directory = new LCT.Common.Directory(folderAction, fileOperations)
                 {
-                    InputFolder = outFolder + @"\PackageIdentifierUTTestFiles"
+                    InputFolder = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"))
                 }
             };
 
@@ -435,7 +435,7 @@ namespace LCT.PackageIdentifier.UTest
             };
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string folderfilepath = outFolder + @"\PackageIdentifierUTTestFiles";
+            string folderfilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 
             //Act
             List<string> allFoundConfigFiles = FolderScanner.FileScanner(folderfilepath, config);
@@ -458,7 +458,7 @@ namespace LCT.PackageIdentifier.UTest
             };
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string folderfilepath = outFolder + @"\PackageIdentifierUTTestFiles";
+            string folderfilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 
             //Act & Assert
             Assert.Throws(typeof(ArgumentNullException), () => FolderScanner.FileScanner(folderfilepath, config));
@@ -493,7 +493,7 @@ namespace LCT.PackageIdentifier.UTest
                 Exclude = null
 
             };
-            string folderfilepath = @"../PackageIdentifierUTTestFiles";
+            string folderfilepath = Path.GetFullPath(Path.Combine("..", "PackageIdentifierUTTestFiles"));
 
             //Act & Assert
             Assert.Throws(typeof(DirectoryNotFoundException), () => FolderScanner.FileScanner(folderfilepath, config));
@@ -520,7 +520,7 @@ namespace LCT.PackageIdentifier.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string csprojfilepath = outFolder + @"\PackageIdentifierUTTestFiles";
+            string csprojfilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
             string[] Excludes = null;
             IFolderAction folderAction = new FolderAction();
             IFileOperations fileOperations = new FileOperations();
@@ -555,7 +555,7 @@ namespace LCT.PackageIdentifier.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string csprojfilepath = outFolder + @"\PackageIdentifierUTTestFiles";
+            string csprojfilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
             string[] Excludes = null;
 
             Bom bom = new Bom();
@@ -1055,7 +1055,7 @@ namespace LCT.PackageIdentifier.UTest
             int expectednoofcomponents = 2;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles";
+            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 
             string[] Includes = { "project.assets.json" };
             IFolderAction folderAction = new FolderAction();
@@ -1086,7 +1086,7 @@ namespace LCT.PackageIdentifier.UTest
             string IsDev = "true";
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles";
+            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 
             string[] Includes = { "project.assets.json" };
 

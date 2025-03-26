@@ -32,7 +32,7 @@ namespace LCT.PackageIdentifier.UTest
             int expectedNoOfcomponents = 17;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles";
+            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 
             string[] Includes = { "conan.lock" };            
 
@@ -64,7 +64,7 @@ namespace LCT.PackageIdentifier.UTest
             string IsDev = "true";
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles";
+            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 
             string[] Includes = { "conan.lock" };
 
@@ -98,7 +98,7 @@ namespace LCT.PackageIdentifier.UTest
             int totalComponentsAfterExclusion = 17;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles";
+            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 
             string[] Includes = { "conan.lock" };
             IFolderAction folderAction = new FolderAction();
@@ -302,7 +302,7 @@ namespace LCT.PackageIdentifier.UTest
 
             ConanProcessor conanProcessor = new ConanProcessor(cycloneDXBomParser.Object);
             string[] Includes = { "SBOM_ConanCATemplate.cdx.json" };
-            string packagefilepath = OutFolder + @"\PackageIdentifierUTTestFiles";
+            string packagefilepath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"));
 
             IFolderAction folderAction = new FolderAction();
             IFileOperations fileOperations = new FileOperations();
@@ -313,7 +313,7 @@ namespace LCT.PackageIdentifier.UTest
                 SW360 = new SW360() { IgnoreDevDependency = true },
                 Directory = new LCT.Common.Directory(folderAction, fileOperations)
                 {
-                    InputFolder = OutFolder + @"\PackageIdentifierUTTestFiles"
+                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }
             };
 

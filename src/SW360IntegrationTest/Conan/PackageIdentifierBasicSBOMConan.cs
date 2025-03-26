@@ -1,58 +1,42 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
-//
-//  SPDX-License-Identifier: MIT
-
-// -------------------------------------------------------------------------------------------------------------------- 
-
-using CycloneDX.Models;
-using NUnit.Framework;
-using System.IO;
+﻿using NUnit.Framework;
 using TestUtilities;
+using CycloneDX.Models;
+using System.IO;
 
-namespace SW360IntegrationTest.Nuget
+namespace SW360IntegrationTest.Conan
 {
-    [TestFixture, Order(22)]
-    public class PackageIdentifierNugetTemplate
+    [TestFixture, Order(30)]
+    public class PackageIdentifierBasicSBOMConan
     {
         private string CCTLocalBomTestFile { get; set; }
         private string OutFolder { get; set; }
-        TestParamNuget testParameters;
+        TestParamConan testParameters;
 
         [SetUp]
         public void Setup()
         {
             OutFolder = TestHelper.OutFolder;
 
-            CCTLocalBomTestFile = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "src", "SW360IntegrationTest", "PackageIdentifierTestFiles", "CCTLocalBOMTemplateNugetInitial.json"));
+            CCTLocalBomTestFile = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "src", "SW360IntegrationTest", "PackageIdentifierTestFiles", "Conan", "CCTLocalBOMConanInitial.json"));
+
             if (!Directory.Exists(Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs"))))
             {
                 Directory.CreateDirectory(Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs")));
             }
-            testParameters = new TestParamNuget();
+            testParameters = new TestParamConan();
         }
-
         [Test, Order(1)]
         public void RunBOMCreatorexe_ProvidedPackageJsonFilePath_ReturnsSuccess()
         {
-            string packagejsonPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles", "SystemTest1stIterationData", "Nuget-Assets"));
-            string sbomTemplatePath = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles", "SystemTest1stIterationData", "Template-Nuget", "Nuget_CATemplate.cdx.json"));
+            string packagejsonPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles", "SystemTest1stIterationData", "Conan"));
             string bomPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs"));
-
+            string appsettingsFilePath = @"BasicSBOMAppsettingsTest.json";
             // Test BOM Creator ran with exit code 0
             Assert.AreEqual(0, TestHelper.RunBOMCreatorExe(new string[]{
                 TestConstant.PackageFilePath, packagejsonPath,
                 TestConstant.BomFolderPath, bomPath,
-                TestConstant.Sw360Token, testParameters.SW360AuthTokenValue,
-                TestConstant.SW360AuthTokenType, testParameters.SW360AuthTokenType,
-                TestConstant.SW360URL, testParameters.SW360URL,
-                TestConstant.SW360ProjectID, testParameters.SW360ProjectID,
-                TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
-                TestConstant.JFrogApiURL, testParameters.JfrogApi,
-                TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
-                TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
-                TestConstant.JfrogNugetInternalRepo,"Nuget-test",
-                TestConstant.ProjectType,"NUGET",
+                TestConstant.Appsettings,appsettingsFilePath,
+                TestConstant.ProjectType,"Conan",
                 TestConstant.Mode,""}),
                 "Test to run  Package Identifier EXE execution");
         }
@@ -68,7 +52,7 @@ namespace SW360IntegrationTest.Nuget
             expected.Read(CCTLocalBomTestFile);
 
             // Actual
-            string generatedBOM = Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs", $"{testParameters.SW360ProjectName}_Bom.cdx.json"));
+            string generatedBOM = Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs", "ContinuousClearing_Bom.cdx.json"));
             if (File.Exists(generatedBOM))
             {
                 fileExist = true;

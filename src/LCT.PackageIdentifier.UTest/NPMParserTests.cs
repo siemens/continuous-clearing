@@ -27,7 +27,7 @@ namespace LCT.PackageIdentifier.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string filepath = outFolder + @"\PackageIdentifierUTTestFiles\TestDir";
+            string filepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles", "TestDir"));
             string[] Includes = { "p*-lock.json" };
             string[] Excludes = { "node_modules" };
 
@@ -61,7 +61,7 @@ namespace LCT.PackageIdentifier.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string filepath = outFolder + @"\PackageIdentifierUTTestFiles";
+            string filepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
             string[] Includes = { "p*-lock16.json" };
             string[] Excludes = { "node_modules" };
 
@@ -96,7 +96,7 @@ namespace LCT.PackageIdentifier.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string filepath = outFolder + @"\PackageIdentifierUTTestFiles\TestDir\DupDir";
+            string filepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles", "TestDir", "DupDir"));
             string[] Includes = { "p*-lock.json" };
             string[] Excludes = { "node_modules" };
             BomKpiData bomKpiData = new BomKpiData();
@@ -145,7 +145,7 @@ namespace LCT.PackageIdentifier.UTest
                 SW360 = new SW360() { IgnoreDevDependency = true },
                 Directory = new LCT.Common.Directory(folderAction, fileOperations)
                 {
-                    InputFolder = outFolder + @"\PackageIdentifierUTTestFiles",
+                    InputFolder = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles")),
                     OutputFolder = outFolder
                 }
             };
@@ -167,7 +167,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
             string[] Includes = { "CycloneDX2_NPM.cdx.json", "SBOMTemplate_Npm.cdx.json", "SBOM_NpmCATemplate.cdx.json" };
-            string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles";
+            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 
             IFolderAction folderAction = new FolderAction();
             IFileOperations fileOperations = new FileOperations();
@@ -200,7 +200,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
             string[] Includes = { "CycloneDX2_NPM.cdx.json" };
-            string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles";
+            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 
             IFolderAction folderAction = new FolderAction();
             IFileOperations fileOperations = new FileOperations();

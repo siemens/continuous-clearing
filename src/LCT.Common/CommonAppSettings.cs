@@ -115,11 +115,7 @@ namespace LCT.Common
             }
             set
             {
-                if (string.IsNullOrEmpty(value))
-                {
-                    throw new ArgumentNullException($"Provide a sw360 url - {value}");
-                }
-                else
+                if (!string.IsNullOrEmpty(value))
                 {
                     m_URL = value.TrimEnd(Dataconstant.ForwardSlash);
                 }
@@ -133,7 +129,6 @@ namespace LCT.Common
             }
             set
             {
-                CommonHelper.CheckNullOrEmpty(nameof(ProjectName), value);
                 m_ProjectName = value;
             }
         }
@@ -145,7 +140,6 @@ namespace LCT.Common
             }
             set
             {
-                CommonHelper.CheckNullOrEmpty(nameof(ProjectID), value);
                 m_ProjectID = value;
             }
         }
@@ -157,8 +151,7 @@ namespace LCT.Common
                 return m_Token;
             }
             set
-            {
-                CommonHelper.CheckNullOrEmpty(nameof(Token), value);
+            {                
                 m_Token = value;
             }
         }

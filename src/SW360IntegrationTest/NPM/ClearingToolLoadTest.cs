@@ -7,6 +7,7 @@
 using NUnit.Framework;
 using System;
 using System.Diagnostics;
+using System.IO;
 using TestUtilities;
 
 namespace SW360IntegrationTest.LoadTest
@@ -24,9 +25,9 @@ namespace SW360IntegrationTest.LoadTest
         public void PerformanceTestFor130Components()
         {
             //Arrange
-            string packageJsonPath = $"{OutFolderPath}\\..\\..\\TestFiles\\NPMTestFile\\ProjectTestData\\PQAdviserCompact";
-            string bomPath = $"{OutFolderPath}\\..\\BOMs";
-            string combomJsonPath = $"{OutFolderPath}\\..\\BOMs\\Test_ComparisonBOM.json";
+            string packageJsonPath = Path.GetFullPath(Path.Combine(OutFolderPath, "..", "..", "TestFiles", "NPMTestFile", "ProjectTestData", "PQAdviserCompact"));
+            string bomPath = Path.GetFullPath(Path.Combine(OutFolderPath, "..", "BOMs"));
+            string combomJsonPath = Path.GetFullPath(Path.Combine(OutFolderPath, "..", "BOMs", "Test_ComparisonBOM.json"));
             //Act
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -45,9 +46,9 @@ namespace SW360IntegrationTest.LoadTest
         public void PerformanceTestFor70Components()
         {
             //Arrange
-            string packageJsonPath = $"{OutFolderPath}\\..\\..\\TestFiles\\NPMTestFile\\ProjectTestData\\SDBBackend";
-            string bomPath = $"{OutFolderPath}\\..\\BOMs";
-            string combomJsonPath = $"{OutFolderPath}\\..\\BOMs\\Test_ComparisonBOM.json";
+            string packageJsonPath = Path.GetFullPath(Path.Combine(OutFolderPath, "..", "..", "TestFiles", "NPMTestFile", "ProjectTestData", "SDBBackend"));
+            string bomPath = Path.GetFullPath(Path.Combine(OutFolderPath, "..", "BOMs"));
+            string combomJsonPath = Path.GetFullPath(Path.Combine(OutFolderPath, "..", "BOMs", "Test_ComparisonBOM.json"));
 
             //Act
             Stopwatch stopwatch = new Stopwatch();

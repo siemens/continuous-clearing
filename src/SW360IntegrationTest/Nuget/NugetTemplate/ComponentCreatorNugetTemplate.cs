@@ -28,13 +28,13 @@ namespace SW360IntegrationTest.Nuget
         {
             testParameters = new TestParamNuget();
             OutFolder = TestHelper.OutFolder;
-            CCTComparisonBomTestFile = OutFolder + @"..\..\..\src\SW360IntegrationTest\PackageCreatorTestFiles\CCTComparisonBOMNugetTemplateInitial.json";
+            CCTComparisonBomTestFile = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "src", "SW360IntegrationTest", "PackageCreatorTestFiles", "CCTComparisonBOMNugetTemplateInitial.json"));
 
             if (!TestHelper.BOMCreated)
             {
                 OutFolder = TestHelper.OutFolder;
-                string packagejsonPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\SystemTest1stIterationData\Nuget-Assets";
-                string bomPath = OutFolder + @"\..\BOMs";                
+                string packagejsonPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles", "SystemTest1stIterationData", "Nuget-Assets"));
+                string bomPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs"));                
 
                 TestHelper.RunBOMCreatorExe(new string[]{
                 TestConstant.PackageFilePath, packagejsonPath,
@@ -56,7 +56,7 @@ namespace SW360IntegrationTest.Nuget
         [Test, Order(1)]
         public void ComponentCreatorExe_ProvidedBOMFilePath_ReturnsSuccess()
         {
-            string bomPath = OutFolder + $"\\..\\BOMs";
+            string bomPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs"));
             // Assert
             // Check exit is normal
 
@@ -87,7 +87,7 @@ namespace SW360IntegrationTest.Nuget
             expected.Read(CCTComparisonBomTestFile);
 
             // Actual
-            string generatedBOM = OutFolder + $"\\..\\BOMs\\{testParameters.SW360ProjectName}_Bom.cdx.json";
+            string generatedBOM = Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs", $"{testParameters.SW360ProjectName}_Bom.cdx.json"));
             if (File.Exists(generatedBOM))
             {
 

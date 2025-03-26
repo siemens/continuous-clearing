@@ -191,7 +191,7 @@ namespace LCT.SW360PackageCreator.UTest
         {
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string attachmentJson = outFolder + @"..\..\..\src\LCT.SW360PackageCreator.UTest\ComponentCreatorUTFiles\Attachment.json";
+            string attachmentJson = Path.GetFullPath(Path.Combine(outFolder, "..", "..", "src", "LCT.SW360PackageCreator.UTest", "ComponentCreatorUTFiles", "Attachment.json"));
 
             string json = "";
             if (File.Exists(attachmentJson))
