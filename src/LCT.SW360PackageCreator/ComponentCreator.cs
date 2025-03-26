@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -37,7 +37,7 @@ namespace LCT.SW360PackageCreator
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        public static  CreatorKpiData kpiData = new();
+        public static CreatorKpiData kpiData = new();
         public List<ComparisonBomData> UpdatedCompareBomData { get; set; } = new List<ComparisonBomData>();
         public List<ReleaseLinked> ReleasesFoundInCbom { get; set; } = new List<ReleaseLinked>();
         public List<Components> ComponentsNotLinked { get; set; } = new List<Components>();
@@ -75,7 +75,7 @@ namespace LCT.SW360PackageCreator
                 {
                     Logger.Debug($"{item.Name}-{item.Version} found as internal component. ");
                 }
-                else if ((componentsData.IsDev == "true" && appSettings.SW360.IgnoreDevDependency)||componentsData.ExcludeComponent == "true")
+                else if ((componentsData.IsDev == "true" && appSettings.SW360.IgnoreDevDependency) || componentsData.ExcludeComponent == "true")
                 {
                     //do nothing
                 }
@@ -151,7 +151,7 @@ namespace LCT.SW360PackageCreator
         private static bool GetPackageType(Component package, ref Components componentsData)
         {
             bool isInternalComponent = false;
-            
+
             foreach (var property in package.Properties)
             {
                 if (property.Name?.ToLower() == Dataconstant.Cdx_ProjectType.ToLower())
@@ -253,7 +253,7 @@ namespace LCT.SW360PackageCreator
             bom = await creatorHelper.GetUpdatedComponentsDetails(ListofBomComponents, UpdatedCompareBomData, sw360Service, bom);
 
             var formattedString = CycloneDX.Json.Serializer.Serialize(bom);
-            
+
             fileOperations.WriteContentToOutputBomFile(formattedString, bomGenerationPath,
                 FileConstant.BomFileName, appSettings.SW360.ProjectName);
 
@@ -263,7 +263,7 @@ namespace LCT.SW360PackageCreator
                 FileConstant.ComponentsWithoutSrcFileName, appSettings.SW360.ProjectName);
 
             // write Kpi Data
-            kpiData =creatorHelper.GetCreatorKpiData (UpdatedCompareBomData);
+            kpiData = creatorHelper.GetCreatorKpiData(UpdatedCompareBomData);
             fileOperations.WriteContentToFile(kpiData, bomGenerationPath,
                 FileConstant.CreatorKpiDataFileName, appSettings.SW360.ProjectName);
 
@@ -278,7 +278,7 @@ namespace LCT.SW360PackageCreator
 
             Logger.Debug($"CreateComponentInSw360():End");
         }
-               
+
         private async Task CreateComponent(ICreatorHelper creatorHelper,
             ISw360CreatorService sw360CreatorService, List<ComparisonBomData> componentsToBoms,
             string sw360Url, CommonAppSettings appSettings)
@@ -534,7 +534,7 @@ namespace LCT.SW360PackageCreator
             }
             catch (AggregateException ex)
             {
-                Logger.DebugFormat("\tError in TriggerFossologyProcess--{0}",ex);
+                Logger.DebugFormat("\tError in TriggerFossologyProcess--{0}", ex);
             }
             return uploadId;
         }
@@ -609,7 +609,7 @@ namespace LCT.SW360PackageCreator
                 ReleasesFoundInCbom.Add(new ReleaseLinked() { Name = item.Name, Version = item.Version, ReleaseId = releaseIdToLink });
             }
             else
-            {                
+            {
                 Environment.ExitCode = -1;
                 Logger.Fatal($"Linking release to the project is failed. " +
                             $"Release version - {item.Version} not found under this component - {item.Name}. ");

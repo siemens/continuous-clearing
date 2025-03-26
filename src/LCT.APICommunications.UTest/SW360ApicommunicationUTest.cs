@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -9,7 +9,6 @@ using LCT.Common.Model;
 using Newtonsoft.Json;
 using System.Net;
 using System.Runtime.InteropServices;
-using System.Security;
 using System.Text;
 
 namespace LCT.APICommunications.UTest
@@ -101,7 +100,7 @@ namespace LCT.APICommunications.UTest
 
             // Assert
             Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.UpdateRelease(releaseId, httpContent));
-        }        
+        }
 
         [Test]
         public void SW360Apicommunication_DownloadAttachmentUsingWebClient_ThrowsWebException()

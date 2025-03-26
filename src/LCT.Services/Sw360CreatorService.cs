@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -15,17 +15,13 @@ using LCT.Facade.Interfaces;
 using LCT.Services.Interface;
 using LCT.Services.Model;
 using log4net;
-using log4net.Core;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -89,7 +85,7 @@ namespace LCT.Services
                 else
                 {
                     componentCreateStatus.IsCreated = false;
-                    componentCreateStatus.ReleaseStatus.IsCreated = false;                    
+                    componentCreateStatus.ReleaseStatus.IsCreated = false;
                     Environment.ExitCode = -1;
                     Logger.Debug($"CreateComponent():Component Name -{componentInfo.Name}- " +
                    $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
@@ -99,7 +95,7 @@ namespace LCT.Services
             }
             catch (HttpRequestException e)
             {
-                Logger.Error($"CreateComponent():", e);                
+                Logger.Error($"CreateComponent():", e);
                 Environment.ExitCode = -1;
                 componentCreateStatus.IsCreated = false;
                 componentCreateStatus.ReleaseStatus.IsCreated = false;
@@ -183,7 +179,7 @@ namespace LCT.Services
                 else
                 {
                     createStatus.IsCreated = false;
-                    
+
                     Environment.ExitCode = -1;
                     Logger.Debug($"CreateReleaseForComponent():Component Name -{componentInfo.Name}{componentInfo.Version}- " +
                    $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
@@ -306,7 +302,7 @@ namespace LCT.Services
                 var response = await m_SW360ApiCommunicationFacade.LinkReleasesToProject(content, sw360ProjectId);
                 if (!response.IsSuccessStatusCode)
                 {
-                    
+
                     Environment.ExitCode = -1;
                     Logger.Error($"LinkReleasesToProject() : Linking releases to project Id {sw360ProjectId} is failed.");
                     return false;

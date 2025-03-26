@@ -6,8 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LCT.PackageIdentifier
 {
@@ -122,25 +120,25 @@ namespace LCT.PackageIdentifier
                 $"PackageFilePath\t\t --> {appSettings.Directory.InputFolder}\n\t" +
                 $"BomFolderPath\t\t --> {appSettings.Directory.OutputFolder}\n\t";
 
-                if (appSettings.SW360 != null)
-                {
+            if (appSettings.SW360 != null)
+            {
                 logMessage += $"SW360Url\t\t --> {appSettings.SW360.URL}\n\t" +
                           $"SW360AuthTokenType\t --> {appSettings.SW360.AuthTokenType}\n\t" +
                           $"SW360ProjectName\t --> {appSettings.SW360.ProjectName}\n\t" +
                           $"SW360ProjectID\t\t --> {appSettings.SW360.ProjectID}\n\t" +
                           $"ExcludeComponents\t --> {listOfExcludeComponents}\n\t";
-                }
-                if (appSettings.Jfrog != null)
-                {
-                    logMessage += $"InternalRepoList\t --> {listOfInternalRepoList}\n\t";
-                }
+            }
+            if (appSettings.Jfrog != null)
+            {
+                logMessage += $"InternalRepoList\t --> {listOfInternalRepoList}\n\t";
+            }
 
 
             logMessage += $"ProjectType\t\t --> {appSettings.ProjectType}\n\t" +
                           $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t" +
                           $"Include\t\t\t --> {listOfInclude}\n\t" +
                           $"Exclude\t\t\t --> {listOfExclude}\n";
-                          
+
 
             Logger.Logger.Log(null, Level.Notice, logMessage, null);
         }

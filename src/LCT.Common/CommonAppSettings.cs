@@ -98,7 +98,7 @@ namespace LCT.Common
     }
     public class Telemetry
     {
-        public bool  Enable { get; set; } = true;
+        public bool Enable { get; set; } = true;
         public string ApplicationInsightInstrumentKey { get; set; }
     }
     public class SW360
@@ -151,7 +151,7 @@ namespace LCT.Common
                 return m_Token;
             }
             set
-            {                
+            {
                 m_Token = value;
             }
         }
@@ -234,7 +234,7 @@ namespace LCT.Common
                 {
                     folderAction.ValidateFolderPath(value);
                     m_InputFolder = value;
-                }                
+                }
             }
         }
 

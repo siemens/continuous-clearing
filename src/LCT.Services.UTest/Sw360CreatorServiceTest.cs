@@ -1,10 +1,13 @@
 // --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using LCT.APICommunications;
 using LCT.APICommunications.Model;
+using LCT.APICommunications.Model.Foss;
+using LCT.Common.Model;
 using LCT.Facade.Interfaces;
 using LCT.Services.Interface;
 using Moq;
@@ -14,22 +17,22 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
-using LCT.Common.Model;
-using UnitTestUtilities;
 using System.Net.Http.Headers;
-using System.Threading.Tasks;
-using LCT.APICommunications.Model.Foss;
 using System.Text;
 using LCT.APICommunications;
 using LCT.Facade;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
+using System.Threading.Tasks;
+using UnitTestUtilities;
+
 
 namespace LCT.Services.UTest
 {
     [TestFixture]
     public class Sw360CreatorServiceTest
     {
+
         private Mock<ISW360ApicommunicationFacade> _sw360ApiCommMock;
         private Mock<ISW360CommonService> _sw360CommonServiceMock;
         private Sw360CreatorService _sw360CreatorService;
@@ -42,6 +45,10 @@ namespace LCT.Services.UTest
             _sw360CommonServiceMock = new Mock<ISW360CommonService>();
             _environmentHelperMock = new Mock<IEnvironmentHelper>();
             _sw360CreatorService = new Sw360CreatorService(_sw360ApiCommMock.Object, _sw360CommonServiceMock.Object, _environmentHelperMock.Object);
+        [SetUp]
+        public void Setup()
+        {
+            //implement
         }
 
         [Test]
@@ -56,7 +63,7 @@ namespace LCT.Services.UTest
             sw360ApiCommMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(fossTriggerStatusSerialized);
             ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object, _environmentHelperMock.Object);
-
+           
             // Act
             var actual = await sw360CreatorService.TriggerFossologyProcess("eruiuwecsjkdnfuieoyieoeiwu", "sw360link");
 
@@ -71,7 +78,9 @@ namespace LCT.Services.UTest
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
             sw360ApiCommMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()))
                 .Throws<HttpRequestException>();
+
             ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object, _environmentHelperMock.Object);
+
 
             // Act
             var actual = await sw360CreatorService.TriggerFossologyProcess("eruiuwecsjkdnfuieoyieoeiwu", "sw360link");
@@ -137,7 +146,7 @@ namespace LCT.Services.UTest
             sw360ApiCommMock.Setup(x => x.CheckFossologyProcessStatus(It.IsAny<string>())).
                 Throws<HttpRequestException>();
             ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object, _environmentHelperMock.Object);
-
+          
             // Act
             var actual = await sw360CreatorService.CheckFossologyProcessStatus("Fossologylink");
 
@@ -152,7 +161,9 @@ namespace LCT.Services.UTest
             HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.InternalServerError);
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
             sw360ApiCommMock.Setup(x => x.LinkReleasesToProject(It.IsAny<HttpContent>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
+
             ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object, _environmentHelperMock.Object);
+
 
             // Act
             var releasesToBeLinked = new List<ReleaseLinked> { new ReleaseLinked { Name = "GitVersion.CommandLine", Version = "5.3.6", ReleaseId = "5e71f9fc2bf9438e9f20a94dddcc6a0f", Comment = "Linked by CA Tool", Relation = "UNKNOWN" } };
@@ -169,7 +180,10 @@ namespace LCT.Services.UTest
             // Arrange
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
             sw360ApiCommMock.Setup(x => x.LinkReleasesToProject(It.IsAny<HttpContent>(), It.IsAny<string>())).Throws<HttpRequestException>();
+
             ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object, _environmentHelperMock.Object);
+
+
 
             // Act
 
@@ -206,6 +220,7 @@ namespace LCT.Services.UTest
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
             sw360ApiCommMock.Setup(x => x.LinkReleasesToProject(It.IsAny<HttpContent>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
             sw360ApiCommMock.Setup(x => x.UpdateLinkedRelease(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<UpdateLinkedRelease>())).ReturnsAsync(httpResponseMessage);
+
             ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object, _environmentHelperMock.Object);
 
             // Act
@@ -256,6 +271,7 @@ namespace LCT.Services.UTest
             sw360ApiCommMock.Setup(x => x.CreateComponent(It.IsAny<CreateComponent>())).Throws<HttpRequestException>();
 
             // Act
+
             var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object, _environmentHelperMock.Object);
             var expected = await sw360CreatorService.CreateComponentBasesOFswComaprisonBOM(ComparisonBomData, attachmentUrlList);
 
@@ -307,6 +323,7 @@ namespace LCT.Services.UTest
             Assert.That(expected.IsCreated, Is.True);
         }
 
+
         public async Task Test_CreateReleaseForComponent_BadRequest()
         {
             //Arrange
@@ -347,7 +364,9 @@ namespace LCT.Services.UTest
             sw360ApiCommMock.Setup(x => x.CreateRelease(It.IsAny<Releases>())).Throws<HttpRequestException>();
 
             // Act
+
             var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object, _environmentHelperMock.Object);
+
             var expected = await sw360CreatorService.CreateReleaseForComponent(ComparisonBomData, componentId, attachmentUrlList);
 
             //Assert
@@ -398,7 +417,9 @@ namespace LCT.Services.UTest
             sw360ApiCommMock.Setup(x => x.GetReleaseByCompoenentName(It.IsAny<string>())).ReturnsAsync(resBody);
             sw360ApiCommMock.Setup(x => x.CreateRelease(It.IsAny<Releases>())).ReturnsAsync(new HttpResponseMessage(HttpStatusCode.Conflict));
             // Act
+
             var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object, _environmentHelperMock.Object);
+
             var actual = await sw360CreatorService.CreateReleaseForComponent(ComparisonBomData, componentId, attachmentUrlList);
 
             //Assert
@@ -415,6 +436,7 @@ namespace LCT.Services.UTest
 
             // Act
             ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object, _environmentHelperMock.Object);
+
             var actual = await sw360CreatorService.GetComponentId("@angular/animations");
 
             // Assert
@@ -430,6 +452,7 @@ namespace LCT.Services.UTest
 
             // Act
             ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object, _environmentHelperMock.Object);
+
             var actual = await sw360CreatorService.GetComponentId("@angular/animations");
 
             // Assert
@@ -465,6 +488,7 @@ namespace LCT.Services.UTest
 
             // Act
             ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object, _environmentHelperMock.Object);
+
             var actual = await sw360CreatorService.GetComponentId("Zone.js");
 
             // Assert
@@ -479,7 +503,9 @@ namespace LCT.Services.UTest
             sw360ApiCommMock.Setup(x => x.GetReleaseById(It.IsAny<string>())).Throws<HttpRequestException>();
 
             // Act
+
             var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object, _environmentHelperMock.Object);
+
             var actual = await sw360CreatorService.GetReleaseInfo("euryieryeirtoeriutoiertoeritu");
 
             // Assert
@@ -510,6 +536,7 @@ namespace LCT.Services.UTest
 
             // Act
             var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object, _environmentHelperMock.Object);
+
             var actual = await sw360CreatorService.GetReleaseIdByName("@angular/animations", "1.10.20");
 
             // Assert
@@ -525,6 +552,7 @@ namespace LCT.Services.UTest
 
             // Act
             var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object, _environmentHelperMock.Object);
+
             var actual = await sw360CreatorService.GetReleaseIDofComponent("@angular/animations", "1.10.20", "ueiwrowieewrrowie8393");
 
             // Assert
@@ -558,6 +586,7 @@ namespace LCT.Services.UTest
 
             // Act
             var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object, _environmentHelperMock.Object);
+
             var actual = await sw360CreatorService.GetReleaseIDofComponent("@angular/animations", "1.10.20", "ueiwrowieewrrowie8393");
 
             // Assert
@@ -581,6 +610,7 @@ namespace LCT.Services.UTest
 
             // Act
             var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object, _environmentHelperMock.Object);
+
             var actual = await sw360CreatorService.UpdatePurlIdForExistingRelease(comparisonBomData, "kjsdiwejjefojffwoje", releasesInfo);
 
             // Assert
@@ -605,6 +635,7 @@ namespace LCT.Services.UTest
 
             // Act
             var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object, _environmentHelperMock.Object);
+
             var actual = await sw360CreatorService.UpdatePurlIdForExistingRelease(comparisonBomData, "kjsdiwejjefojffwoje", releasesInfo);
 
             // Assert
@@ -628,6 +659,7 @@ namespace LCT.Services.UTest
 
             // Act
             var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object, _environmentHelperMock.Object);
+
             var actual = await sw360CreatorService.UpdatePurlIdForExistingRelease(comparisonBomData, "kjsdiwejjefojffwoje", releasesInfo);
 
             // Assert
@@ -647,6 +679,7 @@ namespace LCT.Services.UTest
 
             // Act
             var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object, _environmentHelperMock.Object);
+
             var actual = await sw360CreatorService.UpdatePurlIdForExistingComponent(comparisonBomData, "kjsdiwejjefojffwoje");
 
             // Assert
@@ -666,6 +699,7 @@ namespace LCT.Services.UTest
 
             // Act
             var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object, _environmentHelperMock.Object);
+
             var actual = await sw360CreatorService.UpdatePurlIdForExistingComponent(comparisonBomData, "kjsdiwejjefojffwoje");
 
             // Assert
@@ -692,6 +726,7 @@ namespace LCT.Services.UTest
 
             // Act
             var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object, _environmentHelperMock.Object);
+
             var actual = await sw360CreatorService.UpdatePurlIdForExistingComponent(comparisonBomData, "kjsdiwejjefojffwoje");
 
             // Assert
@@ -718,6 +753,7 @@ namespace LCT.Services.UTest
 
             // Act
             var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object, _environmentHelperMock.Object);
+
             var actual = await sw360CreatorService.UpdatePurlIdForExistingComponent(comparisonBomData, "kjsdiwejjefojffwoje");
 
             // Assert
@@ -742,6 +778,7 @@ namespace LCT.Services.UTest
 
             // Act
             var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object, _environmentHelperMock.Object);
+
             var actual = await sw360CreatorService.UpdatePurlIdForExistingRelease(comparisonBomData, "kjsdiwejjefojffwoje", releasesInfo);
 
             // Assert
@@ -768,6 +805,7 @@ namespace LCT.Services.UTest
 
             // Act
             var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object, _environmentHelperMock.Object);
+
             var actual = await sw360CreatorService.UpdatePurlIdForExistingComponent(comparisonBomData, "kjsdiwejjefojffwoje");
 
             // Assert
@@ -801,6 +839,7 @@ namespace LCT.Services.UTest
 
             // Act
             var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object, sw360CommonServiceMock.Object, _environmentHelperMock.Object);
+
             var actual = await sw360CreatorService.GetReleaseByExternalId("Zone.js", "1.0.0", "pkg:npm/zone.js@1.0.0");
 
 
@@ -834,6 +873,7 @@ namespace LCT.Services.UTest
 
             // Act
             var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object, sw360CommonServiceMock.Object, _environmentHelperMock.Object);
+
             var actual = await sw360CreatorService.GetComponentIdUsingExternalId("Zone.js", "pkg:npm/zone.js@1.0.0");
 
 
@@ -857,6 +897,7 @@ namespace LCT.Services.UTest
 
             // Act
             var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object, _environmentHelperMock.Object);
+
             var actual = await sw360CreatorService.UdpateSW360ReleaseContent(component, "foss url");
 
             // Assert
@@ -879,6 +920,7 @@ namespace LCT.Services.UTest
 
             // Act
             var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object, _environmentHelperMock.Object);
+
             var actual = await sw360CreatorService.UdpateSW360ReleaseContent(component, "foss url");
 
             // Assert
@@ -1063,8 +1105,7 @@ namespace LCT.Services.UTest
             _sw360ApiCommMock.Verify(x => x.LinkPackagesToProject(It.IsAny<StringContent>(), "sw360ProjectId"), Times.Once); // Verify that the API call was made once
             _environmentHelperMock.Verify(x => x.CallEnvironmentExit(-1), Times.Once); // Ensure that environment exit is called with -1 on failure
         }
-
-        // Test case 4: Handle HttpRequestException
+       
         [TestCase]
         public async Task Test_LinkPackagesToProject_ExceptionHandling_HttpRequestException()
         {
@@ -1086,8 +1127,7 @@ namespace LCT.Services.UTest
             _sw360ApiCommMock.Verify(x => x.LinkPackagesToProject(It.IsAny<StringContent>(), "sw360ProjectId"), Times.Once); // Verify that the API call was made once
             _environmentHelperMock.Verify(x => x.CallEnvironmentExit(-1), Times.Once); // Ensure that environment exit is called with -1 on exception
         }
-
-        // Test case 5: Handle AggregateException
+        
         [TestCase]
         public async Task Test_LinkPackagesToProject_ExceptionHandling_AggregateException()
         {
@@ -1109,5 +1149,6 @@ namespace LCT.Services.UTest
             _sw360ApiCommMock.Verify(x => x.LinkPackagesToProject(It.IsAny<StringContent>(), "sw360ProjectId"), Times.Once); // Verify that the API call was made once
             _environmentHelperMock.Verify(x => x.CallEnvironmentExit(-1), Times.Once); // Ensure that environment exit is called with -1 on exception
         }
+
     }
 }

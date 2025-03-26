@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -428,7 +428,7 @@ namespace LCT.SW360PackageCreator
             Program.CreatorStopWatch.Stop();
             creatorKpiData.TimeTakenByComponentCreator =
                 TimeSpan.FromMilliseconds(Program.CreatorStopWatch.ElapsedMilliseconds).TotalSeconds;
-            
+
             return creatorKpiData;
         }
 

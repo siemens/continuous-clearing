@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -22,7 +22,7 @@ namespace LCT.SW360PackageCreator.Interfaces
         /// <param name="componenVersion"></param>
         /// <param name="componentsData"></param>
         /// <returns>string</returns>
-         Task<Components> GetSourceUrlForDebianPackage(string componentName, string componenVersion);
+        Task<Components> GetSourceUrlForDebianPackage(string componentName, string componenVersion);
 
         /// <summary>
         /// Gets the Source Url For Nuget Package

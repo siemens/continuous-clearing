@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -17,7 +17,7 @@ namespace LCT.Common.UTest
         public void GetEnvironment_WhenNoEnvironmentVariableDefined_ReturnsUnknown()
         {
             // Arrange
-            _= EnvironmentType.Unknown;
+            _ = EnvironmentType.Unknown;
             Environment.SetEnvironmentVariable("Unknown", "0");
 
             // Act
@@ -32,7 +32,7 @@ namespace LCT.Common.UTest
         public void GetEnvironment_WhenReleaseIdEnvironmentVariableDefined_ReturnsAzureRelease()
         {
             // Arrange
-            _= EnvironmentType.AzureRelease;
+            _ = EnvironmentType.AzureRelease;
             SetEnvironmentVariable("Release_ReleaseId", "12345");
 
             // Act
@@ -61,7 +61,7 @@ namespace LCT.Common.UTest
         public void GetEnvironment_WhenJobIdEnvironmentVariableDefined_ReturnsGitLab()
         {
             // Arrange
-            _= EnvironmentType.GitLab;
+            _ = EnvironmentType.GitLab;
             SetEnvironmentVariable("CI_JOB_ID", "54321");
 
             // Act
@@ -79,7 +79,7 @@ namespace LCT.Common.UTest
             Environment.SetEnvironmentVariable("CI_JOB_ID", null);
 
             // Act
-            _= RuntimeEnvironment.GetEnvironment();
+            _ = RuntimeEnvironment.GetEnvironment();
 
             // Assert
             Assert.That(Environment.GetEnvironmentVariable("CI_JOB_ID"), Is.Null);

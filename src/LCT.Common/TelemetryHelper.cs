@@ -4,7 +4,6 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 using LCT.Common.Constants;
-using LCT.Common.Interface;
 using LCT.Telemetry;
 using log4net;
 using System;
@@ -35,7 +34,7 @@ namespace LCT.Common
             });
         }
 
-        public void StartTelemetry<T>(string catoolVersion, T kpiData,string telemetryFor)
+        public void StartTelemetry<T>(string catoolVersion, T kpiData, string telemetryFor)
         {
             // Initialize telemetry with CATool version and instrumentation key only if Telemetry is enabled in appsettings
             Logger.Warn(TelemetryConstant.StartLogMessage);

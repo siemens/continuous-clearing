@@ -1,20 +1,12 @@
 ﻿using LCT.APICommunications.Model;
-using Moq;
-using Moq.Protected;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LCT.APICommunications.UTest
 {
     [TestFixture]
     public class JfrogAqlApiCommunicationUTest
-    {      
-       
-        
+    {
+
+
         [Test]
         public void JfrogAqlApiCommunication_CheckConnection_ReturnsInvalidOperationException()
         {
@@ -42,7 +34,7 @@ namespace LCT.APICommunications.UTest
 
             // Act & Assert
             Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApiCommunication.GetInternalComponentDataByRepo(invalidRepoName));
-        }        
+        }
         [Test]
         public void JfrogAqlApiCommunication_GetNpmComponentDataByRepo_ReturnsInvalidOperationException()
         {

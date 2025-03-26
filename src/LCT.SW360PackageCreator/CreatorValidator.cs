@@ -1,29 +1,27 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using LCT.Services.Interface;
-using System.IO;
-using System.Threading.Tasks;
-using LCT.Common;
-using LCT.APICommunications.Model;
-using log4net;
-using System.Reflection;
-using LCT.Common.Interface;
-using LCT.APICommunications.Model.Foss;
 using LCT.APICommunications;
+using LCT.APICommunications.Model;
+using LCT.APICommunications.Model.Foss;
+using LCT.Common;
+using LCT.Common.Constants;
+using LCT.Common.Interface;
 using LCT.Facade.Interfaces;
 using LCT.Services;
-using log4net.Core;
+using LCT.Services.Interface;
+using LCT.SW360PackageCreator.Model;
+using log4net;
 using Newtonsoft.Json;
 using System;
-using System.Net.Http;
-using LCT.SW360PackageCreator.Model;
+using System.IO;
 using System.Linq;
-using LCT.Common.Constants;
-using LCT.Facade;
+using System.Net.Http;
+using System.Reflection;
+using System.Threading.Tasks;
 
 
 namespace LCT.SW360PackageCreator
@@ -34,7 +32,7 @@ namespace LCT.SW360PackageCreator
     public static class CreatorValidator
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private static IEnvironmentHelper environmentHelper =new EnvironmentHelper();
+        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
         public static async Task<int> ValidateAppSettings(CommonAppSettings appSettings, ISw360ProjectService sw360ProjectService, ProjectReleases projectReleases)
         {
             string sw360ProjectName = await sw360ProjectService.GetProjectNameByProjectIDFromSW360(appSettings.SW360.ProjectID, appSettings.SW360.ProjectName, projectReleases);
@@ -56,7 +54,7 @@ namespace LCT.SW360PackageCreator
             return 0;
         }
         public static async Task TriggerFossologyValidation(CommonAppSettings appSettings, ISW360ApicommunicationFacade sW360ApicommunicationFacade)
-        {            
+        {
             ISW360CommonService sw360CommonService = new SW360CommonService(sW360ApicommunicationFacade);
             ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sW360ApicommunicationFacade, sw360CommonService,environmentHelper);
             ISW360Service sw360Service = new Sw360Service(sW360ApicommunicationFacade, sw360CommonService, environmentHelper);
@@ -69,8 +67,8 @@ namespace LCT.SW360PackageCreator
                 ReleasesAllDetails.Sw360Release validRelease = null;
                 int pageCount = 0;
                 while (!validReleaseFound && pageCount < 10)
-                {                    
-                    ReleasesAllDetails releaseResponse = await GetAllReleasesDetails(sW360ApicommunicationFacade,page,pageEntries);
+                {
+                    ReleasesAllDetails releaseResponse = await GetAllReleasesDetails(sW360ApicommunicationFacade, page, pageEntries);
 
                     if (releaseResponse != null)
                     {
@@ -93,7 +91,7 @@ namespace LCT.SW360PackageCreator
                             }
                             else
                             {
-                                break; 
+                                break;
                             }
                         }
                     }
@@ -106,20 +104,20 @@ namespace LCT.SW360PackageCreator
                 if (validReleaseFound)
                 {
                     var releaseUrl = validRelease?.Links?.Self?.Href;
-                    var releaseId=string.Empty;
+                    var releaseId = string.Empty;
                     if (releaseUrl != null)
-                    releaseId = CommonHelper.GetSubstringOfLastOccurance(releaseUrl, "/");
+                        releaseId = CommonHelper.GetSubstringOfLastOccurance(releaseUrl, "/");
                     string sw360link = $"{validRelease?.Name}:{validRelease?.Version}:{appSettings?.SW360?.URL}{ApiConstant.Sw360ReleaseUrlApiSuffix}" +
                     $"{releaseId}#/tab-Summary";
                     FossTriggerStatus fossResult = await sw360CreatorService.TriggerFossologyProcessForValidation(releaseId, sw360link);
                     if (!string.IsNullOrEmpty(fossResult?.Links?.Self?.Href))
-                    {                        
+                    {
                         Logger.Debug($"TriggerFossologyValidation():SW360 Fossology Process validation successfull!!");
                     }
                 }
                 else
                 {
-                    Logger.Debug($"TriggerFossologyValidation():Fossology URl validation Failed");                    
+                    Logger.Debug($"TriggerFossologyValidation():Fossology URl validation Failed");
                 }
 
             }
@@ -141,19 +139,19 @@ namespace LCT.SW360PackageCreator
             }
             catch (HttpRequestException ex)
             {
-                Logger.Debug($"GetAllReleasesDetails():", ex);               
+                Logger.Debug($"GetAllReleasesDetails():", ex);
             }
             catch (InvalidOperationException ex)
             {
-                Logger.Debug($"GetAllReleasesDetails():", ex);                
+                Logger.Debug($"GetAllReleasesDetails():", ex);
             }
             catch (UriFormatException ex)
             {
-                Logger.Debug($"GetAllReleasesDetails():", ex);               
+                Logger.Debug($"GetAllReleasesDetails():", ex);
             }
             catch (TaskCanceledException ex)
             {
-                Logger.Debug($"GetAllReleasesDetails():", ex);               
+                Logger.Debug($"GetAllReleasesDetails():", ex);
             }
 
             return releaseResponse;

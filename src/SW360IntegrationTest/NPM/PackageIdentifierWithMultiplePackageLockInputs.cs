@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 
@@ -7,7 +7,6 @@
 
 using CycloneDX.Models;
 using NUnit.Framework;
-using System.Collections.Generic;
 using System.IO;
 using TestUtilities;
 
@@ -80,7 +79,7 @@ namespace SW360IntegrationTest.NPM
 
                     foreach (var i in actual.Components)
                     {
-                        if ((i.Name == item.Name)&&(i.Version == item.Version))
+                        if ((i.Name == item.Name) && (i.Version == item.Version))
                         {
                             Component component = i;
                             Assert.AreEqual(item.Name, component.Name, "Test to check component name");

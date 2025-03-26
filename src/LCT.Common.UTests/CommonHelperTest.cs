@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -16,7 +16,7 @@ namespace LCT.Common.UTest
     [TestFixture]
     public class CommonHelperTest
     {
-       
+
         [Test]
         public void WriteComponentsNotLinkedListInConsole_PassingList_ReturnSuccess()
         {
@@ -54,13 +54,13 @@ namespace LCT.Common.UTest
         {
             //Arrange
             List<Component> ComponentsForBom = new List<Component>();
-            ComponentsForBom.Add(new Component() { Name = "Debian", Version = "3.1.0", Purl = "pkg:npm/Debian@3.1.0", Properties = new List<Property>()});
+            ComponentsForBom.Add(new Component() { Name = "Debian", Version = "3.1.0", Purl = "pkg:npm/Debian@3.1.0", Properties = new List<Property>() });
             ComponentsForBom.Add(new Component() { Name = "Debian", Version = "3.1.1", Purl = "pkg:npm/Debian@3.1.1", Properties = new List<Property>() });
             ComponentsForBom.Add(new Component() { Name = "Debian", Version = "3.1.2", Purl = "pkg:npm/Debian@3.1.2", Properties = new List<Property>() });
             ComponentsForBom.Add(new Component() { Name = "Newton", Version = "3.1.3", Purl = "pkg:npm/Newton@3.1.3", Properties = new List<Property>() });
             ComponentsForBom.Add(new Component() { Name = "Log4t", Version = "3.1.4", Purl = "pkg:npm/Log4t@3.1.4", Properties = new List<Property>() });
-            ComponentsForBom.Add(new Component() { Name = "Log4t", Version = "3.1.5",Purl= "pkg:npm/Log4t@3.1.5", Properties = new List<Property>() });           
-            
+            ComponentsForBom.Add(new Component() { Name = "Log4t", Version = "3.1.5", Purl = "pkg:npm/Log4t@3.1.5", Properties = new List<Property>() });
+
             int noOfExcludedComponents = 0;
 
             List<string> list = new List<string>();
@@ -72,7 +72,7 @@ namespace LCT.Common.UTest
             CommonHelper.RemoveExcludedComponents(ComponentsForBom, list, ref noOfExcludedComponents);
 
             //Assert            
-            Assert.That(noOfExcludedComponents, Is.EqualTo(5), "Returns the count of excluded components");            
+            Assert.That(noOfExcludedComponents, Is.EqualTo(5), "Returns the count of excluded components");
 
         }
 
@@ -279,7 +279,7 @@ namespace LCT.Common.UTest
             List<Component> result = CommonHelper.RemoveExcludedComponents(componentList, excludedComponents, ref noOfExcludedComponents);
 
             // Assert
-            Assert.AreEqual(3, result.Count);            
+            Assert.AreEqual(3, result.Count);
             Assert.AreEqual(2, noOfExcludedComponents);
         }
 

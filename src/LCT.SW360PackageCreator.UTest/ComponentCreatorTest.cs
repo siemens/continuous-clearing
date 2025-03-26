@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -14,10 +14,8 @@ using LCT.Common.Model;
 using LCT.Facade.Interfaces;
 using LCT.Services;
 using LCT.Services.Interface;
-using LCT.SW360PackageCreator;
 using LCT.SW360PackageCreator.Interfaces;
 using LCT.SW360PackageCreator.Model;
-using Microsoft.CodeAnalysis.FlowAnalysis;
 using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;
@@ -96,7 +94,7 @@ namespace LCT.SW360PackageCreator.UTest
             await componentCreator.CreateComponentInSw360(appSettings, mockSw360CreatorService.Object, mockSw360Service.Object, mockSw360ProjectService.Object, mockFileOperations.Object, mockCreatorHelper.Object, parsedBomData);
 
             // Assert
-            mockFileOperations.Verify(x => x.WriteContentToOutputBomFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);            
+            mockFileOperations.Verify(x => x.WriteContentToOutputBomFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             mockCreatorHelper.Verify(x => x.WriteCreatorKpiDataToConsole(It.IsAny<CreatorKpiData>()), Times.Once);
             mockCreatorHelper.Verify(x => x.WriteSourceNotFoundListToConsole(It.IsAny<List<ComparisonBomData>>(), It.IsAny<CommonAppSettings>()), Times.Once);
             mockSw360CreatorService.Verify(x => x.LinkPackagesToProject(It.IsAny<List<PackageLinked>>(), It.IsAny<string>()), Times.Once);
@@ -225,7 +223,7 @@ namespace LCT.SW360PackageCreator.UTest
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360() { URL = "http://localhost:8081/" },
-                Directory=new Common.Directory(folderAction,fileOperations) 
+                Directory = new Common.Directory(folderAction, fileOperations)
             };
             sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(fossTriggerStatus);
 
@@ -250,7 +248,7 @@ namespace LCT.SW360PackageCreator.UTest
                 Version = "1",
                 ReleaseID = "89768ae1b0ea9dc061328b8f32792cbd"
             };
-           
+
             IFolderAction folderAction = new FolderAction();
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings()
@@ -342,13 +340,13 @@ namespace LCT.SW360PackageCreator.UTest
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings CommonAppSettings = new()
             {
-                SW360 = new SW360() {  ProjectName = "Test" },
+                SW360 = new SW360() { ProjectName = "Test" },
                 Directory = new Common.Directory(folderAction, fileOperations)
                 {
                     OutputFolder = @"\Output"
                 }
             };
-            
+
 
             List<ComparisonBomData> comparisonBomData = new List<ComparisonBomData>();
             comparisonBomData.Add(new ComparisonBomData());
@@ -393,13 +391,13 @@ namespace LCT.SW360PackageCreator.UTest
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings commonAppSettings = new CommonAppSettings()
             {
-                SW360 = new SW360() { IgnoreDevDependency= false, ProjectName = "Test" },
+                SW360 = new SW360() { IgnoreDevDependency = false, ProjectName = "Test" },
                 Directory = new Common.Directory(folderAction, fileOperations)
                 {
                     OutputFolder = @"\Output"
                 }
             };
-            
+
             List<ComparisonBomData> comparisonBomData = new List<ComparisonBomData>();
             comparisonBomData.Add(new ComparisonBomData());
             var sw360Service = new Mock<ISW360Service>();
@@ -445,7 +443,7 @@ namespace LCT.SW360PackageCreator.UTest
                     OutputFolder = @"\Output"
                 }
             };
-            
+
             List<ComparisonBomData> comparisonBomData = new List<ComparisonBomData>();
             comparisonBomData.Add(new ComparisonBomData());
             var sw360Service = new Mock<ISW360Service>();
@@ -684,7 +682,7 @@ namespace LCT.SW360PackageCreator.UTest
                 .ThrowsAsync(new AggregateException());
 
             // Act
-            var uploadId = await ComponentCreator.TriggerFossologyProcess(item, sw360CreatorServiceMock.Object, new CommonAppSettings() { SW360=new SW360()});
+            var uploadId = await ComponentCreator.TriggerFossologyProcess(item, sw360CreatorServiceMock.Object, new CommonAppSettings() { SW360 = new SW360() });
 
             // Assert
             Assert.AreEqual(string.Empty, uploadId);

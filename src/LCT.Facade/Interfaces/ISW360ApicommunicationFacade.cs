@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -42,7 +42,7 @@ namespace LCT.Facade.Interfaces
         void DownloadAttachmentUsingWebClient(string attachmentDownloadLink, string fileName);
         Task<HttpResponseMessage> GetComponentDetailsByUrl(string componentLink);
         Task<HttpResponseMessage> UpdateLinkedRelease(string projectId, string releaseId, UpdateLinkedRelease updateLinkedRelease);
-        Task<HttpResponseMessage> GetReleaseByExternalId(string purlId,string externalIdKey = "");
+        Task<HttpResponseMessage> GetReleaseByExternalId(string purlId, string externalIdKey = "");
         Task<HttpResponseMessage> GetComponentByExternalId(string purlId, string externalIdKey = "");
         Task<HttpResponseMessage> GetAllReleasesWithAllData(int page, int pageEntries);
         Task<string> GetPackages();

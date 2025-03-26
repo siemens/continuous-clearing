@@ -1,12 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 
 // -------------------------------------------------------------------------------------------------------------------- 
 using CycloneDX.Models;
 using NUnit.Framework;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;

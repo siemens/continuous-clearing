@@ -1,9 +1,18 @@
 // --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using LCT.APICommunications;
+using LCT.Common;
+using LCT.Common.Constants;
+using LCT.Common.Model;
+using LCT.SW360PackageCreator.Interfaces;
+using LCT.SW360PackageCreator.Model;
+using log4net;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -16,15 +25,6 @@ using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
-using LCT.APICommunications;
-using LCT.Common;
-using LCT.Common.Constants;
-using LCT.Common.Model;
-using LCT.SW360PackageCreator.Interfaces;
-using LCT.SW360PackageCreator.Model;
-using log4net;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using YamlDotNet.Core;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
@@ -222,9 +222,9 @@ namespace LCT.SW360PackageCreator
             try
             {
                 localPathforSourceRepo = $"{Directory.GetParent(Directory.GetCurrentDirectory())}\\ClearingTool\\DownloadedFiles\\";
-                if(!Directory.Exists(localPathforSourceRepo))
+                if (!Directory.Exists(localPathforSourceRepo))
                 {
-                    localPathforSourceRepo = Directory.CreateDirectory(localPathforSourceRepo).ToString();                    
+                    localPathforSourceRepo = Directory.CreateDirectory(localPathforSourceRepo).ToString();
                 }
             }
             catch (IOException ex)
@@ -261,13 +261,13 @@ namespace LCT.SW360PackageCreator
                     p.StartInfo.RedirectStandardOutput = true;
                     p.StartInfo.RedirectStandardInput = true;
                     p.StartInfo.UseShellExecute = false;
-                    p.StartInfo.CreateNoWindow = true;                    
+                    p.StartInfo.CreateNoWindow = true;
                     p.StartInfo.FileName = Path.Combine(@"git");
                     p.StartInfo.Arguments = command;
                     p.StartInfo.WorkingDirectory = localPathforSourceRepo;
 
                     p.Start();
-                    p.WaitForExit();                  
+                    p.WaitForExit();
 
                 }
             }

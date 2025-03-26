@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -74,7 +74,7 @@ namespace LCT.APICommunications
         }
         public async Task<string> GetProjects()
         {
-            HttpClient httpClient = GetHttpClient();           
+            HttpClient httpClient = GetHttpClient();
             var result = string.Empty;
             try
             {
@@ -111,8 +111,8 @@ namespace LCT.APICommunications
 
         public async Task<HttpResponseMessage> GetProjectById(string projectId)
         {
-            HttpClient httpClient = GetHttpClient();            
-            HttpResponseMessage obj = new HttpResponseMessage();           
+            HttpClient httpClient = GetHttpClient();
+            HttpResponseMessage obj = new HttpResponseMessage();
             var result = obj;
             string projectsByTagUrl = $"{sw360ProjectsApi}/{projectId}";
             try
@@ -137,7 +137,7 @@ namespace LCT.APICommunications
 
         public async Task<string> GetReleases()
         {
-            HttpClient httpClient = GetHttpClient();            
+            HttpClient httpClient = GetHttpClient();
             var result = string.Empty;
             try
             {
@@ -145,7 +145,7 @@ namespace LCT.APICommunications
                 if (responseMessage != null && responseMessage.StatusCode.Equals(HttpStatusCode.OK))
                 {
                     return await responseMessage.Content.ReadAsStringAsync();
-                }                
+                }
                 else
                 {
                     Logger.Error("SW360 server is not accessible while getting All Releases,Please wait for sometime and re run the pipeline again." +
@@ -335,7 +335,7 @@ namespace LCT.APICommunications
         }
         public async Task<HttpResponseMessage> GetAllReleasesWithAllData(int page, int pageEntries)
         {
-            HttpClient httpClient = GetHttpClient();            
+            HttpClient httpClient = GetHttpClient();
             string url = $"{sw360ReleaseApi}?page={page}&allDetails=true&page_entries={pageEntries}";
             return await httpClient.GetAsync(url);
         }
@@ -363,7 +363,6 @@ namespace LCT.APICommunications
             string updateUri = $"{sw360ProjectsApi}/{projectId}/{ApiConstant.Release}/{releaseId}";
             string updateContent = JsonConvert.SerializeObject(updateLinkedRelease);
             HttpContent content = new StringContent(updateContent, Encoding.UTF8, "application/json");
-
             return await httpClient.PatchAsync(updateUri, content);
         }
         #endregion

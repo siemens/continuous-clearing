@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 
@@ -34,7 +34,7 @@ namespace SW360IntegrationTest.Nuget
             {
                 OutFolder = TestHelper.OutFolder;
                 string packagejsonPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles", "SystemTest1stIterationData", "Nuget-Assets"));
-                string bomPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs"));                
+                string bomPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs"));
 
                 TestHelper.RunBOMCreatorExe(new string[]{
                 TestConstant.PackageFilePath, packagejsonPath,

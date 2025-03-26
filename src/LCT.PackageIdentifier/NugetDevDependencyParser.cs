@@ -1,13 +1,15 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using LCT.PackageIdentifier.Model.NugetModel;
 using log4net;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Exceptions;
 using Microsoft.Build.Locator;
+using Newtonsoft.Json.Linq;
 using NuGet.Packaging.Core;
 using NuGet.ProjectModel;
 using System;
@@ -15,11 +17,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Security.Cryptography;
-using LCT.PackageIdentifier.Model.NugetModel;
-using System.Text.Json;
 using System.Runtime.InteropServices;
-using Newtonsoft.Json.Linq;
+using System.Security.Cryptography;
+using System.Text.Json;
 
 namespace LCT.PackageIdentifier
 {
@@ -199,7 +199,7 @@ namespace LCT.PackageIdentifier
                 {
                     return;
                 }
-                List<JProperty> directDepCollection =  new List<JProperty>();
+                List<JProperty> directDepCollection = new List<JProperty>();
 
                 if (projectDependencies.HasValues)
                 {

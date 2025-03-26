@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -68,7 +68,7 @@ namespace LCT.Facade
         {
             return m_sw360ApiCommunication.GetReleases();
         }
-        public Task<string> TriggerFossologyProcess(string releaseId,string sw360link)
+        public Task<string> TriggerFossologyProcess(string releaseId, string sw360link)
         {
             return m_sw360ApiCommunication.TriggerFossologyProcess(releaseId, sw360link);
         }

@@ -1,12 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.AQL;
-using LCT.Common;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -36,7 +35,7 @@ namespace LCT.Services.Interface
         /// <param name="repoName">repoName</param>
         /// <returns>IList<AqlResult></returns>
         public Task<IList<AqlResult>> GetPypiComponentDataByRepo(string repoName);
-       
+
         /// <summary>
         /// Gets the package information in the repo, via the name or path
         /// </summary>
@@ -47,6 +46,6 @@ namespace LCT.Services.Interface
 #nullable enable
         public Task<AqlResult?> GetPackageInfo(ComponentsToArtifactory component);
 
-        public Task<HttpResponseMessage> CheckJFrogConnectivity();        
+        public Task<HttpResponseMessage> CheckJFrogConnectivity();
     }
 }

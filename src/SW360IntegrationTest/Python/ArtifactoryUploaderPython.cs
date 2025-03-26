@@ -5,10 +5,8 @@
 //<license>MIT</license>
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using CycloneDX.Models;
 using NUnit.Framework;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using TestUtilities;

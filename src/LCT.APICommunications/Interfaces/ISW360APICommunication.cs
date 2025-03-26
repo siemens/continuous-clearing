@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -17,7 +17,7 @@ namespace LCT.APICommunications.Interfaces
         Task<string> GetSw360Users();
         Task<string> GetComponents();
         Task<string> GetProjectsByName(string projectName);
-        Task<string> TriggerFossologyProcess(string releaseId,string sw360link);
+        Task<string> TriggerFossologyProcess(string releaseId, string sw360link);
         Task<HttpResponseMessage> CheckFossologyProcessStatus(string link);
         Task<HttpResponseMessage> GetComponentByExternalId(string purlId, string externalIdKey = "");
         Task<HttpResponseMessage> GetReleaseByExternalId(string purlId, string externalIdKey = "");
