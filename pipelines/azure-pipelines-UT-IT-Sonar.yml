@@ -1,0 +1,387 @@
+# --------------------------------------------------------------------------------------------------------------------
+# SPDX-FileCopyrightText: 2025 Siemens AG
+#
+#  SPDX-License-Identifier: MIT
+# -------------------------------------------------------------------------------------------------------------------- 
+
+trigger: none  # Disables triggering on push
+
+pr:
+  branches:
+    include:
+      - '*'  # Runs only when a PR is created or updated
+
+variables:
+  - group: CONTINUOUS_CLEARING_TOOL_TEST_CONFIG
+
+jobs:
+######################################################## START Unit Tests ########################################################
+- job: 'UnitTests'
+  displayName: 'Run Unit Tests'
+  pool:
+    vmImage: 'ubuntu-latest'
+
+  steps:
+  - checkout: self
+  
+  - task: PowerShell@2
+    displayName: 'Update Unit Test Configuration'
+    inputs:
+      targetType: 'inline'
+      script: |
+        $filePath = "$(Build.SourcesDirectory)/src/UnitTestUtilities/appsettingsUnitTest.json"
+
+        # Read JSON file
+        $json = Get-Content $filePath | ConvertFrom-Json
+
+        # Replace values with Azure DevOps variables
+        $json.SW360URL = "$(SW360_URL)"
+        $json.FossologyURL = "$(FOSSOLOGY_URL)"
+        $json.JFrogURL = "$(JFROG_URL)"
+
+        # Save the modified JSON file
+        $json | ConvertTo-Json -Depth 10 | Set-Content $filePath
+
+        Write-Host "✅ JSON file updated successfully!"
+        Write-Host "📄 Updated JSON content:"
+        Get-Content $filePath | Write-Host
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Restore Dependencies'
+    inputs:
+      command: 'restore'
+      projects: '$(Build.SourcesDirectory)/src/LicenseClearingTool.sln'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Build Solution'
+    inputs:
+      command: 'build'
+      projects: '$(Build.SourcesDirectory)/src/LicenseClearingTool.sln'
+
+  - task: PowerShell@2
+    displayName: 'Run Unit Tests with Coverage'
+    inputs:
+      targetType: 'inline'
+      script: |
+        $SolutionDir = "$(Build.SourcesDirectory)/src"
+        $CoverageReport = "$(Build.SourcesDirectory)/coverage" 
+        New-Item -ItemType Directory -Force -Path $CoverageReport
+        $testFailed = $false  # Track if any test fails
+
+        Get-ChildItem -Path $SolutionDir -Recurse -Filter *Utest*.csproj | ForEach-Object {
+            $Project = $_
+            Write-Host "Running tests for: $($Project.Name)"
+            Push-Location $Project.DirectoryName
+            dotnet add package coverlet.msbuild --version 3.2.0
+            dotnet test --no-build --configuration Release --logger trx `
+              /p:CollectCoverage=true /p:CoverletOutputFormat=opencover `
+              /p:CoverletOutput=$CoverageReport/$($Project.BaseName).xml
+
+            if ($LASTEXITCODE -ne 0) {
+                Write-Host "❌ Tests failed in $($Project.Name)"
+                $testFailed = $true  # Mark test failure
+            }
+            Pop-Location
+        }
+
+        # Fail the pipeline if any test failed
+        if ($testFailed) {
+            Write-Error "❌ One or more tests failed. Stopping pipeline."
+            exit 1
+        }
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Unit Test Coverage Report'
+    inputs:
+      PathtoPublish: '$(Build.SourcesDirectory)/coverage'
+      ArtifactName: 'UTreport'
+      publishLocation: 'Container'
+######################################################## END Unit Tests ########################################################
+
+
+#################################################### START Integration Tests ####################################################
+- job: 'IntegrationTests'
+  displayName: 'Run Integration Tests'
+  pool:
+    vmImage: 'ubuntu-latest'
+
+  steps:
+    - checkout: self
+
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'docker-dev-phoebe'
+        command: 'login'
+      displayName: "Docker login to docker-dev-phoebe"
+
+    - script: |
+        echo "Starting a new sw360 container..."
+        CONTAINER_ID=$(docker run -dit --name sw360 -p $(SW360_PORT):8080 -p 5985:5984 -p 5435:5432 --add-host=host.docker.internal:host-gateway $(SW360_DOCKER_IMAGE))
+
+        if [ -z "$CONTAINER_ID" ]; then
+            echo "Failed to start sw360 container!"
+            exit 1
+        fi
+
+        echo "sw360 Container ID: $CONTAINER_ID"
+        echo "Container started successfully."
+      displayName: "Start sw360 Container"
+    
+    - script: |
+        echo "Starting a new fossology container..."
+        CONTAINER_ID=$(docker run -dit --name fossology -p $(FOSSOLOGY_PORT):80 $(FOSSOLOGY_DOCKER_IMAGE))
+
+        if [ -z "$CONTAINER_ID" ]; then
+            echo "Failed to start fossology container!"
+            exit 1
+        fi
+
+        echo "fossology Container ID: $CONTAINER_ID"
+        echo "Container started successfully."
+      displayName: "Start fossology Container"
+    
+    - script: |
+        echo "Waiting for 5 minutes to allow sw360 to start..."
+        sleep 300  # 300 seconds = 5 minutes
+      displayName: "Initial Wait (5 minutes)"
+      enabled: true
+    
+    - script: |
+        echo "Waiting for sw360 API to be available..."
+
+        URL="$(SW360_URL)/resource/api/projects"
+        AUTH_TOKEN="$(SW360_TOKEN)"  # Use pipeline variable
+        MAX_RETRIES=60  # Max 10 minutes
+        RETRY_INTERVAL=10  # 10 seconds
+
+        for i in $(seq 1 $MAX_RETRIES); do
+            echo "Attempt $i: Checking sw360 API..."
+
+            RESPONSE=$(curl --silent --show-error --fail --location --write-out "\nHTTP_STATUS:%{http_code}" \
+              --header "Authorization: Token $AUTH_TOKEN" \
+              --header "Accept: application/hal+json" \
+              "$URL" || echo "HTTP_STATUS:000")
+
+            BODY=$(echo "$RESPONSE" | awk '!/HTTP_STATUS/ {print}')
+            HTTP_STATUS=$(echo "$RESPONSE" | awk -F'HTTP_STATUS:' '{print $2}' | tr -d '[:space:]')
+
+            echo "Response Status: $HTTP_STATUS"
+            echo "Response Body:"
+            echo "$BODY"
+
+            if [ "$HTTP_STATUS" == "200" ]; then
+                echo "sw360 API is up and running!"
+                exit 0
+            fi
+
+            echo "sw360 API not ready yet (Status: $HTTP_STATUS). Retrying in $RETRY_INTERVAL seconds..."
+            sleep $RETRY_INTERVAL
+        done
+
+        echo "ERROR: sw360 API did not become ready in time."
+        exit 1  # Fail pipeline if API isn't ready
+      displayName: "Wait for sw360 API to be ready"
+    
+    - script: |
+        set -e  # Exit on error
+        sudo apt-get update
+        sudo apt-get install -y jq
+
+        JSON_FILE="$(Build.SourcesDirectory)/src/TestUtilities/appSettingsSW360IntegrationTest.json"
+
+        if [[ -z "$(SW360_URL)" || -z "$(FOSSOLOGY_URL)" ]]; then
+            echo "Some of the parameters are not set, e.g., SW360 host or Fossology host."
+            exit 1
+        else
+            echo "The SW360 URL is $(SW360_URL)"
+            echo "The Fossology URL is $(FOSSOLOGY_URL)"
+        fi
+
+        if [[ -f "$JSON_FILE" ]]; then
+            echo "Modifying the settings file: $JSON_FILE"
+
+            jq --arg sw360 "$(SW360_URL)" \
+              --arg fossy "$(FOSSOLOGY_URL)" \
+              --arg email "$(JFROG_USER_EMAIL)" \
+              --arg apiKey "$(JFROG_TOKEN)" \
+              --arg jfrog "$(JFROG_URL)" \
+              --arg authToken "$(SW360_TOKEN)" \
+              '.Fossologyurl = $fossy |
+                .SW360URL = $sw360 |
+                .ArtifactoryUploadUser = $email |
+                .ArtifactoryUploadApiKey = $apiKey |
+                .JFrogApi = $jfrog |
+                .SW360AuthTokenValue = $authToken' "$JSON_FILE" > temp.json && mv temp.json "$JSON_FILE"
+
+            echo "Updated Integration Test Configuration:"
+            cat "$JSON_FILE"
+
+        else
+            echo "$JSON_FILE does not exist"
+            exit 1
+        fi
+      displayName: 'Update Integration Test Configuration'
+    
+    - task: DotNetCoreCLI@2
+      displayName: 'Restore Dependencies'
+      inputs:
+        command: 'restore'
+        projects: '$(Build.SourcesDirectory)/src/LicenseClearingTool.sln'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Build Solution'
+      inputs:
+        command: 'build'
+        projects: '$(Build.SourcesDirectory)/src/LicenseClearingTool.sln'
+
+    - script: |
+        SOLUTION_DIR="$(Build.SourcesDirectory)/src"
+        COVERAGE_REPORT="$(Build.SourcesDirectory)/coverage"
+        mkdir -p "$COVERAGE_REPORT"
+        TEST_PROJECT_PATH="$SOLUTION_DIR/SW360IntegrationTest/SW360IntegrationTest.csproj"
+
+        if [ -f "$TEST_PROJECT_PATH" ]; then
+            echo "Running IT tests..."
+            TEST_PROJECT_DIR=$(dirname "$TEST_PROJECT_PATH")
+            pushd "$TEST_PROJECT_DIR"
+            
+            # Ensure necessary packages are installed
+            dotnet add package Microsoft.NET.Test.Sdk --version 17.8.0
+            dotnet add package coverlet.msbuild --version 3.2.0
+
+            # Run tests with coverage
+            dotnet test --no-build --configuration Release --logger trx \
+              /p:CollectCoverage=true \
+              /p:CoverletOutputFormat=opencover \
+              /p:CoverletOutput="$COVERAGE_REPORT/SW360IntegrationTest.xml"
+
+            # Capture the exit code
+            TEST_EXIT_CODE=$?
+            if [ $TEST_EXIT_CODE -ne 0 ]; then
+                echo "❌ Tests failed! Stopping pipeline."
+                exit $TEST_EXIT_CODE
+            fi
+
+            # Check if coverage report is generated
+            if [ -f "$COVERAGE_REPORT/SW360IntegrationTest.xml" ]; then
+                echo "✅ Coverage report generated successfully!"
+            else
+                echo "❌ Coverage report missing! Check logs."
+                exit 1
+            fi
+
+            popd
+        else
+            echo "❌ Integration test project not found: $TEST_PROJECT_PATH"
+            exit 1
+        fi
+      displayName: 'Run Integration Tests with Coverage'
+
+
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Integration Test Coverage Report'
+      inputs:
+        PathtoPublish: '$(Build.SourcesDirectory)/coverage'
+        ArtifactName: 'ITreport'
+        publishLocation: 'Container'
+#################################################### END Integration Tests ####################################################
+
+
+#################################################### START SonarQube Analysis ####################################################
+- job: 'SonarQubeAnalysis'
+  dependsOn:
+  - UnitTests
+  - IntegrationTests
+  displayName: 'Run SonarQube Analysis'
+  pool:
+    vmImage: 'ubuntu-latest'
+
+  steps:
+  - checkout: self
+
+
+  - task: DownloadBuildArtifacts@0
+    enabled: True
+    displayName: 'Download Unit Test Coverage Reports'
+    inputs:
+      artifactName: 'UTreport'
+      downloadPath: '$(Build.SourcesDirectory)/coverage'
+
+  - task: DownloadBuildArtifacts@0
+    displayName: 'Download Integration Test Coverage Reports'
+    inputs:
+      artifactName: 'ITreport'
+      downloadPath: '$(Build.SourcesDirectory)/coverage'
+  
+  - task: PowerShell@2
+    enabled: True
+    displayName: 'Organize Coverage Reports for SonarQube'
+    inputs:
+      targetType: 'inline'
+      script: |
+        $Destination = "$(Build.SourcesDirectory)/CoverageForMerge"
+        New-Item -ItemType Directory -Force -Path $Destination
+
+        Get-ChildItem -Path "$(Build.SourcesDirectory)/coverage/UTreport" -Filter *.xml | Copy-Item -Destination $Destination -Force
+        Get-ChildItem -Path "$(Build.SourcesDirectory)/coverage/ITreport" -Filter *.xml | Copy-Item -Destination $Destination -Force
+        Write-Host "Final list of copied files:"
+        Get-ChildItem -Path $Destination -Filter *.xml | ForEach-Object { Write-Host $_.FullName }
+        
+        # for use in the below steps
+        New-Item -ItemType Directory -Force -Path "$(Build.SourcesDirectory)/CoverageForSonar"
+  
+  - task: reportgenerator@5
+    inputs:
+      reports: '$(Build.SourcesDirectory)/CoverageForMerge/*.xml'
+      targetdir: '$(Build.SourcesDirectory)/CoverageForSonar'
+      assemblyfilters: '-SW360IntegrationTest'
+      filefilters: '"-*Tests*;-*Test.cs'
+      verbosity: 'Verbose'
+      reporttypes: SonarQube;Cobertura
+
+  - task: PublishCodeCoverageResults@2
+    inputs:
+      summaryFileLocation: '$(Build.SourcesDirectory)/CoverageForSonar/Cobertura.xml'
+    displayName: "ADO - Publish Code Coverage results"
+
+  - task: SonarQubePrepare@7
+    inputs:
+      SonarQube: 'SonarQube'
+      scannerMode: 'dotnet'
+      projectKey: $(SONARQUBE_PROJECT_KEY)
+      projectName: 'Clearing_Automation'
+      projectVersion: 
+      extraProperties: |
+        sonar.projectBaseDir=$(Build.SourcesDirectory)/src
+        sonar.verbose=true
+        sonar.test.exclusions=**/*Test*/**
+        sonar.cpd.exclusions=**/*Test*/**
+        sonar.coverage.exclusions=**/*Test*/**
+        sonar.exclusions=**/**/appSettingsSW360IntegrationTest.json,src/TestUtilities/appSettingsSW360IntegrationTest.json,**/*Test*/**
+        sonar.coverageReportPaths=$(Build.SourcesDirectory)/CoverageForSonar/SonarQube.xml
+        
+
+  - task: DotNetCoreCLI@2
+    enabled: false
+    displayName: 'Restore Dependencies'
+    inputs:
+      command: 'restore'
+      projects: '$(Build.SourcesDirectory)/src/LicenseClearingTool.sln'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Build Solution'
+    inputs:
+      command: 'build'
+      projects: '$(Build.SourcesDirectory)/src/LicenseClearingTool.sln'
+
+  - task: SonarQubeAnalyze@7
+    inputs:
+      jdkversion: 'JAVA_HOME_17_X64'
+    displayName: 'Execute SonarQube Analysis'
+  
+  - task: SonarQubePublish@7
+    inputs:
+      pollingTimeoutSec: '300'
+    displayName: 'Publish SonarQube Results'
+#################################################### END SonarQube Analysis ####################################################
