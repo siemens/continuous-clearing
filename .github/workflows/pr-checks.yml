@@ -54,7 +54,7 @@ jobs:
   pr-branch-name-check:
     runs-on: ubuntu-latest
     steps:
-      - name: Ensure Branch Name Follows Standard Conventions (Warning Only)
+      - name: Ensure Branch Name Follows Standard Conventions
         run: |
           BRANCH_NAME="${{ github.head_ref }}"
           echo "Checking branch name: $BRANCH_NAME"
