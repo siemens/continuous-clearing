@@ -10,6 +10,7 @@ using LCT.Common;
 using LCT.Common.Interface;
 using LCT.Facade.Interfaces;
 using LCT.Services.Interface;
+using LCT.SW360PackageCreator.Model;
 using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;
@@ -18,6 +19,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -274,7 +276,73 @@ namespace LCT.SW360PackageCreator.UTest
             // Assert
             Assert.IsFalse(result);
         }
+        
+        [Test]
+        public async Task GetAllReleasesDetails_WhenHttpRequestExceptionOccurs_ReturnsNull()
+        {
+            // Arrange
+            mockISW360ApicommunicationFacade
+                .Setup(x => x.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>()))
+                .ThrowsAsync(new HttpRequestException());
 
+            // Act
+            var result = await InvokeGetAllReleasesDetails(mockISW360ApicommunicationFacade.Object, 1, 10);
+
+            // Assert
+            Assert.IsNull(result);
+        }
+
+        [Test]
+        public async Task GetAllReleasesDetails_WhenInvalidOperationExceptionOccurs_ReturnsNull()
+        {
+            // Arrange
+            mockISW360ApicommunicationFacade
+                .Setup(x => x.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>()))
+                .ThrowsAsync(new InvalidOperationException());
+
+            // Act
+            var result = await InvokeGetAllReleasesDetails(mockISW360ApicommunicationFacade.Object, 1, 10);
+
+            // Assert
+            Assert.IsNull(result);
+        }
+
+        [Test]
+        public async Task GetAllReleasesDetails_WhenUriFormatExceptionOccurs_ReturnsNull()
+        {
+            // Arrange
+            mockISW360ApicommunicationFacade
+                .Setup(x => x.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>()))
+                .ThrowsAsync(new UriFormatException());
+
+            // Act
+            var result = await InvokeGetAllReleasesDetails(mockISW360ApicommunicationFacade.Object, 1, 10);
+
+            // Assert
+            Assert.IsNull(result);
+        }
+
+        [Test]
+        public async Task GetAllReleasesDetails_WhenTaskCanceledExceptionOccurs_ReturnsNull()
+        {
+            // Arrange
+            mockISW360ApicommunicationFacade
+                .Setup(x => x.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>()))
+                .ThrowsAsync(new TaskCanceledException());
+
+            // Act
+            var result = await InvokeGetAllReleasesDetails(mockISW360ApicommunicationFacade.Object, 1, 10);
+
+            // Assert
+            Assert.IsNull(result);
+        }
+
+        private async Task<ReleasesAllDetails> InvokeGetAllReleasesDetails(ISW360ApicommunicationFacade facade, int page, int pageEntries)
+        {
+            // Use reflection to invoke the private static method
+            var method = typeof(CreatorValidator).GetMethod("GetAllReleasesDetails", BindingFlags.NonPublic | BindingFlags.Static);
+            return await (Task<ReleasesAllDetails>)method.Invoke(null, new object[] { facade, page, pageEntries });
+        }
 
 
     }

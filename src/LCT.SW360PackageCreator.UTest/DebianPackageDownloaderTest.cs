@@ -7,10 +7,13 @@
 using LCT.Common;
 using LCT.Common.Model;
 using LCT.SW360PackageCreator.Interfaces;
+using log4net;
 using Moq;
 using NUnit.Framework;
 using System.IO;
+using System.Reflection;
 using System.Threading.Tasks;
+using Directory = System.IO.Directory;
 
 namespace LCT.SW360PackageCreator.UTest
 {
@@ -191,5 +194,40 @@ namespace LCT.SW360PackageCreator.UTest
             //Assert
             Assert.That(actual != null);
         }
-    }
+        [TestCase]
+        public void DeletePatchedFolderAndFile_ValidFolderAndFile_DeletesSuccessfully()
+        {
+            // Arrange
+            string tempFolderPath = Path.Combine(Path.GetTempPath(), "TestFolder");
+            string tempFilePath = Path.Combine(tempFolderPath, "TestFile.txt");
+
+            Directory.CreateDirectory(tempFolderPath);
+            File.WriteAllText(tempFilePath, "Test content");
+
+            // Act
+            typeof(DebianPackageDownloader)
+                .GetMethod("DeletePatchedFolderAndFile", BindingFlags.NonPublic | BindingFlags.Static)
+                .Invoke(null, new object[] { tempFolderPath, tempFilePath });
+
+            // Assert
+            Assert.IsFalse(Directory.Exists(tempFolderPath));
+            Assert.IsFalse(File.Exists(tempFilePath));
+        }
+
+        [TestCase]
+        public void DeletePatchedFolderAndFile_NonExistentFolderAndFile_NoExceptionThrown()
+        {
+            // Arrange
+            string nonExistentFolderPath = Path.Combine(Path.GetTempPath(), "NonExistentFolder");
+            string nonExistentFilePath = Path.Combine(nonExistentFolderPath, "NonExistentFile.txt");
+
+            // Act & Assert
+            Assert.DoesNotThrow(() =>
+            {
+                typeof(DebianPackageDownloader)
+                    .GetMethod("DeletePatchedFolderAndFile", BindingFlags.NonPublic | BindingFlags.Static)
+                    .Invoke(null, new object[] { nonExistentFolderPath, nonExistentFilePath });
+            });
+        }
+        }
 }
