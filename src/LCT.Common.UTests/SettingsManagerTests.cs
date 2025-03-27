@@ -6,6 +6,7 @@
 
 using NUnit.Framework;
 using System;
+using System.IO;
 
 namespace LCT.Common.UTest
 {
@@ -72,6 +73,41 @@ namespace LCT.Common.UTest
 
             // Assert
             Assert.That(result, Is.False);
+        }
+        [Test]
+        public void DisplayHelp_WhenFileExists_ShouldOutputFileContent()
+        {
+            // Arrange
+            string testFilePath = "CLIUsageNpkg.txt";
+            string expectedContent = "This is a test content for CLI usage.";
+            File.WriteAllText(testFilePath, expectedContent);
+
+            using StringWriter consoleOutput = new StringWriter();
+            Console.SetOut(consoleOutput);
+
+            // Act
+            SettingsManager.DisplayHelp();
+
+            // Assert
+            string actualOutput = consoleOutput.ToString().Trim();
+            Assert.That(actualOutput, Is.EqualTo(expectedContent));
+
+            // Cleanup
+            File.Delete(testFilePath);
+        }
+
+        [Test]
+        public void DisplayHelp_WhenFileDoesNotExist_ShouldThrowFileNotFoundException()
+        {
+            // Arrange
+            string testFilePath = "CLIUsageNpkg.txt";
+            if (File.Exists(testFilePath))
+            {
+                File.Delete(testFilePath);
+            }
+
+            // Act & Assert
+            Assert.Throws<FileNotFoundException>(() => SettingsManager.DisplayHelp());
         }
     }
 }
