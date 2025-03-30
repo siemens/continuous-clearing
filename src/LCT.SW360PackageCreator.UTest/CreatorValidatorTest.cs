@@ -115,6 +115,59 @@ namespace LCT.SW360PackageCreator.UTest
 
         }
         [Test]
+        public async Task TriggerFossologyValidation_TestPositive()
+        {
+            // Arrange
+            var appSettings = new CommonAppSettings()
+            {
+                SW360 = new SW360()
+                {
+                    URL = "https://sw360.example.com"
+                }
+            };
+
+            var responseBody = "{\"_embedded\":{\"sw360:releases\":[{\"id\":\"a3c5c9d1dd469d668433fb147c01bad2\",\"name\":\"HC-Test Pugixml\",\"version\":\"V1.2\",\"clearingState\":\"APPROVED\",\"_embedded\":{\"sw360:attachments\":[[{\"filename\":\"Protocol_Pugixml - 1.2.doc\"}]]},\"_links\":{\"self\":{\"href\":\"https://sw360.siemens.com/resource/api/releases/a3c5c9d1dd469d668433fb147c01bad2\"}}}]},\"page\":{\"totalPages\":1}}";
+            var fossTriggerStatus = new FossTriggerStatus
+            {
+                Links = new Links
+                {
+                    Self = new Self
+                    {
+                        Href = "https://fossology.example.com"
+                    }
+                }
+            };
+
+            var triggerStatusResponse = JsonConvert.SerializeObject(fossTriggerStatus);
+
+            // Mock GetAllReleasesWithAllData to return a valid HttpResponseMessage
+            mockISW360ApicommunicationFacade
+                .Setup(x => x.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>()))
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    Content = new StringContent(responseBody),
+                    StatusCode = HttpStatusCode.OK
+                });
+
+            // Mock TriggerFossologyProcess to return a valid response
+            mockISW360ApicommunicationFacade
+                .Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(triggerStatusResponse);
+
+            // Act
+            await CreatorValidator.TriggerFossologyValidation(appSettings, mockISW360ApicommunicationFacade.Object);
+
+            // Assert
+            mockISW360ApicommunicationFacade.Verify(
+                x => x.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>()),
+                Times.Once
+            );
+            mockISW360ApicommunicationFacade.Verify(
+                x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()),
+                Times.Once
+            );
+        }
+        [Test]
         public async Task FossologyUrlValidation_ValidUrl_ReturnsTrue()
         {
             // Arrange
