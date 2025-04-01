@@ -14,6 +14,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -237,6 +238,88 @@ namespace LCT.Services.UTest
             releaseEmbedded.Sw360Releases = releaseList;
             releaseIdOfComponent.Embedded = releaseEmbedded;
             return releaseIdOfComponent;
+        }
+        [Test]
+        public void GetReleaseExistStatus_ReleaseCollectionContainsMatchingKey_DoesNothing()
+        {
+            // Arrange
+            string name = "Zone.js";
+            string externalIdKey = "?package-url=";
+            var release = new Sw360Releases
+            {
+                Name = "Zone.js",
+                ExternalIds = new ExternalIds { Package_Url = "[\"pkg:npm/zone.js\"]" }
+            };
+            var releaseCollection = new Dictionary<int, Sw360Releases>
+        {
+            { 1, release }
+        };
+            var sw360ReleasesData = new List<Sw360Releases> { release };
+
+            // Act
+            var result = InvokeGetReleaseExistStatus(name, externalIdKey, sw360ReleasesData);
+
+            // Assert
+            Assert.IsTrue(result.isReleaseExist);
+            Assert.AreEqual(release, result.sw360Releases);
+        }
+
+        [Test]
+        public void GetReleaseExistStatus_ReleaseCollectionContainsNonMatchingKey_UpdatesCollection()
+        {
+            // Arrange
+            string name = "Zone.js";
+            string externalIdKey = "?package-url=";
+            var existingRelease = new Sw360Releases
+            {
+                Name = "OtherRelease",
+                ExternalIds = new ExternalIds { Package_Url = "[\"pkg:npm/other\"]" }
+            };
+            var newRelease = new Sw360Releases
+            {
+                Name = "Zone.js",
+                ExternalIds = new ExternalIds { Package_Url = "[\"pkg:npm/zone.js\"]" }
+            };
+            var releaseCollection = new Dictionary<int, Sw360Releases>
+        {
+            { 1, existingRelease }
+        };
+            var sw360ReleasesData = new List<Sw360Releases> { newRelease };
+
+            // Act
+            var result = InvokeGetReleaseExistStatus(name, externalIdKey, sw360ReleasesData);
+
+            // Assert
+            Assert.IsTrue(result.isReleaseExist);
+            Assert.AreEqual(newRelease, result.sw360Releases);
+        }
+
+        [Test]
+        public void GetReleaseExistStatus_ReleaseCollectionDoesNotContainKey_AddsToCollection()
+        {
+            // Arrange
+            string name = "Zone.js";
+            string externalIdKey = "?package-url=";
+            var release = new Sw360Releases
+            {
+                Name = "Zone.js",
+                ExternalIds = new ExternalIds { Package_Url = "[\"pkg:npm/zone.js\"]" }
+            };
+            var sw360ReleasesData = new List<Sw360Releases> { release };
+
+            // Act
+            var result = InvokeGetReleaseExistStatus(name, externalIdKey, sw360ReleasesData);
+
+            // Assert
+            Assert.IsTrue(result.isReleaseExist);
+            Assert.AreEqual(release, result.sw360Releases);
+        }
+
+        private Releasestatus InvokeGetReleaseExistStatus(string name, string externalIdKey, IList<Sw360Releases> sw360ReleasesData)
+        {
+            // Use reflection to invoke the private method
+            var method = typeof(SW360CommonService).GetMethod("GetReleaseExistStatus", BindingFlags.NonPublic | BindingFlags.Static);
+            return (Releasestatus)method.Invoke(null, new object[] { name, externalIdKey, sw360ReleasesData });
         }
     }
 }

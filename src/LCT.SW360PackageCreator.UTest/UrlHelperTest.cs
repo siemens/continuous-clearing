@@ -308,6 +308,16 @@ namespace LCT.SW360PackageCreator.UTest
             string ReadAllText(string path);
         }
 
+        [Test]
+        public void Dispose_ShouldNotThrow_WhenCalledMultipleTimes()
+        {
+            // Arrange
+            var urlHelper = new UrlHelper();
+
+            // Act & Assert
+            Assert.DoesNotThrow(() => urlHelper.Dispose());
+            Assert.DoesNotThrow(() => urlHelper.Dispose(), "Dispose should not throw when called multiple times.");
+        }
 
     }
 }
