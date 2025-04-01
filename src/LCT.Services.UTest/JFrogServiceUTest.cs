@@ -400,5 +400,58 @@ namespace LCT.Services.UTest
             // Assert
             Assert.That(actual.Count, Is.EqualTo(0));
         }
+        [Test]
+        public async Task GetInternalComponentDataByRepo_HandlesHttpRequestException()
+        {
+            // Arrange
+            var mockJfrogApiComFacade = new Mock<IJfrogAqlApiCommunicationFacade>();
+            mockJfrogApiComFacade
+                .Setup(x => x.GetInternalComponentDataByRepo(It.IsAny<string>()))
+                .Throws<HttpRequestException>();
+
+            IJFrogService jFrogService = new JFrogService(mockJfrogApiComFacade.Object);
+
+            // Act
+            IList<AqlResult> actual = await jFrogService.GetInternalComponentDataByRepo("test-repo");
+
+            // Assert
+            Assert.That(actual.Count, Is.EqualTo(0));
+        }
+
+        [Test]
+        public async Task GetInternalComponentDataByRepo_HandlesInvalidOperationException()
+        {
+            // Arrange
+            var mockJfrogApiComFacade = new Mock<IJfrogAqlApiCommunicationFacade>();
+            mockJfrogApiComFacade
+                .Setup(x => x.GetInternalComponentDataByRepo(It.IsAny<string>()))
+                .Throws<InvalidOperationException>();
+
+            IJFrogService jFrogService = new JFrogService(mockJfrogApiComFacade.Object);
+
+            // Act
+            IList<AqlResult> actual = await jFrogService.GetInternalComponentDataByRepo("test-repo");
+
+            // Assert
+            Assert.That(actual.Count, Is.EqualTo(0));
+        }
+
+        [Test]
+        public async Task GetInternalComponentDataByRepo_HandlesTaskCanceledException()
+        {
+            // Arrange
+            var mockJfrogApiComFacade = new Mock<IJfrogAqlApiCommunicationFacade>();
+            mockJfrogApiComFacade
+                .Setup(x => x.GetInternalComponentDataByRepo(It.IsAny<string>()))
+                .Throws<TaskCanceledException>();
+
+            IJFrogService jFrogService = new JFrogService(mockJfrogApiComFacade.Object);
+
+            // Act
+            IList<AqlResult> actual = await jFrogService.GetInternalComponentDataByRepo("test-repo");
+
+            // Assert
+            Assert.That(actual.Count, Is.EqualTo(0));
+        }
     }
 }
