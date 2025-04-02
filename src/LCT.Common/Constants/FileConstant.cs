@@ -51,6 +51,8 @@ namespace LCT.Common.Constants
         public const string CycloneDXFileExtension = ".cdx.json";
         public const string SBOMTemplateFileExtension = "CATemplate.cdx.json";
         public const string NugetAssetFile = "project.assets.json";
+        public static string[] Nuget_DeploymentType_DetectionExt = { "*.csproj" };
+        public static string[] Nuget_DeploymentType_DetectionTags = { "SelfContained", "PublishSingleFile" };
         public const string multipleversionsFileName = "Multipleversions.json";
         public const string artifactoryReportNotApproved = "ReportNotApproved.json";
         public const string basicSBOMName = "ContinuousClearing";

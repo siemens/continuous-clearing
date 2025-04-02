@@ -17,6 +17,9 @@ using LCT.PackageIdentifier.Model.NugetModel;
 using LCT.Services.Interface;
 using log4net;
 using Newtonsoft.Json;
+using NuGet.Packaging;
+using NuGet.ProjectModel;
+using NuGet.Versioning;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -36,10 +39,14 @@ namespace LCT.PackageIdentifier
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
         private readonly ICycloneDXBomParser _cycloneDXBomParser;
+        private readonly IFrameworkPackages _frameworkPackages;
+        private static Dictionary<string, Dictionary<string, NuGetVersion>> _listofFrameworkPackages;
 
-        public NugetProcessor(ICycloneDXBomParser cycloneDXBomParser)
+        public NugetProcessor(ICycloneDXBomParser cycloneDXBomParser, IFrameworkPackages frameworkPackages)
         {
+            _frameworkPackages = frameworkPackages;
             _cycloneDXBomParser = cycloneDXBomParser;
+            _listofFrameworkPackages = new Dictionary<string, Dictionary<string, NuGetVersion>>();
         }
 
         #region public methods
@@ -48,7 +55,12 @@ namespace LCT.PackageIdentifier
             Logger.Debug($"ParsePackageFile():Start");
             List<Component> listComponentForBOM = new List<Component>();
             Bom bom = new Bom();
-
+            if (DetectDeploymentType(appSettings))
+            {
+                Logger.Warn($"Deployment type identified as Self-Contained. Currently, the clearing tool does not support processing for this deployment type solution," +
+                    $" so the operation is being skipped.");
+                return bom;
+            }
             ParsingInputFileForBOM(appSettings, ref listComponentForBOM, ref bom);
             var componentsWithMultipleVersions = bom.Components.GroupBy(s => s.Name).Where(g => g.Count() > 1).SelectMany(g => g).ToList();
 
@@ -445,6 +457,7 @@ namespace LCT.PackageIdentifier
             int totalComponentsIdentified = 0;
 
             configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Nuget);
+            GetFrameworkPackagesForAllConfigLockFiles(configFiles);
             List<string> listOfTemplateBomfilePaths = new List<string>();
             foreach (string filepath in configFiles)
             {
@@ -655,7 +668,7 @@ namespace LCT.PackageIdentifier
             return keyValuePairs.Values.ToList();
         }
 
-        private static void ParseInputFiles(CommonAppSettings appSettings, string filepath, List<NugetPackage> listofComponents)
+        private void ParseInputFiles(CommonAppSettings appSettings, string filepath, List<NugetPackage> listofComponents)
         {
             if (filepath.EndsWith(FileConstant.NugetAssetFile))
             {
@@ -676,7 +689,6 @@ namespace LCT.PackageIdentifier
                 Logger.Warn($"Input file NOT_FOUND :{filepath}");
             }
         }
-
 
         private static void CheckForMultipleVersions(CommonAppSettings appSettings, List<Component> componentsWithMultipleVersions)
         {
@@ -771,16 +783,17 @@ namespace LCT.PackageIdentifier
             return library;
         }
 
-        private static List<NugetPackage> ParseAssetFile(string configFile)
+        private List<NugetPackage> ParseAssetFile(string configFile)
         {
             NugetDevDependencyParser nugetDevDependencyParser = NugetDevDependencyParser.Instance;
             List<Container> containers = nugetDevDependencyParser.Parse(configFile);
             return ConvertContainerAsNugetPackage(containers, configFile);
         }
 
-        private static List<NugetPackage> ConvertContainerAsNugetPackage(List<Container> containers, string configFile)
+        private List<NugetPackage> ConvertContainerAsNugetPackage(List<Container> containers, string configFile)
         {
             List<NugetPackage> nugetPackages = new List<NugetPackage>();
+            List<string> uniqueFrameworkKeys = GetUniqueTargetFrameworkKeysForConfigFile(configFile);
             foreach (Container containermodule in containers)
             {
                 foreach (var lst in containermodule.Components)
@@ -793,7 +806,7 @@ namespace LCT.PackageIdentifier
                         Version = lst.Value.Version,
                         Dependencies = depvalue,
                         Filepath = configFile,
-                        IsDev = lst.Value.Scope.ToString() == "DevDependency" ? "true" : "false",
+                        IsDev = lst.Value.Scope.ToString() == "DevDependency" || IsFrameworkDependentComponent(lst.Value.Name, lst.Value.Version, uniqueFrameworkKeys) ? "true" : "false",
                     });
 
                 }
@@ -801,7 +814,8 @@ namespace LCT.PackageIdentifier
 
             return nugetPackages;
         }
-        public static void GetDependencyList(KeyValuePair<string, BuildInfoComponent> lst, ref List<string> depvalue)
+
+        private static void GetDependencyList(KeyValuePair<string, BuildInfoComponent> lst, ref List<string> depvalue)
         {
             if (lst.Value.Dependencies.Count > 0)
             {
@@ -813,6 +827,102 @@ namespace LCT.PackageIdentifier
             }
 
         }
+
+        private bool IsFrameworkDependentComponent(string name, string version, List<string> uniqueFrameworkKeys)
+        {
+            bool isFrameworkDependent = uniqueFrameworkKeys
+                .SelectMany(key => _listofFrameworkPackages[key])
+                .Any(frameworkPackage => frameworkPackage.Key == name && frameworkPackage.Value.ToNormalizedString() == version);
+
+            if (isFrameworkDependent)
+            {
+                Logger.Debug($"Framework dependent component found: {name} {version}");
+            }
+            return isFrameworkDependent;
+        }
+
+        private void GetFrameworkPackagesForAllConfigLockFiles(List<string> configFiles)
+        {
+            try
+            {
+                List<string> projectAssetsFiles = configFiles.Where(file => file.EndsWith(FileConstant.NugetAssetFile) && File.Exists(file)).ToList();
+                _listofFrameworkPackages = _frameworkPackages.GetFrameworkPackages(projectAssetsFiles);
+            }
+            catch (ArgumentNullException ex)
+            {
+                Logger.Debug($"Error in GetFrameworkPackagesForAllConfigLockFiles:", ex);
+            }
+        }
+
+        private List<string> GetUniqueTargetFrameworkKeysForConfigFile(string configFile)
+        {
+            List<string> uniqueKeys = [];
+            try
+            {
+                var lockFile = new LockFileFormat().Read(configFile);
+
+                foreach (var target in lockFile.Targets)
+                {
+                    var targetFramework = target.TargetFramework;
+                    var frameworkReferences = _frameworkPackages.GetFrameworkReferences(lockFile, target);
+                    foreach (var framework in frameworkReferences)
+                    {
+                        uniqueKeys.Add(targetFramework + "-" + framework);
+                    }
+                }
+            }
+            catch (IOException ex)
+            {
+                Logger.Debug($"IO error while reading the config file '{configFile}':", ex);
+            }
+            catch (Exception ex)
+            {
+                Logger.Debug($"Error in GetUniqueTargetFrameworkKeysForConfigFile:", ex);
+            }
+            return uniqueKeys;
+        }
+
+        private static bool DetectDeploymentType(CommonAppSettings appSettings)
+        {
+            string[] projectFiles = FileConstant.Nuget_DeploymentType_DetectionExt
+                .SelectMany(ext => Directory.GetFiles(appSettings.Directory.InputFolder, ext, SearchOption.AllDirectories))
+                .ToArray();
+
+            bool isSelfContained = false;
+            bool isSingleFile = false;
+            bool result;
+
+            foreach (var projectFilePath in projectFiles)
+            {
+                try
+                {
+                    XDocument projectDocument = XDocument.Load(projectFilePath);
+                    foreach (var tag in FileConstant.Nuget_DeploymentType_DetectionTags)
+                    {
+                        var element = projectDocument.Descendants(tag).FirstOrDefault();
+                        if (element != null)
+                        {
+                            switch (tag)
+                            {
+                                case "SelfContained":
+                                    isSelfContained = bool.TryParse(element.Value, out result) ? result : false;
+                                    break;
+                                case "PublishSingleFile":
+                                    isSingleFile = bool.TryParse(element.Value, out result) ? result : false;
+                                    break;
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Debug($"Error while DetectDeploymentType: {ex.Message}");
+                }
+            }
+
+            return isSelfContained || isSingleFile;
+        }
+
         #endregion
     }
 }
