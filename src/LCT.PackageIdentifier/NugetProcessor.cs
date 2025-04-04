@@ -17,7 +17,6 @@ using LCT.PackageIdentifier.Model.NugetModel;
 using LCT.Services.Interface;
 using log4net;
 using Newtonsoft.Json;
-using NuGet.Packaging;
 using NuGet.ProjectModel;
 using NuGet.Versioning;
 using System;
@@ -41,6 +40,7 @@ namespace LCT.PackageIdentifier
         private readonly ICycloneDXBomParser _cycloneDXBomParser;
         private readonly IFrameworkPackages _frameworkPackages;
         private static Dictionary<string, Dictionary<string, NuGetVersion>> _listofFrameworkPackages;
+        private bool isSelfContainedProject = false;
 
         public NugetProcessor(ICycloneDXBomParser cycloneDXBomParser, IFrameworkPackages frameworkPackages)
         {
@@ -57,9 +57,13 @@ namespace LCT.PackageIdentifier
             Bom bom = new Bom();
             if (DetectDeploymentType(appSettings))
             {
-                Logger.Warn($"Deployment type identified as Self-Contained. Currently, the clearing tool does not support processing for this deployment type solution," +
-                    $" so the operation is being skipped.");
-                return bom;
+                isSelfContainedProject = true;
+                Logger.Warn($"Deployment type identified as Self-Contained. Currently, the clearing tool does not support identification of framework packages for this deployment type solution.");
+            }
+            else
+            {
+                Logger.Debug($"Deployment type identified as Classic");
+                isSelfContainedProject = false;
             }
             ParsingInputFileForBOM(appSettings, ref listComponentForBOM, ref bom);
             var componentsWithMultipleVersions = bom.Components.GroupBy(s => s.Name).Where(g => g.Count() > 1).SelectMany(g => g).ToList();
@@ -457,7 +461,10 @@ namespace LCT.PackageIdentifier
             int totalComponentsIdentified = 0;
 
             configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Nuget);
-            GetFrameworkPackagesForAllConfigLockFiles(configFiles);
+            if (!isSelfContainedProject)
+            {
+                GetFrameworkPackagesForAllConfigLockFiles(configFiles);
+            }
             List<string> listOfTemplateBomfilePaths = new List<string>();
             foreach (string filepath in configFiles)
             {
@@ -806,12 +813,11 @@ namespace LCT.PackageIdentifier
                         Version = lst.Value.Version,
                         Dependencies = depvalue,
                         Filepath = configFile,
-                        IsDev = lst.Value.Scope.ToString() == "DevDependency" || IsFrameworkDependentComponent(lst.Value.Name, lst.Value.Version, uniqueFrameworkKeys) ? "true" : "false",
+                        //IsDev = lst.Value.Scope.ToString() == "DevDependency" ? "true" : "false",
+                        IsDev = lst.Value.Scope.ToString() == "DevDependency" || (!isSelfContainedProject && IsFrameworkDependentComponent(lst.Value.Name, lst.Value.Version, uniqueFrameworkKeys)) ? "true" : "false",
                     });
-
                 }
             }
-
             return nugetPackages;
         }
 
@@ -836,7 +842,8 @@ namespace LCT.PackageIdentifier
 
             if (isFrameworkDependent)
             {
-                Logger.Debug($"Framework dependent component found: {name} {version}");
+                string frameworkTarget = uniqueFrameworkKeys.FirstOrDefault(key => _listofFrameworkPackages[key].ContainsKey(name));
+                Logger.Debug($"Framework dependent component found: {name} {version} for target framework: {frameworkTarget}");
             }
             return isFrameworkDependent;
         }
@@ -867,13 +874,16 @@ namespace LCT.PackageIdentifier
                     var frameworkReferences = _frameworkPackages.GetFrameworkReferences(lockFile, target);
                     foreach (var framework in frameworkReferences)
                     {
-                        uniqueKeys.Add(targetFramework + "-" + framework);
+                        if (!uniqueKeys.Contains(targetFramework + "-" + framework))
+                        {
+                            uniqueKeys.Add(targetFramework + "-" + framework);
+                        }
                     }
                 }
             }
             catch (IOException ex)
             {
-                Logger.Debug($"IO error while reading the config file '{configFile}':", ex);
+                Logger.Debug($"GetUniqueTargetFrameworkKeysForConfigFile: IO error while reading the config file '{configFile}':", ex);
             }
             catch (Exception ex)
             {
