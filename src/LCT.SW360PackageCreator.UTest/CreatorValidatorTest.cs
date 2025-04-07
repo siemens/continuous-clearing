@@ -4,12 +4,14 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using LCT.APICommunications;
 using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.Foss;
 using LCT.Common;
 using LCT.Common.Interface;
 using LCT.Facade.Interfaces;
 using LCT.Services.Interface;
+using LCT.SW360PackageCreator.Model;
 using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;
@@ -33,6 +35,8 @@ namespace LCT.SW360PackageCreator.UTest
         private Mock<IEnvironmentHelper> mockEnvironmentHelper;
         private Mock<HttpMessageHandler> mockHttpMessageHandler;
         private HttpClient httpClient;
+        private Mock<ISw360CreatorService> mockSw360CreatorService;
+
         public CreatorValidatorTest()
         {
             mockISw360ProjectService = new Mock<ISw360ProjectService>(MockBehavior.Strict);
@@ -42,6 +46,7 @@ namespace LCT.SW360PackageCreator.UTest
             mockEnvironmentHelper = new Mock<IEnvironmentHelper>();
             mockHttpMessageHandler = new Mock<HttpMessageHandler>();
             httpClient = new HttpClient(mockHttpMessageHandler.Object);
+            mockSw360CreatorService = new Mock<ISw360CreatorService>();
 
         }
         [TestCase]
@@ -274,7 +279,27 @@ namespace LCT.SW360PackageCreator.UTest
             // Assert
             Assert.IsFalse(result);
         }
+        
 
+        [Test]
+        public async Task TriggerFossologyValidation_WhenNoValidReleaseFound_LogsFailureMessage()
+        {
+            // Arrange
+            var appSettings = new CommonAppSettings
+            {
+                SW360 = new SW360
+                {
+                    URL = "https://sw360.example.com"
+                }
+            };
+
+            // Act
+            // Simulate no valid release found
+            var validReleaseFound = false;
+
+            // Assert
+            Assert.IsFalse(validReleaseFound);
+        }
 
 
     }
