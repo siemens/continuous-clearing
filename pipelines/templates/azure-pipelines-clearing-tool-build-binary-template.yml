@@ -56,7 +56,6 @@ steps:
 
   - ${{ each project in parameters.projectDefinitions }}:
     - task: PowerShell@2
-      pwsh: true
       displayName: 'Run PackageIdentifier for ${{ project.projectType }}'
       inputs:
         targetType: 'inline'
