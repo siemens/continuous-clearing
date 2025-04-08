@@ -65,7 +65,6 @@ steps:
             "--Directory:InputFolder", "${{ project.inputFolder }}",
             "--Directory:OutputFolder", "${{ parameters.outputFolder }}",
             "--ProjectType", "${{ project.projectType }}",
-          ${{ if ne(index(parameters.projectDefinitions, project), 0) }} "--MultipleProjectType", "true",
             "--SW360:ProjectName", "${{ parameters.sw360ProjectName }}",
             "--SW360:ProjectID", "${{ parameters.sw360ProjectId }}",
             "--SW360:AuthTokenType", "Token",
@@ -76,6 +75,15 @@ steps:
             "--Jfrog:Token", "${{ parameters.JfrogToken }}",
             "--settingsfilepath", "${{ parameters.appSettingsPath }}"
           )
+
+          # Add MultipleProjectType flag only for index > 0
+          $index = [array]::IndexOf(@(${{
+            join(',', parameters.projectDefinitions.*.projectType)
+          }}).Split(','), "${{ project.projectType }}")
+          if ($index -ne 0) {
+            $args += "--MultipleProjectType"
+            $args += "true"
+          }
 
           dotnet "$(Build.SourcesDirectory)/continuous-clearing/out/net8.0/PackageIdentifier.dll" @args
 
