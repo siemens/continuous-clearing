@@ -38,7 +38,7 @@ stages:
                 JfrogToken: $(JFROG_TOKEN)
                 projectDefinitions:
                 - projectType: 'npm'
-                  inputFolder: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/npm
+                  inputFolder: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/dependency-locks/npm
                 outputFolder: $(Build.SourcesDirectory)/continuous-clearing/boms
                 appSettingsPath: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/settings/appsettings.json
 
