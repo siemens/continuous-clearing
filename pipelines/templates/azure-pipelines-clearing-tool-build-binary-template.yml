@@ -1,0 +1,156 @@
+
+parameters:
+# Sw360 and Fossology parameters
+  - name: sw360Url
+    type: string
+    default: 'http://localhost:8090'
+  
+  - name: sw360Token
+    type: string
+    default: ''
+
+  - name: sw360ProjectId
+    type: string
+    default: ''
+
+  - name: sw360ProjectName
+    type: string
+    default: ''
+  
+  - name: fossologyUrl
+    type: string
+    default: 'http://localhost:8091'
+
+
+# JFrog parameters
+  - name: JfrogUrl
+    type: string
+    default: ''
+
+  - name: JfrogToken
+    type: string
+    default: ''
+
+  - name: JfrogDryRun
+    type: boolean
+    default: true
+
+# CA Tool parameters
+  - name: projectType
+    type: string
+    default: ''
+
+  - name: projectType2
+    type: string
+    default: ''
+
+  - name: inputFolder
+    type: string
+    default: ''
+  
+  - name: inputFolder2
+    type: string
+    default: ''
+
+  - name: outputFolder
+    type: string
+    default: ''
+
+
+# Template parameters
+  - name: multipleProjectType
+    type: boolean
+    default: false
+
+  - name: PackageCreatorEnabled
+    type: boolean
+    default: true
+
+  - name: ArtifactoryUploaderEnabled
+    type: boolean
+    default: true
+  
+  - name: appSettingsPath
+    type: string
+    default: ""
+
+
+steps:
+  - checkout: self
+
+  - task: CmdLine@2
+    displayName: 'Build CA Tool'
+    inputs:
+      script: |
+        dotnet build $(Build.SourcesDirectory)\continuous-clearing\src\LicenseClearingTool.sln --configuration Release
+
+  - task: PowerShell@2
+    displayName: 'Run PackageIdentifier for ${{ parameters.projectType }}'
+    inputs:
+      targetType: 'inline'
+      script: |
+        $(Build.SourcesDirectory)\continuous-clearing\out\net8.0\PackageIdentifier.exe `
+          --Directory:InputFolder "${{ parameters.inputFolder }}" `
+          --Directory:OutputFolder "${{ parameters.outputFolder }}" `
+          --ProjectType "${{ parameters.projectType }}" `
+          --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
+          --SW360:ProjectID "${{ parameters.sw360ProjectId }}" `
+          --SW360:AuthTokenType "Token" `
+          --SW360:URL "${{ parameters.sw360Url }}" `
+          --SW360:Token "${{ parameters.sw360Token }}" `
+          --SW360:Fossology:URL "${{ parameters.fossologyUrl }}" `
+          --JFrog:URL "${{ parameters.JfrogUrl }}" `
+          --Jfrog:Token "${{ parameters.JfrogToken }}" `
+          --settingsfilepath ${{ parameters.appSettingsPath }}" `
+
+  - task: PowerShell@2
+    condition: eq('${{ parameters.multipleProjectType }}', true)
+    displayName: 'Run PackageIdentifier for multiple-project ${{ parameters.projectType2 }}'
+    inputs:
+      targetType: 'inline'
+      script: |
+        $(Build.SourcesDirectory)\Continuous-Clearing\out\net8.0\PackageIdentifier.exe `
+          --Directory:InputFolder "${{ parameters.inputFolder2 }}" `
+          --Directory:OutputFolder "${{ parameters.outputFolder }}" `
+          --ProjectType "${{ parameters.projectType2 }}" `
+          --MultipleProjectType "true" `
+          --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
+          --SW360:ProjectID "${{ parameters.sw360ProjectId }}" `
+          --SW360:AuthTokenType "Token" `
+          --SW360:URL "${{ parameters.sw360Url }}" `
+          --SW360:Fossology:URL "${{ parameters.fossologyUrl }}" `
+          --SW360:Token "${{ parameters.sw360Token }}" `
+          --JFrog:URL "${{ parameters.JfrogUrl }}" `
+          --Jfrog:Token "${{ parameters.JfrogToken }}" `
+          --settingsfilepath ${{ parameters.appSettingsPath }}"
+
+  - task: PowerShell@2
+    condition: eq('${{ parameters.PackageCreatorEnabled }}', true)
+    continueOnError: true
+    displayName: 'Run SW360PackageCreator'
+    inputs:
+      targetType: 'inline'
+      script: |
+        $(Build.SourcesDirectory)\Continuous-Clearing\out\net8.0\SW360PackageCreator.exe `
+          --Directory:OutputFolder "${{ parameters.outputFolder }}" `
+          --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
+          --SW360:ProjectID "${{ parameters.sw360ProjectId }}" `
+          --SW360:AuthTokenType "Token" `
+          --SW360:URL "${{ parameters.sw360Url }}" `
+          --SW360:Token "${{ parameters.sw360Token }}" `
+          --SW360:Fossology:URL "${{ parameters.fossologyUrl }}" `
+          --settingsfilepath ${{ parameters.appSettingsPath }}"
+
+  - task: PowerShell@2
+    condition: eq('${{ parameters.ArtifactoryUploaderEnabled }}', true)
+    continueOnError: true
+    displayName: 'Run ArtifactoryUploader'
+    inputs:
+      targetType: 'inline'
+      script: |
+        $(Build.SourcesDirectory)\Continuous-Clearing\out\net8.0\ArtifactoryUploader.exe `
+          --Directory:OutputFolder "${{ parameters.outputFolder }}" `
+          --JFrog:URL "${{ parameters.JfrogUrl }}" `
+          --Jfrog:Token "${{ parameters.JfrogToken }}" `
+          --JFrog:DryRun "${{ parameters.jfrogDryRun }}" `
+          --settingsfilepath ${{ parameters.appSettingsPath }}"
