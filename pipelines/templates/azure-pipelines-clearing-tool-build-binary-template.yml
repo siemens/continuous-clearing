@@ -66,7 +66,6 @@ steps:
         dotnet build $(Build.SourcesDirectory)/continuous-clearing/src/LicenseClearingTool.sln --configuration Release
 
   - task: PowerShell@2
-    pwsh: true
     displayName: 'Run PackageIdentifier for ${{ parameters.projectType }}'
     inputs:
       targetType: 'inline'
@@ -86,7 +85,6 @@ steps:
           --settingsfilepath "${{ parameters.appSettingsPath }}"
 
   - task: PowerShell@2
-    pwsh: true
     condition: eq('${{ parameters.multipleProjectType }}', true)
     displayName: 'Run PackageIdentifier for multiple-project ${{ parameters.projectType2 }}'
     inputs:
@@ -108,7 +106,6 @@ steps:
           --settingsfilepath "${{ parameters.appSettingsPath }}"
 
   - task: PowerShell@2
-    pwsh: true
     condition: eq('${{ parameters.PackageCreatorEnabled }}', true)
     continueOnError: true
     displayName: 'Run SW360PackageCreator'
@@ -126,7 +123,6 @@ steps:
           --settingsfilepath "${{ parameters.appSettingsPath }}"
 
   - task: PowerShell@2
-    pwsh: true
     condition: eq('${{ parameters.ArtifactoryUploaderEnabled }}', true)
     continueOnError: true
     displayName: 'Run ArtifactoryUploader'
