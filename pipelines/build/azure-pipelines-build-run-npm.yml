@@ -1,0 +1,42 @@
+trigger: none
+
+variables:
+  - group: CONTINUOUS_CLEARING_TOOL_TEST_CONFIG
+
+stages:
+  - stage: binary
+    displayName: "Build and Run the CA Tool Binary"
+    pool:
+      vmImage: 'ubuntu-latest'
+
+    jobs:
+      - job: binaryRun
+        displayName: "Execute Binary Job"
+        steps:
+          - checkout: self
+          - checkout: git://Continuous-Clearing/ca-tool-config-and-testdata@refs/heads/dev
+          
+          - template: templates/start-sw360-fossology-containers-template.yml
+            parameters:
+                dockerRegistry: $(JFROG_DOCKER_REGISTRY)
+                sw360DockerImage: $(SW360_DOCKER_IMAGE)
+                fossologyDockerImage: $(FOSSOLOGY_DOCKER_IMAGE)
+                sw360Port: $(SW360_PORT)
+                fossologyPort: $(FOSSOLOGY_PORT)
+                sw360Url: $(SW360_URL)
+                sw360Token: $(SW360_TOKEN)
+
+
+          - template: templates/azure-pipelines-clearing-tool-build-binary-template.yml
+            parameters:
+                sw360Url: $(SW360_URL)
+                sw360Token: $(SW360_TOKEN)
+                sw360ProjectId: 80ea2219c1dc488c867ba952d578b053
+                sw360ProjectName: "Test-NPM"
+                fossologyUrl: $(FOSSOLOGY_URL)
+                JfrogUrl: $(JFROG_URL)
+                JfrogToken: $(JFROG_TOKEN)
+                projectType: "npm"
+                inputFolder: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/npm
+                outputFolder: $(Build.SourcesDirectory)/continuous-clearing/boms
+                appSettingsPath: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/settings/appsettings.json
