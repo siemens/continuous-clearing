@@ -87,20 +87,20 @@ steps:
       targetType: 'inline'
       script: |
         $cmd = @"
-$(Build.SourcesDirectory)/continuous-clearing/out/net8.0/PackageIdentifier `
-  --Directory:InputFolder "${{ parameters.inputFolder }}" `
-  --Directory:OutputFolder "${{ parameters.outputFolder }}" `
-  --ProjectType "${{ parameters.projectType }}" `
-  --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
-  --SW360:ProjectID "${{ parameters.sw360ProjectId }}" `
-  --SW360:AuthTokenType "Token" `
-  --SW360:URL "${{ parameters.sw360Url }}" `
-  --SW360:Token "${{ parameters.sw360Token }}" `
-  --SW360:Fossology:URL "${{ parameters.fossologyUrl }}" `
-  --JFrog:URL "${{ parameters.JfrogUrl }}" `
-  --Jfrog:Token "${{ parameters.JfrogToken }}" `
-  --settingsfilepath "${{ parameters.appSettingsPath }}"
-"@
+        $(Build.SourcesDirectory)/continuous-clearing/out/net8.0/PackageIdentifier `
+          --Directory:InputFolder "${{ parameters.inputFolder }}" `
+          --Directory:OutputFolder "${{ parameters.outputFolder }}" `
+          --ProjectType "${{ parameters.projectType }}" `
+          --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
+          --SW360:ProjectID "${{ parameters.sw360ProjectId }}" `
+          --SW360:AuthTokenType "Token" `
+          --SW360:URL "${{ parameters.sw360Url }}" `
+          --SW360:Token "${{ parameters.sw360Token }}" `
+          --SW360:Fossology:URL "${{ parameters.fossologyUrl }}" `
+          --JFrog:URL "${{ parameters.JfrogUrl }}" `
+          --Jfrog:Token "${{ parameters.JfrogToken }}" `
+          --settingsfilepath "${{ parameters.appSettingsPath }}"
+        "@
         Invoke-Expression $cmd
 
   - task: PowerShell@2
@@ -110,21 +110,21 @@ $(Build.SourcesDirectory)/continuous-clearing/out/net8.0/PackageIdentifier `
       targetType: 'inline'
       script: |
         $cmd = @"
-$(Build.SourcesDirectory)/continuous-clearing/out/net8.0/PackageIdentifier `
-  --Directory:InputFolder "${{ parameters.inputFolder2 }}" `
-  --Directory:OutputFolder "${{ parameters.outputFolder }}" `
-  --ProjectType "${{ parameters.projectType2 }}" `
-  --MultipleProjectType "true" `
-  --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
-  --SW360:ProjectID "${{ parameters.sw360ProjectId }}" `
-  --SW360:AuthTokenType "Token" `
-  --SW360:URL "${{ parameters.sw360Url }}" `
-  --SW360:Fossology:URL "${{ parameters.fossologyUrl }}" `
-  --SW360:Token "${{ parameters.sw360Token }}" `
-  --JFrog:URL "${{ parameters.JfrogUrl }}" `
-  --Jfrog:Token "${{ parameters.JfrogToken }}" `
-  --settingsfilepath "${{ parameters.appSettingsPath }}"
-"@
+        $(Build.SourcesDirectory)/continuous-clearing/out/net8.0/PackageIdentifier `
+          --Directory:InputFolder "${{ parameters.inputFolder2 }}" `
+          --Directory:OutputFolder "${{ parameters.outputFolder }}" `
+          --ProjectType "${{ parameters.projectType2 }}" `
+          --MultipleProjectType "true" `
+          --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
+          --SW360:ProjectID "${{ parameters.sw360ProjectId }}" `
+          --SW360:AuthTokenType "Token" `
+          --SW360:URL "${{ parameters.sw360Url }}" `
+          --SW360:Fossology:URL "${{ parameters.fossologyUrl }}" `
+          --SW360:Token "${{ parameters.sw360Token }}" `
+          --JFrog:URL "${{ parameters.JfrogUrl }}" `
+          --Jfrog:Token "${{ parameters.JfrogToken }}" `
+          --settingsfilepath "${{ parameters.appSettingsPath }}"
+        "@
         Invoke-Expression $cmd
 
   - task: PowerShell@2
@@ -135,16 +135,16 @@ $(Build.SourcesDirectory)/continuous-clearing/out/net8.0/PackageIdentifier `
       targetType: 'inline'
       script: |
         $cmd = @"
-$(Build.SourcesDirectory)/continuous-clearing/out/net8.0/SW360PackageCreator `
-  --Directory:OutputFolder "${{ parameters.outputFolder }}" `
-  --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
-  --SW360:ProjectID "${{ parameters.sw360ProjectId }}" `
-  --SW360:AuthTokenType "Token" `
-  --SW360:URL "${{ parameters.sw360Url }}" `
-  --SW360:Token "${{ parameters.sw360Token }}" `
-  --SW360:Fossology:URL "${{ parameters.fossologyUrl }}" `
-  --settingsfilepath "${{ parameters.appSettingsPath }}"
-"@
+        $(Build.SourcesDirectory)/continuous-clearing/out/net8.0/SW360PackageCreator `
+          --Directory:OutputFolder "${{ parameters.outputFolder }}" `
+          --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
+          --SW360:ProjectID "${{ parameters.sw360ProjectId }}" `
+          --SW360:AuthTokenType "Token" `
+          --SW360:URL "${{ parameters.sw360Url }}" `
+          --SW360:Token "${{ parameters.sw360Token }}" `
+          --SW360:Fossology:URL "${{ parameters.fossologyUrl }}" `
+          --settingsfilepath "${{ parameters.appSettingsPath }}"
+        "@
         Invoke-Expression $cmd
 
   - task: PowerShell@2
@@ -155,11 +155,11 @@ $(Build.SourcesDirectory)/continuous-clearing/out/net8.0/SW360PackageCreator `
       targetType: 'inline'
       script: |
         $cmd = @"
-$(Build.SourcesDirectory)/continuous-clearing/out/net8.0/ArtifactoryUploader `
-  --Directory:OutputFolder "${{ parameters.outputFolder }}" `
-  --JFrog:URL "${{ parameters.JfrogUrl }}" `
-  --Jfrog:Token "${{ parameters.JfrogToken }}" `
-  --JFrog:DryRun "${{ parameters.JfrogDryRun }}" `
-  --settingsfilepath "${{ parameters.appSettingsPath }}"
-"@
+        $(Build.SourcesDirectory)/continuous-clearing/out/net8.0/ArtifactoryUploader `
+          --Directory:OutputFolder "${{ parameters.outputFolder }}" `
+          --JFrog:URL "${{ parameters.JfrogUrl }}" `
+          --Jfrog:Token "${{ parameters.JfrogToken }}" `
+          --JFrog:DryRun "${{ parameters.JfrogDryRun }}" `
+          --settingsfilepath "${{ parameters.appSettingsPath }}"
+        "@
         Invoke-Expression $cmd
