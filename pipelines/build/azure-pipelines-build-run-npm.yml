@@ -36,7 +36,9 @@ stages:
                 fossologyUrl: $(FOSSOLOGY_URL)
                 JfrogUrl: $(JFROG_URL)
                 JfrogToken: $(JFROG_TOKEN)
-                projectType: "npm"
-                inputFolder: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/npm
+                projectDefinitions:
+                - projectType: 'npm'
+                  inputFolder: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/npm
                 outputFolder: $(Build.SourcesDirectory)/continuous-clearing/boms
                 appSettingsPath: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/settings/appsettings.json
+
