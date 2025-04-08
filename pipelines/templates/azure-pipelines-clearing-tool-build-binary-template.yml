@@ -3,7 +3,7 @@ parameters:
 # Sw360 and Fossology parameters
   - name: sw360Url
     type: string
-    default: 'http://localhost:8090'
+    default: ''
   
   - name: sw360Token
     type: string
@@ -19,7 +19,7 @@ parameters:
   
   - name: fossologyUrl
     type: string
-    default: 'http://localhost:8091'
+    default: ''
 
 
 # JFrog parameters
@@ -82,14 +82,14 @@ steps:
     displayName: 'Build CA Tool'
     inputs:
       script: |
-        dotnet build $(Build.SourcesDirectory)\continuous-clearing\src\LicenseClearingTool.sln --configuration Release
+        dotnet build $(Build.SourcesDirectory)/continuous-clearing/src/LicenseClearingTool.sln --configuration Release
 
   - task: PowerShell@2
     displayName: 'Run PackageIdentifier for ${{ parameters.projectType }}'
     inputs:
       targetType: 'inline'
       script: |
-        $(Build.SourcesDirectory)\continuous-clearing\out\net8.0\PackageIdentifier.exe `
+        $(Build.SourcesDirectory)/continuous-clearing/out/net8.0/PackageIdentifier `
           --Directory:InputFolder "${{ parameters.inputFolder }}" `
           --Directory:OutputFolder "${{ parameters.outputFolder }}" `
           --ProjectType "${{ parameters.projectType }}" `
@@ -109,7 +109,7 @@ steps:
     inputs:
       targetType: 'inline'
       script: |
-        $(Build.SourcesDirectory)\Continuous-Clearing\out\net8.0\PackageIdentifier.exe `
+        $(Build.SourcesDirectory)/Continuous-Clearing/out/net8.0/PackageIdentifier `
           --Directory:InputFolder "${{ parameters.inputFolder2 }}" `
           --Directory:OutputFolder "${{ parameters.outputFolder }}" `
           --ProjectType "${{ parameters.projectType2 }}" `
@@ -131,7 +131,7 @@ steps:
     inputs:
       targetType: 'inline'
       script: |
-        $(Build.SourcesDirectory)\Continuous-Clearing\out\net8.0\SW360PackageCreator.exe `
+        $(Build.SourcesDirectory)/Continuous-Clearing/out/net8.0/SW360PackageCreator `
           --Directory:OutputFolder "${{ parameters.outputFolder }}" `
           --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
           --SW360:ProjectID "${{ parameters.sw360ProjectId }}" `
@@ -148,7 +148,7 @@ steps:
     inputs:
       targetType: 'inline'
       script: |
-        $(Build.SourcesDirectory)\Continuous-Clearing\out\net8.0\ArtifactoryUploader.exe `
+        $(Build.SourcesDirectory)/Continuous-Clearing/out/net8.0/ArtifactoryUploader `
           --Directory:OutputFolder "${{ parameters.outputFolder }}" `
           --JFrog:URL "${{ parameters.JfrogUrl }}" `
           --Jfrog:Token "${{ parameters.JfrogToken }}" `
