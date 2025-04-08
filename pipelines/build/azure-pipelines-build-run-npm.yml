@@ -16,7 +16,7 @@ stages:
           - checkout: self
           - checkout: git://Continuous-Clearing/ca-tool-config-and-testdata@refs/heads/dev
           
-          - template: ../templates/start-sw360-fossology-containers-template.yml
+          - template: ../templates/azure-pipelines-clearing-tool-build-binary-template.yml
             parameters:
                 dockerRegistry: $(JFROG_DOCKER_REGISTRY)
                 sw360DockerImage: $(SW360_DOCKER_IMAGE)
