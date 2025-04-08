@@ -112,6 +112,11 @@ steps:
       script: |
         dotnet $(Build.SourcesDirectory)/continuous-clearing/out/net8.0/ArtifactoryUploader.dll `
           --Directory:OutputFolder "${{ parameters.outputFolder }}" `
+          --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
+          --SW360:ProjectID "${{ parameters.sw360ProjectId }}" `
+          --SW360:AuthTokenType "Token" `
+          --SW360:URL "${{ parameters.sw360Url }}" `
+          --SW360:Token "${{ parameters.sw360Token }}" `
           --JFrog:URL "${{ parameters.JfrogUrl }}" `
           --Jfrog:Token "${{ parameters.JfrogToken }}" `
           --JFrog:DryRun "${{ parameters.jfrogDryRun }}" `
