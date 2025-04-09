@@ -41,7 +41,7 @@ parameters:
 
   - name: outputFolder
     type: string
-    
+
   - name: appSettingsPath
     type: string
 
@@ -52,7 +52,7 @@ jobs:
       - checkout: self
       - checkout: git://Continuous-Clearing/ca-tool-config-and-testdata@refs/heads/dev
 
-      - template: ../templates/azure-pipelines-start-sw360-fossology-containers-template.yml
+      - template: ../azure-pipelines-start-sw360-fossology-containers-template.yml
         parameters:
           dockerRegistry: $(JFROG_DOCKER_REGISTRY)
           sw360DockerImage: $(SW360_DOCKER_IMAGE)
