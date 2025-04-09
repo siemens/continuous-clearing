@@ -130,7 +130,6 @@ steps:
         $settingsDir = [System.IO.Path]::GetDirectoryName($settingsFileHostPath)
 
         docker run --rm --network="host" `
-          -v ${{ parameters.inputFolder }}:/mnt/Input `
           -v ${{ parameters.outputFolder }}:/mnt/Output `
           -v "$settingsDir:/etc/CATool" `
           ca-tool dotnet SW360PackageCreator.dll `
@@ -156,7 +155,6 @@ steps:
         $settingsDir = [System.IO.Path]::GetDirectoryName($settingsFileHostPath)        
 
         docker run --rm --network="host" `
-          -v ${{ parameters.inputFolder }}:/mnt/Input `
           -v ${{ parameters.outputFolder }}:/mnt/Output `
           -v "$settingsDir:/etc/CATool" `
           ca-tool dotnet ArtifactoryUploader.dll `
