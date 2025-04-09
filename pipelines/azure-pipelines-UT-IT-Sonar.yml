@@ -108,7 +108,7 @@ jobs:
   steps:
     - checkout: self
 
-    - template: ../azure-pipelines-start-sw360-fossology-containers-template.yml
+    - template: ./templates/azure-pipelines-start-sw360-fossology-containers-template.yml
       parameters:
         dockerRegistry: $(JFROG_DOCKER_REGISTRY)
         sw360DockerImage: $(SW360_DOCKER_IMAGE)
