@@ -111,16 +111,15 @@ steps:
             $args += "true"
           }
 
-          Write-Host "Running PackageIdentifier with args: $args"
           docker run --rm --network="host" `
             -v "${{ project.inputFolder }}:/mnt/Input" `
             -v "${{ parameters.outputFolder }}:/mnt/Output" `
-            -v "$settingsDir:/etc/CATool"
+            -v "${settingsDir}:/etc/CATool" `
             ca-tool dotnet PackageIdentifier.dll @args
 
   - task: PowerShell@2
     condition: eq('${{ parameters.PackageCreatorEnabled }}', true)
-    displayName: 'Run PackageCreator'
+    displayName: 'Run SW360PackageCreator'
     inputs:
       targetType: 'inline'
       script: |
@@ -131,7 +130,7 @@ steps:
 
         docker run --rm --network="host" `
           -v ${{ parameters.outputFolder }}:/mnt/Output `
-          -v "$settingsDir:/etc/CATool" `
+          -v "${settingsDir}:/etc/CATool" `
           ca-tool dotnet SW360PackageCreator.dll `
           --Directory:OutputFolder "/mnt/Output" `
           --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
@@ -155,7 +154,7 @@ steps:
 
         docker run --rm --network="host" `
           -v ${{ parameters.outputFolder }}:/mnt/Output `
-          -v "$settingsDir:/etc/CATool" `
+          -v "${settingsDir}:/etc/CATool" `
           ca-tool dotnet ArtifactoryUploader.dll `
           --Directory:OutputFolder "/mnt/Output" `
           --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `

@@ -3,15 +3,19 @@ parameters:
   - name: sw360Url
     type: string
     default: ''
+
   - name: sw360Token
     type: string
     default: ''
+
   - name: sw360ProjectId
     type: string
     default: ''
+
   - name: sw360ProjectName
     type: string
     default: ''
+
   - name: fossologyUrl
     type: string
     default: ''
@@ -20,9 +24,11 @@ parameters:
   - name: JfrogUrl
     type: string
     default: ''
+
   - name: JfrogToken
     type: string
     default: ''
+
   - name: JfrogDryRun
     type: boolean
     default: true
@@ -31,6 +37,7 @@ parameters:
   - name: projectDefinitions
     type: object
     default: []
+
   - name: outputFolder
     type: string
     default: ''
@@ -39,9 +46,11 @@ parameters:
   - name: PackageCreatorEnabled
     type: boolean
     default: true
+
   - name: ArtifactoryUploaderEnabled
     type: boolean
     default: true
+    
   - name: appSettingsPath
     type: string
     default: ''

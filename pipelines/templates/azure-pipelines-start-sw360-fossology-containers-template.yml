@@ -1,16 +1,22 @@
 parameters:
   - name: dockerRegistry
     type: string
+
   - name: sw360DockerImage
     type: string
+
   - name: fossologyDockerImage
     type: string
+
   - name: sw360Port
     type: string
+
   - name: fossologyPort
     type: string
+
   - name: sw360Url
     type: string
+    
   - name: sw360Token
     type: string
 

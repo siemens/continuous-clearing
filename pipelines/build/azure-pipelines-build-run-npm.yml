@@ -4,71 +4,20 @@ variables:
   - group: CONTINUOUS_CLEARING_TOOL_TEST_CONFIG
 
 stages:
-  - stage: npm
-    displayName: "Build and Run the CA Tool against NPM package type"
-    pool:
-      vmImage: 'ubuntu-latest'
-
-    jobs:
-      - job: binaryRun
-        displayName: "Execute Binary Job"
-        steps:
-          - checkout: self
-          - checkout: git://Continuous-Clearing/ca-tool-config-and-testdata@refs/heads/dev
-          
-          - template: ../templates/azure-pipelines-start-sw360-fossology-containers-template.yml
-            parameters:
-              dockerRegistry: $(JFROG_DOCKER_REGISTRY)
-              sw360DockerImage: $(SW360_DOCKER_IMAGE)
-              fossologyDockerImage: $(FOSSOLOGY_DOCKER_IMAGE)
-              sw360Port: $(SW360_PORT)
-              fossologyPort: $(FOSSOLOGY_PORT)
-              sw360Url: $(SW360_URL)
-              sw360Token: $(SW360_TOKEN)
-
-          - template: ../templates/azure-pipelines-clearing-tool-build-run-binary-template.yml
-            parameters:
-              sw360Url: $(SW360_URL)
-              sw360Token: $(SW360_TOKEN)
-              sw360ProjectId: 80ea2219c1dc488c867ba952d578b053
-              sw360ProjectName: "Test-NPM"
-              fossologyUrl: $(FOSSOLOGY_URL)
-              JfrogUrl: $(JFROG_URL)
-              JfrogToken: $(JFROG_TOKEN)
-              projectDefinitions:
-                - projectType: 'npm'
-                  inputFolder: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/dependency-locks/npm
-              outputFolder: $(Build.SourcesDirectory)/continuous-clearing/boms
-              appSettingsPath: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/settings/appsettings.json
-
-      - job: imageRun
-        displayName: "Execute Image Job"
-        steps:
-          - checkout: self
-          - checkout: git://Continuous-Clearing/ca-tool-config-and-testdata@refs/heads/dev
-          
-          - template: ../templates/azure-pipelines-start-sw360-fossology-containers-template.yml
-            parameters:
-              dockerRegistry: $(JFROG_DOCKER_REGISTRY)
-              sw360DockerImage: $(SW360_DOCKER_IMAGE)
-              fossologyDockerImage: $(FOSSOLOGY_DOCKER_IMAGE)
-              sw360Port: $(SW360_PORT)
-              fossologyPort: $(FOSSOLOGY_PORT)
-              sw360Url: $(SW360_URL)
-              sw360Token: $(SW360_TOKEN)
-
-          - template: ../templates/azure-pipelines-clearing-tool-build-run-image-template.yml
-            parameters:
-              sw360Url: $(SW360_URL)
-              sw360Token: $(SW360_TOKEN)
-              sw360ProjectId: 80ea2219c1dc488c867ba952d578b053
-              sw360ProjectName: "Test-NPM"
-              fossologyUrl: $(FOSSOLOGY_URL)
-              JfrogUrl: $(JFROG_URL)
-              JfrogToken: $(JFROG_TOKEN)
-              JfrogDryRun: true
-              projectDefinitions:
-                - projectType: 'npm'
-                  inputFolder: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/dependency-locks/npm
-              outputFolder: $(Build.SourcesDirectory)/continuous-clearing/boms
-              appSettingsPath: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/settings/appsettings.json
+  - template: ../templates/azure-pipelines-clearing-tool-stage-template.yml
+    parameters:
+      stageName: npm
+      displayName: "Build and Run the CA Tool against NPM package type"
+      sw360Url: $(SW360_URL)
+      sw360Token: $(SW360_TOKEN)
+      sw360ProjectId: 80ea2219c1dc488c867ba952d578b053
+      sw360ProjectName: "Test-NPM"
+      fossologyUrl: $(FOSSOLOGY_URL)
+      JfrogUrl: $(JFROG_URL)
+      JfrogToken: $(JFROG_TOKEN)
+      JfrogDryRun: true
+      projectDefinitions:
+        - projectType: 'npm'
+          inputFolder: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/dependency-locks/npm
+      outputFolder: $(Build.SourcesDirectory)/continuous-clearing/boms
+      appSettingsPath: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/settings/appsettings.json
