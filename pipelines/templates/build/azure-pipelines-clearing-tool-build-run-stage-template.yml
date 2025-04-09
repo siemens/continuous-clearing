@@ -44,7 +44,7 @@ stages:
   - stage: ${{ parameters.stageName }}
     displayName: ${{ parameters.displayName }}
     jobs:
-      - template: azure-pipelines-clearing-tool-job-template.yml
+      - template: azure-pipelines-clearing-tool-build-run-job-template.yml
         parameters:
           jobName: binaryRun
           jobDisplayName: "Execute Binary Job"
@@ -60,7 +60,7 @@ stages:
           outputFolder: ${{ parameters.outputFolder }}
           appSettingsPath: ${{ parameters.appSettingsPath }}
 
-      - template: azure-pipelines-clearing-tool-job-template.yml
+      - template: azure-pipelines-clearing-tool-build-run-job-template.yml
         parameters:
           jobName: imageRun
           jobDisplayName: "Execute Image Job"
