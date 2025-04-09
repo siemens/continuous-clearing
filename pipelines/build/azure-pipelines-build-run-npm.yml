@@ -3,11 +3,12 @@ trigger: none
 variables:
   - group: CONTINUOUS_CLEARING_TOOL_TEST_CONFIG
 
+
 stages:
   - template: ../templates/build/azure-pipelines-clearing-tool-build-run-stage-template.yml
     parameters:
       stageName: npm
-      displayName: "Build and Run the CA Tool against NPM package type"
+      displayName: "Build and Run the CA Tool against NPM"
       sw360Url: $(SW360_URL)
       sw360Token: $(SW360_TOKEN)
       sw360ProjectId: 80ea2219c1dc488c867ba952d578b053
@@ -19,5 +20,97 @@ stages:
       projectDefinitions:
         - projectType: 'npm'
           inputFolder: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/dependency-locks/npm
+      outputFolder: $(Build.SourcesDirectory)/continuous-clearing/boms
+      appSettingsPath: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/settings/appsettings.json
+
+  - template: ../templates/build/azure-pipelines-clearing-tool-build-run-stage-template.yml
+    parameters:
+      stageName: conan
+      displayName: "Build and Run the CA Tool against CONAN"
+      sw360Url: $(SW360_URL)
+      sw360Token: $(SW360_TOKEN)
+      sw360ProjectId: f36c5cc520664d1f91fe659931a3ea58
+      sw360ProjectName: "Test-Conan"
+      fossologyUrl: $(FOSSOLOGY_URL)
+      JfrogUrl: $(JFROG_URL)
+      JfrogToken: $(JFROG_TOKEN)
+      JfrogDryRun: true
+      projectDefinitions:
+        - projectType: 'conan'
+          inputFolder: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/dependency-locks/conan
+      outputFolder: $(Build.SourcesDirectory)/continuous-clearing/boms
+      appSettingsPath: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/settings/appsettings.json
+  
+  - template: ../templates/build/azure-pipelines-clearing-tool-build-run-stage-template.yml
+    parameters:
+      stageName: nuget
+      displayName: "Build and Run the CA Tool against NUGET"
+      sw360Url: $(SW360_URL)
+      sw360Token: $(SW360_TOKEN)
+      sw360ProjectId: cb0dfd43b35748d880d4c9f201ca7139
+      sw360ProjectName: "Test-Nuget"
+      fossologyUrl: $(FOSSOLOGY_URL)
+      JfrogUrl: $(JFROG_URL)
+      JfrogToken: $(JFROG_TOKEN)
+      JfrogDryRun: true
+      projectDefinitions:
+        - projectType: 'nuget'
+          inputFolder: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/dependency-locks/nuget
+      outputFolder: $(Build.SourcesDirectory)/continuous-clearing/boms
+      appSettingsPath: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/settings/appsettings.json
+  
+  - template: ../templates/build/azure-pipelines-clearing-tool-build-run-stage-template.yml
+    parameters:
+      stageName: poetry
+      displayName: "Build and Run the CA Tool against POETRY"
+      sw360Url: $(SW360_URL)
+      sw360Token: $(SW360_TOKEN)
+      sw360ProjectId: a331b8488fa140b6a8714d003a0d3a79
+      sw360ProjectName: "Test-Poetry"
+      fossologyUrl: $(FOSSOLOGY_URL)
+      JfrogUrl: $(JFROG_URL)
+      JfrogToken: $(JFROG_TOKEN)
+      JfrogDryRun: true
+      projectDefinitions:
+        - projectType: 'poetry'
+          inputFolder: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/dependency-locks/poetry
+      outputFolder: $(Build.SourcesDirectory)/continuous-clearing/boms
+      appSettingsPath: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/settings/appsettings.json
+
+  - template: ../templates/build/azure-pipelines-clearing-tool-build-run-stage-template.yml
+    parameters:
+      stageName: maven
+      displayName: "Build and Run the CA Tool against MAVEN"
+      sw360Url: $(SW360_URL)
+      sw360Token: $(SW360_TOKEN)
+      sw360ProjectId: a331b8488fa140b6a8714d003a0d3a79 # change this
+      sw360ProjectName: "Test-Poetry" # change this
+      fossologyUrl: $(FOSSOLOGY_URL)
+      JfrogUrl: $(JFROG_URL)
+      JfrogToken: $(JFROG_TOKEN)
+      JfrogDryRun: true
+      projectDefinitions:
+        - projectType: 'maven'
+          inputFolder: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/sboms/cyclonedx/maven
+      outputFolder: $(Build.SourcesDirectory)/continuous-clearing/boms
+      appSettingsPath: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/settings/appsettings.json
+  
+  - template: ../templates/build/azure-pipelines-clearing-tool-build-run-stage-template.yml
+    parameters:
+      stageName: multi
+      displayName: "Build and Run the CA Tool against Multi(NPM+Nuget)"
+      sw360Url: $(SW360_URL)
+      sw360Token: $(SW360_TOKEN)
+      sw360ProjectId: 760a780b0392498caa1c6dfe2a198498 # change this
+      sw360ProjectName: "Test-Multi" # change this
+      fossologyUrl: $(FOSSOLOGY_URL)
+      JfrogUrl: $(JFROG_URL)
+      JfrogToken: $(JFROG_TOKEN)
+      JfrogDryRun: true
+      projectDefinitions:
+        - projectType: 'npm'
+          inputFolder: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/dependency-locks/npm
+        - projectType: 'nuget'
+          inputFolder: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/dependency-locks/nuget
       outputFolder: $(Build.SourcesDirectory)/continuous-clearing/boms
       appSettingsPath: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/settings/appsettings.json
