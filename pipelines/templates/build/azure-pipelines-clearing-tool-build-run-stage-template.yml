@@ -42,6 +42,7 @@ parameters:
 
 stages:
   - stage: ${{ parameters.stageName }}
+    dependsOn: []
     displayName: ${{ parameters.displayName }}
     jobs:
       - template: azure-pipelines-clearing-tool-build-run-job-template.yml
