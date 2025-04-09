@@ -101,14 +101,12 @@ steps:
             "--settingsfilepath", "/etc/CATool/$settingsFileName"
           )
 
-          # Add MultipleProjectType flag if not first
-          $projectTypes = @(${{
-            join(',', parameters.projectDefinitions.*.projectType)
-          }}).Split(',')
+          $projectTypes = ${{ parameters.projectDefinitions | map('projectType') }}  # Get all project types
           $index = [array]::IndexOf($projectTypes, "${{ project.projectType }}")
+
           if ($index -ne 0) {
-            $args += "--MultipleProjectType"
-            $args += "true"
+              $args += "--MultipleProjectType"
+              $args += "true"
           }
 
           docker run --rm --network="host" `

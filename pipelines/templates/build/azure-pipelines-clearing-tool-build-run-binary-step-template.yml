@@ -83,13 +83,12 @@ steps:
             "--settingsfilepath", "${{ parameters.appSettingsPath }}"
           )
 
-          # Add MultipleProjectType flag only for index > 0
-          $index = [array]::IndexOf(@(${{
-            join(',', parameters.projectDefinitions.*.projectType)
-          }}).Split(','), "${{ project.projectType }}")
+          $projectTypes = ${{ parameters.projectDefinitions | map('projectType') }}  # Get all project types
+          $index = [array]::IndexOf($projectTypes, "${{ project.projectType }}")
+
           if ($index -ne 0) {
-            $args += "--MultipleProjectType"
-            $args += "true"
+              $args += "--MultipleProjectType"
+              $args += "true"
           }
 
           dotnet "$(Build.SourcesDirectory)/continuous-clearing/out/net8.0/PackageIdentifier.dll" @args
