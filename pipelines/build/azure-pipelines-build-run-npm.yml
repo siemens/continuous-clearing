@@ -7,7 +7,7 @@ stages:
   - stage: binary
     displayName: "Build and Run the CA Tool Binary"
     pool:
-      vmImage: 'ubuntu-latest-large'
+      vmImage: 'ubuntu-latest'
 
     jobs:
       - job: binaryRun
