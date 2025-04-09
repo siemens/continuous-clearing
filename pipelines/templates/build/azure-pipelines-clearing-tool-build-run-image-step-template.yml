@@ -75,7 +75,7 @@ steps:
 
 
   - ${{ each project in parameters.projectDefinitions }}:
-    - template: ./azure-pipelines-syft-generate-sbom-template.yml
+    - template: ../azure-pipelines-syft-generate-sbom-template.yml
       parameters:
           projectType: ${{ project.projectType }}
           inputFolder: ${{ project.inputFolder }}
