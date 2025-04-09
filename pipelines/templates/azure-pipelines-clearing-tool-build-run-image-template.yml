@@ -1,0 +1,172 @@
+parameters:
+  # SW360 and Fossology parameters
+  - name: sw360Url
+    type: string
+    default: ''
+  - name: sw360Token
+    type: string
+    default: ''
+  - name: sw360ProjectId
+    type: string
+    default: ''
+  - name: sw360ProjectName
+    type: string
+    default: ''
+  - name: fossologyUrl
+    type: string
+    default: ''
+
+  # JFrog parameters
+  - name: JfrogUrl
+    type: string
+    default: ''
+  - name: JfrogToken
+    type: string
+    default: ''
+  - name: JfrogDryRun
+    type: boolean
+    default: true
+
+  # CA Tool parameters
+  - name: projectDefinitions
+    type: object
+    default: []
+  - name: outputFolder
+    type: string
+    default: ''
+
+  # Template parameters
+  - name: PackageCreatorEnabled
+    type: boolean
+    default: true
+  - name: ArtifactoryUploaderEnabled
+    type: boolean
+    default: true
+  - name: appSettingsPath
+    type: string
+    default: ''
+
+steps:
+  - task: CmdLine@2
+    displayName: 'Build CA Tool'
+    inputs:
+      script: |
+        dotnet build $(Build.SourcesDirectory)/continuous-clearing/src/LicenseClearingTool.sln --configuration Release
+
+  - task: PowerShell@2
+    displayName: 'Build CA Tool Image'
+    inputs:
+      targetType: 'inline'
+      script: |
+        docker build -t ca-tool $(Build.SourcesDirectory)/continuous-clearing
+
+  - task: PowerShell@2
+    displayName: 'Tool pre-requisite'
+    inputs:
+      targetType: 'inline'
+      script: |
+        $folderPath = "${{ parameters.outputFolder }}"
+        if (-not (Test-Path -Path $folderPath)) {
+            New-Item -ItemType Directory -Path $folderPath | Out-Null
+            Write-Host "Created output folder: $folderPath"
+        } else {
+            Write-Host "Output folder already exists: $folderPath"
+        }
+
+
+  - ${{ each project in parameters.projectDefinitions }}:
+    - task: PowerShell@2
+      displayName: 'Run PackageIdentifier for ${{ project.projectType }}'
+      inputs:
+        targetType: 'inline'
+        script: |
+          # Extract appsettings filename and directory
+          $settingsFileHostPath = "${{ parameters.appSettingsPath }}"
+          $settingsFileName = [System.IO.Path]::GetFileName($settingsFileHostPath)
+          $settingsDir = [System.IO.Path]::GetDirectoryName($settingsFileHostPath)
+
+
+          $args = @(
+            "--Directory:InputFolder", "/mnt/Input",
+            "--Directory:OutputFolder", "/mnt/Output",
+            "--ProjectType", "${{ project.projectType }}",
+            "--SW360:ProjectName", "${{ parameters.sw360ProjectName }}",
+            "--SW360:ProjectId", "${{ parameters.sw360ProjectId }}",
+            "--SW360:AuthTokenType", "Token",
+            "--SW360:URL", "${{ parameters.sw360Url }}",
+            "--SW360:Token", "${{ parameters.sw360Token }}",
+            "--SW360:Fossology:URL", "${{ parameters.fossologyUrl }}",
+            "--JFrog:URL", "${{ parameters.JfrogUrl }}",
+            "--Jfrog:Token", "${{ parameters.JfrogToken }}",
+            "--settingsfilepath", "/etc/CATool/$settingsFileName"
+          )
+
+          # Add MultipleProjectType flag if not first
+          $projectTypes = @(${{
+            join(',', parameters.projectDefinitions.*.projectType)
+          }}).Split(',')
+          $index = [array]::IndexOf($projectTypes, "${{ project.projectType }}")
+          if ($index -ne 0) {
+            $args += "--MultipleProjectType"
+            $args += "true"
+          }
+
+          Write-Host "Running PackageIdentifier with args: $args"
+          docker run --rm --network="host" `
+            -v "${{ project.inputFolder }}:/mnt/Input" `
+            -v "${{ parameters.outputFolder }}:/mnt/Output" `
+            -v "$settingsDir:/etc/CATool"
+            ca-tool dotnet PackageIdentifier.dll @args
+
+  - task: PowerShell@2
+    condition: eq('${{ parameters.PackageCreatorEnabled }}', true)
+    displayName: 'Run PackageCreator'
+    inputs:
+      targetType: 'inline'
+      script: |
+        # Extract appsettings filename and directory
+        $settingsFileHostPath = "${{ parameters.appSettingsPath }}"
+        $settingsFileName = [System.IO.Path]::GetFileName($settingsFileHostPath)
+        $settingsDir = [System.IO.Path]::GetDirectoryName($settingsFileHostPath)
+
+        docker run --rm --network="host" `
+          -v ${{ parameters.inputFolder }}:/mnt/Input `
+          -v ${{ parameters.outputFolder }}:/mnt/Output `
+          -v "$settingsDir:/etc/CATool" `
+          ca-tool dotnet SW360PackageCreator.dll `
+          --Directory:OutputFolder "/mnt/Output" `
+          --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
+          --SW360:ProjectID "${{ parameters.sw360ProjectId }}" `
+          --SW360:AuthTokenType "Token" `
+          --SW360:URL "${{ parameters.sw360Url }}" `
+          --SW360:Token "${{ parameters.sw360Token }}" `
+          --SW360:Fossology:URL "${{ parameters.fossologyUrl }}" `
+          --ProjectType "${{ parameters.projectType }}" `
+          --settingsfilepath /etc/CATool/$settingsFileName
+
+  - task: PowerShell@2
+    condition: eq('${{ parameters.ArtifactoryUploaderEnabled }}', true)
+    displayName: 'Run ArtifactoryUploader'
+    inputs:
+      targetType: 'inline'
+      script: |
+        # Extract appsettings filename and directory
+        $settingsFileHostPath = "${{ parameters.appSettingsPath }}"
+        $settingsFileName = [System.IO.Path]::GetFileName($settingsFileHostPath)
+        $settingsDir = [System.IO.Path]::GetDirectoryName($settingsFileHostPath)        
+
+        docker run --rm --network="host" `
+          -v ${{ parameters.inputFolder }}:/mnt/Input `
+          -v ${{ parameters.outputFolder }}:/mnt/Output `
+          -v "$settingsDir:/etc/CATool" `
+          ca-tool dotnet ArtifactoryUploader.dll `
+          --Directory:OutputFolder "/mnt/Output" `
+          --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
+          --SW360:ProjectID "${{ parameters.sw360ProjectId }}" `
+          --SW360:AuthTokenType "Token" `
+          --SW360:URL "${{ parameters.sw360Url }}" `
+          --SW360:Token "${{ parameters.sw360Token }}" `
+          --JFrog:URL "${{ parameters.JfrogUrl }}" `
+          --JFrog:Token "${{ parameters.JfrogToken }}" `
+          --JFrog:DryRun "${{ parameters.JfrogDryRun }}" `
+          --settingsfilepath /etc/CATool/$settingsFileName

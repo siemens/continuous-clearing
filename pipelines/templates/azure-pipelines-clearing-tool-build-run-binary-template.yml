@@ -35,7 +35,6 @@ parameters:
     type: string
     default: ''
   
-
   # Template parameters
   - name: PackageCreatorEnabled
     type: boolean
@@ -45,7 +44,7 @@ parameters:
     default: true
   - name: appSettingsPath
     type: string
-    default: ""
+    default: ''
 
 steps:
   - task: CmdLine@2
