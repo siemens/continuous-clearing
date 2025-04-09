@@ -29,7 +29,7 @@ steps:
             $imageFile = "$inputImageDir/debian.tar"
             Write-Host "Pulling Debian image..."
             
-            docker pull $imageName:$imageTag
+            docker pull ${imageName}:${imageTag}
             docker save -o $imageFile ${imageName}:{$imageTag}
             Write-Host "Debian image saved as $imageFile"
 
@@ -66,7 +66,7 @@ steps:
             $imageFile = "$inputImageDir/alpine.tar"
             Write-Host "Pulling Alpine image..."
             
-            docker pull $imageName:$imageTag
+            docker pull ${imageName}:${imageTag}
             docker save -o $imageFile ${imageName}:${imageTag}
             Write-Host "Alpine image saved as $imageFile"
 
