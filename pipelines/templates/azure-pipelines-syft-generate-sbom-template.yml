@@ -30,12 +30,12 @@ steps:
             Write-Host "Pulling Debian image..."
             
             docker pull $imageName:$imageTag
-            docker save -o $imageFile $imageName:$imageTag
+            docker save -o $imageFile ${imageName}:{$imageTag}
             Write-Host "Debian image saved as $imageFile"
 
             docker run --rm `
-              -v $inputImageDir:/tmp/InputImages `
-              -v $inputDir:/tmp/OutputFiles `
+              -v ${inputImageDir}:/tmp/InputImages `
+              -v ${inputDir}:/tmp/OutputFiles `
               ca-tool `
               ./syft packages `
               /tmp/InputImages/debian.tar `
@@ -67,12 +67,12 @@ steps:
             Write-Host "Pulling Alpine image..."
             
             docker pull $imageName:$imageTag
-            docker save -o $imageFile $imageName:$imageTag
+            docker save -o $imageFile ${imageName}:${imageTag}
             Write-Host "Alpine image saved as $imageFile"
 
             docker run --rm `
-              -v $inputImageDir:/tmp/InputImages `
-              -v $inputDir:/tmp/OutputFiles `
+              -v ${inputImageDir}:/tmp/InputImages `
+              -v ${inputDir}:/tmp/OutputFiles `
               ca-tool `
               ./syft packages `
               /tmp/InputImages/alpine.tar `
