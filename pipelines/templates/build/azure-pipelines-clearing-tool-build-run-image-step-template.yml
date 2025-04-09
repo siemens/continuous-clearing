@@ -75,6 +75,40 @@ steps:
 
 
   - ${{ each project in parameters.projectDefinitions }}:
+    - ${{ if eq(project.projectType, 'debian') }}:
+      - task: PowerShell@2
+        displayName: 'Run Syft for ${{ project.projectType }}'
+        inputs:
+          targetType: 'inline'
+          script: |
+            $inputImageDir = "${{ project.inputFolder }}/InputImage"
+            $inputDir = "${{ project.inputFolder }}/InputDirectory"
+            $imageFile = "$inputImageDir/debian.tar"
+            $imageName = "debian"
+            $imageTag = "latest"
+
+            if (-not (Test-Path -Path $inputImageDir)) {
+            New-Item -ItemType Directory -Path $inputImageDir | Out-Null
+            Write-Host "Created InputImage directory: $inputImageDir"
+            }
+            if (-not (Test-Path -Path $inputDir)) {
+                New-Item -ItemType Directory -Path $inputDir | Out-Null
+                Write-Host "Created InputDirectory: $inputDir"
+            }
+
+            docker pull $imageName:$imageTag
+            docker save -o $imageFile $imageName:$imageTag
+            Write-Host "Debian image saved as $imageFile"
+
+            docker run --rm `
+            -v $inputImageDir:/tmp/InputImages `
+            -v $inputDir:/tmp/OutputFiles `
+            ca-tool `
+            ./syft packages `
+            /tmp/InputImages/debian.tar `
+            -o cyclonedx-json `
+            --file "/tmp/OutputFiles/debain_sbom.cdx.json"
+  
     - task: PowerShell@2
       displayName: 'Run PackageIdentifier for ${{ project.projectType }}'
       inputs:
