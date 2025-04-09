@@ -36,7 +36,7 @@ parameters:
 
   - name: outputFolder
     type: string
-    
+
   - name: appSettingsPath
     type: string
 
@@ -44,11 +44,11 @@ stages:
   - stage: ${{ parameters.stageName }}
     displayName: ${{ parameters.displayName }}
     jobs:
-      - template: ../templates/build/azure-pipelines-clearing-tool-job-template.yml
+      - template: ../build/azure-pipelines-clearing-tool-job-template.yml
         parameters:
           jobName: binaryRun
           jobDisplayName: "Execute Binary Job"
-          templatePath: ../templates/build/azure-pipelines-clearing-tool-build-run-binary-step-template.yml
+          templatePath: ../build/azure-pipelines-clearing-tool-build-run-binary-step-template.yml
           sw360Url: ${{ parameters.sw360Url }}
           sw360Token: ${{ parameters.sw360Token }}
           sw360ProjectId: ${{ parameters.sw360ProjectId }}
@@ -60,11 +60,11 @@ stages:
           outputFolder: ${{ parameters.outputFolder }}
           appSettingsPath: ${{ parameters.appSettingsPath }}
 
-      - template: ../templates/build/azure-pipelines-clearing-tool-job-template.yml
+      - template: ../build/azure-pipelines-clearing-tool-job-template.yml
         parameters:
           jobName: imageRun
           jobDisplayName: "Execute Image Job"
-          templatePath: ../templates/build/azure-pipelines-clearing-tool-build-run-image-step-template.yml
+          templatePath: ../build/azure-pipelines-clearing-tool-build-run-image-step-template.yml
           sw360Url: ${{ parameters.sw360Url }}
           sw360Token: ${{ parameters.sw360Token }}
           sw360ProjectId: ${{ parameters.sw360ProjectId }}
