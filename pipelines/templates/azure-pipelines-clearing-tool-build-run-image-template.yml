@@ -140,7 +140,6 @@ steps:
           --SW360:URL "${{ parameters.sw360Url }}" `
           --SW360:Token "${{ parameters.sw360Token }}" `
           --SW360:Fossology:URL "${{ parameters.fossologyUrl }}" `
-          --ProjectType "${{ parameters.projectType }}" `
           --settingsfilepath /etc/CATool/$settingsFileName
 
   - task: PowerShell@2
