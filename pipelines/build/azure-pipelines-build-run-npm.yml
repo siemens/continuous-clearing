@@ -4,7 +4,7 @@ variables:
   - group: CONTINUOUS_CLEARING_TOOL_TEST_CONFIG
 
 stages:
-  - template: ../build/templates/azure-pipelines-clearing-tool-stage-template.yml
+  - template: ../templates/build/azure-pipelines-clearing-tool-stage-template.yml
     parameters:
       stageName: npm
       displayName: "Build and Run the CA Tool against NPM package type"
