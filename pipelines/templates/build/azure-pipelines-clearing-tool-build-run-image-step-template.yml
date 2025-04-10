@@ -189,13 +189,13 @@ steps:
     displayName: 'Publish SBOM Artifacts'
     inputs:
       PathtoPublish: '${{ parameters.outputFolder }}/sbom'
-      ArtifactName: 'ContinuousClearing_Bom_Image'
+      ArtifactName: '$(System.StageName)_ContinuousClearing_Bom_Image'
       publishLocation: 'Container'
 
   - task: PublishBuildArtifacts@1
     displayName: 'Publish Logs Artifacts'
     inputs:
       PathtoPublish: '${{ parameters.outputFolder }}/logs'
-      ArtifactName: 'ContinuousClearing_Log_Image'
+      ArtifactName: '$(System.StageName)_ContinuousClearing_Log_Image'
       publishLocation: 'Container'
   

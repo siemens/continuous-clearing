@@ -137,3 +137,17 @@ steps:
           --Jfrog:Token "${{ parameters.JfrogToken }}" `
           --JFrog:DryRun "${{ parameters.jfrogDryRun }}" `
           --settingsfilepath "${{ parameters.appSettingsPath }}"
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish SBOM Artifacts'
+    inputs:
+      PathtoPublish: '${{ parameters.outputFolder }}/sbom'
+      ArtifactName: '$(System.StageName)_ContinuousClearing_Bom_Binary'
+      publishLocation: 'Container'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Logs Artifacts'
+    inputs:
+      PathtoPublish: '${{ parameters.outputFolder }}/logs'
+      ArtifactName: '$(System.StageName)_ContinuousClearing_Log_Binary'
+      publishLocation: 'Container'
