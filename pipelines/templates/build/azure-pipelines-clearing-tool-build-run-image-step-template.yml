@@ -128,7 +128,7 @@ steps:
           docker run --rm --network="host" `
             -v "${{ project.inputFolder }}:/mnt/Input" `
             -v "${{ parameters.outputFolder }}/sbom:/mnt/Output" `
-            -v "${{ parameters.outputFolder }}/logs:var/log" `
+            -v "${{ parameters.outputFolder }}/logs:/var/log" `
             -v "${settingsDir}:/etc/CATool" `
             ca-tool dotnet PackageIdentifier.dll @args
 
@@ -145,7 +145,7 @@ steps:
 
         docker run --rm --network="host" `
           -v "${{ parameters.outputFolder }}/sbom:/mnt/Output" `
-          -v "${{ parameters.outputFolder }}/logs:var/log" `
+          -v "${{ parameters.outputFolder }}/logs:/var/log" `
           -v "${settingsDir}:/etc/CATool" `
           ca-tool dotnet SW360PackageCreator.dll `
           --Directory:OutputFolder "/mnt/Output" `
@@ -170,7 +170,7 @@ steps:
 
         docker run --rm --network="host" `
           -v "${{ parameters.outputFolder }}/sbom:/mnt/Output" `
-          -v "${{ parameters.outputFolder }}/logs:var/log" `
+          -v "${{ parameters.outputFolder }}/logs:/var/log" `
           ca-tool dotnet ArtifactoryUploader.dll `
           --Directory:OutputFolder "/mnt/Output" `
           --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
