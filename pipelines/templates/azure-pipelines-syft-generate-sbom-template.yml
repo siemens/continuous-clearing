@@ -24,13 +24,11 @@ steps:
               Write-Host "Created InputDirectory: $inputDir"
             }
 
-            $imageName = "debian"
-            $imageTag = "latest"
             $imageFile = "$inputImageDir/debian.tar"
             Write-Host "Pulling Debian image..."
             
-            docker pull ${imageName}:${imageTag}
-            docker save -o $imageFile ${imageName}:{$imageTag}
+            docker pull debian:latest
+            docker save -o $imageFile debian:latest
             Write-Host "Debian image saved as $imageFile"
 
             docker run --rm `
@@ -61,13 +59,11 @@ steps:
               Write-Host "Created InputDirectory: $inputDir"
             }
 
-            $imageName = "alpine"
-            $imageTag = "latest"
             $imageFile = "$inputImageDir/alpine.tar"
             Write-Host "Pulling Alpine image..."
             
-            docker pull ${imageName}:${imageTag}
-            docker save -o $imageFile ${imageName}:${imageTag}
+            docker pull alpine:latest
+            docker save -o $imageFile alpine:latest
             Write-Host "Alpine image saved as $imageFile"
 
             docker run --rm `

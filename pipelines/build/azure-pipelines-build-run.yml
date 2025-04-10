@@ -22,6 +22,6 @@ stages:
       JfrogDryRun: true
       projectDefinitions:
         - projectType: 'debian'
-          inputFolder: $(Build.SourcesDirectory)/ca-tool-config-and-testdata # major actions will be performed in the template
+          inputFolder: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/sboms/cyclonedx/debian # major actions will be performed in the template
       outputFolder: $(Build.SourcesDirectory)/continuous-clearing/boms
       appSettingsPath: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/settings/appsettings.json
