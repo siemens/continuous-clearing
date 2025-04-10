@@ -382,7 +382,7 @@ namespace LCT.ArtifactoryUploader
             var aqlResultList = new List<AqlResult>();
             if (repoList != null && repoList.Length > 0)
             {
-                foreach (var repo in repoList)
+                foreach (var repo in repoList.Where(r => !string.IsNullOrWhiteSpace(r)))
                 {
                     if (repoCache.ContainsKey(repo))
                     {
@@ -403,7 +403,7 @@ namespace LCT.ArtifactoryUploader
             var aqlResultList = new List<AqlResult>();
             if (repoList != null && repoList.Length > 0)
             {
-                foreach (var repo in repoList)
+                foreach (var repo in repoList.Where(r => !string.IsNullOrWhiteSpace(r)))
                 {
                     if (repoCache.ContainsKey(repo))
                     {
@@ -462,7 +462,7 @@ namespace LCT.ArtifactoryUploader
 
             if (repoList != null && repoList.Length > 0)
             {
-                foreach (var repo in repoList)
+                foreach (var repo in repoList.Where(r => !string.IsNullOrWhiteSpace(r)))
                 {
                     if (repoCache.ContainsKey(repo))
                     {

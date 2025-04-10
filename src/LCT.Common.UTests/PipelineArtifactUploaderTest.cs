@@ -32,16 +32,16 @@ namespace LCT.Common.UTest
             Console.SetOut(new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true });
 
             // Cleanup environment variables
-            Environment.SetEnvironmentVariable("Build_BuildId", null);
+            Environment.SetEnvironmentVariable("BUILD_BUILDID", null);
             Environment.SetEnvironmentVariable("CI_JOB_ID", null);
-            Environment.SetEnvironmentVariable("Release_ReleaseId", null);
+            Environment.SetEnvironmentVariable("RELEASE_RELEASEID", null);
         }
 
         [Test]
         public void UploadLogs_ShouldUpload_WhenInAzurePipeline_AndLogFileExists()
         {
             // Arrange
-            Environment.SetEnvironmentVariable("Build_BuildId", "1234"); // Simulate Azure Pipeline
+            Environment.SetEnvironmentVariable("BUILD_BUILDID", "1234"); // Simulate Azure Pipeline
             Log4Net.CatoolLogPath = "mockLogPath.log";
             File.WriteAllText(Log4Net.CatoolLogPath, "Test Log Content");
 
@@ -60,7 +60,7 @@ namespace LCT.Common.UTest
         public void UploadLogs_ShouldNotUpload_WhenInUnknownEnvironment()
         {
             // Arrange
-            Environment.SetEnvironmentVariable("Build_BuildId", null); // No pipeline detected
+            Environment.SetEnvironmentVariable("BUILD_BUILDID", null); // No pipeline detected
             memoryAppender = new MemoryAppender();
             BasicConfigurator.Configure(memoryAppender);
             // Act
@@ -80,7 +80,7 @@ namespace LCT.Common.UTest
         public void UploadBom_ShouldUpload_WhenInAzurePipeline_AndBomFileExists()
         {
             // Arrange
-            Environment.SetEnvironmentVariable("Build_BuildId", "1234"); // Simulate Azure Pipeline
+            Environment.SetEnvironmentVariable("BUILD_BUILDID", "1234"); // Simulate Azure Pipeline
             FileOperations.CatoolBomFilePath = "mockBomFile.json";
             File.WriteAllText(FileOperations.CatoolBomFilePath, "{}"); // Simulate BOM file
 
@@ -99,7 +99,7 @@ namespace LCT.Common.UTest
         public void UploadBom_ShouldNotUpload_WhenInUnknownEnvironment()
         {
             // Arrange
-            Environment.SetEnvironmentVariable("Build_BuildId", null); // No pipeline detected
+            Environment.SetEnvironmentVariable("BUILD_BUILDID", null); // No pipeline detected
             memoryAppender = new MemoryAppender();
             BasicConfigurator.Configure(memoryAppender);
             // Act
