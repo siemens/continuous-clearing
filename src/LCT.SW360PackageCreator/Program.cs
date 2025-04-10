@@ -169,10 +169,10 @@ namespace LCT.SW360PackageCreator
         private static string InitiateLogger(CommonAppSettings appSettings)
         {
             string FolderPath;
-            if (!string.IsNullOrEmpty(appSettings.LogFolderPath))
+            if (!string.IsNullOrEmpty(appSettings.Directory.LogFolder))
             {
-                FolderPath = appSettings.LogFolderPath;
-                Log4Net.Init(FileConstant.ComponentCreatorLog, appSettings.LogFolderPath, m_Verbose);
+                FolderPath = appSettings.Directory.LogFolder;
+                Log4Net.Init(FileConstant.ComponentCreatorLog, appSettings.Directory.LogFolder, m_Verbose);
             }
             else
             {
