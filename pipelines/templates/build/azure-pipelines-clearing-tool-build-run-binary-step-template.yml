@@ -109,7 +109,7 @@ steps:
       script: |
         dotnet $(Build.SourcesDirectory)/continuous-clearing/out/net8.0/SW360PackageCreator.dll `
           --Directory:OutputFolder "${{ parameters.outputFolder }}" `
-          --Directory:LogFolder" "${{ parameters.outputFolder }}/logs `
+          --Directory:LogFolder "${{ parameters.outputFolder }}/logs" `
           --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
           --SW360:ProjectID "${{ parameters.sw360ProjectId }}" `
           --SW360:AuthTokenType "Token" `
@@ -127,7 +127,7 @@ steps:
       script: |
         dotnet $(Build.SourcesDirectory)/continuous-clearing/out/net8.0/ArtifactoryUploader.dll `
           --Directory:OutputFolder "${{ parameters.outputFolder }}" `
-          --Directory:LogFolder" "${{ parameters.outputFolder }}/logs `
+          --Directory:LogFolder "${{ parameters.outputFolder }}/logs" `
           --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
           --SW360:ProjectID "${{ parameters.sw360ProjectId }}" `
           --SW360:AuthTokenType "Token" `
