@@ -164,7 +164,7 @@ stages:
     ##################################################
   - template: ../templates/build/azure-pipelines-clearing-tool-build-run-stage-template.yml
     parameters:
-      stageName: debian
+      stageName: alpine
       displayName: "B&R CA Tool ALPINE"
       sw360Url: $(SW360_URL)
       sw360Token: $(SW360_TOKEN)
@@ -175,7 +175,7 @@ stages:
       JfrogToken: $(JFROG_TOKEN)
       JfrogDryRun: true
       projectDefinitions:
-        - projectType: 'debian'
+        - projectType: 'alpine'
           inputFolder: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/sboms/cyclonedx/alpine
       outputFolder: $(Build.SourcesDirectory)/continuous-clearing/boms
       appSettingsPath: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/settings/appsettings.json
