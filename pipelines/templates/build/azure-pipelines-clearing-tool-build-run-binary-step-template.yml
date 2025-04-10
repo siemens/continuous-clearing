@@ -67,6 +67,24 @@ steps:
     inputs:
       script: |
         dotnet build $(Build.SourcesDirectory)/continuous-clearing/src/LicenseClearingTool.sln --configuration Release
+  
+  - task: PowerShell@2
+    displayName: 'Tool pre-requisite'
+    inputs:
+      targetType: 'inline'
+      script: |
+        $baseOutputPath = "${{ parameters.outputFolder }}"
+        $sbomPath = Join-Path $baseOutputPath "sbom"
+        $logsPath = Join-Path $baseOutputPath "logs"
+
+        foreach ($path in @($baseOutputPath, $sbomPath, $logsPath)) {
+          if (-not (Test-Path -Path $path)) {
+            New-Item -ItemType Directory -Path $path | Out-Null
+            Write-Host "Created directory: $path"
+          } else {
+            Write-Host "Directory already exists: $path"
+          }
+        }
 
   - ${{ each project in parameters.projectDefinitions }}:
     - task: PowerShell@2
@@ -76,7 +94,7 @@ steps:
         script: |
           $args = @(
             "--Directory:InputFolder", "${{ project.inputFolder }}",
-            "--Directory:OutputFolder", "${{ parameters.outputFolder }}",
+            "--Directory:OutputFolder", "${{ parameters.outputFolder }}/sbom",
             "--Directory:LogFolder", "${{ parameters.outputFolder }}/logs",
             "--ProjectType", "${{ project.projectType }}",
             "--SW360:ProjectName", "${{ parameters.sw360ProjectName }}",
@@ -108,7 +126,7 @@ steps:
       targetType: 'inline'
       script: |
         dotnet $(Build.SourcesDirectory)/continuous-clearing/out/net8.0/SW360PackageCreator.dll `
-          --Directory:OutputFolder "${{ parameters.outputFolder }}" `
+          --Directory:OutputFolder "${{ parameters.outputFolder }}/sbom" `
           --Directory:LogFolder "${{ parameters.outputFolder }}/logs" `
           --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
           --SW360:ProjectID "${{ parameters.sw360ProjectId }}" `
@@ -126,7 +144,7 @@ steps:
       targetType: 'inline'
       script: |
         dotnet $(Build.SourcesDirectory)/continuous-clearing/out/net8.0/ArtifactoryUploader.dll `
-          --Directory:OutputFolder "${{ parameters.outputFolder }}" `
+          --Directory:OutputFolder "${{ parameters.outputFolder }}/sbom" `
           --Directory:LogFolder "${{ parameters.outputFolder }}/logs" `
           --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
           --SW360:ProjectID "${{ parameters.sw360ProjectId }}" `

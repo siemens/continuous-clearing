@@ -23,5 +23,5 @@ stages:
       projectDefinitions:
         - projectType: 'npm'
           inputFolder: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/dependency-locks/npm
-      outputFolder: $(Build.SourcesDirectory)/continuous-clearing/boms
+      outputFolder: $(Build.SourcesDirectory)/continuous-clearing
       appSettingsPath: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/settings/appsettings.json
