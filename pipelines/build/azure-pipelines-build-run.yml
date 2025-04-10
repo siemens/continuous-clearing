@@ -102,8 +102,8 @@ stages:
       displayName: "B&R CA Tool MAVEN"
       sw360Url: $(SW360_URL)
       sw360Token: $(SW360_TOKEN)
-      sw360ProjectId: a331b8488fa140b6a8714d003a0d3a79 # change this
-      sw360ProjectName: "Test-Poetry" # change this
+      sw360ProjectId: 401cef6ca8d5470190f3dd903e6bc12f
+      sw360ProjectName: "Test-Maven"
       fossologyUrl: $(FOSSOLOGY_URL)
       JfrogUrl: $(JFROG_URL)
       JfrogToken: $(JFROG_TOKEN)
@@ -135,5 +135,47 @@ stages:
           inputFolder: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/dependency-locks/npm
         - projectType: 'nuget'
           inputFolder: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/dependency-locks/nuget
+      outputFolder: $(Build.SourcesDirectory)/continuous-clearing/boms
+      appSettingsPath: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/settings/appsettings.json
+
+    ##################################################
+    #                    DEBAIN                      #
+    ##################################################
+  - template: ../templates/build/azure-pipelines-clearing-tool-build-run-stage-template.yml
+    parameters:
+      stageName: debian
+      displayName: "B&R CA Tool DEBAIN"
+      sw360Url: $(SW360_URL)
+      sw360Token: $(SW360_TOKEN)
+      sw360ProjectId: 527891008f7042078850f913d62530b9
+      sw360ProjectName: "Test-Debian"
+      fossologyUrl: $(FOSSOLOGY_URL)
+      JfrogUrl: $(JFROG_URL)
+      JfrogToken: $(JFROG_TOKEN)
+      JfrogDryRun: true
+      projectDefinitions:
+        - projectType: 'debian'
+          inputFolder: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/sboms/cyclonedx/debian
+      outputFolder: $(Build.SourcesDirectory)/continuous-clearing/boms
+      appSettingsPath: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/settings/appsettings.json
+
+    ##################################################
+    #                    ALPINE                      #
+    ##################################################
+  - template: ../templates/build/azure-pipelines-clearing-tool-build-run-stage-template.yml
+    parameters:
+      stageName: alpine
+      displayName: "B&R CA Tool ALPINE"
+      sw360Url: $(SW360_URL)
+      sw360Token: $(SW360_TOKEN)
+      sw360ProjectId: f6258e704ef1416e940a87f14b940d9b
+      sw360ProjectName: "Test-Alpine"
+      fossologyUrl: $(FOSSOLOGY_URL)
+      JfrogUrl: $(JFROG_URL)
+      JfrogToken: $(JFROG_TOKEN)
+      JfrogDryRun: true
+      projectDefinitions:
+        - projectType: 'alpine'
+          inputFolder: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/sboms/cyclonedx/alpine
       outputFolder: $(Build.SourcesDirectory)/continuous-clearing/boms
       appSettingsPath: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/settings/appsettings.json

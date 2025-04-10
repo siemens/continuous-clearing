@@ -1,3 +1,9 @@
+# --------------------------------------------------------------------------------------------------------------------
+# SPDX-FileCopyrightText: 2025 Siemens AG
+#
+#  SPDX-License-Identifier: MIT
+# -------------------------------------------------------------------------------------------------------------------- 
+
 parameters:
   # SW360 and Fossology parameters
   - name: sw360Url
@@ -65,16 +71,26 @@ steps:
     inputs:
       targetType: 'inline'
       script: |
-        $folderPath = "${{ parameters.outputFolder }}"
-        if (-not (Test-Path -Path $folderPath)) {
-            New-Item -ItemType Directory -Path $folderPath | Out-Null
-            Write-Host "Created output folder: $folderPath"
-        } else {
-            Write-Host "Output folder already exists: $folderPath"
+        $baseOutputPath = "${{ parameters.outputFolder }}"
+        $sbomPath = Join-Path $baseOutputPath "sbom"
+        $logsPath = Join-Path $baseOutputPath "logs"
+
+        foreach ($path in @($baseOutputPath, $sbomPath, $logsPath)) {
+          if (-not (Test-Path -Path $path)) {
+            New-Item -ItemType Directory -Path $path | Out-Null
+            Write-Host "Created directory: $path"
+          } else {
+            Write-Host "Directory already exists: $path"
+          }
         }
 
 
   - ${{ each project in parameters.projectDefinitions }}:
+    - template: ../azure-pipelines-syft-generate-sbom-template.yml
+      parameters:
+          projectType: ${{ project.projectType }}
+          inputFolder: ${{ project.inputFolder }}
+
     - task: PowerShell@2
       displayName: 'Run PackageIdentifier for ${{ project.projectType }}'
       inputs:
@@ -111,7 +127,8 @@ steps:
 
           docker run --rm --network="host" `
             -v "${{ project.inputFolder }}:/mnt/Input" `
-            -v "${{ parameters.outputFolder }}:/mnt/Output" `
+            -v "${{ parameters.outputFolder }}/sbom:/mnt/Output" `
+            -v "${{ parameters.outputFolder }}/logs:var/log" `
             -v "${settingsDir}:/etc/CATool" `
             ca-tool dotnet PackageIdentifier.dll @args
 
@@ -127,7 +144,8 @@ steps:
         $settingsDir = [System.IO.Path]::GetDirectoryName($settingsFileHostPath)
 
         docker run --rm --network="host" `
-          -v ${{ parameters.outputFolder }}:/mnt/Output `
+          -v "${{ parameters.outputFolder }}/sbom:/mnt/Output" `
+          -v "${{ parameters.outputFolder }}/logs:var/log" `
           -v "${settingsDir}:/etc/CATool" `
           ca-tool dotnet SW360PackageCreator.dll `
           --Directory:OutputFolder "/mnt/Output" `
@@ -151,8 +169,8 @@ steps:
         $settingsDir = [System.IO.Path]::GetDirectoryName($settingsFileHostPath)        
 
         docker run --rm --network="host" `
-          -v ${{ parameters.outputFolder }}:/mnt/Output `
-          -v "${settingsDir}:/etc/CATool" `
+          -v "${{ parameters.outputFolder }}/sbom:/mnt/Output" `
+          -v "${{ parameters.outputFolder }}/logs:var/log" `
           ca-tool dotnet ArtifactoryUploader.dll `
           --Directory:OutputFolder "/mnt/Output" `
           --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
@@ -164,3 +182,18 @@ steps:
           --JFrog:Token "${{ parameters.JfrogToken }}" `
           --JFrog:DryRun "${{ parameters.JfrogDryRun }}" `
           --settingsfilepath /etc/CATool/$settingsFileName
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish SBOM Artifacts'
+    inputs:
+      PathtoPublish: '${{ parameters.outputFolder }}/SBOM'
+      ArtifactName: 'ContinuousClearing_Bom_Image'
+      publishLocation: 'Container'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Logs Artifacts'
+    inputs:
+      PathtoPublish: '${{ parameters.outputFolder }}/Logs'
+      ArtifactName: 'ContinuousClearing_Log_Image'
+      publishLocation: 'Container'
+  

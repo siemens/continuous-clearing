@@ -4,12 +4,17 @@
 #  SPDX-License-Identifier: MIT
 # -------------------------------------------------------------------------------------------------------------------- 
 
-trigger: none  # Disables triggering on push
+trigger:
+  branches:
+    include:
+      - main
+      - development
+      - release/*
 
 pr:
   branches:
     include:
-      - '*'  # Runs only when a PR is created or updated
+      - '*'
 
 variables:
   - group: CONTINUOUS_CLEARING_TOOL_TEST_CONFIG
