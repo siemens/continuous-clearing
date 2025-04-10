@@ -133,6 +133,7 @@ steps:
             ca-tool dotnet PackageIdentifier.dll @args
 
   - task: PowerShell@2
+    continueOnError: true
     condition: eq('${{ parameters.PackageCreatorEnabled }}', true)
     displayName: 'Run SW360PackageCreator'
     inputs:
@@ -158,6 +159,7 @@ steps:
           --settingsfilepath /etc/CATool/$settingsFileName
 
   - task: PowerShell@2
+    continueOnError: true
     condition: eq('${{ parameters.ArtifactoryUploaderEnabled }}', true)
     displayName: 'Run ArtifactoryUploader'
     inputs:
@@ -186,14 +188,14 @@ steps:
   - task: PublishBuildArtifacts@1
     displayName: 'Publish SBOM Artifacts'
     inputs:
-      PathtoPublish: '${{ parameters.outputFolder }}/SBOM'
+      PathtoPublish: '${{ parameters.outputFolder }}/sbom'
       ArtifactName: 'ContinuousClearing_Bom_Image'
       publishLocation: 'Container'
 
   - task: PublishBuildArtifacts@1
     displayName: 'Publish Logs Artifacts'
     inputs:
-      PathtoPublish: '${{ parameters.outputFolder }}/Logs'
+      PathtoPublish: '${{ parameters.outputFolder }}/logs'
       ArtifactName: 'ContinuousClearing_Log_Image'
       publishLocation: 'Container'
   
