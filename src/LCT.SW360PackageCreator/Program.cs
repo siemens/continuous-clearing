@@ -92,7 +92,7 @@ namespace LCT.SW360PackageCreator
                 Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);
 
             //Validate Fossology Url
-            if (appSettings.SW360.Fossology.EnableTrigger)
+            if (appSettings.SW360.Fossology.EnableTrigger && !appSettings.IsTestMode)
             {
                 HttpClient client = new HttpClient();
                 if (await CreatorValidator.FossologyUrlValidation(appSettings, client, environmentHelper))
