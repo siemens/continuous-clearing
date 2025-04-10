@@ -35,7 +35,7 @@ steps:
               -v ${inputImageDir}:/tmp/InputImages `
               -v ${inputDir}:/tmp/OutputFiles `
               ca-tool `
-              ./syft packages `
+              /opt/DebianImageClearing/./syft packages `
               /tmp/InputImages/debian.tar `
               -o cyclonedx-json `
               --file "/tmp/OutputFiles/debian_sbom.cdx.json"
@@ -70,7 +70,7 @@ steps:
               -v ${inputImageDir}:/tmp/InputImages `
               -v ${inputDir}:/tmp/OutputFiles `
               ca-tool `
-              ./syft packages `
+              /opt/DebianImageClearing/./syft packages `
               /tmp/InputImages/alpine.tar `
               -o cyclonedx-json `
               --file "/tmp/OutputFiles/alpine_sbom.cdx.json"
