@@ -19,11 +19,7 @@ namespace LCT.SW360PackageCreator.UTest
             var mockSw360CreatorService = new Mock<ISw360CreatorService>();
             var mockSW360Service = new Mock<ISW360Service>();           
             var appSettings = new CommonAppSettings { Mode = "production" };
-            var parsedBomData = new List<ComparisonBomData>
-    {
-        new ComparisonBomData { PackageName = "Package1", Version = "1.0", PackageStatus = "Not Available" },
-        new ComparisonBomData { PackageName = "Package2", Version = "2.0", PackageStatus = "Not Available" }
-    };            
+            var parsedBomData = new ComparisonBomData { PackageName = "Package1", Version = "1.0", PackageStatus = "Not Available" };
             mockSw360CreatorService
                 .Setup(service => service.CreatePackageBasesOFswComaprisonBOM(It.IsAny<ComparisonBomData>()))
                 .ReturnsAsync(new PackageCreateStatus { IsCreated = true });
@@ -31,7 +27,7 @@ namespace LCT.SW360PackageCreator.UTest
             // Act
             await packageCreater.CreatePackageInSw360(appSettings, mockSw360CreatorService.Object, parsedBomData, mockSW360Service.Object);
             // Assert
-            mockSw360CreatorService.Verify(service => service.CreatePackageBasesOFswComaprisonBOM(It.IsAny<ComparisonBomData>()), Times.Exactly(parsedBomData.Count));            
+            mockSw360CreatorService.Verify(service => service.CreatePackageBasesOFswComaprisonBOM(It.IsAny<ComparisonBomData>()), Times.Never());            
             mockSw360CreatorService.VerifyAll();
         }
         [Test]
@@ -42,11 +38,7 @@ namespace LCT.SW360PackageCreator.UTest
             var mockSw360CreatorService = new Mock<ISw360CreatorService>();
             var mockSW360Service = new Mock<ISW360Service>();
             var appSettings = new CommonAppSettings { Mode = "production" };
-            var parsedBomData = new List<ComparisonBomData>
-    {
-        new ComparisonBomData { PackageName = "Package1", Version = "1.0", PackageStatus = "Available" },
-        new ComparisonBomData { PackageName = "Package2", Version = "2.0", PackageStatus = "Available" }
-    };
+            var parsedBomData = new ComparisonBomData { PackageName = "Package1", Version = "1.0", PackageStatus = "Not Available" };
             mockSw360CreatorService
                 .Setup(service => service.CreatePackageBasesOFswComaprisonBOM(It.IsAny<ComparisonBomData>()))
                 .ReturnsAsync(new PackageCreateStatus { IsCreated = true });

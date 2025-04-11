@@ -17,6 +17,7 @@ namespace LCT.Common.Model
         public string Name { get; set; }
         public string Group { get; set; }
         public string Version { get; set; }
+        public string SW360Name { get; set; }
         public string ComponentExternalId { get; set; }
         public string ReleaseExternalId { get; set; }
         public string PackageUrl { get; set; }

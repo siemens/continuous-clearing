@@ -12,6 +12,6 @@ namespace LCT.SW360PackageCreator.Interfaces
 {
     public interface IPackageCreater
     {
-        Task CreatePackageInSw360(CommonAppSettings appSettings, ISw360CreatorService sw360CreatorService, List<ComparisonBomData> parsedBomData,ISW360Service sW360Service);
+        Task CreatePackageInSw360(CommonAppSettings appSettings, ISw360CreatorService sw360CreatorService, ComparisonBomData item,ISW360Service sW360Service);
     }
 }

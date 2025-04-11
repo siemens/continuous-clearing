@@ -90,7 +90,7 @@ namespace LCT.SW360PackageCreator
 
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);
-
+           
             //Validate Fossology Url
             if (appSettings.SW360.Fossology.EnableTrigger)
             {
@@ -159,12 +159,11 @@ namespace LCT.SW360PackageCreator
 
             // parsing the input file
             IComponentCreator componentCreator = new ComponentCreator();
-            IPackageCreater packageCreator = new PackageCreater();
+            IPackageCreater packageCreator = new PackageCreater();            
             List<ComparisonBomData> parsedBomData = await componentCreator.CycloneDxBomParser(appSettings, sw360Service, cycloneDXBomParser, creatorHelper);
-            await packageCreator.CreatePackageInSw360(appSettings, sw360CreatorService,parsedBomData, sw360Service);
             // initializing Component creation 
             await componentCreator.CreateComponentInSw360(appSettings, sw360CreatorService, sw360Service,
-                 sw360ProjectService, new FileOperations(), creatorHelper, parsedBomData);
+                 sw360ProjectService, new FileOperations(), creatorHelper, parsedBomData, packageCreator);
         }
 
         private static string InitiateLogger(CommonAppSettings appSettings)

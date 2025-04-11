@@ -239,7 +239,7 @@ namespace LCT.SW360PackageCreator
                     if (knownPurl.Purls.Contains(component.ComponentExternalId))
                     {
                         Logger.Logger.Log(null, Level.Debug, $"Component {component.Name} with ComponentExternalId {component.ComponentExternalId} matches known PURL for {knownPurl.Sw360Name}", null);
-                        component.Name = knownPurl.Sw360Name; // Assign SW360Name
+                        component.SW360Name = knownPurl.Sw360Name; // Assign SW360Name
                     }
                 }
             }
@@ -258,6 +258,7 @@ namespace LCT.SW360PackageCreator
                 mapper.Name = item.Name;
                 mapper.Group = item.Group;
                 mapper.Version = item.Version;
+                mapper.SW360Name=item.SW360Name;
                 mapper.ComponentExternalId = item.ComponentExternalId;
                 mapper.ReleaseExternalId = item.ReleaseExternalId;
                 mapper.SourceUrl = item.SourceUrl;
@@ -300,6 +301,7 @@ namespace LCT.SW360PackageCreator
                 mapper.PackageName = item.PackageName;
                 mapper.PackageLink = GetPackagelink(packagesAvailableInSw360, item);
                 mapper.PackageId = CommonHelper.GetSubstringOfLastOccurance(mapper.PackageLink, "/");
+
                 Logger.Debug($"Sw360 avilability status for Name " + mapper.Name + ":" + mapper.ComponentExternalId + "=" + mapper.ComponentStatus +
                     "-Version " + mapper.Version + ":" + mapper.ReleaseExternalId + "=" + mapper.ReleaseStatus);
                 comparisonBomData.Add(mapper);

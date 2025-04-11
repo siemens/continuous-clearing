@@ -69,5 +69,7 @@ namespace LCT.Common.Model
         [JsonIgnore]
         public string PackageStatus { get; set; }
         public string PackageName { get; set; }
+
+        public string SW360Name { get; set; }
     }
 }

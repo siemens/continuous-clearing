@@ -74,6 +74,7 @@ namespace LCT.SW360PackageCreator.UTest
             var mockCreatorHelper = new Mock<ICreatorHelper>();
 
             var componentCreator = new ComponentCreator();
+            var packageCreator = new PackageCreater();
 
             mockCreatorHelper.Setup(x => x.GetUpdatedComponentsDetails(It.IsAny<List<Components>>(), It.IsAny<List<ComparisonBomData>>(), It.IsAny<ISW360Service>(), It.IsAny<Bom>()))
                 .ReturnsAsync(new Bom());
@@ -91,7 +92,7 @@ namespace LCT.SW360PackageCreator.UTest
                 .ReturnsAsync(true);
 
             // Act
-            await componentCreator.CreateComponentInSw360(appSettings, mockSw360CreatorService.Object, mockSw360Service.Object, mockSw360ProjectService.Object, mockFileOperations.Object, mockCreatorHelper.Object, parsedBomData);
+            await componentCreator.CreateComponentInSw360(appSettings, mockSw360CreatorService.Object, mockSw360Service.Object, mockSw360ProjectService.Object, mockFileOperations.Object, mockCreatorHelper.Object, parsedBomData, packageCreator);
 
             // Assert
             mockFileOperations.Verify(x => x.WriteContentToOutputBomFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);

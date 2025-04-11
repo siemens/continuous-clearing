@@ -27,6 +27,8 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Directory = System.IO.Directory;
+using Spectre.Console;
+using Markdig.Extensions.Footnotes;
 
 namespace LCT.SW360PackageCreator
 {
@@ -222,7 +224,7 @@ namespace LCT.SW360PackageCreator
 
         public async Task CreateComponentInSw360(CommonAppSettings appSettings,
             ISw360CreatorService sw360CreatorService, ISW360Service sw360Service, ISw360ProjectService sw360ProjectService,
-            IFileOperations fileOperations, ICreatorHelper creatorHelper, List<ComparisonBomData> parsedBomData)
+            IFileOperations fileOperations, ICreatorHelper creatorHelper, List<ComparisonBomData> parsedBomData,IPackageCreater packageCreater)
         {
             string sw360Url = appSettings.SW360.URL;
             string bomGenerationPath = appSettings.Directory.OutputFolder;
@@ -231,7 +233,7 @@ namespace LCT.SW360PackageCreator
             // create component and package in sw360
             if (!appSettings.IsTestMode)
             {                
-                await CreateComponent(creatorHelper, sw360CreatorService, parsedBomData, sw360Url, appSettings);
+                await CreateComponent(creatorHelper, sw360CreatorService, parsedBomData, sw360Url, appSettings,packageCreater, sw360Service);
             }
             var alreadyLinkedReleases = await GetAlreadyLinkedReleasesByProjectId(appSettings.SW360.ProjectID, sw360ProjectService);
 
@@ -281,14 +283,15 @@ namespace LCT.SW360PackageCreator
 
         private async Task CreateComponent(ICreatorHelper creatorHelper,
             ISw360CreatorService sw360CreatorService, List<ComparisonBomData> componentsToBoms,
-            string sw360Url, CommonAppSettings appSettings)
+            string sw360Url, CommonAppSettings appSettings,IPackageCreater packageCreater,ISW360Service sW360Service)
         {           
 
             try
             {
                 foreach (ComparisonBomData item in componentsToBoms)
-                {
-                    await CreateComponentAndRealease(creatorHelper, sw360CreatorService, item, sw360Url, appSettings);
+                {                   
+                    await packageCreater.CreatePackageInSw360(appSettings, sw360CreatorService, item, sW360Service);
+                    await CreateComponentAndRealease(creatorHelper, sw360CreatorService, item, sw360Url, appSettings);                    
                 }
 
                 string localPathforSourceRepo = UrlHelper.GetDownloadPathForAlpineRepo();
@@ -395,6 +398,15 @@ namespace LCT.SW360PackageCreator
         {
             if (item.ComponentStatus == Dataconstant.NotAvailable && item.ReleaseStatus == Dataconstant.NotAvailable)
             {
+                Tree tree = new Tree("");
+                if (!string.IsNullOrEmpty(item.SW360Name) && string.IsNullOrEmpty(item.ReleaseID))
+                {
+                    tree.AddNode($"[yellow]valid Release not found in Known-purl :SW360Name -{item.SW360Name}, Name - {item.Name} , version - {item.Version}[/]");
+                    AnsiConsole.Write(tree);
+                    return;
+                }
+                tree.AddNode($"[white]Creating the Component & Release : Name - {item.Name} , version - {item.Version}[/]");
+                AnsiConsole.Write(tree);
                 Logger.Logger.Log(null, Level.Notice, $"Creating the Component & Release : Name - {item.Name} , version - {item.Version}", null);
                 var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(item);
 
@@ -465,8 +477,17 @@ namespace LCT.SW360PackageCreator
             ISw360CreatorService sw360CreatorService, ICreatorHelper creatorHelper, CommonAppSettings appSettings)
         {
             if (item.ComponentStatus == Dataconstant.Available && item.ReleaseStatus == Dataconstant.NotAvailable)
-            {
-                Logger.Logger.Log(null, Level.Notice, $"Creating Release : Name - {item.Name} , version - {item.Version}", null);
+            {                
+                Tree tree = new Tree("");
+                if (!string.IsNullOrEmpty(item.SW360Name) && string.IsNullOrEmpty(item.ReleaseID))
+                {
+                    tree.AddNode($"[yellow]valid Release not found in Known-purl :SW360Name -{item.SW360Name}, Name - {item.Name} , version - {item.Version}[/]");
+                    AnsiConsole.Write(tree);
+                    return;
+                }
+                tree.AddNode($"[white]Creating Release : Name - {item.Name} , version - {item.Version}[/]");
+                AnsiConsole.Write(tree);
+                Logger.Logger.Log(null, Level.Debug, $"Creating Release : Name - {item.Name} , version - {item.Version}", null);
                 var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(item);
 
                 if (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]) && !attachmentUrlList.ContainsKey("SOURCE"))
@@ -556,7 +577,10 @@ namespace LCT.SW360PackageCreator
         {
             if (item.ComponentStatus == Dataconstant.Available && item.ReleaseStatus == Dataconstant.Available)
             {
-                Logger.Logger.Log(null, Level.Notice, $"Release exists in SW360 : Name - {item.Name} , version - {item.Version}", null);
+                Tree tree = new Tree("");
+                tree.AddNode($"[white]Release exists in SW360 : Name - {item.Name} , version - {item.Version}[/]");
+                AnsiConsole.Write(tree);
+                Logger.Logger.Log(null, Level.Debug,$"Release exists in SW360 : Name - {item.Name} , version - {item.Version}", null);
                 string releaseLink = item.ReleaseLink ?? string.Empty;
                 string releaseId = CommonHelper.GetSubstringOfLastOccurance(releaseLink, "/");
                 if (!string.IsNullOrWhiteSpace(releaseId))
