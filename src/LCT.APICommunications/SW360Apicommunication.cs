@@ -12,6 +12,7 @@ using LCT.Common.Model;
 using log4net;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -172,7 +173,24 @@ namespace LCT.APICommunications
             HttpClient httpClient = GetHttpClient();
             httpClient.SetLogWarnings(false);
             string url = $"{sw360ReleaseApi}/{releaseId}{ApiConstant.FossTriggerAPIPrefix}{sw360link}{ApiConstant.FossTriggerAPISuffix}";
-            return await httpClient.GetStringAsync(url);
+            try
+            {
+                var response = await httpClient.GetAsync(url);
+                if (!response.IsSuccessStatusCode)
+                {
+                    string errorContent = await response.Content.ReadAsStringAsync();                    
+                    var errorDetails = JsonConvert.DeserializeObject<Dictionary<string, object>>(errorContent);
+                    string message = errorDetails.TryGetValue("message", out object value) ? value.ToString() : "Error";
+                    int status = (int)response.StatusCode;
+                    throw new HttpRequestException($"{status}:{message}");
+                }
+                return await response.Content.ReadAsStringAsync();
+            }
+            catch (HttpRequestException ex)
+            {
+                Logger.Debug($"TriggerFossologyProcess(): {ex.Message}");
+                throw; 
+            }
         }
         public async Task<HttpResponseMessage> CheckFossologyProcessStatus(string link)
         {

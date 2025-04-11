@@ -63,6 +63,7 @@ namespace LCT.Common.Model
         public string IsDev { get; set; }
         [JsonIgnore]
         public string ExcludeComponent { get; set; }
-
+        
+        public string ParentReleaseName { get; set; }
     }
 }

@@ -208,8 +208,13 @@ namespace LCT.SW360PackageCreator.UTest
             FossTriggerStatus fossTriggerStatus = new FossTriggerStatus()
             {
                 Content = new Content() { Message = "triggered succesfully" },
-                Links = new Links() { Self = new Self() { Href = "test_link" } }
+                Links = new Links() { Self = new Self() { Href = "test_link" } },
             };
+            CheckFossologyProcess checkFossologyProcess = new CheckFossologyProcess()
+            {
+                Status = "FAILURE"               
+            };
+
             ComparisonBomData item = new ComparisonBomData()
             {
                 Name = "test",
@@ -226,7 +231,7 @@ namespace LCT.SW360PackageCreator.UTest
             };
             sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(fossTriggerStatus);
 
-
+            sw360CreatorServiceMock.Setup(x => x.CheckFossologyProcessStatus(It.IsAny<string>())).ReturnsAsync(checkFossologyProcess);
             //Act
             await ComponentCreator.TriggerFossologyProcess(item, sw360CreatorServiceMock.Object, appSettings);
 
@@ -730,6 +735,46 @@ namespace LCT.SW360PackageCreator.UTest
 
             // Assert
             Assert.AreEqual("uploadId", uploadId);
+        }
+        [Test]
+        public async Task TriggerFossologyProcess_ProvidedReleaseId_ReturnsProcessingStatus()
+        {
+            // Arrange
+            var sw360CreatorServiceMock = new Mock<ISw360CreatorService>(MockBehavior.Default);
+            FossTriggerStatus fossTriggerStatus = new FossTriggerStatus()
+            {
+                Content = new Content() { Message = "triggered successfully" },
+                Links = new Links() { Self = new Self() { Href = "test_link" } },
+            };
+            CheckFossologyProcess checkFossologyProcess = new CheckFossologyProcess()
+            {
+                Status = "PROCESSING",
+               
+            };
+
+            ComparisonBomData item = new ComparisonBomData()
+            {
+                Name = "test",
+                Version = "1",
+                ReleaseID = "89768ae1b0ea9dc061328b8f32792cbd"
+            };
+
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                SW360 = new SW360() { URL = "http://localhost:8081/" },
+                Directory = new Common.Directory(folderAction, fileOperations)
+            };
+
+            sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(fossTriggerStatus);
+            sw360CreatorServiceMock.Setup(x => x.CheckFossologyProcessStatus(It.IsAny<string>())).ReturnsAsync(checkFossologyProcess);
+
+            // Act
+            string uploadId = await ComponentCreator.TriggerFossologyProcess(item, sw360CreatorServiceMock.Object, appSettings);
+
+            // Assert           
+            sw360CreatorServiceMock.Verify(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()), Times.AtLeastOnce);            
         }
     }
 }

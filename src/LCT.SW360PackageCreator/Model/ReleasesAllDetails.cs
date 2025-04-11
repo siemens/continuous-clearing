@@ -30,6 +30,8 @@ namespace LCT.SW360PackageCreator.Model
         {
             [JsonProperty("filename")]
             public string Filename { get; set; }
+            [JsonProperty("attachmentType")]
+            public string AttachmentType { get; set; }
 
         }
         public class Links

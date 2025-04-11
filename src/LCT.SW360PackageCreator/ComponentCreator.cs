@@ -42,7 +42,7 @@ namespace LCT.SW360PackageCreator
         private Bom bom = new Bom();
         private List<Components> ListofBomComponents { get; set; } = new List<Components>();
         public static int TotalComponentsFromPackageIdentifier { get; private set; }
-
+        public static List<ComparisonBomData> FossologyUploadSucessfullData { get; set; } = new List<ComparisonBomData>();
         public async Task<List<ComparisonBomData>> CycloneDxBomParser(CommonAppSettings appSettings,
             ISW360Service sw360Service, ICycloneDXBomParser cycloneDXBomParser, ICreatorHelper creatorHelper)
         {
@@ -386,20 +386,30 @@ namespace LCT.SW360PackageCreator
 
             if (appSettings.SW360.Fossology.EnableTrigger && (item.ApprovedStatus.Equals("NEW_CLEARING") || item.ApprovedStatus.Equals("Not Available")))
             {
-                Logger.Logger.Log(null, Level.Notice, $"\tInitiating FOSSology process for: Release : Name - {item.Name} , version - {item.Version}", null);
-
+                var formattedName = GetFormattedName(item);
+                Logger.Logger.Log(null, Level.Notice, $"\tInitiating FOSSology process for: Release : Name - {formattedName} , version - {item.Version}", null);
+                if (FossologyUploadSucessfullData.Any(data => data.ReleaseID == item.ReleaseID))
+                {
+                    var matchedData = FossologyUploadSucessfullData.First(data => data.ReleaseID == item.ReleaseID);
+                    string fossologyUploadId = matchedData.FossologyUploadId;
+                    item.FossologyUploadStatus = Dataconstant.Uploaded;
+                    item.FossologyLink = $"{appSettings.SW360.Fossology.URL}{ApiConstant.FossUploadJobUrlSuffix}{fossologyUploadId}";                    
+                    Logger.Logger.Log(null, Level.Info, $"\tFossology upload successful for Release : Name - {formattedName} , version - {item.Version}", null);
+                    return;
+                }
                 string uploadId = await TriggerFossologyProcess(item, sw360CreatorService, appSettings);
                 if (string.IsNullOrEmpty(uploadId))
                 {
                     item.FossologyUploadStatus = Dataconstant.NotUploaded;
-                    Logger.Logger.Log(null, Level.Debug, $"\tFossology upload failed  for Release : Name - {item.Name} ," +
-                        $" version - {item.Version},Fossology has a wait time so re run the pipeline", null);
+                    Logger.Logger.Log(null, Level.Debug, $"\tFossology upload failed  for Release : Name - {formattedName} ," +
+                        $" version - {item.Version},Fossology has a wait time so re run the pipeline", null);                    
                 }
                 else
                 {
                     item.FossologyUploadStatus = Dataconstant.Uploaded;
                     item.FossologyLink = $"{appSettings.SW360.Fossology.URL}{ApiConstant.FossUploadJobUrlSuffix}{uploadId}";
-                    Logger.Logger.Log(null, Level.Info, $"\tFossology upload successful for Release : Name - {item.Name} , version - {item.Version}", null);
+                    item.FossologyUploadId = uploadId;
+                    Logger.Logger.Log(null, Level.Info, $"\tFossology upload successful for Release : Name - {formattedName} , version - {item.Version}", null);
 
                     // Updating foss url in additional data
                     await sw360CreatorService.UdpateSW360ReleaseContent(new Components()
@@ -409,6 +419,8 @@ namespace LCT.SW360PackageCreator
                         UploadId = uploadId,
                         ReleaseId = item.ReleaseID
                     }, appSettings.SW360.Fossology.URL);
+
+                    FossologyUploadSucessfullData.Add(item);
                 }
             }
             else
@@ -416,7 +428,17 @@ namespace LCT.SW360PackageCreator
                 item.FossologyUploadStatus = Dataconstant.NotUploaded;
             }
         }
-
+        private static string GetFormattedName(ComparisonBomData item)
+        {
+            if (!string.IsNullOrEmpty(item.ParentReleaseName))
+            {
+                return $"{item.ParentReleaseName}\\{item.Name}";
+            }
+            else
+            {
+                return item.Name;
+            }
+        }
         private async Task CreateReleaseWhenNotAvailable(ComparisonBomData item,
             ISw360CreatorService sw360CreatorService, ICreatorHelper creatorHelper, CommonAppSettings appSettings)
         {
@@ -482,10 +504,18 @@ namespace LCT.SW360PackageCreator
             string uploadId = string.Empty;
             try
             {
-                CheckFossologyProcess fossResult = await sw360CreatorService.CheckFossologyProcessStatus(link);
+                CheckFossologyProcess fossResult = await sw360CreatorService.CheckFossologyProcessStatus(link);                
                 if (!string.IsNullOrEmpty(fossResult?.FossologyProcessInfo?.ExternalTool))
                 {
                     uploadId = fossResult.FossologyProcessInfo?.ProcessSteps[0]?.ProcessStepIdInTool;
+                }
+                if (fossResult.Status == "FAILURE")
+                {
+                    Logger.Logger.Log(null, Level.Warn, $"\tFossology upload failed: The Fossology process status is 'FAILURE'. Please check the Fossology server or the uploaded file for issues.", null);
+                }
+                else if (fossResult.Status == "PROCESSING" && string.IsNullOrEmpty(uploadId))
+                {
+                    Logger.Logger.Log(null, Level.Warn, $"\tFossology process is still 'PROCESSING'. The upload ID is not yet available. Please wait and re-run the pipeline after some time.", null);
                 }
             }
             catch (AggregateException ex)

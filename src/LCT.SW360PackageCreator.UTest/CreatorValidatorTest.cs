@@ -129,7 +129,7 @@ namespace LCT.SW360PackageCreator.UTest
                 }
             };
 
-            var responseBody = "{\"_embedded\":{\"sw360:releases\":[{\"id\":\"a3c5c9d1dd469d668433fb147c01bad2\",\"name\":\"HC-Test Pugixml\",\"version\":\"V1.2\",\"clearingState\":\"APPROVED\",\"_embedded\":{\"sw360:attachments\":[[{\"filename\":\"Protocol_Pugixml - 1.2.doc\"}]]},\"_links\":{\"self\":{\"href\":\"https://sw360.siemens.com/resource/api/releases/a3c5c9d1dd469d668433fb147c01bad2\"}}}]},\"page\":{\"totalPages\":1}}";
+            var responseBody = @"{""_embedded"": {""sw360:releases"": [{""id"": ""a3c5c9d1dd469d668433fb147c01bad2"",""name"": ""HC-Test Pugixml"",""version"": ""V1.2"",""clearingState"": ""APPROVED"",""_embedded"": {""sw360:attachments"": [[{""filename"": ""Protocol_Pugixml - 1.2.doc"",""attachmentType"": ""SOURCE""}]]},""_links"": {""self"": {""href"": ""https://sw360.siemens.com/resource/api/releases/a3c5c9d1dd469d668433fb147c01bad2""}}}]},""page"": {""totalPages"": 1}}";
             var releasesInfo = new ReleasesInfo
             {
                 Name = "TestRelease",
@@ -300,7 +300,5 @@ namespace LCT.SW360PackageCreator.UTest
             // Assert
             Assert.IsFalse(validReleaseFound);
         }
-
-
     }
 }

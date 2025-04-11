@@ -217,7 +217,10 @@ namespace LCT.Services
                 ComparisonBomData bomData = new ComparisonBomData { ReleaseExternalId = releaseExternalId };
                 _ = UpdatePurlIdForExistingRelease(bomData, releaseId, releasesInfo);
             }
-
+            if (string.IsNullOrEmpty(releaseId))
+            {
+                Logger.Warn($"Release id not found for the Component - {name}-{version}");
+            }
             return releaseId ?? string.Empty;
         }
 
@@ -355,12 +358,7 @@ namespace LCT.Services
             {
                 Logger.Error("GetReleaseIdByName():", e);
                 Environment.ExitCode = -1;
-            }
-
-            if (string.IsNullOrEmpty(releaseid))
-            {
-                Logger.Warn($"Release id not found for the Component - {componentName}-{componentVersion}");
-            }
+            }           
 
             return releaseid ?? string.Empty;
         }
@@ -789,7 +787,7 @@ namespace LCT.Services
             catch (HttpRequestException ex)
             {
                 Logger.Debug($"TriggerFossologyProcessForValidation():", ex);
-                Logger.Error($"Fossology process failed.Please check fossology configuration or Token in sw360");
+                Logger.Error($"Fossology process failed.{ex}");
                 environmentHelper.CallEnvironmentExit(-1);
             }
             catch (InvalidOperationException ex)

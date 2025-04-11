@@ -27,6 +27,7 @@ namespace LCT.APICommunications
                 .Or<TaskCanceledException>()
                 .OrResult<HttpResponseMessage>(r =>
                     (r.StatusCode == HttpStatusCode.RequestTimeout
+                    || r.StatusCode == HttpStatusCode.NotAcceptable
                     || (int)r.StatusCode >= 500)
                     && r.StatusCode != HttpStatusCode.Unauthorized
                     && r.StatusCode != HttpStatusCode.Forbidden)

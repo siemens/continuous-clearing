@@ -72,9 +72,12 @@ namespace LCT.SW360PackageCreator
 
                     if (releaseResponse != null)
                     {
-                        validRelease = releaseResponse?.Embedded?.Sw360releases?.FirstOrDefault(release => release?.ClearingState == "APPROVED" &&
-                                                   release?.AllReleasesEmbedded?.Sw360attachments != null &&
-                                                   release.AllReleasesEmbedded.Sw360attachments.Any(attachments => attachments.Count != 0));
+                        validRelease = releaseResponse?.Embedded?.Sw360releases?.FirstOrDefault(release => 
+                        release?.ClearingState == "APPROVED" &&
+                        release?.AllReleasesEmbedded?.Sw360attachments != null &&
+                        release.AllReleasesEmbedded.Sw360attachments.Any(attachments => 
+                        attachments.Count != 0 &&
+                        attachments.Count(attachment => attachment?.AttachmentType == "SOURCE") == 1));
 
                         if (validRelease != null)
                         {
@@ -94,6 +97,11 @@ namespace LCT.SW360PackageCreator
                                 break;
                             }
                         }
+                    }
+                    else if (releaseResponse == null)
+                    {
+                        Logger.Debug($"TriggerFossologyValidation():Fossology token validation failed in SW360 due to release not found");
+                        break;
                     }
                     else
                     {
