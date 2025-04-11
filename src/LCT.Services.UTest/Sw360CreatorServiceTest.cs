@@ -45,10 +45,6 @@ namespace LCT.Services.UTest
             _sw360CommonServiceMock = new Mock<ISW360CommonService>();
             _environmentHelperMock = new Mock<IEnvironmentHelper>();
             _sw360CreatorService = new Sw360CreatorService(_sw360ApiCommMock.Object, _sw360CommonServiceMock.Object, _environmentHelperMock.Object);
-        [SetUp]
-        public void Setup()
-        {
-            //implement
         }
 
         [Test]

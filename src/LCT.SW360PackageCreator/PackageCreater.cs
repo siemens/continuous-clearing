@@ -48,7 +48,7 @@ namespace LCT.SW360PackageCreator
                 }
                 else
                 {
-                    Logger.Logger.Log(null, Level.Notice, $"Package exists : Name - {item.PackageName} , version - {item.Version}", null);
+                    Logger.Logger.Log(null, Level.Notice, $"Package exists in SW360 : Name - {item.PackageName} , version - {item.Version}", null);
                 }
             }
             catch (AggregateException ex)
