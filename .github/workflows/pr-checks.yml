@@ -1,0 +1,74 @@
+name: PR Checks
+
+on:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        
+      - name: Setup Version      
+        uses: gittools/actions/gitversion/setup@v0.10.2
+        with:
+          versionSpec: '5.12.0'
+          
+      - name: Restore Packages
+        run: dotnet restore src\LicenseClearingTool.sln
+        
+      - name: Build
+        run: dotnet build src\LicenseClearingTool.sln
+
+  commit-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Run Commit Lint
+        uses: wagoid/commitlint-github-action@v6
+        with:
+          failOnErrors: false
+          helpURL: "https://github.com/conventional-changelog/commitlint/tree/master/%40commitlint/config-conventional"
+
+  pr-title-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ensure PR Title Follows Conventional Commits
+        uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  pr-description-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ensure PR Has a Description
+        run: |
+          if [ -z "${{ github.event.pull_request.body }}" ]; then
+            echo "::error::Pull request must have a description."
+            exit 1  # Fails the check
+          fi
+
+  pr-branch-name-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ensure Branch Name Follows Standard Conventions
+        run: |
+          BRANCH_NAME="${{ github.head_ref }}"
+          echo "Checking branch name: $BRANCH_NAME"
+  
+          # Allowed branch name patterns
+          if [[ "$BRANCH_NAME" == "development" ]]; then
+            echo "::warning::Branch 'development' is allowed but should be used with caution."
+            exit 0
+          elif [[ "$BRANCH_NAME" =~ ^(feature|bugfix|hotfix|release|chore|task|docs|test|refactor|ci|experiment)\/[a-zA-Z0-9._-]+$ ]]; then
+            echo "✅ Branch name is valid."
+            exit 0
+          else
+            echo "::error::Branch name '$BRANCH_NAME' does not follow naming conventions."
+            echo "❌ Allowed prefixes: 'feature/', 'bugfix/', 'hotfix/', 'release/', 'chore/', 'task/', 'docs/', 'test/', 'refactor/', 'ci/', 'experiment/'"
+            exit 1
+          fi
+

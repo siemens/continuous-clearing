@@ -295,5 +295,110 @@ namespace LCT.Services.UTest
             // Assert
             Assert.Null(actual);
         }
+        [Test]
+        public async Task GetNpmComponentDataByRepo_GetsRepoInfo_Successfully()
+        {
+            // Arrange
+            AqlResult aqlResult = new AqlResult()
+            {
+                Name = "example-package-1.0.0.tgz",
+                Path = "@testfolder/-/folder",
+                Repo = "npm-repo"
+            };
+
+            IList<AqlResult> results = new List<AqlResult> { aqlResult };
+
+            AqlResponse aqlResponse = new AqlResponse { Results = results };
+
+            var aqlResponseSerialized = JsonConvert.SerializeObject(aqlResponse);
+            var content = new StringContent(aqlResponseSerialized, Encoding.UTF8, "application/json");
+            HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = content
+            };
+
+            Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade = new Mock<IJfrogAqlApiCommunicationFacade>();
+            mockJfrogApiComFacade
+                .Setup(x => x.GetNpmComponentDataByRepo(It.IsAny<string>()))
+                .ReturnsAsync(httpResponseMessage);
+
+            // Act
+            IJFrogService jFrogService = new JFrogService(mockJfrogApiComFacade.Object);
+            IList<AqlResult> actual = await jFrogService.GetNpmComponentDataByRepo("npm-repo");
+
+            // Assert
+            Assert.That(actual.Count, Is.GreaterThan(0));
+            Assert.That(actual[0].Name, Is.EqualTo("example-package-1.0.0.tgz"));
+        }
+
+        [Test]
+        public async Task GetNpmComponentDataByRepo_ResultsWith_NoContent()
+        {
+            // Arrange
+            HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.NoContent);
+
+            Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade = new Mock<IJfrogAqlApiCommunicationFacade>();
+            mockJfrogApiComFacade
+                .Setup(x => x.GetNpmComponentDataByRepo(It.IsAny<string>()))
+                .ReturnsAsync(httpResponseMessage);
+
+            // Act
+            IJFrogService jFrogService = new JFrogService(mockJfrogApiComFacade.Object);
+            IList<AqlResult> actual = await jFrogService.GetNpmComponentDataByRepo("npm-repo");
+
+            // Assert
+            Assert.That(actual.Count, Is.EqualTo(0));
+        }
+
+        [Test]
+        public async Task GetNpmComponentDataByRepo_ResultsWith_HttpRequestException()
+        {
+            // Arrange
+            Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade = new Mock<IJfrogAqlApiCommunicationFacade>();
+            mockJfrogApiComFacade
+                .Setup(x => x.GetNpmComponentDataByRepo(It.IsAny<string>()))
+                .Throws<HttpRequestException>();
+
+            // Act
+            IJFrogService jFrogService = new JFrogService(mockJfrogApiComFacade.Object);
+            IList<AqlResult> actual = await jFrogService.GetNpmComponentDataByRepo("npm-repo");
+
+            // Assert
+            Assert.That(actual.Count, Is.EqualTo(0));
+        }
+
+        [Test]
+        public async Task GetNpmComponentDataByRepo_ResultsWith_InvalidOperationException()
+        {
+            // Arrange
+            Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade = new Mock<IJfrogAqlApiCommunicationFacade>();
+            mockJfrogApiComFacade
+                .Setup(x => x.GetNpmComponentDataByRepo(It.IsAny<string>()))
+                .Throws<InvalidOperationException>();
+
+            // Act
+            IJFrogService jFrogService = new JFrogService(mockJfrogApiComFacade.Object);
+            IList<AqlResult> actual = await jFrogService.GetNpmComponentDataByRepo("npm-repo");
+
+            // Assert
+            Assert.That(actual.Count, Is.EqualTo(0));
+        }
+
+        [Test]
+        public async Task GetNpmComponentDataByRepo_ResultsWith_TaskCanceledException()
+        {
+            // Arrange
+            Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade = new Mock<IJfrogAqlApiCommunicationFacade>();
+            mockJfrogApiComFacade
+                .Setup(x => x.GetNpmComponentDataByRepo(It.IsAny<string>()))
+                .Throws<TaskCanceledException>();
+
+            // Act
+            IJFrogService jFrogService = new JFrogService(mockJfrogApiComFacade.Object);
+            IList<AqlResult> actual = await jFrogService.GetNpmComponentDataByRepo("npm-repo");
+
+            // Assert
+            Assert.That(actual.Count, Is.EqualTo(0));
+        }
     }
 }
