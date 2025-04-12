@@ -130,6 +130,7 @@ steps:
             -v "${{ parameters.outputFolder }}/sbom:/mnt/Output" `
             -v "${{ parameters.outputFolder }}/logs:/var/log" `
             -v "${settingsDir}:/etc/CATool" `
+            -e BUILD_BUILDID=$(BUILD_BUILDID) `
             ca-tool dotnet PackageIdentifier.dll @args
 
   - task: PowerShell@2
@@ -148,6 +149,7 @@ steps:
           -v "${{ parameters.outputFolder }}/sbom:/mnt/Output" `
           -v "${{ parameters.outputFolder }}/logs:/var/log" `
           -v "${settingsDir}:/etc/CATool" `
+          -e BUILD_BUILDID=$(BUILD_BUILDID) `
           ca-tool dotnet SW360PackageCreator.dll `
           --Directory:OutputFolder "/mnt/Output" `
           --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
@@ -174,6 +176,7 @@ steps:
           -v "${{ parameters.outputFolder }}/sbom:/mnt/Output" `
           -v "${{ parameters.outputFolder }}/logs:/var/log" `
           -v "${settingsDir}:/etc/CATool" `
+          -e BUILD_BUILDID=$(BUILD_BUILDID) `
           ca-tool dotnet ArtifactoryUploader.dll `
           --Directory:OutputFolder "/mnt/Output" `
           --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
