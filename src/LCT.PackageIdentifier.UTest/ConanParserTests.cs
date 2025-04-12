@@ -357,7 +357,7 @@ namespace LCT.PackageIdentifier.UTest
             Assert.IsTrue(File.Exists(filePath), "The file was not created.");
 
             string expectedContent = "{  \"Conan\": [    {      \"ComponentName\": \"ComponentA\",      \"ComponentVersion\": \"1.0.0\",      \"PackageFoundIn\": \"DescriptionA\"    },    {      \"ComponentName\": \"ComponentA\",      \"ComponentVersion\": \"2.0.0\",      \"PackageFoundIn\": \"DescriptionA\"    },    {      \"ComponentName\": \"ComponentB\",      \"ComponentVersion\": \"1.0.0\",      \"PackageFoundIn\": \"DescriptionB\"    },    {      \"ComponentName\": \"ComponentB\",      \"ComponentVersion\": \"2.0.0\",      \"PackageFoundIn\": \"DescriptionB\"    }  ]}";
-            string actualContent = File.ReadAllText(filePath).Replace("\r\n", "");
+            string actualContent = File.ReadAllText(filePath).Replace("\r\n", "").Replace("\n", "");
             Assert.AreEqual(expectedContent, actualContent, "The content of the file does not match the expected content.");
         }
 
@@ -405,7 +405,7 @@ namespace LCT.PackageIdentifier.UTest
             Assert.IsTrue(File.Exists(filePath), "The file was not created.");
 
             string expectedContent = "{  \"Conan\": [    {      \"ComponentName\": \"ComponentA\",      \"ComponentVersion\": \"1.0.0\",      \"PackageFoundIn\": \"DescriptionA\"    },    {      \"ComponentName\": \"ComponentA\",      \"ComponentVersion\": \"2.0.0\",      \"PackageFoundIn\": \"DescriptionA\"    },    {      \"ComponentName\": \"ComponentB\",      \"ComponentVersion\": \"1.0.0\",      \"PackageFoundIn\": \"DescriptionB\"    },    {      \"ComponentName\": \"ComponentB\",      \"ComponentVersion\": \"2.0.0\",      \"PackageFoundIn\": \"DescriptionB\"    }  ]}";
-            string actualContent = File.ReadAllText(filePath).Replace("\r\n", "");
+            string actualContent = File.ReadAllText(filePath).Replace("\r\n", "").Replace("\n", "");
             Assert.AreEqual(expectedContent, actualContent, "The content of the file does not match the expected content.");
         }
     }
