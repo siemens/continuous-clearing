@@ -1,4 +1,21 @@
-trigger: none
+trigger:
+  branches:
+    include:
+      - main
+      - development
+      - release/*
+  schedules:
+    - cron: "0 2 * * *"  # Runs daily at 2:00 AM UTC
+      displayName: Daily 2AM Run
+      branches:
+        include:
+          - main
+      always: true  # Ensures it runs even if there are no code changes
+
+pr:
+  branches:
+    include:
+      - '*'
 
 variables:
   - group: CONTINUOUS_CLEARING_TOOL_TEST_CONFIG
@@ -23,5 +40,159 @@ stages:
       projectDefinitions:
         - projectType: 'npm'
           inputFolder: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/dependency-locks/npm
+      outputFolder: $(Build.SourcesDirectory)/continuous-clearing
+      appSettingsPath: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/settings/appsettings.json
+
+    ##################################################
+    #                    CONAN                       #
+    ##################################################
+
+  - template: ../templates/build/azure-pipelines-clearing-tool-build-run-stage-template.yml
+    parameters:
+      stageName: conan
+      displayName: "B&R CA Tool CONAN"
+      sw360Url: $(SW360_URL)
+      sw360Token: $(SW360_TOKEN)
+      sw360ProjectId: f36c5cc520664d1f91fe659931a3ea58
+      sw360ProjectName: "Test-Conan"
+      fossologyUrl: $(FOSSOLOGY_URL)
+      JfrogUrl: $(JFROG_URL)
+      JfrogToken: $(JFROG_TOKEN)
+      JfrogDryRun: true
+      projectDefinitions:
+        - projectType: 'conan'
+          inputFolder: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/dependency-locks/conan
+      outputFolder: $(Build.SourcesDirectory)/continuous-clearing
+      appSettingsPath: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/settings/appsettings.json
+
+    ##################################################
+    #                    NUGET                       #
+    ##################################################
+  
+  - template: ../templates/build/azure-pipelines-clearing-tool-build-run-stage-template.yml
+    parameters:
+      stageName: nuget
+      displayName: "B&R CA Tool NUGET"
+      sw360Url: $(SW360_URL)
+      sw360Token: $(SW360_TOKEN)
+      sw360ProjectId: cb0dfd43b35748d880d4c9f201ca7139
+      sw360ProjectName: "Test-Nuget"
+      fossologyUrl: $(FOSSOLOGY_URL)
+      JfrogUrl: $(JFROG_URL)
+      JfrogToken: $(JFROG_TOKEN)
+      JfrogDryRun: true
+      projectDefinitions:
+        - projectType: 'nuget'
+          inputFolder: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/dependency-locks/nuget
+      outputFolder: $(Build.SourcesDirectory)/continuous-clearing
+      appSettingsPath: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/settings/appsettings.json
+
+    ##################################################
+    #                    POETRY                      #
+    ##################################################
+  
+  - template: ../templates/build/azure-pipelines-clearing-tool-build-run-stage-template.yml
+    parameters:
+      stageName: poetry
+      displayName: "B&R CA Tool POETRY"
+      sw360Url: $(SW360_URL)
+      sw360Token: $(SW360_TOKEN)
+      sw360ProjectId: a331b8488fa140b6a8714d003a0d3a79
+      sw360ProjectName: "Test-Poetry"
+      fossologyUrl: $(FOSSOLOGY_URL)
+      JfrogUrl: $(JFROG_URL)
+      JfrogToken: $(JFROG_TOKEN)
+      JfrogDryRun: true
+      projectDefinitions:
+        - projectType: 'poetry'
+          inputFolder: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/dependency-locks/poetry
+      outputFolder: $(Build.SourcesDirectory)/continuous-clearing
+      appSettingsPath: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/settings/appsettings.json
+    
+    ##################################################
+    #                    MAVEN                       #
+    ##################################################
+
+  - template: ../templates/build/azure-pipelines-clearing-tool-build-run-stage-template.yml
+    parameters:
+      stageName: maven
+      displayName: "B&R CA Tool MAVEN"
+      sw360Url: $(SW360_URL)
+      sw360Token: $(SW360_TOKEN)
+      sw360ProjectId: 401cef6ca8d5470190f3dd903e6bc12f
+      sw360ProjectName: "Test-Maven"
+      fossologyUrl: $(FOSSOLOGY_URL)
+      JfrogUrl: $(JFROG_URL)
+      JfrogToken: $(JFROG_TOKEN)
+      JfrogDryRun: true
+      projectDefinitions:
+        - projectType: 'maven'
+          inputFolder: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/sboms/cyclonedx/maven
+      outputFolder: $(Build.SourcesDirectory)/continuous-clearing
+      appSettingsPath: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/settings/appsettings.json
+
+    ##################################################
+    #               Multi (NPM + Nuget)              #
+    ##################################################
+  
+  - template: ../templates/build/azure-pipelines-clearing-tool-build-run-stage-template.yml
+    parameters:
+      stageName: multi_npm_nuget
+      displayName: "B&R CA Tool Multi(NPM+Nuget)"
+      sw360Url: $(SW360_URL)
+      sw360Token: $(SW360_TOKEN)
+      sw360ProjectId: 760a780b0392498caa1c6dfe2a198498
+      sw360ProjectName: "Test-Multi"
+      fossologyUrl: $(FOSSOLOGY_URL)
+      JfrogUrl: $(JFROG_URL)
+      JfrogToken: $(JFROG_TOKEN)
+      JfrogDryRun: true
+      projectDefinitions:
+        - projectType: 'npm'
+          inputFolder: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/dependency-locks/npm
+        - projectType: 'nuget'
+          inputFolder: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/dependency-locks/nuget
+      outputFolder: $(Build.SourcesDirectory)/continuous-clearing
+      appSettingsPath: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/settings/appsettings.json
+
+    ##################################################
+    #                    DEBAIN                      #
+    ##################################################
+  - template: ../templates/build/azure-pipelines-clearing-tool-build-run-stage-template.yml
+    parameters:
+      stageName: debian
+      displayName: "B&R CA Tool DEBAIN"
+      sw360Url: $(SW360_URL)
+      sw360Token: $(SW360_TOKEN)
+      sw360ProjectId: 527891008f7042078850f913d62530b9
+      sw360ProjectName: "Test-Debian"
+      fossologyUrl: $(FOSSOLOGY_URL)
+      JfrogUrl: $(JFROG_URL)
+      JfrogToken: $(JFROG_TOKEN)
+      JfrogDryRun: true
+      projectDefinitions:
+        - projectType: 'debian'
+          inputFolder: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/sboms/cyclonedx/debian
+      outputFolder: $(Build.SourcesDirectory)/continuous-clearing
+      appSettingsPath: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/settings/appsettings.json
+
+    ##################################################
+    #                    ALPINE                      #
+    ##################################################
+  - template: ../templates/build/azure-pipelines-clearing-tool-build-run-stage-template.yml
+    parameters:
+      stageName: alpine
+      displayName: "B&R CA Tool ALPINE"
+      sw360Url: $(SW360_URL)
+      sw360Token: $(SW360_TOKEN)
+      sw360ProjectId: f6258e704ef1416e940a87f14b940d9b
+      sw360ProjectName: "Test-Alpine"
+      fossologyUrl: $(FOSSOLOGY_URL)
+      JfrogUrl: $(JFROG_URL)
+      JfrogToken: $(JFROG_TOKEN)
+      JfrogDryRun: true
+      projectDefinitions:
+        - projectType: 'alpine'
+          inputFolder: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/sboms/cyclonedx/alpine
       outputFolder: $(Build.SourcesDirectory)/continuous-clearing
       appSettingsPath: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/settings/appsettings.json
