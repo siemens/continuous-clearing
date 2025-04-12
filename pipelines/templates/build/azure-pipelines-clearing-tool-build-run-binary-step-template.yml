@@ -67,6 +67,24 @@ steps:
     inputs:
       script: |
         dotnet build $(Build.SourcesDirectory)/continuous-clearing/src/LicenseClearingTool.sln --configuration Release
+  
+  - task: PowerShell@2
+    displayName: 'Tool pre-requisite'
+    inputs:
+      targetType: 'inline'
+      script: |
+        $baseOutputPath = "${{ parameters.outputFolder }}"
+        $sbomPath = Join-Path $baseOutputPath "sbom"
+        $logsPath = Join-Path $baseOutputPath "logs"
+
+        foreach ($path in @($baseOutputPath, $sbomPath, $logsPath)) {
+          if (-not (Test-Path -Path $path)) {
+            New-Item -ItemType Directory -Path $path | Out-Null
+            Write-Host "Created directory: $path"
+          } else {
+            Write-Host "Directory already exists: $path"
+          }
+        }
 
   - ${{ each project in parameters.projectDefinitions }}:
     - task: PowerShell@2
@@ -76,7 +94,7 @@ steps:
         script: |
           $args = @(
             "--Directory:InputFolder", "${{ project.inputFolder }}",
-            "--Directory:OutputFolder", "${{ parameters.outputFolder }}",
+            "--Directory:OutputFolder", "${{ parameters.outputFolder }}/sbom",
             "--Directory:LogFolder", "${{ parameters.outputFolder }}/logs",
             "--ProjectType", "${{ project.projectType }}",
             "--SW360:ProjectName", "${{ parameters.sw360ProjectName }}",
@@ -108,8 +126,8 @@ steps:
       targetType: 'inline'
       script: |
         dotnet $(Build.SourcesDirectory)/continuous-clearing/out/net8.0/SW360PackageCreator.dll `
-          --Directory:OutputFolder "${{ parameters.outputFolder }}" `
-          --Directory:LogFolder", "${{ parameters.outputFolder }}/logs `
+          --Directory:OutputFolder "${{ parameters.outputFolder }}/sbom" `
+          --Directory:LogFolder "${{ parameters.outputFolder }}/logs" `
           --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
           --SW360:ProjectID "${{ parameters.sw360ProjectId }}" `
           --SW360:AuthTokenType "Token" `
@@ -126,8 +144,8 @@ steps:
       targetType: 'inline'
       script: |
         dotnet $(Build.SourcesDirectory)/continuous-clearing/out/net8.0/ArtifactoryUploader.dll `
-          --Directory:OutputFolder "${{ parameters.outputFolder }}" `
-          --Directory:LogFolder", "${{ parameters.outputFolder }}/logs `
+          --Directory:OutputFolder "${{ parameters.outputFolder }}/sbom" `
+          --Directory:LogFolder "${{ parameters.outputFolder }}/logs" `
           --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
           --SW360:ProjectID "${{ parameters.sw360ProjectId }}" `
           --SW360:AuthTokenType "Token" `
@@ -137,3 +155,17 @@ steps:
           --Jfrog:Token "${{ parameters.JfrogToken }}" `
           --JFrog:DryRun "${{ parameters.jfrogDryRun }}" `
           --settingsfilepath "${{ parameters.appSettingsPath }}"
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish SBOM Artifacts'
+    inputs:
+      PathtoPublish: '${{ parameters.outputFolder }}/sbom'
+      ArtifactName: '$(System.StageName)_ContinuousClearing_Bom_Binary'
+      publishLocation: 'Container'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Logs Artifacts'
+    inputs:
+      PathtoPublish: '${{ parameters.outputFolder }}/logs'
+      ArtifactName: '$(System.StageName)_ContinuousClearing_Log_Binary'
+      publishLocation: 'Container'
