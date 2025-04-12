@@ -356,9 +356,18 @@ namespace LCT.PackageIdentifier.UTest
             string filePath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles", "ContinuousClearing_Multipleversions.json"));
             Assert.IsTrue(File.Exists(filePath), "The file was not created.");
 
-            string expectedContent = "{  \"Conan\": [    {      \"ComponentName\": \"ComponentA\",      \"ComponentVersion\": \"1.0.0\",      \"PackageFoundIn\": \"DescriptionA\"    },    {      \"ComponentName\": \"ComponentA\",      \"ComponentVersion\": \"2.0.0\",      \"PackageFoundIn\": \"DescriptionA\"    },    {      \"ComponentName\": \"ComponentB\",      \"ComponentVersion\": \"1.0.0\",      \"PackageFoundIn\": \"DescriptionB\"    },    {      \"ComponentName\": \"ComponentB\",      \"ComponentVersion\": \"2.0.0\",      \"PackageFoundIn\": \"DescriptionB\"    }  ]}";
-            string actualContent = File.ReadAllText(filePath).Replace("\r\n", "").Replace("\n", "");
-            Assert.AreEqual(expectedContent, actualContent, "The content of the file does not match the expected content.");
+            var expectedContent = new MultipleVersions
+            {
+                Conan = new List<MultipleVersionValues>
+                {
+                    new MultipleVersionValues { ComponentName = "ComponentA", ComponentVersion = "1.0.0", PackageFoundIn = "DescriptionA" },
+                    new MultipleVersionValues { ComponentName = "ComponentA", ComponentVersion = "2.0.0", PackageFoundIn = "DescriptionA" },
+                    new MultipleVersionValues { ComponentName = "ComponentB", ComponentVersion = "1.0.0", PackageFoundIn = "DescriptionB" },
+                    new MultipleVersionValues { ComponentName = "ComponentB", ComponentVersion = "2.0.0", PackageFoundIn = "DescriptionB" }
+                }
+            };
+            var actualContent = JsonConvert.DeserializeObject<MultipleVersions>(File.ReadAllText(filePath));
+            Assert.AreEqual(JsonConvert.SerializeObject(expectedContent), JsonConvert.SerializeObject(actualContent), "The content of the file does not match the expected content.");
         }
 
         [Test]
@@ -404,9 +413,18 @@ namespace LCT.PackageIdentifier.UTest
             // Assert
             Assert.IsTrue(File.Exists(filePath), "The file was not created.");
 
-            string expectedContent = "{  \"Conan\": [    {      \"ComponentName\": \"ComponentA\",      \"ComponentVersion\": \"1.0.0\",      \"PackageFoundIn\": \"DescriptionA\"    },    {      \"ComponentName\": \"ComponentA\",      \"ComponentVersion\": \"2.0.0\",      \"PackageFoundIn\": \"DescriptionA\"    },    {      \"ComponentName\": \"ComponentB\",      \"ComponentVersion\": \"1.0.0\",      \"PackageFoundIn\": \"DescriptionB\"    },    {      \"ComponentName\": \"ComponentB\",      \"ComponentVersion\": \"2.0.0\",      \"PackageFoundIn\": \"DescriptionB\"    }  ]}";
-            string actualContent = File.ReadAllText(filePath).Replace("\r\n", "").Replace("\n", "");
-            Assert.AreEqual(expectedContent, actualContent, "The content of the file does not match the expected content.");
+            var expectedContent = new MultipleVersions
+            {
+                Conan = new List<MultipleVersionValues>
+                {
+                    new MultipleVersionValues { ComponentName = "ComponentA", ComponentVersion = "1.0.0", PackageFoundIn = "DescriptionA" },
+                    new MultipleVersionValues { ComponentName = "ComponentA", ComponentVersion = "2.0.0", PackageFoundIn = "DescriptionA" },
+                    new MultipleVersionValues { ComponentName = "ComponentB", ComponentVersion = "1.0.0", PackageFoundIn = "DescriptionB" },
+                    new MultipleVersionValues { ComponentName = "ComponentB", ComponentVersion = "2.0.0", PackageFoundIn = "DescriptionB" }
+                }
+            };
+            var actualContent = JsonConvert.DeserializeObject<MultipleVersions>(File.ReadAllText(filePath));
+            Assert.AreEqual(JsonConvert.SerializeObject(expectedContent), JsonConvert.SerializeObject(actualContent), "The content of the file does not match the expected content.");
         }
     }
 }
