@@ -33,14 +33,14 @@ namespace LCT.Common.UTest
         {
             // Arrange
             _ = EnvironmentType.AzureRelease;
-            SetEnvironmentVariable("Release_ReleaseId", "12345");
+            SetEnvironmentVariable("RELEASE_RELEASEID", "12345");
 
             // Act
             var actualEnvironment = RuntimeEnvironment.GetEnvironment();
 
             // Assert
             Assert.That(actualEnvironment, Is.Not.Null);
-            Assert.That(Environment.GetEnvironmentVariable("Release_ReleaseId"), Is.Not.Null);
+            Assert.That(Environment.GetEnvironmentVariable("RELEASE_RELEASEID"), Is.Not.Null);
         }
 
         [Test]
@@ -48,7 +48,7 @@ namespace LCT.Common.UTest
         {
             // Arrange
             var expectedEnvironment = EnvironmentType.AzurePipeline;
-            SetEnvironmentVariable("Build_BuildId", "67890");
+            SetEnvironmentVariable("BUILD_BUILDID", "67890");
 
             // Act
             var actualEnvironment = RuntimeEnvironment.GetEnvironment();

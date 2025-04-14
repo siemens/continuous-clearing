@@ -1,6 +1,7 @@
 ﻿using LCT.APICommunications.Model;
 using Moq;
 using System.Net;
+using System.Security;
 
 namespace LCT.APICommunications.UTest
 {
@@ -74,6 +75,84 @@ namespace LCT.APICommunications.UTest
 
             // Cleanup
             File.Delete(jsonFilePath);
+        }
+
+        [Test]
+        public void AttachComponentSourceToSW360_UriFormatException_LogsError()
+        {
+            // Arrange
+            var attachReport = new AttachReport
+            {
+                ReleaseId = "invalid_uri",
+                AttachmentFile = _attachmentFilePath,
+                AttachmentType = "Source",
+                AttachmentReleaseComment = "Test comment"
+            };
+
+            // Act & Assert
+            Assert.DoesNotThrow(() => _attachmentHelper.AttachComponentSourceToSW360(attachReport));
+        }
+
+        [Test]
+        public void AttachComponentSourceToSW360_SecurityException_LogsError()
+        {
+            // Arrange
+            var attachReport = new AttachReport
+            {
+                ReleaseId = "123",
+                AttachmentFile = _attachmentFilePath,
+                AttachmentType = "Source",
+                AttachmentReleaseComment = "Test comment"
+            };
+
+            // Mock WebRequest behavior to throw SecurityException
+            var webRequestMock = new Mock<HttpWebRequest>();
+            webRequestMock.Setup(x => x.GetRequestStream()).Throws(new SecurityException());
+
+            // Act & Assert
+            Assert.DoesNotThrow(() => _attachmentHelper.AttachComponentSourceToSW360(attachReport));
+        }
+
+        [Test]
+        public void AttachComponentSourceToSW360_WebException_LogsError()
+        {
+            // Arrange
+            var attachReport = new AttachReport
+            {
+                ReleaseId = "123",
+                AttachmentFile = _attachmentFilePath,
+                AttachmentType = "Source",
+                AttachmentReleaseComment = "Test comment"
+            };
+
+            // Mock WebRequest behavior to throw WebException
+            var webRequestMock = new Mock<HttpWebRequest>();
+            var webResponseMock = new Mock<WebResponse>();
+            webRequestMock.Setup(x => x.GetRequestStream()).Throws(new WebException());
+            webRequestMock.Setup(x => x.GetResponse()).Returns(webResponseMock.Object);
+
+            // Act & Assert
+            Assert.DoesNotThrow(() => _attachmentHelper.AttachComponentSourceToSW360(attachReport));
+        }
+
+        [Test]
+        public void AttachComponentSourceToSW360_IOException_LogsError()
+        {
+            // Arrange
+            var attachReport = new AttachReport
+            {
+                ReleaseId = "123",
+                AttachmentFile = _attachmentFilePath,
+                AttachmentType = "Source",
+                AttachmentReleaseComment = "Test comment"
+            };
+
+            // Mock WebRequest behavior to throw IOException
+            var webRequestMock = new Mock<HttpWebRequest>();
+            webRequestMock.Setup(x => x.GetRequestStream()).Throws(new IOException());
+
+            // Act & Assert
+            Assert.DoesNotThrow(() => _attachmentHelper.AttachComponentSourceToSW360(attachReport));
         }
     }
 }

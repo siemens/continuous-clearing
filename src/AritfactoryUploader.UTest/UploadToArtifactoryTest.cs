@@ -216,7 +216,7 @@ namespace AritfactoryUploader.UTest
                     }
                 }
             };
-            commonAppSettings.LogFolderPath = outFolder;
+            commonAppSettings.Directory.LogFolder = outFolder;
 
             //Act
             List<ComponentsToArtifactory> uploadList = await UploadToArtifactory.GetComponentsToBeUploadedToArtifactory(componentLists, commonAppSettings, displayPackagesInfo);
@@ -304,7 +304,7 @@ namespace AritfactoryUploader.UTest
                     }
                 }
             };
-            commonAppSettings.LogFolderPath = outFolder;
+            commonAppSettings.Directory.LogFolder = outFolder;
 
 
             //Act

@@ -4,12 +4,17 @@
 #  SPDX-License-Identifier: MIT
 # -------------------------------------------------------------------------------------------------------------------- 
 
-trigger: none  # Disables triggering on push
+trigger:
+  branches:
+    include:
+      - main
+      - development
+      - release/*
 
 pr:
   branches:
     include:
-      - '*'  # Runs only when a PR is created or updated
+      - '*'
 
 variables:
   - group: CONTINUOUS_CLEARING_TOOL_TEST_CONFIG
@@ -108,79 +113,15 @@ jobs:
   steps:
     - checkout: self
 
-    - task: Docker@2
-      inputs:
-        containerRegistry: 'docker-dev-phoebe'
-        command: 'login'
-      displayName: "Docker login to docker-dev-phoebe"
-
-    - script: |
-        echo "Starting a new sw360 container..."
-        CONTAINER_ID=$(docker run -dit --name sw360 -p $(SW360_PORT):8080 -p 5985:5984 -p 5435:5432 --add-host=host.docker.internal:host-gateway $(SW360_DOCKER_IMAGE))
-
-        if [ -z "$CONTAINER_ID" ]; then
-            echo "Failed to start sw360 container!"
-            exit 1
-        fi
-
-        echo "sw360 Container ID: $CONTAINER_ID"
-        echo "Container started successfully."
-      displayName: "Start sw360 Container"
-    
-    - script: |
-        echo "Starting a new fossology container..."
-        CONTAINER_ID=$(docker run -dit --name fossology -p $(FOSSOLOGY_PORT):80 $(FOSSOLOGY_DOCKER_IMAGE))
-
-        if [ -z "$CONTAINER_ID" ]; then
-            echo "Failed to start fossology container!"
-            exit 1
-        fi
-
-        echo "fossology Container ID: $CONTAINER_ID"
-        echo "Container started successfully."
-      displayName: "Start fossology Container"
-    
-    - script: |
-        echo "Waiting for 5 minutes to allow sw360 to start..."
-        sleep 300  # 300 seconds = 5 minutes
-      displayName: "Initial Wait (5 minutes)"
-      enabled: true
-    
-    - script: |
-        echo "Waiting for sw360 API to be available..."
-
-        URL="$(SW360_URL)/resource/api/projects"
-        AUTH_TOKEN="$(SW360_TOKEN)"  # Use pipeline variable
-        MAX_RETRIES=60  # Max 10 minutes
-        RETRY_INTERVAL=10  # 10 seconds
-
-        for i in $(seq 1 $MAX_RETRIES); do
-            echo "Attempt $i: Checking sw360 API..."
-
-            RESPONSE=$(curl --silent --show-error --fail --location --write-out "\nHTTP_STATUS:%{http_code}" \
-              --header "Authorization: Token $AUTH_TOKEN" \
-              --header "Accept: application/hal+json" \
-              "$URL" || echo "HTTP_STATUS:000")
-
-            BODY=$(echo "$RESPONSE" | awk '!/HTTP_STATUS/ {print}')
-            HTTP_STATUS=$(echo "$RESPONSE" | awk -F'HTTP_STATUS:' '{print $2}' | tr -d '[:space:]')
-
-            echo "Response Status: $HTTP_STATUS"
-            echo "Response Body:"
-            echo "$BODY"
-
-            if [ "$HTTP_STATUS" == "200" ]; then
-                echo "sw360 API is up and running!"
-                exit 0
-            fi
-
-            echo "sw360 API not ready yet (Status: $HTTP_STATUS). Retrying in $RETRY_INTERVAL seconds..."
-            sleep $RETRY_INTERVAL
-        done
-
-        echo "ERROR: sw360 API did not become ready in time."
-        exit 1  # Fail pipeline if API isn't ready
-      displayName: "Wait for sw360 API to be ready"
+    - template: ./templates/azure-pipelines-start-sw360-fossology-containers-template.yml
+      parameters:
+        dockerRegistry: $(JFROG_DOCKER_REGISTRY)
+        sw360DockerImage: $(SW360_DOCKER_IMAGE)
+        fossologyDockerImage: $(FOSSOLOGY_DOCKER_IMAGE)
+        sw360Port: $(SW360_PORT)
+        fossologyPort: $(FOSSOLOGY_PORT)
+        sw360Url: $(SW360_URL)
+        sw360Token: $(SW360_TOKEN)
     
     - script: |
         set -e  # Exit on error

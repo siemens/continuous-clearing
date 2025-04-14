@@ -33,7 +33,10 @@ namespace LCT.Common
         public static void UploadLogs()
         {
             EnvironmentType envType = RuntimeEnvironment.GetEnvironment();
-            if (envType == EnvironmentType.AzurePipeline && !string.IsNullOrEmpty(Log4Net.CatoolLogPath) && File.Exists(Log4Net.CatoolLogPath))
+            if (envType == EnvironmentType.AzurePipeline
+                            && !string.IsNullOrEmpty(Log4Net.CatoolLogPath)
+                            && File.Exists(Log4Net.CatoolLogPath)
+                            && Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") != "true")
             {
                 LogManager.Shutdown();
                 Console.WriteLine($"##vso[artifact.upload containerfolder={LogContainerFolderName};artifactname={LogArtifactFolderName}]{Log4Net.CatoolLogPath}");
@@ -51,7 +54,10 @@ namespace LCT.Common
         public static void UploadBom()
         {
             EnvironmentType envType = RuntimeEnvironment.GetEnvironment();
-            if (envType == EnvironmentType.AzurePipeline && !string.IsNullOrEmpty(FileOperations.CatoolBomFilePath) && File.Exists(FileOperations.CatoolBomFilePath))
+            if (envType == EnvironmentType.AzurePipeline
+                            && !string.IsNullOrEmpty(FileOperations.CatoolBomFilePath)
+                            && File.Exists(FileOperations.CatoolBomFilePath)
+                            && Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") != "true")
             {
                 Console.WriteLine($"##vso[artifact.upload containerfolder={BomContainerFolderName};artifactname={BomArtifactFolderName}]{FileOperations.CatoolBomFilePath}");
             }
