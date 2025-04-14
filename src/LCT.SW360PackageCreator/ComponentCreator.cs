@@ -401,7 +401,7 @@ namespace LCT.SW360PackageCreator
                 Tree tree = new Tree("");
                 if (!string.IsNullOrEmpty(item.SW360Name) && string.IsNullOrEmpty(item.ReleaseID))
                 {
-                    tree.AddNode($"[yellow]valid Release not found in Known-purl :SW360Name -{item.SW360Name}, Name - {item.Name} , version - {item.Version}[/]");
+                    tree.AddNode($"[red]valid Release not found in Known-purl :SW360Name -{item.SW360Name}, Name - {item.Name} , version - {item.Version}[/]");
                     AnsiConsole.Write(tree);
                     return;
                 }
@@ -481,7 +481,7 @@ namespace LCT.SW360PackageCreator
                 Tree tree = new Tree("");
                 if (!string.IsNullOrEmpty(item.SW360Name) && string.IsNullOrEmpty(item.ReleaseID))
                 {
-                    tree.AddNode($"[yellow]valid Release not found in Known-purl :SW360Name -{item.SW360Name}, Name - {item.Name} , version - {item.Version}[/]");
+                    tree.AddNode($"[red]valid Release not found in Known-purl :SW360Name -{item.SW360Name}, Name - {item.Name} , version - {item.Version}[/]");
                     AnsiConsole.Write(tree);
                     return;
                 }
