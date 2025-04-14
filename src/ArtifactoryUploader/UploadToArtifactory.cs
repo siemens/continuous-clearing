@@ -25,7 +25,7 @@ namespace LCT.ArtifactoryUploader
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static IJFrogService jFrogService { get; set; }
-        private static List<AqlResult> aqlResultList = new();
+        private static readonly Dictionary<string, IList<AqlResult>> repoCache = new();
         public async static Task<List<ComponentsToArtifactory>> GetComponentsToBeUploadedToArtifactory(List<Component> comparisonBomData,
                                                                                                       CommonAppSettings appSettings,
                                                                                                       DisplayPackagesInfo displayPackagesInfo)
@@ -350,7 +350,7 @@ namespace LCT.ArtifactoryUploader
             if (item.Purl.Contains("pypi", StringComparison.OrdinalIgnoreCase))
             {
                 // get the  component list from Jfrog for given repo
-                aqlResultList = await GetPypiListOfComponentsFromRepo(new string[] { item.Properties.Find(x => x.Name == Dataconstant.Cdx_ArtifactoryRepoName)?.Value }, jFrogService);
+                var aqlResultList = await GetPypiListOfComponentsFromRepo(new string[] { item.Properties.Find(x => x.Name == Dataconstant.Cdx_ArtifactoryRepoName)?.Value }, jFrogService);
                 if (aqlResultList.Count > 0)
                 {
                     return GetArtifactoryRepoName(aqlResultList, item);
@@ -367,7 +367,7 @@ namespace LCT.ArtifactoryUploader
             }
             else if (item.Purl.Contains("npm", StringComparison.OrdinalIgnoreCase))
             {
-                aqlResultList = await GetNpmListOfComponentsFromRepo(new string[] { item.Properties.Find(x => x.Name == Dataconstant.Cdx_ArtifactoryRepoName)?.Value }, jFrogService);
+                var aqlResultList = await GetNpmListOfComponentsFromRepo(new string[] { item.Properties.Find(x => x.Name == Dataconstant.Cdx_ArtifactoryRepoName)?.Value }, jFrogService);
 
                 if (aqlResultList.Count > 0)
                 {
@@ -379,28 +379,44 @@ namespace LCT.ArtifactoryUploader
         }
         public static async Task<List<AqlResult>> GetNpmListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService)
         {
+            var aqlResultList = new List<AqlResult>();
             if (repoList != null && repoList.Length > 0)
             {
-                foreach (var repo in repoList)
+                foreach (var repo in repoList.Where(r => !string.IsNullOrWhiteSpace(r)))
                 {
-                    var componentRepoData = await jFrogService.GetNpmComponentDataByRepo(repo) ?? new List<AqlResult>();
-                    aqlResultList.AddRange(componentRepoData);
+                    if (repoCache.ContainsKey(repo))
+                    {
+                        aqlResultList.AddRange(repoCache[repo]);
+                    }
+                    else
+                    {
+                        var componentRepoData = await jFrogService.GetNpmComponentDataByRepo(repo) ?? new List<AqlResult>();
+                        repoCache[repo] = componentRepoData;
+                        aqlResultList.AddRange(componentRepoData);
+                    }
                 }
             }
-
             return aqlResultList;
         }
         public static async Task<List<AqlResult>> GetListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService)
         {
+            var aqlResultList = new List<AqlResult>();
             if (repoList != null && repoList.Length > 0)
             {
-                foreach (var repo in repoList)
+                foreach (var repo in repoList.Where(r => !string.IsNullOrWhiteSpace(r)))
                 {
-                    var test = await jFrogService.GetInternalComponentDataByRepo(repo) ?? new List<AqlResult>();
-                    aqlResultList.AddRange(test);
+                    if (repoCache.ContainsKey(repo))
+                    {
+                        aqlResultList.AddRange(repoCache[repo]);
+                    }
+                    else
+                    {
+                        var componentRepoData = await jFrogService.GetInternalComponentDataByRepo(repo) ?? new List<AqlResult>();
+                        repoCache[repo] = componentRepoData;
+                        aqlResultList.AddRange(componentRepoData);
+                    }
                 }
             }
-
             return aqlResultList;
         }
         private static AqlResult GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component)
@@ -442,15 +458,24 @@ namespace LCT.ArtifactoryUploader
 
         public static async Task<List<AqlResult>> GetPypiListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService)
         {
+            var aqlResultList = new List<AqlResult>();
+
             if (repoList != null && repoList.Length > 0)
             {
-                foreach (var repo in repoList)
+                foreach (var repo in repoList.Where(r => !string.IsNullOrWhiteSpace(r)))
                 {
-                    var componentRepoData = await jFrogService.GetPypiComponentDataByRepo(repo) ?? new List<AqlResult>();
-                    aqlResultList.AddRange(componentRepoData);
+                    if (repoCache.ContainsKey(repo))
+                    {
+                        aqlResultList.AddRange(repoCache[repo]);
+                    }
+                    else
+                    {
+                        var componentRepoData = await jFrogService.GetPypiComponentDataByRepo(repo) ?? new List<AqlResult>();
+                        repoCache[repo] = componentRepoData;
+                        aqlResultList.AddRange(componentRepoData);
+                    }
                 }
             }
-
             return aqlResultList;
         }
         private static PackageType GetPackageType(Component item)

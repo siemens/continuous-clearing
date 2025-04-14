@@ -153,10 +153,10 @@ namespace LCT.PackageIdentifier
         private static string LogFolderInitialisation(CommonAppSettings appSettings)
         {
             string FolderPath;
-            if (!string.IsNullOrEmpty(appSettings.LogFolderPath))
+            if (!string.IsNullOrEmpty(appSettings.Directory.LogFolder))
             {
-                FolderPath = appSettings.LogFolderPath;
-                Log4Net.Init(FileConstant.BomCreatorLog, appSettings.LogFolderPath, m_Verbose);
+                FolderPath = appSettings.Directory.LogFolder;
+                Log4Net.Init(FileConstant.BomCreatorLog, appSettings.Directory.LogFolder, m_Verbose);
             }
             else
             {
