@@ -64,7 +64,7 @@ namespace LCT.APICommunications
             if (_initialRetryLogged)
             {
                 var attempt = context.ContainsKey("RetryAttempt") ? context["RetryAttempt"] : 0;
-                Logger.Debug($"Retry attempt successful after {attempt} attempts for {request.Method} {request.RequestUri}");
+                Logger.Debug($"Retry attempt successful after {attempt} attempts for {request.Method} {request.RequestUri}.");
                 _initialRetryLogged = false;
             }
 

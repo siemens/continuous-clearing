@@ -509,7 +509,7 @@ namespace LCT.SW360PackageCreator
                 {
                     uploadId = fossResult.FossologyProcessInfo?.ProcessSteps[0]?.ProcessStepIdInTool;
                 }
-                if (fossResult.Status == "FAILURE")
+                if (fossResult.Status == "FAILURE" && string.IsNullOrEmpty(uploadId))
                 {
                     Logger.Logger.Log(null, Level.Warn, $"\tFossology upload failed: The Fossology process status is FAILURE. Please check the Fossology server or the uploaded file for issues.", null);
                 }
