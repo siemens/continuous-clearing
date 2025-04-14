@@ -511,11 +511,11 @@ namespace LCT.SW360PackageCreator
                 }
                 if (fossResult.Status == "FAILURE")
                 {
-                    Logger.Logger.Log(null, Level.Warn, $"\tFossology upload failed: The Fossology process status is 'FAILURE'. Please check the Fossology server or the uploaded file for issues.", null);
+                    Logger.Logger.Log(null, Level.Warn, $"\tFossology upload failed: The Fossology process status is FAILURE. Please check the Fossology server or the uploaded file for issues.", null);
                 }
                 else if (fossResult.Status == "PROCESSING" && string.IsNullOrEmpty(uploadId))
                 {
-                    Logger.Logger.Log(null, Level.Warn, $"\tFossology process is still 'PROCESSING'. The upload ID is not yet available. Please wait and re-run the pipeline after some time.", null);
+                    Logger.Logger.Log(null, Level.Warn, $"\tFossology process is still PROCESSING. The upload ID is not yet available. Please wait and re-run the pipeline after some time.", null);
                 }
             }
             catch (AggregateException ex)
