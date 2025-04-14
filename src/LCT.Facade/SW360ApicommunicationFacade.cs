@@ -93,11 +93,6 @@ namespace LCT.Facade
 
         public async Task<HttpResponseMessage> LinkReleasesToProject(HttpContent httpContent, string sw360ProjectId)
         {
-            if (m_TestMode)
-            {
-                return new HttpResponseMessage(HttpStatusCode.OK);
-            }
-
             return await m_sw360ApiCommunication.LinkReleasesToProject(httpContent, sw360ProjectId);
         }
         public async Task<HttpResponseMessage> LinkPackagesToProject(HttpContent httpContent, string sw360ProjectId)
@@ -111,21 +106,11 @@ namespace LCT.Facade
         }
         public async Task<HttpResponseMessage> CreateComponent(CreateComponent createComponentContent)
         {
-            if (m_TestMode)
-            {
-                return new HttpResponseMessage(HttpStatusCode.OK);
-            }
-
             return await m_sw360ApiCommunication.CreateComponent(createComponentContent);
         }
 
         public async Task<HttpResponseMessage> CreateRelease(Releases createReleaseContent)
         {
-            if (m_TestMode)
-            {
-                return new HttpResponseMessage(HttpStatusCode.OK);
-            }
-
             return await m_sw360ApiCommunication.CreateRelease(createReleaseContent);
         }
 
@@ -151,19 +136,11 @@ namespace LCT.Facade
 
         public async Task<HttpResponseMessage> UpdateRelease(string releaseId, HttpContent httpContent)
         {
-            if (m_TestMode)
-            {
-                return new HttpResponseMessage(HttpStatusCode.OK);
-            }
             return await m_sw360ApiCommunication.UpdateRelease(releaseId, httpContent);
         }
 
         public async Task<HttpResponseMessage> UpdateComponent(string componentId, HttpContent httpContent)
         {
-            if (m_TestMode)
-            {
-                return new HttpResponseMessage(HttpStatusCode.OK);
-            }
             return await m_sw360ApiCommunication.UpdateComponent(componentId, httpContent);
         }
 

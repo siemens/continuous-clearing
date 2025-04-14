@@ -229,12 +229,9 @@ namespace LCT.SW360PackageCreator
             string sw360Url = appSettings.SW360.URL;
             string bomGenerationPath = appSettings.Directory.OutputFolder;
             Logger.Debug($"Bom Generation Path - {bomGenerationPath}");
-           
-            // create component and package in sw360
-            if (!appSettings.IsTestMode)
-            {                
-                await CreateComponent(creatorHelper, sw360CreatorService, parsedBomData, sw360Url, appSettings,packageCreater, sw360Service);
-            }
+
+            // create component in sw360
+            await CreateComponent(creatorHelper, sw360CreatorService, parsedBomData, sw360Url, appSettings, packageCreater, sw360Service);
             var alreadyLinkedReleases = await GetAlreadyLinkedReleasesByProjectId(appSettings.SW360.ProjectID, sw360ProjectService);
 
             var manuallyLinkedReleases = await GetManuallyLinkedReleasesFromProject(alreadyLinkedReleases);
