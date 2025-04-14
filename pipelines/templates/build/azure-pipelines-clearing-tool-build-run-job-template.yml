@@ -1,0 +1,83 @@
+# --------------------------------------------------------------------------------------------------------------------
+# SPDX-FileCopyrightText: 2025 Siemens AG
+#
+#  SPDX-License-Identifier: MIT
+# -------------------------------------------------------------------------------------------------------------------- 
+
+parameters:
+  - name: jobName
+    type: string
+
+  - name: jobDisplayName
+    type: string
+
+  - name: templatePath
+    type: string
+
+  # SW360 and Fossology
+  - name: sw360Url
+    type: string
+
+  - name: sw360Token
+    type: string
+
+  - name: sw360ProjectId
+    type: string
+
+  - name: sw360ProjectName
+    type: string
+
+  - name: fossologyUrl
+    type: string
+
+  # JFrog
+  - name: JfrogUrl
+    type: string
+
+  - name: JfrogToken
+    type: string
+
+  - name: JfrogDryRun
+    type: boolean
+    default: true
+
+  # CA Tool
+  - name: projectDefinitions
+    type: object
+
+  - name: outputFolder
+    type: string
+
+  - name: appSettingsPath
+    type: string
+
+jobs:
+  - job: ${{ parameters.jobName }}
+    displayName: ${{ parameters.jobDisplayName }}
+    steps:
+      - checkout: self
+      - checkout: git://Continuous-Clearing/ca-tool-config-and-testdata@refs/heads/main
+
+      - template: ../azure-pipelines-start-sw360-fossology-containers-template.yml
+        parameters:
+          dockerRegistry: $(JFROG_DOCKER_REGISTRY)
+          sw360DockerImage: $(SW360_DOCKER_IMAGE)
+          fossologyDockerImage: $(FOSSOLOGY_DOCKER_IMAGE)
+          sw360Port: $(SW360_PORT)
+          fossologyPort: $(FOSSOLOGY_PORT)
+          sw360Url: ${{ parameters.sw360Url }}
+          sw360Token: ${{ parameters.sw360Token }}
+
+      - template: ${{ parameters.templatePath }}
+        parameters:
+          sw360Url: ${{ parameters.sw360Url }}
+          sw360Token: ${{ parameters.sw360Token }}
+          sw360ProjectId: ${{ parameters.sw360ProjectId }}
+          sw360ProjectName: ${{ parameters.sw360ProjectName }}
+          fossologyUrl: ${{ parameters.fossologyUrl }}
+          JfrogUrl: ${{ parameters.JfrogUrl }}
+          JfrogToken: ${{ parameters.JfrogToken }}
+          JfrogDryRun: ${{ parameters.JfrogDryRun }}
+          projectDefinitions: ${{ parameters.projectDefinitions }}
+          outputFolder: ${{ parameters.outputFolder }}
+          appSettingsPath: ${{ parameters.appSettingsPath }}

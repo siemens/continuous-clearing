@@ -31,7 +31,9 @@ namespace LCT.Common
         {
             LoggerRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
             XmlConfigurator.Configure(LoggerRepository, new FileInfo(GetDefaultLogConfigFile()));
-            string logPath = CatoolLogPath = Path.Combine(CatoolCurrentDirectory, logFolder, logFileName);
+            string logPath = CatoolLogPath = Path.IsPathRooted(logFolder)
+                                                ? Path.Combine(logFolder, logFileName)
+                                                : Path.Combine(CatoolCurrentDirectory, logFolder, logFileName);
 
             if (LoggerRepository is Hierarchy rootRepo)
             {

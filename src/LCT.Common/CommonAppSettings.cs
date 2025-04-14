@@ -82,19 +82,6 @@ namespace LCT.Common
             }
 
         }
-
-        public string LogFolderPath
-        {
-            get
-            {
-                return m_LogFolderPath;
-            }
-            set
-            {
-                folderAction.ValidateFolderPath(value);
-                m_LogFolderPath = value;
-            }
-        }
     }
     public class Telemetry
     {
@@ -215,6 +202,7 @@ namespace LCT.Common
         private readonly IFileOperations fileOperations;
         private string m_InputFolder;
         private string m_OutputFolder;
+        private string m_LogFolder;
 
         public Directory(IFolderAction folderAction, IFileOperations fileOperations)
         {
@@ -254,6 +242,26 @@ namespace LCT.Common
                 catch (DirectoryNotFoundException)
                 {
                     System.IO.Directory.CreateDirectory(m_OutputFolder);
+                }
+            }
+        }
+
+        public string LogFolder
+        {
+            get
+            {
+                return m_LogFolder;
+            }
+            set
+            {
+                try
+                {
+                    m_LogFolder = value;
+                    folderAction.ValidateFolderPath(value);
+                }
+                catch(DirectoryNotFoundException)
+                {
+                    System.IO.Directory.CreateDirectory(m_LogFolder);
                 }
             }
         }
