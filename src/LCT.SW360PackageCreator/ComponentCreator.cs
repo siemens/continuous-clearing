@@ -399,7 +399,7 @@ namespace LCT.SW360PackageCreator
                 {
                     item.FossologyUploadStatus = Dataconstant.NotUploaded;
                     Logger.Logger.Log(null, Level.Debug, $"\tFossology upload failed  for Release : Name - {formattedName} ," +
-                        $" version - {item.Version},Fossology has a wait time so re run the pipeline", null);                    
+                        $" version - {item.Version},Fossology has a wait time so re run the pipeline", null);
                 }
                 else
                 {
@@ -501,7 +501,7 @@ namespace LCT.SW360PackageCreator
             string uploadId = string.Empty;
             try
             {
-                CheckFossologyProcess fossResult = await sw360CreatorService.CheckFossologyProcessStatus(link);                
+                CheckFossologyProcess fossResult = await sw360CreatorService.CheckFossologyProcessStatus(link);
                 if (!string.IsNullOrEmpty(fossResult?.FossologyProcessInfo?.ExternalTool))
                 {
                     uploadId = fossResult.FossologyProcessInfo?.ProcessSteps[0]?.ProcessStepIdInTool;

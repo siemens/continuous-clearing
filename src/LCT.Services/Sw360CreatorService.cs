@@ -787,7 +787,7 @@ namespace LCT.Services
             catch (HttpRequestException ex)
             {
                 Logger.Debug($"TriggerFossologyProcessForValidation():", ex);
-                Logger.Error($"Fossology process failed.{ex}");
+                Logger.Error($"Fossology process failed.Please check fossology configuration or Token in sw360");
                 environmentHelper.CallEnvironmentExit(-1);
             }
             catch (InvalidOperationException ex)
