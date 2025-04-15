@@ -90,7 +90,60 @@ namespace LCT.Telemetry.UTest
         {
             Assert.Throws<NotSupportedException>(() => new LCT.Telemetry.Telemetry("InvalidType", configuration));
         }
+        [Test]
+        public void GetHashString_InputIsNull_ReturnsEmptyString()
+        {
+            // Arrange
+            string input = null;
 
+            // Act
+            string result = HashUtility.GetHashString(input);
+
+            // Assert
+            Assert.AreEqual(string.Empty, result);
+        }
+
+        [Test]
+        public void GetHashString_InputIsEmpty_ReturnsEmptyString()
+        {
+            // Arrange
+            string input = string.Empty;
+
+            // Act
+            string result = HashUtility.GetHashString(input);
+
+            // Assert
+            Assert.AreEqual(string.Empty, result);
+        }
+
+        [Test]
+        public void GetHashString_ValidInput_ReturnsExpectedHash()
+        {
+            // Arrange
+            string input = "test";
+            string expectedHash = "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"; // Precomputed SHA256 hash for "test"
+
+            // Act
+            string result = HashUtility.GetHashString(input);
+
+            // Assert
+            Assert.AreEqual(expectedHash, result);
+        }
+
+        [Test]
+        public void GetHashString_DifferentInputs_ReturnDifferentHashes()
+        {
+            // Arrange
+            string input1 = "test1";
+            string input2 = "test2";
+
+            // Act
+            string result1 = HashUtility.GetHashString(input1);
+            string result2 = HashUtility.GetHashString(input2);
+
+            // Assert
+            Assert.AreNotEqual(result1, result2);
+        }
 
     }
 }

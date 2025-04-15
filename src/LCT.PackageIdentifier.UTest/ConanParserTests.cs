@@ -13,6 +13,7 @@ using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using Moq;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
@@ -321,6 +322,83 @@ namespace LCT.PackageIdentifier.UTest
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
+        }
+
+        [Test]
+        public void CreateFileForMultipleVersions_GivenComponentsWithMultipleVersions_CreatesFileSuccessfully()
+        {
+            // Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string OutFolder = Path.GetDirectoryName(exePath);
+
+            var componentsWithMultipleVersions = new List<Component>
+            {
+                new Component { Name = "ComponentA", Version = "1.0.0", Description = "DescriptionA" },
+                new Component { Name = "ComponentA", Version = "2.0.0", Description = "DescriptionA" },
+                new Component { Name = "ComponentB", Version = "1.0.0", Description = "DescriptionB" },
+                new Component { Name = "ComponentB", Version = "2.0.0", Description = "DescriptionB" }
+            };
+
+            var folderAction = new Mock<IFolderAction>();
+            var fileOperations = new Mock<IFileOperations>();
+            var appSettings = new CommonAppSettings(folderAction.Object, fileOperations.Object)
+            {
+                Directory = new LCT.Common.Directory(folderAction.Object, fileOperations.Object)
+                {
+                    OutputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
+                }
+            };
+
+            // Act
+            ConanProcessor.CreateFileForMultipleVersions(componentsWithMultipleVersions, appSettings);
+
+            // Assert
+            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles", "ContinuousClearing_Multipleversions.json"));
+            Assert.IsTrue(File.Exists(filePath), "The file was not created.");
+        }
+
+        [Test]
+        public void CreateFileForMultipleVersions_FileAlreadyExists_UpdatesFileSuccessfully()
+        {
+            // Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string outputFolder = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
+            string filePath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles", "ContinuousClearing_Multipleversions.json"));
+
+            // Create an initial file with some content
+            var initialContent = new MultipleVersions
+            {
+                Conan = new List<MultipleVersionValues>
+                {
+                    new MultipleVersionValues { ComponentName = "InitialComponent", ComponentVersion = "1.0.0", PackageFoundIn = "InitialDescription" }
+                }
+            };
+            File.WriteAllText(filePath, JsonConvert.SerializeObject(initialContent));
+
+            var componentsWithMultipleVersions = new List<Component>
+            {
+                new Component { Name = "ComponentA", Version = "1.0.0", Description = "DescriptionA" },
+                new Component { Name = "ComponentA", Version = "2.0.0", Description = "DescriptionA" },
+                new Component { Name = "ComponentB", Version = "1.0.0", Description = "DescriptionB" },
+                new Component { Name = "ComponentB", Version = "2.0.0", Description = "DescriptionB" }
+            };
+
+            var folderAction = new Mock<IFolderAction>();
+            var fileOperations = new Mock<IFileOperations>();
+            var appSettings = new CommonAppSettings(folderAction.Object, fileOperations.Object)
+            {
+                Directory = new LCT.Common.Directory(folderAction.Object, fileOperations.Object)
+                {
+                    OutputFolder = outputFolder
+                }
+            };
+
+            // Act
+            ConanProcessor.CreateFileForMultipleVersions(componentsWithMultipleVersions, appSettings);
+
+            // Assert
+            Assert.IsTrue(File.Exists(filePath), "The file was not created.");
         }
     }
 }

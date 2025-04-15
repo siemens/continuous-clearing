@@ -1,0 +1,82 @@
+# --------------------------------------------------------------------------------------------------------------------
+# SPDX-FileCopyrightText: 2025 Siemens AG
+#
+#  SPDX-License-Identifier: MIT
+# -------------------------------------------------------------------------------------------------------------------- 
+
+parameters:
+  - name: projectType
+    type: string
+  - name: inputFolder
+    type: string
+
+steps:
+  - ${{ if eq(parameters.projectType, 'debian') }}:
+      - task: PowerShell@2
+        displayName: 'Run Syft for Debian to generate SBOM'
+        inputs:
+          targetType: 'inline'
+          script: |
+            $inputImageDir = "${{ parameters.inputFolder }}/InputImage"
+            $inputDir = "${{ parameters.inputFolder }}/InputDirectory"
+            
+            if (-not (Test-Path -Path $inputImageDir)) {
+              New-Item -ItemType Directory -Path $inputImageDir | Out-Null
+              Write-Host "Created InputImage directory: $inputImageDir"
+            }
+
+            if (-not (Test-Path -Path $inputDir)) {
+              New-Item -ItemType Directory -Path $inputDir | Out-Null
+              Write-Host "Created InputDirectory: $inputDir"
+            }
+
+            $imageFile = "$inputImageDir/debian.tar"
+            Write-Host "Pulling Debian image..."
+            
+            docker pull debian:latest
+            docker save -o $imageFile debian:latest
+            Write-Host "Debian image saved as $imageFile"
+
+            docker run --rm `
+              -v ${inputImageDir}:/tmp/InputImages `
+              -v ${inputDir}:/tmp/OutputFiles `
+              ca-tool `
+              /opt/DebianImageClearing/./syft packages `
+              /tmp/InputImages/debian.tar `
+              -o cyclonedx-json `
+              --file "/tmp/OutputFiles/debian_sbom.cdx.json"
+
+  - ${{ if eq(parameters.projectType, 'alpine') }}:
+      - task: PowerShell@2
+        displayName: 'Run Syft for Alpine to generate SBOM'
+        inputs:
+          targetType: 'inline'
+          script: |
+            $inputImageDir = "${{ parameters.inputFolder }}/InputImage"
+            $inputDir = "${{ parameters.inputFolder }}/InputDirectory"
+            
+            if (-not (Test-Path -Path $inputImageDir)) {
+              New-Item -ItemType Directory -Path $inputImageDir | Out-Null
+              Write-Host "Created InputImage directory: $inputImageDir"
+            }
+
+            if (-not (Test-Path -Path $inputDir)) {
+              New-Item -ItemType Directory -Path $inputDir | Out-Null
+              Write-Host "Created InputDirectory: $inputDir"
+            }
+
+            $imageFile = "$inputImageDir/alpine.tar"
+            Write-Host "Pulling Alpine image..."
+            
+            docker pull alpine:latest
+            docker save -o $imageFile alpine:latest
+            Write-Host "Alpine image saved as $imageFile"
+
+            docker run --rm `
+              -v ${inputImageDir}:/tmp/InputImages `
+              -v ${inputDir}:/tmp/OutputFiles `
+              ca-tool `
+              /opt/DebianImageClearing/./syft packages `
+              /tmp/InputImages/alpine.tar `
+              -o cyclonedx-json `
+              --file "/tmp/OutputFiles/alpine_sbom.cdx.json"
