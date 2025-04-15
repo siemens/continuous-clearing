@@ -926,7 +926,7 @@ namespace LCT.PackageIdentifier
                 }
                 catch (Exception ex)
                 {
-                    Logger.Debug($"Error while DetectDeploymentType: {ex.Message}");
+                    Logger.Debug($"Error while Detecting Deployment Type: {ex.Message}");
                 }
             }
 
