@@ -93,13 +93,13 @@ namespace LCT.PackageIdentifier
         #endregion
 
         #region private methods
-        private static Type? LoadAssembly()
+        private static Type LoadAssembly()
         {
             Assembly componentDetectionAssembly = Assembly.Load("Microsoft.ComponentDetection.Detectors");
             return componentDetectionAssembly.GetType("Microsoft.ComponentDetection.Detectors.NuGet.FrameworkPackages");
         }
 
-        private MethodInfo? GetFrameworkPackagesMethod(Type frameworkPackagesType)
+        private MethodInfo GetFrameworkPackagesMethod(Type frameworkPackagesType)
         {
             var methods = frameworkPackagesType.GetMethods(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
             if (methods != null && methods.Any(m => m.Name == "GetFrameworkPackages"))
@@ -109,7 +109,7 @@ namespace LCT.PackageIdentifier
             return null;
         }
 
-        private void InvokeGetFrameworkPackagesMethod(MethodInfo getFrameworkPackagesMethod, NuGetFramework targetFramework, string[] frameworkReferences, LockFileTarget? lockFileTarget)
+        private void InvokeGetFrameworkPackagesMethod(MethodInfo getFrameworkPackagesMethod, NuGetFramework targetFramework, string[] frameworkReferences, LockFileTarget lockFileTarget)
         {
             object[] parameters = { targetFramework, frameworkReferences, lockFileTarget };
             var result = getFrameworkPackagesMethod.Invoke(null, parameters);
