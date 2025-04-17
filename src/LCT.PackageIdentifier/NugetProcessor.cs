@@ -16,9 +16,11 @@ using LCT.PackageIdentifier.Model;
 using LCT.PackageIdentifier.Model.NugetModel;
 using LCT.Services.Interface;
 using log4net;
+using Microsoft.ComponentDetection.Contracts.TypedComponent;
 using Newtonsoft.Json;
 using NuGet.ProjectModel;
 using NuGet.Versioning;
+using PackageUrl;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -39,14 +41,18 @@ namespace LCT.PackageIdentifier
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
         private readonly ICycloneDXBomParser _cycloneDXBomParser;
         private readonly IFrameworkPackages _frameworkPackages;
+        private readonly ICompositionBuilder _compositionBuilder;
         private static Dictionary<string, Dictionary<string, NuGetVersion>> _listofFrameworkPackages;
+        private static Dictionary<string, Dictionary<string, NuGetVersion>> _listofFrameworkPackagesInInputFiles;
         private bool isSelfContainedProject = false;
 
-        public NugetProcessor(ICycloneDXBomParser cycloneDXBomParser, IFrameworkPackages frameworkPackages)
+        public NugetProcessor(ICycloneDXBomParser cycloneDXBomParser, IFrameworkPackages frameworkPackages, ICompositionBuilder compositionBuilder)
         {
             _frameworkPackages = frameworkPackages;
             _cycloneDXBomParser = cycloneDXBomParser;
             _listofFrameworkPackages = new Dictionary<string, Dictionary<string, NuGetVersion>>();
+            _listofFrameworkPackagesInInputFiles = new Dictionary<string, Dictionary<string, NuGetVersion>>();
+            _compositionBuilder = compositionBuilder;
         }
 
         #region public methods
@@ -71,6 +77,7 @@ namespace LCT.PackageIdentifier
             CheckForMultipleVersions(appSettings, componentsWithMultipleVersions);
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
             bom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(bom.Components, bom.Dependencies);
+            AddCompositionDetails(bom);
             Logger.Debug($"ParsePackageFile():End");
             return bom;
         }
@@ -699,7 +706,6 @@ namespace LCT.PackageIdentifier
 
         private static void CheckForMultipleVersions(CommonAppSettings appSettings, List<Component> componentsWithMultipleVersions)
         {
-
             if (componentsWithMultipleVersions.Count != 0)
             {
                 CreateFileForMultipleVersions(componentsWithMultipleVersions, appSettings);
@@ -813,7 +819,6 @@ namespace LCT.PackageIdentifier
                         Version = lst.Value.Version,
                         Dependencies = depvalue,
                         Filepath = configFile,
-                        //IsDev = lst.Value.Scope.ToString() == "DevDependency" ? "true" : "false",
                         IsDev = lst.Value.Scope.ToString() == "DevDependency" || (!isSelfContainedProject && IsFrameworkDependentComponent(lst.Value.Name, lst.Value.Version, uniqueFrameworkKeys)) ? "true" : "false",
                     });
                 }
@@ -836,17 +841,48 @@ namespace LCT.PackageIdentifier
 
         private bool IsFrameworkDependentComponent(string name, string version, List<string> uniqueFrameworkKeys)
         {
+            // Check if the component is already added to the input files list
+            bool isAlreadyAddedToInputFilesList = uniqueFrameworkKeys
+                .Select(key => key.Split('-')[0]) // Extract runtime
+                .Where(runtime => _listofFrameworkPackagesInInputFiles.ContainsKey(runtime)) // Ensure runtime exists
+                .SelectMany(runtime => _listofFrameworkPackagesInInputFiles[runtime])
+                .Any(frameworkPackage => frameworkPackage.Key == name && frameworkPackage.Value.ToNormalizedString() == version);
+
+            if (isAlreadyAddedToInputFilesList)
+            {
+                return true;
+            }
+
+            // Check if the component is framework-dependent
             bool isFrameworkDependent = uniqueFrameworkKeys
                 .SelectMany(key => _listofFrameworkPackages[key])
                 .Any(frameworkPackage => frameworkPackage.Key == name && frameworkPackage.Value.ToNormalizedString() == version);
 
             if (isFrameworkDependent)
             {
-                string frameworkTarget = uniqueFrameworkKeys.FirstOrDefault(key => _listofFrameworkPackages[key].ContainsKey(name));
-                Logger.Debug($"Framework dependent component found: {name} {version} for target framework: {frameworkTarget}");
+                foreach (var frameworkKey in uniqueFrameworkKeys)
+                {
+                    string runtime = frameworkKey.Split('-')[0];
+                    if (_listofFrameworkPackages[frameworkKey].ContainsKey(name) &&
+                        _listofFrameworkPackages[frameworkKey][name].ToNormalizedString() == version)
+                    {
+                        if (!_listofFrameworkPackagesInInputFiles.ContainsKey(runtime))
+                        {
+                            _listofFrameworkPackagesInInputFiles[runtime] = new Dictionary<string, NuGetVersion>();
+                        }
+
+                        if (!_listofFrameworkPackagesInInputFiles[runtime].ContainsKey(name))
+                        {
+                            _listofFrameworkPackagesInInputFiles[runtime][name] = NuGetVersion.Parse(version);
+                            Logger.Debug($"Framework dependent component added: {name} {version} for target framework: {frameworkKey}");
+                        }
+                    }
+                }
             }
+
             return isFrameworkDependent;
         }
+
 
         private void GetFrameworkPackagesForAllConfigLockFiles(List<string> configFiles)
         {
@@ -931,6 +967,30 @@ namespace LCT.PackageIdentifier
             }
 
             return isSelfContained || isSingleFile;
+        }
+
+        private void AddCompositionDetails(Bom bom)
+        {
+            int totalCount = 0;
+            // Remove duplicates in _listofFrameworkPackagesInInputFiles
+            foreach (var frameworkKey in _listofFrameworkPackagesInInputFiles.Keys.ToList())
+            {
+                var uniquePackages = _listofFrameworkPackagesInInputFiles[frameworkKey]
+                    .GroupBy(package => package.Key)
+                    .ToDictionary(group => group.Key, group => group.First().Value);
+
+                if (uniquePackages.Count != _listofFrameworkPackagesInInputFiles[frameworkKey].Count)
+                {
+                    Logger.Debug($"AddCompositionDetails: Removed {_listofFrameworkPackagesInInputFiles[frameworkKey].Count - uniquePackages.Count} duplicate packages for framework '{frameworkKey}'.");
+                }
+
+                _listofFrameworkPackagesInInputFiles[frameworkKey] = uniquePackages;
+                totalCount = totalCount + uniquePackages.Count;
+            }
+
+            Logger.Warn($"Total Framework packages marked as development dependencies: {totalCount}");
+            // Add compositions to the BOM
+            _compositionBuilder.AddCompositionsToBom(bom, _listofFrameworkPackagesInInputFiles);
         }
 
         #endregion

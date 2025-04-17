@@ -74,6 +74,7 @@ namespace LCT.PackageIdentifier
             services.AddTransient<ICycloneDXBomParser, CycloneDXBomParser>();
             services.AddTransient<IBomCreator, BomCreator>();
             services.AddTransient<Program>();
+            services.AddScoped<ICompositionBuilder, CompositionBuilder>();
         }
 
         public async Task Run(string[] args)

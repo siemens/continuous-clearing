@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <PackageReference Include="CycloneDX.Utils" Version="5.2.0" />
+    <PackageReference Include="NuGet.Versioning" Version="6.10.0" />
   </ItemGroup>
 
   <ItemGroup>
