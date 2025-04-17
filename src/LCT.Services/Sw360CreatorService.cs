@@ -16,6 +16,7 @@ using LCT.Services.Interface;
 using LCT.Services.Model;
 using log4net;
 using Newtonsoft.Json;
+using Spectre.Console;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -105,7 +106,7 @@ namespace LCT.Services
         }
 
 
-        public async Task<FossTriggerStatus> TriggerFossologyProcess(string releaseId, string sw360link)
+        public async Task<FossTriggerStatus> TriggerFossologyProcess(string releaseId, string sw360link,TreeNode fossologyNode)
         {
             FossTriggerStatus fossTriggerStatus = null;
             try
@@ -115,7 +116,7 @@ namespace LCT.Services
             }
             catch (HttpRequestException ex)
             {
-                ExceptionHandling.FossologyException(ex);
+                ExceptionHandling.FossologyException(ex, fossologyNode);
 
             }
 

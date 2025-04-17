@@ -29,6 +29,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using UnitTestUtilities;
+using Spectre.Console;
 
 
 namespace LCT.SW360PackageCreator.UTest
@@ -226,14 +227,16 @@ namespace LCT.SW360PackageCreator.UTest
                 SW360 = new SW360() { URL = "http://localhost:8081/" },
                 Directory = new Common.Directory(folderAction, fileOperations)
             };
-            sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(fossTriggerStatus);
+            Tree tree = new Tree("");
+            var fossologyNode = tree.AddNode("");
+            sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TreeNode>())).ReturnsAsync(fossTriggerStatus);
 
 
             //Act
-            await ComponentCreator.TriggerFossologyProcess(item, sw360CreatorServiceMock.Object, appSettings);
+            await ComponentCreator.TriggerFossologyProcess(item, sw360CreatorServiceMock.Object, appSettings, fossologyNode);
 
             // Assert
-            sw360CreatorServiceMock.Verify(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()), Times.AtLeastOnce);
+            sw360CreatorServiceMock.Verify(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TreeNode>()), Times.AtLeastOnce);
 
         }
 
@@ -249,7 +252,8 @@ namespace LCT.SW360PackageCreator.UTest
                 Version = "1",
                 ReleaseID = "89768ae1b0ea9dc061328b8f32792cbd"
             };
-
+            Tree tree = new Tree("");
+            var fossologyNode = tree.AddNode("");
             IFolderAction folderAction = new FolderAction();
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings()
@@ -257,11 +261,11 @@ namespace LCT.SW360PackageCreator.UTest
                 SW360 = new SW360() { URL = "http://localhost:8081/" },
                 Directory = new Common.Directory(folderAction, fileOperations)
             };
-            sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>())).ThrowsAsync(new AggregateException());
+            sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TreeNode>())).ThrowsAsync(new AggregateException());
 
 
             //Act
-            string value = await ComponentCreator.TriggerFossologyProcess(item, sw360CreatorServiceMock.Object, appSettings);
+            string value = await ComponentCreator.TriggerFossologyProcess(item, sw360CreatorServiceMock.Object, appSettings, fossologyNode);
 
             // Assert
             Assert.That(string.IsNullOrEmpty(value));
@@ -498,9 +502,9 @@ namespace LCT.SW360PackageCreator.UTest
             var releaseIdToLink = "12345";
 
             var componentCreator = new ComponentCreator();
-
+            Tree rootNode=new Tree("");
             // Act
-            componentCreator.AddReleaseIdToLink(item, releaseIdToLink);
+            componentCreator.AddReleaseIdToLink(item, releaseIdToLink, rootNode);
 
             // Assert
             Assert.AreEqual(1, componentCreator.ReleasesFoundInCbom.Count);
@@ -521,9 +525,9 @@ namespace LCT.SW360PackageCreator.UTest
             string releaseIdToLink = null;
 
             var componentCreator = new ComponentCreator();
-
+            Tree rootNode = new Tree("");
             // Act & Assert
-            componentCreator.AddReleaseIdToLink(item, releaseIdToLink);
+            componentCreator.AddReleaseIdToLink(item, releaseIdToLink, rootNode);
             Assert.Pass();
         }
 
@@ -677,13 +681,14 @@ namespace LCT.SW360PackageCreator.UTest
             {
                 ReleaseID = "releaseId"
             };
-
+            Tree tree = new Tree("");
+            var fossologyNode = tree.AddNode("");
             var sw360CreatorServiceMock = new Mock<ISw360CreatorService>();
-            sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()))
+            sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TreeNode>()))
                 .ThrowsAsync(new AggregateException());
 
             // Act
-            var uploadId = await ComponentCreator.TriggerFossologyProcess(item, sw360CreatorServiceMock.Object, new CommonAppSettings() { SW360 = new SW360() });
+            var uploadId = await ComponentCreator.TriggerFossologyProcess(item, sw360CreatorServiceMock.Object, new CommonAppSettings() { SW360 = new SW360() }, fossologyNode);
 
             // Assert
             Assert.AreEqual(string.Empty, uploadId);
@@ -697,14 +702,15 @@ namespace LCT.SW360PackageCreator.UTest
             {
                 ReleaseID = "releaseId"
             };
-
+            Tree tree = new Tree("");
+            var fossologyNode = tree.AddNode("");
             ProcessSteps processSteps = new ProcessSteps
             {
                 ProcessStepIdInTool = "uploadId"
             };
             var steps = new List<ProcessSteps>() { processSteps };
             var sw360CreatorServiceMock = new Mock<ISw360CreatorService>();
-            sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()))
+            sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TreeNode>()))
                 .ReturnsAsync(new FossTriggerStatus
                 {
                     Links = new Links
@@ -728,7 +734,7 @@ namespace LCT.SW360PackageCreator.UTest
 
 
             // Act
-            var uploadId = await ComponentCreator.TriggerFossologyProcess(item, sw360CreatorServiceMock.Object, new CommonAppSettings() { SW360 = new SW360() });
+            var uploadId = await ComponentCreator.TriggerFossologyProcess(item, sw360CreatorServiceMock.Object, new CommonAppSettings() { SW360 = new SW360() }, fossologyNode);
 
             // Assert
             Assert.AreEqual("uploadId", uploadId);

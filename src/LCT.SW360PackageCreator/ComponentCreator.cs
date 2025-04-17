@@ -281,12 +281,13 @@ namespace LCT.SW360PackageCreator
         private async Task CreateComponent(ICreatorHelper creatorHelper,
             ISw360CreatorService sw360CreatorService, List<ComparisonBomData> componentsToBoms,
             string sw360Url, CommonAppSettings appSettings,IPackageCreater packageCreater,ISW360Service sW360Service)
-        {           
+        {
+            Logger.Logger.Log(null, Level.Notice, $"No of Unique and Valid components read from Comparison BOM = {componentsToBoms.Count} ", null);
 
             try
             {
                 foreach (ComparisonBomData item in componentsToBoms)
-                {                   
+                {                    
                     await packageCreater.CreatePackageInSw360(appSettings, sw360CreatorService, item, sW360Service);
                     await CreateComponentAndRealease(creatorHelper, sw360CreatorService, item, sw360Url, appSettings);                    
                 }
@@ -381,31 +382,37 @@ namespace LCT.SW360PackageCreator
             ISw360CreatorService sw360CreatorService, ComparisonBomData item, string sw360Url, CommonAppSettings appSettings)
         {
             Logger.Debug($"Reading Component Name - {item.Name} , version - {item.Version}");
-            
-            await CreateComponentAndReleaseWhenNotAvailable(item, sw360CreatorService, creatorHelper, appSettings);
-
-            await CreateReleaseWhenNotAvailable(item, sw360CreatorService, creatorHelper, appSettings);
-
-            await ComponentAndReleaseAvailable(item, sw360Url, sw360CreatorService, appSettings);
+            Tree rootNode = new Tree("");
+            if (!string.IsNullOrEmpty(item.SW360Name))
+            {
+                rootNode.AddNode($"[green]PurlId found in Known-purl file :SW360Name - {item.SW360Name},Name - {item.PackageName} , version - {item.Version}[/]");
+                Logger.Logger.Log(null, Level.Debug, $"PurlId found in Known-purl file :SW360Name - {item.SW360Name},Name - {item.PackageName} , version - {item.Version}", null);
+            }
+            else
+            {
+                rootNode.AddNode($"[yellow]PurlId not found in Known-purl file : Name - {item.PackageName} , version - {item.Version}[/]");
+                Logger.Logger.Log(null, Level.Debug, $"PurlId not found in Known-purl file : Name - {item.PackageName} , version - {item.Version}", null);
+            }
+            await CreateComponentAndReleaseWhenNotAvailable(item, sw360CreatorService, creatorHelper, appSettings, rootNode);
+            await CreateReleaseWhenNotAvailable(item, sw360CreatorService, creatorHelper, appSettings, rootNode);
+            await ComponentAndReleaseAvailable(item, sw360Url, sw360CreatorService, appSettings, rootNode);
+            AnsiConsole.Write(rootNode);
         }
         
 
         private async Task CreateComponentAndReleaseWhenNotAvailable(ComparisonBomData item,
-            ISw360CreatorService sw360CreatorService, ICreatorHelper creatorHelper, CommonAppSettings appSettings)
+            ISw360CreatorService sw360CreatorService, ICreatorHelper creatorHelper, CommonAppSettings appSettings, Tree rootNode)
         {
             if (item.ComponentStatus == Dataconstant.NotAvailable && item.ReleaseStatus == Dataconstant.NotAvailable)
-            {
-                Tree tree = new Tree("");
-                if (!string.IsNullOrEmpty(item.SW360Name) && string.IsNullOrEmpty(item.ReleaseID))
+            {                
+                if (!string.IsNullOrEmpty(item.SW360Name) && item.ComponentStatus == Dataconstant.NotAvailable)
                 {
-                    tree.AddNode($"[red]valid Release not found in Known-purl :SW360Name -{item.SW360Name}, Name - {item.Name} , version - {item.Version}[/]");
-                    AnsiConsole.Write(tree);
+                    rootNode.AddNode($"[red]valid Release not found in SW360 :SW360Name -{item.SW360Name}, Name - {item.PackageName} , version - {item.Version}[/]");                    
                     return;
                 }
-                tree.AddNode($"[white]Creating the Component & Release : Name - {item.Name} , version - {item.Version}[/]");
-                AnsiConsole.Write(tree);
-                Logger.Logger.Log(null, Level.Notice, $"Creating the Component & Release : Name - {item.Name} , version - {item.Version}", null);
-                var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(item);
+                var parentNode= rootNode.AddNode($"[white]Creating the Component & Release : Name - {item.Name} , version - {item.Version}[/]");                
+                Logger.Logger.Log(null, Level.Debug, $"Creating the Component & Release : Name - {item.Name} , version - {item.Version}", null);
+                var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(item,parentNode);
 
                 if (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]) && !attachmentUrlList.ContainsKey("SOURCE"))
                 {
@@ -422,26 +429,27 @@ namespace LCT.SW360PackageCreator
                 item.ReleaseAttachmentLink = createdStatus.ReleaseStatus.AttachmentApiUrl;
                 item.DownloadUrl = !attachmentUrlList.ContainsKey("SOURCE") ? Dataconstant.DownloadUrlNotFound : item.DownloadUrl;
                 if (!string.IsNullOrEmpty(createdStatus.ReleaseStatus.ReleaseIdToLink))
-                    AddReleaseIdToLink(item, createdStatus.ReleaseStatus.ReleaseIdToLink);
+                    AddReleaseIdToLink(item, createdStatus.ReleaseStatus.ReleaseIdToLink, rootNode);
 
                 item.ReleaseID = createdStatus.ReleaseStatus?.ReleaseIdToLink ?? string.Empty;
                 if (!(string.IsNullOrEmpty(item.DownloadUrl) || item.DownloadUrl.Equals(Dataconstant.DownloadUrlNotFound)))
                 {
-                    await TriggeringFossologyUploadAndUpdateAdditionalData(item, sw360CreatorService, appSettings);
+                    await TriggeringFossologyUploadAndUpdateAdditionalData(item, sw360CreatorService, appSettings, parentNode);
                 }
                 UpdatedCompareBomData.Add(item);
             }
         }
 
         private static async Task TriggeringFossologyUploadAndUpdateAdditionalData(ComparisonBomData item,
-            ISw360CreatorService sw360CreatorService, CommonAppSettings appSettings)
+            ISw360CreatorService sw360CreatorService, CommonAppSettings appSettings,TreeNode rootNode)
         {
 
             if (appSettings.SW360.Fossology.EnableTrigger && (item.ApprovedStatus.Equals("NEW_CLEARING") || item.ApprovedStatus.Equals("Not Available")))
             {
-                Logger.Logger.Log(null, Level.Notice, $"\tInitiating FOSSology process for: Release : Name - {item.Name} , version - {item.Version}", null);
+                var fossologyNode= rootNode.AddNode($"[white]Initiating FOSSology process for: Release : Name - {item.Name} , version - {item.Version}[/]");
+                Logger.Logger.Log(null, Level.Debug, $"\tInitiating FOSSology process for: Release : Name - {item.Name} , version - {item.Version}", null);
 
-                string uploadId = await TriggerFossologyProcess(item, sw360CreatorService, appSettings);
+                string uploadId = await TriggerFossologyProcess(item, sw360CreatorService, appSettings, fossologyNode);
                 if (string.IsNullOrEmpty(uploadId))
                 {
                     item.FossologyUploadStatus = Dataconstant.NotUploaded;
@@ -452,7 +460,8 @@ namespace LCT.SW360PackageCreator
                 {
                     item.FossologyUploadStatus = Dataconstant.Uploaded;
                     item.FossologyLink = $"{appSettings.SW360.Fossology.URL}{ApiConstant.FossUploadJobUrlSuffix}{uploadId}";
-                    Logger.Logger.Log(null, Level.Info, $"\tFossology upload successful for Release : Name - {item.Name} , version - {item.Version}", null);
+                    fossologyNode.AddNode($"[green]Fossology upload successful for Release : Name - {item.Name} , version - {item.Version}[/]");
+                    Logger.Logger.Log(null, Level.Debug, $"\tFossology upload successful for Release : Name - {item.Name} , version - {item.Version}", null);
 
                     // Updating foss url in additional data
                     await sw360CreatorService.UdpateSW360ReleaseContent(new Components()
@@ -471,21 +480,23 @@ namespace LCT.SW360PackageCreator
         }
 
         private async Task CreateReleaseWhenNotAvailable(ComparisonBomData item,
-            ISw360CreatorService sw360CreatorService, ICreatorHelper creatorHelper, CommonAppSettings appSettings)
+            ISw360CreatorService sw360CreatorService, ICreatorHelper creatorHelper, CommonAppSettings appSettings, Tree rootNode)
         {
             if (item.ComponentStatus == Dataconstant.Available && item.ReleaseStatus == Dataconstant.NotAvailable)
-            {                
-                Tree tree = new Tree("");
-                if (!string.IsNullOrEmpty(item.SW360Name) && string.IsNullOrEmpty(item.ReleaseID))
+            {
+                TreeNode parentNode;
+                if (!string.IsNullOrEmpty(item.SW360Name))
                 {
-                    tree.AddNode($"[red]valid Release not found in Known-purl :SW360Name -{item.SW360Name}, Name - {item.Name} , version - {item.Version}[/]");
-                    AnsiConsole.Write(tree);
-                    return;
+                    parentNode = rootNode.AddNode($"[white]Creating Release  :SW360Name - {item.SW360Name},Name - {item.PackageName} , version - {item.Version}[/]");
+                    Logger.Logger.Log(null, Level.Debug, $"Creating Release  :SW360Name - {item.SW360Name},Name - {item.PackageName} , version - {item.Version}", null);
                 }
-                tree.AddNode($"[white]Creating Release : Name - {item.Name} , version - {item.Version}[/]");
-                AnsiConsole.Write(tree);
-                Logger.Logger.Log(null, Level.Debug, $"Creating Release : Name - {item.Name} , version - {item.Version}", null);
-                var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(item);
+                else
+                {
+                    parentNode = rootNode.AddNode($"[white]Creating Release : Name - {item.Name} , version - {item.Version}[/]");
+                    Logger.Logger.Log(null, Level.Debug, $"Creating Release : Name - {item.Name} , version - {item.Version}", null);
+                }
+                
+                var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(item,parentNode);
 
                 if (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]) && !attachmentUrlList.ContainsKey("SOURCE"))
                 {
@@ -501,12 +512,12 @@ namespace LCT.SW360PackageCreator
                 item.ReleaseAttachmentLink = releaseCreateStatus.AttachmentApiUrl;
                 item.DownloadUrl = !attachmentUrlList.ContainsKey("SOURCE") ? Dataconstant.DownloadUrlNotFound : item.DownloadUrl;
                 if (!string.IsNullOrEmpty(releaseCreateStatus.ReleaseIdToLink))
-                    AddReleaseIdToLink(item, releaseCreateStatus.ReleaseIdToLink);
+                    AddReleaseIdToLink(item, releaseCreateStatus.ReleaseIdToLink, rootNode);
 
                 item.ReleaseID = releaseCreateStatus.ReleaseIdToLink ?? string.Empty;
                 if (!(string.IsNullOrEmpty(item.DownloadUrl) || item.DownloadUrl.Equals(Dataconstant.DownloadUrlNotFound)))
                 {
-                    await TriggeringFossologyUploadAndUpdateAdditionalData(item, sw360CreatorService, appSettings);
+                    await TriggeringFossologyUploadAndUpdateAdditionalData(item, sw360CreatorService, appSettings, parentNode);
                 }
 
                 UpdatedCompareBomData.Add(item);
@@ -515,7 +526,7 @@ namespace LCT.SW360PackageCreator
         }
 
         public static async Task<string> TriggerFossologyProcess(ComparisonBomData item,
-            ISw360CreatorService sw360CreatorService, CommonAppSettings appSettings)
+            ISw360CreatorService sw360CreatorService, CommonAppSettings appSettings,TreeNode fossologyNode)
         {
             string uploadId = string.Empty;
             try
@@ -524,7 +535,7 @@ namespace LCT.SW360PackageCreator
                 string sw360link = $"{item.Name}:{item.Version}:{appSettings.SW360.URL}{ApiConstant.Sw360ReleaseUrlApiSuffix}" +
                     $"{item.ReleaseID}#/tab-Summary";
 
-                FossTriggerStatus fossResult = await sw360CreatorService.TriggerFossologyProcess(item.ReleaseID, sw360link);
+                FossTriggerStatus fossResult = await sw360CreatorService.TriggerFossologyProcess(item.ReleaseID, sw360link, fossologyNode);
                 if (!string.IsNullOrEmpty(fossResult?.Links?.Self?.Href))
                 {
                     Logger.Debug($"{fossResult.Content?.Message}");
@@ -570,19 +581,26 @@ namespace LCT.SW360PackageCreator
         }
 
         private async Task ComponentAndReleaseAvailable(ComparisonBomData item,
-            string sw360Url, ISw360CreatorService sw360CreatorService, CommonAppSettings appSettings)
+            string sw360Url, ISw360CreatorService sw360CreatorService, CommonAppSettings appSettings, Tree rootNode)
         {
             if (item.ComponentStatus == Dataconstant.Available && item.ReleaseStatus == Dataconstant.Available)
             {
-                Tree tree = new Tree("");
-                tree.AddNode($"[white]Release exists in SW360 : Name - {item.Name} , version - {item.Version}[/]");
-                AnsiConsole.Write(tree);
-                Logger.Logger.Log(null, Level.Debug,$"Release exists in SW360 : Name - {item.Name} , version - {item.Version}", null);
+                TreeNode parentNode;
+                if (!string.IsNullOrEmpty(item.SW360Name))
+                {
+                    parentNode = rootNode.AddNode($"[white]Release exists in SW360  :SW360Name - {item.SW360Name},Name - {item.PackageName} , version - {item.Version}[/]");
+                    Logger.Logger.Log(null, Level.Debug, $"Release exists in SW360  :SW360Name - {item.SW360Name},Name - {item.PackageName} , version - {item.Version}", null);
+                }
+                else
+                {
+                    parentNode = rootNode.AddNode($"[white]Release exists in SW360 : Name - {item.Name} , version - {item.Version}[/]");
+                    Logger.Logger.Log(null, Level.Debug, $"Release exists in SW360 : Name - {item.Name} , version - {item.Version}", null);
+                }                
                 string releaseLink = item.ReleaseLink ?? string.Empty;
                 string releaseId = CommonHelper.GetSubstringOfLastOccurance(releaseLink, "/");
                 if (!string.IsNullOrWhiteSpace(releaseId))
                 {
-                    UpdateAttachmentURLInBOm(sw360Url, item, releaseId);
+                    UpdateAttachmentURLInBOm(sw360Url, item, releaseId, rootNode);
                 }
                 else
                 {
@@ -595,7 +613,7 @@ namespace LCT.SW360PackageCreator
                 item.ReleaseID = releaseId;
                 if (IsReleaseAttachmentExist(releasesInfo))
                 {
-                    await TriggeringFossologyUploadAndUpdateAdditionalData(item, sw360CreatorService, appSettings);
+                    await TriggeringFossologyUploadAndUpdateAdditionalData(item, sw360CreatorService, appSettings, parentNode);
                 }
 
                 await sw360CreatorService.UpdatePurlIdForExistingComponent(item, componentId);
@@ -610,12 +628,12 @@ namespace LCT.SW360PackageCreator
             return releaseAttachments.Any(x => x.AttachmentType.Equals("SOURCE"));
         }
 
-        private void UpdateAttachmentURLInBOm(string sw360Url, ComparisonBomData item, string releaseId)
+        private void UpdateAttachmentURLInBOm(string sw360Url, ComparisonBomData item, string releaseId,Tree rootNode)
         {
             string attachmentUrl = $"{sw360Url}{ApiConstant.Sw360ReleaseApiSuffix}/{releaseId}/{ApiConstant.Attachments}";
             Uri releaseUrl = new Uri(attachmentUrl);
             item.ReleaseAttachmentLink = releaseUrl.AbsoluteUri;
-            AddReleaseIdToLink(item, releaseId);
+            AddReleaseIdToLink(item, releaseId, rootNode);
         }
 
         public static string GetCreatedStatus(bool status)
@@ -623,7 +641,7 @@ namespace LCT.SW360PackageCreator
             return status ? Dataconstant.NewlyCreated : Dataconstant.NotCreated;
         }
 
-        public void AddReleaseIdToLink(ComparisonBomData item, string releaseIdToLink)
+        public void AddReleaseIdToLink(ComparisonBomData item, string releaseIdToLink,Tree rootNode)
         {
             if (!string.IsNullOrWhiteSpace(releaseIdToLink))
             {
@@ -632,9 +650,10 @@ namespace LCT.SW360PackageCreator
             else
             {
                 Environment.ExitCode = -1;
+                rootNode.AddNode($"[red]Linking release to the project is failed.Release version - {item.Version} not found under this component - {item.Name}.[/]");
                 Logger.Fatal($"Linking release to the project is failed. " +
                             $"Release version - {item.Version} not found under this component - {item.Name}. ");
-                Logger.Error($"Linking release to the project is failed. " +
+                Logger.Debug($"Linking release to the project is failed. " +
                           $"Release version - {item.Version} not found under this component - {item.Name}. ");
             }
         }

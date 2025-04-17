@@ -16,6 +16,7 @@ using LCT.SW360PackageCreator.Interfaces;
 using LCT.SW360PackageCreator.Model;
 using Moq;
 using NUnit.Framework;
+using Spectre.Console;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -81,9 +82,10 @@ namespace LCT.SW360PackageCreator.UTest
                 { "NUGET", new PackageDownloader() }
             };
             var creatorHelper = new CreatorHelper(_packageDownloderList);
-
+            Tree rootNode = new Tree("");
+            var parentNode = rootNode.AddNode("");
             //Act
-            var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(lstComparisonBomData);
+            var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(lstComparisonBomData, parentNode);
 
             //Assert
             Assert.That(attachmentUrlList.ContainsKey("SOURCE"));
@@ -421,9 +423,10 @@ namespace LCT.SW360PackageCreator.UTest
                 { "PYTHON", new PackageDownloader() }
             };
             var creatorHelper = new CreatorHelper(_packageDownloderList);
-
+            Tree rootNode = new Tree("");
+            var parentNode = rootNode.AddNode("");
             //Act
-            var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(lstComparisonBomData);
+            var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(lstComparisonBomData, parentNode);
 
             //Assert
             Assert.That(attachmentUrlList.ContainsKey("SOURCE"));
@@ -446,9 +449,10 @@ namespace LCT.SW360PackageCreator.UTest
                 { "PYTHON", new PackageDownloader() }
             };
             var creatorHelper = new CreatorHelper(_packageDownloderList);
-
+            Tree rootNode = new Tree("");
+            var parentNode = rootNode.AddNode("");
             //Act
-            var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(lstComparisonBomData);
+            var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(lstComparisonBomData, parentNode);
 
             //Assert
             Assert.That(attachmentUrlList.IsNullOrEmpty);

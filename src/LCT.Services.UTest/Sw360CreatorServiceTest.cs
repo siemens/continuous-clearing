@@ -25,6 +25,7 @@ using LCT.Common.Constants;
 using LCT.Common.Interface;
 using System.Threading.Tasks;
 using UnitTestUtilities;
+using Spectre.Console;
 
 
 namespace LCT.Services.UTest
@@ -54,14 +55,15 @@ namespace LCT.Services.UTest
             FossTriggerStatus fossTriggerStatus = new FossTriggerStatus();
             fossTriggerStatus.Links = new Links() { Self = new Self() { Href = "fossology upload link" } };
             var fossTriggerStatusSerialized = JsonConvert.SerializeObject(fossTriggerStatus);
-
+            Tree tree = new Tree("");
+            var fossologyNode = tree.AddNode("");
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
             sw360ApiCommMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(fossTriggerStatusSerialized);
             ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object, _environmentHelperMock.Object);
            
             // Act
-            var actual = await sw360CreatorService.TriggerFossologyProcess("eruiuwecsjkdnfuieoyieoeiwu", "sw360link");
+            var actual = await sw360CreatorService.TriggerFossologyProcess("eruiuwecsjkdnfuieoyieoeiwu", "sw360link", fossologyNode);
 
             // Assert
             Assert.That(actual, Is.Not.Null);
@@ -76,10 +78,10 @@ namespace LCT.Services.UTest
                 .Throws<HttpRequestException>();
 
             ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object, _environmentHelperMock.Object);
-
-
+            Tree tree = new Tree("");
+            var fossologyNode = tree.AddNode("");
             // Act
-            var actual = await sw360CreatorService.TriggerFossologyProcess("eruiuwecsjkdnfuieoyieoeiwu", "sw360link");
+            var actual = await sw360CreatorService.TriggerFossologyProcess("eruiuwecsjkdnfuieoyieoeiwu", "sw360link", fossologyNode);
 
             // Assert
             Assert.That(actual, Is.Null);

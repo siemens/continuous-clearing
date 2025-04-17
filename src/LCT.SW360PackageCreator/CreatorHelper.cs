@@ -17,7 +17,9 @@ using LCT.SW360PackageCreator.Interfaces;
 using LCT.SW360PackageCreator.Model;
 using log4net;
 using log4net.Core;
+using Markdig.Extensions.Footnotes;
 using Newtonsoft.Json;
+using Spectre.Console;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -65,7 +67,7 @@ namespace LCT.SW360PackageCreator
             return downloadUrlNotFoundList;
         }
 
-        public async Task<Dictionary<string, string>> DownloadReleaseAttachmentSource(ComparisonBomData component)
+        public async Task<Dictionary<string, string>> DownloadReleaseAttachmentSource(ComparisonBomData component,TreeNode parentNode)
         {
             Dictionary<string, string> AttachmentUrlList = new Dictionary<string, string>();
             string localPathforDownload = GetDownloadPathForComponetType(component);
@@ -76,11 +78,15 @@ namespace LCT.SW360PackageCreator
                 Logger.Debug($"DownloadReleaseAttachmentSource()-Name-{component.Name},version-{component.Version},localPathforDownload-{localPathforDownload}");
 
                 if (string.IsNullOrEmpty(component.SourceUrl) || component.SourceUrl.Equals(Dataconstant.SourceUrlNotFound))
-                    Logger.Warn($"Source URL is not Found for {component.Name}-{component.Version}");
+                {
+                    parentNode.AddNode($"[yellow]Source URL is not Found for {component.Name}-{component.Version}[/]");
+                    Logger.Debug($"Source URL is not Found for {component.Name}-{component.Version}");
+                }
+                    
 
                 if (component.DownloadUrl.Equals(Dataconstant.DownloadUrlNotFound))
                 {
-                    Logger.Warn($"Source file is not attached,Release source Download Url is not Found for {component.Name}-{component.Version}");
+                    parentNode.AddNode($"[yellow]Source file is not attached,Release source Download Url is not Found for {component.Name}-{component.Version}[/]");                    
                     Logger.Debug($"DownloadReleaseAttachmentSource():Source file is not attached,Release source Download Url is not Found for {component.Name}-{component.Version}");
                 }
                 else
@@ -239,7 +245,8 @@ namespace LCT.SW360PackageCreator
                     if (knownPurl.Purls.Contains(component.ComponentExternalId))
                     {
                         Logger.Logger.Log(null, Level.Debug, $"Component {component.Name} with ComponentExternalId {component.ComponentExternalId} matches known PURL for {knownPurl.Sw360Name}", null);
-                        component.SW360Name = knownPurl.Sw360Name; // Assign SW360Name
+                        component.SW360Name = knownPurl.Sw360Name;
+                        component.Name = knownPurl.Sw360Name;
                     }
                 }
             }

@@ -79,12 +79,16 @@ namespace LCT.Services
 
                     if (sw360ComponentsList.Count > 0)
                     {
-                        sw360components = GetComponentExistStatus(componentName, externalIdKey, sw360ComponentsList);
-
-                        if (sw360components.isComponentExist)
+                        if (sw360ComponentsList.Any(release => release.Name.Equals(componentName, StringComparison.OrdinalIgnoreCase)))
                         {
-                            break;
+                            sw360components = GetComponentExistStatus(componentName, externalIdKey, sw360ComponentsList);
+
+                            if (sw360components.isComponentExist)
+                            {
+                                break;
+                            }
                         }
+                        
                     }
                 }
             }
@@ -133,7 +137,6 @@ namespace LCT.Services
                     var responseContent = httpResponseComponent?.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
                     var componentsRelease = JsonConvert.DeserializeObject<ComponentsRelease>(responseContent);
                     var sw360releasesdata = componentsRelease?.Embedded?.Sw360Releases ?? new List<Sw360Releases>();
-
                     //It's for Local Sw360 servers,making an API call with EscapeDataString..
                     if (sw360releasesdata.Count == 0 && releaseExternalId.Contains(Dataconstant.PurlCheck()["NPM"]))
                     {
@@ -143,17 +146,20 @@ namespace LCT.Services
                         componentsRelease = JsonConvert.DeserializeObject<ComponentsRelease>(responseContent);
                         sw360releasesdata = componentsRelease?.Embedded?.Sw360Releases ?? new List<Sw360Releases>();
                     }
-
                     if (sw360releasesdata.Count > 0)
                     {
-                        Releasestatus releaseStatus = GetReleaseExistStatus(releaseName, externalIdKey, sw360releasesdata);
-                        if (releaseStatus.isReleaseExist)
+                        if (sw360releasesdata.Any(release => release.Name.Equals(releaseName, StringComparison.OrdinalIgnoreCase)))
                         {
-                            releasestatus.sw360Releases = releaseStatus.sw360Releases;
-                            releasestatus.isReleaseExist = releaseStatus.isReleaseExist;
-                            break;
+                            Releasestatus releaseStatus = GetReleaseExistStatus(releaseName, externalIdKey, sw360releasesdata);
+                            if (releaseStatus.isReleaseExist)
+                            {
+                                releasestatus.sw360Releases = releaseStatus.sw360Releases;
+                                releasestatus.isReleaseExist = releaseStatus.isReleaseExist;
+                                break;
+                            }
                         }
                     }
+
                 }
             }
             catch (HttpRequestException ex)

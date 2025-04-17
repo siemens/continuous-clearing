@@ -6,7 +6,9 @@
 
 using log4net;
 using log4net.Core;
+using Spectre.Console;
 using System;
+using System.ComponentModel.Design;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -31,15 +33,17 @@ namespace LCT.Common
             }
 
         }
-        public static void FossologyException(HttpRequestException ex)
+        public static void FossologyException(HttpRequestException ex,TreeNode fossologyNode)
         {
             if (500 <= Convert.ToInt32(ex.StatusCode) && Convert.ToInt32(ex.StatusCode) <= 599)
             {
-                Logger.Logger.Log(null, Level.Error, $"\tThe exception may arise because  fossology is currently unresponsive:{ex.Message} Please try again later", null);
+                fossologyNode.AddNode($"[red]The exception may arise because  fossology is currently unresponsive:{ex.Message} Please try again later[/]");
+                Logger.Logger.Log(null, Level.Debug, $"\tThe exception may arise because  fossology is currently unresponsive:{ex.Message} Please try again later", null);
             }
             else
             {
-                Logger.Logger.Log(null, Level.Error, $"\tThe exception may be caused by an incorrect or missing token for  fossology :{ex.Message} Please ensure that a valid token is provided and try again", null);
+                fossologyNode.AddNode($"[red]The exception may be caused by an incorrect or missing token for  fossology :{ex.Message} Please ensure that a valid token is provided and try again[/]");
+                Logger.Logger.Log(null, Level.Debug, $"\tThe exception may be caused by an incorrect or missing token for  fossology :{ex.Message} Please ensure that a valid token is provided and try again", null);
             }
         }
 

@@ -9,6 +9,7 @@ using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.Foss;
 using LCT.Common.Model;
 using LCT.Services.Model;
+using Spectre.Console;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -29,7 +30,7 @@ namespace LCT.Services.Interface
 
         Task<string> GetReleaseIDofComponent(string componentName, string componentVersion, string componentid);
 
-        Task<FossTriggerStatus> TriggerFossologyProcess(string releaseId, string sw360link);
+        Task<FossTriggerStatus> TriggerFossologyProcess(string releaseId, string sw360link,TreeNode fossologyNode);
 
         Task<CheckFossologyProcess> CheckFossologyProcessStatus(string link);
 

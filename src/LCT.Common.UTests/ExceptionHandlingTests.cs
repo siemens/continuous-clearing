@@ -6,6 +6,7 @@
 
 
 using NUnit.Framework;
+using Spectre.Console;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -81,9 +82,10 @@ namespace LCT.Common.UTest
             // Arrange
             var ex = new HttpRequestException();
             ex.HResult = 500;
-
+            Tree tree=new Tree("");
+            var fossologyNode = tree.AddNode("");
             // Act
-            ExceptionHandling.FossologyException(ex);
+            ExceptionHandling.FossologyException(ex, fossologyNode);
 
             // Assert
             // Verify that the error message is logged
@@ -96,10 +98,10 @@ namespace LCT.Common.UTest
             // Arrange
             var ex = new HttpRequestException();
             ex.HResult = 400;
-
-
+            Tree tree = new Tree("");
+            var fossologyNode = tree.AddNode("");
             // Act
-            ExceptionHandling.FossologyException(ex);
+            ExceptionHandling.FossologyException(ex, fossologyNode);
 
             // Assert
             // Verify that the error message is logged

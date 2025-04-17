@@ -9,6 +9,7 @@ using LCT.Common;
 using LCT.Common.Model;
 using LCT.Services.Interface;
 using LCT.SW360PackageCreator.Model;
+using Spectre.Console;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -20,7 +21,7 @@ namespace LCT.SW360PackageCreator.Interfaces
     public interface ICreatorHelper
     {
         public Task<List<ComparisonBomData>> SetContentsForComparisonBOM(List<Components> lstComponentForBOM, ISW360Service sw360Service);
-        public Task<Dictionary<string, string>> DownloadReleaseAttachmentSource(ComparisonBomData component);
+        public Task<Dictionary<string, string>> DownloadReleaseAttachmentSource(ComparisonBomData component,TreeNode parentNode);
         public CreatorKpiData GetCreatorKpiData(List<ComparisonBomData> updatedCompareBomData);
         public void WriteCreatorKpiDataToConsole(CreatorKpiData creatorKpiData);
         public void WriteSourceNotFoundListToConsole(List<ComparisonBomData> comparisionBomDataList, CommonAppSettings appSetting);

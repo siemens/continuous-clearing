@@ -1,20 +1,13 @@
-﻿using LCT.APICommunications;
-using LCT.Common.Constants;
+﻿using LCT.Common.Constants;
 using LCT.Common.Model;
 using LCT.Common;
 using LCT.Services.Interface;
 using LCT.SW360PackageCreator.Interfaces;
 using log4net.Core;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using log4net;
 using System.Reflection;
-using CycloneDX.Models;
-using LCT.Common.Interface;
-using LCT.Services;
 using LCT.APICommunications.Model;
 using Spectre.Console;
 
@@ -24,12 +17,8 @@ namespace LCT.SW360PackageCreator
     {
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public async Task CreatePackageInSw360(CommonAppSettings appSettings,ISw360CreatorService sw360CreatorService,ComparisonBomData item,ISW360Service sW360Service)
-        {            
-            if (!appSettings.IsTestMode)
-            {
-                await CreatePackage(sw360CreatorService, item, appSettings);                               
-            }
-            
+        {           
+            await CreatePackage(sw360CreatorService, item, appSettings); 
         }        
         private static async Task CreatePackage(ISw360CreatorService sw360CreatorService, ComparisonBomData item, CommonAppSettings appSettings)
         {
