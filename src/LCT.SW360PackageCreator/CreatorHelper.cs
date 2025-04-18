@@ -263,7 +263,7 @@ namespace LCT.SW360PackageCreator
                 mapper.IsReleaseCreated = GetCreatedStatus(mapper.ReleaseStatus);
                 mapper.FossologyUploadStatus = GetFossologyUploadStatus(mapper.ApprovedStatus);
                 mapper.ReleaseAttachmentLink = string.Empty;
-                mapper.ReleaseLink = GetReleaseLink(componentsAvailableInSw360, item.Name, item.Version);               
+                mapper.ReleaseLink = GetReleaseLink(componentsAvailableInSw360, item.Name, item.Version);
 
                 Logger.Debug($"Sw360 avilability status for Name " + mapper.Name + ":" + mapper.ComponentExternalId + "=" + mapper.ComponentStatus +
                     "-Version " + mapper.Version + ":" + mapper.ReleaseExternalId + "=" + mapper.ReleaseStatus);
@@ -546,7 +546,7 @@ namespace LCT.SW360PackageCreator
         {
             return componentsAvailable.Exists(x => x.Name.ToLowerInvariant() == component.Name.ToLowerInvariant()
             || x.ComponentExternalId.ToLowerInvariant() == component.ComponentExternalId.ToLowerInvariant()) ? Dataconstant.Available : Dataconstant.NotAvailable;
-        }        
+        }
 
         private string IsReleaseAvailable(string componentName, string componentVersion, string releaseExternalId)
         {

@@ -71,7 +71,6 @@ namespace LCT.Common.Constants
         public const string ProductionFossologyURL = "automation.fossology";
         public const string StageFossologyURL = "stage.fossology";
         public const string ScanClearingState = "SCAN_AVAILABLE";
-        
 
         public static Dictionary<string, string> PurlCheck()
         {

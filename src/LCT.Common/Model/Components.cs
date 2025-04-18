@@ -62,7 +62,7 @@ namespace LCT.Common.Model
         [JsonIgnore]
         public string IsDev { get; set; }
         [JsonIgnore]
-        public string ExcludeComponent { get; set; }       
+        public string ExcludeComponent { get; set; }
 
     }
 }
