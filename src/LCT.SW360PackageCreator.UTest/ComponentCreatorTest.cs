@@ -36,10 +36,119 @@ namespace LCT.SW360PackageCreator.UTest
     [TestFixture]
     public class ComponentCreatorTest
     {
+        private Mock<ISw360CreatorService> _mockSw360CreatorService;
+        private CommonAppSettings _appSettings;
         [SetUp]
         public void Setup()
         {
-            // implement here
+            _mockSw360CreatorService = new Mock<ISw360CreatorService>();
+            _appSettings = new CommonAppSettings
+            {
+                SW360 = new SW360
+                {
+                    Fossology = new Fossology
+                    {
+                        URL = "https://fossology.example.com/"
+                    }
+                }
+            };
+        }
+        [Test]
+        public async Task UpdateFossologyStatus_FossologyAlreadyUploaded_ShouldSetStatusToUploaded()
+        {
+            // Arrange
+            var item = new ComparisonBomData
+            {
+                FossologyLink = "https://fossology.example.com/upload/12345",
+                FossologyUploadId = Dataconstant.NotUploaded,
+                Name = "TestComponent",
+                Version = "1.0.0"
+            };
+            string formattedName = "TestComponent";
+
+            // Act
+            await ComponentCreator.UpdateFossologyStatus(item, _mockSw360CreatorService.Object, _appSettings, formattedName);
+
+            // Assert
+            Assert.AreEqual(Dataconstant.Uploaded, item.FossologyUploadStatus);
+            _mockSw360CreatorService.Verify(x => x.UdpateSW360ReleaseContent(It.IsAny<Components>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [Test]
+        public async Task UpdateFossologyStatus_FossologyUploadIdExistsButNoLink_ShouldUpdateFossologyLinkAndStatus()
+        {
+            // Arrange
+            var item = new ComparisonBomData
+            {
+                FossologyLink = null,
+                FossologyUploadId = Dataconstant.NotUploaded,
+                Name = "TestComponent",
+                Version = "1.0.0",
+                ReleaseID = "67890"
+            };
+            string formattedName = "TestComponent";
+
+            // Act
+            await ComponentCreator.UpdateFossologyStatus(item, _mockSw360CreatorService.Object, _appSettings, formattedName);
+
+            // Assert
+            Assert.AreEqual(Dataconstant.Uploaded, item.FossologyUploadStatus);
+           
+        }
+
+        [Test]
+        public async Task UpdateFossologyStatus_NoFossologyUploadIdOrLink_ShouldNotUpdateStatus()
+        {
+            // Arrange
+            var item = new ComparisonBomData
+            {
+                FossologyLink = null,
+                FossologyUploadId = null,
+                Name = "TestComponent",
+                Version = "1.0.0"
+            };
+            string formattedName = "TestComponent";
+
+            // Act
+            await ComponentCreator.UpdateFossologyStatus(item, _mockSw360CreatorService.Object, _appSettings, formattedName);
+
+            // Assert
+            Assert.IsNull(item.FossologyUploadStatus);
+            Assert.IsNull(item.FossologyLink);
+            _mockSw360CreatorService.Verify(x => x.UdpateSW360ReleaseContent(It.IsAny<Components>(), It.IsAny<string>()), Times.Never);
+        }
+        [Test]
+        public void GetFormattedName_ParentReleaseNameIsDifferent_ShouldReturnFormattedName()
+        {
+            // Arrange
+            var item = new ComparisonBomData
+            {
+                ParentReleaseName = "ParentRelease",
+                Name = "ChildRelease"
+            };
+
+            // Act
+            var result = ComponentCreator.GetFormattedName(item);
+
+            // Assert
+            Assert.AreEqual("ParentRelease\\ChildRelease", result);
+        }
+
+        [Test]
+        public void GetFormattedName_ParentReleaseNameIsSameAsName_ShouldReturnName()
+        {
+            // Arrange
+            var item = new ComparisonBomData
+            {
+                ParentReleaseName = "ReleaseName",
+                Name = "ReleaseName"
+            };
+
+            // Act
+            var result = ComponentCreator.GetFormattedName(item);
+
+            // Assert
+            Assert.AreEqual("ReleaseName", result);
         }
         [Test]
         public async Task CreateComponentInSw360_ShouldCreateComponentsAndWriteFiles()

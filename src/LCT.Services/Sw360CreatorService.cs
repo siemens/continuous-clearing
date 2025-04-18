@@ -786,9 +786,12 @@ namespace LCT.Services
             }
             catch (HttpRequestException ex)
             {
-                Logger.Debug($"TriggerFossologyProcessForValidation():", ex);
-                Logger.Error($"Fossology process failed.Please check fossology configuration or Token in sw360");
-                environmentHelper.CallEnvironmentExit(-1);
+                if (ex.Message== "500:Connection to Fossology server Failed.")
+                {
+                    Logger.Debug($"TriggerFossologyProcessForValidation():", ex);
+                    Logger.Error($"Fossology process failed.Please check fossology configuration or Token in sw360");
+                    environmentHelper.CallEnvironmentExit(-1);
+                }                
             }
             catch (InvalidOperationException ex)
             {

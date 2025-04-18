@@ -12,7 +12,7 @@ namespace LCT.APICommunications.Model.Foss
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class ProcessSteps
     {
-        [JsonProperty("processStstepNameeps")]
+        [JsonProperty("stepName")]
         public string StepName { get; set; }
 
         [JsonProperty("stepStatus")]

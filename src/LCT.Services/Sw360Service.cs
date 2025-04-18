@@ -444,8 +444,7 @@ namespace LCT.Services
                         Version = componentToBomData.Version,
                         ReleaseLink = releaseStatus.sw360Releases.Links?.Self?.Href,
                         ReleaseExternalId = componentToBomData.ReleaseExternalId,
-                        ComponentExternalId = componentToBomData.ComponentExternalId,
-                        ParentReleaseName=releaseStatus.sw360Releases?.Name
+                        ComponentExternalId = componentToBomData.ComponentExternalId                        
                     });
                 }
             }

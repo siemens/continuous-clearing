@@ -49,5 +49,8 @@ namespace LCT.APICommunications.Model
 
         [JsonProperty("_embedded")]
         public AttachmentEmbedded Embedded { get; set; }
+        [JsonProperty("externalToolProcesses")]
+        public List<ExternalToolProcess> ExternalToolProcesses { get; set; }
+       
     }
 }
