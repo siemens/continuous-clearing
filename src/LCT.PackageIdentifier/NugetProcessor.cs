@@ -16,11 +16,9 @@ using LCT.PackageIdentifier.Model;
 using LCT.PackageIdentifier.Model.NugetModel;
 using LCT.Services.Interface;
 using log4net;
-using Microsoft.ComponentDetection.Contracts.TypedComponent;
 using Newtonsoft.Json;
 using NuGet.ProjectModel;
 using NuGet.Versioning;
-using PackageUrl;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -883,7 +881,6 @@ namespace LCT.PackageIdentifier
             return isFrameworkDependent;
         }
 
-
         private void GetFrameworkPackagesForAllConfigLockFiles(List<string> configFiles)
         {
             try
@@ -932,6 +929,7 @@ namespace LCT.PackageIdentifier
         {
             string[] projectFiles = FileConstant.Nuget_DeploymentType_DetectionExt
                 .SelectMany(ext => Directory.GetFiles(appSettings.Directory.InputFolder, ext, SearchOption.AllDirectories))
+                .Where(file => !IsExcluded(file, appSettings.Nuget?.Exclude))
                 .ToArray();
 
             bool isSelfContained = false;
@@ -967,6 +965,16 @@ namespace LCT.PackageIdentifier
             }
 
             return isSelfContained || isSingleFile;
+        }
+
+        private static bool IsExcluded(string filePath, string[] excludePatterns)
+        {
+            if (excludePatterns == null || excludePatterns.Length == 0)
+            {
+                return false;
+            }
+
+            return excludePatterns.Any(pattern => filePath.Contains(pattern, StringComparison.OrdinalIgnoreCase));
         }
 
         private void AddCompositionDetails(Bom bom)

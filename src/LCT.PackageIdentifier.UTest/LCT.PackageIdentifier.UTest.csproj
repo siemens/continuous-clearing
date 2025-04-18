@@ -33,6 +33,9 @@
 		<None Include="PackageIdentifierUTTestFiles\Nuget.csproj">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
+		<None Include="PackageIdentifierUTTestFiles\NugetSelfContainedProject\Nuget-SelfContained.csproj">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 
 	<ItemGroup>
