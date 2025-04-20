@@ -96,7 +96,7 @@ namespace LCT.SW360PackageCreator
                     break;
                 }
 
-                var validRelease = releaseResponse?.Embedded?.Sw360releases?.FirstOrDefault(release =>
+                var validRelease = releaseResponse.Embedded?.Sw360releases?.FirstOrDefault(release =>
                     release?.ClearingState == "APPROVED" &&
                     release?.AllReleasesEmbedded?.Sw360attachments != null &&
                     release.AllReleasesEmbedded.Sw360attachments.Any(attachments =>

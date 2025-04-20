@@ -376,7 +376,7 @@ namespace LCT.SW360PackageCreator
             }
         }
 
-        private static async Task TriggeringFossologyUploadAndUpdateAdditionalData(ComparisonBomData item,
+        public static async Task TriggeringFossologyUploadAndUpdateAdditionalData(ComparisonBomData item,
             ISw360CreatorService sw360CreatorService, CommonAppSettings appSettings)
         {
 
