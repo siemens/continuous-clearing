@@ -10,9 +10,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace LCT.SW360PackageCreator.Model
 {
+    [ExcludeFromCodeCoverage]
     public class ReleasesAllDetails
-    {
-        [ExcludeFromCodeCoverage]
+    {        
         [JsonProperty("_embedded")]
         public AllReleasesEmbedded Embedded { get; set; }
         [JsonProperty("page")]
