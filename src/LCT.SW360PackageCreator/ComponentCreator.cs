@@ -522,18 +522,23 @@ namespace LCT.SW360PackageCreator
             try
             {
                 CheckFossologyProcess fossResult = await sw360CreatorService.CheckFossologyProcessStatus(link);
-                if (!string.IsNullOrEmpty(fossResult?.FossologyProcessInfo?.ExternalTool))
+
+                if (fossResult != null)
                 {
-                    uploadId = fossResult.FossologyProcessInfo?.ProcessSteps[0]?.ProcessStepIdInTool;
-                }
-                if (fossResult.Status == "FAILURE" && string.IsNullOrEmpty(uploadId))
-                {
-                    Logger.Logger.Log(null, Level.Warn, $"\t❌ Fossology upload failed for release", null);
-                }
-                else if (fossResult.Status == "PROCESSING" && string.IsNullOrEmpty(uploadId))
-                {
-                    Logger.Logger.Log(null, Level.Warn, $"\t⏳ Fossology upload is still processing. Upload ID is not yet available. Please wait and re-run the pipeline later.", null);
-                }
+                    if (!string.IsNullOrEmpty(fossResult.FossologyProcessInfo?.ExternalTool))
+                    {
+                        uploadId = fossResult.FossologyProcessInfo?.ProcessSteps[0]?.ProcessStepIdInTool;
+                    }
+
+                    if (fossResult.Status == "FAILURE" && string.IsNullOrEmpty(uploadId))
+                    {
+                        Logger.Logger.Log(null, Level.Warn, $"\t❌ Fossology upload failed for release", null);
+                    }
+                    else if (fossResult.Status == "PROCESSING" && string.IsNullOrEmpty(uploadId))
+                    {
+                        Logger.Logger.Log(null, Level.Warn, $"\t⏳ Fossology upload is still processing. Upload ID is not yet available. Please wait and re-run the pipeline later.", null);
+                    }
+                }                
             }
             catch (AggregateException ex)
             {
@@ -587,15 +592,25 @@ namespace LCT.SW360PackageCreator
         }
         public static Task GetUploadIdWhenReleaseExists(ComparisonBomData item, ReleasesInfo releasesInfo = null, CommonAppSettings appSettings = null)
         {
-            item.ClearingState = releasesInfo?.ClearingState;
-            var uploadId = releasesInfo?.ExternalToolProcesses?.SelectMany(process => process.ProcessSteps).FirstOrDefault(step => step.StepName == "01_upload")?.ProcessStepIdInTool;
+            if (releasesInfo == null)
+            {                
+                return Task.CompletedTask;
+            }
 
-            if (releasesInfo?.AdditionalData?.TryGetValue(ApiConstant.AdditionalDataFossologyURL, out string fossologyUrl) == true && fossologyUrl.Contains(appSettings.SW360.Fossology.URL))
+            item.ClearingState = releasesInfo.ClearingState;
+
+            var uploadId = releasesInfo.ExternalToolProcesses?
+                .SelectMany(process => process.ProcessSteps)
+                .FirstOrDefault(step => step.StepName == "01_upload")?.ProcessStepIdInTool;
+
+            if (releasesInfo.AdditionalData != null &&
+                releasesInfo.AdditionalData.TryGetValue(ApiConstant.AdditionalDataFossologyURL, out string fossologyUrl) &&
+                fossologyUrl.Contains(appSettings?.SW360?.Fossology?.URL))
             {
                 item.FossologyLink = fossologyUrl;
                 item.FossologyUploadId = uploadId;
             }
-            else if (releasesInfo?.AdditionalData == null || !releasesInfo.AdditionalData.ContainsKey(ApiConstant.AdditionalDataFossologyURL))
+            else if (releasesInfo.AdditionalData == null || !releasesInfo.AdditionalData.ContainsKey(ApiConstant.AdditionalDataFossologyURL))
             {
                 item.FossologyUploadId = uploadId;
             }
