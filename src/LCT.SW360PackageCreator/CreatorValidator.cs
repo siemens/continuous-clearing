@@ -74,9 +74,7 @@ namespace LCT.SW360PackageCreator
             }
             catch (AggregateException ex)
             {
-                Logger.Debug($"\tError in TriggerFossologyValidation--{ex}");
-                Logger.Error($"Trigger fossology process failed. Please check fossology configuration in SW360");
-                environmentHelper.CallEnvironmentExit(-1);
+                Logger.Debug($"\tError in TriggerFossologyValidation--{ex}");                
             }
         }
 
@@ -178,17 +176,19 @@ namespace LCT.SW360PackageCreator
         }
         public static async Task<bool> FossologyUrlValidation(CommonAppSettings appSettings, HttpClient client, IEnvironmentHelper environmentHelper)
         {
-            string url = appSettings.SW360.Fossology.URL.ToLower();
+            string url = appSettings.SW360.Fossology.URL;
+            if (string.IsNullOrEmpty(url))
+            {
+                Logger.Error($"Fossology URL is not provided, Please make sure to add Fossology URL in appsettings.");
+                Logger.Debug($"FossologyUrlValidation() : Fossology URL not provided in appsettings");
+                environmentHelper.CallEnvironmentExit(-1);
+                return false; 
+            }
+            url = url.ToLower(); 
             string prodFossUrl = Dataconstant.ProductionFossologyURL.ToLower();
             string stageFossUrl = Dataconstant.StageFossologyURL.ToLower();
 
-            if (string.IsNullOrEmpty(appSettings.SW360.Fossology.URL))
-            {
-                Logger.Error($"Fossology URL is not provided ,Please make sure to add Fossologyurl in appsettings..");
-                Logger.Debug($"FossologyUrlValidation() : Fossology url not provided in appsettings");
-                environmentHelper.CallEnvironmentExit(-1);
-            }
-            else if (Uri.IsWellFormedUriString(appSettings.SW360.Fossology.URL, UriKind.Absolute))
+        if (Uri.IsWellFormedUriString(appSettings.SW360.Fossology.URL, UriKind.Absolute))
             {
                 if (url.Contains(prodFossUrl) || url.Contains(stageFossUrl))
                 {

@@ -795,21 +795,15 @@ namespace LCT.Services
             }
             catch (InvalidOperationException ex)
             {
-                Logger.Debug($"TriggerFossologyProcessForValidation():", ex);
-                Logger.Error($"Fossology process failed.Please check fossology configuration in sw360");
-                environmentHelper.CallEnvironmentExit(-1);
+                Logger.Debug($"TriggerFossologyProcessForValidation():", ex);                                
             }
             catch (UriFormatException ex)
             {
-                Logger.Debug($"TriggerFossologyProcessForValidation():", ex);
-                Logger.Error($"Fossology process failed.Please check fossology configuration in sw360");
-                environmentHelper.CallEnvironmentExit(-1);
+                Logger.Debug($"TriggerFossologyProcessForValidation():", ex);                               
             }
             catch (TaskCanceledException ex)
             {
-                Logger.Debug($"TriggerFossologyProcessForValidation():", ex);
-                Logger.Error($"Fossology process failed.Please check fossology configuration in sw360");
-                environmentHelper.CallEnvironmentExit(-1);
+                Logger.Debug($"TriggerFossologyProcessForValidation():", ex);                                
             }
             return fossTriggerStatus;
         }

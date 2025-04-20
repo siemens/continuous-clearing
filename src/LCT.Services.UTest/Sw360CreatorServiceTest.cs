@@ -875,5 +875,58 @@ namespace LCT.Services.UTest
             // Assert
             Assert.That(actual, Is.False);
         }
+
+        [Test]
+        public async Task TriggerFossologyProcessForValidation_ShouldLogDebugMessage_WhenInvalidOperationExceptionIsThrown()
+        {
+            // Arrange
+            var mockFacade = new Mock<ISW360ApicommunicationFacade>();
+            mockFacade
+                .Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()))
+                .Throws<InvalidOperationException>();
+
+            var sw360CreatorService = new Sw360CreatorService(mockFacade.Object);
+
+            // Act
+            var result = await sw360CreatorService.TriggerFossologyProcessForValidation("releaseId", "sw360link");
+
+            // Assert
+            Assert.IsNull(result, "Expected result to be null when InvalidOperationException is thrown.");
+        }
+
+        [Test]
+        public async Task TriggerFossologyProcessForValidation_ShouldLogDebugMessage_WhenUriFormatExceptionIsThrown()
+        {
+            // Arrange
+            var mockFacade = new Mock<ISW360ApicommunicationFacade>();
+            mockFacade
+                .Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()))
+                .Throws<UriFormatException>();
+
+            var sw360CreatorService = new Sw360CreatorService(mockFacade.Object);
+
+            // Act
+            var result = await sw360CreatorService.TriggerFossologyProcessForValidation("releaseId", "sw360link");
+
+            // Assert
+            Assert.IsNull(result, "Expected result to be null when UriFormatException is thrown.");
+        }
+        [Test]
+        public async Task TriggerFossologyProcessForValidation_ShouldLogDebugMessage_WhenTaskCanceledExceptionIsThrown()
+        {
+            // Arrange
+            var mockFacade = new Mock<ISW360ApicommunicationFacade>();
+            mockFacade
+                .Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()))
+                .Throws<TaskCanceledException>();
+
+            var sw360CreatorService = new Sw360CreatorService(mockFacade.Object);
+
+            // Act
+            var result = await sw360CreatorService.TriggerFossologyProcessForValidation("releaseId", "sw360link");
+
+            // Assert
+            Assert.IsNull(result, "Expected result to be null when TaskCanceledException is thrown.");
+        }
     }
 }
