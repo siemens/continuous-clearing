@@ -929,7 +929,7 @@ namespace LCT.SW360PackageCreator.UTest
             CheckFossologyProcess checkFossologyProcess = new CheckFossologyProcess()
             {
                 Status = "PROCESSING",
-               
+
             };
 
             ComparisonBomData item = new ComparisonBomData()
@@ -954,7 +954,69 @@ namespace LCT.SW360PackageCreator.UTest
             string uploadId = await ComponentCreator.TriggerFossologyProcess(item, sw360CreatorServiceMock.Object, appSettings);
 
             // Assert           
-            sw360CreatorServiceMock.Verify(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()), Times.AtLeastOnce);            
+            sw360CreatorServiceMock.Verify(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()), Times.AtLeastOnce);
+        }
+        [Test]
+        public async Task GetUploadIdWhenReleaseExists_ShouldExitEarly_WhenReleasesInfoIsNull()
+        {
+            // Arrange
+            var item = new ComparisonBomData();
+            ReleasesInfo releasesInfo = null; // Simulate null releasesInfo
+            var appSettings = new CommonAppSettings();
+
+            // Act
+            await ComponentCreator.GetUploadIdWhenReleaseExists(item, releasesInfo, appSettings);
+
+            // Assert
+            Assert.IsNull(item.ClearingState, "ClearingState should remain null when releasesInfo is null.");
+            Assert.IsNull(item.FossologyLink, "FossologyLink should remain null when releasesInfo is null.");
+            Assert.IsNull(item.FossologyUploadId, "FossologyUploadId should remain null when releasesInfo is null.");
+        }
+        [Test]
+        public async Task GetUploadIdWhenReleaseExists_ShouldSetFossologyLinkAndUploadId_WhenAdditionalDataContainsFossologyURL()
+        {
+            // Arrange
+            var item = new ComparisonBomData();
+            var releasesInfo = new ReleasesInfo
+            {
+                ClearingState = "APPROVED",
+                AdditionalData = new Dictionary<string, string>
+        {
+            { ApiConstant.AdditionalDataFossologyURL, "https://fossology.example.com/upload/12345" }
+        },
+                ExternalToolProcesses = new List<ExternalToolProcess>
+        {
+            new ExternalToolProcess
+            {
+                ProcessSteps = new List<ProcessSteps>
+                {
+                    new ProcessSteps
+                    {
+                        StepName = "01_upload",
+                        ProcessStepIdInTool = "12345"
+                    }
+                }
+            }
+        }
+            };
+            var appSettings = new CommonAppSettings
+            {
+                SW360 = new SW360
+                {
+                    Fossology = new Fossology
+                    {
+                        URL = "https://fossology.example.com"
+                    }
+                }
+            };
+
+            // Act
+            await ComponentCreator.GetUploadIdWhenReleaseExists(item, releasesInfo, appSettings);
+
+            // Assert
+            Assert.AreEqual("APPROVED", item.ClearingState, "ClearingState should be set from releasesInfo.");
+            Assert.AreEqual("https://fossology.example.com/upload/12345", item.FossologyLink, "FossologyLink should be set from AdditionalData.");
+            Assert.AreEqual("12345", item.FossologyUploadId, "FossologyUploadId should be set from ProcessStepIdInTool.");
         }
 
     }
