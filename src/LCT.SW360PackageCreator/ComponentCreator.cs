@@ -394,9 +394,7 @@ namespace LCT.SW360PackageCreator
 
                     if (string.IsNullOrEmpty(uploadId))
                     {
-                        item.FossologyUploadStatus = Dataconstant.NotUploaded;
-                        Logger.Logger.Log(null, Level.Debug, $"\tFossology upload failed  for Release : Name - {formattedName} ," +
-                            $" version - {item.Version},Fossology has a wait time so re run the pipeline", null);
+                        item.FossologyUploadStatus = Dataconstant.NotUploaded;                       
                     }
                     else
                     {
@@ -505,7 +503,7 @@ namespace LCT.SW360PackageCreator
                 if (!string.IsNullOrEmpty(fossResult?.Links?.Self?.Href))
                 {
                     Logger.Debug($"{fossResult.Content?.Message}");
-                    uploadId = await CheckFossologyProcessStatus(fossResult.Links?.Self?.Href, sw360CreatorService);
+                    uploadId = await CheckFossologyProcessStatus(fossResult.Links?.Self?.Href, sw360CreatorService,item);
                 }
 
             }
@@ -516,7 +514,7 @@ namespace LCT.SW360PackageCreator
             return uploadId;
         }
 
-        public static async Task<string> CheckFossologyProcessStatus(string link, ISw360CreatorService sw360CreatorService)
+        public static async Task<string> CheckFossologyProcessStatus(string link, ISw360CreatorService sw360CreatorService,ComparisonBomData item)
         {
             string uploadId = string.Empty;
             try
@@ -529,7 +527,6 @@ namespace LCT.SW360PackageCreator
                     {
                         uploadId = fossResult.FossologyProcessInfo?.ProcessSteps[0]?.ProcessStepIdInTool;
                     }
-
                     if (fossResult.Status == "FAILURE" && string.IsNullOrEmpty(uploadId))
                     {
                         Logger.Logger.Log(null, Level.Warn, $"\t❌ Fossology upload failed for release", null);
@@ -538,7 +535,13 @@ namespace LCT.SW360PackageCreator
                     {
                         Logger.Logger.Log(null, Level.Warn, $"\t⏳ Fossology upload is still processing. Upload ID is not yet available. Please wait and re-run the pipeline later.", null);
                     }
-                }                
+                }
+                else
+                {
+                    var formattedName = GetFormattedName(item);
+                    Logger.Logger.Log(null, Level.Warn, $"\t❌ Fossology upload failed  for Release : Name - {formattedName} ," +
+                        $" version - {item.Version}", null);
+                }              
             }
             catch (AggregateException ex)
             {

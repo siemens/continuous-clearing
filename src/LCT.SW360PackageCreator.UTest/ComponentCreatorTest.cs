@@ -810,12 +810,16 @@ namespace LCT.SW360PackageCreator.UTest
             // Arrange
             var link = "https://example.com/fossology/process/12345";
             var sw360CreatorServiceMock = new Mock<ISw360CreatorService>();
+            var item = new ComparisonBomData
+            {
+                ReleaseID = "releaseId"
+            };
             sw360CreatorServiceMock
                 .Setup(x => x.CheckFossologyProcessStatus(link))
                 .ThrowsAsync(new AggregateException("Error in TriggerFossologyProcess"));
 
             // Act
-            var uploadId = await ComponentCreator.CheckFossologyProcessStatus(link, sw360CreatorServiceMock.Object);
+            var uploadId = await ComponentCreator.CheckFossologyProcessStatus(link, sw360CreatorServiceMock.Object,item);
 
             // Assert
             Assert.AreEqual(string.Empty, uploadId);
@@ -827,6 +831,10 @@ namespace LCT.SW360PackageCreator.UTest
             // Arrange
             var link = "https://example.com/fossology/process/12345";
             var sw360CreatorServiceMock = new Mock<ISw360CreatorService>();
+            var item = new ComparisonBomData
+            {
+                ReleaseID = "releaseId"
+            };
             var processStep = new ProcessSteps
             {
                 ProcessStepIdInTool = "67890"
@@ -846,7 +854,7 @@ namespace LCT.SW360PackageCreator.UTest
                 .ReturnsAsync(fossResult);
 
             // Act
-            var uploadId = await ComponentCreator.CheckFossologyProcessStatus(link, sw360CreatorServiceMock.Object);
+            var uploadId = await ComponentCreator.CheckFossologyProcessStatus(link, sw360CreatorServiceMock.Object,item);
 
             // Assert
             Assert.AreEqual("67890", uploadId);
