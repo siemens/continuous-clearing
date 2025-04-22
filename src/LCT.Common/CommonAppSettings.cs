@@ -161,14 +161,10 @@ namespace LCT.Common
                 if (!AppDomain.CurrentDomain.FriendlyName.Contains("PackageIdentifier") &&
                     !AppDomain.CurrentDomain.FriendlyName.Contains("ArtifactoryUploader"))
                 {
-                    if (string.IsNullOrEmpty(value))
-                    {
-                        throw new ArgumentNullException($"Provide a fossology url - {value}");
-                    }
-                    else
+                    if (!string.IsNullOrEmpty(value))
                     {
                         m_FOSSURL = value.TrimEnd(Dataconstant.ForwardSlash);
-                    }
+                    }                    
                 }
             }
         }

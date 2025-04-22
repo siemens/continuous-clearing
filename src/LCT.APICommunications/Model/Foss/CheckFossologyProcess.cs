@@ -14,6 +14,8 @@ namespace LCT.APICommunications.Model.Foss
     {
         [JsonProperty("fossologyProcessInfo")]
         public FossologyProcessInfo FossologyProcessInfo { get; set; }
+        [JsonProperty("status")]
+        public string Status { get; set; }
 
     }
 }

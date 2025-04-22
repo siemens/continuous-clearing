@@ -61,6 +61,7 @@ namespace LCT.SW360PackageCreator
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
 
             string FolderPath = InitiateLogger(appSettings);
+            Console.OutputEncoding = System.Text.Encoding.UTF8;            
             settingsManager.CheckRequiredArgsToRun(appSettings, "Creator");
             int isValid = await CreatorValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
 

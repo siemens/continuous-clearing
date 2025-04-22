@@ -5,6 +5,7 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using LCT.APICommunications;
 using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.Foss;
 using LCT.Common;
@@ -36,10 +37,189 @@ namespace LCT.SW360PackageCreator.UTest
     [TestFixture]
     public class ComponentCreatorTest
     {
+        private Mock<ISw360CreatorService> _mockSw360CreatorService;
+        private CommonAppSettings _appSettings;
+        private ComponentCreator _componentCreator;
         [SetUp]
         public void Setup()
         {
-            // implement here
+            _mockSw360CreatorService = new Mock<ISw360CreatorService>();
+            _appSettings = new CommonAppSettings
+            {
+                SW360 = new SW360
+                {
+                    Fossology = new Fossology
+                    {
+                        URL = "https://fossology.example.com/"
+                    }
+                }
+            };
+            _componentCreator = new ComponentCreator();
+        }
+
+        [Test]
+        public async Task TriggeringFossologyUploadAndUpdateAdditionalData_FossologyDisabled_ShouldSetNotUploaded()
+        {
+            // Arrange
+            _appSettings.SW360.Fossology.EnableTrigger = false;
+            var item = new ComparisonBomData
+            {
+                Name = "TestComponent",
+                Version = "1.0.0",
+                ApprovedStatus = "NEW_CLEARING",
+                ClearingState = Dataconstant.ScanClearingState
+            };
+
+            // Act
+            await ComponentCreator.TriggeringFossologyUploadAndUpdateAdditionalData(item, _mockSw360CreatorService.Object, _appSettings);
+
+            // Assert
+            Assert.AreEqual(Dataconstant.NotUploaded, item.FossologyUploadStatus);
+            _mockSw360CreatorService.VerifyNoOtherCalls();
+        }
+        [Test]
+        public async Task TriggeringFossologyUploadAndUpdateAdditionalData_FossologyAlreadyUploaded_ShouldNotTriggerAgain()
+        {
+            // Arrange
+            var item = new ComparisonBomData
+            {
+                Name = "TestComponent",
+                Version = "1.0.0",
+                ApprovedStatus = "NEW_CLEARING",
+                ClearingState = Dataconstant.ScanClearingState,
+                FossologyLink = "https://fossology.example.com/upload/12345",
+                FossologyUploadId = "12345"
+            };
+
+            // Act
+            await ComponentCreator.TriggeringFossologyUploadAndUpdateAdditionalData(item, _mockSw360CreatorService.Object, _appSettings);
+
+            // Assert
+            Assert.AreEqual(Dataconstant.NotUploaded, item.FossologyUploadStatus);
+            _mockSw360CreatorService.VerifyNoOtherCalls();
+        }
+        [Test]
+        public async Task TriggeringFossologyUploadAndUpdateAdditionalData_FossologyUploadFails_ShouldSetNotUploaded()
+        {
+            // Arrange
+            _appSettings.SW360.Fossology.EnableTrigger = true;
+            var item = new ComparisonBomData
+            {
+                Name = "TestComponent",
+                Version = "1.0.0",
+                ApprovedStatus = "NEW_CLEARING",
+                ClearingState = Dataconstant.ScanClearingState
+            };
+
+            _mockSw360CreatorService
+                .Setup(service => service.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new FossTriggerStatus());
+
+            // Act
+            await ComponentCreator.TriggeringFossologyUploadAndUpdateAdditionalData(item, _mockSw360CreatorService.Object, _appSettings);
+
+            // Assert
+            Assert.AreEqual(Dataconstant.NotUploaded, item.FossologyUploadStatus);
+            _mockSw360CreatorService.Verify(service => service.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+        }
+        
+
+        [Test]
+        public async Task UpdateFossologyStatus_FossologyAlreadyUploaded_ShouldSetStatusToUploaded()
+        {
+            // Arrange
+            var item = new ComparisonBomData
+            {
+                FossologyLink = "https://fossology.example.com/upload/12345",
+                FossologyUploadId = Dataconstant.NotUploaded,
+                Name = "TestComponent",
+                Version = "1.0.0"
+            };
+            string formattedName = "TestComponent";
+
+            // Act
+            await ComponentCreator.UpdateFossologyStatus(item, _mockSw360CreatorService.Object, _appSettings, formattedName);
+
+            // Assert
+            Assert.AreEqual(Dataconstant.Uploaded, item.FossologyUploadStatus);
+            _mockSw360CreatorService.Verify(x => x.UdpateSW360ReleaseContent(It.IsAny<Components>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [Test]
+        public async Task UpdateFossologyStatus_FossologyUploadIdExistsButNoLink_ShouldUpdateFossologyLinkAndStatus()
+        {
+            // Arrange
+            var item = new ComparisonBomData
+            {
+                FossologyLink = null,
+                FossologyUploadId = Dataconstant.NotUploaded,
+                Name = "TestComponent",
+                Version = "1.0.0",
+                ReleaseID = "67890"
+            };
+            string formattedName = "TestComponent";
+
+            // Act
+            await ComponentCreator.UpdateFossologyStatus(item, _mockSw360CreatorService.Object, _appSettings, formattedName);
+
+            // Assert
+            Assert.AreEqual(Dataconstant.Uploaded, item.FossologyUploadStatus);
+           
+        }
+
+        [Test]
+        public async Task UpdateFossologyStatus_NoFossologyUploadIdOrLink_ShouldNotUpdateStatus()
+        {
+            // Arrange
+            var item = new ComparisonBomData
+            {
+                FossologyLink = null,
+                FossologyUploadId = null,
+                Name = "TestComponent",
+                Version = "1.0.0"
+            };
+            string formattedName = "TestComponent";
+
+            // Act
+            await ComponentCreator.UpdateFossologyStatus(item, _mockSw360CreatorService.Object, _appSettings, formattedName);
+
+            // Assert
+            Assert.IsNull(item.FossologyUploadStatus);
+            Assert.IsNull(item.FossologyLink);
+            _mockSw360CreatorService.Verify(x => x.UdpateSW360ReleaseContent(It.IsAny<Components>(), It.IsAny<string>()), Times.Never);
+        }
+        [Test]
+        public void GetFormattedName_ParentReleaseNameIsDifferent_ShouldReturnFormattedName()
+        {
+            // Arrange
+            var item = new ComparisonBomData
+            {
+                ParentReleaseName = "ParentRelease",
+                Name = "ChildRelease"
+            };
+
+            // Act
+            var result = ComponentCreator.GetFormattedName(item);
+
+            // Assert
+            Assert.AreEqual("ParentRelease\\ChildRelease", result);
+        }
+
+        [Test]
+        public void GetFormattedName_ParentReleaseNameIsSameAsName_ShouldReturnName()
+        {
+            // Arrange
+            var item = new ComparisonBomData
+            {
+                ParentReleaseName = "ReleaseName",
+                Name = "ReleaseName"
+            };
+
+            // Act
+            var result = ComponentCreator.GetFormattedName(item);
+
+            // Assert
+            Assert.AreEqual("ReleaseName", result);
         }
         [Test]
         public async Task CreateComponentInSw360_ShouldCreateComponentsAndWriteFiles()
@@ -208,8 +388,13 @@ namespace LCT.SW360PackageCreator.UTest
             FossTriggerStatus fossTriggerStatus = new FossTriggerStatus()
             {
                 Content = new Content() { Message = "triggered succesfully" },
-                Links = new Links() { Self = new Self() { Href = "test_link" } }
+                Links = new Links() { Self = new Self() { Href = "test_link" } },
             };
+            CheckFossologyProcess checkFossologyProcess = new CheckFossologyProcess()
+            {
+                Status = "FAILURE"               
+            };
+
             ComparisonBomData item = new ComparisonBomData()
             {
                 Name = "test",
@@ -226,7 +411,7 @@ namespace LCT.SW360PackageCreator.UTest
             };
             sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(fossTriggerStatus);
 
-
+            sw360CreatorServiceMock.Setup(x => x.CheckFossologyProcessStatus(It.IsAny<string>())).ReturnsAsync(checkFossologyProcess);
             //Act
             await ComponentCreator.TriggerFossologyProcess(item, sw360CreatorServiceMock.Object, appSettings);
 
@@ -625,23 +810,54 @@ namespace LCT.SW360PackageCreator.UTest
             // Arrange
             var link = "https://example.com/fossology/process/12345";
             var sw360CreatorServiceMock = new Mock<ISw360CreatorService>();
+            var item = new ComparisonBomData
+            {
+                ReleaseID = "releaseId"
+            };
             sw360CreatorServiceMock
                 .Setup(x => x.CheckFossologyProcessStatus(link))
                 .ThrowsAsync(new AggregateException("Error in TriggerFossologyProcess"));
 
             // Act
-            var uploadId = await ComponentCreator.CheckFossologyProcessStatus(link, sw360CreatorServiceMock.Object);
+            var uploadId = await ComponentCreator.CheckFossologyProcessStatus(link, sw360CreatorServiceMock.Object,item);
 
             // Assert
             Assert.AreEqual(string.Empty, uploadId);
         }
+        [Test]
+        public async Task CheckFossologyProcessStatus_FossologyResultIsNull_ReturnsEmptyUploadId()
+        {
+            // Arrange
+            var link = "https://example.com/fossology/process/12345";
+            var sw360CreatorServiceMock = new Mock<ISw360CreatorService>();
+            var item = new ComparisonBomData
+            {
+                Name = "TestComponent",
+                Version = "1.0.0",
+                ParentReleaseName = "ParentComponent"
+            };
 
+            sw360CreatorServiceMock
+                .Setup(x => x.CheckFossologyProcessStatus(link))
+                .ReturnsAsync((CheckFossologyProcess)null); // Simulate null response
+
+            // Act
+            var uploadId = await ComponentCreator.CheckFossologyProcessStatus(link, sw360CreatorServiceMock.Object, item);
+
+            // Assert
+            Assert.AreEqual(string.Empty, uploadId);
+            sw360CreatorServiceMock.Verify(x => x.CheckFossologyProcessStatus(link), Times.Once);
+        }
         [Test]
         public async Task CheckFossologyProcessStatus_NonExceptionScenario_ReturnsUploadId()
         {
             // Arrange
             var link = "https://example.com/fossology/process/12345";
             var sw360CreatorServiceMock = new Mock<ISw360CreatorService>();
+            var item = new ComparisonBomData
+            {
+                ReleaseID = "releaseId"
+            };
             var processStep = new ProcessSteps
             {
                 ProcessStepIdInTool = "67890"
@@ -661,7 +877,7 @@ namespace LCT.SW360PackageCreator.UTest
                 .ReturnsAsync(fossResult);
 
             // Act
-            var uploadId = await ComponentCreator.CheckFossologyProcessStatus(link, sw360CreatorServiceMock.Object);
+            var uploadId = await ComponentCreator.CheckFossologyProcessStatus(link, sw360CreatorServiceMock.Object,item);
 
             // Assert
             Assert.AreEqual("67890", uploadId);
@@ -731,6 +947,109 @@ namespace LCT.SW360PackageCreator.UTest
             // Assert
             Assert.AreEqual("uploadId", uploadId);
         }
+        [Test]
+        public async Task TriggerFossologyProcess_ProvidedReleaseId_ReturnsProcessingStatus()
+        {
+            // Arrange
+            var sw360CreatorServiceMock = new Mock<ISw360CreatorService>(MockBehavior.Default);
+            FossTriggerStatus fossTriggerStatus = new FossTriggerStatus()
+            {
+                Content = new Content() { Message = "triggered successfully" },
+                Links = new Links() { Self = new Self() { Href = "test_link" } },
+            };
+            CheckFossologyProcess checkFossologyProcess = new CheckFossologyProcess()
+            {
+                Status = "PROCESSING",
+
+            };
+
+            ComparisonBomData item = new ComparisonBomData()
+            {
+                Name = "test",
+                Version = "1",
+                ReleaseID = "89768ae1b0ea9dc061328b8f32792cbd"
+            };
+
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                SW360 = new SW360() { URL = "http://localhost:8081/" },
+                Directory = new Common.Directory(folderAction, fileOperations)
+            };
+
+            sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(fossTriggerStatus);
+            sw360CreatorServiceMock.Setup(x => x.CheckFossologyProcessStatus(It.IsAny<string>())).ReturnsAsync(checkFossologyProcess);
+
+            // Act
+            string uploadId = await ComponentCreator.TriggerFossologyProcess(item, sw360CreatorServiceMock.Object, appSettings);
+
+            // Assert           
+            sw360CreatorServiceMock.Verify(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()), Times.AtLeastOnce);
+        }
+        [Test]
+        public async Task GetUploadIdWhenReleaseExists_ShouldExitEarly_WhenReleasesInfoIsNull()
+        {
+            // Arrange
+            var item = new ComparisonBomData();
+            ReleasesInfo releasesInfo = null; // Simulate null releasesInfo
+            var appSettings = new CommonAppSettings();
+
+            // Act
+            await ComponentCreator.GetUploadIdWhenReleaseExists(item, releasesInfo, appSettings);
+
+            // Assert
+            Assert.IsNull(item.ClearingState, "ClearingState should remain null when releasesInfo is null.");
+            Assert.IsNull(item.FossologyLink, "FossologyLink should remain null when releasesInfo is null.");
+            Assert.IsNull(item.FossologyUploadId, "FossologyUploadId should remain null when releasesInfo is null.");
+        }
+        [Test]
+        public async Task GetUploadIdWhenReleaseExists_ShouldSetFossologyLinkAndUploadId_WhenAdditionalDataContainsFossologyURL()
+        {
+            // Arrange
+            var item = new ComparisonBomData();
+            var releasesInfo = new ReleasesInfo
+            {
+                ClearingState = "APPROVED",
+                AdditionalData = new Dictionary<string, string>
+        {
+            { ApiConstant.AdditionalDataFossologyURL, "https://fossology.example.com/upload/12345" }
+        },
+                ExternalToolProcesses = new List<ExternalToolProcess>
+        {
+            new ExternalToolProcess
+            {
+                ProcessSteps = new List<ProcessSteps>
+                {
+                    new ProcessSteps
+                    {
+                        StepName = "01_upload",
+                        ProcessStepIdInTool = "12345"
+                    }
+                }
+            }
+        }
+            };
+            var appSettings = new CommonAppSettings
+            {
+                SW360 = new SW360
+                {
+                    Fossology = new Fossology
+                    {
+                        URL = "https://fossology.example.com"
+                    }
+                }
+            };
+
+            // Act
+            await ComponentCreator.GetUploadIdWhenReleaseExists(item, releasesInfo, appSettings);
+
+            // Assert
+            Assert.AreEqual("APPROVED", item.ClearingState, "ClearingState should be set from releasesInfo.");
+            Assert.AreEqual("https://fossology.example.com/upload/12345", item.FossologyLink, "FossologyLink should be set from AdditionalData.");
+            Assert.AreEqual("12345", item.FossologyUploadId, "FossologyUploadId should be set from ProcessStepIdInTool.");
+        }
+
     }
 }
 

@@ -61,73 +61,91 @@ namespace LCT.SW360PackageCreator
 
             try
             {
-                int page = 0;
-                int pageEntries = 40;
-                bool validReleaseFound = false;
-                ReleasesAllDetails.Sw360Release validRelease = null;
-                int pageCount = 0;
-                while (!validReleaseFound && pageCount < 10)
+                ReleasesAllDetails.Sw360Release validRelease = await FindValidRelease(sW360ApicommunicationFacade);
+
+                if (validRelease != null)
                 {
-                    ReleasesAllDetails releaseResponse = await GetAllReleasesDetails(sW360ApicommunicationFacade, page, pageEntries);
-
-                    if (releaseResponse != null)
-                    {
-                        validRelease = releaseResponse?.Embedded?.Sw360releases?.FirstOrDefault(release => release?.ClearingState == "APPROVED" &&
-                                                   release?.AllReleasesEmbedded?.Sw360attachments != null &&
-                                                   release.AllReleasesEmbedded.Sw360attachments.Any(attachments => attachments.Count != 0));
-
-                        if (validRelease != null)
-                        {
-                            validReleaseFound = true;
-                        }
-                        else
-                        {
-                            int currentPage = page;
-                            int totalPages = (int)(releaseResponse?.Page?.TotalPages ?? 0);
-                            if (currentPage < totalPages - 1)
-                            {
-                                page = currentPage + 1;
-                                pageCount++;
-                            }
-                            else
-                            {
-                                break;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Logger.Debug($"TriggerFossologyValidation():Fossology URl validation Failed");
-                    }
-                }
-
-                if (validReleaseFound)
-                {
-                    var releaseUrl = validRelease?.Links?.Self?.Href;
-                    var releaseId = string.Empty;
-                    if (releaseUrl != null)
-                        releaseId = CommonHelper.GetSubstringOfLastOccurance(releaseUrl, "/");
-                    string sw360link = $"{validRelease?.Name}:{validRelease?.Version}:{appSettings?.SW360?.URL}{ApiConstant.Sw360ReleaseUrlApiSuffix}" +
-                    $"{releaseId}#/tab-Summary";
-                    FossTriggerStatus fossResult = await sw360CreatorService.TriggerFossologyProcessForValidation(releaseId, sw360link);
-                    if (!string.IsNullOrEmpty(fossResult?.Links?.Self?.Href))
-                    {
-                        Logger.Debug($"TriggerFossologyValidation():SW360 Fossology Process validation successfull!!");
-                    }
+                    await TriggerFossologyProcessForRelease(validRelease, appSettings, sw360CreatorService);
                 }
                 else
                 {
-                    Logger.Debug($"TriggerFossologyValidation():Fossology URl validation Failed");
+                    Logger.Debug($"TriggerFossologyValidation(): Fossology URL validation failed");
                 }
-
             }
             catch (AggregateException ex)
             {
-                Logger.Debug($"\tError in TriggerFossologyValidation--{ex}");
-                Logger.Error($"Trigger fossology process failed.Please check fossology configuration in sw360");
-                environmentHelper.CallEnvironmentExit(-1);
+                Logger.Debug($"\tError in TriggerFossologyValidation--{ex}");                
             }
         }
+
+        private static async Task<ReleasesAllDetails.Sw360Release> FindValidRelease(ISW360ApicommunicationFacade sW360ApicommunicationFacade)
+        {
+            int page = 0;
+            int pageEntries = 40;
+            int pageCount = 0;
+
+            while (pageCount < 10)
+            {
+                ReleasesAllDetails releaseResponse = await GetAllReleasesDetails(sW360ApicommunicationFacade, page, pageEntries);
+
+                if (releaseResponse == null)
+                {
+                    Logger.Debug($"FindValidRelease(): Fossology token validation failed in SW360 due to release not found");
+                    break;
+                }
+
+                var validRelease = releaseResponse.Embedded?.Sw360releases?.FirstOrDefault(release =>
+                    release?.ClearingState == "APPROVED" &&
+                    release?.AllReleasesEmbedded?.Sw360attachments != null &&
+                    release.AllReleasesEmbedded.Sw360attachments.Any(attachments =>
+                        attachments.Count != 0 &&
+                        attachments.Count(attachment => attachment?.AttachmentType == "SOURCE") == 1));
+
+                if (validRelease != null)
+                {
+                    return validRelease;
+                }
+
+                if (!MoveToNextPage(releaseResponse, ref page, ref pageCount))
+                {
+                    break;
+                }
+            }
+
+            return null;
+        }
+
+        private static bool MoveToNextPage(ReleasesAllDetails releaseResponse, ref int page, ref int pageCount)
+        {
+            int currentPage = page;
+            int totalPages = (int)(releaseResponse?.Page?.TotalPages ?? 0);
+
+            if (currentPage < totalPages - 1)
+            {
+                page = currentPage + 1;
+                pageCount++;
+                return true;
+            }
+
+            return false;
+        }
+
+        private static async Task TriggerFossologyProcessForRelease(ReleasesAllDetails.Sw360Release validRelease, CommonAppSettings appSettings, ISw360CreatorService sw360CreatorService)
+        {
+            var releaseUrl = validRelease?.Links?.Self?.Href;
+            var releaseId = releaseUrl != null ? CommonHelper.GetSubstringOfLastOccurance(releaseUrl, "/") : string.Empty;
+
+            string sw360link = $"{validRelease?.Name}:{validRelease?.Version}:{appSettings?.SW360?.URL}{ApiConstant.Sw360ReleaseUrlApiSuffix}" +
+                               $"{releaseId}#/tab-Summary";
+
+            FossTriggerStatus fossResult = await sw360CreatorService.TriggerFossologyProcessForValidation(releaseId, sw360link);
+
+            if (!string.IsNullOrEmpty(fossResult?.Links?.Self?.Href))
+            {
+                Logger.Debug($"TriggerFossologyValidation(): SW360 Fossology Process validation successful!!");
+            }
+        }
+        
         private static async Task<ReleasesAllDetails> GetAllReleasesDetails(ISW360ApicommunicationFacade sW360ApicommunicationFacade, int page, int pageEntries)
         {
             ReleasesAllDetails releaseResponse = null;
@@ -158,17 +176,19 @@ namespace LCT.SW360PackageCreator
         }
         public static async Task<bool> FossologyUrlValidation(CommonAppSettings appSettings, HttpClient client, IEnvironmentHelper environmentHelper)
         {
-            string url = appSettings.SW360.Fossology.URL.ToLower();
+            string url = appSettings.SW360.Fossology.URL;
+            if (string.IsNullOrEmpty(url))
+            {
+                Logger.Error($"Fossology URL is not provided, Please make sure to add Fossology URL in appsettings.");
+                Logger.Debug($"FossologyUrlValidation() : Fossology URL not provided in appsettings");
+                environmentHelper.CallEnvironmentExit(-1);
+                return false; 
+            }
+            url = url.ToLower(); 
             string prodFossUrl = Dataconstant.ProductionFossologyURL.ToLower();
             string stageFossUrl = Dataconstant.StageFossologyURL.ToLower();
 
-            if (string.IsNullOrEmpty(appSettings.SW360.Fossology.URL))
-            {
-                Logger.Error($"Fossology URL is not provided ,Please make sure to add Fossologyurl in appsettings..");
-                Logger.Debug($"FossologyUrlValidation() : Fossology url not provided in appsettings");
-                environmentHelper.CallEnvironmentExit(-1);
-            }
-            else if (Uri.IsWellFormedUriString(appSettings.SW360.Fossology.URL, UriKind.Absolute))
+        if (Uri.IsWellFormedUriString(appSettings.SW360.Fossology.URL, UriKind.Absolute))
             {
                 if (url.Contains(prodFossUrl) || url.Contains(stageFossUrl))
                 {

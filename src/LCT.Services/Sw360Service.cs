@@ -314,7 +314,7 @@ namespace LCT.Services
                 else if (await CheckComponentExistenceByExternalId(component) ||
                          CheckAvailabilityByName(sw360ComponentList, component))
                 {
-                    Logger.Debug($"GetAvailableComponenentsList():  Compoennt Exist : Release name - {component.Name}, version - {component.Version}");
+                    Logger.Debug($"GetAvailableComponenentsList():  Component Exist : Release name - {component.Name}, version - {component.Version}");
                 }
                 else
                 {

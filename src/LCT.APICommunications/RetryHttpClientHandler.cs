@@ -27,6 +27,7 @@ namespace LCT.APICommunications
                 .Or<TaskCanceledException>()
                 .OrResult<HttpResponseMessage>(r =>
                     (r.StatusCode == HttpStatusCode.RequestTimeout
+                    || r.StatusCode == HttpStatusCode.NotAcceptable
                     || (int)r.StatusCode >= 500)
                     && r.StatusCode != HttpStatusCode.Unauthorized
                     && r.StatusCode != HttpStatusCode.Forbidden)
@@ -34,10 +35,12 @@ namespace LCT.APICommunications
                      GetRetryInterval,
                     onRetry: (outcome, timespan, attempt, context) =>
                     {
-                        Logger.Debug($"Retry attempt {attempt} due to: {(outcome.Exception != null ? outcome.Exception.Message : $"{outcome.Result.StatusCode}")}");
+                        var httpMethod = context.ContainsKey("HttpMethod") ? context["HttpMethod"] : "Unknown Method";
+                        var requestUri = context.ContainsKey("RequestUri") ? context["RequestUri"] : "Unknown URI";
+                        Logger.Debug($"Retry attempt {attempt} for {httpMethod} method this URL {requestUri} : {(outcome.Exception != null ? outcome.Exception.Message : $"{outcome.Result.StatusCode}")}");
                         if (!_initialRetryLogged && context["LogWarnings"] as bool? != false)
                         {
-                            Logger.Warn($"Retry attempt triggered due to: {(outcome.Exception != null ? outcome.Exception.Message : $"{outcome.Result.StatusCode}")}");
+                            Logger.Warn($"Retry attempt triggered for this URL {requestUri} due to : {(outcome.Exception != null ? outcome.Exception.Message : $"{outcome.Result.StatusCode}")}");
                         }
                         context["RetryAttempt"] = attempt;
                         _initialRetryLogged = true;
@@ -48,7 +51,9 @@ namespace LCT.APICommunications
         {
             var context = new Context
             {
-                ["LogWarnings"] = !request.Headers.TryGetValues("LogWarnings", out var logWarningsValues) || !bool.TryParse(logWarningsValues.FirstOrDefault(), out var logWarnings) || logWarnings
+                ["LogWarnings"] = !request.Headers.TryGetValues("LogWarnings", out var logWarningsValues) || !bool.TryParse(logWarningsValues.FirstOrDefault(), out var logWarnings) || logWarnings,
+                ["HttpMethod"] = request.Method.ToString(), 
+                ["RequestUri"] = request.RequestUri?.ToString() 
             };
 
             var response = await _retryPolicy.ExecuteAsync(async (ctx) =>
@@ -59,7 +64,7 @@ namespace LCT.APICommunications
             if (_initialRetryLogged)
             {
                 var attempt = context.ContainsKey("RetryAttempt") ? context["RetryAttempt"] : 0;
-                Logger.Debug($"Retry attempt successful after {attempt} attempts.");
+                Logger.Debug($"Retry attempt successful after {attempt} attempts for {request.Method} {request.RequestUri}.");
                 _initialRetryLogged = false;
             }
 

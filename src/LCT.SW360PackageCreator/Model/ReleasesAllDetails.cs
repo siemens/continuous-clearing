@@ -10,9 +10,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace LCT.SW360PackageCreator.Model
 {
+    [ExcludeFromCodeCoverage]
     public class ReleasesAllDetails
-    {
-        [ExcludeFromCodeCoverage]
+    {        
         [JsonProperty("_embedded")]
         public AllReleasesEmbedded Embedded { get; set; }
         [JsonProperty("page")]
@@ -30,6 +30,8 @@ namespace LCT.SW360PackageCreator.Model
         {
             [JsonProperty("filename")]
             public string Filename { get; set; }
+            [JsonProperty("attachmentType")]
+            public string AttachmentType { get; set; }
 
         }
         public class Links
