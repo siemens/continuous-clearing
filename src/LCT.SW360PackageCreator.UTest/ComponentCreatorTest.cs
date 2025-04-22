@@ -824,7 +824,30 @@ namespace LCT.SW360PackageCreator.UTest
             // Assert
             Assert.AreEqual(string.Empty, uploadId);
         }
+        [Test]
+        public async Task CheckFossologyProcessStatus_FossologyResultIsNull_ReturnsEmptyUploadId()
+        {
+            // Arrange
+            var link = "https://example.com/fossology/process/12345";
+            var sw360CreatorServiceMock = new Mock<ISw360CreatorService>();
+            var item = new ComparisonBomData
+            {
+                Name = "TestComponent",
+                Version = "1.0.0",
+                ParentReleaseName = "ParentComponent"
+            };
 
+            sw360CreatorServiceMock
+                .Setup(x => x.CheckFossologyProcessStatus(link))
+                .ReturnsAsync((CheckFossologyProcess)null); // Simulate null response
+
+            // Act
+            var uploadId = await ComponentCreator.CheckFossologyProcessStatus(link, sw360CreatorServiceMock.Object, item);
+
+            // Assert
+            Assert.AreEqual(string.Empty, uploadId);
+            sw360CreatorServiceMock.Verify(x => x.CheckFossologyProcessStatus(link), Times.Once);
+        }
         [Test]
         public async Task CheckFossologyProcessStatus_NonExceptionScenario_ReturnsUploadId()
         {

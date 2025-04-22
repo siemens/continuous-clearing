@@ -539,8 +539,7 @@ namespace LCT.SW360PackageCreator
                 else
                 {
                     var formattedName = GetFormattedName(item);
-                    Logger.Logger.Log(null, Level.Warn, $"\t❌ Fossology upload failed  for Release : Name - {formattedName} ," +
-                        $" version - {item.Version}", null);
+                    Logger.Logger.Log(null, Level.Warn, $"\t❌ Fossology upload failed  for Release : Name - {formattedName} , version - {item.Version}", null);
                 }              
             }
             catch (AggregateException ex)
