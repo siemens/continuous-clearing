@@ -25,6 +25,7 @@
     <PackageReference Include="SharpZipLib" Version="1.4.2" />
     <PackageReference Include="YamlDotNet" Version="13.7.1" />
 	<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
+	<PackageReference Include="NuGet.Frameworks" Version="6.10.0" />
   </ItemGroup>
 
   <ItemGroup>

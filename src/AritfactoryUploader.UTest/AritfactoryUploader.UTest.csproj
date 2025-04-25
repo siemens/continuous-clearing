@@ -24,6 +24,7 @@
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+		<PackageReference Include="NuGet.Frameworks" Version="6.10.0" />
 	</ItemGroup>
 
 	<ItemGroup>

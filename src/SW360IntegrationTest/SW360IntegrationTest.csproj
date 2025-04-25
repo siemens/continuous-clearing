@@ -21,6 +21,7 @@
 		<PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
+		<PackageReference Include="NuGet.Frameworks" Version="6.10.0" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -32,7 +33,7 @@
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Update="PackageIdentifierTestFiles\CCTLocalBOMTemplateNugetInitial.json">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Update="PackageIdentifierTestFiles\Maven\CCTLocalBOMMavenInitial.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
