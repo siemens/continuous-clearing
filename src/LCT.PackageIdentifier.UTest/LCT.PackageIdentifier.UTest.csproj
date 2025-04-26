@@ -33,6 +33,9 @@
 		<None Include="PackageIdentifierUTTestFiles\Nuget.csproj">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
+		<None Include="PackageIdentifierUTTestFiles\NugetSelfContainedProject\Nuget-SelfContained.csproj">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -44,6 +47,9 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+		<PackageReference Include="NuGet.Frameworks" Version="6.13.2" />
 	</ItemGroup>
 	<!--<ItemGroup>
     <None Update="appsetting.json">
