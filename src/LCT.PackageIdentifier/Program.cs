@@ -88,7 +88,10 @@ namespace LCT.PackageIdentifier
 
             ICycloneDXBomParser cycloneDXBomParser = new CycloneDXBomParser();
             IBomCreator bomCreator = new BomCreator(cycloneDXBomParser);
-            bomCreator.JFrogService = GetJfrogService(appSettings);
+            if (appSettings!= null)
+            {
+                bomCreator.JFrogService = GetJfrogService(appSettings);
+            }
             bomCreator.BomHelper = new BomHelper();
 
             //Validating JFrog Settings
@@ -127,10 +130,10 @@ namespace LCT.PackageIdentifier
 
             ArtifactoryCredentials artifactoryUpload = new ArtifactoryCredentials()
             {
-                Token = appSettings.Jfrog.Token,
+                Token = appSettings?.Jfrog?.Token,
             };
             IJfrogAqlApiCommunication jfrogAqlApiCommunication =
-                new JfrogAqlApiCommunication(appSettings.Jfrog.URL, artifactoryUpload, appSettings.TimeOut);
+                new JfrogAqlApiCommunication(appSettings?.Jfrog?.URL, artifactoryUpload, appSettings.TimeOut);
             IJfrogAqlApiCommunicationFacade jFrogApiCommunicationFacade =
                 new JfrogAqlApiCommunicationFacade(jfrogAqlApiCommunication);
             IJFrogService jFrogService = new JFrogService(jFrogApiCommunicationFacade);
