@@ -120,14 +120,22 @@ namespace LCT.PackageIdentifier
 
         private static IJFrogService GetJfrogService(CommonAppSettings appSettings)
         {
+            if (appSettings == null)
+            {
+                throw new ArgumentNullException(nameof(appSettings), "AppSettings cannot be null.");
+            }
+
             ArtifactoryCredentials artifactoryUpload = new ArtifactoryCredentials()
             {
-                Token = appSettings?.Jfrog?.Token,
+                Token = appSettings.Jfrog?.Token,
             };
+
             IJfrogAqlApiCommunication jfrogAqlApiCommunication =
-                new JfrogAqlApiCommunication(appSettings?.Jfrog?.URL, artifactoryUpload, appSettings.TimeOut);
+                new JfrogAqlApiCommunication(appSettings.Jfrog?.URL, artifactoryUpload, appSettings.TimeOut);
+
             IJfrogAqlApiCommunicationFacade jFrogApiCommunicationFacade =
                 new JfrogAqlApiCommunicationFacade(jfrogAqlApiCommunication);
+
             IJFrogService jFrogService = new JFrogService(jFrogApiCommunicationFacade);
             return jFrogService;
         }
