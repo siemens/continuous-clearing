@@ -88,10 +88,7 @@ namespace LCT.PackageIdentifier
 
             ICycloneDXBomParser cycloneDXBomParser = new CycloneDXBomParser();
             IBomCreator bomCreator = new BomCreator(cycloneDXBomParser);
-            if (appSettings!= null)
-            {
-                bomCreator.JFrogService = GetJfrogService(appSettings);
-            }
+            bomCreator.JFrogService = GetJfrogService(appSettings);
             bomCreator.BomHelper = new BomHelper();
 
             //Validating JFrog Settings
@@ -123,11 +120,6 @@ namespace LCT.PackageIdentifier
 
         private static IJFrogService GetJfrogService(CommonAppSettings appSettings)
         {
-            if (appSettings == null || appSettings.Jfrog == null)
-            {
-                throw new ArgumentNullException(nameof(appSettings), "appSettings or appSettings.Jfrog is null.");
-            }
-
             ArtifactoryCredentials artifactoryUpload = new ArtifactoryCredentials()
             {
                 Token = appSettings?.Jfrog?.Token,
