@@ -53,12 +53,12 @@ namespace LCT.SW360PackageCreator
                 m_Verbose = true;
 
             ISettingsManager settingsManager = new SettingsManager();
+            CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
             EnvironmentHelper environmentHelper = new EnvironmentHelper();
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
-            Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
-            DefaultLogFolderInitialisation();
-            CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
+            Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;            
+            
             ISW360ApicommunicationFacade sW360ApicommunicationFacade;
             ISw360ProjectService sw360ProjectService = Getsw360ProjectServiceObject(appSettings, out sW360ApicommunicationFacade);
             ProjectReleases projectReleases = new ProjectReleases();
@@ -175,35 +175,23 @@ namespace LCT.SW360PackageCreator
             string FolderPath;
             if (!string.IsNullOrEmpty(appSettings.Directory.LogFolder))
             {
-                string defaultLogFilePath = Log4Net.CatoolLogPath;
-                LoggerManager.Shutdown();
                 FolderPath = appSettings.Directory.LogFolder;
                 Log4Net.Init(FileConstant.ComponentCreatorLog, appSettings.Directory.LogFolder, m_Verbose);
-                string currentLogFilePath = Log4Net.CatoolLogPath;
-                string logFileName = Path.GetFileName(Log4Net.CatoolLogPath);
-                LoggerManager.Shutdown();
-                File.Copy(defaultLogFilePath, currentLogFilePath, overwrite: true);
-                Thread.Sleep(2000);
-                Log4Net.Init(logFileName, FolderPath, m_Verbose);
-                return FolderPath;
-            }
-
-            return DefaultLogPath;
-        }
-        private static void DefaultLogFolderInitialisation()
-        {
-            string FolderPath;
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                FolderPath = FileConstant.LogFolder;
             }
             else
             {
-                FolderPath = "/var/log";
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    FolderPath = FileConstant.LogFolder;
+                }
+                else
+                {
+                    FolderPath = "/var/log";
+                }
+                Log4Net.Init(FileConstant.ComponentCreatorLog, FolderPath, m_Verbose);
             }
 
-            Log4Net.Init(FileConstant.ComponentCreatorLog, FolderPath, m_Verbose);
-            DefaultLogPath = FolderPath;            
+            return FolderPath;
         }
     }
 }
