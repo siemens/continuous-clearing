@@ -56,7 +56,7 @@ namespace LCT.APICommunications
         {
             var context = new Context
             {
-                ["LogWarnings"] = request.Headers.TryGetValues("LogWarnings", out var logWarningsValues) && bool.TryParse(logWarningsValues.FirstOrDefault(), out var logWarnings) ? logWarnings : true,
+                ["LogWarnings"] = request.Headers.TryGetValues("LogWarnings", out var logWarningsValues) && bool.TryParse(logWarningsValues.FirstOrDefault(), out var logWarnings) ? logWarnings : default,
                 ["HttpMethod"] = request.Method.ToString(),
                 ["RequestUri"] = request.RequestUri?.ToString(),
                 ["OperationInfo"] = request.Headers.TryGetValues("urlInfo", out var operationInfoValues) ? operationInfoValues.FirstOrDefault() : ""

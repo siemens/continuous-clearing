@@ -306,6 +306,34 @@ namespace LCT.Common.UTest
             Assert.IsTrue(result.Any(c => c.Name == "Component3" && c.Version == "3.0"));
             Assert.AreEqual(0, noOfExcludedComponents);
         }
+
+        [Test]
+        public void ValidateProjectName_WithInvalidCharacters_ReturnsMinusOne()
+        {
+            // Arrange
+            string projectName = "Invalid/Project\\Name.";
+            string projectReleaseName = "Release1";
+
+            // Act
+            int result = CommonHelper.ValidateProjectName(projectName, projectReleaseName);
+
+            // Assert
+            Assert.AreEqual(-1, result, "Expected -1 when project name contains invalid characters.");
+        }
+
+        [Test]
+        public void ValidateProjectName_WithValidCharacters_ReturnsZero()
+        {
+            // Arrange
+            string projectName = "ValidProjectName";
+            string projectReleaseName = "Release1";
+
+            // Act
+            int result = CommonHelper.ValidateProjectName(projectName, projectReleaseName);
+
+            // Assert
+            Assert.AreEqual(0, result, "Expected 0 when project name does not contain invalid characters.");
+        }        
     }
 
     public class TestObject

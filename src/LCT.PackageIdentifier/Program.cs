@@ -128,10 +128,10 @@ namespace LCT.PackageIdentifier
             }
             ArtifactoryCredentials artifactoryUpload = new ArtifactoryCredentials()
             {
-                Token = appSettings?.Jfrog?.Token,
+                Token = appSettings.Jfrog?.Token,
             };
             IJfrogAqlApiCommunication jfrogAqlApiCommunication =
-                new JfrogAqlApiCommunication(appSettings?.Jfrog?.URL, artifactoryUpload, appSettings.TimeOut);
+                new JfrogAqlApiCommunication(appSettings.Jfrog?.URL, artifactoryUpload, appSettings.TimeOut);
             IJfrogAqlApiCommunicationFacade jFrogApiCommunicationFacade =
                 new JfrogAqlApiCommunicationFacade(jfrogAqlApiCommunication);
             IJFrogService jFrogService = new JFrogService(jFrogApiCommunicationFacade);

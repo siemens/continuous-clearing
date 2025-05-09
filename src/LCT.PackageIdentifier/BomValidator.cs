@@ -29,10 +29,8 @@ namespace LCT.PackageIdentifier
             {
                 throw new InvalidDataException($"Invalid Project Id - {appSettings.SW360.ProjectID}");
             }
-            else if (CommonHelper.ContainsInvalidCharacters(sw360ProjectName, out string invalidChars))
+            else if (CommonHelper.ValidateProjectName(sw360ProjectName, projectReleases.Name) == -1)
             {
-                Logger.Error($"Invalid characters ({invalidChars}) found in SW360 project name '{sw360ProjectName}'. Create or rename project name without using these characters: '/', '\\', '.'");
-                Logger.Debug($"ValidateAppSettings(): Project name validation failed for '{projectReleases.Name}' due to invalid characters: {invalidChars}");
                 return -1;
             }
             else if (projectReleases?.clearingState == "CLOSED")

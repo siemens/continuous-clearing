@@ -286,7 +286,17 @@ namespace LCT.Common
                                              .ToList();
 
             invalidChars = string.Join(", ", foundInvalidChars.Select(c => $"'{c}'"));
-            return foundInvalidChars.Count > 0;
+            return foundInvalidChars.Count != 0;
+        }
+        public static int ValidateProjectName(string projectName, string projectReleaseName)
+        {
+            if (ContainsInvalidCharacters(projectName, out string invalidChars))
+            {
+                Logger.Error($"Invalid characters ({invalidChars}) found in SW360 project name '{projectName}'. Create or rename project name without using these characters: '/', '\\', '.'");
+                Logger.Debug($"ValidateAppSettings(): Project name validation failed for '{projectReleaseName}' due to invalid characters: {invalidChars}");
+                return -1;
+            }
+            return 0;
         }
         #endregion
 
