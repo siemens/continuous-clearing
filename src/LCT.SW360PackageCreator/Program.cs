@@ -61,10 +61,10 @@ namespace LCT.SW360PackageCreator
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
             ISW360ApicommunicationFacade sW360ApicommunicationFacade;
             ISw360ProjectService sw360ProjectService = Getsw360ProjectServiceObject(appSettings, out sW360ApicommunicationFacade);
-            ProjectReleases projectReleases = new ProjectReleases();           
+            ProjectReleases projectReleases = new ProjectReleases();
 
             string FolderPath = InitiateLogger(appSettings);
-            Console.OutputEncoding = System.Text.Encoding.UTF8;            
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
             settingsManager.CheckRequiredArgsToRun(appSettings, "Creator");
             int isValid = await CreatorValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
 

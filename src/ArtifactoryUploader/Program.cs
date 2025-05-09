@@ -17,7 +17,6 @@ using LCT.Facade.Interfaces;
 using LCT.Services;
 using LCT.Services.Interface;
 using log4net;
-using log4net.Config;
 using log4net.Core;
 using System;
 using System.Diagnostics;
@@ -52,7 +51,7 @@ namespace ArtifactoryUploader
 
             Log4Net.CatoolCurrentDirectory = System.IO.Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
             DefaultLogFolderInitialisation();
-            CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);           
+            CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
 
             string FolderPath = InitiateLogger(appSettings);
 
@@ -135,7 +134,7 @@ namespace ArtifactoryUploader
                 Log4Net.Init(logFileName, FolderPath, m_Verbose);
                 return FolderPath;
             }
-           
+
             return DefaultLogPath;
         }
         private static string DefaultLogFolderInitialisation()

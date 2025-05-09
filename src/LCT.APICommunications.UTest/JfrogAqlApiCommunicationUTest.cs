@@ -202,7 +202,7 @@ namespace LCT.APICommunications.UTest
             string expectedQuery = "items.find({\"repo\":{\"$eq\":\"npm-repo\"}, \"@npm.name\":{\"$eq\":\"test-package\"}, \"@npm.version\":{\"$eq\":\"1.0.0\"}}).include(\"repo\", \"path\", \"name\")";
             Assert.That(query, Is.EqualTo(expectedQuery));
         }
-       
+
 
         [Test]
         public void BuildAqlQuery_EmptyComponentType_ReturnsBasicQuery()
@@ -221,7 +221,7 @@ namespace LCT.APICommunications.UTest
             string expectedQuery = "items.find({\"repo\":{\"$eq\":\"generic-repo\"}}).include(\"repo\", \"path\", \"name\").limit(1)";
             Assert.That(query, Is.EqualTo(expectedQuery));
         }
-       
+
 
     }
 }

@@ -35,7 +35,7 @@ namespace LCT.Common
                 {
                     Logger.Error($"File not found: {filePath}. Please provide a valid file path.");
                 }
-                
+
             }
             catch (JsonSerializationException)
             {

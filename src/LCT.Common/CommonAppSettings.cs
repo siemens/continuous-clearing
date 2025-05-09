@@ -164,7 +164,7 @@ namespace LCT.Common
                     if (!string.IsNullOrEmpty(value))
                     {
                         m_FOSSURL = value.TrimEnd(Dataconstant.ForwardSlash);
-                    }                    
+                    }
                 }
             }
         }
@@ -255,7 +255,7 @@ namespace LCT.Common
                     m_LogFolder = value;
                     folderAction.ValidateFolderPath(value);
                 }
-                catch(DirectoryNotFoundException)
+                catch (DirectoryNotFoundException)
                 {
                     System.IO.Directory.CreateDirectory(m_LogFolder);
                 }

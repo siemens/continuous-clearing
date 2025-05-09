@@ -52,8 +52,8 @@ namespace LCT.APICommunications
             var context = new Context
             {
                 ["LogWarnings"] = !request.Headers.TryGetValues("LogWarnings", out var logWarningsValues) || !bool.TryParse(logWarningsValues.FirstOrDefault(), out var logWarnings) || logWarnings,
-                ["HttpMethod"] = request.Method.ToString(), 
-                ["RequestUri"] = request.RequestUri?.ToString() 
+                ["HttpMethod"] = request.Method.ToString(),
+                ["RequestUri"] = request.RequestUri?.ToString()
             };
 
             var response = await _retryPolicy.ExecuteAsync(async (ctx) =>

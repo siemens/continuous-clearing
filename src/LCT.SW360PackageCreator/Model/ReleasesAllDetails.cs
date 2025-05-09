@@ -12,7 +12,7 @@ namespace LCT.SW360PackageCreator.Model
 {
     [ExcludeFromCodeCoverage]
     public class ReleasesAllDetails
-    {        
+    {
         [JsonProperty("_embedded")]
         public AllReleasesEmbedded Embedded { get; set; }
         [JsonProperty("page")]

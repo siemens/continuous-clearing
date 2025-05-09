@@ -178,7 +178,7 @@ namespace LCT.APICommunications
                 var response = await httpClient.GetAsync(url);
                 if (!response.IsSuccessStatusCode)
                 {
-                    string errorContent = await response.Content.ReadAsStringAsync();                    
+                    string errorContent = await response.Content.ReadAsStringAsync();
                     var errorDetails = JsonConvert.DeserializeObject<Dictionary<string, object>>(errorContent);
                     string message = errorDetails.TryGetValue("message", out object value) ? value.ToString() : "Error";
                     int status = (int)response.StatusCode;
@@ -189,7 +189,7 @@ namespace LCT.APICommunications
             catch (HttpRequestException ex)
             {
                 Logger.Debug($"TriggerFossologyProcess(): {ex.Message}");
-                throw; 
+                throw;
             }
         }
         public async Task<HttpResponseMessage> CheckFossologyProcessStatus(string link)

@@ -123,7 +123,7 @@ namespace LCT.SW360PackageCreator.UTest
             Assert.AreEqual(Dataconstant.NotUploaded, item.FossologyUploadStatus);
             _mockSw360CreatorService.Verify(service => service.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
-        
+
 
         [Test]
         public async Task UpdateFossologyStatus_FossologyAlreadyUploaded_ShouldSetStatusToUploaded()
@@ -165,7 +165,7 @@ namespace LCT.SW360PackageCreator.UTest
 
             // Assert
             Assert.AreEqual(Dataconstant.Uploaded, item.FossologyUploadStatus);
-           
+
         }
 
         [Test]
@@ -393,7 +393,7 @@ namespace LCT.SW360PackageCreator.UTest
             };
             CheckFossologyProcess checkFossologyProcess = new CheckFossologyProcess()
             {
-                Status = "FAILURE"               
+                Status = "FAILURE"
             };
 
             ComparisonBomData item = new ComparisonBomData()
@@ -820,7 +820,7 @@ namespace LCT.SW360PackageCreator.UTest
                 .ThrowsAsync(new AggregateException("Error in TriggerFossologyProcess"));
 
             // Act
-            var uploadId = await ComponentCreator.CheckFossologyProcessStatus(link, sw360CreatorServiceMock.Object,item);
+            var uploadId = await ComponentCreator.CheckFossologyProcessStatus(link, sw360CreatorServiceMock.Object, item);
 
             // Assert
             Assert.AreEqual(string.Empty, uploadId);
@@ -878,7 +878,7 @@ namespace LCT.SW360PackageCreator.UTest
                 .ReturnsAsync(fossResult);
 
             // Act
-            var uploadId = await ComponentCreator.CheckFossologyProcessStatus(link, sw360CreatorServiceMock.Object,item);
+            var uploadId = await ComponentCreator.CheckFossologyProcessStatus(link, sw360CreatorServiceMock.Object, item);
 
             // Assert
             Assert.AreEqual("67890", uploadId);

@@ -58,7 +58,7 @@ namespace LCT.PackageIdentifier
             DefaultLogFolderInitialisation();
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
             ProjectReleases projectReleases = new ProjectReleases();
-            
+
             string FolderPath = LogFolderInitialisation(appSettings);
 
             settingsManager.CheckRequiredArgsToRun(appSettings, "Identifer");
@@ -169,7 +169,7 @@ namespace LCT.PackageIdentifier
                 Thread.Sleep(2000);
                 Log4Net.Init(logFileName, FolderPath, m_Verbose);
                 return FolderPath;
-            }          
+            }
 
             return DefaultLogPath;
         }

@@ -10,7 +10,6 @@ using LCT.Common.Interface;
 using LCT.Services.Interface;
 using log4net;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -22,7 +21,7 @@ namespace LCT.PackageIdentifier
     public static class BomValidator
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();        
+        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
         public static async Task<int> ValidateAppSettings(CommonAppSettings appSettings, ISw360ProjectService bomService, ProjectReleases projectReleases)
         {
             string sw360ProjectName = await bomService.GetProjectNameByProjectIDFromSW360(appSettings.SW360.ProjectID, appSettings.SW360.ProjectName, projectReleases);
@@ -49,6 +48,6 @@ namespace LCT.PackageIdentifier
             }
             return 0;
         }
-        
+
     }
 }

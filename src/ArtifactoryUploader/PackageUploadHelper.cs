@@ -55,7 +55,7 @@ namespace LCT.ArtifactoryUploader
             }
             catch (JsonReaderException ex)
             {
-                Logger.Error($"Exception occurred in reading the comparison BOM: {ex.Message}");                
+                Logger.Error($"Exception occurred in reading the comparison BOM: {ex.Message}");
             }
             return componentsToBoms;
         }

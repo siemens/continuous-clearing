@@ -74,7 +74,7 @@ namespace LCT.SW360PackageCreator
             }
             catch (AggregateException ex)
             {
-                Logger.Debug($"\tError in TriggerFossologyValidation--{ex}");                
+                Logger.Debug($"\tError in TriggerFossologyValidation--{ex}");
             }
         }
 
@@ -145,7 +145,7 @@ namespace LCT.SW360PackageCreator
                 Logger.Debug($"TriggerFossologyValidation(): SW360 Fossology Process validation successful!!");
             }
         }
-        
+
         private static async Task<ReleasesAllDetails> GetAllReleasesDetails(ISW360ApicommunicationFacade sW360ApicommunicationFacade, int page, int pageEntries)
         {
             ReleasesAllDetails releaseResponse = null;
@@ -182,13 +182,13 @@ namespace LCT.SW360PackageCreator
                 Logger.Error($"Fossology URL is not provided, Please make sure to add Fossology URL in appsettings.");
                 Logger.Debug($"FossologyUrlValidation() : Fossology URL not provided in appsettings");
                 environmentHelper.CallEnvironmentExit(-1);
-                return false; 
+                return false;
             }
-            url = url.ToLower(); 
+            url = url.ToLower();
             string prodFossUrl = Dataconstant.ProductionFossologyURL.ToLower();
             string stageFossUrl = Dataconstant.StageFossologyURL.ToLower();
 
-        if (Uri.IsWellFormedUriString(appSettings.SW360.Fossology.URL, UriKind.Absolute))
+            if (Uri.IsWellFormedUriString(appSettings.SW360.Fossology.URL, UriKind.Absolute))
             {
                 if (url.Contains(prodFossUrl) || url.Contains(stageFossUrl))
                 {

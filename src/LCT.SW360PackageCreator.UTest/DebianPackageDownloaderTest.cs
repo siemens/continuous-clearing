@@ -7,7 +7,6 @@
 using LCT.Common;
 using LCT.Common.Model;
 using LCT.SW360PackageCreator.Interfaces;
-using log4net;
 using Moq;
 using NUnit.Framework;
 using System.IO;
@@ -229,5 +228,5 @@ namespace LCT.SW360PackageCreator.UTest
                     .Invoke(null, new object[] { nonExistentFolderPath, nonExistentFilePath });
             });
         }
-        }
+    }
 }
