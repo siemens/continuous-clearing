@@ -36,6 +36,7 @@ namespace LCT.APICommunications
         public override async Task<HttpResponseMessage> GetApiKey()
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
+            httpClient.SetLogWarnings(false, "unable to get api key details");
             string url = $"{DomainName}/api/security/apiKey";
             return await httpClient.GetAsync(url);
         }
@@ -43,6 +44,7 @@ namespace LCT.APICommunications
         public override async Task<HttpResponseMessage> CopyFromRemoteRepo(ComponentsToArtifactory component)
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
+            httpClient.SetLogWarnings(false, "unable to copy package from remote repository");
             const HttpContent httpContent = null;
             return await httpClient.PostAsync(component.CopyPackageApiUrl, httpContent);
         }
@@ -50,6 +52,7 @@ namespace LCT.APICommunications
         public override async Task<HttpResponseMessage> MoveFromRepo(ComponentsToArtifactory component)
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
+            httpClient.SetLogWarnings(false, "unable to move package from remote repository");
             const HttpContent httpContent = null;
             return await httpClient.PostAsync(component.MovePackageApiUrl, httpContent);
         }
@@ -57,11 +60,13 @@ namespace LCT.APICommunications
         public override async Task<HttpResponseMessage> GetPackageInfo(ComponentsToArtifactory component)
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
+            httpClient.SetLogWarnings(false, "unable to get package information");
             return await httpClient.GetAsync(component.PackageInfoApiUrl);
         }
         public override void UpdatePackagePropertiesInJfrog(string sw360releaseUrl, string destRepoName, UploadArgs uploadArgs)
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
+            httpClient.SetLogWarnings(false, "unable to update package properties in jfrog repository");
             const HttpContent httpContent = null;
             string url = $"{DomainName}/api/storage/{destRepoName}/{uploadArgs.ReleaseName}.{uploadArgs.Version}.pypi?" +
                  $"properties=sw360url={sw360releaseUrl}";
