@@ -118,8 +118,7 @@ namespace ArtifactoryUploader
 
         private static string InitiateLogger(CommonAppSettings appSettings)
         {
-            string FolderPath;
-            appSettings.Directory.LogFolder = "D:\\CATool";
+            string FolderPath;            
             if (!string.IsNullOrEmpty(appSettings.Directory.LogFolder))
             {
                 string defaultLogFilePath = Log4Net.CatoolLogPath;
