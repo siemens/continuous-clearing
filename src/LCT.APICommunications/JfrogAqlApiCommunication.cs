@@ -52,7 +52,6 @@ namespace LCT.APICommunications
         public async Task<HttpResponseMessage> GetInternalComponentDataByRepo(string repoName)
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-            httpClient.SetLogWarnings(false, "unable to get component data from jfrog repository");
             TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
             httpClient.Timeout = timeOutInSec;
 
@@ -69,7 +68,6 @@ namespace LCT.APICommunications
         public async Task<HttpResponseMessage> GetNpmComponentDataByRepo(string repoName)
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-            httpClient.SetLogWarnings(false, "unable to get npm component data from jfrog repository");
             TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
             httpClient.Timeout = timeOutInSec;
 
@@ -86,7 +84,6 @@ namespace LCT.APICommunications
         public async Task<HttpResponseMessage> GetPypiComponentDataByRepo(string repoName)
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-            httpClient.SetLogWarnings(false, "unable to get poetry component data from jfrog repository");
             TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
             httpClient.Timeout = timeOutInSec;
 
@@ -214,7 +211,6 @@ namespace LCT.APICommunications
         private async Task<HttpResponseMessage> ExecuteSearchAqlAsync(string uri, HttpContent httpContent)
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-            httpClient.SetLogWarnings(false, "unable to get component data from jfrog repository");
             TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
             httpClient.Timeout = timeOutInSec;
 
