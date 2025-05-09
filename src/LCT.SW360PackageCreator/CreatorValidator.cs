@@ -41,6 +41,10 @@ namespace LCT.SW360PackageCreator
             {
                 throw new InvalidDataException($"Invalid Project Id - {appSettings.SW360.ProjectID}");
             }
+            else if (CommonHelper.ValidateProjectName(sw360ProjectName, projectReleases.Name) == -1)
+            {
+                return -1;
+            }
             else if (projectReleases?.clearingState == "CLOSED")
             {
                 Logger.Error($"Provided Sw360 project is not in active state ,Please make sure you added the correct project details that is in active state..");
