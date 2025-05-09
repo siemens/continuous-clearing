@@ -11,6 +11,7 @@ using log4net;
 using log4net.Core;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -287,14 +288,28 @@ namespace LCT.Common
 
             invalidChars = string.Join(", ", foundInvalidChars.Select(c => $"'{c}'"));
             return foundInvalidChars.Count != 0;
-        }
-        public static int ValidateProjectName(string projectName, string projectReleaseName)
+        }        
+        public static int ValidateSw360Project(string sw360ProjectName, string clearingState, string Name, CommonAppSettings appSettings)
         {
-            if (ContainsInvalidCharacters(projectName, out string invalidChars))
+            if (string.IsNullOrEmpty(sw360ProjectName))
             {
-                Logger.Error($"Invalid characters ({invalidChars}) found in SW360 project name '{projectName}'. Create or rename project name without using these characters: '/', '\\', '.'");
-                Logger.Debug($"ValidateAppSettings(): Project name validation failed for '{projectReleaseName}' due to invalid characters: {invalidChars}");
+                throw new InvalidDataException($"Invalid Project Id - {appSettings.SW360.ProjectID}");
+            }
+            else if (ContainsInvalidCharacters(Name, out string invalidChars))
+            {
+                Logger.Error($"Invalid characters ({invalidChars}) found in SW360 project name '{Name}'. Create or rename project name without using these characters: '/', '\\', '.'");
+                Logger.Debug($"ValidateAppSettings(): Project name validation failed for '{sw360ProjectName}' due to invalid characters: {invalidChars}");
                 return -1;
+            }
+            else if (clearingState == "CLOSED")
+            {
+                Logger.Error($"Provided Sw360 project is not in active state. Please make sure you added the correct project details that are in an active state.");
+                Logger.Debug($"ValidateSw360Project(): Sw360 project {Name} is in {clearingState} state.");
+                return -1;
+            }
+            else
+            {
+                appSettings.SW360.ProjectName = sw360ProjectName;
             }
             return 0;
         }

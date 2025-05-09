@@ -37,25 +37,7 @@ namespace LCT.SW360PackageCreator
         {
             string sw360ProjectName = await sw360ProjectService.GetProjectNameByProjectIDFromSW360(appSettings.SW360.ProjectID, appSettings.SW360.ProjectName, projectReleases);
 
-            if (string.IsNullOrEmpty(sw360ProjectName))
-            {
-                throw new InvalidDataException($"Invalid Project Id - {appSettings.SW360.ProjectID}");
-            }
-            else if (CommonHelper.ValidateProjectName(sw360ProjectName, projectReleases.Name) == -1)
-            {
-                return -1;
-            }
-            else if (projectReleases?.clearingState == "CLOSED")
-            {
-                Logger.Error($"Provided Sw360 project is not in active state ,Please make sure you added the correct project details that is in active state..");
-                Logger.Debug($"ValidateAppSettings() : Sw360 project " + projectReleases.Name + " is in " + projectReleases.clearingState + " state.");
-                return -1;
-            }
-            else
-            {
-                appSettings.SW360.ProjectName = sw360ProjectName;
-            }
-            return 0;
+            return CommonHelper.ValidateSw360Project(sw360ProjectName, projectReleases?.clearingState,projectReleases?.Name, appSettings);
         }
         public static async Task TriggerFossologyValidation(CommonAppSettings appSettings, ISW360ApicommunicationFacade sW360ApicommunicationFacade)
         {

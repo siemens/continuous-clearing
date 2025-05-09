@@ -9,6 +9,7 @@ using LCT.Common.Model;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace LCT.Common.UTest
@@ -306,34 +307,80 @@ namespace LCT.Common.UTest
             Assert.IsTrue(result.Any(c => c.Name == "Component3" && c.Version == "3.0"));
             Assert.AreEqual(0, noOfExcludedComponents);
         }
-
         [Test]
-        public void ValidateProjectName_WithInvalidCharacters_ReturnsMinusOne()
+        public void ValidateSw360Project_WithEmptyProjectName_ThrowsInvalidDataException()
         {
             // Arrange
-            string projectName = "Invalid/Project\\Name.";
-            string projectReleaseName = "Release1";
+            string sw360ProjectName = string.Empty;
+            string clearingState = "OPEN";
+            string name = "ValidProjectName";
+            var appSettings = new CommonAppSettings
+            {
+                SW360 = new SW360 { ProjectID = "12345" }
+            };
+
+            // Act & Assert
+            var ex = Assert.Throws<InvalidDataException>(() =>
+                CommonHelper.ValidateSw360Project(sw360ProjectName, clearingState, name, appSettings));
+            Assert.AreEqual("Invalid Project Id - 12345", ex.Message);
+        }
+
+        [Test]
+        public void ValidateSw360Project_WithInvalidCharacters_ReturnsMinusOne()
+        {
+            // Arrange
+            string sw360ProjectName = "ValidProjectName";
+            string clearingState = "OPEN";
+            string name = "Invalid/Project\\Name.";
+            var appSettings = new CommonAppSettings
+            {
+                SW360 = new SW360 { ProjectID = "12345" }
+            };
 
             // Act
-            int result = CommonHelper.ValidateProjectName(projectName, projectReleaseName);
+            int result = CommonHelper.ValidateSw360Project(sw360ProjectName, clearingState, name, appSettings);
 
             // Assert
             Assert.AreEqual(-1, result, "Expected -1 when project name contains invalid characters.");
         }
 
         [Test]
-        public void ValidateProjectName_WithValidCharacters_ReturnsZero()
+        public void ValidateSw360Project_WithClosedClearingState_ReturnsMinusOne()
         {
             // Arrange
-            string projectName = "ValidProjectName";
-            string projectReleaseName = "Release1";
+            string sw360ProjectName = "ValidProjectName";
+            string clearingState = "CLOSED";
+            string name = "ValidProjectName";
+            var appSettings = new CommonAppSettings
+            {
+                SW360 = new SW360 { ProjectID = "12345" }
+            };
 
             // Act
-            int result = CommonHelper.ValidateProjectName(projectName, projectReleaseName);
+            int result = CommonHelper.ValidateSw360Project(sw360ProjectName, clearingState, name, appSettings);
 
             // Assert
-            Assert.AreEqual(0, result, "Expected 0 when project name does not contain invalid characters.");
-        }        
+            Assert.AreEqual(-1, result, "Expected -1 when clearing state is CLOSED.");
+        }
+
+        [Test]
+        public void ValidateSw360Project_WithValidInputs_ReturnsZero()
+        {
+            // Arrange
+            string sw360ProjectName = "ValidProjectName";
+            string clearingState = "OPEN";
+            string name = "ValidProjectName";
+            var appSettings = new CommonAppSettings
+            {
+                SW360 = new SW360 { ProjectID = "12345" }
+            };
+
+            // Act
+            int result = CommonHelper.ValidateSw360Project(sw360ProjectName, clearingState, name, appSettings);
+
+            // Assert
+            Assert.AreEqual(0, result, "Expected 0 when all inputs are valid.");
+        }
     }
 
     public class TestObject
