@@ -123,6 +123,10 @@ namespace LCT.PackageIdentifier
 
         private static IJFrogService GetJfrogService(CommonAppSettings appSettings)
         {
+            if (appSettings == null)
+            {
+                throw new ArgumentNullException(nameof(appSettings), "Application settings cannot be null.");
+            }
             ArtifactoryCredentials artifactoryUpload = new ArtifactoryCredentials()
             {
                 Token = appSettings?.Jfrog?.Token,
@@ -173,7 +177,7 @@ namespace LCT.PackageIdentifier
 
             return DefaultLogPath;
         }
-        private static string DefaultLogFolderInitialisation()
+        private static void DefaultLogFolderInitialisation()
         {
             string FolderPath;
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -186,8 +190,7 @@ namespace LCT.PackageIdentifier
             }
 
             Log4Net.Init(FileConstant.BomCreatorLog, FolderPath, m_Verbose);
-            DefaultLogPath = FolderPath;
-            return FolderPath;
+            DefaultLogPath = FolderPath;            
         }
     }
 }

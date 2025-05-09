@@ -136,7 +136,7 @@ namespace ArtifactoryUploader
 
             return DefaultLogPath;
         }
-        private static string DefaultLogFolderInitialisation()
+        private static void DefaultLogFolderInitialisation()
         {
             string FolderPath;
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -150,7 +150,6 @@ namespace ArtifactoryUploader
 
             Log4Net.Init(FileConstant.ArtifactoryUploaderLog, FolderPath, m_Verbose);
             DefaultLogPath = FolderPath;
-            return FolderPath;
         }
 
         private static IJFrogService GetJfrogService(CommonAppSettings appSettings)

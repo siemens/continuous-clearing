@@ -126,7 +126,8 @@ namespace LCT.PackageIdentifier
                 component.BomRef = RemoveSuffix(component.BomRef, suffix);
                 component.Purl = RemoveSuffix(component.Purl, suffix);
             }
-            foreach (var dependency in bom?.Dependencies)
+
+            foreach (var dependency in bom?.Dependencies ?? Enumerable.Empty<Dependency>()) 
             {
                 RemoveTypeJarSuffixFromDependency(dependency);
             }
@@ -140,7 +141,7 @@ namespace LCT.PackageIdentifier
             }
 
             // Recursively process nested dependencies
-            if (dependency.Dependencies != null && dependency.Dependencies.Any())
+            if (dependency.Dependencies != null && dependency.Dependencies.Count != 0)
             {
                 foreach (var nestedDependency in dependency.Dependencies)
                 {

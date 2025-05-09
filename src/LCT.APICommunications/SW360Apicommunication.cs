@@ -74,7 +74,7 @@ namespace LCT.APICommunications
         public async Task<string> GetProjects()
         {
             HttpClient httpClient = GetHttpClient();
-            //httpClient.SetLogWarnings(true, "unable to get project details");
+            httpClient.SetLogWarnings(true, "unable to get project details");
             var result = string.Empty;
             try
             {

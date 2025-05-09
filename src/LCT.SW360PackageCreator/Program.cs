@@ -190,7 +190,7 @@ namespace LCT.SW360PackageCreator
 
             return DefaultLogPath;
         }
-        private static string DefaultLogFolderInitialisation()
+        private static void DefaultLogFolderInitialisation()
         {
             string FolderPath;
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -203,8 +203,7 @@ namespace LCT.SW360PackageCreator
             }
 
             Log4Net.Init(FileConstant.ComponentCreatorLog, FolderPath, m_Verbose);
-            DefaultLogPath = FolderPath;
-            return FolderPath;
+            DefaultLogPath = FolderPath;            
         }
     }
 }

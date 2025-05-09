@@ -32,21 +32,25 @@ namespace LCT.APICommunications
                     && r.StatusCode != HttpStatusCode.Unauthorized
                     && r.StatusCode != HttpStatusCode.Forbidden)
                 .WaitAndRetryAsync(ApiConstant.APIRetryIntervals.Count,
-                     GetRetryInterval,
-                    onRetry: (outcome, timespan, attempt, context) =>
-                    {
-                        var httpMethod = context.ContainsKey("HttpMethod") ? context["HttpMethod"] : "Unknown Method";
-                        var operationInfo = context.ContainsKey("OperationInfo") ? context["OperationInfo"] : "";
-                        var requestUri = context.ContainsKey("RequestUri") ? context["RequestUri"] : "Unknown URI";
-                        Logger.Debug($"Retry attempt {attempt} for {httpMethod} method this URL {requestUri} : {(outcome.Exception != null ? outcome.Exception.Message : $"{outcome.Result.StatusCode}")}");
-                        if (!_initialRetryLogged && context["LogWarnings"] as bool? != false)
-                        {
-                            Logger.Warn($"Retry attempt triggered for {operationInfo}: {(outcome.Exception != null ? outcome.Exception.Message : $"{outcome.Result.StatusCode}")}");
-                        }
-                        context["RetryAttempt"] = attempt;
-                        _initialRetryLogged = true;
+                    GetRetryInterval,
+                    OnRetry);
+        }
 
-                    });
+        private void OnRetry(DelegateResult<HttpResponseMessage> outcome, TimeSpan timespan, int attempt, Context context)
+        {
+            var httpMethod = context.ContainsKey("HttpMethod") ? context["HttpMethod"] : "Unknown Method";
+            var operationInfo = context.ContainsKey("OperationInfo") ? context["OperationInfo"] : "";
+            var requestUri = context.ContainsKey("RequestUri") ? context["RequestUri"] : "Unknown URI";
+
+            Logger.Debug($"Retry attempt {attempt} for {httpMethod} method this URL {requestUri} : {(outcome.Exception != null ? outcome.Exception.Message : $"{outcome.Result.StatusCode}")}");
+
+            if (!_initialRetryLogged && context["LogWarnings"] as bool? != false)
+            {
+                Logger.Warn($"Retry attempt triggered for {operationInfo}: {(outcome.Exception != null ? outcome.Exception.Message : $"{outcome.Result.StatusCode}")}");
+            }
+
+            context["RetryAttempt"] = attempt;
+            _initialRetryLogged = true;
         }
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, System.Threading.CancellationToken cancellationToken)
         {

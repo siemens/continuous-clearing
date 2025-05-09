@@ -180,7 +180,7 @@ namespace LCT.APICommunications
                 query.Append($"{{ \"@nuget.id\":{{ \"$eq\": \"{component.Name.ToLowerInvariant()}\" }} }}");
                 query.Append("] },");
                 query.Append($"{{ \"@nuget.version\":{{\"$eq\": \"{component.Version}\" }} }}");
-                query.Append("]");
+                query.Append(']');
                 query.Append("}).include(\"repo\", \"path\", \"name\").limit(1)");
 
                 return query.ToString();

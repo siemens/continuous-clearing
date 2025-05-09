@@ -286,7 +286,7 @@ namespace LCT.Common
                                              .ToList();
 
             invalidChars = string.Join(", ", foundInvalidChars.Select(c => $"'{c}'"));
-            return foundInvalidChars.Any();
+            return foundInvalidChars.Count > 0;
         }
         #endregion
 
