@@ -31,7 +31,8 @@ namespace LCT.PackageIdentifier.UTest
             ProjectReleases projectReleases = new ProjectReleases();
             IFolderAction folderAction = new FolderAction();
             IFileOperations fileOperations = new FileOperations();
-
+            projectReleases.clearingState = "CLOSED";
+            projectReleases.Name = projectName;
             mockISw360ProjectService.Setup(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<String>(), It.IsAny<string>(), projectReleases))
                 .ReturnsAsync(projectName);
 
@@ -51,10 +52,10 @@ namespace LCT.PackageIdentifier.UTest
                 }
             };
             //Act
-            await BomValidator.ValidateAppSettings(CommonAppSettings, mockISw360ProjectService.Object, projectReleases);
+            int result=await BomValidator.ValidateAppSettings(CommonAppSettings, mockISw360ProjectService.Object, projectReleases);
 
             //Assert
-            mockISw360ProjectService.Verify(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<string>(), It.IsAny<string>(), projectReleases), Times.AtLeastOnce);
+            Assert.AreEqual(-1,result, "Expected -1 when clearing state is CLOSED.");
 
         }
 
@@ -91,41 +92,6 @@ namespace LCT.PackageIdentifier.UTest
             return Task.CompletedTask;
         }
 
-        [TestCase]
-        public async Task ValidateAppSettings_ProvidedProjectID_EndsTheApplicationOnClosedProject()
-        {
-            //Arrange
-            string projectName = "Test";
-            ProjectReleases projectReleases = new ProjectReleases();
-            projectReleases.clearingState = "CLOSED";
-
-            mockISw360ProjectService.Setup(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<String>(), It.IsAny<string>(), projectReleases))
-                .ReturnsAsync(projectName);
-
-            mockIFileOperations.Setup(x => x.ValidateFilePath(It.IsAny<string>()))
-                .Callback((string message) => { })
-                .Verifiable();
-
-            mockIFolderAction.Setup(x => x.ValidateFolderPath(It.IsAny<string>()))
-                .Callback((string message) => { })
-                .Verifiable();
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            var CommonAppSettings = new CommonAppSettings(mockIFolderAction.Object, mockIFileOperations.Object)
-            {
-                SW360 = new SW360() { ProjectName = "Test" },
-                Directory = new LCT.Common.Directory(mockIFolderAction.Object, mockIFileOperations.Object)
-                {
-                    InputFolder = ""
-                }
-            };
-
-            //Act
-            await BomValidator.ValidateAppSettings(CommonAppSettings, mockISw360ProjectService.Object, projectReleases);
-
-            //Assert
-            mockISw360ProjectService.Verify(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<string>(), It.IsAny<string>(), projectReleases), Times.AtLeastOnce);
-
-        }
+        
     }
 }
