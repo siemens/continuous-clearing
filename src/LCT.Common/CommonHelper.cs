@@ -23,6 +23,7 @@ namespace LCT.Common
     public static class CommonHelper
     {
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly char[] InvalidProjectNameChars = new char[] { '/', '\\', '.' };
         public static string ProjectSummaryLink { get; set; }
 
         #region public
@@ -277,6 +278,15 @@ namespace LCT.Common
             }
 
             return Array.Empty<string>();
+        }
+        public static bool ContainsInvalidCharacters(string projectName, out string invalidChars)
+        {
+            var foundInvalidChars = projectName.Where(c => InvalidProjectNameChars.Contains(c))
+                                             .Distinct()
+                                             .ToList();
+
+            invalidChars = string.Join(", ", foundInvalidChars.Select(c => $"'{c}'"));
+            return foundInvalidChars.Any();
         }
         #endregion
 

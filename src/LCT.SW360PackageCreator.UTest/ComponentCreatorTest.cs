@@ -15,6 +15,7 @@ using LCT.Common.Model;
 using LCT.Facade.Interfaces;
 using LCT.Services;
 using LCT.Services.Interface;
+using LCT.Services.Model;
 using LCT.SW360PackageCreator.Interfaces;
 using LCT.SW360PackageCreator.Model;
 using Moq;
@@ -67,7 +68,7 @@ namespace LCT.SW360PackageCreator.UTest
                 Name = "TestComponent",
                 Version = "1.0.0",
                 ApprovedStatus = "NEW_CLEARING",
-                ClearingState = Dataconstant.ScanClearingState
+                ClearingState = Dataconstant.ScanAvailableState
             };
 
             // Act
@@ -86,7 +87,7 @@ namespace LCT.SW360PackageCreator.UTest
                 Name = "TestComponent",
                 Version = "1.0.0",
                 ApprovedStatus = "NEW_CLEARING",
-                ClearingState = Dataconstant.ScanClearingState,
+                ClearingState = Dataconstant.ScanAvailableState,
                 FossologyLink = "https://fossology.example.com/upload/12345",
                 FossologyUploadId = "12345"
             };
@@ -108,7 +109,7 @@ namespace LCT.SW360PackageCreator.UTest
                 Name = "TestComponent",
                 Version = "1.0.0",
                 ApprovedStatus = "NEW_CLEARING",
-                ClearingState = Dataconstant.ScanClearingState
+                ClearingState = Dataconstant.ScanAvailableState
             };
 
             _mockSw360CreatorService
@@ -1049,7 +1050,118 @@ namespace LCT.SW360PackageCreator.UTest
             Assert.AreEqual("https://fossology.example.com/upload/12345", item.FossologyLink, "FossologyLink should be set from AdditionalData.");
             Assert.AreEqual("12345", item.FossologyUploadId, "FossologyUploadId should be set from ProcessStepIdInTool.");
         }
+        [Test]
+        public async Task ProcessReleaseAlreadyExist_ReleaseAlreadyExists_WithValidReleaseID_ShouldTriggerFossologyUpload()
+        {
+            // Arrange
+            var item = new ComparisonBomData
+            {
+                ReleaseID = "12345",
+                DownloadUrl = "https://example.com/download"
+            };
+            var releaseCreateStatus = new ReleaseCreateStatus
+            {
+                ReleaseAlreadyExist = true
+            };
+            var releasesInfo = new ReleasesInfo
+            {
+                Name = "TestRelease",
+                Embedded = new AttachmentEmbedded
+                {
+                    Sw360attachments = new List<Sw360Attachments>
+                {
+                    new Sw360Attachments { AttachmentType = "SOURCE" }
+                }
+                }
+            };
 
+            _mockSw360CreatorService
+                .Setup(service => service.GetReleaseInfo(item.ReleaseID))
+                .ReturnsAsync(releasesInfo);
+
+            // Act
+            await ComponentCreator.ProcessReleaseAlreadyExist(item, _mockSw360CreatorService.Object, _appSettings, releaseCreateStatus);
+
+            // Assert
+            Assert.AreEqual("TestRelease", item.ParentReleaseName);
+            _mockSw360CreatorService.Verify(service => service.GetReleaseInfo(item.ReleaseID), Times.Once);
+        }
+
+        [Test]
+        public async Task ProcessReleaseAlreadyExist_ReleaseAlreadyExists_WithNoAttachments_ShouldNotTriggerFossologyUpload()
+        {
+            // Arrange
+            var item = new ComparisonBomData
+            {
+                ReleaseID = "12345",
+                DownloadUrl = "https://example.com/download"
+            };
+            var releaseCreateStatus = new ReleaseCreateStatus
+            {
+                ReleaseAlreadyExist = true
+            };
+            var releasesInfo = new ReleasesInfo
+            {
+                Name = "TestRelease",
+                Embedded = new AttachmentEmbedded
+                {
+                    Sw360attachments = new List<Sw360Attachments>() // No attachments
+                }
+            };
+
+            _mockSw360CreatorService
+                .Setup(service => service.GetReleaseInfo(item.ReleaseID))
+                .ReturnsAsync(releasesInfo);
+
+            // Act
+            await ComponentCreator.ProcessReleaseAlreadyExist(item, _mockSw360CreatorService.Object, _appSettings, releaseCreateStatus);
+
+            // Assert
+            Assert.AreEqual("TestRelease", item.ParentReleaseName);
+            _mockSw360CreatorService.Verify(service => service.GetReleaseInfo(item.ReleaseID), Times.Once);
+        }
+
+        [Test]
+        public async Task ProcessReleaseAlreadyExist_ReleaseDoesNotExist_WithValidDownloadUrl_ShouldTriggerFossologyUpload()
+        {
+            // Arrange
+            var item = new ComparisonBomData
+            {
+                ReleaseID = "12345",
+                DownloadUrl = "https://example.com/download"
+            };
+            var releaseCreateStatus = new ReleaseCreateStatus
+            {
+                ReleaseAlreadyExist = false
+            };
+
+            // Act
+            await ComponentCreator.ProcessReleaseAlreadyExist(item, _mockSw360CreatorService.Object, _appSettings, releaseCreateStatus);
+
+            // Assert
+            _mockSw360CreatorService.Verify(service => service.GetReleaseInfo(It.IsAny<string>()), Times.Never);
+        }
+
+        [Test]
+        public async Task ProcessReleaseAlreadyExist_ReleaseDoesNotExist_WithInvalidDownloadUrl_ShouldNotTriggerFossologyUpload()
+        {
+            // Arrange
+            var item = new ComparisonBomData
+            {
+                ReleaseID = "12345",
+                DownloadUrl = Dataconstant.DownloadUrlNotFound
+            };
+            var releaseCreateStatus = new ReleaseCreateStatus
+            {
+                ReleaseAlreadyExist = false
+            };
+
+            // Act
+            await ComponentCreator.ProcessReleaseAlreadyExist(item, _mockSw360CreatorService.Object, _appSettings, releaseCreateStatus);
+
+            // Assert
+            _mockSw360CreatorService.Verify(service => service.GetReleaseInfo(It.IsAny<string>()), Times.Never);
+        }
     }
 }
 

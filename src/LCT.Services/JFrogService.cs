@@ -141,7 +141,7 @@ namespace LCT.Services
                 httpResponseMessage.EnsureSuccessStatusCode();
 
                 string stringData = httpResponseMessage.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
-                var aqlResponse = JsonConvert.DeserializeObject<AqlResponse>(stringData);
+                var aqlResponse = JsonConvert.DeserializeObject<AqlResponse>(stringData);                
                 aqlResult = aqlResponse?.Results.FirstOrDefault();
             }
             catch (HttpRequestException httpException)

@@ -24,6 +24,7 @@ using System.IO;
 using System.Net.Http;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Directory = System.IO.Directory;
 
@@ -39,6 +40,7 @@ namespace LCT.SW360PackageCreator
         private static bool m_Verbose = false;
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
+        public static string DefaultLogPath { get; set; }
 
         protected Program() { }
 
@@ -52,13 +54,14 @@ namespace LCT.SW360PackageCreator
 
             ISettingsManager settingsManager = new SettingsManager();
             EnvironmentHelper environmentHelper = new EnvironmentHelper();
-            CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
-            ISW360ApicommunicationFacade sW360ApicommunicationFacade;
-            ISw360ProjectService sw360ProjectService = Getsw360ProjectServiceObject(appSettings, out sW360ApicommunicationFacade);
-            ProjectReleases projectReleases = new ProjectReleases();
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
+            DefaultLogFolderInitialisation();
+            CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
+            ISW360ApicommunicationFacade sW360ApicommunicationFacade;
+            ISw360ProjectService sw360ProjectService = Getsw360ProjectServiceObject(appSettings, out sW360ApicommunicationFacade);
+            ProjectReleases projectReleases = new ProjectReleases();           
 
             string FolderPath = InitiateLogger(appSettings);
             Console.OutputEncoding = System.Text.Encoding.UTF8;            
@@ -172,22 +175,35 @@ namespace LCT.SW360PackageCreator
             string FolderPath;
             if (!string.IsNullOrEmpty(appSettings.Directory.LogFolder))
             {
+                string defaultLogFilePath = Log4Net.CatoolLogPath;
+                LoggerManager.Shutdown();
                 FolderPath = appSettings.Directory.LogFolder;
                 Log4Net.Init(FileConstant.ComponentCreatorLog, appSettings.Directory.LogFolder, m_Verbose);
+                string currentLogFilePath = Log4Net.CatoolLogPath;
+                string logFileName = Path.GetFileName(Log4Net.CatoolLogPath);
+                LoggerManager.Shutdown();
+                File.Copy(defaultLogFilePath, currentLogFilePath, overwrite: true);
+                Thread.Sleep(2000);
+                Log4Net.Init(logFileName, FolderPath, m_Verbose);
+                return FolderPath;
+            }
+
+            return DefaultLogPath;
+        }
+        private static string DefaultLogFolderInitialisation()
+        {
+            string FolderPath;
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                FolderPath = FileConstant.LogFolder;
             }
             else
             {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    FolderPath = FileConstant.LogFolder;
-                }
-                else
-                {
-                    FolderPath = "/var/log";
-                }
-                Log4Net.Init(FileConstant.ComponentCreatorLog, FolderPath, m_Verbose);
+                FolderPath = "/var/log";
             }
 
+            Log4Net.Init(FileConstant.ComponentCreatorLog, FolderPath, m_Verbose);
+            DefaultLogPath = FolderPath;
             return FolderPath;
         }
     }

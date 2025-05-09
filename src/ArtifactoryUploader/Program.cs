@@ -17,6 +17,7 @@ using LCT.Facade.Interfaces;
 using LCT.Services;
 using LCT.Services.Interface;
 using log4net;
+using log4net.Config;
 using log4net.Core;
 using System;
 using System.Diagnostics;
@@ -24,6 +25,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ArtifactoryUploader
@@ -35,6 +37,7 @@ namespace ArtifactoryUploader
         public static Stopwatch UploaderStopWatch { get; set; }
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
+        public static string DefaultLogPath { get; set; }
         static async Task Main(string[] args)
         {
             UploaderStopWatch = new Stopwatch();
@@ -44,11 +47,12 @@ namespace ArtifactoryUploader
                 m_Verbose = true;
 
             ISettingsManager settingsManager = new SettingsManager();
-            CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
 
             Log4Net.CatoolCurrentDirectory = System.IO.Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
+            DefaultLogFolderInitialisation();
+            CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);           
 
             string FolderPath = InitiateLogger(appSettings);
 
@@ -116,24 +120,38 @@ namespace ArtifactoryUploader
         private static string InitiateLogger(CommonAppSettings appSettings)
         {
             string FolderPath;
+            appSettings.Directory.LogFolder = "D:\\CATool";
             if (!string.IsNullOrEmpty(appSettings.Directory.LogFolder))
             {
+                string defaultLogFilePath = Log4Net.CatoolLogPath;
+                LoggerManager.Shutdown();
                 FolderPath = appSettings.Directory.LogFolder;
                 Log4Net.Init(FileConstant.ArtifactoryUploaderLog, appSettings.Directory.LogFolder, m_Verbose);
+                string currentLogFilePath = Log4Net.CatoolLogPath;
+                string logFileName = Path.GetFileName(Log4Net.CatoolLogPath);
+                LoggerManager.Shutdown();
+                File.Copy(defaultLogFilePath, currentLogFilePath, overwrite: true);
+                Thread.Sleep(2000);
+                Log4Net.Init(logFileName, FolderPath, m_Verbose);
+                return FolderPath;
+            }
+           
+            return DefaultLogPath;
+        }
+        private static string DefaultLogFolderInitialisation()
+        {
+            string FolderPath;
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                FolderPath = FileConstant.LogFolder;
             }
             else
             {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    FolderPath = FileConstant.LogFolder;
-                }
-                else
-                {
-                    FolderPath = "/var/log";
-                }
-                Log4Net.Init(FileConstant.ArtifactoryUploaderLog, FolderPath, m_Verbose);
+                FolderPath = "/var/log";
             }
 
+            Log4Net.Init(FileConstant.ArtifactoryUploaderLog, FolderPath, m_Verbose);
+            DefaultLogPath = FolderPath;
             return FolderPath;
         }
 
