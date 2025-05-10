@@ -36,8 +36,7 @@ namespace LCT.Common
 
             if (args != null)
             {
-                string[] maskedArgs = CommonHelper.MaskSensitiveArguments(args);
-                Logger.Debug($"ReadConfiguration():args: {string.Join(",", maskedArgs)}");
+                Logger.Debug($"ReadConfiguration():args: {string.Join(",", args)}");
             }
             if (args?.Length == 0)
             {
@@ -85,7 +84,8 @@ namespace LCT.Common
             Logger.Debug($"ReadConfiguration():End");
 
             return appSettings;
-        }        
+        }
+
         public static void DisplayHelp()
         {
 

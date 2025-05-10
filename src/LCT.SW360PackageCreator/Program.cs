@@ -53,18 +53,17 @@ namespace LCT.SW360PackageCreator
                 m_Verbose = true;
 
             ISettingsManager settingsManager = new SettingsManager();
+            CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
+            
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
-            Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
-
-            CommonHelper.DefaultLogFolderInitialisation(FileConstant.ComponentCreatorLog, m_Verbose);
-            CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
-                        
+            Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;            
+            
             ISW360ApicommunicationFacade sW360ApicommunicationFacade;
             ISw360ProjectService sw360ProjectService = Getsw360ProjectServiceObject(appSettings, out sW360ApicommunicationFacade);
             ProjectReleases projectReleases = new ProjectReleases();
 
-            string FolderPath = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.ComponentCreatorLog, m_Verbose); 
+            string FolderPath = InitiateLogger(appSettings);
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             settingsManager.CheckRequiredArgsToRun(appSettings, "Creator");
             int isValid = await CreatorValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
@@ -170,6 +169,29 @@ namespace LCT.SW360PackageCreator
             await componentCreator.CreateComponentInSw360(appSettings, sw360CreatorService, sw360Service,
                  sw360ProjectService, new FileOperations(), creatorHelper, parsedBomData);
         }
-        
+
+        private static string InitiateLogger(CommonAppSettings appSettings)
+        {
+            string FolderPath;
+            if (!string.IsNullOrEmpty(appSettings.Directory.LogFolder))
+            {
+                FolderPath = appSettings.Directory.LogFolder;
+                Log4Net.Init(FileConstant.ComponentCreatorLog, appSettings.Directory.LogFolder, m_Verbose);
+            }
+            else
+            {
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    FolderPath = FileConstant.LogFolder;
+                }
+                else
+                {
+                    FolderPath = "/var/log";
+                }
+                Log4Net.Init(FileConstant.ComponentCreatorLog, FolderPath, m_Verbose);
+            }
+
+            return FolderPath;
+        }
     }
 }
