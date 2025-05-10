@@ -14,7 +14,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace LCT.Common
 {
@@ -26,6 +28,7 @@ namespace LCT.Common
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly char[] InvalidProjectNameChars = new char[] { '/', '\\', '.' };
         public static string ProjectSummaryLink { get; set; }
+        public static string DefaultLogPath { get; set; }
 
         #region public
         public static bool IsAzureDevOpsDebugEnabled()
@@ -280,6 +283,60 @@ namespace LCT.Common
 
             return Array.Empty<string>();
         }
+        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        public static string LogFolderInitialisation(CommonAppSettings appSettings, string logFileName, bool m_Verbose)
+        {
+            string FolderPath = "";
+            if (!string.IsNullOrEmpty(appSettings.Directory.LogFolder))
+            {
+                string defaultLogFilePath = Log4Net.CatoolLogPath;
+
+                if (File.Exists(defaultLogFilePath))
+                {
+                    LoggerManager.Shutdown();
+                    FolderPath = appSettings.Directory.LogFolder;
+                    Log4Net.Init(logFileName, appSettings.Directory.LogFolder, m_Verbose);
+                    string currentLogFilePath = Log4Net.CatoolLogPath;
+                    string currentlogFileName = Path.GetFileName(Log4Net.CatoolLogPath);
+                    LoggerManager.Shutdown();
+                    try
+                    {
+                        File.Copy(defaultLogFilePath, currentLogFilePath, overwrite: true);
+                    }
+                    catch (IOException ioEx)
+                    {
+                        Logger.Debug($"IO Exception during log file copy: {ioEx.Message}");
+                    }
+                    catch (UnauthorizedAccessException uaEx)
+                    {
+                        Logger.Debug($"Unauthorized Access Exception during log file copy: {uaEx.Message}");
+                    }
+                    Thread.Sleep(2000);
+                    Log4Net.Init(currentlogFileName, FolderPath, m_Verbose);
+                }
+                else
+                {
+                    FolderPath = appSettings.Directory.LogFolder;
+                    Log4Net.Init(logFileName, appSettings.Directory.LogFolder, m_Verbose);
+                }
+            }
+            return FolderPath;
+        }
+        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        public static void DefaultLogFolderInitialisation(string logFileName, bool m_Verbose)
+        {
+            string FolderPath;
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                FolderPath = FileConstant.LogFolder;
+            }
+            else
+            {
+                FolderPath = "/var/log";
+            }
+            Log4Net.Init(logFileName, FolderPath, m_Verbose);
+            DefaultLogPath = FolderPath;
+        }
         public static bool ContainsInvalidCharacters(string projectName, out string invalidChars)
         {
             var foundInvalidChars = projectName.Where(c => InvalidProjectNameChars.Contains(c))
@@ -313,6 +370,30 @@ namespace LCT.Common
             }
             return 0;
         }
+        public static string[] MaskSensitiveArguments(string[] args)
+        {
+            if (args == null || args.Length == 0)
+            {
+                Logger.Debug("MaskSensitiveArguments(): No arguments passed to the method.");
+                return [];
+            }
+            string[] maskedArgs = new string[args.Length];
+            for (int i = 0; i < args.Length; i++)
+            {
+                if (args[i].Contains("--SW360:Token", StringComparison.OrdinalIgnoreCase) ||
+                    args[i].Contains("--Jfrog:Token", StringComparison.OrdinalIgnoreCase))
+                {
+                    // Mask the token value
+                    maskedArgs[i] = $"{args[i].Split(':')[0]}:******";
+                }
+                else
+                {
+                    maskedArgs[i] = args[i];
+                }
+            }
+            return maskedArgs;
+        }
+        
         #endregion
 
         #region private

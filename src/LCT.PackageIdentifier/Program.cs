@@ -37,7 +37,7 @@ namespace LCT.PackageIdentifier
     [ExcludeFromCodeCoverage]
     public class Program
     {
-        private static bool m_Verbose = false;
+        public static bool m_Verbose = false;
 
         public static Stopwatch BomStopWatch { get; set; }
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
@@ -55,12 +55,12 @@ namespace LCT.PackageIdentifier
             ISettingsManager settingsManager = new SettingsManager();
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
-            DefaultLogFolderInitialisation();
+            CommonHelper.DefaultLogFolderInitialisation(FileConstant.BomCreatorLog, m_Verbose);
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
             
             ProjectReleases projectReleases = new ProjectReleases();
 
-            string FolderPath = LogFolderInitialisation(appSettings);
+            string FolderPath = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.BomCreatorLog, m_Verbose);
 
             settingsManager.CheckRequiredArgsToRun(appSettings, "Identifer");
 
@@ -156,50 +156,7 @@ namespace LCT.PackageIdentifier
             {
                 environmentHelper.CallEnvironmentExit(-1);
             }
-        }
-
-        private static string LogFolderInitialisation(CommonAppSettings appSettings)
-        {
-            string FolderPath="";
-            if (!string.IsNullOrEmpty(appSettings.Directory.LogFolder))
-            {
-                string defaultLogFilePath = Log4Net.CatoolLogPath;
-
-                if (File.Exists(defaultLogFilePath))
-                {
-                    LoggerManager.Shutdown();
-                    FolderPath = appSettings.Directory.LogFolder;
-                    Log4Net.Init(FileConstant.BomCreatorLog, appSettings.Directory.LogFolder, m_Verbose);
-                    string currentLogFilePath = Log4Net.CatoolLogPath;
-                    string logFileName = Path.GetFileName(Log4Net.CatoolLogPath);
-                    LoggerManager.Shutdown();
-                    File.Copy(defaultLogFilePath, currentLogFilePath, overwrite: true);
-                    Thread.Sleep(2000);
-                    Log4Net.Init(logFileName, FolderPath, m_Verbose);                    
-                }
-                else
-                {
-                    FolderPath = appSettings.Directory.LogFolder;
-                    Log4Net.Init(FileConstant.BomCreatorLog, appSettings.Directory.LogFolder, m_Verbose);                    
-                }
-            }            
-            return FolderPath;
-        }
-        private static void DefaultLogFolderInitialisation()
-        {
-            string FolderPath;
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                FolderPath = FileConstant.LogFolder;
-            }
-            else
-            {
-                FolderPath = "/var/log";
-            }
-            Log4Net.Init(FileConstant.BomCreatorLog, FolderPath, m_Verbose);
-            Logger.Warn($"input log file:{FolderPath}");
-            DefaultLogPath = FolderPath;
-        }
+        }        
         
     }
 }

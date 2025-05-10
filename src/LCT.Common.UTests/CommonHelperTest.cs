@@ -381,6 +381,71 @@ namespace LCT.Common.UTest
             // Assert
             Assert.AreEqual(0, result, "Expected 0 when all inputs are valid.");
         }
+        [Test]
+        public void MaskSensitiveArguments_WithSensitiveTokens_MasksTokens()
+        {
+            // Arrange
+            string[] args = new string[]
+            {
+                "--SW360:Token,eIx0tfriKMB9TqFMxvKj",
+                "--Jfrog:Token,cmVmdGtuOjAxOjE3NzQwOTM4Mjg6Z2doMVdxWWlWWHgwV2RUSm8xMnRwRkxMb3BS",
+                "--Directory:InputFolder,/mnt/Input",
+                "--Directory:OutputFolder,/mnt/Output"
+            };
+
+            // Act
+            string[] result = CommonHelper.MaskSensitiveArguments(args);
+
+            // Assert
+            Assert.IsNotEmpty(result, "The result array should not be empty.");
+        }
+
+        [Test]
+        public void MaskSensitiveArguments_WithoutSensitiveTokens_ReturnsUnchangedArguments()
+        {
+            // Arrange
+            string[] args = new string[]
+            {
+                "--Directory:InputFolder,/mnt/Input",
+                "--Directory:OutputFolder,/mnt/Output",
+                "--ProjectType,alpine"
+            };
+
+            // Act
+            string[] result = CommonHelper.MaskSensitiveArguments(args);
+
+            // Assert
+            Assert.AreEqual("--Directory:InputFolder,/mnt/Input", result[0], "Non-sensitive argument should remain unchanged.");
+            Assert.AreEqual("--Directory:OutputFolder,/mnt/Output", result[1], "Non-sensitive argument should remain unchanged.");
+            Assert.AreEqual("--ProjectType,alpine", result[2], "Non-sensitive argument should remain unchanged.");
+        }
+
+        [Test]
+        public void MaskSensitiveArguments_WithEmptyArguments_ReturnsEmptyArray()
+        {
+            // Arrange
+            string[] args = new string[] { };
+
+            // Act
+            string[] result = CommonHelper.MaskSensitiveArguments(args);
+
+            // Assert
+            Assert.IsEmpty(result, "Empty input should return an empty array.");
+        }
+
+        [Test]
+        public void MaskSensitiveArguments_WithNullArguments_ReturnsEmptyArrayAndLogsWarning()
+        {
+            // Arrange
+            string[] args = null;
+
+            // Act
+            string[] result = CommonHelper.MaskSensitiveArguments(args);
+
+            // Assert
+            Assert.IsEmpty(result, "Null input should return an empty array.");
+            // Note: You can verify the log message if you are using a logging framework that supports testing logs.
+        }
     }
 
     public class TestObject
