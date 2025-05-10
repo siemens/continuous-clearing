@@ -37,7 +37,7 @@ namespace LCT.SW360PackageCreator
     public class Program
     {
         public static Stopwatch CreatorStopWatch { get; set; }
-        public static bool m_Verbose = false;
+        private static bool m_Verbose = false;
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
 

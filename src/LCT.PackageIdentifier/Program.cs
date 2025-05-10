@@ -37,7 +37,7 @@ namespace LCT.PackageIdentifier
     [ExcludeFromCodeCoverage]
     public class Program
     {
-        public static bool m_Verbose = false;
+        private static bool m_Verbose = false;
 
         public static Stopwatch BomStopWatch { get; set; }
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
@@ -61,7 +61,7 @@ namespace LCT.PackageIdentifier
             ProjectReleases projectReleases = new ProjectReleases();
 
             string FolderPath = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.BomCreatorLog, m_Verbose);
-
+            Logger.Logger.Log(null, Level.Debug, $"log manager initiated folder path: {FolderPath}", null);
             settingsManager.CheckRequiredArgsToRun(appSettings, "Identifer");
 
             Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Package Identifier >>>>>====================", null);
