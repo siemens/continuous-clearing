@@ -160,56 +160,30 @@ namespace LCT.PackageIdentifier
 
         private static string LogFolderInitialisation(CommonAppSettings appSettings)
         {
-            string FolderPath;
-            try
+            string FolderPath="";
+            if (!string.IsNullOrEmpty(appSettings.Directory.LogFolder))
             {
-                if (!string.IsNullOrEmpty(appSettings.Directory.LogFolder))
+                string defaultLogFilePath = Log4Net.CatoolLogPath;
+
+                if (File.Exists(defaultLogFilePath))
                 {
-                    Logger.Warn($"input log file:{appSettings.Directory.LogFolder}");
-                    string defaultLogFilePath = Log4Net.CatoolLogPath;
-                    Logger.Warn($"catoolpath:{Log4Net.CatoolLogPath}");
-                    if (File.Exists(defaultLogFilePath))
-                    {
-                        Logger.Warn($"catoolpath:{Log4Net.CatoolLogPath}");
-                    }
                     LoggerManager.Shutdown();
                     FolderPath = appSettings.Directory.LogFolder;
-                    if (File.Exists(FolderPath))
-                    {
-                        Logger.Warn($"folder:{FolderPath}");
-                    }
                     Log4Net.Init(FileConstant.BomCreatorLog, appSettings.Directory.LogFolder, m_Verbose);
                     string currentLogFilePath = Log4Net.CatoolLogPath;
                     string logFileName = Path.GetFileName(Log4Net.CatoolLogPath);
                     LoggerManager.Shutdown();
-
-                    // Copy the default log file to the new log folder
                     File.Copy(defaultLogFilePath, currentLogFilePath, overwrite: true);
-
-                    // Allow time for the logger to reinitialize
                     Thread.Sleep(2000);
-
-                    Log4Net.Init(logFileName, FolderPath, m_Verbose);
-                    Logger.Warn($"folder2:{FolderPath}");
-                    return FolderPath;
+                    Log4Net.Init(logFileName, FolderPath, m_Verbose);                    
                 }
-            }
-            catch (IOException ioEx)
-            {
-                Logger.Error($"IO Exception occurred during log folder initialization: {ioEx.Message}");
-            }
-            catch (UnauthorizedAccessException uaEx)
-            {
-                Logger.Error($"Unauthorized Access Exception occurred during log folder initialization: {uaEx.Message}");
-            }
-            catch (Exception ex)
-            {
-                Logger.Error($"An unexpected error occurred during log folder initialization: {ex.Message}");
-            }
-
-            // Fallback to the default log path if an exception occurs
-            Logger.Warn("Falling back to the default log path due to an error during log folder initialization.");
-            return DefaultLogPath;
+                else
+                {
+                    FolderPath = appSettings.Directory.LogFolder;
+                    Log4Net.Init(FileConstant.BomCreatorLog, appSettings.Directory.LogFolder, m_Verbose);                    
+                }
+            }            
+            return FolderPath;
         }
         private static void DefaultLogFolderInitialisation()
         {
@@ -223,7 +197,7 @@ namespace LCT.PackageIdentifier
                 FolderPath = "/var/log";
             }
             Log4Net.Init(FileConstant.BomCreatorLog, FolderPath, m_Verbose);
-            Logger.Warn($"input log file:FolderPath");
+            Logger.Warn($"input log file:{FolderPath}");
             DefaultLogPath = FolderPath;
         }
         
