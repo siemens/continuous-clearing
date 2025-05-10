@@ -286,7 +286,7 @@ namespace LCT.Common
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public static string LogFolderInitialisation(CommonAppSettings appSettings, string logFileName, bool m_Verbose)
         {
-            string FolderPath = "";
+            string FolderPath = DefaultLogPath;
             if (!string.IsNullOrEmpty(appSettings.Directory.LogFolder))
             {
                 string defaultLogFilePath = Log4Net.CatoolLogPath;
