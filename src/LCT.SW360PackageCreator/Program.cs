@@ -40,7 +40,6 @@ namespace LCT.SW360PackageCreator
         public static bool m_Verbose = false;
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
-        public static string DefaultLogPath { get; set; }
 
         protected Program() { }
 

@@ -41,8 +41,7 @@ namespace LCT.PackageIdentifier
 
         public static Stopwatch BomStopWatch { get; set; }
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
-        public static string DefaultLogPath { get; set; }
+        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();        
         protected Program() { }
 
         static async Task Main(string[] args)
