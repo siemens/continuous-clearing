@@ -388,7 +388,7 @@ namespace LCT.Common.UTest
             string[] args = new string[]
             {
                 "--SW360:Token,dfjkasldjjkas",
-                "--Jfrog:Token,dfsdffasdgga",
+                "--Jfrog:Token,asdrfddfdg",
                 "--Directory:InputFolder,/mnt/Input",
                 "--Directory:OutputFolder,/mnt/Output"
             };

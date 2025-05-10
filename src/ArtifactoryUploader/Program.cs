@@ -32,7 +32,7 @@ namespace ArtifactoryUploader
     [ExcludeFromCodeCoverage]
     public static class Program
     {
-        private static bool m_Verbose = false;
+        public static bool m_Verbose = false;
         public static Stopwatch UploaderStopWatch { get; set; }
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
@@ -46,12 +46,13 @@ namespace ArtifactoryUploader
                 m_Verbose = true;
 
             ISettingsManager settingsManager = new SettingsManager();
-            CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
-            Log4Net.CatoolCurrentDirectory = System.IO.Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;            
-            
-            string FolderPath = InitiateLogger(appSettings);
+            Log4Net.CatoolCurrentDirectory = System.IO.Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
+            CommonHelper.DefaultLogFolderInitialisation(FileConstant.ArtifactoryUploaderLog, m_Verbose);
+            CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
+
+            string FolderPath = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.ArtifactoryUploaderLog, m_Verbose);
 
             settingsManager.CheckRequiredArgsToRun(appSettings, "Uploader");
 
@@ -112,31 +113,7 @@ namespace ArtifactoryUploader
             catoolInfo.CatoolVersion = $"{versionFromProj.Major}.{versionFromProj.Minor}.{versionFromProj.Build}";
             catoolInfo.CatoolRunningLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
             return catoolInfo;
-        }
-
-        private static string InitiateLogger(CommonAppSettings appSettings)
-        {
-            string FolderPath;
-            if (!string.IsNullOrEmpty(appSettings.Directory.LogFolder))
-            {
-                FolderPath = appSettings.Directory.LogFolder;
-                Log4Net.Init(FileConstant.ArtifactoryUploaderLog, appSettings.Directory.LogFolder, m_Verbose);
-            }
-            else
-            {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    FolderPath = FileConstant.LogFolder;
-                }
-                else
-                {
-                    FolderPath = "/var/log";
-                }
-                Log4Net.Init(FileConstant.ArtifactoryUploaderLog, FolderPath, m_Verbose);
-            }
-
-            return FolderPath;
-        }
+        }        
 
         private static IJFrogService GetJfrogService(CommonAppSettings appSettings)
         {
