@@ -387,8 +387,8 @@ namespace LCT.Common.UTest
             // Arrange
             string[] args = new string[]
             {
-                "--SW360:Token,eIx0tfriKMB9TqFMxvKj",
-                "--Jfrog:Token,cmVmdGtuOjAxOjE3NzQwOTM4Mjg6Z2doMVdxWWlWWHgwV2RUSm8xMnRwRkxMb3BS",
+                "--SW360:Token,dfjkasldjjkas",
+                "--Jfrog:Token,dfsdffasdgga",
                 "--Directory:InputFolder,/mnt/Input",
                 "--Directory:OutputFolder,/mnt/Output"
             };
