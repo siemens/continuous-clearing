@@ -165,10 +165,19 @@ namespace LCT.PackageIdentifier
             {
                 if (!string.IsNullOrEmpty(appSettings.Directory.LogFolder))
                 {
-                    Logger.Debug($"input log file:{appSettings.Directory.LogFolder}");
+                    Logger.Warn($"input log file:{appSettings.Directory.LogFolder}");
                     string defaultLogFilePath = Log4Net.CatoolLogPath;
+                    Logger.Warn($"catoolpath:{Log4Net.CatoolLogPath}");
+                    if (File.Exists(defaultLogFilePath))
+                    {
+                        Logger.Warn($"catoolpath:{Log4Net.CatoolLogPath}");
+                    }
                     LoggerManager.Shutdown();
                     FolderPath = appSettings.Directory.LogFolder;
+                    if (File.Exists(FolderPath))
+                    {
+                        Logger.Warn($"folder:{FolderPath}");
+                    }
                     Log4Net.Init(FileConstant.BomCreatorLog, appSettings.Directory.LogFolder, m_Verbose);
                     string currentLogFilePath = Log4Net.CatoolLogPath;
                     string logFileName = Path.GetFileName(Log4Net.CatoolLogPath);
@@ -181,6 +190,7 @@ namespace LCT.PackageIdentifier
                     Thread.Sleep(2000);
 
                     Log4Net.Init(logFileName, FolderPath, m_Verbose);
+                    Logger.Warn($"folder2:{FolderPath}");
                     return FolderPath;
                 }
             }
@@ -213,6 +223,7 @@ namespace LCT.PackageIdentifier
                 FolderPath = "/var/log";
             }
             Log4Net.Init(FileConstant.BomCreatorLog, FolderPath, m_Verbose);
+            Logger.Warn($"input log file:FolderPath");
             DefaultLogPath = FolderPath;
         }
         
