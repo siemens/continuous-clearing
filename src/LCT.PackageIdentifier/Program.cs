@@ -53,9 +53,11 @@ namespace LCT.PackageIdentifier
             if (!m_Verbose && CommonHelper.IsAzureDevOpsDebugEnabled())
                 m_Verbose = true;
             ISettingsManager settingsManager = new SettingsManager();
-            CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
-            Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;           
+            Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
+            DefaultLogFolderInitialisation();
+            CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
+            
             ProjectReleases projectReleases = new ProjectReleases();
 
             string FolderPath = LogFolderInitialisation(appSettings);
@@ -159,26 +161,69 @@ namespace LCT.PackageIdentifier
         private static string LogFolderInitialisation(CommonAppSettings appSettings)
         {
             string FolderPath;
-            if (!string.IsNullOrEmpty(appSettings.Directory.LogFolder))
+            try
             {
-                FolderPath = appSettings.Directory.LogFolder;
-                Log4Net.Init(FileConstant.BomCreatorLog, appSettings.Directory.LogFolder, m_Verbose);
+                if (!string.IsNullOrEmpty(appSettings.Directory.LogFolder))
+                {
+                    string defaultLogFilePath = Log4Net.CatoolLogPath;
+                    LoggerManager.Shutdown();
+                    FolderPath = appSettings.Directory.LogFolder;
+
+                    EnsureLogFolderExists(FolderPath);
+
+                    Log4Net.Init(FileConstant.BomCreatorLog, appSettings.Directory.LogFolder, m_Verbose);
+                    string currentLogFilePath = Log4Net.CatoolLogPath;
+                    string logFileName = Path.GetFileName(Log4Net.CatoolLogPath);
+                    LoggerManager.Shutdown();
+
+                    // Copy the default log file to the new log folder
+                    File.Copy(defaultLogFilePath, currentLogFilePath, overwrite: true);
+
+                    // Allow time for the logger to reinitialize
+                    Thread.Sleep(2000);
+
+                    Log4Net.Init(logFileName, FolderPath, m_Verbose);
+                    return FolderPath;
+                }
+            }
+            catch (IOException ioEx)
+            {
+                Logger.Error($"IO Exception occurred during log folder initialization: {ioEx.Message}");
+            }
+            catch (UnauthorizedAccessException uaEx)
+            {
+                Logger.Error($"Unauthorized Access Exception occurred during log folder initialization: {uaEx.Message}");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"An unexpected error occurred during log folder initialization: {ex.Message}");
+            }
+
+            // Fallback to the default log path if an exception occurs
+            Logger.Warn("Falling back to the default log path due to an error during log folder initialization.");
+            return DefaultLogPath;
+        }
+        private static void DefaultLogFolderInitialisation()
+        {
+            string FolderPath;
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                FolderPath = FileConstant.LogFolder;
             }
             else
             {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    FolderPath = FileConstant.LogFolder;
-                }
-                else
-                {
-                    FolderPath = "/var/log";
-                }
-
-                Log4Net.Init(FileConstant.BomCreatorLog, FolderPath, m_Verbose);
+                FolderPath = "/var/log";
             }
-
-            return FolderPath;
+            EnsureLogFolderExists(FolderPath);
+            Log4Net.Init(FileConstant.BomCreatorLog, FolderPath, m_Verbose);
+            DefaultLogPath = FolderPath;
+        }
+        private static void EnsureLogFolderExists(string folderPath)
+        {
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+            }
         }
     }
 }
