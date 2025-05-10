@@ -90,7 +90,7 @@ namespace LCT.SW360PackageCreator
               $"FossologyURL\t\t --> {appSettings.SW360.Fossology.URL}\n\t" +
               $"EnableFossTrigger\t --> {appSettings.SW360.Fossology.EnableTrigger}\n\t" +
               $"IgnoreDevDependency\t --> {appSettings.SW360.IgnoreDevDependency}\n\t" +
-              $"LogFolderPath\t\t --> {Path.GetFullPath(FolderPath)}\n\t", null);
+              $"LogFolderPath\t\t --> {FolderPath}\n\t", null);
 
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);

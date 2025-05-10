@@ -71,7 +71,7 @@ namespace ArtifactoryUploader
                 $"CaToolRunningPath\t {caToolInformation.CatoolRunningLocation}\n\t" +
                 $"JFrogUrl:\t\t {appSettings.Jfrog.URL}\n\t" +
                 $"Dry-run:\t\t {appSettings.Jfrog.DryRun}\n\t" +
-                $"LogFolderPath:\t\t {Path.GetFullPath(FolderPath)}\n", null);
+                $"LogFolderPath:\t\t {FolderPath}\n", null);
 
             //Validator method to check token validity
             ArtifactoryCredentials artifactoryCredentials = new ArtifactoryCredentials()
