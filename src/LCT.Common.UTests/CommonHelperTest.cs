@@ -443,8 +443,7 @@ namespace LCT.Common.UTest
             string[] result = CommonHelper.MaskSensitiveArguments(args);
 
             // Assert
-            Assert.IsEmpty(result, "Null input should return an empty array.");
-            // Note: You can verify the log message if you are using a logging framework that supports testing logs.
+            Assert.IsEmpty(result, "Null input should return an empty array.");            
         }
     }
 

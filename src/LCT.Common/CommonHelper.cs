@@ -383,8 +383,11 @@ namespace LCT.Common
                 if (args[i].Contains("--SW360:Token", StringComparison.OrdinalIgnoreCase) ||
                     args[i].Contains("--Jfrog:Token", StringComparison.OrdinalIgnoreCase))
                 {
-                    // Mask the token value
-                    maskedArgs[i] = $"{args[i].Split(':')[0]}:******";
+                    var parts = args[i].Split(new[] { ',' }, 2);
+                    if (parts.Length == 2)
+                        maskedArgs[i] = $"{parts[0]},******";
+                    else
+                        maskedArgs[i] = args[i];
                 }
                 else
                 {
