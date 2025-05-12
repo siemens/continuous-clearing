@@ -383,11 +383,10 @@ namespace LCT.Common
                     args[i].Equals("--Jfrog:Token", StringComparison.OrdinalIgnoreCase))
                 {
                     maskedArgs[i] = args[i];
-                    // Mask the next argument if it exists
                     if (i + 1 < args.Length)
                     {
                         maskedArgs[i + 1] = "******";
-                        i++; // Skip the value, already handled
+                        continue; 
                     }
                 }
                 else
