@@ -385,39 +385,40 @@ namespace LCT.Common.UTest
         public void MaskSensitiveArguments_WithSensitiveTokens_MasksTokens()
         {
             // Arrange
-            string[] args = new string[]
-            {
-                "--SW360:Token,dfjkasldjjkas",
-                "--Jfrog:Token,asdrfddfdg",
-                "--Directory:InputFolder,/mnt/Input",
-                "--Directory:OutputFolder,/mnt/Output"
-            };
+            string[] args = "--SW360:Token asdfghj --Jfrog:Token abcdefgh --Directory:InputFolder /mnt/Input --Directory:OutputFolder /mnt/Output"
+                .Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
             // Act
             string[] result = CommonHelper.MaskSensitiveArguments(args);
 
             // Assert
-            Assert.IsNotEmpty(result, "The result array should not be empty.");
+            Assert.AreEqual("--SW360:Token", result[0]);
+            Assert.AreEqual("******", result[1]);
+            Assert.AreEqual("--Jfrog:Token", result[2]);
+            Assert.AreEqual("******", result[3]);
+            Assert.AreEqual("--Directory:InputFolder", result[4]);
+            Assert.AreEqual("/mnt/Input", result[5]);
+            Assert.AreEqual("--Directory:OutputFolder", result[6]);
+            Assert.AreEqual("/mnt/Output", result[7]);
         }
 
         [Test]
         public void MaskSensitiveArguments_WithoutSensitiveTokens_ReturnsUnchangedArguments()
         {
             // Arrange
-            string[] args = new string[]
-            {
-                "--Directory:InputFolder,/mnt/Input",
-                "--Directory:OutputFolder,/mnt/Output",
-                "--ProjectType,alpine"
-            };
+            string[] args = "--Directory:InputFolder /mnt/Input --Directory:OutputFolder /mnt/Output --ProjectType alpine"
+                .Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
             // Act
             string[] result = CommonHelper.MaskSensitiveArguments(args);
 
             // Assert
-            Assert.AreEqual("--Directory:InputFolder,/mnt/Input", result[0], "Non-sensitive argument should remain unchanged.");
-            Assert.AreEqual("--Directory:OutputFolder,/mnt/Output", result[1], "Non-sensitive argument should remain unchanged.");
-            Assert.AreEqual("--ProjectType,alpine", result[2], "Non-sensitive argument should remain unchanged.");
+            Assert.AreEqual("--Directory:InputFolder", result[0]);
+            Assert.AreEqual("/mnt/Input", result[1]);
+            Assert.AreEqual("--Directory:OutputFolder", result[2]);
+            Assert.AreEqual("/mnt/Output", result[3]);
+            Assert.AreEqual("--ProjectType", result[4]);
+            Assert.AreEqual("alpine", result[5]);
         }
 
         [Test]

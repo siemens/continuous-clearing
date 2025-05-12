@@ -37,7 +37,7 @@ namespace LCT.Common
             if (args != null)
             {
                 string[] maskedArgs = CommonHelper.MaskSensitiveArguments(args);
-                Logger.Debug($"ReadConfiguration():args: {string.Join(",", maskedArgs)}");
+                Logger.Debug($"ReadConfiguration():args: {string.Join(" ", maskedArgs)}");
             }
             if (args?.Length == 0)
             {

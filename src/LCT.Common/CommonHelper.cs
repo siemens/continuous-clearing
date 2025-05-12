@@ -377,17 +377,20 @@ namespace LCT.Common
                 Logger.Debug("MaskSensitiveArguments(): No arguments passed to the method.");
                 return [];
             }
+
             string[] maskedArgs = new string[args.Length];
             for (int i = 0; i < args.Length; i++)
             {
-                if (args[i].Contains("--SW360:Token", StringComparison.OrdinalIgnoreCase) ||
-                    args[i].Contains("--Jfrog:Token", StringComparison.OrdinalIgnoreCase))
+                if (args[i].Equals("--SW360:Token", StringComparison.OrdinalIgnoreCase) ||
+                    args[i].Equals("--Jfrog:Token", StringComparison.OrdinalIgnoreCase))
                 {
-                    var parts = args[i].Split(new[] { ',' }, 2);
-                    if (parts.Length == 2)
-                        maskedArgs[i] = $"{parts[0]},******";
-                    else
-                        maskedArgs[i] = args[i];
+                    maskedArgs[i] = args[i];
+                    // Mask the next argument if it exists
+                    if (i + 1 < args.Length)
+                    {
+                        maskedArgs[i + 1] = "******";
+                        i++; // Skip the value, already handled
+                    }
                 }
                 else
                 {
