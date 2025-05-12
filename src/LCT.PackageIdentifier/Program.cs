@@ -126,7 +126,9 @@ namespace LCT.PackageIdentifier
         {
             if (appSettings == null)
             {
-                throw new ArgumentNullException(nameof(appSettings), "Application settings cannot be null.");
+                Logger.Error("Application settings are missing. Please ensure the following:\n" +
+                     "1. Provide a valid settings file (e.g., appsettings.json) in the expected location.\n" +
+                     "2. Alternatively, pass the required configuration settings as inline arguments during application execution.");
             }
             ArtifactoryCredentials artifactoryUpload = new ArtifactoryCredentials()
             {
