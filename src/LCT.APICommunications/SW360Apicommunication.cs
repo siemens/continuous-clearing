@@ -339,7 +339,7 @@ namespace LCT.APICommunications
         public async Task<string> GetReleaseByCompoenentName(string componentName)
         {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(true, "unable to get release data by component name");
+            httpClient.SetLogWarnings(false, "unable to get release data by component name");
             string url = $"{sw360ReleaseNameApi}{componentName}";
             return await httpClient.GetStringAsync(url);
         }
@@ -368,7 +368,7 @@ namespace LCT.APICommunications
         public async Task<HttpResponseMessage> GetAllReleasesWithAllData(int page, int pageEntries)
         {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(false, "unable to get all releases details");
+            httpClient.SetLogWarnings(true, "unable to get all releases details");
             string url = $"{sw360ReleaseApi}?page={page}&allDetails=true&page_entries={pageEntries}";
             return await httpClient.GetAsync(url);
         }

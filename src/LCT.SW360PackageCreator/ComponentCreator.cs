@@ -378,7 +378,7 @@ namespace LCT.SW360PackageCreator
             ISw360CreatorService sw360CreatorService, CommonAppSettings appSettings)
         {
 
-            if (appSettings.SW360.Fossology.EnableTrigger && (item.ApprovedStatus.Equals(Dataconstant.NewClearing) || item.ApprovedStatus.Equals("Not Available") || item.ApprovedStatus.Equals(Dataconstant.SentToClearingState) || item.ApprovedStatus.Equals(Dataconstant.ScanAvailableState) || item.ClearingState.Equals(Dataconstant.ScanAvailableState) || item.ClearingState.Equals(Dataconstant.SentToClearingState)))
+            if (appSettings.SW360.Fossology.EnableTrigger && (item.ApprovedStatus.Equals(Dataconstant.NewClearing) || item.ApprovedStatus.Equals("Not Available") || item.ApprovedStatus.Equals(Dataconstant.SentToClearingState) || item.ApprovedStatus.Equals(Dataconstant.ScanAvailableState) ))
             {
                 var formattedName = GetFormattedName(item);
                 Logger.Logger.Log(null, Level.Notice, $"\tInitiating FOSSology process for: Release : Name - {formattedName} , version - {item.Version}", null);
@@ -571,11 +571,12 @@ namespace LCT.SW360PackageCreator
                 {
                     ComponentsNotLinked.Add(new Components() { Name = item.Name, Version = item.Version });
                 }
-                UpdatedCompareBomData.Add(item);
+                
                 ReleasesInfo releasesInfo = await sw360CreatorService.GetReleaseInfo(releaseId);
                 string componentId = CommonHelper.GetSubstringOfLastOccurance(releasesInfo.Links?.Sw360Component?.Href, "/");
                 item.ReleaseID = releaseId;
                 await GetUploadIdWhenReleaseExists(item, releasesInfo, appSettings);
+                UpdatedCompareBomData.Add(item);
                 if (IsReleaseAttachmentExist(releasesInfo))
                 {
                     await TriggeringFossologyUploadAndUpdateAdditionalData(item, sw360CreatorService, appSettings);
@@ -593,7 +594,7 @@ namespace LCT.SW360PackageCreator
                 return Task.CompletedTask;
             }
 
-            item.ClearingState = releasesInfo.ClearingState;
+            item.ApprovedStatus = releasesInfo.ClearingState;
 
             var uploadId = releasesInfo.ExternalToolProcesses?
                 .SelectMany(process => process.ProcessSteps)
@@ -623,7 +624,7 @@ namespace LCT.SW360PackageCreator
                 {
                     ReleasesInfo releasesInfo = await sw360CreatorService.GetReleaseInfo(item.ReleaseID);
                     item.ParentReleaseName = releasesInfo?.Name ?? string.Empty;
-
+                    item.ApprovedStatus = releasesInfo?.ClearingState;
                     if (IsReleaseAttachmentExist(releasesInfo))
                     {
                         await TriggeringFossologyUploadAndUpdateAdditionalData(item, sw360CreatorService, appSettings);

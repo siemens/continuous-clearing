@@ -282,8 +282,7 @@ namespace LCT.Common
             }
 
             return Array.Empty<string>();
-        }
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        }        
         public static string LogFolderInitialisation(CommonAppSettings appSettings, string logFileName, bool m_Verbose)
         {
             string FolderPath = DefaultLogPath;
@@ -321,8 +320,7 @@ namespace LCT.Common
                 }
             }
             return FolderPath;
-        }
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        }        
         public static void DefaultLogFolderInitialisation(string logFileName, bool m_Verbose)
         {
             string FolderPath;

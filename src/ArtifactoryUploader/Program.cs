@@ -52,7 +52,7 @@ namespace ArtifactoryUploader
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
 
             string FolderPath = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.ArtifactoryUploaderLog, m_Verbose);
-
+            Logger.Logger.Log(null, Level.Debug, $"log manager initiated folder path: {FolderPath}", null);
             settingsManager.CheckRequiredArgsToRun(appSettings, "Uploader");
 
             Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Artifactory Uploader >>>>>====================", null);
@@ -71,7 +71,7 @@ namespace ArtifactoryUploader
                 $"CaToolRunningPath\t {caToolInformation.CatoolRunningLocation}\n\t" +
                 $"JFrogUrl:\t\t {appSettings.Jfrog.URL}\n\t" +
                 $"Dry-run:\t\t {appSettings.Jfrog.DryRun}\n\t" +
-                $"LogFolderPath:\t\t {FolderPath}\n", null);
+                $"LogFolderPath:\t\t {Log4Net.CatoolLogPath}\n", null);
 
             //Validator method to check token validity
             ArtifactoryCredentials artifactoryCredentials = new ArtifactoryCredentials()

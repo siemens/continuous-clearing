@@ -64,6 +64,7 @@ namespace LCT.SW360PackageCreator
             ProjectReleases projectReleases = new ProjectReleases();
 
             string FolderPath = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.ComponentCreatorLog, m_Verbose);
+            Logger.Logger.Log(null, Level.Debug, $"log manager initiated folder path: {FolderPath}", null);
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             settingsManager.CheckRequiredArgsToRun(appSettings, "Creator");
             int isValid = await CreatorValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
@@ -90,7 +91,7 @@ namespace LCT.SW360PackageCreator
               $"FossologyURL\t\t --> {appSettings.SW360.Fossology.URL}\n\t" +
               $"EnableFossTrigger\t --> {appSettings.SW360.Fossology.EnableTrigger}\n\t" +
               $"IgnoreDevDependency\t --> {appSettings.SW360.IgnoreDevDependency}\n\t" +
-              $"LogFolderPath\t\t --> {FolderPath}\n\t", null);
+              $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t", null);
 
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);

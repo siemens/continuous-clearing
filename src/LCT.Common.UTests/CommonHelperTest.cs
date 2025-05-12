@@ -5,18 +5,76 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using LCT.Common.Constants;
+using LCT.Common.Interface;
 using LCT.Common.Model;
+using log4net;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace LCT.Common.UTest
 {
     [TestFixture]
     public class CommonHelperTest
     {
+        private string tempDir;
+        private string tempLogFile;
+        private CommonAppSettings appSettings;
+        [SetUp]
+        public void SetUp()
+        {
+            tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            System.IO.Directory.CreateDirectory(tempDir);
+
+            tempLogFile = Path.Combine(tempDir, "catool.log");
+            File.WriteAllText(tempLogFile, "test log content");
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            appSettings = new CommonAppSettings(folderAction, fileOperations)
+            {
+                Directory = new Directory(folderAction, fileOperations)
+                {
+                    LogFolder = tempDir // Mocked LogFolder
+                }
+            };
+
+            // Set the static log path for the test
+            Log4Net.CatoolLogPath = tempLogFile;
+            CommonHelper.DefaultLogPath = "default";
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            LogManager.Shutdown();
+            if (System.IO.Directory.Exists(tempDir))
+                System.IO.Directory.Delete(tempDir, true);
+        }
+        [Test]
+        public void LogFolderInitialisation_WhenLogFileExists_CopiesLogAndReturnsFolder()
+        {
+            // Act
+            string result = CommonHelper.LogFolderInitialisation(appSettings, "catool.log", false);
+
+            // Assert
+            Assert.AreEqual(tempDir, result);
+            Assert.IsTrue(File.Exists(tempLogFile));
+        }
+        [Test]
+        public void LogFolderInitialisation_WhenLogFolderIsNull_ReturnsDefaultLogPath()
+        {
+            Log4Net.CatoolLogPath= "C:\\catool\\fds.log";
+
+            // Act
+            string result = CommonHelper.LogFolderInitialisation(appSettings, "catool.log", false);
+
+            // Assert
+            Assert.IsNotEmpty(result);
+        }
 
         [Test]
         public void WriteComponentsNotLinkedListInConsole_PassingList_ReturnSuccess()
@@ -446,6 +504,29 @@ namespace LCT.Common.UTest
             // Assert
             Assert.IsEmpty(result, "Null input should return an empty array.");            
         }
+        [Test]
+        public void DefaultLogFolderInitialisation_SetsDefaultLogPath_Windows()
+        {
+            // Arrange
+            string logFileName = FileConstant.BomCreatorLog;
+            string runningLocation=Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            Log4Net.CatoolCurrentDirectory = System.IO.Directory.GetParent(runningLocation).FullName;
+            bool m_Verbose = false;
+          
+
+            // Act
+            CommonHelper.DefaultLogFolderInitialisation(logFileName, m_Verbose);
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                Assert.AreEqual(FileConstant.LogFolder, CommonHelper.DefaultLogPath);
+            }
+            else
+            {
+                Assert.AreEqual("/var/log", CommonHelper.DefaultLogPath);
+            }               
+            
+        }       
     }
 
     public class TestObject

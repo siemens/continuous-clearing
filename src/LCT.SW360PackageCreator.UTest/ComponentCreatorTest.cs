@@ -1046,7 +1046,7 @@ namespace LCT.SW360PackageCreator.UTest
             await ComponentCreator.GetUploadIdWhenReleaseExists(item, releasesInfo, appSettings);
 
             // Assert
-            Assert.AreEqual("APPROVED", item.ClearingState, "ClearingState should be set from releasesInfo.");
+            Assert.AreEqual("APPROVED", item.ApprovedStatus, "ClearingState should be set from releasesInfo.");
             Assert.AreEqual("https://fossology.example.com/upload/12345", item.FossologyLink, "FossologyLink should be set from AdditionalData.");
             Assert.AreEqual("12345", item.FossologyUploadId, "FossologyUploadId should be set from ProcessStepIdInTool.");
         }
