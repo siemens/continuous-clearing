@@ -140,8 +140,10 @@
       ]
     },
     {
-      "ref" : "pkg:maven/joda-time/joda-time@2.9.2?type=jar",
-      "dependsOn" : [ ]
+      "ref": "pkg:maven/joda-time/joda-time@2.9.2?type=jar",
+      "dependsOn": [
+        "pkg:maven/joda-time/joda-time@2.9.2?type=jar"
+      ]
     }
   ]
 }

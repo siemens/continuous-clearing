@@ -37,21 +37,7 @@ namespace LCT.SW360PackageCreator
         {
             string sw360ProjectName = await sw360ProjectService.GetProjectNameByProjectIDFromSW360(appSettings.SW360.ProjectID, appSettings.SW360.ProjectName, projectReleases);
 
-            if (string.IsNullOrEmpty(sw360ProjectName))
-            {
-                throw new InvalidDataException($"Invalid Project Id - {appSettings.SW360.ProjectID}");
-            }
-            else if (projectReleases?.clearingState == "CLOSED")
-            {
-                Logger.Error($"Provided Sw360 project is not in active state ,Please make sure you added the correct project details that is in active state..");
-                Logger.Debug($"ValidateAppSettings() : Sw360 project " + projectReleases.Name + " is in " + projectReleases.clearingState + " state.");
-                return -1;
-            }
-            else
-            {
-                appSettings.SW360.ProjectName = sw360ProjectName;
-            }
-            return 0;
+            return CommonHelper.ValidateSw360Project(sw360ProjectName, projectReleases?.clearingState,projectReleases?.Name, appSettings);
         }
         public static async Task TriggerFossologyValidation(CommonAppSettings appSettings, ISW360ApicommunicationFacade sW360ApicommunicationFacade)
         {
@@ -74,7 +60,7 @@ namespace LCT.SW360PackageCreator
             }
             catch (AggregateException ex)
             {
-                Logger.Debug($"\tError in TriggerFossologyValidation--{ex}");                
+                Logger.Debug($"\tError in TriggerFossologyValidation--{ex}");
             }
         }
 
@@ -145,7 +131,7 @@ namespace LCT.SW360PackageCreator
                 Logger.Debug($"TriggerFossologyValidation(): SW360 Fossology Process validation successful!!");
             }
         }
-        
+
         private static async Task<ReleasesAllDetails> GetAllReleasesDetails(ISW360ApicommunicationFacade sW360ApicommunicationFacade, int page, int pageEntries)
         {
             ReleasesAllDetails releaseResponse = null;
@@ -182,13 +168,13 @@ namespace LCT.SW360PackageCreator
                 Logger.Error($"Fossology URL is not provided, Please make sure to add Fossology URL in appsettings.");
                 Logger.Debug($"FossologyUrlValidation() : Fossology URL not provided in appsettings");
                 environmentHelper.CallEnvironmentExit(-1);
-                return false; 
+                return false;
             }
-            url = url.ToLower(); 
+            url = url.ToLower();
             string prodFossUrl = Dataconstant.ProductionFossologyURL.ToLower();
             string stageFossUrl = Dataconstant.StageFossologyURL.ToLower();
 
-        if (Uri.IsWellFormedUriString(appSettings.SW360.Fossology.URL, UriKind.Absolute))
+            if (Uri.IsWellFormedUriString(appSettings.SW360.Fossology.URL, UriKind.Absolute))
             {
                 if (url.Contains(prodFossUrl) || url.Contains(stageFossUrl))
                 {

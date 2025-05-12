@@ -70,7 +70,9 @@ namespace LCT.Common.Constants
         public const string Cdx_ExcludeComponent = "internal:siemens:clearing:sw360:exclude";
         public const string ProductionFossologyURL = "automation.fossology";
         public const string StageFossologyURL = "stage.fossology";
-        public const string ScanClearingState = "SCAN_AVAILABLE";
+        public const string ScanAvailableState = "SCAN_AVAILABLE";
+        public const string SentToClearingState = "SENT_TO_CLEARING_TOOL";
+        public const string TypeJarSuffix = "?type=jar";
 
         public static Dictionary<string, string> PurlCheck()
         {

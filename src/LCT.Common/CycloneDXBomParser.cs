@@ -26,8 +26,16 @@ namespace LCT.Common
             string json = string.Empty;
             try
             {
-                json = File.ReadAllText(filePath);
-                bom = JsonConvert.DeserializeObject<Bom>(json);
+                if (File.Exists(filePath))
+                {
+                    json = File.ReadAllText(filePath);
+                    bom = JsonConvert.DeserializeObject<Bom>(json);
+                }
+                else
+                {
+                    Logger.Error($"File not found: {filePath}. Please provide a valid file path.");
+                }
+
             }
             catch (JsonSerializationException)
             {

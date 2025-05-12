@@ -53,13 +53,16 @@ namespace AritfactoryUploader.UTest
             Assert.AreEqual(extension, actualExtension);
         }
         [Test]
-        public void GetComponentListFromComparisonBOM_GivenInvalidComparisonBOM_ReturnsException()
+        public void GetComponentListFromComparisonBOM_GivenInvalidComparisonBOM_ReturnsNull()
         {
-            //Arrange
+            // Arrange
             string comparisonBOMPath = @"TestFiles\CCTComparisonBOM.json";
 
-            //Act && Assert
-            Assert.Throws<FileNotFoundException>(() => PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath));
+            // Act
+            var result = PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath);
+
+            // Assert
+            Assert.IsNull(result, "Expected null when the file does not exist.");
         }
         [Test]
         public void GetComponentListFromComparisonBOM_GivenInvalidfile_ReturnsException()

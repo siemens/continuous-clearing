@@ -19,5 +19,6 @@ namespace LCT.Services.Model
         public string ReleaseIdToLink { get; set; }
 
         public string AttachmentApiUrl { get; set; }
+        public bool ReleaseAlreadyExist { get; set; } = false;
     }
 }

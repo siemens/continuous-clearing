@@ -173,6 +173,7 @@ namespace LCT.Services
                     releaseId = await GetReleaseIdToLinkToProject(componentInfo.Name, componentInfo.Version, componentInfo.ReleaseExternalId, componentId);
                     Logger.Debug($"CreateReleaseForComponent():Release already exists for component -->" +
                         $"{componentInfo.Name} - {componentInfo.Version}. No changes made by tool");
+                    createStatus.ReleaseAlreadyExist = true;
                 }
                 else
                 {
@@ -185,7 +186,7 @@ namespace LCT.Services
                         $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
                 }
 
-                Logger.Debug($"Component Name -{componentInfo.Name}{componentInfo.Version} : Release Id :{releaseId}");
+                Logger.Debug($"Component Name -{componentInfo.Name},Version :{componentInfo.Version} , Release Id :{releaseId}");
                 createStatus.ReleaseIdToLink = releaseId;
             }
             catch (HttpRequestException e)
@@ -358,7 +359,7 @@ namespace LCT.Services
             {
                 Logger.Error("GetReleaseIdByName():", e);
                 Environment.ExitCode = -1;
-            }           
+            }
 
             return releaseid ?? string.Empty;
         }
@@ -786,24 +787,24 @@ namespace LCT.Services
             }
             catch (HttpRequestException ex)
             {
-                if (ex.Message== "500:Connection to Fossology server Failed.")
+                if (ex.Message == "500:Connection to Fossology server Failed.")
                 {
                     Logger.Debug($"TriggerFossologyProcessForValidation():", ex);
                     Logger.Error($"Fossology process failed.Please check fossology configuration or Token in sw360");
                     environmentHelper.CallEnvironmentExit(-1);
-                }                
+                }
             }
             catch (InvalidOperationException ex)
             {
-                Logger.Debug($"TriggerFossologyProcessForValidation():", ex);                                
+                Logger.Debug($"TriggerFossologyProcessForValidation():", ex);
             }
             catch (UriFormatException ex)
             {
-                Logger.Debug($"TriggerFossologyProcessForValidation():", ex);                               
+                Logger.Debug($"TriggerFossologyProcessForValidation():", ex);
             }
             catch (TaskCanceledException ex)
             {
-                Logger.Debug($"TriggerFossologyProcessForValidation():", ex);                                
+                Logger.Debug($"TriggerFossologyProcessForValidation():", ex);
             }
             return fossTriggerStatus;
         }

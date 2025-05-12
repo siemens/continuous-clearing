@@ -50,15 +50,12 @@ namespace LCT.ArtifactoryUploader
                 }
                 else
                 {
-                    throw new FileNotFoundException($"File :- {comparisionBomFilePath} is not found.Enter a valid file path");
+                    Logger.Error($"File not found: {comparisionBomFilePath}. Please provide a valid file path.");
                 }
             }
             catch (JsonReaderException ex)
             {
-
-                Logger.Error($"Exception occurred in reading the comparison BOM: {ex}");
-                throw new JsonReaderException();
-
+                Logger.Error($"Exception occurred in reading the comparison BOM: {ex.Message}");
             }
             return componentsToBoms;
         }

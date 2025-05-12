@@ -9,7 +9,6 @@ using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
 using LCT.Common.Model;
 using LCT.Facade.Interfaces;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 

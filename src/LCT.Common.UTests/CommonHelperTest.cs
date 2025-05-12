@@ -5,17 +5,76 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using LCT.Common.Constants;
+using LCT.Common.Interface;
 using LCT.Common.Model;
+using log4net;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace LCT.Common.UTest
 {
     [TestFixture]
     public class CommonHelperTest
     {
+        private string tempDir;
+        private string tempLogFile;
+        private CommonAppSettings appSettings;
+        [SetUp]
+        public void SetUp()
+        {
+            tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            System.IO.Directory.CreateDirectory(tempDir);
+
+            tempLogFile = Path.Combine(tempDir, "catool.log");
+            File.WriteAllText(tempLogFile, "test log content");
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            appSettings = new CommonAppSettings(folderAction, fileOperations)
+            {
+                Directory = new Directory(folderAction, fileOperations)
+                {
+                    LogFolder = tempDir // Mocked LogFolder
+                }
+            };
+
+            // Set the static log path for the test
+            Log4Net.CatoolLogPath = tempLogFile;
+            CommonHelper.DefaultLogPath = "default";
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            LogManager.Shutdown();
+            if (System.IO.Directory.Exists(tempDir))
+                System.IO.Directory.Delete(tempDir, true);
+        }
+        [Test]
+        public void LogFolderInitialisation_WhenLogFileExists_CopiesLogAndReturnsFolder()
+        {
+            // Act
+            string result = CommonHelper.LogFolderInitialisation(appSettings, "catool.log", false);
+
+            // Assert
+            Assert.AreEqual(tempDir, result);
+            Assert.IsTrue(File.Exists(tempLogFile));
+        }
+        [Test]
+        public void LogFolderInitialisation_WhenLogFolderIsNull_ReturnsDefaultLogPath()
+        {
+            Log4Net.CatoolLogPath= "C:\\catool\\fds.log";
+
+            // Act
+            string result = CommonHelper.LogFolderInitialisation(appSettings, "catool.log", false);
+
+            // Assert
+            Assert.IsNotEmpty(result);
+        }
 
         [Test]
         public void WriteComponentsNotLinkedListInConsole_PassingList_ReturnSuccess()
@@ -306,6 +365,168 @@ namespace LCT.Common.UTest
             Assert.IsTrue(result.Any(c => c.Name == "Component3" && c.Version == "3.0"));
             Assert.AreEqual(0, noOfExcludedComponents);
         }
+        [Test]
+        public void ValidateSw360Project_WithEmptyProjectName_ThrowsInvalidDataException()
+        {
+            // Arrange
+            string sw360ProjectName = string.Empty;
+            string clearingState = "OPEN";
+            string name = "ValidProjectName";
+            var appSettings = new CommonAppSettings
+            {
+                SW360 = new SW360 { ProjectID = "12345" }
+            };
+
+            // Act & Assert
+            var ex = Assert.Throws<InvalidDataException>(() =>
+                CommonHelper.ValidateSw360Project(sw360ProjectName, clearingState, name, appSettings));
+            Assert.AreEqual("Invalid Project Id - 12345", ex.Message);
+        }
+
+        [Test]
+        public void ValidateSw360Project_WithInvalidCharacters_ReturnsMinusOne()
+        {
+            // Arrange
+            string sw360ProjectName = "ValidProjectName";
+            string clearingState = "OPEN";
+            string name = "Invalid/Project\\Name.";
+            var appSettings = new CommonAppSettings
+            {
+                SW360 = new SW360 { ProjectID = "12345" }
+            };
+
+            // Act
+            int result = CommonHelper.ValidateSw360Project(sw360ProjectName, clearingState, name, appSettings);
+
+            // Assert
+            Assert.AreEqual(-1, result, "Expected -1 when project name contains invalid characters.");
+        }
+
+        [Test]
+        public void ValidateSw360Project_WithClosedClearingState_ReturnsMinusOne()
+        {
+            // Arrange
+            string sw360ProjectName = "ValidProjectName";
+            string clearingState = "CLOSED";
+            string name = "ValidProjectName";
+            var appSettings = new CommonAppSettings
+            {
+                SW360 = new SW360 { ProjectID = "12345" }
+            };
+
+            // Act
+            int result = CommonHelper.ValidateSw360Project(sw360ProjectName, clearingState, name, appSettings);
+
+            // Assert
+            Assert.AreEqual(-1, result, "Expected -1 when clearing state is CLOSED.");
+        }
+
+        [Test]
+        public void ValidateSw360Project_WithValidInputs_ReturnsZero()
+        {
+            // Arrange
+            string sw360ProjectName = "ValidProjectName";
+            string clearingState = "OPEN";
+            string name = "ValidProjectName";
+            var appSettings = new CommonAppSettings
+            {
+                SW360 = new SW360 { ProjectID = "12345" }
+            };
+
+            // Act
+            int result = CommonHelper.ValidateSw360Project(sw360ProjectName, clearingState, name, appSettings);
+
+            // Assert
+            Assert.AreEqual(0, result, "Expected 0 when all inputs are valid.");
+        }
+        [Test]
+        public void MaskSensitiveArguments_WithSensitiveTokens_MasksTokens()
+        {
+            // Arrange
+            string[] args = "--SW360:Token asdfghj --Jfrog:Token abcdefgh --Directory:InputFolder /mnt/Input --Directory:OutputFolder /mnt/Output"
+                .Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+            // Act
+            string[] result = CommonHelper.MaskSensitiveArguments(args);
+
+            // Assert
+            Assert.AreEqual("--SW360:Token", result[0]);
+            Assert.AreEqual("******", result[1]);
+            Assert.AreEqual("--Jfrog:Token", result[2]);
+            Assert.AreEqual("******", result[3]);
+            Assert.AreEqual("--Directory:InputFolder", result[4]);
+            Assert.AreEqual("/mnt/Input", result[5]);
+            Assert.AreEqual("--Directory:OutputFolder", result[6]);
+            Assert.AreEqual("/mnt/Output", result[7]);
+        }
+
+        [Test]
+        public void MaskSensitiveArguments_WithoutSensitiveTokens_ReturnsUnchangedArguments()
+        {
+            // Arrange
+            string[] args = "--Directory:InputFolder /mnt/Input --Directory:OutputFolder /mnt/Output --ProjectType alpine"
+                .Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+            // Act
+            string[] result = CommonHelper.MaskSensitiveArguments(args);
+
+            // Assert
+            Assert.AreEqual("--Directory:InputFolder", result[0]);
+            Assert.AreEqual("/mnt/Input", result[1]);
+            Assert.AreEqual("--Directory:OutputFolder", result[2]);
+            Assert.AreEqual("/mnt/Output", result[3]);
+            Assert.AreEqual("--ProjectType", result[4]);
+            Assert.AreEqual("alpine", result[5]);
+        }
+
+        [Test]
+        public void MaskSensitiveArguments_WithEmptyArguments_ReturnsEmptyArray()
+        {
+            // Arrange
+            string[] args = new string[] { };
+
+            // Act
+            string[] result = CommonHelper.MaskSensitiveArguments(args);
+
+            // Assert
+            Assert.IsEmpty(result, "Empty input should return an empty array.");
+        }
+
+        [Test]
+        public void MaskSensitiveArguments_WithNullArguments_ReturnsEmptyArrayAndLogsWarning()
+        {
+            // Arrange
+            string[] args = null;
+
+            // Act
+            string[] result = CommonHelper.MaskSensitiveArguments(args);
+
+            // Assert
+            Assert.IsEmpty(result, "Null input should return an empty array.");            
+        }
+        [Test]
+        public void DefaultLogFolderInitialisation_SetsDefaultLogPath_Windows()
+        {
+            // Arrange
+            string logFileName = FileConstant.BomCreatorLog;
+            string runningLocation=Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            Log4Net.CatoolCurrentDirectory = System.IO.Directory.GetParent(runningLocation).FullName;
+            bool m_Verbose = false;
+          
+
+            // Act
+            CommonHelper.DefaultLogFolderInitialisation(logFileName, m_Verbose);
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                Assert.AreEqual(FileConstant.LogFolder, CommonHelper.DefaultLogPath);
+            }
+            else
+            {
+                Assert.AreEqual("/var/log", CommonHelper.DefaultLogPath);
+            }               
+            
+        }       
     }
 
     public class TestObject

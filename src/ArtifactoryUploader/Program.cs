@@ -24,6 +24,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ArtifactoryUploader
@@ -44,14 +45,14 @@ namespace ArtifactoryUploader
                 m_Verbose = true;
 
             ISettingsManager settingsManager = new SettingsManager();
-            CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
-
             Log4Net.CatoolCurrentDirectory = System.IO.Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
+            CommonHelper.DefaultLogFolderInitialisation(FileConstant.ArtifactoryUploaderLog, m_Verbose);
+            CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
 
-            string FolderPath = InitiateLogger(appSettings);
-
+            string FolderPath = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.ArtifactoryUploaderLog, m_Verbose);
+            Logger.Logger.Log(null, Level.Debug, $"log manager initiated folder path: {FolderPath}", null);
             settingsManager.CheckRequiredArgsToRun(appSettings, "Uploader");
 
             Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Artifactory Uploader >>>>>====================", null);
@@ -70,7 +71,7 @@ namespace ArtifactoryUploader
                 $"CaToolRunningPath\t {caToolInformation.CatoolRunningLocation}\n\t" +
                 $"JFrogUrl:\t\t {appSettings.Jfrog.URL}\n\t" +
                 $"Dry-run:\t\t {appSettings.Jfrog.DryRun}\n\t" +
-                $"LogFolderPath:\t\t {Path.GetFullPath(FolderPath)}\n", null);
+                $"LogFolderPath:\t\t {Log4Net.CatoolLogPath}\n", null);
 
             //Validator method to check token validity
             ArtifactoryCredentials artifactoryCredentials = new ArtifactoryCredentials()
@@ -111,31 +112,7 @@ namespace ArtifactoryUploader
             catoolInfo.CatoolVersion = $"{versionFromProj.Major}.{versionFromProj.Minor}.{versionFromProj.Build}";
             catoolInfo.CatoolRunningLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
             return catoolInfo;
-        }
-
-        private static string InitiateLogger(CommonAppSettings appSettings)
-        {
-            string FolderPath;
-            if (!string.IsNullOrEmpty(appSettings.Directory.LogFolder))
-            {
-                FolderPath = appSettings.Directory.LogFolder;
-                Log4Net.Init(FileConstant.ArtifactoryUploaderLog, appSettings.Directory.LogFolder, m_Verbose);
-            }
-            else
-            {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    FolderPath = FileConstant.LogFolder;
-                }
-                else
-                {
-                    FolderPath = "/var/log";
-                }
-                Log4Net.Init(FileConstant.ArtifactoryUploaderLog, FolderPath, m_Verbose);
-            }
-
-            return FolderPath;
-        }
+        }        
 
         private static IJFrogService GetJfrogService(CommonAppSettings appSettings)
         {

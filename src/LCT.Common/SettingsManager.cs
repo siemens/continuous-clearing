@@ -36,7 +36,8 @@ namespace LCT.Common
 
             if (args != null)
             {
-                Logger.Debug($"ReadConfiguration():args: {string.Join(",", args)}");
+                string[] maskedArgs = CommonHelper.MaskSensitiveArguments(args);
+                Logger.Debug($"ReadConfiguration():args: {string.Join(" ", maskedArgs)}");
             }
             if (args?.Length == 0)
             {
@@ -45,7 +46,7 @@ namespace LCT.Common
                 environmentHelper.CallEnvironmentExit(0);
             }
             string settingsFilePath = GetConfigFilePathFromArgs(args, jsonSettingsFileName);
-            Logger.Logger.Log(null, Level.Notice, $"Settings File: {settingsFilePath}", null);
+            Logger.Logger.Log(null, Level.Debug, $"Settings File: {settingsFilePath}", null);
 
             //add ut for reading - add json and then cmd args
             IConfigurationBuilder settingsConfigBuilder = new ConfigurationBuilder()
@@ -55,8 +56,21 @@ namespace LCT.Common
                                                                     .AddCommandLine(args);
 
 
-            IConfiguration settingsConfig = settingsConfigBuilder.Build();
-
+            IConfiguration settingsConfig;
+            try
+            {
+                settingsConfig = settingsConfigBuilder.Build();
+            }
+            catch (InvalidDataException)
+            {
+                Logger.Error($"Failed to load configuration file. Please verify the JSON format in: {settingsFilePath}");
+                throw new InvalidDataException($"Failed to load configuration file. Please verify the JSON format in: {settingsFilePath}");
+            }
+            catch (FormatException)
+            {
+                Logger.Error($"Configuration file contains invalid format. Please check for missing quotes or invalid syntax in: {settingsFilePath}");
+                throw new InvalidDataException($"Configuration file contains invalid format. Please check for missing quotes or invalid syntax in: {settingsFilePath}");
+            }
 
 
             T appSettings = settingsConfig.Get<T>();
