@@ -42,7 +42,7 @@ namespace LCT.APICommunications
             var httpMethod = context.ContainsKey("HttpMethod") ? context["HttpMethod"] : "Unknown Method";
             var requestUri = context.ContainsKey("RequestUri") ? context["RequestUri"] : "Unknown URI";
             var operationInfo = context.ContainsKey("OperationInfo") ? context["OperationInfo"] : requestUri;
-            
+
 
             Logger.Debug($"Retry attempt {attempt} for {httpMethod} method this URL {requestUri} : {(outcome.Exception != null ? outcome.Exception.Message : $"{outcome.Result.StatusCode}")}");
 

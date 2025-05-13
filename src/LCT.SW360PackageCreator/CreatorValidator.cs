@@ -17,7 +17,6 @@ using LCT.SW360PackageCreator.Model;
 using log4net;
 using Newtonsoft.Json;
 using System;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
@@ -37,7 +36,7 @@ namespace LCT.SW360PackageCreator
         {
             string sw360ProjectName = await sw360ProjectService.GetProjectNameByProjectIDFromSW360(appSettings.SW360.ProjectID, appSettings.SW360.ProjectName, projectReleases);
 
-            return CommonHelper.ValidateSw360Project(sw360ProjectName, projectReleases?.clearingState,projectReleases?.Name, appSettings);
+            return CommonHelper.ValidateSw360Project(sw360ProjectName, projectReleases?.clearingState, projectReleases?.Name, appSettings);
         }
         public static async Task TriggerFossologyValidation(CommonAppSettings appSettings, ISW360ApicommunicationFacade sW360ApicommunicationFacade)
         {
