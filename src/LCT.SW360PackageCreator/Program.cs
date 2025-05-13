@@ -24,7 +24,6 @@ using System.IO;
 using System.Net.Http;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Threading;
 using System.Threading.Tasks;
 using Directory = System.IO.Directory;
 
@@ -52,18 +51,16 @@ namespace LCT.SW360PackageCreator
                 m_Verbose = true;
 
             ISettingsManager settingsManager = new SettingsManager();
-            // do not change the order of getting ca tool information
-            CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
-            Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
-            CommonHelper.DefaultLogFolderInitialisation(FileConstant.ComponentCreatorLog, m_Verbose);
+            EnvironmentHelper environmentHelper = new EnvironmentHelper();
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
-
             ISW360ApicommunicationFacade sW360ApicommunicationFacade;
             ISw360ProjectService sw360ProjectService = Getsw360ProjectServiceObject(appSettings, out sW360ApicommunicationFacade);
             ProjectReleases projectReleases = new ProjectReleases();
+            // do not change the order of getting ca tool information
+            CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
+            Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
 
-            string FolderPath = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.ComponentCreatorLog, m_Verbose);
-            Logger.Logger.Log(null, Level.Debug, $"log manager initiated folder path: {FolderPath}", null);
+            string FolderPath = InitiateLogger(appSettings);
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             settingsManager.CheckRequiredArgsToRun(appSettings, "Creator");
             int isValid = await CreatorValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
@@ -90,7 +87,7 @@ namespace LCT.SW360PackageCreator
               $"FossologyURL\t\t --> {appSettings.SW360.Fossology.URL}\n\t" +
               $"EnableFossTrigger\t --> {appSettings.SW360.Fossology.EnableTrigger}\n\t" +
               $"IgnoreDevDependency\t --> {appSettings.SW360.IgnoreDevDependency}\n\t" +
-              $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t", null);
+              $"LogFolderPath\t\t --> {Path.GetFullPath(FolderPath)}\n\t", null);
 
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);
@@ -168,6 +165,30 @@ namespace LCT.SW360PackageCreator
             // initializing Component creation 
             await componentCreator.CreateComponentInSw360(appSettings, sw360CreatorService, sw360Service,
                  sw360ProjectService, new FileOperations(), creatorHelper, parsedBomData);
-        }        
+        }
+
+        private static string InitiateLogger(CommonAppSettings appSettings)
+        {
+            string FolderPath;
+            if (!string.IsNullOrEmpty(appSettings.Directory.LogFolder))
+            {
+                FolderPath = appSettings.Directory.LogFolder;
+                Log4Net.Init(FileConstant.ComponentCreatorLog, appSettings.Directory.LogFolder, m_Verbose);
+            }
+            else
+            {
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    FolderPath = FileConstant.LogFolder;
+                }
+                else
+                {
+                    FolderPath = "/var/log";
+                }
+                Log4Net.Init(FileConstant.ComponentCreatorLog, FolderPath, m_Verbose);
+            }
+
+            return FolderPath;
+        }
     }
 }

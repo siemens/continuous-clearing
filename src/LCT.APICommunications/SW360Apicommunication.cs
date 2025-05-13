@@ -24,13 +24,9 @@ namespace LCT.APICommunications
 {
     public static class HttpClientExtensions
     {
-        public static void SetLogWarnings(this HttpClient client, bool logWarnings,string urlInformation)
+        public static void SetLogWarnings(this HttpClient client, bool logWarnings)
         {
-            client.DefaultRequestHeaders.Remove("LogWarnings");
-            client.DefaultRequestHeaders.Remove("urlInfo");
-
             client.DefaultRequestHeaders.Add("LogWarnings", logWarnings.ToString());
-            client.DefaultRequestHeaders.Add("urlInfo", urlInformation);
         }
     }
     /// <summary>
@@ -74,7 +70,6 @@ namespace LCT.APICommunications
         public async Task<string> GetProjects()
         {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(true, "unable to get project details");
             var result = string.Empty;
             try
             {
@@ -92,14 +87,12 @@ namespace LCT.APICommunications
         public async Task<string> GetSw360Users()
         {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(true, "unable to get Sw360 users");
             return await httpClient.GetStringAsync(sw360UsersApi);
         }
 
         public async Task<string> GetProjectsByName(string projectName)
         {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(true, "unable to get projects by name");
             string projectNameApiUrl = $"{sw360ProjectsApi}{ApiConstant.ComponentNameUrl}{projectName}";
             return await httpClient.GetStringAsync(projectNameApiUrl);
         }
@@ -107,7 +100,6 @@ namespace LCT.APICommunications
         public async Task<HttpResponseMessage> GetProjectsByTag(string projectTag)
         {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(true, "unable to get projects by tag");
             string projectsByTagUrl = $"{sw360ProjectByTagApi}{projectTag}";
             return await httpClient.GetAsync(projectsByTagUrl);
         }
@@ -115,7 +107,6 @@ namespace LCT.APICommunications
         public async Task<HttpResponseMessage> GetProjectById(string projectId)
         {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(true, "unable to get project details by project id");
             HttpResponseMessage obj = new HttpResponseMessage();
             var result = obj;
             string projectsByTagUrl = $"{sw360ProjectsApi}/{projectId}";
@@ -142,7 +133,6 @@ namespace LCT.APICommunications
         public async Task<string> GetReleases()
         {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(true, "unable to get releases");
             var result = string.Empty;
             try
             {
@@ -181,7 +171,7 @@ namespace LCT.APICommunications
         public async Task<string> TriggerFossologyProcess(string releaseId, string sw360link)
         {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(false, "unable to trigger fossology process");
+            httpClient.SetLogWarnings(false);
             string url = $"{sw360ReleaseApi}/{releaseId}{ApiConstant.FossTriggerAPIPrefix}{sw360link}{ApiConstant.FossTriggerAPISuffix}";
             try
             {
@@ -205,20 +195,18 @@ namespace LCT.APICommunications
         public async Task<HttpResponseMessage> CheckFossologyProcessStatus(string link)
         {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(false, "unable to check fossology process status");
+            httpClient.SetLogWarnings(false);
             return await httpClient.GetAsync(link);
         }
         public async Task<string> GetComponents()
         {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(true, "unable to get components details");
             return await httpClient.GetStringAsync(sw360ComponentApi);
         }
 
         public async Task<HttpResponseMessage> GetReleaseByExternalId(string purlId, string externalIdKey = "")
         {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(false, "unable to get release details by externalid");
             string releaseByExternalIdUrl = $"{sw360ReleaseByExternalId}{externalIdKey}{purlId}";
             return await httpClient.GetAsync(releaseByExternalIdUrl);
         }
@@ -226,7 +214,7 @@ namespace LCT.APICommunications
         public async Task<HttpResponseMessage> GetComponentByExternalId(string purlId, string externalIdKey = "")
         {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(false, "unable to get component details by externalid");
+            httpClient.SetLogWarnings(false);
             string componentByExternalIdUrl = $"{sw360ComponentByExternalId}{externalIdKey}{purlId}";
             return await httpClient.GetAsync(componentByExternalIdUrl);
         }
@@ -234,7 +222,7 @@ namespace LCT.APICommunications
         public async Task<HttpResponseMessage> GetReleaseById(string releaseId)
         {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(false, "unable to get release details by releaseid");
+            httpClient.SetLogWarnings(false);
             string url = $"{sw360ReleaseApi}/{releaseId}";
             return await httpClient.GetAsync(url);
         }
@@ -242,14 +230,12 @@ namespace LCT.APICommunications
         public async Task<HttpResponseMessage> GetReleaseByLink(string releaseLink)
         {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(true, "unable to get release details by releaselink");
             return await httpClient.GetAsync(releaseLink);
         }
 
         public async Task<HttpResponseMessage> LinkReleasesToProject(HttpContent httpContent, string sw360ProjectId)
         {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(true, "unable to link releases to the project");
             string url = $"{sw360ProjectsApi}/{sw360ProjectId}/{ApiConstant.Releases}";
             return await httpClient.PostAsync(url, httpContent);
         }
@@ -257,7 +243,6 @@ namespace LCT.APICommunications
         public async Task<HttpResponseMessage> UpdateLinkedRelease(string projectId, string releaseId, UpdateLinkedRelease updateLinkedRelease)
         {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(true, "unable to update linked releases");
             string updateUri = $"{sw360ProjectsApi}/{projectId}/{ApiConstant.Release}/{releaseId}";
             string updateContent = JsonConvert.SerializeObject(updateLinkedRelease);
             HttpContent content = new StringContent(updateContent, Encoding.UTF8, "application/json");
@@ -268,21 +253,21 @@ namespace LCT.APICommunications
         public async Task<HttpResponseMessage> CreateComponent(CreateComponent createComponentContent)
         {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(false,"unable to create component");
+            httpClient.SetLogWarnings(false);
             return await httpClient.PostAsJsonAsync(sw360ComponentApi, createComponentContent);
         }
 
         public async Task<HttpResponseMessage> CreateRelease(Releases createReleaseContent)
         {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(false, "unable to create release");
+            httpClient.SetLogWarnings(false);
             return await httpClient.PostAsJsonAsync(sw360ReleaseApi, createReleaseContent);
         }
 
         public async Task<string> GetReleaseOfComponentById(string componentId)
         {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(false, "unable to get release data by component id");
+            httpClient.SetLogWarnings(false);
             string componentUrl = $"{sw360ComponentApi}/{componentId}";
             return await httpClient.GetStringAsync(componentUrl);
         }
@@ -290,14 +275,12 @@ namespace LCT.APICommunications
         public async Task<string> GetReleaseAttachments(string releaseAttachmentsUrl)
         {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(false, "unable to get release attachments");
             return await httpClient.GetStringAsync(releaseAttachmentsUrl);
         }
 
         public async Task<string> GetAttachmentInfo(string attachmentUrl)
         {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(false, "unable to get attachment information");
             return await httpClient.GetStringAsync(attachmentUrl);
         }
 
@@ -315,7 +298,7 @@ namespace LCT.APICommunications
         public async Task<HttpResponseMessage> UpdateRelease(string releaseId, HttpContent httpContent)
         {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(false,"unable to update the release data");
+            httpClient.SetLogWarnings(false);
             string releaseApi = $"{sw360ReleaseApi}/{releaseId}";
             return await httpClient.PatchAsync(releaseApi, httpContent);
         }
@@ -323,7 +306,6 @@ namespace LCT.APICommunications
         public async Task<HttpResponseMessage> UpdateComponent(string componentId, HttpContent httpContent)
         {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(false, "unable to update the component data");
             string componentApi = $"{sw360ComponentApi}/{componentId}";
             return await httpClient.PatchAsync(componentApi, httpContent);
         }
@@ -339,7 +321,6 @@ namespace LCT.APICommunications
         public async Task<string> GetReleaseByCompoenentName(string componentName)
         {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(false, "unable to get release data by component name");
             string url = $"{sw360ReleaseNameApi}{componentName}";
             return await httpClient.GetStringAsync(url);
         }
@@ -347,28 +328,26 @@ namespace LCT.APICommunications
         public async Task<HttpResponseMessage> GetComponentDetailsByUrl(string componentLink)
         {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(true, "unable to get component details by component link");
             return await httpClient.GetAsync(componentLink);
         }
 
         public async Task<string> GetComponentByName(string componentName)
         {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(false, "unable to get component details by component name");
+            httpClient.SetLogWarnings(false);
             string url = $"{sw360ComponentApi}{ApiConstant.ComponentNameUrl}{componentName}";
             return await httpClient.GetStringAsync(url);
         }
         public async Task<HttpResponseMessage> GetComponentUsingName(string componentName)
         {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(false, "unable to get component details by component name");
+            httpClient.SetLogWarnings(false);
             string url = $"{sw360ComponentApi}{ApiConstant.ComponentNameUrl}{componentName}";
             return await httpClient.GetAsync(url);
         }
         public async Task<HttpResponseMessage> GetAllReleasesWithAllData(int page, int pageEntries)
         {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(true, "unable to get all releases details");
             string url = $"{sw360ReleaseApi}?page={page}&allDetails=true&page_entries={pageEntries}";
             return await httpClient.GetAsync(url);
         }
