@@ -24,7 +24,7 @@ namespace LCT.APICommunications
 {
     public static class HttpClientExtensions
     {
-        public static void SetLogWarnings(this HttpClient client, bool logWarnings,string urlInformation)
+        public static void SetLogWarnings(this HttpClient client, bool logWarnings, string urlInformation)
         {
             client.DefaultRequestHeaders.Remove("LogWarnings");
             client.DefaultRequestHeaders.Remove("urlInfo");
@@ -268,7 +268,7 @@ namespace LCT.APICommunications
         public async Task<HttpResponseMessage> CreateComponent(CreateComponent createComponentContent)
         {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(false,"unable to create component");
+            httpClient.SetLogWarnings(false, "unable to create component");
             return await httpClient.PostAsJsonAsync(sw360ComponentApi, createComponentContent);
         }
 
@@ -315,7 +315,7 @@ namespace LCT.APICommunications
         public async Task<HttpResponseMessage> UpdateRelease(string releaseId, HttpContent httpContent)
         {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(false,"unable to update the release data");
+            httpClient.SetLogWarnings(false, "unable to update the release data");
             string releaseApi = $"{sw360ReleaseApi}/{releaseId}";
             return await httpClient.PatchAsync(releaseApi, httpContent);
         }

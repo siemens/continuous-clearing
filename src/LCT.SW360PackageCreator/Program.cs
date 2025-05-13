@@ -23,8 +23,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net.Http;
 using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Threading;
 using System.Threading.Tasks;
 using Directory = System.IO.Directory;
 
@@ -168,6 +166,6 @@ namespace LCT.SW360PackageCreator
             // initializing Component creation 
             await componentCreator.CreateComponentInSw360(appSettings, sw360CreatorService, sw360Service,
                  sw360ProjectService, new FileOperations(), creatorHelper, parsedBomData);
-        }        
+        }
     }
 }
