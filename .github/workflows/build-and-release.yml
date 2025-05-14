@@ -1,8 +1,13 @@
 name: Build & Release
 
 on:
+  workflow_run:
+    workflows: ["PR Checks"]
+    types:
+      - completed
   push:
-    branches: ['**']
+    branches:
+      - main
 
 jobs:
 
@@ -80,7 +85,7 @@ jobs:
             *.nupkg
 
   release:
-    #if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     runs-on: windows-latest
     needs: [build, build-docker, pack-nuget]
 
