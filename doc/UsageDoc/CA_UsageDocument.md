@@ -171,7 +171,7 @@ Users have the flexibility to generate a basic SBOM even if connections to SW360
   * **Project Type :** **Maven**
 
     * [Apache Maven](https://dlcdn.apache.org/maven/maven-3/3.9.0/binaries/apache-maven-3.9.0-bin.zip) has to be installed in the build machine and added in the PATH variable.
-      \*Add the cycloneDX Maven Plugin to the main \*\*pom.xml" and run the command to generate the input bom file.
+      *Add the cycloneDX Maven Plugin to the main pom.xml* and run the command to generate the input bom file.
 
       ```
        mvn install cyclonedx:makeAggregateBom
@@ -201,7 +201,7 @@ Users have the flexibility to generate a basic SBOM even if connections to SW360
 
     * Run the command given below by replacing the place holder values (i.e., path to input image directory, path to input directory and file name of the Debian image to be cleared) with actual values.
 
-      **Example**:   `docker run --rm -v \<path/to/InputImageDirectory>:/tmp/InputImages -v \<path/to/InputDirectory>:/tmp/OutputFiles ghcr.io/siemens/continuous-clearing /opt/DebianImageClearing/./syft /tmp/InputImages/\<fileNameoftheImageTobeCleared.tar> -o cyclonedx-json --file "/tmp/OutputFiles/output.sbom.cdx.json"`
+      **Example**:   `docker run --rm -v <path/to/InputImageDirectory>:/tmp/InputImages -v <path/to/InputDirectory>:/tmp/OutputFiles ghcr.io/siemens/continuous-clearing /opt/DebianImageClearing/./syft /tmp/InputImages/<fileNameoftheImageTobeCleared.tar> -o cyclonedx-json --file "/tmp/OutputFiles/output.sbom.cdx.json"`
 
       After successful execution, output.sbom.cdx.json (*CycloneDX.json*) file will be created in specified directory
 
@@ -235,7 +235,7 @@ Description for the settings in appSettings.json file
 | 11   | SW360.Fossology.URL                       | URL of Fossology server                                       | Yes             | [https://fossology.example.com](https://fossology.example.com)           |
 | 12   | SW360.Fossology.EnableTrigger             | Enable Fossology scan trigger                                 | No              | `True`                                                                     |
 | 13   | SW360.IgnoreDevDependency                 | Ignore development dependencies                               | No              | `True`                                                                     |
-| 14   | SW360.ExcludeComponents                   | Components to exclude (PURL format or ComponentName:Version) | No              | [`"pkg\:npm/foobar\@12.3.1"`, `"foobar:12.3.1"`, `"foobar:12.*"`, `"foobar:*"`] |
+| 14   | SW360.ExcludeComponents                   | Components to exclude (PURL format or ComponentName:Version) | No              | [`"pkg:npm/foobar@12.3.1"`, `"foobar:12.3.1"`, `"foobar:12.*"`, `"foobar:*"`] |
 | 15   | Directory.InputFolder                     | Path to input directory                                       | Yes             | `"/mnt/Input"`                                                             |
 | 16   | Directory.OutputFolder                    | Path to output directory                                      | Yes             | `"/mnt/Output"`                                                            |
 | 17   | Jfrog.URL                                 | URL of JFrog Artifactory                                      | Yes             | [https://jfrog.example.com](https://jfrog.example.com)                 |
@@ -246,7 +246,7 @@ Description for the settings in appSettings.json file
 
 | S.No | Argument Name                   | Description                           | Is it Mandatory | Example                                   |
 | ---- | ------------------------------- | ------------------------------------- | --------------- | ----------------------------------------- |
-| 20   | Npm.Include                     | File patterns to include for NPM      | Yes             | `["p*-lock.json", "\*.cdx.json"]`         |
+| 20   | Npm.Include                     | File patterns to include for NPM      | Yes             | `["p*-lock.json", "*.cdx.json"]`         |
 | 21   | Npm.Exclude                     | Folders/files to exclude for NPM      | No              | `["node_modules"]`                        |
 | 22   | Npm.Artifactory.ThirdPartyRepos | 3rd-party NPM repos and upload toggle | Yes             | `[{"Name": "npm-remote", "Upload": true}]` |
 | 23   | Npm.Artifactory.InternalRepos   | Internal NPM repos                    | Yes             | `["npm-internal"]`                         |
@@ -272,8 +272,8 @@ Note: If the second approach is followed then make sure you provide all the sett
 
 In order to exclude any components ,it can be configured in the  `appSettings.json` or in the cmdline paramater by providing the `packageName:version` or the `PURL` in the `SW360:ExcludeComponents` field.
 
-- Incase if you want to exclude a single component of the format *"@group/componentname"* eg : @angular/common specify it as *"@group/componentname\:version"* i.e @angular/common:4.2.6
-- If multiple versions has to be excluded of the same component, specify it as *"@group/componentname:\*"* i.e @angular/common:\*
+- Incase if you want to exclude a single component of the format *"@group/componentname"* eg : @angular/common specify it as *"@group/componentname:version"* i.e @angular/common:4.2.6
+- If multiple versions has to be excluded of the same component, specify it as *"@group/componentname:*"* i.e @angular/common:*
 
 
 In order to **Exclude specific folders** from the execution, It can be specified under the **Exclude section** of that specific **package type**.
@@ -357,11 +357,11 @@ When the JFrogDryRun is set to False, it indicates a shift towards deployment in
 * In order to execute the tool in release mode we need to pass an extra parameter to the existing
   argument list.
 
-  **Example** : docker run --rm -it -v /D/Projects/Output:/mnt/Output -v /D/Projects/DockerLog:/var/log -v /D/Projects/CAConfig:/etc/CATool ghcr.io/siemens/continuous-clearing dotnet ArtifactoryUploader.dll --settingsfilepath /etc/CATool/appSettings.json --Jfrog\:DryRun false
+  **Example** : docker run --rm -it -v /D/Projects/Output:/mnt/Output -v /D/Projects/DockerLog:/var/log -v /D/Projects/CAConfig:/etc/CATool ghcr.io/siemens/continuous-clearing dotnet ArtifactoryUploader.dll --settingsfilepath /etc/CATool/appSettings.json --Jfrog:DryRun false
 
   or
 
-  **Example** : ArtifactoryUploader.exe --settingsfilepath /<PathToConfig>/appSettings.json -Jfrog\:DryRun false
+  **Example** : ArtifactoryUploader.exe --settingsfilepath /<PathToConfig>/appSettings.json -Jfrog:DryRun false
 
 # How to handle multiple project types in same project
 
