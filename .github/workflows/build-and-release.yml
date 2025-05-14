@@ -16,15 +16,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup Version      
+
+      - name: Setup GitVersion
         uses: gittools/actions/gitversion/setup@v0.10.2
         with:
           versionSpec: '5.12.0'
+
       - name: Restore Packages
         run: dotnet restore src\LicenseClearingTool.sln
+
       - name: Build
         run: dotnet build src\LicenseClearingTool.sln
-      - name: Upload artifact
+
+      - name: Upload Build Output
         uses: actions/upload-artifact@v4
         with:
           name: buildoutput
@@ -36,55 +40,136 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Download Build Output
-        uses: actions/download-artifact@v4
-        with:
-            name: buildoutput
-            path: ${{ github.workspace }}/out/net8.0
-      - name: Build the Docker image
-        run: |
-          docker build . --file Dockerfile --tag ${{ github.repository }}:continuous-clearing-v8.0.0
-          docker save ${{ github.repository }}:continuous-clearing-v8.0.0 -o continuous-clearing-v8.0.0.tar
-      - name: Upload Docker Image
-        uses: actions/upload-artifact@v4
-        with:
-          name: docker-continuous-clearing
-          path: "*.tar"
 
-  release:
-    if: github.ref == 'refs/heads/main'    
-    runs-on: windows-latest
-    needs: [build, build-docker]
-  
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
       - name: Download Build Output
         uses: actions/download-artifact@v4
         with:
           name: buildoutput
+          path: ${{ github.workspace }}/out/net8.0
+
+      - name: Build Docker Image
+        run: |
+          docker build . --file Dockerfile --tag ${{ github.repository }}:continuous-clearing-v8.0.0
+          docker save ${{ github.repository }}:continuous-clearing-v8.0.0 -o continuous-clearing-v8.0.0.tar
+
+      - name: Upload Docker Image
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-continuous-clearing
+          path: |
+            *.tar
+
+  pack-nuget:
+    runs-on: windows-latest
+    needs: build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Download Build Output
+        uses: actions/download-artifact@v4
+        with:
+          name: buildoutput
+          path: ${{ github.workspace }}/out/net8.0
+
+      - name: Pack NuGet Package
+        run: |
+          nuget pack CA.nuspec -Version 8.0.0
+
+      - name: Upload NuGet Package
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-continuous-clearing
+          path: |
+            *.nupkg
+
+  release:
+    #if: github.ref == 'refs/heads/main'
+    runs-on: windows-latest
+    needs: [build, build-docker, pack-nuget]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Download Build Output
+        uses: actions/download-artifact@v4
+        with:
+          name: buildoutput
+
       - name: Download Docker Image
         uses: actions/download-artifact@v4
         with:
           name: docker-continuous-clearing
+
+      - name: Download NuGet Package
+        uses: actions/download-artifact@v4
+        with:
+          name: nuget-continuous-clearing
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: v8.0.0
           release_name: Release v8.0.0
           body: |
             ${{ github.event.head_commit.message }}
-          draft: true
-          prerelease: false   
+          draft: false
+          prerelease: false
+
+      - name: Compress Build Output into ZIP
+        run: |
+          powershell -Command "& {Compress-Archive -Path ${{ github.workspace }}/out/* -DestinationPath ${{ github.workspace }}/continuous-clearing-v8.0.0.zip}"
+
+      - name: Upload Build Output ZIP
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ github.workspace }}/continuous-clearing-v8.0.0.zip
+          asset_name: continuous-clearing-v8.0.0.zip
+          asset_content_type: application/zip
+
       - name: Upload Docker Image
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} 
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./continuous-clearing-v8.0.0.tar
           asset_name: continuous-clearing-v8.0.0.tar
-          asset_content_type: application/zip
+          asset_content_type: application/x-tar
+
+      - name: Upload NuGet Package
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: nuget/*.nupkg
+          asset_name: continuous-clearing.8.0.0.nupkg
+          asset_content_type: application/octet-stream
+
+      - name: Upload ReadmeOSS_nupkg file
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ github.workspace }}/ReadmeOSS_continuous-clearing_nupkg.html
+          asset_name: ReadmeOSS_continuous-clearing_nupkg.html
+          asset_content_type: text/html
+
+      - name: Upload ReadmeOSS_Docker file
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ github.workspace }}/ReadmeOSS_continuous-clearing_DockerImage.html
+          asset_name: ReadmeOSS_continuous-clearing_DockerImage.html
+          asset_content_type: text/html
