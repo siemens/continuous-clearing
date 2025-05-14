@@ -12,11 +12,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Setup GitVersion
-        uses: gittools/actions/gitversion/setup@v0.10.2
-        with:
-          versionSpec: '5.12.0'
-
       - name: Restore Packages
         run: dotnet restore src\LicenseClearingTool.sln
 
@@ -28,6 +23,12 @@ jobs:
         with:
           name: buildoutput
           path: ${{ github.workspace }}/out/net8.0
+      
+      - name: Upload Entire Output Directory
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-build-output
+          path: ${{ github.workspace }}/out
 
   build-docker:
     runs-on: ubuntu-latest
@@ -87,10 +88,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Download Build Output
+      - name: Download Full Build Output
         uses: actions/download-artifact@v4
         with:
-          name: buildoutput
+          name: full-build-output
+          path: ${{ github.workspace }}/out
 
       - name: Download Docker Image
         uses: actions/download-artifact@v4
@@ -115,11 +117,11 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Compress Build Output into ZIP
+      - name: Compress Full Build Output into ZIP
         run: |
           powershell -Command "& {Compress-Archive -Path ${{ github.workspace }}/out/* -DestinationPath ${{ github.workspace }}/continuous-clearing-v8.0.0.zip}"
 
-      - name: Upload Build Output ZIP
+      - name: Upload Build Output ZIP to Release
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -129,7 +131,7 @@ jobs:
           asset_name: continuous-clearing-v8.0.0.zip
           asset_content_type: application/zip
 
-      - name: Upload Docker Image
+      - name: Upload Docker Image(tar) to Release
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -139,7 +141,7 @@ jobs:
           asset_name: continuous-clearing-v8.0.0.tar
           asset_content_type: application/x-tar
 
-      - name: Upload NuGet Package
+      - name: Upload NuGet Package to Release
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -149,7 +151,7 @@ jobs:
           asset_name: continuous-clearing.8.0.0.nupkg
           asset_content_type: application/octet-stream
 
-      - name: Upload ReadmeOSS_nupkg file
+      - name: Upload ReadmeOSS_nupkg file to Release 
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -159,7 +161,7 @@ jobs:
           asset_name: ReadmeOSS_continuous-clearing_nupkg.html
           asset_content_type: text/html
 
-      - name: Upload ReadmeOSS_Docker file
+      - name: Upload ReadmeOSS_Docker file to Release
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
