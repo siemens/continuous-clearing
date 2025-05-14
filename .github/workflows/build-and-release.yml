@@ -121,7 +121,7 @@ jobs:
         run: |
           powershell -Command "& {Compress-Archive -Path ${{ github.workspace }}/out/* -DestinationPath ${{ github.workspace }}/continuous-clearing-v8.0.0.zip}"
 
-      - name: Upload Build Output ZIP to Release
+      - name: Upload Full Build Output ZIP to Release
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -147,7 +147,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: nuget/*.nupkg
+          asset_path: |
+            *.nupkg
           asset_name: continuous-clearing.8.0.0.nupkg
           asset_content_type: application/octet-stream
 
