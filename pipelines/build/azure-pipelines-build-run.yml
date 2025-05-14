@@ -17,6 +17,10 @@ pr:
   branches:
     include:
       - '*'
+  paths:
+    include:
+      - src/**
+      - TestFiles/**
 
 variables:
   - group: CONTINUOUS_CLEARING_TOOL_TEST_CONFIG
