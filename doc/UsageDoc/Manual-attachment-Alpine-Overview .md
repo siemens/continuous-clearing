@@ -101,3 +101,5 @@ git apply <path of patch file>/<patch file name>
 
 
 -  Attach  the `<source_Name>_<version><.tar.gz>` file as SRC under the attachment section for the release in SW360.
+
+Copyright © Siemens AG ▪ 2025

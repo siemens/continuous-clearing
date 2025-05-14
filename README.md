@@ -21,7 +21,7 @@ To ensure such practises are in place, we need to provide software bill of mater
 
 This tool has been  logically split into 3 different executables that enable it to be used as separate modules as per the user's requirement.
 
-**_Note: Continuous Clearing Tool internally uses [Syft](https://github.com/anchore/syft) for component detection for debian type projects._**
+**_Note: Continuous Clearing Tool internally uses [Syft](https://github.com/anchore/syft) for component detection for debian/alpine type projects._**
 
 
 # Package Installation 
@@ -101,7 +101,7 @@ docker run --rm -it -v /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDire
 
 Detailed insight on configuration and execution is provided in [Usage Doc](doc/UsageDoc/CA_UsageDocument.md).
  
- **_Note: ArtifactoryUploader is not applicable for Debian clearing._**
+ **_Note: ArtifactoryUploader is not applicable for Debian/Alpine clearing._**
 
 # Development
 
@@ -156,5 +156,5 @@ Third-party software components list:
 - [ReadmeOSS_continuous-clearing_nupkg](https://htmlpreview.github.io/?https://github.com/siemens/continuous-clearing/blob/main/ReadmeOSS_continuous-clearing_nupkg.html)
 - [ReadmeOSS_continuous-clearing_DockerImage](https://htmlpreview.github.io/?https://github.com/siemens/continuous-clearing/blob/main/ReadmeOSS_continuous-clearing_DockerImage.html)
     
-Copyright 2024 Siemens AG
+Copyright 2025 Siemens AG
 
