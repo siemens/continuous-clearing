@@ -5,10 +5,8 @@
 //<license>MIT</license>
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using CycloneDX.Models;
 using NUnit.Framework;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using TestUtilities;
@@ -23,19 +21,18 @@ namespace SW360IntegrationTest.Python
         [Test, Order(1)]
         public void TestArtifactoryUploaderexe()
         {
-            OutFolder = TestHelper.OutFolder;
-            string comparisonBOMPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\ArtifactoryUploaderTestData\PythonComparisonBOM.json";
+            OutFolder = Path.GetFullPath(Path.Combine(TestHelper.OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles", "ArtifactoryUploaderTestData", "Poetry"));
 
             int result = TestHelper.RunArtifactoryUploaderExe(new string[]{
-                TestConstant.BomFilePath, comparisonBOMPath,
+                TestConstant.BomFolderPath, OutFolder,
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
-                TestConstant.ArtifactoryUser, testParameters.ArtifactoryUploadUser,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
                 TestConstant.JfrogPythonThirdPartyDestRepoName,testParameters.ThirdPartyDestinationRepoName,
                 TestConstant.JfrogPythonDevDestRepoName,testParameters.DevDestinationRepoName,
                 TestConstant.JfrogPythonInternalDestRepoName,testParameters.InternalDestinationRepoName,
+                TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
                 TestConstant.JFrogApiURL,testParameters.JfrogApi,
-                TestConstant.Release, false.ToString()
+                TestConstant.DryRun, false.ToString()
             });
 
             // Test BOM Creator ran with exit code 0 or 2 (Warning)

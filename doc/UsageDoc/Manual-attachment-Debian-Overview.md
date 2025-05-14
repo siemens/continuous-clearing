@@ -47,3 +47,5 @@ i.e., shown in snapshot given below)
 
 ![image.png](../usagedocimg/DebianImg/FolderCheck.PNG)
 -  Attach  the `<source_Name>_<version><-debian-combined.tar.bz2>` file as SRC under the attachment section for the release in SW360.
+
+Copyright © Siemens AG ▪ 2025

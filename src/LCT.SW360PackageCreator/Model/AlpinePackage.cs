@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -24,7 +24,7 @@ namespace LCT.SW360PackageCreator.Model
 
         public string DownloadUrl { get; set; }
 
-        public string SourceDataForAlpine {  get; set; }
+        public string SourceDataForAlpine { get; set; }
 
 
     }

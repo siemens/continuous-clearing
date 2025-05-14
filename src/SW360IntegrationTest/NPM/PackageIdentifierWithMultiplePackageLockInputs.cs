@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 
@@ -7,7 +7,6 @@
 
 using CycloneDX.Models;
 using NUnit.Framework;
-using System.Collections.Generic;
 using System.IO;
 using TestUtilities;
 
@@ -25,19 +24,19 @@ namespace SW360IntegrationTest.NPM
         {
             OutFolder = TestHelper.OutFolder;
 
-            CCTLocalBomTestFile = OutFolder + @"..\..\..\src\SW360IntegrationTest\PackageIdentifierTestFiles\Npm\CCTLocalBOMNpmMultiplePackages.json";
+            CCTLocalBomTestFile = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "src", "SW360IntegrationTest", "PackageIdentifierTestFiles", "Npm", "CCTLocalBOMNpmMultiplePackages.json"));
 
-            if (!Directory.Exists(OutFolder + @"\..\BOMs"))
+            if (!Directory.Exists(Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs"))))
             {
-                Directory.CreateDirectory(OutFolder + @"\..\BOMs");
+                Directory.CreateDirectory(Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs")));
             }
         }
 
         [Test, Order(1)]
         public void TestBOMCreatorexe()
         {
-            string packagjsonPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles";
-            string bomPath = OutFolder + @"\..\BOMs";
+            string packagjsonPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles"));
+            string bomPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs"));
 
             // Test BOM Creator ran with exit code 0
             Assert.AreEqual(0, TestHelper.RunBOMCreatorExe(new string[]{
@@ -50,6 +49,8 @@ namespace SW360IntegrationTest.NPM
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
+                TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
+                TestConstant.JfrogNpmInternalRepo,"Npm-test",
                 TestConstant.ProjectType, "NPM",
                 TestConstant.Mode,""}),
                 "Test to run  Package Identifier EXE execution");
@@ -65,7 +66,7 @@ namespace SW360IntegrationTest.NPM
             expected.Read(CCTLocalBomTestFile);
 
             // Actual
-            string generatedBOM = OutFolder + $"\\..\\BOMs\\{testParameters.SW360ProjectName}_Bom.cdx.json";
+            string generatedBOM = Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs", $"{testParameters.SW360ProjectName}_Bom.cdx.json"));
             if (File.Exists(generatedBOM))
             {
                 fileExist = true;
@@ -78,7 +79,7 @@ namespace SW360IntegrationTest.NPM
 
                     foreach (var i in actual.Components)
                     {
-                        if ((i.Name == item.Name)&&(i.Version == item.Version))
+                        if ((i.Name == item.Name) && (i.Version == item.Version))
                         {
                             Component component = i;
                             Assert.AreEqual(item.Name, component.Name, "Test to check component name");

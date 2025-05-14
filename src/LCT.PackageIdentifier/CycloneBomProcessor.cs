@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -36,7 +36,7 @@ namespace LCT.PackageIdentifier
 
             Component component = new Component
             {
-                Name = appSettings.SW360ProjectName,
+                Name = appSettings?.SW360?.ProjectName,
                 Version = projectReleases.Version,
                 Type = Component.Classification.Application
             };

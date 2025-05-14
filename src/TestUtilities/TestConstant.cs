@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -26,46 +26,54 @@ namespace TestUtilities
 
 
         public const string componentNameUrl = "?name=";
-        public const string PackageFilePath = "--packageFilePath";
-        public const string BomFolderPath = "--bomFolderPath";
-        public const string Sw360Token = "--sw360Token";
-        public const string BomFilePath = "--bomFilePath";
-        public const string SW360URL = "--sW360URL";
-        public const string FossologyURL = "--fossologyURL";
-        public const string SW360AuthTokenType = "--sW360AuthTokenType";
-        public const string SW360ProjectName = "--sW360ProjectName";
-        public const string SW360ProjectID = "--sW360ProjectID";
-        public const string ProjectType = "--projectType";
-        public const string RemoveDevDependency = "--removeDevDependency";
+        public const string PackageFilePath = "--Directory:InputFolder";
+        public const string BomFolderPath = "--Directory:OutputFolder";
+        public const string Sw360Token = "--SW360:Token";
+        public const string BomFilePath = "--Directory:BomFilePath";
+        public const string SW360URL = "--SW360:URL";
+        public const string FossologyURL = "--SW360:Fossology:URL";
+        public const string EnableFossologyTrigger = "--SW360:Fossology:EnableTrigger";
+        public const string SW360AuthTokenType = "--SW360:AuthTokenType";
+        public const string SW360ProjectName = "--SW360:ProjectName";
+        public const string SW360ProjectID = "--SW360:ProjectID";
+        public const string ProjectType = "--ProjectType";
+        public const string RemoveDevDependency = "--SW360:IgnoreDevDependency";
         public const string Mode = "--Mode";
         public const string JFrog_API_Header = "X-JFrog-Art-Api";
         public const string Email = "Email";
+        public const string ArtifactoryKey = "--Jfrog:Token";
         public const string ArtifactoryUser = "--artifactoryuploaduser";
-        public const string ArtifactoryKey = "--artifactoryuploadapikey";
+        public const string TelemetryEnable = "--Telemetry:Enable";
 
-        public const string JfrogNpmThirdPartyDestRepoName = "--npm:JfrogThirdPartyDestRepoName ";
-        public const string JfrogNpmInternalDestRepoName = "--npm:JfrogInternalDestRepoName ";
-        public const string JfrogNpmDevDestRepoName = "--npm:JfrogDevDestRepoName ";
+        public const string JfrogNpmThirdPartyDestRepoName = "--Npm:Artifactory:ThirdPartyRepos:0:Name";
+        public const string JfrogNpmInternalRepo = "--Npm:Artifactory:InternalRepos:0";
+        public const string JfrogNpmInternalDestRepoName = "--Npm:ReleaseRepo ";
+        public const string JfrogNpmDevDestRepoName = "--Npm:DevDepRepo ";
 
-        public const string JfrogMavenThirdPartyDestRepoName = "--maven:JfrogThirdPartyDestRepoName ";
-        public const string JfrogMavenInternalDestRepoName = "--maven:JfrogInternalDestRepoName ";
-        public const string JfrogMavenDevDestRepoName = "--maven:JfrogDevDestRepoName ";
+        public const string JfrogMavenThirdPartyDestRepoName = "--Maven:Artifactory:ThirdPartyRepos:0:Name";
+        public const string JfrogMavenInternalRepo = "--Maven:Artifactory:InternalRepos:0";
+        public const string JfrogMavenInternalDestRepoName = "--Maven:ReleaseRepo ";
+        public const string JfrogMavenDevDestRepoName = "--Maven:DevDepRepo ";
 
-        public const string JfrogNugetThirdPartyDestRepoName = "--nuget:JfrogThirdPartyDestRepoName ";
-        public const string JfrogNugetInternalDestRepoName = "--nuget:JfrogInternalDestRepoName ";
-        public const string JfrogNugetDevDestRepoName = "--nuget:JfrogDevDestRepoName ";
+        public const string JfrogNugetThirdPartyDestRepoName = "--Nuget:Artifactory:ThirdPartyRepos:0:Name";
+        public const string JfrogNugetInternalRepo = "--Nuget:Artifactory:InternalRepos:0";
+        public const string JfrogNugetInternalDestRepoName = "--Nuget:ReleaseRepo ";
+        public const string JfrogNugetDevDestRepoName = "--Nuget:DevDepRepo ";
 
-        public const string JfrogPythonThirdPartyDestRepoName = "--python:JfrogThirdPartyDestRepoName ";
-        public const string JfrogPythonInternalDestRepoName = "--python:JfrogInternalDestRepoName ";
-        public const string JfrogPythonDevDestRepoName = "--python:JfrogDevDestRepoName ";
+        public const string JfrogPythonThirdPartyDestRepoName = "--Poetry:Artifactory:ThirdPartyRepos:0:Name";
+        public const string JfrogPoetryInternalRepo = "--Poetry:Artifactory:InternalRepos:0";
+        public const string JfrogPythonInternalDestRepoName = "--Poetry:ReleaseRepo ";
+        public const string JfrogPythonDevDestRepoName = "--Poetry:DevDepRepo ";
 
-        public const string JfrogConanThirdPartyDestRepoName = "--conan:JfrogThirdPartyDestRepoName ";
-        public const string JfrogConanInternalDestRepoName = "--conan:JfrogInternalDestRepoName ";
-        public const string JfrogConanDevDestRepoName = "--conan:JfrogDevDestRepoName ";
+        public const string JfrogConanThirdPartyDestRepoName = "--Conan:Artifactory:ThirdPartyRepos:0:Name";
+        public const string JfrogConanInternalRepo = "--Conan:Artifactory:InternalRepos:0";
+        public const string JfrogConanInternalDestRepoName = "--Conan:ReleaseRepo ";
+        public const string JfrogConanDevDestRepoName = "--Conan:DevDepRepo ";
+        public const string JfrogDebianInternalRepo = "--Debian:Artifactory:InternalRepos:0";
 
         public const string NuspecMode = "--NuspecMode";
-        public const string JFrogApiURL = "--JFrogApi";
-        public const string CycloneDxSBomTemplatePath = "--cycloneDxSBomTemplatePath";
-        public const string Release = "--release";
+        public const string JFrogApiURL = "--JFrog:URL";
+        public const string DryRun = "--JFrog:DryRun";
+        public const string Appsettings = "--settingsfilepath";
     }
 }

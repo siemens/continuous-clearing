@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -13,7 +13,7 @@ namespace LCT.SW360PackageCreator.Model
     [ExcludeFromCodeCoverage]
     public class Sources
     {
-        [YamlMember(Alias ="sources")]
+        [YamlMember(Alias = "sources")]
         public Dictionary<string, Source> SourcesData { get; set; }
         [YamlMember(Alias = "patches")]
         public Dictionary<string, List<Patch>> Patches { get; set; }

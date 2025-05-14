@@ -1,14 +1,16 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.APICommunications.Model;
 using LCT.Common;
+using LCT.Common.Interface;
 using log4net;
 using System;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -18,6 +20,7 @@ namespace LCT.APICommunications
     {
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static int TimeoutInSec { get; set; }
+        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
         public NpmJfrogApiCommunication(string repoDomainName, string srcrepoName, ArtifactoryCredentials repoCredentials, int timeout) : base(repoDomainName, srcrepoName, repoCredentials, timeout)
         {
             TimeoutInSec = timeout;
@@ -25,11 +28,14 @@ namespace LCT.APICommunications
 
         private static HttpClient GetHttpClient(ArtifactoryCredentials credentials)
         {
-            HttpClient httpClient = new HttpClient();
+            var handler = new RetryHttpClientHandler()
+            {
+                InnerHandler = new HttpClientHandler()
+            };
+            var httpClient = new HttpClient(handler);
             TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
             httpClient.Timeout = timeOutInSec;
-            httpClient.DefaultRequestHeaders.Add(ApiConstant.JFrog_API_Header, credentials.ApiKey);
-            httpClient.DefaultRequestHeaders.Add(ApiConstant.Email, credentials.Email);
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", credentials.Token);
             return httpClient;
         }
 
@@ -67,9 +73,9 @@ namespace LCT.APICommunications
             catch (TaskCanceledException ex)
             {
                 Logger.Debug($"{ex.Message}");
-                ExceptionHandling.TaskCancelledException(ex,"Jfrog");
-                CommonHelper.CallEnvironmentExit(-1);
-            }           
+                ExceptionHandling.TaskCancelledException(ex, "Jfrog");
+                environmentHelper.CallEnvironmentExit(-1);
+            }
             return result;
         }
 

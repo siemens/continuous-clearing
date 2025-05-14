@@ -1,17 +1,16 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Diagnostics.CodeAnalysis;
 
 namespace TestUtilities
 {
+    [ExcludeFromCodeCoverage]
     public class TestParamNuget
     {
         static readonly IConfiguration s_Config =
@@ -32,6 +31,8 @@ namespace TestUtilities
         public string ThirdPartyDestinationRepoName { get; set; }
         public string InternalDestinationRepoName { get; set; }
         public string DevDestinationRepoName { get; set; }
+        public string FossologyTrigger { get; set; }
+        public string TelemetryEnable { get; set; }
 
         public TestParamNuget()
         {
@@ -49,6 +50,8 @@ namespace TestUtilities
             ThirdPartyDestinationRepoName = "nuget-test";
             InternalDestinationRepoName = "nuget-test";
             DevDestinationRepoName = "nuget-test";
+            FossologyTrigger = s_Config["EnableFossologyTrigger"];
+            TelemetryEnable = s_Config["TelemetryEnable"];
         }
     }
 }

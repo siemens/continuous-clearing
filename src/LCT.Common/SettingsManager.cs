@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -11,7 +11,6 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -24,6 +23,7 @@ namespace LCT.Common
     {
         public string BasePath { get; private set; } = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
 
         /// <summary>
         /// Reads the Configuration from input args and json setting file
@@ -36,17 +36,17 @@ namespace LCT.Common
 
             if (args != null)
             {
-                Logger.Debug($"ReadConfiguration():args: {string.Join(",", args)}");
+                string[] maskedArgs = CommonHelper.MaskSensitiveArguments(args);
+                Logger.Debug($"ReadConfiguration():args: {string.Join(" ", maskedArgs)}");
             }
             if (args?.Length == 0)
             {
                 Logger.Debug($"Argument Count : {args.Length}");
                 DisplayHelp();
-                CommonHelper.PublishFilesToArtifact();
-                Environment.Exit(0);
+                environmentHelper.CallEnvironmentExit(0);
             }
             string settingsFilePath = GetConfigFilePathFromArgs(args, jsonSettingsFileName);
-            Logger.Logger.Log(null, Level.Notice, $"Settings File: {settingsFilePath}", null);
+            Logger.Logger.Log(null, Level.Debug, $"Settings File: {settingsFilePath}", null);
 
             //add ut for reading - add json and then cmd args
             IConfigurationBuilder settingsConfigBuilder = new ConfigurationBuilder()
@@ -56,8 +56,21 @@ namespace LCT.Common
                                                                     .AddCommandLine(args);
 
 
-            IConfiguration settingsConfig = settingsConfigBuilder.Build();
-
+            IConfiguration settingsConfig;
+            try
+            {
+                settingsConfig = settingsConfigBuilder.Build();
+            }
+            catch (InvalidDataException)
+            {
+                Logger.Error($"Failed to load configuration file. Please verify the JSON format in: {settingsFilePath}");
+                throw new InvalidDataException($"Failed to load configuration file. Please verify the JSON format in: {settingsFilePath}");
+            }
+            catch (FormatException)
+            {
+                Logger.Error($"Configuration file contains invalid format. Please check for missing quotes or invalid syntax in: {settingsFilePath}");
+                throw new InvalidDataException($"Configuration file contains invalid format. Please check for missing quotes or invalid syntax in: {settingsFilePath}");
+            }
 
 
             T appSettings = settingsConfig.Get<T>();
@@ -121,17 +134,33 @@ namespace LCT.Common
             {
                 //Required parameters to run Package Identifier
                 List<string> identifierReqParameters = new List<string>()
-            {
-                "SW360ProjectID",
-                "Sw360Token",
-                "SW360URL",
-                "JFrogApi",
-                "PackageFilePath",
-                "BomFolderPath",
-                "ArtifactoryUploadApiKey",
-                "InternalRepoList",
-                "ProjectType"
-            };
+                {
+                    "Directory.InputFolder",
+                    "Directory.OutputFolder",
+                    "ProjectType"
+                };
+
+                if (appSettings.SW360 != null)
+                {
+                    identifierReqParameters.Add($"SW360.ProjectID");
+                    identifierReqParameters.Add($"SW360.Token");
+                    identifierReqParameters.Add($"SW360.URL");
+                }
+                if (appSettings.Jfrog != null)
+                {
+                    identifierReqParameters.Add($"Jfrog.Token");
+                    identifierReqParameters.Add($"Jfrog.URL");
+                }
+
+
+                //Check if ProjectType contains a value and add InternalRepos key accordingly
+                if (!string.IsNullOrWhiteSpace(appSettings.ProjectType))
+                {
+                    if (appSettings.Jfrog != null && !appSettings.ProjectType.Equals("ALPINE", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        identifierReqParameters.Add($"{appSettings.ProjectType}.Artifactory.InternalRepos");
+                    }
+                }
                 CheckForMissingParameter(appSettings, properties, identifierReqParameters);
             }
             else if (currentExe == "Creator")
@@ -139,10 +168,10 @@ namespace LCT.Common
                 //Required parameters to run SW360Component Creator
                 List<string> creatorReqParameters = new List<string>()
             {
-                "SW360ProjectID",
-                "Sw360Token",
-                "SW360URL",
-                "BomFilePath"
+                "SW360.ProjectID",
+                "Sw360.Token",
+                "SW360.URL",
+                "Directory.OutputFolder"
             };
                 CheckForMissingParameter(appSettings, properties, creatorReqParameters);
             }
@@ -151,9 +180,9 @@ namespace LCT.Common
                 //Required parameters to run Artifactory Uploader
                 List<string> uploaderReqParameters = new List<string>()
             {
-                "JFrogApi",
-                "BomFilePath",
-                "ArtifactoryUploadApiKey",
+                "Jfrog.URL",
+                "Directory.OutputFolder",
+                "Jfrog.Token",
             };
                 CheckForMissingParameter(appSettings, properties, uploaderReqParameters);
             }
@@ -165,18 +194,49 @@ namespace LCT.Common
 
             foreach (string key in reqParameters)
             {
-                string value = properties.First(x => x.Name == key)?.GetValue(appSettings)?.ToString();
+                string[] parts = key.Split('.');
+                object currentObject = appSettings;
+                PropertyInfo property = null;
 
-                if (string.IsNullOrWhiteSpace(value))
+                foreach (string part in parts)
                 {
-                    missingParameters.Append(key + "\n");
+                    if (currentObject == null)
+                    {
+                        break;
+                    }
+
+                    property = currentObject.GetType().GetProperty(part, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                    currentObject = property?.GetValue(currentObject);
+                }
+
+                if (currentObject is Array array)
+                {
+                    if (array.Length == 0 || string.IsNullOrWhiteSpace(array.GetValue(0)?.ToString()))
+                    {
+                        missingParameters.Append(key + "\n");
+                    }
+                }
+                else if (currentObject is IList<object> list)
+                {
+                    if (list.Count == 0 || string.IsNullOrWhiteSpace(list[0]?.ToString()))
+                    {
+                        missingParameters.Append(key + "\n");
+                    }
+                }
+                else
+                {
+                    string value = currentObject?.ToString();
+                    if (string.IsNullOrWhiteSpace(value))
+                    {
+                        missingParameters.Append(key + "\n");
+                    }
                 }
             }
 
             if (!string.IsNullOrWhiteSpace(missingParameters.ToString()))
             {
                 ExceptionHandling.ArgumentException(missingParameters.ToString());
-                CommonHelper.CallEnvironmentExit(-1);
+                environmentHelper.CallEnvironmentExit(-1);
             }
         }
         public static bool IsAzureDevOpsDebugEnabled()

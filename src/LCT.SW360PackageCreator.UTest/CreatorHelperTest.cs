@@ -1,29 +1,28 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using Castle.Core.Internal;
+using CycloneDX.Models;
+using LCT.APICommunications.Model;
+using LCT.Common;
+using LCT.Common.Constants;
+using LCT.Common.Model;
+using LCT.Facade.Interfaces;
+using LCT.Services.Interface;
+using LCT.SW360PackageCreator.Interfaces;
+using LCT.SW360PackageCreator.Model;
 using Moq;
 using NUnit.Framework;
 using System.Collections.Generic;
-using LCT.Common.Model;
-using LCT.Common.Constants;
-using LCT.Services.Interface;
-using LCT.SW360PackageCreator;
-using LCT.SW360PackageCreator.Interfaces;
-using LCT.SW360PackageCreator.Model;
-using LCT.APICommunications.Model;
-using System.Threading.Tasks;
-using CycloneDX.Models;
 using System.Diagnostics;
-using LCT.Common;
-using Castle.Core.Internal;
-using LCT.Facade.Interfaces;
-using System.Net.Http;
-using System.Net;
-using System.Text;
 using System.IO;
+using System.Net;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace LCT.SW360PackageCreator.UTest
 {
@@ -102,10 +101,15 @@ namespace LCT.SW360PackageCreator.UTest
         public void InitializeSw360ProjectService_ForGivenAppSeetings_ReturnsSw360ServiceObject()
         {
             // Arrange
-            CommonAppSettings appSettings = new CommonAppSettings();
-            appSettings.SW360AuthTokenType = "Token";
-            appSettings.Sw360Token = "uifhiopsjfposddkf[fopefp[ld[p[lfffuhdffdkf";
-            appSettings.SW360URL = "http://localhost:8090";
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                SW360 = new SW360()
+                {
+                    AuthTokenType = "Token",
+                    Token = "uifhiopsjfposddkf[fopefp[ld[p[lfffuhdffdkf",
+                    URL = "http://localhost:8090"
+                }
+            };
 
             // Act
             ISw360ProjectService sw360ProjectService = CreatorHelper.InitializeSw360ProjectService(appSettings);
@@ -118,10 +122,15 @@ namespace LCT.SW360PackageCreator.UTest
         public void InitializeSw360CreatorService_ForGivenAppSettings_ReturnsSw360Creatorervice()
         {
             // Arrange
-            CommonAppSettings appSettings = new CommonAppSettings();
-            appSettings.SW360AuthTokenType = "Token";
-            appSettings.Sw360Token = "uifhiopsjfposddkf[fopefp[ld[p[lfffuhdffdkf";
-            appSettings.SW360URL = "http://localhost:8090";
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                SW360 = new SW360()
+                {
+                    AuthTokenType = "Token",
+                    Token = "uifhiopsjfposddkf[fopefp[ld[p[lfffuhdffdkf",
+                    URL = "http://localhost:8090"
+                }
+            };
 
             // Act
             ISw360CreatorService sw360CreatorService = CreatorHelper.InitializeSw360CreatorService(appSettings);
@@ -242,7 +251,7 @@ namespace LCT.SW360PackageCreator.UTest
             {
                 Name = "adduser",
                 Version = "3.118"
-                
+
             });
 
             List<Components> componentsAvailableInSw360 = new List<Components>();
@@ -330,10 +339,15 @@ namespace LCT.SW360PackageCreator.UTest
         public void WriteSourceNotFoundListToConsole_GetComparisionBomDatan_ReturnsNothing()
         {
             //Arrange
-            CommonAppSettings appSettings = new CommonAppSettings();
-            appSettings.SW360AuthTokenType = "Token";
-            appSettings.Sw360Token = "uifhiopsjfposddkf[fopefp[ld[p[lfffuhdffdkf";
-            appSettings.SW360URL = "http://localhost:8090";
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                SW360 = new SW360()
+                {
+                    AuthTokenType = "Token",
+                    Token = "uifhiopsjfposddkf[fopefp[ld[p[lfffuhdffdkf",
+                    URL = "http://localhost:8090"
+                }
+            };
 
             List<ComparisonBomData> compareBomData = new List<ComparisonBomData>();
             compareBomData.Add(new ComparisonBomData()
@@ -689,7 +703,7 @@ namespace LCT.SW360PackageCreator.UTest
         public void Test_GetMavenDownloadUrl_WhenReleaseExists()
         {
             // Arrange
-            var mapper = new ComparisonBomData() { ReleaseStatus= Dataconstant.Available };
+            var mapper = new ComparisonBomData() { ReleaseStatus = Dataconstant.Available };
             var item = new Components();
             var releasesInfo = new ReleasesInfo
             {
@@ -731,7 +745,7 @@ namespace LCT.SW360PackageCreator.UTest
             // Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string localPathforDownload = outFolder + @"..\..\..\src\LCT.SW360PackageCreator.UTest\ComponentCreatorUTFiles\";
+            string localPathforDownload = Path.GetFullPath(Path.Combine(outFolder, "..", "..", "src", "LCT.SW360PackageCreator.UTest", "ComponentCreatorUTFiles")) + Path.DirectorySeparatorChar;
 
             var component = new ComparisonBomData
             {

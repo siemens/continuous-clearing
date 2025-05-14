@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -24,6 +24,7 @@ namespace LCT.PackageIdentifier
     {
 
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
         public static List<string> FileScanner(string rootPath, Config config)
         {
 
@@ -42,7 +43,7 @@ namespace LCT.PackageIdentifier
                 throw new ArgumentException($"Invalid value for the {nameof(rootPath)} - {rootPath}");
             }
 
-            if (!Directory.Exists(rootPath))
+            if (!System.IO.Directory.Exists(rootPath))
             {
                 Logger.Error("Root path does not exist.Provide a valid  path");
                 throw new DirectoryNotFoundException($"The {nameof(rootPath)}  is not found at this path" +
@@ -52,24 +53,24 @@ namespace LCT.PackageIdentifier
             Logger.Logger.Log(null, Level.Notice, $"Directory Location: Packages are read from the below locations:", null);
             foreach (string includePattern in config.Include)
             {
-                foundConfigFiles = Directory.GetFiles(rootPath, includePattern, SearchOption.AllDirectories);
+                foundConfigFiles = System.IO.Directory.GetFiles(rootPath, includePattern, SearchOption.AllDirectories);
 
                 if (foundConfigFiles != null && foundConfigFiles.Length > 0)
                 {
                     foreach (string configFile in foundConfigFiles)
                     {
                         CheckingForExcludedFiles(config, fileOperations, allFoundConfigFiles, configFile);
-                    }                  
-                }             
+                    }
+                }
             }
 
             if (allFoundConfigFiles.Count == 0)
             {
-                Logger.Error("   Provided package file path do not contain valid input files.");
-                CommonHelper.CallEnvironmentExit(-1);
+                Logger.Error("Provided package file path do not contain valid input files.");
+                environmentHelper.CallEnvironmentExit(-1);
             }
 
-           
+
             return allFoundConfigFiles;
 
         }

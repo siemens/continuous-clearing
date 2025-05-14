@@ -1,4 +1,4 @@
-﻿// SPDX-FileCopyrightText: 2024 Siemens AG
+﻿// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // --------------------------------------------------------------------------------------------------------------------
@@ -14,7 +14,6 @@ using LCT.Services.Interface;
 using log4net;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -42,13 +41,18 @@ namespace LCT.PackageIdentifier
             List<Dependency> dependenciesForBOM = new();
             List<string> configFiles;
 
-            configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Maven);
-
+            configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Maven);
+            List<string> listOfTemplateBomfilePaths = new List<string>();
             foreach (string filepath in configFiles)
             {
+                if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                {
+                    listOfTemplateBomfilePaths.Add(filepath);
+                }
                 if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     Bom bomList = ParseCycloneDXBom(filepath);
+
                     if (bomList?.Components != null)
                     {
                         CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
@@ -75,14 +79,9 @@ namespace LCT.PackageIdentifier
                 }
             }
 
-            if (File.Exists(appSettings.CycloneDxSBomTemplatePath) && appSettings.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
-            {
-                //Adding Template Component Details
-                Bom templateDetails;
-                templateDetails = ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
-                CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
-                SbomTemplate.AddComponentDetails(componentsForBOM, templateDetails);
-            }
+            string templateFilePath = SbomTemplate.GetFilePathForTemplate(listOfTemplateBomfilePaths);
+            SbomTemplate.ProcessTemplateFile(templateFilePath, _cycloneDXBomParser, componentsForBOM, appSettings.ProjectType);
+
 
             //checking Dev dependency
             DevDependencyIdentificationLogic(componentsForBOM, componentsToBOM, ref ListOfComponents);
@@ -97,11 +96,11 @@ namespace LCT.PackageIdentifier
             BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - componentsForBOM.Count;
 
 
-            if (appSettings.Maven.ExcludedComponents != null)
+            if (appSettings?.SW360?.ExcludeComponents != null)
             {
-                componentsForBOM = CommonHelper.RemoveExcludedComponents(componentsForBOM, appSettings.Maven.ExcludedComponents, ref noOfExcludedComponents);
+                componentsForBOM = CommonHelper.RemoveExcludedComponents(componentsForBOM, appSettings?.SW360?.ExcludeComponents, ref noOfExcludedComponents);
                 dependenciesForBOM = CommonHelper.RemoveInvalidDependenciesAndReferences(componentsForBOM, dependenciesForBOM);
-                BomCreator.bomKpiData.ComponentsExcluded += noOfExcludedComponents;
+                BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents;
             }
 
             bom.Components = componentsForBOM;
@@ -114,10 +113,48 @@ namespace LCT.PackageIdentifier
             {
                 AddSiemensDirectProperty(ref bom);
             }
-
+            bom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(bom.Components, bom.Dependencies);
+            RemoveTypeJarSuffix(bom);
             return bom;
         }
+        private static void RemoveTypeJarSuffix(Bom bom)
+        {
+            const string suffix = Dataconstant.TypeJarSuffix;
 
+            foreach (var component in bom?.Components ?? Enumerable.Empty<Component>())
+            {
+                component.BomRef = RemoveSuffix(component.BomRef, suffix);
+                component.Purl = RemoveSuffix(component.Purl, suffix);
+            }
+
+            foreach (var dependency in bom?.Dependencies ?? Enumerable.Empty<Dependency>()) 
+            {
+                RemoveTypeJarSuffixFromDependency(dependency);
+            }
+        }
+        private static void RemoveTypeJarSuffixFromDependency(Dependency dependency)
+        {
+            const string suffix = Dataconstant.TypeJarSuffix;
+            if (!string.IsNullOrEmpty(dependency.Ref) && dependency.Ref.EndsWith(suffix))
+            {
+                dependency.Ref = dependency.Ref[..^suffix.Length];
+            }
+
+            // Recursively process nested dependencies
+            if (dependency.Dependencies != null && dependency.Dependencies.Count != 0)
+            {
+                foreach (var nestedDependency in dependency.Dependencies)
+                {
+                    RemoveTypeJarSuffixFromDependency(nestedDependency);
+                }
+            }
+        }
+        private static string RemoveSuffix(string value, string suffix)
+        {
+            return !string.IsNullOrEmpty(value) && value.EndsWith(suffix)
+                ? value[..^suffix.Length]
+                : value;
+        }
         public void AddSiemensDirectProperty(ref Bom bom)
         {
             List<string> mavenDirectDependencies = new List<string>();
@@ -207,7 +244,7 @@ namespace LCT.PackageIdentifier
         {
 
             // get the  component list from Jfrog for given repo + internal repo
-            string[] repoList = appSettings.InternalRepoList.Concat(appSettings.Maven?.JfrogMavenRepoList).ToArray();
+            string[] repoList = CommonHelper.GetRepoList(appSettings);
             List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(repoList, jFrogService);
             Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
             List<Component> modifiedBOM = new List<Component>();
@@ -222,18 +259,26 @@ namespace LCT.PackageIdentifier
                 AqlResult finalRepoData = GetJfrogArtifactoryRepoDetials(aqlResultList, component, bomhelper, out jfrogRepoPath);
                 Property siemensfileNameProp = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = finalRepoData?.Name ?? Dataconstant.PackageNameNotFoundInJfrog };
                 Property jfrogRepoPathProp = new() { Name = Dataconstant.Cdx_JfrogRepoPath, Value = jfrogRepoPath };
-                Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = finalRepoData.Repo };
+                Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = finalRepoData?.Repo };
 
                 Component componentVal = component;
-                if (artifactoryrepo.Value == appSettings.Maven.JfrogDevDestRepoName)
+                if (artifactoryrepo.Value == appSettings.Maven.DevDepRepo)
                 {
                     BomCreator.bomKpiData.DevdependencyComponents++;
                 }
-                if (artifactoryrepo.Value == appSettings.Maven.JfrogThirdPartyDestRepoName)
+                if (appSettings.Maven.Artifactory.ThirdPartyRepos != null)
                 {
-                    BomCreator.bomKpiData.ThirdPartyRepoComponents++;
+                    foreach (var thirdPartyRepo in appSettings.Maven.Artifactory.ThirdPartyRepos)
+                    {
+                        if (artifactoryrepo.Value == thirdPartyRepo.Name)
+                        {
+                            BomCreator.bomKpiData.ThirdPartyRepoComponents++;
+                            break;
+                        }
+                    }
+
                 }
-                if (artifactoryrepo.Value == appSettings.Maven.JfrogInternalDestRepoName)
+                if (artifactoryrepo.Value == appSettings.Maven.ReleaseRepo)
                 {
                     BomCreator.bomKpiData.ReleaseRepoComponents++;
                 }
@@ -285,7 +330,7 @@ namespace LCT.PackageIdentifier
         {
 
             // get the  component list from Jfrog for given repo
-            List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(appSettings.InternalRepoList, jFrogService);
+            List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(appSettings.Maven.Artifactory.InternalRepos, jFrogService);
 
             // find the components in the list of internal components
             List<Component> internalComponents = new List<Component>();
@@ -375,7 +420,10 @@ namespace LCT.PackageIdentifier
                 aqlResult = aqlResults.FirstOrDefault(x => x.Repo.Equals(repoName));
                 jfrogRepoPath = GetJfrogRepoPath(aqlResult);
             }
-            aqlResult.Repo ??= repoName;
+            if (aqlResult != null)
+            {
+                aqlResult.Repo ??= repoName;
+            }
             return aqlResult;
         }
 

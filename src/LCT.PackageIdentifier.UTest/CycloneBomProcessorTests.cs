@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -9,7 +9,6 @@ using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Model;
-using LCT.PackageIdentifier;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
@@ -36,9 +35,11 @@ namespace LCT.PackageIdentifier.UTest
             };
             CommonAppSettings appSettings = new CommonAppSettings()
             {
-                CaVersion = "1.2.3"
+                SW360 = new()
+
             };
-            CatoolInfo caToolInformation = new CatoolInfo() { CatoolVersion = "6.0.0", CatoolRunningLocation="" };
+            projectReleases.Version = "1.2.3";
+            CatoolInfo caToolInformation = new CatoolInfo() { CatoolVersion = "6.0.0", CatoolRunningLocation = "" };
             //Act
             Bom files = CycloneBomProcessor.SetMetadataInComparisonBOM(bom, appSettings, projectReleases, caToolInformation);
 
@@ -50,9 +51,9 @@ namespace LCT.PackageIdentifier.UTest
         public void SetMetadataInComparisonBOM_GivenBOMWithMetadata_AddsNewMetadataInfoInBOM()
         {
             //Arrange
-            ProjectReleases projectReleases = new ProjectReleases();            
-            projectReleases.Version= "1.0";
-            
+            ProjectReleases projectReleases = new ProjectReleases();
+            projectReleases.Version = "1.0";
+
             Bom bom = new Bom()
             {
                 Metadata = new Metadata()
@@ -70,9 +71,9 @@ namespace LCT.PackageIdentifier.UTest
             };
             CommonAppSettings appSettings = new CommonAppSettings()
             {
-                CaVersion = "1.2.3",
-                SW360ProjectName = "Test",
+                SW360 = new() { ProjectName = "Test" }
             };
+            projectReleases.Version = "1.2.3";
 
             Tool tools = new Tool()
             {
@@ -84,11 +85,11 @@ namespace LCT.PackageIdentifier.UTest
             {
                 Name = "Siemens SBOM",
                 Version = "2.0.0",
-                Vendor = "Siemens AG",                
+                Vendor = "Siemens AG",
             };
             Component component = new Component
             {
-                Name = appSettings.SW360ProjectName,
+                Name = appSettings.SW360.ProjectName,
                 Version = projectReleases.Version,
                 Type = Component.Classification.Application
             };
@@ -151,7 +152,7 @@ namespace LCT.PackageIdentifier.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string BomTestFile = outFolder + @"\PackageIdentifierUTTestFiles\CycloneDX_Debian.cdx.json";
+            string BomTestFile = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles", "CycloneDX_Debian.cdx.json"));
 
             //Act
             CycloneDXBomParser cycloneBomProcessor = new CycloneDXBomParser();
@@ -168,7 +169,7 @@ namespace LCT.PackageIdentifier.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string BomTestFile = outFolder + @"\PackageIdentifierUTTestFiles\Cyclonedx1.json";
+            string BomTestFile = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles", "Cyclonedx1.json"));
 
             //Act
             CycloneDXBomParser cycloneBomProcessor = new CycloneDXBomParser();
@@ -183,12 +184,12 @@ namespace LCT.PackageIdentifier.UTest
         public void ParseCycloneDXBom_GivenInCorrectJsonFile_ReturnsZeroComponents()
         {
             //Arrange
-            string sourcePath = $"{Path.GetTempPath()}\\";
+            string sourcePath = $"{Path.GetTempPath()}";
             File.WriteAllText(sourcePath + "output.json", "{[}");
 
             //Act
             CycloneDXBomParser cycloneBomProcessor = new CycloneDXBomParser();
-            Bom files = cycloneBomProcessor.ParseCycloneDXBom(sourcePath + "/output.json");
+            Bom files = cycloneBomProcessor.ParseCycloneDXBom(Path.GetFullPath(Path.Combine(sourcePath, "output.json")));
 
             //Assert
             Assert.IsNull(files.Components, "Returns Zero components in BOM");
@@ -225,8 +226,8 @@ namespace LCT.PackageIdentifier.UTest
             {
                 Metadata = null,
                 Components = null
-         
-            
+
+
             };
 
             //Act
@@ -234,7 +235,7 @@ namespace LCT.PackageIdentifier.UTest
             Bom files = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(bom);
 
             //Assert
-            Assert.That(0,Is.EqualTo(files.Components.Count), "Returns Zero components in BOM");
+            Assert.That(0, Is.EqualTo(files.Components.Count), "Returns Zero components in BOM");
 
         }
     }

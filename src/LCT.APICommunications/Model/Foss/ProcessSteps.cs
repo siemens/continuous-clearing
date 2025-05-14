@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -12,7 +12,7 @@ namespace LCT.APICommunications.Model.Foss
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class ProcessSteps
     {
-        [JsonProperty("processStstepNameeps")]
+        [JsonProperty("stepName")]
         public string StepName { get; set; }
 
         [JsonProperty("stepStatus")]

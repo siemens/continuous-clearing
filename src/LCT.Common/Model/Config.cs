@@ -1,9 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -17,17 +18,21 @@ namespace LCT.Common.Model
     {
         public string[] Include { get; set; }
         public string[] Exclude { get; set; }
-        public List<string> ExcludedComponents { get; set; }
-        public string[] JfrogNpmRepoList { get; set; }
-        public string[] JfrogNugetRepoList { get; set; }
-        public string[] JfrogMavenRepoList { get; set; }
-        public string[] JfrogDebianRepoList { get; set; }
-        public string[] JfrogPythonRepoList { get; set; }
-        public string[] JfrogConanRepoList { get; set; }
-        public string JfrogThirdPartyDestRepoName { get; set; }
-        public string JfrogInternalDestRepoName {  get; set; }
-        public string JfrogDevDestRepoName {  get; set; }
-        public string[] DevDependentScopeList { get; set; }
-        
+        public Artifactory Artifactory { get; set; }
+        public string ReleaseRepo { get; set; }
+        public string DevDepRepo { get; set; }
+
+    }
+    public class Artifactory
+    {
+        public List<ThirdPartyRepo> ThirdPartyRepos { get; set; }
+        public string[] InternalRepos { get; set; } = Array.Empty<string>();
+        public string[] DevRepos { get; set; }
+        public string[] RemoteRepos { get; set; }
+    }
+    public class ThirdPartyRepo
+    {
+        public string Name { get; set; }
+        public bool Upload { get; set; }
     }
 }

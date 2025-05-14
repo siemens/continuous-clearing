@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 
@@ -22,19 +22,17 @@ namespace SW360IntegrationTest.NPM
         public void TestArtifactoryUploaderexe()
         {
             OutFolder = TestHelper.OutFolder;
-            string comparisonBOMPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\ArtifactoryUploaderTestData\NPMComparisonBOM.json";
-
 
             int result = TestHelper.RunArtifactoryUploaderExe(new string[]{
-                TestConstant.BomFilePath, comparisonBOMPath,
+                TestConstant.BomFolderPath, Path.GetFullPath(Path.Join(OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles", "ArtifactoryUploaderTestData", "Npm")),
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
-                TestConstant.ArtifactoryUser, testParameters.ArtifactoryUploadUser,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
                 TestConstant.JfrogNpmThirdPartyDestRepoName,testParameters.ThirdPartyDestinationRepoName,
                 TestConstant.JfrogNpmDevDestRepoName,testParameters.DevDestinationRepoName,
                 TestConstant.JfrogNpmInternalDestRepoName,testParameters.InternalDestinationRepoName,
                 TestConstant.JFrogApiURL,testParameters.JfrogApi,
-                TestConstant.Release, false.ToString()
+                TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
+                TestConstant.DryRun, false.ToString()
             });
 
             // Test BOM Creator ran with exit code 0 or 2 (Warning)
@@ -46,7 +44,7 @@ namespace SW360IntegrationTest.NPM
         public void ComponentUpload_IsUnsuccessful_AlreadyPresentInDestination()
         {
             OutFolder = TestHelper.OutFolder;
-            string comparisonBOMPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\ArtifactoryUploaderTestData\NPMComparisonBOM.json";
+            string comparisonBOMPath = Path.GetFullPath(Path.Join(OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles", "ArtifactoryUploaderTestData", "Npm", "Test_Bom.cdx.json"));
             if (File.Exists(comparisonBOMPath))
             {
                 ComponentJsonParsor expected = new ComponentJsonParsor();

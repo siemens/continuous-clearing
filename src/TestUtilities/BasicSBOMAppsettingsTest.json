@@ -1,0 +1,198 @@
+// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2025 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// --------------------------------------------------------------------------------------------------------------------
+
+{
+  "TimeOut": 400,
+  "ProjectType": "<Insert ProjectType>",
+  "MultipleProjectType": false,
+  "Telemetry": {
+    "Enable": false,
+    "ApplicationInsightInstrumentKey": "" //From Application Insight to enable Telemetry
+  },
+  
+  "Directory": {
+    "InputFolder": "/PathToInputDirectory", //Input File path. For Docker run set as /mnt/Input
+    "OutputFolder": "/PathToOutputDirectory" //Output Bom Folder path. For Docker run set as /mnt/Output    
+  }, 
+  "Npm": {
+    "Include": [
+      "p*-lock.json",
+      "*.cdx.json"
+    ],
+    "Exclude": [
+      "node_modules"
+    ],
+    "Artifactory": {
+      "ThirdPartyRepos": [
+        {
+          "Name": "<Insert Npm 3rd party Repo Name>",
+          "Upload": true
+        }
+      ],
+      "InternalRepos": [
+        "<Insert Npm Internal Repo Name>"
+      ],
+      "DevRepos": [
+        "<Insert Npm Dev Repo Name>"
+      ],
+      "RemoteRepos": [
+        "<Insert Npm Remote Repo Name>"
+      ]
+    },
+    "ReleaseRepo": "<Insert Npm Release RepoName>",
+    "DevDepRepo": "<Insert Npm DevDep RepoName>"
+  },
+  "Nuget": {
+    "Include": [
+      "packages.config",
+      "p*.assets.json",
+      "*.cdx.json"
+    ],
+    "Exclude": [],
+    "Artifactory": {
+      "ThirdPartyRepos": [
+        {
+          "Name": "<Insert Nuget 3rd party Repo Name>",
+          "Upload": true
+        }
+      ],
+      "InternalRepos": [], //Insert Nuget Internal Repo Name
+      "DevRepos": [
+        "<Insert Nuget Dev Repo Name>"
+      ],
+      "RemoteRepos": [
+        "<Insert Nuget Remote Repo Name>"
+      ]
+    },
+    "ReleaseRepo": "<Insert Nuget Release RepoName>",
+    "DevDepRepo": "<Insert Nuget DevDep RepoName>"
+  },
+  "Maven": {
+    "Include": [
+      "*.cdx.json"
+    ],
+    "Exclude": [],
+    "Artifactory": {
+      "ThirdPartyRepos": [
+        {
+          "Name": "<Insert Maven 3rd party Repo Name>",
+          "Upload": true
+        }
+      ],
+      "InternalRepos": [], //Insert Maven Internal Repo Name
+      "DevRepos": [
+        "<Insert Maven Dev Repo Name>"
+      ],
+      "RemoteRepos": [
+        "<Insert Maven Remote Repo Name>"
+      ]
+    },
+    "ReleaseRepo": "<Insert Maven Release RepoName>",
+    "DevDepRepo": "<Insert Maven DevDep RepoName>"
+  },
+  "Debian": {
+    "Include": [
+      "*.cdx.json"
+    ],
+    "Exclude": [],
+    "Artifactory": {
+      "ThirdPartyRepos": [
+        {
+          "Name": "<Insert Debian 3rd party Repo Name>",
+          "Upload": true
+        }
+      ],
+      "InternalRepos": [
+        "<Insert Debian Internal Repo Names>"
+      ],
+      "DevRepos": [
+        "<Insert Debian Dev Repo Name>"
+      ],
+      "RemoteRepos": [
+        "<Insert Debian Remote Repo Name>"
+      ]
+    },
+    "ReleaseRepo": "<Insert Debian Release RepoName>",
+    "DevDepRepo": "<Insert Debian DevDep RepoName>"
+  },
+  "Alpine": {
+    "Include": [
+      "*.cdx.json"
+    ],
+    "Exclude": [],
+    "Artifactory": {
+      "ThirdPartyRepos": [
+        {
+          "Name": "<Insert Alpine 3rd party Repo Name>",
+          "Upload": true
+        }
+      ],
+      "InternalRepos": [
+        "<Insert Alpine Internal Repo Names>"
+      ],
+      "DevRepos": [
+        "<Insert Alpine Dev Repo Name>"
+      ],
+      "RemoteRepos": [
+        "<Insert Alpine Remote Repo Name>"
+      ]
+    },
+    "ReleaseRepo": "<Insert Alpine Release RepoName>",
+    "DevDepRepo": "<Insert Alpine DevDep RepoName>"
+  },
+  "Poetry": {
+    "Include": [
+      "poetry.lock",
+      "*.cdx.json"
+    ],
+    "Exclude": [],
+    "Artifactory": {
+      "ThirdPartyRepos": [
+        {
+          "Name": "<Insert Poetry 3rd party Repo Name>",
+          "Upload": true
+        }
+      ],
+      "InternalRepos": [
+        "<Insert Poetry Internal Repo Names>"
+      ],
+      "DevRepos": [
+        "<Insert Poetry Dev Repo Name>"
+      ],
+      "RemoteRepos": [
+        "<Insert Poetry Remote Repo Name>"
+      ]
+    },
+    "ReleaseRepo": "<Insert Poetry Release RepoName>",
+    "DevDepRepo": "<Insert Poetry DevDep RepoName>"
+  },
+  "Conan": {
+    "Include": [
+      "conan.lock",
+      "*.cdx.json"
+    ],
+    "Exclude": [],
+    "Artifactory": {
+      "ThirdPartyRepos": [
+        {
+          "Name": "<Insert Conan 3rd party Repo Name>",
+          "Upload": true
+        }
+      ],
+      "InternalRepos": [
+        "<Insert Conan Internal Repo Names>"
+      ],
+      "DevRepos": [
+        "<Insert Conan Dev Repo Name>"
+      ],
+      "RemoteRepos": [
+        "<Insert Conan Remote Repo Name>"
+      ]
+    },
+    "ReleaseRepo": "<Insert Conan Release RepoName>",
+    "DevDepRepo": "<Insert Conan DevDep RepoName>"
+  }
+}

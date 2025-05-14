@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -9,22 +9,19 @@ using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.Foss;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Interface;
 using LCT.Common.Model;
 using LCT.Facade.Interfaces;
 using LCT.Services.Interface;
 using LCT.Services.Model;
 using log4net;
-using log4net.Core;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -38,6 +35,7 @@ namespace LCT.Services
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         readonly ISW360ApicommunicationFacade m_SW360ApiCommunicationFacade;
         readonly ISW360CommonService m_SW360CommonService;
+        private static IEnvironmentHelper environmentHelper;
 
         public Sw360CreatorService(ISW360ApicommunicationFacade sw360ApiCommunicationFacade)
         {
@@ -85,7 +83,7 @@ namespace LCT.Services
                 else
                 {
                     componentCreateStatus.IsCreated = false;
-                    componentCreateStatus.ReleaseStatus.IsCreated = false;                    
+                    componentCreateStatus.ReleaseStatus.IsCreated = false;
                     Environment.ExitCode = -1;
                     Logger.Debug($"CreateComponent():Component Name -{componentInfo.Name}- " +
                    $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
@@ -95,7 +93,7 @@ namespace LCT.Services
             }
             catch (HttpRequestException e)
             {
-                Logger.Error($"CreateComponent():", e);                
+                Logger.Error($"CreateComponent():", e);
                 Environment.ExitCode = -1;
                 componentCreateStatus.IsCreated = false;
                 componentCreateStatus.ReleaseStatus.IsCreated = false;
@@ -175,11 +173,12 @@ namespace LCT.Services
                     releaseId = await GetReleaseIdToLinkToProject(componentInfo.Name, componentInfo.Version, componentInfo.ReleaseExternalId, componentId);
                     Logger.Debug($"CreateReleaseForComponent():Release already exists for component -->" +
                         $"{componentInfo.Name} - {componentInfo.Version}. No changes made by tool");
+                    createStatus.ReleaseAlreadyExist = true;
                 }
                 else
                 {
                     createStatus.IsCreated = false;
-                    
+
                     Environment.ExitCode = -1;
                     Logger.Debug($"CreateReleaseForComponent():Component Name -{componentInfo.Name}{componentInfo.Version}- " +
                    $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
@@ -187,7 +186,7 @@ namespace LCT.Services
                         $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
                 }
 
-                Logger.Debug($"Component Name -{componentInfo.Name}{componentInfo.Version} : Release Id :{releaseId}");
+                Logger.Debug($"Component Name -{componentInfo.Name},Version :{componentInfo.Version} , Release Id :{releaseId}");
                 createStatus.ReleaseIdToLink = releaseId;
             }
             catch (HttpRequestException e)
@@ -219,7 +218,10 @@ namespace LCT.Services
                 ComparisonBomData bomData = new ComparisonBomData { ReleaseExternalId = releaseExternalId };
                 _ = UpdatePurlIdForExistingRelease(bomData, releaseId, releasesInfo);
             }
-
+            if (string.IsNullOrEmpty(releaseId))
+            {
+                Logger.Warn($"Release id not found for the Component - {name}-{version}");
+            }
             return releaseId ?? string.Empty;
         }
 
@@ -302,7 +304,7 @@ namespace LCT.Services
                 var response = await m_SW360ApiCommunicationFacade.LinkReleasesToProject(content, sw360ProjectId);
                 if (!response.IsSuccessStatusCode)
                 {
-                    
+
                     Environment.ExitCode = -1;
                     Logger.Error($"LinkReleasesToProject() : Linking releases to project Id {sw360ProjectId} is failed.");
                     return false;
@@ -357,11 +359,6 @@ namespace LCT.Services
             {
                 Logger.Error("GetReleaseIdByName():", e);
                 Environment.ExitCode = -1;
-            }
-
-            if (string.IsNullOrEmpty(releaseid))
-            {
-                Logger.Warn($"Release id not found for the Component - {componentName}-{componentVersion}");
             }
 
             return releaseid ?? string.Empty;
@@ -778,6 +775,38 @@ namespace LCT.Services
             };
 
             return updateRelease;
+        }
+        public async Task<FossTriggerStatus> TriggerFossologyProcessForValidation(string releaseId, string sw360link)
+        {
+            environmentHelper = new EnvironmentHelper();
+            FossTriggerStatus fossTriggerStatus = null;
+            try
+            {
+                string triggerStatus = await m_SW360ApiCommunicationFacade.TriggerFossologyProcess(releaseId, sw360link);
+                fossTriggerStatus = JsonConvert.DeserializeObject<FossTriggerStatus>(triggerStatus);
+            }
+            catch (HttpRequestException ex)
+            {
+                if (ex.Message == "500:Connection to Fossology server Failed.")
+                {
+                    Logger.Debug($"TriggerFossologyProcessForValidation():", ex);
+                    Logger.Error($"Fossology process failed.Please check fossology configuration or Token in sw360");
+                    environmentHelper.CallEnvironmentExit(-1);
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                Logger.Debug($"TriggerFossologyProcessForValidation():", ex);
+            }
+            catch (UriFormatException ex)
+            {
+                Logger.Debug($"TriggerFossologyProcessForValidation():", ex);
+            }
+            catch (TaskCanceledException ex)
+            {
+                Logger.Debug($"TriggerFossologyProcessForValidation():", ex);
+            }
+            return fossTriggerStatus;
         }
     }
 }

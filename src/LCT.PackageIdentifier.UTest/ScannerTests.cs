@@ -1,15 +1,14 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using LCT.PackageIdentifier;
+using LCT.Common.Model;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using LCT.Common.Model;
 
 namespace LCT.PackageIdentifier.UTest
 {
@@ -23,7 +22,7 @@ namespace LCT.PackageIdentifier.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string filepath = outFolder + @"\PackageIdentifierUTTestFiles\TestDir";
+            string filepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles", "TestDir"));
             string[] Includes = { "p*-lock.json" };
             string[] Excludes = { "node_modules" };
             Config config = new Config()
@@ -84,7 +83,7 @@ namespace LCT.PackageIdentifier.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string filepath = outFolder + @"\PackageIdentifierUTTestFiles\TestDir";
+            string filepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles", "TestDir"));
             Config config = new Config()
             {
                 Include = null,

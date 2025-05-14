@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -7,12 +7,13 @@
 using CycloneDX.Models;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
+using LCT.Common.Interface;
 using LCT.Common.Model;
-using LCT.PackageIdentifier;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using Moq;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
@@ -31,18 +32,20 @@ namespace LCT.PackageIdentifier.UTest
             int expectedNoOfcomponents = 17;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles";
+            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 
             string[] Includes = { "conan.lock" };
-            Config config = new Config()
-            {
-                Include = Includes
-            };
 
-            CommonAppSettings appSettings = new CommonAppSettings()
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                PackageFilePath = packagefilepath,
-                Conan = config
+                Conan = new Config() { Include = Includes },
+                SW360 = new SW360(),
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                {
+                    InputFolder = packagefilepath
+                }
             };
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
@@ -61,18 +64,20 @@ namespace LCT.PackageIdentifier.UTest
             string IsDev = "true";
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles";
+            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 
             string[] Includes = { "conan.lock" };
-            Config config = new Config()
-            {
-                Include = Includes
-            };
 
-            CommonAppSettings appSettings = new CommonAppSettings()
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                PackageFilePath = packagefilepath,
-                Conan = config
+                Conan = new Config() { Include = Includes },
+                SW360 = new SW360(),
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                {
+                    InputFolder = packagefilepath
+                }
             };
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
@@ -90,22 +95,22 @@ namespace LCT.PackageIdentifier.UTest
         public void ParseLockFile_GivenAInputFilePathExcludeComponent_ReturnComponentCount()
         {
             //Arrange
-            int totalComponentsAfterExclusion = 15;
+            int totalComponentsAfterExclusion = 17;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles";
+            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 
             string[] Includes = { "conan.lock" };
-            Config config = new Config()
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                Include = Includes,
-                ExcludedComponents = new List<string> { "openldap:2.6.4-shared-ossl3.1", "libcurl:7.87.0-shared-ossl3.1" }
-            };
-
-            CommonAppSettings appSettings = new CommonAppSettings()
-            {
-                PackageFilePath = packagefilepath,
-                Conan = config
+                Conan = new Config() { Include = Includes },
+                SW360 = new SW360() { ExcludeComponents = ["openldap:2.6.4-shared-ossl3.1", "libcurl:7.87.0-shared-ossl3.1"] },
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                {
+                    InputFolder = packagefilepath
+                }
             };
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
@@ -120,7 +125,7 @@ namespace LCT.PackageIdentifier.UTest
         public void IsDevDependent_GivenListOfDevComponents_ReturnsSuccess()
         {
             //Arrange
-            var conanPackage = new ConanPackage() {Id = "10"};
+            var conanPackage = new ConanPackage() { Id = "10" };
             var buildNodeIds = new List<string> { "10", "11", "12" };
             var noOfDevDependent = 0;
             //Act
@@ -135,17 +140,29 @@ namespace LCT.PackageIdentifier.UTest
         {
             // Arrange
             Component component = new Component()
-            { 
+            {
                 Name = "securitycommunicationmanager",
                 Description = string.Empty,
                 Version = "2.6.5",
                 Purl = "pkg:conan/securitycommunicationmanager@2.6.5"
             };
-            
+
             var components = new List<Component>() { component };
             ComponentIdentification componentIdentification = new() { comparisonBOMData = components };
             string[] repoList = { "internalrepo1", "internalrepo2" };
-            CommonAppSettings appSettings = new() { InternalRepoList = repoList };
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            {
+                SW360 = new SW360(),
+                Conan = new Config
+                {
+                    Artifactory = new Artifactory
+                    {
+                        InternalRepos = repoList
+                    }
+                }
+            };
 
             AqlResult aqlResult = new()
             {
@@ -182,8 +199,20 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component };
             string[] repoList = { "internalrepo1", "internalrepo2" };
-            CommonAppSettings appSettings = new();
-            appSettings.Conan = new LCT.Common.Model.Config() { JfrogConanRepoList = repoList };
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            {
+                ProjectType = "Conan",
+                SW360 = new SW360(),
+                Conan = new Config
+                {
+                    Artifactory = new Artifactory
+                    {
+                        RemoteRepos = repoList
+                    }
+                }
+            };
             AqlResult aqlResult = new()
             {
                 Name = "index.json",
@@ -223,8 +252,20 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component };
             string[] repoList = { "internalrepo1", "internalrepo2" };
-            CommonAppSettings appSettings = new();
-            appSettings.Conan = new LCT.Common.Model.Config() { JfrogConanRepoList = repoList };
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            {
+                ProjectType = "Conan",
+                SW360 = new SW360(),
+                Conan = new Config
+                {
+                    Artifactory = new Artifactory
+                    {
+                        RemoteRepos = repoList
+                    }
+                }
+            };
             AqlResult aqlResult = new()
             {
                 Name = "index.json",
@@ -261,15 +302,19 @@ namespace LCT.PackageIdentifier.UTest
 
             ConanProcessor conanProcessor = new ConanProcessor(cycloneDXBomParser.Object);
             string[] Includes = { "SBOM_ConanCATemplate.cdx.json" };
-            string packagefilepath = OutFolder + @"\PackageIdentifierUTTestFiles";
+            string packagefilepath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"));
 
-            CommonAppSettings appSettings = new CommonAppSettings()
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                PackageFilePath = packagefilepath,
                 ProjectType = "CONAN",
-                RemoveDevDependency = true,
                 Conan = new Config() { Include = Includes },
-                CycloneDxSBomTemplatePath = packagefilepath + "\\SBOMTemplates\\SBOM_ConanCATemplate.cdx.json"
+                SW360 = new SW360() { IgnoreDevDependency = true },
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                {
+                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
+                }
             };
 
             //Act
@@ -277,6 +322,83 @@ namespace LCT.PackageIdentifier.UTest
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
+        }
+
+        [Test]
+        public void CreateFileForMultipleVersions_GivenComponentsWithMultipleVersions_CreatesFileSuccessfully()
+        {
+            // Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string OutFolder = Path.GetDirectoryName(exePath);
+
+            var componentsWithMultipleVersions = new List<Component>
+            {
+                new Component { Name = "ComponentA", Version = "1.0.0", Description = "DescriptionA" },
+                new Component { Name = "ComponentA", Version = "2.0.0", Description = "DescriptionA" },
+                new Component { Name = "ComponentB", Version = "1.0.0", Description = "DescriptionB" },
+                new Component { Name = "ComponentB", Version = "2.0.0", Description = "DescriptionB" }
+            };
+
+            var folderAction = new Mock<IFolderAction>();
+            var fileOperations = new Mock<IFileOperations>();
+            var appSettings = new CommonAppSettings(folderAction.Object, fileOperations.Object)
+            {
+                Directory = new LCT.Common.Directory(folderAction.Object, fileOperations.Object)
+                {
+                    OutputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
+                }
+            };
+
+            // Act
+            ConanProcessor.CreateFileForMultipleVersions(componentsWithMultipleVersions, appSettings);
+
+            // Assert
+            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles", "ContinuousClearing_Multipleversions.json"));
+            Assert.IsTrue(File.Exists(filePath), "The file was not created.");
+        }
+
+        [Test]
+        public void CreateFileForMultipleVersions_FileAlreadyExists_UpdatesFileSuccessfully()
+        {
+            // Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string outputFolder = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
+            string filePath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles", "ContinuousClearing_Multipleversions.json"));
+
+            // Create an initial file with some content
+            var initialContent = new MultipleVersions
+            {
+                Conan = new List<MultipleVersionValues>
+                {
+                    new MultipleVersionValues { ComponentName = "InitialComponent", ComponentVersion = "1.0.0", PackageFoundIn = "InitialDescription" }
+                }
+            };
+            File.WriteAllText(filePath, JsonConvert.SerializeObject(initialContent));
+
+            var componentsWithMultipleVersions = new List<Component>
+            {
+                new Component { Name = "ComponentA", Version = "1.0.0", Description = "DescriptionA" },
+                new Component { Name = "ComponentA", Version = "2.0.0", Description = "DescriptionA" },
+                new Component { Name = "ComponentB", Version = "1.0.0", Description = "DescriptionB" },
+                new Component { Name = "ComponentB", Version = "2.0.0", Description = "DescriptionB" }
+            };
+
+            var folderAction = new Mock<IFolderAction>();
+            var fileOperations = new Mock<IFileOperations>();
+            var appSettings = new CommonAppSettings(folderAction.Object, fileOperations.Object)
+            {
+                Directory = new LCT.Common.Directory(folderAction.Object, fileOperations.Object)
+                {
+                    OutputFolder = outputFolder
+                }
+            };
+
+            // Act
+            ConanProcessor.CreateFileForMultipleVersions(componentsWithMultipleVersions, appSettings);
+
+            // Assert
+            Assert.IsTrue(File.Exists(filePath), "The file was not created.");
         }
     }
 }

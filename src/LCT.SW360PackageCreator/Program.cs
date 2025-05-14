@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -21,9 +21,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Net.Http;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using Directory = System.IO.Directory;
 
 namespace LCT.SW360PackageCreator
 {
@@ -36,6 +37,7 @@ namespace LCT.SW360PackageCreator
         public static Stopwatch CreatorStopWatch { get; set; }
         private static bool m_Verbose = false;
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
 
         protected Program() { }
 
@@ -48,21 +50,25 @@ namespace LCT.SW360PackageCreator
                 m_Verbose = true;
 
             ISettingsManager settingsManager = new SettingsManager();
-            CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
-            ISW360ApicommunicationFacade sW360ApicommunicationFacade;
-            ISw360ProjectService sw360ProjectService= Getsw360ProjectServiceObject(appSettings, out sW360ApicommunicationFacade);
-            ProjectReleases projectReleases = new ProjectReleases();
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
+            CommonHelper.DefaultLogFolderInitialisation(FileConstant.ComponentCreatorLog, m_Verbose);
+            CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
 
+            ISW360ApicommunicationFacade sW360ApicommunicationFacade;
+            ISw360ProjectService sw360ProjectService = Getsw360ProjectServiceObject(appSettings, out sW360ApicommunicationFacade);
+            ProjectReleases projectReleases = new ProjectReleases();
 
-            string FolderPath = InitiateLogger(appSettings);
+            string FolderPath = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.ComponentCreatorLog, m_Verbose);
+            Logger.Logger.Log(null, Level.Debug, $"log manager initiated folder path: {FolderPath}", null);
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
             settingsManager.CheckRequiredArgsToRun(appSettings, "Creator");
             int isValid = await CreatorValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
+
             if (isValid == -1)
             {
-                CommonHelper.CallEnvironmentExit(-1);
+                environmentHelper.CallEnvironmentExit(-1);
             }
 
             Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Package creator >>>>>====================", null);
@@ -70,29 +76,43 @@ namespace LCT.SW360PackageCreator
 
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Alert, $"Package creator is running in TEST mode \n", null);
-
+            var bomFilePath = Path.Combine(appSettings.Directory.OutputFolder, appSettings.SW360.ProjectName + "_" + FileConstant.BomFileName);
             Logger.Logger.Log(null, Level.Notice, $"Input parameters used in Package Creator:\n\t" +
               $"CaToolVersion\t\t --> {caToolInformation.CatoolVersion}\n\t" +
               $"CaToolRunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
-              $"BomFilePath\t\t --> {appSettings.BomFilePath}\n\t" +
-              $"SW360Url\t\t --> {appSettings.SW360URL}\n\t" +
-              $"SW360AuthTokenType\t --> {appSettings.SW360AuthTokenType}\n\t" +
-              $"SW360ProjectName\t --> {appSettings.SW360ProjectName}\n\t" +
-              $"SW360ProjectID\t\t --> {appSettings.SW360ProjectID}\n\t" +
-              $"EnableFossTrigger\t --> {appSettings.EnableFossTrigger}\n\t" +
-              $"RemoveDevDependency\t --> {appSettings.RemoveDevDependency}\n\t" +
-              $"LogFolderPath\t\t --> {Path.GetFullPath(FolderPath)}\n\t", null);
+              $"BomFilePath\t\t --> {bomFilePath}\n\t" +
+              $"SW360Url\t\t --> {appSettings.SW360.URL}\n\t" +
+              $"SW360AuthTokenType\t --> {appSettings.SW360.AuthTokenType}\n\t" +
+              $"SW360ProjectName\t --> {appSettings.SW360.ProjectName}\n\t" +
+              $"SW360ProjectID\t\t --> {appSettings.SW360.ProjectID}\n\t" +
+              $"FossologyURL\t\t --> {appSettings.SW360.Fossology.URL}\n\t" +
+              $"EnableFossTrigger\t --> {appSettings.SW360.Fossology.EnableTrigger}\n\t" +
+              $"IgnoreDevDependency\t --> {appSettings.SW360.IgnoreDevDependency}\n\t" +
+              $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t", null);
 
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);
 
+            //Validate Fossology Url
+            if (appSettings.SW360.Fossology.EnableTrigger && !appSettings.IsTestMode)
+            {
+                HttpClient client = new HttpClient();
+                if (await CreatorValidator.FossologyUrlValidation(appSettings, client, environmentHelper))
+                    await CreatorValidator.TriggerFossologyValidation(appSettings, sW360ApicommunicationFacade);
+            }
             await InitiatePackageCreatorProcess(appSettings, sw360ProjectService, sW360ApicommunicationFacade);
-
+            // Initialize telemetry with CATool version and instrumentation key only if Telemetry is enabled in appsettings
+            if (appSettings.Telemetry.Enable == true)
+            {
+                TelemetryHelper telemetryHelper = new TelemetryHelper(appSettings);
+                telemetryHelper.StartTelemetry(caToolInformation.CatoolVersion, ComponentCreator.kpiData, TelemetryConstant.CreatorKpiData);
+            }
             Logger.Logger.Log(null, Level.Notice, $"End of Package Creator execution: {DateTime.Now}\n", null);
-            
+
             // publish logs and bom file to pipeline artifact
-            CommonHelper.PublishFilesToArtifact();
+            PipelineArtifactUploader.UploadArtifacts();
         }
+
 
         private static CatoolInfo GetCatoolVersionFromProjectfile()
         {
@@ -108,9 +128,9 @@ namespace LCT.SW360PackageCreator
             ISw360ProjectService sw360ProjectService;
             SW360ConnectionSettings sw360ConnectionSettings = new SW360ConnectionSettings()
             {
-                SW360URL = appSettings.SW360URL,
-                SW360AuthTokenType = appSettings.SW360AuthTokenType,
-                Sw360Token = appSettings.Sw360Token,
+                SW360URL = appSettings.SW360.URL,
+                SW360AuthTokenType = appSettings.SW360.AuthTokenType,
+                Sw360Token = appSettings.SW360.Token,
                 IsTestMode = appSettings.IsTestMode,
                 Timeout = appSettings.TimeOut
             };
@@ -125,7 +145,7 @@ namespace LCT.SW360PackageCreator
         {
             ISW360CommonService sw360CommonService = new SW360CommonService(sW360ApicommunicationFacade);
             ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sW360ApicommunicationFacade, sw360CommonService);
-            ISW360Service sw360Service = new Sw360Service(sW360ApicommunicationFacade, sw360CommonService);
+            ISW360Service sw360Service = new Sw360Service(sW360ApicommunicationFacade, sw360CommonService, environmentHelper);
             ICycloneDXBomParser cycloneDXBomParser = new CycloneDXBomParser();
 
             IDebianPatcher debianPatcher = new DebianPatcher();
@@ -146,30 +166,6 @@ namespace LCT.SW360PackageCreator
             // initializing Component creation 
             await componentCreator.CreateComponentInSw360(appSettings, sw360CreatorService, sw360Service,
                  sw360ProjectService, new FileOperations(), creatorHelper, parsedBomData);
-        }
-
-        private static string InitiateLogger(CommonAppSettings appSettings)
-        {
-            string FolderPath;
-            if (!string.IsNullOrEmpty(appSettings.LogFolderPath))
-            {
-                FolderPath = appSettings.LogFolderPath;
-                Log4Net.Init(FileConstant.ComponentCreatorLog, appSettings.LogFolderPath, m_Verbose);
-            }
-            else
-            {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    FolderPath = FileConstant.LogFolder;
-                }
-                else
-                {
-                    FolderPath = "/var/log";
-                }
-                Log4Net.Init(FileConstant.ComponentCreatorLog, FolderPath, m_Verbose);
-            }
-
-            return FolderPath;
         }
     }
 }

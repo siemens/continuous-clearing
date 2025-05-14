@@ -1,0 +1,85 @@
+# --------------------------------------------------------------------------------------------------------------------
+# SPDX-FileCopyrightText: 2025 Siemens AG
+#
+#  SPDX-License-Identifier: MIT
+# -------------------------------------------------------------------------------------------------------------------- 
+
+parameters:
+  - name: stageName
+    type: string
+
+  - name: displayName
+    type: string
+
+  # Shared inputs
+  - name: sw360Url
+    type: string
+
+  - name: sw360Token
+    type: string
+
+  - name: sw360ProjectId
+    type: string
+
+  - name: sw360ProjectName
+    type: string
+
+  - name: fossologyUrl
+    type: string
+
+  - name: JfrogUrl
+    type: string
+
+  - name: JfrogToken
+    type: string
+
+  - name: JfrogDryRun
+    type: boolean
+
+    default: true
+  - name: projectDefinitions
+    type: object
+
+  - name: outputFolder
+    type: string
+
+  - name: appSettingsPath
+    type: string
+
+stages:
+  - stage: ${{ parameters.stageName }}
+    dependsOn: []
+    displayName: ${{ parameters.displayName }}
+    jobs:
+      - template: azure-pipelines-clearing-tool-build-run-job-template.yml
+        parameters:
+          jobName: binaryRun
+          jobDisplayName: "Execute Binary Job"
+          templatePath: azure-pipelines-clearing-tool-build-run-binary-step-template.yml
+          sw360Url: ${{ parameters.sw360Url }}
+          sw360Token: ${{ parameters.sw360Token }}
+          sw360ProjectId: ${{ parameters.sw360ProjectId }}
+          sw360ProjectName: ${{ parameters.sw360ProjectName }}
+          fossologyUrl: ${{ parameters.fossologyUrl }}
+          JfrogUrl: ${{ parameters.JfrogUrl }}
+          JfrogToken: ${{ parameters.JfrogToken }}
+          projectDefinitions: ${{ parameters.projectDefinitions }}
+          outputFolder: ${{ parameters.outputFolder }}
+          appSettingsPath: ${{ parameters.appSettingsPath }}
+
+      - template: azure-pipelines-clearing-tool-build-run-job-template.yml
+        parameters:
+          jobName: imageRun
+          jobDisplayName: "Execute Image Job"
+          templatePath: azure-pipelines-clearing-tool-build-run-image-step-template.yml
+          sw360Url: ${{ parameters.sw360Url }}
+          sw360Token: ${{ parameters.sw360Token }}
+          sw360ProjectId: ${{ parameters.sw360ProjectId }}
+          sw360ProjectName: ${{ parameters.sw360ProjectName }}
+          fossologyUrl: ${{ parameters.fossologyUrl }}
+          JfrogUrl: ${{ parameters.JfrogUrl }}
+          JfrogToken: ${{ parameters.JfrogToken }}
+          JfrogDryRun: ${{ parameters.JfrogDryRun }}
+          projectDefinitions: ${{ parameters.projectDefinitions }}
+          outputFolder: ${{ parameters.outputFolder }}
+          appSettingsPath: ${{ parameters.appSettingsPath }}

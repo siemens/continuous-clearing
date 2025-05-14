@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -12,11 +12,7 @@ namespace LCT.APICommunications.UTest
     [TestFixture]
     public class DebainJfrogAPICommunicationUTest
     {
-        [SetUp]
-        public void Setup()
-        {
-            // Method intentionally left empty.
-        }
+
 
         [Test]
         public void DebainJfrogApiCommunication_CopyFromRemoteRepo_ReturnsInvalidOperationException()
@@ -25,7 +21,7 @@ namespace LCT.APICommunications.UTest
             ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials();
 
             //Act
-            JfrogApicommunication jfrogApicommunication = new DebianJfrogAPICommunication("", "", repoCredentials,100);
+            JfrogApicommunication jfrogApicommunication = new DebianJfrogAPICommunication("", "", repoCredentials, 100);
 
             //Assert
             Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApicommunication.CopyFromRemoteRepo(new ComponentsToArtifactory()));
@@ -56,5 +52,31 @@ namespace LCT.APICommunications.UTest
             //Assert
             Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApicommunication.GetPackageInfo(new ComponentsToArtifactory()));
         }
+        [Test]
+        public void DebainJfrogApiCommunication_GetApiKey_ReturnsInvalidOperationException()
+        {
+            //Arrange
+            ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials();
+
+            //Act
+            JfrogApicommunication jfrogApicommunication = new DebianJfrogAPICommunication("", "", repoCredentials, 100);
+
+            //Assert
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApicommunication.GetApiKey());
+        }
+
+        [Test]
+        public void DebianJfrogApiCommunication_MoveFromRepo_ReturnsInvalidOperationException()
+        {
+            //Arrange
+            ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials();
+
+            //Act
+            JfrogApicommunication jfrogApicommunication = new DebianJfrogAPICommunication("", "", repoCredentials, 100);
+
+            //Assert
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApicommunication.MoveFromRepo(new ComponentsToArtifactory()));
+        }
     }
+
 }

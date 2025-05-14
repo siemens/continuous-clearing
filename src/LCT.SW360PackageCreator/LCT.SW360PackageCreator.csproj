@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <AssemblyName>SW360PackageCreator</AssemblyName>
-    <Version>7.0.2</Version>
+    <Version>8.0.0</Version>
     <RootNamespace>LCT.SW360PackageCreator</RootNamespace>
   </PropertyGroup>
 
@@ -30,6 +30,7 @@
     <ProjectReference Include="..\LCT.Common\LCT.Common.csproj" />
     <ProjectReference Include="..\LCT.Facade\LCT.Facade.csproj" />
     <ProjectReference Include="..\LCT.Services\LCT.Services.csproj" />
+    <ProjectReference Include="..\LCT.Telemetry\LCT.Telemetry.csproj" />
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>

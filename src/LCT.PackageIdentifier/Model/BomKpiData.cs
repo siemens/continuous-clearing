@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -46,8 +46,11 @@ namespace LCT.PackageIdentifier.Model
         public int UnofficialComponents { get; set; }
 
 
-        [DisplayName(@"Total Components Excluded")]
+        [DisplayName(@"Total InvalidComponents Excluded")]
         public int ComponentsExcluded { get; set; }
+
+        [DisplayName(@"Total Components Excluded SW360")]
+        public int ComponentsExcludedSW360 { get; set; }
 
         [DisplayName(@"Components With SourceURL")]
         public int ComponentsWithSourceURL { get; set; }

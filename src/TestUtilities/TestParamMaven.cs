@@ -1,13 +1,15 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using Microsoft.Extensions.Configuration;
+using System.Diagnostics.CodeAnalysis;
 
 namespace TestUtilities
 {
+    [ExcludeFromCodeCoverage]
     public class TestParamMaven
     {
         static readonly IConfiguration s_Config =
@@ -28,6 +30,8 @@ namespace TestUtilities
         public string ThirdPartyDestinationRepoName { get; set; }
         public string InternalDestinationRepoName { get; set; }
         public string DevDestinationRepoName { get; set; }
+        public string FossologyTrigger { get; set; }
+        public string TelemetryEnable { get; set; }
 
         public TestParamMaven()
         {
@@ -45,6 +49,8 @@ namespace TestUtilities
             ThirdPartyDestinationRepoName = "maven-test";
             InternalDestinationRepoName = "maven-test";
             DevDestinationRepoName = "maven-test";
+            FossologyTrigger = s_Config["EnableFossologyTrigger"];
+            TelemetryEnable = s_Config["TelemetryEnable"];
         }
     }
 }

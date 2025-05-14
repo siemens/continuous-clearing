@@ -1,0 +1,171 @@
+# --------------------------------------------------------------------------------------------------------------------
+# SPDX-FileCopyrightText: 2025 Siemens AG
+#
+#  SPDX-License-Identifier: MIT
+# -------------------------------------------------------------------------------------------------------------------- 
+
+parameters:
+  # Sw360 and Fossology parameters
+  - name: sw360Url
+    type: string
+    default: ''
+
+  - name: sw360Token
+    type: string
+    default: ''
+
+  - name: sw360ProjectId
+    type: string
+    default: ''
+
+  - name: sw360ProjectName
+    type: string
+    default: ''
+
+  - name: fossologyUrl
+    type: string
+    default: ''
+
+  # JFrog parameters
+  - name: JfrogUrl
+    type: string
+    default: ''
+
+  - name: JfrogToken
+    type: string
+    default: ''
+
+  - name: JfrogDryRun
+    type: boolean
+    default: true
+
+  # CA Tool parameters
+  - name: projectDefinitions
+    type: object
+    default: []
+
+  - name: outputFolder
+    type: string
+    default: ''
+  
+  # Template parameters
+  - name: PackageCreatorEnabled
+    type: boolean
+    default: true
+
+  - name: ArtifactoryUploaderEnabled
+    type: boolean
+    default: true
+    
+  - name: appSettingsPath
+    type: string
+    default: ''
+
+steps:
+  - task: CmdLine@2
+    displayName: 'Build CA Tool'
+    inputs:
+      script: |
+        dotnet build $(Build.SourcesDirectory)/continuous-clearing/src/LicenseClearingTool.sln --configuration Release
+  
+  - task: PowerShell@2
+    displayName: 'Tool pre-requisite'
+    inputs:
+      targetType: 'inline'
+      script: |
+        $baseOutputPath = "${{ parameters.outputFolder }}"
+        $sbomPath = Join-Path $baseOutputPath "sbom"
+        $logsPath = Join-Path $baseOutputPath "logs"
+
+        foreach ($path in @($baseOutputPath, $sbomPath, $logsPath)) {
+          if (-not (Test-Path -Path $path)) {
+            New-Item -ItemType Directory -Path $path | Out-Null
+            Write-Host "Created directory: $path"
+          } else {
+            Write-Host "Directory already exists: $path"
+          }
+        }
+
+  - ${{ each project in parameters.projectDefinitions }}:
+    - task: PowerShell@2
+      displayName: 'Run PackageIdentifier for ${{ project.projectType }}'
+      inputs:
+        targetType: 'inline'
+        script: |
+          $args = @(
+            "--Directory:InputFolder", "${{ project.inputFolder }}",
+            "--Directory:OutputFolder", "${{ parameters.outputFolder }}/sbom",
+            "--Directory:LogFolder", "${{ parameters.outputFolder }}/logs",
+            "--ProjectType", "${{ project.projectType }}",
+            "--SW360:ProjectName", "${{ parameters.sw360ProjectName }}",
+            "--SW360:ProjectID", "${{ parameters.sw360ProjectId }}",
+            "--SW360:AuthTokenType", "Token",
+            "--SW360:URL", "${{ parameters.sw360Url }}",
+            "--SW360:Token", "${{ parameters.sw360Token }}",
+            "--SW360:Fossology:URL", "${{ parameters.fossologyUrl }}",
+            "--JFrog:URL", "${{ parameters.JfrogUrl }}",
+            "--Jfrog:Token", "${{ parameters.JfrogToken }}",
+            "--settingsfilepath", "${{ parameters.appSettingsPath }}"
+          )
+
+          $projectTypes = @()
+          $parameters.projectDefinitions | ForEach-Object { $projectTypes += $_.projectType }
+          $index = [array]::IndexOf($projectTypes, "${{ project.projectType }}")
+          if ($index -ne 0) {
+            $args += "--MultipleProjectType"
+            $args += "true"
+          }
+
+          dotnet "$(Build.SourcesDirectory)/continuous-clearing/out/net8.0/PackageIdentifier.dll" @args
+
+  - task: PowerShell@2
+    condition: eq('${{ parameters.PackageCreatorEnabled }}', true)
+    continueOnError: true
+    displayName: 'Run SW360PackageCreator'
+    inputs:
+      targetType: 'inline'
+      script: |
+        dotnet $(Build.SourcesDirectory)/continuous-clearing/out/net8.0/SW360PackageCreator.dll `
+          --Directory:OutputFolder "${{ parameters.outputFolder }}/sbom" `
+          --Directory:LogFolder "${{ parameters.outputFolder }}/logs" `
+          --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
+          --SW360:ProjectID "${{ parameters.sw360ProjectId }}" `
+          --SW360:AuthTokenType "Token" `
+          --SW360:URL "${{ parameters.sw360Url }}" `
+          --SW360:Token "${{ parameters.sw360Token }}" `
+          --SW360:Fossology:URL "${{ parameters.fossologyUrl }}" `
+          --settingsfilepath "${{ parameters.appSettingsPath }}"
+
+  - task: PowerShell@2
+    condition: eq('${{ parameters.ArtifactoryUploaderEnabled }}', true)
+    continueOnError: true
+    displayName: 'Run ArtifactoryUploader'
+    inputs:
+      targetType: 'inline'
+      script: |
+        dotnet $(Build.SourcesDirectory)/continuous-clearing/out/net8.0/ArtifactoryUploader.dll `
+          --Directory:OutputFolder "${{ parameters.outputFolder }}/sbom" `
+          --Directory:LogFolder "${{ parameters.outputFolder }}/logs" `
+          --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
+          --SW360:ProjectID "${{ parameters.sw360ProjectId }}" `
+          --SW360:AuthTokenType "Token" `
+          --SW360:URL "${{ parameters.sw360Url }}" `
+          --SW360:Token "${{ parameters.sw360Token }}" `
+          --JFrog:URL "${{ parameters.JfrogUrl }}" `
+          --Jfrog:Token "${{ parameters.JfrogToken }}" `
+          --JFrog:DryRun "${{ parameters.jfrogDryRun }}" `
+          --settingsfilepath "${{ parameters.appSettingsPath }}"
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish SBOM Artifacts'
+    inputs:
+      PathtoPublish: '${{ parameters.outputFolder }}/sbom'
+      ArtifactName: '$(System.StageName)_ContinuousClearing_Bom_Binary'
+      publishLocation: 'Container'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Logs Artifacts'
+    inputs:
+      PathtoPublish: '${{ parameters.outputFolder }}/logs'
+      ArtifactName: '$(System.StageName)_ContinuousClearing_Log_Binary'
+      publishLocation: 'Container'

@@ -1,38 +1,37 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 //---------------------------------------------------------------------------------------------------------------------
 
+using LCT.APICommunications.Interfaces;
 using LCT.Common;
-using LCT.APICommunications;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System;
 
 namespace LCT.ArtifactoryUploader
 {
     public class ArtifactoryValidator
     {
-        private readonly NpmJfrogApiCommunication JfrogApiCommunication;
+        private readonly IJfrogAqlApiCommunication _JfrogAqlApiCommunication;
 
-        public ArtifactoryValidator(NpmJfrogApiCommunication jfrogApiCommunication)
+        public ArtifactoryValidator(IJfrogAqlApiCommunication jfrogAqlApiCommunication)
         {
-            JfrogApiCommunication = jfrogApiCommunication;
+            _JfrogAqlApiCommunication = jfrogAqlApiCommunication;
         }
 
-        public async Task<int> ValidateArtifactoryCredentials(CommonAppSettings appSettings)
+        public async Task<int> ValidateArtifactoryCredentials()
         {
             HttpResponseMessage responseMessage = new HttpResponseMessage();
             try
             {
-                responseMessage = await JfrogApiCommunication.GetApiKey();
+                responseMessage = await _JfrogAqlApiCommunication.CheckConnection();
                 responseMessage.EnsureSuccessStatusCode();
                 return 0;
             }
-            catch(HttpRequestException ex)
+            catch (HttpRequestException ex)
             {
-                ExceptionHandling.HttpException(ex,responseMessage, "Artifactory");
+                ExceptionHandling.HttpException(ex, responseMessage, "Artifactory");
                 return -1;
             }
         }

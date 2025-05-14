@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using CycloneDX.Models;
+using LCT.APICommunications.Model.AQL;
+using LCT.Common;
+using LCT.Common.Constants;
+using LCT.Common.Interface;
+using LCT.Common.Model;
+using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
+using LCT.Services.Interface;
+using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using LCT.Common;
-using LCT.Common.Model;
-using LCT.PackageIdentifier;
-using LCT.Services.Interface;
-using LCT.PackageIdentifier.Interface;
-using Moq;
-using LCT.APICommunications.Model.AQL;
-using CycloneDX.Models;
-using System.Threading.Tasks;
 using System.Linq;
-using LCT.Common.Constants;
+using System.Threading.Tasks;
 
 namespace LCT.PackageIdentifier.UTest
 {
@@ -399,11 +399,18 @@ namespace LCT.PackageIdentifier.UTest
             int expectednoofcomponents = 7;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles\packages.config";
+            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles", "packages.config"));
 
-            CommonAppSettings appSettings = new CommonAppSettings()
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                PackageFilePath = outFolder + @"\PackageIdentifierUTTestFiles"
+                Nuget = new Config(),
+                SW360 = new SW360(),
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                {
+                    InputFolder = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"))
+                }
             };
 
             //Act
@@ -427,7 +434,7 @@ namespace LCT.PackageIdentifier.UTest
             };
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string folderfilepath = outFolder + @"\PackageIdentifierUTTestFiles";
+            string folderfilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 
             //Act
             List<string> allFoundConfigFiles = FolderScanner.FileScanner(folderfilepath, config);
@@ -450,7 +457,7 @@ namespace LCT.PackageIdentifier.UTest
             };
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string folderfilepath = outFolder + @"\PackageIdentifierUTTestFiles";
+            string folderfilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 
             //Act & Assert
             Assert.Throws(typeof(ArgumentNullException), () => FolderScanner.FileScanner(folderfilepath, config));
@@ -485,7 +492,7 @@ namespace LCT.PackageIdentifier.UTest
                 Exclude = null
 
             };
-            string folderfilepath = @"../PackageIdentifierUTTestFiles";
+            string folderfilepath = Path.GetFullPath(Path.Combine("..", "PackageIdentifierUTTestFiles"));
 
             //Act & Assert
             Assert.Throws(typeof(DirectoryNotFoundException), () => FolderScanner.FileScanner(folderfilepath, config));
@@ -512,17 +519,23 @@ namespace LCT.PackageIdentifier.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string csprojfilepath = outFolder + @"\PackageIdentifierUTTestFiles";
+            string csprojfilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
             string[] Excludes = null;
-            CommonAppSettings CommonAppSettings = new CommonAppSettings()
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings commonAppSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                PackageFilePath = csprojfilepath,
-                Nuget = new Config() { Exclude = Excludes }
+                Nuget = new Config() { Exclude = Excludes },
+                SW360 = new SW360(),
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                {
+                    InputFolder = csprojfilepath
+                }
             };
             int devDependent = 0;
 
             //Act
-            List<ReferenceDetails> referenceDetails = NugetProcessor.Parsecsproj(CommonAppSettings);
+            List<ReferenceDetails> referenceDetails = NugetProcessor.Parsecsproj(commonAppSettings);
             foreach (var item in referenceDetails)
             {
                 if (item.Private)
@@ -541,19 +554,26 @@ namespace LCT.PackageIdentifier.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string csprojfilepath = outFolder + @"\PackageIdentifierUTTestFiles";
+            string csprojfilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
             string[] Excludes = null;
 
             Bom bom = new Bom();
             bom.Components = new List<Component>();
-            CommonAppSettings CommonAppSettings = new CommonAppSettings()
+
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings commonAppSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                PackageFilePath = csprojfilepath,
-                Nuget = new Config() { Exclude = Excludes, ExcludedComponents = new List<string>() }
+                Nuget = new Config() { Exclude = Excludes },
+                SW360 = new SW360() { ExcludeComponents = new List<string>() },
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                {
+                    InputFolder = csprojfilepath
+                }
             };
 
             //Act
-            Bom updatedBom = NugetProcessor.RemoveExcludedComponents(CommonAppSettings, bom);
+            Bom updatedBom = NugetProcessor.RemoveExcludedComponents(commonAppSettings, bom);
 
             //Assert
             Assert.AreEqual(0, updatedBom.Components.Count, "Zero component exculded");
@@ -572,7 +592,19 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             ComponentIdentification component = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo1" };
-            CommonAppSettings appSettings = new() { InternalRepoList = reooListArr };
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            {
+                SW360 = new SW360(),
+                Nuget = new Config
+                {
+                    Artifactory = new Artifactory
+                    {
+                        InternalRepos = reooListArr
+                    }
+                }
+            };
 
             AqlResult aqlResult = new()
             {
@@ -610,7 +642,19 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             ComponentIdentification component = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            CommonAppSettings appSettings = new() { InternalRepoList = reooListArr };
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            {
+                SW360 = new SW360(),
+                Nuget = new Config
+                {
+                    Artifactory = new Artifactory
+                    {
+                        InternalRepos = reooListArr
+                    }
+                }
+            };
 
             AqlResult aqlResult = new()
             {
@@ -649,7 +693,19 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             ComponentIdentification componentIdentification = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            CommonAppSettings appSettings = new() { InternalRepoList = reooListArr };
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            {
+                SW360 = new SW360(),
+                Nuget = new Config
+                {
+                    Artifactory = new Artifactory
+                    {
+                        InternalRepos = reooListArr
+                    }
+                }
+            };
 
             AqlResult aqlResult = new()
             {
@@ -689,8 +745,21 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            CommonAppSettings appSettings = new();
-            appSettings.Nuget = new Config() { JfrogNugetRepoList = reooListArr };
+
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            {
+                ProjectType = "NUGET",
+                SW360 = new SW360(),
+                Nuget = new Config
+                {
+                    Artifactory = new Artifactory
+                    {
+                        RemoteRepos = reooListArr
+                    }
+                }
+            };
             AqlResult aqlResult = new()
             {
                 Name = "animations-common-1.0.0.nupkg",
@@ -729,8 +798,20 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            CommonAppSettings appSettings = new();
-            appSettings.Nuget = new Config() { JfrogNugetRepoList = reooListArr };
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            {
+                ProjectType = "NUGET",
+                SW360 = new SW360(),
+                Nuget = new Config
+                {
+                    Artifactory = new Artifactory
+                    {
+                        RemoteRepos = reooListArr
+                    }
+                }
+            };
             AqlResult aqlResult = new()
             {
                 Name = "animations-common-1.0.0.nupkg",
@@ -769,8 +850,20 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            CommonAppSettings appSettings = new();
-            appSettings.Nuget = new Config() { JfrogNugetRepoList = reooListArr };
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            {
+                ProjectType = "NUGET",
+                SW360 = new SW360(),
+                Nuget = new Config
+                {
+                    Artifactory = new Artifactory
+                    {
+                        RemoteRepos = reooListArr
+                    }
+                }
+            };
             AqlResult aqlResult = new()
             {
                 Name = "animations-common-1.0.0.nupkg",
@@ -809,8 +902,20 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            CommonAppSettings appSettings = new();
-            appSettings.Nuget = new Config() { JfrogNugetRepoList = reooListArr };
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            {
+                ProjectType = "NUGET",
+                SW360 = new SW360(),
+                Nuget = new Config
+                {
+                    Artifactory = new Artifactory
+                    {
+                        RemoteRepos = reooListArr
+                    }
+                }
+            };
             AqlResult aqlResult = new()
             {
                 Name = "animation-test-1.0.0.nupkg",
@@ -849,8 +954,20 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            CommonAppSettings appSettings = new();
-            appSettings.Nuget = new Config() { JfrogNugetRepoList = reooListArr };
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            {
+                ProjectType = "NUGET",
+                SW360 = new SW360(),
+                Nuget = new Config
+                {
+                    Artifactory = new Artifactory
+                    {
+                        RemoteRepos = reooListArr
+                    }
+                }
+            };
             AqlResult aqlResult = new()
             {
                 Name = "animations-common.1.0.0.nupkg",
@@ -890,8 +1007,20 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            CommonAppSettings appSettings = new();
-            appSettings.Nuget = new Config() { JfrogNugetRepoList = reooListArr };
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            {
+                ProjectType = "NUGET",
+                SW360 = new SW360(),
+                Nuget = new Config
+                {
+                    Artifactory = new Artifactory
+                    {
+                        RemoteRepos = reooListArr
+                    }
+                }
+            };
             AqlResult aqlResult = new()
             {
                 Name = "animation-common.1.0.0.nupkg",
@@ -925,18 +1054,19 @@ namespace LCT.PackageIdentifier.UTest
             int expectednoofcomponents = 2;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles";
+            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 
             string[] Includes = { "project.assets.json" };
-            Config config = new Config()
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                Include = Includes
-            };
-
-            CommonAppSettings appSettings = new CommonAppSettings()
-            {
-                PackageFilePath = packagefilepath,
-                Nuget = config
+                Nuget = new Config() { Include = Includes },
+                SW360 = new SW360(),
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                {
+                    InputFolder = packagefilepath
+                }
             };
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
@@ -955,25 +1085,27 @@ namespace LCT.PackageIdentifier.UTest
             string IsDev = "true";
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string packagefilepath = outFolder + @"\PackageIdentifierUTTestFiles";
+            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 
             string[] Includes = { "project.assets.json" };
-            Config config = new Config()
-            {
-                Include = Includes
-            };
 
-            CommonAppSettings appSettings = new CommonAppSettings()
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
             {
-                PackageFilePath = packagefilepath,
-                Nuget = config
+                Nuget = new Config() { Include = Includes },
+                SW360 = new SW360(),
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                {
+                    InputFolder = packagefilepath
+                }
             };
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
 
             //Act
             Bom listofcomponents = new NugetProcessor(cycloneDXBomParser.Object).ParsePackageFile(appSettings);
-            var IsDevDependency = 
+            var IsDevDependency =
                 listofcomponents.Components.Find(a => a.Name == "SonarAnalyzer.CSharp")
                 .Properties[0].Value;
 

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -101,7 +101,7 @@ namespace LCT.APICommunications
         /// <summary>
         /// Gets the package information in the repo, via the name or path
         /// </summary>
-       
+
         public async Task<HttpResponseMessage> GetPackageInfo(ComponentsToArtifactory component = null)
         {
             ValidateParameters(component.JfrogPackageName, component.Path);
@@ -113,12 +113,15 @@ namespace LCT.APICommunications
 
             return await ExecuteSearchAqlAsync(uri, httpContent);
         }
-       
+
         private static HttpClient GetHttpClient(ArtifactoryCredentials credentials)
         {
-            HttpClient httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", credentials.ApiKey);
+            var handler = new RetryHttpClientHandler()
+            {
+                InnerHandler = new HttpClientHandler()
+            };
+            var httpClient = new HttpClient(handler);
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", credentials.Token);
             return httpClient;
         }
 
@@ -130,9 +133,9 @@ namespace LCT.APICommunications
             }
         }
 
-        private static string BuildAqlQuery( ComponentsToArtifactory component)
+        public static string BuildAqlQuery(ComponentsToArtifactory component)
         {
-            
+
             if (component.ComponentType.Equals("NPM", StringComparison.InvariantCultureIgnoreCase))
             {
                 var queryList = new List<string>
@@ -162,6 +165,23 @@ namespace LCT.APICommunications
 
                 return query.ToString();
             }
+            else if (component.ComponentType.Equals("Nuget", StringComparison.InvariantCultureIgnoreCase))
+            {
+                // Build the AQL query for NuGet components
+                StringBuilder query = new();
+                query.Append("items.find({");
+                query.Append("\"$and\": [");
+                query.Append($"{{ \"repo\":{{ \"$eq\": \"{component.SrcRepoName}\" }} }},");
+                query.Append("{ \"$or\":[");
+                query.Append($"{{ \"@nuget.id\":{{ \"$eq\": \"{component.Name}\" }} }} ,");
+                query.Append($"{{ \"@nuget.id\":{{ \"$eq\": \"{component.Name.ToLowerInvariant()}\" }} }}");
+                query.Append("] },");
+                query.Append($"{{ \"@nuget.version\":{{\"$eq\": \"{component.Version}\" }} }}");
+                query.Append(']');
+                query.Append("}).include(\"repo\", \"path\", \"name\").limit(1)");
+
+                return query.ToString();
+            }
             else
             {
                 var queryList = new List<string>()
@@ -183,9 +203,9 @@ namespace LCT.APICommunications
                 query.Append($"items.find({{{string.Join(", ", queryList)}}}).include(\"repo\", \"path\", \"name\").limit(1)");
                 return query.ToString();
             }
-            
 
-            
+
+
         }
 
         private async Task<HttpResponseMessage> ExecuteSearchAqlAsync(string uri, HttpContent httpContent)

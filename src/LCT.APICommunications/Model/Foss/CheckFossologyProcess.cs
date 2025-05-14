@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -14,6 +14,8 @@ namespace LCT.APICommunications.Model.Foss
     {
         [JsonProperty("fossologyProcessInfo")]
         public FossologyProcessInfo FossologyProcessInfo { get; set; }
+        [JsonProperty("status")]
+        public string Status { get; set; }
 
     }
 }

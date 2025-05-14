@@ -1,13 +1,15 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using Microsoft.Extensions.Configuration;
+using System.Diagnostics.CodeAnalysis;
 
 namespace TestUtilities
 {
+    [ExcludeFromCodeCoverage]
     public class TestParamAlpine
     {
         static readonly IConfiguration s_Config = new ConfigurationBuilder().AddJsonFile(@"appSettingsSW360IntegrationTest.json", true, true).Build();
@@ -23,6 +25,8 @@ namespace TestUtilities
         public string ArtifactoryUploadUser { get; set; }
         public string ArtifactoryUploadApiKey { get; set; }
         public string JfrogApi { get; set; }
+        public string FossologyTrigger { get; set; }
+        public string TelemetryEnable { get; set; }
 
         public TestParamAlpine()
         {
@@ -37,6 +41,8 @@ namespace TestUtilities
             ArtifactoryUploadApiKey = s_Config["ArtifactoryUploadApiKey"];
             JfrogApi = s_Config["JfrogApi"];
             RemoveDevDependency = s_Config["RemoveDevDependency"];
+            FossologyTrigger = s_Config["EnableFossologyTrigger"];
+            TelemetryEnable = s_Config["TelemetryEnable"];
         }
     }
 }

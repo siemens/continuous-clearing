@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -61,6 +61,18 @@ namespace LCT.APICommunications.UTest
 
             //Assert
             Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApicommunication.GetApiKey());
+        }
+        [Test]
+        public void MavenJfrogApiCommunication_MoveFromRepo_ReturnsInvalidOperationException()
+        {
+            //Arrange
+            ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials();
+
+            //Act
+            JfrogApicommunication jfrogApicommunication = new MavenJfrogApiCommunication("", "", repoCredentials, 100);
+
+            //Assert
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApicommunication.MoveFromRepo(new ComponentsToArtifactory()));
         }
     }
 }

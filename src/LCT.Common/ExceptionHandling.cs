@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -33,17 +33,10 @@ namespace LCT.Common
         }
         public static void FossologyException(HttpRequestException ex)
         {
-            if (500 <= Convert.ToInt32(ex.StatusCode) && Convert.ToInt32(ex.StatusCode) <= 599)
-            {
-                Logger.Logger.Log(null, Level.Error, $"\tThe exception may arise because  fossology is currently unresponsive:{ex.Message} Please try again later", null);
-            }
-            else
-            {
-                Logger.Logger.Log(null, Level.Error, $"\tThe exception may be caused by an incorrect or missing token for  fossology :{ex.Message} Please ensure that a valid token is provided and try again", null);
-            }
+            Logger.Logger.Log(null, Level.Error, $"\tThe Fossology process could not be completed. Exception: {ex.Message}", null);
         }
 
-        public static void ArgumentException( string message)
+        public static void ArgumentException(string message)
         {
             Logger.Logger.Log(null, Level.Error, $"Missing Arguments: Please provide the below arguments via inline or in the appSettings.json file to proceed.", null);
             Logger.Logger.Log(null, Level.Warn, $"{message}", null);

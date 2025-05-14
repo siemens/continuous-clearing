@@ -1,0 +1,468 @@
+parameters:
+  # Sw360 and Fossology parameters
+  - name: sw360Url
+    type: string
+    default: ''
+  
+  - name: sw360AuthTokenType
+    type: string
+    default: ''
+
+  - name: sw360Token
+    type: string
+    default: ''
+
+  - name: sw360ProjectId
+    type: string
+    default: ''
+
+  - name: sw360ProjectName
+    type: string
+    default: ''
+
+  - name: fossologyUrl
+    type: string
+    default: ''
+  
+  - name: fossologyEnableTrigger
+    type: boolean
+    default: true
+
+  # JFrog parameters
+  - name: JfrogUrl
+    type: string
+    default: ''
+
+  - name: JfrogToken
+    type: string
+    default: ''
+
+  - name: JfrogDryRun
+    type: boolean
+    default: true
+
+  # CA Tool parameters
+  - name: projectDefinitions
+    type: object
+    default: []
+
+  - name: outputFolder
+    type: string
+    default: ''
+  
+  # Template parameters
+  - name: toolVersion
+    type: string
+    default: ''
+
+  - name: PackageCreatorEnabled
+    type: boolean
+    default: true
+
+  - name: ArtifactoryUploaderEnabled
+    type: boolean
+    default: true
+    
+  - name: appSettingsPath
+    type: string
+    default: ''
+  
+  - name: enableTelemetry
+    type: boolean
+    default: true
+  
+  - name: workingDirectory
+    type: string
+    default: '$(Build.SourcesDirectory)'
+  
+  - name: excludeComponents
+    type: string
+    default: ''
+  
+  # Template parameters for power users
+  - name: branchName_powerUser
+    type: string
+    default: ''
+
+steps:
+  - powershell: |
+      # Display the PowerShell version
+      Write-Host "##[section] PowerShell version: $($PSVersionTable.PSVersion)"
+
+      # Ensure the working directory exists
+      if (-not (Test-Path -Path "${{ parameters.workingDirectory }}")) {
+        Write-Host "##[section] Working directory does not exist. Creating: ${{ parameters.workingDirectory }}"
+        New-Item -ItemType Directory -Path "${{ parameters.workingDirectory }}" -Force | Out-Null
+      } else {
+        Write-Host "##[section] Working directory already exists: ${{ parameters.workingDirectory }}"
+      }
+
+      # Define repo and base filename
+      $repo = "siemens/continuous-clearing"
+      $fileName = "continuous-clearing"
+
+      $toolsDir = Join-Path "${{ parameters.workingDirectory }}" "tools"
+      # Ensure tools directory exists
+      Write-Host "##[section] Creating tools directory: $toolsDir"
+      New-Item -ItemType Directory -Path $toolsDir -Force | Out-Null
+      $extractPath = Join-Path $toolsDir "LicenseClearingTool"
+
+      # Conditional block to check if branchName is provided
+      if ([string]::IsNullOrWhiteSpace("${{ parameters.branchName_powerUser }}")) {
+        # No branch provided, proceed with fetching release
+        Write-Host "##[section] No branch specified, fetching release..."
+        
+        # Determine release tag
+        if ([string]::IsNullOrWhiteSpace("${{ parameters.toolVersion }}")) {
+          Write-Host "##[section] No toolVersion provided, fetching latest release..."
+          $releasesUrl = "https://api.github.com/repos/$repo/releases/latest"
+          $tag = (Invoke-RestMethod -Uri $releasesUrl).tag_name
+        } else {
+          $tag = "${{ parameters.toolVersion }}"
+          Write-Host "##[section] Using provided toolVersion: $tag"
+          if (-not $tag.StartsWith('v')) {
+            $tag = "v$tag"
+          }
+        }
+
+        # Set up file names and paths
+        $nugetFileName = "$fileName.$($tag.TrimStart('v')).nupkg"
+        $downloadUrl = "https://github.com/$repo/releases/download/$tag/$nugetFileName"
+        $nupkgPath = Join-Path $toolsDir $nugetFileName
+        $zipPath = "$nupkgPath.zip"
+
+        # Set security protocols and download package
+        Write-Host "##[section] Downloading release from $downloadUrl"
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+        $ProgressPreference = 'SilentlyContinue'
+        Invoke-WebRequest -Uri $downloadUrl -OutFile $nupkgPath
+
+        # Rename .nupkg to .zip and extract
+        Write-Host "##[section] Extracting $nugetFileName"
+        Rename-Item -Path $nupkgPath -NewName "$($nupkgPath).zip" -Force
+        Expand-Archive -Path $zipPath -DestinationPath $extractPath -Force
+
+        # List extracted files
+        Write-Host "##[section] Listing extracted files:"
+        Get-ChildItem -Path $extractPath -Recurse
+      } else {
+        # If branchName is provided, skip release fetching and build solution from source
+        Write-Host "##[section] Branch specified: ${{ parameters.branchName_powerUser }}"
+
+        # Checkout specific branch from GitHub
+        git clone --branch "${{ parameters.branchName_powerUser }}" https://github.com/siemens/continuous-clearing.git ${{ parameters.workingDirectory }}/CA-Tool
+
+        # Build the solution
+        $solutionPath = "${{ parameters.workingDirectory }}/CA-Tool/src/LicenseClearingTool.sln"
+        Write-Host "##[section] Building the solution at $solutionPath"
+        dotnet build $solutionPath --configuration Release
+
+        # Move the build output to the tools directory
+        $buildOutputDir = "${{ parameters.workingDirectory }}/CA-Tool/out/net8.0"
+        if (Test-Path -Path $buildOutputDir) {
+          Write-Host "##[section] Ensuring tools directory exists at $extractPath/tools"
+          if (-not (Test-Path -Path "$extractPath/tools")) {
+            New-Item -ItemType Directory -Path "$extractPath/tools" -Force | Out-Null
+          }
+
+          Write-Host "##[section] Moving build output from $buildOutputDir to $extractPath/tools"
+          Move-Item -Path "$buildOutputDir/*" -Destination "$extractPath/tools" -Force
+
+          Write-Host "##[section] Listing build files in $extractPath/tools:"
+          Get-ChildItem -Path "$extractPath/tools" -Recurse
+        } else {
+          Write-Host "##[error] Build output not found at $buildOutputDir"
+          exit 1
+        }
+      }
+    displayName: "Install LicenseClearing tool"
+
+
+  - powershell: |
+      # Define output folders
+      $sbomFolder = "${{ parameters.outputFolder }}"
+      $logsFolder = "${{ parameters.outputFolder }}"
+
+      # Check if the last folder in the path is already 'sbom'
+      if ($sbomFolder -match '/sbom$') {
+        Write-Host "##[section] The output folder already ends with 'sbom'. Using as is: $sbomFolder"
+      } else {
+        Write-Host "##[section] Appending 'sbom' to the output folder."
+        $sbomFolder = Join-Path $sbomFolder "sbom"
+      }
+
+      # Check if the last folder in the path is already 'logs'
+      if ($logsFolder -match '/logs$') {
+        Write-Host "##[section] The output folder already ends with 'logs'. Using as is: $logsFolder"
+      } else {
+        Write-Host "##[section] Appending 'logs' to the output folder."
+        $logsFolder = Join-Path $logsFolder "logs"
+      }
+
+      Write-Host "##[section] Checking and creating necessary output directories..."
+
+      # Create SBOM folder if it doesn't exist
+      if (-not (Test-Path -Path $sbomFolder)) {
+        Write-Host "##[command] Creating SBOM folder: $sbomFolder"
+        New-Item -ItemType Directory -Path $sbomFolder -Force | Out-Null
+      } else {
+        Write-Host "##[command] SBOM folder already exists: $sbomFolder"
+      }
+
+      # Create Logs folder if it doesn't exist
+      if (-not (Test-Path -Path $logsFolder)) {
+        Write-Host "##[command] Creating Logs folder: $logsFolder"
+        New-Item -ItemType Directory -Path $logsFolder -Force | Out-Null
+      } else {
+        Write-Host "##[command] Logs folder already exists: $logsFolder"
+      }
+    displayName: "Prepare CA tool output directories"
+
+  - ${{ each project in parameters.projectDefinitions }}:
+    - task: PowerShell@2
+      displayName: 'Run PackageIdentifier for ${{ project.projectType }}'
+      inputs:
+        targetType: 'inline'
+        script: |
+          # Print the working directory parameter
+          Write-Host "##[section] Working Directory: ${{ parameters.workingDirectory }}"
+
+          Write-Host "##[section] Preparing arguments for PackageIdentifier..."
+          # Initialize arguments with mandatory fields
+          $args = @(
+            "--Directory:InputFolder", "${{ project.inputFolder }}",
+            "--Directory:OutputFolder", "${{ parameters.outputFolder }}/sbom",
+            "--Directory:LogFolder", "${{ parameters.outputFolder }}/logs",
+            "--ProjectType", "${{ project.projectType }}",
+            "--SW360:ProjectName", "${{ parameters.sw360ProjectName }}",
+            "--SW360:ProjectID", "${{ parameters.sw360ProjectId }}",
+            "--SW360:Token", "${{ parameters.sw360Token }}",
+            "--Jfrog:Token", "${{ parameters.JfrogToken }}",
+            "--Telemetry:Enable", "${{ parameters.enableTelemetry }}"
+          )
+
+          # Handle Exclude list if provided
+          $excludeList = "${{ project.exclude }}"
+          if (-not [string]::IsNullOrWhiteSpace($excludeList)) {
+            $excludes = $excludeList.Split(';')
+            for ($i = 0; $i -lt $excludes.Length; $i++) {
+              if ($env:SYSTEM_DEBUG -eq 'true') {
+                Write-Host "##[debug] Adding exclude item: $($excludes[$i])"
+              }
+              $args += "--${{ project.projectType }}:Exclude:$i"
+              $args += $excludes[$i]
+            }
+          }
+
+          # Handle global ExcludeComponents list
+          $excludeComponentsList = "${{ parameters.excludeComponents }}"
+          if (-not [string]::IsNullOrWhiteSpace($excludeComponentsList)) {
+            $excludeComponents = $excludeComponentsList.Split(';')
+            for ($i = 0; $i -lt $excludeComponents.Length; $i++) {
+              if ($env:SYSTEM_DEBUG -eq 'true') {
+                Write-Host "##[debug] Adding exclude component item: $($excludeComponents[$i])"
+              }
+              $args += "--SW360:ExcludeComponents:$i"
+              $args += $excludeComponents[$i]
+            }
+          }
+
+
+          # Conditionally add optional parameters only if provided
+          if ("${{ parameters.sw360Url }}" -ne "") {
+            Write-Host "##[section] Adding SW360 URL"
+            $args += "--SW360:URL"
+            $args += "${{ parameters.sw360Url }}"
+          }
+
+          if ("${{ parameters.sw360AuthTokenType }}" -ne "") {
+            Write-Host "##[section] Adding SW360 Auth Token Type"
+            $args += "--SW360:AuthTokenType"
+            $args += "${{ parameters.sw360AuthTokenType }}"
+          }
+
+          if ("${{ parameters.JfrogUrl }}" -ne "") {
+            Write-Host "##[section] Adding JFrog URL"
+            $args += "--JFrog:URL"
+            $args += "${{ parameters.JfrogUrl }}"
+          }
+
+          # Handle appsettings path
+          $appSettingsPath = "${{ parameters.appSettingsPath }}"
+          if ([string]::IsNullOrEmpty($appSettingsPath)) {
+            # If not provided, use the default path
+            $appSettingsPath = "$(Build.SourcesDirectory)\Templates_Pipeline\files\ca-tool-default-appsettings.json"
+            Write-Host "##[section] No appsettings path provided. Using default: $appSettingsPath"
+          } else {
+            Write-Host "##[section] Using provided appsettings path: $appSettingsPath"
+          }
+
+          # Validate that the appsettings file exists
+          if (-Not (Test-Path -Path $appSettingsPath)) {
+            Write-Host "##[error] The appsettings file was not found at path: $appSettingsPath"
+            exit 1
+          }
+
+          $args += "--settingsfilepath"
+          $args += $appSettingsPath
+
+          # Handle multiple project types if necessary
+          $projectTypes = @()
+          $parameters.projectDefinitions | ForEach-Object { $projectTypes += $_.projectType }
+          $index = [array]::IndexOf($projectTypes, "${{ project.projectType }}")
+          if ($index -ne 0) {
+            Write-Host "##[section] Multiple project types detected. Setting MultipleProjectType to true."
+            $args += "--MultipleProjectType"
+            $args += "true"
+          }
+          
+          # Print the arguments for debugging
+          if ($env:SYSTEM_DEBUG -eq 'true') {
+            Write-Host "##[debug] Arguments for PackageIdentifier:"
+            $args | ForEach-Object { Write-Host "##[debug] $_" }
+          }
+
+          # Start executing the tool
+          Write-Host "##[section] Running PackageIdentifier tool..."
+          ${{ parameters.workingDirectory }}/tools/LicenseClearingTool/tools/PackageIdentifier.exe @args
+
+  - task: PowerShell@2
+    condition: eq('${{ parameters.PackageCreatorEnabled }}', true)
+    continueOnError: true
+    displayName: 'Run SW360PackageCreator'
+    inputs:
+      targetType: 'inline'
+      script: |
+        # Print the working directory parameter
+        Write-Host "##[section] Working Directory: ${{ parameters.workingDirectory }}"
+
+        Write-Host "##[section] Preparing arguments for SW360PackageCreator..."
+
+        # Setup base arguments
+        $args = @(
+          "--Directory:OutputFolder", "${{ parameters.outputFolder }}/sbom",
+          "--Directory:LogFolder", "${{ parameters.outputFolder }}/logs",
+          "--SW360:ProjectName", "${{ parameters.sw360ProjectName }}",
+          "--SW360:ProjectID", "${{ parameters.sw360ProjectId }}",
+          "--SW360:Token", "${{ parameters.sw360Token }}",
+          "--SW360:Fossology:EnableTrigger", "${{ parameters.fossologyEnableTrigger }}",
+          "--Telemetry:Enable", "${{ parameters.enableTelemetry }}"
+        )
+
+        # Conditionally add optional parameters only if provided
+        if ("${{ parameters.sw360Url }}" -ne "") {
+          Write-Host "##[section] Adding SW360 URL"
+          $args += "--SW360:URL"
+          $args += "${{ parameters.sw360Url }}"
+        }
+
+        if ("${{ parameters.sw360AuthTokenType }}" -ne "") {
+            Write-Host "##[section] Adding SW360 Auth Token Type"
+            $args += "--SW360:AuthTokenType"
+            $args += "${{ parameters.sw360AuthTokenType }}"
+          }
+
+        if ("${{ parameters.fossologyUrl }}" -ne "") {
+          Write-Host "##[section] Adding Fossology URL"
+          $args += "--SW360:Fossology:URL"
+          $args += "${{ parameters.fossologyUrl }}"
+        }
+
+        # Handle appsettings path
+        $appSettingsPath = "${{ parameters.appSettingsPath }}"
+        if ([string]::IsNullOrEmpty($appSettingsPath)) {
+          $appSettingsPath = "$(Build.SourcesDirectory)/Templates_Pipeline/files/ca-tool-default-appsettings.json"
+          Write-Host "##[section] No appsettings path provided. Using default: $appSettingsPath"
+        } else {
+          Write-Host "##[section] Using provided appsettings path: $appSettingsPath"
+        }
+
+        # Validate that the appsettings file exists
+        if (-Not (Test-Path -Path $appSettingsPath)) {
+          Write-Host "##[error] The appsettings file was not found at path: $appSettingsPath"
+          exit 1
+        }
+
+        $args += "--settingsfilepath"
+        $args += $appSettingsPath
+
+        # Print the arguments for debugging
+        if ($env:SYSTEM_DEBUG -eq 'true') {
+            Write-Host "##[debug] Arguments for PackageIdentifier:"
+            $args | ForEach-Object { Write-Host "##[debug] $_" }
+        }
+
+        # Start executing the tool
+        Write-Host "##[section] Running SW360PackageCreator..."
+        ${{ parameters.workingDirectory }}/tools/LicenseClearingTool/tools/SW360PackageCreator.exe @args
+
+  - task: PowerShell@2
+    condition: eq('${{ parameters.ArtifactoryUploaderEnabled }}', true)
+    continueOnError: true
+    displayName: 'Run ArtifactoryUploader'
+    inputs:
+      targetType: 'inline'
+      script: |
+        # Print the working directory parameter
+        Write-Host "##[section] Working Directory: ${{ parameters.workingDirectory }}"
+
+        Write-Host "##[section] Preparing arguments for ArtifactoryUploader..."
+
+        # Setup base arguments
+        $args = @(
+          "--Directory:OutputFolder", "${{ parameters.outputFolder }}/sbom",
+          "--Directory:LogFolder", "${{ parameters.outputFolder }}/logs",
+          "--SW360:ProjectName", "${{ parameters.sw360ProjectName }}",
+          "--SW360:ProjectID", "${{ parameters.sw360ProjectId }}",
+          "--SW360:Token", "${{ parameters.sw360Token }}",
+          "--Jfrog:Token", "${{ parameters.JfrogToken }}",
+          "--Jfrog:DryRun", "${{ parameters.JfrogDryRun }}",
+          "--Telemetry:Enable", "${{ parameters.enableTelemetry }}"
+        )
+
+        # Conditionally add optional parameters
+        if ("${{ parameters.sw360Url }}" -ne "") {
+          Write-Host "##[section] Adding SW360 URL"
+          $args += "--SW360:URL"
+          $args += "${{ parameters.sw360Url }}"
+        }
+
+        if ("${{ parameters.sw360AuthTokenType }}" -ne "") {
+            Write-Host "##[section] Adding SW360 Auth Token Type"
+            $args += "--SW360:AuthTokenType"
+            $args += "${{ parameters.sw360AuthTokenType }}"
+          }
+
+        if ("${{ parameters.JfrogUrl }}" -ne "") {
+          Write-Host "##[section] Adding JFrog URL"
+          $args += "--JFrog:URL"
+          $args += "${{ parameters.JfrogUrl }}"
+        }
+
+        # Handle appsettings path
+        $appSettingsPath = "${{ parameters.appSettingsPath }}"
+        if ([string]::IsNullOrEmpty($appSettingsPath)) {
+          $appSettingsPath = "$(Build.SourcesDirectory)/Templates_Pipeline/files/ca-tool-default-appsettings.json"
+          Write-Host "##[section] No appsettings path provided. Using default: $appSettingsPath"
+        } else {
+          Write-Host "##[section] Using provided appsettings path: $appSettingsPath"
+        }
+
+        # Validate that the appsettings file exists
+        if (-Not (Test-Path -Path $appSettingsPath)) {
+          Write-Host "##[error] The appsettings file was not found at path: $appSettingsPath"
+          exit 1
+        }
+
+        $args += "--settingsfilepath"
+        $args += $appSettingsPath
+
+        # Print the arguments for debugging
+        if ($env:SYSTEM_DEBUG -eq 'true') {
+            Write-Host "##[debug] Arguments for PackageIdentifier:"
+            $args | ForEach-Object { Write-Host "##[debug] $_" }
+        }
+
+        # Start executing the tool
+        Write-Host "##[section] Running ArtifactoryUploader..."
+        ${{ parameters.workingDirectory }}/tools/LicenseClearingTool/tools/ArtifactoryUploader.exe @args

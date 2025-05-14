@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -64,12 +64,12 @@ namespace LCT.Common
         /// <param name="folderPath"></param>
         public void ValidateFolderPath(string folderPath)
         {
-            if(string.IsNullOrWhiteSpace(folderPath))
+            if (string.IsNullOrWhiteSpace(folderPath))
             {
                 throw new ArgumentException($"Invalid value for folderPath -{folderPath}");
             }
 
-            if (!Directory.Exists(folderPath))
+            if (!System.IO.Directory.Exists(folderPath))
             {
                 throw new DirectoryNotFoundException($"Invalid folder path -{folderPath}");
             }
@@ -124,7 +124,7 @@ namespace LCT.Common
 
             try
             {
-                Directory.CreateDirectory(target.FullName);
+                System.IO.Directory.CreateDirectory(target.FullName);
 
                 // Copy each file into the new directory.
                 foreach (FileInfo fi in source.GetFiles())

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -9,7 +9,6 @@ using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
 using LCT.Common.Model;
 using LCT.Facade.Interfaces;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -65,7 +64,7 @@ namespace LCT.Facade
         {
             return m_sw360ApiCommunication.GetReleases();
         }
-        public Task<string> TriggerFossologyProcess(string releaseId,string sw360link)
+        public Task<string> TriggerFossologyProcess(string releaseId, string sw360link)
         {
             return m_sw360ApiCommunication.TriggerFossologyProcess(releaseId, sw360link);
         }
@@ -90,31 +89,16 @@ namespace LCT.Facade
 
         public async Task<HttpResponseMessage> LinkReleasesToProject(HttpContent httpContent, string sw360ProjectId)
         {
-            if (m_TestMode)
-            {
-                return new HttpResponseMessage(HttpStatusCode.OK);
-            }
-
             return await m_sw360ApiCommunication.LinkReleasesToProject(httpContent, sw360ProjectId);
         }
 
         public async Task<HttpResponseMessage> CreateComponent(CreateComponent createComponentContent)
         {
-            if (m_TestMode)
-            {
-                return new HttpResponseMessage(HttpStatusCode.OK);
-            }
-
             return await m_sw360ApiCommunication.CreateComponent(createComponentContent);
         }
 
         public async Task<HttpResponseMessage> CreateRelease(Releases createReleaseContent)
         {
-            if (m_TestMode)
-            {
-                return new HttpResponseMessage(HttpStatusCode.OK);
-            }
-
             return await m_sw360ApiCommunication.CreateRelease(createReleaseContent);
         }
 
@@ -140,19 +124,11 @@ namespace LCT.Facade
 
         public async Task<HttpResponseMessage> UpdateRelease(string releaseId, HttpContent httpContent)
         {
-            if (m_TestMode)
-            {
-                return new HttpResponseMessage(HttpStatusCode.OK);
-            }
             return await m_sw360ApiCommunication.UpdateRelease(releaseId, httpContent);
         }
 
         public async Task<HttpResponseMessage> UpdateComponent(string componentId, HttpContent httpContent)
         {
-            if (m_TestMode)
-            {
-                return new HttpResponseMessage(HttpStatusCode.OK);
-            }
             return await m_sw360ApiCommunication.UpdateComponent(componentId, httpContent);
         }
 
@@ -194,6 +170,10 @@ namespace LCT.Facade
         public Task<HttpResponseMessage> GetComponentByExternalId(string purlId, string externalIdKey = "")
         {
             return m_sw360ApiCommunication.GetComponentByExternalId(purlId, externalIdKey);
+        }
+        public Task<HttpResponseMessage> GetAllReleasesWithAllData(int page, int pageEntries)
+        {
+            return m_sw360ApiCommunication.GetAllReleasesWithAllData(page, pageEntries);
         }
     }
 }

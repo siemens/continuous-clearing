@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -70,6 +70,7 @@ namespace LCT.PackageIdentifier
             bom.Components = componentsForBOM;
             bom.Dependencies = dependencies;
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
+            bom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(bom.Components, bom.Dependencies);
             Logger.Debug($"ParsePackageFile():End");
             return bom;
         }
@@ -107,10 +108,10 @@ namespace LCT.PackageIdentifier
                     }
                 }
 
-                if (appSettings.Npm.ExcludedComponents != null)
+                if (appSettings?.SW360?.ExcludeComponents != null)
                 {
-                    lstComponentForBOM = CommonHelper.RemoveExcludedComponents(lstComponentForBOM, appSettings.Npm.ExcludedComponents, ref noOfExcludedComponents);
-                    BomCreator.bomKpiData.ComponentsExcluded += noOfExcludedComponents;
+                    lstComponentForBOM = CommonHelper.RemoveExcludedComponents(lstComponentForBOM, appSettings.SW360.ExcludeComponents, ref noOfExcludedComponents);
+                    BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents;
 
                 }
                 BomCreator.bomKpiData.DevDependentComponents += noOfDevDependent;
@@ -153,32 +154,31 @@ namespace LCT.PackageIdentifier
         {
             MultipleVersions multipleVersions = new MultipleVersions();
             IFileOperations fileOperations = new FileOperations();
-            string filename = $"{appSettings.BomFolderPath}\\{appSettings.SW360ProjectName}_{FileConstant.multipleversionsFileName}";
-            if (string.IsNullOrEmpty(appSettings.IdentifierBomFilePath) || (!File.Exists(filename)))
+            string defaultProjectName = CommonIdentiferHelper.GetDefaultProjectName(appSettings);
+            string bomFullPath = $"{appSettings.Directory.OutputFolder}\\{defaultProjectName}_Bom.cdx.json";
+            string filePath = $"{appSettings.Directory.OutputFolder}\\{defaultProjectName}_{FileConstant.multipleversionsFileName}";
+            if (!File.Exists(filePath))
             {
                 multipleVersions.Npm = new List<MultipleVersionValues>();
                 foreach (var npmpackage in componentsWithMultipleVersions)
                 {
-                    npmpackage.Description = !string.IsNullOrEmpty(appSettings.CycloneDxSBomTemplatePath) ? appSettings.CycloneDxSBomTemplatePath : npmpackage.Description;
-
+                    npmpackage.Description = !string.IsNullOrEmpty(bomFullPath) ? bomFullPath : npmpackage.Description;
                     MultipleVersionValues jsonComponents = new MultipleVersionValues();
                     jsonComponents.ComponentName = npmpackage.Name;
                     jsonComponents.ComponentVersion = npmpackage.Version;
                     jsonComponents.PackageFoundIn = npmpackage.Description;
                     multipleVersions.Npm.Add(jsonComponents);
                 }
-                fileOperations.WriteContentToMultipleVersionsFile(multipleVersions, appSettings.BomFolderPath, FileConstant.multipleversionsFileName, appSettings.SW360ProjectName);
-                Logger.Warn($"\nTotal Multiple versions detected {multipleVersions.Npm.Count} and details can be found at {appSettings.BomFolderPath}\\{appSettings.SW360ProjectName}_{FileConstant.multipleversionsFileName}\n");
+                fileOperations.WriteContentToMultipleVersionsFile(multipleVersions, appSettings.Directory.OutputFolder, FileConstant.multipleversionsFileName, defaultProjectName);
+                Logger.Warn($"\nTotal Multiple versions detected {multipleVersions.Npm.Count} and details can be found at {filePath}\n");
             }
             else
             {
-                string json = File.ReadAllText(filename);
+                string json = File.ReadAllText(filePath);
                 MultipleVersions myDeserializedClass = JsonConvert.DeserializeObject<MultipleVersions>(json);
                 List<MultipleVersionValues> npmComponents = new List<MultipleVersionValues>();
                 foreach (var npmpackage in componentsWithMultipleVersions)
                 {
-                    npmpackage.Description = !string.IsNullOrEmpty(appSettings.CycloneDxSBomTemplatePath) ? appSettings.CycloneDxSBomTemplatePath : npmpackage.Description;
-
                     MultipleVersionValues jsonComponents = new MultipleVersionValues();
                     jsonComponents.ComponentName = npmpackage.Name;
                     jsonComponents.ComponentVersion = npmpackage.Version;
@@ -188,8 +188,8 @@ namespace LCT.PackageIdentifier
                 }
                 myDeserializedClass.Npm = npmComponents;
 
-                fileOperations.WriteContentToMultipleVersionsFile(myDeserializedClass, appSettings.BomFolderPath, FileConstant.multipleversionsFileName, appSettings.SW360ProjectName);
-                Logger.Warn($"\nTotal Multiple versions detected {npmComponents.Count} and details can be found at {appSettings.BomFolderPath}\\{appSettings.SW360ProjectName}_{FileConstant.multipleversionsFileName}\n");
+                fileOperations.WriteContentToMultipleVersionsFile(myDeserializedClass, appSettings.Directory.OutputFolder, FileConstant.multipleversionsFileName, defaultProjectName);
+                Logger.Warn($"\nTotal Multiple versions detected {npmComponents.Count} and details can be found at {filePath}\n");
             }
         }
 
@@ -204,6 +204,7 @@ namespace LCT.PackageIdentifier
             List<JToken> directDependencies = new List<JToken>();
             directDependencies.AddRange(dep);
             directDependencies.AddRange(devDep);
+
             foreach (JProperty prop in depencyComponentList.Skip(1))
             {
                 Property isdev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
@@ -228,27 +229,11 @@ namespace LCT.PackageIdentifier
                 }
 
                 string folderPath = CommonHelper.TrimEndOfString(filepath, $"\\{FileConstant.PackageLockFileName}");
-                string packageName=string.Empty;
-                if (properties[Name] != null)
-                {
-                    packageName = Convert.ToString(properties[Name]);                   
-                }
-                else 
-                {
-                    packageName = CommonHelper.GetSubstringOfLastOccurance(prop.Name, $"node_modules/");
-                }
-                
+                string packageName = GetPackageName(properties, prop);
+
                 string componentName = packageName.StartsWith('@') ? packageName.Replace("@", "%40") : packageName;
 
-                if (packageName.Contains('@'))
-                {
-                    components.Group = packageName.Split('/')[0];
-                    components.Name = packageName.Split('/')[1];
-                }
-                else
-                {
-                    components.Name = packageName;
-                }                
+                SetComponentGroupAndName(components, packageName);
 
                 components.Type = Component.Classification.Library;
                 components.Description = folderPath;
@@ -268,6 +253,31 @@ namespace LCT.PackageIdentifier
             }
         }
 
+        private static void SetComponentGroupAndName(Component component, string packageName)
+        {
+            if (packageName.Contains('@'))
+            {
+                component.Group = packageName.Split('/')[0];
+                component.Name = packageName.Split('/')[1];
+            }
+            else
+            {
+                component.Name = packageName;
+            }
+        }
+        private static string GetPackageName(JObject properties, JProperty prop)
+        {
+            string packageName;
+            if (properties[Name] != null)
+            {
+                packageName = Convert.ToString(properties[Name]);
+            }
+            else
+            {
+                packageName = CommonHelper.GetSubstringOfLastOccurance(prop.Name, $"node_modules/");
+            }
+            return packageName;
+        }
         public static string GetIsDirect(List<JToken> directDependencies, JProperty prop)
         {
             string subvalue = CommonHelper.GetSubstringOfLastOccurance(prop.Name, $"node_modules/");
@@ -282,7 +292,6 @@ namespace LCT.PackageIdentifier
 
             return "false";
         }
-
         private static void CheckAndAddToBundleComponents(List<BundledComponents> bundledComponents, JProperty prop, Component components)
         {
             if (prop.Value[Bundled] != null &&
@@ -296,7 +305,7 @@ namespace LCT.PackageIdentifier
 
         private static void GetComponentsForBom(string filepath, CommonAppSettings appSettings,
             ref List<BundledComponents> bundledComponents, ref List<Component> lstComponentForBOM,
-            ref int noOfDevDependent, IEnumerable<JProperty> depencyComponentList , List<JToken> directDependenciesList)
+            ref int noOfDevDependent, IEnumerable<JProperty> depencyComponentList, List<JToken> directDependenciesList)
         {
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += depencyComponentList.Count();
 
@@ -363,7 +372,7 @@ namespace LCT.PackageIdentifier
         {
             // get the  component list from Jfrog for given repo
             List<AqlResult> aqlResultList =
-                await bomhelper.GetNpmListOfComponentsFromRepo(appSettings.InternalRepoList, jFrogService);
+                await bomhelper.GetNpmListOfComponentsFromRepo(appSettings.Npm.Artifactory.InternalRepos, jFrogService);
 
             // find the components in the list of internal components
             List<Component> internalComponents = new List<Component>();
@@ -405,17 +414,17 @@ namespace LCT.PackageIdentifier
             CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
             // get the  component list from Jfrog for given repo + internal repo
-            string[] repoList = appSettings.InternalRepoList.Concat(appSettings.Npm?.JfrogNpmRepoList).ToArray();
+            string[] repoList = CommonHelper.GetRepoList(appSettings);
             List<AqlResult> aqlResultList = await bomhelper.GetNpmListOfComponentsFromRepo(repoList, jFrogService);
-           
+
             Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
             List<Component> modifiedBOM = new List<Component>();
 
             foreach (var component in componentsForBOM)
             {
-                
-                string jfrogpackageName= bomhelper.GetFullNameOfComponent(component);
-                
+
+                string jfrogpackageName = bomhelper.GetFullNameOfComponent(component);
+
                 var hashes = aqlResultList.FirstOrDefault(x => x.Properties.Any(p => p.Key == "npm.name" && p.Value == jfrogpackageName) && x.Properties.Any(p => p.Key == "npm.version" && p.Value == component.Version));
                 string jfrogRepoPath = string.Empty;
                 AqlResult finalRepoData = GetJfrogArtifactoryRepoDetials(aqlResultList, component, bomhelper, out jfrogRepoPath);
@@ -424,15 +433,24 @@ namespace LCT.PackageIdentifier
                 Property siemensfileNameProp = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = finalRepoData?.Name ?? Dataconstant.PackageNameNotFoundInJfrog };
                 Property jfrogRepoPathProp = new() { Name = Dataconstant.Cdx_JfrogRepoPath, Value = jfrogRepoPath };
                 Component componentVal = component;
-                if (artifactoryrepo.Value == appSettings.Npm.JfrogDevDestRepoName)
+                if (artifactoryrepo.Value == appSettings.Npm.DevDepRepo)
                 {
                     BomCreator.bomKpiData.DevdependencyComponents++;
                 }
-                if (artifactoryrepo.Value == appSettings.Npm.JfrogThirdPartyDestRepoName)
+                if (appSettings.Npm.Artifactory.ThirdPartyRepos != null)
                 {
-                    BomCreator.bomKpiData.ThirdPartyRepoComponents++;
+
+                    foreach (var thirdPartyRepo in appSettings.Npm.Artifactory.ThirdPartyRepos)
+                    {
+                        if (artifactoryrepo.Value == thirdPartyRepo.Name)
+                        {
+                            BomCreator.bomKpiData.ThirdPartyRepoComponents++;
+                            break;
+                        }
+                    }
+
                 }
-                if (artifactoryrepo.Value == appSettings.Npm.JfrogInternalDestRepoName)
+                if (artifactoryrepo.Value == appSettings.Npm.ReleaseRepo)
                 {
                     BomCreator.bomKpiData.ReleaseRepoComponents++;
                 }
@@ -485,11 +503,11 @@ namespace LCT.PackageIdentifier
             List<Component> componentForBOM = cycloneDXBOM.Components.ToList();
             List<Dependency> dependenciesForBOM = cycloneDXBOM.Dependencies?.ToList() ?? new List<Dependency>();
             int noOfExcludedComponents = 0;
-            if (appSettings.Npm.ExcludedComponents != null)
+            if (appSettings?.SW360?.ExcludeComponents != null)
             {
-                componentForBOM = CommonHelper.RemoveExcludedComponents(componentForBOM, appSettings.Npm.ExcludedComponents, ref noOfExcludedComponents);
+                componentForBOM = CommonHelper.RemoveExcludedComponents(componentForBOM, appSettings.SW360.ExcludeComponents, ref noOfExcludedComponents);
                 dependenciesForBOM = CommonHelper.RemoveInvalidDependenciesAndReferences(componentForBOM, dependenciesForBOM);
-                BomCreator.bomKpiData.ComponentsExcluded += noOfExcludedComponents;
+                BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents;
 
             }
             cycloneDXBOM.Components = componentForBOM;
@@ -500,10 +518,14 @@ namespace LCT.PackageIdentifier
         private void ParsingInputFileForBOM(CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom, ref List<Dependency> dependencies)
         {
             List<string> configFiles;
-            configFiles = FolderScanner.FileScanner(appSettings.PackageFilePath, appSettings.Npm);
-
+            configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Npm);
+            List<string> listOfTemplateBomfilePaths = new List<string>();
             foreach (string filepath in configFiles)
             {
+                if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                {
+                    listOfTemplateBomfilePaths.Add(filepath);
+                }
                 Logger.Debug($"ParsingInputFileForBOM():FileName: " + filepath);
 
                 if (filepath.EndsWith(FileConstant.CycloneDXFileExtension))
@@ -527,16 +549,8 @@ namespace LCT.PackageIdentifier
                     componentsForBOM.AddRange(components);
                 }
             }
-
-            if (File.Exists(appSettings.CycloneDxSBomTemplatePath) && appSettings.CycloneDxSBomTemplatePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
-            {
-                Bom templateDetails;
-                templateDetails = ExtractSBOMDetailsFromTemplate(_cycloneDXBomParser.ParseCycloneDXBom(appSettings.CycloneDxSBomTemplatePath));
-                CheckValidComponentsForProjectType(templateDetails.Components, appSettings.ProjectType);
-                //Adding Template Component Details
-                SbomTemplate.AddComponentDetails(componentsForBOM, templateDetails);
-            }
-
+            string templateFilePath = SbomTemplate.GetFilePathForTemplate(listOfTemplateBomfilePaths);
+            SbomTemplate.ProcessTemplateFile(templateFilePath, _cycloneDXBomParser, componentsForBOM, appSettings.ProjectType);
             if (dependencies != null)
             {
                 GetdependencyDetails(componentsForBOM, dependencies);
@@ -555,8 +569,20 @@ namespace LCT.PackageIdentifier
                     foreach (var item in (component.Author?.Split(",")).Where(item => item.Contains(':')))
                     {
                         var componentDetails = item.Split(":");
-                        var name = StringFormat(componentDetails[0]);
-                        var version = StringFormat(componentDetails[1]);
+                        string name;
+                        string version;
+
+                        if (componentDetails.Length >= 3 && componentDetails[2].Contains('@'))
+                        {
+                            var npmDetails = componentDetails[2].Split('@');
+                            name = StringFormat(npmDetails[0]);
+                            version = StringFormat(npmDetails[1]);
+                        }
+                        else
+                        {
+                            name = StringFormat(componentDetails[0]);
+                            version = StringFormat(componentDetails[1]);
+                        }
                         string purlId = $"{ApiConstant.NPMExternalID}{name}@{version}";
                         Dependency dependentList = new Dependency()
                         {
@@ -641,7 +667,7 @@ namespace LCT.PackageIdentifier
             if (aqlResultList.Exists(x => x.Properties.Any(p => p.Key == "npm.name" && p.Value == jfrogcomponentName) && x.Properties.Any(p => p.Key == "npm.version" && p.Value == component.Version)))
             {
                 return true;
-            }            
+            }
 
             return false;
         }
@@ -653,7 +679,7 @@ namespace LCT.PackageIdentifier
         {
             AqlResult aqlResult = new AqlResult();
             jfrogRepoPath = Dataconstant.JfrogRepoPathNotFound;
-            string jfrogpackageName = bomHelper.GetFullNameOfComponent(component);           
+            string jfrogpackageName = bomHelper.GetFullNameOfComponent(component);
 
             var aqlResults = aqlResultList.FindAll(x => x.Properties.Any(p => p.Key == "npm.name" && p.Value == jfrogpackageName) && x.Properties.Any(p => p.Key == "npm.version" && p.Value == component.Version));
 
@@ -666,7 +692,10 @@ namespace LCT.PackageIdentifier
                 jfrogRepoPath = GetJfrogRepoPath(aqlResult);
             }
 
-            aqlResult.Repo ??= NotFoundInRepo;
+            if (aqlResult != null)
+            {
+                aqlResult.Repo ??= NotFoundInRepo;
+            }
             return aqlResult;
         }
 

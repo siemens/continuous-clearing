@@ -1,12 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 
 // -------------------------------------------------------------------------------------------------------------------- 
 using CycloneDX.Models;
 using NUnit.Framework;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -22,26 +21,28 @@ namespace SW360IntegrationTest.Nuget
         [Test, Order(1)]
         public void TestArtifactoryUploaderexe()
         {
-            OutFolder = TestHelper.OutFolder;
-            string comparisonBOMPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\ArtifactoryUploaderTestData\NugetComparisonBOM.json";
+            OutFolder = Path.GetFullPath(Path.Combine(TestHelper.OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles", "ArtifactoryUploaderTestData", "Nuget"));
 
             // Test BOM Creator ran with exit code 0
             Assert.AreEqual(0, TestHelper.RunArtifactoryUploaderExe(new string[]{
-                TestConstant.BomFilePath, comparisonBOMPath,
-                TestConstant.ArtifactoryUser, testParameters.ArtifactoryUploadUser,
+                TestConstant.BomFolderPath, OutFolder,
+                TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
-                 TestConstant.JfrogNpmThirdPartyDestRepoName,testParameters.ThirdPartyDestinationRepoName,
-                TestConstant.JfrogNpmDevDestRepoName,testParameters.DevDestinationRepoName,
-                TestConstant.JfrogNpmInternalDestRepoName,testParameters.InternalDestinationRepoName,
-                TestConstant.JFrogApiURL,testParameters.JfrogApi
+                TestConstant.JfrogNugetThirdPartyDestRepoName,testParameters.ThirdPartyDestinationRepoName,
+                TestConstant.JfrogNugetDevDestRepoName,testParameters.DevDestinationRepoName,
+                TestConstant.JfrogNugetInternalDestRepoName,testParameters.InternalDestinationRepoName,
+                TestConstant.JFrogApiURL,testParameters.JfrogApi,
+                TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
+                TestConstant.DryRun, false.ToString()
             }),
                 "Test to run Artifactory Uploader EXE execution");
         }
+
         [Test, Order(2)]
         public void ComponentUpload_IsUnsuccessful_AlreadyPresentInDestination()
         {
             OutFolder = TestHelper.OutFolder;
-            string comparisonBOMPath = OutFolder + @"\..\..\TestFiles\IntegrationTestFiles\ArtifactoryUploaderTestData\NugetComparisonBOM.json";
+            string comparisonBOMPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles", "ArtifactoryUploaderTestData", "Nuget", "Test_Bom.cdx.json"));
             if (File.Exists(comparisonBOMPath))
             {
                 ComponentJsonParsor expected = new ComponentJsonParsor();

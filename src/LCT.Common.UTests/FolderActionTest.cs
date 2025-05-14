@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -12,7 +12,7 @@ namespace LCT.Common.UTest
     [TestFixture]
     public class FolderActionTest
     {
-       
+
         [Test]
         public void ValidateFolderPath_WhenFolderPathIsEmpty_ThrowsArgumentException()
         {
@@ -30,7 +30,7 @@ namespace LCT.Common.UTest
             //Assert
             Assert.Throws<System.IO.DirectoryNotFoundException>(() => folderAction.ValidateFolderPath("test"));
         }
-        
+
         [Test]
         public void ZipFileToTargetDirectory_WhenPathIsNotProper_ReturnsFalse()
         {
@@ -63,7 +63,7 @@ namespace LCT.Common.UTest
             var folderAction = new FolderAction();
 
             //Act
-            var acutal = folderAction.CopyToTargetDirectory(sourcePath,targetPath);
+            var acutal = folderAction.CopyToTargetDirectory(sourcePath, targetPath);
 
             //Assert
             Assert.IsTrue(acutal);
@@ -71,11 +71,11 @@ namespace LCT.Common.UTest
 
         [Test]
         public void CopyToTargetDirectory_PassingDirsWithFiles_ReturnSuccess()
-        { 
+        {
             //Arrange
             string sourcePath = $"{Path.GetTempPath()}\\SampleFolder";
-            Directory.CreateDirectory(sourcePath);
-            Directory.CreateDirectory(sourcePath +"\\SampleSubFolder");
+            System.IO.Directory.CreateDirectory(sourcePath);
+            System.IO.Directory.CreateDirectory(sourcePath + "\\SampleSubFolder");
             File.WriteAllText(sourcePath + "\\Sample.txt", "");
             string targetPath = $"{Path.GetTempPath()}/targetPath/";
             var folderAction = new FolderAction();
@@ -86,5 +86,6 @@ namespace LCT.Common.UTest
             //Assert
             Assert.IsTrue(acutal);
         }
+
     }
 }

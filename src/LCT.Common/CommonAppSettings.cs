@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 // SPDX-License-Identifier: MIT
 // --------------------------------------------------------------------------------------------------------------------
@@ -8,6 +8,7 @@ using LCT.Common.Constants;
 using LCT.Common.Interface;
 using LCT.Common.Model;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
@@ -20,7 +21,7 @@ namespace LCT.Common
     public class CommonAppSettings
     {
         private readonly IFolderAction folderAction;
-        private readonly IFileOperations _fileOperations;
+        private readonly IFileOperations fileOperations;
 
         public static string PackageUrlApi { get; set; } = $"https://www.nuget.org/api/v2/package/";
         public static string SourceURLNugetApi { get; set; } = $"https://api.nuget.org/v3-flatcontainer/";
@@ -30,178 +31,24 @@ namespace LCT.Common
         public static string PyPiURL { get; set; } = $"https://pypi.org/pypi/";
         public static string SourceURLConan { get; set; } = "https://raw.githubusercontent.com/conan-io/conan-center-index/master/recipes/";
         public static string AlpineAportsGitURL { get; set; } = $"https://gitlab.alpinelinux.org/alpine/aports.git";
+
+        private string m_ProjectType;
+        private string m_LogFolderPath;
         public CommonAppSettings()
         {
             folderAction = new FolderAction();
-            _fileOperations = new FileOperations();
+            fileOperations = new FileOperations();
+            Directory = new Directory(folderAction, fileOperations);
         }
 
-        public CommonAppSettings(IFolderAction iFolderAction)
+        public CommonAppSettings(IFolderAction iFolderAction, IFileOperations ifileOperations)
         {
             folderAction = iFolderAction;
+            fileOperations = ifileOperations;
+            Directory = new Directory(folderAction, fileOperations);
         }
 
-        private string m_PackageFilePath;
-        private string m_BomFolderPath;
-        private string m_Sw360Token;
-        private string m_SW360ProjectName;
-        private string m_SW360ProjectID;
-        private string m_ProjectType;
-        private string m_ArtifactoryApiKey;
-        private string m_SW360URL;
-        private string m_BomFilePath;
-        private string m_LogFolderPath;
-        private string m_FOSSURL;
-        private string m_ArtifactoryUser;
-        private string m_CycloneDxSBomTemplatePath;
-
-
-        public bool RemoveDevDependency { get; set; } = true;
-        public string SW360AuthTokenType { get; set; } = "Bearer";
-        public string JFrogApi { get; set; }
         public int TimeOut { get; set; } = 200;
-        public Config Npm { get; set; }
-        public Config Nuget { get; set; }
-
-        public Config Maven { get; set; }
-        public Config Debian { get; set; }
-        public Config Python { get; set; }
-        public Config Conan { get; set; }
-        public Config Alpine { get; set; }
-        public string CaVersion { get; set; }
-        public string CycloneDxSBomTemplatePath { get; set; }
-        public string[] InternalRepoList { get; set; } = Array.Empty<string>();
-        public bool EnableFossTrigger { get; set; } = true;
-        public string JfrogNpmSrcRepo { get; set; }
-        public string Mode { get; set; } = string.Empty;
-
-
-        public string SW360URL
-        {
-            get
-            {
-                return m_SW360URL;
-            }
-            set
-            {
-                if (string.IsNullOrEmpty(value))
-                {
-                    throw new ArgumentNullException($"Provide a sw360 url - {value}");
-                }
-                else
-                {
-                    m_SW360URL = value.TrimEnd(Dataconstant.ForwardSlash);
-                }
-            }
-        }
-
-        public string IdentifierBomFilePath
-        {
-            get
-            {
-                return m_BomFilePath;
-            }
-            set
-            {
-                if (!AppDomain.CurrentDomain.FriendlyName.Contains("SW360PackageCreator") &&
-                    !AppDomain.CurrentDomain.FriendlyName.Contains("ArtifactoryUploader") &&
-                    !string.IsNullOrEmpty(value))
-                {
-                    _fileOperations.ValidateFilePath(value);
-                    m_BomFilePath = value;
-                }
-            }
-        }
-
-        public string PackageFilePath
-        {
-            get
-            {
-                return m_PackageFilePath;
-            }
-            set
-            {
-                if (!AppDomain.CurrentDomain.FriendlyName.Contains("SW360PackageCreator") &&
-                    !AppDomain.CurrentDomain.FriendlyName.Contains("ArtifactoryUploader"))
-                {
-                    folderAction.ValidateFolderPath(value);
-                    m_PackageFilePath = value;
-                }
-            }
-        }
-
-        public string LogFolderPath
-        {
-            get
-            {
-                return m_LogFolderPath;
-            }
-            set
-            {
-                folderAction.ValidateFolderPath(value);
-                m_LogFolderPath = value;
-            }
-        }
-
-        public string BomFolderPath
-        {
-            get
-            {
-                return m_BomFolderPath;
-            }
-            set
-            {
-                try
-                {
-                    m_BomFolderPath = value;
-                    folderAction.ValidateFolderPath(value);
-                }
-                catch (DirectoryNotFoundException)
-                {
-                    Directory.CreateDirectory(m_BomFolderPath);
-                }
-            }
-        }
-
-        public string Sw360Token
-        {
-            get
-            {
-                return m_Sw360Token;
-            }
-            set
-            {
-                CommonHelper.CheckNullOrEmpty(nameof(Sw360Token), value);
-                m_Sw360Token = value;
-            }
-        }
-
-        public string SW360ProjectName
-        {
-            get
-            {
-                return m_SW360ProjectName;
-            }
-            set
-            {
-                CommonHelper.CheckNullOrEmpty(nameof(SW360ProjectName), value);
-                m_SW360ProjectName = value;
-            }
-        }
-
-        public string SW360ProjectID
-        {
-            get
-            {
-                return m_SW360ProjectID;
-            }
-            set
-            {
-                CommonHelper.CheckNullOrEmpty(nameof(SW360ProjectID), value);
-                m_SW360ProjectID = value;
-            }
-        }
-
         public string ProjectType
         {
             get
@@ -214,21 +61,19 @@ namespace LCT.Common
                 m_ProjectType = value;
             }
         }
-
-        public string ArtifactoryUploadApiKey
-        {
-            get
-            {
-                return m_ArtifactoryApiKey;
-            }
-            set
-            {
-                CommonHelper.CheckNullOrEmpty(nameof(ArtifactoryUploadApiKey), value);
-                m_ArtifactoryApiKey = value;
-            }
-
-        }
-
+        public bool MultipleProjectType { get; set; } = false;
+        public Telemetry Telemetry { get; set; }
+        public SW360 SW360 { get; set; }
+        public Directory Directory { get; set; }
+        public Jfrog Jfrog { get; set; }
+        public Config Npm { get; set; }
+        public Config Nuget { get; set; }
+        public Config Maven { get; set; }
+        public Config Debian { get; set; }
+        public Config Alpine { get; set; }
+        public Config Poetry { get; set; }
+        public Config Conan { get; set; }
+        public string Mode { get; set; } = string.Empty;
         public bool IsTestMode
         {
             get
@@ -237,8 +82,75 @@ namespace LCT.Common
             }
 
         }
+    }
+    public class Telemetry
+    {
+        public bool Enable { get; set; } = true;
+        public string ApplicationInsightInstrumentKey { get; set; }
+    }
+    public class SW360
+    {
+        private string m_URL;
+        private string m_Token;
+        private string m_ProjectName;
+        private string m_ProjectID;
+        public string URL
+        {
+            get
+            {
+                return m_URL;
+            }
+            set
+            {
+                if (!string.IsNullOrEmpty(value))
+                {
+                    m_URL = value.TrimEnd(Dataconstant.ForwardSlash);
+                }
+            }
+        }
+        public string ProjectName
+        {
+            get
+            {
+                return m_ProjectName;
+            }
+            set
+            {
+                m_ProjectName = value;
+            }
+        }
+        public string ProjectID
+        {
+            get
+            {
+                return m_ProjectID;
+            }
+            set
+            {
+                m_ProjectID = value;
+            }
+        }
+        public string AuthTokenType { get; set; } = "Bearer";
+        public string Token
+        {
+            get
+            {
+                return m_Token;
+            }
+            set
+            {
+                m_Token = value;
+            }
+        }
+        public Fossology Fossology { get; set; }
+        public bool IgnoreDevDependency { get; set; } = true;
+        public List<string> ExcludeComponents { get; set; }
 
-        public string Fossologyurl
+    }
+    public class Fossology
+    {
+        private string m_FOSSURL;
+        public string URL
         {
             get
             {
@@ -246,64 +158,110 @@ namespace LCT.Common
             }
             set
             {
-                if (AppDomain.CurrentDomain.FriendlyName.Contains("SW360PackageCreator"))
+                if (!AppDomain.CurrentDomain.FriendlyName.Contains("PackageIdentifier") &&
+                    !AppDomain.CurrentDomain.FriendlyName.Contains("ArtifactoryUploader"))
                 {
-                    if (string.IsNullOrEmpty(value))
-                    {
-                        throw new ArgumentNullException($"Provide a fossology url - {value}");
-                    }
-                    else
+                    if (!string.IsNullOrEmpty(value))
                     {
                         m_FOSSURL = value.TrimEnd(Dataconstant.ForwardSlash);
                     }
                 }
             }
         }
+        public bool EnableTrigger { get; set; }
+    }
 
-        public string BomFilePath
+    public class Jfrog
+    {
+        private string m_Token;
+
+        public string URL { get; set; }
+
+        public string Token
         {
             get
             {
-                return m_BomFilePath;
+                return m_Token;
             }
             set
             {
-                if (!AppDomain.CurrentDomain.FriendlyName.Contains("PackageIdentifier"))
+                CommonHelper.CheckNullOrEmpty(nameof(Token), value);
+                m_Token = value;
+            }
+        }
+
+        public bool DryRun { get; set; } = false;
+    }
+    public class Directory
+    {
+        private readonly IFolderAction folderAction;
+        private readonly IFileOperations fileOperations;
+        private string m_InputFolder;
+        private string m_OutputFolder;
+        private string m_LogFolder;
+
+        public Directory(IFolderAction folderAction, IFileOperations fileOperations)
+        {
+            this.folderAction = folderAction;
+            this.fileOperations = fileOperations;
+        }
+        public string InputFolder
+        {
+            get
+            {
+                return m_InputFolder;
+            }
+            set
+            {
+                if (!AppDomain.CurrentDomain.FriendlyName.Contains("SW360PackageCreator") &&
+                    !AppDomain.CurrentDomain.FriendlyName.Contains("ArtifactoryUploader"))
                 {
-                    m_BomFilePath = value;
-                    _fileOperations.ValidateFilePath(m_BomFilePath);
+                    folderAction.ValidateFolderPath(value);
+                    m_InputFolder = value;
                 }
             }
         }
 
-        public string SBomTemplatePath
+        public string OutputFolder
         {
             get
             {
-                return m_CycloneDxSBomTemplatePath;
+                return m_OutputFolder;
             }
             set
             {
-                m_CycloneDxSBomTemplatePath = value;
-                _fileOperations.ValidateFilePath(m_CycloneDxSBomTemplatePath);
+                try
+                {
+                    m_OutputFolder = value;
+                    folderAction.ValidateFolderPath(value);
+                }
+                catch (DirectoryNotFoundException)
+                {
+                    System.IO.Directory.CreateDirectory(m_OutputFolder);
+                }
             }
         }
 
-        public string ArtifactoryUploadUser
+        public string LogFolder
         {
             get
             {
-                return m_ArtifactoryUser;
+                return m_LogFolder;
             }
             set
             {
-                CommonHelper.CheckNullOrEmpty(nameof(ArtifactoryUploadUser), value);
-                m_ArtifactoryUser = value;
+                try
+                {
+                    m_LogFolder = value;
+                    folderAction.ValidateFolderPath(value);
+                }
+                catch (DirectoryNotFoundException)
+                {
+                    System.IO.Directory.CreateDirectory(m_LogFolder);
+                }
             }
-
         }
-
-        public bool Release { get; set; } = false;
 
     }
+
 }

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -53,5 +53,6 @@ namespace LCT.Common.Constants
         public const string NugetAssetFile = "project.assets.json";
         public const string multipleversionsFileName = "Multipleversions.json";
         public const string artifactoryReportNotApproved = "ReportNotApproved.json";
+        public const string basicSBOMName = "ContinuousClearing";
     }
 }

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -25,6 +25,6 @@ namespace LCT.PackageIdentifier.Interface
         public Task GenerateBom(CommonAppSettings appSettings, IBomHelper bomHelper, IFileOperations fileOperations,
                                 ProjectReleases projectReleases, CatoolInfo caToolInformation);
 
-        public Task<bool> CheckJFrogConnection();
+        public Task<bool> CheckJFrogConnection(CommonAppSettings appSettings);
     }
 }

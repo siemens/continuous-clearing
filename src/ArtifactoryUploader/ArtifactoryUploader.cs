@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -12,7 +12,7 @@ using LCT.ArtifactoryUploader.Model;
 using LCT.Services.Interface;
 using log4net;
 using System;
-using System.Configuration;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
@@ -24,16 +24,13 @@ namespace LCT.ArtifactoryUploader
     {
         //ConfigurationAttribute
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private static string destRepoName = Environment.GetEnvironmentVariable("JfrogDestRepoName");
-        private static string JfrogApi = Environment.GetEnvironmentVariable("JfrogApi");
-        private static string srcRepoName = Environment.GetEnvironmentVariable("JfrogSrcRepo");
         public static IJFrogService jFrogService { get; set; }
         public static IJFrogApiCommunication JFrogApiCommInstance { get; set; }
 
         public static async Task<HttpResponseMessage> UploadPackageToRepo(ComponentsToArtifactory component, int timeout, DisplayPackagesInfo displayPackagesInfo)
         {
             Logger.Debug("Starting UploadPackageToArtifactory method");
-            string operationType = component.PackageType == PackageType.ClearedThirdParty 
+            string operationType = component.PackageType == PackageType.ClearedThirdParty
                 || component.PackageType == PackageType.Development ? "copy" : "move";
             string dryRunSuffix = component.DryRun ? " dry-run" : "";
             HttpResponseMessage responsemessage = new HttpResponseMessage();
@@ -88,33 +85,16 @@ namespace LCT.ArtifactoryUploader
             return responsemessage;
         }
 
-        /// </summary>
-        public static void SetConfigurationValues()
-        {
-            if (string.IsNullOrEmpty(destRepoName))
-            {
-                destRepoName = ConfigurationManager.AppSettings["JfrogDestRepoName"];
-            }
-            if (string.IsNullOrEmpty(JfrogApi))
-            {
-                JfrogApi = ConfigurationManager.AppSettings["JfrogApi"];
-            }
-            if (string.IsNullOrEmpty(srcRepoName))
-            {
-                srcRepoName = ConfigurationManager.AppSettings["JfrogSrcRepo"];
-            }
-        }
-
         private static async Task<AqlResult> GetPackageInfoWithRetry(IJFrogService jFrogService, ComponentsToArtifactory component)
         {
             async Task<AqlResult> TryGetPackageInfo(ComponentsToArtifactory component)
                 => await jFrogService.GetPackageInfo(component);
 
-             var  packageInfo = await TryGetPackageInfo(component);
-                       
+            var packageInfo = await TryGetPackageInfo(component);
+
 
             // Handle DEBIAN package name mismatch
-            if (component.ComponentType == "DEBIAN" && packageInfo?.Name != component.JfrogPackageName)
+            if (component.ComponentType == "DEBIAN" && packageInfo != null && packageInfo.Name != component.JfrogPackageName)
             {
                 component.CopyPackageApiUrl = component.CopyPackageApiUrl.Replace(component.JfrogPackageName, packageInfo.Name);
             }
@@ -122,10 +102,10 @@ namespace LCT.ArtifactoryUploader
             // Retry with lowercase values if packageInfo is still null
             if (packageInfo == null)
             {
-                var lowerSrcRepo = component.SrcRepoName.ToLower();
-                var lowerPackageName = component.JfrogPackageName.ToLower();
-                var lowerPath = component.Path.ToLower();
-                
+                _ = component.SrcRepoName.ToLower();
+                _ = component.JfrogPackageName.ToLower();
+                _ = component.Path.ToLower();
+
 
                 packageInfo = await TryGetPackageInfo(component);
 
@@ -133,9 +113,32 @@ namespace LCT.ArtifactoryUploader
                 {
                     component.CopyPackageApiUrl = component.CopyPackageApiUrl.ToLower();
                 }
-            }          
+            }
 
             return packageInfo;
+        }
+        public static string GettPathForArtifactoryUpload()
+        {
+            string localPathforartifactory = string.Empty;
+            try
+            {
+                String Todaysdate = DateTime.Now.ToString("dd-MM-yyyy_ss");
+                localPathforartifactory = $"{Directory.GetParent(Directory.GetCurrentDirectory())}\\ClearingTool\\ArtifactoryFiles\\{Todaysdate}\\";
+                if (!Directory.Exists(localPathforartifactory))
+                {
+                    localPathforartifactory = Directory.CreateDirectory(localPathforartifactory).ToString();
+                }
+            }
+            catch (IOException ex)
+            {
+                Logger.Error($"GettPathForArtifactoryUpload() ", ex);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                Logger.Error($"GettPathForArtifactoryUpload() ", ex);
+            }
+
+            return localPathforartifactory;
         }
 
     }

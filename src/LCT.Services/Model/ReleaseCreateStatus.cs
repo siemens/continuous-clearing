@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -19,5 +19,6 @@ namespace LCT.Services.Model
         public string ReleaseIdToLink { get; set; }
 
         public string AttachmentApiUrl { get; set; }
+        public bool ReleaseAlreadyExist { get; set; } = false;
     }
 }

@@ -1,11 +1,10 @@
 // --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.APICommunications;
-using LCT.PackageIdentifier;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using System.IO;
@@ -21,7 +20,7 @@ namespace LCT.PackageIdentifier.UTest
         {
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string CCTComparisonBomTestFile = outFolder + @"\PackageIdentifierUTTestFiles\CycloneDX_Debian.cdx.json";
+            string CCTComparisonBomTestFile = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles", "CycloneDX_Debian.cdx.json"));
 
             string json = "";
             if (File.Exists(CCTComparisonBomTestFile))
@@ -41,7 +40,7 @@ namespace LCT.PackageIdentifier.UTest
         {
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string filepath = outFolder + @"\PackageIdentifierUTTestFiles\SW360ProjectInfo.xml";
+            string filepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles", "SW360ProjectInfo.xml"));
 
             string expectedproject_id = "42e86178b3b4fe8b8623788052002a6c";
             string expectedprojectname = "CCT";

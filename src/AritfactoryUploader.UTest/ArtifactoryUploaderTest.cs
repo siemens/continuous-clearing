@@ -1,27 +1,27 @@
 // --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using LCT.APICommunications;
 using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
-using Moq;
-using System.Net;
-using LCT.ArtifactoryUploader;
-using System.Net.Http;
-using NUnit.Framework;
-using System.Threading.Tasks;
-using LCT.APICommunications;
-using LCT.Common;
-using LCT.Facade.Interfaces;
-using LCT.Facade;
-using LCT.Services.Interface;
-using LCT.Services;
-using UnitTestUtilities;
-using LCT.ArtifactoryUploader.Model;
 using LCT.APICommunications.Model.AQL;
+using LCT.ArtifactoryUploader;
+using LCT.ArtifactoryUploader.Model;
+using LCT.Common;
+using LCT.Facade;
+using LCT.Facade.Interfaces;
+using LCT.Services;
+using LCT.Services.Interface;
+using Moq;
+using NUnit.Framework;
 using System;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
+using UnitTestUtilities;
 
 namespace AritfactoryUploader.UTest
 {
@@ -33,18 +33,20 @@ namespace AritfactoryUploader.UTest
         {
             // Method intentionally left empty.
         }
- 
+
 
         [Test]
         public async Task UploadPackageToRepo_InputEmptyCreds_ReturnsPackgeNotFound()
         {
             //Arrange
-            CommonAppSettings appSettings = new CommonAppSettings()
+            CommonAppSettings appSettings = new CommonAppSettings();
+            appSettings.Jfrog = new Jfrog()
             {
-                JFrogApi = UTParams.JFrogURL
+                URL = UTParams.JFrogURL
             };
+
             ArtfactoryUploader.jFrogService = GetJfrogService(appSettings);
-            DisplayPackagesInfo displayPackagesInfo = PackageUploadHelper.GetComponentsToBePackages();
+            DisplayPackagesInfo displayPackagesInfo = PackageUploadInformation.GetComponentsToBePackages();
             var componentsToArtifactory = new ComponentsToArtifactory
             {
                 Name = "html5lib",
@@ -56,8 +58,7 @@ namespace AritfactoryUploader.UTest
                 SrcRepoPathWithFullName = "org1-pythonhosted-pypi-remote-cache/6c/dd/a834df6482147d48e225a49515aabc28974ad5a4ca3215c18a882565b028/html5lib-1.1-py2.py3-none-any.whl",
                 PypiOrNpmCompName = "html5lib-1.1-py2.py3-none-any.whl",
                 DestRepoName = "pypi-test",
-                ApiKey = "",
-                Email = "",
+                Token = "",
                 CopyPackageApiUrl = "https://abc.jfrog.io/artifactory/api/copy/org1-pythonhosted-pypi-remote-cache/6c/dd/a834df6482147d48e225a49515aabc28974ad5a4ca3215c18a882565b028/html5lib-1.1-py2.py3-none-any.whl?to=/pypi-test/html5lib-1.1-py2.py3-none-any.whl&dry=1",
                 Path = "",
                 DryRun = true,
@@ -72,27 +73,14 @@ namespace AritfactoryUploader.UTest
 
         }
 
-        [Test]
-        public void SetConfigurationValues_InputEmptyCreds_ReturnsVoid()
-        {
-            //Arrange
-            bool returnValue = true;
-
-            //Act
-            ArtfactoryUploader.SetConfigurationValues();
-
-            //Assert
-            Assert.That(returnValue, Is.True);
-        }
-
         private static IJFrogService GetJfrogService(CommonAppSettings appSettings)
         {
             ArtifactoryCredentials artifactoryUpload = new ArtifactoryCredentials()
             {
-                ApiKey = appSettings.ArtifactoryUploadApiKey
+                Token = appSettings.Jfrog.Token
             };
             IJfrogAqlApiCommunication jfrogAqlApiCommunication =
-                new JfrogAqlApiCommunication(appSettings.JFrogApi, artifactoryUpload, appSettings.TimeOut);
+                new JfrogAqlApiCommunication(appSettings.Jfrog.URL, artifactoryUpload, appSettings.TimeOut);
             IJfrogAqlApiCommunicationFacade jFrogApiCommunicationFacade =
                 new JfrogAqlApiCommunicationFacade(jfrogAqlApiCommunication);
             IJFrogService jFrogService = new JFrogService(jFrogApiCommunicationFacade);
@@ -129,8 +117,7 @@ namespace AritfactoryUploader.UTest
             var component = new ComponentsToArtifactory
             {
                 PackageType = PackageType.ClearedThirdParty,
-                ApiKey = "apiKey",
-                Email = "test@example.com"
+                Token = "apiKey"
             };
             component.SrcRepoName = "";
             component.DestRepoName = "";
@@ -147,7 +134,7 @@ namespace AritfactoryUploader.UTest
             ArtfactoryUploader.jFrogService = jFrogServiceMock.Object;
             ArtfactoryUploader.JFrogApiCommInstance = jfrogApicommunicationMock.Object;
             // Act
-            _= await ArtfactoryUploader.UploadPackageToRepo(component, timeout, displayPackagesInfo);
+            _ = await ArtfactoryUploader.UploadPackageToRepo(component, timeout, displayPackagesInfo);
 
             // Assert
             jfrogApicommunicationMock.Verify(x => x.CopyFromRemoteRepo(component), Times.Once);
@@ -160,8 +147,7 @@ namespace AritfactoryUploader.UTest
             var component = new ComponentsToArtifactory
             {
                 PackageType = PackageType.Internal,
-                ApiKey = "apiKey",
-                Email = "test@example.com"
+                Token = "apiKey"
             };
             component.SrcRepoName = "";
             component.DestRepoName = "";
@@ -192,8 +178,7 @@ namespace AritfactoryUploader.UTest
             var component = new ComponentsToArtifactory
             {
                 PackageType = PackageType.Unknown,
-                ApiKey = "apiKey",
-                Email = "test@example.com"
+                Token = "apiKey"
             };
             component.SrcRepoName = "";
             component.DestRepoName = "";
@@ -216,8 +201,7 @@ namespace AritfactoryUploader.UTest
             var component = new ComponentsToArtifactory
             {
                 PackageType = PackageType.Unknown,
-                ApiKey = "apiKey",
-                Email = "test@example.com"
+                Token = "apiKey"
             };
             component.SrcRepoName = "";
             component.DestRepoName = "";
@@ -246,8 +230,7 @@ namespace AritfactoryUploader.UTest
             var component = new ComponentsToArtifactory
             {
                 PackageType = PackageType.Unknown,
-                ApiKey = "apiKey",
-                Email = "test@example.com"
+                Token = "apiKey"
             };
             component.SrcRepoName = "";
             component.DestRepoName = "";

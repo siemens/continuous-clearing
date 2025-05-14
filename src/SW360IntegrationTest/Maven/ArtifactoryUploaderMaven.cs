@@ -22,33 +22,31 @@ namespace SW360IntegrationTest.Maven
         public void TestArtifactoryUploaderexe()
         {
             OutFolder = TestHelper.OutFolder;
-            string comparisonBOMPath = OutFolder + @"\..\..\TestFiles\MavenTestFile\ArtifactoryUploaderTestData\MavenComparisonBOM.json";
 
             int result = TestHelper.RunArtifactoryUploaderExe(new string[]{
-                TestConstant.BomFilePath, comparisonBOMPath,
+                TestConstant.BomFolderPath, Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "TestFiles", "MavenTestFile", "ArtifactoryUploaderTestData")),
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
-                TestConstant.ArtifactoryUser, testParameters.ArtifactoryUploadUser,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
                 TestConstant.JfrogMavenThirdPartyDestRepoName,testParameters.ThirdPartyDestinationRepoName,
                 TestConstant.JfrogMavenDevDestRepoName,testParameters.DevDestinationRepoName,
                 TestConstant.JfrogMavenInternalDestRepoName,testParameters.InternalDestinationRepoName,
                 TestConstant.JFrogApiURL,testParameters.JfrogApi,
-                TestConstant.Release, false.ToString()
+                TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
+                TestConstant.DryRun, false.ToString()
             });
 
             // Test BOM Creator ran with exit code 0 or 2 (Warning)
             Assert.IsTrue(result == 0 || result == 2,
                 "Test to run Artifactory Uploader EXE execution");
         }
+
         [Test, Order(2)]
         public void ComponentUpload_IsUnsuccessful_AlreadyPresentInDestination()
         {
             OutFolder = TestHelper.OutFolder;
-            string comparisonBOMPath = OutFolder + @"\..\..\TestFiles\MavenTestFile\ArtifactoryUploaderTestData\MavenComparisonBOM.json";
+            string comparisonBOMPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "TestFiles", "MavenTestFile", "ArtifactoryUploaderTestData", "Test_Bom.cdx.json"));
             if (File.Exists(comparisonBOMPath))
             {
-
-
                 ComponentJsonParsor expected = new ComponentJsonParsor();
                 expected.Read(comparisonBOMPath);
 

@@ -1,11 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // --------------------------------------------------------------------------------------------------------------------
 
 using LCT.Common.Interface;
-using System;
 using System.IO;
 using Tommy;
 
@@ -23,7 +22,7 @@ namespace LCT.Common
                 table = TOML.Parse(reader);
                 return table;
             }
-            catch(TomlParseException)
+            catch (TomlParseException)
             {
                 return new TomlTable();
             }

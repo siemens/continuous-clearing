@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // --------------------------------------------------------------------------------------------------------------------
@@ -8,8 +8,10 @@ using CycloneDX.Models;
 using LCT.Common;
 using LCT.Common.Constants;
 using log4net;
+using log4net.Core;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -19,6 +21,28 @@ namespace LCT.PackageIdentifier
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
+        public static void ProcessTemplateFile(string templateFilePath, ICycloneDXBomParser cycloneDXBomParser, List<Component> componentsForBOM, string projectType)
+        {
+            if (File.Exists(templateFilePath) && templateFilePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+            {
+                Bom templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(templateFilePath));
+                CycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, projectType);
+                AddComponentDetails(componentsForBOM, templateDetails);
+            }
+        }
+        public static string GetFilePathForTemplate(List<string> filePaths)
+        {
+            string firstFilePath = string.Empty;
+            if (filePaths != null && filePaths.Any())
+            {
+                firstFilePath = filePaths.First();
+                if (filePaths.Count > 1)
+                {
+                    Logger.Logger.Log(null, Level.Alert, "Multiple Template files are given", null);
+                }
+            }
+            return firstFilePath;
+        }
         public static void AddComponentDetails(List<Component> bom, Bom sbomdDetails)
         {
             if (sbomdDetails.Components == null)

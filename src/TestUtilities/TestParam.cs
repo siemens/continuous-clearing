@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -15,9 +15,9 @@ namespace TestUtilities
         static readonly IConfiguration s_Config =
          new ConfigurationBuilder().AddJsonFile(@"appSettingsSW360IntegrationTest.json", true, true).Build();
 
-        public string SW360AuthTokenType { get; set; } 
-        public string SW360AuthTokenValue { get; set; } 
-        public string SW360URL { get; set; } 
+        public string SW360AuthTokenType { get; set; }
+        public string SW360AuthTokenValue { get; set; }
+        public string SW360URL { get; set; }
         public string FossUrl { get; set; }
         public string SW360ProjectName { get; set; }
         public string SW360ProjectID { get; set; }
@@ -29,6 +29,8 @@ namespace TestUtilities
         public string ThirdPartyDestinationRepoName { get; set; }
         public string InternalDestinationRepoName { get; set; }
         public string DevDestinationRepoName { get; set; }
+        public string FossologyTrigger { get; set; }
+        public string TelemetryEnable { get; set; }
 
         public TestParam()
         {
@@ -46,6 +48,8 @@ namespace TestUtilities
             ThirdPartyDestinationRepoName = "npm-test";
             InternalDestinationRepoName = "npm-test";
             DevDestinationRepoName = "npm-test";
+            FossologyTrigger = s_Config["EnableFossologyTrigger"];
+            TelemetryEnable = s_Config["TelemetryEnable"];
         }
     }
 }

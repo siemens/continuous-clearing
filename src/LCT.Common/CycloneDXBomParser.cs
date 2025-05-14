@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -8,7 +8,6 @@ using CycloneDX.Json;
 using CycloneDX.Models;
 using LCT.Common.Constants;
 using log4net;
-using log4net.Core;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -27,8 +26,16 @@ namespace LCT.Common
             string json = string.Empty;
             try
             {
-                json = File.ReadAllText(filePath);
-                bom = JsonConvert.DeserializeObject<Bom>(json);
+                if (File.Exists(filePath))
+                {
+                    json = File.ReadAllText(filePath);
+                    bom = JsonConvert.DeserializeObject<Bom>(json);
+                }
+                else
+                {
+                    Logger.Error($"File not found: {filePath}. Please provide a valid file path.");
+                }
+
             }
             catch (JsonSerializationException)
             {

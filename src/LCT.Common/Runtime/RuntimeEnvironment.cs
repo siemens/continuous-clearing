@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -16,13 +16,13 @@ namespace LCT.Common.Runtime
             // Azure Release Pipeline contains both "Release_ReleaseId" and
             // "Build_BuildId". Therefore we need to check first for "Release_ReleaseId".
             // https://docs.microsoft.com/en-us/azure/devops/pipelines/release/variables
-            if (IsEnvironmentVariableDefined("Release_ReleaseId"))
+            if (IsEnvironmentVariableDefined("RELEASE_RELEASEID"))
             {
                 return EnvironmentType.AzureRelease;
             }
 
             // https://docs.microsoft.com/en-us/azure/devops/pipelines/build/variables
-            if (IsEnvironmentVariableDefined("Build_BuildId"))
+            if (IsEnvironmentVariableDefined("BUILD_BUILDID"))
             {
                 return EnvironmentType.AzurePipeline;
             }
