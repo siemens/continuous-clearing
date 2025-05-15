@@ -25,6 +25,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Directory = System.IO.Directory;
 
@@ -41,7 +42,7 @@ namespace LCT.PackageIdentifier
 
         public static Stopwatch BomStopWatch { get; set; }
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
+        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();        
         protected Program() { }
 
         static async Task Main(string[] args)
@@ -52,17 +53,17 @@ namespace LCT.PackageIdentifier
             if (!m_Verbose && CommonHelper.IsAzureDevOpsDebugEnabled())
                 m_Verbose = true;
             ISettingsManager settingsManager = new SettingsManager();
-            CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
-            ProjectReleases projectReleases = new ProjectReleases();
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
-            string FolderPath = LogFolderInitialisation(appSettings);
+            CommonHelper.DefaultLogFolderInitialisation(FileConstant.BomCreatorLog, m_Verbose);
+            CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
+            
+            ProjectReleases projectReleases = new ProjectReleases();
 
-            Logger.Logger.Log(null, Level.Notice, $"====================<<<<< Package Identifier >>>>>====================", null);
-            string operatingSystem = RuntimeInformation.OSDescription;
-            Logger.Debug($"Application started on {operatingSystem} operating system\n");
-            LogHandling.LogCommandLineArguments(args);
+            string FolderPath = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.BomCreatorLog, m_Verbose);
+            Logger.Logger.Log(null, Level.Debug, $"log manager initiated folder path: {FolderPath}", null);
+            settingsManager.CheckRequiredArgsToRun(appSettings, "Identifer");
 
             Logger.Logger.Log(null, Level.Notice, $"\nStart of Package Identifier execution: {DateTime.Now}", null);
 
@@ -102,10 +103,6 @@ namespace LCT.PackageIdentifier
                 await bomCreator.GenerateBom(appSettings, new BomHelper(), new FileOperations(), projectReleases,
                                              caToolInformation);
             }
-            else
-            {
-                environmentHelper.CallEnvironmentExit(-1);
-            }
 
             if (appSettings?.Telemetry?.Enable == true)
             {
@@ -129,12 +126,18 @@ namespace LCT.PackageIdentifier
 
         private static IJFrogService GetJfrogService(CommonAppSettings appSettings)
         {
+            if (appSettings == null)
+            {
+                Logger.Error("Application settings are missing. Please ensure the following:\n" +
+                     "1. Provide a valid settings file (e.g., appsettings.json) in the expected location.\n" +
+                     "2. Alternatively, pass the required configuration settings as inline arguments during application execution.");
+            }
             ArtifactoryCredentials artifactoryUpload = new ArtifactoryCredentials()
             {
-                Token = appSettings?.Jfrog?.Token,
+                Token = appSettings.Jfrog?.Token,
             };
             IJfrogAqlApiCommunication jfrogAqlApiCommunication =
-                new JfrogAqlApiCommunication(appSettings?.Jfrog?.URL, artifactoryUpload, appSettings.TimeOut);
+                new JfrogAqlApiCommunication(appSettings.Jfrog?.URL, artifactoryUpload, appSettings.TimeOut);
             IJfrogAqlApiCommunicationFacade jFrogApiCommunicationFacade =
                 new JfrogAqlApiCommunicationFacade(jfrogAqlApiCommunication);
             IJFrogService jFrogService = new JFrogService(jFrogApiCommunicationFacade);
@@ -158,34 +161,8 @@ namespace LCT.PackageIdentifier
             {
                 environmentHelper.CallEnvironmentExit(-1);
             }
-            Logger.Debug("ValidateAppsettingsFile():Validation of SW360 details has completed.\n");
         }
 
-        private static string LogFolderInitialisation(CommonAppSettings appSettings)
-        {
-            string FolderPath;
-            Log4Net.AppendVerboseValue(appSettings);
-            string logFileNameWithTimestamp = $"{FileConstant.BomCreatorLog}_{DateTime.Now:yyyyMMdd_HHmmss}.log";
-            if (!string.IsNullOrEmpty(appSettings.Directory.LogFolder))
-            {
-                FolderPath = appSettings.Directory.LogFolder;
-                Log4Net.Init(logFileNameWithTimestamp, appSettings.Directory.LogFolder, m_Verbose);
-            }
-            else
-            {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    FolderPath = FileConstant.LogFolder;
-                }
-                else
-                {
-                    FolderPath = "/var/log";
-                }
-
-                Log4Net.Init(logFileNameWithTimestamp, FolderPath, m_Verbose);
-            }
-
-            return FolderPath;
-        }
+       
     }
 }

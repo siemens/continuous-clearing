@@ -28,32 +28,40 @@ namespace LCT.APICommunications
                 .OrResult<HttpResponseMessage>(r =>
                     (r.StatusCode == HttpStatusCode.RequestTimeout
                     || r.StatusCode == HttpStatusCode.NotAcceptable
+                    || r.StatusCode == HttpStatusCode.BadRequest
                     || (int)r.StatusCode >= 500)
                     && r.StatusCode != HttpStatusCode.Unauthorized
                     && r.StatusCode != HttpStatusCode.Forbidden)
                 .WaitAndRetryAsync(ApiConstant.APIRetryIntervals.Count,
-                     GetRetryInterval,
-                    onRetry: (outcome, timespan, attempt, context) =>
-                    {
-                        var httpMethod = context.ContainsKey("HttpMethod") ? context["HttpMethod"] : "Unknown Method";
-                        var requestUri = context.ContainsKey("RequestUri") ? context["RequestUri"] : "Unknown URI";
-                        if (!_initialRetryLogged && context["LogWarnings"] as bool? != false)
-                        {
-                            Logger.Warn($"Retry attempt triggered for this URL {requestUri} due to : {(outcome.Exception != null ? outcome.Exception.Message : $"{outcome.Result.StatusCode}")}");
-                        }
-                        Logger.Debug($"Retry attempt {attempt} for {httpMethod} method this URL {requestUri} : {(outcome.Exception != null ? outcome.Exception.Message : $"{outcome.Result.StatusCode}")}");
-                        context["RetryAttempt"] = attempt;
-                        _initialRetryLogged = true;
+                    GetRetryInterval,
+                    OnRetry);
+        }
 
-                    });
+        private void OnRetry(DelegateResult<HttpResponseMessage> outcome, TimeSpan timespan, int attempt, Context context)
+        {
+            var httpMethod = context.ContainsKey("HttpMethod") ? context["HttpMethod"] : "Unknown Method";
+            var requestUri = context.ContainsKey("RequestUri") ? context["RequestUri"] : "Unknown URI";
+            var operationInfo = context.ContainsKey("OperationInfo") ? context["OperationInfo"] : requestUri;
+
+
+            Logger.Debug($"Retry attempt {attempt} for {httpMethod} method this URL {requestUri} : {(outcome.Exception != null ? outcome.Exception.Message : $"{outcome.Result.StatusCode}")}");
+
+            if (!_initialRetryLogged && context["LogWarnings"] as bool? != false)
+            {
+                Logger.Warn($"Retry attempt triggered for {operationInfo}: {(outcome.Exception != null ? outcome.Exception.Message : $"{outcome.Result.StatusCode}")}");
+            }
+
+            context["RetryAttempt"] = attempt;
+            _initialRetryLogged = true;
         }
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, System.Threading.CancellationToken cancellationToken)
         {
             var context = new Context
             {
-                ["LogWarnings"] = !request.Headers.TryGetValues("LogWarnings", out var logWarningsValues) || !bool.TryParse(logWarningsValues.FirstOrDefault(), out var logWarnings) || logWarnings,
+                ["LogWarnings"] = request.Headers.TryGetValues("LogWarnings", out var logWarningsValues) && bool.TryParse(logWarningsValues.FirstOrDefault(), out var logWarnings) ? logWarnings : default,
                 ["HttpMethod"] = request.Method.ToString(),
-                ["RequestUri"] = request.RequestUri?.ToString()
+                ["RequestUri"] = request.RequestUri?.ToString(),
+                ["OperationInfo"] = request.Headers.TryGetValues("urlInfo", out var operationInfoValues) ? operationInfoValues.FirstOrDefault() : ""
             };
 
             var response = await _retryPolicy.ExecuteAsync(async (ctx) =>

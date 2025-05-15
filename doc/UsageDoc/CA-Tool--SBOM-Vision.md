@@ -55,3 +55,4 @@ BOM generated from the Continuous Clearing Tool will have all the dependencies i
    
 3. After CATool final execution Standard SBOM should generate & send it for JFrog XRay & Siemens AG SBOM Service
 
+Copyright © Siemens AG ▪ 2025

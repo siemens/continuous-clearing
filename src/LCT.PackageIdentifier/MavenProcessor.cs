@@ -55,6 +55,7 @@ namespace LCT.PackageIdentifier
                 if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     Bom bomList = ParseCycloneDXBom(filepath);
+
                     if (bomList?.Components != null)
                     {
                         CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
@@ -116,10 +117,48 @@ namespace LCT.PackageIdentifier
                 AddSiemensDirectProperty(ref bom);
             }
             bom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(bom.Components, bom.Dependencies);
+            RemoveTypeJarSuffix(bom);
             Logger.Debug($"ParsePackageFile():Completed parsing the package file.\n");
             return bom;
         }
+        private static void RemoveTypeJarSuffix(Bom bom)
+        {
+            const string suffix = Dataconstant.TypeJarSuffix;
 
+            foreach (var component in bom?.Components ?? Enumerable.Empty<Component>())
+            {
+                component.BomRef = RemoveSuffix(component.BomRef, suffix);
+                component.Purl = RemoveSuffix(component.Purl, suffix);
+            }
+
+            foreach (var dependency in bom?.Dependencies ?? Enumerable.Empty<Dependency>()) 
+            {
+                RemoveTypeJarSuffixFromDependency(dependency);
+            }
+        }
+        private static void RemoveTypeJarSuffixFromDependency(Dependency dependency)
+        {
+            const string suffix = Dataconstant.TypeJarSuffix;
+            if (!string.IsNullOrEmpty(dependency.Ref) && dependency.Ref.EndsWith(suffix))
+            {
+                dependency.Ref = dependency.Ref[..^suffix.Length];
+            }
+
+            // Recursively process nested dependencies
+            if (dependency.Dependencies != null && dependency.Dependencies.Count != 0)
+            {
+                foreach (var nestedDependency in dependency.Dependencies)
+                {
+                    RemoveTypeJarSuffixFromDependency(nestedDependency);
+                }
+            }
+        }
+        private static string RemoveSuffix(string value, string suffix)
+        {
+            return !string.IsNullOrEmpty(value) && value.EndsWith(suffix)
+                ? value[..^suffix.Length]
+                : value;
+        }
         public void AddSiemensDirectProperty(ref Bom bom)
         {
             List<string> mavenDirectDependencies = new List<string>();

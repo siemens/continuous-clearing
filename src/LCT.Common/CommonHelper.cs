@@ -11,9 +11,12 @@ using log4net;
 using log4net.Core;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace LCT.Common
 {
@@ -23,7 +26,9 @@ namespace LCT.Common
     public static class CommonHelper
     {
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly char[] InvalidProjectNameChars = new char[] { '/', '\\', '.' };
         public static string ProjectSummaryLink { get; set; }
+        public static string DefaultLogPath { get; set; }
 
         #region public
         public static bool IsAzureDevOpsDebugEnabled()
@@ -278,6 +283,127 @@ namespace LCT.Common
             }
 
             return Array.Empty<string>();
+        }        
+        public static string LogFolderInitialisation(CommonAppSettings appSettings, string logFileName, bool m_Verbose)
+        {
+            string FolderPath = DefaultLogPath;
+            if (!string.IsNullOrEmpty(appSettings.Directory.LogFolder))
+            {
+                string defaultLogFilePath = Log4Net.CatoolLogPath;
+
+                if (File.Exists(defaultLogFilePath))
+                {
+                    LoggerManager.Shutdown();
+                    FolderPath = appSettings.Directory.LogFolder;
+                    Log4Net.Init(logFileName, appSettings.Directory.LogFolder, m_Verbose);
+                    string currentLogFilePath = Log4Net.CatoolLogPath;
+                    string currentlogFileName = Path.GetFileName(Log4Net.CatoolLogPath);
+                    LoggerManager.Shutdown();
+                    try
+                    {
+                        File.Copy(defaultLogFilePath, currentLogFilePath, overwrite: true);
+                    }
+                    catch (IOException ioEx)
+                    {
+                        Logger.Debug($"IO Exception during log file copy: {ioEx.Message}");
+                    }
+                    catch (UnauthorizedAccessException uaEx)
+                    {
+                        Logger.Debug($"Unauthorized Access Exception during log file copy: {uaEx.Message}");
+                    }
+                    Thread.Sleep(2000);
+                    Log4Net.Init(currentlogFileName, FolderPath, m_Verbose);
+                }
+                else
+                {
+                    FolderPath = appSettings.Directory.LogFolder;
+                    Log4Net.Init(logFileName, appSettings.Directory.LogFolder, m_Verbose);
+                }
+            }
+            return FolderPath;
+        }        
+        public static void DefaultLogFolderInitialisation(string logFileName, bool m_Verbose)
+        {
+            string FolderPath;
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                FolderPath = FileConstant.LogFolder;
+            }
+            else
+            {
+                FolderPath = "/var/log";
+            }
+            Log4Net.Init(logFileName, FolderPath, m_Verbose);
+            DefaultLogPath = FolderPath;
+        }
+        public static bool ContainsInvalidCharacters(string projectName, out string invalidChars)
+        {
+            var foundInvalidChars = projectName.Where(c => InvalidProjectNameChars.Contains(c))
+                                             .Distinct()
+                                             .ToList();
+
+            invalidChars = string.Join(", ", foundInvalidChars.Select(c => $"'{c}'"));
+            return foundInvalidChars.Count != 0;
+        }        
+        public static int ValidateSw360Project(string sw360ProjectName, string clearingState, string Name, CommonAppSettings appSettings)
+        {
+            if (string.IsNullOrEmpty(sw360ProjectName))
+            {
+                throw new InvalidDataException($"Invalid Project Id - {appSettings.SW360.ProjectID}");
+            }
+            else if (ContainsInvalidCharacters(Name, out string invalidChars))
+            {
+                Logger.Error($"Invalid characters ({invalidChars}) found in SW360 project name '{Name}'. Create or rename project name without using these characters: '/', '\\', '.'");
+                Logger.Debug($"ValidateAppSettings(): Project name validation failed for '{sw360ProjectName}' due to invalid characters: {invalidChars}");
+                return -1;
+            }
+            else if (clearingState == "CLOSED")
+            {
+                Logger.Error($"Provided Sw360 project is not in active state. Please make sure you added the correct project details that are in an active state.");
+                Logger.Debug($"ValidateSw360Project(): Sw360 project {Name} is in {clearingState} state.");
+                return -1;
+            }
+            else
+            {
+                appSettings.SW360.ProjectName = sw360ProjectName;
+            }
+            return 0;
+        }
+        public static string[] MaskSensitiveArguments(string[] args)
+        {
+            if (args == null || args.Length == 0)
+            {
+                Logger.Debug("MaskSensitiveArguments(): No arguments passed to the method.");
+                return Array.Empty<string>();
+            }
+
+            string[] maskedArgs = new string[args.Length];
+            bool skipNext = false; // Flag to skip processing the next argument
+
+            for (int i = 0; i < args.Length; i++)
+            {
+                if (skipNext)
+                {
+                    skipNext = false;
+                    continue;
+                }
+                if (args[i].Equals("--SW360:Token", StringComparison.OrdinalIgnoreCase) ||
+                    args[i].Equals("--Jfrog:Token", StringComparison.OrdinalIgnoreCase))
+                {
+                    maskedArgs[i] = args[i];
+                    if (i + 1 < args.Length)
+                    {
+                        maskedArgs[i + 1] = "******";
+                        skipNext = true; 
+                    }
+                }
+                else
+                {
+                    maskedArgs[i] = args[i]; 
+                }
+            }
+
+            return maskedArgs;
         }
         #endregion
 

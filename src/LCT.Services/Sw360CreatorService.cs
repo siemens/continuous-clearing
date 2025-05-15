@@ -188,6 +188,7 @@ namespace LCT.Services
                     releaseId = await GetReleaseIdToLinkToProject(componentInfo.Name, componentInfo.Version, componentInfo.ReleaseExternalId, componentId);
                     Logger.Debug($"CreateReleaseForComponent():Release already exists for component -->" +
                         $"{componentInfo.Name} - {componentInfo.Version}. No changes made by tool");
+                    createStatus.ReleaseAlreadyExist = true;
                 }
                 else
                 {
@@ -200,7 +201,7 @@ namespace LCT.Services
                         $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
                 }
 
-                Logger.Debug($"Component Name -{componentInfo.Name}{componentInfo.Version} : Release Id :{releaseId}");
+                Logger.Debug($"Component Name -{componentInfo.Name},Version :{componentInfo.Version} , Release Id :{releaseId}");
                 createStatus.ReleaseIdToLink = releaseId;
             }
             catch (HttpRequestException e)

@@ -140,7 +140,7 @@ namespace LCT.APICommunications
             }
         }
 
-        private static string BuildAqlQuery(ComponentsToArtifactory component)
+        public static string BuildAqlQuery(ComponentsToArtifactory component)
         {
 
             if (component.ComponentType.Equals("NPM", StringComparison.InvariantCultureIgnoreCase))
@@ -169,6 +169,23 @@ namespace LCT.APICommunications
                 // Build the AQL query string
                 StringBuilder query = new();
                 query.Append($"items.find({{{string.Join(", ", queryList)}}}).include(\"repo\", \"path\", \"name\")");
+
+                return query.ToString();
+            }
+            else if (component.ComponentType.Equals("Nuget", StringComparison.InvariantCultureIgnoreCase))
+            {
+                // Build the AQL query for NuGet components
+                StringBuilder query = new();
+                query.Append("items.find({");
+                query.Append("\"$and\": [");
+                query.Append($"{{ \"repo\":{{ \"$eq\": \"{component.SrcRepoName}\" }} }},");
+                query.Append("{ \"$or\":[");
+                query.Append($"{{ \"@nuget.id\":{{ \"$eq\": \"{component.Name}\" }} }} ,");
+                query.Append($"{{ \"@nuget.id\":{{ \"$eq\": \"{component.Name.ToLowerInvariant()}\" }} }}");
+                query.Append("] },");
+                query.Append($"{{ \"@nuget.version\":{{\"$eq\": \"{component.Version}\" }} }}");
+                query.Append(']');
+                query.Append("}).include(\"repo\", \"path\", \"name\").limit(1)");
 
                 return query.ToString();
             }

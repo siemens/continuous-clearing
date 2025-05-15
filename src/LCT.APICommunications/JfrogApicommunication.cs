@@ -46,6 +46,7 @@ namespace LCT.APICommunications
         public async Task<HttpResponseMessage> DeletePackageFromJFrogRepo(string repoName, string componentName)
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
+            httpClient.SetLogWarnings(false, "unable to delete package from jfrog repository");
             string url = $"{DomainName}/{repoName}/{componentName}";
             return await httpClient.DeleteAsync(url);
         }

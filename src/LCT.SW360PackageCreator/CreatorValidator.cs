@@ -18,7 +18,6 @@ using LCT.SW360PackageCreator.Model;
 using log4net;
 using Newtonsoft.Json;
 using System;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
@@ -39,22 +38,7 @@ namespace LCT.SW360PackageCreator
             Logger.Debug("ValidateAppSettings():Validation of SW360 details has started.");
             string sw360ProjectName = await sw360ProjectService.GetProjectNameByProjectIDFromSW360(appSettings.SW360.ProjectID, appSettings.SW360.ProjectName, projectReleases);
 
-            if (string.IsNullOrEmpty(sw360ProjectName))
-            {
-                throw new InvalidDataException($"Invalid Project Id - {appSettings.SW360.ProjectID}");
-            }
-            else if (projectReleases?.clearingState == "CLOSED")
-            {
-                Logger.Error($"Provided Sw360 project is not in active state ,Please make sure you added the correct project details that is in active state..");
-                LogHandling.BasicErrorHandelingForLog("Validation failed: SW360 project is not in an active state", "ValidateAppSettings()", $"SW360 project '{projectReleases.Name}' is in a '{projectReleases.clearingState}' state.", "Please make sure you added the correct project details that is in active state..");
-                return -1;
-            }
-            else
-            {
-                appSettings.SW360.ProjectName = sw360ProjectName;
-            }
-            Logger.Debug("ValidateAppSettings():Validation of SW360 details has completed.");
-            return 0;
+            return CommonHelper.ValidateSw360Project(sw360ProjectName, projectReleases?.clearingState, projectReleases?.Name, appSettings);
         }
         public static async Task TriggerFossologyValidation(CommonAppSettings appSettings, ISW360ApicommunicationFacade sW360ApicommunicationFacade)
         {
@@ -79,8 +63,7 @@ namespace LCT.SW360PackageCreator
             }
             catch (AggregateException ex)
             {
-                Logger.Error($"TriggerFossologyValidation(): An error occurred during the Fossology validation process.{ex.Message}");
-                LogHandling.HttpErrorHandelingForLog("Fossology Validation", "TriggerFossologyValidation()", ex, "Check the inner exceptions for more details about the error.");
+                Logger.Debug($"\tError in TriggerFossologyValidation--{ex}");
             }
             catch (Exception ex)
             {
@@ -199,7 +182,6 @@ namespace LCT.SW360PackageCreator
                 environmentHelper.CallEnvironmentExit(-1);
                 return false;
             }
-
             url = url.ToLower();
             string prodFossUrl = Dataconstant.ProductionFossologyURL.ToLower();
             string stageFossUrl = Dataconstant.StageFossologyURL.ToLower();

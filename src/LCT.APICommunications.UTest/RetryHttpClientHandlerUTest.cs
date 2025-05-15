@@ -66,7 +66,7 @@ namespace LCT.APICommunications.UTest
                     "SendAsync",
                     ItExpr.IsAny<HttpRequestMessage>(),
                     ItExpr.IsAny<CancellationToken>())
-                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.BadRequest));
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.Conflict));
 
             var retryHandler = new RetryHttpClientHandler
             {
@@ -79,7 +79,7 @@ namespace LCT.APICommunications.UTest
             var response = await httpClient.GetAsync("http://test.com");
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.AreEqual(HttpStatusCode.Conflict, response.StatusCode);
             handlerMock.Protected().Verify(
                 "SendAsync",
                 Times.Once(), // No retries

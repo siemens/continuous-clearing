@@ -53,6 +53,7 @@ namespace LCT.SW360PackageCreator.UTest
             //Arrange
             string projectName = "Test";
             ProjectReleases projectReleases = new ProjectReleases();
+            projectReleases.Name = projectName;
             var CommonAppSettings = new CommonAppSettings()
             {
                 SW360 = new SW360()
@@ -64,10 +65,10 @@ namespace LCT.SW360PackageCreator.UTest
                 .ReturnsAsync(projectName);
 
             //Act
-            await CreatorValidator.ValidateAppSettings(CommonAppSettings, mockISw360ProjectService.Object, projectReleases);
+            int result = await CreatorValidator.ValidateAppSettings(CommonAppSettings, mockISw360ProjectService.Object, projectReleases);
 
             //Assert
-            mockISw360ProjectService.Verify(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<string>(), It.IsAny<string>(), projectReleases), Times.AtLeastOnce);
+            Assert.AreEqual(0, result, "Expected 0 when project name is positive.");
         }
 
         [TestCase]
@@ -77,6 +78,7 @@ namespace LCT.SW360PackageCreator.UTest
             string projectName = "Test";
             ProjectReleases projectReleases = new ProjectReleases();
             projectReleases.clearingState = "CLOSED";
+            projectReleases.Name = projectName;
             var CommonAppSettings = new CommonAppSettings()
             {
                 SW360 = new SW360()
@@ -89,10 +91,10 @@ namespace LCT.SW360PackageCreator.UTest
                 .ReturnsAsync(projectName);
 
             //Act
-            await CreatorValidator.ValidateAppSettings(CommonAppSettings, mockISw360ProjectService.Object, projectReleases);
+            int result = await CreatorValidator.ValidateAppSettings(CommonAppSettings, mockISw360ProjectService.Object, projectReleases);
 
             //Assert
-            mockISw360ProjectService.Verify(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<string>(), It.IsAny<string>(), projectReleases), Times.AtLeastOnce);
+            Assert.AreEqual(-1, result, "Expected -1 when clearing state is CLOSED.");
 
         }
 

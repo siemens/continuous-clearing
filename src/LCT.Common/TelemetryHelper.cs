@@ -66,9 +66,9 @@ namespace LCT.Common
             telemetry_.TrackCustomEvent(eventName, new Dictionary<string, string>
             {
                 { "CA Tool Version", toolVersion },
-                { "SW360 Project Name", appSettings.SW360.ProjectName },
-                { "SW360 Project ID", appSettings.SW360.ProjectID },
-                { "Project Type", appSettings.ProjectType },
+                { "SW360 Project Name", appSettings?.SW360?.ProjectName },
+                { "SW360 Project ID", appSettings?.SW360?.ProjectID },
+                { "Project Type", appSettings?.ProjectType },
                 { "Hashed User ID", HashUtility.GetHashString(Environment.UserName) },
                 { "Start Time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture) }
             });
