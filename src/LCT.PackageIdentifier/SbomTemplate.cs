@@ -7,6 +7,7 @@
 using CycloneDX.Models;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Logging;
 using log4net;
 using log4net.Core;
 using System;
@@ -26,8 +27,10 @@ namespace LCT.PackageIdentifier
             if (File.Exists(templateFilePath) && templateFilePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
                 Bom templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(templateFilePath));
+                LogHandling.LogCyclonedxComponentsTable(templateFilePath, templateDetails.Components);
                 CycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, projectType);
                 AddComponentDetails(componentsForBOM, templateDetails);
+
             }
         }
         public static string GetFilePathForTemplate(List<string> filePaths)
@@ -89,11 +92,13 @@ namespace LCT.PackageIdentifier
             }
             catch (ArgumentException ex)
             {
-                Logger.Error($"AddComponentDetails():ArgumentException:Error from " + sbomcomp.Name + " : " + sbomcomp.Version, ex);
+                LogHandling.HttpErrorHandelingForLog("ArgumentException", "PropertyAdditionForTemplate()", ex, $"Component: {sbomcomp.Name} @ {sbomcomp.Version}");
+                Logger.Error($"ArgumentException occurred while adding properties for component: {sbomcomp.Name} @ {sbomcomp.Version}. Details: {ex.Message}");
             }
             catch (InvalidOperationException ex)
             {
-                Logger.Error($"AddComponentDetails():InvalidOperationException:Error from " + sbomcomp.Name + " : " + sbomcomp.Version, ex);
+                LogHandling.HttpErrorHandelingForLog("InvalidOperationException", "PropertyAdditionForTemplate()", ex, $"Component: {sbomcomp.Name} @ {sbomcomp.Version}");
+                Logger.Error($"InvalidOperationException occurred while adding properties for component: {sbomcomp.Name} @ {sbomcomp.Version}. Details: {ex.Message}");
             }
         }
 

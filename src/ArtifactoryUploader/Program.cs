@@ -11,6 +11,7 @@ using LCT.ArtifactoryUploader;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
+using LCT.Common.Logging;
 using LCT.Common.Model;
 using LCT.Facade;
 using LCT.Facade.Interfaces;
@@ -51,11 +52,14 @@ namespace ArtifactoryUploader
             Log4Net.CatoolCurrentDirectory = System.IO.Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
 
             string FolderPath = InitiateLogger(appSettings);
+            Logger.Logger.Log(null, Level.Notice, $"====================<<<<< Artifactory Uploader >>>>>====================", null);
+            Logger.Logger.Log(null, Level.Notice, $"\nStart of Artifactory Uploader execution: {DateTime.Now}", null);
 
+            string operatingSystem = RuntimeInformation.OSDescription;
+            Logger.Debug($"Application started on {operatingSystem} operating system\n");
+            LogHandling.LogCommandLineArguments(args);
             settingsManager.CheckRequiredArgsToRun(appSettings, "Uploader");
 
-            Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Artifactory Uploader >>>>>====================", null);
-            Logger.Logger.Log(null, Level.Notice, $"\nStart of Artifactory Uploader execution: {DateTime.Now}", null);
 
             if (!appSettings.Jfrog.DryRun)
                 Logger.Logger.Log(null, Level.Alert, $"Artifactory Uploader is running in release mode !!! \n", null);
@@ -116,10 +120,12 @@ namespace ArtifactoryUploader
         private static string InitiateLogger(CommonAppSettings appSettings)
         {
             string FolderPath;
+            Log4Net.AppendVerboseValue(appSettings);
+            string logFileNameWithTimestamp = $"{FileConstant.ArtifactoryUploaderLog}_{DateTime.Now:yyyyMMdd_HHmmss}.log";
             if (!string.IsNullOrEmpty(appSettings.Directory.LogFolder))
             {
                 FolderPath = appSettings.Directory.LogFolder;
-                Log4Net.Init(FileConstant.ArtifactoryUploaderLog, appSettings.Directory.LogFolder, m_Verbose);
+                Log4Net.Init(logFileNameWithTimestamp, appSettings.Directory.LogFolder, m_Verbose);
             }
             else
             {
@@ -131,7 +137,7 @@ namespace ArtifactoryUploader
                 {
                     FolderPath = "/var/log";
                 }
-                Log4Net.Init(FileConstant.ArtifactoryUploaderLog, FolderPath, m_Verbose);
+                Log4Net.Init(logFileNameWithTimestamp, FolderPath, m_Verbose);
             }
 
             return FolderPath;

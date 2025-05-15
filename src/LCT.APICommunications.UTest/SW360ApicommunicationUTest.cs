@@ -73,7 +73,7 @@ namespace LCT.APICommunications.UTest
             SW360Apicommunication sW360Apicommunication = new SW360Apicommunication(connectionSettings);
 
             // Assert
-            Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.CreateComponent(createComponentContent));
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.CreateComponent(createComponentContent,""));
         }
         [Test]
         public void SW360Apicommunication_CreateRelease_ReturnsInvalidOperationException()
@@ -85,7 +85,7 @@ namespace LCT.APICommunications.UTest
             SW360Apicommunication sW360Apicommunication = new SW360Apicommunication(connectionSettings);
 
             // Assert
-            Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.CreateRelease(createReleaseContent));
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.CreateRelease(createReleaseContent, ""));
         }
         [Test]
         public void SW360Apicommunication_UpdateRelease_ReturnsInvalidOperationException()
@@ -99,7 +99,7 @@ namespace LCT.APICommunications.UTest
             SW360Apicommunication sW360Apicommunication = new SW360Apicommunication(connectionSettings);
 
             // Assert
-            Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.UpdateRelease(releaseId, httpContent));
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.UpdateRelease(releaseId, httpContent,""));
         }
 
         [Test]
@@ -119,12 +119,12 @@ namespace LCT.APICommunications.UTest
             // Arrange
             var page = 1;
             var pageEntries = 10;
-
+            string correlationId = Guid.NewGuid().ToString();
             // Act
             SW360Apicommunication sW360Apicommunication = new SW360Apicommunication(connectionSettings);
 
             // Assert
-            Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.GetAllReleasesWithAllData(page, pageEntries));
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.GetAllReleasesWithAllData(page, pageEntries, correlationId));
         }
 
         [Test]
@@ -198,7 +198,7 @@ namespace LCT.APICommunications.UTest
             SW360Apicommunication sW360Apicommunication = new SW360Apicommunication(connectionSettings);
 
             //Assert
-            Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.CheckFossologyProcessStatus(""));
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.CheckFossologyProcessStatus("",""));
         }
 
         [Test]
@@ -258,7 +258,7 @@ namespace LCT.APICommunications.UTest
             SW360Apicommunication sW360Apicommunication = new SW360Apicommunication(connectionSettings);
 
             //Assert
-            Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.GetReleaseByCompoenentName(""));
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.GetReleaseByCompoenentName("", ""));
         }
 
         [Test]
@@ -277,7 +277,7 @@ namespace LCT.APICommunications.UTest
             SW360Apicommunication sW360Apicommunication = new SW360Apicommunication(connectionSettings);
 
             //Assert
-            Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.GetComponentByName(""));
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.GetComponentByName("", ""));
         }
         [Test]
         public void SW360Apicommunication_UpdateComponent_ReturnsInvalidOperationException()

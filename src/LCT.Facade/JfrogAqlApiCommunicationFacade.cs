@@ -32,9 +32,9 @@ namespace LCT.Facade
         /// Checks connectivity with JFrog server
         /// </summary>
         /// <returns>HttpResponseMessage</returns>
-        public Task<HttpResponseMessage> CheckConnection()
+        public Task<HttpResponseMessage> CheckConnection(string correlationId)
         {
-            return m_jfrogAqlApiCommunication.CheckConnection();
+            return m_jfrogAqlApiCommunication.CheckConnection(correlationId);
         }
 
         /// <summary>

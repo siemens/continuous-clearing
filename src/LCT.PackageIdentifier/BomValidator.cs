@@ -6,6 +6,7 @@
 
 using LCT.APICommunications.Model;
 using LCT.Common;
+using LCT.Common.Logging;
 using LCT.Services.Interface;
 using log4net;
 using System.IO;
@@ -31,7 +32,7 @@ namespace LCT.PackageIdentifier
             else if (projectReleases?.clearingState == "CLOSED")
             {
                 Logger.Error($"Provided Sw360 project is not in active state ,Please make sure you added the correct project details that is in active state..");
-                Logger.Debug($"ValidateAppSettings() : Sw360 project " + projectReleases.Name + " is in " + projectReleases.clearingState + " state.");
+                LogHandling.BasicErrorHandelingForLog("Validation failed: SW360 project is not in an active state", "ValidateAppSettings()", $"SW360 project '{projectReleases.Name}' is in a '{projectReleases.clearingState}' state.", "Please make sure you added the correct project details that is in active state..");
                 return -1;
             }
             else

@@ -49,6 +49,6 @@ namespace LCT.Facade.Interfaces
         /// Checks connectivity with JFrog server
         /// </summary>
         /// <returns>HttpResponseMessage</returns>
-        Task<HttpResponseMessage> CheckConnection();
+        Task<HttpResponseMessage> CheckConnection(string correlationId);
     }
 }

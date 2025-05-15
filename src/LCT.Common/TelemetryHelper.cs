@@ -4,6 +4,7 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 using LCT.Common.Constants;
+using LCT.Common.Logging;
 using LCT.Telemetry;
 using log4net;
 using System;
@@ -46,6 +47,7 @@ namespace LCT.Common
             }
             catch (Exception ex)
             {
+                LogHandling.HttpErrorHandelingForLog("Exception", "StartTelemetry()", ex, "");
                 Logger.Error($"An error occurred: {ex.Message}");
                 TrackException(ex);
                 environmentHelper.CallEnvironmentExit(-1);

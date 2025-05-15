@@ -11,6 +11,7 @@ using LCT.APICommunications.Model.Foss;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
+using LCT.Common.Logging;
 using LCT.Common.Model;
 using LCT.Services.Interface;
 using LCT.Services.Model;
@@ -47,6 +48,8 @@ namespace LCT.SW360PackageCreator
         {
             var bomFilePath = Path.Combine(appSettings.Directory.OutputFolder, appSettings.SW360.ProjectName + "_" + FileConstant.BomFileName);
             bom = cycloneDXBomParser.ParseCycloneDXBom(bomFilePath);
+            // Log the components in a tabular format
+            LogHandling.LogCreaterCyclonedxComponentsTable(bomFilePath, bom?.Components ?? new List<Component>());
             TotalComponentsFromPackageIdentifier = bom != null ? bom.Components.Count : 0;
             ListofBomComponents = await GetListOfBomData(bom?.Components ?? new List<Component>(), appSettings);
 
@@ -142,7 +145,7 @@ namespace LCT.SW360PackageCreator
             }
             else
             {
-                Logger.Debug($"Local Bom not updated for {currName}-{currVersion}.");
+                Logger.Debug($"UpdateToLocalBomFile():Local Bom not updated for {currName}-{currVersion}.");
             }
         }
 
@@ -222,6 +225,7 @@ namespace LCT.SW360PackageCreator
             ISw360CreatorService sw360CreatorService, ISW360Service sw360Service, ISw360ProjectService sw360ProjectService,
             IFileOperations fileOperations, ICreatorHelper creatorHelper, List<ComparisonBomData> parsedBomData)
         {
+            Logger.Debug($"CreateComponentInSw360():Create component process started");
             string sw360Url = appSettings.SW360.URL;
             string bomGenerationPath = appSettings.Directory.OutputFolder;
             Logger.Debug($"Bom Generation Path - {bomGenerationPath}");
@@ -266,7 +270,7 @@ namespace LCT.SW360PackageCreator
             //write list of components which are not linked
             CommonHelper.WriteComponentsNotLinkedListInConsole(ComponentsNotLinked);
 
-            Logger.Debug($"CreateComponentInSw360():End");
+            Logger.Debug($"CreateComponentInSw360():Create component process completed");
         }
 
         private async Task CreateComponent(ICreatorHelper creatorHelper,
@@ -348,12 +352,39 @@ namespace LCT.SW360PackageCreator
             if (item.ComponentStatus == Dataconstant.NotAvailable && item.ReleaseStatus == Dataconstant.NotAvailable)
             {
                 Logger.Logger.Log(null, Level.Notice, $"Creating the Component & Release : Name - {item.Name} , version - {item.Version}", null);
+                var initialItem = new ComparisonBomData
+                {
+                    Name = item.Name,
+                    Group = item.Group,
+                    Version = item.Version,
+                    ComponentExternalId = item.ComponentExternalId,
+                    ReleaseExternalId = item.ReleaseExternalId,
+                    PackageUrl = item.PackageUrl,
+                    SourceUrl = item.SourceUrl,
+                    DownloadUrl = item.DownloadUrl,
+                    PatchURls = item.PatchURls,
+                    ComponentStatus = item.ComponentStatus,
+                    ReleaseStatus = item.ReleaseStatus,
+                    ApprovedStatus = item.ApprovedStatus,
+                    IsComponentCreated = item.IsComponentCreated,
+                    IsReleaseCreated = item.IsReleaseCreated,
+                    FossologyUploadStatus = item.FossologyUploadStatus,
+                    ReleaseAttachmentLink = item.ReleaseAttachmentLink,
+                    ReleaseLink = item.ReleaseLink,
+                    FossologyLink = item.FossologyLink,
+                    ReleaseID = item.ReleaseID,
+                    AlpineSource = item.AlpineSource,
+                    ParentReleaseName = item.ParentReleaseName,
+                    FossologyUploadId = item.FossologyUploadId,
+                    ClearingState = item.ClearingState
+                };                
                 var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(item);
 
                 if (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]) && !attachmentUrlList.ContainsKey("SOURCE"))
                 {
                     item.DownloadUrl = Dataconstant.DownloadUrlNotFound;
                     UpdatedCompareBomData.Add(item);
+                    LogHandling.LogItemDetailsInTableFormat("CreateComponentAndReleaseWhenNotAvailable()", initialItem, item);
                     return;
                 }
 
@@ -373,18 +404,24 @@ namespace LCT.SW360PackageCreator
                     await TriggeringFossologyUploadAndUpdateAdditionalData(item, sw360CreatorService, appSettings);
                 }
                 UpdatedCompareBomData.Add(item);
+                LogHandling.LogItemDetailsInTableFormat("CreateComponentAndReleaseWhenNotAvailable()", initialItem, item);
             }
         }
 
         public static async Task TriggeringFossologyUploadAndUpdateAdditionalData(ComparisonBomData item,
             ISw360CreatorService sw360CreatorService, CommonAppSettings appSettings)
         {
-
             if (appSettings.SW360.Fossology.EnableTrigger && (item.ApprovedStatus.Equals("NEW_CLEARING") || item.ApprovedStatus.Equals("Not Available") || item.ClearingState.Equals(Dataconstant.ScanClearingState)))
             {
+                Logger.Debug($"TriggeringFossologyUploadAndUpdateAdditionalData():Required details" +
+                    $"Name-{item.Name}" +
+                    $"Version-{item.Version}" +
+                    $"ReleaseId-{item.ReleaseID}" +
+                    $"ApprovedStatus-{item.ApprovedStatus}" +
+                    $"ClearingState-{item.ClearingState}");
                 var formattedName = GetFormattedName(item);
                 Logger.Logger.Log(null, Level.Notice, $"\tInitiating FOSSology process for: Release : Name - {formattedName} , version - {item.Version}", null);
-                
+
                 bool fossologyUpload = await UpdateFossologyStatus(item, sw360CreatorService, appSettings, formattedName);
 
                 if (!fossologyUpload)
@@ -394,7 +431,7 @@ namespace LCT.SW360PackageCreator
 
                     if (string.IsNullOrEmpty(uploadId))
                     {
-                        item.FossologyUploadStatus = Dataconstant.NotUploaded;                       
+                        item.FossologyUploadStatus = Dataconstant.NotUploaded;
                     }
                     else
                     {
@@ -417,19 +454,46 @@ namespace LCT.SW360PackageCreator
             {
                 item.FossologyUploadStatus = Dataconstant.NotUploaded;
             }
-        }        
+        }
         private async Task CreateReleaseWhenNotAvailable(ComparisonBomData item,
             ISw360CreatorService sw360CreatorService, ICreatorHelper creatorHelper, CommonAppSettings appSettings)
         {
             if (item.ComponentStatus == Dataconstant.Available && item.ReleaseStatus == Dataconstant.NotAvailable)
             {
                 Logger.Logger.Log(null, Level.Notice, $"Creating Release : Name - {item.Name} , version - {item.Version}", null);
+                var initialItem = new ComparisonBomData
+                {
+                    Name = item.Name,
+                    Group = item.Group,
+                    Version = item.Version,
+                    ComponentExternalId = item.ComponentExternalId,
+                    ReleaseExternalId = item.ReleaseExternalId,
+                    PackageUrl = item.PackageUrl,
+                    SourceUrl = item.SourceUrl,
+                    DownloadUrl = item.DownloadUrl,
+                    PatchURls = item.PatchURls,
+                    ComponentStatus = item.ComponentStatus,
+                    ReleaseStatus = item.ReleaseStatus,
+                    ApprovedStatus = item.ApprovedStatus,
+                    IsComponentCreated = item.IsComponentCreated,
+                    IsReleaseCreated = item.IsReleaseCreated,
+                    FossologyUploadStatus = item.FossologyUploadStatus,
+                    ReleaseAttachmentLink = item.ReleaseAttachmentLink,
+                    ReleaseLink = item.ReleaseLink,
+                    FossologyLink = item.FossologyLink,
+                    ReleaseID = item.ReleaseID,
+                    AlpineSource = item.AlpineSource,
+                    ParentReleaseName = item.ParentReleaseName,
+                    FossologyUploadId = item.FossologyUploadId,
+                    ClearingState = item.ClearingState
+                };
                 var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(item);
 
                 if (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]) && !attachmentUrlList.ContainsKey("SOURCE"))
                 {
                     item.DownloadUrl = Dataconstant.DownloadUrlNotFound;
                     UpdatedCompareBomData.Add(item);
+                    LogHandling.LogItemDetailsInTableFormat(nameof(CreateComponentAndReleaseWhenNotAvailable), initialItem, item);
                     return;
                 }
 
@@ -448,8 +512,9 @@ namespace LCT.SW360PackageCreator
                     await TriggeringFossologyUploadAndUpdateAdditionalData(item, sw360CreatorService, appSettings);
                 }
 
-                UpdatedCompareBomData.Add(item);
+                UpdatedCompareBomData.Add(item);                
                 await sw360CreatorService.UpdatePurlIdForExistingComponent(item, componentId);
+                LogHandling.LogItemDetailsInTableFormat("CreateReleaseWhenNotAvailable()", initialItem, item);
             }
         }
         public static async Task<bool> UpdateFossologyStatus(ComparisonBomData item, ISw360CreatorService sw360CreatorService, CommonAppSettings appSettings, string formattedName)
@@ -463,7 +528,7 @@ namespace LCT.SW360PackageCreator
             }
             else if (!string.IsNullOrEmpty(item.FossologyUploadId) && string.IsNullOrEmpty(item.FossologyLink))
             {
-                fossologyUpload= true;
+                fossologyUpload = true;
                 Logger.Logger.Log(null, Level.Info, $"\t🔗 Fossology upload ID and URL successfully updated in SW360 for release: Name - {formattedName}, version - {item.Version}", null);
                 item.FossologyUploadStatus = Dataconstant.Uploaded;
                 item.FossologyLink = $"{appSettings.SW360.Fossology.URL}{ApiConstant.FossUploadJobUrlSuffix}{item.FossologyUploadId}";
@@ -503,7 +568,7 @@ namespace LCT.SW360PackageCreator
                 if (!string.IsNullOrEmpty(fossResult?.Links?.Self?.Href))
                 {
                     Logger.Debug($"{fossResult.Content?.Message}");
-                    uploadId = await CheckFossologyProcessStatus(fossResult.Links?.Self?.Href, sw360CreatorService,item);
+                    uploadId = await CheckFossologyProcessStatus(fossResult.Links?.Self?.Href, sw360CreatorService, item);
                 }
 
             }
@@ -514,7 +579,7 @@ namespace LCT.SW360PackageCreator
             return uploadId;
         }
 
-        public static async Task<string> CheckFossologyProcessStatus(string link, ISw360CreatorService sw360CreatorService,ComparisonBomData item)
+        public static async Task<string> CheckFossologyProcessStatus(string link, ISw360CreatorService sw360CreatorService, ComparisonBomData item)
         {
             string uploadId = string.Empty;
             try
@@ -540,7 +605,7 @@ namespace LCT.SW360PackageCreator
                 {
                     var formattedName = GetFormattedName(item);
                     Logger.Logger.Log(null, Level.Warn, $"\t❌ Fossology upload failed  for Release : Name - {formattedName} , version - {item.Version}", null);
-                }              
+                }
             }
             catch (AggregateException ex)
             {
@@ -567,6 +632,32 @@ namespace LCT.SW360PackageCreator
             if (item.ComponentStatus == Dataconstant.Available && item.ReleaseStatus == Dataconstant.Available)
             {
                 Logger.Logger.Log(null, Level.Notice, $"Release exists in SW360 : Name - {item.Name} , version - {item.Version}", null);
+                var initialItem = new ComparisonBomData
+                {
+                    Name = item.Name,
+                    Group = item.Group,
+                    Version = item.Version,
+                    ComponentExternalId = item.ComponentExternalId,
+                    ReleaseExternalId = item.ReleaseExternalId,
+                    PackageUrl = item.PackageUrl,
+                    SourceUrl = item.SourceUrl,
+                    DownloadUrl = item.DownloadUrl,
+                    PatchURls = item.PatchURls,
+                    ComponentStatus = item.ComponentStatus,
+                    ReleaseStatus = item.ReleaseStatus,
+                    ApprovedStatus = item.ApprovedStatus,
+                    IsComponentCreated = item.IsComponentCreated,
+                    IsReleaseCreated = item.IsReleaseCreated,
+                    FossologyUploadStatus = item.FossologyUploadStatus,
+                    ReleaseAttachmentLink = item.ReleaseAttachmentLink,
+                    ReleaseLink = item.ReleaseLink,
+                    FossologyLink = item.FossologyLink,
+                    ReleaseID = item.ReleaseID,
+                    AlpineSource = item.AlpineSource,
+                    ParentReleaseName = item.ParentReleaseName,
+                    FossologyUploadId = item.FossologyUploadId,
+                    ClearingState = item.ClearingState
+                };
                 string releaseLink = item.ReleaseLink ?? string.Empty;
                 string releaseId = CommonHelper.GetSubstringOfLastOccurance(releaseLink, "/");
                 if (!string.IsNullOrWhiteSpace(releaseId))
@@ -589,28 +680,31 @@ namespace LCT.SW360PackageCreator
 
                 await sw360CreatorService.UpdatePurlIdForExistingComponent(item, componentId);
                 await sw360CreatorService.UpdatePurlIdForExistingRelease(item, releaseId, releasesInfo);
-
+                LogHandling.LogItemDetailsInTableFormat("ComponentAndReleaseAvailable()", initialItem, item);
             }
         }
         public static Task GetUploadIdWhenReleaseExists(ComparisonBomData item, ReleasesInfo releasesInfo = null, CommonAppSettings appSettings = null)
         {
             if (releasesInfo == null)
-            {                
+            {
+                Logger.Debug("GetUploadIdWhenReleaseExists(): releasesInfo is null. No processing required.");
                 return Task.CompletedTask;
             }
-
+            
             item.ClearingState = releasesInfo.ClearingState;
 
             var uploadId = releasesInfo.ExternalToolProcesses?
                 .SelectMany(process => process.ProcessSteps)
                 .FirstOrDefault(step => step.StepName == "01_upload")?.ProcessStepIdInTool;
-
+            Logger.Debug($"GetUploadIdWhenReleaseExists(): UploadId {(string.IsNullOrEmpty(uploadId) ? "not identified" : "identified")} from release data. UploadId={uploadId}");
+            
             if (releasesInfo.AdditionalData != null &&
                 releasesInfo.AdditionalData.TryGetValue(ApiConstant.AdditionalDataFossologyURL, out string fossologyUrl) &&
                 fossologyUrl.Contains(appSettings?.SW360?.Fossology?.URL))
             {
                 item.FossologyLink = fossologyUrl;
                 item.FossologyUploadId = uploadId;
+                Logger.Debug($"GetUploadIdWhenReleaseExists(): FossologyLink identified from releasedata: {item.FossologyLink}");                
             }
             else if (releasesInfo.AdditionalData == null || !releasesInfo.AdditionalData.ContainsKey(ApiConstant.AdditionalDataFossologyURL))
             {

@@ -9,6 +9,7 @@ using LCT.APICommunications;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Logging;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
@@ -30,6 +31,7 @@ namespace LCT.PackageIdentifier
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ICycloneDXBomParser _cycloneDXBomParser;
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
+        private List<Component> listOfInternalComponents = new List<Component>();
 
         public DebianProcessor(ICycloneDXBomParser cycloneDXBomParser)
         {
@@ -49,11 +51,17 @@ namespace LCT.PackageIdentifier
             List<string> listOfTemplateBomfilePaths = new List<string>();
             foreach (string filepath in configFiles)
             {
-                if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                if (filepath.EndsWith(FileConstant.CycloneDXFileExtension)
+                    && !filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
-                    Logger.Debug($"ParsePackageFile():FileName: " + filepath);
+                    Logger.Debug($"ParsePackageFile():Processing input file for identifying components: {filepath}");
                     var list = ParseCycloneDX(filepath, ref bom);
                     listofComponents.AddRange(list);
+                }
+                else if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                {
+                    listOfTemplateBomfilePaths.Add(filepath);
+                    Logger.Debug($"ParsePackageFile():Template BOM file detected: {filepath}");
                 }
             }
 
@@ -119,6 +127,7 @@ namespace LCT.PackageIdentifier
                                                           IJFrogService jFrogService,
                                                           IBomHelper bomhelper)
         {
+            Logger.Debug("GetJfrogRepoDetailsOfAComponent():Starting to retrieve JFrog repository details for components.\n");
             // get the  component list from Jfrog for given repo + internal repo
             string[] repoList = CommonHelper.GetRepoList(appSettings);
             List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(repoList, jFrogService);
@@ -197,13 +206,15 @@ namespace LCT.PackageIdentifier
                 }
                 modifiedBOM.Add(componentVal);
             }
-
+            LogHandling.LogConsolidatedComponentTable(componentsForBOM, listOfInternalComponents);
+            Logger.Debug("GetJfrogRepoDetailsOfAComponent():Completed retrieving JFrog repository details for components.\n");
             return modifiedBOM;
         }
 
         public async Task<ComponentIdentification> IdentificationOfInternalComponents(ComponentIdentification componentData,
             CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
+            Logger.Debug("IdentificationOfInternalComponents(): Starting identification of internal components.");
             // get the  component list from Jfrog for given repo
             List<AqlResult> aqlResultList =
                 await bomhelper.GetListOfComponentsFromRepo(appSettings.Debian.Artifactory.InternalRepos, jFrogService);
@@ -240,7 +251,9 @@ namespace LCT.PackageIdentifier
             // update the comparision bom data
             componentData.comparisonBOMData = internalComponentStatusUpdatedList;
             componentData.internalComponents = internalComponents;
-
+            listOfInternalComponents = internalComponents;
+            Logger.Debug($"IdentificationOfInternalComponents(): identified internal components:{internalComponents.Count}.");
+            Logger.Debug($"IdentificationOfInternalComponents(): Completed identification of internal components.\n");
             return componentData;
         }
 
@@ -362,12 +375,12 @@ namespace LCT.PackageIdentifier
                 {
                     BomCreator.bomKpiData.DebianComponents++;
                     debianPackages.Add(package);
-                    Logger.Debug($"ExtractDetailsForJson():ValidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
+                    Logger.Debug($"ExtractDetailsForJson():ValidComponent for Debian : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
                 }
                 else
                 {
                     BomCreator.bomKpiData.ComponentsExcluded++;
-                    Logger.Debug($"ExtractDetailsForJson():InvalidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
+                    Logger.Debug($"ExtractDetailsForJson():InvalidComponent for Debian : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
                 }
             }
             return bom;

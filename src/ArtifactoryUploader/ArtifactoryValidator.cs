@@ -6,6 +6,8 @@
 
 using LCT.APICommunications.Interfaces;
 using LCT.Common;
+using LCT.Common.Logging;
+using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -23,14 +25,17 @@ namespace LCT.ArtifactoryUploader
         public async Task<int> ValidateArtifactoryCredentials()
         {
             HttpResponseMessage responseMessage = new HttpResponseMessage();
+            string correlationId = Guid.NewGuid().ToString();
             try
             {
-                responseMessage = await _JfrogAqlApiCommunication.CheckConnection();
+                responseMessage = await _JfrogAqlApiCommunication.CheckConnection(correlationId);
+                LogHandling.LogHttpResponseDetails("JFrog Connection Validation", $"Methodname-ValidateArtifactoryCredentials():CorrelationId-{correlationId}", responseMessage, "");
                 responseMessage.EnsureSuccessStatusCode();
                 return 0;
             }
             catch (HttpRequestException ex)
             {
+                LogHandling.HttpErrorHandelingForLog("Get sw360 Project details for validating", $"MethodName-GetProjectById():CorrelationId-{correlationId}", ex, "");
                 ExceptionHandling.HttpException(ex, responseMessage, "Artifactory");
                 return -1;
             }

@@ -8,6 +8,7 @@ using LCT.APICommunications.Interfaces;
 using LCT.ArtifactoryUploader;
 using Moq;
 using NUnit.Framework;
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -22,8 +23,9 @@ namespace AritfactoryUploader.UTest
         {
             // Arrange
             HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK);
+            string correlationId = Guid.NewGuid().ToString();
             Mock<IJfrogAqlApiCommunication> jfrogCommunicationMck = new Mock<IJfrogAqlApiCommunication>();
-            jfrogCommunicationMck.Setup(x => x.CheckConnection()).ReturnsAsync(httpResponseMessage);
+            jfrogCommunicationMck.Setup(x => x.CheckConnection(correlationId)).ReturnsAsync(httpResponseMessage);
             ArtifactoryValidator artifactoryValidator = new ArtifactoryValidator(jfrogCommunicationMck.Object);
 
             // Act
@@ -38,8 +40,9 @@ namespace AritfactoryUploader.UTest
         {
             // Arrange
             HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.Unauthorized);
+            string correlationId = Guid.NewGuid().ToString();
             Mock<IJfrogAqlApiCommunication> jfrogCommunicationMck = new Mock<IJfrogAqlApiCommunication>();
-            jfrogCommunicationMck.Setup(x => x.CheckConnection()).ReturnsAsync(httpResponseMessage);
+            jfrogCommunicationMck.Setup(x => x.CheckConnection(correlationId)).ReturnsAsync(httpResponseMessage);
             ArtifactoryValidator artifactoryValidator = new ArtifactoryValidator(jfrogCommunicationMck.Object);
 
             // Act
@@ -53,8 +56,9 @@ namespace AritfactoryUploader.UTest
         public async Task ValidateArtifactoryCredentials_HttpRequestException_ReturnsMinusOne()
         {
             // Arrange
+            string correlationId = Guid.NewGuid().ToString();
             Mock<IJfrogAqlApiCommunication> jfrogCommunicationMck = new Mock<IJfrogAqlApiCommunication>();
-            jfrogCommunicationMck.Setup(x => x.CheckConnection()).ThrowsAsync(new HttpRequestException());
+            jfrogCommunicationMck.Setup(x => x.CheckConnection(correlationId)).ThrowsAsync(new HttpRequestException());
             ArtifactoryValidator artifactoryValidator = new ArtifactoryValidator(jfrogCommunicationMck.Object);
 
             // Act

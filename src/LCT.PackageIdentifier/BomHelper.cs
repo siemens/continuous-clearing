@@ -36,7 +36,9 @@ namespace LCT.PackageIdentifier
 
         public string GetProjectSummaryLink(string projectId, string sw360Url)
         {
-            Logger.Debug("starting method GetProjectSummaryLink");
+            Logger.Debug("GetProjectSummaryLink():starting method GetProjectSummaryLink");
+            Logger.Debug($"GetProjectSummaryLink():Generated Project Summary Link: {sw360Url}{ApiConstant.Sw360ProjectUrlApiSuffix}{projectId}");
+            Logger.Debug("GetProjectSummaryLink():GetProjectSummaryLink generation completed\n");
             return $"{sw360Url}{ApiConstant.Sw360ProjectUrlApiSuffix}{projectId}";
         }
 

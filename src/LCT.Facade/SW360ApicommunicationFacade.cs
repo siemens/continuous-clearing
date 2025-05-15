@@ -9,9 +9,9 @@ using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
 using LCT.Common.Model;
 using LCT.Facade.Interfaces;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace LCT.Facade
 {
@@ -69,18 +69,18 @@ namespace LCT.Facade
         {
             return m_sw360ApiCommunication.TriggerFossologyProcess(releaseId, sw360link);
         }
-        public Task<HttpResponseMessage> CheckFossologyProcessStatus(string link)
+        public Task<HttpResponseMessage> CheckFossologyProcessStatus(string link, string correlationId)
         {
-            return m_sw360ApiCommunication.CheckFossologyProcessStatus(link);
+            return m_sw360ApiCommunication.CheckFossologyProcessStatus(link,correlationId);
         }
-        public Task<string> GetComponents()
+        public Task<string> GetComponents(string correlationId)
         {
-            return m_sw360ApiCommunication.GetComponents();
+            return m_sw360ApiCommunication.GetComponents(correlationId);
         }
 
-        public Task<HttpResponseMessage> GetReleaseById(string releaseId)
+        public Task<HttpResponseMessage> GetReleaseById(string releaseId, string correlationId)
         {
-            return m_sw360ApiCommunication.GetReleaseById(releaseId);
+            return m_sw360ApiCommunication.GetReleaseById(releaseId, correlationId);
         }
 
         public Task<HttpResponseMessage> GetReleaseByLink(string releaseLink)
@@ -88,24 +88,24 @@ namespace LCT.Facade
             return m_sw360ApiCommunication.GetReleaseByLink(releaseLink);
         }
 
-        public async Task<HttpResponseMessage> LinkReleasesToProject(HttpContent httpContent, string sw360ProjectId)
+        public async Task<HttpResponseMessage> LinkReleasesToProject(HttpContent httpContent, string sw360ProjectId,string correlationId)
         {
-            return await m_sw360ApiCommunication.LinkReleasesToProject(httpContent, sw360ProjectId);
+            return await m_sw360ApiCommunication.LinkReleasesToProject(httpContent, sw360ProjectId, correlationId);
         }
 
-        public async Task<HttpResponseMessage> CreateComponent(CreateComponent createComponentContent)
+        public async Task<HttpResponseMessage> CreateComponent(CreateComponent createComponentContent, string correlationId)
         {
-            return await m_sw360ApiCommunication.CreateComponent(createComponentContent);
+            return await m_sw360ApiCommunication.CreateComponent(createComponentContent, correlationId);
         }
 
-        public async Task<HttpResponseMessage> CreateRelease(Releases createReleaseContent)
+        public async Task<HttpResponseMessage> CreateRelease(Releases createReleaseContent,string correlationId)
         {
-            return await m_sw360ApiCommunication.CreateRelease(createReleaseContent);
+            return await m_sw360ApiCommunication.CreateRelease(createReleaseContent, correlationId);
         }
 
-        public Task<string> GetReleaseOfComponentById(string componentId)
+        public Task<string> GetReleaseOfComponentById(string componentId, string correlationId)
         {
-            return m_sw360ApiCommunication.GetReleaseOfComponentById(componentId);
+            return m_sw360ApiCommunication.GetReleaseOfComponentById(componentId, correlationId);
         }
 
         public Task<string> GetReleaseAttachments(string releaseAttachmentsUrl)
@@ -123,9 +123,9 @@ namespace LCT.Facade
             m_sw360ApiCommunication.DownloadAttachmentUsingWebClient(attachmentDownloadLink, fileName);
         }
 
-        public async Task<HttpResponseMessage> UpdateRelease(string releaseId, HttpContent httpContent)
+        public async Task<HttpResponseMessage> UpdateRelease(string releaseId, HttpContent httpContent,string correlationId)
         {
-            return await m_sw360ApiCommunication.UpdateRelease(releaseId, httpContent);
+            return await m_sw360ApiCommunication.UpdateRelease(releaseId, httpContent, correlationId);
         }
 
         public async Task<HttpResponseMessage> UpdateComponent(string componentId, HttpContent httpContent)
@@ -138,9 +138,9 @@ namespace LCT.Facade
             return m_sw360ApiCommunication.AttachComponentSourceToSW360(attachReport);
         }
 
-        public Task<string> GetReleaseByCompoenentName(string componentName)
+        public Task<string> GetReleaseByCompoenentName(string componentName, string correlationId)
         {
-            return m_sw360ApiCommunication.GetReleaseByCompoenentName(componentName);
+            return m_sw360ApiCommunication.GetReleaseByCompoenentName(componentName,correlationId);
         }
 
         public Task<HttpResponseMessage> GetComponentDetailsByUrl(string componentLink)
@@ -149,9 +149,9 @@ namespace LCT.Facade
             return m_sw360ApiCommunication.GetComponentDetailsByUrl(componentLink);
         }
 
-        public Task<string> GetComponentByName(string componentName)
+        public Task<string> GetComponentByName(string componentName, string correlationId)
         {
-            return m_sw360ApiCommunication.GetComponentByName(componentName);
+            return m_sw360ApiCommunication.GetComponentByName(componentName,correlationId);
         }
         public Task<HttpResponseMessage> GetComponentUsingName(string componentName)
         {
@@ -163,18 +163,18 @@ namespace LCT.Facade
             return m_sw360ApiCommunication.UpdateLinkedRelease(projectId, releaseId, updateLinkedRelease);
         }
 
-        public Task<HttpResponseMessage> GetReleaseByExternalId(string purlId, string externalIdKey = "")
+        public Task<HttpResponseMessage> GetReleaseByExternalId(string purlId, string externalIdKey = "", string correlationId="")
         {
-            return m_sw360ApiCommunication.GetReleaseByExternalId(purlId, externalIdKey);
+            return m_sw360ApiCommunication.GetReleaseByExternalId(purlId, externalIdKey, correlationId);
         }
 
-        public Task<HttpResponseMessage> GetComponentByExternalId(string purlId, string externalIdKey = "")
+        public Task<HttpResponseMessage> GetComponentByExternalId(string purlId, string externalIdKey = "", string correlationId = "")
         {
-            return m_sw360ApiCommunication.GetComponentByExternalId(purlId, externalIdKey);
+            return m_sw360ApiCommunication.GetComponentByExternalId(purlId, externalIdKey, correlationId);
         }
-        public Task<HttpResponseMessage> GetAllReleasesWithAllData(int page, int pageEntries)
+        public Task<HttpResponseMessage> GetAllReleasesWithAllData(int page, int pageEntries, string correlationId)
         {
-            return m_sw360ApiCommunication.GetAllReleasesWithAllData(page, pageEntries);
+            return m_sw360ApiCommunication.GetAllReleasesWithAllData(page, pageEntries, correlationId);
         }
     }
 }

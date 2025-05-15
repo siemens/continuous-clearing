@@ -6,6 +6,7 @@
 
 using LCT.Common;
 using LCT.Common.Interface;
+using LCT.Common.Logging;
 using LCT.Common.Model;
 using log4net;
 using log4net.Core;
@@ -33,18 +34,27 @@ namespace LCT.PackageIdentifier
             List<string> allFoundConfigFiles = new List<string>();
             if (config?.Include == null && config?.Exclude == null)
             {
+                string errorMessage = "Inclusion/Exclusion list is not provided. Unable to identify the files.";
+                string solution = "Please check if you have provided a valid settings file with inclusion/exclusion patterns.";
+                LogHandling.BasicErrorHandelingForLog("File Scanning", "FileScanner()", errorMessage, solution);
                 Logger.Error("Inclusion/Exclusion list is not provided!!Unable to identify the files\nPlease check if you have given a valid settings file");
                 throw new ArgumentNullException($"Inlude:{config?.Include} or Exclude:{config?.Exclude} in config is found to be empty");
 
             }
             if (string.IsNullOrWhiteSpace(rootPath))
             {
+                string errorMessage = "No root path provided.";
+                string solution = "Provide a valid input file path.";
+                LogHandling.BasicErrorHandelingForLog("File Scanning", "FileScanner()", errorMessage, solution);
                 Logger.Error("No root path given.Provide a valid input file path");
                 throw new ArgumentException($"Invalid value for the {nameof(rootPath)} - {rootPath}");
             }
 
             if (!System.IO.Directory.Exists(rootPath))
             {
+                string errorMessage = "Root path does not exist.";
+                string solution = "Provide a valid path.";
+                LogHandling.BasicErrorHandelingForLog("File Scanning", "FileScanner()", errorMessage, solution);
                 Logger.Error("Root path does not exist.Provide a valid  path");
                 throw new DirectoryNotFoundException($"The {nameof(rootPath)}  is not found at this path" +
                $" - {rootPath}");
@@ -66,6 +76,7 @@ namespace LCT.PackageIdentifier
 
             if (allFoundConfigFiles.Count == 0)
             {
+                LogHandling.BasicErrorHandelingForLog("File scanning failed due to no valid input files found.", "FileScanner()", $"The provided package file path does not contain any valid input files. Please check the input path and inclusion/exclusion patterns.", "provide valid input files");
                 Logger.Error("Provided package file path do not contain valid input files.");
                 environmentHelper.CallEnvironmentExit(-1);
             }

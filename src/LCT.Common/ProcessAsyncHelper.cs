@@ -4,6 +4,7 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using LCT.Common.Logging;
 using log4net;
 using System;
 using System.Collections.Generic;
@@ -83,6 +84,7 @@ namespace LCT.Common
                 }
                 catch (AggregateException ex)
                 {
+                    LogHandling.HttpErrorHandelingForLog("AggregateException", "RunAsync()", ex, "");
                     Logger.Error($"Exception in RunAsync method(){ex}");
                 }
 

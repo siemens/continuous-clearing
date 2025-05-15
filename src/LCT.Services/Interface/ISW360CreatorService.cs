@@ -6,10 +6,12 @@
 
 using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.Foss;
+using LCT.Common.Interface;
 using LCT.Common.Model;
 using LCT.Services.Model;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
 
 namespace LCT.Services.Interface
 {
@@ -44,6 +46,6 @@ namespace LCT.Services.Interface
         Task<bool> UpdatePurlIdForExistingRelease(ComparisonBomData cbomData, string releaseId, ReleasesInfo releasesInfo = null);
 
         Task<bool> UdpateSW360ReleaseContent(Components component, string fossUrl);
-        Task<FossTriggerStatus> TriggerFossologyProcessForValidation(string releaseId, string sw360link);
+        Task<FossTriggerStatus> TriggerFossologyProcessForValidation(string releaseId, string sw360link, IEnvironmentHelper environmentHelper);
     }
 }

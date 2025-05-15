@@ -11,6 +11,7 @@ namespace LCT.APICommunications.UTest
         public void JfrogAqlApiCommunication_CheckConnection_ReturnsInvalidOperationException()
         {
             // Arrange
+            string correlationId = Guid.NewGuid().ToString();
             ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials();
             string invalidDomainName = ""; // Invalid domain name
             int timeout = 30; // Timeout in seconds
@@ -18,7 +19,7 @@ namespace LCT.APICommunications.UTest
             JfrogAqlApiCommunication jfrogApiCommunication = new JfrogAqlApiCommunication(invalidDomainName, repoCredentials, timeout);
 
             // Act & Assert
-            Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApiCommunication.CheckConnection());
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApiCommunication.CheckConnection(correlationId));
         }
 
         [Test]

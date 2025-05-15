@@ -113,6 +113,7 @@ namespace LCT.Common
 
         public void CheckRequiredArgsToRun(CommonAppSettings appSettings, string currentExe)
         {
+            Logger.Debug("CheckRequiredArgsToRun():Validating mandatory parameters has started");
             Type type = appSettings.GetType();
             PropertyInfo[] properties = type.GetProperties();
 
@@ -172,10 +173,12 @@ namespace LCT.Common
             };
                 CheckForMissingParameter(appSettings, properties, uploaderReqParameters);
             }
+            Logger.Debug("CheckRequiredArgsToRun():Validating mandatory parameters has completed\n");
         }
 
         private static void CheckForMissingParameter(CommonAppSettings appSettings, PropertyInfo[] properties, List<string> reqParameters)
         {
+            Logger.Debug($"CheckForMissingParameter(): Required Parameters: {string.Join(", ", reqParameters)}");
             StringBuilder missingParameters = new StringBuilder();
 
             foreach (string key in reqParameters)
@@ -221,8 +224,13 @@ namespace LCT.Common
 
             if (!string.IsNullOrWhiteSpace(missingParameters.ToString()))
             {
+                Logger.Debug($"CheckForMissingParameter(): Missing Parameters: {missingParameters.ToString().Trim()}");
                 ExceptionHandling.ArgumentException(missingParameters.ToString());
                 environmentHelper.CallEnvironmentExit(-1);
+            }
+            else
+            {
+                Logger.Debug("CheckForMissingParameter(): All required parameters are present.");
             }
         }
         public static bool IsAzureDevOpsDebugEnabled()

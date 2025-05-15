@@ -6,6 +6,7 @@
 
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Logging;
 using LCT.Common.Model;
 using LCT.SW360PackageCreator.Interfaces;
 using log4net;
@@ -61,11 +62,11 @@ namespace LCT.SW360PackageCreator
                 }
                 catch (DirectoryNotFoundException ex)
                 {
-                    Logger.Debug($"DownloadComponentPackage:DirectoryNotFoundException : Release Name : {component.Name}@{component.Version},Error {ex}");
+                    LogHandling.HttpErrorHandelingForLog("DownloadPackage", $"MethodName:DownloadPackage(), Release Name: {component.Name}@{component.Version}", ex, "The specified directory was not found while attempting to download the package.");
                 }
                 catch (IOException ex)
                 {
-                    Logger.Debug($"DownloadComponentPackage:IOException:Release Name : {component.Name}@{component.Version},Error {ex}");
+                    LogHandling.HttpErrorHandelingForLog("DownloadPackage", $"MethodName:DownloadPackage(), Release Name: {component.Name}@{component.Version}", ex, "An I/O error occurred while attempting to download the package.");
                 }
             }
             else
@@ -103,7 +104,7 @@ namespace LCT.SW360PackageCreator
                 }
                 catch (ArgumentException ex)
                 {
-                    Logger.Debug($"GetFileDetails:Release Name : {component.Name}@{component.Version}: Error {ex}");
+                    LogHandling.HttpErrorHandelingForLog("GetFileDetails", $"MethodName:GetFileDetails(), Release Name: {component.Name}@{component.Version}, PatchUrl: {path}", ex, "An invalid argument was provided while processing the patch URLs.");
                 }
             }
 
@@ -154,11 +155,11 @@ namespace LCT.SW360PackageCreator
             }
             catch (WebException ex)
             {
-                Logger.Debug($"DownloadTarFileAndGetPath :WebException :Release Name : {component.Name}@{component.Version}-PackageUrl: ,Error {ex}");
+                LogHandling.HttpErrorHandelingForLog("DownloadTarFileAndGetPath", $"MethodName:DownloadTarFileAndGetPath(), Release Name: {component.Name}@{component.Version}, SourceUrl: {SourceUrl}", ex, "A network error occurred while trying to download the tar file.");
             }
             catch (UriFormatException ex)
             {
-                Logger.Debug($"DownloadTarFileAndGetPath:Release Name : {component.Name}@{component.Version}: Error {ex}");
+                LogHandling.HttpErrorHandelingForLog("DownloadTarFileAndGetPath", $"MethodName:DownloadTarFileAndGetPath(), Release Name: {component.Name}@{component.Version}, SourceUrl: {SourceUrl}", ex, "The provided URL is not in a valid format.");
             }
 
             return downloadPath;
@@ -238,7 +239,7 @@ namespace LCT.SW360PackageCreator
             }
             catch (IOException ex)
             {
-                Logger.Debug($"DeletePatchedFolder : Folder Name : {Path.GetDirectoryName(folderPath)},Error {ex}");
+                LogHandling.HttpErrorHandelingForLog("DeletePatchedFolderAndFile", $"MethodName:DeletePatchedFolderAndFile(), Folder Name: {Path.GetDirectoryName(folderPath)}", ex, "An I/O error occurred while trying to delete the folder.");
             }
             try
             {
@@ -250,7 +251,7 @@ namespace LCT.SW360PackageCreator
             }
             catch (IOException ex)
             {
-                Logger.Debug($"DeletePatchedFile:File Name : {Path.GetFileName(downloadPath)},Error {ex}");
+                LogHandling.HttpErrorHandelingForLog("DeletePatchedFolderAndFile", $"MethodName:DeletePatchedFolderAndFile(), File Name: {Path.GetFileName(downloadPath)}", ex, "An I/O error occurred while trying to delete the file.");
             }
         }
 
@@ -269,7 +270,7 @@ namespace LCT.SW360PackageCreator
             }
             catch (ArgumentException ex)
             {
-                Logger.Debug($"GetPatchedFileFromDownloadedFolder:DownloadPath : {currentDownloadFolder},Error {ex}");
+                LogHandling.HttpErrorHandelingForLog("GetPatchedFileFromDownloadedFolder", $"MethodName:GetPatchedFileFromDownloadedFolder(), DownloadPath: {currentDownloadFolder}", ex, "An invalid argument was provided while trying to access the downloaded folder.");
             }
             return patchedFilePath;
         }

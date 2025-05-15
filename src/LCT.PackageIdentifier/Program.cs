@@ -10,6 +10,7 @@ using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
+using LCT.Common.Logging;
 using LCT.Common.Model;
 using LCT.Facade;
 using LCT.Facade.Interfaces;
@@ -58,10 +59,14 @@ namespace LCT.PackageIdentifier
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
             string FolderPath = LogFolderInitialisation(appSettings);
 
-            settingsManager.CheckRequiredArgsToRun(appSettings, "Identifer");
+            Logger.Logger.Log(null, Level.Notice, $"====================<<<<< Package Identifier >>>>>====================", null);
+            string operatingSystem = RuntimeInformation.OSDescription;
+            Logger.Debug($"Application started on {operatingSystem} operating system\n");
+            LogHandling.LogCommandLineArguments(args);
 
-            Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Package Identifier >>>>>====================", null);
             Logger.Logger.Log(null, Level.Notice, $"\nStart of Package Identifier execution: {DateTime.Now}", null);
+
+            settingsManager.CheckRequiredArgsToRun(appSettings, "Identifer");
 
             if (appSettings.ProjectType.ToUpperInvariant() == "ALPINE")
             {
@@ -96,6 +101,10 @@ namespace LCT.PackageIdentifier
             {
                 await bomCreator.GenerateBom(appSettings, new BomHelper(), new FileOperations(), projectReleases,
                                              caToolInformation);
+            }
+            else
+            {
+                environmentHelper.CallEnvironmentExit(-1);
             }
 
             if (appSettings?.Telemetry?.Enable == true)
@@ -134,6 +143,7 @@ namespace LCT.PackageIdentifier
 
         private static async Task ValidateAppsettingsFile(CommonAppSettings appSettings, ProjectReleases projectReleases)
         {
+            Logger.Debug("ValidateAppsettingsFile():Validation of SW360 details has started.");
             SW360ConnectionSettings sw360ConnectionSettings = new SW360ConnectionSettings()
             {
                 SW360URL = appSettings.SW360.URL,
@@ -148,15 +158,18 @@ namespace LCT.PackageIdentifier
             {
                 environmentHelper.CallEnvironmentExit(-1);
             }
+            Logger.Debug("ValidateAppsettingsFile():Validation of SW360 details has completed.\n");
         }
 
         private static string LogFolderInitialisation(CommonAppSettings appSettings)
         {
             string FolderPath;
+            Log4Net.AppendVerboseValue(appSettings);
+            string logFileNameWithTimestamp = $"{FileConstant.BomCreatorLog}_{DateTime.Now:yyyyMMdd_HHmmss}.log";
             if (!string.IsNullOrEmpty(appSettings.Directory.LogFolder))
             {
                 FolderPath = appSettings.Directory.LogFolder;
-                Log4Net.Init(FileConstant.BomCreatorLog, appSettings.Directory.LogFolder, m_Verbose);
+                Log4Net.Init(logFileNameWithTimestamp, appSettings.Directory.LogFolder, m_Verbose);
             }
             else
             {
@@ -169,7 +182,7 @@ namespace LCT.PackageIdentifier
                     FolderPath = "/var/log";
                 }
 
-                Log4Net.Init(FileConstant.BomCreatorLog, FolderPath, m_Verbose);
+                Log4Net.Init(logFileNameWithTimestamp, FolderPath, m_Verbose);
             }
 
             return FolderPath;

@@ -5,8 +5,8 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.APICommunications.Model.AQL;
-using LCT.Common.Constants;
 using LCT.Common;
+using LCT.Common.Constants;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -42,7 +42,7 @@ namespace LCT.PackageIdentifier
         public static string GetBomFileName(CommonAppSettings appSettings)
         {
             string bomFileName;
-            if (appSettings.SW360!=null)
+            if (appSettings.SW360 != null)
             {
                 bomFileName = $"{appSettings.SW360.ProjectName}_Bom.cdx.json";
             }

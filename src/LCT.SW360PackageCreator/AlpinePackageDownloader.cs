@@ -7,6 +7,7 @@ using ICSharpCode.SharpZipLib.BZip2;
 using ICSharpCode.SharpZipLib.GZip;
 using ICSharpCode.SharpZipLib.Tar;
 using LCT.Common.Constants;
+using LCT.Common.Logging;
 using LCT.Common.Model;
 using LCT.SW360PackageCreator.Interfaces;
 using log4net;
@@ -88,11 +89,11 @@ namespace LCT.SW360PackageCreator
             }
             catch (WebException ex)
             {
-                Logger.Debug($"DownloadTarFileAndGetPath :WebException :Release Name : {component.Name}@{component.Version}-PackageUrl: ,Error {ex}");
+                LogHandling.HttpErrorHandelingForLog("DownloadTarFileAndGetPath", $"MethodName:DownloadTarFileAndGetPath(), Release Name: {component.Name}@{component.Version}, PackageUrl: {SourceUrl}", ex, "A network error occurred while trying to download the tar file.");
             }
             catch (UriFormatException ex)
             {
-                Logger.Debug($"DownloadTarFileAndGetPath:Release Name : {component.Name}@{component.Version}: Error {ex}");
+                LogHandling.HttpErrorHandelingForLog("DownloadTarFileAndGetPath", $"MethodName:DownloadTarFileAndGetPath(), Release Name: {component.Name}@{component.Version}, PackageUrl: {SourceUrl}", ex, "The provided URL is not in a valid format.");
             }
 
             return downloadPath;
@@ -149,7 +150,7 @@ namespace LCT.SW360PackageCreator
                 }
                 catch (IOException ex)
                 {
-                    Logger.Debug(ex.ToString());
+                    LogHandling.HttpErrorHandelingForLog("ApplyPatchFilesToSourceCode", $"MethodName:ApplyPatchFilesToSourceCode(), ComponentName:{component.Name}, DownloadPath:{downloadPath}", ex, "An I/O error occurred while applying patch files to the source code.");
                 }
             }
 

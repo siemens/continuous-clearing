@@ -8,6 +8,7 @@ using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
+using LCT.Common.Logging;
 using LCT.Common.Model;
 using LCT.Facade;
 using LCT.Facade.Interfaces;
@@ -61,7 +62,12 @@ namespace LCT.SW360PackageCreator
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
 
             string FolderPath = InitiateLogger(appSettings);
-            Console.OutputEncoding = System.Text.Encoding.UTF8;            
+            Logger.Logger.Log(null, Level.Notice, $"====================<<<<< Package creator >>>>>====================", null);
+            Logger.Logger.Log(null, Level.Notice, $"\nStart of Package creator execution : {DateTime.Now}", null);
+            string operatingSystem = RuntimeInformation.OSDescription;
+            Logger.Debug($"Application started on {operatingSystem} operating system\n");
+            LogHandling.LogCommandLineArguments(args);
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
             settingsManager.CheckRequiredArgsToRun(appSettings, "Creator");
             int isValid = await CreatorValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
 
@@ -69,9 +75,6 @@ namespace LCT.SW360PackageCreator
             {
                 environmentHelper.CallEnvironmentExit(-1);
             }
-
-            Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Package creator >>>>>====================", null);
-            Logger.Logger.Log(null, Level.Notice, $"\nStart of Package creator execution : {DateTime.Now}", null);
 
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Alert, $"Package creator is running in TEST mode \n", null);
@@ -170,10 +173,12 @@ namespace LCT.SW360PackageCreator
         private static string InitiateLogger(CommonAppSettings appSettings)
         {
             string FolderPath;
+            Log4Net.AppendVerboseValue(appSettings);
+            string logFileNameWithTimestamp = $"{FileConstant.ComponentCreatorLog}_{DateTime.Now:yyyyMMdd_HHmmss}.log";
             if (!string.IsNullOrEmpty(appSettings.Directory.LogFolder))
             {
                 FolderPath = appSettings.Directory.LogFolder;
-                Log4Net.Init(FileConstant.ComponentCreatorLog, appSettings.Directory.LogFolder, m_Verbose);
+                Log4Net.Init(logFileNameWithTimestamp, appSettings.Directory.LogFolder, m_Verbose);
             }
             else
             {
@@ -185,7 +190,7 @@ namespace LCT.SW360PackageCreator
                 {
                     FolderPath = "/var/log";
                 }
-                Log4Net.Init(FileConstant.ComponentCreatorLog, FolderPath, m_Verbose);
+                Log4Net.Init(logFileNameWithTimestamp, FolderPath, m_Verbose);
             }
 
             return FolderPath;

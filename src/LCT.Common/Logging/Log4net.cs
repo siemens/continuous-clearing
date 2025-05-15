@@ -26,6 +26,7 @@ namespace LCT.Common
 
         public static string CatoolLogPath { get; set; }
         public static string CatoolCurrentDirectory { get; set; }
+        public static bool verbose { get; set; }
 
         public static void Init(string logFileName, string logFolder, bool verbose)
         {
@@ -77,6 +78,18 @@ namespace LCT.Common
             }
 
             return Path.Combine(appFolder, "log4net.color.config");
+        }
+        public static void AppendVerboseValue(CommonAppSettings appSettings)
+        {
+            if (appSettings.Verbose || CommonHelper.IsAzureDevOpsDebugEnabled())
+            {
+                verbose = true;
+            }
+            else
+            {
+                verbose = false;
+            }
+
         }
     }
 }

@@ -9,6 +9,7 @@ using LCT.APICommunications;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Logging;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
@@ -30,7 +31,7 @@ namespace LCT.PackageIdentifier
 
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ICycloneDXBomParser _cycloneDXBomParser;
-
+        private List<Component> listOfInternalComponents = new List<Component>();
         public PythonProcessor(ICycloneDXBomParser cycloneDXBomParser)
         {
             _cycloneDXBomParser = cycloneDXBomParser;
@@ -38,6 +39,7 @@ namespace LCT.PackageIdentifier
 
         public Bom ParsePackageFile(CommonAppSettings appSettings)
         {
+            Logger.Debug("ParsePackageFile():Starting to parse package files for BOM.");
             List<string> configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Poetry);
             List<PythonPackage> listofComponents = new List<PythonPackage>();
             Bom bom = new Bom();
@@ -50,14 +52,19 @@ namespace LCT.PackageIdentifier
                 if (config.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     listOfTemplateBomfilePaths.Add(config);
+                    Logger.Debug("ParsePackageFile():Template BOM file detected: {config}");
                 }
                 if (config.ToLower().EndsWith("poetry.lock"))
                 {
                     listofComponents.AddRange(ExtractDetailsForPoetryLockfile(config, dependencies));
+                    Logger.Debug("ParsePackageFile():Poetry lock file detected: {config}");
+                    LogPythonPackagesTable(config, listofComponents, dependencies);
                 }
                 else if (config.EndsWith(FileConstant.CycloneDXFileExtension) && !config.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     listofComponents.AddRange(ExtractDetailsFromJson(config, appSettings, ref dependencies));
+                    Logger.Debug("ParsePackageFile():CycloneDX file detected: {config}");
+                    LogPythonPackagesTable(config, listofComponents, dependencies);
                 }
             }
 
@@ -79,6 +86,7 @@ namespace LCT.PackageIdentifier
                 AddSiemensDirectProperty(ref bom);
             }
             bom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(bom.Components, bom.Dependencies);
+            Logger.Debug("ParsePackageFile():Completed parsing package files for BOM.");
             return bom;
         }
 
@@ -113,7 +121,35 @@ namespace LCT.PackageIdentifier
             PythonPackages = GetPackagesFromTOMLFile(filePath, dependencies);
             return PythonPackages;
         }
+        private static void LogPythonPackagesTable(string filepath, List<PythonPackage> packages, List<Dependency> dependencies)
+        {
 
+            if (packages == null || packages.Count == 0)
+            {
+                // Log a message indicating no packages were found
+                Logger.Debug($"No Python packages were found in the file: {filepath}");
+                return;
+            }
+
+            // Build the table
+            var logBuilder = new System.Text.StringBuilder();
+            logBuilder.AppendLine("============================================================================================================================================");
+            logBuilder.AppendLine($" PYTHON PACKAGES FOUND IN FILE: {filepath}");
+            logBuilder.AppendLine("============================================================================================================================================");
+            logBuilder.AppendLine($"| {"Name",-40} | {"Version",-20} | {"PURL",-60} | {"DevDependent",-15} |{"Dependencies",-60} |");
+            logBuilder.AppendLine("--------------------------------------------------------------------------------------------------------------------------------------------");
+
+            foreach (var package in packages)
+            {
+                string devDependent = package.Isdevdependent ? "true" : "false";
+                logBuilder.AppendLine($"| {package.Name,-40} | {package.Version,-20} | {package.PurlID,-60} | {devDependent,-15} | {dependencies,-60} |");
+            }
+
+            logBuilder.AppendLine("============================================================================================================================================");
+
+            // Log the table
+            Logger.Debug(logBuilder.ToString());
+        }
         private static List<PythonPackage> GetPackagesFromTOMLFile(string filePath, List<Dependency> dependencies)
         {
             List<PythonPackage> PythonPackages = new();
@@ -205,12 +241,11 @@ namespace LCT.PackageIdentifier
                 {
                     BomCreator.bomKpiData.DebianComponents++;
                     PythonPackages.Add(package);
-                    Logger.Debug($"ExtractDetailsFromJson():ValidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
                 }
                 else
                 {
                     BomCreator.bomKpiData.ComponentsExcluded++;
-                    Logger.Debug($"ExtractDetailsFromJson():InvalidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
+                    Logger.Debug($"ExtractDetailsFromJson():InvalidComponent for poetry: Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
                 }
             }
 
@@ -314,6 +349,7 @@ namespace LCT.PackageIdentifier
 
         public async Task<ComponentIdentification> IdentificationOfInternalComponents(ComponentIdentification componentData, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
+            Logger.Debug("IdentificationOfInternalComponents(): Starting identification of internal components.");
             // get the  component list from Jfrog for given repo
             List<AqlResult> aqlResultList =
                 await bomhelper.GetPypiListOfComponentsFromRepo(appSettings.Poetry.Artifactory.InternalRepos, jFrogService);
@@ -350,7 +386,9 @@ namespace LCT.PackageIdentifier
             // update the comparision bom data
             componentData.comparisonBOMData = internalComponentStatusUpdatedList;
             componentData.internalComponents = internalComponents;
-
+            listOfInternalComponents = internalComponents;
+            Logger.Debug($"IdentificationOfInternalComponents(): identified internal components:{internalComponents.Count}.");
+            Logger.Debug($"IdentificationOfInternalComponents(): Completed identification of internal components.\n");
             return componentData;
         }
 
@@ -380,6 +418,7 @@ namespace LCT.PackageIdentifier
 
         public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
+            Logger.Debug("GetJfrogRepoDetailsOfAComponent():Starting to retrieve JFrog repository details for components.");
             // get the  component list from Jfrog for given repo + internal repo
             string[] repoList = CommonHelper.GetRepoList(appSettings);
             List<AqlResult> aqlResultList = await bomhelper.GetPypiListOfComponentsFromRepo(repoList, jFrogService);
@@ -457,6 +496,8 @@ namespace LCT.PackageIdentifier
                 }
                 modifiedBOM.Add(componentVal);
             }
+            LogHandling.LogConsolidatedComponentTable(componentsForBOM, listOfInternalComponents);
+            Logger.Debug("GetJfrogRepoDetailsOfAComponent():Completed retrieving JFrog repository details for components.\n");
             return modifiedBOM;
         }
 
