@@ -55,7 +55,6 @@ namespace LCT.PackageIdentifier
                 if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     Bom bomList = ParseCycloneDXBom(filepath);
-
                     if (bomList?.Components != null)
                     {
                         CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
