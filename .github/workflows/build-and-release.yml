@@ -85,7 +85,7 @@ jobs:
             *.nupkg
 
   release:
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: windows-latest
     needs: [build, build-docker, pack-nuget]
 
