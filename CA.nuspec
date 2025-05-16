@@ -57,6 +57,8 @@
     <file src="out\net8.0\log4net.ansi.config" target="tools\log4net.ansi.config"/>
     <file src="out\net8.0\log4net.color.config" target="tools\log4net.color.config"/>
     <file src="out\net8.0\log4net.dll" target="tools\log4net.dll"/>
+    <file src="out\net8.0\Polly.Core.dll" target="tools\Polly.Core.dll"/>
+    <file src="out\net8.0\Polly.dll" target="tools\Polly.dll"/>
     <file src="out\net8.0\Markdig.Signed.dll" target="tools\Markdig.Signed.dll"/>
     <file src="out\net8.0\Microsoft.ApplicationInsights.dll" target="tools\Microsoft.ApplicationInsights.dll"/>
     <file src="out\net8.0\Microsoft.Build.Locator.dll" target="tools\Microsoft.Build.Locator.dll"/>
