@@ -125,6 +125,7 @@
     <file src="out\net8.0\System.Security.Permissions.dll" target="tools\System.Security.Permissions.dll"/>
     <file src="out\net8.0\System.Threading.AccessControl.dll" target="tools\System.Threading.AccessControl.dll"/>
     <file src="out\net8.0\System.Windows.Extensions.dll" target="tools\System.Windows.Extensions.dll"/>
+    <file src="out\net8.0\LCT.Telemetry.dll" target="tools\LCT.Telemetry.dll"/>
     <file src="out\net8.0\Tommy.dll" target="tools\Tommy.dll"/>
     <file src="out\net8.0\YamlDotNet.dll" target="tools\YamlDotNet.dll"/>
     <file src="out\net8.0\cs\Microsoft.CodeAnalysis.CSharp.resources.dll" target="tools\cs\Microsoft.CodeAnalysis.CSharp.resources.dll"/>
