@@ -72,7 +72,7 @@ namespace LCT.Common.UTest
 
             // Assert
             Assert.IsNotEmpty(logEvents);
-            var actualLogMessage = logEvents[0].RenderedMessage;
+            var actualLogMessage = logEvents[3].RenderedMessage;
             Assert.AreEqual(expectedlogmessage, actualLogMessage);
         }
 
@@ -110,7 +110,7 @@ namespace LCT.Common.UTest
 
             // Assert
             Assert.IsNotEmpty(logEvents);
-            var actualLogMessage = logEvents[0].RenderedMessage;
+            var actualLogMessage = logEvents[2].RenderedMessage;
             Assert.AreEqual(expectedlogmessage, actualLogMessage);
         }
     }

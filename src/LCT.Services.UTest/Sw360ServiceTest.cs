@@ -138,7 +138,7 @@ namespace LCT.Services.UTest
 
             Mock<ISW360ApicommunicationFacade> swApiCommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
             swApiCommunicationFacade.Setup(x => x.GetReleases()).ReturnsAsync(componentsReleaseModelSerialized);
-            swApiCommunicationFacade.Setup(x => x.GetComponents("")).ReturnsAsync(componentsModelSerialized);
+            swApiCommunicationFacade.Setup(x => x.GetComponents(It.IsAny<string>())).ReturnsAsync(componentsModelSerialized);
 
             Mock<ISW360CommonService> sw360CommonService = new Mock<ISW360CommonService>();
             sw360CommonService.Setup(x => x.GetReleaseDataByExternalId(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
@@ -148,7 +148,7 @@ namespace LCT.Services.UTest
 
             if (availableCompExceptionOn)
             {
-                swApiCommunicationFacade.Setup(x => x.GetComponents("")).Throws<HttpRequestException>();
+                swApiCommunicationFacade.Setup(x => x.GetComponents(It.IsAny<string>())).Throws<HttpRequestException>();
             }
             if (setHttpException)
             {

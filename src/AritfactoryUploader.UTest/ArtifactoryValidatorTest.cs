@@ -23,9 +23,8 @@ namespace AritfactoryUploader.UTest
         {
             // Arrange
             HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK);
-            string correlationId = Guid.NewGuid().ToString();
             Mock<IJfrogAqlApiCommunication> jfrogCommunicationMck = new Mock<IJfrogAqlApiCommunication>();
-            jfrogCommunicationMck.Setup(x => x.CheckConnection(correlationId)).ReturnsAsync(httpResponseMessage);
+            jfrogCommunicationMck.Setup(x => x.CheckConnection(It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
             ArtifactoryValidator artifactoryValidator = new ArtifactoryValidator(jfrogCommunicationMck.Object);
 
             // Act
@@ -40,9 +39,8 @@ namespace AritfactoryUploader.UTest
         {
             // Arrange
             HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.Unauthorized);
-            string correlationId = Guid.NewGuid().ToString();
             Mock<IJfrogAqlApiCommunication> jfrogCommunicationMck = new Mock<IJfrogAqlApiCommunication>();
-            jfrogCommunicationMck.Setup(x => x.CheckConnection(correlationId)).ReturnsAsync(httpResponseMessage);
+            jfrogCommunicationMck.Setup(x => x.CheckConnection(It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
             ArtifactoryValidator artifactoryValidator = new ArtifactoryValidator(jfrogCommunicationMck.Object);
 
             // Act
@@ -56,9 +54,8 @@ namespace AritfactoryUploader.UTest
         public async Task ValidateArtifactoryCredentials_HttpRequestException_ReturnsMinusOne()
         {
             // Arrange
-            string correlationId = Guid.NewGuid().ToString();
             Mock<IJfrogAqlApiCommunication> jfrogCommunicationMck = new Mock<IJfrogAqlApiCommunication>();
-            jfrogCommunicationMck.Setup(x => x.CheckConnection(correlationId)).ThrowsAsync(new HttpRequestException());
+            jfrogCommunicationMck.Setup(x => x.CheckConnection(It.IsAny<string>())).ThrowsAsync(new HttpRequestException());
             ArtifactoryValidator artifactoryValidator = new ArtifactoryValidator(jfrogCommunicationMck.Object);
 
             // Act
