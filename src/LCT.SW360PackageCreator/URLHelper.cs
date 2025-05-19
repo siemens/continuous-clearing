@@ -615,7 +615,7 @@ namespace LCT.SW360PackageCreator
                 {
                     URL = $"{CommonAppSettings.SnapshotBaseURL}binary/{packageDetails.Name}{Dataconstant.ForwardSlash}";
                 }
-                Logger.Debug($"GetArchiveResponse(): Constructed URL: {URL}");
+                Logger.Debug($"GetArchiveResponse(): Constructed URL for {packageType} package type: {URL}");
                 var result = await httpClient.GetStringAsync(URL);
                 packageDetails.JsonText = result.ToString();
                 Logger.Debug($"GetArchiveResponse(): Successfully fetched response for Package Name: {packageDetails.Name}, Package Type: {packageType}");
