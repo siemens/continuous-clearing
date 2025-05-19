@@ -26,7 +26,7 @@ namespace LCT.Common
 
         public static string CatoolLogPath { get; set; }
         public static string CatoolCurrentDirectory { get; set; }
-        public static bool verbose { get; set; }
+        public static bool Verbose { get; set; }
 
         public static void Init(string logFileName, string logFolder, bool verbose)
         {
@@ -83,11 +83,11 @@ namespace LCT.Common
         {
             if (appSettings.Verbose || CommonHelper.IsAzureDevOpsDebugEnabled())
             {
-                verbose = true;
+                Verbose = true;
             }
             else
             {
-                verbose = false;
+                Verbose = false;
             }
 
         }

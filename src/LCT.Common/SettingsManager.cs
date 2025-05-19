@@ -5,6 +5,7 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.Common.Interface;
+using LCT.Common.Logging;
 using log4net;
 using log4net.Core;
 using Microsoft.Extensions.Configuration;
@@ -32,21 +33,21 @@ namespace LCT.Common
         /// <returns>AppSettings</returns>
         public T ReadConfiguration<T>(string[] args, string jsonSettingsFileName)
         {
-            Logger.Debug($"ReadConfiguration():Start");
+            Logger.Debug("ReadConfiguration():Start reading configuration.");
 
             if (args != null)
             {
                 string[] maskedArgs = CommonHelper.MaskSensitiveArguments(args);
-                Logger.Debug($"ReadConfiguration():args: {string.Join(" ", maskedArgs)}");
+                Logger.Debug($"ReadConfiguration():Commandline arguments: {string.Join(" ", maskedArgs)}");
             }
             if (args?.Length == 0)
             {
-                Logger.Debug($"Argument Count : {args.Length}");
+                Logger.Debug($"ReadConfiguration():No arguments provided through command line.");
                 DisplayHelp();
                 environmentHelper.CallEnvironmentExit(0);
             }
             string settingsFilePath = GetConfigFilePathFromArgs(args, jsonSettingsFileName);
-            Logger.Logger.Log(null, Level.Debug, $"Settings File: {settingsFilePath}", null);
+            Logger.Logger.Log(null, Level.Debug, $"Settings File Path: {settingsFilePath}", null);
 
             //add ut for reading - add json and then cmd args
             IConfigurationBuilder settingsConfigBuilder = new ConfigurationBuilder()
@@ -61,13 +62,15 @@ namespace LCT.Common
             {
                 settingsConfig = settingsConfigBuilder.Build();
             }
-            catch (InvalidDataException)
+            catch (InvalidDataException ex)
             {
+                LogHandling.HttpErrorHandelingForLog("ReadConfiguration()",$"Failed to load configuration file. Please verify the JSON format in: {settingsFilePath}",ex,"InvalidDataException occurred while loading configuration.");
                 Logger.Error($"Failed to load configuration file. Please verify the JSON format in: {settingsFilePath}");
                 throw new InvalidDataException($"Failed to load configuration file. Please verify the JSON format in: {settingsFilePath}");
             }
-            catch (FormatException)
+            catch (FormatException ex)
             {
+                LogHandling.HttpErrorHandelingForLog("ReadConfiguration()",$"Configuration file contains invalid format. Please check for missing quotes or invalid syntax in: {settingsFilePath}",ex,"FormatException occurred while loading configuration.");
                 Logger.Error($"Configuration file contains invalid format. Please check for missing quotes or invalid syntax in: {settingsFilePath}");
                 throw new InvalidDataException($"Configuration file contains invalid format. Please check for missing quotes or invalid syntax in: {settingsFilePath}");
             }
@@ -77,12 +80,12 @@ namespace LCT.Common
 
             if (appSettings == null)
             {
-                Logger.Debug($"ReadConfiguration(): {nameof(appSettings)} is null");
+                Logger.Debug($"ReadConfiguration():{nameof(appSettings)} is null. Configuration could not be loaded.");
 
                 throw new InvalidDataException(nameof(appSettings));
             }
 
-            Logger.Debug($"ReadConfiguration():End");
+            Logger.Debug($"ReadConfiguration():Successfully completed configuration reading.");
 
             return appSettings;
         }

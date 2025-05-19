@@ -255,7 +255,7 @@ namespace LCT.Common.Logging
                 responseContent = MaskSensitiveData(responseContent);
             }
             // If verbose is false, limit the response content to the first 1000 lines
-            if (!Log4Net.verbose && !string.IsNullOrEmpty(responseContent))
+            if (!Log4Net.Verbose && !string.IsNullOrEmpty(responseContent))
             {
                 // Define a configurable limit for the number of lines to display
                 int maxLinesToShow = 1000; // Change this value to show more lines
@@ -539,7 +539,7 @@ namespace LCT.Common.Logging
                 responseBody = MaskSensitiveData(responseBody);
             }
             // If verbose is false, limit the response content to the first 1000 lines
-            if (!Log4Net.verbose && !string.IsNullOrEmpty(responseBody))
+            if (!Log4Net.Verbose && !string.IsNullOrEmpty(responseBody))
             {
                 // Define a configurable limit for the number of lines to display
                 int maxLinesToShow = 1000; // Change this value to show more lines

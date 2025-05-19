@@ -42,27 +42,27 @@ namespace LCT.Facade
         /// </summary>
         /// <param name="repoName">repoName</param>
         /// <returns>HttpResponseMessage</returns>
-        public async Task<HttpResponseMessage> GetInternalComponentDataByRepo(string repoName)
+        public async Task<HttpResponseMessage> GetInternalComponentDataByRepo(string repoName,string correlationId)
         {
-            return await m_jfrogAqlApiCommunication.GetInternalComponentDataByRepo(repoName);
+            return await m_jfrogAqlApiCommunication.GetInternalComponentDataByRepo(repoName, correlationId);
         }
         /// <summary>
         /// Gets the Internal Component Data By Repo Name
         /// </summary>
         /// <param name="repoName">repoName</param>
         /// <returns>HttpResponseMessage</returns>
-        public async Task<HttpResponseMessage> GetNpmComponentDataByRepo(string repoName)
+        public async Task<HttpResponseMessage> GetNpmComponentDataByRepo(string repoName, string correlationId)
         {
-            return await m_jfrogAqlApiCommunication.GetNpmComponentDataByRepo(repoName);
+            return await m_jfrogAqlApiCommunication.GetNpmComponentDataByRepo(repoName, correlationId);
         }
         /// <summary>
         /// Gets the Internal Component Data By Repo Name
         /// </summary>
         /// <param name="repoName">repoName</param>
         /// <returns>HttpResponseMessage</returns>
-        public async Task<HttpResponseMessage> GetPypiComponentDataByRepo(string repoName)
+        public async Task<HttpResponseMessage> GetPypiComponentDataByRepo(string repoName,string correlationId)
         {
-            return await m_jfrogAqlApiCommunication.GetPypiComponentDataByRepo(repoName);
+            return await m_jfrogAqlApiCommunication.GetPypiComponentDataByRepo(repoName, correlationId);
         }
 
         /// <summary>
@@ -72,9 +72,9 @@ namespace LCT.Facade
         /// <param name="packageName">repoName</param>
         /// <param name="path">repoName</param>
         /// <returns>AqlResult</returns>
-        public async Task<HttpResponseMessage> GetPackageInfo(ComponentsToArtifactory component)
+        public async Task<HttpResponseMessage> GetPackageInfo(ComponentsToArtifactory component, string correlationId)
         {
-            return await m_jfrogAqlApiCommunication.GetPackageInfo(component);
+            return await m_jfrogAqlApiCommunication.GetPackageInfo(component, correlationId);
         }
     }
 }

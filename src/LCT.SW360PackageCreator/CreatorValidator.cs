@@ -63,7 +63,7 @@ namespace LCT.SW360PackageCreator
             }
             catch (AggregateException ex)
             {
-                Logger.Debug($"\tError in TriggerFossologyValidation--{ex}");
+                LogHandling.HttpErrorHandelingForLog("Fossology Validation", $"MethodName:TriggerFossologyValidation()", ex, "");
             }
             catch (Exception ex)
             {

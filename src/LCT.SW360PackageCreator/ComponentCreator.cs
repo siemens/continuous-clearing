@@ -302,7 +302,7 @@ namespace LCT.SW360PackageCreator
             }
             catch (AggregateException ex)
             {
-                Logger.Debug($"CreateComponent()", ex);
+                LogHandling.HttpErrorHandelingForLog("Createing Component in SW360", $"MethodName:CreateComponent()", ex, "");
             }
         }
 
@@ -569,7 +569,7 @@ namespace LCT.SW360PackageCreator
             }
             catch (AggregateException ex)
             {
-                Logger.DebugFormat("\tError in TriggerFossologyProcess--{0}", ex);
+                LogHandling.HttpErrorHandelingForLog("Error in TriggerFossologyProcess", $"MethodName:TriggerFossologyProcess()", ex, "");
             }
             return uploadId;
         }
@@ -604,7 +604,7 @@ namespace LCT.SW360PackageCreator
             }
             catch (AggregateException ex)
             {
-                Logger.DebugFormat("\tError in TriggerFossologyProcess--{0}", ex);
+                LogHandling.HttpErrorHandelingForLog("Error in CheckFossologyProcessStatus", $"MethodName:CheckFossologyProcessStatus()", ex, "");
             }
             return uploadId;
         }

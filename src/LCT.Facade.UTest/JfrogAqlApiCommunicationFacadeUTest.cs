@@ -31,14 +31,14 @@ namespace LCT.Facade.UTest
             Mock<IJfrogAqlApiCommunication> mockJfrogAqlApiCommunicationFacade =
                 new Mock<IJfrogAqlApiCommunication>();
             mockJfrogAqlApiCommunicationFacade.
-                Setup(x => x.GetInternalComponentDataByRepo(It.IsAny<string>())).
+                Setup(x => x.GetInternalComponentDataByRepo(It.IsAny<string>(), It.IsAny<string>())).
                 ReturnsAsync(httpResponseMessage);
 
             // Act
             JfrogAqlApiCommunicationFacade jfrogAqlApiCommunicationFacade =
                 new JfrogAqlApiCommunicationFacade(mockJfrogAqlApiCommunicationFacade.Object);
             HttpResponseMessage actual =
-                await jfrogAqlApiCommunicationFacade.GetInternalComponentDataByRepo("energy-dev-npm-egll");
+                await jfrogAqlApiCommunicationFacade.GetInternalComponentDataByRepo("energy-dev-npm-egll", "");
 
             //Assert
             Assert.That(actual.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -52,14 +52,14 @@ namespace LCT.Facade.UTest
             Mock<IJfrogAqlApiCommunication> mockJfrogAqlApiCommunicationFacade =
                 new Mock<IJfrogAqlApiCommunication>();
             mockJfrogAqlApiCommunicationFacade.
-                Setup(x => x.GetInternalComponentDataByRepo(It.IsAny<string>())).
+                Setup(x => x.GetInternalComponentDataByRepo(It.IsAny<string>(), It.IsAny<string>())).
                 ReturnsAsync(httpResponseMessage);
 
             // Act
             JfrogAqlApiCommunicationFacade jfrogAqlApiCommunicationFacade =
                 new JfrogAqlApiCommunicationFacade(mockJfrogAqlApiCommunicationFacade.Object);
             HttpResponseMessage actual =
-                await jfrogAqlApiCommunicationFacade.GetInternalComponentDataByRepo("energy-dev-npm-egll");
+                await jfrogAqlApiCommunicationFacade.GetInternalComponentDataByRepo("energy-dev-npm-egll","");
 
             //Assert
             Assert.That(actual.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
@@ -81,14 +81,14 @@ namespace LCT.Facade.UTest
             Mock<IJfrogAqlApiCommunication> mockJfrogAqlApiCommunicationFacade =
                 new Mock<IJfrogAqlApiCommunication>();
             mockJfrogAqlApiCommunicationFacade.
-                Setup(x => x.GetPackageInfo(component)).
+                Setup(x => x.GetPackageInfo(component, "")).
                 ReturnsAsync(httpResponseMessage);
 
             // Act
             JfrogAqlApiCommunicationFacade jfrogAqlApiCommunicationFacade =
                 new JfrogAqlApiCommunicationFacade(mockJfrogAqlApiCommunicationFacade.Object);
             HttpResponseMessage actual =
-                await jfrogAqlApiCommunicationFacade.GetPackageInfo(component);
+                await jfrogAqlApiCommunicationFacade.GetPackageInfo(component, "");
 
             //Assert
             Assert.That(actual.StatusCode, Is.EqualTo(HttpStatusCode.OK));

@@ -13,6 +13,7 @@ using LCT.APICommunications.Model.AQL;
 using LCT.ArtifactoryUploader.Model;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Logging;
 using LCT.Services.Interface;
 using log4net;
 using Newtonsoft.Json;
@@ -39,7 +40,7 @@ namespace LCT.ArtifactoryUploader
         private static bool SetWarningCode;
         public static Bom GetComponentListFromComparisonBOM(string comparisionBomFilePath)
         {
-            Logger.Debug("Starting GetComponentListFromComparisonBOM() method");
+            Logger.Debug("GetComponentListFromComparisonBOM(): Reading bom file for components.");
             Bom componentsToBoms = null;
             try
             {
@@ -47,6 +48,7 @@ namespace LCT.ArtifactoryUploader
                 {
                     string json = File.ReadAllText(comparisionBomFilePath);
                     componentsToBoms = CycloneDX.Json.Serializer.Deserialize(json);
+                    LogHandling.LogCreaterCyclonedxComponentsTable(comparisionBomFilePath, componentsToBoms.Components ?? new List<Component>());
                 }
                 else
                 {
@@ -55,8 +57,10 @@ namespace LCT.ArtifactoryUploader
             }
             catch (JsonReaderException ex)
             {
+                LogHandling.HttpErrorHandelingForLog("GetComponentListFromComparisonBOM", $"Failed to deserialize the comparison BOM file at path: {comparisionBomFilePath}", ex, "JsonReaderException occurred while deserializing the comparison BOM.");
                 Logger.Error($"Exception occurred in reading the comparison BOM: {ex.Message}");
             }
+            Logger.Debug("GetComponentListFromComparisonBOM(): Completed the reading and identifying components from bom file.");
             return componentsToBoms;
         }
 
@@ -213,7 +217,7 @@ namespace LCT.ArtifactoryUploader
 
         public static async Task UploadingThePackages(List<ComponentsToArtifactory> componentsToUpload, int timeout, DisplayPackagesInfo displayPackagesInfo)
         {
-            Logger.Debug("Starting UploadingThePackages() method");
+            Logger.Debug("UploadingThePackages(): Starting the package upload process.");
             foreach (var item in componentsToUpload)
             {
                 await PackageUploadToArtifactory(PackageUploader.uploaderKpiData, item, timeout, displayPackagesInfo);
@@ -226,7 +230,7 @@ namespace LCT.ArtifactoryUploader
                 Logger.Debug("Setting ExitCode to 2");
             }
 
-            Logger.Debug("Ending UploadingThePackages() method");
+            Logger.Debug("UploadingThePackages(): Package upload process completed.");
             Program.UploaderStopWatch?.Stop();
         }
 

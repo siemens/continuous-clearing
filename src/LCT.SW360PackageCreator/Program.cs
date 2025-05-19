@@ -54,14 +54,16 @@ namespace LCT.SW360PackageCreator
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
-            CommonHelper.DefaultLogFolderInitialisation(FileConstant.ComponentCreatorLog, m_Verbose);
+            string logFileNameWithTimestamp = $"{FileConstant.ComponentCreatorLog}_{DateTime.Now:yyyyMMdd_HHmmss}.log";
+            CommonHelper.DefaultLogFolderInitialisation(logFileNameWithTimestamp, m_Verbose);
+            Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Package creator >>>>>====================", null);
+            
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
-
+            Log4Net.AppendVerboseValue(appSettings);
             ISW360ApicommunicationFacade sW360ApicommunicationFacade;
             ISw360ProjectService sw360ProjectService = Getsw360ProjectServiceObject(appSettings, out sW360ApicommunicationFacade);
             ProjectReleases projectReleases = new ProjectReleases();
-
-            string FolderPath = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.ComponentCreatorLog, m_Verbose);
+            string FolderPath = CommonHelper.LogFolderInitialisation(appSettings, logFileNameWithTimestamp, m_Verbose);
             Logger.Logger.Log(null, Level.Debug, $"log manager initiated folder path: {FolderPath}", null);
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             settingsManager.CheckRequiredArgsToRun(appSettings, "Creator");
@@ -71,7 +73,7 @@ namespace LCT.SW360PackageCreator
             {
                 environmentHelper.CallEnvironmentExit(-1);
             }
-
+            Logger.Logger.Log(null, Level.Notice, $"\nStart of Package creator execution : {DateTime.Now}", null);
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Alert, $"Package creator is running in TEST mode \n", null);
             var bomFilePath = Path.Combine(appSettings.Directory.OutputFolder, appSettings.SW360.ProjectName + "_" + FileConstant.BomFileName);

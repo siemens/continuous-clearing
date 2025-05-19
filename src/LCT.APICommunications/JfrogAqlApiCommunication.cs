@@ -53,7 +53,7 @@ namespace LCT.APICommunications
         /// </summary>
         /// <param name="repoName"></param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> GetInternalComponentDataByRepo(string repoName)
+        public async Task<HttpResponseMessage> GetInternalComponentDataByRepo(string repoName, string correlationId)
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
             TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
@@ -67,10 +67,10 @@ namespace LCT.APICommunications
             string aqlQueryToBody = query.ToString();
             string uri = $"{DomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}";
             HttpContent httpContent = new StringContent(aqlQueryToBody);
-            LogHandling.LogRequestDetails("Get component data from jfrog repository", "GetInternalComponentDataByRepo", httpClient, uri, httpContent);
+            LogHandling.LogRequestDetails("Get component data from jfrog repository", $"MethodName:GetInternalComponentDataByRepo(),CorrelationId:{correlationId}", httpClient, uri, httpContent);
             return await httpClient.PostAsync(uri, httpContent);
         }
-        public async Task<HttpResponseMessage> GetNpmComponentDataByRepo(string repoName)
+        public async Task<HttpResponseMessage> GetNpmComponentDataByRepo(string repoName, string correlationId)
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
             TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
@@ -84,10 +84,10 @@ namespace LCT.APICommunications
             string aqlQueryToBody = query.ToString();
             string uri = $"{DomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}";
             HttpContent httpContent = new StringContent(aqlQueryToBody);
-            LogHandling.LogRequestDetails("Get Npm component data from jfrog repository", "GetNpmComponentDataByRepo", httpClient, uri, httpContent);
+            LogHandling.LogRequestDetails("Get Npm component data from jfrog repository", $"MethodName:GetNpmComponentDataByRepo(),CorrelationId:{correlationId}", httpClient, uri, httpContent);
             return await httpClient.PostAsync(uri, httpContent);
         }
-        public async Task<HttpResponseMessage> GetPypiComponentDataByRepo(string repoName)
+        public async Task<HttpResponseMessage> GetPypiComponentDataByRepo(string repoName,string correlationId)
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
             TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
@@ -101,7 +101,7 @@ namespace LCT.APICommunications
             string aqlQueryToBody = query.ToString();
             string uri = $"{DomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}";
             HttpContent httpContent = new StringContent(aqlQueryToBody);
-            LogHandling.LogRequestDetails("Get poetry component data from jfrog repository", "GetPypiComponentDataByRepo()", httpClient, uri, httpContent);
+            LogHandling.LogRequestDetails("Get poetry component data from jfrog repository", $"MethodName:GetPypiComponentDataByRepo(),CorrelationId:{correlationId}", httpClient, uri, httpContent);
             return await httpClient.PostAsync(uri, httpContent);
         }
 
@@ -109,7 +109,7 @@ namespace LCT.APICommunications
         /// Gets the package information in the repo, via the name or path
         /// </summary>
 
-        public async Task<HttpResponseMessage> GetPackageInfo(ComponentsToArtifactory component = null)
+        public async Task<HttpResponseMessage> GetPackageInfo(ComponentsToArtifactory component = null, string correlationId=null)
         {
             ValidateParameters(component.JfrogPackageName, component.Path);
 
@@ -118,7 +118,7 @@ namespace LCT.APICommunications
             string uri = $"{DomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}";
             HttpContent httpContent = new StringContent(aqlQueryToBody);
 
-            return await ExecuteSearchAqlAsync(uri, httpContent);
+            return await ExecuteSearchAqlAsync(uri, httpContent, correlationId);
         }
 
         private static HttpClient GetHttpClient(ArtifactoryCredentials credentials)
@@ -215,12 +215,12 @@ namespace LCT.APICommunications
 
         }
 
-        private async Task<HttpResponseMessage> ExecuteSearchAqlAsync(string uri, HttpContent httpContent)
+        private async Task<HttpResponseMessage> ExecuteSearchAqlAsync(string uri, HttpContent httpContent,string correlationId)
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
             TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
             httpClient.Timeout = timeOutInSec;
-            LogHandling.LogRequestDetails("Get package information from jfrog repository", "ExecuteSearchAqlAsync()", httpClient, uri, httpContent);
+            LogHandling.LogRequestDetails("Get package information from jfrog repository", $"MethodName:ExecuteSearchAqlAsync(),CorrelationId:{correlationId}", httpClient, uri, httpContent);
             return await httpClient.PostAsync(uri, httpContent);
         }
 

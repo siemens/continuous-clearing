@@ -56,12 +56,13 @@ namespace LCT.PackageIdentifier
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
-            CommonHelper.DefaultLogFolderInitialisation(FileConstant.BomCreatorLog, m_Verbose);
+            string logFileNameWithTimestamp = $"{FileConstant.BomCreatorLog}_{DateTime.Now:yyyyMMdd_HHmmss}.log";
+            CommonHelper.DefaultLogFolderInitialisation(logFileNameWithTimestamp, m_Verbose);
+            Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Package Identifier >>>>>====================", null);
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
-            
+            Log4Net.AppendVerboseValue(appSettings);
             ProjectReleases projectReleases = new ProjectReleases();
-
-            string FolderPath = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.BomCreatorLog, m_Verbose);
+            string FolderPath = CommonHelper.LogFolderInitialisation(appSettings, logFileNameWithTimestamp, m_Verbose);
             Logger.Logger.Log(null, Level.Debug, $"log manager initiated folder path: {FolderPath}", null);
             settingsManager.CheckRequiredArgsToRun(appSettings, "Identifer");
 

@@ -9,6 +9,7 @@ using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.AQL;
 using LCT.ArtifactoryUploader.Model;
+using LCT.Common.Logging;
 using LCT.Services.Interface;
 using log4net;
 using System;
@@ -29,14 +30,14 @@ namespace LCT.ArtifactoryUploader
 
         public static async Task<HttpResponseMessage> UploadPackageToRepo(ComponentsToArtifactory component, int timeout, DisplayPackagesInfo displayPackagesInfo)
         {
-            Logger.Debug("Starting UploadPackageToArtifactory method");
+            Logger.Debug("UploadPackageToRepo(): Starting the upload package to Artifactory.");
             string operationType = component.PackageType == PackageType.ClearedThirdParty
                 || component.PackageType == PackageType.Development ? "copy" : "move";
             string dryRunSuffix = component.DryRun ? " dry-run" : "";
             HttpResponseMessage responsemessage = new HttpResponseMessage();
             try
             {
-
+                Logger.Debug($"UploadPackageToRepo(): Component details - Name: {component.Name}, PackageType: {component.PackageType}");
                 // Package Information
                 var packageInfo = await GetPackageInfoWithRetry(jFrogService, component);
                 if (packageInfo == null)
@@ -67,19 +68,21 @@ namespace LCT.ArtifactoryUploader
             }
             catch (HttpRequestException ex)
             {
+                LogHandling.HttpErrorHandelingForLog("UploadPackageToRepo", $"MethodName:UploadPackageToRepo(), ComponentName: {component.Name}", ex, "An HTTP request error occurred while uploading the package to Artifactory.");
                 Logger.Error($"Error has occurred in UploadPackageToArtifactory--{ex}");
                 responsemessage.ReasonPhrase = ApiConstant.ErrorInUpload;
                 return responsemessage;
             }
             catch (InvalidOperationException ex)
             {
+                LogHandling.HttpErrorHandelingForLog("UploadPackageToRepo", $"MethodName:UploadPackageToRepo(), ComponentName: {component.Name}", ex, "An invalid operation occurred while uploading the package to Artifactory.");
                 Logger.Error($"Error has occurred in UploadPackageToArtifactory--{ex}");
                 responsemessage.ReasonPhrase = ApiConstant.ErrorInUpload;
                 return responsemessage;
             }
             finally
             {
-                Logger.Debug("Ending UploadPackageToArtifactory method");
+                Logger.Debug($"UploadPackageToRepo(): Ending the upload process for component: {component.Name}.");
             }
 
             return responsemessage;
@@ -131,10 +134,12 @@ namespace LCT.ArtifactoryUploader
             }
             catch (IOException ex)
             {
+                LogHandling.HttpErrorHandelingForLog("GettPathForArtifactoryUpload", $"Failed to create directory ", ex, "IOException occurred while creating the directory.");
                 Logger.Error($"GettPathForArtifactoryUpload() ", ex);
             }
             catch (UnauthorizedAccessException ex)
             {
+                LogHandling.HttpErrorHandelingForLog("GettPathForArtifactoryUpload", $"Unauthorized access while creating directory", ex, "UnauthorizedAccessException occurred while creating the directory.");
                 Logger.Error($"GettPathForArtifactoryUpload() ", ex);
             }
 

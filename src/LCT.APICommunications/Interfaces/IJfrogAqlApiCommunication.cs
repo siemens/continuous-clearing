@@ -20,19 +20,19 @@ namespace LCT.APICommunications.Interfaces
         /// </summary>
         /// <param name="repoName">repoName</param>
         /// <returns>HttpResponseMessage</returns>
-        Task<HttpResponseMessage> GetInternalComponentDataByRepo(string repoName);
+        Task<HttpResponseMessage> GetInternalComponentDataByRepo(string repoName, string correlationId);
         /// <summary>
         /// Gets the internal component data based on repo name
         /// </summary>
         /// <param name="repoName">repoName</param>
         /// <returns>HttpResponseMessage</returns>
-        Task<HttpResponseMessage> GetNpmComponentDataByRepo(string repoName);
+        Task<HttpResponseMessage> GetNpmComponentDataByRepo(string repoName,string correlationId);
         /// <summary>
         /// Gets the internal component data based on repo name
         /// </summary>
         /// <param name="repoName">repoName</param>
         /// <returns>HttpResponseMessage</returns>
-        Task<HttpResponseMessage> GetPypiComponentDataByRepo(string repoName);
+        Task<HttpResponseMessage> GetPypiComponentDataByRepo(string repoName, string correlationId);
 
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace LCT.APICommunications.Interfaces
         /// <param name="packageName">repoName</param>
         /// <param name="path">repoName</param>
         /// <returns>AqlResult</returns>
-        Task<HttpResponseMessage> GetPackageInfo(ComponentsToArtifactory component = null);
+        Task<HttpResponseMessage> GetPackageInfo(ComponentsToArtifactory component = null, string correlationId=null);
 
         /// <summary>
         /// Checks connectivity with JFrog server
