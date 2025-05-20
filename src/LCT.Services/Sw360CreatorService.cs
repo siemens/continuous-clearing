@@ -79,8 +79,9 @@ namespace LCT.Services
                 //Component creation Success 
                 if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.Conflict)
                 {
+                    Logger.Debug($"CreateComponentBasesOFswComaprisonBOM(): start Identifying componentId for creaeing release");
                     string componentId = await GetComponentId(componentInfo.Name);
-                    Logger.Debug($"Name - {componentInfo.Name}, component Id - {componentId}");
+                    Logger.Debug($"GetComponentId(): Identified componentId for creating release is :{componentId}");
                     componentCreateStatus.ReleaseStatus = await CreateReleaseForComponent(componentInfo, componentId, attachmentUrlList);
                 }
                 else
@@ -89,9 +90,9 @@ namespace LCT.Services
                     componentCreateStatus.ReleaseStatus.IsCreated = false;
                     Environment.ExitCode = -1;
                     Logger.Debug($"CreateComponentBasesOFswComaprisonBOM():Component Name -{componentInfo.Name}- " +
-                   $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
+                   $"response status code-{response.StatusCode} and reason parse-{response.ReasonPhrase}");
                     Logger.Error($"CreateComponentBasesOFswComaprisonBOM():Component Name -{componentInfo.Name}- " +
-                        $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
+                        $"response status code-{response.StatusCode} and reason parse-{response.ReasonPhrase}");
                 }
             }
             catch (HttpRequestException e)
@@ -201,7 +202,7 @@ namespace LCT.Services
                         $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
                 }
 
-                Logger.Debug($"Component Name -{componentInfo.Name},Version :{componentInfo.Version} , Release Id :{releaseId}");
+                Logger.Debug($"Component Name -{componentInfo.Name},Version :{componentInfo.Version} ,for this identified Release Id is:{releaseId}");
                 createStatus.ReleaseIdToLink = releaseId;
             }
             catch (HttpRequestException e)
@@ -408,7 +409,7 @@ namespace LCT.Services
         }
 
         public async Task<string> GetComponentId(string componentName)
-        {
+        {            
             string ComponentId = "";
             string correlationId = Guid.NewGuid().ToString();
             try
@@ -444,7 +445,7 @@ namespace LCT.Services
 
         private string AttachSourcesToReleasesCreated(string releaseId, Dictionary<string, string> attachmentUrlList)
         {
-            Logger.Debug($"AttachSourcesToReleasesCreated(): start");
+            Logger.Debug($"AttachSourcesToReleasesCreated(): starting attach sources to the releases");
 
             string attachmentApiUrl = string.Empty;
             foreach (var attachmenturl in attachmentUrlList)
@@ -460,7 +461,7 @@ namespace LCT.Services
                 attachmentApiUrl = m_SW360ApiCommunicationFacade.AttachComponentSourceToSW360(attachReport);
             }
 
-            Logger.Debug($"AttachSourcesToReleasesCreated(): end");
+            Logger.Debug($"AttachSourcesToReleasesCreated(): completed attach sources to the releases");
             return attachmentApiUrl;
         }
 
@@ -470,7 +471,7 @@ namespace LCT.Services
             try
             {
                 string responseBody = await m_SW360ApiCommunicationFacade.GetReleaseOfComponentById(componentId, correlationId);
-                LogHandling.LogHttpResponseDetailsForStringContent("Response of Update PurlId For Existin gComponent", $"MethodName:UpdatePurlIdForExistingComponent(),CorrelationId:{correlationId}", responseBody);
+                LogHandling.LogHttpResponseDetailsForStringContent("Response of Update PurlId For Existing Component", $"MethodName:UpdatePurlIdForExistingComponent(),CorrelationId:{correlationId}", responseBody);
                 var componentPurlId = JsonConvert.DeserializeObject<ComponentPurlId>(responseBody);
                 Dictionary<string, string> externalIds = new Dictionary<string, string>();
                 Dictionary<string, string> existingExternalIds = componentPurlId.ExternalIds;

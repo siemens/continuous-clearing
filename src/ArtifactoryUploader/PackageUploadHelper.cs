@@ -270,7 +270,6 @@ namespace LCT.ArtifactoryUploader
             ArtfactoryUploader.jFrogService = jFrogService;
             ArtfactoryUploader.JFrogApiCommInstance = GetJfrogApiCommInstance(item, timeout);
             HttpResponseMessage responseMessage = await ArtfactoryUploader.UploadPackageToRepo(item, timeout, displayPackagesInfo);
-
             if (responseMessage.StatusCode == HttpStatusCode.OK && !item.DryRun)
             {
                 IncrementCountersBasedOnPackageType(uploaderKpiData, packageType, true);
@@ -287,8 +286,6 @@ namespace LCT.ArtifactoryUploader
                 await JfrogFoundPackagesAsync(item, displayPackagesInfo, operationType, responseMessage, dryRunSuffix);
                 IncrementCountersBasedOnPackageType(uploaderKpiData, packageType, false);
                 item.DestRepoName = null;
-                var responseContent = await responseMessage.Content.ReadAsStringAsync();
-                Logger.Debug($"JFrog Response - {responseContent}");
             }
             else
             {

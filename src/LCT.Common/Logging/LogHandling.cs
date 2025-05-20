@@ -11,9 +11,15 @@ using System.Text;
 
 namespace LCT.Common.Logging
 {
-    public static class LogHandling
+    public static partial class LogHandling
     {
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(LogHandling));
+        public static ILog _logger = LogManager.GetLogger(typeof(LogHandling));
+
+        public static ILog Logger
+        {
+            get => _logger;
+            set => _logger = value ?? throw new ArgumentNullException(nameof(value));
+        }
         public static void HttpErrorHandelingForLog(string context, string details, Exception ex, string additionalDetails = null)
         {
             // Build the log message in table format
@@ -94,17 +100,30 @@ namespace LCT.Common.Logging
         {
             // Read the response content
             string responseContent = response.Content != null ? response.Content.ReadAsStringAsync().Result : string.Empty;
-
-            // Mask sensitive headers
-            var headers = response.Headers.Select(h =>
+            var headers = response.Headers
+        .Where(h => !h.Key.Equals("LogWarnings", StringComparison.CurrentCultureIgnoreCase) &&
+                    !h.Key.Equals("urlInfo", StringComparison.CurrentCultureIgnoreCase))
+        .Select(h =>
+        {
+            string headerValue = string.Join(", ", h.Value);
+            if (h.Key.Contains("authorization", StringComparison.CurrentCultureIgnoreCase) ||
+                h.Key.Contains("token", StringComparison.CurrentCultureIgnoreCase) ||
+                headerValue.ToLower().Contains("bearer"))
             {
-                string headerValue = string.Join(", ", h.Value);
-                if (h.Key.ToLower().Contains("authorization") || h.Key.ToLower().Contains("token") || headerValue.ToLower().Contains("bearer"))
-                {
-                    headerValue = "*****"; // Mask sensitive values
-                }
-                return new { Key = h.Key, Value = headerValue };
-            }).ToList();
+                headerValue = "*****"; // Mask sensitive values
+            }
+            return new { Key = h.Key, Value = headerValue };
+        }).ToList();
+            // Mask sensitive headers
+            //var headers = response.Headers.Select(h =>
+            //{
+            //    string headerValue = string.Join(", ", h.Value);
+            //    if (h.Key.Contains("authorization", StringComparison.CurrentCultureIgnoreCase) || h.Key.Contains("token", StringComparison.CurrentCultureIgnoreCase) || headerValue.Contains("bearer", StringComparison.CurrentCultureIgnoreCase))
+            //    {
+            //        headerValue = "*****"; // Mask sensitive values
+            //    }
+            //    return new { Key = h.Key, Value = headerValue };
+            //}).ToList();
 
             // Build the log message in table format
             var logBuilder = new System.Text.StringBuilder();
@@ -126,7 +145,7 @@ namespace LCT.Common.Logging
             logBuilder.AppendLine("--------------------------------------------------------------------------------------------------------------------------------------------");
             logBuilder.AppendLine(" HEADERS");
             logBuilder.AppendLine("--------------------------------------------------------------------------------------------------------------------------------------------");
-            if (headers.Any())
+            if (headers.Count != 0)
             {
                 foreach (var header in headers)
                 {
@@ -167,16 +186,31 @@ namespace LCT.Common.Logging
         }
         public static void LogRequestDetails(string context, string details, HttpClient httpClient, string url, HttpContent httpContent = null)
         {
-            // Mask sensitive headers
-            var headers = httpClient.DefaultRequestHeaders.Select(h =>
+
+            var headers = httpClient.DefaultRequestHeaders
+        .Where(h => !h.Key.Equals("LogWarnings", StringComparison.CurrentCultureIgnoreCase) &&
+                    !h.Key.Equals("urlInfo", StringComparison.CurrentCultureIgnoreCase))
+        .Select(h =>
+        {
+            string headerValue = string.Join(", ", h.Value);
+            if (h.Key.Contains("authorization", StringComparison.CurrentCultureIgnoreCase) ||
+                h.Key.Contains("token", StringComparison.CurrentCultureIgnoreCase) ||
+                headerValue.ToLower().Contains("bearer"))
             {
-                string headerValue = string.Join(", ", h.Value);
-                if (h.Key.ToLower().Contains("authorization") || h.Key.ToLower().Contains("token") || headerValue.ToLower().Contains("bearer"))
-                {
-                    headerValue = "*****"; // Mask sensitive values
-                }
-                return new { Key = h.Key, Value = headerValue };
-            }).ToList();
+                headerValue = "*****"; // Mask sensitive values
+            }
+            return new { Key = h.Key, Value = headerValue };
+        }).ToList();
+            // Mask sensitive headers
+            //var headers = httpClient.DefaultRequestHeaders.Select(h =>
+            //{
+            //    string headerValue = string.Join(", ", h.Value);
+            //    if (h.Key.Contains("authorization", StringComparison.CurrentCultureIgnoreCase) || h.Key.Contains("token", StringComparison.CurrentCultureIgnoreCase) || headerValue.ToLower().Contains("bearer"))
+            //    {
+            //        headerValue = "*****"; // Mask sensitive values
+            //    }
+            //    return new { Key = h.Key, Value = headerValue };
+            //}).ToList();
 
             // Read the content of the HttpContent
             string content = httpContent != null ? httpContent.ReadAsStringAsync().Result : string.Empty;
@@ -195,7 +229,7 @@ namespace LCT.Common.Logging
             logBuilder.AppendLine("--------------------------------------------------------------------------------------------------------------------------------------------");
             logBuilder.AppendLine(" HEADERS");
             logBuilder.AppendLine("--------------------------------------------------------------------------------------------------------------------------------------------");
-            if (headers.Any())
+            if (headers.Count != 0)
             {
                 foreach (var header in headers)
                 {
@@ -228,16 +262,32 @@ namespace LCT.Common.Logging
             string requestMethod = response?.RequestMessage?.Method.ToString() ?? string.Empty;
             string requestUrl = response?.RequestMessage?.RequestUri?.ToString() ?? string.Empty;
             string requestHeaders = response?.RequestMessage?.Headers != null
-                ? string.Join("\n", response.RequestMessage.Headers.Select(h =>
+        ? string.Join("\n", response.RequestMessage.Headers
+            .Where(h => !h.Key.Equals("LogWarnings", StringComparison.CurrentCultureIgnoreCase) &&
+                        !h.Key.Equals("urlInfo", StringComparison.CurrentCultureIgnoreCase))
+            .Select(h =>
+            {
+                string headerValue = string.Join(", ", h.Value);
+                if (h.Key.Contains("authorization", StringComparison.CurrentCultureIgnoreCase) ||
+                    h.Key.Contains("token", StringComparison.CurrentCultureIgnoreCase) ||
+                    headerValue.Contains("bearer", StringComparison.CurrentCultureIgnoreCase))
                 {
-                    string headerValue = string.Join(", ", h.Value);
-                    if (h.Key.ToLower().Contains("authorization") || h.Key.ToLower().Contains("token") || headerValue.ToLower().Contains("bearer"))
-                    {
-                        headerValue = "*****"; // Mask sensitive values
-                    }
-                    return $"{h.Key}: {headerValue}";
-                }))
-                : string.Empty;
+                    headerValue = "*****"; // Mask sensitive values
+                }
+                return $"{h.Key}: {headerValue}";
+            }))
+        : string.Empty;
+            //string requestHeaders = response?.RequestMessage?.Headers != null
+            //    ? string.Join("\n", response.RequestMessage.Headers.Select(h =>
+            //    {
+            //        string headerValue = string.Join(", ", h.Value);
+            //        if (h.Key.Contains("authorization", StringComparison.CurrentCultureIgnoreCase) || h.Key.Contains("token", StringComparison.CurrentCultureIgnoreCase) || headerValue.Contains("bearer", StringComparison.CurrentCultureIgnoreCase))
+            //        {
+            //            headerValue = "*****"; // Mask sensitive values
+            //        }
+            //        return $"{h.Key}: {headerValue}";
+            //    }))
+            //    : string.Empty;
 
             // Simplified reasonPhrase logic
             string reasonPhrase = !string.IsNullOrEmpty(response?.ReasonPhrase)
@@ -355,7 +405,7 @@ namespace LCT.Common.Logging
 
         public static void LogComponentsTable(string filepath, List<Component> components)
         {
-            if (components == null || !components.Any())
+            if (components == null || components.Count == 0)
             {
                 // Log a message indicating no components were found
                 Logger.Debug($"No components were found in the file: {filepath}");
@@ -383,7 +433,7 @@ namespace LCT.Common.Logging
 
         public static void LogCyclonedxComponentsTable(string filepath, List<Component> components)
         {
-            if (components == null || !components.Any())
+            if (components == null || components.Count == 0)
             {
                 // Log a message indicating no components were found
                 Logger.Debug($"No packages were found in the file: {filepath}");
@@ -409,7 +459,7 @@ namespace LCT.Common.Logging
         }
         public static void LogAvailableComponentList(List<Components> components)
         {
-            if (components == null || !components.Any())
+            if (components == null || components.Count == 0)
             {
                 // Log a message indicating no components were found
                 Logger.Debug($"No components were found in the list");
@@ -436,7 +486,7 @@ namespace LCT.Common.Logging
 
         public static void LogComparitionComponentListData(List<ComparisonBomData> components)
         {
-            if (components == null || !components.Any())
+            if (components == null || components.Count == 0)
             {
                 // Log a message indicating no components were found
                 Logger.Debug($"No components were found in the list");
@@ -463,18 +513,7 @@ namespace LCT.Common.Logging
 
             // Log the table
             Logger.Debug(logBuilder.ToString());
-        }
-        public static void LogCommandLineArguments(string[] args)
-        {
-            if (args != null && args.Length > 0)
-            {
-                Logger.Debug($"Command-line arguments: {string.Join(" ", args)}");
-            }
-            else
-            {
-                Logger.Debug("No command-line arguments were provided.");
-            }
-        }
+        }       
 
         public static void LogCreaterCyclonedxComponentsTable(string bomFilePath, List<Component> components)
         {
@@ -503,7 +542,7 @@ namespace LCT.Common.Logging
             logBuilder.AppendLine("================================================================================================================");
 
             // Create the table header
-            logBuilder.Append($"|{"Component Name",-30} |{"Version",-15} | {"PURL",-50} |");
+            logBuilder.Append($"|{"Component Name",-60} |{"Version",-15} | {"PURL",-80} |");
             foreach (var simplifiedName in propertyMapping.Values)
             {
                 logBuilder.Append($" {simplifiedName,-45}|");
@@ -518,7 +557,7 @@ namespace LCT.Common.Logging
                 string version = component.Version ?? "N/A";
                 string purl = component.Purl ?? "N/A";
 
-                logBuilder.Append($"|{componentName,-30} | {version,-15} | {purl,-50} |");
+                logBuilder.Append($"|{componentName,-60} | {version,-15} | {purl,-80} |");
 
                 foreach (var actualName in propertyMapping.Keys)
                 {
@@ -598,36 +637,39 @@ namespace LCT.Common.Logging
         {
             var table = new StringBuilder();
 
+            // Header
             table.AppendLine($"Method: {methodName}");
-            table.AppendLine("+---------------------------+---------------------------+---------------------------+");
-            table.AppendLine($"| {"Property",-25} | {"Initial Value",-150} | {"Updated Value",-150} |");
-            table.AppendLine("+---------------------------+---------------------------+---------------------------+");
+            table.AppendLine("+------------------------------------+------------------------------------------+------------------------------------------+");
+            table.AppendLine($"| {"Property",-45} | {"Initial Value",-100} | {"Updated Value",-100} |");
+            table.AppendLine("+------------------------------------+------------------------------------------+------------------------------------------+");
 
-            table.AppendLine($"| Name                      | {initialItem.Name,-150} | {updatedItem.Name,-150} |");
-            table.AppendLine($"| Group                     | {initialItem.Group,-150} | {updatedItem.Group,-150} |");
-            table.AppendLine($"| Version                   | {initialItem.Version,-150} | {updatedItem.Version,-150} |");
-            table.AppendLine($"| ComponentExternalId       | {initialItem.ComponentExternalId,-150} | {updatedItem.ComponentExternalId,-150} |");
-            table.AppendLine($"| ReleaseExternalId         | {initialItem.ReleaseExternalId,-150} | {updatedItem.ReleaseExternalId,-150} |");
-            table.AppendLine($"| PackageUrl                | {initialItem.PackageUrl,-150} | {updatedItem.PackageUrl,-150} |");
-            table.AppendLine($"| SourceUrl                 | {initialItem.SourceUrl,-150} | {updatedItem.SourceUrl,-150} |");
-            table.AppendLine($"| DownloadUrl               | {initialItem.DownloadUrl,-150} | {updatedItem.DownloadUrl,-25} |");
-            table.AppendLine($"| PatchURls                 | {string.Join(",", initialItem.PatchURls ?? Array.Empty<string>()),-150} | {string.Join(",", updatedItem.PatchURls ?? Array.Empty<string>()),-150} |");
-            table.AppendLine($"| ComponentStatus           | {initialItem.ComponentStatus,-150} | {updatedItem.ComponentStatus,-150} |");
-            table.AppendLine($"| ReleaseStatus             | {initialItem.ReleaseStatus,-150} | {updatedItem.ReleaseStatus,-150} |");
-            table.AppendLine($"| ApprovedStatus            | {initialItem.ApprovedStatus,-150} | {updatedItem.ApprovedStatus,-150} |");
-            table.AppendLine($"| IsComponentCreated        | {initialItem.IsComponentCreated,-150} | {updatedItem.IsComponentCreated,-150} |");
-            table.AppendLine($"| IsReleaseCreated          | {initialItem.IsReleaseCreated,-150} | {updatedItem.IsReleaseCreated,-150} |");
-            table.AppendLine($"| FossologyUploadStatus     | {initialItem.FossologyUploadStatus,-150} | {updatedItem.FossologyUploadStatus,-150} |");
-            table.AppendLine($"| ReleaseAttachmentLink     | {initialItem.ReleaseAttachmentLink,-150} | {updatedItem.ReleaseAttachmentLink,-150} |");
-            table.AppendLine($"| ReleaseLink               | {initialItem.ReleaseLink,-150} | {updatedItem.ReleaseLink,-150} |");
-            table.AppendLine($"| FossologyLink             | {initialItem.FossologyLink,-150} | {updatedItem.FossologyLink,-150} |");
-            table.AppendLine($"| ReleaseID                 | {initialItem.ReleaseID,-150} | {updatedItem.ReleaseID,-150} |");
-            table.AppendLine($"| AlpineSource              | {initialItem.AlpineSource,-150} | {updatedItem.AlpineSource,-150} |");
-            table.AppendLine($"| ParentReleaseName         | {initialItem.ParentReleaseName,-150} | {updatedItem.ParentReleaseName,-150} |");
-            table.AppendLine($"| FossologyUploadId         | {initialItem.FossologyUploadId,-150} | {updatedItem.FossologyUploadId,-150} |");
-            table.AppendLine($"| ClearingState             | {initialItem.ClearingState,-150} | {updatedItem.ClearingState,-150} |");
+            // Rows
+            table.AppendLine($"| {"Name",-45} | {initialItem.Name,-100} | {updatedItem.Name,-100} |");
+            table.AppendLine($"| {"Group",-45} | {initialItem.Group,-100} | {updatedItem.Group,-100} |");
+            table.AppendLine($"| {"Version",-45} | {initialItem.Version,-100} | {updatedItem.Version,-100} |");
+            table.AppendLine($"| {"ComponentExternalId",-45} | {initialItem.ComponentExternalId,-100} | {updatedItem.ComponentExternalId,-100} |");
+            table.AppendLine($"| {"ReleaseExternalId",-45} | {initialItem.ReleaseExternalId,-100} | {updatedItem.ReleaseExternalId,-100} |");
+            table.AppendLine($"| {"PackageUrl",-45} | {initialItem.PackageUrl,-100} | {updatedItem.PackageUrl,-100} |");
+            table.AppendLine($"| {"SourceUrl",-45} | {initialItem.SourceUrl,-100} | {updatedItem.SourceUrl,-100} |");
+            table.AppendLine($"| {"DownloadUrl",-45} | {initialItem.DownloadUrl,-100} | {updatedItem.DownloadUrl,-100} |");
+            table.AppendLine($"| {"PatchURls",-45} | {string.Join(",", initialItem.PatchURls ?? Array.Empty<string>()),-100} | {string.Join(",", updatedItem.PatchURls ?? Array.Empty<string>()),-100} |");
+            table.AppendLine($"| {"ComponentStatus",-45} | {initialItem.ComponentStatus,-100} | {updatedItem.ComponentStatus,-100} |");
+            table.AppendLine($"| {"ReleaseStatus",-45} | {initialItem.ReleaseStatus,-100} | {updatedItem.ReleaseStatus,-100} |");
+            table.AppendLine($"| {"ApprovedStatus",-45} | {initialItem.ApprovedStatus,-100} | {updatedItem.ApprovedStatus,-100} |");
+            table.AppendLine($"| {"IsComponentCreated",-45} | {initialItem.IsComponentCreated,-100} | {updatedItem.IsComponentCreated,-100} |");
+            table.AppendLine($"| {"IsReleaseCreated",-45} | {initialItem.IsReleaseCreated,-100} | {updatedItem.IsReleaseCreated,-100} |");
+            table.AppendLine($"| {"FossologyUploadStatus",-45} | {initialItem.FossologyUploadStatus,-100} | {updatedItem.FossologyUploadStatus,-100} |");
+            table.AppendLine($"| {"ReleaseAttachmentLink",-45} | {initialItem.ReleaseAttachmentLink,-100} | {updatedItem.ReleaseAttachmentLink,-100} |");
+            table.AppendLine($"| {"ReleaseLink",-45} | {initialItem.ReleaseLink,-100} | {updatedItem.ReleaseLink,-100} |");
+            table.AppendLine($"| {"FossologyLink",-45} | {initialItem.FossologyLink,-100} | {updatedItem.FossologyLink,-100} |");
+            table.AppendLine($"| {"ReleaseID",-45} | {initialItem.ReleaseID,-100} | {updatedItem.ReleaseID,-100} |");
+            table.AppendLine($"| {"AlpineSource",-45} | {initialItem.AlpineSource,-100} | {updatedItem.AlpineSource,-100} |");
+            table.AppendLine($"| {"ParentReleaseName",-45} | {initialItem.ParentReleaseName,-100} | {updatedItem.ParentReleaseName,-100} |");
+            table.AppendLine($"| {"FossologyUploadId",-45} | {initialItem.FossologyUploadId,-100} | {updatedItem.FossologyUploadId,-100} |");
+            table.AppendLine($"| {"ClearingState",-45} | {initialItem.ClearingState,-100} | {updatedItem.ClearingState,-100} |");
 
-            table.AppendLine("+---------------------------+---------------------------+---------------------------+");
+            // Footer
+            table.AppendLine("+------------------------------------+------------------------------------------+------------------------------------------+");
 
             // Log the table to the log file
             Logger.Debug(table.ToString());
@@ -640,11 +682,13 @@ namespace LCT.Common.Logging
         private static string MaskSensitiveData(string content)
         {
             // Mask API keys
-            content = System.Text.RegularExpressions.Regex.Replace(content, @"""apiKey"":""[^""]+""", @"""apiKey"":""*****""");
+            content = MyRegex().Replace(content, @"""apiKey"":""*****""");
 
             // Add more patterns to mask other sensitive data if needed
             return content;
         }
 
+        [System.Text.RegularExpressions.GeneratedRegex(@"""apiKey"":""[^""]+""")]
+        private static partial System.Text.RegularExpressions.Regex MyRegex();
     }
 }

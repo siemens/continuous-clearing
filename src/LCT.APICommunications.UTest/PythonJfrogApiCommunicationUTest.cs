@@ -23,7 +23,7 @@ namespace LCT.APICommunications.UTest
             JfrogApicommunication jfrogApicommunication = new PythonJfrogApiCommunication("", "", repoCredentials, 100);
 
             //Assert
-            Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApicommunication.CopyFromRemoteRepo(new ComponentsToArtifactory()));
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApicommunication.CopyFromRemoteRepo(new ComponentsToArtifactory(), ""));
         }
         [Test]
         public void PythonJfrogApiCommunication_MoveFromRepo_ReturnsInvalidOperationException()
@@ -35,7 +35,7 @@ namespace LCT.APICommunications.UTest
             JfrogApicommunication jfrogApicommunication = new PythonJfrogApiCommunication("", "", repoCredentials, 100);
 
             //Assert
-            Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApicommunication.MoveFromRepo(new ComponentsToArtifactory()));
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApicommunication.MoveFromRepo(new ComponentsToArtifactory(), ""));
         }
         [Test]
         public void PythonJfrogApiCommunication_GetApiKey_ReturnsInvalidOperationException()

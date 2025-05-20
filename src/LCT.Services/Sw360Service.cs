@@ -65,7 +65,7 @@ namespace LCT.Services
                 Sw360ServiceStopWatch.Start();
                 string responseBody = await m_SW360ApiCommunicationFacade.GetReleases();
                 Sw360ServiceStopWatch.Stop();
-                Logger.Debug($"GetAvailableReleasesInSw360():Time taken to in GetReleases() call" +
+                Logger.Debug($"GetAvailableReleasesInSw360():Time taken for Get all Releases api call" +
                     $"-{TimeSpan.FromMilliseconds(Sw360ServiceStopWatch.ElapsedMilliseconds).TotalSeconds}");
                 var modelMappedObject = JsonConvert.DeserializeObject<ComponentsRelease>(responseBody);
 

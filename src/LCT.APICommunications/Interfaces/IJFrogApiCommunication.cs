@@ -16,9 +16,9 @@ namespace LCT.APICommunications.Interfaces
 
         Task<HttpResponseMessage> DeletePackageFromJFrogRepo(string repoName, string componentName);
 
-        Task<HttpResponseMessage> CopyFromRemoteRepo(ComponentsToArtifactory component);
+        Task<HttpResponseMessage> CopyFromRemoteRepo(ComponentsToArtifactory component,string correlationId);
 
-        Task<HttpResponseMessage> MoveFromRepo(ComponentsToArtifactory component);
+        Task<HttpResponseMessage> MoveFromRepo(ComponentsToArtifactory component, string correlationId);
 
         Task<HttpResponseMessage> GetApiKey();
 

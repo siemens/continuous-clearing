@@ -145,7 +145,7 @@ namespace LCT.SW360PackageCreator
             }
             else
             {
-                Logger.Debug($"UpdateToLocalBomFile():Local Bom not updated for {currName}-{currVersion}.");
+                Logger.Debug($"UpdateToLocalBomFile():Local Bom not updated for {currName}-{currVersion}.\n");
             }
         }
 
@@ -413,11 +413,10 @@ namespace LCT.SW360PackageCreator
             if (appSettings.SW360.Fossology.EnableTrigger && (item.ApprovedStatus.Equals(Dataconstant.NewClearing) || item.ApprovedStatus.Equals("Not Available") || item.ApprovedStatus.Equals(Dataconstant.SentToClearingState) || item.ApprovedStatus.Equals(Dataconstant.ScanAvailableState)))
             {
                 Logger.Debug($"TriggeringFossologyUploadAndUpdateAdditionalData():Required details" +
-                    $"Name-{item.Name}" +
-                    $"Version-{item.Version}" +
-                    $"ReleaseId-{item.ReleaseID}" +
-                    $"ApprovedStatus-{item.ApprovedStatus}" +
-                    $"ClearingState-{item.ClearingState}");
+                    $"Name-{item.Name}," +
+                    $"Version-{item.Version}," +
+                    $"ReleaseId-{item.ReleaseID}," +
+                    $"ApprovedStatus-{item.ApprovedStatus}");
                 var formattedName = GetFormattedName(item);
                 Logger.Logger.Log(null, Level.Notice, $"\tInitiating FOSSology process for: Release : Name - {formattedName} , version - {item.Version}", null);
 
@@ -611,13 +610,14 @@ namespace LCT.SW360PackageCreator
 
         public static async Task<string> GetComponentId(ComparisonBomData item, ISw360CreatorService sw360CreatorService)
         {
+            Logger.Debug($"GetComponentId(): start Identifying componentId for creating release");
             string componentId = await sw360CreatorService.GetComponentId(item.Name);
 
             if (string.IsNullOrEmpty(componentId))
             {
                 componentId = await sw360CreatorService.GetComponentIdUsingExternalId(item.Name, item.ComponentExternalId);
             }
-
+            Logger.Debug($"GetComponentId(): Identified componentId for creating release is :{componentId}");
             return componentId;
         }
 
@@ -692,8 +692,8 @@ namespace LCT.SW360PackageCreator
             var uploadId = releasesInfo.ExternalToolProcesses?
                 .SelectMany(process => process.ProcessSteps)
                 .FirstOrDefault(step => step.StepName == "01_upload")?.ProcessStepIdInTool;
-            Logger.Debug($"GetUploadIdWhenReleaseExists(): UploadId {(string.IsNullOrEmpty(uploadId) ? "not identified" : "identified")} from release data. UploadId={uploadId}");
-            
+            Logger.Debug(!string.IsNullOrEmpty(uploadId)? $"GetUploadIdWhenReleaseExists(): UploadId identified from release data. UploadId={uploadId}": "GetUploadIdWhenReleaseExists(): UploadId not identified from release data.");
+
             if (releasesInfo.AdditionalData != null &&
                 releasesInfo.AdditionalData.TryGetValue(ApiConstant.AdditionalDataFossologyURL, out string fossologyUrl) &&
                 fossologyUrl.Contains(appSettings?.SW360?.Fossology?.URL))

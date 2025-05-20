@@ -52,7 +52,7 @@ namespace LCT.SW360PackageCreator
 
                 if (validRelease != null)
                 {
-                    Logger.Debug("TriggerFossologyValidation(): Valid release found. Triggering Fossology process.");
+                    Logger.Debug($"TriggerFossologyValidation(): Valid release found. Identified component Name-{validRelease.Name},Version-{validRelease.Version}.");
                     await TriggerFossologyProcessForRelease(validRelease, appSettings, sw360CreatorService);
                 }
                 else

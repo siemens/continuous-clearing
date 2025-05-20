@@ -135,7 +135,7 @@ namespace LCT.Services
         /// <returns>Sw360Releases</returns>
         public async Task<Releasestatus> GetReleaseDataByExternalId(string releaseName, string releaseVersion, string releaseExternalId)
         {
-            Logger.Debug($"GetReleaseDataByExternalId(): Release name - {releaseName}@{releaseVersion}");
+            Logger.Debug($"GetReleaseDataByExternalId(): Identifying release data through ExternalId, Release details - {releaseName}@{releaseVersion}");
             Releasestatus releasestatus = new Releasestatus();            
             releasestatus.isReleaseExist = false;
             string correlationId = Guid.NewGuid().ToString();
@@ -241,12 +241,11 @@ namespace LCT.Services
         {
             Dictionary<int, Sw360Releases> releaseCollection = new Dictionary<int, Sw360Releases>();
 
-            Logger.Debug($"GetReleaseExistStatus(): Release Name : {name}");
+            Logger.Debug($"GetReleaseExistStatus(): Identifying release exist status from SW360: {name}");
             foreach (var release in sw360releasesdata)
             {
                 string packageUrl = string.Empty;
                 packageUrl = GetPackageUrlValue(externlaIdKey, release, packageUrl);
-                Logger.Debug($"GetReleaseExistStatus(): Checking against.. : {name} X {release.Name}");
                 try
                 {
                     var purlids = JsonConvert.DeserializeObject<List<string>>(packageUrl);
@@ -271,7 +270,7 @@ namespace LCT.Services
             }
             Releasestatus releasestatus = new Releasestatus();
             releasestatus.sw360Releases = releaseCollection[releaseCollection.Keys.Max()];
-            Logger.Debug($"GetReleaseExistStatus(): Release Name : {name} selected {releasestatus.sw360Releases?.Name} \n");
+            Logger.Debug($"GetReleaseExistStatus(): Selected release '{releasestatus.sw360Releases?.Name}' for the name '{name}' based on the highest number of PURL IDs.\n");
             releasestatus.isReleaseExist = !string.IsNullOrEmpty(releasestatus.sw360Releases?.ExternalIds?.Package_Url) || !string.IsNullOrEmpty(releasestatus.sw360Releases?.ExternalIds?.Purl_Id);
 
             return releasestatus;
@@ -313,7 +312,7 @@ namespace LCT.Services
             ComponentStatus component = new ComponentStatus();
 
             component.Sw360components = componentCollection[componentCollection.Keys.Max()];
-            Logger.Debug($"GetComponentExistStatus(): Component Name : {name} selected {component.Sw360components?.Name} \n");
+            Logger.Debug($"GetComponentExistStatus(): Component Name : {name} selected {component.Sw360components?.Name},based on the highest number of PURL IDs \n");
             component.isComponentExist = !string.IsNullOrEmpty(component.Sw360components?.ExternalIds?.Package_Url) || !string.IsNullOrEmpty(component.Sw360components?.ExternalIds?.Purl_Id);
             return component;
 

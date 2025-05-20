@@ -519,12 +519,12 @@ namespace LCT.ArtifactoryUploader
             logBuilder.AppendLine("================================================================================================================");
             logBuilder.AppendLine(" Components to be Uploaded to Artifactory");
             logBuilder.AppendLine("================================================================================================================");
-            logBuilder.AppendLine($"| {"Name",-30} | {"Version",-15} | {"ComponentType",-15} | {"PackageType",-20} | {"SrcRepoName",-20} | {"DestRepoName",-20} |");
+            logBuilder.AppendLine($"| {"Name",-50} | {"Version",-15} | {"ComponentType",-15} | {"PackageType",-20} | {"SrcRepoName",-20} | {"DestRepoName",-20} |");
             logBuilder.AppendLine("----------------------------------------------------------------------------------------------------------------");
 
             foreach (var component in componentsToBeUploaded)
             {
-                logBuilder.AppendLine($"| {component.Name,-30} | {component.Version,-15} | {component.ComponentType,-15} | {component.PackageType,-20} | {component.SrcRepoName,-20} | {component.DestRepoName,-20} |");
+                logBuilder.AppendLine($"| {component.Name,-50} | {component.Version,-15} | {component.ComponentType,-15} | {component.PackageType,-20} | {component.SrcRepoName,-20} | {component.DestRepoName,-20} |");
             }
 
             logBuilder.AppendLine("================================================================================================================");

@@ -37,7 +37,7 @@ namespace LCT.ArtifactoryUploader
             HttpResponseMessage responsemessage = new HttpResponseMessage();
             try
             {
-                Logger.Debug($"UploadPackageToRepo(): Component details - Name: {component.Name}, PackageType: {component.PackageType}");
+                Logger.Debug($"UploadPackageToRepo():Upload package to repository,Component details - Name: {component.Name}, PackageType: {component.PackageType}");
                 // Package Information
                 var packageInfo = await GetPackageInfoWithRetry(jFrogService, component);
                 if (packageInfo == null)
@@ -47,15 +47,16 @@ namespace LCT.ArtifactoryUploader
                         ReasonPhrase = ApiConstant.PackageNotFound
                     };
                 }
-
+                
+                string correlationId = Guid.NewGuid().ToString();
                 // Perform Copy or Move operation
                 responsemessage = component.PackageType switch
                 {
-                    PackageType.ClearedThirdParty or PackageType.Development => await JFrogApiCommInstance.CopyFromRemoteRepo(component),
-                    PackageType.Internal => await JFrogApiCommInstance.MoveFromRepo(component),
+                    PackageType.ClearedThirdParty or PackageType.Development => await JFrogApiCommInstance.CopyFromRemoteRepo(component, correlationId),
+                    PackageType.Internal => await JFrogApiCommInstance.MoveFromRepo(component, correlationId),
                     _ => new HttpResponseMessage(HttpStatusCode.NotFound)
                 };
-
+                LogHandling.LogHttpResponseDetails("Upload Package To Repo", $"MethodName:UploadPackageToRepo(),CorrelationId:{correlationId}", responsemessage, "");
                 // Check status code and handle errors
                 if (responsemessage.StatusCode != HttpStatusCode.OK)
                 {
