@@ -63,7 +63,7 @@ namespace LCT.PackageIdentifier
             Log4Net.AppendVerboseValue(appSettings);
             ProjectReleases projectReleases = new ProjectReleases();
             string FolderPath = CommonHelper.LogFolderInitialisation(appSettings, logFileNameWithTimestamp, m_Verbose);
-            Logger.Logger.Log(null, Level.Debug, $"log manager initiated folder path: {FolderPath}", null);
+            Logger.Logger.Log(null, Level.Debug, $"log manager initiated folder Name: {FolderPath}", null);
             settingsManager.CheckRequiredArgsToRun(appSettings, "Identifer");
 
             Logger.Logger.Log(null, Level.Notice, $"\nStart of Package Identifier execution: {DateTime.Now}", null);
