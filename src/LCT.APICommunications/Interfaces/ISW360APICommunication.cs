@@ -28,7 +28,7 @@ namespace LCT.APICommunications.Interfaces
         Task<string> GetReleaseOfComponentById(string componentId, string correlationId);
         Task<string> GetReleaseAttachments(string releaseAttachmentsUrl);
         Task<string> GetAttachmentInfo(string attachmentUrl);
-        Task<HttpResponseMessage> GetReleaseById(string releaseId, string GetReleaseById);
+        Task<HttpResponseMessage> GetReleaseById(string releaseId, string correlationId);
         Task<HttpResponseMessage> GetReleaseByLink(string releaseLink);
         Task<string> GetReleaseByCompoenentName(string componentName, string correlationId);
         Task<HttpResponseMessage> CreateRelease(Releases createReleaseContent, string correlationId);

@@ -190,7 +190,7 @@ namespace LCT.PackageIdentifier
         }
         public static void IdentifiedMavenComponents(string filepath, List<Component> components, List<Dependency> dependencies)
         {
-            if (components == null || !components.Any())
+            if (components == null || components.Count == 0)
             {
                 // Log a message indicating no components were found
                 Logger.Debug($"No components were found in the file: {filepath}");

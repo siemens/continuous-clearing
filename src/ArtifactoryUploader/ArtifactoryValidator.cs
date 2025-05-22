@@ -28,7 +28,7 @@ namespace LCT.ArtifactoryUploader
             try
             {
                 responseMessage = await _JfrogAqlApiCommunication.CheckConnection(correlationId);
-                LogHandlingHelper.HttpResponseHandling("JFrog Connection Validation", $"Methodname-ValidateArtifactoryCredentials():CorrelationId-{correlationId}", responseMessage, "");
+                await LogHandlingHelper.HttpResponseHandling("JFrog Connection Validation", $"Methodname-ValidateArtifactoryCredentials():CorrelationId-{correlationId}", responseMessage, "");
                 responseMessage.EnsureSuccessStatusCode();
                 return 0;
             }

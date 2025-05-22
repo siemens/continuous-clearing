@@ -237,23 +237,23 @@ namespace LCT.PackageIdentifier
                     if (response.IsSuccessStatusCode)
                     {
                         Logger.Logger.Log(null, Level.Info, $"JFrog Connection was successfull!!", null);
-                        LogHandlingHelper.HttpResponseHandling("JFrog Connection Validation", $"Methodname:CheckJFrogConnection(),CorrelationId:{correlationId}", response, "");
+                        await LogHandlingHelper.HttpResponseHandling("JFrog Connection Validation", $"Methodname:CheckJFrogConnection(),CorrelationId:{correlationId}", response, "");
                         Logger.Debug("CheckJFrogConnection():Validating JFrog Connection has completed\n");
                         return true;
                     }
                     else if (response.StatusCode == HttpStatusCode.Unauthorized)
                     {
-                        LogHandlingHelper.HttpResponseErrorHandling("JFrog Connection Validation", $"Methodname:CheckJFrogConnection(),CorrelationId:{correlationId}", response, "Check the JFrog server details or token validity.");
+                        await LogHandlingHelper.HttpResponseErrorHandling("JFrog Connection Validation", $"Methodname:CheckJFrogConnection(),CorrelationId:{correlationId}", response, "Check the JFrog server details or token validity.");
                         Logger.Logger.Log(null, Level.Error, $"Check the JFrog token validity/permission..", null);
                     }
                     else if (response.StatusCode == HttpStatusCode.NotFound)
                     {
-                        LogHandlingHelper.HttpResponseErrorHandling("JFrog Connection Validation", $"Methodname:CheckJFrogConnection(),CorrelationId:{correlationId}", response, "Check the JFrog server details .");
+                        await LogHandlingHelper.HttpResponseErrorHandling("JFrog Connection Validation", $"Methodname:CheckJFrogConnection(),CorrelationId:{correlationId}", response, "Check the JFrog server details .");
                         Logger.Logger.Log(null, Level.Error, $"Check the provided JFrog server details..", null);
                     }
                     else
                     {
-                        LogHandlingHelper.HttpResponseErrorHandling("JFrog Connection Validation", $"Methodname:CheckJFrogConnection(),CorrelationId:{correlationId}", response, "");
+                        await LogHandlingHelper.HttpResponseErrorHandling("JFrog Connection Validation", $"Methodname:CheckJFrogConnection(),CorrelationId:{correlationId}", response, "");
                         Logger.Logger.Log(null, Level.Error, $"JFrog Connection was not successfull check the server status.", null);
                     }
                 }

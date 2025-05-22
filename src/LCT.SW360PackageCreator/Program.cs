@@ -55,7 +55,7 @@ namespace LCT.SW360PackageCreator
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
             string logFileNameWithTimestamp = $"{FileConstant.ComponentCreatorLog}_{DateTime.Now:yyyyMMdd_HHmmss}.log";
             CommonHelper.DefaultLogFolderInitialisation(logFileNameWithTimestamp, m_Verbose);
-            Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Package creator >>>>>====================", null);
+            Logger.Logger.Log(null, Level.Notice, $"====================<<<<< Package creator >>>>>====================", null);
 
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
             Log4Net.AppendVerboseValue(appSettings);
@@ -73,8 +73,6 @@ namespace LCT.SW360PackageCreator
             {
                 environmentHelper.CallEnvironmentExit(-1);
             }
-
-            Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Package creator >>>>>====================", null);
             Logger.Logger.Log(null, Level.Notice, $"\nStart of Package creator execution : {DateTime.Now}", null);
 
             if (appSettings.IsTestMode)

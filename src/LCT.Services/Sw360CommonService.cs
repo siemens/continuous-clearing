@@ -108,7 +108,7 @@ namespace LCT.Services
         {
             string correlationId = Guid.NewGuid().ToString();
             HttpResponseMessage httpResponseComponent = await m_SW360ApiCommunicationFacade.GetComponentByExternalId(externalIdUriString, externalIdKey, correlationId);
-            LogHandlingHelper.HttpResponseHandling("Response of get component data by externalId", $"MethodName:GetReleaseDataByExternalId(),CorrelationId:{correlationId}", httpResponseComponent);
+            await LogHandlingHelper.HttpResponseHandling("Response of get component data by externalId", $"MethodName:GetReleaseDataByExternalId(),CorrelationId:{correlationId}", httpResponseComponent);
             var responseContent = httpResponseComponent?.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
             var componentsModel = JsonConvert.DeserializeObject<ComponentsModel>(responseContent);
             return componentsModel?.Embedded?.Sw360components ?? new List<Sw360Components>();
@@ -133,7 +133,7 @@ namespace LCT.Services
                 foreach (string externalIdKey in externalIdKeyList)
                 {
                     HttpResponseMessage httpResponseComponent = await m_SW360ApiCommunicationFacade.GetReleaseByExternalId(releaseExternalId, externalIdKey, correlationId);
-                    LogHandlingHelper.HttpResponseHandling("Response of get release data by externalId", $"MethodName:GetReleaseDataByExternalId(),CorrelationId:{correlationId}", httpResponseComponent);
+                    await LogHandlingHelper.HttpResponseHandling("Response of get release data by externalId", $"MethodName:GetReleaseDataByExternalId(),CorrelationId:{correlationId}", httpResponseComponent);
                     var responseContent = httpResponseComponent?.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
                     var componentsRelease = JsonConvert.DeserializeObject<ComponentsRelease>(responseContent);
                     var sw360releasesdata = componentsRelease?.Embedded?.Sw360Releases ?? new List<Sw360Releases>();
@@ -144,7 +144,7 @@ namespace LCT.Services
                         Logger.Debug($"GetReleaseDataByExternalId(): If releaseExternalId have NPM . We reruning the api call.");
                         releaseExternalId = Uri.EscapeDataString(releaseExternalId);
                         httpResponseComponent = await m_SW360ApiCommunicationFacade.GetReleaseByExternalId(releaseExternalId, externalIdKey, correlationId);
-                        LogHandlingHelper.HttpResponseHandling("Response of get release data by externalId", $"MethodName:GetReleaseDataByExternalId(),CorrelationId:{correlationId}", httpResponseComponent);
+                        await LogHandlingHelper.HttpResponseHandling("Response of get release data by externalId", $"MethodName:GetReleaseDataByExternalId(),CorrelationId:{correlationId}", httpResponseComponent);
                         responseContent = httpResponseComponent?.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
                         componentsRelease = JsonConvert.DeserializeObject<ComponentsRelease>(responseContent);
                         sw360releasesdata = componentsRelease?.Embedded?.Sw360Releases ?? new List<Sw360Releases>();

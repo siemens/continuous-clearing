@@ -161,9 +161,7 @@ namespace LCT.Common
                 }
                 else
                 {
-                    string errorMessage = "Invalid path entered. Please check if the comparison BOM path entered is correct.";
-                    string solution = "Ensure the file path is correct and the file exists.";
-                    LogHandlingHelper.BasicErrorHandling("Combine components in already existing Bomfile", "CombineComponentsFromExistingBOM()", errorMessage, solution);
+                    LogHandlingHelper.BasicErrorHandling("Combine components in already existing Bomfile", "CombineComponentsFromExistingBOM()", "Invalid path entered. Please check if the comparison BOM path entered is correct.", "Ensure the file path is correct and the file exists.");
                     Logger.Error($"Error:Invalid path entered,Please check if the comparison BOM  path entered is correct");
                     throw new FileNotFoundException();
                 }

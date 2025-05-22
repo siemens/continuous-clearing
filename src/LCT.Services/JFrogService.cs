@@ -41,7 +41,7 @@ namespace LCT.Services
             try
             {
                 httpResponseMessage = await m_JFrogApiCommunicationFacade.GetInternalComponentDataByRepo(repoName, correlationId);
-                LogHandlingHelper.HttpResponseHandling("Get component data by repo", $"MethodName:GetInternalComponentDataByRepo(),CorrelationId:{correlationId}", httpResponseMessage, "");
+                await LogHandlingHelper.HttpResponseHandling("Get component data by repo", $"MethodName:GetInternalComponentDataByRepo(),CorrelationId:{correlationId}", httpResponseMessage, "");
                 if (httpResponseMessage == null || !httpResponseMessage.IsSuccessStatusCode)
                 {
                     return new List<AqlResult>();
@@ -74,7 +74,7 @@ namespace LCT.Services
             try
             {
                 httpResponseMessage = await m_JFrogApiCommunicationFacade.GetNpmComponentDataByRepo(repoName, correlationId);
-                LogHandlingHelper.HttpResponseHandling("Get NPM component data by repo", $"MethodName:GetNpmComponentDataByRepo(),CorrelationId:{correlationId}", httpResponseMessage, "");
+                await LogHandlingHelper.HttpResponseHandling("Get NPM component data by repo", $"MethodName:GetNpmComponentDataByRepo(),CorrelationId:{correlationId}", httpResponseMessage, "");
                 if (httpResponseMessage == null || !httpResponseMessage.IsSuccessStatusCode)
                 {
                     return new List<AqlResult>();
@@ -108,7 +108,7 @@ namespace LCT.Services
             try
             {
                 httpResponseMessage = await m_JFrogApiCommunicationFacade.GetPypiComponentDataByRepo(repoName, correlationId);
-                LogHandlingHelper.HttpResponseHandling("Get Pypi component data by repo", $"MethodName:GetPypiComponentDataByRepo()", httpResponseMessage, "");
+                await LogHandlingHelper.HttpResponseHandling("Get Pypi component data by repo", $"MethodName:GetPypiComponentDataByRepo()", httpResponseMessage, "");
                 if (httpResponseMessage == null || !httpResponseMessage.IsSuccessStatusCode)
                 {
                     return new List<AqlResult>();
@@ -144,7 +144,7 @@ namespace LCT.Services
             try
             {
                 httpResponseMessage = await m_JFrogApiCommunicationFacade.GetPackageInfo(component, correlationId);
-                LogHandlingHelper.HttpResponseHandling("Get package info", $"MethodName:GetPackageInfo(),CorrelationId:{correlationId}", httpResponseMessage, "");
+                await LogHandlingHelper.HttpResponseHandling("Get package info", $"MethodName:GetPackageInfo(),CorrelationId:{correlationId}", httpResponseMessage, "");
                 httpResponseMessage.EnsureSuccessStatusCode();
 
                 string stringData = httpResponseMessage.Content?.ReadAsStringAsync()?.Result ?? string.Empty;

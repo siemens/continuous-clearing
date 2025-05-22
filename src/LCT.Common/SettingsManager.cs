@@ -197,56 +197,64 @@ namespace LCT.Common
         {
             StringBuilder missingParameters = new StringBuilder();
             Logger.Debug($"CheckForMissingParameter(): Required Parameters: {string.Join(", ", reqParameters)}");
+
             foreach (string key in reqParameters)
             {
-                string[] parts = key.Split('.');
-                object currentObject = appSettings;
-                PropertyInfo property = null;
-
-                foreach (string part in parts)
+                if (IsParameterMissing(appSettings, key))
                 {
-                    if (currentObject == null)
-                    {
-                        break;
-                    }
-
-                    property = currentObject.GetType().GetProperty(part, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-                    currentObject = property?.GetValue(currentObject);
-                }
-
-                if (currentObject is Array array)
-                {
-                    if (array.Length == 0 || string.IsNullOrWhiteSpace(array.GetValue(0)?.ToString()))
-                    {
-                        missingParameters.Append(key + "\n");
-                    }
-                }
-                else if (currentObject is IList<object> list)
-                {
-                    if (list.Count == 0 || string.IsNullOrWhiteSpace(list[0]?.ToString()))
-                    {
-                        missingParameters.Append(key + "\n");
-                    }
-                }
-                else
-                {
-                    string value = currentObject?.ToString();
-                    if (string.IsNullOrWhiteSpace(value))
-                    {
-                        missingParameters.Append(key + "\n");
-                    }
+                    missingParameters.Append(key + "\n");
                 }
             }
 
+            HandleMissingParameters(missingParameters);
+        }
+
+        private static bool IsParameterMissing(CommonAppSettings appSettings, string key)
+        {
+            string[] parts = key.Split('.');
+            object currentObject = appSettings;
+
+            foreach (string part in parts)
+            {
+                if (currentObject == null)
+                {
+                    return true;
+                }
+
+                PropertyInfo property = currentObject.GetType().GetProperty(part, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                currentObject = property?.GetValue(currentObject);
+            }
+
+            return IsValueMissing(currentObject);
+        }
+
+        private static bool IsValueMissing(object currentObject)
+        {
+            if (currentObject is Array array)
+            {
+                return array.Length == 0 || string.IsNullOrWhiteSpace(array.GetValue(0)?.ToString());
+            }
+
+            if (currentObject is IList<object> list)
+            {
+                return list.Count == 0 || string.IsNullOrWhiteSpace(list[0]?.ToString());
+            }
+
+            string value = currentObject?.ToString();
+            return string.IsNullOrWhiteSpace(value);
+        }
+
+        private static void HandleMissingParameters(StringBuilder missingParameters)
+        {
             if (!string.IsNullOrWhiteSpace(missingParameters.ToString()))
             {
-                Logger.Debug($"CheckForMissingParameter(): Missing Parameters: {missingParameters.ToString().Trim()}");
+                Logger.Debug($"HandleMissingParameters(): Missing Parameters: {missingParameters.ToString().Trim()}");
                 ExceptionHandling.ArgumentException(missingParameters.ToString());
                 environmentHelper.CallEnvironmentExit(-1);
             }
             else
             {
-                Logger.Debug("CheckForMissingParameter(): All required parameters are present.");
+                Logger.Debug("HandleMissingParameters(): All required parameters are present.");
             }
         }
         public static bool IsAzureDevOpsDebugEnabled()

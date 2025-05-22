@@ -86,7 +86,7 @@ namespace LCT.ArtifactoryUploader
         }
         private static void ValidComponentsIdentifiedToBeUpload(List<ComponentsToArtifactory> componentsToBeUploaded)
         {
-            if (componentsToBeUploaded == null || !componentsToBeUploaded.Any())
+            if (componentsToBeUploaded == null || componentsToBeUploaded.Count == 0)
             {
                 Logger.Debug("No components to be uploaded to Artifactory.");
                 return;

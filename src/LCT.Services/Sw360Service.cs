@@ -131,7 +131,7 @@ namespace LCT.Services
             try
             {
                 responseBody = await m_SW360ApiCommunicationFacade.GetReleaseById(releaseId, correlationId);
-                LogHandlingHelper.HttpResponseHandling("Response of get release data by releaseId", $"MethodName:GetReleaseInfoByReleaseId(),CorrelationId:{correlationId}", responseBody);
+                await LogHandlingHelper.HttpResponseHandling("Response of get release data by releaseId", $"MethodName:GetReleaseInfoByReleaseId(),CorrelationId:{correlationId}", responseBody);
             }
             catch (HttpRequestException ex)
             {

@@ -10,6 +10,7 @@ using System.Net;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace LCT.Common.UTest
 {
@@ -89,7 +90,7 @@ namespace LCT.Common.UTest
         }
 
         [Test]
-        public void HttpResponseErrorHandling_ShouldLogHttpResponseDetails()
+        public async Task HttpResponseErrorHandling_ShouldLogHttpResponseDetails()
         {
             // Arrange
             string context = "TestContext";
@@ -103,7 +104,7 @@ namespace LCT.Common.UTest
             string additionalDetails = "AdditionalTestDetails";
 
             // Act
-            LogHandlingHelper.HttpResponseErrorHandling(context, details, response, additionalDetails);
+            await LogHandlingHelper.HttpResponseErrorHandling(context, details, response, additionalDetails);
 
             // Assert
             _mockLogger.Verify(logger => logger.Debug(It.Is<string>(log =>
@@ -115,7 +116,7 @@ namespace LCT.Common.UTest
         }
 
         [Test]
-        public void HttpRequestHandling_ShouldLogRequestDetails()
+        public async Task HttpRequestHandling_ShouldLogRequestDetails()
         {
             // Arrange
             string context = "TestContext";
@@ -126,7 +127,7 @@ namespace LCT.Common.UTest
             var httpContent = new StringContent("Test request content");
 
             // Act
-            LogHandlingHelper.HttpRequestHandling(context, details, httpClient, url, httpContent);
+            await LogHandlingHelper.HttpRequestHandling(context, details, httpClient, url, httpContent);
 
             // Assert
             _mockLogger.Verify(logger => logger.Debug(It.Is<string>(log =>
@@ -136,7 +137,7 @@ namespace LCT.Common.UTest
                 log.Contains("Test request content"))), Times.Once);
         }
         [Test]
-        public void HttpResponseHandling_ShouldLogRequestAndResponseDetails()
+        public async Task HttpResponseHandling_ShouldLogRequestAndResponseDetails()
         {
             // Arrange
             string context = "TestContext";
@@ -152,7 +153,7 @@ namespace LCT.Common.UTest
             response.RequestMessage.Headers.Add("Authorization", "Bearer token");
 
             // Act
-            LogHandlingHelper.HttpResponseHandling(context, details, response, additionalDetails);
+            await LogHandlingHelper.HttpResponseHandling(context, details, response, additionalDetails);
 
             // Assert
             _mockLogger.Verify(logger => logger.Debug(It.Is<string>(log =>
@@ -167,7 +168,7 @@ namespace LCT.Common.UTest
         }
 
         [Test]
-        public void HttpResponseHandling_ShouldHandleEmptyResponseContent()
+        public async Task HttpResponseHandling_ShouldHandleEmptyResponseContent()
         {
             // Arrange
             string context = "TestContext";
@@ -182,7 +183,7 @@ namespace LCT.Common.UTest
             response.RequestMessage = new HttpRequestMessage(HttpMethod.Post, "https://example.com/api");
 
             // Act
-            LogHandlingHelper.HttpResponseHandling(context, details, response, additionalDetails);
+            await LogHandlingHelper.HttpResponseHandling(context, details, response, additionalDetails);
 
             // Assert
             _mockLogger.Verify(logger => logger.Debug(It.Is<string>(log =>
@@ -196,7 +197,7 @@ namespace LCT.Common.UTest
         }
 
         [Test]
-        public void HttpResponseHandling_ShouldHandleNullResponse()
+        public async Task HttpResponseHandling_ShouldHandleNullResponse()
         {
             // Arrange
             string context = "TestContext";
@@ -204,7 +205,7 @@ namespace LCT.Common.UTest
             string additionalDetails = "AdditionalTestDetails";
 
             // Act
-            LogHandlingHelper.HttpResponseHandling(context, details, null, additionalDetails);
+            await LogHandlingHelper.HttpResponseHandling(context, details, null, additionalDetails);
 
             // Assert
             _mockLogger.Verify(logger => logger.Debug(It.Is<string>(log =>
@@ -216,7 +217,7 @@ namespace LCT.Common.UTest
         }
 
         [Test]
-        public void HttpResponseHandling_ShouldTruncateContentWhenVerboseIsFalse()
+        public async Task HttpResponseHandling_ShouldTruncateContentWhenVerboseIsFalse()
         {
             // Arrange
             string context = "TestContext";
@@ -240,7 +241,7 @@ namespace LCT.Common.UTest
             Log4Net.Verbose = false;
 
             // Act
-            LogHandlingHelper.HttpResponseHandling(context, details, response, additionalDetails);
+            await LogHandlingHelper.HttpResponseHandling(context, details, response, additionalDetails);
 
             // Assert
             _mockLogger.Verify(logger => logger.Debug(It.Is<string>(log =>

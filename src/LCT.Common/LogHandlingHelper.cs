@@ -7,13 +7,16 @@ using System.Net.Http;
 using CycloneDX.Models;
 using LCT.Common.Model;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace LCT.Common
 {
     public static partial class LogHandlingHelper
     {
-        public static ILog _logger = LogManager.GetLogger(typeof(LogHandlingHelper));
-
+#pragma warning disable CA2211 // Non-constant fields should not be visible
+        private static ILog _logger = LogManager.GetLogger(typeof(LogHandlingHelper));
+#pragma warning restore CA2211 // Non-constant fields should not be visible
+        private static readonly char[] NewLineSeparator = new[] { '\n' };
         public static ILog Logger
         {
             get => _logger;
@@ -95,133 +98,148 @@ namespace LCT.Common
             // Log the constructed message
             Logger.Debug("\n" + logBuilder.ToString());
         }
-        public static void HttpResponseHandling(string context, string details, HttpResponseMessage response, string additionalDetails = null)
+        public static async Task HttpResponseHandling(string context, string details, HttpResponseMessage response, string additionalDetails = null)
         {
-            // Extract request details from the response
+            // Extract request details
             string requestMethod = response?.RequestMessage?.Method.ToString() ?? string.Empty;
             string requestUrl = response?.RequestMessage?.RequestUri?.ToString() ?? string.Empty;
-            string requestHeaders = response?.RequestMessage?.Headers != null
-        ? string.Join("\n", response.RequestMessage.Headers
-            .Where(h => !h.Key.Equals("LogWarnings", StringComparison.CurrentCultureIgnoreCase) &&
-                        !h.Key.Equals("urlInfo", StringComparison.CurrentCultureIgnoreCase))
-            .Select(h =>
-            {
-                string headerValue = string.Join(", ", h.Value);
-                if (h.Key.Contains("authorization", StringComparison.CurrentCultureIgnoreCase) ||
-                    h.Key.Contains("token", StringComparison.CurrentCultureIgnoreCase) ||
-                    headerValue.Contains("bearer", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    headerValue = "*****"; // Mask sensitive values
-                }
-                return $"{h.Key}: {headerValue}";
-            }))
-        : string.Empty;
-            
+            string requestHeaders = ExtractRequestHeaders(response);
 
-            // Simplified reasonPhrase logic
-            string reasonPhrase = !string.IsNullOrEmpty(response?.ReasonPhrase)
-                ? response.ReasonPhrase
-                : "No Reason Phrase";
-
-            // Parse response content (full content for all responses)
-            string responseContent = response?.Content != null
-                ? response.Content.ReadAsStringAsync().Result
-                : string.Empty;
-
-            // Mask sensitive information in the response content
-            if (!string.IsNullOrEmpty(responseContent))
-            {
-                responseContent = MaskSensitiveData(responseContent);
-            }
-            // If verbose is false, limit the response content to the first 1000 lines
-            if (!Log4Net.Verbose && !string.IsNullOrEmpty(responseContent))
-            {
-                // Define a configurable limit for the number of lines to display
-                int maxLinesToShow = 1000; // Change this value to show more lines
-
-                var lines = responseContent.Split(new[] { '\n' }, StringSplitOptions.None);
-
-                // Check if the content has more lines than the limit
-                if (lines.Length > maxLinesToShow)
-                {
-                    responseContent = string.Join("\n", lines.Take(maxLinesToShow));
-                    responseContent += $"\n... [Content truncated. Showing first {maxLinesToShow} lines. Enable verbose mode to see full content.]";
-                }
-                else
-                {
-                    // If the content has fewer than or equal to 1000 lines, display it as is
-                    responseContent = string.Join("\n", lines);
-                }
-            }
+            // Extract response details
+            string reasonPhrase = GetReasonPhrase(response);
+            string responseContent = await GetResponseContentAsync(response);
 
             // Build the log message
             var logBuilder = new System.Text.StringBuilder();
-            logBuilder.AppendLine("\n============================================================================================================================================");
-            logBuilder.AppendLine(" HTTP API RESPONSE DETAILS");
-            logBuilder.AppendLine("--------------------------------------------------------------------------------------------------------------------------------------------");
-            logBuilder.AppendLine($"Details: {details}");
-            logBuilder.AppendLine($"Description: {context}");
-            logBuilder.AppendLine("--------------------------------------------------------------------------------------------------------------------------------------------");
-
-            // Add request details if available
-            if (!string.IsNullOrEmpty(requestMethod) || !string.IsNullOrEmpty(requestUrl) || !string.IsNullOrEmpty(requestHeaders))
-            {
-                logBuilder.AppendLine("REQUEST DETAILS");
-                logBuilder.AppendLine("--------------------------------------------------------------------------------------------------------------------------------------------");
-                if (!string.IsNullOrEmpty(requestMethod)) logBuilder.AppendLine($"Method: {requestMethod}");
-                if (!string.IsNullOrEmpty(requestUrl)) logBuilder.AppendLine($"URL: {requestUrl}");
-                if (!string.IsNullOrEmpty(requestHeaders)) logBuilder.AppendLine($"Headers:\n{requestHeaders}");
-                logBuilder.AppendLine("--------------------------------------------------------------------------------------------------------------------------------------------");
-            }
-
-            // Add response details
-            logBuilder.AppendLine("RESPONSE DETAILS");
-            logBuilder.AppendLine("--------------------------------------------------------------------------------------------------------------------------------------------");
-            logBuilder.AppendLine($"Status Code: {response?.StatusCode}");
-            logBuilder.AppendLine($"Reason Phrase: {reasonPhrase}");
-
-            // Add full content for all responses
-            if (!string.IsNullOrEmpty(responseContent))
-            {
-                logBuilder.AppendLine("--------------------------------------------------------------------------------------------------------------------------------------------");
-                logBuilder.AppendLine("CONTENT:");
-                logBuilder.AppendLine("--------------------------------------------------------------------------------------------------------------------------------------------");
-                logBuilder.AppendLine(responseContent);
-            }
-
-            // Append additional details if available
-            if (!string.IsNullOrEmpty(additionalDetails))
-            {
-                logBuilder.AppendLine("--------------------------------------------------------------------------------------------------------------------------------------------");
-                logBuilder.AppendLine("ADDITIONAL DETAILS:");
-                logBuilder.AppendLine("--------------------------------------------------------------------------------------------------------------------------------------------");
-                logBuilder.AppendLine(additionalDetails);
-            }
+            AppendLogHeader(logBuilder, context, details);
+            AppendRequestDetails(logBuilder, requestMethod, requestUrl, requestHeaders);
+            AppendResponseDetails(logBuilder, response, reasonPhrase, responseContent);
+            AppendAdditionalDetails(logBuilder, additionalDetails);
 
             logBuilder.AppendLine("============================================================================================================================================");
 
             // Log the constructed message
             Logger.Debug(logBuilder.ToString());
         }
-        public static void HttpResponseErrorHandling(string context, string details, HttpResponseMessage response, string additionalDetails = null)
+
+        private static string ExtractRequestHeaders(HttpResponseMessage response)
         {
-            // Read the response content
-            string responseContent = response.Content != null ? response.Content.ReadAsStringAsync().Result : string.Empty;
-            var headers = response.Headers
-        .Where(h => !h.Key.Equals("LogWarnings", StringComparison.CurrentCultureIgnoreCase) &&
-                    !h.Key.Equals("urlInfo", StringComparison.CurrentCultureIgnoreCase))
-        .Select(h =>
+            if (response?.RequestMessage?.Headers == null) return string.Empty;
+
+            return string.Join("\n", response.RequestMessage.Headers
+                .Where(h => !h.Key.Equals("LogWarnings", StringComparison.CurrentCultureIgnoreCase) &&
+                            !h.Key.Equals("urlInfo", StringComparison.CurrentCultureIgnoreCase))
+                .Select(h =>
+                {
+                    string headerValue = string.Join(", ", h.Value);
+                    if (h.Key.Contains("authorization", StringComparison.CurrentCultureIgnoreCase) ||
+                        h.Key.Contains("token", StringComparison.CurrentCultureIgnoreCase) ||
+                        headerValue.Contains("bearer", StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        headerValue = "*****"; // Mask sensitive values
+                    }
+                    return $"{h.Key}: {headerValue}";
+                }));
+        }
+
+        private static string GetReasonPhrase(HttpResponseMessage response)
         {
-            string headerValue = string.Join(", ", h.Value);
-            if (h.Key.Contains("authorization", StringComparison.CurrentCultureIgnoreCase) ||
-                h.Key.Contains("token", StringComparison.CurrentCultureIgnoreCase) ||
-                headerValue.ToLower().Contains("bearer"))
+            return !string.IsNullOrEmpty(response?.ReasonPhrase) ? response.ReasonPhrase : "No Reason Phrase";
+        }
+
+        private static async Task<string> GetResponseContentAsync(HttpResponseMessage response)
+        {
+            string content = response?.Content != null ? await response.Content.ReadAsStringAsync() : string.Empty;
+
+            if (!string.IsNullOrEmpty(content))
             {
-                headerValue = "*****"; // Mask sensitive values
+                content = MaskSensitiveData(content);
+                if (!Log4Net.Verbose)
+                {
+                    content = TruncateContent(content, 1000);
+                }
             }
-            return new { Key = h.Key, Value = headerValue };
-        }).ToList();
-            
+
+            return content;
+        }
+
+        private static string TruncateContent(string content,int maxLinesToShow)
+        {
+            var lines = content.Split(NewLineSeparator, StringSplitOptions.None);
+            if (lines.Length > maxLinesToShow)
+            {
+                return string.Join("\n", lines.Take(maxLinesToShow)) +
+                       $"\n... [Content truncated. Showing first {maxLinesToShow} lines. Enable verbose mode to see full content.]";
+            }
+            return content;
+        }
+
+        private static void AppendLogHeader(StringBuilder logBuilder, string context, string details)
+        {
+            logBuilder.AppendLine("\n============================================================================================================================================");
+            logBuilder.AppendLine(" HTTP API RESPONSE DETAILS");
+            logBuilder.AppendLine("--------------------------------------------------------------------------------------------------------------------------------------------");
+            logBuilder.AppendLine($"Details: {details}");
+            logBuilder.AppendLine($"Description: {context}");
+            logBuilder.AppendLine("--------------------------------------------------------------------------------------------------------------------------------------------");
+        }
+
+        private static void AppendRequestDetails(StringBuilder logBuilder, string method, string url, string headers)
+        {
+            if (string.IsNullOrEmpty(method) && string.IsNullOrEmpty(url) && string.IsNullOrEmpty(headers)) return;
+
+            logBuilder.AppendLine("REQUEST DETAILS");
+            logBuilder.AppendLine("--------------------------------------------------------------------------------------------------------------------------------------------");
+            if (!string.IsNullOrEmpty(method)) logBuilder.AppendLine($"Method: {method}");
+            if (!string.IsNullOrEmpty(url)) logBuilder.AppendLine($"URL: {url}");
+            if (!string.IsNullOrEmpty(headers)) logBuilder.AppendLine($"Headers:\n{headers}");
+            logBuilder.AppendLine("--------------------------------------------------------------------------------------------------------------------------------------------");
+        }
+
+        private static void AppendResponseDetails(StringBuilder logBuilder, HttpResponseMessage response, string reasonPhrase, string content)
+        {
+            logBuilder.AppendLine("RESPONSE DETAILS");
+            logBuilder.AppendLine("--------------------------------------------------------------------------------------------------------------------------------------------");
+            logBuilder.AppendLine($"Status Code: {response?.StatusCode}");
+            logBuilder.AppendLine($"Reason Phrase: {reasonPhrase}");
+
+            if (!string.IsNullOrEmpty(content))
+            {
+                logBuilder.AppendLine("--------------------------------------------------------------------------------------------------------------------------------------------");
+                logBuilder.AppendLine("CONTENT:");
+                logBuilder.AppendLine("--------------------------------------------------------------------------------------------------------------------------------------------");
+                logBuilder.AppendLine(content);
+            }
+        }
+
+        private static void AppendAdditionalDetails(StringBuilder logBuilder, string additionalDetails)
+        {
+            if (string.IsNullOrEmpty(additionalDetails)) return;
+
+            logBuilder.AppendLine("--------------------------------------------------------------------------------------------------------------------------------------------");
+            logBuilder.AppendLine("ADDITIONAL DETAILS:");
+            logBuilder.AppendLine("--------------------------------------------------------------------------------------------------------------------------------------------");
+            logBuilder.AppendLine(additionalDetails);
+        }
+        public static async Task HttpResponseErrorHandling(string context, string details, HttpResponseMessage response, string additionalDetails = null)
+        {
+            // Read the response content asynchronously
+            string responseContent = response.Content != null ? await response.Content.ReadAsStringAsync() : string.Empty;
+
+            var headers = response.Headers
+                .Where(h => !h.Key.Equals("LogWarnings", StringComparison.CurrentCultureIgnoreCase) &&
+                            !h.Key.Equals("urlInfo", StringComparison.CurrentCultureIgnoreCase))
+                .Select(h =>
+                {
+                    string headerValue = string.Join(", ", h.Value);
+                    if (h.Key.Contains("authorization", StringComparison.CurrentCultureIgnoreCase) ||
+                        h.Key.Contains("token", StringComparison.CurrentCultureIgnoreCase) ||
+                        headerValue.Contains("bearer", StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        headerValue = "*****"; // Mask sensitive values
+                    }
+                    return new { Key = h.Key, Value = headerValue };
+                }).ToList();
 
             // Build the log message in table format
             var logBuilder = new System.Text.StringBuilder();
@@ -282,26 +300,25 @@ namespace LCT.Common
             // Log the constructed message
             Logger.Debug(logBuilder.ToString());
         }
-        public static void HttpRequestHandling(string context, string details, HttpClient httpClient, string url, HttpContent httpContent = null)
+        public static async Task HttpRequestHandling(string context, string details, HttpClient httpClient, string url, HttpContent httpContent = null)
         {
-
             var headers = httpClient.DefaultRequestHeaders
-        .Where(h => !h.Key.Equals("LogWarnings", StringComparison.CurrentCultureIgnoreCase) &&
-                    !h.Key.Equals("urlInfo", StringComparison.CurrentCultureIgnoreCase))
-        .Select(h =>
-        {
-            string headerValue = string.Join(", ", h.Value);
-            if (h.Key.Contains("authorization", StringComparison.CurrentCultureIgnoreCase) ||
-                h.Key.Contains("token", StringComparison.CurrentCultureIgnoreCase) ||
-                headerValue.ToLower().Contains("bearer"))
-            {
-                headerValue = "*****"; // Mask sensitive values
-            }
-            return new { Key = h.Key, Value = headerValue };
-        }).ToList();            
+                .Where(h => !h.Key.Equals("LogWarnings", StringComparison.CurrentCultureIgnoreCase) &&
+                            !h.Key.Equals("urlInfo", StringComparison.CurrentCultureIgnoreCase))
+                .Select(h =>
+                {
+                    string headerValue = string.Join(", ", h.Value);
+                    if (h.Key.Contains("authorization", StringComparison.CurrentCultureIgnoreCase) ||
+                        h.Key.Contains("token", StringComparison.CurrentCultureIgnoreCase) ||
+                        headerValue.Contains("bearer", StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        headerValue = "*****"; // Mask sensitive values
+                    }
+                    return new { Key = h.Key, Value = headerValue };
+                }).ToList();
 
-            // Read the content of the HttpContent
-            string content = httpContent != null ? httpContent.ReadAsStringAsync().Result : string.Empty;
+            // Read the content of the HttpContent asynchronously
+            string content = httpContent != null ? await httpContent.ReadAsStringAsync() : string.Empty;
 
             // Build the log message
             var logBuilder = new System.Text.StringBuilder();
@@ -410,9 +427,9 @@ namespace LCT.Common
             if (!Log4Net.Verbose && !string.IsNullOrEmpty(responseBody))
             {
                 // Define a configurable limit for the number of lines to display
-                int maxLinesToShow = 1000; // Change this value to show more lines
+                const int maxLinesToShow = 1000; // Change this value to show more lines
 
-                var lines = responseBody.Split(new[] { '\n' }, StringSplitOptions.None);
+                var lines = responseBody.Split(NewLineSeparator, StringSplitOptions.None);
 
                 // Check if the content has more lines than the limit
                 if (lines.Length > maxLinesToShow)
@@ -551,7 +568,7 @@ namespace LCT.Common
             // Add rows for each component
             foreach (var component in components)
             {
-                logBuilder.AppendLine($"| {component.Name,-20} | {component.Group,-15} | {component.Version,-10} | {component.ComponentExternalId,-50} | {component.ReleaseExternalId,-70} | {component.SourceUrl,-100} | {component.DownloadUrl,-100} | {component.ComponentStatus,-20} | {component.ReleaseStatus,-20} | {component.ApprovedStatus,-25} | {component.IsComponentCreated,-20} | {component.IsReleaseCreated,-20} | {component.FossologyUploadStatus,-25} | {component.ReleaseLink,-150} | {component.ReleaseID,-15} | {component.AlpineSource,-20} | {string.Join(", ", component.PatchURls ?? new string[0]),-50} |");
+                logBuilder.AppendLine($"| {component.Name,-20} | {component.Group,-15} | {component.Version,-10} | {component.ComponentExternalId,-50} | {component.ReleaseExternalId,-70} | {component.SourceUrl,-100} | {component.DownloadUrl,-100} | {component.ComponentStatus,-20} | {component.ReleaseStatus,-20} | {component.ApprovedStatus,-25} | {component.IsComponentCreated,-20} | {component.IsReleaseCreated,-20} | {component.FossologyUploadStatus,-25} | {component.ReleaseLink,-150} | {component.ReleaseID,-15} | {component.AlpineSource,-20} | {string.Join(", ", component.PatchURls ?? []),-50} |");
             }
 
             logBuilder.AppendLine("=====================================================================================================================================================");

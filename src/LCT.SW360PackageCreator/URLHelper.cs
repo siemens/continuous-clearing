@@ -824,7 +824,7 @@ namespace LCT.SW360PackageCreator
                 URL = $"{CommonAppSettings.PyPiURL}{componentName}" +
                     $"{Dataconstant.ForwardSlash}{componenVersion}{Dataconstant.ForwardSlash}json";
                 // Log the request details
-                LogHandlingHelper.HttpRequestHandling("GetResponseFromPyPiOrg", $"MethodName:GetResponseFromPyPiOrg(), ComponentName: {componentName}, Version: {componenVersion}", httpClient, URL);
+                await LogHandlingHelper.HttpRequestHandling("GetResponseFromPyPiOrg", $"MethodName:GetResponseFromPyPiOrg(), ComponentName: {componentName}, Version: {componenVersion}", httpClient, URL);
                 var response = await httpClient.GetStringAsync(URL);
                 LogHandlingHelper.HttpResponseOfStringContent("GetResponseFromPyPiOrg", $"MethodName:GetResponseFromPyPiOrg(), ComponentName: {componentName}, Version: {componenVersion}", response);
                 return response.ToString();

@@ -56,7 +56,7 @@ namespace LCT.ArtifactoryUploader
                     PackageType.Internal => await JFrogApiCommInstance.MoveFromRepo(component, correlationId),
                     _ => new HttpResponseMessage(HttpStatusCode.NotFound)
                 };
-                LogHandlingHelper.HttpResponseHandling("Upload Package To Repo", $"MethodName:UploadPackageToRepo(),CorrelationId:{correlationId}", responsemessage, "");
+                await LogHandlingHelper.HttpResponseHandling("Upload Package To Repo", $"MethodName:UploadPackageToRepo(),CorrelationId:{correlationId}", responsemessage, "");
                 // Check status code and handle errors
                 if (responsemessage.StatusCode != HttpStatusCode.OK)
                 {

@@ -64,9 +64,9 @@ namespace LCT.SW360PackageCreator
             {
                 LogHandlingHelper.ExceptionErrorHandling("Fossology Validation", $"MethodName:TriggerFossologyValidation()", ex, "");
             }
-            catch (Exception ex)
+            catch (HttpRequestException ex)
             {
-                Logger.Error($"TriggerFossologyValidation(): An unexpected error occurred.{ex.Message}");
+                Logger.Error($"TriggerFossologyValidation(): {ex.Message}");
                 LogHandlingHelper.ExceptionErrorHandling("Fossology Validation", "TriggerFossologyValidation()", ex, "Investigate the exception details to identify the root cause.");
             }
         }
@@ -146,7 +146,7 @@ namespace LCT.SW360PackageCreator
             try
             {
                 var responseData = await sW360ApicommunicationFacade.GetAllReleasesWithAllData(page, pageEntries, correlationId);
-                LogHandlingHelper.HttpResponseHandling("Get All Releases Details", $"MethodName:GetAllReleasesDetails(),CorrelationId:{correlationId}", responseData);
+                await LogHandlingHelper.HttpResponseHandling("Get All Releases Details", $"MethodName:GetAllReleasesDetails(),CorrelationId:{correlationId}", responseData);
                 string response = responseData?.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
                 releaseResponse = JsonConvert.DeserializeObject<ReleasesAllDetails>(response);
             }
@@ -191,9 +191,9 @@ namespace LCT.SW360PackageCreator
                 {
                     try
                     {
-                        LogHandlingHelper.HttpRequestHandling("Fossology URL Validation", $"Methodname:FossologyUrlValidation(),CorrelationId:{correlationId}", client, url);
+                        await LogHandlingHelper.HttpRequestHandling("Fossology URL Validation", $"Methodname:FossologyUrlValidation(),CorrelationId:{correlationId}", client, url);
                         HttpResponseMessage response = await client.GetAsync(new Uri(appSettings.SW360.Fossology.URL));
-                        LogHandlingHelper.HttpResponseHandling("Fossology URL Validation", $"Methodname:FossologyUrlValidation(),CorrelationId:{correlationId}", response);
+                        await LogHandlingHelper.HttpResponseHandling("Fossology URL Validation", $"Methodname:FossologyUrlValidation(),CorrelationId:{correlationId}", response);
 
                         if (response.IsSuccessStatusCode)
                         {

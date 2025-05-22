@@ -73,7 +73,7 @@ namespace LCT.Services
                 crt.ExternalIds.Purl_Id = string.Empty;
                 // create component in sw360
                 HttpResponseMessage response = await m_SW360ApiCommunicationFacade.CreateComponent(crt, correlationId);
-                LogHandlingHelper.HttpResponseHandling("CreateComponent", $"MethodName:CreateComponentBasesOFswComaprisonBOM(), CorrelationId: {correlationId}, ComponentName: {componentInfo.Name}", response);
+                await LogHandlingHelper.HttpResponseHandling("CreateComponent", $"MethodName:CreateComponentBasesOFswComaprisonBOM(), CorrelationId: {correlationId}, ComponentName: {componentInfo.Name}", response);
                 //Component creation Success 
                 if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.Conflict)
                 {
@@ -136,7 +136,7 @@ namespace LCT.Services
             {
 
                 var triggerStatus = await m_SW360ApiCommunicationFacade.CheckFossologyProcessStatus(link, correlationId);
-                LogHandlingHelper.HttpResponseHandling("CheckFossologyProcessStatus", $"MethodName:CheckFossologyProcessStatus(),correlationId:{correlationId} ", triggerStatus);
+                await LogHandlingHelper.HttpResponseHandling("CheckFossologyProcessStatus", $"MethodName:CheckFossologyProcessStatus(),correlationId:{correlationId} ", triggerStatus);
                 string fossStatus = await triggerStatus.Content.ReadAsStringAsync();
                 fossTriggerStatus = JsonConvert.DeserializeObject<CheckFossologyProcess>(fossStatus);
             }
@@ -175,7 +175,7 @@ namespace LCT.Services
                 release.ExternalIds.Package_Url = componentInfo.ReleaseExternalId;
                 release.ExternalIds.Purl_Id = string.Empty;
                 var response = await m_SW360ApiCommunicationFacade.CreateRelease(release, correlationId);
-                LogHandlingHelper.HttpResponseHandling("CreateRelease", $"MethodName:CreateReleaseForComponent(), CorrelationId: {correlationId}, ComponentName: {componentInfo.Name}, Version: {componentInfo.Version}", response);
+                await LogHandlingHelper.HttpResponseHandling("CreateRelease", $"MethodName:CreateReleaseForComponent(), CorrelationId: {correlationId}, ComponentName: {componentInfo.Name}, Version: {componentInfo.Version}", response);
                 //come here - if success to attch src code
                 if (response.IsSuccessStatusCode)
                 {
@@ -317,10 +317,10 @@ namespace LCT.Services
                 StringContent content = new StringContent(JsonConvert.SerializeObject(linkedReleasesDict), Encoding.UTF8, "application/json");
 
                 var response = await m_SW360ApiCommunicationFacade.LinkReleasesToProject(content, sw360ProjectId, correlationId);
-                LogHandlingHelper.HttpResponseHandling("LinkReleasesToProject", $"MethodName:LinkReleasesToProject(), CorrelationId: {correlationId}, ProjectId: {sw360ProjectId}", response);
+                await LogHandlingHelper.HttpResponseHandling("LinkReleasesToProject", $"MethodName:LinkReleasesToProject(), CorrelationId: {correlationId}, ProjectId: {sw360ProjectId}", response);
                 if (!response.IsSuccessStatusCode)
                 {
-                    LogHandlingHelper.HttpResponseErrorHandling("LinkReleasesToProject", $"MethodName:LinkReleasesToProject(), CorrelationId: {correlationId}, ProjectId: {sw360ProjectId}", response, "");
+                    await LogHandlingHelper.HttpResponseErrorHandling("LinkReleasesToProject", $"MethodName:LinkReleasesToProject(), CorrelationId: {correlationId}, ProjectId: {sw360ProjectId}", response, "");
                     Environment.ExitCode = -1;
                     Logger.Error($"LinkReleasesToProject() : Linking releases to project Id {sw360ProjectId} is failed.");
                     return false;
@@ -487,7 +487,7 @@ namespace LCT.Services
                 StringContent content = new StringContent(JsonConvert.SerializeObject(componentPurlUpdated), Encoding.UTF8, "application/json");
 
                 var updateResponse = await m_SW360ApiCommunicationFacade.UpdateComponent(componentId, content);
-                LogHandlingHelper.HttpResponseHandling("UpdateComponent", $"MethodName:UpdatePurlIdForExistingComponent(), CorrelationId: {correlationId}, ComponentId: {componentId}", updateResponse);
+                await LogHandlingHelper.HttpResponseHandling("UpdateComponent", $"MethodName:UpdatePurlIdForExistingComponent(), CorrelationId: {correlationId}, ComponentId: {componentId}", updateResponse);
                 return updateResponse.IsSuccessStatusCode;
             }
             catch (HttpRequestException ex)
@@ -594,7 +594,7 @@ namespace LCT.Services
                 StringContent content = new StringContent(JsonConvert.SerializeObject(updateRelease), Encoding.UTF8, "application/json");
 
                 var updateResponse = await m_SW360ApiCommunicationFacade.UpdateRelease(releaseId, content, correlationId);
-                LogHandlingHelper.HttpResponseHandling("UpdateRelease", $"MethodName:UpdatePurlIdForExistingRelease(), CorrelationId: {correlationId}", updateResponse);
+                await LogHandlingHelper.HttpResponseHandling("UpdateRelease", $"MethodName:UpdatePurlIdForExistingRelease(), CorrelationId: {correlationId}", updateResponse);
                 if (updateResponse != null)
                 {
                     return updateResponse.IsSuccessStatusCode;
@@ -709,7 +709,7 @@ namespace LCT.Services
             try
             {
                 var responseData = await m_SW360ApiCommunicationFacade.GetReleaseById(releaseId, correlationId);
-                LogHandlingHelper.HttpResponseHandling("Response of get release data by releaseId", $"MethodName:GetReleaseInfo(),CorrelationId:{correlationId}", responseData);
+                await LogHandlingHelper.HttpResponseHandling("Response of get release data by releaseId", $"MethodName:GetReleaseInfo(),CorrelationId:{correlationId}", responseData);
                 string response = responseData?.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
                 responsBody = JsonConvert.DeserializeObject<ReleasesInfo>(response);
             }
@@ -742,7 +742,7 @@ namespace LCT.Services
                     Encoding.UTF8,
                     ApiConstant.ApplicationJson);
                 HttpResponseMessage response = await m_SW360ApiCommunicationFacade.UpdateRelease(releaseId, content, correlationId);
-                LogHandlingHelper.HttpResponseHandling("UpdateRelease", $"MethodName:UpdateRelease(), CorrelationId: {correlationId}, ReleaseId: {releaseId}", response);
+                await LogHandlingHelper.HttpResponseHandling("UpdateRelease", $"MethodName:UpdateRelease(), CorrelationId: {correlationId}, ReleaseId: {releaseId}", response);
                 if (response.IsSuccessStatusCode)
                 {
                     isUpdated = true;
@@ -750,7 +750,7 @@ namespace LCT.Services
                 else
                 {
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    LogHandlingHelper.HttpResponseErrorHandling("UdpateSW360ReleaseContent", $"MethodName:UdpateSW360ReleaseContent(), CorrelationId: {correlationId}", response, $"Error Content: {errorContent}");
+                    await LogHandlingHelper.HttpResponseErrorHandling("UdpateSW360ReleaseContent", $"MethodName:UdpateSW360ReleaseContent(), CorrelationId: {correlationId}", response, $"Error Content: {errorContent}");
                 }
             }
             catch (HttpRequestException ex)
