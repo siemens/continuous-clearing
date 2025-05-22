@@ -46,6 +46,6 @@ namespace LCT.Services.Interface
 #nullable enable
         public Task<AqlResult?> GetPackageInfo(ComponentsToArtifactory component);
 
-        public Task<HttpResponseMessage> CheckJFrogConnectivity();
+        public Task<HttpResponseMessage> CheckJFrogConnectivity(string correlationId);
     }
 }

@@ -65,13 +65,13 @@ namespace LCT.Services
             catch (HttpRequestException ex)
             {
                 Logger.Error($"Failed to connect SW360 : {ex.Message}");
-                Logger.Debug($"GetProjectNameByProjectIDFromSW360()", ex);
+                LogHandlingHelper.ExceptionErrorHandling("HTTP request to SW360 failed", "GetProjectNameByProjectIDFromSW360()", ex, $"Project ID: {projectId}");
                 Environment.ExitCode = -1;
             }
             catch (AggregateException ex)
             {
                 Logger.Error($"Failed to connect SW360 : {ex.Message}");
-                Logger.Debug($"GetProjectNameByProjectIDFromSW360()", ex);
+                LogHandlingHelper.ExceptionErrorHandling("An aggregate exception occurred while connecting to SW360", "GetProjectNameByProjectIDFromSW360()", ex, $"Project ID: {projectId}");
                 Environment.ExitCode = -1;
             }
 
@@ -110,11 +110,13 @@ namespace LCT.Services
             }
             catch (HttpRequestException ex)
             {
-                Logger.Error($"alreadyLinkedReleases()", ex);
+                LogHandlingHelper.ExceptionErrorHandling("Get Already Linked Releases By ProjectId", $"MethodName:GetAlreadyLinkedReleasesByProjectId()", ex, "");
+                Logger.Error($"GetAlreadyLinkedReleasesByProjectId()", ex);
             }
             catch (AggregateException ex)
             {
-                Logger.Error($"alreadyLinkedReleases()", ex);
+                LogHandlingHelper.ExceptionErrorHandling("Get Already Linked Releases By ProjectId", $"MethodName:GetAlreadyLinkedReleasesByProjectId()", ex, "");
+                Logger.Error($"GetAlreadyLinkedReleasesByProjectId()", ex);
             }
 
             return alreadyLinkedReleases;

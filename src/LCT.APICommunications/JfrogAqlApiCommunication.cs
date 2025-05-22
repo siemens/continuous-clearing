@@ -6,10 +6,13 @@
 
 using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
+using LCT.Common;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -23,7 +26,6 @@ namespace LCT.APICommunications
         protected string DomainName { get; set; }
         private static int TimeoutInSec { get; set; }
         protected ArtifactoryCredentials ArtifactoryCredentials { get; set; }
-
         /// <summary>
         /// The JfrogAqlApiCommunication constructor
         /// </summary>
@@ -36,11 +38,11 @@ namespace LCT.APICommunications
             ArtifactoryCredentials = artifactoryCredentials;
             TimeoutInSec = timeout;
         }
-
-        public async Task<HttpResponseMessage> CheckConnection()
+        public async Task<HttpResponseMessage> CheckConnection(string correlationId)
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
             string url = $"{DomainName}/api/security/apiKey";
+            LogHandlingHelper.HttpRequestHandling("JFrog Connection validation", $"Methodname:CheckConnection(),CorrelationId:{correlationId}", httpClient, url);
             return await httpClient.GetAsync(url);
         }
 
@@ -49,7 +51,7 @@ namespace LCT.APICommunications
         /// </summary>
         /// <param name="repoName"></param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> GetInternalComponentDataByRepo(string repoName)
+        public async Task<HttpResponseMessage> GetInternalComponentDataByRepo(string repoName, string correlationId)
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
             TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
@@ -63,9 +65,10 @@ namespace LCT.APICommunications
             string aqlQueryToBody = query.ToString();
             string uri = $"{DomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}";
             HttpContent httpContent = new StringContent(aqlQueryToBody);
+            LogHandlingHelper.HttpRequestHandling("Get component data from jfrog repository", $"MethodName:GetInternalComponentDataByRepo(),CorrelationId:{correlationId}", httpClient, uri, httpContent);
             return await httpClient.PostAsync(uri, httpContent);
         }
-        public async Task<HttpResponseMessage> GetNpmComponentDataByRepo(string repoName)
+        public async Task<HttpResponseMessage> GetNpmComponentDataByRepo(string repoName, string correlationId)
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
             TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
@@ -79,9 +82,10 @@ namespace LCT.APICommunications
             string aqlQueryToBody = query.ToString();
             string uri = $"{DomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}";
             HttpContent httpContent = new StringContent(aqlQueryToBody);
+            LogHandlingHelper.HttpRequestHandling("Get Npm component data from jfrog repository", $"MethodName:GetNpmComponentDataByRepo(),CorrelationId:{correlationId}", httpClient, uri, httpContent);
             return await httpClient.PostAsync(uri, httpContent);
         }
-        public async Task<HttpResponseMessage> GetPypiComponentDataByRepo(string repoName)
+        public async Task<HttpResponseMessage> GetPypiComponentDataByRepo(string repoName, string correlationId)
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
             TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
@@ -95,14 +99,14 @@ namespace LCT.APICommunications
             string aqlQueryToBody = query.ToString();
             string uri = $"{DomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}";
             HttpContent httpContent = new StringContent(aqlQueryToBody);
+            LogHandlingHelper.HttpRequestHandling("Get poetry component data from jfrog repository", $"MethodName:GetPypiComponentDataByRepo(),CorrelationId:{correlationId}", httpClient, uri, httpContent);
             return await httpClient.PostAsync(uri, httpContent);
         }
 
         /// <summary>
         /// Gets the package information in the repo, via the name or path
         /// </summary>
-
-        public async Task<HttpResponseMessage> GetPackageInfo(ComponentsToArtifactory component = null)
+        public async Task<HttpResponseMessage> GetPackageInfo(ComponentsToArtifactory component = null, string correlationId = null)
         {
             ValidateParameters(component.JfrogPackageName, component.Path);
 
@@ -111,9 +115,8 @@ namespace LCT.APICommunications
             string uri = $"{DomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}";
             HttpContent httpContent = new StringContent(aqlQueryToBody);
 
-            return await ExecuteSearchAqlAsync(uri, httpContent);
+            return await ExecuteSearchAqlAsync(uri, httpContent, correlationId);
         }
-
         private static HttpClient GetHttpClient(ArtifactoryCredentials credentials)
         {
             var handler = new RetryHttpClientHandler()
@@ -132,7 +135,6 @@ namespace LCT.APICommunications
                 throw new ArgumentException("Either packageName or path, or both must be provided.");
             }
         }
-
         public static string BuildAqlQuery(ComponentsToArtifactory component)
         {
 
@@ -207,13 +209,12 @@ namespace LCT.APICommunications
 
 
         }
-
-        private async Task<HttpResponseMessage> ExecuteSearchAqlAsync(string uri, HttpContent httpContent)
+        private async Task<HttpResponseMessage> ExecuteSearchAqlAsync(string uri, HttpContent httpContent, string correlationId)
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
             TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
             httpClient.Timeout = timeOutInSec;
-
+            LogHandlingHelper.HttpRequestHandling("Get package information from jfrog repository", $"MethodName:ExecuteSearchAqlAsync(),CorrelationId:{correlationId}", httpClient, uri, httpContent);
             return await httpClient.PostAsync(uri, httpContent);
         }
 

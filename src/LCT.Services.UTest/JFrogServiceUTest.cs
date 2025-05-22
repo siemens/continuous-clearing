@@ -50,7 +50,7 @@ namespace LCT.Services.UTest
             Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade =
                 new Mock<IJfrogAqlApiCommunicationFacade>();
             mockJfrogApiComFacade
-                .Setup(x => x.GetInternalComponentDataByRepo(It.IsAny<string>()))
+                .Setup(x => x.GetInternalComponentDataByRepo(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
 
             // Act
@@ -71,7 +71,7 @@ namespace LCT.Services.UTest
             Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade =
                 new Mock<IJfrogAqlApiCommunicationFacade>();
             mockJfrogApiComFacade
-                .Setup(x => x.GetInternalComponentDataByRepo(It.IsAny<string>()))
+                .Setup(x => x.GetInternalComponentDataByRepo(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
 
             // Act
@@ -90,7 +90,7 @@ namespace LCT.Services.UTest
             Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade =
                 new Mock<IJfrogAqlApiCommunicationFacade>();
             mockJfrogApiComFacade
-                .Setup(x => x.GetInternalComponentDataByRepo(It.IsAny<string>()))
+                .Setup(x => x.GetInternalComponentDataByRepo(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
 
             // Act
@@ -108,7 +108,7 @@ namespace LCT.Services.UTest
             Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade =
                 new Mock<IJfrogAqlApiCommunicationFacade>();
             mockJfrogApiComFacade
-                .Setup(x => x.GetInternalComponentDataByRepo(It.IsAny<string>())).
+                .Setup(x => x.GetInternalComponentDataByRepo(It.IsAny<string>(), It.IsAny<string>())).
                 Throws<HttpRequestException>();
 
             // Act
@@ -126,7 +126,7 @@ namespace LCT.Services.UTest
             Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade =
                 new Mock<IJfrogAqlApiCommunicationFacade>();
             mockJfrogApiComFacade
-                .Setup(x => x.GetInternalComponentDataByRepo(It.IsAny<string>())).
+                .Setup(x => x.GetInternalComponentDataByRepo(It.IsAny<string>(), It.IsAny<string>())).
                 Throws<InvalidOperationException>();
 
             // Act
@@ -144,7 +144,7 @@ namespace LCT.Services.UTest
             Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade =
                 new Mock<IJfrogAqlApiCommunicationFacade>();
             mockJfrogApiComFacade
-                .Setup(x => x.GetInternalComponentDataByRepo(It.IsAny<string>())).
+                .Setup(x => x.GetInternalComponentDataByRepo(It.IsAny<string>(), It.IsAny<string>())).
                 Throws<TaskCanceledException>();
 
             // Act
@@ -187,7 +187,7 @@ namespace LCT.Services.UTest
             Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade =
                 new Mock<IJfrogAqlApiCommunicationFacade>();
             mockJfrogApiComFacade
-                .Setup(x => x.GetPackageInfo(component))
+                .Setup(x => x.GetPackageInfo(component, It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
 
             // Act
@@ -213,7 +213,7 @@ namespace LCT.Services.UTest
             Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade =
                 new Mock<IJfrogAqlApiCommunicationFacade>();
             mockJfrogApiComFacade
-                .Setup(x => x.GetPackageInfo(component))
+                .Setup(x => x.GetPackageInfo(component, It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
 
             // Act
@@ -237,7 +237,7 @@ namespace LCT.Services.UTest
             Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade =
                 new Mock<IJfrogAqlApiCommunicationFacade>();
             mockJfrogApiComFacade
-                .Setup(x => x.GetPackageInfo(component)).
+                .Setup(x => x.GetPackageInfo(component, It.IsAny<string>())).
                 Throws<HttpRequestException>();
 
             // Act
@@ -261,7 +261,7 @@ namespace LCT.Services.UTest
             Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade =
                 new Mock<IJfrogAqlApiCommunicationFacade>();
             mockJfrogApiComFacade
-                .Setup(x => x.GetPackageInfo(component)).
+                .Setup(x => x.GetPackageInfo(component, It.IsAny<string>())).
                 Throws<TaskCanceledException>();
 
             // Act
@@ -285,7 +285,7 @@ namespace LCT.Services.UTest
             Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade =
                 new Mock<IJfrogAqlApiCommunicationFacade>();
             mockJfrogApiComFacade
-                .Setup(x => x.GetPackageInfo(component)).
+                .Setup(x => x.GetPackageInfo(component, It.IsAny<string>())).
                 Throws<InvalidOperationException>();
 
             // Act
@@ -319,7 +319,7 @@ namespace LCT.Services.UTest
 
             Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade = new Mock<IJfrogAqlApiCommunicationFacade>();
             mockJfrogApiComFacade
-                .Setup(x => x.GetNpmComponentDataByRepo(It.IsAny<string>()))
+                .Setup(x => x.GetNpmComponentDataByRepo(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
 
             // Act
@@ -339,7 +339,7 @@ namespace LCT.Services.UTest
 
             Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade = new Mock<IJfrogAqlApiCommunicationFacade>();
             mockJfrogApiComFacade
-                .Setup(x => x.GetNpmComponentDataByRepo(It.IsAny<string>()))
+                .Setup(x => x.GetNpmComponentDataByRepo(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
 
             // Act
@@ -356,7 +356,7 @@ namespace LCT.Services.UTest
             // Arrange
             Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade = new Mock<IJfrogAqlApiCommunicationFacade>();
             mockJfrogApiComFacade
-                .Setup(x => x.GetNpmComponentDataByRepo(It.IsAny<string>()))
+                .Setup(x => x.GetNpmComponentDataByRepo(It.IsAny<string>(), It.IsAny<string>()))
                 .Throws<HttpRequestException>();
 
             // Act
@@ -373,7 +373,7 @@ namespace LCT.Services.UTest
             // Arrange
             Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade = new Mock<IJfrogAqlApiCommunicationFacade>();
             mockJfrogApiComFacade
-                .Setup(x => x.GetNpmComponentDataByRepo(It.IsAny<string>()))
+                .Setup(x => x.GetNpmComponentDataByRepo(It.IsAny<string>(), It.IsAny<string>()))
                 .Throws<InvalidOperationException>();
 
             // Act
@@ -390,7 +390,7 @@ namespace LCT.Services.UTest
             // Arrange
             Mock<IJfrogAqlApiCommunicationFacade> mockJfrogApiComFacade = new Mock<IJfrogAqlApiCommunicationFacade>();
             mockJfrogApiComFacade
-                .Setup(x => x.GetNpmComponentDataByRepo(It.IsAny<string>()))
+                .Setup(x => x.GetNpmComponentDataByRepo(It.IsAny<string>(), It.IsAny<string>()))
                 .Throws<TaskCanceledException>();
 
             // Act

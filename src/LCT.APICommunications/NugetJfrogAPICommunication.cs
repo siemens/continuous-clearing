@@ -16,28 +16,11 @@ using System.Threading.Tasks;
 
 namespace LCT.APICommunications
 {
-    public class NugetJfrogApiCommunication : JfrogApicommunication
+    public class NugetJfrogApiCommunication(string repoDomainName, string srcrepoName, ArtifactoryCredentials repoCredentials, int timeout) : JfrogApicommunication(repoDomainName, srcrepoName, repoCredentials, timeout)
     {
-        private static int TimeoutInSec { get; set; }
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
-        public NugetJfrogApiCommunication(string repoDomainName, string srcrepoName, ArtifactoryCredentials repoCredentials, int timeout) : base(repoDomainName, srcrepoName, repoCredentials, timeout)
-        {
-            TimeoutInSec = timeout;
-        }
 
-        private static HttpClient GetHttpClient(ArtifactoryCredentials credentials)
-        {
-            var handler = new RetryHttpClientHandler()
-            {
-                InnerHandler = new HttpClientHandler()
-            };
-            var httpClient = new HttpClient(handler);
-            TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
-            httpClient.Timeout = timeOutInSec;
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", credentials.Token);
-            return httpClient;
-        }
+        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();       
 
         public override async Task<HttpResponseMessage> GetApiKey()
         {
@@ -46,17 +29,19 @@ namespace LCT.APICommunications
             return await httpClient.GetAsync(url);
         }
 
-        public override async Task<HttpResponseMessage> CopyFromRemoteRepo(ComponentsToArtifactory component)
+        public override async Task<HttpResponseMessage> CopyFromRemoteRepo(ComponentsToArtifactory component, string correlationId)
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
             const HttpContent httpContent = null;
+            LogHandlingHelper.HttpRequestHandling("Package Copy from remote repository", $"MethodName:CopyFromRemoteRepo(),CorrelationId:{correlationId}", httpClient, component.CopyPackageApiUrl, httpContent);
             return await httpClient.PostAsync(component.CopyPackageApiUrl, httpContent);
         }
 
-        public override async Task<HttpResponseMessage> MoveFromRepo(ComponentsToArtifactory component)
+        public override async Task<HttpResponseMessage> MoveFromRepo(ComponentsToArtifactory component, string correlationId)
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
             const HttpContent httpContent = null;
+            LogHandlingHelper.HttpRequestHandling("Package Move from remote repository", $"MethodName:CopyFromRemoteRepo(),CorrelationId:{correlationId}", httpClient, component.CopyPackageApiUrl, httpContent);
             return await httpClient.PostAsync(component.MovePackageApiUrl, httpContent);
         }
 

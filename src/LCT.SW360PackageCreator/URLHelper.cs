@@ -82,6 +82,7 @@ namespace LCT.SW360PackageCreator
             }
             catch (IOException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("GetSourceUrlForAlpinePackage", $"MethodName:GetSourceUrlForAlpinePackage(), ComponentName: {componentName}, Version: {componenVersion}", ex, "An I/O error occurred while processing the Alpine package source URL.");
                 Logger.Error($"GetAlpineSourceUrl() ", ex);
             }
             return componentsData;
@@ -119,6 +120,7 @@ namespace LCT.SW360PackageCreator
             }
             catch (IOException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("GetAlpineSourceUrl", $"MethodName:GetAlpineSourceUrl(), PackageName: {name}, Version: {version}, LocalPath: {localPathforSourceRepo}", ex, "An I/O error occurred while trying to retrieve the Alpine source URL.");
                 Logger.Error($"GetAlpineSourceUrl() ", ex);
             }
             return Task.FromResult(sourceURLDetails);
@@ -146,10 +148,12 @@ namespace LCT.SW360PackageCreator
             }
             catch (IOException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("GetSourceFromAPKBUILD", $"MethodName:GetSourceFromAPKBUILD(), PackageName: {name}, LocalPath: {localPathforSourceRepo}", ex, "An I/O error occurred while trying to read the APKBUILD file.");
                 Logger.Error($"GetSourceFromAPKBUILD() ", ex);
             }
             catch (UnauthorizedAccessException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("GetSourceFromAPKBUILD", $"MethodName:GetSourceFromAPKBUILD(), PackageName: {name}, LocalPath: {localPathforSourceRepo}", ex, "Unauthorized access occurred while trying to read the APKBUILD file.");
                 Logger.Error($"GetSourceFromAPKBUILD() ", ex);
             }
 
@@ -206,10 +210,12 @@ namespace LCT.SW360PackageCreator
             }
             catch (IOException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("GetSourceUrlForAlpine", $"MethodName:GetSourceUrlForAlpine(), PackageFilePath: {pkgFilePath}", ex, "An I/O error occurred while trying to read the package file.");
                 Logger.Error($"GetDownloadPathForAlpineRepo() ", ex);
             }
             catch (UnauthorizedAccessException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("GetSourceUrlForAlpine", $"MethodName:GetSourceUrlForAlpine(), PackageFilePath: {pkgFilePath}", ex, "Unauthorized access occurred while trying to read the package file.");
                 Logger.Error($"GetDownloadPathForAlpineRepo() ", ex);
             }
 
@@ -229,10 +235,12 @@ namespace LCT.SW360PackageCreator
             }
             catch (IOException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("GetDownloadPathForAlpineRepo", "MethodName:GetDownloadPathForAlpineRepo()", ex, "An I/O error occurred while trying to create or access the directory.");
                 Logger.Error($"GetDownloadPathForAlpineRepo() ", ex);
             }
             catch (UnauthorizedAccessException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("GetDownloadPathForAlpineRepo", "MethodName:GetDownloadPathForAlpineRepo()", ex, "Unauthorized access occurred while trying to create or access the directory.");
                 Logger.Error($"GetDownloadPathForAlpineRepo() ", ex);
             }
 
@@ -251,11 +259,13 @@ namespace LCT.SW360PackageCreator
 
         private static void CloneSource(string localPathforSourceRepo, string alpineDistro, string fullPath)
         {
+            Logger.Debug($"CloneSource(): Start cloneing from git - LocalPath: {localPathforSourceRepo}, AlpineDistro: {alpineDistro}, FullPath: {fullPath}");
             List<string> gitCommands = GetGitCloneCommands();
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 foreach (string command in gitCommands)
                 {
+                    Logger.Debug($"CloneSource(): Executing Git command: {command}");
                     Process p = new Process();
                     p.StartInfo.RedirectStandardError = true;
                     p.StartInfo.RedirectStandardOutput = true;
@@ -268,11 +278,12 @@ namespace LCT.SW360PackageCreator
 
                     p.Start();
                     p.WaitForExit();
-
+                    Logger.Debug($"CloneSource(): Git command completed with ExitCode: {p.ExitCode}");
                 }
             }
             else
             {
+                Logger.Debug($"CloneSource(): Executing Git command: {gitCommands[1]}");
                 Process p = new Process();
                 p.StartInfo.RedirectStandardError = true;
                 p.StartInfo.RedirectStandardOutput = true;
@@ -285,17 +296,19 @@ namespace LCT.SW360PackageCreator
 
                 p.Start();
                 p.WaitForExit();
+                Logger.Debug($"CloneSource(): Git command completed with ExitCode: {p.ExitCode}");
             }
             if (Directory.Exists(fullPath))
             {
+                Logger.Debug($"CloneSource(): Directory exists at {fullPath}, proceeding to checkout distro.");
                 CheckoutDistro(alpineDistro, fullPath);
             }
-
+            Logger.Debug($"CloneSource(): completed cloneing - LocalPath: {localPathforSourceRepo}, AlpineDistro: {alpineDistro}, FullPath: {fullPath}");
         }
 
         private static void CheckoutDistro(string alpineDistro, string fullPath)
         {
-
+            Logger.Debug($"CheckoutDistro(): Start checkout github repo - AlpineDistro: {alpineDistro}, FullPath: {fullPath}");
             Process p = new Process();
             p.StartInfo.RedirectStandardError = true;
             p.StartInfo.RedirectStandardOutput = true;
@@ -308,7 +321,13 @@ namespace LCT.SW360PackageCreator
 
             p.Start();
             p.WaitForExit();
-
+            Logger.Debug($"CheckoutDistro(): Git checkout completed with ExitCode: {p.ExitCode}");
+            if (p.ExitCode != 0)
+            {
+                string errorOutput = p.StandardError.ReadToEnd();
+                Logger.Error($"CheckoutDistro(): Git checkout failed for AlpineDistro: {alpineDistro}, FullPath: {fullPath}, Error: {errorOutput}");
+            }
+            Logger.Debug($"CheckoutDistro(): Completed checkout github repo - AlpineDistro: {alpineDistro}, FullPath: {fullPath}");
         }
 
         private static List<string> GetGitCloneCommands()
@@ -364,11 +383,13 @@ namespace LCT.SW360PackageCreator
         /// <returns>string</returns>
         public async Task<string> GetSourceUrlForNugetPackage(string componentName, string componenVersion)
         {
-            Logger.Debug($"URLHelper.GetSourceUrlForNugetPackage():Start");
+            Logger.Debug($"GetSourceUrlForNugetPackage(): Start identifying sourceUrl for Nuget Package - ComponentName: {componentName}, Version: {componenVersion}");
             string name = componentName.ToLowerInvariant();
             string version = componenVersion.ToLowerInvariant();
             string nuspecURL = $"{CommonAppSettings.SourceURLNugetApi}{name}/{version}/{name}.nuspec";
+            Logger.Debug($"GetSourceUrlForNugetPackage(): Constructed NuSpec URL: {nuspecURL}");
             var sourceURL = await GetSourceURLFromNuspecFile(nuspecURL, componentName);
+            Logger.Debug($"GetSourceUrlForNugetPackage(): Completed to identify sourceUrl for Nuget - ComponentName: {componentName}, Version: {componenVersion}, SourceURL: {sourceURL}");
             return sourceURL;
         }
 
@@ -380,10 +401,9 @@ namespace LCT.SW360PackageCreator
         /// <returns>string</returns>
         public string GetSourceUrlForNpmPackage(string componentName, string version)
         {
-            Logger.Debug($"GetSourceUrl():Start");
+            Logger.Debug($"GetSourceUrlForNpmPackage(): Start identifying sourceUrl for Npm Package - ComponentName: {componentName}, Version: {version}");
 
             string npmViewCommandToGetUrl = String.Empty;
-            Logger.Debug($"GetSourceUrl():{npmViewCommandToGetUrl}");
 
             Process p = new Process();
             p.StartInfo.RedirectStandardError = true;
@@ -396,17 +416,17 @@ namespace LCT.SW360PackageCreator
             {
                 npmViewCommandToGetUrl = $"-c \" npm view {componentName}@{version} repository.url --registry https://registry.npmjs.org/ \"";
                 p.StartInfo.FileName = FileConstant.DockerCMDTool;
-                Logger.Debug($"GetSourceUrlForNpmPackage():Linux OS Found!!");
+                Logger.Debug($"GetSourceUrlForNpmPackage(): Linux OS detected. Command: {npmViewCommandToGetUrl}");
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 npmViewCommandToGetUrl = $"/c npm view {componentName}@{version} repository.url --registry https://registry.npmjs.org/";
                 p.StartInfo.FileName = Path.Combine(@"cmd.exe");
-                Logger.Debug($"GetSourceUrlForNpmPackage():Windows OS Found!!");
+                Logger.Debug($"GetSourceUrlForNpmPackage(): Windows OS detected. Command: {npmViewCommandToGetUrl}");
             }
             else
             {
-                Logger.Debug($"GetSourceUrlForNpmPackage():OS Details not Found!!");
+                Logger.Debug($"GetSourceUrlForNpmPackage(): OS not recognized. Unable to determine the command to execute.");
             }
 
 
@@ -414,11 +434,11 @@ namespace LCT.SW360PackageCreator
             var processResult = ProcessAsyncHelper.RunAsync(p.StartInfo);
             Result result = processResult?.Result;
             string sourceUrl = result?.StdOut?.TrimEnd();
+            Logger.Debug($"GetSourceUrlForNpmPackage(): NPM view command output - StdOut: {result?.StdOut}, StdErr: {result?.StdErr}");
             IRepository repo = new Repository();
             GithubUrl = repo.IdentifyRepoURLForGit(sourceUrl, componentName);
-
-            Logger.Debug($"GetSourceUrl():Release Name : {componentName}@{version}, NPM view Output:{result?.StdOut},  Error  : {result?.StdErr}");
-            Logger.Debug($"GetSourceUrl():End");
+            Logger.Debug($"GetSourceUrlForNpmPackage(): Final GitHub URL for source code: {GithubUrl}");
+            Logger.Debug($"GetSourceUrlForNpmPackage():Completed to identify sourceUrl - ComponentName: {componentName}, Version: {version}");
 
             return GithubUrl;
         }
@@ -463,17 +483,17 @@ namespace LCT.SW360PackageCreator
                 {
                     Logger.Warn($"Identification of SRC url failed for {componentName}, " +
                                     $"Exclude if it is an internal component or manually update the SRC url");
-                    Logger.Debug($"GetSourceUrlForConanPackage()", ex);
+                    LogHandlingHelper.ExceptionErrorHandling("GetSourceUrlForConanPackage", $"MethodName:GetSourceUrlForConanPackage(), ComponentName: {componentName}, Version: {componenVersion}, URL: {downLoadUrl}", ex, "An HTTP request error occurred while trying to fetch the Conan package source URL.");
                 }
                 catch (YamlException ex)
                 {
                     Logger.Warn($"Identification of SRC url failed for {componentName}, " +
                                     $"Exclude if it is an internal component or manually update the SRC url");
-                    Logger.Debug($"GetSourceUrlForConanPackage()", ex);
+                    LogHandlingHelper.ExceptionErrorHandling("GetSourceUrlForConanPackage", $"MethodName:GetSourceUrlForConanPackage(), ComponentName: {componentName}, Version: {componenVersion}, URL: {downLoadUrl}", ex, "A YAML parsing error occurred while trying to deserialize the Conan package data.");
                 }
                 catch (ArgumentNullException ex)
                 {
-                    Logger.Debug($"GetSourceUrlForConanPackage()", ex);
+                    LogHandlingHelper.ExceptionErrorHandling("GetSourceUrlForConanPackage", $"MethodName:GetSourceUrlForConanPackage(), ComponentName: {componentName}, Version: {componenVersion}, URL: {downLoadUrl}", ex, "A null argument was encountered while processing the Conan package source URL.");
                 }
             }
             return componentSrcURL;
@@ -505,13 +525,13 @@ namespace LCT.SW360PackageCreator
             }
             catch (AggregateException ex)
             {
-                Logger.Debug($"GetSourceURLFromNuspecFile():", ex);
+                LogHandlingHelper.ExceptionErrorHandling("GetSourceURLFromNuspecFile", $"MethodName:GetSourceURLFromNuspecFile(), ComponentName: {componentName}, NuspecURL: {nuspecURL}", ex, "Multiple errors occurred while processing the Nuspec file. Please investigate the inner exceptions for more details.");
             }
             catch (HttpRequestException ex)
             {
                 Logger.Warn($"Identification of SRC url failed for {componentName}, " +
             $"Exclude if it is an internal component or manually update the SRC url");
-                Logger.Debug($"GetSourceURLFromNuspecFile()", ex);
+                LogHandlingHelper.ExceptionErrorHandling("GetSourceURLFromNuspecFile", $"MethodName:GetSourceURLFromNuspecFile(), ComponentName: {componentName}, NuspecURL: {nuspecURL}", ex, "An HTTP request error occurred while trying to fetch the Nuspec file.");
             }
             return GithubUrl;
         }
@@ -594,14 +614,15 @@ namespace LCT.SW360PackageCreator
                 {
                     URL = $"{CommonAppSettings.SnapshotBaseURL}binary/{packageDetails.Name}{Dataconstant.ForwardSlash}";
                 }
-
+                Logger.Debug($"GetArchiveResponse(): Constructed URL for {packageType} package type: {URL}");
                 var result = await httpClient.GetStringAsync(URL);
                 packageDetails.JsonText = result.ToString();
+                Logger.Debug($"GetArchiveResponse(): Successfully fetched response for Package Name: {packageDetails.Name}, Package Type: {packageType}");
                 return packageDetails;
             }
             catch (HttpRequestException ex)
             {
-                Logger.Debug($"GetArchiveResponse():HttpRequestException", ex);
+                LogHandlingHelper.ExceptionErrorHandling("GetArchiveResponse", $"MethodName:GetArchiveResponse(), PackageName: {packageDetails.Name}, PackageType: {packageType}", ex, "An HTTP request error occurred while trying to fetch the archive response.");
                 if (!ex.Message.Contains("404") && packageType == "source")
                 {
                     packageDetails.IsRetryRequired = true;
@@ -657,11 +678,11 @@ namespace LCT.SW360PackageCreator
             }
             catch (JsonReaderException ex)
             {
-                Logger.Debug($"GetSourceURLFromJsonText():", ex);
+                LogHandlingHelper.ExceptionErrorHandling("GetSourceURLFromJsonTextForSourceType", $"MethodName:GetSourceURLFromJsonTextForSourceType(), JsonText: {sourceURLDetails.JsonText}", ex, "An error occurred while parsing the JSON text.");
             }
             catch (IOException ex)
             {
-                Logger.Debug($"GetSourceURLFromJsonText():", ex);
+                LogHandlingHelper.ExceptionErrorHandling("GetSourceURLFromJsonTextForSourceType", $"MethodName:GetSourceURLFromJsonTextForSourceType(), JsonText: {sourceURLDetails.JsonText}", ex, "An I/O error occurred while processing the source URL.");
             }
             return sourceURLDetails;
         }
@@ -693,11 +714,11 @@ namespace LCT.SW360PackageCreator
             }
             catch (JsonReaderException ex)
             {
-                Logger.Debug($"GetSourceURLFromJsonTextForBinaryType():", ex);
+                LogHandlingHelper.ExceptionErrorHandling("GetSourceURLFromJsonTextForBinaryType", $"MethodName:GetSourceURLFromJsonTextForBinaryType(), JsonText: {sourceURLDetails.JsonText}", ex, "An error occurred while parsing the JSON text.");
             }
             catch (IOException ex)
             {
-                Logger.Debug($"GetSourceURLFromJsonTextForBinaryType():", ex);
+                LogHandlingHelper.ExceptionErrorHandling("GetSourceURLFromJsonTextForBinaryType", $"MethodName:GetSourceURLFromJsonTextForBinaryType(), JsonText: {sourceURLDetails.JsonText}", ex, "An I/O error occurred while processing the binary type source URL.");
             }
 
             return sourceURLDetails;
@@ -760,19 +781,20 @@ namespace LCT.SW360PackageCreator
 
         private async Task<DebianPackage> RetryToGetSourceURlDetailsAsync(string name, string version)
         {
-            Logger.Debug($"Retry for.. {name}-{version}");
+            Logger.Debug($"RetryToGetSourceURlDetailsAsync(): Start - ComponentName: {name}, Version: {version}");
             await Task.Delay(2000);
             DebianPackage sourceDetails = await GetSourceUrl(name, version);
 
             if (!string.IsNullOrEmpty(sourceDetails.SourceUrl))
             {
-                Logger.Debug($"Retry Success for.. {name}-{version}");
+                Logger.Debug($"RetryToGetSourceURlDetailsAsync(): Retry successful for ComponentName: {name}, Version: {version}, SourceUrl: {sourceDetails.SourceUrl}");
             }
             else
             {
-                Logger.Debug($"Source package not found for {name}-{version}");
-                Logger.Debug($"Retry Failure for.. {name}-{version}");
+                Logger.Warn($"RetryToGetSourceURlDetailsAsync(): Source package not found for ComponentName: {name}, Version: {version}");
+                Logger.Debug($"RetryToGetSourceURlDetailsAsync(): Retry failed for ComponentName: {name}, Version: {version}");
             }
+            Logger.Debug($"RetryToGetSourceURlDetailsAsync(): End - ComponentName: {name}, Version: {version}");
             return sourceDetails;
         }
 
@@ -801,17 +823,19 @@ namespace LCT.SW360PackageCreator
             {
                 URL = $"{CommonAppSettings.PyPiURL}{componentName}" +
                     $"{Dataconstant.ForwardSlash}{componenVersion}{Dataconstant.ForwardSlash}json";
-
+                // Log the request details
+                LogHandlingHelper.HttpRequestHandling("GetResponseFromPyPiOrg", $"MethodName:GetResponseFromPyPiOrg(), ComponentName: {componentName}, Version: {componenVersion}", httpClient, URL);
                 var response = await httpClient.GetStringAsync(URL);
+                LogHandlingHelper.HttpResponseOfStringContent("GetResponseFromPyPiOrg", $"MethodName:GetResponseFromPyPiOrg(), ComponentName: {componentName}, Version: {componenVersion}", response);
                 return response.ToString();
             }
             catch (HttpRequestException ex)
             {
-                Logger.Debug($"GetResponseFromPyPiOrg():HttpRequestException", ex);
+                LogHandlingHelper.ExceptionErrorHandling("GetResponseFromPyPiOrg", $"MethodName:GetResponseFromPyPiOrg(), ComponentName: {componentName}, Version: {componenVersion}", ex, "An HTTP request error occurred while trying to fetch the response from PyPi.");
             }
             catch (TaskCanceledException ex)
             {
-                Logger.Debug($"GetResponseFromPyPiOrg():TaskCanceledException", ex);
+                LogHandlingHelper.ExceptionErrorHandling("GetResponseFromPyPiOrg", $"MethodName:GetResponseFromPyPiOrg(), ComponentName: {componentName}, Version: {componenVersion}", ex, "The request to PyPi was canceled, possibly due to a timeout.");
             }
             return result;
         }
@@ -837,11 +861,11 @@ namespace LCT.SW360PackageCreator
             }
             catch (JsonReaderException ex)
             {
-                Logger.Debug($"GetSourceURLFromPyPiResponse():", ex);
+                LogHandlingHelper.ExceptionErrorHandling("GetSourceURLFromPyPiResponse", "MethodName:GetSourceURLFromPyPiResponse()", ex, "An error occurred while parsing the JSON response from PyPi.");
             }
             catch (IOException ex)
             {
-                Logger.Debug($"GetSourceURLFromPyPiResponse():", ex);
+                LogHandlingHelper.ExceptionErrorHandling("GetSourceURLFromPyPiResponse", "MethodName:GetSourceURLFromPyPiResponse()", ex, "An I/O error occurred while processing the PyPi response.");
             }
             return SourceURL;
         }
@@ -861,7 +885,7 @@ namespace LCT.SW360PackageCreator
             }
             catch (WebException webex)
             {
-                Logger.Debug($"DownloadFileFromSnapshotorgAsync:File Name : {Path.GetFileName(downloadFilePath)},Error {webex}");
+                LogHandlingHelper.ExceptionErrorHandling("DownloadFileAsync", $"MethodName:DownloadFileAsync(), FilePath: {downloadFilePath}, URI: {uri}", webex, "A network error occurred while trying to download the file.");
             }
             return downloadedPath;
         }

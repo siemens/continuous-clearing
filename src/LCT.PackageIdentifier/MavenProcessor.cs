@@ -25,7 +25,7 @@ namespace LCT.PackageIdentifier
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
         private readonly ICycloneDXBomParser _cycloneDXBomParser;
-
+        private List<Component> listOfInternalComponents = new List<Component>();
         public MavenProcessor(ICycloneDXBomParser cycloneDXBomParser)
         {
             _cycloneDXBomParser = cycloneDXBomParser;
@@ -33,6 +33,7 @@ namespace LCT.PackageIdentifier
 
         public Bom ParsePackageFile(CommonAppSettings appSettings)
         {
+            Logger.Debug("ParsePackageFile():Starting to parse the package file for Maven components.");
             List<Component> componentsForBOM = new();
             List<Component> componentsToBOM = new();
             List<Component> ListOfComponents = new();
@@ -48,11 +49,11 @@ namespace LCT.PackageIdentifier
                 if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     listOfTemplateBomfilePaths.Add(filepath);
+                    Logger.Debug($"ParsePackageFile():Template BOM file detected: {filepath}");
                 }
                 if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     Bom bomList = ParseCycloneDXBom(filepath);
-
                     if (bomList?.Components != null)
                     {
                         CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
@@ -76,6 +77,7 @@ namespace LCT.PackageIdentifier
                     {
                         dependenciesForBOM.AddRange(bomList.Dependencies);
                     }
+                    IdentifiedMavenComponents(filepath, bomList.Components, bom.Dependencies);
                 }
             }
 
@@ -107,7 +109,6 @@ namespace LCT.PackageIdentifier
             bom.Dependencies = dependenciesForBOM;
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
             BomCreator.bomKpiData.ComponentsInComparisonBOM = bom.Components.Count;
-            Logger.Debug($"ParsePackageFile():End");
 
             if (bom != null)
             {
@@ -115,6 +116,7 @@ namespace LCT.PackageIdentifier
             }
             bom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(bom.Components, bom.Dependencies);
             RemoveTypeJarSuffix(bom);
+            Logger.Debug($"ParsePackageFile():Completed parsing the package file.\n");
             return bom;
         }
         private static void RemoveTypeJarSuffix(Bom bom)
@@ -127,7 +129,7 @@ namespace LCT.PackageIdentifier
                 component.Purl = RemoveSuffix(component.Purl, suffix);
             }
 
-            foreach (var dependency in bom?.Dependencies ?? Enumerable.Empty<Dependency>()) 
+            foreach (var dependency in bom?.Dependencies ?? Enumerable.Empty<Dependency>())
             {
                 RemoveTypeJarSuffixFromDependency(dependency);
             }
@@ -186,7 +188,33 @@ namespace LCT.PackageIdentifier
             ListOfComponents = DevdependencyIdentification(ListOfComponents, iterateBOM, checkBOM);
 
         }
+        public static void IdentifiedMavenComponents(string filepath, List<Component> components, List<Dependency> dependencies)
+        {
+            if (components == null || !components.Any())
+            {
+                // Log a message indicating no components were found
+                Logger.Debug($"No components were found in the file: {filepath}");
+                return;
+            }
+            // Build the table
+            var logBuilder = new System.Text.StringBuilder();
+            logBuilder.AppendLine("============================================================================================================================================");
+            logBuilder.AppendLine($" COMPONENTS FOUND IN FILE: {filepath}");
+            logBuilder.AppendLine("============================================================================================================================================");
+            logBuilder.AppendLine($"| {"Name",-40} | {"Version",-20} | {"PURL",-60} | {"DevDependent",-15} | {"Dependencies",-60} |");
+            logBuilder.AppendLine("--------------------------------------------------------------------------------------------------------------------------------------------");
 
+            foreach (var component in components)
+            {
+                string devDependent = component.Properties?.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsDevelopment)?.Value ?? "false";
+                logBuilder.AppendLine($"| {component.Name,-40} | {component.Version,-20} | {component.Purl,-60} | {devDependent,-15} | {dependencies,-60} |");
+            }
+
+            logBuilder.AppendLine("============================================================================================================================================");
+
+            // Log the table
+            Logger.Debug(logBuilder.ToString());
+        }
         private static List<Component> DevdependencyIdentification(List<Component> ListOfComponents, List<Component> iterateBOM, List<Component> checkBOM)
         {
             foreach (var item in iterateBOM)
@@ -242,7 +270,7 @@ namespace LCT.PackageIdentifier
                                                                            IJFrogService jFrogService,
                                                                            IBomHelper bomhelper)
         {
-
+            Logger.Debug("GetJfrogRepoDetailsOfAComponent():Starting to retrieve JFrog repository details for components.\n");
             // get the  component list from Jfrog for given repo + internal repo
             string[] repoList = CommonHelper.GetRepoList(appSettings);
             List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(repoList, jFrogService);
@@ -321,14 +349,15 @@ namespace LCT.PackageIdentifier
                 }
                 modifiedBOM.Add(componentVal);
             }
-
+            LogHandlingHelper.IdentifierComponentsData(componentsForBOM, listOfInternalComponents);
+            Logger.Debug("GetJfrogRepoDetailsOfAComponent():Completed retrieving JFrog repository details for components.\n");
             return modifiedBOM;
         }
 
         public async Task<ComponentIdentification> IdentificationOfInternalComponents(
            ComponentIdentification componentData, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
-
+            Logger.Debug("IdentificationOfInternalComponents(): Starting identification of internal components.");
             // get the  component list from Jfrog for given repo
             List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(appSettings.Maven.Artifactory.InternalRepos, jFrogService);
 
@@ -364,7 +393,9 @@ namespace LCT.PackageIdentifier
             // update the comparision bom data
             componentData.comparisonBOMData = internalComponentStatusUpdatedList;
             componentData.internalComponents = internalComponents;
-
+            listOfInternalComponents = internalComponents;
+            Logger.Debug($"IdentificationOfInternalComponents(): identified internal components:{internalComponents.Count}.");
+            Logger.Debug($"IdentificationOfInternalComponents(): Completed identification of internal components.\n");
             return componentData;
         }
 

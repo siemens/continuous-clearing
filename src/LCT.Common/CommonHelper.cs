@@ -107,7 +107,8 @@ namespace LCT.Common
         {
             if (string.IsNullOrWhiteSpace(value))
             {
-                throw new ArgumentException($"Invalid value for {name} - {value}");
+                Logger.Error($"The provided value for '{name}' is null, empty, or whitespace. Value: '{value}'");
+                LogHandlingHelper.ExceptionErrorHandling("CheckNullOrEmpty()", $"Validation failed for parameter: {name}", new ArgumentException($"Invalid value for {name} - {value}"), $"The provided value for '{name}' is null, empty, or whitespace.");
             }
         }
 
@@ -273,6 +274,7 @@ namespace LCT.Common
                 var artifactory = getArtifactory();
                 if (artifactory != null)
                 {
+                    Logger.Debug($"GetRepoList():Input Repositories for identifying JFrog packages: Internal Repositories = [{string.Join(", ", artifactory.InternalRepos ?? [])}], Dev Repositories = [{string.Join(", ", artifactory.DevRepos ?? [])}], Remote Repositories = [{string.Join(", ", artifactory.RemoteRepos ?? [])}], Third Party Repositories = [{string.Join(", ", artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? [])}]");
                     return (artifactory.InternalRepos ?? Array.Empty<string>())
                         .Concat(artifactory.DevRepos ?? Array.Empty<string>())
                         .Concat(artifactory.RemoteRepos ?? Array.Empty<string>())
@@ -432,6 +434,7 @@ namespace LCT.Common
                     {
                         component.Properties.Add(excludeProperty);
                         noOfExcludedComponents++;
+                        Logger.Debug($"Component excluded due to PURL match: Name = {component.Name}, Version = {component.Version}, PURL = {component.Purl}");
                     }
                 }
             }
@@ -464,6 +467,7 @@ namespace LCT.Common
                     {
                         noOfExcludedComponents++;
                         component.Properties.Add(excludeProperty);
+                        Logger.Debug($"Component excluded due to Name and Version match: Name = {component.Name}, Version = {component.Version}, Group = {component.Group}");
                     }
                 }
             }

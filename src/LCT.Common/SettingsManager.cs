@@ -8,11 +8,13 @@ using LCT.Common.Interface;
 using log4net;
 using log4net.Core;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Xml.Linq;
 
 namespace LCT.Common
 {
@@ -32,21 +34,21 @@ namespace LCT.Common
         /// <returns>AppSettings</returns>
         public T ReadConfiguration<T>(string[] args, string jsonSettingsFileName)
         {
-            Logger.Debug($"ReadConfiguration():Start");
+            Logger.Debug("ReadConfiguration():Start reading configuration.");
 
             if (args != null)
             {
                 string[] maskedArgs = CommonHelper.MaskSensitiveArguments(args);
-                Logger.Debug($"ReadConfiguration():args: {string.Join(" ", maskedArgs)}");
+                Logger.Debug($"ReadConfiguration():Commandline arguments: {string.Join(" ", maskedArgs)}");
             }
             if (args?.Length == 0)
             {
-                Logger.Debug($"Argument Count : {args.Length}");
+                Logger.Debug($"ReadConfiguration():No arguments provided through command line.");
                 DisplayHelp();
                 environmentHelper.CallEnvironmentExit(0);
             }
             string settingsFilePath = GetConfigFilePathFromArgs(args, jsonSettingsFileName);
-            Logger.Logger.Log(null, Level.Debug, $"Settings File: {settingsFilePath}", null);
+            Logger.Logger.Log(null, Level.Debug, $"Settings File Path: {settingsFilePath}", null);
 
             //add ut for reading - add json and then cmd args
             IConfigurationBuilder settingsConfigBuilder = new ConfigurationBuilder()
@@ -61,15 +63,17 @@ namespace LCT.Common
             {
                 settingsConfig = settingsConfigBuilder.Build();
             }
-            catch (InvalidDataException)
+            catch (InvalidDataException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("ReadConfiguration()", $"Failed to load configuration file. Please verify the JSON format in: {settingsFilePath}", ex, "InvalidDataException occurred while loading configuration.");
                 Logger.Error($"Failed to load configuration file. Please verify the JSON format in: {settingsFilePath}");
                 throw new InvalidDataException($"Failed to load configuration file. Please verify the JSON format in: {settingsFilePath}");
             }
-            catch (FormatException)
+            catch (FormatException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("ReadConfiguration()", $"Configuration file contains invalid format. Please check for missing quotes or invalid syntax in: {settingsFilePath}", ex, "FormatException occurred while loading configuration.");
                 Logger.Error($"Configuration file contains invalid format. Please check for missing quotes or invalid syntax in: {settingsFilePath}");
-                throw new InvalidDataException($"Configuration file contains invalid format. Please check for missing quotes or invalid syntax in: {settingsFilePath}");
+                throw new FormatException($"Configuration file contains invalid format. Please check for missing quotes or invalid syntax in: {settingsFilePath}");
             }
 
 
@@ -77,12 +81,11 @@ namespace LCT.Common
 
             if (appSettings == null)
             {
-                Logger.Debug($"ReadConfiguration(): {nameof(appSettings)} is null");
-
+                LogHandlingHelper.ExceptionErrorHandling("ReadConfiguration()", $"Failed to load application settings. The configuration object is null.", new InvalidDataException(nameof(appSettings)), $"The application settings could not be loaded. Ensure the configuration file is valid and contains the required settings.");
                 throw new InvalidDataException(nameof(appSettings));
             }
 
-            Logger.Debug($"ReadConfiguration():End");
+            Logger.Debug($"ReadConfiguration():Successfully completed configuration reading.");
 
             return appSettings;
         }
@@ -127,6 +130,7 @@ namespace LCT.Common
 
         public void CheckRequiredArgsToRun(CommonAppSettings appSettings, string currentExe)
         {
+            Logger.Debug("CheckRequiredArgsToRun():Validating mandatory parameters has started");
             Type type = appSettings.GetType();
             PropertyInfo[] properties = type.GetProperties();
 
@@ -186,12 +190,13 @@ namespace LCT.Common
             };
                 CheckForMissingParameter(appSettings, properties, uploaderReqParameters);
             }
+            Logger.Debug("CheckRequiredArgsToRun():Validating mandatory parameters has completed\n");
         }
 
         private static void CheckForMissingParameter(CommonAppSettings appSettings, PropertyInfo[] properties, List<string> reqParameters)
         {
             StringBuilder missingParameters = new StringBuilder();
-
+            Logger.Debug($"CheckForMissingParameter(): Required Parameters: {string.Join(", ", reqParameters)}");
             foreach (string key in reqParameters)
             {
                 string[] parts = key.Split('.');
@@ -235,8 +240,13 @@ namespace LCT.Common
 
             if (!string.IsNullOrWhiteSpace(missingParameters.ToString()))
             {
+                Logger.Debug($"CheckForMissingParameter(): Missing Parameters: {missingParameters.ToString().Trim()}");
                 ExceptionHandling.ArgumentException(missingParameters.ToString());
                 environmentHelper.CallEnvironmentExit(-1);
+            }
+            else
+            {
+                Logger.Debug("CheckForMissingParameter(): All required parameters are present.");
             }
         }
         public static bool IsAzureDevOpsDebugEnabled()

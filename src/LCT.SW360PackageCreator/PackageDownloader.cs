@@ -61,7 +61,7 @@ namespace LCT.SW360PackageCreator
             }
             catch (UnauthorizedAccessException ex)
             {
-                Logger.Debug($"DownloadSourceCodeUsingGitClone():{ex}");
+                LogHandlingHelper.ExceptionErrorHandling("Download", $"MethodName:Download(), Release Name: {component.Name}@{component.Version}, DownloadPath: {downloadPath}", ex, "Unauthorized access occurred while trying to create the download directory.");
                 return downloadedPackageName;
             }
 

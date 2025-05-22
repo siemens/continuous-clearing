@@ -6,6 +6,7 @@
 
 using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.AQL;
+using LCT.Common;
 using LCT.Facade.Interfaces;
 using LCT.Services.Interface;
 using log4net;
@@ -36,10 +37,11 @@ namespace LCT.Services
         {
             HttpResponseMessage httpResponseMessage = null;
             IList<AqlResult> aqlResult = new List<AqlResult>();
-
+            string correlationId = Guid.NewGuid().ToString();
             try
             {
-                httpResponseMessage = await m_JFrogApiCommunicationFacade.GetInternalComponentDataByRepo(repoName);
+                httpResponseMessage = await m_JFrogApiCommunicationFacade.GetInternalComponentDataByRepo(repoName, correlationId);
+                LogHandlingHelper.HttpResponseHandling("Get component data by repo", $"MethodName:GetInternalComponentDataByRepo(),CorrelationId:{correlationId}", httpResponseMessage, "");
                 if (httpResponseMessage == null || !httpResponseMessage.IsSuccessStatusCode)
                 {
                     return new List<AqlResult>();
@@ -51,15 +53,15 @@ namespace LCT.Services
             }
             catch (HttpRequestException httpException)
             {
-                Logger.Debug(httpException);
+                LogHandlingHelper.ExceptionErrorHandling("Get component data by repo", $"MethodName:GetInternalComponentDataByRepo(),CorrelationId:{correlationId}", httpException, "Check the JFrog server details ");
             }
             catch (InvalidOperationException invalidOperationExcep)
             {
-                Logger.Debug(invalidOperationExcep);
+                LogHandlingHelper.ExceptionErrorHandling("Get component data by repo", $"MethodName:GetInternalComponentDataByRepo(),CorrelationId:{correlationId}", invalidOperationExcep, "An invalid operation occurred while processing the request.");
             }
             catch (TaskCanceledException taskCancelledException)
             {
-                Logger.Debug(taskCancelledException);
+                LogHandlingHelper.ExceptionErrorHandling("Get component data by repo", $"MethodName:GetInternalComponentDataByRepo(),CorrelationId:{correlationId}", taskCancelledException, "The request was canceled. This could be due to a timeout.");
             }
 
             return aqlResult;
@@ -68,10 +70,11 @@ namespace LCT.Services
         {
             HttpResponseMessage httpResponseMessage = null;
             IList<AqlResult> aqlResult = new List<AqlResult>();
-
+            string correlationId = Guid.NewGuid().ToString();
             try
             {
-                httpResponseMessage = await m_JFrogApiCommunicationFacade.GetNpmComponentDataByRepo(repoName);
+                httpResponseMessage = await m_JFrogApiCommunicationFacade.GetNpmComponentDataByRepo(repoName, correlationId);
+                LogHandlingHelper.HttpResponseHandling("Get NPM component data by repo", $"MethodName:GetNpmComponentDataByRepo(),CorrelationId:{correlationId}", httpResponseMessage, "");
                 if (httpResponseMessage == null || !httpResponseMessage.IsSuccessStatusCode)
                 {
                     return new List<AqlResult>();
@@ -83,15 +86,15 @@ namespace LCT.Services
             }
             catch (HttpRequestException httpException)
             {
-                Logger.Debug(httpException);
+                LogHandlingHelper.ExceptionErrorHandling("Get NPM component data by repo", $"MethodName:GetNpmComponentDataByRepo(),CorrelationId:{correlationId}", httpException, "Check the JFrog server details");
             }
             catch (InvalidOperationException invalidOperationExcep)
             {
-                Logger.Debug(invalidOperationExcep);
+                LogHandlingHelper.ExceptionErrorHandling("Get NPM component data by repo", $"MethodName:GetNpmComponentDataByRepo(),CorrelationId:{correlationId}", invalidOperationExcep, "An invalid operation occurred while processing the request.");
             }
             catch (TaskCanceledException taskCancelledException)
             {
-                Logger.Debug(taskCancelledException);
+                LogHandlingHelper.ExceptionErrorHandling("Get NPM component data by repo", $"MethodName:GetNpmComponentDataByRepo(),CorrelationId:{correlationId}", taskCancelledException, "The request was canceled. This could be due to a timeout.");
             }
 
             return aqlResult;
@@ -100,10 +103,12 @@ namespace LCT.Services
         {
             HttpResponseMessage httpResponseMessage = null;
             IList<AqlResult> aqlResult = new List<AqlResult>();
+            string correlationId = Guid.NewGuid().ToString();
 
             try
             {
-                httpResponseMessage = await m_JFrogApiCommunicationFacade.GetPypiComponentDataByRepo(repoName);
+                httpResponseMessage = await m_JFrogApiCommunicationFacade.GetPypiComponentDataByRepo(repoName, correlationId);
+                LogHandlingHelper.HttpResponseHandling("Get Pypi component data by repo", $"MethodName:GetPypiComponentDataByRepo()", httpResponseMessage, "");
                 if (httpResponseMessage == null || !httpResponseMessage.IsSuccessStatusCode)
                 {
                     return new List<AqlResult>();
@@ -115,15 +120,15 @@ namespace LCT.Services
             }
             catch (HttpRequestException httpException)
             {
-                Logger.Debug(httpException);
+                LogHandlingHelper.ExceptionErrorHandling("Get Pypi component data by repo", $"MethodName:GetPypiComponentDataByRepo(),CorrelationId:{correlationId}", httpException, "Check the JFrog server details or token validity.");
             }
             catch (InvalidOperationException invalidOperationExcep)
             {
-                Logger.Debug(invalidOperationExcep);
+                LogHandlingHelper.ExceptionErrorHandling("Get Pypi component data by repo", $"MethodName:GetPypiComponentDataByRepo(),CorrelationId:{correlationId}", invalidOperationExcep, "An invalid operation occurred while processing the request.");
             }
             catch (TaskCanceledException taskCancelledException)
             {
-                Logger.Debug(taskCancelledException);
+                LogHandlingHelper.ExceptionErrorHandling("Get Pypi component data by repo", $"MethodName:GetPypiComponentDataByRepo(),CorrelationId:{correlationId}", taskCancelledException, "The request was canceled. This could be due to a timeout.");
             }
 
             return aqlResult;
@@ -135,9 +140,11 @@ namespace LCT.Services
         {
             HttpResponseMessage? httpResponseMessage = null;
             AqlResult? aqlResult = null;
+            string correlationId = Guid.NewGuid().ToString();
             try
             {
-                httpResponseMessage = await m_JFrogApiCommunicationFacade.GetPackageInfo(component);
+                httpResponseMessage = await m_JFrogApiCommunicationFacade.GetPackageInfo(component, correlationId);
+                LogHandlingHelper.HttpResponseHandling("Get package info", $"MethodName:GetPackageInfo(),CorrelationId:{correlationId}", httpResponseMessage, "");
                 httpResponseMessage.EnsureSuccessStatusCode();
 
                 string stringData = httpResponseMessage.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
@@ -146,24 +153,24 @@ namespace LCT.Services
             }
             catch (HttpRequestException httpException)
             {
-                Logger.Debug(httpException);
+                LogHandlingHelper.ExceptionErrorHandling("Get package info", $"MethodName:GetPackageInfo(),CorrelationId:{correlationId}", httpException, "Check the JFrog server details or token validity.");
             }
             catch (InvalidOperationException invalidOperationExcep)
             {
-                Logger.Debug(invalidOperationExcep);
+                LogHandlingHelper.ExceptionErrorHandling("Get package info", $"MethodName:GetPackageInfo(),CorrelationId:{correlationId}", invalidOperationExcep, "An invalid operation occurred while processing the request.");
             }
             catch (TaskCanceledException taskCancelledException)
             {
-                Logger.Debug(taskCancelledException);
+                LogHandlingHelper.ExceptionErrorHandling("Get package info", $"MethodName:GetPackageInfo(),CorrelationId:{correlationId}", taskCancelledException, "The request was canceled. This could be due to a timeout.");
             }
 
             return aqlResult;
         }
 
-        public async Task<HttpResponseMessage> CheckJFrogConnectivity()
+        public async Task<HttpResponseMessage> CheckJFrogConnectivity(string correlationId)
         {
             HttpResponseMessage? httpResponseMessage = null;
-            httpResponseMessage = await m_JFrogApiCommunicationFacade.CheckConnection();
+            httpResponseMessage = await m_JFrogApiCommunicationFacade.CheckConnection(correlationId);
 
             return httpResponseMessage;
         }

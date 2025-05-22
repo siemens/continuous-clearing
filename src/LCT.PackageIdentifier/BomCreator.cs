@@ -54,7 +54,7 @@ namespace LCT.PackageIdentifier
                                       ProjectReleases projectReleases,
                                        CatoolInfo caToolInformation)
         {
-            Logger.Debug($"GenerateBom():Start");
+            Logger.Debug($"GenerateBom():SBOM generation process has started.");
             Bom listOfComponentsToBom;
             jfrog = appSettings.Jfrog;
             sw360 = appSettings.SW360;
@@ -74,9 +74,9 @@ namespace LCT.PackageIdentifier
 
             string defaultProjectName = CommonIdentiferHelper.GetDefaultProjectName(appSettings);
             // Writes Comparison Bom
-            Logger.Logger.Log(null, Level.Notice, $"Writing CycloneDX BOM..", null);
+            Logger.Logger.Log(null, Level.Notice, $"Writing CycloneDX BOM to the output folder.", null);
             WritecontentsToBOM(appSettings, bomKpiData, listOfComponentsToBom, defaultProjectName);
-            Logger.Logger.Log(null, Level.Notice, $"Writing CycloneDX BOM completed", null);
+            Logger.Logger.Log(null, Level.Notice, $"CycloneDX BOM writing process has been completed.", null);
 
             // Log warnings based on appSettings
             DisplayInformation.LogBomGenerationWarnings(appSettings);
@@ -85,8 +85,10 @@ namespace LCT.PackageIdentifier
             Program.BomStopWatch?.Stop();
             bomKpiData.TimeTakenByBomCreator = Program.BomStopWatch == null ? 0 :
               TimeSpan.FromMilliseconds(Program.BomStopWatch.ElapsedMilliseconds).TotalSeconds;
+            Logger.Debug($"GenerateBom(): Starting to write KPI data to the output folder - {appSettings.Directory.OutputFolder}");
             fileOperations.WriteContentToFile(bomKpiData, appSettings.Directory.OutputFolder,
                 FileConstant.BomKpiDataFileName, defaultProjectName);
+            Logger.Debug($"GenerateBom(): Successfully wrote KPI data to the output folder - {appSettings.Directory.OutputFolder}.\n");
             if (appSettings.SW360 != null)
             {
                 // Writes Project Summary Url on CLI
@@ -104,7 +106,7 @@ namespace LCT.PackageIdentifier
                 bomHelper.WriteInternalComponentsListToKpi(componentData.internalComponents);
             }
 
-            Logger.Debug($"GenerateBom():End");
+            Logger.Debug($"GenerateBom():SBOM generation process has completed.\n");
         }
 
         private static void WritecontentsToBOM(CommonAppSettings appSettings, BomKpiData bomKpiData, Bom listOfComponentsToBom, string defaultProjectName)
@@ -165,6 +167,7 @@ namespace LCT.PackageIdentifier
                     parser = new ConanProcessor(CycloneDXBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 default:
+                    LogHandlingHelper.BasicErrorHandling("Identified invalid projecttype", "CallPackageParser()", $"Unable to retrieve exclude files because an invalid project type was provided: {appSettings.ProjectType}", "Provide Valid project type in configuration.");
                     Logger.Error($"GenerateBom():Invalid ProjectType - {appSettings.ProjectType}");
                     break;
             }
@@ -173,6 +176,7 @@ namespace LCT.PackageIdentifier
 
         private async Task<Bom> ComponentIdentification(CommonAppSettings appSettings, IParser parser)
         {
+            Logger.Debug("ComponentIdentification():Component identification process for BOM file has started.");
             ComponentIdentification lstOfComponents;
             List<Component> components;
             Metadata metadata;
@@ -214,38 +218,48 @@ namespace LCT.PackageIdentifier
             }
             catch (HttpRequestException ex)
             {
-                Logger.Debug($"ComponentIdentification: {ex}");
+                LogHandlingHelper.ExceptionErrorHandling("An error occurred during component identification.", "ComponentIdentification()", ex);
             }
+            Logger.Debug("ComponentIdentification():Component identification process for BOM file has completed.");
             return bom;
         }
 
         public async Task<bool> CheckJFrogConnection(CommonAppSettings appSettings)
         {
+            Logger.Debug("CheckJFrogConnection():Validating JFrog Connection has started");
             if (appSettings.Jfrog != null)
             {
-                var response = await JFrogService.CheckJFrogConnectivity();
+                string correlationId = Guid.NewGuid().ToString();
+                var response = await JFrogService.CheckJFrogConnectivity(correlationId);
+
                 if (response != null)
                 {
                     if (response.IsSuccessStatusCode)
                     {
                         Logger.Logger.Log(null, Level.Info, $"JFrog Connection was successfull!!", null);
+                        LogHandlingHelper.HttpResponseHandling("JFrog Connection Validation", $"Methodname:CheckJFrogConnection(),CorrelationId:{correlationId}", response, "");
+                        Logger.Debug("CheckJFrogConnection():Validating JFrog Connection has completed\n");
                         return true;
                     }
                     else if (response.StatusCode == HttpStatusCode.Unauthorized)
                     {
+                        LogHandlingHelper.HttpResponseErrorHandling("JFrog Connection Validation", $"Methodname:CheckJFrogConnection(),CorrelationId:{correlationId}", response, "Check the JFrog server details or token validity.");
                         Logger.Logger.Log(null, Level.Error, $"Check the JFrog token validity/permission..", null);
                     }
                     else if (response.StatusCode == HttpStatusCode.NotFound)
                     {
+                        LogHandlingHelper.HttpResponseErrorHandling("JFrog Connection Validation", $"Methodname:CheckJFrogConnection(),CorrelationId:{correlationId}", response, "Check the JFrog server details .");
                         Logger.Logger.Log(null, Level.Error, $"Check the provided JFrog server details..", null);
                     }
                     else
                     {
+                        LogHandlingHelper.HttpResponseErrorHandling("JFrog Connection Validation", $"Methodname:CheckJFrogConnection(),CorrelationId:{correlationId}", response, "");
                         Logger.Logger.Log(null, Level.Error, $"JFrog Connection was not successfull check the server status.", null);
                     }
                 }
                 return false;
             }
+            Logger.Debug("CheckJFrogConnection():Validating JFrog Connection has completed\n");
             return true;
 
         }

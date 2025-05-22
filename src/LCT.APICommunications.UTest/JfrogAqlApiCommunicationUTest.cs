@@ -18,7 +18,7 @@ namespace LCT.APICommunications.UTest
             JfrogAqlApiCommunication jfrogApiCommunication = new JfrogAqlApiCommunication(invalidDomainName, repoCredentials, timeout);
 
             // Act & Assert
-            Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApiCommunication.CheckConnection());
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApiCommunication.CheckConnection(""));
         }
 
         [Test]
@@ -33,7 +33,7 @@ namespace LCT.APICommunications.UTest
             JfrogAqlApiCommunication jfrogApiCommunication = new JfrogAqlApiCommunication(invalidDomainName, repoCredentials, timeout);
 
             // Act & Assert
-            Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApiCommunication.GetInternalComponentDataByRepo(invalidRepoName));
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApiCommunication.GetInternalComponentDataByRepo(invalidRepoName, ""));
         }
         [Test]
         public void JfrogAqlApiCommunication_GetNpmComponentDataByRepo_ReturnsInvalidOperationException()
@@ -47,7 +47,7 @@ namespace LCT.APICommunications.UTest
             JfrogAqlApiCommunication jfrogApiCommunication = new JfrogAqlApiCommunication(invalidDomainName, repoCredentials, timeout);
 
             // Act & Assert
-            Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApiCommunication.GetNpmComponentDataByRepo(invalidRepoName));
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApiCommunication.GetNpmComponentDataByRepo(invalidRepoName, ""));
         }
         [Test]
         public void JfrogAqlApiCommunication_GetPypiComponentDataByRepo_ReturnsInvalidOperationException()
@@ -61,7 +61,7 @@ namespace LCT.APICommunications.UTest
             JfrogAqlApiCommunication jfrogApiCommunication = new JfrogAqlApiCommunication(invalidDomainName, repoCredentials, timeout);
 
             // Act & Assert
-            Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApiCommunication.GetPypiComponentDataByRepo(invalidRepoName));
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApiCommunication.GetPypiComponentDataByRepo(invalidRepoName,""));
         }
         [Test]
         public void JfrogAqlApiCommunication_GetPackageInfo_ReturnsArgumentException_WhenNoPackageNameOrPathProvided()

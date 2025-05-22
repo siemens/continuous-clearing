@@ -9,6 +9,7 @@ using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.AQL;
 using LCT.ArtifactoryUploader.Model;
+using LCT.Common;
 using LCT.Services.Interface;
 using log4net;
 using System;
@@ -17,6 +18,7 @@ using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
+using Directory = System.IO.Directory;
 
 namespace LCT.ArtifactoryUploader
 {
@@ -29,7 +31,7 @@ namespace LCT.ArtifactoryUploader
 
         public static async Task<HttpResponseMessage> UploadPackageToRepo(ComponentsToArtifactory component, int timeout, DisplayPackagesInfo displayPackagesInfo)
         {
-            Logger.Debug("Starting UploadPackageToArtifactory method");
+            Logger.Debug("UploadPackageToRepo(): Starting the upload package to Artifactory.");
             string operationType = component.PackageType == PackageType.ClearedThirdParty
                 || component.PackageType == PackageType.Development ? "copy" : "move";
             string dryRunSuffix = component.DryRun ? " dry-run" : "";
@@ -46,15 +48,15 @@ namespace LCT.ArtifactoryUploader
                         ReasonPhrase = ApiConstant.PackageNotFound
                     };
                 }
-
+                string correlationId = Guid.NewGuid().ToString();
                 // Perform Copy or Move operation
                 responsemessage = component.PackageType switch
                 {
-                    PackageType.ClearedThirdParty or PackageType.Development => await JFrogApiCommInstance.CopyFromRemoteRepo(component),
-                    PackageType.Internal => await JFrogApiCommInstance.MoveFromRepo(component),
+                    PackageType.ClearedThirdParty or PackageType.Development => await JFrogApiCommInstance.CopyFromRemoteRepo(component, correlationId),
+                    PackageType.Internal => await JFrogApiCommInstance.MoveFromRepo(component, correlationId),
                     _ => new HttpResponseMessage(HttpStatusCode.NotFound)
                 };
-
+                LogHandlingHelper.HttpResponseHandling("Upload Package To Repo", $"MethodName:UploadPackageToRepo(),CorrelationId:{correlationId}", responsemessage, "");
                 // Check status code and handle errors
                 if (responsemessage.StatusCode != HttpStatusCode.OK)
                 {
@@ -67,19 +69,21 @@ namespace LCT.ArtifactoryUploader
             }
             catch (HttpRequestException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("UploadPackageToRepo", $"MethodName:UploadPackageToRepo(), ComponentName: {component.Name}", ex, "An HTTP request error occurred while uploading the package to Artifactory.");
                 Logger.Error($"Error has occurred in UploadPackageToArtifactory--{ex}");
                 responsemessage.ReasonPhrase = ApiConstant.ErrorInUpload;
                 return responsemessage;
             }
             catch (InvalidOperationException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("UploadPackageToRepo", $"MethodName:UploadPackageToRepo(), ComponentName: {component.Name}", ex, "An invalid operation occurred while uploading the package to Artifactory.");
                 Logger.Error($"Error has occurred in UploadPackageToArtifactory--{ex}");
                 responsemessage.ReasonPhrase = ApiConstant.ErrorInUpload;
                 return responsemessage;
             }
             finally
             {
-                Logger.Debug("Ending UploadPackageToArtifactory method");
+                Logger.Debug($"UploadPackageToRepo(): Ending the upload process for component: {component.Name}.");
             }
 
             return responsemessage;
@@ -131,10 +135,12 @@ namespace LCT.ArtifactoryUploader
             }
             catch (IOException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("GettPathForArtifactoryUpload", $"Failed to create directory ", ex, "IOException occurred while creating the directory.");
                 Logger.Error($"GettPathForArtifactoryUpload() ", ex);
             }
             catch (UnauthorizedAccessException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("GettPathForArtifactoryUpload", $"Unauthorized access while creating directory", ex, "UnauthorizedAccessException occurred while creating the directory.");
                 Logger.Error($"GettPathForArtifactoryUpload() ", ex);
             }
 
