@@ -5,10 +5,12 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.APICommunications.Model;
+using LCT.Common;
 using log4net;
 using Newtonsoft.Json;
 using System;
 using System.IO;
+using System.Management.Automation;
 using System.Net;
 using System.Reflection;
 using System.Security;
@@ -89,10 +91,12 @@ namespace LCT.APICommunications
             }
             catch (UriFormatException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("Attachment Error",$"AttachComponentSourceToSW360():Failed to attach component source for ReleaseId: {attachReport.ReleaseId}",ex,$"Invalid URI format: {url.AbsoluteUri}");
                 Logger.Error($"AttachComponentSourceToSW360:", ex);
             }
             catch (SecurityException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("Attachment Error",$"AttachComponentSourceToSW360():Failed to attach component source for ReleaseId: {attachReport.ReleaseId}",ex,"A security exception occurred. Ensure the application has the required permissions.");
                 Logger.Error($"AttachComponentSourceToSW360:", ex);
             }
             catch (WebException webex)
@@ -104,7 +108,7 @@ namespace LCT.APICommunications
                     {
                         StreamReader reader = new StreamReader(respStream);
                         string text = reader.ReadToEnd();
-                        Logger.Debug($"Web exception: {text}", webex);
+                        LogHandlingHelper.ExceptionErrorHandling("Attachment Error",$"Failed to attach component source for ReleaseId: {attachReport.ReleaseId}",webex,$"Web exception occurred. Details: {text}");
                         Logger.Warn($"Web exception: {text}", webex);
                     }
                 }
@@ -112,7 +116,7 @@ namespace LCT.APICommunications
             catch (IOException ex)
             {
                 Logger.Error($"AttachComponentSourceToSW360:Failed attach source for release = {attachReport.ReleaseId}");
-                Logger.Debug($"AttachComponentSourceToSW360:", ex);
+                LogHandlingHelper.ExceptionErrorHandling("Attachment Error",$"AttachComponentSourceToSW360():Failed to attach component source for ReleaseId: {attachReport.ReleaseId}",ex,"An I/O error occurred while processing the attachment.");
             }
             return releaseAttachementApi;
         }
@@ -136,9 +140,9 @@ namespace LCT.APICommunications
                 attachment.CheckStatus = attachReport.AttachmentCheckStatus;
             }
 
-            if (!Directory.Exists(folderPath))
+            if (!System.IO.Directory.Exists(folderPath))
             {
-                Directory.CreateDirectory(folderPath);
+                System.IO.Directory.CreateDirectory(folderPath);
             }
 
             string jsonString = JsonConvert.SerializeObject(attachment, Formatting.Indented);

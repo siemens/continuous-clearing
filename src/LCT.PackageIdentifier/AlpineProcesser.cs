@@ -47,12 +47,14 @@ namespace LCT.PackageIdentifier
             {
                 if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
+                    Logger.Debug($"ParsePackageFile():Template file detected: {filepath}");
                     listOfTemplateBomfilePaths.Add(filepath);
                 }
                 else
                 {
-                    Logger.Debug($"ParsePackageFile():FileName: " + filepath);
+                    Logger.Debug($"ParsePackageFile():CycloneDX file detected: {filepath}");
                     listofComponents.AddRange(ParseCycloneDX(filepath, dependenciesForBOM));
+                    IdentifiedAlpinePackages(filepath, listofComponents, dependenciesForBOM);
                 }
 
             }
@@ -137,9 +139,7 @@ namespace LCT.PackageIdentifier
 
                 if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["ALPINE"]))
                 {
-
                     alpinePackages.Add(package);
-                    Logger.Debug($"ExtractDetailsForJson():ValidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
                 }
                 else
                 {
@@ -198,7 +198,34 @@ namespace LCT.PackageIdentifier
             }
             return listComponentForBOM;
         }
+        private static void IdentifiedAlpinePackages(string filepath, List<AlpinePackage> packages, List<Dependency> dependencies)
+        {
 
+            if (packages == null || packages.Count == 0)
+            {
+                // Log a message indicating no packages were found
+                Logger.Debug($"No Alpine packages were found in the file: {filepath}");
+                return;
+            }
+
+            // Build the table
+            var logBuilder = new System.Text.StringBuilder();
+            logBuilder.AppendLine("============================================================================================================================================");
+            logBuilder.AppendLine($" Alpine PACKAGES FOUND IN FILE: {filepath}");
+            logBuilder.AppendLine("============================================================================================================================================");
+            logBuilder.AppendLine($"| {"Name",-40} | {"Version",-20} | {"PURL",-60} | {"Dependencies",-60} |");
+            logBuilder.AppendLine("--------------------------------------------------------------------------------------------------------------------------------------------");
+
+            foreach (var package in packages)
+            {
+                logBuilder.AppendLine($"| {package.Name,-40} | {package.Version,-20} | {package.PurlID,-60} | {dependencies,-60} |");
+            }
+
+            logBuilder.AppendLine("============================================================================================================================================");
+
+            // Log the table
+            Logger.Debug(logBuilder.ToString());
+        }
         #endregion
     }
 }

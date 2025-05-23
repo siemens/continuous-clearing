@@ -9,6 +9,8 @@ using LCT.Common.Constants;
 using LCT.Common.Interface;
 using LCT.Common.Model;
 using log4net;
+using log4net.Appender;
+using log4net.Config;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -24,6 +26,7 @@ namespace LCT.Common.UTest
         private string tempDir;
         private string tempLogFile;
         private CommonAppSettings appSettings;
+        private MemoryAppender memoryAppender;
         [SetUp]
         public void SetUp()
         {
@@ -45,6 +48,9 @@ namespace LCT.Common.UTest
             // Set the static log path for the test
             Log4Net.CatoolLogPath = tempLogFile;
             CommonHelper.DefaultLogPath = "default";
+            memoryAppender = new MemoryAppender();
+            LogManager.GetRepository().ResetConfiguration();
+            BasicConfigurator.Configure(memoryAppender);
         }
 
         [TearDown]
@@ -156,36 +162,48 @@ namespace LCT.Common.UTest
         }
 
         [Test]
-        public void CheckNullOrEmpty_WhenValueIsNull_ThrowsArgumentException()
+        public void CheckNullOrEmpty_WhenValueIsNull_LogsError()
         {
             // Arrange
             string name = "TestName";
             string value = null;
 
-            // Act & Assert
-            Assert.Throws<ArgumentException>(() => CommonHelper.CheckNullOrEmpty(name, value));
+            // Act
+            CommonHelper.CheckNullOrEmpty(name, value);
+
+            // Assert
+            var logEvents = memoryAppender.GetEvents();
+            Assert.IsTrue(logEvents.Any(e => e.RenderedMessage.Contains($"The provided value for '{name}' is null, empty, or whitespace.")));
         }
 
         [Test]
-        public void CheckNullOrEmpty_WhenValueIsEmpty_ThrowsArgumentException()
+        public void CheckNullOrEmpty_WhenValueIsEmpty_LogsError()
         {
             // Arrange
             string name = "TestName";
             string value = "";
 
-            // Act & Assert
-            Assert.Throws<ArgumentException>(() => CommonHelper.CheckNullOrEmpty(name, value));
+            // Act
+            CommonHelper.CheckNullOrEmpty(name, value);
+
+            // Assert
+            var logEvents = memoryAppender.GetEvents();
+            Assert.IsTrue(logEvents.Any(e => e.RenderedMessage.Contains($"The provided value for '{name}' is null, empty, or whitespace.")));
         }
 
         [Test]
-        public void CheckNullOrEmpty_WhenValueIsWhiteSpace_ThrowsArgumentException()
+        public void CheckNullOrEmpty_WhenValueIsWhiteSpace_LogsError()
         {
             // Arrange
             string name = "TestName";
             string value = "   ";
 
-            // Act & Assert
-            Assert.Throws<ArgumentException>(() => CommonHelper.CheckNullOrEmpty(name, value));
+            // Act
+            CommonHelper.CheckNullOrEmpty(name, value);
+
+            // Assert
+            var logEvents = memoryAppender.GetEvents();
+            Assert.IsTrue(logEvents.Any(e => e.RenderedMessage.Contains($"The provided value for '{name}' is null, empty, or whitespace.")));
         }
 
         [Test]

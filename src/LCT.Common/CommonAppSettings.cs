@@ -62,6 +62,7 @@ namespace LCT.Common
             }
         }
         public bool MultipleProjectType { get; set; } = false;
+        public bool Verbose { get; set; } = false;
         public Telemetry Telemetry { get; set; }
         public SW360 SW360 { get; set; }
         public Directory Directory { get; set; }
