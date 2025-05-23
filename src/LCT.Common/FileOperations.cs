@@ -305,7 +305,7 @@ namespace LCT.Common
             return "success";
 
         }
-        private void HandleValidationError(string message, Exception exception, string additionalDetails)
+        private static void HandleValidationError(string message, Exception exception, string additionalDetails)
         {
             LogHandlingHelper.ExceptionErrorHandling("Validation Error", message, exception, additionalDetails);
             throw exception;
