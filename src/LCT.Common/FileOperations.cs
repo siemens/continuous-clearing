@@ -29,15 +29,11 @@ namespace LCT.Common
         {
             if (string.IsNullOrWhiteSpace(filePath))
             {
-                LogHandlingHelper.ExceptionErrorHandling("Validation Error",$"Validation failed for file path.",new ArgumentException($"Invalid value for the {nameof(filePath)} - {filePath}"),"The provided file path is null, empty, or consists only of whitespace.");
-                throw new ArgumentException($"Invalid value for the {nameof(filePath)} - {filePath}");
+                HandleValidationError("Validation failed for file path.", new ArgumentException($"Invalid value for the {nameof(filePath)} - {filePath}"), "The provided file path is null, empty, or consists only of whitespace.");
             }
-
             if (!File.Exists(filePath))
             {
-                LogHandlingHelper.ExceptionErrorHandling("Validation Error",$"File not found at the specified path.",new FileNotFoundException($"The {nameof(filePath)} is not found at this path - {filePath}"),$"Ensure the file exists at the specified path: {filePath}");
-                throw new FileNotFoundException($"The {nameof(filePath)}  is not found at this path" +
-                    $" - {filePath}");
+                HandleValidationError("File not found at the specified path.", new FileNotFoundException($"The {nameof(filePath)} is not found at this path - {filePath}"), $"Ensure the file exists at the specified path: {filePath}");
             }
         }
 
@@ -308,6 +304,11 @@ namespace LCT.Common
             Logger.Debug($"WriteContentToMultipleVersionsFile():Completed writing content to the file.");
             return "success";
 
+        }
+        private void HandleValidationError(string message, Exception exception, string additionalDetails)
+        {
+            LogHandlingHelper.ExceptionErrorHandling("Validation Error", message, exception, additionalDetails);
+            throw exception;
         }
     }
 }

@@ -351,42 +351,13 @@ namespace LCT.SW360PackageCreator
             if (item.ComponentStatus == Dataconstant.NotAvailable && item.ReleaseStatus == Dataconstant.NotAvailable)
             {
                 Logger.Logger.Log(null, Level.Notice, $"Creating the Component & Release : Name - {item.Name} , version - {item.Version}", null);
-                var initialItem = new ComparisonBomData
-                {
-                    Name = item.Name,
-                    Group = item.Group,
-                    Version = item.Version,
-                    ComponentExternalId = item.ComponentExternalId,
-                    ReleaseExternalId = item.ReleaseExternalId,
-                    PackageUrl = item.PackageUrl,
-                    SourceUrl = item.SourceUrl,
-                    DownloadUrl = item.DownloadUrl,
-                    PatchURls = item.PatchURls,
-                    ComponentStatus = item.ComponentStatus,
-                    ReleaseStatus = item.ReleaseStatus,
-                    ApprovedStatus = item.ApprovedStatus,
-                    IsComponentCreated = item.IsComponentCreated,
-                    IsReleaseCreated = item.IsReleaseCreated,
-                    FossologyUploadStatus = item.FossologyUploadStatus,
-                    ReleaseAttachmentLink = item.ReleaseAttachmentLink,
-                    ReleaseLink = item.ReleaseLink,
-                    FossologyLink = item.FossologyLink,
-                    ReleaseID = item.ReleaseID,
-                    AlpineSource = item.AlpineSource,
-                    ParentReleaseName = item.ParentReleaseName,
-                    FossologyUploadId = item.FossologyUploadId,
-                    ClearingState = item.ClearingState
-                };
+                var initialItem = CloneComparisonBomData(item);
                 var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(item);
-
-                if (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]) && !attachmentUrlList.ContainsKey("SOURCE"))
+                if (IsDebianSourceMissing(item, attachmentUrlList))
                 {
-                    item.DownloadUrl = Dataconstant.DownloadUrlNotFound;
-                    UpdatedCompareBomData.Add(item);
-                    LogHandlingHelper.ComponentDataForLogTable("CreateComponentAndReleaseWhenNotAvailable()", initialItem, item);
+                    HandleMissingDebianSource(item, initialItem);
                     return;
                 }
-
                 //till here
 
                 ComponentCreateStatus createdStatus = await sw360CreatorService.CreateComponentBasesOFswComaprisonBOM(item, attachmentUrlList);
@@ -458,39 +429,11 @@ namespace LCT.SW360PackageCreator
             if (item.ComponentStatus == Dataconstant.Available && item.ReleaseStatus == Dataconstant.NotAvailable)
             {
                 Logger.Logger.Log(null, Level.Notice, $"Creating Release : Name - {item.Name} , version - {item.Version}", null);
-                var initialItem = new ComparisonBomData
-                {
-                    Name = item.Name,
-                    Group = item.Group,
-                    Version = item.Version,
-                    ComponentExternalId = item.ComponentExternalId,
-                    ReleaseExternalId = item.ReleaseExternalId,
-                    PackageUrl = item.PackageUrl,
-                    SourceUrl = item.SourceUrl,
-                    DownloadUrl = item.DownloadUrl,
-                    PatchURls = item.PatchURls,
-                    ComponentStatus = item.ComponentStatus,
-                    ReleaseStatus = item.ReleaseStatus,
-                    ApprovedStatus = item.ApprovedStatus,
-                    IsComponentCreated = item.IsComponentCreated,
-                    IsReleaseCreated = item.IsReleaseCreated,
-                    FossologyUploadStatus = item.FossologyUploadStatus,
-                    ReleaseAttachmentLink = item.ReleaseAttachmentLink,
-                    ReleaseLink = item.ReleaseLink,
-                    FossologyLink = item.FossologyLink,
-                    ReleaseID = item.ReleaseID,
-                    AlpineSource = item.AlpineSource,
-                    ParentReleaseName = item.ParentReleaseName,
-                    FossologyUploadId = item.FossologyUploadId,
-                    ClearingState = item.ClearingState
-                };
+                var initialItem = CloneComparisonBomData(item);
                 var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(item);
-
-                if (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]) && !attachmentUrlList.ContainsKey("SOURCE"))
+                if (IsDebianSourceMissing(item, attachmentUrlList))
                 {
-                    item.DownloadUrl = Dataconstant.DownloadUrlNotFound;
-                    UpdatedCompareBomData.Add(item);
-                    LogHandlingHelper.ComponentDataForLogTable(nameof(CreateComponentAndReleaseWhenNotAvailable), initialItem, item);
+                    HandleMissingDebianSource(item, initialItem);
                     return;
                 }
 
@@ -626,32 +569,7 @@ namespace LCT.SW360PackageCreator
             if (item.ComponentStatus == Dataconstant.Available && item.ReleaseStatus == Dataconstant.Available)
             {
                 Logger.Logger.Log(null, Level.Notice, $"Release exists in SW360 : Name - {item.Name} , version - {item.Version}", null);
-                var initialItem = new ComparisonBomData
-                {
-                    Name = item.Name,
-                    Group = item.Group,
-                    Version = item.Version,
-                    ComponentExternalId = item.ComponentExternalId,
-                    ReleaseExternalId = item.ReleaseExternalId,
-                    PackageUrl = item.PackageUrl,
-                    SourceUrl = item.SourceUrl,
-                    DownloadUrl = item.DownloadUrl,
-                    PatchURls = item.PatchURls,
-                    ComponentStatus = item.ComponentStatus,
-                    ReleaseStatus = item.ReleaseStatus,
-                    ApprovedStatus = item.ApprovedStatus,
-                    IsComponentCreated = item.IsComponentCreated,
-                    IsReleaseCreated = item.IsReleaseCreated,
-                    FossologyUploadStatus = item.FossologyUploadStatus,
-                    ReleaseAttachmentLink = item.ReleaseAttachmentLink,
-                    ReleaseLink = item.ReleaseLink,
-                    FossologyLink = item.FossologyLink,
-                    ReleaseID = item.ReleaseID,
-                    AlpineSource = item.AlpineSource,
-                    ParentReleaseName = item.ParentReleaseName,
-                    FossologyUploadId = item.FossologyUploadId,
-                    ClearingState = item.ClearingState
-                };
+                var initialItem = CloneComparisonBomData(item);
                 string releaseLink = item.ReleaseLink ?? string.Empty;
                 string releaseId = CommonHelper.GetSubstringOfLastOccurance(releaseLink, "/");
                 if (!string.IsNullOrWhiteSpace(releaseId))
@@ -773,6 +691,46 @@ namespace LCT.SW360PackageCreator
             // Removes duplicate
             bom.Components = bom.Components?.GroupBy(x => new { x.Name, x.Version }).Select(y => y.First()).ToList();
             return components.GroupBy(x => new { x.Name, x.Version }).Select(y => y.First()).ToList();
+        }
+        private static ComparisonBomData CloneComparisonBomData(ComparisonBomData item)
+        {
+            return new ComparisonBomData
+            {
+                Name = item.Name,
+                Group = item.Group,
+                Version = item.Version,
+                ComponentExternalId = item.ComponentExternalId,
+                ReleaseExternalId = item.ReleaseExternalId,
+                PackageUrl = item.PackageUrl,
+                SourceUrl = item.SourceUrl,
+                DownloadUrl = item.DownloadUrl,
+                PatchURls = item.PatchURls,
+                ComponentStatus = item.ComponentStatus,
+                ReleaseStatus = item.ReleaseStatus,
+                ApprovedStatus = item.ApprovedStatus,
+                IsComponentCreated = item.IsComponentCreated,
+                IsReleaseCreated = item.IsReleaseCreated,
+                FossologyUploadStatus = item.FossologyUploadStatus,
+                ReleaseAttachmentLink = item.ReleaseAttachmentLink,
+                ReleaseLink = item.ReleaseLink,
+                FossologyLink = item.FossologyLink,
+                ReleaseID = item.ReleaseID,
+                AlpineSource = item.AlpineSource,
+                ParentReleaseName = item.ParentReleaseName,
+                FossologyUploadId = item.FossologyUploadId,
+                ClearingState = item.ClearingState
+            };
+        }
+        private static bool IsDebianSourceMissing(ComparisonBomData item, Dictionary<string, string> attachmentUrlList)
+        {
+            return item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]) && !attachmentUrlList.ContainsKey("SOURCE");
+        }
+
+        private void HandleMissingDebianSource(ComparisonBomData item, ComparisonBomData initialItem)
+        {
+            item.DownloadUrl = Dataconstant.DownloadUrlNotFound;
+            UpdatedCompareBomData.Add(item);
+            LogHandlingHelper.ComponentDataForLogTable("HandleMissingDebianSource()", initialItem, item);
         }
 
     }

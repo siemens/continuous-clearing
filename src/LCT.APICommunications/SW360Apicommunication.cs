@@ -120,7 +120,7 @@ namespace LCT.APICommunications
             var result = obj;
             string projectsByTagUrl = $"{sw360ProjectsApi}/{projectId}";
             string correlationId = Guid.NewGuid().ToString();
-            LogHandlingHelper.HttpRequestHandling("Get sw360 Project details for validating", $"MethodName:GetProjectById(),CorrelationId:{correlationId}", httpClient, projectsByTagUrl);
+            await LogHandlingHelper.HttpRequestHandling("Get sw360 Project details for validating", $"MethodName:GetProjectById(),CorrelationId:{correlationId}", httpClient, projectsByTagUrl);
 
             try
             {
@@ -151,7 +151,7 @@ namespace LCT.APICommunications
             string correlationId = Guid.NewGuid().ToString();
             try
             {
-                LogHandlingHelper.HttpRequestHandling("Request for get all releases", $"MethodName:GetReleases(),CorrelationId:{correlationId}", httpClient, sw360ReleaseApi);
+                await LogHandlingHelper.HttpRequestHandling("Request for get all releases", $"MethodName:GetReleases(),CorrelationId:{correlationId}", httpClient, sw360ReleaseApi);
                 HttpResponseMessage responseMessage = await httpClient.GetAsync(sw360ReleaseApi);
                 await LogHandlingHelper.HttpResponseHandling("Response of get all releases", $"MethodName:GetReleases(),CorrelationId:{correlationId}", responseMessage);
                 if (responseMessage != null && responseMessage.StatusCode.Equals(HttpStatusCode.OK))
