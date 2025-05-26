@@ -13,10 +13,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace LCT.Common
 {
@@ -405,6 +407,11 @@ namespace LCT.Common
             }
 
             return maskedArgs;
+        }
+        public static async Task LogHttpRequest(string action, string methodName, string correlationId, HttpClient httpClient, string url, HttpContent httpContent = null)
+        {
+            string details = $"MethodName:{methodName},CorrelationId:{correlationId}";
+            await LogHandlingHelper.HttpRequestHandling(action, details, httpClient, url, httpContent);
         }
         #endregion
 
