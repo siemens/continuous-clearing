@@ -54,7 +54,7 @@ namespace LCT.SW360PackageCreator
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
             string logFileNameWithTimestamp = $"{FileConstant.ComponentCreatorLog}_{DateTime.Now:yyyyMMdd_HHmmss}.log";
-            CommonHelper.DefaultLogFolderInitialisation(logFileNameWithTimestamp, m_Verbose);
+            CommonHelper.DefaultLogFolderInitialization(logFileNameWithTimestamp, m_Verbose);
             Logger.Logger.Log(null, Level.Notice, $"====================<<<<< Package creator >>>>>====================", null);
 
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
@@ -63,7 +63,7 @@ namespace LCT.SW360PackageCreator
             ISw360ProjectService sw360ProjectService = Getsw360ProjectServiceObject(appSettings, out sW360ApicommunicationFacade);
             ProjectReleases projectReleases = new ProjectReleases();
 
-            string FolderPath = CommonHelper.LogFolderInitialisation(appSettings, logFileNameWithTimestamp, m_Verbose);
+            string FolderPath = CommonHelper.LogFolderInitialization(appSettings, logFileNameWithTimestamp, m_Verbose);
             Logger.Logger.Log(null, Level.Debug, $"log manager initiated folder name: {FolderPath}", null);
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             settingsManager.CheckRequiredArgsToRun(appSettings, "Creator");

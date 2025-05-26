@@ -285,7 +285,7 @@ namespace LCT.Common
 
             return Array.Empty<string>();
         }        
-        public static string LogFolderInitialisation(CommonAppSettings appSettings, string logFileName, bool m_Verbose)
+        public static string LogFolderInitialization(CommonAppSettings appSettings, string logFileName, bool m_Verbose)
         {
             string FolderPath = DefaultLogPath;
             if (!string.IsNullOrEmpty(appSettings.Directory.LogFolder))
@@ -323,7 +323,7 @@ namespace LCT.Common
             }
             return FolderPath;
         }        
-        public static void DefaultLogFolderInitialisation(string logFileName, bool m_Verbose)
+        public static void DefaultLogFolderInitialization(string logFileName, bool m_Verbose)
         {
             string FolderPath;
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
