@@ -27,7 +27,7 @@ namespace LCT.APICommunications
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
             const HttpContent httpContent = null;
-            await CommonHelper.LogHttpRequest("Package Copy from remote repository", "CopyFromRemoteRepo", correlationId, httpClient, component.CopyPackageApiUrl, httpContent);
+            await LogHandlingHelper.HttpRequestHandling("Package copy from remote repository", $"MethodName:CopyFromRemoteRepo(),CorrelationId:{correlationId}", httpClient, component.CopyPackageApiUrl, httpContent);
             return await httpClient.PostAsync(component.CopyPackageApiUrl, httpContent);
         }
 
@@ -35,7 +35,7 @@ namespace LCT.APICommunications
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
             const HttpContent httpContent = null;
-            await CommonHelper.LogHttpRequest("Package move from remote repository", "MoveFromRepo", correlationId, httpClient, component.MovePackageApiUrl, httpContent);
+            await LogHandlingHelper.HttpRequestHandling("Package Move from remote repository", $"MethodName:MoveFromRepo(),CorrelationId:{correlationId}", httpClient, component.MovePackageApiUrl, httpContent);
             return await httpClient.PostAsync(component.MovePackageApiUrl, httpContent);
         }
 
