@@ -1,38 +1,32 @@
 {
   "bomFormat": "CycloneDX",
-  "specVersion": "1.4",
-  "serialNumber": "urn:uuid:b7b3d78c-3b44-41c4-a7d2-1f4be11916bc",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:167dc9b4-dd8d-4f55-926a-c0f96cabf035",
   "version": 1,
   "metadata": {
-    "timestamp": "2024-07-08T12:54:44Z",
-    "tools": [
-      {
-        "vendor": "Siemens AG",
-        "name": "Clearing Automation Tool",
-        "version": "6.1.0",
-        "externalReferences": [
-          {
-            "url": "https://github.com/siemens/continuous-clearing",
-            "type": "website"
-          }
-        ]
-      },
-      {
-        "vendor": "Siemens AG",
-        "name": "Siemens SBOM",
-        "version": "2.0.0",
-        "externalReferences": [
-          {
-            "url": "https://sbom.siemens.io/",
-            "type": "website"
-          }
-        ]
-      }
-    ],
+    "timestamp": "2025-05-26T04:19:21Z",
+    "tools": {
+      "components": [
+        {
+          "type": "null",
+          "supplier": {
+            "name": "Siemens AG"
+          },
+          "name": "Clearing Automation Tool",
+          "version": "8.0.0",
+          "externalReferences": [
+            {
+              "url": "https://github.com/siemens/continuous-clearing",
+              "type": "website"
+            }
+          ]
+        }
+      ]
+    },
     "component": {
       "type": "application",
-      "name": "Test",
-      "version": "1.0"
+      "name": "continuous-clearing",
+      "version": "v9.0.x"
     },
     "properties": [
       {
@@ -409,5 +403,22 @@
       "ref": "pkg:maven/org.hamcrest/hamcrest-core@1.3",
       "dependsOn": []
     }
-  ]
+  ],
+  "definitions": {
+    "standards": [
+      {
+        "bom-ref": "standard-bom",
+        "name": "Standard BOM",
+        "version": "3.0.0",
+        "description": "The Standard for Software Bills of Materials in Siemens",
+        "owner": "Siemens AG",
+        "externalReferences": [
+          {
+            "url": "https://sbom.siemens.io/",
+            "type": "website"
+          }
+        ]
+      }
+    ]
+  }
 }

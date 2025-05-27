@@ -10,6 +10,7 @@ using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Model;
 using log4net;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -21,58 +22,114 @@ namespace LCT.PackageIdentifier
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public static Bom SetMetadataInComparisonBOM(Bom bom,
-                                                     CommonAppSettings appSettings,
-                                                     ProjectReleases projectReleases,
-                                                     CatoolInfo caToolInformation)
+                                             CommonAppSettings appSettings,
+                                             ProjectReleases projectReleases,
+                                             CatoolInfo caToolInformation)
         {
             Logger.Debug("Starting to add metadata info into the BOM");
+
+            // Create metadata
+            Metadata metadata = CreateMetadata(appSettings, projectReleases, caToolInformation);
+            // Create definitions
+            Definitions definitions = AddDefinitionsToBom();
+            // Add metadata to BOM
+            bom.Metadata = metadata;
+
+            // Add definitions to BOM
+            bom.Definitions = definitions;
+
+            return bom;
+        }
+
+        private static Metadata CreateMetadata(CommonAppSettings appSettings, ProjectReleases projectReleases, CatoolInfo caToolInformation)
+        {
             Metadata metadata = new Metadata
             {
-                Tools = new List<Tool>(),
-                Properties = new List<Property>()
+                Tools = CreateToolChoices(caToolInformation),
+                Properties = CreateProperties()
             };
 
-            SetMetaDataToolsValues(metadata, caToolInformation);
+            // Add metadata component
+            metadata.Component = CreateMetadataComponent(appSettings, projectReleases);
 
-            Component component = new Component
+            return metadata;
+        }
+
+        private static ToolChoices CreateToolChoices(CatoolInfo caToolInformation)
+        {
+            return new ToolChoices
+            {
+                Components = new List<Component>
+        {
+            new Component
+            {
+                Supplier = new OrganizationalEntity
+                {
+                    Name = "Siemens AG"
+                },
+                Name = "Clearing Automation Tool",
+                Version = caToolInformation.CatoolVersion,
+                ExternalReferences = new List<ExternalReference>
+                {
+                    new ExternalReference
+                    {
+                        Type = ExternalReference.ExternalReferenceType.Website,
+                        Url = "https://github.com/siemens/continuous-clearing"
+                    }
+                }
+            }
+        }
+            };
+        }
+
+        private static List<Property> CreateProperties()
+        {
+            return new List<Property>
+    {
+        new Property
+        {
+            Name = "siemens:profile",
+            Value = "clearing"
+        }
+    };
+        }
+
+        private static Component CreateMetadataComponent(CommonAppSettings appSettings, ProjectReleases projectReleases)
+        {
+            return new Component
             {
                 Name = appSettings?.SW360?.ProjectName,
                 Version = projectReleases.Version,
                 Type = Component.Classification.Application
             };
-            metadata.Component = component;
-
-            Property projectType = new Property
-            {
-                Name = "siemens:profile",
-                Value = "clearing"
-            };
-            metadata.Properties.Add(projectType);
-
-            bom.Metadata = metadata;
-            return bom;
         }
-
-        public static void SetMetaDataToolsValues(Metadata metadata, CatoolInfo caToolInformation)
+        public static Definitions AddDefinitionsToBom()
         {
-            Tool tool = new Tool
+            Definitions definitions = new Definitions
             {
-                Name = "Clearing Automation Tool",
-                Version = caToolInformation.CatoolVersion,
-                Vendor = "Siemens AG",
-                ExternalReferences = new List<ExternalReference>() { new ExternalReference { Url = "https://github.com/siemens/continuous-clearing", Type = ExternalReference.ExternalReferenceType.Website } }
-            };
-            metadata.Tools.Add(tool);
-
-            Tool SiemensSBOM = new Tool
+                Standards = new List<Standard>
+        {
+            new Standard
             {
-                Name = "Siemens SBOM",
-                Version = "2.0.0",
-                Vendor = "Siemens AG",
-                ExternalReferences = new List<ExternalReference>() { new ExternalReference { Url = "https://sbom.siemens.io/", Type = ExternalReference.ExternalReferenceType.Website } }
-            };
-            metadata.Tools.Add(SiemensSBOM);
+                Name = "Standard BOM",
+                Version = "3.0.0",
+                Description = "The Standard for Software Bills of Materials in Siemens",
+                Owner = "Siemens AG",
+                ExternalReferences = new List<ExternalReference>
+                {
+                    new ExternalReference
+                    {
+                        Type = ExternalReference.ExternalReferenceType.Website,
+                        Url = "https://sbom.siemens.io/"
+                    }
+                },
+                BomRef = "standard-bom"
+            }
         }
+            };
+
+            return definitions;
+        }        
         public static void SetProperties(CommonAppSettings appSettings, Component component, ref List<Component> componentForBOM, string repo = "Not Found in JFrogRepo")
         {
             List<Property> propList = new();

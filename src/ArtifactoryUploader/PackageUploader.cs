@@ -19,6 +19,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Level = log4net.Core.Level;
 
 namespace LCT.ArtifactoryUploader
 {

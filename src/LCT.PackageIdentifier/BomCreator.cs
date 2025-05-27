@@ -24,6 +24,7 @@ using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 using Directory = System.IO.Directory;
+using Level = log4net.Core.Level;
 
 
 namespace LCT.PackageIdentifier

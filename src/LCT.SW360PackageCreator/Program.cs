@@ -164,7 +164,7 @@ namespace LCT.SW360PackageCreator
             List<ComparisonBomData> parsedBomData = await componentCreator.CycloneDxBomParser(appSettings, sw360Service, cycloneDXBomParser, creatorHelper);
 
             // initializing Component creation 
-            await componentCreator.CreateComponentInSw360(appSettings, sw360CreatorService, sw360Service,
+           await componentCreator.CreateComponentInSw360(appSettings, sw360CreatorService, sw360Service,
                  sw360ProjectService, new FileOperations(), creatorHelper, parsedBomData);
         }
     }

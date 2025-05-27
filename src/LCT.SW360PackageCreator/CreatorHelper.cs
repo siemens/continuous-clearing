@@ -28,6 +28,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Directory = System.IO.Directory;
+using Level = log4net.Core.Level;
 
 namespace LCT.SW360PackageCreator
 {

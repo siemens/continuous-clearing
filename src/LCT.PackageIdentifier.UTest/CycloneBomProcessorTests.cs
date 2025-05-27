@@ -10,6 +10,7 @@ using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Model;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -41,10 +42,11 @@ namespace LCT.PackageIdentifier.UTest
             projectReleases.Version = "1.2.3";
             CatoolInfo caToolInformation = new CatoolInfo() { CatoolVersion = "6.0.0", CatoolRunningLocation = "" };
             //Act
-            Bom files = CycloneBomProcessor.SetMetadataInComparisonBOM(bom, appSettings, projectReleases, caToolInformation);
+            Bom resultBom = CycloneBomProcessor.SetMetadataInComparisonBOM(bom, appSettings, projectReleases, caToolInformation);
 
             //Assert
-            Assert.That(2, Is.EqualTo(files.Metadata.Tools.Count), "Returns bom with metadata ");
+            Assert.IsNotNull(resultBom.Metadata, "Metadata should not be null.");
+            Assert.AreEqual(1, resultBom.Metadata.Tools.Components.Count, "Metadata should contain one tool component.");
 
         }
         [Test]
@@ -54,39 +56,44 @@ namespace LCT.PackageIdentifier.UTest
             ProjectReleases projectReleases = new ProjectReleases();
             projectReleases.Version = "1.0";
 
-            Bom bom = new Bom()
+            Bom bom = new Bom
             {
-                Metadata = new Metadata()
+                Metadata = new Metadata
                 {
-                    Tools = new List<Tool>() {
-                        new Tool() {
-                            Name = "Existing Data", Version = "1.0.", Vendor = "AG" } },
-                    Component = new Component()
-                },
-                Components = new List<Component>()
+                    Tools = new ToolChoices
+                    {
+                        Components = new List<Component>
             {
-                new Component(){Name="Test",Version="2.2"},
-                new Component(){Name="new",Version="4.2"}
+                new Component
+                {
+                    Supplier = new OrganizationalEntity
+                    {
+                        Name = "Siemens AG"
+                    },
+                    Name = "Clearing Automation Tool",
+                    Version = "8.0.0",
+                    ExternalReferences = new List<ExternalReference>
+                    {
+                        new ExternalReference
+                        {
+                            Url = "",
+                            Type = ExternalReference.ExternalReferenceType.Website
+                        }
+                    }
+                }
             }
+                    }
+                },
+                Definitions=new Definitions() 
             };
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new() { ProjectName = "Test" }
             };
             projectReleases.Version = "1.2.3";
-
-            Tool tools = new Tool()
-            {
-                Name = "Clearing Automation Tool",
-                Version = "1.0.17",
-                Vendor = "Siemens AG"
-            };
-            Tool SiemensSBOM = new Tool
-            {
-                Name = "Siemens SBOM",
-                Version = "2.0.0",
-                Vendor = "Siemens AG",
-            };
+            
+           
             Component component = new Component
             {
                 Name = appSettings.SW360.ProjectName,
@@ -99,8 +106,9 @@ namespace LCT.PackageIdentifier.UTest
             Bom files = CycloneBomProcessor.SetMetadataInComparisonBOM(bom, appSettings, projectReleases, caToolInformation);
 
             //Assert
-            Assert.That(tools.Name, Is.EqualTo(files.Metadata.Tools[0].Name), "Returns bom with metadata tools");
-            Assert.That(SiemensSBOM.Name, Is.EqualTo(files.Metadata.Tools[1].Name), "Returns bom with metadata tools");
+            Assert.That(bom.Metadata.Tools.Components[0].Name, Is.EqualTo(files.Metadata.Tools.Components[0].Name), "Returns bom with metadata tools");
+            Assert.AreEqual(files.Definitions.Standards[0].Name, "Standard BOM");
+            Assert.AreEqual(files.Definitions.Standards[0].Version, "3.0.0");
             Assert.That(component.Name, Is.EqualTo(files.Metadata.Component.Name), "Returns bom with metadata component ");
             Assert.That(component.Version, Is.EqualTo(files.Metadata.Component.Version), "Returns bom with metadata component ");
             Assert.That(component.Type, Is.EqualTo(files.Metadata.Component.Type), "Returns bom with metadata component ");

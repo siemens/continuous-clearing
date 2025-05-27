@@ -145,7 +145,7 @@ namespace LCT.Common.UTest
             List<Component> listComponentForBOM = new List<Component>();
 
             //Act
-            CommonHelper.GetDetailsforManuallyAdded(componentsForBOM, listComponentForBOM);
+            CommonHelper.GetDetailsForManuallyAdded(componentsForBOM, listComponentForBOM);
 
             //Assert
             Assert.AreEqual(2, listComponentForBOM.Count);
