@@ -73,7 +73,8 @@ namespace LCT.Common.Constants
         public const string ScanAvailableState = "SCAN_AVAILABLE";
         public const string SentToClearingState = "SENT_TO_CLEARING_TOOL";
         public const string TypeJarSuffix = "?type=jar";
-
+        public const string GithubUrl = "https://github.com/siemens/continuous-clearing";
+        public const string StandardSbomUrl = "https://sbom.siemens.io/";
         public static Dictionary<string, string> PurlCheck()
         {
             return purlids;

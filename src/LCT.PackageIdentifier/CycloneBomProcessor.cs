@@ -73,7 +73,7 @@ namespace LCT.PackageIdentifier
                     new ExternalReference
                     {
                         Type = ExternalReference.ExternalReferenceType.Website,
-                        Url = GetExternalReferenceUrl("GitHubRepo")
+                        Url = Dataconstant.GithubUrl
                     }
                 }
             }
@@ -91,18 +91,7 @@ namespace LCT.PackageIdentifier
             Value = "clearing"
         }
     };
-        }
-        private static string GetExternalReferenceUrl(string key)
-        {
-            var urls = new Dictionary<string, string>
-    {
-        { "GitHubRepo", "https://github.com/siemens/continuous-clearing" },
-        { "StandardBOM", "https://sbom.siemens.io/" }
-    };
-
-            return urls.TryGetValue(key, out string value) ? value : string.Empty;
-        }
-
+        }        
         private static Component CreateMetadataComponent(CommonAppSettings appSettings, ProjectReleases projectReleases)
         {
             return new Component
@@ -129,7 +118,7 @@ namespace LCT.PackageIdentifier
                     new ExternalReference
                     {
                         Type = ExternalReference.ExternalReferenceType.Website,
-                        Url = GetExternalReferenceUrl("StandardBOM")
+                        Url = Dataconstant.StandardSbomUrl
                     }
                 },
                 BomRef = "standard-bom"
