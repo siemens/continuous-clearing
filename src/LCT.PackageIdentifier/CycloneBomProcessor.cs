@@ -10,7 +10,6 @@ using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Model;
 using log4net;
-using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -74,7 +73,7 @@ namespace LCT.PackageIdentifier
                     new ExternalReference
                     {
                         Type = ExternalReference.ExternalReferenceType.Website,
-                        Url = "https://github.com/siemens/continuous-clearing"
+                        Url = GetExternalReferenceUrl("GitHubRepo")
                     }
                 }
             }
@@ -93,6 +92,16 @@ namespace LCT.PackageIdentifier
         }
     };
         }
+        private static string GetExternalReferenceUrl(string key)
+        {
+            var urls = new Dictionary<string, string>
+    {
+        { "GitHubRepo", "https://github.com/siemens/continuous-clearing" },
+        { "StandardBOM", "https://sbom.siemens.io/" }
+    };
+
+            return urls.TryGetValue(key, out string value) ? value : string.Empty;
+        }
 
         private static Component CreateMetadataComponent(CommonAppSettings appSettings, ProjectReleases projectReleases)
         {
@@ -103,7 +112,7 @@ namespace LCT.PackageIdentifier
                 Type = Component.Classification.Application
             };
         }
-        public static Definitions AddDefinitionsToBom()
+        private static Definitions AddDefinitionsToBom()
         {
             Definitions definitions = new Definitions
             {
@@ -120,7 +129,7 @@ namespace LCT.PackageIdentifier
                     new ExternalReference
                     {
                         Type = ExternalReference.ExternalReferenceType.Website,
-                        Url = "https://sbom.siemens.io/"
+                        Url = GetExternalReferenceUrl("StandardBOM")
                     }
                 },
                 BomRef = "standard-bom"
@@ -129,7 +138,7 @@ namespace LCT.PackageIdentifier
             };
 
             return definitions;
-        }        
+        }
         public static void SetProperties(CommonAppSettings appSettings, Component component, ref List<Component> componentForBOM, string repo = "Not Found in JFrogRepo")
         {
             List<Property> propList = new();

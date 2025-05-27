@@ -311,7 +311,7 @@ namespace LCT.PackageIdentifier
 
             foreach (JProperty prop in depencyComponentList)
             {
-                Component components = new Component() {Manufacturer= new OrganizationalEntity() };
+                Component components = new Component() { Manufacturer = new OrganizationalEntity() };
                 Property isdev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
 
                 var properties = JObject.Parse(Convert.ToString(prop.Value));

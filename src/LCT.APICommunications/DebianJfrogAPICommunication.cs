@@ -57,7 +57,7 @@ namespace LCT.APICommunications
 
         public override async Task<HttpResponseMessage> MoveFromRepo(ComponentsToArtifactory component)
         {
-            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);            
+            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
             const HttpContent httpContent = null;
             return await httpClient.PostAsync(component.MovePackageApiUrl, httpContent);
         }

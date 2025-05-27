@@ -16,7 +16,6 @@ using LCT.Services.Interface;
 using LCT.SW360PackageCreator.Interfaces;
 using LCT.SW360PackageCreator.Model;
 using log4net;
-using log4net.Core;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

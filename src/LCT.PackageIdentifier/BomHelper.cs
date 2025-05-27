@@ -12,7 +12,6 @@ using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
-using log4net.Core;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

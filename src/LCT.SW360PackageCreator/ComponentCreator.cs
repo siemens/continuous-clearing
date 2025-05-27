@@ -17,7 +17,6 @@ using LCT.Services.Model;
 using LCT.SW360PackageCreator.Interfaces;
 using LCT.SW360PackageCreator.Model;
 using log4net;
-using log4net.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;

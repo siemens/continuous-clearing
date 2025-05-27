@@ -10,7 +10,6 @@ using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Model;
 using NUnit.Framework;
-using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -84,7 +83,7 @@ namespace LCT.PackageIdentifier.UTest
             }
                     }
                 },
-                Definitions=new Definitions() 
+                Definitions = new Definitions()
             };
 
             CommonAppSettings appSettings = new CommonAppSettings()
@@ -92,8 +91,8 @@ namespace LCT.PackageIdentifier.UTest
                 SW360 = new() { ProjectName = "Test" }
             };
             projectReleases.Version = "1.2.3";
-            
-           
+
+
             Component component = new Component
             {
                 Name = appSettings.SW360.ProjectName,

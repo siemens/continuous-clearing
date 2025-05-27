@@ -23,8 +23,6 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace ArtifactoryUploader
@@ -112,7 +110,7 @@ namespace ArtifactoryUploader
             catoolInfo.CatoolVersion = $"{versionFromProj.Major}.{versionFromProj.Minor}.{versionFromProj.Build}";
             catoolInfo.CatoolRunningLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
             return catoolInfo;
-        }        
+        }
 
         private static IJFrogService GetJfrogService(CommonAppSettings appSettings)
         {

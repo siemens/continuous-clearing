@@ -8,7 +8,6 @@ using CycloneDX.Models;
 using LCT.Common;
 using LCT.Common.Constants;
 using log4net;
-using log4net.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;

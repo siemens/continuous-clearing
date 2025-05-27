@@ -441,7 +441,7 @@ namespace LCT.PackageIdentifier.UTest
 
         [Test]
         public void GetdependencyDetailsOfAComponent_ReturnsListOfDependency_SuccessFully()
-        {            
+        {
             // Arrange
             Component component = new Component
             {
