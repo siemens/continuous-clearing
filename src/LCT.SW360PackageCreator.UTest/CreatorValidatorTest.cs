@@ -160,7 +160,6 @@ namespace LCT.SW360PackageCreator.UTest
 
             // Act
             await CreatorValidator.TriggerFossologyValidation(appSettings, mockISW360ApicommunicationFacade.Object,mockEnvironmentHelper.Object);
-
             // Assert
             mockISW360ApicommunicationFacade.Verify(x => x.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>()), Times.Once);
             mockISW360ApicommunicationFacade.Verify(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
@@ -364,7 +363,6 @@ namespace LCT.SW360PackageCreator.UTest
             // Assert
             Assert.Pass("No valid release was found, and the debug message was logged.");
         }
-
         [Test]
         public async Task TriggerFossologyValidation_ShouldLogDebugMessage_WhenReleaseResponseIsNull()
         {
@@ -383,6 +381,7 @@ namespace LCT.SW360PackageCreator.UTest
             mockISW360ApicommunicationFacade
                 .Setup(facade => facade.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>()))
                 .ReturnsAsync((HttpResponseMessage)null); // Simulate null response
+
             var mockEnvironmentHelper = new Mock<IEnvironmentHelper>();
             // Act
             await CreatorValidator.TriggerFossologyValidation(appSettings, mockISW360ApicommunicationFacade.Object, mockEnvironmentHelper.Object);
@@ -477,7 +476,6 @@ namespace LCT.SW360PackageCreator.UTest
             var mockEnvironmentHelper = new Mock<IEnvironmentHelper>();
             // Act
             await CreatorValidator.TriggerFossologyValidation(appSettings, mockISW360ApicommunicationFacade.Object, mockEnvironmentHelper.Object);
-
             // Assert
             Assert.Pass("InvalidOperationException was handled and logged.");
         }
@@ -502,7 +500,6 @@ namespace LCT.SW360PackageCreator.UTest
             var mockEnvironmentHelper = new Mock<IEnvironmentHelper>();
             // Act
             await CreatorValidator.TriggerFossologyValidation(appSettings, mockISW360ApicommunicationFacade.Object, mockEnvironmentHelper.Object);
-
             // Assert
             Assert.Pass("UriFormatException was handled and logged.");
         }
@@ -527,7 +524,6 @@ namespace LCT.SW360PackageCreator.UTest
             var mockEnvironmentHelper = new Mock<IEnvironmentHelper>();
             // Act
             await CreatorValidator.TriggerFossologyValidation(appSettings, mockISW360ApicommunicationFacade.Object, mockEnvironmentHelper.Object);
-
             // Assert
             Assert.Pass("TaskCanceledException was handled and logged.");
         }
