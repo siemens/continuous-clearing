@@ -17,7 +17,7 @@ pr:
   branches:
     include:
       - '*'
-paths:
+  paths:
     include:
       - src/**
       - TestFiles/**
