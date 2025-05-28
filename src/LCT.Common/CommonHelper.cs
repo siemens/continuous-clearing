@@ -284,7 +284,7 @@ namespace LCT.Common
             }
 
             return Array.Empty<string>();
-        }
+        }        
         public static string LogFolderInitialisation(CommonAppSettings appSettings, string logFileName, bool m_Verbose)
         {
             string FolderPath = DefaultLogPath;
@@ -322,7 +322,7 @@ namespace LCT.Common
                 }
             }
             return FolderPath;
-        }
+        }        
         public static void DefaultLogFolderInitialisation(string logFileName, bool m_Verbose)
         {
             string FolderPath;
@@ -345,7 +345,7 @@ namespace LCT.Common
 
             invalidChars = string.Join(", ", foundInvalidChars.Select(c => $"'{c}'"));
             return foundInvalidChars.Count != 0;
-        }
+        }        
         public static int ValidateSw360Project(string sw360ProjectName, string clearingState, string Name, CommonAppSettings appSettings)
         {
             if (string.IsNullOrEmpty(sw360ProjectName))
@@ -395,12 +395,12 @@ namespace LCT.Common
                     if (i + 1 < args.Length)
                     {
                         maskedArgs[i + 1] = "******";
-                        skipNext = true;
+                        skipNext = true; 
                     }
                 }
                 else
                 {
-                    maskedArgs[i] = args[i];
+                    maskedArgs[i] = args[i]; 
                 }
             }
 

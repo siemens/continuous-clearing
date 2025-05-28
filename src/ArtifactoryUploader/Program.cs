@@ -110,7 +110,7 @@ namespace ArtifactoryUploader
             catoolInfo.CatoolVersion = $"{versionFromProj.Major}.{versionFromProj.Minor}.{versionFromProj.Build}";
             catoolInfo.CatoolRunningLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
             return catoolInfo;
-        }
+        }        
 
         private static IJFrogService GetJfrogService(CommonAppSettings appSettings)
         {

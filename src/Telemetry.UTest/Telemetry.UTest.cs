@@ -30,7 +30,7 @@ namespace LCT.Telemetry.UTest
                 { "InstrumentationKey", "1" }
             };
             _telemetry = new LCT.Telemetry.Telemetry(telemetryType, configuration);
-            aiConfig.InstrumentationKey = "1";
+            aiConfig.ConnectionString = $"InstrumentationKey=1";
             _mockTelemetryClient = new TelemetryClient(aiConfig);
         }
         [Test]
@@ -94,13 +94,13 @@ namespace LCT.Telemetry.UTest
         public void GetHashString_InputIsNull_ReturnsEmptyString()
         {
             // Arrange
-            string input = null;
+            string? input = null;
 
             // Act
-            string result = HashUtility.GetHashString(input);
+            string result = HashUtility.GetHashString(input ?? string.Empty);
 
             // Assert
-            Assert.AreEqual(string.Empty, result);
+            Assert.That(result, Is.EqualTo(string.Empty));
         }
 
         [Test]
@@ -113,7 +113,7 @@ namespace LCT.Telemetry.UTest
             string result = HashUtility.GetHashString(input);
 
             // Assert
-            Assert.AreEqual(string.Empty, result);
+            Assert.That(result, Is.EqualTo(string.Empty));
         }
 
         [Test]
@@ -127,7 +127,7 @@ namespace LCT.Telemetry.UTest
             string result = HashUtility.GetHashString(input);
 
             // Assert
-            Assert.AreEqual(expectedHash, result);
+            Assert.That(result, Is.EqualTo(expectedHash));
         }
 
         [Test]
@@ -142,7 +142,7 @@ namespace LCT.Telemetry.UTest
             string result2 = HashUtility.GetHashString(input2);
 
             // Assert
-            Assert.AreNotEqual(result1, result2);
+            Assert.That(result1, Is.Not.EqualTo(result2));
         }
 
     }

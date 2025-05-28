@@ -282,7 +282,7 @@ namespace LCT.SW360PackageCreator.UTest
 
 
         [Test]
-        public async Task TriggerFossologyValidation_WhenNoValidReleaseFound_LogsFailureMessage()
+        public Task TriggerFossologyValidation_WhenNoValidReleaseFound_LogsFailureMessage()
         {
             // Arrange
             var appSettings = new CommonAppSettings
@@ -298,6 +298,7 @@ namespace LCT.SW360PackageCreator.UTest
 
             // Assert
             Assert.IsFalse(validReleaseFound);
+            return Task.CompletedTask;
         }
 
         [Test]
