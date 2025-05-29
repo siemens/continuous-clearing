@@ -8,7 +8,7 @@
     "tools": {
       "components": [
         {
-          "type": "null",
+          "type": "application",
           "supplier": {
             "name": "Siemens AG"
           },

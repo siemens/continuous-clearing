@@ -62,6 +62,7 @@ namespace LCT.PackageIdentifier
         {
             new Component
             {
+                Type= Component.Classification.Application,
                 Supplier = new OrganizationalEntity
                 {
                     Name = "Siemens AG"
@@ -91,7 +92,7 @@ namespace LCT.PackageIdentifier
             Value = "clearing"
         }
     };
-        }        
+        }
         private static Component CreateMetadataComponent(CommonAppSettings appSettings, ProjectReleases projectReleases)
         {
             return new Component
