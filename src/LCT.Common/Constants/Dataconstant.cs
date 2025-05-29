@@ -75,6 +75,7 @@ namespace LCT.Common.Constants
         public const string TypeJarSuffix = "?type=jar";
         public const string GithubUrl = "https://github.com/siemens/continuous-clearing";
         public const string StandardSbomUrl = "https://sbom.siemens.io/";
+        public const string SbomSpecVersionString = "1.6";
         public static Dictionary<string, string> PurlCheck()
         {
             return purlids;

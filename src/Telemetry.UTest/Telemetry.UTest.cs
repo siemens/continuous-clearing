@@ -30,7 +30,7 @@ namespace LCT.Telemetry.UTest
                 { "InstrumentationKey", "1" }
             };
             _telemetry = new LCT.Telemetry.Telemetry(telemetryType, configuration);
-            aiConfig.ConnectionString = $"InstrumentationKey=1";
+            aiConfig.InstrumentationKey = "1";
             _mockTelemetryClient = new TelemetryClient(aiConfig);
         }
         [Test]

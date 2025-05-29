@@ -254,7 +254,7 @@ namespace LCT.Common
             listOfComponentsToBom.Version = 1;
             listOfComponentsToBom.Metadata.Timestamp = DateTime.UtcNow;
             listOfComponentsToBom.SpecVersion = CycloneDX.SpecificationVersion.v1_6;
-            listOfComponentsToBom.SpecVersionString = "1.6";
+            listOfComponentsToBom.SpecVersionString = Dataconstant.SbomSpecVersionString;
             var serializedBomData = CycloneDX.Json.Serializer.Serialize(listOfComponentsToBom);
             return serializedBomData;
         }

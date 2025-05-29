@@ -24,7 +24,7 @@ namespace LCT.Telemetry
             }
 
             var aiConfig = TelemetryConfiguration.CreateDefault();
-            aiConfig.ConnectionString = $"InstrumentationKey={instrumentationKey}";
+            aiConfig.InstrumentationKey = instrumentationKey;
 
             _telemetryClient = new TelemetryClient(aiConfig);
         }

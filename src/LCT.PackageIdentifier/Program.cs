@@ -39,7 +39,7 @@ namespace LCT.PackageIdentifier
 
         public static Stopwatch BomStopWatch { get; set; }
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
+        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();        
         protected Program() { }
 
         static async Task Main(string[] args)
@@ -57,7 +57,7 @@ namespace LCT.PackageIdentifier
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
 
             ProjectReleases projectReleases = new ProjectReleases();
-
+            
             string FolderPath = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.BomCreatorLog, m_Verbose);
             Logger.Logger.Log(null, Level.Debug, $"log manager initiated folder path: {FolderPath}", null);
             settingsManager.CheckRequiredArgsToRun(appSettings, "Identifer");
@@ -156,6 +156,6 @@ namespace LCT.PackageIdentifier
             {
                 environmentHelper.CallEnvironmentExit(-1);
             }
-        }
+        }        
     }
 }

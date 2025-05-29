@@ -21,9 +21,9 @@ namespace LCT.PackageIdentifier
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public static Bom SetMetadataInComparisonBOM(Bom bom,
-                                             CommonAppSettings appSettings,
-                                             ProjectReleases projectReleases,
-                                             CatoolInfo caToolInformation)
+                                                     CommonAppSettings appSettings,
+                                                     ProjectReleases projectReleases,
+                                                     CatoolInfo caToolInformation)
         {
             Logger.Debug("Starting to add metadata info into the BOM");
 

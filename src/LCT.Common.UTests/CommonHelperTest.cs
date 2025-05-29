@@ -502,7 +502,7 @@ namespace LCT.Common.UTest
             string[] result = CommonHelper.MaskSensitiveArguments(args);
 
             // Assert
-            Assert.IsEmpty(result, "Null input should return an empty array.");           
+            Assert.IsEmpty(result, "Null input should return an empty array.");            
         }
         [Test]
         public void DefaultLogFolderInitialisation_SetsDefaultLogPath_Windows()
@@ -512,7 +512,7 @@ namespace LCT.Common.UTest
             string runningLocation=Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
             Log4Net.CatoolCurrentDirectory = System.IO.Directory.GetParent(runningLocation).FullName;
             bool m_Verbose = false;
-        
+          
 
             // Act
             CommonHelper.DefaultLogFolderInitialisation(logFileName, m_Verbose);
