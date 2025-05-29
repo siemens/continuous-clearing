@@ -165,7 +165,7 @@ namespace LCT.SW360PackageCreator
 
             // initializing Component creation 
             await componentCreator.CreateComponentInSw360(appSettings, sw360CreatorService, sw360Service,
-                  sw360ProjectService, new FileOperations(), creatorHelper, parsedBomData);
+                 sw360ProjectService, new FileOperations(), creatorHelper, parsedBomData);
         }
     }
 }

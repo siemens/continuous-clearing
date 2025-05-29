@@ -526,7 +526,7 @@ namespace LCT.Common.UTest
                 Assert.AreEqual("/var/log", CommonHelper.DefaultLogPath);
             }               
             
-        }        
+        }       
     }
 
     public class TestObject

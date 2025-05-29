@@ -127,7 +127,7 @@ namespace LCT.PackageIdentifier
                 component.Purl = RemoveSuffix(component.Purl, suffix);
             }
 
-            foreach (var dependency in bom?.Dependencies ?? Enumerable.Empty<Dependency>())
+            foreach (var dependency in bom?.Dependencies ?? Enumerable.Empty<Dependency>()) 
             {
                 RemoveTypeJarSuffixFromDependency(dependency);
             }

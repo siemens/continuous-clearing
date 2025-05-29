@@ -55,7 +55,7 @@ namespace LCT.PackageIdentifier.UTest
             int result=await BomValidator.ValidateAppSettings(CommonAppSettings, mockISw360ProjectService.Object, projectReleases);
 
             //Assert
-            Assert.AreEqual(-1, result, "Expected -1 when clearing state is CLOSED.");
+            Assert.AreEqual(-1,result, "Expected -1 when clearing state is CLOSED.");
 
         }
 
