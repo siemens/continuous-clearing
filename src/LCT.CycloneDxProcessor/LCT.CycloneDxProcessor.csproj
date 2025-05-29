@@ -19,7 +19,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CycloneDX.Utils" Version="5.2.0" />
+    <PackageReference Include="CycloneDX.Utils" Version="8.0.3" />
   </ItemGroup>
 
   <ItemGroup>
