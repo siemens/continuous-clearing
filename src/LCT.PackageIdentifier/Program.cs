@@ -55,6 +55,7 @@ namespace LCT.PackageIdentifier
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
             CommonHelper.DefaultLogFolderInitialisation(FileConstant.BomCreatorLog, m_Verbose);
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
+
             ProjectReleases projectReleases = new ProjectReleases();
 
             string FolderPath = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.BomCreatorLog, m_Verbose);
