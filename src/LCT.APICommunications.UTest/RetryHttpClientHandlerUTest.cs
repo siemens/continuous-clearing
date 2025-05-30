@@ -47,7 +47,7 @@ namespace LCT.APICommunications.UTest
             var response = await httpClient.GetAsync("http://test.com");
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             handlerMock.Protected().Verify(
                 "SendAsync",
                 Times.Exactly(3), // 2 retries + 1 initial call
@@ -79,7 +79,7 @@ namespace LCT.APICommunications.UTest
             var response = await httpClient.GetAsync("http://test.com");
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.Conflict, response.StatusCode);
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Conflict));
             handlerMock.Protected().Verify(
                 "SendAsync",
                 Times.Once(), // No retries
@@ -113,7 +113,7 @@ namespace LCT.APICommunications.UTest
             var response = await httpClient.GetAsync("http://test.com");
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         }
         [Test]
         public async Task ExecuteWithRetryAsync_ShouldCompleteSuccessfully_WhenActionSucceedsAfterRetry()
@@ -134,7 +134,7 @@ namespace LCT.APICommunications.UTest
             await RetryHttpClientHandler.ExecuteWithRetryAsync(action);
 
             // Assert
-            Assert.AreEqual(ApiConstant.APIRetryIntervals.Count, attempts, "Action should have been attempted the expected number of times.");
+            Assert.That(attempts, Is.EqualTo(ApiConstant.APIRetryIntervals.Count), "Action should have been attempted the expected number of times.");
         }
 
         [Test]
@@ -152,7 +152,7 @@ namespace LCT.APICommunications.UTest
             await RetryHttpClientHandler.ExecuteWithRetryAsync(action);
 
             // Assert
-            Assert.IsTrue(actionExecuted, "Action should have been executed.");
+            Assert.That(actionExecuted, Is.True, "Action should have been executed.");
             _mockLogger.Verify(logger => logger.Debug(It.IsAny<string>()), Times.Never, "Retry should not occur if there is no exception.");
         }
 

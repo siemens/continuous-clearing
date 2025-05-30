@@ -29,12 +29,12 @@ namespace LCT.Telemetry
             _telemetryClient = new TelemetryClient(aiConfig);
         }
 
-        public void TrackEvent(string eventName, Dictionary<string, string> properties = null)
+        public void TrackEvent(string eventName, Dictionary<string, string>? properties = null)
         {
             _telemetryClient.TrackEvent(eventName, properties);
         }
 
-        public void TrackException(Exception ex, Dictionary<string, string> properties = null)
+        public void TrackException(Exception ex, Dictionary<string, string>? properties = null)
         {
             var exceptionTelemetry = new ExceptionTelemetry(ex);
 

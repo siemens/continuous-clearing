@@ -39,7 +39,7 @@ namespace LCT.SW360PackageCreator
 
             return CommonHelper.ValidateSw360Project(sw360ProjectName, projectReleases?.clearingState, projectReleases?.Name, appSettings);
         }
-        public static async Task TriggerFossologyValidation(CommonAppSettings appSettings, ISW360ApicommunicationFacade sW360ApicommunicationFacade)
+        public static async Task TriggerFossologyValidation(CommonAppSettings appSettings, ISW360ApicommunicationFacade sW360ApicommunicationFacade,IEnvironmentHelper environmentHelper)
         {
             ISW360CommonService sw360CommonService = new SW360CommonService(sW360ApicommunicationFacade);
             ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sW360ApicommunicationFacade, sw360CommonService);
@@ -56,7 +56,9 @@ namespace LCT.SW360PackageCreator
                 }
                 else
                 {
-                    Logger.Debug("TriggerFossologyValidation(): No valid release found. Fossology validation failed.");
+                    Logger.Debug($"TriggerFossologyValidation(): No valid release found. Fossology URL validation failed");
+                    Logger.Error("Fossology URL validation failed due to valid release not found from SW360");
+                    environmentHelper.CallEnvironmentExit(-1);
                 }
                 Logger.Debug("TriggerFossologyValidation(): Completed trigger fossology validation process.");
             }

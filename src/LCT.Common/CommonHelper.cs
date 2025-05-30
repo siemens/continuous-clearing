@@ -17,6 +17,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
+using Level = log4net.Core.Level;
 
 namespace LCT.Common
 {
@@ -234,7 +235,7 @@ namespace LCT.Common
             return component.Properties.Exists(x => x.Name == constant);
         }
 
-        public static void GetDetailsforManuallyAdded(List<Component> componentsForBOM, List<Component> listComponentForBOM)
+        public static void GetDetailsForManuallyAdded(List<Component> componentsForBOM, List<Component> listComponentForBOM)
         {
             foreach (var component in componentsForBOM)
             {
@@ -253,9 +254,10 @@ namespace LCT.Common
             listOfComponentsToBom.SerialNumber = $"urn:uuid:{guid}";
             listOfComponentsToBom.Version = 1;
             listOfComponentsToBom.Metadata.Timestamp = DateTime.UtcNow;
-            var formattedString = CycloneDX.Json.Serializer.Serialize(listOfComponentsToBom);
-
-            return formattedString;
+            listOfComponentsToBom.SpecVersion = CycloneDX.SpecificationVersion.v1_6;
+            listOfComponentsToBom.SpecVersionString = Dataconstant.SbomSpecVersionString;
+            var serializedBomData = CycloneDX.Json.Serializer.Serialize(listOfComponentsToBom);
+            return serializedBomData;
         }
         public static string[] GetRepoList(CommonAppSettings appSettings)
         {

@@ -26,53 +26,106 @@ namespace LCT.PackageIdentifier
                                                      CatoolInfo caToolInformation)
         {
             Logger.Debug("SetMetadataInComparisonBOM():Starting the process of adding metadata information to the BOM.");
+            // Create metadata
+            Metadata metadata = CreateMetadata(appSettings, projectReleases, caToolInformation);
+            // Create definitions
+            Definitions definitions = AddDefinitionsToBom();
+            // Add metadata to BOM
+            bom.Metadata = metadata;
+
+            // Add definitions to BOM
+            bom.Definitions = definitions;
+            Logger.Debug("SetMetadataInComparisonBOM():Successfully added metadata information to the BOM.\n");
+            return bom;
+        }
+
+        private static Metadata CreateMetadata(CommonAppSettings appSettings, ProjectReleases projectReleases, CatoolInfo caToolInformation)
+        {
             Metadata metadata = new Metadata
             {
-                Tools = new List<Tool>(),
-                Properties = new List<Property>()
+                Tools = CreateToolChoices(caToolInformation),
+                Properties = CreateProperties()
             };
+            // Add metadata component
+            metadata.Component = CreateMetadataComponent(appSettings, projectReleases);
+          
+            return metadata;
+        }
 
-            SetMetaDataToolsValues(metadata, caToolInformation);
+        private static ToolChoices CreateToolChoices(CatoolInfo caToolInformation)
+        {
+            return new ToolChoices
+            {
+                Components = new List<Component>
+        {
+            new Component
+            {
+                Type= Component.Classification.Application,
+                Supplier = new OrganizationalEntity
+                {
+                    Name = "Siemens AG"
+                },
+                Name = "Clearing Automation Tool",
+                Version = caToolInformation.CatoolVersion,
+                ExternalReferences = new List<ExternalReference>
+                {
+                    new ExternalReference
+                    {
+                        Type = ExternalReference.ExternalReferenceType.Website,
+                        Url = Dataconstant.GithubUrl
+                    }
+                }
+            }
+        }
+            };
+        }
 
-            Component component = new Component
+        private static List<Property> CreateProperties()
+        {
+            return new List<Property>
+    {
+        new Property
+        {
+            Name = "siemens:profile",
+            Value = "clearing"
+        }
+    };
+        }
+        private static Component CreateMetadataComponent(CommonAppSettings appSettings, ProjectReleases projectReleases)
+        {
+            return new Component
             {
                 Name = appSettings?.SW360?.ProjectName,
                 Version = projectReleases.Version,
                 Type = Component.Classification.Application
             };
-            metadata.Component = component;
-
-            Property projectType = new Property
-            {
-                Name = "siemens:profile",
-                Value = "clearing"
-            };
-            metadata.Properties.Add(projectType);
-
-            bom.Metadata = metadata;
-            Logger.Debug("SetMetadataInComparisonBOM():Successfully added metadata information to the BOM.\n");
-            return bom;
         }
-
-        public static void SetMetaDataToolsValues(Metadata metadata, CatoolInfo caToolInformation)
+        private static Definitions AddDefinitionsToBom()
         {
-            Tool tool = new Tool
+            Definitions definitions = new Definitions
             {
-                Name = "Clearing Automation Tool",
-                Version = caToolInformation.CatoolVersion,
-                Vendor = "Siemens AG",
-                ExternalReferences = new List<ExternalReference>() { new ExternalReference { Url = "https://github.com/siemens/continuous-clearing", Type = ExternalReference.ExternalReferenceType.Website } }
+                Standards = new List<Standard>
+        {
+            new Standard
+            {
+                Name = "Standard BOM",
+                Version = "3.0.0",
+                Description = "The Standard for Software Bills of Materials in Siemens",
+                Owner = "Siemens AG",
+                ExternalReferences = new List<ExternalReference>
+                {
+                    new ExternalReference
+                    {
+                        Type = ExternalReference.ExternalReferenceType.Website,
+                        Url = Dataconstant.StandardSbomUrl
+                    }
+                },
+                BomRef = "standard-bom"
+            }
+        }
             };
-            metadata.Tools.Add(tool);
 
-            Tool SiemensSBOM = new Tool
-            {
-                Name = "Siemens SBOM",
-                Version = "2.0.0",
-                Vendor = "Siemens AG",
-                ExternalReferences = new List<ExternalReference>() { new ExternalReference { Url = "https://sbom.siemens.io/", Type = ExternalReference.ExternalReferenceType.Website } }
-            };
-            metadata.Tools.Add(SiemensSBOM);
+            return definitions;
         }
         public static void SetProperties(CommonAppSettings appSettings, Component component, ref List<Component> componentForBOM, string repo = "Not Found in JFrogRepo")
         {

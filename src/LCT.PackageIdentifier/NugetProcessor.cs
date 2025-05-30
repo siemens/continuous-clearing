@@ -475,7 +475,7 @@ namespace LCT.PackageIdentifier
                         CycloneDXBomParser.CheckValidComponentsForProjectType(
                             bom.Components, appSettings.ProjectType);
                         componentsForBOM.AddRange(bom.Components);
-                        CommonHelper.GetDetailsforManuallyAdded(componentsForBOM,
+                        CommonHelper.GetDetailsForManuallyAdded(componentsForBOM,
                             listComponentForBOM);
                         LogHandlingHelper.IdentifierInputfileComponents(filepath, bom.Components);
                     }

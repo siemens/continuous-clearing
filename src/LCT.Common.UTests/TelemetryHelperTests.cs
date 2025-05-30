@@ -6,7 +6,6 @@
 
 using NUnit.Framework;
 using System;
-using System.IO;
 
 namespace LCT.Common.UTest
 {
@@ -15,7 +14,6 @@ namespace LCT.Common.UTest
     {
         private TelemetryHelper telemetryHelper;
         private CommonAppSettings appSettings;
-        private readonly StringWriter consoleOutput;
         [SetUp]
         public void Setup()
         {

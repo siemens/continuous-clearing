@@ -73,7 +73,7 @@ namespace LCT.Common.UTest
         [Test]
         public void LogFolderInitialisation_WhenLogFolderIsNull_ReturnsDefaultLogPath()
         {
-            Log4Net.CatoolLogPath= "C:\\catool\\fds.log";
+            Log4Net.CatoolLogPath = "C:\\catool\\fds.log";
 
             // Act
             string result = CommonHelper.LogFolderInitialization(appSettings, "catool.log", false);
@@ -151,7 +151,7 @@ namespace LCT.Common.UTest
             List<Component> listComponentForBOM = new List<Component>();
 
             //Act
-            CommonHelper.GetDetailsforManuallyAdded(componentsForBOM, listComponentForBOM);
+            CommonHelper.GetDetailsForManuallyAdded(componentsForBOM, listComponentForBOM);
 
             //Assert
             Assert.AreEqual(2, listComponentForBOM.Count);
