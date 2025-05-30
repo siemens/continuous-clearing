@@ -90,24 +90,7 @@ namespace LCT.PackageIdentifier
             {
                 var currentIterationItem = component;
                 bool isTrue = IsInternalConanComponent(aqlResultList, currentIterationItem);
-                if (currentIterationItem.Properties?.Count == null || currentIterationItem.Properties?.Count <= 0)
-                {
-                    currentIterationItem.Properties = new List<Property>();
-                }
-
-                Property isInternal = new() { Name = Dataconstant.Cdx_IsInternal, Value = "false" };
-                if (isTrue)
-                {
-                    internalComponents.Add(currentIterationItem);
-                    isInternal.Value = "true";
-                }
-                else
-                {
-                    isInternal.Value = "false";
-                }
-
-                currentIterationItem.Properties.Add(isInternal);
-                internalComponentStatusUpdatedList.Add(currentIterationItem);
+                bomhelper.ProcessSingleInternalComponent(currentIterationItem, isTrue, internalComponents, internalComponentStatusUpdatedList);
             }
 
             // update the comparison BOM data
@@ -172,31 +155,7 @@ namespace LCT.PackageIdentifier
                 componentVal.Properties.Add(artifactoryrepo);
                 componentVal.Properties.Add(projectType);
                 componentVal.Properties.Add(jfrogRepoPathProperty);
-                componentVal.Description = null;
-                if (hashes != null)
-                {
-                    componentVal.Hashes = new List<Hash>()
-                {
-
-                new()
-                 {
-                  Alg = Hash.HashAlgorithm.MD5,
-                  Content = hashes.MD5
-                },
-                new()
-                {
-                  Alg = Hash.HashAlgorithm.SHA_1,
-                  Content = hashes.SHA1
-                 },
-                 new()
-                 {
-                  Alg = Hash.HashAlgorithm.SHA_256,
-                  Content = hashes.SHA256
-                  }
-                  };
-
-                }
-                modifiedBOM.Add(componentVal);
+                bomhelper.ProcessComponentHashes(componentVal, hashes, modifiedBOM);
             }
             LogHandlingHelper.IdentifierComponentsData(componentsForBOM, listOfInternalComponents);
             Logger.Debug("GetJfrogRepoDetailsOfAComponent():Completed retrieving JFrog repository details for components.\n");
@@ -284,7 +243,7 @@ namespace LCT.PackageIdentifier
                     var components = ParsePackageLockJson(filepath, ref dependencies);
                     AddingIdentifierType(components, "PackageFile");
                     componentsForBOM.AddRange(components);
-                    LogHandlingHelper.IdentifierInputfileComponents(filepath, components);
+                    LogHandlingHelper.IdentifierInputFileComponents(filepath, components);
                 }
                 else if (filepath.EndsWith(FileConstant.CycloneDXFileExtension)
                     && !filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
@@ -294,7 +253,7 @@ namespace LCT.PackageIdentifier
                     CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
                     GetDetailsforManuallyAddedComp(bom.Components);
                     componentsForBOM.AddRange(bom.Components);
-                    LogHandlingHelper.IdentifierInputfileComponents(filepath, bom.Components);
+                    LogHandlingHelper.IdentifierInputFileComponents(filepath, bom.Components);
                 }
             }
 
@@ -315,8 +274,9 @@ namespace LCT.PackageIdentifier
             string templateFilePath = SbomTemplate.GetFilePathForTemplate(listOfTemplateBomfilePaths);
             SbomTemplate.ProcessTemplateFile(templateFilePath, _cycloneDXBomParser, bom.Components, appSettings.ProjectType);
 
-
-            bom = RemoveExcludedComponents(appSettings, bom);
+            int noOfExcludedComponents = 0;
+            bom = CommonHelper.IdentifyExcludedComponents(appSettings, bom, ref noOfExcludedComponents);
+            BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents;
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
             Logger.Debug("ParsingInputFileForBOM():Completed parsing of input files for BOM.");
         }
@@ -563,23 +523,7 @@ namespace LCT.PackageIdentifier
 
             if (listofComponents.Count != initialCount)
                 BomCreator.bomKpiData.DuplicateComponents = initialCount - listofComponents.Count;
-        }
-
-        private static Bom RemoveExcludedComponents(CommonAppSettings appSettings, Bom cycloneDXBOM)
-        {
-            List<Component> componentForBOM = cycloneDXBOM.Components.ToList();
-            List<Dependency> dependenciesForBOM = cycloneDXBOM.Dependencies?.ToList() ?? new List<Dependency>();
-            int noOfExcludedComponents = 0;
-            if (appSettings?.SW360?.ExcludeComponents != null)
-            {
-                componentForBOM = CommonHelper.RemoveExcludedComponents(componentForBOM, appSettings.SW360.ExcludeComponents, ref noOfExcludedComponents);
-                dependenciesForBOM = CommonHelper.RemoveInvalidDependenciesAndReferences(componentForBOM, dependenciesForBOM);
-                BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents;
-            }
-            cycloneDXBOM.Components = componentForBOM;
-            cycloneDXBOM.Dependencies = dependenciesForBOM;
-            return cycloneDXBOM;
-        }
+        }       
 
         private static void GetDetailsforManuallyAddedComp(List<Component> componentsForBOM)
         {

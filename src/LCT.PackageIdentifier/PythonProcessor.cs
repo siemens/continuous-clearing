@@ -51,19 +51,19 @@ namespace LCT.PackageIdentifier
                 if (config.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     listOfTemplateBomfilePaths.Add(config);
-                    Logger.Debug("ParsePackageFile():Template BOM file detected: {config}");
+                    Logger.Debug($"ParsePackageFile():Template BOM file detected: {config}");
                 }
                 if (config.ToLower().EndsWith("poetry.lock"))
                 {
                     listofComponents.AddRange(ExtractDetailsForPoetryLockfile(config, dependencies));
-                    Logger.Debug("ParsePackageFile():Poetry lock file detected: {config}");
-                    IdentifiedPythonPackages(config, listofComponents, dependencies);
+                    Logger.Debug($"ParsePackageFile():Poetry lock file detected: {config}");
+                    IdentifiedPythonPackages(config, listofComponents);
                 }
                 else if (config.EndsWith(FileConstant.CycloneDXFileExtension) && !config.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     listofComponents.AddRange(ExtractDetailsFromJson(config, appSettings, ref dependencies));
-                    Logger.Debug("ParsePackageFile():CycloneDX file detected: {config}");
-                    IdentifiedPythonPackages(config, listofComponents, dependencies);
+                    Logger.Debug($"ParsePackageFile():CycloneDX file detected: {config}");
+                    IdentifiedPythonPackages(config, listofComponents);
                 }
             }
 
@@ -77,7 +77,9 @@ namespace LCT.PackageIdentifier
             bom.Dependencies = dependencies;
             string templateFilePath = SbomTemplate.GetFilePathForTemplate(listOfTemplateBomfilePaths);
             SbomTemplate.ProcessTemplateFile(templateFilePath, _cycloneDXBomParser, bom.Components, appSettings.ProjectType);
-            bom = RemoveExcludedComponents(appSettings, bom);
+            int noOfExcludedComponents = 0;
+            bom = CommonHelper.IdentifyExcludedComponents(appSettings, bom, ref noOfExcludedComponents);
+            BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents;
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
 
             if (bom != null)
@@ -120,7 +122,7 @@ namespace LCT.PackageIdentifier
             PythonPackages = GetPackagesFromTOMLFile(filePath, dependencies);
             return PythonPackages;
         }
-        private static void IdentifiedPythonPackages(string filepath, List<PythonPackage> packages, List<Dependency> dependencies)
+        private static void IdentifiedPythonPackages(string filepath, List<PythonPackage> packages)
         {
 
             if (packages == null || packages.Count == 0)
@@ -132,19 +134,19 @@ namespace LCT.PackageIdentifier
 
             // Build the table
             var logBuilder = new System.Text.StringBuilder();
-            logBuilder.AppendLine("============================================================================================================================================");
+            logBuilder.AppendLine(LogHandlingHelper.LogSeparator);
             logBuilder.AppendLine($" PYTHON PACKAGES FOUND IN FILE: {filepath}");
-            logBuilder.AppendLine("============================================================================================================================================");
-            logBuilder.AppendLine($"| {"Name",-40} | {"Version",-20} | {"PURL",-60} | {"DevDependent",-15} |{"Dependencies",-60} |");
-            logBuilder.AppendLine("--------------------------------------------------------------------------------------------------------------------------------------------");
+            logBuilder.AppendLine(LogHandlingHelper.LogSeparator);
+            logBuilder.AppendLine($"| {"Name",-40} | {"Version",-20} | {"PURL",-60} | {"DevDependent",-15} |");
+            logBuilder.AppendLine(LogHandlingHelper.LogHeaderSeparator);
 
             foreach (var package in packages)
             {
                 string devDependent = package.Isdevdependent ? "true" : "false";
-                logBuilder.AppendLine($"| {package.Name,-40} | {package.Version,-20} | {package.PurlID,-60} | {devDependent,-15} | {dependencies,-60} |");
+                logBuilder.AppendLine($"| {package.Name,-40} | {package.Version,-20} | {package.PurlID,-60} | {devDependent,-15} |");
             }
 
-            logBuilder.AppendLine("============================================================================================================================================");
+            logBuilder.AppendLine(LogHandlingHelper.LogSeparator);
 
             // Log the table
             Logger.Debug(logBuilder.ToString());
@@ -326,25 +328,7 @@ namespace LCT.PackageIdentifier
                 listComponentForBOM.Add(component);
             }
             return listComponentForBOM;
-        }
-
-        private static Bom RemoveExcludedComponents(CommonAppSettings appSettings,
-            Bom cycloneDXBOM)
-        {
-            List<Component> componentForBOM = cycloneDXBOM.Components.ToList();
-            List<Dependency> dependenciesForBOM = cycloneDXBOM.Dependencies?.ToList() ?? new List<Dependency>();
-            int noOfExcludedComponents = 0;
-            if (appSettings?.SW360?.ExcludeComponents != null)
-            {
-                componentForBOM = CommonHelper.RemoveExcludedComponents(componentForBOM, appSettings?.SW360?.ExcludeComponents, ref noOfExcludedComponents);
-                dependenciesForBOM = CommonHelper.RemoveInvalidDependenciesAndReferences(componentForBOM, dependenciesForBOM);
-                BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents;
-
-            }
-            cycloneDXBOM.Components = componentForBOM;
-            cycloneDXBOM.Dependencies = dependenciesForBOM;
-            return cycloneDXBOM;
-        }
+        }       
 
         public async Task<ComponentIdentification> IdentificationOfInternalComponents(ComponentIdentification componentData, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
@@ -362,24 +346,7 @@ namespace LCT.PackageIdentifier
             {
                 var currentIterationItem = component;
                 bool isTrue = IsInternalPythonComponent(aqlResultList, currentIterationItem, bomhelper);
-                if (currentIterationItem.Properties?.Count == null || currentIterationItem.Properties?.Count <= 0)
-                {
-                    currentIterationItem.Properties = new List<Property>();
-                }
-
-                Property isInternal = new() { Name = Dataconstant.Cdx_IsInternal, Value = "false" };
-                if (isTrue)
-                {
-                    internalComponents.Add(currentIterationItem);
-                    isInternal.Value = "true";
-                }
-                else
-                {
-                    isInternal.Value = "false";
-                }
-
-                currentIterationItem.Properties.Add(isInternal);
-                internalComponentStatusUpdatedList.Add(currentIterationItem);
+                bomhelper.ProcessSingleInternalComponent(currentIterationItem, isTrue, internalComponents, internalComponentStatusUpdatedList);
             }
 
             // update the comparision bom data
@@ -469,31 +436,7 @@ namespace LCT.PackageIdentifier
                 componentVal.Properties.Add(projectType);
                 componentVal.Properties.Add(fileNameProperty);
                 componentVal.Properties.Add(jfrogRepoPathProperty);
-                componentVal.Description = null;
-                if (hashes != null)
-                {
-                    componentVal.Hashes = new List<Hash>()
-                {
-
-                new()
-                 {
-                  Alg = Hash.HashAlgorithm.MD5,
-                  Content = hashes.MD5
-                },
-                new()
-                {
-                  Alg = Hash.HashAlgorithm.SHA_1,
-                  Content = hashes.SHA1
-                 },
-                 new()
-                 {
-                  Alg = Hash.HashAlgorithm.SHA_256,
-                  Content = hashes.SHA256
-                  }
-                  };
-
-                }
-                modifiedBOM.Add(componentVal);
+                bomhelper.ProcessComponentHashes(componentVal, hashes, modifiedBOM);
             }
             LogHandlingHelper.IdentifierComponentsData(componentsForBOM, listOfInternalComponents);
             Logger.Debug("GetJfrogRepoDetailsOfAComponent():Completed retrieving JFrog repository details for components.\n");

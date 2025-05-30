@@ -198,19 +198,19 @@ namespace LCT.PackageIdentifier
             }
             // Build the table
             var logBuilder = new System.Text.StringBuilder();
-            logBuilder.AppendLine("============================================================================================================================================");
+            logBuilder.AppendLine($"\n{LogHandlingHelper.LogSeparator}");
             logBuilder.AppendLine($" COMPONENTS FOUND IN FILE: {filepath}");
-            logBuilder.AppendLine("============================================================================================================================================");
-            logBuilder.AppendLine($"| {"Name",-40} | {"Version",-20} | {"PURL",-60} | {"DevDependent",-15} | {"Dependencies",-60} |");
-            logBuilder.AppendLine("--------------------------------------------------------------------------------------------------------------------------------------------");
+            logBuilder.AppendLine($"{LogHandlingHelper.LogSeparator}");
+            logBuilder.AppendLine($"| {"Name",-40} | {"Version",-40} | {"PURL",-100} | {"DevDependent",-15} | {"Dependencies",-60} |");
+            logBuilder.AppendLine($"{LogHandlingHelper.LogHeaderSeparator}");
 
             foreach (var component in components)
             {
                 string devDependent = component.Properties?.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsDevelopment)?.Value ?? "false";
-                logBuilder.AppendLine($"| {component.Name,-40} | {component.Version,-20} | {component.Purl,-60} | {devDependent,-15} | {dependencies,-60} |");
+                logBuilder.AppendLine($"| {component.Name,-40} | {component.Version,-40} | {component.Purl,-100} | {devDependent,-15} | {dependencies,-60} |");
             }
 
-            logBuilder.AppendLine("============================================================================================================================================");
+            logBuilder.AppendLine($"{LogHandlingHelper.LogSeparator}");
 
             // Log the table
             Logger.Debug(logBuilder.ToString());
@@ -323,31 +323,7 @@ namespace LCT.PackageIdentifier
                 componentVal.Properties.Add(projectType);
                 componentVal.Properties.Add(siemensfileNameProp);
                 componentVal.Properties.Add(jfrogRepoPathProp);
-                componentVal.Description = null;
-                if (hashes != null)
-                {
-                    componentVal.Hashes = new List<Hash>()
-                {
-
-                new()
-                 {
-                  Alg = Hash.HashAlgorithm.MD5,
-                  Content = hashes.MD5
-                },
-                new()
-                {
-                  Alg = Hash.HashAlgorithm.SHA_1,
-                  Content = hashes.SHA1
-                 },
-                 new()
-                 {
-                  Alg = Hash.HashAlgorithm.SHA_256,
-                  Content = hashes.SHA256
-                  }
-                  };
-
-                }
-                modifiedBOM.Add(componentVal);
+                bomhelper.ProcessComponentHashes(componentVal, hashes, modifiedBOM);
             }
             LogHandlingHelper.IdentifierComponentsData(componentsForBOM, listOfInternalComponents);
             Logger.Debug("GetJfrogRepoDetailsOfAComponent():Completed retrieving JFrog repository details for components.\n");
@@ -370,26 +346,8 @@ namespace LCT.PackageIdentifier
             {
                 var currentIterationItem = component;
                 bool isTrue = IsInternalMavenComponent(aqlResultList, currentIterationItem, bomhelper);
-                if (currentIterationItem.Properties?.Count == null || currentIterationItem.Properties?.Count <= 0)
-                {
-                    currentIterationItem.Properties = new List<Property>();
-                }
-
-                Property isInternal = new() { Name = Dataconstant.Cdx_IsInternal, Value = "false" };
-                if (isTrue)
-                {
-                    internalComponents.Add(currentIterationItem);
-                    isInternal.Value = "true";
-                }
-                else
-                {
-                    isInternal.Value = "false";
-                }
-
-                currentIterationItem.Properties.Add(isInternal);
-                internalComponentStatusUpdatedList.Add(currentIterationItem);
+                bomhelper.ProcessSingleInternalComponent(currentIterationItem, isTrue, internalComponents, internalComponentStatusUpdatedList);
             }
-
             // update the comparision bom data
             componentData.comparisonBOMData = internalComponentStatusUpdatedList;
             componentData.internalComponents = internalComponents;

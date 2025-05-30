@@ -25,6 +25,9 @@ namespace LCT.PackageIdentifier.Interface
         public Task<List<AqlResult>> GetListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService);
         public Task<List<AqlResult>> GetNpmListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService);
         public Task<List<AqlResult>> GetPypiListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService);
+        public void ProcessSingleInternalComponent(Component currentIterationItem, bool isInternal, List<Component> internalComponents, List<Component> internalComponentStatusUpdatedList);
+
+        public void ProcessComponentHashes(Component componentVal, AqlResult hashes, List<Component> modifiedBOM);
 
     }
 }

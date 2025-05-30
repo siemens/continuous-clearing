@@ -544,7 +544,38 @@ namespace LCT.Common.UTest
                 Assert.AreEqual("/var/log", CommonHelper.DefaultLogPath);
             }               
             
-        }       
+        }
+        [TestCase]
+        public void IdentifyExcludedComponents_ReturnsUpdatedBom()
+        {
+            //Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string csprojfilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
+            string[] Excludes = null;
+            int noOfExcludedComponents = 0;
+            Bom bom = new Bom();
+            bom.Components = new List<Component>();
+
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings commonAppSettings = new CommonAppSettings(folderAction, fileOperations)
+            {
+                Nuget = new Config() { Exclude = Excludes },
+                SW360 = new SW360() { ExcludeComponents = new List<string>() },
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                {
+                    InputFolder = csprojfilepath
+                }
+            };
+
+            //Act
+            Bom updatedBom = CommonHelper.IdentifyExcludedComponents(commonAppSettings, bom,ref noOfExcludedComponents);
+
+            //Assert
+            Assert.AreEqual(0, updatedBom.Components.Count, "Zero component excluded");
+
+        }
     }
 
     public class TestObject

@@ -22,7 +22,7 @@ namespace LCT.Common
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public Bom ParseCycloneDXBom(string filePath)
         {
-            Logger.Debug("ParseCycloneDXBom():Parseing CycloneDX Bom File started");
+            Logger.Debug("ParseCycloneDXBom():Parsing CycloneDX Bom File started");
             Bom bom = new Bom();
             string json = string.Empty;
             try

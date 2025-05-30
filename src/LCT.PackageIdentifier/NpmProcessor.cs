@@ -389,24 +389,7 @@ namespace LCT.PackageIdentifier
             {
                 var currentIterationItem = component;
                 bool isTrue = IsInternalNpmComponent(aqlResultList, currentIterationItem, bomhelper);
-                if (currentIterationItem.Properties?.Count == null || currentIterationItem.Properties?.Count <= 0)
-                {
-                    currentIterationItem.Properties = new List<Property>();
-                }
-
-                Property isInternal = new() { Name = Dataconstant.Cdx_IsInternal, Value = "false" };
-                if (isTrue)
-                {
-                    internalComponents.Add(currentIterationItem);
-                    isInternal.Value = "true";
-                }
-                else
-                {
-                    isInternal.Value = "false";
-                }
-
-                currentIterationItem.Properties.Add(isInternal);
-                internalComponentStatusUpdatedList.Add(currentIterationItem);
+                bomhelper.ProcessSingleInternalComponent(currentIterationItem, isTrue, internalComponents, internalComponentStatusUpdatedList);
             }
 
             // update the comparision bom data
@@ -478,53 +461,12 @@ namespace LCT.PackageIdentifier
                 componentVal.Properties.Add(projectType);
                 componentVal.Properties.Add(siemensfileNameProp);
                 componentVal.Properties.Add(jfrogRepoPathProp);
-                componentVal.Description = null;
-                if (hashes != null)
-                {
-                    componentVal.Hashes = new List<Hash>()
-                {
-
-                new()
-                 {
-                  Alg = Hash.HashAlgorithm.MD5,
-                  Content = hashes.MD5
-                },
-                new()
-                {
-                  Alg = Hash.HashAlgorithm.SHA_1,
-                  Content = hashes.SHA1
-                 },
-                 new()
-                 {
-                  Alg = Hash.HashAlgorithm.SHA_256,
-                  Content = hashes.SHA256
-                  }
-                  };
-
-                }
-                modifiedBOM.Add(componentVal);
+                bomhelper.ProcessComponentHashes(componentVal, hashes, modifiedBOM);
             }
             LogHandlingHelper.IdentifierComponentsData(componentsForBOM, listOfInternalComponents);
 
             Logger.Debug("GetJfrogRepoDetailsOfAComponent():Completed retrieving JFrog repository details for components.\n");
             return modifiedBOM;
-        }
-
-        public static Bom RemoveExcludedComponents(CommonAppSettings appSettings, Bom cycloneDXBOM)
-        {
-            List<Component> componentForBOM = cycloneDXBOM.Components.ToList();
-            List<Dependency> dependenciesForBOM = cycloneDXBOM.Dependencies?.ToList() ?? new List<Dependency>();
-            int noOfExcludedComponents = 0;
-            if (appSettings?.SW360?.ExcludeComponents != null)
-            {
-                componentForBOM = CommonHelper.RemoveExcludedComponents(componentForBOM, appSettings.SW360.ExcludeComponents, ref noOfExcludedComponents);
-                dependenciesForBOM = CommonHelper.RemoveInvalidDependenciesAndReferences(componentForBOM, dependenciesForBOM);
-                BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents;
-
-            }
-            cycloneDXBOM.Components = componentForBOM;
-            cycloneDXBOM.Dependencies = dependenciesForBOM;
-            return cycloneDXBOM;
         }
 
         private void ParsingInputFileForBOM(CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom, ref List<Dependency> dependencies)
@@ -546,12 +488,14 @@ namespace LCT.PackageIdentifier
                     {
                         Logger.Debug($"ParsingInputFileForBOM():CycloneDX file detected: {filepath}");
                         bom = ParseCycloneDXBom(filepath);
-                        bom = RemoveExcludedComponents(appSettings, bom);
+                        int noOfExcludedComponents = 0;
+                        bom = CommonHelper.IdentifyExcludedComponents(appSettings, bom, ref noOfExcludedComponents);
+                        BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents;
                         CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
                         AddingIdentifierType(bom.Components, "CycloneDXFile");
                         componentsForBOM.AddRange(bom.Components);
                         dependencies = bom.Dependencies;
-                        LogHandlingHelper.IdentifierInputfileComponents(filepath, bom.Components);
+                        LogHandlingHelper.IdentifierInputFileComponents(filepath, bom.Components);
                     }
                 }
                 else
@@ -560,7 +504,7 @@ namespace LCT.PackageIdentifier
                     var components = ParsePackageLockJson(filepath, appSettings);
                     AddingIdentifierType(components, "PackageFile");
                     componentsForBOM.AddRange(components);
-                    LogHandlingHelper.IdentifierInputfileComponents(filepath, components);
+                    LogHandlingHelper.IdentifierInputFileComponents(filepath, components);
                 }
             }
             string templateFilePath = SbomTemplate.GetFilePathForTemplate(listOfTemplateBomfilePaths);
@@ -580,7 +524,7 @@ namespace LCT.PackageIdentifier
             {
                 if ((component.Manufacturer?.BomRef?.Split(",")) != null)
                 {
-                    Logger.Debug($"GetdependencyDetails():Processing component for dependency extraction: [Name: {component.Name}, Version: {component.Version}, PURL: {component.Purl}, Author(s): {component.Author}]");
+                    Logger.Debug($"GetdependencyDetails():Processing component for dependency extraction: [Name: {component.Name}, Version: {component.Version}, PURL: {component.Purl}, Author(s): {component.Manufacturer?.BomRef}]");
                     List<Dependency> subDependencies = new();
                     foreach (var item in (component.Manufacturer?.BomRef?.Split(",")).Where(item => item.Contains(':')))
                     {

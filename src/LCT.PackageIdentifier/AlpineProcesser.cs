@@ -70,12 +70,15 @@ namespace LCT.PackageIdentifier
 
             SbomTemplate.ProcessTemplateFile(templateFilePath, _cycloneDXBomParser, bom.Components, appSettings.ProjectType);
 
-            bom = RemoveExcludedComponents(appSettings, bom);
+            int noOfExcludedComponents = 0;
+            bom = CommonHelper.IdentifyExcludedComponents(appSettings, bom, ref noOfExcludedComponents);
+            BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents;
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
             return bom;
         }
 
-        public static Bom RemoveExcludedComponents(CommonAppSettings appSettings, Bom cycloneDXBOM)
+        public static Bom RemoveExcludedComponents(CommonAppSettings appSettings, 
+            Bom cycloneDXBOM)
         {
             List<Component> componentForBOM = cycloneDXBOM.Components.ToList();
             List<Dependency> dependenciesForBOM = cycloneDXBOM.Dependencies?.ToList() ?? new List<Dependency>();
@@ -210,18 +213,18 @@ namespace LCT.PackageIdentifier
 
             // Build the table
             var logBuilder = new System.Text.StringBuilder();
-            logBuilder.AppendLine("============================================================================================================================================");
+            logBuilder.AppendLine(LogHandlingHelper.LogSeparator);
             logBuilder.AppendLine($" Alpine PACKAGES FOUND IN FILE: {filepath}");
-            logBuilder.AppendLine("============================================================================================================================================");
+            logBuilder.AppendLine(LogHandlingHelper.LogSeparator);
             logBuilder.AppendLine($"| {"Name",-40} | {"Version",-20} | {"PURL",-60} | {"Dependencies",-60} |");
-            logBuilder.AppendLine("--------------------------------------------------------------------------------------------------------------------------------------------");
+            logBuilder.AppendLine(LogHandlingHelper.LogHeaderSeparator);
 
             foreach (var package in packages)
             {
                 logBuilder.AppendLine($"| {package.Name,-40} | {package.Version,-20} | {package.PurlID,-60} | {dependencies,-60} |");
             }
 
-            logBuilder.AppendLine("============================================================================================================================================");
+            logBuilder.AppendLine(LogHandlingHelper.LogSeparator);
 
             // Log the table
             Logger.Debug(logBuilder.ToString());

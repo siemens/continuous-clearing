@@ -340,7 +340,7 @@ namespace LCT.Common.UTest
                 log.Contains("Yes"))), Times.Once);
         }
         [Test]
-        public void IdentifierInputfileComponents_ShouldLogTableWithComponents()
+        public void IdentifierInputFileComponents_ShouldLogTableWithComponents()
         {
             // Arrange
             string filepath = "test-file.json";
@@ -369,7 +369,7 @@ namespace LCT.Common.UTest
             };
 
             // Act
-            LogHandlingHelper.IdentifierInputfileComponents(filepath, components);
+            LogHandlingHelper.IdentifierInputFileComponents(filepath, components);
 
             // Assert
             _mockLogger.Verify(logger => logger.Debug(It.Is<string>(log =>
@@ -385,14 +385,14 @@ namespace LCT.Common.UTest
         }
 
         [Test]
-        public void IdentifierInputfileComponents_ShouldLogMessageWhenNoComponents()
+        public void IdentifierInputFileComponents_ShouldLogMessageWhenNoComponents()
         {
             // Arrange
             string filepath = "test-file.json";
             var components = new List<Component>(); // Empty list
 
             // Act
-            LogHandlingHelper.IdentifierInputfileComponents(filepath, components);
+            LogHandlingHelper.IdentifierInputFileComponents(filepath, components);
 
             // Assert
             _mockLogger.Verify(logger => logger.Debug(It.Is<string>(log =>
@@ -407,7 +407,7 @@ namespace LCT.Common.UTest
             List<Component> components = null; // Null list
 
             // Act
-            LogHandlingHelper.IdentifierInputfileComponents(filepath, components);
+            LogHandlingHelper.IdentifierInputFileComponents(filepath, components);
 
             // Assert
             _mockLogger.Verify(logger => logger.Debug(It.Is<string>(log =>
@@ -431,7 +431,7 @@ namespace LCT.Common.UTest
             };
 
             // Act
-            LogHandlingHelper.IdentifierInputfileComponents(filepath, components);
+            LogHandlingHelper.IdentifierInputFileComponents(filepath, components);
 
             // Assert
             _mockLogger.Verify(logger => logger.Debug(It.Is<string>(log =>

@@ -8,6 +8,7 @@ using CycloneDX.Models;
 using LCT.APICommunications;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
+using LCT.Common.Constants;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
@@ -213,6 +214,48 @@ namespace LCT.PackageIdentifier
             }
 
             return aqlResultList;
+        }
+        public void ProcessComponentHashes(Component componentVal, AqlResult hashes, List<Component> modifiedBOM)
+        {
+            componentVal.Description = null;
+
+            if (hashes != null)
+            {
+                componentVal.Hashes = new List<Hash>()
+        {
+            new()
+            {
+                Alg = Hash.HashAlgorithm.MD5,
+                Content = hashes.MD5
+            },
+            new()
+            {
+                Alg = Hash.HashAlgorithm.SHA_1,
+                Content = hashes.SHA1
+            },
+            new()
+            {
+                Alg = Hash.HashAlgorithm.SHA_256,
+                Content = hashes.SHA256
+            }
+        };
+            }
+
+            modifiedBOM.Add(componentVal);
+        }       
+        public void ProcessSingleInternalComponent(Component currentIterationItem,bool isTrue, List<Component> internalComponents,List<Component> internalComponentStatusUpdatedList)
+        {            
+            if (currentIterationItem.Properties?.Count == null || currentIterationItem.Properties?.Count <= 0)
+            {
+                currentIterationItem.Properties = new List<Property>();
+            }
+            Property isInternalProperty = new() { Name = Dataconstant.Cdx_IsInternal, Value = isTrue ? "true" : "false" };
+            if (isTrue)
+            {
+                internalComponents.Add(currentIterationItem);
+            }
+            currentIterationItem.Properties.Add(isInternalProperty);
+            internalComponentStatusUpdatedList.Add(currentIterationItem);
         }
 
         #endregion

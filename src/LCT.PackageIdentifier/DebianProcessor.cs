@@ -56,7 +56,7 @@ namespace LCT.PackageIdentifier
                     Logger.Debug($"ParsePackageFile():Processing input file for identifying components: {filepath}");
                     var list = ParseCycloneDX(filepath, ref bom);
                     listofComponents.AddRange(list);
-                    DebianPackageslist(filepath, listofComponents);
+                    DebiAnPackagesList(filepath, listofComponents);
                 }
                 else if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
@@ -73,8 +73,9 @@ namespace LCT.PackageIdentifier
             bom.Components = listComponentForBOM;
             string templateFilePath = SbomTemplate.GetFilePathForTemplate(listOfTemplateBomfilePaths);
             SbomTemplate.ProcessTemplateFile(templateFilePath, _cycloneDXBomParser, bom.Components, appSettings.ProjectType);
-
-            bom = RemoveExcludedComponents(appSettings, bom);
+            int noOfExcludedComponents = 0;
+            bom = CommonHelper.IdentifyExcludedComponents(appSettings, bom, ref noOfExcludedComponents);
+            BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents;
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
 
             if (bom != null)
@@ -105,23 +106,7 @@ namespace LCT.PackageIdentifier
             }
 
             bom.Components = bomComponentsList;
-        }
-
-        public static Bom RemoveExcludedComponents(CommonAppSettings appSettings, Bom cycloneDXBOM)
-        {
-            List<Component> componentForBOM = cycloneDXBOM.Components.ToList();
-            List<Dependency> dependenciesForBOM = cycloneDXBOM.Dependencies?.ToList() ?? new List<Dependency>();
-            int noOfExcludedComponents = 0;
-            if (appSettings?.SW360?.ExcludeComponents != null)
-            {
-                componentForBOM = CommonHelper.RemoveExcludedComponents(componentForBOM, appSettings?.SW360?.ExcludeComponents, ref noOfExcludedComponents);
-                dependenciesForBOM = CommonHelper.RemoveInvalidDependenciesAndReferences(componentForBOM, dependenciesForBOM);
-                BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents;
-            }
-            cycloneDXBOM.Components = componentForBOM;
-            cycloneDXBOM.Dependencies = dependenciesForBOM;
-            return cycloneDXBOM;
-        }
+        }        
 
         public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM, CommonAppSettings appSettings,
                                                           IJFrogService jFrogService,
@@ -180,31 +165,7 @@ namespace LCT.PackageIdentifier
                 componentVal.Properties.Add(projectType);
                 componentVal.Properties.Add(jfrogFileNameProperty);
                 componentVal.Properties.Add(jfrogRepoPathProperty);
-                componentVal.Description = null;
-                if (hashes != null)
-                {
-                    componentVal.Hashes = new List<Hash>()
-                {
-
-                new()
-                 {
-                  Alg = Hash.HashAlgorithm.MD5,
-                  Content = hashes.MD5
-                },
-                new()
-                {
-                  Alg = Hash.HashAlgorithm.SHA_1,
-                  Content = hashes.SHA1
-                 },
-                 new()
-                 {
-                  Alg = Hash.HashAlgorithm.SHA_256,
-                  Content = hashes.SHA256
-                  }
-                  };
-
-                }
-                modifiedBOM.Add(componentVal);
+                bomhelper.ProcessComponentHashes(componentVal, hashes, modifiedBOM);
             }
             LogHandlingHelper.IdentifierComponentsData(componentsForBOM, listOfInternalComponents);
             Logger.Debug("GetJfrogRepoDetailsOfAComponent():Completed retrieving JFrog repository details for components.\n");
@@ -228,24 +189,7 @@ namespace LCT.PackageIdentifier
             {
                 var currentIterationItem = component;
                 bool isTrue = IsInternalDebianComponent(aqlResultList, currentIterationItem, bomhelper);
-                if (currentIterationItem.Properties?.Count == null || currentIterationItem.Properties?.Count <= 0)
-                {
-                    currentIterationItem.Properties = new List<Property>();
-                }
-
-                Property isInternal = new() { Name = Dataconstant.Cdx_IsInternal, Value = "false" };
-                if (isTrue)
-                {
-                    internalComponents.Add(currentIterationItem);
-                    isInternal.Value = "true";
-                }
-                else
-                {
-                    isInternal.Value = "false";
-                }
-
-                currentIterationItem.Properties.Add(isInternal);
-                internalComponentStatusUpdatedList.Add(currentIterationItem);
+                bomhelper.ProcessSingleInternalComponent(currentIterationItem, isTrue, internalComponents, internalComponentStatusUpdatedList);
             }
 
             // update the comparision bom data
@@ -313,30 +257,30 @@ namespace LCT.PackageIdentifier
 
             return repoName;
         }
-        public static void DebianPackageslist(string filepath, List<DebianPackage> packages)
+        public static void DebiAnPackagesList(string filePath, List<DebianPackage> packages)
         {
 
             if (packages == null || packages.Count == 0)
             {
-                // Log a message indicating no packages were found
-                Logger.Debug($"No Debian packages were found in the file: {filepath}");
+                
+                Logger.Debug($"No Debian packages were found in the file: {filePath}");
                 return;
             }
 
             // Build the table
             var logBuilder = new System.Text.StringBuilder();
-            logBuilder.AppendLine("============================================================================================================================================");
-            logBuilder.AppendLine($" DEBIAN PACKAGES FOUND IN FILE: {filepath}");
-            logBuilder.AppendLine("============================================================================================================================================");
+            logBuilder.AppendLine(LogHandlingHelper.LogSeparator);
+            logBuilder.AppendLine($" DEBIAN PACKAGES FOUND IN FILE: {filePath}");
+            logBuilder.AppendLine(LogHandlingHelper.LogSeparator);
             logBuilder.AppendLine($"| {"Name",-40} | {"Version",-20} | {"PURL",-60} |");
-            logBuilder.AppendLine("--------------------------------------------------------------------------------------------------------------------------------------------");
+            logBuilder.AppendLine(LogHandlingHelper.LogHeaderSeparator);
 
             foreach (var package in packages)
             {
                 logBuilder.AppendLine($"| {package.Name,-40} | {package.Version,-20} | {package.PurlID,-60} |");
             }
 
-            logBuilder.AppendLine("============================================================================================================================================");
+            logBuilder.AppendLine(LogHandlingHelper.LogSeparator);
 
             // Log the table
             Logger.Debug(logBuilder.ToString());

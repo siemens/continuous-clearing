@@ -125,7 +125,8 @@ namespace LCT.APICommunications
             try
             {
                 result = await httpClient.GetAsync(projectsByTagUrl);
-                await LogHandlingHelper.HttpResponseHandling("Get sw360 Project details for validating", $"MethodName:GetProjectById(),CorrelationId:{correlationId}", result, "");
+                string truncatedContent = await LogHandlingHelper.TruncateTopLinesAsync(result,25);
+                LogHandlingHelper.HttpResponseOfStringContent("Get sw360 Project details for validating", $"MethodName:GetProjectById(),CorrelationId:{correlationId}", truncatedContent, "");
                 result.EnsureSuccessStatusCode();
             }
             catch (HttpRequestException ex)
