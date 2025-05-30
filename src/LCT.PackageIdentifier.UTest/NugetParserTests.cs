@@ -546,39 +546,7 @@ namespace LCT.PackageIdentifier.UTest
 
             //Assert
             Assert.That(1, Is.EqualTo(devDependent), "Checks for total dev dependent components found");
-        }
-
-        [TestCase]
-        public void RemoveExcludedComponents_ReturnsUpdatedBom()
-        {
-            //Arrange
-            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string outFolder = Path.GetDirectoryName(exePath);
-            string csprojfilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
-            string[] Excludes = null;
-
-            Bom bom = new Bom();
-            bom.Components = new List<Component>();
-
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings commonAppSettings = new CommonAppSettings(folderAction, fileOperations)
-            {
-                Nuget = new Config() { Exclude = Excludes },
-                SW360 = new SW360() { ExcludeComponents = new List<string>() },
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
-                {
-                    InputFolder = csprojfilepath
-                }
-            };
-
-            //Act
-            Bom updatedBom = NugetProcessor.RemoveExcludedComponents(commonAppSettings, bom);
-
-            //Assert
-            Assert.AreEqual(0, updatedBom.Components.Count, "Zero component exculded");
-
-        }
+        }        
 
         [Test]
         public async Task IdentificationOfInternalComponents_Nuget_ReturnsComponentData_Successfully()

@@ -82,7 +82,7 @@ namespace LCT.APICommunications
             }
             catch (TaskCanceledException ex)
             {
-                Logger.Debug($"{ex.Message}");
+                LogHandlingHelper.ExceptionErrorHandling("Get sw360 Projects details", $"MethodName:GetProjects(),A timeout error is thrown from SW360 server,Please wait for sometime and re run the pipeline again", ex, "");
                 Logger.Error("A timeout error is thrown from SW360 server,Please wait for sometime and re run the pipeline again");
                 environmentHelper.CallEnvironmentExit(-1);
             }
@@ -119,22 +119,27 @@ namespace LCT.APICommunications
             HttpResponseMessage obj = new HttpResponseMessage();
             var result = obj;
             string projectsByTagUrl = $"{sw360ProjectsApi}/{projectId}";
+            string correlationId = Guid.NewGuid().ToString();
+            await LogHandlingHelper.HttpRequestHandling("Get sw360 Project details for validating", $"MethodName:GetProjectById(),CorrelationId:{correlationId}", httpClient, projectsByTagUrl);
+
             try
             {
                 result = await httpClient.GetAsync(projectsByTagUrl);
+                string truncatedContent = await LogHandlingHelper.TruncateTopLinesAsync(result,25);
+                LogHandlingHelper.HttpResponseOfStringContent("Get sw360 Project details for validating", $"MethodName:GetProjectById(),CorrelationId:{correlationId}", truncatedContent, "");
                 result.EnsureSuccessStatusCode();
             }
             catch (HttpRequestException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("Get sw360 Project details for validating", $"MethodName:GetProjectById(),CorrelationId:{correlationId}", ex, "");
                 ExceptionHandling.HttpException(ex, result, "SW360");
                 environmentHelper.CallEnvironmentExit(-1);
             }
             catch (TaskCanceledException ex)
             {
-                Logger.Debug($"{ex.Message}");
+                LogHandlingHelper.ExceptionErrorHandling("Get sw360 Project details for validating", $"MethodName:GetProjectById(),CorrelationId:{correlationId}", ex, "");
                 ExceptionHandling.TaskCancelledException(ex, "SW360");
                 environmentHelper.CallEnvironmentExit(-1);
-
             }
             return result;
         }
@@ -144,15 +149,21 @@ namespace LCT.APICommunications
             HttpClient httpClient = GetHttpClient();
             httpClient.SetLogWarnings(true, "unable to get releases");
             var result = string.Empty;
+            string correlationId = Guid.NewGuid().ToString();
             try
             {
+                await LogHandlingHelper.HttpRequestHandling("Request for get all releases", $"MethodName:GetReleases(),CorrelationId:{correlationId}", httpClient, sw360ReleaseApi);
                 HttpResponseMessage responseMessage = await httpClient.GetAsync(sw360ReleaseApi);
+                await LogHandlingHelper.HttpResponseHandling("Response of get all releases", $"MethodName:GetReleases(),CorrelationId:{correlationId}", responseMessage);
                 if (responseMessage != null && responseMessage.StatusCode.Equals(HttpStatusCode.OK))
                 {
                     return await responseMessage.Content.ReadAsStringAsync();
                 }
                 else
                 {
+                    LogHandlingHelper.BasicErrorHandling("GetReleases", $"MethodName:GetReleases(),CorrelationId:{correlationId}",
+                $"SW360 server is not accessible. StatusCode: {responseMessage?.StatusCode}, ReasonPhrase: {responseMessage?.ReasonPhrase}",
+                "Please wait for some time and re-run the pipeline.");
                     Logger.Error("SW360 server is not accessible while getting All Releases,Please wait for sometime and re run the pipeline again." +
                         " StatusCode:" + responseMessage?.StatusCode + " & ReasonPharse :" + responseMessage?.ReasonPhrase);
                     environmentHelper.CallEnvironmentExit(-1);
@@ -160,19 +171,21 @@ namespace LCT.APICommunications
             }
             catch (TaskCanceledException ex)
             {
-                Logger.Debug($"GetReleases():TaskCanceledException Error : {ex.Message}", ex);
+                LogHandlingHelper.ExceptionErrorHandling("GetReleases", $"MethodName:GetReleases(),CorrelationId:{correlationId}", ex,
+            "TaskCanceledException occurred while getting all releases from the SW360 server. Please wait for some time and re-run the pipeline.");
                 Logger.Error("TaskCanceledException error has error while getting all releases from the SW360 server,Please wait for sometime and re run the pipeline again. Error :" + ex.Message);
                 environmentHelper.CallEnvironmentExit(-1);
             }
             catch (HttpRequestException ex)
             {
-                Logger.Debug($"GetReleases():HttpRequestException Error : {ex.Message}", ex);
+                LogHandlingHelper.ExceptionErrorHandling("GetReleases", $"MethodName:GetReleases(),CorrelationId:{correlationId}", ex, "");
                 Logger.Error("HttpRequestException error has error while getting all releases from the SW360 server,Please wait for sometime and re run the pipeline again. Error :" + ex.Message);
                 environmentHelper.CallEnvironmentExit(-1);
             }
             catch (InvalidOperationException ex)
             {
-                Logger.Debug($"GetReleases():InvalidOperationException Error : {ex.Message}", ex);
+                LogHandlingHelper.ExceptionErrorHandling("GetReleases", $"MethodName:GetReleases(),CorrelationId:{correlationId}", ex,
+            "InvalidOperationException occurred while getting all releases from the SW360 server. Please wait for some time and re-run the pipeline.");
                 Logger.Error("InvalidOperationException error has error while getting all releases from the SW360 server,Please wait for sometime and re run the pipeline again. Error :" + ex.Message);
                 environmentHelper.CallEnvironmentExit(-1);
             }
@@ -183,9 +196,12 @@ namespace LCT.APICommunications
             HttpClient httpClient = GetHttpClient();
             httpClient.SetLogWarnings(false, "unable to trigger fossology process");
             string url = $"{sw360ReleaseApi}/{releaseId}{ApiConstant.FossTriggerAPIPrefix}{sw360link}{ApiConstant.FossTriggerAPISuffix}";
+            string correlationId = Guid.NewGuid().ToString();
             try
             {
+                await LogHandlingHelper.HttpRequestHandling("TriggerFossologyProcess", $"MethodName:TriggerFossologyProcess(),correlationId:{correlationId}", httpClient, url);
                 var response = await httpClient.GetAsync(url);
+                await LogHandlingHelper.HttpResponseHandling("TriggerFossologyProcess", $"MethodName:TriggerFossologyProcess(),correlationId:{correlationId}", response);
                 if (!response.IsSuccessStatusCode)
                 {
                     string errorContent = await response.Content.ReadAsStringAsync();
@@ -198,44 +214,49 @@ namespace LCT.APICommunications
             }
             catch (HttpRequestException ex)
             {
-                Logger.Debug($"TriggerFossologyProcess(): {ex.Message}");
+                LogHandlingHelper.ExceptionErrorHandling("TriggerFossologyProcess", $"MethodName:TriggerFossologyProcess(),correlationId:{correlationId}", ex, "An HTTP request error occurred while triggering the Fossology process.");
                 throw;
             }
         }
-        public async Task<HttpResponseMessage> CheckFossologyProcessStatus(string link)
+        public async Task<HttpResponseMessage> CheckFossologyProcessStatus(string link, string correlationId)
         {
             HttpClient httpClient = GetHttpClient();
+            await LogHandlingHelper.HttpRequestHandling("TriggerFossologyProcess", $"MethodName:TriggerFossologyProcess(),correlationId:{correlationId}", httpClient, link);
             httpClient.SetLogWarnings(false, "unable to check fossology process status");
             return await httpClient.GetAsync(link);
         }
-        public async Task<string> GetComponents()
+        public async Task<string> GetComponents(string correlationId)
         {
             HttpClient httpClient = GetHttpClient();
+            await LogHandlingHelper.HttpRequestHandling("Request for get components data", $"MethodName:GetComponents(),CorrelationId:{correlationId}", httpClient, sw360ComponentApi);
             httpClient.SetLogWarnings(true, "unable to get components details");
             return await httpClient.GetStringAsync(sw360ComponentApi);
         }
 
-        public async Task<HttpResponseMessage> GetReleaseByExternalId(string purlId, string externalIdKey = "")
+        public async Task<HttpResponseMessage> GetReleaseByExternalId(string purlId, string externalIdKey = "", string correlationId = "")
         {
             HttpClient httpClient = GetHttpClient();
             httpClient.SetLogWarnings(false, "unable to get release details by externalid");
             string releaseByExternalIdUrl = $"{sw360ReleaseByExternalId}{externalIdKey}{purlId}";
+            await LogHandlingHelper.HttpRequestHandling("Request for get release data by ExternalId", $"MethodName:GetReleaseByExternalId(),CorrelationId:{correlationId}", httpClient, releaseByExternalIdUrl);
             return await httpClient.GetAsync(releaseByExternalIdUrl);
         }
 
-        public async Task<HttpResponseMessage> GetComponentByExternalId(string purlId, string externalIdKey = "")
+        public async Task<HttpResponseMessage> GetComponentByExternalId(string purlId, string externalIdKey = "", string correlationId = "")
         {
             HttpClient httpClient = GetHttpClient();
             httpClient.SetLogWarnings(false, "unable to get component details by externalid");
             string componentByExternalIdUrl = $"{sw360ComponentByExternalId}{externalIdKey}{purlId}";
+            await LogHandlingHelper.HttpRequestHandling("Request for get component data by ExternalId", $"MethodName:GetComponentByExternalId(),CorrelationId:{correlationId}", httpClient, componentByExternalIdUrl);
             return await httpClient.GetAsync(componentByExternalIdUrl);
         }
 
-        public async Task<HttpResponseMessage> GetReleaseById(string releaseId)
+        public async Task<HttpResponseMessage> GetReleaseById(string releaseId, string correlationId)
         {
             HttpClient httpClient = GetHttpClient();
             httpClient.SetLogWarnings(false, "unable to get release details by releaseid");
             string url = $"{sw360ReleaseApi}/{releaseId}";
+            await LogHandlingHelper.HttpRequestHandling("Request for get release data by ReleaseId", $"MethodName:GetReleaseById(),CorrelationId:{correlationId}", httpClient, url);
             return await httpClient.GetAsync(url);
         }
 
@@ -246,11 +267,12 @@ namespace LCT.APICommunications
             return await httpClient.GetAsync(releaseLink);
         }
 
-        public async Task<HttpResponseMessage> LinkReleasesToProject(HttpContent httpContent, string sw360ProjectId)
+        public async Task<HttpResponseMessage> LinkReleasesToProject(HttpContent httpContent, string sw360ProjectId, string correlationId)
         {
             HttpClient httpClient = GetHttpClient();
             httpClient.SetLogWarnings(true, "unable to link releases to the project");
             string url = $"{sw360ProjectsApi}/{sw360ProjectId}/{ApiConstant.Releases}";
+            await LogHandlingHelper.HttpRequestHandling("LinkReleasesToProject", $"MethodName:LinkReleasesToProject(), CorrelationId: {correlationId}, ProjectId: {sw360ProjectId}", httpClient, url, httpContent);
             return await httpClient.PostAsync(url, httpContent);
         }
 
@@ -265,25 +287,28 @@ namespace LCT.APICommunications
             return await httpClient.PatchAsync(updateUri, content);
         }
 
-        public async Task<HttpResponseMessage> CreateComponent(CreateComponent createComponentContent)
+        public async Task<HttpResponseMessage> CreateComponent(CreateComponent createComponentContent, string correlationId)
         {
             HttpClient httpClient = GetHttpClient();
+            await LogHandlingHelper.HttpRequestHandling("CreateComponent", $"MethodName:CreateComponent(), CorrelationId: {correlationId}", httpClient, sw360ComponentApi, new StringContent(JsonConvert.SerializeObject(createComponentContent), Encoding.UTF8, ApiConstant.ApplicationJson));
             httpClient.SetLogWarnings(false, "unable to create component");
             return await httpClient.PostAsJsonAsync(sw360ComponentApi, createComponentContent);
         }
 
-        public async Task<HttpResponseMessage> CreateRelease(Releases createReleaseContent)
+        public async Task<HttpResponseMessage> CreateRelease(Releases createReleaseContent, string correlationId)
         {
             HttpClient httpClient = GetHttpClient();
+            await LogHandlingHelper.HttpRequestHandling("CreateRelease", $"MethodName:CreateRelease(), CorrelationId: {correlationId}", httpClient, sw360ReleaseApi, new StringContent(JsonConvert.SerializeObject(createReleaseContent), Encoding.UTF8, ApiConstant.ApplicationJson));
             httpClient.SetLogWarnings(false, "unable to create release");
             return await httpClient.PostAsJsonAsync(sw360ReleaseApi, createReleaseContent);
         }
 
-        public async Task<string> GetReleaseOfComponentById(string componentId)
+        public async Task<string> GetReleaseOfComponentById(string componentId, string correlationId)
         {
             HttpClient httpClient = GetHttpClient();
             httpClient.SetLogWarnings(false, "unable to get release data by component id");
             string componentUrl = $"{sw360ComponentApi}/{componentId}";
+            await LogHandlingHelper.HttpRequestHandling("Get Release Of Component By Id", $"MethodName:GetReleaseOfComponentById(),CorrelationId:{correlationId}", httpClient, componentUrl);
             return await httpClient.GetStringAsync(componentUrl);
         }
 
@@ -312,11 +337,12 @@ namespace LCT.APICommunications
             }
         }
 
-        public async Task<HttpResponseMessage> UpdateRelease(string releaseId, HttpContent httpContent)
+        public async Task<HttpResponseMessage> UpdateRelease(string releaseId, HttpContent httpContent, string correlationId)
         {
             HttpClient httpClient = GetHttpClient();
             httpClient.SetLogWarnings(false, "unable to update the release data");
             string releaseApi = $"{sw360ReleaseApi}/{releaseId}";
+            await LogHandlingHelper.HttpRequestHandling("UpdateRelease", $"MethodName:UpdateRelease(), CorrelationId: {correlationId}, ReleaseId: {releaseId}", httpClient, releaseApi, httpContent);
             return await httpClient.PatchAsync(releaseApi, httpContent);
         }
 
@@ -336,11 +362,12 @@ namespace LCT.APICommunications
             return attachmentHelper.AttachComponentSourceToSW360(attachReport);
         }
 
-        public async Task<string> GetReleaseByCompoenentName(string componentName)
+        public async Task<string> GetReleaseByCompoenentName(string componentName, string correlationId)
         {
             HttpClient httpClient = GetHttpClient();
             httpClient.SetLogWarnings(false, "unable to get release data by component name");
             string url = $"{sw360ReleaseNameApi}{componentName}";
+            await LogHandlingHelper.HttpRequestHandling("Get Release By Compoenent Name", $"MethodName:GetReleaseByCompoenentName(),CorrelationId:{correlationId}", httpClient, url);
             return await httpClient.GetStringAsync(url);
         }
 
@@ -351,11 +378,12 @@ namespace LCT.APICommunications
             return await httpClient.GetAsync(componentLink);
         }
 
-        public async Task<string> GetComponentByName(string componentName)
+        public async Task<string> GetComponentByName(string componentName, string correlationId)
         {
             HttpClient httpClient = GetHttpClient();
             httpClient.SetLogWarnings(false, "unable to get component details by component name");
             string url = $"{sw360ComponentApi}{ApiConstant.ComponentNameUrl}{componentName}";
+            await LogHandlingHelper.HttpRequestHandling("Get Component By Name", $"MethodName:GetComponentByName(),CorrelationId:{correlationId}", httpClient, url);
             return await httpClient.GetStringAsync(url);
         }
         public async Task<HttpResponseMessage> GetComponentUsingName(string componentName)
@@ -365,11 +393,12 @@ namespace LCT.APICommunications
             string url = $"{sw360ComponentApi}{ApiConstant.ComponentNameUrl}{componentName}";
             return await httpClient.GetAsync(url);
         }
-        public async Task<HttpResponseMessage> GetAllReleasesWithAllData(int page, int pageEntries)
+        public async Task<HttpResponseMessage> GetAllReleasesWithAllData(int page, int pageEntries, string correlationId)
         {
             HttpClient httpClient = GetHttpClient();
             httpClient.SetLogWarnings(true, "unable to get all releases details");
             string url = $"{sw360ReleaseApi}?page={page}&allDetails=true&page_entries={pageEntries}";
+            await LogHandlingHelper.HttpRequestHandling("Get All Releases With All Data", $"MethodName:GetAllReleasesWithAllData(),CorrelationId:{correlationId}", httpClient, url);
             return await httpClient.GetAsync(url);
         }
         #endregion

@@ -7,6 +7,7 @@
 using LCT.APICommunications;
 using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.Foss;
+using LCT.Common.Interface;
 using LCT.Common.Model;
 using LCT.Facade.Interfaces;
 using LCT.Services.Interface;
@@ -80,7 +81,7 @@ namespace LCT.Services.UTest
             var content = new StringContent(fossTriggerStatusSerialized, Encoding.UTF8, "application/json");
             httpResponseMessage.Content = content;
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-            sw360ApiCommMock.Setup(x => x.CheckFossologyProcessStatus(It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
+            sw360ApiCommMock.Setup(x => x.CheckFossologyProcessStatus(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
             ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object);
 
             // Act
@@ -101,7 +102,7 @@ namespace LCT.Services.UTest
             var content = new StringContent(fossTriggerStatusSerialized, Encoding.UTF8, "application/json");
             httpResponseMessage.Content = content;
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-            sw360ApiCommMock.Setup(x => x.CheckFossologyProcessStatus(It.IsAny<string>())).
+            sw360ApiCommMock.Setup(x => x.CheckFossologyProcessStatus(It.IsAny<string>(), It.IsAny<string>())).
                 Throws<JsonReaderException>();
             ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object);
 
@@ -123,7 +124,7 @@ namespace LCT.Services.UTest
             var content = new StringContent(fossTriggerStatusSerialized, Encoding.UTF8, "application/json");
             httpResponseMessage.Content = content;
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-            sw360ApiCommMock.Setup(x => x.CheckFossologyProcessStatus(It.IsAny<string>())).
+            sw360ApiCommMock.Setup(x => x.CheckFossologyProcessStatus(It.IsAny<string>(), It.IsAny<string>())).
                 Throws<HttpRequestException>();
             ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object);
 
@@ -140,7 +141,7 @@ namespace LCT.Services.UTest
             // Arrange
             HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.InternalServerError);
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-            sw360ApiCommMock.Setup(x => x.LinkReleasesToProject(It.IsAny<HttpContent>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
+            sw360ApiCommMock.Setup(x => x.LinkReleasesToProject(It.IsAny<HttpContent>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
             ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object);
 
             // Act
@@ -157,7 +158,7 @@ namespace LCT.Services.UTest
         {
             // Arrange
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-            sw360ApiCommMock.Setup(x => x.LinkReleasesToProject(It.IsAny<HttpContent>(), It.IsAny<string>())).Throws<HttpRequestException>();
+            sw360ApiCommMock.Setup(x => x.LinkReleasesToProject(It.IsAny<HttpContent>(), It.IsAny<string>(), It.IsAny<string>())).Throws<HttpRequestException>();
             ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object);
 
             // Act
@@ -175,7 +176,7 @@ namespace LCT.Services.UTest
         {
             // Arrange
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-            sw360ApiCommMock.Setup(x => x.LinkReleasesToProject(It.IsAny<HttpContent>(), It.IsAny<string>())).Throws<AggregateException>();
+            sw360ApiCommMock.Setup(x => x.LinkReleasesToProject(It.IsAny<HttpContent>(), It.IsAny<string>(), It.IsAny<string>())).Throws<AggregateException>();
             ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object);
 
             // Act
@@ -193,7 +194,7 @@ namespace LCT.Services.UTest
             // Arrange
             HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK);
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-            sw360ApiCommMock.Setup(x => x.LinkReleasesToProject(It.IsAny<HttpContent>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
+            sw360ApiCommMock.Setup(x => x.LinkReleasesToProject(It.IsAny<HttpContent>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
             sw360ApiCommMock.Setup(x => x.UpdateLinkedRelease(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<UpdateLinkedRelease>())).ReturnsAsync(httpResponseMessage);
             ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object);
 
@@ -220,7 +221,7 @@ namespace LCT.Services.UTest
                 { "Test", "Test" }
             };
             var httpResponseMessage = new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest);
-            sw360ApiCommMock.Setup(x => x.CreateComponent(It.IsAny<CreateComponent>())).ReturnsAsync(httpResponseMessage);
+            sw360ApiCommMock.Setup(x => x.CreateComponent(It.IsAny<CreateComponent>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
             // Act
             var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object);
             var actual = await sw360CreatorService.CreateComponentBasesOFswComaprisonBOM(ComparisonBomData, attachmentUrlList);
@@ -242,7 +243,7 @@ namespace LCT.Services.UTest
             {
                 { "Test", "Test" }
             };
-            sw360ApiCommMock.Setup(x => x.CreateComponent(It.IsAny<CreateComponent>())).Throws<HttpRequestException>();
+            sw360ApiCommMock.Setup(x => x.CreateComponent(It.IsAny<CreateComponent>(), It.IsAny<string>())).Throws<HttpRequestException>();
 
             // Act
             var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object);
@@ -285,7 +286,7 @@ namespace LCT.Services.UTest
             httpResponseMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
 
-            sw360ApiCommMock.Setup(x => x.CreateRelease(It.IsAny<Releases>())).ReturnsAsync(httpResponseMessage);
+            sw360ApiCommMock.Setup(x => x.CreateRelease(It.IsAny<Releases>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
             sw360ApiCommMock.Setup(x => x.AttachComponentSourceToSW360(It.IsAny<AttachReport>())).Returns(string.Empty);
 
             // Act
@@ -310,7 +311,7 @@ namespace LCT.Services.UTest
             };
             var httpResponseMessage = new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest);
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-            sw360ApiCommMock.Setup(x => x.CreateRelease(It.IsAny<Releases>())).ReturnsAsync(httpResponseMessage);
+            sw360ApiCommMock.Setup(x => x.CreateRelease(It.IsAny<Releases>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
             // Act
             var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object);
             var expected = await sw360CreatorService.CreateReleaseForComponent(ComparisonBomData, componentId, attachmentUrlList);
@@ -333,7 +334,7 @@ namespace LCT.Services.UTest
                 { "Test", "Test" }
             };
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-            sw360ApiCommMock.Setup(x => x.CreateRelease(It.IsAny<Releases>())).Throws<HttpRequestException>();
+            sw360ApiCommMock.Setup(x => x.CreateRelease(It.IsAny<Releases>(), It.IsAny<string>())).Throws<HttpRequestException>();
 
             // Act
             var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object);
@@ -384,8 +385,8 @@ namespace LCT.Services.UTest
 
             var resBody = JsonConvert.SerializeObject(releaseIdOfComponent);
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-            sw360ApiCommMock.Setup(x => x.GetReleaseByCompoenentName(It.IsAny<string>())).ReturnsAsync(resBody);
-            sw360ApiCommMock.Setup(x => x.CreateRelease(It.IsAny<Releases>())).ReturnsAsync(new HttpResponseMessage(HttpStatusCode.Conflict));
+            sw360ApiCommMock.Setup(x => x.GetReleaseByCompoenentName(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(resBody);
+            sw360ApiCommMock.Setup(x => x.CreateRelease(It.IsAny<Releases>(), It.IsAny<string>())).ReturnsAsync(new HttpResponseMessage(HttpStatusCode.Conflict));
             // Act
             var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object);
             var actual = await sw360CreatorService.CreateReleaseForComponent(ComparisonBomData, componentId, attachmentUrlList);
@@ -400,7 +401,7 @@ namespace LCT.Services.UTest
         {
             // Arrange
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-            sw360ApiCommMock.Setup(x => x.GetComponentByName(It.IsAny<string>())).Throws<HttpRequestException>();
+            sw360ApiCommMock.Setup(x => x.GetComponentByName(It.IsAny<string>(), It.IsAny<string>())).Throws<HttpRequestException>();
 
             // Act
             ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object);
@@ -415,7 +416,7 @@ namespace LCT.Services.UTest
         {
             // Arrange
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-            sw360ApiCommMock.Setup(x => x.GetComponentByName(It.IsAny<string>())).Throws<AggregateException>();
+            sw360ApiCommMock.Setup(x => x.GetComponentByName(It.IsAny<string>(), It.IsAny<string>())).Throws<AggregateException>();
 
             // Act
             ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object);
@@ -450,7 +451,7 @@ namespace LCT.Services.UTest
             var componentsModelSerialized = JsonConvert.SerializeObject(componentsModel);
 
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-            sw360ApiCommMock.Setup(x => x.GetComponentByName(It.IsAny<string>())).ReturnsAsync(componentsModelSerialized);
+            sw360ApiCommMock.Setup(x => x.GetComponentByName(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(componentsModelSerialized);
 
             // Act
             ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object);
@@ -465,7 +466,7 @@ namespace LCT.Services.UTest
         {
             // Arrange
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-            sw360ApiCommMock.Setup(x => x.GetReleaseById(It.IsAny<string>())).Throws<HttpRequestException>();
+            sw360ApiCommMock.Setup(x => x.GetReleaseById(It.IsAny<string>(), It.IsAny<string>())).Throws<HttpRequestException>();
 
             // Act
             var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object);
@@ -480,7 +481,7 @@ namespace LCT.Services.UTest
         {
             // Arrange
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-            sw360ApiCommMock.Setup(x => x.GetReleaseById(It.IsAny<string>())).Throws<AggregateException>();
+            sw360ApiCommMock.Setup(x => x.GetReleaseById(It.IsAny<string>(), It.IsAny<string>())).Throws<AggregateException>();
 
             // Act
             var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object);
@@ -495,7 +496,7 @@ namespace LCT.Services.UTest
         {
             // Arrange
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-            sw360ApiCommMock.Setup(x => x.GetReleaseByCompoenentName(It.IsAny<string>())).Throws<HttpRequestException>();
+            sw360ApiCommMock.Setup(x => x.GetReleaseByCompoenentName(It.IsAny<string>(), It.IsAny<string>())).Throws<HttpRequestException>();
 
             // Act
             var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object);
@@ -510,7 +511,7 @@ namespace LCT.Services.UTest
         {
             // Arrange
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-            sw360ApiCommMock.Setup(x => x.GetReleaseOfComponentById(It.IsAny<string>())).Throws<HttpRequestException>();
+            sw360ApiCommMock.Setup(x => x.GetReleaseOfComponentById(It.IsAny<string>(), It.IsAny<string>())).Throws<HttpRequestException>();
 
             // Act
             var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object);
@@ -543,7 +544,7 @@ namespace LCT.Services.UTest
             string releaseResponse = JsonConvert.SerializeObject(releaseIdOfComponent);
 
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-            sw360ApiCommMock.Setup(x => x.GetReleaseOfComponentById(It.IsAny<string>())).ReturnsAsync(releaseResponse);
+            sw360ApiCommMock.Setup(x => x.GetReleaseOfComponentById(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(releaseResponse);
 
             // Act
             var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object);
@@ -558,7 +559,7 @@ namespace LCT.Services.UTest
         {
             // Arrange
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-            sw360ApiCommMock.Setup(x => x.UpdateRelease(It.IsAny<string>(), It.IsAny<HttpContent>())).Throws<HttpRequestException>();
+            sw360ApiCommMock.Setup(x => x.UpdateRelease(It.IsAny<string>(), It.IsAny<HttpContent>(), It.IsAny<string>())).Throws<HttpRequestException>();
             ComparisonBomData comparisonBomData = new ComparisonBomData
             {
                 ReleaseExternalId = "pkg:npm/%40angular/common"
@@ -582,7 +583,7 @@ namespace LCT.Services.UTest
             // Arrange
             HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK);
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-            sw360ApiCommMock.Setup(x => x.UpdateRelease(It.IsAny<string>(), It.IsAny<HttpContent>())).ReturnsAsync(httpResponseMessage);
+            sw360ApiCommMock.Setup(x => x.UpdateRelease(It.IsAny<string>(), It.IsAny<HttpContent>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
             ComparisonBomData comparisonBomData = new ComparisonBomData
             {
                 ReleaseExternalId = "pkg:npm/%40angular/common/10.0.2"
@@ -605,7 +606,7 @@ namespace LCT.Services.UTest
             // Arrange
             HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK);
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-            sw360ApiCommMock.Setup(x => x.UpdateRelease(It.IsAny<string>(), It.IsAny<HttpContent>())).ReturnsAsync(httpResponseMessage);
+            sw360ApiCommMock.Setup(x => x.UpdateRelease(It.IsAny<string>(), It.IsAny<HttpContent>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
             ComparisonBomData comparisonBomData = new ComparisonBomData
             {
                 ReleaseExternalId = "pkg:npm/%40angular/common/10.0.2,pkg:npm/%40angular/common/10.0.3"
@@ -628,7 +629,7 @@ namespace LCT.Services.UTest
         {
             // Arrange
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-            sw360ApiCommMock.Setup(x => x.GetReleaseOfComponentById(It.IsAny<string>())).Throws<HttpRequestException>();
+            sw360ApiCommMock.Setup(x => x.GetReleaseOfComponentById(It.IsAny<string>(), It.IsAny<string>())).Throws<HttpRequestException>();
             ComparisonBomData comparisonBomData = new ComparisonBomData
             {
                 ComponentExternalId = "pkg:npm/%40angular/common"
@@ -647,7 +648,7 @@ namespace LCT.Services.UTest
         {
             // Arrange
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-            sw360ApiCommMock.Setup(x => x.GetReleaseOfComponentById(It.IsAny<string>())).Throws<AggregateException>();
+            sw360ApiCommMock.Setup(x => x.GetReleaseOfComponentById(It.IsAny<string>(), It.IsAny<string>())).Throws<AggregateException>();
             ComparisonBomData comparisonBomData = new ComparisonBomData
             {
                 ComponentExternalId = "pkg:npm/%40angular/common"
@@ -672,7 +673,7 @@ namespace LCT.Services.UTest
             string externalIDResponse = JsonConvert.SerializeObject(componentPurlId);
             HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK);
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-            sw360ApiCommMock.Setup(x => x.GetReleaseOfComponentById(It.IsAny<string>())).ReturnsAsync(externalIDResponse);
+            sw360ApiCommMock.Setup(x => x.GetReleaseOfComponentById(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(externalIDResponse);
             sw360ApiCommMock.Setup(x => x.UpdateComponent(It.IsAny<string>(), It.IsAny<HttpContent>())).ReturnsAsync(httpResponseMessage);
             ComparisonBomData comparisonBomData = new ComparisonBomData
             {
@@ -698,7 +699,7 @@ namespace LCT.Services.UTest
             string externalIDResponse = JsonConvert.SerializeObject(componentPurlId);
             HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK);
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-            sw360ApiCommMock.Setup(x => x.GetReleaseOfComponentById(It.IsAny<string>())).ReturnsAsync(externalIDResponse);
+            sw360ApiCommMock.Setup(x => x.GetReleaseOfComponentById(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(externalIDResponse);
             sw360ApiCommMock.Setup(x => x.UpdateComponent(It.IsAny<string>(), It.IsAny<HttpContent>())).ReturnsAsync(httpResponseMessage);
             ComparisonBomData comparisonBomData = new ComparisonBomData
             {
@@ -719,7 +720,7 @@ namespace LCT.Services.UTest
             // Arrange
             HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK);
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-            sw360ApiCommMock.Setup(x => x.UpdateRelease(It.IsAny<string>(), It.IsAny<HttpContent>())).ReturnsAsync(httpResponseMessage);
+            sw360ApiCommMock.Setup(x => x.UpdateRelease(It.IsAny<string>(), It.IsAny<HttpContent>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
             ComparisonBomData comparisonBomData = new ComparisonBomData
             {
                 ReleaseExternalId = "pkg:npm/%40angular/common@10.0.2"
@@ -748,7 +749,7 @@ namespace LCT.Services.UTest
             string externalIDResponse = JsonConvert.SerializeObject(componentPurlId);
             HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK);
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-            sw360ApiCommMock.Setup(x => x.GetReleaseOfComponentById(It.IsAny<string>())).ReturnsAsync(externalIDResponse);
+            sw360ApiCommMock.Setup(x => x.GetReleaseOfComponentById(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(externalIDResponse);
             sw360ApiCommMock.Setup(x => x.UpdateComponent(It.IsAny<string>(), It.IsAny<HttpContent>())).ReturnsAsync(httpResponseMessage);
             ComparisonBomData comparisonBomData = new ComparisonBomData
             {
@@ -843,8 +844,8 @@ namespace LCT.Services.UTest
                          ApiConstant.ApplicationJson);
             Components component = new Components() { Name = "Zone.js", Version = "1.0.0" };
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-            sw360ApiCommMock.Setup(x => x.GetReleaseById(It.IsAny<string>())).Throws<HttpRequestException>();
-            sw360ApiCommMock.Setup(x => x.UpdateRelease(It.IsAny<string>(), It.IsAny<HttpContent>())).Throws<HttpRequestException>();
+            sw360ApiCommMock.Setup(x => x.GetReleaseById(It.IsAny<string>(), It.IsAny<string>())).Throws<HttpRequestException>();
+            sw360ApiCommMock.Setup(x => x.UpdateRelease(It.IsAny<string>(), It.IsAny<HttpContent>(), It.IsAny<string>())).Throws<HttpRequestException>();
 
             // Act
             var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object);
@@ -865,8 +866,8 @@ namespace LCT.Services.UTest
                          ApiConstant.ApplicationJson);
             Components component = new Components() { Name = "Zone.js", Version = "1.0.0" };
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
-            sw360ApiCommMock.Setup(x => x.GetReleaseById(It.IsAny<string>())).Throws<AggregateException>();
-            sw360ApiCommMock.Setup(x => x.UpdateRelease(It.IsAny<string>(), It.IsAny<HttpContent>())).Throws<AggregateException>();
+            sw360ApiCommMock.Setup(x => x.GetReleaseById(It.IsAny<string>(), It.IsAny<string>())).Throws<AggregateException>();
+            sw360ApiCommMock.Setup(x => x.UpdateRelease(It.IsAny<string>(), It.IsAny<HttpContent>(), It.IsAny<string>())).Throws<AggregateException>();
 
             // Act
             var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object);
@@ -884,11 +885,13 @@ namespace LCT.Services.UTest
             mockFacade
                 .Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()))
                 .Throws<InvalidOperationException>();
+            Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
+            environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));
 
             var sw360CreatorService = new Sw360CreatorService(mockFacade.Object);
 
             // Act
-            var result = await sw360CreatorService.TriggerFossologyProcessForValidation("releaseId", "sw360link");
+            var result = await sw360CreatorService.TriggerFossologyProcessForValidation("releaseId", "sw360link", environmentHelperMock.Object);
 
             // Assert
             Assert.IsNull(result, "Expected result to be null when InvalidOperationException is thrown.");
@@ -902,11 +905,12 @@ namespace LCT.Services.UTest
             mockFacade
                 .Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()))
                 .Throws<UriFormatException>();
-
+            Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
+            environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));
             var sw360CreatorService = new Sw360CreatorService(mockFacade.Object);
 
             // Act
-            var result = await sw360CreatorService.TriggerFossologyProcessForValidation("releaseId", "sw360link");
+            var result = await sw360CreatorService.TriggerFossologyProcessForValidation("releaseId", "sw360link", environmentHelperMock.Object);
 
             // Assert
             Assert.IsNull(result, "Expected result to be null when UriFormatException is thrown.");
@@ -919,14 +923,36 @@ namespace LCT.Services.UTest
             mockFacade
                 .Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()))
                 .Throws<TaskCanceledException>();
+            Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
+            environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));
+            var sw360CreatorService = new Sw360CreatorService(mockFacade.Object);
+
+            // Act
+            var result = await sw360CreatorService.TriggerFossologyProcessForValidation("releaseId", "sw360link", environmentHelperMock.Object);
+
+            // Assert
+            Assert.IsNull(result, "Expected result to be null when TaskCanceledException is thrown.");
+        }
+        [Test]
+        public async Task TriggerFossologyProcessForValidation_ShouldLogErrorAndExit_WhenHttpRequestExceptionWithSpecificMessageIsThrown()
+        {
+            // Arrange
+            var mockFacade = new Mock<ISW360ApicommunicationFacade>();
+            var exceptionMessage = "500:Connection to Fossology server Failed.";
+            mockFacade
+                .Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()))
+                .Throws(new HttpRequestException(exceptionMessage));
+
+            var environmentHelperMock = new Mock<IEnvironmentHelper>();
+            environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));
 
             var sw360CreatorService = new Sw360CreatorService(mockFacade.Object);
 
             // Act
-            var result = await sw360CreatorService.TriggerFossologyProcessForValidation("releaseId", "sw360link");
+            var result = await sw360CreatorService.TriggerFossologyProcessForValidation("releaseId", "sw360link", environmentHelperMock.Object);
 
             // Assert
-            Assert.IsNull(result, "Expected result to be null when TaskCanceledException is thrown.");
+            Assert.IsNull(result, "Expected result to be null when HttpRequestException with specific message is thrown.");
         }
     }
 }

@@ -46,6 +46,7 @@ namespace LCT.Common
             }
             catch (Exception ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("Exception", "StartTelemetry()", ex, "");
                 Logger.Error($"An error occurred: {ex.Message}");
                 TrackException(ex);
                 environmentHelper.CallEnvironmentExit(-1);

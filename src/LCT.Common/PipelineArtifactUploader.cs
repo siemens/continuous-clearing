@@ -23,8 +23,8 @@ namespace LCT.Common
 
         public static void UploadArtifacts()
         {
-            UploadLogs();
             UploadBom();
+            UploadLogs();            
         }
 
         /// <summary>
@@ -38,12 +38,14 @@ namespace LCT.Common
                             && File.Exists(Log4Net.CatoolLogPath)
                             && Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") != "true")
             {
+                Logger.Debug("====================<<<<< Exit >>>>>====================");
                 LogManager.Shutdown();
                 Console.WriteLine($"##vso[artifact.upload containerfolder={LogContainerFolderName};artifactname={LogArtifactFolderName}]{Log4Net.CatoolLogPath}");
             }
             else if (envType == EnvironmentType.Unknown)
             {
                 Logger.Logger.Log(null, Level.Alert, $"Uploading of logs is not supported.", null);
+                Logger.Debug("====================<<<<< Exit >>>>>====================");
             }
 
         }

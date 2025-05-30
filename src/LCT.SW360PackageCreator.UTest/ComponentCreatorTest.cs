@@ -358,7 +358,7 @@ namespace LCT.SW360PackageCreator.UTest
             {
                 StatusCode = HttpStatusCode.OK
             };
-            sw360ApiCommunicationService.Setup(x => x.CreateRelease(It.IsAny<Releases>())).ReturnsAsync(responseMessage);
+            sw360ApiCommunicationService.Setup(x => x.CreateRelease(It.IsAny<Releases>(), It.IsAny<string>())).ReturnsAsync(responseMessage);
             var subjectUnderTest = new Sw360CreatorService(sw360ApiCommunicationService.Object);
             var result = subjectUnderTest.CreateReleaseForComponent(packageLockMapper, "811609589f3798e2345634bdd4013a60", attachmentURL);
             Assert.IsNotNull(result);

@@ -24,7 +24,7 @@ namespace LCT.APICommunications.UTest
             JfrogApicommunication jfrogApicommunication = new DebianJfrogAPICommunication("", "", repoCredentials, 100);
 
             //Assert
-            Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApicommunication.CopyFromRemoteRepo(new ComponentsToArtifactory()));
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApicommunication.CopyFromRemoteRepo(new ComponentsToArtifactory(),""));
         }
 
         [Test]
@@ -75,7 +75,7 @@ namespace LCT.APICommunications.UTest
             JfrogApicommunication jfrogApicommunication = new DebianJfrogAPICommunication("", "", repoCredentials, 100);
 
             //Assert
-            Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApicommunication.MoveFromRepo(new ComponentsToArtifactory()));
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApicommunication.MoveFromRepo(new ComponentsToArtifactory(), ""));
         }
     }
 
