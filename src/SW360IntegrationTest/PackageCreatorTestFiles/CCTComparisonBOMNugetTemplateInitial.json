@@ -206,6 +206,129 @@
           "value": ""
         }
       ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/System.Memory@4.5.4",
+      "publisher": "",
+      "name": "System.Memory",
+      "version": "4.5.4",
+      "hashes": [
+        {
+          "alg": "MD5",
+          "content": "8128dfe11ed0dc50447266386f9c60d7"
+        },
+        {
+          "alg": "SHA-1",
+          "content": "0743af83114163ee2aa87368401a8421b90dda73"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "dec0847f33b8823e4260672d97d657411461c00ada3107ec7bbcb32a845eeb91"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "GPL-2.0-only"
+          }
+        }
+      ],
+      "cpe": "",
+      "purl": "pkg:nuget/System.Memory@4.5.4",
+      "properties": [
+        {
+          "name": "syft:package:foundBy",
+          "value": "Testing Properties"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "TemplateAdded"
+        },
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "siparty-release-nuget-egll"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NUGET"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "System.Memory.4.5.4.nupkg"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "siparty-release-nuget-egll/System.Memory.4.5.4.nupkg"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/System.Text.Encoding@4.3.0",
+      "name": "System.Text.Encoding",
+      "version": "4.3.0",
+      "hashes": [
+        {
+          "alg": "MD5",
+          "content": "0ece90b64e8079b79c163fccd067647c"
+        },
+        {
+          "alg": "SHA-1",
+          "content": "b1b83606b6c1da0f167d881937472e3a91397518"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "19cb475462d901afebaa404d86c0469ec89674acafe950ee6d8a4692e3a404b8"
+        }
+      ],
+      "purl": "pkg:nuget/System.Text.Encoding@4.3.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NUGET"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": ""
+        }
+      ]
     }
   ],
   "dependencies": [
@@ -216,6 +339,17 @@
     {
       "ref": "pkg:nuget/SonarAnalyzer.CSharp@9.5.0.73987",
       "dependsOn": []
+    }
+  ],
+"compositions": [
+    {
+      "aggregate": "complete",
+      "assemblies": [
+        "pkg:nuget/dotnet-runtime@8.0.0"
+      ],
+      "dependencies": [
+        "pkg:nuget/System.Text.Encoding@4.3.0"
+      ]
     }
   ],
   "definitions": {

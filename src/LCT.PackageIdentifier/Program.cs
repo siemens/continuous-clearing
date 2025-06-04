@@ -18,14 +18,15 @@ using LCT.Services;
 using LCT.Services.Interface;
 using log4net;
 using log4net.Core;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Directory = System.IO.Directory;
-
 
 namespace LCT.PackageIdentifier
 {
@@ -39,28 +40,59 @@ namespace LCT.PackageIdentifier
 
         public static Stopwatch BomStopWatch { get; set; }
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();        
+        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
+
+        private readonly IFrameworkPackages _frameworkPackages;
+        private readonly ISettingsManager _settingsManager;
+        private readonly ICycloneDXBomParser _cycloneDXBomParser;
+        private readonly IBomCreator _bomCreator;
+
+        public Program(IFrameworkPackages frameworkPackages, ISettingsManager settingsManager, ICycloneDXBomParser cycloneDXBomParser, IBomCreator bomCreator)
+        {
+            _frameworkPackages = frameworkPackages;
+            _settingsManager = settingsManager;
+            _cycloneDXBomParser = cycloneDXBomParser;
+            _bomCreator = bomCreator;
+        }
         protected Program() { }
 
         static async Task Main(string[] args)
+        {
+            var serviceCollection = new ServiceCollection();
+            ConfigureServices(serviceCollection);
+
+            var serviceProvider = serviceCollection.BuildServiceProvider();
+
+            var program = serviceProvider.GetService<Program>();
+            await program.Run(args);
+        }
+
+        private static void ConfigureServices(IServiceCollection services)
+        {
+            services.AddTransient<IFrameworkPackages, FrameworkPackages>();
+            services.AddTransient<ISettingsManager, SettingsManager>();
+            services.AddTransient<ICycloneDXBomParser, CycloneDXBomParser>();
+            services.AddTransient<IBomCreator, BomCreator>();
+            services.AddTransient<Program>();
+            services.AddScoped<ICompositionBuilder, CompositionBuilder>();
+        }
+
+        public async Task Run(string[] args)
         {
             BomStopWatch = new Stopwatch();
             BomStopWatch.Start();
 
             if (!m_Verbose && CommonHelper.IsAzureDevOpsDebugEnabled())
                 m_Verbose = true;
-            ISettingsManager settingsManager = new SettingsManager();
+
+            CommonAppSettings appSettings = _settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
+            ProjectReleases projectReleases = new ProjectReleases();
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
-            CommonHelper.DefaultLogFolderInitialisation(FileConstant.BomCreatorLog, m_Verbose);
-            CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
-            
-            ProjectReleases projectReleases = new ProjectReleases();
+            string FolderPath = LogFolderInitialisation(appSettings);
 
-            string FolderPath = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.BomCreatorLog, m_Verbose);
-            Logger.Logger.Log(null, Level.Debug, $"log manager initiated folder path: {FolderPath}", null);
-            settingsManager.CheckRequiredArgsToRun(appSettings, "Identifer");
+            _settingsManager.CheckRequiredArgsToRun(appSettings, "Identifer");
 
             Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Package Identifier >>>>>====================", null);
             Logger.Logger.Log(null, Level.Notice, $"\nStart of Package Identifier execution: {DateTime.Now}", null);
@@ -88,16 +120,13 @@ namespace LCT.PackageIdentifier
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);
 
-            ICycloneDXBomParser cycloneDXBomParser = new CycloneDXBomParser();
-            IBomCreator bomCreator = new BomCreator(cycloneDXBomParser);
-            bomCreator.JFrogService = GetJfrogService(appSettings);
-            bomCreator.BomHelper = new BomHelper();
+            _bomCreator.JFrogService = GetJfrogService(appSettings);
+            _bomCreator.BomHelper = new BomHelper();
 
             //Validating JFrog Settings
-            if (await bomCreator.CheckJFrogConnection(appSettings))
+            if (await _bomCreator.CheckJFrogConnection(appSettings))
             {
-                await bomCreator.GenerateBom(appSettings, new BomHelper(), new FileOperations(), projectReleases,
-                                             caToolInformation);
+                await _bomCreator.GenerateBom(appSettings, new BomHelper(), new FileOperations(), projectReleases, caToolInformation);
             }
 
             if (appSettings?.Telemetry?.Enable == true)
@@ -108,7 +137,6 @@ namespace LCT.PackageIdentifier
             Logger.Logger.Log(null, Level.Notice, $"End of Package Identifier execution : {DateTime.Now}\n", null);
             // publish logs and bom file to pipeline artifact
             PipelineArtifactUploader.UploadArtifacts();
-
         }
 
         private static CatoolInfo GetCatoolVersionFromProjectfile()
@@ -122,18 +150,12 @@ namespace LCT.PackageIdentifier
 
         private static IJFrogService GetJfrogService(CommonAppSettings appSettings)
         {
-            if (appSettings == null)
-            {
-                Logger.Error("Application settings are missing. Please ensure the following:\n" +
-                     "1. Provide a valid settings file (e.g., appsettings.json) in the expected location.\n" +
-                     "2. Alternatively, pass the required configuration settings as inline arguments during application execution.");
-            }
             ArtifactoryCredentials artifactoryUpload = new ArtifactoryCredentials()
             {
-                Token = appSettings.Jfrog?.Token,
+                Token = appSettings?.Jfrog?.Token,
             };
             IJfrogAqlApiCommunication jfrogAqlApiCommunication =
-                new JfrogAqlApiCommunication(appSettings.Jfrog?.URL, artifactoryUpload, appSettings.TimeOut);
+                new JfrogAqlApiCommunication(appSettings?.Jfrog?.URL, artifactoryUpload, appSettings.TimeOut);
             IJfrogAqlApiCommunicationFacade jFrogApiCommunicationFacade =
                 new JfrogAqlApiCommunicationFacade(jfrogAqlApiCommunication);
             IJFrogService jFrogService = new JFrogService(jFrogApiCommunicationFacade);
@@ -156,6 +178,31 @@ namespace LCT.PackageIdentifier
             {
                 environmentHelper.CallEnvironmentExit(-1);
             }
-        }        
+        }
+
+        private static string LogFolderInitialisation(CommonAppSettings appSettings)
+        {
+            string FolderPath;
+            if (!string.IsNullOrEmpty(appSettings.Directory.LogFolder))
+            {
+                FolderPath = appSettings.Directory.LogFolder;
+                Log4Net.Init(FileConstant.BomCreatorLog, appSettings.Directory.LogFolder, m_Verbose);
+            }
+            else
+            {
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    FolderPath = FileConstant.LogFolder;
+                }
+                else
+                {
+                    FolderPath = "/var/log";
+                }
+
+                Log4Net.Init(FileConstant.BomCreatorLog, FolderPath, m_Verbose);
+            }
+
+            return FolderPath;
+        }
     }
 }
