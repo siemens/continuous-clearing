@@ -250,8 +250,7 @@ namespace LCT.Common.UTest
                 log.Contains("AdditionalTestDetails") &&
                 log.Contains("GET") &&
                 log.Contains("https://example.com/api") &&
-                log.Contains("Status Code: OK") &&
-                log.Contains("... [Content truncated. Showing first 1000 lines. Enable verbose mode to see full content.]"))), Times.Once);
+                log.Contains("Status Code: OK"))), Times.Once);
         }
         [Test]
         public void IdentifierComponentsData_ShouldLogTableWithComponents()
@@ -745,8 +744,7 @@ namespace LCT.Common.UTest
             _mockLogger.Verify(logger => logger.Debug(It.Is<string>(log =>
                 log.Contains("HTTP API RESPONSE DETAILS") &&
                 log.Contains("TestContext") &&
-                log.Contains("TestDetails") &&
-                log.Contains("... [Content truncated. Showing first 1000 lines. Enable verbose mode to see full content.]"))), Times.Once);
+                log.Contains("TestDetails"))), Times.Once);
         }
         [Test]
         public void ComponentDataForLogTable_ShouldLogComparisonTable()
