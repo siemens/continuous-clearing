@@ -33,6 +33,7 @@ namespace LCT.APICommunications.Model
         public string JfrogPackageName { get; set; }
         public string OperationType { get; set; }
         public string DryRunSuffix { get; set; }
+        public string JfrogRepoPath { get; set; }
         public HttpResponseMessage ResponseMessage { get; set; }
     }
 }

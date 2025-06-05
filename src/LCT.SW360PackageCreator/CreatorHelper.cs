@@ -53,7 +53,7 @@ namespace LCT.SW360PackageCreator
 
             foreach (ComparisonBomData comparionBomData in comparisionBomDataList)
             {
-                if (comparionBomData.DownloadUrl == Dataconstant.DownloadUrlNotFound || string.IsNullOrEmpty(comparionBomData.DownloadUrl))
+                if ((comparionBomData.DownloadUrl == Dataconstant.DownloadUrlNotFound || string.IsNullOrEmpty(comparionBomData.DownloadUrl)) && !comparionBomData.SourceAttachmentStatus)
                 {
                     comparionBomData.ReleaseID = string.IsNullOrEmpty(comparionBomData.ReleaseLink) ?
                         comparionBomData.ReleaseID : CommonHelper.GetSubstringOfLastOccurance(comparionBomData.ReleaseLink, "/");
@@ -264,6 +264,8 @@ namespace LCT.SW360PackageCreator
                 mapper.FossologyUploadStatus = GetFossologyUploadStatus(mapper.ApprovedStatus);
                 mapper.ReleaseAttachmentLink = string.Empty;
                 mapper.ReleaseLink = GetReleaseLink(componentsAvailableInSw360, item.Name, item.Version);
+                mapper.FossologyLink= releasesInfo?.AdditionalData?.TryGetValue("fossology url", out string fossologyUrl) == true ? fossologyUrl : string.Empty;
+                mapper.ReleaseCreatedBy = releasesInfo?.CreatedBy ?? string.Empty;
 
                 Logger.Debug($"Sw360 avilability status for Name " + mapper.Name + ":" + mapper.ComponentExternalId + "=" + mapper.ComponentStatus +
                     "-Version " + mapper.Version + ":" + mapper.ReleaseExternalId + "=" + mapper.ReleaseStatus);

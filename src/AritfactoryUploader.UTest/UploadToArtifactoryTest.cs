@@ -5,6 +5,7 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using LCT.APICommunications;
 using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.AQL;
 using LCT.ArtifactoryUploader;
@@ -113,7 +114,7 @@ namespace AritfactoryUploader.UTest
 
             jFrogServiceMock.Setup(x => x.GetNpmComponentDataByRepo(It.IsAny<string>())).ReturnsAsync(aqlResultList);
 
-            UploadToArtifactory.jFrogService = jFrogServiceMock.Object;
+            UploadToArtifactory.JFrogService = jFrogServiceMock.Object;
 
 
             // Act
@@ -188,7 +189,7 @@ namespace AritfactoryUploader.UTest
             DisplayPackagesInfo displayPackagesInfo = PackageUploadInformation.GetComponentsToBePackages();
 
             var jFrogServiceMock = new Mock<IJFrogService>();
-            UploadToArtifactory.jFrogService = jFrogServiceMock.Object;
+            UploadToArtifactory.JFrogService = jFrogServiceMock.Object;
 
             CommonAppSettings commonAppSettings = new CommonAppSettings();
             commonAppSettings.Jfrog = new Jfrog()
@@ -265,7 +266,7 @@ namespace AritfactoryUploader.UTest
             DisplayPackagesInfo displayPackagesInfo = PackageUploadInformation.GetComponentsToBePackages();
 
             var jFrogServiceMock = new Mock<IJFrogService>();
-            UploadToArtifactory.jFrogService = jFrogServiceMock.Object;
+            UploadToArtifactory.JFrogService = jFrogServiceMock.Object;
 
             foreach (var component in componentLists)
             {
@@ -358,7 +359,7 @@ namespace AritfactoryUploader.UTest
             jFrogServiceMock.Setup(x => x.GetPypiComponentDataByRepo(It.IsAny<string>())).ReturnsAsync(aqlResultList);
 
 
-            UploadToArtifactory.jFrogService = jFrogServiceMock.Object;
+            UploadToArtifactory.JFrogService = jFrogServiceMock.Object;
 
             // Act
             var result = await UploadToArtifactory.GetSrcRepoDetailsForComponent(item);
@@ -396,7 +397,7 @@ namespace AritfactoryUploader.UTest
 
             var jFrogServiceMock = new Mock<IJFrogService>();
             jFrogServiceMock.Setup(x => x.GetInternalComponentDataByRepo(It.IsAny<string>())).ReturnsAsync(aqlResultList);
-            UploadToArtifactory.jFrogService = jFrogServiceMock.Object;
+            UploadToArtifactory.JFrogService = jFrogServiceMock.Object;
 
             // Act
             var result = await UploadToArtifactory.GetSrcRepoDetailsForComponent(item);
@@ -415,13 +416,120 @@ namespace AritfactoryUploader.UTest
                 Purl = "unknown://example-package"
             };
             var jFrogServiceMock = new Mock<IJFrogService>();
-            UploadToArtifactory.jFrogService = jFrogServiceMock.Object;
+            UploadToArtifactory.JFrogService = jFrogServiceMock.Object;
 
             // Act
             var result = await UploadToArtifactory.GetSrcRepoDetailsForComponent(item);
 
             // Assert
             Assert.IsNull(result);
+        }
+        [Test]
+        public void GetJfrogRepPath_NpmComponent_ReturnsExpectedPath()
+        {
+            var component = new ComponentsToArtifactory
+            {
+                ComponentType = "NPM",
+                DestRepoName = "npm-repo",
+                Path = "package/path",
+                PypiOrNpmCompName = "my-npm-package"
+            };
+
+            var result = UploadToArtifactory.GetJfrogRepPath(component);
+
+            Assert.AreEqual("npm-repo/package/path/my-npm-package", result);
+        }
+
+        [Test]
+        public void GetJfrogRepPath_NugetComponent_ReturnsExpectedPath()
+        {
+            var component = new ComponentsToArtifactory
+            {
+                ComponentType = "NUGET",
+                DestRepoName = "nuget-repo",
+                Name = "MyNuget",
+                Version = "1.2.3"
+            };
+
+            var result = UploadToArtifactory.GetJfrogRepPath(component);
+
+            Assert.AreEqual($"nuget-repo/MyNuget.1.2.3{ApiConstant.NugetExtension}", result);
+        }
+
+        [Test]
+        public void GetJfrogRepPath_MavenComponent_ReturnsExpectedPath()
+        {
+            var component = new ComponentsToArtifactory
+            {
+                ComponentType = "MAVEN",
+                DestRepoName = "maven-repo",
+                Name = "my-maven",
+                Version = "2.0.0"
+            };
+
+            var result = UploadToArtifactory.GetJfrogRepPath(component);
+
+            Assert.AreEqual("maven-repo/my-maven/2.0.0", result);
+        }
+
+        [Test]
+        public void GetJfrogRepPath_PoetryComponent_ReturnsExpectedPath()
+        {
+            var component = new ComponentsToArtifactory
+            {
+                ComponentType = "POETRY",
+                DestRepoName = "poetry-repo",
+                PypiOrNpmCompName = "my-poetry"
+            };
+
+            var result = UploadToArtifactory.GetJfrogRepPath(component);
+
+            Assert.AreEqual("poetry-repo/my-poetry", result);
+        }
+
+        [Test]
+        public void GetJfrogRepPath_ConanComponent_ReturnsExpectedPath()
+        {
+            var component = new ComponentsToArtifactory
+            {
+                ComponentType = "CONAN",
+                DestRepoName = "conan-repo",
+                Path = "conan/path"
+            };
+
+            var result = UploadToArtifactory.GetJfrogRepPath(component);
+
+            Assert.AreEqual("conan-repo/conan/path", result);
+        }
+
+        [Test]
+        public void GetJfrogRepPath_DebianComponent_ReturnsExpectedPath()
+        {
+            var component = new ComponentsToArtifactory
+            {
+                ComponentType = "DEBIAN",
+                DestRepoName = "debian-repo",
+                Path = "debian/path",
+                Name = "my-deb",
+                Version = "1.0.0"
+            };
+
+            var result = UploadToArtifactory.GetJfrogRepPath(component);
+
+            Assert.AreEqual("debian-repo/debian/path/my-deb_1.0.0*", result);
+        }
+
+        [Test]
+        public void GetJfrogRepPath_UnknownComponent_ReturnsEmptyString()
+        {
+            var component = new ComponentsToArtifactory
+            {
+                ComponentType = "UNKNOWN"
+            };
+
+            var result = UploadToArtifactory.GetJfrogRepPath(component);
+
+            Assert.AreEqual(string.Empty, result);
         }
         private static List<Component> GetComponentList()
         {
