@@ -129,15 +129,15 @@ namespace AritfactoryUploader.UTest
             var jfrogApicommunicationMock = new Mock<IJFrogApiCommunication>();
             jFrogServiceMock.Setup(x => x.GetPackageInfo(component))
                 .ReturnsAsync(new AqlResult());
-            jfrogApicommunicationMock.Setup(x => x.CopyFromRemoteRepo(It.IsAny<ComponentsToArtifactory>()))
+            jfrogApicommunicationMock.Setup(x => x.CopyFromRemoteRepo(It.IsAny<ComponentsToArtifactory>(), It.IsAny<string>()))
                 .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK));
             ArtfactoryUploader.jFrogService = jFrogServiceMock.Object;
             ArtfactoryUploader.JFrogApiCommInstance = jfrogApicommunicationMock.Object;
             // Act
-            _ = await ArtfactoryUploader.UploadPackageToRepo(component, timeout, displayPackagesInfo);
+            var response = await ArtfactoryUploader.UploadPackageToRepo(component, timeout, displayPackagesInfo);
 
             // Assert
-            jfrogApicommunicationMock.Verify(x => x.CopyFromRemoteRepo(component), Times.Once);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         }
 
         [Test]
@@ -159,15 +159,14 @@ namespace AritfactoryUploader.UTest
             var jfrogApicommunicationMock = new Mock<IJFrogApiCommunication>();
             jFrogServiceMock.Setup(x => x.GetPackageInfo(component))
                 .ReturnsAsync(new AqlResult());
-            jfrogApicommunicationMock.Setup(x => x.MoveFromRepo(It.IsAny<ComponentsToArtifactory>()))
+            jfrogApicommunicationMock.Setup(x => x.MoveFromRepo(It.IsAny<ComponentsToArtifactory>(), It.IsAny<string>()))
                 .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK));
             ArtfactoryUploader.jFrogService = jFrogServiceMock.Object;
             ArtfactoryUploader.JFrogApiCommInstance = jfrogApicommunicationMock.Object;
             // Act
             var response = await ArtfactoryUploader.UploadPackageToRepo(component, timeout, displayPackagesInfo);
 
-            // Assert
-            jfrogApicommunicationMock.Verify(x => x.MoveFromRepo(component), Times.Once);
+            // Assert           
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         }
 

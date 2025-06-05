@@ -9,6 +9,8 @@ using LCT.Common.Constants;
 using LCT.Common.Interface;
 using LCT.Common.Model;
 using log4net;
+using log4net.Appender;
+using log4net.Config;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -24,6 +26,7 @@ namespace LCT.Common.UTest
         private string tempDir;
         private string tempLogFile;
         private CommonAppSettings appSettings;
+        private MemoryAppender memoryAppender;
         [SetUp]
         public void SetUp()
         {
@@ -45,6 +48,9 @@ namespace LCT.Common.UTest
             // Set the static log path for the test
             Log4Net.CatoolLogPath = tempLogFile;
             CommonHelper.DefaultLogPath = "default";
+            memoryAppender = new MemoryAppender();
+            LogManager.GetRepository().ResetConfiguration();
+            BasicConfigurator.Configure(memoryAppender);
         }
 
         [TearDown]
@@ -58,7 +64,7 @@ namespace LCT.Common.UTest
         public void LogFolderInitialisation_WhenLogFileExists_CopiesLogAndReturnsFolder()
         {
             // Act
-            string result = CommonHelper.LogFolderInitialisation(appSettings, "catool.log", false);
+            string result = CommonHelper.LogFolderInitialization(appSettings, "catool.log", false);
 
             // Assert
             Assert.AreEqual(tempDir, result);
@@ -70,7 +76,7 @@ namespace LCT.Common.UTest
             Log4Net.CatoolLogPath = "C:\\catool\\fds.log";
 
             // Act
-            string result = CommonHelper.LogFolderInitialisation(appSettings, "catool.log", false);
+            string result = CommonHelper.LogFolderInitialization(appSettings, "catool.log", false);
 
             // Assert
             Assert.IsNotEmpty(result);
@@ -156,36 +162,48 @@ namespace LCT.Common.UTest
         }
 
         [Test]
-        public void CheckNullOrEmpty_WhenValueIsNull_ThrowsArgumentException()
+        public void CheckNullOrEmpty_WhenValueIsNull_LogsError()
         {
             // Arrange
             string name = "TestName";
             string value = null;
 
-            // Act & Assert
-            Assert.Throws<ArgumentException>(() => CommonHelper.CheckNullOrEmpty(name, value));
+            // Act
+            CommonHelper.CheckNullOrEmpty(name, value);
+
+            // Assert
+            var logEvents = memoryAppender.GetEvents();
+            Assert.IsTrue(logEvents.Any(e => e.RenderedMessage.Contains($"The provided value for '{name}' is null, empty, or whitespace.")));
         }
 
         [Test]
-        public void CheckNullOrEmpty_WhenValueIsEmpty_ThrowsArgumentException()
+        public void CheckNullOrEmpty_WhenValueIsEmpty_LogsError()
         {
             // Arrange
             string name = "TestName";
             string value = "";
 
-            // Act & Assert
-            Assert.Throws<ArgumentException>(() => CommonHelper.CheckNullOrEmpty(name, value));
+            // Act
+            CommonHelper.CheckNullOrEmpty(name, value);
+
+            // Assert
+            var logEvents = memoryAppender.GetEvents();
+            Assert.IsTrue(logEvents.Any(e => e.RenderedMessage.Contains($"The provided value for '{name}' is null, empty, or whitespace.")));
         }
 
         [Test]
-        public void CheckNullOrEmpty_WhenValueIsWhiteSpace_ThrowsArgumentException()
+        public void CheckNullOrEmpty_WhenValueIsWhiteSpace_LogsError()
         {
             // Arrange
             string name = "TestName";
             string value = "   ";
 
-            // Act & Assert
-            Assert.Throws<ArgumentException>(() => CommonHelper.CheckNullOrEmpty(name, value));
+            // Act
+            CommonHelper.CheckNullOrEmpty(name, value);
+
+            // Assert
+            var logEvents = memoryAppender.GetEvents();
+            Assert.IsTrue(logEvents.Any(e => e.RenderedMessage.Contains($"The provided value for '{name}' is null, empty, or whitespace.")));
         }
 
         [Test]
@@ -515,7 +533,7 @@ namespace LCT.Common.UTest
           
 
             // Act
-            CommonHelper.DefaultLogFolderInitialisation(logFileName, m_Verbose);
+            CommonHelper.DefaultLogFolderInitialization(logFileName, m_Verbose);
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
@@ -526,7 +544,38 @@ namespace LCT.Common.UTest
                 Assert.AreEqual("/var/log", CommonHelper.DefaultLogPath);
             }               
             
-        }       
+        }
+        [TestCase]
+        public void IdentifyExcludedComponents_ReturnsUpdatedBom()
+        {
+            //Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string csprojfilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
+            string[] Excludes = null;
+            int noOfExcludedComponents = 0;
+            Bom bom = new Bom();
+            bom.Components = new List<Component>();
+
+            IFolderAction folderAction = new FolderAction();
+            IFileOperations fileOperations = new FileOperations();
+            CommonAppSettings commonAppSettings = new CommonAppSettings(folderAction, fileOperations)
+            {
+                Nuget = new Config() { Exclude = Excludes },
+                SW360 = new SW360() { ExcludeComponents = new List<string>() },
+                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                {
+                    InputFolder = csprojfilepath
+                }
+            };
+
+            //Act
+            Bom updatedBom = CommonHelper.IdentifyExcludedComponents(commonAppSettings, bom,ref noOfExcludedComponents);
+
+            //Assert
+            Assert.AreEqual(0, updatedBom.Components.Count, "Zero component excluded");
+
+        }
     }
 
     public class TestObject

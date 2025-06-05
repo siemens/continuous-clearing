@@ -4,6 +4,7 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using LCT.Common;
 using LCT.Common.Constants;
 using LCT.SW360PackageCreator.Interfaces;
 using log4net;
@@ -36,12 +37,13 @@ namespace LCT.SW360PackageCreator
         /// <returns>string</returns>
         string IRepository.IdentifyRepoURLForGit(string url, string componentName)
         {
-            Logger.Debug($"Repository.IdentifyRepoURLForGitHub():Start");
+            Logger.Debug($"Repository.IdentifyRepoURLForGit(): Start identifying Repo url for git - ComponentName: {componentName}, URL: {url}");
             string downloadUrl = string.Empty;
             string repoName = GetRepoName(url);
 
             if (string.IsNullOrEmpty(repoName))
             {
+                Logger.Debug($"Repository.IdentifyRepoURLForGit(): Repository name could not be identified for ComponentName: {componentName}, URL: {url}");
                 return downloadUrl;
             }
 
@@ -55,27 +57,29 @@ namespace LCT.SW360PackageCreator
             catch (ArgumentOutOfRangeException ex)
             {
                 Environment.ExitCode = -1;
+                LogHandlingHelper.ExceptionErrorHandling("IdentifyRepoURLForGit", $"MethodName:IdentifyRepoURLForGit(), ComponentName: {componentName}, URL: {url}", ex, "An error occurred while identifying the repository URL. The URL format might be invalid.");
                 Logger.Error($"Repository.IdentifyRepoURLForGitHub():{componentName}-{url}", ex);
             }
 
-            Logger.Debug($"Repository.IdentifyRepoURLForGitHub():End");
+            Logger.Debug($"Repository.IdentifyRepoURLForGit(): Completed identifying Repo url for git - ComponentName: {componentName}, final updated Download URL: {downloadUrl}");
             return downloadUrl;
         }
 
         public string FormGitCloneUrl(string url, string componentName, string version)
         {
-            Logger.Debug($"FormGitCloneUrl():Start");
+            Logger.Debug($"FormGitCloneUrl(): Start - ComponentName: {componentName}, Version: {version}, URL: {url}");
             string downloadUrl = Dataconstant.DownloadUrlNotFound;
 
             if (string.IsNullOrEmpty(url) || url == Dataconstant.SourceUrlNotFound)
             {
+                Logger.Debug($"FormGitCloneUrl(): URL is either null or marked as not found for ComponentName: {componentName}, Version: {version}");
                 return downloadUrl;
             }
 
             string cloneUrl = url.TrimEnd('/');
             downloadUrl = $"{cloneUrl}.git";
 
-            Logger.Debug($"FormGitCloneUrl():End");
+            Logger.Debug($"FormGitCloneUrl(): End - ComponentName: {componentName}, Version: {version}, Resolved Clone URL: {downloadUrl}");
             return downloadUrl;
         }
 

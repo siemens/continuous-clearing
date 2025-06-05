@@ -42,6 +42,7 @@ namespace LCT.PackageIdentifier
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
         private const string Requires = "requires";
         private const string Name = "name";
+        private List<Component> listOfInternalComponents = new List<Component>();
         public NpmProcessor(ICycloneDXBomParser cycloneDXBomParser)
         {
             _cycloneDXBomParser = cycloneDXBomParser;
@@ -49,6 +50,7 @@ namespace LCT.PackageIdentifier
 
         public Bom ParsePackageFile(CommonAppSettings appSettings)
         {
+            Logger.Debug("ParsePackageFile():Starting to parse the package file for NPM components.");
             List<Component> componentsForBOM = new List<Component>();
             Bom bom = new Bom();
             List<Dependency> dependencies = new List<Dependency>();
@@ -71,7 +73,7 @@ namespace LCT.PackageIdentifier
             bom.Dependencies = dependencies;
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
             bom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(bom.Components, bom.Dependencies);
-            Logger.Debug($"ParsePackageFile():End");
+            Logger.Debug($"ParsePackageFile():Completed parsing the package file for NPM components.\n");
             return bom;
         }
 
@@ -120,17 +122,20 @@ namespace LCT.PackageIdentifier
             catch (JsonReaderException ex)
             {
                 Environment.ExitCode = -1;
-                Logger.Error($"ParsePackageFile():", ex);
+                LogHandlingHelper.ExceptionErrorHandling("JsonReaderException", "ParsePackageLockJson()", ex, $"File Path: {filepath}");
+                Logger.Error($"Failed to parse JSON file. File Path: {filepath}. Details: {ex.Message}");
             }
             catch (IOException ex)
             {
                 Environment.ExitCode = -1;
-                Logger.Error($"ParsePackageFile():", ex);
+                LogHandlingHelper.ExceptionErrorHandling("IOException", "ParsePackageLockJson()", ex, $"File Path: {filepath}");
+                Logger.Error($"IO error occurred while processing the file. File Path: {filepath}. Details: {ex.Message}");
             }
             catch (SecurityException ex)
             {
                 Environment.ExitCode = -1;
-                Logger.Error($"ParsePackageFile():", ex);
+                LogHandlingHelper.ExceptionErrorHandling("SecurityException", "ParsePackageLockJson()", ex, $"File Path: {filepath}");
+                Logger.Error($"Security error occurred while accessing the file. File Path: {filepath}. Details: {ex.Message}");
             }
 
             return lstComponentForBOM;
@@ -370,6 +375,7 @@ namespace LCT.PackageIdentifier
             ComponentIdentification componentData, CommonAppSettings appSettings,
             IJFrogService jFrogService, IBomHelper bomhelper)
         {
+            Logger.Debug("IdentificationOfInternalComponents(): Starting identification of internal components.");
             // get the  component list from Jfrog for given repo
             List<AqlResult> aqlResultList =
                 await bomhelper.GetNpmListOfComponentsFromRepo(appSettings.Npm.Artifactory.InternalRepos, jFrogService);
@@ -383,36 +389,22 @@ namespace LCT.PackageIdentifier
             {
                 var currentIterationItem = component;
                 bool isTrue = IsInternalNpmComponent(aqlResultList, currentIterationItem, bomhelper);
-                if (currentIterationItem.Properties?.Count == null || currentIterationItem.Properties?.Count <= 0)
-                {
-                    currentIterationItem.Properties = new List<Property>();
-                }
-
-                Property isInternal = new() { Name = Dataconstant.Cdx_IsInternal, Value = "false" };
-                if (isTrue)
-                {
-                    internalComponents.Add(currentIterationItem);
-                    isInternal.Value = "true";
-                }
-                else
-                {
-                    isInternal.Value = "false";
-                }
-
-                currentIterationItem.Properties.Add(isInternal);
-                internalComponentStatusUpdatedList.Add(currentIterationItem);
+                bomhelper.ProcessSingleInternalComponent(currentIterationItem, isTrue, internalComponents, internalComponentStatusUpdatedList);
             }
 
             // update the comparision bom data
             componentData.comparisonBOMData = internalComponentStatusUpdatedList;
             componentData.internalComponents = internalComponents;
-
+            listOfInternalComponents = internalComponents;
+            Logger.Debug($"IdentificationOfInternalComponents(): identified internal components:{internalComponents.Count}.");
+            Logger.Debug($"IdentificationOfInternalComponents(): Completed identification of internal components.\n");
             return componentData;
         }
 
         public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM,
             CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
+            Logger.Debug("GetJfrogRepoDetailsOfAComponent():Starting to retrieve JFrog repository details for components.\n");
             // get the  component list from Jfrog for given repo + internal repo
             string[] repoList = CommonHelper.GetRepoList(appSettings);
             List<AqlResult> aqlResultList = await bomhelper.GetNpmListOfComponentsFromRepo(repoList, jFrogService);
@@ -460,6 +452,7 @@ namespace LCT.PackageIdentifier
                     BomCreator.bomKpiData.UnofficialComponents++;
                 }
 
+
                 if (componentVal.Properties?.Count == null || componentVal.Properties?.Count <= 0)
                 {
                     componentVal.Properties = new List<Property>();
@@ -468,51 +461,12 @@ namespace LCT.PackageIdentifier
                 componentVal.Properties.Add(projectType);
                 componentVal.Properties.Add(siemensfileNameProp);
                 componentVal.Properties.Add(jfrogRepoPathProp);
-                componentVal.Description = null;
-                if (hashes != null)
-                {
-                    componentVal.Hashes = new List<Hash>()
-                {
-
-                new()
-                 {
-                  Alg = Hash.HashAlgorithm.MD5,
-                  Content = hashes.MD5
-                },
-                new()
-                {
-                  Alg = Hash.HashAlgorithm.SHA_1,
-                  Content = hashes.SHA1
-                 },
-                 new()
-                 {
-                  Alg = Hash.HashAlgorithm.SHA_256,
-                  Content = hashes.SHA256
-                  }
-                  };
-
-                }
-                modifiedBOM.Add(componentVal);
+                bomhelper.ProcessComponentHashes(componentVal, hashes, modifiedBOM);
             }
+            LogHandlingHelper.IdentifierComponentsData(componentsForBOM, listOfInternalComponents);
 
+            Logger.Debug("GetJfrogRepoDetailsOfAComponent():Completed retrieving JFrog repository details for components.\n");
             return modifiedBOM;
-        }
-
-        public static Bom RemoveExcludedComponents(CommonAppSettings appSettings, Bom cycloneDXBOM)
-        {
-            List<Component> componentForBOM = cycloneDXBOM.Components.ToList();
-            List<Dependency> dependenciesForBOM = cycloneDXBOM.Dependencies?.ToList() ?? new List<Dependency>();
-            int noOfExcludedComponents = 0;
-            if (appSettings?.SW360?.ExcludeComponents != null)
-            {
-                componentForBOM = CommonHelper.RemoveExcludedComponents(componentForBOM, appSettings.SW360.ExcludeComponents, ref noOfExcludedComponents);
-                dependenciesForBOM = CommonHelper.RemoveInvalidDependenciesAndReferences(componentForBOM, dependenciesForBOM);
-                BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents;
-
-            }
-            cycloneDXBOM.Components = componentForBOM;
-            cycloneDXBOM.Dependencies = dependenciesForBOM;
-            return cycloneDXBOM;
         }
 
         private void ParsingInputFileForBOM(CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom, ref List<Dependency> dependencies)
@@ -525,28 +479,32 @@ namespace LCT.PackageIdentifier
                 if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     listOfTemplateBomfilePaths.Add(filepath);
+                    Logger.Debug($"Template BOM file detected: {filepath}");
                 }
-                Logger.Debug($"ParsingInputFileForBOM():FileName: " + filepath);
 
                 if (filepath.EndsWith(FileConstant.CycloneDXFileExtension))
                 {
                     if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                     {
-                        Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
+                        Logger.Debug($"ParsingInputFileForBOM():CycloneDX file detected: {filepath}");
                         bom = ParseCycloneDXBom(filepath);
-                        bom = RemoveExcludedComponents(appSettings, bom);
+                        int noOfExcludedComponents = 0;
+                        bom = CommonHelper.IdentifyExcludedComponents(appSettings, bom, ref noOfExcludedComponents);
+                        BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents;
                         CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
                         AddingIdentifierType(bom.Components, "CycloneDXFile");
                         componentsForBOM.AddRange(bom.Components);
                         dependencies = bom.Dependencies;
+                        LogHandlingHelper.IdentifierInputFileComponents(filepath, bom.Components);
                     }
                 }
                 else
                 {
-                    Logger.Debug($"ParsingInputFileForBOM():Found as Package File");
+                    Logger.Debug($"ParsingInputFileForBOM():Package file detected: {filepath}");
                     var components = ParsePackageLockJson(filepath, appSettings);
                     AddingIdentifierType(components, "PackageFile");
                     componentsForBOM.AddRange(components);
+                    LogHandlingHelper.IdentifierInputFileComponents(filepath, components);
                 }
             }
             string templateFilePath = SbomTemplate.GetFilePathForTemplate(listOfTemplateBomfilePaths);
@@ -559,12 +517,14 @@ namespace LCT.PackageIdentifier
 
         public static void GetdependencyDetails(List<Component> componentsForBOM, List<Dependency> dependencies)
         {
+            Logger.Debug("GetdependencyDetails(): Starting dependency extraction process.");
             List<Dependency> dependencyList = new();
 
             foreach (var component in componentsForBOM)
             {
                 if ((component.Manufacturer?.BomRef?.Split(",")) != null)
                 {
+                    Logger.Debug($"GetdependencyDetails():Processing component for dependency extraction: [Name: {component.Name}, Version: {component.Version}, PURL: {component.Purl}, Author(s): {component.Manufacturer?.BomRef}]");
                     List<Dependency> subDependencies = new();
                     foreach (var item in (component.Manufacturer?.BomRef?.Split(",")).Where(item => item.Contains(':')))
                     {
@@ -596,7 +556,7 @@ namespace LCT.PackageIdentifier
                         Ref = component.Purl,
                         Dependencies = subDependencies
                     };
-
+                    Logger.Debug($"GetdependencyDetails():Final Dependency for Component: Ref = {dependency.Ref}, Sub-Dependencies = [{string.Join(", ", dependency.Dependencies.Select(d => d.Ref))}]\n");
                     dependencyList.Add(dependency);
 
                     component.Manufacturer = null;
@@ -605,6 +565,7 @@ namespace LCT.PackageIdentifier
                 component.Manufacturer = null;
             }
             dependencies.AddRange(dependencyList);
+            Logger.Debug("GetdependencyDetails(): Completed dependency extraction process.");
         }
 
         private static string StringFormat(string componentInfo)
@@ -718,7 +679,6 @@ namespace LCT.PackageIdentifier
                 if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["NPM"]))
                 {
                     components.Add(componentsInfo);
-                    Logger.Debug($"GetExcludedComponentsList():ValidComponent For NPM : Component Details : {componentsInfo.Name} @ {componentsInfo.Version} @ {componentsInfo.Purl}");
                 }
                 else
                 {

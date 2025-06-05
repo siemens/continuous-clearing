@@ -30,7 +30,7 @@ namespace LCT.APICommunications
             TimeoutInSec = timeout;
         }
 
-        private static HttpClient GetHttpClient(ArtifactoryCredentials credentials)
+        protected virtual HttpClient GetHttpClient(ArtifactoryCredentials credentials)
         {
             var handler = new RetryHttpClientHandler()
             {
@@ -55,9 +55,9 @@ namespace LCT.APICommunications
 
         public abstract Task<HttpResponseMessage> GetPackageInfo(ComponentsToArtifactory component);
 
-        public abstract Task<HttpResponseMessage> CopyFromRemoteRepo(ComponentsToArtifactory component);
+        public abstract Task<HttpResponseMessage> CopyFromRemoteRepo(ComponentsToArtifactory component, string correlationId);
 
-        public abstract Task<HttpResponseMessage> MoveFromRepo(ComponentsToArtifactory component);
+        public abstract Task<HttpResponseMessage> MoveFromRepo(ComponentsToArtifactory component, string correlationId);
 
         public abstract void UpdatePackagePropertiesInJfrog(string sw360releaseUrl, string destRepoName, UploadArgs uploadArgs);
 

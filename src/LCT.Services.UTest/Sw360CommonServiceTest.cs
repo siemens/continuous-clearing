@@ -54,7 +54,7 @@ namespace LCT.Services.UTest
 
             Mock<ISW360ApicommunicationFacade> sw360ApiCommunicationFacade = new();
             sw360ApiCommunicationFacade.Setup(
-                x => x.GetComponentByExternalId(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
+                x => x.GetComponentByExternalId(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
 
             // Act
             ISW360CommonService sW360CommonService = new SW360CommonService(sw360ApiCommunicationFacade.Object);
@@ -70,7 +70,7 @@ namespace LCT.Services.UTest
             // Arrange
             Mock<ISW360ApicommunicationFacade> sw360ApiCommunicationFacade = new();
             sw360ApiCommunicationFacade.Setup(
-                x => x.GetComponentByExternalId(It.IsAny<string>(), It.IsAny<string>())).Throws<HttpRequestException>();
+                x => x.GetComponentByExternalId(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Throws<HttpRequestException>();
 
             // Act
             ISW360CommonService sW360CommonService = new SW360CommonService(sw360ApiCommunicationFacade.Object);
@@ -86,7 +86,7 @@ namespace LCT.Services.UTest
             // Arrange
             Mock<ISW360ApicommunicationFacade> sw360ApiCommunicationFacade = new();
             sw360ApiCommunicationFacade.Setup(
-                x => x.GetComponentByExternalId(It.IsAny<string>(), It.IsAny<string>())).Throws<AggregateException>();
+                x => x.GetComponentByExternalId(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Throws<AggregateException>();
 
             // Act
             ISW360CommonService sW360CommonService = new SW360CommonService(sw360ApiCommunicationFacade.Object);
@@ -125,7 +125,7 @@ namespace LCT.Services.UTest
 
             Mock<ISW360ApicommunicationFacade> sw360ApiCommunicationFacade = new();
             sw360ApiCommunicationFacade.Setup(
-                x => x.GetReleaseByExternalId(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
+                x => x.GetReleaseByExternalId(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
 
             // Act
             ISW360CommonService sW360CommonService = new SW360CommonService(sw360ApiCommunicationFacade.Object);
@@ -142,7 +142,7 @@ namespace LCT.Services.UTest
 
             Mock<ISW360ApicommunicationFacade> sw360ApiCommunicationFacade = new();
             sw360ApiCommunicationFacade.Setup(
-                x => x.GetReleaseByExternalId(It.IsAny<string>(), It.IsAny<string>())).Throws<HttpRequestException>();
+                x => x.GetReleaseByExternalId(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Throws<HttpRequestException>();
 
             // Act
             ISW360CommonService sW360CommonService = new SW360CommonService(sw360ApiCommunicationFacade.Object);
@@ -159,7 +159,7 @@ namespace LCT.Services.UTest
 
             Mock<ISW360ApicommunicationFacade> sw360ApiCommunicationFacade = new();
             sw360ApiCommunicationFacade.Setup(
-                x => x.GetReleaseByExternalId(It.IsAny<string>(), It.IsAny<string>())).Throws<AggregateException>();
+                x => x.GetReleaseByExternalId(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Throws<AggregateException>();
 
             // Act
             ISW360CommonService sW360CommonService = new SW360CommonService(sw360ApiCommunicationFacade.Object);
@@ -176,7 +176,7 @@ namespace LCT.Services.UTest
             var releaseIdOfComponentSerialized = JsonConvert.SerializeObject(releaseIdOfComponent);
             Mock<ISW360ApicommunicationFacade> sw360ApiCommunicationFacade = new();
             sw360ApiCommunicationFacade.Setup(
-                x => x.GetReleaseOfComponentById(It.IsAny<string>())).ReturnsAsync(releaseIdOfComponentSerialized);
+                x => x.GetReleaseOfComponentById(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(releaseIdOfComponentSerialized);
 
             // Act
             ISW360CommonService sW360CommonService = new SW360CommonService(sw360ApiCommunicationFacade.Object);
@@ -192,7 +192,7 @@ namespace LCT.Services.UTest
             // Arrange
             Mock<ISW360ApicommunicationFacade> sw360ApiCommunicationFacade = new();
             sw360ApiCommunicationFacade.Setup(
-                x => x.GetReleaseOfComponentById(It.IsAny<string>())).Throws<HttpRequestException>();
+                x => x.GetReleaseOfComponentById(It.IsAny<string>(), It.IsAny<string>())).Throws<HttpRequestException>();
 
             // Act
             ISW360CommonService sW360CommonService = new SW360CommonService(sw360ApiCommunicationFacade.Object);
@@ -208,7 +208,7 @@ namespace LCT.Services.UTest
             // Arrange
             Mock<ISW360ApicommunicationFacade> sw360ApiCommunicationFacade = new();
             sw360ApiCommunicationFacade.Setup(
-                x => x.GetReleaseOfComponentById(It.IsAny<string>())).Throws<AggregateException>();
+                x => x.GetReleaseOfComponentById(It.IsAny<string>(), It.IsAny<string>())).Throws<AggregateException>();
 
             // Act
             ISW360CommonService sW360CommonService = new SW360CommonService(sw360ApiCommunicationFacade.Object);

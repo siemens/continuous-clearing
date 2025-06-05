@@ -146,22 +146,22 @@ namespace LCT.SW360PackageCreator.UTest
                     }
                 }
             };
-
+            var environmentHelper = new EnvironmentHelper();
             var triggerStatusResponse = JsonConvert.SerializeObject(fossTriggerStatus);
 
-            mockISW360ApicommunicationFacade.Setup(x => x.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(new HttpResponseMessage
+            mockISW360ApicommunicationFacade.Setup(x => x.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>())).ReturnsAsync(new HttpResponseMessage
             {
                 Content = new StringContent(responseBody)
             });
 
             mockISW360ApicommunicationFacade.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(triggerStatusResponse);
 
-            mockISw360CreatorService.Setup(x => x.TriggerFossologyProcessForValidation(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(fossTriggerStatus);
+            mockISw360CreatorService.Setup(x => x.TriggerFossologyProcessForValidation(It.IsAny<string>(), It.IsAny<string>(), environmentHelper)).ReturnsAsync(fossTriggerStatus);
 
             // Act
             await CreatorValidator.TriggerFossologyValidation(appSettings, mockISW360ApicommunicationFacade.Object,mockEnvironmentHelper.Object);
             // Assert
-            mockISW360ApicommunicationFacade.Verify(x => x.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>()), Times.Once);
+            mockISW360ApicommunicationFacade.Verify(x => x.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()), Times.Once);
             mockISW360ApicommunicationFacade.Verify(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
         [Test]
@@ -318,7 +318,7 @@ namespace LCT.SW360PackageCreator.UTest
 
             // Arrange
             mockISW360ApicommunicationFacade
-                .Setup(facade => facade.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>()))
+                .Setup(facade => facade.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ThrowsAsync(new AggregateException("Test exception"));
 
             // Act
@@ -355,7 +355,7 @@ namespace LCT.SW360PackageCreator.UTest
             };
 
             mockISW360ApicommunicationFacade
-                .Setup(facade => facade.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>()))
+                .Setup(facade => facade.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ReturnsAsync(mockResponse);
             var mockEnvironmentHelper = new Mock<IEnvironmentHelper>();
             // Act
@@ -380,7 +380,7 @@ namespace LCT.SW360PackageCreator.UTest
             };
 
             mockISW360ApicommunicationFacade
-                .Setup(facade => facade.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>()))
+                .Setup(facade => facade.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ReturnsAsync((HttpResponseMessage)null); // Simulate null response
 
             var mockEnvironmentHelper = new Mock<IEnvironmentHelper>();
@@ -421,7 +421,7 @@ namespace LCT.SW360PackageCreator.UTest
             };
 
             mockISW360ApicommunicationFacade
-                .Setup(facade => facade.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>()))
+                .Setup(facade => facade.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ReturnsAsync(mockResponse);
             var mockEnvironmentHelper = new Mock<IEnvironmentHelper>();
             // Act
@@ -447,7 +447,7 @@ namespace LCT.SW360PackageCreator.UTest
             };
 
             mockISW360ApicommunicationFacade
-                .Setup(facade => facade.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>()))
+                .Setup(facade => facade.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ThrowsAsync(new HttpRequestException("Test HttpRequestException"));
             var mockEnvironmentHelper = new Mock<IEnvironmentHelper>();
             // Act
@@ -472,7 +472,7 @@ namespace LCT.SW360PackageCreator.UTest
             };
 
             mockISW360ApicommunicationFacade
-                .Setup(facade => facade.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>()))
+                .Setup(facade => facade.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ThrowsAsync(new InvalidOperationException("Test InvalidOperationException"));
             var mockEnvironmentHelper = new Mock<IEnvironmentHelper>();
             // Act
@@ -496,7 +496,7 @@ namespace LCT.SW360PackageCreator.UTest
             };
 
             mockISW360ApicommunicationFacade
-                .Setup(facade => facade.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>()))
+                .Setup(facade => facade.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ThrowsAsync(new UriFormatException("Test UriFormatException"));
             var mockEnvironmentHelper = new Mock<IEnvironmentHelper>();
             // Act
@@ -520,7 +520,7 @@ namespace LCT.SW360PackageCreator.UTest
             };
 
             mockISW360ApicommunicationFacade
-                .Setup(facade => facade.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>()))
+                .Setup(facade => facade.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ThrowsAsync(new TaskCanceledException("Test TaskCanceledException"));
             var mockEnvironmentHelper = new Mock<IEnvironmentHelper>();
             // Act

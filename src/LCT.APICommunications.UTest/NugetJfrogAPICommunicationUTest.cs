@@ -41,7 +41,7 @@ namespace LCT.APICommunications.UTest
             JfrogApicommunication jfrogApicommunication = new NugetJfrogApiCommunication("", "", repoCredentials, 100);
 
             //Assert
-            Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApicommunication.CopyFromRemoteRepo(cmpts));
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApicommunication.CopyFromRemoteRepo(cmpts, ""));
         }
 
         [Test]
@@ -83,7 +83,7 @@ namespace LCT.APICommunications.UTest
             JfrogApicommunication jfrogApicommunication = new NugetJfrogApiCommunication("", "", repoCredentials, 100);
 
             //Assert
-            Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApicommunication.MoveFromRepo(cmpts));
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApicommunication.MoveFromRepo(cmpts, ""));
         }
     }
 }
