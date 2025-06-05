@@ -396,7 +396,6 @@ namespace LCT.SW360PackageCreator
                     }
                     else
                     {
-
                         await UpdateFossologyLinkAndStatus(item, sw360CreatorService, appSettings, formattedName, uploadId, "\t✅ Fossology upload completed successfully for release");
                     }
                 }
