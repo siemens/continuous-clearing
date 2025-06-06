@@ -36,7 +36,6 @@ namespace LCT.ArtifactoryUploader
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static IJFrogService JFrogService { get; set; }
-        public readonly static List<AqlResult> aqlResultList = new();
 
         private static bool SetWarningCode;
         public static Bom GetComponentListFromComparisonBOM(string comparisonBomFilePath)

@@ -596,7 +596,7 @@ namespace LCT.SW360PackageCreator
             }
 
             item.ApprovedStatus = releasesInfo.ClearingState;
-            item.ReleaseCreatedBy = releasesInfo?.CreatedBy;
+            item.ReleaseCreatedBy = releasesInfo.CreatedBy;
             item.SourceAttachmentStatus= IsReleaseAttachmentExist(releasesInfo);
             var uploadId = releasesInfo.ExternalToolProcesses?
                 .SelectMany(process => process.ProcessSteps)
