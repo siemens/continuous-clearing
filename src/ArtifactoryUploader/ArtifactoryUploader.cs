@@ -24,7 +24,7 @@ namespace LCT.ArtifactoryUploader
     {
         //ConfigurationAttribute
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        public static IJFrogService jFrogService { get; set; }
+        public static IJFrogService JFrogService { get; set; }
         public static IJFrogApiCommunication JFrogApiCommInstance { get; set; }
 
         public static async Task<HttpResponseMessage> UploadPackageToRepo(ComponentsToArtifactory component, int timeout, DisplayPackagesInfo displayPackagesInfo)
@@ -38,7 +38,7 @@ namespace LCT.ArtifactoryUploader
             {
 
                 // Package Information
-                var packageInfo = await GetPackageInfoWithRetry(jFrogService, component);
+                var packageInfo = await GetPackageInfoWithRetry(JFrogService, component);
                 if (packageInfo == null)
                 {
                     return new HttpResponseMessage(HttpStatusCode.NotFound)
