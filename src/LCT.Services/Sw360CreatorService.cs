@@ -706,7 +706,7 @@ namespace LCT.Services
                 HttpResponseMessage response=await m_SW360ApiCommunicationFacade.UpdateRelease(releaseId, content);
                 string responseContent = await response.Content.ReadAsStringAsync();
                 Logger.Debug($"UpdateSW360ReleaseContent():Response of fossology Url updation in SW360:{responseContent}");
-                if (responseContent.Contains(Dataconstant.FossologyModerationMessage))
+                if (responseContent.Contains(Dataconstant.FossologyModerationMessage, StringComparison.OrdinalIgnoreCase))
                 {
                     Logger.Logger.Log(null, Level.Warn, $"\t⏳ Moderation request is created while updating the Fossology URL in SW360. Please request {component.ReleaseCreatedBy} or the license clearing team to approve the moderation request.", null);
                 }

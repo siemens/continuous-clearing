@@ -237,26 +237,22 @@ namespace LCT.SW360PackageCreator
                 mapper.ReleaseStatus = IsReleaseAvailable(item.Name, item.Version, item.ReleaseExternalId);
                 mapper.AlpineSource = item.AlpineSourceData;
 
-                if (!string.IsNullOrEmpty(item.ReleaseExternalId))
+                if (!string.IsNullOrEmpty(item.ReleaseExternalId) && item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
                 {
-                    if (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
-                    {
-                        SetDebianUrls(item, releasesInfo, mapper);
-                    }
-                    else if (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["MAVEN"]))
-                    {
-                        mapper.DownloadUrl = GetMavenDownloadUrl(mapper, item, releasesInfo);
-                    }
-                    else if (IsOtherPackageType(item))
-                    {
-                        mapper.DownloadUrl = mapper.SourceUrl;
-                    }
-                    else
-                    {
-                        mapper.DownloadUrl = GetComponentDownloadUrl(mapper, item, repo, releasesInfo);
-                    }
+                    SetDebianUrls(item, releasesInfo, mapper);
                 }
-
+                else if (!string.IsNullOrEmpty(item.ReleaseExternalId) && item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["MAVEN"]))
+                {
+                    mapper.DownloadUrl = GetMavenDownloadUrl(mapper, item, releasesInfo);
+                }
+                else if (!string.IsNullOrEmpty(item.ReleaseExternalId) && IsOtherPackageType(item))
+                {
+                    mapper.DownloadUrl = mapper.SourceUrl;
+                }
+                else
+                {
+                    mapper.DownloadUrl = GetComponentDownloadUrl(mapper, item, repo, releasesInfo);
+                } 
                 SetMapperStatus(mapper, releasesInfo);
                 Logger.Debug($"Sw360 availability status for Name {mapper.Name}: {mapper.ComponentExternalId}={mapper.ComponentStatus} - Version {mapper.Version}: {mapper.ReleaseExternalId}={mapper.ReleaseStatus}");
                 comparisonBomData.Add(mapper);
@@ -268,6 +264,7 @@ namespace LCT.SW360PackageCreator
         {
             if ((string.IsNullOrEmpty(item.SourceUrl) || item.SourceUrl == Dataconstant.SourceUrlNotFound) && !string.IsNullOrEmpty(releasesInfo.SourceCodeDownloadUrl))
             {
+                // If not able to get source details from snapshot.org, try getting source URL from SW360
                 mapper.SourceUrl = releasesInfo.SourceCodeDownloadUrl;
                 mapper.DownloadUrl = releasesInfo.SourceCodeDownloadUrl;
             }
