@@ -77,6 +77,10 @@ namespace LCT.PackageIdentifier
                         dependenciesForBOM.AddRange(bomList.Dependencies);
                     }
                 }
+                else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
+                {
+
+                }
             }
 
             string templateFilePath = SbomTemplate.GetFilePathForTemplate(listOfTemplateBomfilePaths);

@@ -55,6 +55,10 @@ namespace LCT.PackageIdentifier
                     var list = ParseCycloneDX(filepath, ref bom);
                     listofComponents.AddRange(list);
                 }
+                else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
+                {
+
+                }
             }
 
             int initialCount = listofComponents.Count;

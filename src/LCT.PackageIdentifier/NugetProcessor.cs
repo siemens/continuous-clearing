@@ -466,6 +466,22 @@ namespace LCT.PackageIdentifier
                             listComponentForBOM);
                     }
                 }
+                else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
+                {
+                    string filename = Path.GetFileName(filepath); // e.g., "example.spdx.sbom.json"
+                    var relatedExtensions = new[] { $"{filename}.peg", $"{filename}.sig" };
+
+                    var foundFiles = new Dictionary<string, string>();
+                    foreach (var related in relatedExtensions)
+                    {
+                        string relatedFile = Path.Combine(appSettings.Directory.InputFolder, related);
+                        if (File.Exists(relatedFile))
+                        {
+                            foundFiles[related] = relatedFile;
+                        }
+                    }
+
+                }
                 else
                 {
                     Logger.Debug($"ParsingInputFileForBOM():Found as Package File");

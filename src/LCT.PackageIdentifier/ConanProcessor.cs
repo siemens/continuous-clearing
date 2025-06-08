@@ -277,6 +277,10 @@ namespace LCT.PackageIdentifier
                     AddingIdentifierType(components, "PackageFile");
                     componentsForBOM.AddRange(components);
                 }
+                else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
+                {
+
+                }
                 else if (filepath.EndsWith(FileConstant.CycloneDXFileExtension)
                     && !filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {

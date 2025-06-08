@@ -541,6 +541,10 @@ namespace LCT.PackageIdentifier
                         dependencies = bom.Dependencies;
                     }
                 }
+                else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
+                {
+
+                }
                 else
                 {
                     Logger.Debug($"ParsingInputFileForBOM():Found as Package File");

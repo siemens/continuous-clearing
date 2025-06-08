@@ -59,6 +59,10 @@ namespace LCT.PackageIdentifier
                 {
                     listofComponents.AddRange(ExtractDetailsFromJson(config, appSettings, ref dependencies));
                 }
+                else if (config.EndsWith(FileConstant.SPDXFileExtension))
+                {
+
+                }
             }
 
 
