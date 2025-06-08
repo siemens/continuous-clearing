@@ -537,6 +537,7 @@ namespace LCT.PackageIdentifier
                         bom = RemoveExcludedComponents(appSettings, bom);
                         CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
                         AddingIdentifierType(bom.Components, "CycloneDXFile");
+                        BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += bom.Components.Count;
                         componentsForBOM.AddRange(bom.Components);
                         dependencies = bom.Dependencies;
                     }

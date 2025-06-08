@@ -45,7 +45,7 @@ namespace AritfactoryUploader.UTest
                 URL = UTParams.JFrogURL
             };
 
-            ArtfactoryUploader.jFrogService = GetJfrogService(appSettings);
+            ArtfactoryUploader.JFrogService = GetJfrogService(appSettings);
             DisplayPackagesInfo displayPackagesInfo = PackageUploadInformation.GetComponentsToBePackages();
             var componentsToArtifactory = new ComponentsToArtifactory
             {
@@ -101,7 +101,7 @@ namespace AritfactoryUploader.UTest
             var jFrogServiceMock = new Mock<IJFrogService>();
             jFrogServiceMock.Setup(x => x.GetPackageInfo(component))
                 .ReturnsAsync((AqlResult)null);
-            ArtfactoryUploader.jFrogService = jFrogServiceMock.Object;
+            ArtfactoryUploader.JFrogService = jFrogServiceMock.Object;
             // Act
             var response = await ArtfactoryUploader.UploadPackageToRepo(component, timeout, displayPackagesInfo);
 
@@ -131,7 +131,7 @@ namespace AritfactoryUploader.UTest
                 .ReturnsAsync(new AqlResult());
             jfrogApicommunicationMock.Setup(x => x.CopyFromRemoteRepo(It.IsAny<ComponentsToArtifactory>()))
                 .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK));
-            ArtfactoryUploader.jFrogService = jFrogServiceMock.Object;
+            ArtfactoryUploader.JFrogService = jFrogServiceMock.Object;
             ArtfactoryUploader.JFrogApiCommInstance = jfrogApicommunicationMock.Object;
             // Act
             _ = await ArtfactoryUploader.UploadPackageToRepo(component, timeout, displayPackagesInfo);
@@ -161,7 +161,7 @@ namespace AritfactoryUploader.UTest
                 .ReturnsAsync(new AqlResult());
             jfrogApicommunicationMock.Setup(x => x.MoveFromRepo(It.IsAny<ComponentsToArtifactory>()))
                 .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK));
-            ArtfactoryUploader.jFrogService = jFrogServiceMock.Object;
+            ArtfactoryUploader.JFrogService = jFrogServiceMock.Object;
             ArtfactoryUploader.JFrogApiCommInstance = jfrogApicommunicationMock.Object;
             // Act
             var response = await ArtfactoryUploader.UploadPackageToRepo(component, timeout, displayPackagesInfo);
@@ -187,7 +187,7 @@ namespace AritfactoryUploader.UTest
             var timeout = 10000;
             var displayPackagesInfo = new DisplayPackagesInfo();
             var jFrogServiceMock = new Mock<IJFrogService>();
-            ArtfactoryUploader.jFrogService = jFrogServiceMock.Object;
+            ArtfactoryUploader.JFrogService = jFrogServiceMock.Object;
             // Act
             var response = await ArtfactoryUploader.UploadPackageToRepo(component, timeout, displayPackagesInfo);
 
@@ -213,7 +213,7 @@ namespace AritfactoryUploader.UTest
             var jfrogApicommunicationMock = new Mock<IJFrogApiCommunication>();
             jFrogServiceMock.Setup(x => x.GetPackageInfo(component))
                 .ThrowsAsync(new HttpRequestException());
-            ArtfactoryUploader.jFrogService = jFrogServiceMock.Object;
+            ArtfactoryUploader.JFrogService = jFrogServiceMock.Object;
             ArtfactoryUploader.JFrogApiCommInstance = jfrogApicommunicationMock.Object;
 
             // Act
@@ -242,7 +242,7 @@ namespace AritfactoryUploader.UTest
             var jfrogApicommunicationMock = new Mock<IJFrogApiCommunication>();
             jFrogServiceMock.Setup(x => x.GetPackageInfo(component))
                 .ThrowsAsync(new InvalidOperationException());
-            ArtfactoryUploader.jFrogService = jFrogServiceMock.Object;
+            ArtfactoryUploader.JFrogService = jFrogServiceMock.Object;
             ArtfactoryUploader.JFrogApiCommInstance = jfrogApicommunicationMock.Object;
 
             // Act
