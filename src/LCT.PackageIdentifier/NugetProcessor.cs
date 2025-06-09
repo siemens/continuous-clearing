@@ -42,7 +42,7 @@ namespace LCT.PackageIdentifier
         private readonly IFrameworkPackages _frameworkPackages = frameworkPackages;
         private readonly ICompositionBuilder _compositionBuilder = compositionBuilder;
         private Dictionary<string, Dictionary<string, NuGetVersion>> _listofFrameworkPackages = new Dictionary<string, Dictionary<string, NuGetVersion>>();
-        private Dictionary<string, Dictionary<string, NuGetVersion>> _listofFrameworkPackagesInInputFiles = new Dictionary<string, Dictionary<string, NuGetVersion>>();
+        private readonly Dictionary<string, Dictionary<string, NuGetVersion>> _listofFrameworkPackagesInInputFiles = new Dictionary<string, Dictionary<string, NuGetVersion>>();
         private bool isSelfContainedProject = false;
 
         #region public methods
@@ -445,7 +445,7 @@ namespace LCT.PackageIdentifier
             return cycloneDXBOM;
         }
 
-        public void AddSiemensDirectProperty(ref Bom bom)
+        public static void AddSiemensDirectProperty(ref Bom bom)
         {
             var bomComponentsList = bom.Components;
             foreach (var component in bomComponentsList)
@@ -670,11 +670,7 @@ namespace LCT.PackageIdentifier
             Dictionary<string, Component> keyValuePairs = new Dictionary<string, Component>();
             foreach (var component in listComponentForBOM)
             {
-                if (!keyValuePairs.ContainsKey(component.Purl))
-                {
-                    keyValuePairs.Add(component.Purl, component);
-                }
-                else
+                if (!keyValuePairs.TryAdd(component.Purl, component))
                 {
                     if (keyValuePairs[component.Purl].Properties[0].Value == "false" && component.Properties[0].Value == "true")
                     {
@@ -903,14 +899,15 @@ namespace LCT.PackageIdentifier
                     packages.TryGetValue(name, out var pkgVersion) &&
                     pkgVersion.ToNormalizedString() == version)
                 {
-                    if (!_listofFrameworkPackagesInInputFiles.ContainsKey(runtime))
+                    if (!_listofFrameworkPackagesInInputFiles.TryGetValue(runtime, out Dictionary<string, NuGetVersion> value))
                     {
-                        _listofFrameworkPackagesInInputFiles[runtime] = new Dictionary<string, NuGetVersion>();
+                        value = new Dictionary<string, NuGetVersion>();
+                        _listofFrameworkPackagesInInputFiles[runtime] = value;
                     }
 
-                    if (!_listofFrameworkPackagesInInputFiles[runtime].ContainsKey(name))
+                    if (!value.ContainsKey(name))
                     {
-                        _listofFrameworkPackagesInInputFiles[runtime][name] = NuGetVersion.Parse(version);
+                        value[name] = NuGetVersion.Parse(version);
                         Logger.Debug($"Framework dependent component added: {name} {version} for target framework: {frameworkKey}");
                     }
                 }
@@ -1012,10 +1009,10 @@ namespace LCT.PackageIdentifier
                     switch (tag)
                     {
                         case "SelfContained":
-                            isSelfContained = bool.TryParse(element.Value, out result) ? result : false;
+                            isSelfContained = bool.TryParse(element.Value, out result) && result;
                             break;
                         case "PublishSingleFile":
-                            isSingleFile = bool.TryParse(element.Value, out result) ? result : false;
+                            isSingleFile = bool.TryParse(element.Value, out result) && result;
                             break;
                     }
                 }

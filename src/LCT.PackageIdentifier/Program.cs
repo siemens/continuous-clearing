@@ -180,7 +180,7 @@ namespace LCT.PackageIdentifier
             }
         }
 
-        private static string LogFolderInitialisation(CommonAppSettings appSettings)
+        private static void LogFolderInitialisation(CommonAppSettings appSettings)
         {
             string FolderPath;
             if (!string.IsNullOrEmpty(appSettings.Directory.LogFolder))
@@ -201,8 +201,6 @@ namespace LCT.PackageIdentifier
 
                 Log4Net.Init(FileConstant.BomCreatorLog, FolderPath, m_Verbose);
             }
-
-            return FolderPath;
         }
     }
 }

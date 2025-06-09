@@ -68,29 +68,9 @@ namespace LCT.PackageIdentifier
                     InvokeGetFrameworkPackagesMethod(getFrameworkPackagesMethod, target.Key, target.Value.ToArray(), null);
                 }
             }
-            catch (FileNotFoundException ex)
-            {
-                Logger.Debug($"GetFrameworkPackages: FileNotFoundException  {ex.Message}");
-            }
-            catch (FileLoadException ex)
-            {
-                Logger.Debug($"GetFrameworkPackages: FileLoadException {ex.Message}");
-            }
-            catch (TypeLoadException ex)
-            {
-                Logger.Debug($"GetFrameworkPackages : Not able to load Microsoft.ComponentDetection.Detectors.NuGet.FrameworkPackages assembly.: {ex.Message}");
-            }
-            catch (ArgumentNullException ex)
-            {
-                Logger.Debug($"GetFrameworkPackages : Argument null: {ex.Message}");
-            }
             catch (ArgumentException ex)
             {
                 Logger.Debug($"GetFrameworkPackages: Argument error: {ex.Message}");
-            }
-            catch (NullReferenceException ex)
-            {
-                Logger.Debug($"GetFrameworkPackages : Null reference: {ex.Message}");
             }
             catch (InvalidOperationException ex)
             {
@@ -121,13 +101,25 @@ namespace LCT.PackageIdentifier
         #region private methods
         private static Type LoadAssembly()
         {
-            Assembly componentDetectionAssembly = Assembly.Load("Microsoft.ComponentDetection.Detectors");
-            return componentDetectionAssembly.GetType("Microsoft.ComponentDetection.Detectors.NuGet.FrameworkPackages");
+            try
+            {
+                Assembly componentDetectionAssembly = Assembly.Load("Microsoft.ComponentDetection.Detectors");
+                return componentDetectionAssembly.GetType("Microsoft.ComponentDetection.Detectors.NuGet.FrameworkPackages");
+            }
+            catch (FileNotFoundException ex)
+            {
+                Logger.Debug($"LoadAssembly: FileNotFoundException  {ex.Message}");
+            }
+            catch (FileLoadException ex)
+            {
+                Logger.Debug($"LoadAssembly: FileLoadException {ex.Message}");
+            }
+            return null;
         }
 
         private static MethodInfo GetFrameworkPackagesMethod(Type frameworkPackagesType)
         {
-            var methods = frameworkPackagesType.GetMethods(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
+            var methods = frameworkPackagesType.GetMethods(BindingFlags.Static | BindingFlags.Public);
             if (methods != null && methods.Any(m => m.Name == "GetFrameworkPackages"))
             {
                 return frameworkPackagesType.GetMethod("GetFrameworkPackages", BindingFlags.Static | BindingFlags.Public);
