@@ -21,6 +21,7 @@ using NuGet.ProjectModel;
 using NuGet.Versioning;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -33,25 +34,16 @@ using Directory = System.IO.Directory;
 
 namespace LCT.PackageIdentifier
 {
-    public class NugetProcessor : CycloneDXBomParser, IParser
+    public class NugetProcessor(ICycloneDXBomParser cycloneDXBomParser, IFrameworkPackages frameworkPackages, ICompositionBuilder compositionBuilder) : CycloneDXBomParser, IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
-        private readonly ICycloneDXBomParser _cycloneDXBomParser;
-        private readonly IFrameworkPackages _frameworkPackages;
-        private readonly ICompositionBuilder _compositionBuilder;
-        private static Dictionary<string, Dictionary<string, NuGetVersion>> _listofFrameworkPackages;
-        private static Dictionary<string, Dictionary<string, NuGetVersion>> _listofFrameworkPackagesInInputFiles;
+        private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
+        private readonly IFrameworkPackages _frameworkPackages = frameworkPackages;
+        private readonly ICompositionBuilder _compositionBuilder = compositionBuilder;
+        private Dictionary<string, Dictionary<string, NuGetVersion>> _listofFrameworkPackages = new Dictionary<string, Dictionary<string, NuGetVersion>>();
+        private Dictionary<string, Dictionary<string, NuGetVersion>> _listofFrameworkPackagesInInputFiles = new Dictionary<string, Dictionary<string, NuGetVersion>>();
         private bool isSelfContainedProject = false;
-
-        public NugetProcessor(ICycloneDXBomParser cycloneDXBomParser, IFrameworkPackages frameworkPackages, ICompositionBuilder compositionBuilder)
-        {
-            _frameworkPackages = frameworkPackages;
-            _cycloneDXBomParser = cycloneDXBomParser;
-            _listofFrameworkPackages = new Dictionary<string, Dictionary<string, NuGetVersion>>();
-            _listofFrameworkPackagesInInputFiles = new Dictionary<string, Dictionary<string, NuGetVersion>>();
-            _compositionBuilder = compositionBuilder;
-        }
 
         #region public methods
         public Bom ParsePackageFile(CommonAppSettings appSettings)
@@ -453,90 +445,6 @@ namespace LCT.PackageIdentifier
             return cycloneDXBOM;
         }
 
-        #endregion
-
-        #region private methods
-        private void ParsingInputFileForBOM(CommonAppSettings appSettings,
-                                            ref List<Component> listComponentForBOM,
-                                            ref Bom bom)
-        {
-            List<string> configFiles;
-            List<Component> componentsForBOM = new List<Component>();
-            List<Dependency> dependencies = new List<Dependency>();
-            int totalComponentsIdentified = 0;
-
-            configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Nuget);
-            if (!isSelfContainedProject)
-            {
-                GetFrameworkPackagesForAllConfigLockFiles(configFiles);
-            }
-            List<string> listOfTemplateBomfilePaths = new List<string>();
-            foreach (string filepath in configFiles)
-            {
-                if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
-                {
-                    listOfTemplateBomfilePaths.Add(filepath);
-                }
-                Logger.Debug($"ParsingInputFileForBOM():FileName: " + filepath);
-                if (filepath.EndsWith(FileConstant.CycloneDXFileExtension))
-                {
-                    if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
-                    {
-                        Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
-                        bom = _cycloneDXBomParser.ParseCycloneDXBom(filepath);
-                        CycloneDXBomParser.CheckValidComponentsForProjectType(
-                            bom.Components, appSettings.ProjectType);
-                        componentsForBOM.AddRange(bom.Components);
-                        CommonHelper.GetDetailsForManuallyAdded(componentsForBOM,
-                            listComponentForBOM);
-                    }
-                }
-                else
-                {
-                    Logger.Debug($"ParsingInputFileForBOM():Found as Package File");
-                    List<NugetPackage> listofComponents = new();
-                    ParseInputFiles(appSettings, filepath, listofComponents);
-                    ConvertToCycloneDXModel(listComponentForBOM, listofComponents, dependencies);
-                    if (bom.Dependencies == null || bom.Dependencies.Count == 0)
-                    {
-                        bom.Dependencies = dependencies;
-                        dependencies = new List<Dependency>();
-                    }
-                    else
-                    {
-                        bom.Dependencies.AddRange(dependencies);
-                    }
-                    BomCreator.bomKpiData.ComponentsinPackageLockJsonFile =
-                        listComponentForBOM.Count;
-                }
-            }
-
-            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = listComponentForBOM.Count;
-            totalComponentsIdentified = listComponentForBOM.Count;
-            listComponentForBOM = KeepUniqueNonDevComponents(listComponentForBOM);
-            listComponentForBOM = listComponentForBOM.Distinct(
-                new ComponentEqualityComparer()).ToList();
-
-            if (BomCreator.bomKpiData.DuplicateComponents == 0)
-            {
-                BomCreator.bomKpiData.DuplicateComponents =
-                    totalComponentsIdentified - listComponentForBOM.Count;
-            }
-
-            BomCreator.bomKpiData.DevDependentComponents =
-                listComponentForBOM.Count(s => s.Properties[0].Value == "true");
-            bom.Components = listComponentForBOM;
-            string templateFilePath = SbomTemplate.GetFilePathForTemplate(listOfTemplateBomfilePaths);
-            SbomTemplate.ProcessTemplateFile(templateFilePath, _cycloneDXBomParser, bom.Components, appSettings.ProjectType);
-
-            bom = RemoveExcludedComponents(appSettings, bom);
-
-            if (bom != null)
-            {
-                AddSiemensDirectProperty(ref bom);
-            }
-        }
-
         public void AddSiemensDirectProperty(ref Bom bom)
         {
             var bomComponentsList = bom.Components;
@@ -559,6 +467,107 @@ namespace LCT.PackageIdentifier
 
             bom.Components = bomComponentsList;
         }
+
+        #endregion
+
+        #region private methods
+
+        private void ParsingInputFileForBOM(CommonAppSettings appSettings,
+                                    ref List<Component> listComponentForBOM,
+                                    ref Bom bom)
+        {
+            var configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Nuget);
+            if (!isSelfContainedProject)
+            {
+                GetFrameworkPackagesForAllConfigLockFiles(configFiles);
+            }
+
+            var listOfTemplateBomfilePaths = new List<string>();
+            var totalComponentsIdentified = 0;
+
+            foreach (string filepath in configFiles)
+            {
+                HandleConfigFile(filepath, appSettings, ref listComponentForBOM, ref bom, listOfTemplateBomfilePaths);
+            }
+
+            PostProcessBOM(appSettings, ref listComponentForBOM, ref bom, listOfTemplateBomfilePaths, ref totalComponentsIdentified);
+        }
+
+        private void HandleConfigFile(
+            string filepath,
+            CommonAppSettings appSettings,
+            ref List<Component> listComponentForBOM,
+            ref Bom bom,
+            List<string> listOfTemplateBomfilePaths)
+        {
+            if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+            {
+                listOfTemplateBomfilePaths.Add(filepath);
+            }
+
+            Logger.Debug($"ParsingInputFileForBOM():FileName: {filepath}");
+
+            if (filepath.EndsWith(FileConstant.CycloneDXFileExtension) &&
+                !filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+            {
+                Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
+                bom = _cycloneDXBomParser.ParseCycloneDXBom(filepath);
+                CycloneDXBomParser.CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
+                var componentsForBOM = new List<Component>(bom.Components);
+                CommonHelper.GetDetailsForManuallyAdded(componentsForBOM, listComponentForBOM);
+            }
+            else
+            {
+                Logger.Debug($"ParsingInputFileForBOM():Found as Package File");
+                var listofComponents = new List<NugetPackage>();
+                ParseInputFiles(appSettings, filepath, listofComponents);
+                var dependencies = new List<Dependency>();
+                ConvertToCycloneDXModel(listComponentForBOM, listofComponents, dependencies);
+
+                if (bom.Dependencies == null || bom.Dependencies.Count == 0)
+                {
+                    bom.Dependencies = dependencies;
+                }
+                else
+                {
+                    bom.Dependencies.AddRange(dependencies);
+                }
+                BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = listComponentForBOM.Count;
+            }
+        }
+
+        private void PostProcessBOM(
+            CommonAppSettings appSettings,
+            ref List<Component> listComponentForBOM,
+            ref Bom bom,
+            List<string> listOfTemplateBomfilePaths,
+            ref int totalComponentsIdentified)
+        {
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = listComponentForBOM.Count;
+            totalComponentsIdentified = listComponentForBOM.Count;
+
+            listComponentForBOM = KeepUniqueNonDevComponents(listComponentForBOM);
+            listComponentForBOM = listComponentForBOM.Distinct(new ComponentEqualityComparer()).ToList();
+
+            if (BomCreator.bomKpiData.DuplicateComponents == 0)
+            {
+                BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - listComponentForBOM.Count;
+            }
+
+            BomCreator.bomKpiData.DevDependentComponents = listComponentForBOM.Count(s => s.Properties[0].Value == "true");
+            bom.Components = listComponentForBOM;
+
+            string templateFilePath = SbomTemplate.GetFilePathForTemplate(listOfTemplateBomfilePaths);
+            SbomTemplate.ProcessTemplateFile(templateFilePath, _cycloneDXBomParser, bom.Components, appSettings.ProjectType);
+
+            bom = RemoveExcludedComponents(appSettings, bom);
+
+            if (bom != null)
+            {
+                AddSiemensDirectProperty(ref bom);
+            }
+        }
+
 
         private static void CreateFileForMultipleVersions(List<Component> componentsWithMultipleVersions, CommonAppSettings appSettings)
         {
@@ -667,10 +676,10 @@ namespace LCT.PackageIdentifier
                 }
                 else
                 {
-                    if (keyValuePairs[component.Purl].Properties[0].Value == "true" && component.Properties[0].Value == "false")
+                    if (keyValuePairs[component.Purl].Properties[0].Value == "false" && component.Properties[0].Value == "true")
                     {
-                        //Already Comp with Development Dependent added as 'true' ,remove that Comp
-                        //& add New Comp as Development Dependent 'false' If case of Duplicate
+                        //Already Comp with Development Dependent added as 'false' ,remove that Comp
+                        //& add New Comp as Development Dependent only if 'true'
                         keyValuePairs.Remove(component.Purl);
                         keyValuePairs.Add(component.Purl, component);
                     }
@@ -817,7 +826,7 @@ namespace LCT.PackageIdentifier
                         Version = lst.Value.Version,
                         Dependencies = depvalue,
                         Filepath = configFile,
-                        IsDev =  (!isSelfContainedProject && IsFrameworkDependentComponent(lst.Value.Name, lst.Value.Version, uniqueFrameworkKeys)) || lst.Value.Scope.ToString() == "DevDependency" ? "true" : "false",
+                        IsDev = (!isSelfContainedProject && IsFrameworkDependentComponent(lst.Value.Name, lst.Value.Version, uniqueFrameworkKeys)) || lst.Value.Scope.ToString() == "DevDependency" ? "true" : "false",
                     });
                 }
             }
@@ -839,46 +848,73 @@ namespace LCT.PackageIdentifier
 
         private bool IsFrameworkDependentComponent(string name, string version, List<string> uniqueFrameworkKeys)
         {
-            // Check if the component is already added to the input files list
-            bool isAlreadyAddedToInputFilesList = uniqueFrameworkKeys
-                .Select(key => key.Split('-')[0]) // Extract runtime
-                .Where(runtime => _listofFrameworkPackagesInInputFiles.ContainsKey(runtime)) // Ensure runtime exists
-                .SelectMany(runtime => _listofFrameworkPackagesInInputFiles[runtime])
-                .Any(frameworkPackage => frameworkPackage.Key == name && frameworkPackage.Value.ToNormalizedString() == version);
-
-            if (isAlreadyAddedToInputFilesList)
+            if (IsAlreadyAddedToInputFilesList(name, version, uniqueFrameworkKeys))
             {
                 return true;
             }
 
-            // Check if the component is framework-dependent
-            bool isFrameworkDependent = uniqueFrameworkKeys
-                .SelectMany(key => _listofFrameworkPackages[key])
-                .Any(frameworkPackage => frameworkPackage.Key == name && frameworkPackage.Value.ToNormalizedString() == version);
+            bool isFrameworkDependent = IsInFrameworkPackages(name, version, uniqueFrameworkKeys);
 
             if (isFrameworkDependent)
             {
-                foreach (var frameworkKey in uniqueFrameworkKeys)
-                {
-                    string runtime = frameworkKey.Split('-')[0];
-                    if (_listofFrameworkPackages[frameworkKey].ContainsKey(name) &&
-                        _listofFrameworkPackages[frameworkKey][name].ToNormalizedString() == version)
-                    {
-                        if (!_listofFrameworkPackagesInInputFiles.ContainsKey(runtime))
-                        {
-                            _listofFrameworkPackagesInInputFiles[runtime] = new Dictionary<string, NuGetVersion>();
-                        }
-
-                        if (!_listofFrameworkPackagesInInputFiles[runtime].ContainsKey(name))
-                        {
-                            _listofFrameworkPackagesInInputFiles[runtime][name] = NuGetVersion.Parse(version);
-                            Logger.Debug($"Framework dependent component added: {name} {version} for target framework: {frameworkKey}");
-                        }
-                    }
-                }
+                AddToFrameworkPackagesInInputFiles(name, version, uniqueFrameworkKeys);
             }
 
             return isFrameworkDependent;
+        }
+
+        private bool IsAlreadyAddedToInputFilesList(string name, string version, List<string> uniqueFrameworkKeys)
+        {
+            foreach (var key in uniqueFrameworkKeys)
+            {
+                string runtime = key.Split('-')[0];
+                if (_listofFrameworkPackagesInInputFiles.TryGetValue(runtime, out var packages))
+                {
+                    if (packages.TryGetValue(name, out var pkgVersion) && pkgVersion.ToNormalizedString() == version)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private bool IsInFrameworkPackages(string name, string version, List<string> uniqueFrameworkKeys)
+        {
+            foreach (var key in uniqueFrameworkKeys)
+            {
+                if (_listofFrameworkPackages.TryGetValue(key, out var packages))
+                {
+                    if (packages.TryGetValue(name, out var pkgVersion) && pkgVersion.ToNormalizedString() == version)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private void AddToFrameworkPackagesInInputFiles(string name, string version, List<string> uniqueFrameworkKeys)
+        {
+            foreach (var frameworkKey in uniqueFrameworkKeys)
+            {
+                string runtime = frameworkKey.Split('-')[0];
+                if (_listofFrameworkPackages.TryGetValue(frameworkKey, out var packages) &&
+                    packages.TryGetValue(name, out var pkgVersion) &&
+                    pkgVersion.ToNormalizedString() == version)
+                {
+                    if (!_listofFrameworkPackagesInInputFiles.ContainsKey(runtime))
+                    {
+                        _listofFrameworkPackagesInInputFiles[runtime] = new Dictionary<string, NuGetVersion>();
+                    }
+
+                    if (!_listofFrameworkPackagesInInputFiles[runtime].ContainsKey(name))
+                    {
+                        _listofFrameworkPackagesInInputFiles[runtime][name] = NuGetVersion.Parse(version);
+                        Logger.Debug($"Framework dependent component added: {name} {version} for target framework: {frameworkKey}");
+                    }
+                }
+            }
         }
 
         private void GetFrameworkPackagesForAllConfigLockFiles(List<string> configFiles)
@@ -918,7 +954,7 @@ namespace LCT.PackageIdentifier
             {
                 Logger.Debug($"GetUniqueTargetFrameworkKeysForConfigFile: IO error while reading the config file '{configFile}':", ex);
             }
-            catch (Exception ex)
+            catch (ArgumentNullException ex)
             {
                 Logger.Debug($"Error in GetUniqueTargetFrameworkKeysForConfigFile:", ex);
             }
@@ -934,37 +970,57 @@ namespace LCT.PackageIdentifier
 
             bool isSelfContained = false;
             bool isSingleFile = false;
-            bool result;
 
             foreach (var projectFilePath in projectFiles)
             {
                 try
                 {
-                    XDocument projectDocument = XDocument.Load(projectFilePath);
-                    foreach (var tag in FileConstant.Nuget_DeploymentType_DetectionTags)
+                    (bool selfContained, bool singleFile) = CheckDeploymentTags(projectFilePath);
+                    isSelfContained |= selfContained;
+                    isSingleFile |= singleFile;
+                    if (isSelfContained || isSingleFile)
                     {
-                        var element = projectDocument.Descendants(tag).FirstOrDefault();
-                        if (element != null)
-                        {
-                            switch (tag)
-                            {
-                                case "SelfContained":
-                                    isSelfContained = bool.TryParse(element.Value, out result) ? result : false;
-                                    break;
-                                case "PublishSingleFile":
-                                    isSingleFile = bool.TryParse(element.Value, out result) ? result : false;
-                                    break;
-                            }
-                        }
+                        // Early exit if either is detected
+                        break;
                     }
                 }
-                catch (Exception ex)
+                catch (IOException ex)
                 {
-                    Logger.Debug($"Error while Detecting Deployment Type: {ex.Message}");
+                    Logger.Debug($"IO error while Loading project file path :{projectFilePath} Error : {ex.Message}");
+                }
+                catch (ArgumentException ex)
+                {
+                    Logger.Debug($"IO error while Loading project file path :{projectFilePath} Error : {ex.Message}");
                 }
             }
 
             return isSelfContained || isSingleFile;
+        }
+
+        private static (bool isSelfContained, bool isSingleFile) CheckDeploymentTags(string projectFilePath)
+        {
+            bool isSelfContained = false;
+            bool isSingleFile = false;
+
+            XDocument projectDocument = XDocument.Load(projectFilePath);
+            foreach (var tag in FileConstant.Nuget_DeploymentType_DetectionTags)
+            {
+                var element = projectDocument.Descendants(tag).FirstOrDefault();
+                if (element != null)
+                {
+                    bool result;
+                    switch (tag)
+                    {
+                        case "SelfContained":
+                            isSelfContained = bool.TryParse(element.Value, out result) ? result : false;
+                            break;
+                        case "PublishSingleFile":
+                            isSingleFile = bool.TryParse(element.Value, out result) ? result : false;
+                            break;
+                    }
+                }
+            }
+            return (isSelfContained, isSingleFile);
         }
 
         private static bool IsExcluded(string filePath, string[] excludePatterns)

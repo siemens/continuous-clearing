@@ -9,9 +9,9 @@ using System.IO;
 
 namespace LCT.Common.Constants
 {
-    /// <summary>
-    /// The file constants 
-    /// </summary>
+    /// <summary>  
+    /// The file constants   
+    /// </summary>  
     [ExcludeFromCodeCoverage]
     public static class FileConstant
     {
@@ -54,7 +54,7 @@ namespace LCT.Common.Constants
         public const string multipleversionsFileName = "Multipleversions.json";
         public const string artifactoryReportNotApproved = "ReportNotApproved.json";
         public const string basicSBOMName = "ContinuousClearing";
-        public static string[] Nuget_DeploymentType_DetectionExt = { "*.csproj", "*.Build.props" };
-        public static string[] Nuget_DeploymentType_DetectionTags = { "SelfContained" };
+        public static readonly string[] Nuget_DeploymentType_DetectionExt = ["*.csproj", "*.Build.props"];
+        public static readonly string[] Nuget_DeploymentType_DetectionTags = ["SelfContained"];
     }
 }

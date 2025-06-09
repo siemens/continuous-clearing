@@ -42,16 +42,12 @@ namespace LCT.PackageIdentifier
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
 
-        private readonly IFrameworkPackages _frameworkPackages;
         private readonly ISettingsManager _settingsManager;
-        private readonly ICycloneDXBomParser _cycloneDXBomParser;
         private readonly IBomCreator _bomCreator;
 
         public Program(IFrameworkPackages frameworkPackages, ISettingsManager settingsManager, ICycloneDXBomParser cycloneDXBomParser, IBomCreator bomCreator)
         {
-            _frameworkPackages = frameworkPackages;
             _settingsManager = settingsManager;
-            _cycloneDXBomParser = cycloneDXBomParser;
             _bomCreator = bomCreator;
         }
         protected Program() { }
@@ -90,7 +86,7 @@ namespace LCT.PackageIdentifier
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
-            string FolderPath = LogFolderInitialisation(appSettings);
+            LogFolderInitialisation(appSettings);
 
             _settingsManager.CheckRequiredArgsToRun(appSettings, "Identifer");
 
@@ -150,12 +146,16 @@ namespace LCT.PackageIdentifier
 
         private static IJFrogService GetJfrogService(CommonAppSettings appSettings)
         {
+            if (appSettings == null)
+            {
+                return null;
+            }
             ArtifactoryCredentials artifactoryUpload = new ArtifactoryCredentials()
             {
-                Token = appSettings?.Jfrog?.Token,
+                Token = appSettings.Jfrog?.Token,
             };
             IJfrogAqlApiCommunication jfrogAqlApiCommunication =
-                new JfrogAqlApiCommunication(appSettings?.Jfrog?.URL, artifactoryUpload, appSettings.TimeOut);
+                new JfrogAqlApiCommunication(appSettings.Jfrog?.URL, artifactoryUpload, appSettings.TimeOut);
             IJfrogAqlApiCommunicationFacade jFrogApiCommunicationFacade =
                 new JfrogAqlApiCommunicationFacade(jfrogAqlApiCommunication);
             IJFrogService jFrogService = new JFrogService(jFrogApiCommunicationFacade);

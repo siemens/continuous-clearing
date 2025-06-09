@@ -12,6 +12,7 @@ using NuGet.ProjectModel;
 using NuGet.Versioning;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -19,7 +20,7 @@ namespace LCT.PackageIdentifier
 {
     public class FrameworkPackages : IFrameworkPackages
     {
-        Dictionary<string, Dictionary<string, NuGetVersion>> _foundFrameworkPackages = new Dictionary<string, Dictionary<string, NuGetVersion>>();
+        readonly Dictionary<string, Dictionary<string, NuGetVersion>> _foundFrameworkPackages = [];
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         #region public methods
@@ -35,13 +36,14 @@ namespace LCT.PackageIdentifier
                     foreach (var target in lockFile.Targets)
                     {
                         var frameworkReferences = GetFrameworkReferences(lockFile, target);
-                        if (!uniqueTargets.ContainsKey(target.TargetFramework))
+                        if (!uniqueTargets.TryGetValue(target.TargetFramework, out HashSet<string> value))
                         {
-                            uniqueTargets[target.TargetFramework] = new HashSet<string>();
+                            value = new HashSet<string>();
+                            uniqueTargets[target.TargetFramework] = value;
                         }
                         foreach (var reference in frameworkReferences)
                         {
-                            uniqueTargets[target.TargetFramework].Add(reference);
+                            value.Add(reference);
                         }
                     }
                 }
@@ -66,9 +68,33 @@ namespace LCT.PackageIdentifier
                     InvokeGetFrameworkPackagesMethod(getFrameworkPackagesMethod, target.Key, target.Value.ToArray(), null);
                 }
             }
-            catch (Exception ex)
+            catch (FileNotFoundException ex)
             {
-                Logger.Debug($"Error occurred while GetFrameworkPackages: {ex.Message}");
+                Logger.Debug($"GetFrameworkPackages: FileNotFoundException  {ex.Message}");
+            }
+            catch (FileLoadException ex)
+            {
+                Logger.Debug($"GetFrameworkPackages: FileLoadException {ex.Message}");
+            }
+            catch (TypeLoadException ex)
+            {
+                Logger.Debug($"GetFrameworkPackages : Not able to load Microsoft.ComponentDetection.Detectors.NuGet.FrameworkPackages assembly.: {ex.Message}");
+            }
+            catch (ArgumentNullException ex)
+            {
+                Logger.Debug($"GetFrameworkPackages : Argument null: {ex.Message}");
+            }
+            catch (ArgumentException ex)
+            {
+                Logger.Debug($"GetFrameworkPackages: Argument error: {ex.Message}");
+            }
+            catch (NullReferenceException ex)
+            {
+                Logger.Debug($"GetFrameworkPackages : Null reference: {ex.Message}");
+            }
+            catch (InvalidOperationException ex)
+            {
+                Logger.Debug($"GetFrameworkPackages : Invalid operation: {ex.Message}");
             }
 
             return _foundFrameworkPackages;
@@ -99,7 +125,7 @@ namespace LCT.PackageIdentifier
             return componentDetectionAssembly.GetType("Microsoft.ComponentDetection.Detectors.NuGet.FrameworkPackages");
         }
 
-        private MethodInfo GetFrameworkPackagesMethod(Type frameworkPackagesType)
+        private static MethodInfo GetFrameworkPackagesMethod(Type frameworkPackagesType)
         {
             var methods = frameworkPackagesType.GetMethods(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
             if (methods != null && methods.Any(m => m.Name == "GetFrameworkPackages"))
