@@ -185,7 +185,6 @@ namespace LCT.PackageIdentifier
             string FolderPath;
             if (!string.IsNullOrEmpty(appSettings.Directory.LogFolder))
             {
-                FolderPath = appSettings.Directory.LogFolder;
                 Log4Net.Init(FileConstant.BomCreatorLog, appSettings.Directory.LogFolder, m_Verbose);
             }
             else
