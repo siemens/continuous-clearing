@@ -4,6 +4,8 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+// Ignore Spelling: Bom LCT
+
 using LCT.APICommunications;
 using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;

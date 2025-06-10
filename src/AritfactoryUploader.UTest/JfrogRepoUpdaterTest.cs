@@ -34,7 +34,7 @@ namespace AritfactoryUploader.UTest
             var jFrogServiceMock = new Mock<IJFrogService>();
             jFrogServiceMock.Setup(service => service.GetInternalComponentDataByRepo(It.IsAny<string>()))
                             .ReturnsAsync(expectedAqlResultList);
-            JfrogRepoUpdater.jFrogService = jFrogServiceMock.Object;
+            JfrogRepoUpdater.JFrogService = jFrogServiceMock.Object;
 
             // Act
             var actualAqlResultList = await JfrogRepoUpdater.GetJfrogRepoInfoForAllTypePackages(destRepoNames);
