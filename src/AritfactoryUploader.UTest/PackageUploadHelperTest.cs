@@ -4,11 +4,14 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+// Ignore Spelling: Aritfactory Uploader
+
 using CycloneDX.Models;
 using LCT.APICommunications;
 using LCT.APICommunications.Model;
 using LCT.ArtifactoryUploader;
 using LCT.ArtifactoryUploader.Model;
+using LCT.Common.Constants;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using NUnit.Framework;
 using System.Collections.Generic;
@@ -92,6 +95,7 @@ namespace AritfactoryUploader.UTest
                     Purl = "pkg:npm/rxjs@6.5.4",
                     DestRepoName = "org1-npmjs-npm-remote",
                     DryRun = false,
+                    JfrogRepoPath="org1-npmjs-npm-remote/rxjs/-/rxjs-6.5.4.tgz",
                 }
             };
 
@@ -99,8 +103,10 @@ namespace AritfactoryUploader.UTest
             PackageUploadHelper.UpdateBomArtifactoryRepoUrl(ref bom, components);
 
             //Assert
-            var repoUrl = bom.Components.First(x => x.Properties[3].Name == "internal:siemens:clearing:jfrog-repo-name").Properties[3].Value;
+            var repoUrl = bom.Components.First(x => x.Properties[3].Name == Dataconstant.Cdx_ArtifactoryRepoName).Properties[3].Value;
+            var repoPath = bom.Components.First(x => x.Properties[6].Name == Dataconstant.Cdx_JfrogRepoPath).Properties[6].Value;
             Assert.AreEqual("org1-npmjs-npm-remote", repoUrl);
+            Assert.AreEqual("org1-npmjs-npm-remote/rxjs/-/rxjs-6.5.4.tgz", repoPath);
         }
 
         [Test]
@@ -124,7 +130,7 @@ namespace AritfactoryUploader.UTest
             PackageUploadHelper.UpdateBomArtifactoryRepoUrl(ref bom, components);
 
             //Assert
-            var repoUrl = bom.Components.First(x => x.Properties[3].Name == "internal:siemens:clearing:jfrog-repo-name").Properties[3].Value;
+            var repoUrl = bom.Components.First(x => x.Properties[3].Name == Dataconstant.Cdx_ArtifactoryRepoName).Properties[3].Value;
             Assert.AreNotEqual("org1-npmjs-npm-remote", repoUrl);
         }
 

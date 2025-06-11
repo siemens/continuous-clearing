@@ -76,6 +76,7 @@ namespace LCT.Common.Constants
         public const string GithubUrl = "https://github.com/siemens/continuous-clearing";
         public const string StandardSbomUrl = "https://sbom.siemens.io/";
         public const string SbomSpecVersionString = "1.6";
+        public const string FossologyModerationMessage = "Moderation request is created";
         public static Dictionary<string, string> PurlCheck()
         {
             return purlids;
