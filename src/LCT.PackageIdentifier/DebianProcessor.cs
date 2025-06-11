@@ -15,6 +15,7 @@ using LCT.Services.Interface;
 using log4net;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -51,9 +52,15 @@ namespace LCT.PackageIdentifier
             {
                 if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
-                    Logger.Debug($"ParsePackageFile():FileName: " + filepath);
-                    var list = ParseCycloneDX(filepath, ref bom);
-                    listofComponents.AddRange(list);
+                    Logger.Debug($"ParsePackageFile():FileName: " + filepath);                    if (filepath.EndsWith(FileConstant.SPDXFileExtension))
+                    {
+                        BomHelper.NamingConventionOfSPDXFile(filepath, appSettings);
+                    }
+                    else
+                    {
+                        var list = ParseCycloneDX(filepath, ref bom);
+                        listofComponents.AddRange(list);
+                    }
                 }
             }
 

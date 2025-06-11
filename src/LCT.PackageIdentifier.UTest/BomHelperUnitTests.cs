@@ -15,7 +15,9 @@ using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using Moq;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace LCT.PackageIdentifier.UTest
@@ -575,6 +577,170 @@ namespace LCT.PackageIdentifier.UTest
 
             string hashcode = BomHelper.GetHashCodeUsingNpmView(name, version);
             Assert.That(expectedhashcode, Is.EqualTo(hashcode));
+        }
+
+        [Test]
+        public void NamingConventionOfSPDXFile_WhenAllRequiredFilesExist_DoesNotThrowException()
+        {
+            // Arrange
+            string tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            System.IO.Directory.CreateDirectory(tempDirectory);
+            
+            try
+            {
+                // Create test files
+                string spdxFileName = "test.spdx.sbom.json";
+                string spdxFilePath = Path.Combine(tempDirectory, spdxFileName);
+                string pemFilePath = Path.Combine(tempDirectory, $"{spdxFileName}.pem");
+                string sigFilePath = Path.Combine(tempDirectory, $"{spdxFileName}.sig");
+                
+                // Create empty files
+                File.Create(spdxFilePath).Dispose();
+                File.Create(pemFilePath).Dispose();
+                File.Create(sigFilePath).Dispose();
+                
+                // Setup app settings with the temp directory
+                var appSettings = new CommonAppSettings
+                {
+                    Directory = new LCT.Common.Directory(new FolderAction(), new FileOperations())
+                    {
+                        InputFolder = tempDirectory
+                    }
+                };
+                
+                // Act & Assert
+                Assert.DoesNotThrow(() => BomHelper.NamingConventionOfSPDXFile(spdxFilePath, appSettings));
+            }
+            finally
+            {
+                // Clean up
+                if (System.IO.Directory.Exists(tempDirectory))
+                {
+                    System.IO.Directory.Delete(tempDirectory, true);
+                }
+            }
+        }
+        
+        [Test]
+        public void NamingConventionOfSPDXFile_WhenPemFileMissing_ThrowsApplicationException()
+        {
+            // Arrange
+            string tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            System.IO.Directory.CreateDirectory(tempDirectory);
+            
+            try
+            {
+                // Create test files
+                string spdxFileName = "test.spdx.sbom.json";
+                string spdxFilePath = Path.Combine(tempDirectory, spdxFileName);
+                string sigFilePath = Path.Combine(tempDirectory, $"{spdxFileName}.sig");
+                
+                // Create empty files (only SPDX and sig files, missing pem)
+                File.Create(spdxFilePath).Dispose();
+                File.Create(sigFilePath).Dispose();
+                
+                // Setup app settings with the temp directory
+                var appSettings = new CommonAppSettings
+                {
+                    Directory = new LCT.Common.Directory(new FolderAction(), new FileOperations())
+                    {
+                        InputFolder = tempDirectory
+                    }
+                };
+                  // Act & Assert
+                var exception = Assert.Throws<ApplicationException>(() => BomHelper.NamingConventionOfSPDXFile(spdxFilePath, appSettings));
+                StringAssert.Contains($"{spdxFileName}.pem", exception.Message);
+                StringAssert.Contains("Naming convention error", exception.Message);
+            }
+            finally
+            {
+                // Clean up
+                if (System.IO.Directory.Exists(tempDirectory))
+                {
+                    System.IO.Directory.Delete(tempDirectory, true);
+                }
+            }
+        }
+        
+        [Test]
+        public void NamingConventionOfSPDXFile_WhenSigFileMissing_ThrowsApplicationException()
+        {
+            // Arrange
+            string tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            System.IO.Directory.CreateDirectory(tempDirectory);
+            
+            try
+            {
+                // Create test files
+                string spdxFileName = "test.spdx.sbom.json";
+                string spdxFilePath = Path.Combine(tempDirectory, spdxFileName);
+                string pemFilePath = Path.Combine(tempDirectory, $"{spdxFileName}.pem");
+                
+                // Create empty files (only SPDX and pem files, missing sig)
+                File.Create(spdxFilePath).Dispose();
+                File.Create(pemFilePath).Dispose();
+                
+                // Setup app settings with the temp directory
+                var appSettings = new CommonAppSettings
+                {
+                    Directory = new LCT.Common.Directory(new FolderAction(), new FileOperations())
+                    {
+                        InputFolder = tempDirectory
+                    }
+                };
+                  // Act & Assert
+                var exception = Assert.Throws<ApplicationException>(() => BomHelper.NamingConventionOfSPDXFile(spdxFilePath, appSettings));
+                StringAssert.Contains($"{spdxFileName}.sig", exception.Message);
+                StringAssert.Contains("Naming convention error", exception.Message);
+            }
+            finally
+            {
+                // Clean up
+                if (System.IO.Directory.Exists(tempDirectory))
+                {
+                    System.IO.Directory.Delete(tempDirectory, true);
+                }
+            }
+        }
+        
+        [Test]
+        public void NamingConventionOfSPDXFile_WhenAllFilesMissing_ThrowsApplicationException()
+        {
+            // Arrange
+            string tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            System.IO.Directory.CreateDirectory(tempDirectory);
+            
+            try
+            {
+                // Create test files
+                string spdxFileName = "test.spdx.sbom.json";
+                string spdxFilePath = Path.Combine(tempDirectory, spdxFileName);
+                
+                // Create only the SPDX file, missing both pem and sig
+                File.Create(spdxFilePath).Dispose();
+                
+                // Setup app settings with the temp directory
+                var appSettings = new CommonAppSettings
+                {
+                    Directory = new LCT.Common.Directory(new FolderAction(), new FileOperations())
+                    {
+                        InputFolder = tempDirectory
+                    }
+                };
+                  // Act & Assert
+                var exception = Assert.Throws<ApplicationException>(() => BomHelper.NamingConventionOfSPDXFile(spdxFilePath, appSettings));
+                StringAssert.Contains($"{spdxFileName}.pem", exception.Message);
+                StringAssert.Contains($"{spdxFileName}.sig", exception.Message);
+                StringAssert.Contains("Naming convention error", exception.Message);
+            }
+            finally
+            {
+                // Clean up
+                if (System.IO.Directory.Exists(tempDirectory))
+                {
+                    System.IO.Directory.Delete(tempDirectory, true);
+                }
+            }
         }
     }
 }

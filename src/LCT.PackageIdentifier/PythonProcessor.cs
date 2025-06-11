@@ -15,6 +15,7 @@ using LCT.Services.Interface;
 using log4net;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -50,6 +51,9 @@ namespace LCT.PackageIdentifier
                 if (config.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     listOfTemplateBomfilePaths.Add(config);
+                }                else if (config.EndsWith(FileConstant.SPDXFileExtension))
+                {
+                    BomHelper.NamingConventionOfSPDXFile(config, appSettings);
                 }
                 if (config.ToLower().EndsWith("poetry.lock"))
                 {

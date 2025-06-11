@@ -14,6 +14,7 @@ using LCT.Services.Interface;
 using log4net;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -48,6 +49,11 @@ namespace LCT.PackageIdentifier
                 if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     listOfTemplateBomfilePaths.Add(filepath);
+                }
+                else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
+                {
+                  BomHelper.NamingConventionOfSPDXFile(filepath, appSettings);
+                   
                 }
                 if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {

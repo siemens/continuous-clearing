@@ -8,6 +8,7 @@ using CycloneDX.Models;
 using LCT.APICommunications;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
+using LCT.Common.Interface;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
@@ -31,7 +32,7 @@ namespace LCT.PackageIdentifier
     public class BomHelper : IBomHelper
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
+        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
         #region public methods
 
         public string GetProjectSummaryLink(string projectId, string sw360Url)
@@ -93,6 +94,48 @@ namespace LCT.PackageIdentifier
                 }
                 Logger.Info("\n");
             }
+        }
+
+
+        public static void NamingConventionOfSPDXFile(string filepath, CommonAppSettings appSettings)
+        {
+            string filename = Path.GetFileName(filepath); // e.g., "example.spdx.sbom.json"
+            string missing = String.Empty;
+            var relatedExtensions = new[] { $"{filename}.pem", $"{filename}.sig" };
+
+            var foundFiles = new Dictionary<string, string>();
+            var missingFiles = new List<string>();
+            foreach (var related in relatedExtensions)
+            {
+                string relatedFile = Path.Combine(appSettings.Directory.InputFolder, related);
+                if (File.Exists(relatedFile))
+                {
+                    foundFiles[related] = relatedFile;
+                }
+                else
+                {
+                    missingFiles.Add(related);
+                }
+            }
+
+            if (missingFiles.Count > 0)
+            {
+                foreach (var missingFile in missingFiles)
+                {
+                    if (missingFile.EndsWith(".sig", StringComparison.OrdinalIgnoreCase))
+                    {
+                        Logger.Error($"Naming Convention Error: The certificate file(s) for the SPDX document '{filename}' are missing. Please ensure that signature files are named in the format '{filename}.sig'.");
+                    }
+                    else if (missingFile.EndsWith(".pem", StringComparison.OrdinalIgnoreCase))
+                    {
+                        Logger.Error($"Naming Convention Error: The certificate file(s) for the SPDX document '{filename}' are missing. Please ensure that .pem files are named in the format '{filename}.pem'.");
+                    }
+                }
+                environmentHelper.CallEnvironmentExit(-1);
+            }
+
+
+
         }
 
         public static string GetHashCodeUsingNpmView(string name, string version)

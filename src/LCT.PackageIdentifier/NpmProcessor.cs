@@ -540,6 +540,9 @@ namespace LCT.PackageIdentifier
                         componentsForBOM.AddRange(bom.Components);
                         dependencies = bom.Dependencies;
                     }
+                }                else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
+                {
+                    BomHelper.NamingConventionOfSPDXFile(filepath, appSettings);
                 }
                 else
                 {
