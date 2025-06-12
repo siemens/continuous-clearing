@@ -133,9 +133,10 @@ namespace LCT.PackageIdentifier
                 }
                 environmentHelper.CallEnvironmentExit(-1);
             }
-
-
-
+            else
+            {
+              bool isValidFile =  PemSignatureVerifier.ValidatePem(filepath,foundFiles.TryGetValue($"{filename}.sig", out string pemFile) ? pemFile : string.Empty, foundFiles.TryGetValue($"{filename}.pem", out string sigFile) ? sigFile : string.Empty);
+            }
         }
 
         public static string GetHashCodeUsingNpmView(string name, string version)

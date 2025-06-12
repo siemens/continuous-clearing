@@ -56,7 +56,17 @@ namespace LCT.PackageIdentifier
 
                 PrintCertificateInfo(certificate);
 
-                return ValidateSignedFileFromCertificate(documentPath, signaturePath, certificate);
+                bool IsValid = ValidateSignedFileFromCertificate(documentPath, signaturePath, certificate);
+                if (IsValid)
+                {
+                    Logger.Info($"SPDX file validated successfully!!");
+                }
+                else
+                {
+                    Logger.Warn($"SPDX file Not validated successfully!!");
+                }
+                return IsValid;
+
             }
             catch (CryptographicException ex)
             {
