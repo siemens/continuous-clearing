@@ -1,6 +1,12 @@
-﻿using log4net;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2025 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// --------------------------------------------------------------------------------------------------------------------
+using log4net;
 using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -191,17 +197,20 @@ namespace LCT.PackageIdentifier
 
             for (int i = 0; i < headers.Length; i++)
             {
-                if (pem.StartsWith(headers[i]))
+                int headerIndex = pem.IndexOf(headers[i], StringComparison.Ordinal);
+                int footerIndex = pem.IndexOf(footers[i], StringComparison.Ordinal);
+                if (headerIndex >= 0 && footerIndex > headerIndex)
                 {
-                    return pem.Replace(headers[i], "")
-                              .Replace(footers[i], "")
-                              .Replace("\r", "")
-                              .Replace("\n", "")
-                              .Trim();
+                    int start = headerIndex + headers[i].Length;
+                    int length = footerIndex - start;
+                    string base64 = pem.Substring(start, length);
+                    // Remove all whitespace (including \r, \n, spaces, tabs)
+                    base64 = new string(base64.Where(c => !char.IsWhiteSpace(c)).ToArray());
+                    return base64;
                 }
             }
             // If no header matched, assume the whole string is base64
-            return pem;
+            return new string(pem.Where(c => !char.IsWhiteSpace(c)).ToArray());
         }
 
         /// <summary>
