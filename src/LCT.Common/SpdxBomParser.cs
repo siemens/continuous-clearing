@@ -21,8 +21,6 @@ namespace LCT.Common
         {           
 
             var bom = InitializeBom();
-            string filename = Path.GetFileName(filePath);
-
             try
             {
                 string json = File.ReadAllText(filePath);
@@ -49,7 +47,7 @@ namespace LCT.Common
                 }
 
                 var packageMap = BuildPackageMap(graph);
-                BuildComponents(graph, filename, bom);
+                BuildComponents(graph, bom);
                 BuildDependencies(graph, packageMap, bom);
             }
             catch (System.Text.Json.JsonException ex)
@@ -139,7 +137,7 @@ namespace LCT.Common
             return true;
         }
 
-        private static void BuildComponents(JsonArray graph, string filename, Bom bom)
+        private static void BuildComponents(JsonArray graph, Bom bom)
         {
             foreach (var pkg in graph.Where(e => e?["type"]?.ToString() == "software_Package"))
             {
@@ -156,15 +154,13 @@ namespace LCT.Common
                         continue;
                     }
 
-                    var spdxFileName = new Property { Name = Dataconstant.Cdx_SpdxFileName, Value = filename };
                     var component = new Component
                     {
                         Type = Component.Classification.Library,
                         Name = name,
                         Version = version,
                         BomRef = purl,
-                        Purl = purl,
-                        Properties = new List<Property> { spdxFileName }
+                        Purl = purl
                     };
 
                     bom.Components.Add(component);

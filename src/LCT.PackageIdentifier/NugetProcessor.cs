@@ -473,6 +473,10 @@ namespace LCT.PackageIdentifier
                     componentsForBOM.AddRange(bom.Components);
                     CommonHelper.GetDetailsForManuallyAdded(componentsForBOM,
                         listComponentForBOM);
+                    if (bom != null)
+                    {
+                        CommonHelper.AddSpdxSBomFileNameProperty(ref bom, filepath);
+                    }
 
                 }
                 else

@@ -220,7 +220,13 @@ namespace LCT.PackageIdentifier
         {
             if (filePath.EndsWith(FileConstant.SPDXFileExtension))
             {
-                return spdxBomParser.ParseSPDXBom(filePath);
+                Bom bom;
+                bom= spdxBomParser.ParseSPDXBom(filePath);
+                if (bom != null)
+                {
+                    CommonHelper.AddSpdxSBomFileNameProperty(ref bom, filePath);
+                }
+                return bom;
             }
             else
             {

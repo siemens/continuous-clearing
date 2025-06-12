@@ -548,6 +548,10 @@ namespace LCT.PackageIdentifier
                     BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += bom.Components.Count;
                     componentsForBOM.AddRange(bom.Components);
                     dependencies = bom.Dependencies;
+                    if (bom != null)
+                    {
+                        CommonHelper.AddSpdxSBomFileNameProperty(ref bom, filepath);
+                    }
                 }
                 else
                 {
