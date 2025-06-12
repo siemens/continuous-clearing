@@ -745,11 +745,7 @@ namespace LCT.PackageIdentifier
         {
             foreach (var component in components)
             {
-                if (component.Properties == null)
-                {
-                    component.Properties = new List<Property>();
-                }
-
+                component.Properties ??= new List<Property>();
                 Property isDev;
                 Property identifierType;
                 if (identifiedBy == "PackageFile")
