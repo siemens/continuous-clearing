@@ -833,7 +833,7 @@ namespace LCT.Services.UTest
         }
 
         [Test]
-        public async Task UdpateSW360ReleaseContent_ForGivenComponentInfo_ThorwsHttpRequestExceptionOnError()
+        public async Task UpdateSW360ReleaseContent_ForGivenComponentInfo_ThorwsHttpRequestExceptionOnError()
         {
             // Arrange
             UpdateReleaseAdditinoalData updateRelease = new UpdateReleaseAdditinoalData();
@@ -848,14 +848,14 @@ namespace LCT.Services.UTest
 
             // Act
             var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object);
-            var actual = await sw360CreatorService.UdpateSW360ReleaseContent(component, "foss url");
+            var actual = await sw360CreatorService.UpdateSW360ReleaseContent(component, "foss url");
 
             // Assert
             Assert.That(actual, Is.False);
         }
 
         [Test]
-        public async Task UdpateSW360ReleaseContent_ForGivenComponentInfo_ThorwsAggregateExceptionOnError()
+        public async Task UpdateSW360ReleaseContent_ForGivenComponentInfo_ThrowsAggregateExceptionOnError()
         {
             // Arrange
             UpdateReleaseAdditinoalData updateRelease = new UpdateReleaseAdditinoalData();
@@ -870,7 +870,7 @@ namespace LCT.Services.UTest
 
             // Act
             var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object);
-            var actual = await sw360CreatorService.UdpateSW360ReleaseContent(component, "foss url");
+            var actual = await sw360CreatorService.UpdateSW360ReleaseContent(component, "foss url");
 
             // Assert
             Assert.That(actual, Is.False);
