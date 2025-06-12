@@ -45,7 +45,8 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-            NpmProcessor NpmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            NpmProcessor NpmProcessor = new NpmProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
 
             //Act
             NpmProcessor.ParsePackageFile(appSettings);
@@ -78,7 +79,8 @@ namespace LCT.PackageIdentifier.UTest
                 }
             };
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-            NpmProcessor NpmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            NpmProcessor NpmProcessor = new NpmProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
 
             //Act
             Bom bom = NpmProcessor.ParsePackageFile(appSettings);
@@ -116,7 +118,8 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-            NpmProcessor NpmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            NpmProcessor NpmProcessor = new NpmProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
 
             //Act
             NpmProcessor.ParsePackageFile(appSettings);
@@ -133,7 +136,8 @@ namespace LCT.PackageIdentifier.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-            NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             string[] Includes = { "*_NPM.cdx.json" };
             IFolderAction folderAction = new FolderAction();
             IFileOperations fileOperations = new FileOperations();
@@ -164,7 +168,8 @@ namespace LCT.PackageIdentifier.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-            NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             string[] Includes = { "CycloneDX2_NPM.cdx.json", "SBOMTemplate_Npm.cdx.json", "SBOM_NpmCATemplate.cdx.json" };
             string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 
@@ -197,7 +202,8 @@ namespace LCT.PackageIdentifier.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-            NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             string[] Includes = { "CycloneDX2_NPM.cdx.json" };
             string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 

@@ -9,6 +9,7 @@ using LCT.APICommunications;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Interface;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
@@ -25,16 +26,13 @@ namespace LCT.PackageIdentifier
     /// <summary>
     /// The DebianProcessor class
     /// </summary>
-    public class DebianProcessor : IParser
+    public class DebianProcessor(ICycloneDXBomParser cycloneDXBomParser, ISpdxBomParser spdxBomParser) : IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private readonly ICycloneDXBomParser _cycloneDXBomParser;
+        private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
+        private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
-
-        public DebianProcessor(ICycloneDXBomParser cycloneDXBomParser)
-        {
-            _cycloneDXBomParser = cycloneDXBomParser;
-        }
+        
 
         #region public method
 
@@ -54,11 +52,7 @@ namespace LCT.PackageIdentifier
                     Logger.Debug($"ParsePackageFile():FileName: " + filepath);
                     var list = ParseCycloneDX(filepath, ref bom);
                     listofComponents.AddRange(list);
-                }
-                else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
-                {
-
-                }
+                }                
             }
 
             int initialCount = listofComponents.Count;
@@ -349,8 +343,7 @@ namespace LCT.PackageIdentifier
 
         private Bom ExtractDetailsForJson(string filePath, ref List<DebianPackage> debianPackages)
         {
-            Bom bom = _cycloneDXBomParser.ParseCycloneDXBom(filePath);
-
+            Bom bom = BomHelper.ParseBomFile(filePath, _spdxBomParser, _cycloneDXBomParser);
             foreach (var componentsInfo in bom.Components)
             {
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;

@@ -91,7 +91,8 @@ namespace LCT.PackageIdentifier
                 Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);
 
             ICycloneDXBomParser cycloneDXBomParser = new CycloneDXBomParser();
-            IBomCreator bomCreator = new BomCreator(cycloneDXBomParser);
+            ISpdxBomParser spdxBomParser = new SpdxBomParser();
+            IBomCreator bomCreator = new BomCreator(cycloneDXBomParser,spdxBomParser);
             bomCreator.JFrogService = GetJfrogService(appSettings);
             bomCreator.BomHelper = new BomHelper();
 

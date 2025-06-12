@@ -7,11 +7,13 @@
 using CycloneDX.Models;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Interface;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -22,15 +24,12 @@ namespace LCT.PackageIdentifier
     /// <summary>
     /// The AlpineProcessor class
     /// </summary>
-    public class AlpineProcessor : IParser
+    public class AlpineProcessor(ICycloneDXBomParser cycloneDXBomParser, ISpdxBomParser spdxBomParser) : IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private readonly ICycloneDXBomParser _cycloneDXBomParser;
-        public AlpineProcessor(ICycloneDXBomParser cycloneDXBomParser)
-        {
-            _cycloneDXBomParser = cycloneDXBomParser;
-        }
-
+        private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
+        private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
+        
         #region public method
 
         public Bom ParsePackageFile(CommonAppSettings appSettings)
@@ -48,7 +47,7 @@ namespace LCT.PackageIdentifier
                 if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     listOfTemplateBomfilePaths.Add(filepath);
-                }
+                }                
                 else
                 {
                     Logger.Debug($"ParsePackageFile():FileName: " + filepath);
@@ -124,7 +123,8 @@ namespace LCT.PackageIdentifier
 
         private void ExtractDetailsForJson(string filePath, ref List<AlpinePackage> alpinePackages, List<Dependency> dependenciesForBOM)
         {
-            Bom bom = _cycloneDXBomParser.ParseCycloneDXBom(filePath);
+            Bom bom = BomHelper.ParseBomFile(filePath, _spdxBomParser, _cycloneDXBomParser);
+
             foreach (var componentsInfo in bom.Components)
             {
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;

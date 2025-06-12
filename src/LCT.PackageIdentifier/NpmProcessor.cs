@@ -30,10 +30,11 @@ namespace LCT.PackageIdentifier
     /// <summary>
     /// Parses the NPM Packages
     /// </summary>
-    public class NpmProcessor : CycloneDXBomParser, IParser
+    public class NpmProcessor(ICycloneDXBomParser cycloneDXBomParser, ISpdxBomParser spdxBomParser) : CycloneDXBomParser, IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private readonly ICycloneDXBomParser _cycloneDXBomParser;
+        private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
+        private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
         private const string Bundled = "bundled";
         private const string Dependencies = "dependencies";
         private const string Dev = "dev";
@@ -41,11 +42,7 @@ namespace LCT.PackageIdentifier
         private const string Version = "version";
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
         private const string Requires = "requires";
-        private const string Name = "name";
-        public NpmProcessor(ICycloneDXBomParser cycloneDXBomParser)
-        {
-            _cycloneDXBomParser = cycloneDXBomParser;
-        }
+        private const string Name = "name";        
 
         public Bom ParsePackageFile(CommonAppSettings appSettings)
         {
@@ -544,7 +541,13 @@ namespace LCT.PackageIdentifier
                 }
                 else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
                 {
-
+                    bom = _spdxBomParser.ParseSPDXBom(filepath);
+                    bom = RemoveExcludedComponents(appSettings, bom);
+                    CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
+                    AddingIdentifierType(bom.Components, "SpdxFile");
+                    BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += bom.Components.Count;
+                    componentsForBOM.AddRange(bom.Components);
+                    dependencies = bom.Dependencies;
                 }
                 else
                 {

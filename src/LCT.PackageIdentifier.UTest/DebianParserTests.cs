@@ -28,6 +28,7 @@ namespace LCT.PackageIdentifier.UTest
         private Mock<IBomHelper> _mockBomHelper;
         private Mock<IJFrogService> _mockJFrogService;
         private Mock<ICycloneDXBomParser> _mockCycloneDXBomParser;
+        private Mock<ISpdxBomParser> _mockSpdxBomParser;
 
         [SetUp]
         public void Setup()
@@ -35,7 +36,8 @@ namespace LCT.PackageIdentifier.UTest
             _mockBomHelper = new Mock<IBomHelper>();
             _mockJFrogService = new Mock<IJFrogService>();
             _mockCycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-            _mdebianProcessor = new DebianProcessor(_mockCycloneDXBomParser.Object);
+            _mockSpdxBomParser = new Mock<ISpdxBomParser>();
+            _mdebianProcessor = new DebianProcessor(_mockCycloneDXBomParser.Object, _mockSpdxBomParser.Object);
         }
 
 
@@ -115,8 +117,9 @@ namespace LCT.PackageIdentifier.UTest
 
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             cycloneDXBomParser.Setup(x => x.ParseCycloneDXBom(It.IsAny<string>())).Returns(bom);
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
 
-            _debianProcessor = new DebianProcessor(cycloneDXBomParser.Object);
+            _debianProcessor = new DebianProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
         }
 
         [Test]

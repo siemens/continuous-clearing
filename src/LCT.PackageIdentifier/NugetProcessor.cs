@@ -4,6 +4,8 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+// Ignore Spelling: Nuget LCT app
+
 using CycloneDX.Models;
 using LCT.APICommunications;
 using LCT.APICommunications.Model.AQL;
@@ -31,16 +33,12 @@ using Directory = System.IO.Directory;
 
 namespace LCT.PackageIdentifier
 {
-    public class NugetProcessor : CycloneDXBomParser, IParser
+    public class NugetProcessor(ICycloneDXBomParser cycloneDXBomParser, ISpdxBomParser spdxBomParser) : CycloneDXBomParser, IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
-        private readonly ICycloneDXBomParser _cycloneDXBomParser;
-
-        public NugetProcessor(ICycloneDXBomParser cycloneDXBomParser)
-        {
-            _cycloneDXBomParser = cycloneDXBomParser;
-        }
+        private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
+        private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
 
         #region public methods
         public Bom ParsePackageFile(CommonAppSettings appSettings)
@@ -468,18 +466,13 @@ namespace LCT.PackageIdentifier
                 }
                 else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
                 {
-                    string filename = Path.GetFileName(filepath); // e.g., "example.spdx.sbom.json"
-                    var relatedExtensions = new[] { $"{filename}.peg", $"{filename}.sig" };
-
-                    var foundFiles = new Dictionary<string, string>();
-                    foreach (var related in relatedExtensions)
-                    {
-                        string relatedFile = Path.Combine(appSettings.Directory.InputFolder, related);
-                        if (File.Exists(relatedFile))
-                        {
-                            foundFiles[related] = relatedFile;
-                        }
-                    }
+                    string filename = Path.GetFileName(filepath); // e.g., "example.spdx.sbom.json"                    
+                    bom = _spdxBomParser.ParseSPDXBom(filepath);
+                    CycloneDXBomParser.CheckValidComponentsForProjectType(
+                            bom.Components, appSettings.ProjectType);
+                    componentsForBOM.AddRange(bom.Components);
+                    CommonHelper.GetDetailsForManuallyAdded(componentsForBOM,
+                        listComponentForBOM);
 
                 }
                 else

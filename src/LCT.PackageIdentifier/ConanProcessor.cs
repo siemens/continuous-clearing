@@ -31,19 +31,13 @@ namespace LCT.PackageIdentifier
     /// <summary>
     /// Parses the Conan Packages
     /// </summary>
-    public class ConanProcessor : CycloneDXBomParser, IParser
+    public class ConanProcessor(ICycloneDXBomParser cycloneDXBomParser, ISpdxBomParser spdxBomParser) : CycloneDXBomParser, IParser
     {
         #region fields
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private readonly ICycloneDXBomParser _cycloneDXBomParser;
-        #endregion
-
-        #region constructor
-        public ConanProcessor(ICycloneDXBomParser cycloneDXBomParser)
-        {
-            _cycloneDXBomParser = cycloneDXBomParser;
-        }
-        #endregion
+        private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
+        private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
+        #endregion        
 
         #region public methods
         public Bom ParsePackageFile(CommonAppSettings appSettings)
@@ -279,7 +273,11 @@ namespace LCT.PackageIdentifier
                 }
                 else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
                 {
-
+                    string filename = Path.GetFileName(filepath); // e.g., "example.spdx.sbom.json"                    
+                    bom = _spdxBomParser.ParseSPDXBom(filepath);
+                    CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
+                    GetDetailsforManuallyAddedComp(bom.Components);
+                    componentsForBOM.AddRange(bom.Components);
                 }
                 else if (filepath.EndsWith(FileConstant.CycloneDXFileExtension)
                     && !filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
