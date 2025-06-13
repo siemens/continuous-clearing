@@ -208,7 +208,28 @@ Users have the flexibility to generate a basic SBOM even if connections to SW360
       After successful execution, output.sbom.cdx.json (*CycloneDX.json*) file will be created in specified directory
 
       Resulted output.sbom.cdx.json file will be having the list of installed packages  and the same file will be used as  an input to Continuous clearing tool - Package identifier via the input directory parameter. The remaining process is same as other project types.
+# SPDX v3 to CycloneDX SBOM Converter
 
+## Overview
+This tool implements support for SPDX v3 in SBOM (Software Bill of Materials) processing, allowing automatic conversion of SPDX files to CycloneDX format while preserving relationships and metadata.
+
+## About SPDX
+SPDX (Software Package Data Exchange) is an open standard for communicating software bill of materials information, including components, licenses, copyrights, and security references. SPDX v3 is the latest version that provides:
+- Enhanced security features
+- Improved relationship mapping
+- Better support for software supply chain documentation
+- Standardized format for sharing software metadata
+
+## Features
+- Automatic detection and processing of SPDX files
+- Conversion from SPDX to CycloneDX format
+- Relationship preservation during conversion
+- Custom property mapping
+
+## Requirements
+- Input files must have the `.spdx.sbom.json` extension
+- Valid SPDX v3 formatted files
+- Specified input directory path
 
 ### **Configuring the Continuous Clearing Tool**
 
