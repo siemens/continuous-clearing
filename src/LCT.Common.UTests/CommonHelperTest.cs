@@ -502,17 +502,17 @@ namespace LCT.Common.UTest
             string[] result = CommonHelper.MaskSensitiveArguments(args);
 
             // Assert
-            Assert.IsEmpty(result, "Null input should return an empty array.");            
+            Assert.IsEmpty(result, "Null input should return an empty array.");
         }
         [Test]
         public void DefaultLogFolderInitialisation_SetsDefaultLogPath_Windows()
         {
             // Arrange
             string logFileName = FileConstant.BomCreatorLog;
-            string runningLocation=Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            string runningLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
             Log4Net.CatoolCurrentDirectory = System.IO.Directory.GetParent(runningLocation).FullName;
             bool m_Verbose = false;
-          
+
 
             // Act
             CommonHelper.DefaultLogFolderInitialisation(logFileName, m_Verbose);
@@ -524,16 +524,45 @@ namespace LCT.Common.UTest
             else
             {
                 Assert.AreEqual("/var/log", CommonHelper.DefaultLogPath);
-            }               
-            
-        }       
+            }
+
     }
 
-    public class TestObject
+    [Test]
+    public void AddSpdxSBomFileNameProperty_AddsPropertyToAllComponents()
     {
-        [System.ComponentModel.DisplayName("Display Name 1")]
-        public string Property1 { get; set; }
+        // Arrange
+        var bom = new Bom
+        {
+            Components = new List<Component>
+            {
+                new Component { Name = "Comp1", Properties = null },
+                new Component { Name = "Comp2", Properties = new List<Property>() }
+            }
+        };
+        string filePath = @"C:\temp\sbom.spdx.json";
+        string expectedFileName = "sbom.spdx.json";
 
-        public string Property2 { get; set; }
+        // Act
+        CommonHelper.AddSpdxSBomFileNameProperty(ref bom, filePath);
+
+        // Assert
+        foreach (var component in bom.Components)
+        {
+            Assert.IsNotNull(component.Properties, "Properties list should not be null");
+            Assert.IsTrue(
+                component.Properties.Any(p => p.Name == Dataconstant.Cdx_SpdxFileName && p.Value == expectedFileName),
+                $"Component '{component.Name}' should have SPDX file name property set"
+            );
+        }
     }
+}
+
+public class TestObject
+{
+    [System.ComponentModel.DisplayName("Display Name 1")]
+    public string Property1 { get; set; }
+
+    public string Property2 { get; set; }
+}
 }

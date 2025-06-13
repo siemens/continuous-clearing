@@ -582,5 +582,6 @@ namespace LCT.PackageIdentifier.UTest
             string hashcode = BomHelper.GetHashCodeUsingNpmView(name, version);
             Assert.That(expectedhashcode, Is.EqualTo(hashcode));
         }
+        
     }
 }
