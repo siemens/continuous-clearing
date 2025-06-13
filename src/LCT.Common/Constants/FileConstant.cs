@@ -54,5 +54,6 @@ namespace LCT.Common.Constants
         public const string multipleversionsFileName = "Multipleversions.json";
         public const string artifactoryReportNotApproved = "ReportNotApproved.json";
         public const string basicSBOMName = "ContinuousClearing";
+        public const string SPDXFileExtension = ".spdx.sbom.json";
     }
 }

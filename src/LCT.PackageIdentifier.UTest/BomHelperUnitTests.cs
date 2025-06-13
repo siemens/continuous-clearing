@@ -15,7 +15,9 @@ using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using Moq;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace LCT.PackageIdentifier.UTest

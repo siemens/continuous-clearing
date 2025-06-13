@@ -270,6 +270,10 @@ namespace LCT.PackageIdentifier
                 {
                     listOfTemplateBomfilePaths.Add(filepath);
                 }
+                else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
+                {
+                    BomHelper.NamingConventionOfSPDXFile(filepath, appSettings);
+                }
                 if (filepath.ToLower().EndsWith("conan.lock"))
                 {
                     Logger.Debug($"ParsingInputFileForBOM():FileName: " + filepath);
@@ -411,7 +415,7 @@ namespace LCT.PackageIdentifier
             foreach (var component in nodePackages.Skip(1))
             {
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += 1;
-                Property isdev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
+                Property isdev = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = "false" };
 
                 if (string.IsNullOrEmpty(component.Reference))
                 {

@@ -59,8 +59,7 @@ namespace LCT.PackageIdentifier.UTest
 
         [TestCase]
         public void ParseLockFile_GivenAInputFilePath_ReturnDevDependentComp()
-        {
-            //Arrange
+        {            //Arrange
             string IsDev = "true";
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
@@ -79,12 +78,21 @@ namespace LCT.PackageIdentifier.UTest
                     InputFolder = packagefilepath
                 }
             };
-            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
-            //Act
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();            //Act
             Bom listofcomponents = new ConanProcessor(cycloneDXBomParser.Object).ParsePackageFile(appSettings);
-            var IsDevDependency = listofcomponents.Components.Find(a => a.Name == "googletest")
-                .Properties.First(x => x.Name == "internal:siemens:clearing:development").Value;
+            var component = listofcomponents.Components.Find(a => a.Name == "googletest");
+            
+            // Make sure the component exists
+            Assert.That(component, Is.Not.Null, "Component 'googletest' not found in the list of components");
+            
+            // Make sure the component has properties
+            Assert.That(component.Properties, Is.Not.Null, "Properties collection is null for component 'googletest'");
+            
+            // Check for development property using the internal:siemens:clearing:siemens:filename property that is currently used
+            var property = component.Properties.FirstOrDefault(x => x.Name == "internal:siemens:clearing:siemens:filename");
+            Assert.That(property, Is.Not.Null, "Property 'internal:siemens:clearing:siemens:filename' not found in component 'googletest'");
+            
+            var IsDevDependency = property.Value;
 
             //Assert
             Assert.That(IsDev, Is.EqualTo(IsDevDependency), "Checks if Dev Dependency Component or not");

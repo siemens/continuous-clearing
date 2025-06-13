@@ -465,8 +465,11 @@ namespace LCT.PackageIdentifier
                         CommonHelper.GetDetailsForManuallyAdded(componentsForBOM,
                             listComponentForBOM);
                     }
+                }                else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
+                {
+                    BomHelper.NamingConventionOfSPDXFile(filepath, appSettings);
                 }
-                else
+                else 
                 {
                     Logger.Debug($"ParsingInputFileForBOM():Found as Package File");
                     List<NugetPackage> listofComponents = new();

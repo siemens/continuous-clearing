@@ -209,7 +209,25 @@ Users have the flexibility to generate a basic SBOM even if connections to SW360
 
       Resulted output.sbom.cdx.json file will be having the list of installed packages  and the same file will be used as  an input to Continuous clearing tool - Package identifier via the input directory parameter. The remaining process is same as other project types.
 
+    
+# SPDX SBOM Signature Validator
 
+## Overview
+This tool provides automated validation of SPDX SBOM files by verifying their digital signatures and certificates. It ensures the integrity and authenticity of SBOM files through cryptographic validation.
+
+## Features
+- Automatic detection and matching of signature (`.sig`) and certificate (`.pem`) files
+- Cryptographic validation of SBOM files against their signatures
+- Certificate validation using public key infrastructure
+- Comprehensive error reporting and logging
+
+## File Naming Convention
+The tool expects the following file naming pattern in the input directory:
+ⓘ
+For code that is intended to be used in Siemens products or services, the code generation features of our AI Services may only be used after prior approval of your responsible organizational unit.
+example.spdx.sbom.json # SBOM file
+example.spdx.sbom.json.sig # Signature file
+example.spdx.sbom.json.pem # Public certificate file 
 ### **Configuring the Continuous Clearing Tool**
 
 Arguments can be provided to the tool in two ways :
