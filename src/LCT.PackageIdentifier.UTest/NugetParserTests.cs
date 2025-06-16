@@ -29,7 +29,7 @@ namespace LCT.PackageIdentifier.UTest
         private Mock<IBomHelper> _mockBomHelper;
         private NugetProcessor _nugetProcessor;
         private ICycloneDXBomParser _cycloneDXBomParser;
-        private ISpdxBomParser _spdxBomParser;
+        private readonly ISpdxBomParser _spdxBomParser;
         [SetUp]
         public void Setup()
         {
@@ -239,10 +239,9 @@ namespace LCT.PackageIdentifier.UTest
             };
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
-            var nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
 
             // Act
-            nugetProcessor.AddSiemensDirectProperty(ref bom);
+            NugetProcessor.AddSiemensDirectProperty(ref bom);
 
             // Assert
             Assert.AreEqual(expectedBom.Components.Count, bom.Components.Count);
@@ -297,10 +296,9 @@ namespace LCT.PackageIdentifier.UTest
             };
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
-            var nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
 
             // Act
-            nugetProcessor.AddSiemensDirectProperty(ref bom);
+            NugetProcessor.AddSiemensDirectProperty(ref bom);
 
             // Assert
             // Assert
@@ -388,7 +386,7 @@ namespace LCT.PackageIdentifier.UTest
             var nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
 
             // Act
-            nugetProcessor.AddSiemensDirectProperty(ref bom);
+            NugetProcessor.AddSiemensDirectProperty(ref bom);
 
             // Assert
             Assert.AreEqual(expectedBom.Components.Count, bom.Components.Count);

@@ -272,8 +272,7 @@ namespace LCT.PackageIdentifier
                     componentsForBOM.AddRange(components);
                 }
                 else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
-                {
-                    string filename = Path.GetFileName(filepath); // e.g., "example.spdx.sbom.json"                    
+                {                   
                     bom = _spdxBomParser.ParseSPDXBom(filepath);
                     CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
                     GetDetailsforManuallyAddedComp(bom.Components);

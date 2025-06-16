@@ -188,7 +188,7 @@ namespace LCT.PackageIdentifier
 
         private List<PythonPackage> ExtractDetailsFromJson(string filePath, CommonAppSettings appSettings, ref List<Dependency> dependencies)
         {
-            Bom bom;
+            Bom bom=new Bom();
             List<PythonPackage> PythonPackages = new List<PythonPackage>();
             if (filePath.EndsWith(FileConstant.SPDXFileExtension))
             {

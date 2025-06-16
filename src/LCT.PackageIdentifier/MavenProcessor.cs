@@ -27,7 +27,7 @@ namespace LCT.PackageIdentifier
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
-        
+
         public Bom ParsePackageFile(CommonAppSettings appSettings)
         {
             List<Component> componentsForBOM = new();
@@ -36,95 +36,126 @@ namespace LCT.PackageIdentifier
             Bom bom = new();
             int noOfExcludedComponents = 0;
             List<Dependency> dependenciesForBOM = new();
-            List<string> configFiles;
 
-            configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Maven);
-            List<string> listOfTemplateBomfilePaths = new List<string>();
-            foreach (string filepath in configFiles)
+            List<string> configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Maven);
+            List<string> listOfTemplateBomfilePaths = GetTemplateBomFilePaths(configFiles);
+
+            ProcessBomFiles(configFiles, ref componentsForBOM, ref componentsToBOM, ref dependenciesForBOM, appSettings);
+
+            ProcessTemplateFile(listOfTemplateBomfilePaths, componentsForBOM, appSettings);
+
+            IdentifyDevDependencies(componentsForBOM, componentsToBOM, ref ListOfComponents);
+
+            RemoveDuplicates(ref componentsForBOM, ListOfComponents);
+
+            ExcludeComponents(appSettings, ref componentsForBOM, ref dependenciesForBOM, ref noOfExcludedComponents);
+
+            FinalizeBom(ref bom, componentsForBOM, dependenciesForBOM);
+
+            Logger.Debug($"ParsePackageFile():End");
+
+            return bom;
+        }
+
+        private static List<string> GetTemplateBomFilePaths(List<string> configFiles)
+        {
+            return configFiles.Where(filepath => filepath.EndsWith(FileConstant.SBOMTemplateFileExtension)).ToList();
+        }
+
+        private void ProcessBomFiles(List<string> configFiles, ref List<Component> componentsForBOM, ref List<Component> componentsToBOM, ref List<Dependency> dependenciesForBOM, CommonAppSettings appSettings)
+        {
+            foreach (string filepath in configFiles.Where(filepath => !filepath.EndsWith(FileConstant.SBOMTemplateFileExtension)))
             {
-                if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                Bom bomList = ParseBomFile(filepath);
+                if (bomList?.Components != null)
                 {
-                    listOfTemplateBomfilePaths.Add(filepath);
+                    CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
+                    AddComponentsToBom(bomList, ref componentsForBOM, ref componentsToBOM);
+                    AddDependenciesToBom(bomList, ref dependenciesForBOM);
                 }
-                if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                else
                 {
-                    Bom bomList;
-                    if (filepath.EndsWith(FileConstant.SPDXFileExtension))
-                    {
-                        bomList = _spdxBomParser.ParseSPDXBom(filepath);
-                        if (bomList != null)
-                        {
-                            CommonHelper.AddSpdxSBomFileNameProperty(ref bomList, filepath);
-                        }                        
-                    }
-                    else
-                    {
-                        bomList = ParseCycloneDXBom(filepath);
-                    }                    
-
-                    if (bomList?.Components != null)
-                    {
-                        CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
-                    }
-                    else
-                    {
-                        Logger.Warn("No components found in the BOM file : " + filepath);
-                        continue;
-                    }
-
-                    if (componentsForBOM.Count == 0)
-                    {
-                        componentsForBOM.AddRange(bomList.Components);
-                    }
-                    else
-                    {
-                        componentsToBOM.AddRange(bomList.Components);
-                    }
-
-                    if (bomList.Dependencies != null)
-                    {
-                        dependenciesForBOM.AddRange(bomList.Dependencies);
-                    }
-                }                
+                    Logger.Warn($"No components found in the BOM file: {filepath}");
+                }
             }
+        }
 
+        private Bom ParseBomFile(string filepath)
+        {
+            Bom bomList;
+            if (filepath.EndsWith(FileConstant.SPDXFileExtension))
+            {
+                bomList = _spdxBomParser.ParseSPDXBom(filepath);
+                if (bomList != null)
+                {
+                    CommonHelper.AddSpdxSBomFileNameProperty(ref bomList, filepath);
+                }
+            }
+            else
+            {
+                bomList = ParseCycloneDXBom(filepath);
+            }
+            return bomList;
+        }
+
+        private static void AddComponentsToBom(Bom bomList, ref List<Component> componentsForBOM, ref List<Component> componentsToBOM)
+        {
+            if (componentsForBOM.Count == 0)
+            {
+                componentsForBOM.AddRange(bomList.Components);
+            }
+            else
+            {
+                componentsToBOM.AddRange(bomList.Components);
+            }
+        }
+
+        private static void AddDependenciesToBom(Bom bomList, ref List<Dependency> dependenciesForBOM)
+        {
+            if (bomList.Dependencies != null)
+            {
+                dependenciesForBOM.AddRange(bomList.Dependencies);
+            }
+        }
+
+        private void ProcessTemplateFile(List<string> listOfTemplateBomfilePaths, List<Component> componentsForBOM, CommonAppSettings appSettings)
+        {
             string templateFilePath = SbomTemplate.GetFilePathForTemplate(listOfTemplateBomfilePaths);
             SbomTemplate.ProcessTemplateFile(templateFilePath, _cycloneDXBomParser, componentsForBOM, appSettings.ProjectType);
+        }
 
-
-            //checking Dev dependency
+        private static void IdentifyDevDependencies(List<Component> componentsForBOM, List<Component> componentsToBOM, ref List<Component> ListOfComponents)
+        {
             DevDependencyIdentificationLogic(componentsForBOM, componentsToBOM, ref ListOfComponents);
-
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = componentsForBOM.Count + componentsToBOM.Count;
+        }
 
+        private static void RemoveDuplicates(ref List<Component> componentsForBOM, List<Component> ListOfComponents)
+        {
             int totalComponentsIdentified = BomCreator.bomKpiData.ComponentsinPackageLockJsonFile;
-
-            //Removing if there are any other duplicates           
             componentsForBOM = ListOfComponents.Distinct(new ComponentEqualityComparer()).ToList();
-
             BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - componentsForBOM.Count;
+        }
 
-
+        private static void ExcludeComponents(CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref List<Dependency> dependenciesForBOM, ref int noOfExcludedComponents)
+        {
             if (appSettings?.SW360?.ExcludeComponents != null)
             {
-                componentsForBOM = CommonHelper.RemoveExcludedComponents(componentsForBOM, appSettings?.SW360?.ExcludeComponents, ref noOfExcludedComponents);
+                componentsForBOM = CommonHelper.RemoveExcludedComponents(componentsForBOM, appSettings.SW360.ExcludeComponents, ref noOfExcludedComponents);
                 dependenciesForBOM = CommonHelper.RemoveInvalidDependenciesAndReferences(componentsForBOM, dependenciesForBOM);
                 BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents;
             }
+        }
 
+        private static void FinalizeBom(ref Bom bom, List<Component> componentsForBOM, List<Dependency> dependenciesForBOM)
+        {
             bom.Components = componentsForBOM;
-            bom.Dependencies = dependenciesForBOM;
-            bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
+            bom.Dependencies = dependenciesForBOM?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
             BomCreator.bomKpiData.ComponentsInComparisonBOM = bom.Components.Count;
-            Logger.Debug($"ParsePackageFile():End");
 
-            if (bom != null)
-            {
-                AddSiemensDirectProperty(ref bom);
-            }
+            AddSiemensDirectProperty(ref bom);
             bom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(bom.Components, bom.Dependencies);
             RemoveTypeJarSuffix(bom);
-            return bom;
         }
         private static void RemoveTypeJarSuffix(Bom bom)
         {
@@ -164,7 +195,7 @@ namespace LCT.PackageIdentifier
                 ? value[..^suffix.Length]
                 : value;
         }
-        public void AddSiemensDirectProperty(ref Bom bom)
+        public static void AddSiemensDirectProperty(ref Bom bom)
         {
             List<string> mavenDirectDependencies = new List<string>();
             mavenDirectDependencies.AddRange(bom.Dependencies?.Select(x => x.Ref)?.ToList() ?? new List<string>());

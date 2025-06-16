@@ -23,17 +23,15 @@ namespace LCT.PackageIdentifier.UTest
 {
     [TestFixture]
     public class MavenParserTests
-    {
-        private MavenProcessor _mavenProcessor;
+    {        
 
         [SetUp]
         public void Setup()
-        {
-            _mavenProcessor = new MavenProcessor(Mock.Of<ICycloneDXBomParser>(), Mock.Of<ISpdxBomParser>());
+        {           
         }
 
         [Test]
-        public void AddSiemensDirectProperty_ShouldAddProperty_WhenMavenDirectDependencyExists()
+        public static void AddSiemensDirectProperty_ShouldAddProperty_WhenMavenDirectDependencyExists()
         {
             // Arrange
             var bom = new Bom
@@ -65,7 +63,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             // Act
-            _mavenProcessor.AddSiemensDirectProperty(ref bom);
+            MavenProcessor.AddSiemensDirectProperty(ref bom);
 
             // Assert
             Assert.AreEqual("true", bom.Components[0].Properties[0].Value);
@@ -105,7 +103,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             // Act
-            _mavenProcessor.AddSiemensDirectProperty(ref bom);
+            MavenProcessor.AddSiemensDirectProperty(ref bom);
 
             // Assert
             Assert.AreEqual("false", bom.Components[0].Properties[0].Value);

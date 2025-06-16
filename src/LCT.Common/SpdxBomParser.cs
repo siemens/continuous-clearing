@@ -65,12 +65,7 @@ namespace LCT.Common
             catch (JsonReaderException ex)
             {
                 Logger.Error("Exception in reading spdx bom", ex);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("An unexpected error occurred while parsing the SPDX file.", ex);
-                
-            }
+            }          
 
             return bom;
         }
@@ -145,7 +140,6 @@ namespace LCT.Common
                 {
                     string name = pkg["name"]?.ToString();
                     string version = pkg["software_packageVersion"]?.ToString();
-                    string spdxId = pkg["spdxId"]?.ToString();
                     string purl = pkg["software_packageUrl"]?.ToString();
 
                     if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(version) || string.IsNullOrWhiteSpace(purl))
@@ -165,9 +159,17 @@ namespace LCT.Common
 
                     bom.Components.Add(component);
                 }
-                catch (Exception ex)
+                catch (ArgumentNullException ex)
                 {
-                    Logger.Debug("Failed to process a software package in the SPDX file.", ex);
+                    Logger.Error("A required argument was null while processing a software package.", ex);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    Logger.Error("An invalid operation occurred while processing a software package.", ex);
+                }
+                catch (Exception ex) when (ex is FormatException || ex is JsonException)
+                {
+                    Logger.Error("Failed to process a software package due to invalid data format or JSON parsing error.", ex);
                 }
 
             }
@@ -206,9 +208,17 @@ namespace LCT.Common
                         bom.Dependencies.Add(dependency);
                     }
                 }
-                catch (Exception ex)
+                catch (ArgumentNullException ex)
                 {
-                    Logger.Debug("Failed to process a dependency relationship in the SPDX file.", ex);
+                    Logger.Error("A required argument was null while processing a dependency relationship.", ex);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    Logger.Error("An invalid operation occurred while processing a dependency relationship.", ex);
+                }
+                catch (Exception ex) when (ex is FormatException || ex is JsonException)
+                {
+                    Logger.Error("Failed to process a dependency relationship due to invalid data format or JSON parsing error.", ex);
                 }
             }
 
