@@ -64,6 +64,9 @@
     <file src="out\net8.0\Microsoft.Build.Locator.dll" target="tools\Microsoft.Build.Locator.dll"/>
     <file src="out\net8.0\Microsoft.CodeAnalysis.CSharp.dll" target="tools\Microsoft.CodeAnalysis.CSharp.dll"/>
     <file src="out\net8.0\Microsoft.CodeAnalysis.dll" target="tools\Microsoft.CodeAnalysis.dll"/>
+    <file src="out\net8.0\Microsoft.ComponentDetection.Common.dll" target="tools\Microsoft.ComponentDetection.Common.dll"/>
+    <file src="out\net8.0\Microsoft.ComponentDetection.Contracts.dll" target="tools\Microsoft.ComponentDetection.Contracts.dll"/>
+    <file src="out\net8.0\Microsoft.ComponentDetection.Detectors.dll" target="tools\Microsoft.ComponentDetection.Detectors.dll"/>
     <file src="out\net8.0\Microsoft.Extensions.Configuration.Abstractions.dll" target="tools\Microsoft.Extensions.Configuration.Abstractions.dll"/>
     <file src="out\net8.0\Microsoft.Extensions.Configuration.Binder.dll" target="tools\Microsoft.Extensions.Configuration.Binder.dll"/>
     <file src="out\net8.0\Microsoft.Extensions.Configuration.CommandLine.dll" target="tools\Microsoft.Extensions.Configuration.CommandLine.dll"/>
@@ -125,6 +128,9 @@
     <file src="out\net8.0\System.Security.Permissions.dll" target="tools\System.Security.Permissions.dll"/>
     <file src="out\net8.0\System.Threading.AccessControl.dll" target="tools\System.Threading.AccessControl.dll"/>
     <file src="out\net8.0\System.Windows.Extensions.dll" target="tools\System.Windows.Extensions.dll"/>
+    <file src="out\net8.0\System.Text.Json.dll" target="tools\System.Text.Json.dll"/>
+    <file src="out\net8.0\System.IO.Pipelines.dll" target="tools\System.IO.Pipelines.dll"/>
+    <file src="out\net8.0\System.Text.Encodings.Web.dll" target="tools\System.Text.Encodings.Web.dll"/>
     <file src="out\net8.0\LCT.Telemetry.dll" target="tools\LCT.Telemetry.dll"/>
     <file src="out\net8.0\Tommy.dll" target="tools\Tommy.dll"/>
     <file src="out\net8.0\YamlDotNet.dll" target="tools\YamlDotNet.dll"/>
