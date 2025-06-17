@@ -379,7 +379,7 @@ namespace LCT.SW360PackageCreator
         {
 
             if (appSettings.SW360.Fossology.EnableTrigger && (item.ApprovedStatus.Equals(Dataconstant.NewClearing) || item.ApprovedStatus.Equals("Not Available") || item.ApprovedStatus.Equals(Dataconstant.SentToClearingState) || item.ApprovedStatus.Equals(Dataconstant.ScanAvailableState)))
-            {                
+            {
                 var formattedName = GetFormattedName(item);
 
                 bool fossologyUpload = await UpdateFossologyStatus(item, sw360CreatorService, appSettings, formattedName);
@@ -533,7 +533,7 @@ namespace LCT.SW360PackageCreator
 
             return componentId;
         }
-        private static async Task<bool> UpdateFossologyLinkAndStatus(ComparisonBomData item,ISw360CreatorService sw360CreatorService,CommonAppSettings appSettings,string formattedName,string uploadId,string logPrefix)
+        private static async Task<bool> UpdateFossologyLinkAndStatus(ComparisonBomData item, ISw360CreatorService sw360CreatorService, CommonAppSettings appSettings, string formattedName, string uploadId, string logPrefix)
         {
             item.FossologyLink = $"{appSettings.SW360.Fossology.URL}{ApiConstant.FossUploadJobUrlSuffix}{uploadId}";
             bool uploadStatus = await sw360CreatorService.UpdateSW360ReleaseContent(new Components
@@ -597,7 +597,7 @@ namespace LCT.SW360PackageCreator
 
             item.ApprovedStatus = releasesInfo.ClearingState;
             item.ReleaseCreatedBy = releasesInfo.CreatedBy;
-            item.SourceAttachmentStatus= IsReleaseAttachmentExist(releasesInfo);
+            item.SourceAttachmentStatus = IsReleaseAttachmentExist(releasesInfo);
             var uploadId = releasesInfo.ExternalToolProcesses?
                 .SelectMany(process => process.ProcessSteps)
                 .FirstOrDefault(step => step.StepName == "01_upload")?.ProcessStepIdInTool;
