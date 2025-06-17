@@ -1,38 +1,32 @@
 {
   "bomFormat": "CycloneDX",
-  "specVersion": "1.4",
-  "serialNumber": "urn:uuid:d2d0a930-3595-4c0d-b554-3883fb23da07",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:167dc9b4-dd8d-4f55-926a-c0f96cabf035",
   "version": 1,
   "metadata": {
-    "timestamp": "2024-06-27T18:04:37Z",
-    "tools": [
-      {
-        "vendor": "Siemens AG",
-        "name": "Clearing Automation Tool",
-        "version": "6.1.0",
-        "externalReferences": [
-          {
-            "url": "https://github.com/siemens/continuous-clearing",
-            "type": "website"
-          }
-        ]
-      },
-      {
-        "vendor": "Siemens AG",
-        "name": "Siemens SBOM",
-        "version": "2.0.0",
-        "externalReferences": [
-          {
-            "url": "https://sbom.siemens.io/",
-            "type": "website"
-          }
-        ]
-      }
-    ],
+    "timestamp": "2025-05-26T04:19:21Z",
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "supplier": {
+            "name": "Siemens AG"
+          },
+          "name": "Clearing Automation Tool",
+          "version": "8.0.0",
+          "externalReferences": [
+            {
+              "url": "https://github.com/siemens/continuous-clearing",
+              "type": "website"
+            }
+          ]
+        }
+      ]
+    },
     "component": {
       "type": "application",
-      "name": "Test",
-      "version": "1.0"
+      "name": "continuous-clearing",
+      "version": "v9.0.x"
     },
     "properties": [
       {
@@ -255,5 +249,22 @@
         "pkg:npm/tslib@^1.9.0"
       ]
     }
-  ]
+  ],
+  "definitions": {
+    "standards": [
+      {
+        "bom-ref": "standard-bom",
+        "name": "Standard BOM",
+        "version": "3.0.0",
+        "description": "The Standard for Software Bills of Materials in Siemens",
+        "owner": "Siemens AG",
+        "externalReferences": [
+          {
+            "url": "https://sbom.siemens.io/",
+            "type": "website"
+          }
+        ]
+      }
+    ]
+  }
 }

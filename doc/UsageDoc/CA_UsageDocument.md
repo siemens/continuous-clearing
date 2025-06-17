@@ -138,6 +138,8 @@ Explore these configurations in the [DemoProject](../../DemoProject). These samp
 ### Overview
 The Continuous Clearing Tool comprises three executable DLLs, each playing a crucial role in achieving a comprehensive license clearing process. Execute them sequentially as listed below:
 
+**Note** :The SBOM created by this tool follows the CycloneDX version [v1.6](https://cyclonedx.org/docs/1.6/json/) and Siemens SBOM standard [v3](https://sbom.siemens.io/v3/format.html). These formats ensure the SBOM is detailed, secure, and meets industry and Siemens-specific requirements.
+
 > **1. Package Identifier**
 > - This DLL processes the input file and generates a CycloneDX BOM file. The input can be a package file or a CycloneDX BOM file created using a standard tool. If multiple input files are present, simply provide the path to the directory as an argument.
 

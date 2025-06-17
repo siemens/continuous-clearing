@@ -450,8 +450,10 @@ namespace LCT.PackageIdentifier.UTest
                 Description = string.Empty,
                 Version = "1.0.0",
                 Purl = "pkg:npm/animations@1.0.0",
-                Author = "{ testcomponent:1.2.3 , subdepenendency:3.4.1 }"
-
+                Manufacturer = new OrganizationalEntity
+                {
+                    BomRef = "{ testcomponent:1.2.3 , subdepenendency:3.4.1 }"
+                }
             };
             List<Component> componentsForBOM = new List<Component>();
             componentsForBOM.Add(component);

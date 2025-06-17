@@ -46,7 +46,7 @@ namespace LCT.APICommunications.UTest
             var result = _attachmentHelper.AttachComponentSourceToSW360(attachReport);
 
             // Assert
-            Assert.AreEqual("https://api.mock.com/release/123/attachments", result);
+            Assert.That(result, Is.EqualTo("https://api.mock.com/release/123/attachments"));
         }
 
         [Test]
@@ -66,12 +66,12 @@ namespace LCT.APICommunications.UTest
 
             // Assert
             var jsonFilePath = Path.Combine(folderPath, "Attachment.json");
-            Assert.IsTrue(File.Exists(jsonFilePath));
+            Assert.That(File.Exists(jsonFilePath), Is.True);
 
             // Validate JSON content
             var fileContent = File.ReadAllText(jsonFilePath);
-            Assert.IsTrue(fileContent.Contains("Source"));
-            Assert.IsTrue(fileContent.Contains("Test comment"));
+            Assert.That(fileContent, Does.Contain("Source"));
+            Assert.That(fileContent, Does.Contain("Test comment"));
 
             // Cleanup
             File.Delete(jsonFilePath);

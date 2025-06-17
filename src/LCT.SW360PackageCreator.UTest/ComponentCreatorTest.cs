@@ -4,6 +4,8 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+// Ignore Spelling: Fossology Expections Dx Sbom Bom Doesnt LCT
+
 using CycloneDX.Models;
 using LCT.APICommunications;
 using LCT.APICommunications.Model;
@@ -132,7 +134,7 @@ namespace LCT.SW360PackageCreator.UTest
             var item = new ComparisonBomData
             {
                 FossologyLink = "https://fossology.example.com/upload/12345",
-                FossologyUploadId = Dataconstant.NotUploaded,
+                FossologyUploadId = "12345",
                 Name = "TestComponent",
                 Version = "1.0.0"
             };
@@ -142,8 +144,8 @@ namespace LCT.SW360PackageCreator.UTest
             await ComponentCreator.UpdateFossologyStatus(item, _mockSw360CreatorService.Object, _appSettings, formattedName);
 
             // Assert
-            Assert.AreEqual(Dataconstant.Uploaded, item.FossologyUploadStatus);
-            _mockSw360CreatorService.Verify(x => x.UdpateSW360ReleaseContent(It.IsAny<Components>(), It.IsAny<string>()), Times.Never);
+            Assert.AreEqual(Dataconstant.AlreadyUploaded, item.FossologyUploadStatus);
+            _mockSw360CreatorService.Verify(x => x.UpdateSW360ReleaseContent(It.IsAny<Components>(), It.IsAny<string>()), Times.Never);
         }
 
         [Test]
@@ -153,19 +155,25 @@ namespace LCT.SW360PackageCreator.UTest
             var item = new ComparisonBomData
             {
                 FossologyLink = null,
-                FossologyUploadId = Dataconstant.NotUploaded,
+                FossologyUploadId = "12345",
                 Name = "TestComponent",
                 Version = "1.0.0",
                 ReleaseID = "67890"
             };
             string formattedName = "TestComponent";
+            string fossologyUrl = "http://fossology" + ApiConstant.FossUploadJobUrlSuffix + "12345";
+            _appSettings.SW360.Fossology.URL = "http://fossology/";
+            _mockSw360CreatorService
+                .Setup(s => s.UpdateSW360ReleaseContent(It.IsAny<Components>(), It.IsAny<string>()))
+                .ReturnsAsync(true);
 
             // Act
-            await ComponentCreator.UpdateFossologyStatus(item, _mockSw360CreatorService.Object, _appSettings, formattedName);
+            var result = await ComponentCreator.UpdateFossologyStatus(item, _mockSw360CreatorService.Object, _appSettings, formattedName);
 
             // Assert
+            Assert.IsTrue(result);
+            Assert.AreEqual(fossologyUrl, item.FossologyLink);
             Assert.AreEqual(Dataconstant.Uploaded, item.FossologyUploadStatus);
-
         }
 
         [Test]
@@ -187,7 +195,7 @@ namespace LCT.SW360PackageCreator.UTest
             // Assert
             Assert.IsNull(item.FossologyUploadStatus);
             Assert.IsNull(item.FossologyLink);
-            _mockSw360CreatorService.Verify(x => x.UdpateSW360ReleaseContent(It.IsAny<Components>(), It.IsAny<string>()), Times.Never);
+            _mockSw360CreatorService.Verify(x => x.UpdateSW360ReleaseContent(It.IsAny<Components>(), It.IsAny<string>()), Times.Never);
         }
         [Test]
         public void GetFormattedName_ParentReleaseNameIsDifferent_ShouldReturnFormattedName()
@@ -671,7 +679,7 @@ namespace LCT.SW360PackageCreator.UTest
         }
 
         [Test]
-        public void AddReleaseIdToLink_WhenReleaseIdIsNotNull_AddsReleaseToReleasesFoundInCbom()
+        public void AddReleaseIdToLink_WhenReleaseIdIsNotNull_AddsReleaseToReleasesFoundInSbom()
         {
             // Arrange
             var item = new ComparisonBomData

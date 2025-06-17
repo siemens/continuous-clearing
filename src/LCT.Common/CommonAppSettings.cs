@@ -33,7 +33,6 @@ namespace LCT.Common
         public static string AlpineAportsGitURL { get; set; } = $"https://gitlab.alpinelinux.org/alpine/aports.git";
 
         private string m_ProjectType;
-        private string m_LogFolderPath;
         public CommonAppSettings()
         {
             folderAction = new FolderAction();

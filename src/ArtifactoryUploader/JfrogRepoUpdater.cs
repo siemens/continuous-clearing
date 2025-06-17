@@ -22,8 +22,8 @@ namespace LCT.ArtifactoryUploader
     public class JfrogRepoUpdater
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        public static IJFrogService jFrogService { get; set; }
-        private static List<AqlResult> aqlResultList = new();
+        public static IJFrogService JFrogService { get; set; }
+        private readonly static List<AqlResult> aqlResultList = new();
         public static async Task<Bom> UpdateJfrogRepoPathForSucessfullyUploadedItems(Bom m_ComponentsInBOM,
                                                                             DisplayPackagesInfo displayPackagesInfo)
         {
@@ -114,7 +114,7 @@ namespace LCT.ArtifactoryUploader
             {
                 foreach (var repo in destRepoNames)
                 {
-                    var result = await jFrogService.GetInternalComponentDataByRepo(repo) ?? new List<AqlResult>();
+                    var result = await JFrogService.GetInternalComponentDataByRepo(repo) ?? new List<AqlResult>();
                     aqlResultList.AddRange(result);
                 }
             }

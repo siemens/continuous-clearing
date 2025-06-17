@@ -3,12 +3,15 @@
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
-namespace LCT.Telemetry
+
+using CycloneDX.Models;
+using NuGet.Versioning;
+using System.Collections.Generic;
+
+namespace LCT.PackageIdentifier.Interface
 {
-    public interface ITelemetryProvider
+    public interface ICompositionBuilder
     {
-        void TrackEvent(string eventName, Dictionary<string, string>? properties = null);
-        void TrackException(Exception ex, Dictionary<string, string>? properties = null);
-        void Flush();
+        void AddCompositionsToBom(Bom bom, Dictionary<string, Dictionary<string, NuGetVersion>> frameworkPackages);
     }
 }

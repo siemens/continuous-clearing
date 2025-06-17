@@ -4,6 +4,8 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+// Ignore Spelling: Uploader Artifactory
+
 using LCT.APICommunications;
 using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
@@ -23,8 +25,6 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace ArtifactoryUploader
@@ -87,9 +87,9 @@ namespace ArtifactoryUploader
             }
 
             //Uploading Package to artifactory
-            PackageUploadHelper.jFrogService = GetJfrogService(appSettings);
-            UploadToArtifactory.jFrogService = GetJfrogService(appSettings);
-            JfrogRepoUpdater.jFrogService = GetJfrogService(appSettings);
+            PackageUploadHelper.JFrogService = GetJfrogService(appSettings);
+            UploadToArtifactory.JFrogService = GetJfrogService(appSettings);
+            JfrogRepoUpdater.JFrogService = GetJfrogService(appSettings);
             await PackageUploader.UploadPackageToArtifactory(appSettings);
 
             // Initialize telemetry with CATool version and instrumentation key only if Telemetry is enabled in appsettings

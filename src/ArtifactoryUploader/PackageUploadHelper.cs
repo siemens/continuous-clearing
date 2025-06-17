@@ -4,12 +4,13 @@
 //  SPDX-License-Identifier: MIT
 //---------------------------------------------------------------------------------------------------------------------
 
+// Ignore Spelling: Artifactory Bom Repo uploader Kpi Jfrog Api LCT aql
+
 using ArtifactoryUploader;
 using CycloneDX.Models;
 using LCT.APICommunications;
 using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
-using LCT.APICommunications.Model.AQL;
 using LCT.ArtifactoryUploader.Model;
 using LCT.Common;
 using LCT.Common.Constants;
@@ -33,24 +34,23 @@ namespace LCT.ArtifactoryUploader
     public static class PackageUploadHelper
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        public static IJFrogService jFrogService { get; set; }
-        private static List<AqlResult> aqlResultList = new();
+        public static IJFrogService JFrogService { get; set; }
 
         private static bool SetWarningCode;
-        public static Bom GetComponentListFromComparisonBOM(string comparisionBomFilePath)
+        public static Bom GetComponentListFromComparisonBOM(string comparisonBomFilePath)
         {
             Logger.Debug("Starting GetComponentListFromComparisonBOM() method");
             Bom componentsToBoms = null;
             try
             {
-                if (File.Exists(comparisionBomFilePath))
+                if (File.Exists(comparisonBomFilePath))
                 {
-                    string json = File.ReadAllText(comparisionBomFilePath);
+                    string json = File.ReadAllText(comparisonBomFilePath);
                     componentsToBoms = CycloneDX.Json.Serializer.Deserialize(json);
                 }
                 else
                 {
-                    Logger.Error($"File not found: {comparisionBomFilePath}. Please provide a valid file path.");
+                    Logger.Error($"File not found: {comparisonBomFilePath}. Please provide a valid file path.");
                 }
             }
             catch (JsonReaderException ex)
@@ -263,7 +263,7 @@ namespace LCT.ArtifactoryUploader
         {
             const string dryRunSuffix = null;
             string operationType = item.PackageType == PackageType.ClearedThirdParty || item.PackageType == PackageType.Development ? "copy" : "move";
-            ArtfactoryUploader.jFrogService = jFrogService;
+            ArtfactoryUploader.JFrogService = JFrogService;
             ArtfactoryUploader.JFrogApiCommInstance = GetJfrogApiCommInstance(item, timeout);
             HttpResponseMessage responseMessage = await ArtfactoryUploader.UploadPackageToRepo(item, timeout, displayPackagesInfo);
 
@@ -431,6 +431,7 @@ namespace LCT.ArtifactoryUploader
                 if (component.DestRepoName != null && !component.DryRun)
                 {
                     bomComponent.Properties.First(x => x.Name == Dataconstant.Cdx_ArtifactoryRepoName).Value = component.DestRepoName;
+                    bomComponent.Properties.First(x => x.Name == Dataconstant.Cdx_JfrogRepoPath).Value = component.JfrogRepoPath;
                 }
             }
         }

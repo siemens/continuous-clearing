@@ -107,13 +107,13 @@ namespace LCT.APICommunications.UTest
             var response = await jfrogApiCommunication.GetPackageInfo(component);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         }
 
         // Custom HttpMessageHandler to mock SendAsync
         public class MockHttpMessageHandler : HttpMessageHandler
         {
-            private HttpResponseMessage _response;
+            private HttpResponseMessage? _response;
 
             public void SetResponse(HttpResponseMessage response)
             {
@@ -122,6 +122,10 @@ namespace LCT.APICommunications.UTest
 
             protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
             {
+                if (_response == null)
+                {
+                    throw new InvalidOperationException("Mock response has not been set.");
+                }
                 return Task.FromResult(_response);
             }
         }

@@ -1,38 +1,32 @@
 {
   "bomFormat": "CycloneDX",
-  "specVersion": "1.4",
-  "serialNumber": "urn:uuid:6cdf02ad-b1f2-4f4b-b46f-176ad93005ee",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:167dc9b4-dd8d-4f55-926a-c0f96cabf035",
   "version": 1,
   "metadata": {
-    "timestamp": "2024-07-08T13:56:05Z",
-    "tools": [
-      {
-        "vendor": "Siemens AG",
-        "name": "Clearing Automation Tool",
-        "version": "6.1.0",
-        "externalReferences": [
-          {
-            "url": "https://github.com/siemens/continuous-clearing",
-            "type": "website"
-          }
-        ]
-      },
-      {
-        "vendor": "Siemens AG",
-        "name": "Siemens SBOM",
-        "version": "2.0.0",
-        "externalReferences": [
-          {
-            "url": "https://sbom.siemens.io/",
-            "type": "website"
-          }
-        ]
-      }
-    ],
+    "timestamp": "2025-05-26T04:19:21Z",
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "supplier": {
+            "name": "Siemens AG"
+          },
+          "name": "Clearing Automation Tool",
+          "version": "8.0.0",
+          "externalReferences": [
+            {
+              "url": "https://github.com/siemens/continuous-clearing",
+              "type": "website"
+            }
+          ]
+        }
+      ]
+    },
     "component": {
       "type": "application",
-      "name": "Test",
-      "version": "1.0"
+      "name": "continuous-clearing",
+      "version": "v9.0.x"
     },
     "properties": [
       {
@@ -212,6 +206,61 @@
           "value": ""
         }
       ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/System.Text.Encoding@4.3.0",
+      "name": "System.Text.Encoding",
+      "version": "4.3.0",
+      "hashes": [
+        {
+          "alg": "MD5",
+          "content": "0ece90b64e8079b79c163fccd067647c"
+        },
+        {
+          "alg": "SHA-1",
+          "content": "b1b83606b6c1da0f167d881937472e3a91397518"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "19cb475462d901afebaa404d86c0469ec89674acafe950ee6d8a4692e3a404b8"
+        }
+      ],
+      "purl": "pkg:nuget/System.Text.Encoding@4.3.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NUGET"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": ""
+        }
+      ]
     }
   ],
   "dependencies": [
@@ -223,5 +272,33 @@
       "ref": "pkg:nuget/SonarAnalyzer.CSharp@9.5.0.73987",
       "dependsOn": []
     }
-  ]
+  ],
+  "compositions": [
+    {
+      "aggregate": "complete",
+      "assemblies": [
+        "pkg:nuget/dotnet-runtime@8.0.0"
+      ],
+      "dependencies": [
+        "pkg:nuget/System.Text.Encoding@4.3.0"
+      ]
+    }
+  ],
+  "definitions": {
+    "standards": [
+      {
+        "bom-ref": "standard-bom",
+        "name": "Standard BOM",
+        "version": "3.0.0",
+        "description": "The Standard for Software Bills of Materials in Siemens",
+        "owner": "Siemens AG",
+        "externalReferences": [
+          {
+            "url": "https://sbom.siemens.io/",
+            "type": "website"
+          }
+        ]
+      }
+    ]
+  }
 }

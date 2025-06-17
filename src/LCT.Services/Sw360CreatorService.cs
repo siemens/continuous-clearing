@@ -1,4 +1,4 @@
-// --------------------------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
@@ -24,6 +24,7 @@ using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Level = log4net.Core.Level;
 
 namespace LCT.Services
 {
@@ -688,13 +689,13 @@ namespace LCT.Services
         }
 
 
-        public async Task<bool> UdpateSW360ReleaseContent(Components component, string fossUrl)
+        public async Task<bool> UpdateSW360ReleaseContent(Components component, string fossUrl)
         {
             bool isUpdated = false;
             try
             {
                 string releaseId = component.ReleaseId;
-                Logger.Debug($"UdpateSW360ReleaseContent():Name-{component.Name},Version-{component.Version}");
+                Logger.Debug($"UpdateSW360ReleaseContent():Name-{component.Name},Version-{component.Version}");
 
                 UpdateReleaseAdditinoalData updateRelease = await GetUpdateReleaseContent(releaseId, fossUrl, component.UploadId);
 
@@ -702,17 +703,26 @@ namespace LCT.Services
                     JsonConvert.SerializeObject(updateRelease),
                     Encoding.UTF8,
                     ApiConstant.ApplicationJson);
-                await m_SW360ApiCommunicationFacade.UpdateRelease(releaseId, content);
+                HttpResponseMessage response = await m_SW360ApiCommunicationFacade.UpdateRelease(releaseId, content);
+                string responseContent = await response.Content.ReadAsStringAsync();
+                Logger.Debug($"UpdateSW360ReleaseContent():Response of fossology Url updation in SW360:{responseContent}");
+                if (responseContent.Contains(Dataconstant.FossologyModerationMessage, StringComparison.OrdinalIgnoreCase))
+                {
+                    Logger.Logger.Log(null, Level.Warn, $"\t⏳ Moderation request is created while updating the Fossology URL in SW360. Please request {component.ReleaseCreatedBy} or the license clearing team to approve the moderation request.", null);
+                }
+                else
+                {
+                    isUpdated = true;
+                }
 
-                isUpdated = true;
             }
             catch (HttpRequestException ex)
             {
-                Logger.Error($"UdpateSW360ReleaseContent():", ex);
+                Logger.Error($"UpdateSW360ReleaseContent():", ex);
             }
             catch (AggregateException ex)
             {
-                Logger.Error($"UdpateSW360ReleaseContent():", ex);
+                Logger.Error($"UpdateSW360ReleaseContent():", ex);
             }
 
             return isUpdated;

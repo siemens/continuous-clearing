@@ -23,6 +23,8 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
+		<PackageReference Include="NuGet.Frameworks" Version="6.13.2" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -32,16 +34,16 @@
 
 	<ItemGroup>
 		<None Update="ComponentCreatorUTFiles\adduser_3.118-debian10-combined.tar.bz2">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Update="ComponentCreatorUTFiles\Attachment.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Update="ComponentCreatorUTFiles\patched-file_022.tar.gz">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Update="ComponentCreatorUTFiles\TestComponent-1.0-sources.jar">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
 
