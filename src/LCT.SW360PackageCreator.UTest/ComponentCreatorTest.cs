@@ -161,7 +161,7 @@ namespace LCT.SW360PackageCreator.UTest
                 ReleaseID = "67890"
             };
             string formattedName = "TestComponent";
-            string fossologyUrl= "http://fossology" + ApiConstant.FossUploadJobUrlSuffix + "12345";
+            string fossologyUrl = "http://fossology" + ApiConstant.FossUploadJobUrlSuffix + "12345";
             _appSettings.SW360.Fossology.URL = "http://fossology/";
             _mockSw360CreatorService
                 .Setup(s => s.UpdateSW360ReleaseContent(It.IsAny<Components>(), It.IsAny<string>()))

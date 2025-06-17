@@ -41,11 +41,16 @@ namespace LCT.PackageIdentifier
         public IJFrogService JFrogService { get; set; }
         public IBomHelper BomHelper { get; set; }
 
+        private readonly IFrameworkPackages _frameworkPackages;
+        private readonly ICompositionBuilder _compositionBuilder;
+
         public static Jfrog jfrog { get; set; } = new Jfrog();
         public static SW360 sw360 { get; set; } = new SW360();
-        public BomCreator(ICycloneDXBomParser cycloneDXBomParser)
+        public BomCreator(ICycloneDXBomParser cycloneDXBomParser, IFrameworkPackages frameworkPackages, ICompositionBuilder compositionBuilder)
         {
             CycloneDXBomParser = cycloneDXBomParser;
+            _frameworkPackages = frameworkPackages;
+            _compositionBuilder = compositionBuilder;
         }
 
         public async Task GenerateBom(CommonAppSettings appSettings,
@@ -147,7 +152,7 @@ namespace LCT.PackageIdentifier
                     parser = new NpmProcessor(CycloneDXBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 case "NUGET":
-                    parser = new NugetProcessor(CycloneDXBomParser);
+                    parser = new NugetProcessor(CycloneDXBomParser, _frameworkPackages, _compositionBuilder);
                     return await ComponentIdentification(appSettings, parser);
                 case "MAVEN":
                     parser = new MavenProcessor(CycloneDXBomParser);
