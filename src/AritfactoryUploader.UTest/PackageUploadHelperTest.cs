@@ -12,7 +12,9 @@ using LCT.APICommunications.Model;
 using LCT.ArtifactoryUploader;
 using LCT.ArtifactoryUploader.Model;
 using LCT.Common.Constants;
+using LCT.Common.Interface;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Moq;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
@@ -25,7 +27,7 @@ namespace AritfactoryUploader.UTest
     [TestFixture]
     public class PackageUploadHelperTest
     {
-
+        
         [Test]
         public void GetComponentListFromComparisonBOM_GivenComparisonBOM_ReturnsComponentList()
         {
@@ -33,8 +35,10 @@ namespace AritfactoryUploader.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
             string comparisonBOMPath = Path.GetFullPath(Path.Combine(outFolder, "ArtifactoryUTTestFiles", "Test_Bom.cdx.json"));
+            Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
+            environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));
             //Act
-            Bom componentList = PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath);
+            Bom componentList = PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath, environmentHelperMock.Object);
             // Assert
             Assert.That(6, Is.EqualTo(componentList.Components.Count), "Checks for no of components");
         }
@@ -60,9 +64,10 @@ namespace AritfactoryUploader.UTest
         {
             // Arrange
             string comparisonBOMPath = @"TestFiles\CCTComparisonBOM.json";
-
+            Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
+            environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));
             // Act
-            var result = PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath);
+            var result = PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath, environmentHelperMock.Object);
 
             // Assert
             Assert.IsNull(result, "Expected null when the file does not exist.");
@@ -74,9 +79,10 @@ namespace AritfactoryUploader.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
             string comparisonBOMPath = Path.GetFullPath(Path.Combine(outFolder, "ArtifactoryUTTestFiles", "ComparisonBOM.json"));
-
+            Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
+            environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));
             //Act && Assert
-            Assert.Throws<System.Text.Json.JsonException>(() => PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath));
+            Assert.Throws<System.Text.Json.JsonException>(() => PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath, environmentHelperMock.Object));
         }
 
 
@@ -87,7 +93,9 @@ namespace AritfactoryUploader.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
             string comparisonBOMPath = Path.GetFullPath(Path.Combine(outFolder, "ArtifactoryUTTestFiles", "Test_Bom.cdx.json"));
-            Bom bom = PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath);
+            Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
+            environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));
+            Bom bom = PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath, environmentHelperMock.Object);
             List<ComponentsToArtifactory> components = new List<ComponentsToArtifactory>()
             {
                 new ComponentsToArtifactory()
@@ -116,7 +124,9 @@ namespace AritfactoryUploader.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
             string comparisonBOMPath = Path.GetFullPath(Path.Combine(outFolder, "ArtifactoryUTTestFiles", "Test_Bom.cdx.json"));
-            Bom bom = PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath);
+            Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
+            environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));
+            Bom bom = PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath, environmentHelperMock.Object);
             List<ComponentsToArtifactory> components = new List<ComponentsToArtifactory>()
             {
                 new ComponentsToArtifactory()

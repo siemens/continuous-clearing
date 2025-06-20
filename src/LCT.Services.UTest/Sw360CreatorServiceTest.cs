@@ -7,6 +7,7 @@
 using LCT.APICommunications;
 using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.Foss;
+using LCT.Common.Constants;
 using LCT.Common.Model;
 using LCT.Facade.Interfaces;
 using LCT.Services.Interface;
@@ -27,10 +28,13 @@ namespace LCT.Services.UTest
     [TestFixture]
     public class Sw360CreatorServiceTest
     {
+        private Mock<ISW360ApicommunicationFacade> _mockApiCommunicationFacade;
+        private Sw360CreatorService _sw360CreatorService;
         [SetUp]
         public void Setup()
         {
-            //implement
+            _mockApiCommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
+            _sw360CreatorService = new Sw360CreatorService(_mockApiCommunicationFacade.Object);
         }
 
         [Test]
@@ -286,7 +290,7 @@ namespace LCT.Services.UTest
             Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
 
             sw360ApiCommMock.Setup(x => x.CreateRelease(It.IsAny<Releases>())).ReturnsAsync(httpResponseMessage);
-            sw360ApiCommMock.Setup(x => x.AttachComponentSourceToSW360(It.IsAny<AttachReport>())).Returns(string.Empty);
+            sw360ApiCommMock.Setup(x => x.AttachComponentSourceToSW360(It.IsAny<AttachReport>(), It.IsAny<ComparisonBomData>())).Returns(string.Empty);
 
             // Act
             var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object);
@@ -927,6 +931,76 @@ namespace LCT.Services.UTest
 
             // Assert
             Assert.IsNull(result, "Expected result to be null when TaskCanceledException is thrown.");
+        }
+        [Test]
+        public async Task UpdateSourceCodeDownloadURLForExistingRelease_ShouldReturnTrue_WhenResponseDoesNotContainModerationRequestMessage()
+        {
+            // Arrange
+            var cbomData = new ComparisonBomData { ReleaseCreatedBy = "testUser" };
+            var attachmentUrlList = new Dictionary<string, string>();
+            var releaseId = "12345";
+
+            var responseContent = "{\"message\":\"SourceDownloadURL updated successfully.\"}";
+            var mockResponse = new HttpResponseMessage
+            {
+                Content = new StringContent(responseContent, Encoding.UTF8, "application/json"),
+                StatusCode = System.Net.HttpStatusCode.OK
+            };
+
+            _mockApiCommunicationFacade
+                .Setup(x => x.UpdateRelease(releaseId, It.IsAny<StringContent>()))
+                .ReturnsAsync(mockResponse);
+
+            // Act
+            var result = await _sw360CreatorService.UpdateSourceCodeDownloadURLForExistingRelease(cbomData, attachmentUrlList, releaseId);
+
+            // Assert
+            Assert.IsTrue(result);
+        }
+
+        [Test]
+        public async Task UpdateSourceCodeDownloadURLForExistingRelease_ShouldReturnFalse_WhenResponseContainsModerationRequestMessage()
+        {
+            // Arrange
+            var cbomData = new ComparisonBomData { ReleaseCreatedBy = "testUser" };
+            var attachmentUrlList = new Dictionary<string, string>();
+            var releaseId = "12345";
+
+            var responseContent = $"{{\"message\":\"{Dataconstant.ModerationRequestMessage}\"}}";
+            var mockResponse = new HttpResponseMessage
+            {
+                Content = new StringContent(responseContent, Encoding.UTF8, "application/json"),
+                StatusCode = System.Net.HttpStatusCode.OK
+            };
+
+            _mockApiCommunicationFacade
+                .Setup(x => x.UpdateRelease(releaseId, It.IsAny<StringContent>()))
+                .ReturnsAsync(mockResponse);
+
+            // Act
+            var result = await _sw360CreatorService.UpdateSourceCodeDownloadURLForExistingRelease(cbomData, attachmentUrlList, releaseId);
+
+            // Assert
+            Assert.IsFalse(result);
+        }
+
+        [Test]
+        public async Task UpdateSourceCodeDownloadURLForExistingRelease_ShouldReturnFalse_WhenHttpRequestExceptionIsThrown()
+        {
+            // Arrange
+            var cbomData = new ComparisonBomData { ReleaseCreatedBy = "testUser" };
+            var attachmentUrlList = new Dictionary<string, string>();
+            var releaseId = "12345";
+
+            _mockApiCommunicationFacade
+                .Setup(x => x.UpdateRelease(releaseId, It.IsAny<StringContent>()))
+                .ThrowsAsync(new HttpRequestException("Request failed"));
+
+            // Act
+            var result = await _sw360CreatorService.UpdateSourceCodeDownloadURLForExistingRelease(cbomData, attachmentUrlList, releaseId);
+
+            // Assert
+            Assert.IsFalse(result);
         }
     }
 }

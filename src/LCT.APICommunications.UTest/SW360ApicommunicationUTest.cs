@@ -139,15 +139,15 @@ namespace LCT.APICommunications.UTest
 
             // Act
             SW360Apicommunication sW360Apicommunication = new SW360Apicommunication(connectionSettings);
-
+            ComparisonBomData comparisonBomData = new ComparisonBomData();
             // Assert
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                Assert.Throws<UriFormatException>(() => sW360Apicommunication.AttachComponentSourceToSW360(attachReport));
+                Assert.Throws<UriFormatException>(() => sW360Apicommunication.AttachComponentSourceToSW360(attachReport, comparisonBomData));
             }
             else
             {
-                Assert.Throws<InvalidCastException>(() => sW360Apicommunication.AttachComponentSourceToSW360(attachReport));
+                Assert.Throws<InvalidCastException>(() => sW360Apicommunication.AttachComponentSourceToSW360(attachReport, comparisonBomData));
             }
         }
 

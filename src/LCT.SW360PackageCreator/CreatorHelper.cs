@@ -584,7 +584,7 @@ namespace LCT.SW360PackageCreator
 
             if (mapper.ReleaseStatus.Equals(Dataconstant.Available))
             {
-                return releasesInfo?.SourceCodeDownloadUrl ?? string.Empty;
+                return !string.IsNullOrEmpty(releasesInfo?.SourceCodeDownloadUrl) ? releasesInfo.SourceCodeDownloadUrl : repo.FormGitCloneUrl(mapper.SourceUrl, item.Name, item.Version);
             }
             return repo.FormGitCloneUrl(mapper.SourceUrl, item.Name, item.Version);
         }
