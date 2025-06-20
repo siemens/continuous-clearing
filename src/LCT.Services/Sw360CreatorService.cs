@@ -736,7 +736,7 @@ namespace LCT.Services
                     JsonConvert.SerializeObject(updateRelease),
                     Encoding.UTF8,
                     ApiConstant.ApplicationJson);
-                HttpResponseMessage response=await m_SW360ApiCommunicationFacade.UpdateRelease(releaseId, content);
+                HttpResponseMessage response = await m_SW360ApiCommunicationFacade.UpdateRelease(releaseId, content);
                 string responseContent = await response.Content.ReadAsStringAsync();
                 Logger.Debug($"UpdateSW360ReleaseContent():Response of fossology Url updation in SW360:{responseContent}");
                 if (responseContent.Contains(Dataconstant.ModerationRequestMessage, StringComparison.OrdinalIgnoreCase))
@@ -746,8 +746,8 @@ namespace LCT.Services
                 else
                 {
                     isUpdated = true;
-                }              
-                
+                }
+
             }
             catch (HttpRequestException ex)
             {
