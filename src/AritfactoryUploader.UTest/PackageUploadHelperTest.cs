@@ -28,6 +28,26 @@ namespace AritfactoryUploader.UTest
     public class PackageUploadHelperTest
     {
         [Test]
+        public void GetComponentListFromComparisonBOM_ShouldCallEnvironmentExit_WhenJsonReaderExceptionIsThrown()
+        {
+            // Arrange
+            Mock<IEnvironmentHelper> _environmentHelperMock= new Mock<IEnvironmentHelper>();
+            string invalidJsonFilePath = "invalidBom.cdx.json";
+            File.WriteAllText(invalidJsonFilePath, "{ invalidJson "); // Write invalid JSON to simulate the exception
+
+            _environmentHelperMock.Setup(x => x.CallEnvironmentExit(It.IsAny<int>()));
+
+            // Act
+            Bom result = PackageUploadHelper.GetComponentListFromComparisonBOM(invalidJsonFilePath, _environmentHelperMock.Object);
+
+            // Assert
+            Assert.IsNull(result); // Ensure the method returns null
+            _environmentHelperMock.Verify(x => x.CallEnvironmentExit(-1), Times.Once); // Verify that CallEnvironmentExit is called with -1
+
+            // Cleanup
+            File.Delete(invalidJsonFilePath); // Remove the test file
+        }
+        [Test]
         public void GetComponentListFromComparisonBOM_GivenComparisonBOM_ReturnsComponentList()
         {
             //Arrange

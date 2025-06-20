@@ -33,6 +33,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using UnitTestUtilities;
+using static System.Net.WebRequestMethods;
 
 
 namespace LCT.SW360PackageCreator.UTest
@@ -43,10 +44,12 @@ namespace LCT.SW360PackageCreator.UTest
         private Mock<ISw360CreatorService> _mockSw360CreatorService;
         private CommonAppSettings _appSettings;
         private ComponentCreator _componentCreator;
+        private Mock<ICreatorHelper> _creatorHelperMock;
         [SetUp]
         public void Setup()
         {
             _mockSw360CreatorService = new Mock<ISw360CreatorService>();
+            _creatorHelperMock = new Mock<ICreatorHelper>();
             _appSettings = new CommonAppSettings
             {
                 SW360 = new SW360
@@ -58,6 +61,107 @@ namespace LCT.SW360PackageCreator.UTest
                 }
             };
             _componentCreator = new ComponentCreator();
+        }
+        [Test]
+        public async Task UploadSourceCodeAndUrlInSW360_ShouldNotDownloadAttachments_WhenApprovedStatusIsNotNewClearing()
+        {
+            // Arrange
+            var item = new ComparisonBomData { ApprovedStatus = "NotClearing" };
+            var releasesInfo = new ReleasesInfo();
+            var releaseId = "release123";
+
+            // Act
+            await ComponentCreator.UploadSourceCodeAndUrlInSW360(item, releasesInfo, releaseId, _creatorHelperMock.Object, _mockSw360CreatorService.Object);
+
+            // Assert
+            _creatorHelperMock.Verify(x => x.DownloadReleaseAttachmentSource(It.IsAny<ComparisonBomData>()), Times.Never);
+        }
+        [Test]
+        public async Task UploadSourceCodeAndUrlInSW360_ShouldNotDownloadAttachments_WhenAttachmentsArePresent()
+        {
+            // Arrange
+            var item = new ComparisonBomData { ApprovedStatus = Dataconstant.NewClearing };
+            var releasesInfo = new ReleasesInfo
+            {
+                Embedded = new AttachmentEmbedded
+                {
+                    Sw360attachments = new List<Sw360Attachments>
+                    {
+                        new Sw360Attachments { AttachmentType = "SOURCE" }
+                    }
+                }
+            };
+            var releaseId = "release123";
+
+            // Act
+            await ComponentCreator.UploadSourceCodeAndUrlInSW360(item, releasesInfo, releaseId, _creatorHelperMock.Object, _mockSw360CreatorService.Object);
+
+            // Assert
+            _creatorHelperMock.Verify(x => x.DownloadReleaseAttachmentSource(It.IsAny<ComparisonBomData>()), Times.Never);
+        }
+
+        [Test]
+        public async Task UploadSourceCodeAndUrlInSW360_ShouldUpdateSourceCodeDownloadURL_WhenSourceCodeDownloadUrlIsEmpty()
+        {
+            // Arrange
+            var item = new ComparisonBomData { ApprovedStatus = Dataconstant.NewClearing };
+            var releasesInfo = new ReleasesInfo { SourceCodeDownloadUrl = string.Empty };
+            var releaseId = "release123";
+            var attachmentUrlList = new Dictionary<string, string> { { "SOURCE", "http://example.com/source" } };
+
+            _creatorHelperMock.Setup(x => x.DownloadReleaseAttachmentSource(item))
+                .ReturnsAsync(attachmentUrlList);
+
+            _mockSw360CreatorService.Setup(x => x.UpdateSourceCodeDownloadURLForExistingRelease(item, attachmentUrlList, releaseId))
+                .ReturnsAsync(true);
+
+            // Act
+            await ComponentCreator.UploadSourceCodeAndUrlInSW360(item, releasesInfo, releaseId, _creatorHelperMock.Object, _mockSw360CreatorService.Object);
+
+            // Assert
+            _mockSw360CreatorService.Verify(x => x.UpdateSourceCodeDownloadURLForExistingRelease(item, attachmentUrlList, releaseId), Times.Once);
+        }
+
+        [Test]
+        public async Task UploadSourceCodeAndUrlInSW360_ShouldAttachSourcesToReleases_WhenAttachmentUrlListIsNotEmpty()
+        {
+            // Arrange
+            var item = new ComparisonBomData { ApprovedStatus = Dataconstant.NewClearing,DownloadUrl= "http://example.com/source" };
+            var releasesInfo = new ReleasesInfo { SourceCodeDownloadUrl = "http://example.com/download" };
+            var releaseId = "release123";
+            var attachmentUrlList = new Dictionary<string, string> { { "SOURCE", "http://example.com/source" } };
+
+            _creatorHelperMock.Setup(x => x.DownloadReleaseAttachmentSource(item))
+                .ReturnsAsync(attachmentUrlList);
+
+            _mockSw360CreatorService.Setup(x => x.AttachSourcesToReleasesCreated(releaseId, attachmentUrlList, item))
+                .Returns("http://example.com/attachment");
+
+            // Act
+            await ComponentCreator.UploadSourceCodeAndUrlInSW360(item, releasesInfo, releaseId, _creatorHelperMock.Object, _mockSw360CreatorService.Object);
+
+            // Assert
+            Assert.AreEqual("http://example.com/attachment", item.ReleaseAttachmentLink);
+            Assert.AreEqual("http://example.com/source", item.DownloadUrl);
+        }
+
+        [Test]
+        public async Task UploadSourceCodeAndUrlInSW360_ShouldNotAttachSources_WhenAttachmentUrlListIsEmpty()
+        {
+            // Arrange
+            var item = new ComparisonBomData { ApprovedStatus = Dataconstant.NewClearing };
+            var releasesInfo = new ReleasesInfo { SourceCodeDownloadUrl = "http://example.com/download" };
+            var releaseId = "release123";
+            var attachmentUrlList = new Dictionary<string, string>();
+
+            _creatorHelperMock.Setup(x => x.DownloadReleaseAttachmentSource(item))
+                .ReturnsAsync(attachmentUrlList);
+
+            // Act
+            await ComponentCreator.UploadSourceCodeAndUrlInSW360(item, releasesInfo, releaseId, _creatorHelperMock.Object, _mockSw360CreatorService.Object);
+
+            // Assert
+            Assert.IsNull(item.ReleaseAttachmentLink);
         }
 
         [Test]
@@ -380,9 +484,9 @@ namespace LCT.SW360PackageCreator.UTest
             string attachmentJson = Path.GetFullPath(Path.Combine(outFolder, "..", "..", "src", "LCT.SW360PackageCreator.UTest", "ComponentCreatorUTFiles", "Attachment.json"));
 
             string json = "";
-            if (File.Exists(attachmentJson))
+            if (System.IO.File.Exists(attachmentJson))
             {
-                json = File.ReadAllText(attachmentJson);
+                json = System.IO.File.ReadAllText(attachmentJson);
             }
 
             dynamic array = JsonConvert.DeserializeObject(json);

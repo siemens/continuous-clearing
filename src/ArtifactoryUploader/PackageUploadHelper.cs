@@ -55,7 +55,7 @@ namespace LCT.ArtifactoryUploader
                     environmentHelper.CallEnvironmentExit(-1);
                 }
             }
-            catch (JsonReaderException ex)
+            catch (System.Text.Json.JsonException ex)
             {
                 Logger.Error($"Exception occurred in reading the comparison BOM: {ex.Message}");
                 environmentHelper.CallEnvironmentExit(-1);

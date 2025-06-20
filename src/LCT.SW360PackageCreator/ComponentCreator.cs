@@ -578,18 +578,7 @@ namespace LCT.SW360PackageCreator
                 string componentId = CommonHelper.GetSubstringOfLastOccurance(releasesInfo.Links?.Sw360Component?.Href, "/");
                 item.ReleaseID = releaseId;
                 await GetUploadIdWhenReleaseExists(item, releasesInfo, appSettings);
-                if (item.ApprovedStatus==Dataconstant.NewClearing && !AreAttachmentsPresent(releasesInfo))
-                {
-                    var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(item);
-                    if (string.IsNullOrEmpty(releasesInfo?.SourceCodeDownloadUrl))
-                        await sw360CreatorService.UpdateSourceCodeDownloadURLForExistingRelease(item, attachmentUrlList, releaseId);
-                    if (attachmentUrlList != null && attachmentUrlList.Count > 0)
-                    {
-                        string AttachmentApiUrl = sw360CreatorService.AttachSourcesToReleasesCreated(releaseId, attachmentUrlList,item);
-                        item.ReleaseAttachmentLink = AttachmentApiUrl;
-                        item.DownloadUrl = !attachmentUrlList.ContainsKey("SOURCE") ? Dataconstant.DownloadUrlNotFound : item.DownloadUrl;
-                    }                    
-                }
+                await UploadSourceCodeAndUrlInSW360(item, releasesInfo, releaseId, creatorHelper, sw360CreatorService);
                 UpdatedCompareBomData.Add(item);
                 if (IsReleaseAttachmentExist(releasesInfo) && !string.IsNullOrEmpty(item.ReleaseID))
                 {
@@ -597,6 +586,23 @@ namespace LCT.SW360PackageCreator
                 }                
                 await sw360CreatorService.UpdatePurlIdForExistingComponent(item, componentId);
                 await sw360CreatorService.UpdatePurlIdForExistingRelease(item, releaseId, releasesInfo);
+            }
+        }
+        public static async Task UploadSourceCodeAndUrlInSW360(ComparisonBomData item, ReleasesInfo releasesInfo, string releaseId, ICreatorHelper creatorHelper, ISw360CreatorService sw360CreatorService)
+        {
+            if (item.ApprovedStatus == Dataconstant.NewClearing && !AreAttachmentsPresent(releasesInfo))
+            {
+                var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(item);
+                if (string.IsNullOrEmpty(releasesInfo.SourceCodeDownloadUrl))
+                {
+                    await sw360CreatorService.UpdateSourceCodeDownloadURLForExistingRelease(item, attachmentUrlList, releaseId);
+                }
+                if (attachmentUrlList != null && attachmentUrlList.Count > 0)
+                {
+                    string attachmentApiUrl = sw360CreatorService.AttachSourcesToReleasesCreated(releaseId, attachmentUrlList, item);
+                    item.ReleaseAttachmentLink = attachmentApiUrl;
+                    item.DownloadUrl = !attachmentUrlList.ContainsKey("SOURCE") ? Dataconstant.DownloadUrlNotFound : item.DownloadUrl;
+                }
             }
         }
         public static Task GetUploadIdWhenReleaseExists(ComparisonBomData item, ReleasesInfo releasesInfo = null, CommonAppSettings appSettings = null)
