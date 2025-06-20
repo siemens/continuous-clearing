@@ -27,6 +27,7 @@ namespace AritfactoryUploader.UTest
     [TestFixture]
     public class PackageUploadHelperTest
     {
+
         [Test]
         public void GetComponentListFromComparisonBOM_ShouldCallEnvironmentExit_WhenJsonReaderExceptionIsThrown()
         {
