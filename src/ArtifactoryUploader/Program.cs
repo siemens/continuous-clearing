@@ -35,7 +35,7 @@ namespace ArtifactoryUploader
         private static bool m_Verbose = false;
         public static Stopwatch UploaderStopWatch { get; set; }
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
+        private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
         static async Task Main(string[] args)
         {
             UploaderStopWatch = new Stopwatch();

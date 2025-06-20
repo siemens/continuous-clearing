@@ -167,7 +167,7 @@ namespace LCT.Services
                 //come here - if success to attch src code
                 if (response.IsSuccessStatusCode)
                 {
-                    releaseId = AttachSourceAndBinary(attachmentUrlList, createStatus, response);
+                    releaseId = AttachSourceAndBinary(attachmentUrlList, createStatus, response, componentInfo);
                 }
                 else if (response.StatusCode == HttpStatusCode.Conflict)
                 {
@@ -226,7 +226,7 @@ namespace LCT.Services
             return releaseId ?? string.Empty;
         }
 
-        private string AttachSourceAndBinary(Dictionary<string, string> attachmentUrlList, ReleaseCreateStatus createStatus, HttpResponseMessage response)
+        private string AttachSourceAndBinary(Dictionary<string, string> attachmentUrlList, ReleaseCreateStatus createStatus, HttpResponseMessage response, ComparisonBomData comparisonBomData)
         {
             string releaseId = string.Empty;
 
@@ -236,7 +236,7 @@ namespace LCT.Services
                 var responseData = JsonConvert.DeserializeObject<Releases>(responseString);
                 string href = responseData?.Links?.Self?.Href ?? string.Empty;
                 releaseId = CommonHelper.GetSubstringOfLastOccurance(href, "/");
-                createStatus.AttachmentApiUrl = AttachSourcesToReleasesCreated(releaseId, attachmentUrlList);
+                createStatus.AttachmentApiUrl = AttachSourcesToReleasesCreated(releaseId, attachmentUrlList,comparisonBomData);
             }
 
             return releaseId;
@@ -413,7 +413,7 @@ namespace LCT.Services
         }
 
 
-        private string AttachSourcesToReleasesCreated(string releaseId, Dictionary<string, string> attachmentUrlList)
+        public string AttachSourcesToReleasesCreated(string releaseId, Dictionary<string, string> attachmentUrlList, ComparisonBomData comparisonBomData)
         {
             Logger.Debug($"AttachSourcesToReleasesCreated(): start");
 
@@ -428,7 +428,7 @@ namespace LCT.Services
                     ReleaseId = releaseId,
                     AttachmentReleaseComment = Dataconstant.ReleaseAttachmentComment
                 };
-                attachmentApiUrl = m_SW360ApiCommunicationFacade.AttachComponentSourceToSW360(attachReport);
+                attachmentApiUrl = m_SW360ApiCommunicationFacade.AttachComponentSourceToSW360(attachReport,comparisonBomData);
             }
 
             Logger.Debug($"AttachSourcesToReleasesCreated(): end");
@@ -584,7 +584,40 @@ namespace LCT.Services
                 return false;
             }
         }
+        public async Task<bool> UpdateSourceCodeDownloadURLForExistingRelease(ComparisonBomData cbomData, Dictionary<string, string> attachmentUrlList, string releaseId)
+        {
+            try
+            {                
+                Releases release = new Releases
+                {                   
+                    SourceDownloadurl = GetSourceDownloadUrl(cbomData, attachmentUrlList)                    
+                };
 
+                StringContent content = new StringContent(JsonConvert.SerializeObject(release), Encoding.UTF8, "application/json");
+
+                HttpResponseMessage updateResponse = await m_SW360ApiCommunicationFacade.UpdateRelease(releaseId, content);
+                string responseContent = await updateResponse.Content.ReadAsStringAsync();
+                if (responseContent.Contains(Dataconstant.ModerationRequestMessage, StringComparison.OrdinalIgnoreCase))
+                {
+                    Logger.Logger.Log(null, Level.Warn, $"Moderation request is created while updating the SourceDownloadURL in SW360. Please request {cbomData.ReleaseCreatedBy} or the license clearing team to approve the moderation request.", null);
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                Logger.Error($"UpdateExternalIdForRelease(): {ex}");
+                return false;
+            }
+            catch (AggregateException ex)
+            {
+                Logger.Error($"UpdateExternalIdForRelease(): {ex}");
+                return false;
+            }
+        }
         private static string GetDecodedExternalId(string ReleaseExternalID)
         {
             string releaseID;
@@ -706,7 +739,7 @@ namespace LCT.Services
                 HttpResponseMessage response=await m_SW360ApiCommunicationFacade.UpdateRelease(releaseId, content);
                 string responseContent = await response.Content.ReadAsStringAsync();
                 Logger.Debug($"UpdateSW360ReleaseContent():Response of fossology Url updation in SW360:{responseContent}");
-                if (responseContent.Contains(Dataconstant.FossologyModerationMessage, StringComparison.OrdinalIgnoreCase))
+                if (responseContent.Contains(Dataconstant.ModerationRequestMessage, StringComparison.OrdinalIgnoreCase))
                 {
                     Logger.Logger.Log(null, Level.Warn, $"\t⏳ Moderation request is created while updating the Fossology URL in SW360. Please request {component.ReleaseCreatedBy} or the license clearing team to approve the moderation request.", null);
                 }

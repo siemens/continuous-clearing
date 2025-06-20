@@ -87,7 +87,7 @@ namespace LCT.SW360PackageCreator
             {
                 taglist = result?.StdOut?.Split("\n") ?? Array.Empty<string>();
             }
-
+            string baseVersion = component.Version.Contains(".0") ? component.Version[..component.Version.LastIndexOf(".0")] : component.Version;
             foreach (string item in taglist)
             {
                 Logger.Debug($"GetCorrectVersion - Current Item:{item}");
@@ -104,6 +104,10 @@ namespace LCT.SW360PackageCreator
                     }
 
                     if (tag.Contains(component.Version))
+                    {
+                        return tag;
+                    }
+                    else if (tag.Contains(baseVersion))
                     {
                         return tag;
                     }

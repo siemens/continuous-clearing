@@ -15,6 +15,7 @@ using LCT.APICommunications.Model.AQL;
 using LCT.ArtifactoryUploader.Model;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Interface;
 using LCT.Services.Interface;
 using log4net;
 using Newtonsoft.Json;
@@ -38,7 +39,7 @@ namespace LCT.ArtifactoryUploader
         public static IJFrogService JFrogService { get; set; }
 
         private static bool SetWarningCode;
-        public static Bom GetComponentListFromComparisonBOM(string comparisonBomFilePath)
+        public static Bom GetComponentListFromComparisonBOM(string comparisonBomFilePath,IEnvironmentHelper environmentHelper)
         {
             Logger.Debug("Starting GetComponentListFromComparisonBOM() method");
             Bom componentsToBoms = null;
@@ -52,11 +53,13 @@ namespace LCT.ArtifactoryUploader
                 else
                 {
                     Logger.Error($"File not found: {comparisonBomFilePath}. Please provide a valid file path.");
+                    environmentHelper.CallEnvironmentExit(-1);
                 }
             }
             catch (JsonReaderException ex)
             {
                 Logger.Error($"Exception occurred in reading the comparison BOM: {ex.Message}");
+                environmentHelper.CallEnvironmentExit(-1);
             }
             return componentsToBoms;
         }

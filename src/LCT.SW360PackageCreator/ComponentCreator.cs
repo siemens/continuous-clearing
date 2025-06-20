@@ -12,6 +12,7 @@ using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
 using LCT.Common.Model;
+using LCT.Services;
 using LCT.Services.Interface;
 using LCT.Services.Model;
 using LCT.SW360PackageCreator.Interfaces;
@@ -339,7 +340,7 @@ namespace LCT.SW360PackageCreator
 
             await CreateReleaseWhenNotAvailable(item, sw360CreatorService, creatorHelper, appSettings);
 
-            await ComponentAndReleaseAvailable(item, sw360Url, sw360CreatorService, appSettings);
+            await ComponentAndReleaseAvailable(item, sw360Url, sw360CreatorService, appSettings,creatorHelper);
         }
 
         private async Task CreateComponentAndReleaseWhenNotAvailable(ComparisonBomData item,
@@ -557,7 +558,7 @@ namespace LCT.SW360PackageCreator
             return uploadStatus;
         }
         private async Task ComponentAndReleaseAvailable(ComparisonBomData item,
-            string sw360Url, ISw360CreatorService sw360CreatorService, CommonAppSettings appSettings)
+            string sw360Url, ISw360CreatorService sw360CreatorService, CommonAppSettings appSettings, ICreatorHelper creatorHelper)
         {
             if (item.ComponentStatus == Dataconstant.Available && item.ReleaseStatus == Dataconstant.Available)
             {
@@ -573,19 +574,29 @@ namespace LCT.SW360PackageCreator
                     ComponentsNotLinked.Add(new Components() { Name = item.Name, Version = item.Version });
                 }
 
-                ReleasesInfo releasesInfo = await sw360CreatorService.GetReleaseInfo(releaseId);
+                ReleasesInfo releasesInfo = await sw360CreatorService.GetReleaseInfo(releaseId);                
                 string componentId = CommonHelper.GetSubstringOfLastOccurance(releasesInfo.Links?.Sw360Component?.Href, "/");
                 item.ReleaseID = releaseId;
                 await GetUploadIdWhenReleaseExists(item, releasesInfo, appSettings);
+                if (item.ApprovedStatus==Dataconstant.NewClearing && !AreAttachmentsPresent(releasesInfo))
+                {
+                    var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(item);
+                    if (string.IsNullOrEmpty(releasesInfo?.SourceCodeDownloadUrl))
+                        await sw360CreatorService.UpdateSourceCodeDownloadURLForExistingRelease(item, attachmentUrlList, releaseId);
+                    if (attachmentUrlList != null && attachmentUrlList.Count > 0)
+                    {
+                        string AttachmentApiUrl = sw360CreatorService.AttachSourcesToReleasesCreated(releaseId, attachmentUrlList,item);
+                        item.ReleaseAttachmentLink = AttachmentApiUrl;
+                        item.DownloadUrl = !attachmentUrlList.ContainsKey("SOURCE") ? Dataconstant.DownloadUrlNotFound : item.DownloadUrl;
+                    }                    
+                }
                 UpdatedCompareBomData.Add(item);
-                if (IsReleaseAttachmentExist(releasesInfo))
+                if (IsReleaseAttachmentExist(releasesInfo) && !string.IsNullOrEmpty(item.ReleaseID))
                 {
                     await TriggeringFossologyUploadAndUpdateAdditionalData(item, sw360CreatorService, appSettings);
-                }
-
+                }                
                 await sw360CreatorService.UpdatePurlIdForExistingComponent(item, componentId);
                 await sw360CreatorService.UpdatePurlIdForExistingRelease(item, releaseId, releasesInfo);
-
             }
         }
         public static Task GetUploadIdWhenReleaseExists(ComparisonBomData item, ReleasesInfo releasesInfo = null, CommonAppSettings appSettings = null)
@@ -634,7 +645,7 @@ namespace LCT.SW360PackageCreator
             }
             else
             {
-                if (!(string.IsNullOrEmpty(item.DownloadUrl) || item.DownloadUrl.Equals(Dataconstant.DownloadUrlNotFound)))
+                if (!string.IsNullOrEmpty(item.ReleaseID) && (!string.IsNullOrEmpty(item.DownloadUrl) || item.DownloadUrl.Equals(Dataconstant.DownloadUrlNotFound)))
                 {
                     await TriggeringFossologyUploadAndUpdateAdditionalData(item, sw360CreatorService, appSettings);
                 }
@@ -645,7 +656,11 @@ namespace LCT.SW360PackageCreator
             var releaseAttachments = releasesInfo?.Embedded?.Sw360attachments ?? new List<Sw360Attachments>();
             return releaseAttachments.Any(x => x.AttachmentType.Equals("SOURCE"));
         }
-
+        public static bool AreAttachmentsPresent(ReleasesInfo releasesInfo)
+        {
+            var attachments = releasesInfo?.Embedded?.Sw360attachments ?? new List<Sw360Attachments>();
+            return attachments.Any(x => x.AttachmentType.Equals("SOURCE") || x.AttachmentType.Equals("SOURCE_SELF"));
+        }
         private void UpdateAttachmentURLInBOm(string sw360Url, ComparisonBomData item, string releaseId)
         {
             string attachmentUrl = $"{sw360Url}{ApiConstant.Sw360ReleaseApiSuffix}/{releaseId}/{ApiConstant.Attachments}";

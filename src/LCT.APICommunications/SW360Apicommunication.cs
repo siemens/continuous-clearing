@@ -329,11 +329,11 @@ namespace LCT.APICommunications
         }
 
 
-        public string AttachComponentSourceToSW360(AttachReport attachReport)
+        public string AttachComponentSourceToSW360(AttachReport attachReport,ComparisonBomData comparisonBomData)
         {
             AttachmentHelper attachmentHelper = new AttachmentHelper(sw360AuthTokenType, sw360AuthToken, sw360ReleaseApi);
 
-            return attachmentHelper.AttachComponentSourceToSW360(attachReport);
+            return attachmentHelper.AttachComponentSourceToSW360(attachReport,comparisonBomData);
         }
 
         public async Task<string> GetReleaseByCompoenentName(string componentName)
