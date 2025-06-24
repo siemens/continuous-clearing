@@ -55,7 +55,7 @@ namespace LCT.SW360PackageCreator
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
             CommonHelper.DefaultLogFolderInitialisation(FileConstant.ComponentCreatorLog, m_Verbose);
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
-
+            string baseVersion = GetBaseVersion("5.0.1");
             ISW360ApicommunicationFacade sW360ApicommunicationFacade;
             ISw360ProjectService sw360ProjectService = Getsw360ProjectServiceObject(appSettings, out sW360ApicommunicationFacade);
             ProjectReleases projectReleases = new ProjectReleases();
@@ -112,7 +112,23 @@ namespace LCT.SW360PackageCreator
             // publish logs and bom file to pipeline artifact
             PipelineArtifactUploader.UploadArtifacts();
         }
-
+        private static string GetBaseVersion(string version)
+        {
+            try
+            {
+                var parsedVersion = Version.Parse(version);
+                if (parsedVersion.Build == 0 && parsedVersion.Revision == -1)
+                {
+                    return $"{parsedVersion.Major}.{parsedVersion.Minor}";
+                }
+                return version;
+            }
+            catch (FormatException)
+            {
+                Logger.Debug($"Invalid version format: {version}");
+                return version; 
+            }
+        }
 
         private static CatoolInfo GetCatoolVersionFromProjectfile()
         {

@@ -63,7 +63,7 @@ namespace LCT.SW360PackageCreator.UTest
             _componentCreator = new ComponentCreator();
         }
         [Test]
-        public async Task UploadSourceCodeAndUrlInSW360_ShouldNotDownloadAttachments_WhenApprovedStatusIsNotNewClearing()
+        public async Task IfAlreadyReleaseExistsUploadSourceCodeAndUrlInSW360_ShouldNotDownloadAttachments_WhenApprovedStatusIsNotNewClearing()
         {
             // Arrange
             var item = new ComparisonBomData { ApprovedStatus = "NotClearing" };
@@ -71,13 +71,13 @@ namespace LCT.SW360PackageCreator.UTest
             var releaseId = "release123";
 
             // Act
-            await ComponentCreator.UploadSourceCodeAndUrlInSW360(item, releasesInfo, releaseId, _creatorHelperMock.Object, _mockSw360CreatorService.Object);
+            await ComponentCreator.IfAlreadyReleaseExistsUploadSourceCodeAndUrlInSW360(item, releasesInfo, releaseId, _creatorHelperMock.Object, _mockSw360CreatorService.Object);
 
             // Assert
             _creatorHelperMock.Verify(x => x.DownloadReleaseAttachmentSource(It.IsAny<ComparisonBomData>()), Times.Never);
         }
         [Test]
-        public async Task UploadSourceCodeAndUrlInSW360_ShouldNotDownloadAttachments_WhenAttachmentsArePresent()
+        public async Task IfAlreadyReleaseExistsUploadSourceCodeAndUrlInSW360_ShouldNotDownloadAttachments_WhenAttachmentsArePresent()
         {
             // Arrange
             var item = new ComparisonBomData { ApprovedStatus = Dataconstant.NewClearing };
@@ -94,14 +94,14 @@ namespace LCT.SW360PackageCreator.UTest
             var releaseId = "release123";
 
             // Act
-            await ComponentCreator.UploadSourceCodeAndUrlInSW360(item, releasesInfo, releaseId, _creatorHelperMock.Object, _mockSw360CreatorService.Object);
+            await ComponentCreator.IfAlreadyReleaseExistsUploadSourceCodeAndUrlInSW360(item, releasesInfo, releaseId, _creatorHelperMock.Object, _mockSw360CreatorService.Object);
 
             // Assert
             _creatorHelperMock.Verify(x => x.DownloadReleaseAttachmentSource(It.IsAny<ComparisonBomData>()), Times.Never);
         }
 
         [Test]
-        public async Task UploadSourceCodeAndUrlInSW360_ShouldUpdateSourceCodeDownloadURL_WhenSourceCodeDownloadUrlIsEmpty()
+        public async Task IfAlreadyReleaseExistsUploadSourceCodeAndUrlInSW360_ShouldUpdateSourceCodeDownloadURL_WhenSourceCodeDownloadUrlIsEmpty()
         {
             // Arrange
             var item = new ComparisonBomData { ApprovedStatus = Dataconstant.NewClearing };
@@ -116,14 +116,14 @@ namespace LCT.SW360PackageCreator.UTest
                 .ReturnsAsync(true);
 
             // Act
-            await ComponentCreator.UploadSourceCodeAndUrlInSW360(item, releasesInfo, releaseId, _creatorHelperMock.Object, _mockSw360CreatorService.Object);
+            await ComponentCreator.IfAlreadyReleaseExistsUploadSourceCodeAndUrlInSW360(item, releasesInfo, releaseId, _creatorHelperMock.Object, _mockSw360CreatorService.Object);
 
             // Assert
             _mockSw360CreatorService.Verify(x => x.UpdateSourceCodeDownloadURLForExistingRelease(item, attachmentUrlList, releaseId), Times.Once);
         }
 
         [Test]
-        public async Task UploadSourceCodeAndUrlInSW360_ShouldAttachSourcesToReleases_WhenAttachmentUrlListIsNotEmpty()
+        public async Task IfAlreadyReleaseExistsUploadSourceCodeAndUrlInSW360_ShouldAttachSourcesToReleases_WhenAttachmentUrlListIsNotEmpty()
         {
             // Arrange
             var item = new ComparisonBomData { ApprovedStatus = Dataconstant.NewClearing,DownloadUrl= "http://example.com/source" };
@@ -138,7 +138,7 @@ namespace LCT.SW360PackageCreator.UTest
                 .Returns("http://example.com/attachment");
 
             // Act
-            await ComponentCreator.UploadSourceCodeAndUrlInSW360(item, releasesInfo, releaseId, _creatorHelperMock.Object, _mockSw360CreatorService.Object);
+            await ComponentCreator.IfAlreadyReleaseExistsUploadSourceCodeAndUrlInSW360(item, releasesInfo, releaseId, _creatorHelperMock.Object, _mockSw360CreatorService.Object);
 
             // Assert
             Assert.AreEqual("http://example.com/attachment", item.ReleaseAttachmentLink);
@@ -146,7 +146,7 @@ namespace LCT.SW360PackageCreator.UTest
         }
 
         [Test]
-        public async Task UploadSourceCodeAndUrlInSW360_ShouldNotAttachSources_WhenAttachmentUrlListIsEmpty()
+        public async Task IfAlreadyReleaseExistsUploadSourceCodeAndUrlInSW360_ShouldNotAttachSources_WhenAttachmentUrlListIsEmpty()
         {
             // Arrange
             var item = new ComparisonBomData { ApprovedStatus = Dataconstant.NewClearing };
@@ -158,7 +158,7 @@ namespace LCT.SW360PackageCreator.UTest
                 .ReturnsAsync(attachmentUrlList);
 
             // Act
-            await ComponentCreator.UploadSourceCodeAndUrlInSW360(item, releasesInfo, releaseId, _creatorHelperMock.Object, _mockSw360CreatorService.Object);
+            await ComponentCreator.IfAlreadyReleaseExistsUploadSourceCodeAndUrlInSW360(item, releasesInfo, releaseId, _creatorHelperMock.Object, _mockSw360CreatorService.Object);
 
             // Assert
             Assert.IsNull(item.ReleaseAttachmentLink);
