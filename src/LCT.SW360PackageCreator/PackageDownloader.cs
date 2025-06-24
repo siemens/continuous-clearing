@@ -78,7 +78,6 @@ namespace LCT.SW360PackageCreator
             Result result = ListTagsOfComponent(component);
 
             string[] taglist;
-            component.Version = "3.2";
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 taglist = result?.StdOut?.Split("\r\n") ?? Array.Empty<string>();
