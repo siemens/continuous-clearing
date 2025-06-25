@@ -74,7 +74,7 @@ jobs:
 
       - name: Pack NuGet Package
         run: |
-          nuget pack CA.nuspec -Version 8.0.0
+          nuget pack CA.nuspec -Version 8.1.0
 
       - name: Upload NuGet Package
         uses: actions/upload-artifact@v4
@@ -151,8 +151,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./continuous-clearing.8.0.0.nupkg
-          asset_name: continuous-clearing.8.0.0.nupkg
+          asset_path: ./continuous-clearing.8.1.0.nupkg
+          asset_name: continuous-clearing.8.1.0.nupkg
           asset_content_type: application/octet-stream
 
       - name: Upload ReadmeOSS_nupkg file to Release 
