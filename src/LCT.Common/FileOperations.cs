@@ -140,7 +140,7 @@ namespace LCT.Common
                     }
 
                     fileRead.Close();
-                    List<Component> list = new List<Component>(comparisonData.Components.Count + components.Components.Count);
+                    List<Component> list = new(comparisonData.Components.Count + components.Components.Count);
                     list.AddRange(comparisonData.Components);
                     list.AddRange(components.Components);
                     comparisonData.Components = list;
@@ -156,13 +156,14 @@ namespace LCT.Common
                         comparisonData.Dependencies = components.Dependencies;
                     }
                     comparisonData.Dependencies = comparisonData.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
+                    //Update Compositions section
+                    UpdateCompositions(ref components, ref comparisonData);
                 }
                 else
                 {
                     Logger.Error($"Error:Invalid path entered,Please check if the comparison BOM  path entered is correct");
                     throw new FileNotFoundException();
                 }
-
             }
             catch (IOException e)
             {
@@ -305,6 +306,60 @@ namespace LCT.Common
             Logger.Debug($"WriteContentToMultipleVersionsFile():End");
             return "success";
 
+        }
+
+        private static void UpdateCompositions(ref Bom components, ref Bom comparisonData)
+        {
+            // Early return if there are no compositions to process
+            if (components.Compositions == null || components.Compositions.Count == 0)
+            {
+                return;
+            }
+
+            // If target has no compositions, simply assign the source compositions
+            if (comparisonData.Compositions == null || comparisonData.Compositions.Count == 0)
+            {
+                comparisonData.Compositions = components.Compositions;
+                return;
+            }
+
+            // Process each source composition
+            foreach (var sourceComposition in components.Compositions)
+            {
+                var matchingComposition = FindMatchingComposition(comparisonData.Compositions, sourceComposition);
+
+                if (matchingComposition != null)
+                {
+                    MergeDependencies(sourceComposition, matchingComposition);
+                }
+                else
+                {
+                    comparisonData.Compositions.Add(sourceComposition);
+                }
+            }
+        }
+
+        private static Composition FindMatchingComposition(List<Composition> compositions, Composition sourceComposition)
+        {
+            return compositions.FirstOrDefault(c =>
+                c.Assemblies != null &&
+                sourceComposition.Assemblies != null &&
+                c.Assemblies.SequenceEqual(sourceComposition.Assemblies));
+        }
+
+        private static void MergeDependencies(Composition source, Composition target)
+        {
+            if (source.Dependencies == null || source.Dependencies.Count == 0)
+            {
+                return;
+            }
+
+            // Initialize dependencies collection if null
+            target.Dependencies ??= new List<string>();
+
+            // Add only unique dependencies using LINQ
+            var newDependencies = source.Dependencies.Where(d => !target.Dependencies.Contains(d));
+            target.Dependencies.AddRange(newDependencies);
         }
     }
 }

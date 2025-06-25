@@ -214,7 +214,7 @@ namespace LCT.PackageIdentifier
                     continue;
                 }
 
-                Component components = new Component();
+                Component components = new Component() { Manufacturer = new OrganizationalEntity() };
                 var properties = JObject.Parse(Convert.ToString(prop.Value));
 
                 // dev components are not ignored and added as a part of SBOM 
@@ -238,7 +238,7 @@ namespace LCT.PackageIdentifier
                 components.Type = Component.Classification.Library;
                 components.Description = folderPath;
                 components.Version = Convert.ToString(properties[Version]);
-                components.Author = prop.Value[Dependencies]?.ToString();
+                components.Manufacturer.BomRef = prop.Value[Dependencies]?.ToString();
                 components.Purl = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
                 components.BomRef = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
 
@@ -311,7 +311,7 @@ namespace LCT.PackageIdentifier
 
             foreach (JProperty prop in depencyComponentList)
             {
-                Component components = new Component();
+                Component components = new Component() { Manufacturer = new OrganizationalEntity() };
                 Property isdev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
 
                 var properties = JObject.Parse(Convert.ToString(prop.Value));
@@ -352,7 +352,7 @@ namespace LCT.PackageIdentifier
 
                 components.Description = folderPath;
                 components.Version = Convert.ToString(properties[Version]);
-                components.Author = prop.Value[Requires]?.ToString();
+                components.Manufacturer.BomRef = prop.Value[Requires]?.ToString();
                 components.Purl = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
                 components.BomRef = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
                 components.Type = Component.Classification.Library;
@@ -537,6 +537,7 @@ namespace LCT.PackageIdentifier
                         bom = RemoveExcludedComponents(appSettings, bom);
                         CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
                         AddingIdentifierType(bom.Components, "CycloneDXFile");
+                        BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += bom.Components.Count;
                         componentsForBOM.AddRange(bom.Components);
                         dependencies = bom.Dependencies;
                     }
@@ -563,10 +564,10 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in componentsForBOM)
             {
-                if ((component.Author?.Split(",")) != null)
+                if ((component.Manufacturer?.BomRef?.Split(",")) != null)
                 {
                     List<Dependency> subDependencies = new();
-                    foreach (var item in (component.Author?.Split(",")).Where(item => item.Contains(':')))
+                    foreach (var item in (component.Manufacturer?.BomRef?.Split(",")).Where(item => item.Contains(':')))
                     {
                         var componentDetails = item.Split(":");
                         string name;
@@ -599,9 +600,10 @@ namespace LCT.PackageIdentifier
 
                     dependencyList.Add(dependency);
 
-                    component.Author = null;
+                    component.Manufacturer = null;
 
                 }
+                component.Manufacturer = null;
             }
             dependencies.AddRange(dependencyList);
         }

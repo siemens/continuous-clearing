@@ -21,6 +21,8 @@ To ensure such practises are in place, we need to provide software bill of mater
 
 This tool has been  logically split into 3 different executables that enable it to be used as separate modules as per the user's requirement.
 
+**_Note: The SBOM created by this tool follows the CycloneDX version [v1.6](https://cyclonedx.org/docs/1.6/json/) and Siemens SBOM standard [v3](https://sbom.siemens.io/v3/format.html). These formats ensure the SBOM is detailed, secure, and meets industry and Siemens-specific requirements._**
+
 **_Note: Continuous Clearing Tool internally uses [Syft](https://github.com/anchore/syft) for component detection for debian/alpine type projects._**
 
 

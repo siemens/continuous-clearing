@@ -14,7 +14,6 @@ using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
-using log4net.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -24,6 +23,7 @@ using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 using Directory = System.IO.Directory;
+using Level = log4net.Core.Level;
 
 
 namespace LCT.PackageIdentifier
@@ -41,11 +41,16 @@ namespace LCT.PackageIdentifier
         public IJFrogService JFrogService { get; set; }
         public IBomHelper BomHelper { get; set; }
 
+        private readonly IFrameworkPackages _frameworkPackages;
+        private readonly ICompositionBuilder _compositionBuilder;
+
         public static Jfrog jfrog { get; set; } = new Jfrog();
         public static SW360 sw360 { get; set; } = new SW360();
-        public BomCreator(ICycloneDXBomParser cycloneDXBomParser)
+        public BomCreator(ICycloneDXBomParser cycloneDXBomParser, IFrameworkPackages frameworkPackages, ICompositionBuilder compositionBuilder)
         {
             CycloneDXBomParser = cycloneDXBomParser;
+            _frameworkPackages = frameworkPackages;
+            _compositionBuilder = compositionBuilder;
         }
 
         public async Task GenerateBom(CommonAppSettings appSettings,
@@ -65,6 +70,12 @@ namespace LCT.PackageIdentifier
 
             bomKpiData.ComponentsInComparisonBOM = listOfComponentsToBom.Components.Count;
             //Get project details for metadata properties
+
+            //Add composition information to the BOM , if empty then add empty composition
+            if (listOfComponentsToBom.Compositions == null || listOfComponentsToBom.Compositions.Count == 0)
+            {
+                listOfComponentsToBom.Compositions = [];
+            }
 
             //sets metadata properties
             listOfComponentsToBom = CycloneBomProcessor.SetMetadataInComparisonBOM(listOfComponentsToBom,
@@ -147,7 +158,7 @@ namespace LCT.PackageIdentifier
                     parser = new NpmProcessor(CycloneDXBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 case "NUGET":
-                    parser = new NugetProcessor(CycloneDXBomParser);
+                    parser = new NugetProcessor(CycloneDXBomParser, _frameworkPackages, _compositionBuilder);
                     return await ComponentIdentification(appSettings, parser);
                 case "MAVEN":
                     parser = new MavenProcessor(CycloneDXBomParser);

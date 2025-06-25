@@ -12,13 +12,13 @@ using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Model;
 using log4net;
-using log4net.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Level = log4net.Core.Level;
 
 namespace LCT.ArtifactoryUploader
 {

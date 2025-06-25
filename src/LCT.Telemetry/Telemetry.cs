@@ -48,12 +48,12 @@ namespace LCT.Telemetry
             TrackUserDetails();
         }
 
-        public void TrackCustomEvent(string eventName, Dictionary<string, string> properties = null)
+        public void TrackCustomEvent(string eventName, Dictionary<string, string>? properties = null)
         {
             _telemetryProvider.TrackEvent(eventName, properties);
         }
 
-        public void TrackException(Exception ex, Dictionary<string, string> properties = null)
+        public void TrackException(Exception ex, Dictionary<string, string>? properties = null)
         {
             _telemetryProvider.TrackException(ex, properties);
         }

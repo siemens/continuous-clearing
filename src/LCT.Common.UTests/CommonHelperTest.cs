@@ -67,7 +67,7 @@ namespace LCT.Common.UTest
         [Test]
         public void LogFolderInitialisation_WhenLogFolderIsNull_ReturnsDefaultLogPath()
         {
-            Log4Net.CatoolLogPath= "C:\\catool\\fds.log";
+            Log4Net.CatoolLogPath = "C:\\catool\\fds.log";
 
             // Act
             string result = CommonHelper.LogFolderInitialisation(appSettings, "catool.log", false);
@@ -145,7 +145,7 @@ namespace LCT.Common.UTest
             List<Component> listComponentForBOM = new List<Component>();
 
             //Act
-            CommonHelper.GetDetailsforManuallyAdded(componentsForBOM, listComponentForBOM);
+            CommonHelper.GetDetailsForManuallyAdded(componentsForBOM, listComponentForBOM);
 
             //Assert
             Assert.AreEqual(2, listComponentForBOM.Count);
@@ -502,17 +502,17 @@ namespace LCT.Common.UTest
             string[] result = CommonHelper.MaskSensitiveArguments(args);
 
             // Assert
-            Assert.IsEmpty(result, "Null input should return an empty array.");            
+            Assert.IsEmpty(result, "Null input should return an empty array.");
         }
         [Test]
         public void DefaultLogFolderInitialisation_SetsDefaultLogPath_Windows()
         {
             // Arrange
             string logFileName = FileConstant.BomCreatorLog;
-            string runningLocation=Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            string runningLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
             Log4Net.CatoolCurrentDirectory = System.IO.Directory.GetParent(runningLocation).FullName;
             bool m_Verbose = false;
-          
+
 
             // Act
             CommonHelper.DefaultLogFolderInitialisation(logFileName, m_Verbose);
@@ -524,9 +524,9 @@ namespace LCT.Common.UTest
             else
             {
                 Assert.AreEqual("/var/log", CommonHelper.DefaultLogPath);
-            }               
-            
-        }       
+            }
+
+        }
     }
 
     public class TestObject

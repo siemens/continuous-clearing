@@ -338,8 +338,11 @@ namespace LCT.PackageIdentifier.UTest
             };
             mockIProcessor.Setup(x => x.GetJfrogArtifactoryRepoInfo(It.IsAny<CommonAppSettings>(), It.IsAny<ArtifactoryCredentials>(), It.IsAny<Component>(), It.IsAny<string>())).ReturnsAsync(lstComponentForBOM);
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            Mock<IFrameworkPackages> frameworkPackages = new Mock<IFrameworkPackages>();
+            Mock<ICompositionBuilder> compositionBuilder = new Mock<ICompositionBuilder>();
 
-            IParser parser = new NugetProcessor(cycloneDXBomParser.Object);
+            IParser parser = new NugetProcessor(cycloneDXBomParser.Object, frameworkPackages.Object, compositionBuilder.Object);
+            //IParser parser = new NugetProcessor(cycloneDXBomParser.Object);
             Mock<IJFrogService> jFrogService = new Mock<IJFrogService>();
             Mock<IBomHelper> bomHelper = new Mock<IBomHelper>();
             bomHelper.Setup(x => x.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>())).ReturnsAsync(aqlResultList);

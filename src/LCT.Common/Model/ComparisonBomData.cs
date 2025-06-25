@@ -37,5 +37,8 @@ namespace LCT.Common.Model
         public string ParentReleaseName { get; set; }
         public string FossologyUploadId { get; set; }
         public string ClearingState { get; set; }
+        public string ReleaseCreatedBy { get; set; }
+        public bool SourceAttachmentStatus { get; set; } = false;
+
     }
 }
