@@ -71,6 +71,12 @@ namespace LCT.PackageIdentifier
             bomKpiData.ComponentsInComparisonBOM = listOfComponentsToBom.Components.Count;
             //Get project details for metadata properties
 
+            //Add composition information to the BOM , if empty then add empty composition
+            if (listOfComponentsToBom.Compositions == null || listOfComponentsToBom.Compositions.Count == 0)
+            {
+                listOfComponentsToBom.Compositions = [];
+            }
+
             //sets metadata properties
             listOfComponentsToBom = CycloneBomProcessor.SetMetadataInComparisonBOM(listOfComponentsToBom,
                                                                                    appSettings,
