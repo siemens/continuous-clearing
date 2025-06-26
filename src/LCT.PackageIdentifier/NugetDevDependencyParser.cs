@@ -27,7 +27,9 @@ namespace LCT.PackageIdentifier
     {
         private static NugetDevDependencyParser instance = null;
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+#pragma warning disable CA2211 // Non-constant fields should not be visible
         public static List<string> NugetDirectDependencies = new List<string>();
+#pragma warning restore CA2211 // Non-constant fields should not be visible
 
         private NugetDevDependencyParser()
         {
@@ -38,10 +40,7 @@ namespace LCT.PackageIdentifier
         {
             get
             {
-                if (instance == null)
-                {
-                    instance = new NugetDevDependencyParser();
-                }
+                instance ??= new NugetDevDependencyParser();
                 return instance;
             }
         }
@@ -192,7 +191,7 @@ namespace LCT.PackageIdentifier
             IEnumerable<JProperty> listChilds = projectFramworks.Children().OfType<JProperty>();
 
             //check has values
-            if (listChilds != null && listChilds.ToList()[0].HasValues)
+            if (listChilds.Any() && listChilds.First().HasValues)
             {
                 JToken projectDependencies = listChilds.ToList()[0].Value["dependencies"];
                 if (projectDependencies == null)

@@ -211,9 +211,9 @@ namespace LCT.Services
         }
 
         #region PrivateMethods
+       
 
-        private static Releasestatus GetReleaseExistStatus(
-            string name, string externlaIdKey, IList<Sw360Releases> sw360releasesdata)
+        private static Releasestatus GetReleaseExistStatus(string name, string externlaIdKey, IList<Sw360Releases> sw360releasesdata)
         {
             Dictionary<int, Sw360Releases> releaseCollection = new Dictionary<int, Sw360Releases>();
 
@@ -227,17 +227,13 @@ namespace LCT.Services
                 {
                     var purlids = JsonConvert.DeserializeObject<List<string>>(packageUrl);
 
-                    if (releaseCollection.ContainsKey(purlids.Count) && releaseCollection[purlids.Count].Name.ToLower().Equals(name.ToLower()))
+                    if (!releaseCollection.TryAdd(purlids.Count, release))
                     {
-                        // Do nothing
-                    }
-                    else if (releaseCollection.ContainsKey(purlids.Count))
-                    {
-                        releaseCollection[1] = release;
-                    }
-                    else
-                    {
-                        releaseCollection.Add(purlids.Count, release);
+                        if (releaseCollection.TryGetValue(purlids.Count, out var existingRelease) &&
+                            !existingRelease.Name.ToLower().Equals(name.ToLower()))
+                        {
+                            releaseCollection[1] = release;
+                        }
                     }
                 }
                 catch (JsonReaderException)
@@ -245,15 +241,15 @@ namespace LCT.Services
                     UpdateCollection(name, ref releaseCollection, release);
                 }
             }
+
             Releasestatus releasestatus = new Releasestatus();
             releasestatus.sw360Releases = releaseCollection[releaseCollection.Keys.Max()];
             Logger.Debug($"GetReleaseExistStatus(): Release Name : {name} selected {releasestatus.sw360Releases?.Name} \n");
-            releasestatus.isReleaseExist = !string.IsNullOrEmpty(releasestatus.sw360Releases?.ExternalIds?.Package_Url) || !string.IsNullOrEmpty(releasestatus.sw360Releases?.ExternalIds?.Purl_Id);
+            releasestatus.isReleaseExist = !string.IsNullOrEmpty(releasestatus.sw360Releases?.ExternalIds?.Package_Url) ||
+                                            !string.IsNullOrEmpty(releasestatus.sw360Releases?.ExternalIds?.Purl_Id);
 
             return releasestatus;
         }
-
-
         private static ComponentStatus GetComponentExistStatus(string name, string externlaIdKey, IList<Sw360Components> sw360components)
         {
             Dictionary<int, Sw360Components> componentCollection = new Dictionary<int, Sw360Components>();
@@ -268,17 +264,13 @@ namespace LCT.Services
                 {
                     var purlids = JsonConvert.DeserializeObject<List<string>>(packageUrl);
 
-                    if (componentCollection.ContainsKey(purlids.Count) && componentCollection[purlids.Count].Name.ToLower().Equals(name.ToLower()))
+                    if (!componentCollection.TryAdd(purlids.Count, componentsData))
                     {
-                        // Do nothing
-                    }
-                    else if (componentCollection.ContainsKey(purlids.Count))
-                    {
-                        componentCollection[1] = componentsData;
-                    }
-                    else
-                    {
-                        componentCollection.Add(purlids.Count, componentsData);
+                        if (componentCollection.TryGetValue(purlids.Count, out var existingComponent) &&
+                            !existingComponent.Name.ToLower().Equals(name.ToLower()))
+                        {
+                            componentCollection[1] = componentsData;
+                        }
                     }
                 }
                 catch (JsonReaderException)
@@ -286,13 +278,16 @@ namespace LCT.Services
                     UpdateCollection(name, ref componentCollection, componentsData);
                 }
             }
-            ComponentStatus component = new ComponentStatus();
 
-            component.Sw360components = componentCollection[componentCollection.Keys.Max()];
+            ComponentStatus component = new ComponentStatus
+            {
+                Sw360components = componentCollection[componentCollection.Keys.Max()],
+                isComponentExist = !string.IsNullOrEmpty(componentCollection[componentCollection.Keys.Max()]?.ExternalIds?.Package_Url) ||
+                                   !string.IsNullOrEmpty(componentCollection[componentCollection.Keys.Max()]?.ExternalIds?.Purl_Id)
+            };
+
             Logger.Debug($"GetComponentExistStatus(): Component Name : {name} selected {component.Sw360components?.Name} \n");
-            component.isComponentExist = !string.IsNullOrEmpty(component.Sw360components?.ExternalIds?.Package_Url) || !string.IsNullOrEmpty(component.Sw360components?.ExternalIds?.Purl_Id);
             return component;
-
         }
 
 
@@ -336,33 +331,33 @@ namespace LCT.Services
 
         private static void UpdateCollection(string name, ref Dictionary<int, Sw360Components> componentCollection, Sw360Components components)
         {
-            if (componentCollection.ContainsKey(1) && componentCollection[1].Name.ToLower().Equals(name.ToLower()))
+            if (componentCollection.TryGetValue(1, out var existingComponent) && existingComponent.Name.ToLower().Equals(name.ToLower()))
             {
                 // Do nothing
             }
-            else if (componentCollection.ContainsKey(1))
+            else if (componentCollection.TryGetValue(1, out _))
             {
                 componentCollection[1] = components;
             }
             else
             {
-                componentCollection.Add(1, components);
+                componentCollection.TryAdd(1, components);
             }
         }
 
         private static void UpdateCollection(string name, ref Dictionary<int, Sw360Releases> releaseCollection, Sw360Releases release)
         {
-            if (releaseCollection.ContainsKey(1) && releaseCollection[1].Name.ToLower().Equals(name.ToLower()))
+            if (releaseCollection.TryGetValue(1, out var existingRelease) && existingRelease.Name.ToLower().Equals(name.ToLower()))
             {
                 // Do nothing
             }
-            else if (releaseCollection.ContainsKey(1))
+            else if (releaseCollection.TryGetValue(1, out _))
             {
                 releaseCollection[1] = release;
             }
             else
             {
-                releaseCollection.Add(1, release);
+                releaseCollection.TryAdd(1, release);
             }
         }
 

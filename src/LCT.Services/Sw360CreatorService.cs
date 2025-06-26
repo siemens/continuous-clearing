@@ -36,7 +36,7 @@ namespace LCT.Services
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         readonly ISW360ApicommunicationFacade m_SW360ApiCommunicationFacade;
         readonly ISW360CommonService m_SW360CommonService;
-        private static IEnvironmentHelper environmentHelper;
+        private static EnvironmentHelper environmentHelper;
 
         public Sw360CreatorService(ISW360ApicommunicationFacade sw360ApiCommunicationFacade)
         {
@@ -275,30 +275,24 @@ namespace LCT.Services
                 Dictionary<string, ReleaseLinked> linkedReleasesUniqueDict = new Dictionary<string, ReleaseLinked>();
                 foreach (var release in finalReleasesToBeLinked)
                 {
-                    if (!linkedReleasesUniqueDict.ContainsKey(release.ReleaseId))
+                    if (!linkedReleasesUniqueDict.TryAdd(release.ReleaseId, release))
                     {
-                        linkedReleasesUniqueDict.Add(release.ReleaseId, release);
-                    }
-                    else
-                    {
-                        Logger.Debug("Duplicate entries found in finalReleasesToBeLinked: " + release.Name + ":" + release.ReleaseId +
-                            " , with :" + linkedReleasesUniqueDict[release.ReleaseId].Name + ":" + linkedReleasesUniqueDict[release.ReleaseId].ReleaseId);
+                        linkedReleasesUniqueDict.TryGetValue(release.ReleaseId, out var existingRelease);
+                        Logger.Debug($"Duplicate entries found in finalReleasesToBeLinked: {release.Name}:{release.ReleaseId} , with: {existingRelease?.Name}:{existingRelease?.ReleaseId}");
                     }
                 }
 
                 // Assigning unique entries from the Dict
                 finalReleasesToBeLinked = linkedReleasesUniqueDict.Values.ToList();
 
-                Dictionary<string, AddLinkedRelease> linkedReleasesDict;
-                linkedReleasesDict = finalReleasesToBeLinked
-                                        .ToDictionary(
-                                            releaseLinked => releaseLinked.ReleaseId,
-                                            releaseLinked => new AddLinkedRelease()
-                                            {
-                                                ReleaseRelation = string.IsNullOrEmpty(releaseLinked.Relation) ? Dataconstant.LinkedByCAToolReleaseRelationContained
-                                                                    : releaseLinked.Relation,
-                                                Comment = manuallyLinkedReleases.Exists(r => r.ReleaseId == releaseLinked.ReleaseId) ? releaseLinked.Comment : Dataconstant.LinkedByCATool
-                                            });
+                Dictionary<string, AddLinkedRelease> linkedReleasesDict = finalReleasesToBeLinked
+                    .ToDictionary(
+                        releaseLinked => releaseLinked.ReleaseId,
+                        releaseLinked => new AddLinkedRelease
+                        {
+                            ReleaseRelation = string.IsNullOrEmpty(releaseLinked.Relation) ? Dataconstant.LinkedByCAToolReleaseRelationContained : releaseLinked.Relation,
+                            Comment = manuallyLinkedReleases.Exists(r => r.ReleaseId == releaseLinked.ReleaseId) ? releaseLinked.Comment : Dataconstant.LinkedByCATool
+                        });
 
                 StringContent content = new StringContent(JsonConvert.SerializeObject(linkedReleasesDict), Encoding.UTF8, "application/json");
 
@@ -307,7 +301,7 @@ namespace LCT.Services
                 {
 
                     Environment.ExitCode = -1;
-                    Logger.Error($"LinkReleasesToProject() : Linking releases to project Id {sw360ProjectId} is failed.");
+                    Logger.Error($"LinkReleasesToProject() : Linking releases to project Id {sw360ProjectId} failed.");
                     return false;
                 }
                 return true;
@@ -371,8 +365,8 @@ namespace LCT.Services
             var listofSw360Releases = responseData?.Embedded?.Sw360Releases ?? new List<Sw360Releases>();
             for (int i = 0; i < listofSw360Releases.Count; i++)
             {
-                if (listofSw360Releases[i].Name?.ToLowerInvariant() == componentName.ToLowerInvariant()
-                    && listofSw360Releases[i].Version?.ToLowerInvariant() == componentVersion.ToLowerInvariant())
+                if ((listofSw360Releases[i].Name?.ToLowerInvariant()).Equals(componentName, StringComparison.InvariantCultureIgnoreCase)
+                    && (listofSw360Releases[i].Version?.ToLowerInvariant()).Equals(componentVersion, StringComparison.InvariantCultureIgnoreCase))
                 {
                     string urlofreleaseid = listofSw360Releases[i]?.Links?.Self?.Href ?? string.Empty;
                     releaseid = CommonHelper.GetSubstringOfLastOccurance(urlofreleaseid, "/");

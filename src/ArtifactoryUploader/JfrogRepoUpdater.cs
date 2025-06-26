@@ -19,9 +19,8 @@ using System.Threading.Tasks;
 
 namespace LCT.ArtifactoryUploader
 {
-    public class JfrogRepoUpdater
-    {
-        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+    public static class JfrogRepoUpdater
+    {        
         public static IJFrogService JFrogService { get; set; }
         private readonly static List<AqlResult> aqlResultList = new();
         public static async Task<Bom> UpdateJfrogRepoPathForSucessfullyUploadedItems(Bom m_ComponentsInBOM,

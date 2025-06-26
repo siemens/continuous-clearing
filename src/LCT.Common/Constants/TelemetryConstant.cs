@@ -8,7 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace LCT.Common.Constants
 {
     [ExcludeFromCodeCoverage]
-    public class TelemetryConstant
+    public static class TelemetryConstant
     {
         public const string ToolName = "CATool";
         public const string PackageIdentifier = "PackageIdentifierExecution";

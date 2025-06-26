@@ -33,7 +33,7 @@ namespace LCT.PackageIdentifier.UTest
         }
 
         [Test]
-        public void GetArtifactoryRepoName_Returns_RepoName()
+        public static void GetArtifactoryRepoName_Returns_RepoName()
         {
             // Arrange
             var aqlResultList = new List<AqlResult>
@@ -55,11 +55,10 @@ namespace LCT.PackageIdentifier.UTest
             {
                 Name = "package",
                 Version = "1.0.0"
-            };
-            string jfrogRepoPath;
+            };           
 
             // Act
-            var repoName = _conanProcessor.GetArtifactoryRepoName(aqlResultList, component, out jfrogRepoPath);
+            var repoName = ConanProcessor.GetArtifactoryRepoName(aqlResultList, component, out string jfrogRepoPath);
 
             // Assert
             Assert.AreEqual("repo1", repoName);

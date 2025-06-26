@@ -21,7 +21,7 @@ using System.Reflection;
 
 namespace LCT.ArtifactoryUploader
 {
-    public class PackageUploadInformation
+    public static class PackageUploadInformation
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static DisplayPackagesInfo GetComponentsToBePackages()
@@ -124,7 +124,7 @@ namespace LCT.ArtifactoryUploader
         }
         private static void DisplaySortedForeachComponents(List<ComponentsToArtifactory> unknownPackages, List<ComponentsToArtifactory> JfrogNotFoundPackages, List<ComponentsToArtifactory> SucessfullPackages, List<ComponentsToArtifactory> JfrogFoundPackages, string name, string filename)
         {
-            if (unknownPackages.Any() || JfrogNotFoundPackages.Any() || SucessfullPackages.Any() || JfrogFoundPackages.Any())
+            if (unknownPackages.Count != 0 || JfrogNotFoundPackages.Count != 0 || SucessfullPackages.Count != 0 || JfrogFoundPackages.Count != 0)
             {
                 Logger.Info("\n" + name + ":\n");
                 DisplayErrorForUnknownPackages(unknownPackages, name, filename);
@@ -137,7 +137,7 @@ namespace LCT.ArtifactoryUploader
         public static void DisplayErrorForJfrogFoundPackages(List<ComponentsToArtifactory> JfrogFoundPackages)
         {
 
-            if (JfrogFoundPackages.Any())
+            if (JfrogFoundPackages.Count != 0)
             {
 
                 foreach (var jfrogFoundPackage in JfrogFoundPackages)
@@ -166,7 +166,7 @@ namespace LCT.ArtifactoryUploader
         public static void DisplayErrorForJfrogPackages(List<ComponentsToArtifactory> JfrogNotFoundPackages)
         {
 
-            if (JfrogNotFoundPackages.Any())
+            if (JfrogNotFoundPackages.Count != 0)
             {
 
                 foreach (var jfrogNotFoundPackage in JfrogNotFoundPackages)
@@ -181,7 +181,7 @@ namespace LCT.ArtifactoryUploader
         private static void DisplayErrorForSucessfullPackages(List<ComponentsToArtifactory> SucessfullPackages)
         {
 
-            if (SucessfullPackages.Any())
+            if (SucessfullPackages.Count != 0)
             {
 
                 foreach (var sucessfullPackage in SucessfullPackages)
@@ -198,7 +198,7 @@ namespace LCT.ArtifactoryUploader
             IFileOperations fileOperations = new FileOperations();
             var filename = Path.Combine(filepath, $"Artifactory_{FileConstant.artifactoryReportNotApproved}");
 
-            if (unknownPackages.Any())
+            if (unknownPackages.Count != 0)
             {
                 var packageHandlers = new Dictionary<string, Action<List<ComponentsToArtifactory>, ProjectResponse, IFileOperations, string, string>>
         {

@@ -18,9 +18,9 @@ namespace LCT.Common
     public class TelemetryHelper
     {
         private readonly ILog Logger;
-        LCT.Telemetry.Telemetry telemetry_;
-        EnvironmentHelper environmentHelper;
-        CommonAppSettings appSettings_;
+        private readonly LCT.Telemetry.Telemetry telemetry_;
+        private readonly EnvironmentHelper environmentHelper;
+        private readonly CommonAppSettings appSettings_;
 
         public TelemetryHelper(CommonAppSettings appSettings)
         {
@@ -44,7 +44,19 @@ namespace LCT.Common
                                                     , appSettings_);
                 TrackKpiDataTelemetry(telemetryFor, kpiData);
             }
-            catch (Exception ex)
+            catch (ArgumentNullException ex)
+            {
+                Logger.Error($"An error occurred: {ex.Message}");
+                TrackException(ex);
+                environmentHelper.CallEnvironmentExit(-1);
+            }
+            catch (InvalidOperationException ex)
+            {
+                Logger.Error($"An error occurred: {ex.Message}");
+                TrackException(ex);
+                environmentHelper.CallEnvironmentExit(-1);
+            }
+            catch (Exception ex) when ( ex is FormatException)
             {
                 Logger.Error($"An error occurred: {ex.Message}");
                 TrackException(ex);

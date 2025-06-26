@@ -57,7 +57,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             // Act
-            var result = _nugetProcessor.GetJfrogRepoPath(aqlResult);
+            var result = NugetProcessor.GetJfrogRepoPath(aqlResult);
 
             // Assert
             Assert.AreEqual("my-repo/my-package", result);
@@ -75,7 +75,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             // Act
-            var result = _nugetProcessor.GetJfrogRepoPath(aqlResult);
+            var result = NugetProcessor.GetJfrogRepoPath(aqlResult);
 
             // Assert
             Assert.AreEqual("my-repo/my-package", result);
@@ -93,7 +93,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             // Act
-            var result = _nugetProcessor.GetJfrogRepoPath(aqlResult);
+            var result = NugetProcessor.GetJfrogRepoPath(aqlResult);
 
             // Assert
             Assert.AreEqual("my-repo/my-folder/my-package", result);
@@ -146,11 +146,10 @@ namespace LCT.PackageIdentifier.UTest
                 new AqlResult { Name = "Component-1.0.0.nupkg", Repo = "Repo1" },
                 new AqlResult { Name = "Component-2.0.0.nupkg", Repo = "Repo2" }
             };
-            Component component = new Component { Name = "Component", Version = "3.0.0" };
-            string jfrogRepoPath;
+            Component component = new Component { Name = "Component", Version = "3.0.0" };            
 
             // Act
-            var result = _nugetProcessor.GetJfrogArtifactoryRepoDetials(aqlResultList, component, _mockBomHelper.Object, out jfrogRepoPath);
+            var result = _nugetProcessor.GetJfrogArtifactoryRepoDetials(aqlResultList, component, _mockBomHelper.Object, out string jfrogRepoPath);
 
             // Assert
             Assert.IsNotNull(result);
@@ -168,11 +167,10 @@ namespace LCT.PackageIdentifier.UTest
                 new AqlResult { Name = "Component-2.0.0.nupkg", Repo = "Repo2", Path= "path/to" }
             };
             Component component = new Component { Name = "Component", Version = "1.0.0" };
-            _mockBomHelper.Setup(x => x.GetFullNameOfComponent(component)).Returns("Component");
-            string jfrogRepoPath;
+            _mockBomHelper.Setup(x => x.GetFullNameOfComponent(component)).Returns("Component");            
 
             // Act
-            var result = _nugetProcessor.GetJfrogArtifactoryRepoDetials(aqlResultList, component, _mockBomHelper.Object, out jfrogRepoPath);
+            var result = _nugetProcessor.GetJfrogArtifactoryRepoDetials(aqlResultList, component, _mockBomHelper.Object, out string jfrogRepoPath);
 
             // Assert
             Assert.IsNotNull(result);
@@ -405,14 +403,12 @@ namespace LCT.PackageIdentifier.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
             string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles", "packages.config"));
-
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+                       
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 Nuget = new Config(),
                 SW360 = new SW360(),
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"))
                 }
@@ -526,13 +522,12 @@ namespace LCT.PackageIdentifier.UTest
             string outFolder = Path.GetDirectoryName(exePath);
             string csprojfilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
             string[] Excludes = null;
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings commonAppSettings = new CommonAppSettings(folderAction, fileOperations)
+            
+            CommonAppSettings commonAppSettings = new CommonAppSettings()
             {
                 Nuget = new Config() { Exclude = Excludes },
                 SW360 = new SW360(),
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = csprojfilepath
                 }
@@ -564,14 +559,12 @@ namespace LCT.PackageIdentifier.UTest
 
             Bom bom = new Bom();
             bom.Components = new List<Component>();
-
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings commonAppSettings = new CommonAppSettings(folderAction, fileOperations)
+                        
+            CommonAppSettings commonAppSettings = new CommonAppSettings()
             {
                 Nuget = new Config() { Exclude = Excludes },
                 SW360 = new SW360() { ExcludeComponents = new List<string>() },
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = csprojfilepath
                 }
@@ -597,9 +590,8 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             ComponentIdentification component = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo1" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+           
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360(),
                 Nuget = new Config
@@ -647,9 +639,8 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             ComponentIdentification component = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360(),
                 Nuget = new Config
@@ -698,9 +689,8 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             ComponentIdentification componentIdentification = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+           
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360(),
                 Nuget = new Config
@@ -750,10 +740,8 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+                        
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "NUGET",
                 SW360 = new SW360(),
@@ -803,9 +791,8 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "NUGET",
                 SW360 = new SW360(),
@@ -855,9 +842,8 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+           
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "NUGET",
                 SW360 = new SW360(),
@@ -907,9 +893,8 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "NUGET",
                 SW360 = new SW360(),
@@ -959,9 +944,8 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "NUGET",
                 SW360 = new SW360(),
@@ -1012,9 +996,8 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "NUGET",
                 SW360 = new SW360(),
@@ -1062,13 +1045,12 @@ namespace LCT.PackageIdentifier.UTest
             string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 
             string[] Includes = { "project.assets.json" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 Nuget = new Config() { Include = Includes },
                 SW360 = new SW360(),
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = packagefilepath
                 }
@@ -1094,13 +1076,12 @@ namespace LCT.PackageIdentifier.UTest
 
             string[] Includes = { "project.assets.json" };
 
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 Nuget = new Config() { Include = Includes },
                 SW360 = new SW360(),
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = packagefilepath
                 }
@@ -1129,13 +1110,12 @@ namespace LCT.PackageIdentifier.UTest
             string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 
             string[] Includes = { "project.assets.json", "Nuget-SelfContained.csproj" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 Nuget = new Config() { Include = Includes },
                 SW360 = new SW360(),
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = packagefilepath
                 }
@@ -1192,13 +1172,12 @@ namespace LCT.PackageIdentifier.UTest
 
             string[] Includes = { "project.assets.json", "Nuget.csproj" };
             string[] excludes = { "NugetSelfContainedProject" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 Nuget = new Config() { Include = Includes, Exclude = excludes },
                 SW360 = new SW360(),
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = packagefilepath
                 }
@@ -1238,13 +1217,12 @@ namespace LCT.PackageIdentifier.UTest
 
             string[] Includes = { "project.assets.json" };
             string[] excludes = { "NugetSelfContainedProject" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 Nuget = new Config() { Include = Includes, Exclude = excludes },
                 SW360 = new SW360(),
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = packagefilepath
                 }
@@ -1301,13 +1279,12 @@ namespace LCT.PackageIdentifier.UTest
 
             string[] Includes = { "project.assets.json" };
             string[] excludes = { "NugetSelfContainedProject" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 Nuget = new Config() { Include = Includes, Exclude = excludes },
                 SW360 = new SW360(),
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = packagefilepath
                 }

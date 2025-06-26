@@ -20,19 +20,16 @@ namespace LCT.Facade
     /// </summary>
     public class SW360ApicommunicationFacade : ISW360ApicommunicationFacade
     {
-        private readonly ISw360ApiCommunication m_sw360ApiCommunication;
-        private readonly bool m_TestMode;
+        private readonly ISw360ApiCommunication m_sw360ApiCommunication;       
 
         public SW360ApicommunicationFacade(SW360ConnectionSettings sw360ConnectionSettings)
         {
             m_sw360ApiCommunication = new SW360Apicommunication(sw360ConnectionSettings);
-            m_TestMode = sw360ConnectionSettings.IsTestMode;
         }
 
-        public SW360ApicommunicationFacade(ISw360ApiCommunication sw360ApiCommunication, bool testMode)
+        public SW360ApicommunicationFacade(ISw360ApiCommunication sw360ApiCommunication)
         {
             m_sw360ApiCommunication = sw360ApiCommunication;
-            m_TestMode = testMode;
         }
 
         public Task<string> GetProjects()

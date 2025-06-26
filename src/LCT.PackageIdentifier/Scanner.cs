@@ -24,7 +24,7 @@ namespace LCT.PackageIdentifier
     {
 
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
+        private static EnvironmentHelper environmentHelper = new EnvironmentHelper();
         public static List<string> FileScanner(string rootPath, Config config)
         {
 

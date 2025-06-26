@@ -94,14 +94,11 @@ namespace LCT.APICommunications.UTest
                 StatusCode = HttpStatusCode.OK
             });
 
-            var mockHttpClient = new HttpClient(mockHttpMessageHandler);
             var repoCredentials = new ArtifactoryCredentials { Token = "dummyToken" };
             var component = new ComponentsToArtifactory { PackageInfoApiUrl = "http://dummyurl.com" };
 
             var jfrogApiCommunication = new NpmJfrogApiCommunication("", "", repoCredentials, 100);
-            typeof(NpmJfrogApiCommunication)
-                .GetField("environmentHelper", BindingFlags.NonPublic | BindingFlags.Static)
-                ?.SetValue(null, new Mock<IEnvironmentHelper>().Object);
+           
 
             // Act
             var response = await jfrogApiCommunication.GetPackageInfo(component);

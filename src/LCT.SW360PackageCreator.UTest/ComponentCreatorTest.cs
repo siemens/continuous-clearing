@@ -244,7 +244,7 @@ namespace LCT.SW360PackageCreator.UTest
                     ProjectID = "projectId",
                     ProjectName = "projectName"
                 },
-                Directory = new Common.Directory(folderAction.Object, fileOperations.Object)
+                Directory = new Common.Directory()
                 {
                     OutputFolder = "outputFolder"
                 },
@@ -416,7 +416,7 @@ namespace LCT.SW360PackageCreator.UTest
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360() { URL = "http://localhost:8081/" },
-                Directory = new Common.Directory(folderAction, fileOperations)
+                Directory = new Common.Directory()
             };
             sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(fossTriggerStatus);
 
@@ -447,7 +447,7 @@ namespace LCT.SW360PackageCreator.UTest
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360() { URL = "http://localhost:8081/" },
-                Directory = new Common.Directory(folderAction, fileOperations)
+                Directory = new Common.Directory()
             };
             sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>())).ThrowsAsync(new AggregateException());
 
@@ -483,7 +483,7 @@ namespace LCT.SW360PackageCreator.UTest
             CommonAppSettings CommonAppSettings = new()
             {
                 SW360 = new SW360() { ProjectName = "Test" },
-                Directory = new Common.Directory(folderAction, fileOperations)
+                Directory = new Common.Directory()
                 {
                     OutputFolder = @"\Output"
                 }
@@ -534,7 +534,7 @@ namespace LCT.SW360PackageCreator.UTest
             CommonAppSettings CommonAppSettings = new()
             {
                 SW360 = new SW360() { ProjectName = "Test" },
-                Directory = new Common.Directory(folderAction, fileOperations)
+                Directory = new Common.Directory()
                 {
                     OutputFolder = @"\Output"
                 }
@@ -585,7 +585,7 @@ namespace LCT.SW360PackageCreator.UTest
             CommonAppSettings commonAppSettings = new CommonAppSettings()
             {
                 SW360 = new SW360() { IgnoreDevDependency = false, ProjectName = "Test" },
-                Directory = new Common.Directory(folderAction, fileOperations)
+                Directory = new Common.Directory()
                 {
                     OutputFolder = @"\Output"
                 }
@@ -625,13 +625,12 @@ namespace LCT.SW360PackageCreator.UTest
                 {
                     new Component() { Name = "apk-tools",Version="2.12.9-r3",Group="",BomRef="pkg:apk/alpine/alpine-keys@2.4-r1?distro=alpine-3.16.2",Purl="pkg:apk/alpine/apk-tools@2.12.9-r3?arch=source",Properties = properties },
                 };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
 
                 SW360 = new SW360() { ProjectName = "Test" },
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     OutputFolder = @"\Output"
                 }
@@ -984,7 +983,7 @@ namespace LCT.SW360PackageCreator.UTest
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360() { URL = "http://localhost:8081/" },
-                Directory = new Common.Directory(folderAction, fileOperations)
+                Directory = new Common.Directory()
             };
 
             sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(fossTriggerStatus);

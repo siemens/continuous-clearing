@@ -119,7 +119,7 @@ namespace LCT.PackageIdentifier
 
         private static void WriteContentToCycloneDxBOM(CommonAppSettings appSettings, Bom listOfComponentsToBom, ref BomKpiData bomKpiData, string defaultProjectName)
         {
-            IFileOperations fileOperations = new FileOperations();
+            FileOperations fileOperations = new FileOperations();
             string bomFileName = CommonIdentiferHelper.GetBomFileName(appSettings);
 
             string outputFolderPath = appSettings.Directory.OutputFolder;

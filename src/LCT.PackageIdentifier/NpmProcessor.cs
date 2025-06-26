@@ -136,10 +136,8 @@ namespace LCT.PackageIdentifier
             return lstComponentForBOM;
         }
 
-        private List<JToken> GetDirectDependenciesList(string filepath)
-        {
-            string directoryName = Path.GetDirectoryName(filepath);
-            string packageJsonPath = $"{directoryName}\\{FileConstant.PackageJsonFileName}";
+        private static List<JToken> GetDirectDependenciesList(string filepath)
+        {            
             string jsonContent = File.ReadAllText(filepath);
             var jsonDeserialized = JObject.Parse(jsonContent);
             List<JToken> dependencies = jsonDeserialized[Dependencies]?.ToList() ?? new List<JToken>();
@@ -153,7 +151,7 @@ namespace LCT.PackageIdentifier
         private static void CreateFileForMultipleVersions(List<Component> componentsWithMultipleVersions, CommonAppSettings appSettings)
         {
             MultipleVersions multipleVersions = new MultipleVersions();
-            IFileOperations fileOperations = new FileOperations();
+            FileOperations fileOperations = new FileOperations();
             string defaultProjectName = CommonIdentiferHelper.GetDefaultProjectName(appSettings);
             string bomFullPath = $"{appSettings.Directory.OutputFolder}\\{defaultProjectName}_Bom.cdx.json";
             string filePath = $"{appSettings.Directory.OutputFolder}\\{defaultProjectName}_{FileConstant.multipleversionsFileName}";
@@ -219,11 +217,7 @@ namespace LCT.PackageIdentifier
 
                 // dev components are not ignored and added as a part of SBOM 
                 // If package section has Dev or DevOptional as true , considering it as Dev Component
-                if (IsDevDependency(prop.Value[Dev], ref noOfDevDependent))
-                {
-                    isdev.Value = "true";
-                }
-                else if (IsDevDependency(prop.Value[DevOptional], ref noOfDevDependent))
+                if (IsDevDependency(prop.Value[Dev], ref noOfDevDependent) || IsDevDependency(prop.Value[DevOptional], ref noOfDevDependent))
                 {
                     isdev.Value = "true";
                 }
@@ -294,8 +288,7 @@ namespace LCT.PackageIdentifier
         }
         private static void CheckAndAddToBundleComponents(List<BundledComponents> bundledComponents, JProperty prop, Component components)
         {
-            if (prop.Value[Bundled] != null &&
-                  !(bundledComponents.Any(x => x.Name == components.Name && x.Version.ToLowerInvariant() == components.Version)))
+            if (prop.Value[Bundled] != null && (!bundledComponents.Any(x => x.Name == components.Name && x.Version.Equals(components.Version,StringComparison.OrdinalIgnoreCase))))
             {
                 BundledComponents component = new() { Name = components.Name, Version = components.Version };
                 bundledComponents.Add(component);
@@ -318,14 +311,10 @@ namespace LCT.PackageIdentifier
 
                 // dev components are not ignored and added as a part of SBOM 
                 // If package section has Dev or DevOptional as true , considering it as Dev Component 
-                if (IsDevDependency(prop.Value[Dev], ref noOfDevDependent))
+                if (IsDevDependency(prop.Value[Dev], ref noOfDevDependent) || IsDevDependency(prop.Value[DevOptional], ref noOfDevDependent))
                 {
                     isdev.Value = "true";
-                }
-                else if (IsDevDependency(prop.Value[DevOptional], ref noOfDevDependent))
-                {
-                    isdev.Value = "true";
-                }
+                }                
 
                 IEnumerable<JProperty> subDependencyComponentList = prop.Value[Dependencies]?.OfType<JProperty>();
                 if (subDependencyComponentList != null)
@@ -640,7 +629,7 @@ namespace LCT.PackageIdentifier
 
                     //check for duplicate components in the list
                     if (dependentProperty[Bundled] != null &&
-                       !(bundledComponents.Any(x => x.Name == sub.Name && x.Version.ToLowerInvariant() == version)))
+                       (!bundledComponents.Any(x => x.Name == sub.Name && x.Version.Equals(version, StringComparison.InvariantCultureIgnoreCase))))
                     {
                         BundledComponents component = new() { Name = sub.Name, Version = version };
                         bundledComponents.Add(component);
@@ -651,11 +640,10 @@ namespace LCT.PackageIdentifier
 
         private static List<Component> RemoveBundledComponentFromList(List<BundledComponents> bundledComponents, List<Component> lstComponentForBOM)
         {
-            List<Component> components = new List<Component>();
-            components.AddRange(lstComponentForBOM);
+            List<Component> components = [.. lstComponentForBOM];
 
             foreach (var componentsToBOM in lstComponentForBOM.Where(x => bundledComponents.Any(y => y.Name == x.Name &&
-                y.Version.ToLowerInvariant() == x.Version.ToLowerInvariant())))
+                y.Version.Equals(x.Version, StringComparison.InvariantCultureIgnoreCase))))
             {
                 components.Remove(componentsToBOM);
             }
@@ -701,7 +689,7 @@ namespace LCT.PackageIdentifier
             return aqlResult;
         }
 
-        public string GetJfrogRepoPath(AqlResult aqlResult)
+        public static string GetJfrogRepoPath(AqlResult aqlResult)
         {
             if (string.IsNullOrEmpty(aqlResult.Path) || aqlResult.Path.Equals("."))
             {

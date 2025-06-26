@@ -35,13 +35,16 @@ namespace LCT.SW360PackageCreator
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        public static CreatorKpiData kpiData = new();
+#pragma warning disable CA2211 // Non-constant fields should not be visible
+        public static CreatorKpiData KpiData = new();
+#pragma warning restore CA2211 // Non-constant fields should not be visible
         public List<ComparisonBomData> UpdatedCompareBomData { get; set; } = new List<ComparisonBomData>();
         public List<ReleaseLinked> ReleasesFoundInCbom { get; set; } = new List<ReleaseLinked>();
         public List<Components> ComponentsNotLinked { get; set; } = new List<Components>();
         private Bom bom = new Bom();
         private List<Components> ListofBomComponents { get; set; } = new List<Components>();
         public static int TotalComponentsFromPackageIdentifier { get; private set; }
+
         public async Task<List<ComparisonBomData>> CycloneDxBomParser(CommonAppSettings appSettings,
             ISW360Service sw360Service, ICycloneDXBomParser cycloneDXBomParser, ICreatorHelper creatorHelper)
         {
@@ -90,12 +93,12 @@ namespace LCT.SW360PackageCreator
                     Components component = await GetSourceUrl(componentsData.Name, componentsData.Version, componentsData.ProjectType, item.BomRef);
                     componentsData.SourceUrl = component.SourceUrl;
 
-                    if (componentsData.ProjectType.ToUpperInvariant() == "ALPINE")
+                    if (componentsData.ProjectType.Equals("ALPINE", StringComparison.InvariantCultureIgnoreCase))
                     {
                         componentsData.AlpineSourceData = component.AlpineSourceData;
                     }
 
-                    if (componentsData.ProjectType.ToUpperInvariant() == "DEBIAN")
+                    if (componentsData.ProjectType.Equals("DEBIAN", StringComparison.InvariantCultureIgnoreCase))
                     {
                         componentsData = component;
                     }
@@ -111,7 +114,7 @@ namespace LCT.SW360PackageCreator
         private void UpdateToLocalBomFile(Components componentsData, string currName, string currVersion)
         {
             Component currBom;
-            if (componentsData.ProjectType.ToLowerInvariant() == "debian" &&
+            if (componentsData.ProjectType.Equals("debian", StringComparison.InvariantCultureIgnoreCase) &&
                 (currName != componentsData.Name || currVersion != componentsData.Version))
             {
                 Logger.Debug($"Source name found for binary package {currName}-{currVersion} --" +
@@ -130,7 +133,7 @@ namespace LCT.SW360PackageCreator
 
                 componentsData.Version = $"{componentsData.Version}.debian";
             }
-            else if (componentsData.ProjectType.ToLowerInvariant() == "debian")
+            else if (componentsData.ProjectType.Equals("debian", StringComparison.InvariantCultureIgnoreCase))
             {
                 //Append .debian to all Debian type component releases
                 currBom = bom.Components?.Find(val => val.Name == currName && val.Version == currVersion);
@@ -152,19 +155,19 @@ namespace LCT.SW360PackageCreator
 
             foreach (var property in package.Properties)
             {
-                if (property.Name?.ToLower() == Dataconstant.Cdx_ProjectType.ToLower())
+                if ((property.Name?.ToLower()).Equals(Dataconstant.Cdx_ProjectType, StringComparison.CurrentCultureIgnoreCase))
                 {
                     componentsData.ProjectType = property.Value;
                 }
-                if (property.Name?.ToLower() == Dataconstant.Cdx_IsInternal.ToLower())
+                if ((property.Name?.ToLower()).Equals(Dataconstant.Cdx_IsInternal, StringComparison.CurrentCultureIgnoreCase))
                 {
                     _ = bool.TryParse(property.Value, out isInternalComponent);
                 }
-                if (property.Name?.ToLower() == Dataconstant.Cdx_IsDevelopment.ToLower())
+                if ((property.Name?.ToLower()).Equals(Dataconstant.Cdx_IsDevelopment, StringComparison.CurrentCultureIgnoreCase))
                 {
                     componentsData.IsDev = property.Value;
                 }
-                if (property.Name?.ToLower() == Dataconstant.Cdx_ExcludeComponent.ToLower())
+                if ((property.Name?.ToLower()).Equals(Dataconstant.Cdx_ExcludeComponent, StringComparison.CurrentCultureIgnoreCase))
                 {
                     componentsData.ExcludeComponent = property.Value;
                 }
@@ -253,12 +256,12 @@ namespace LCT.SW360PackageCreator
                 FileConstant.ComponentsWithoutSrcFileName, appSettings.SW360.ProjectName);
 
             // write Kpi Data
-            kpiData = creatorHelper.GetCreatorKpiData(UpdatedCompareBomData);
-            fileOperations.WriteContentToFile(kpiData, bomGenerationPath,
+            KpiData = creatorHelper.GetCreatorKpiData(UpdatedCompareBomData);
+            fileOperations.WriteContentToFile(KpiData, bomGenerationPath,
                 FileConstant.CreatorKpiDataFileName, appSettings.SW360.ProjectName);
 
             // write kpi info to console table 
-            creatorHelper.WriteCreatorKpiDataToConsole(kpiData);
+            creatorHelper.WriteCreatorKpiDataToConsole(KpiData);
 
             //write download url not found list to kpi 
             creatorHelper.WriteSourceNotFoundListToConsole(UpdatedCompareBomData, appSettings);

@@ -24,17 +24,12 @@ using Component = CycloneDX.Models.Component;
 
 namespace LCT.PackageIdentifier
 {
-    public class PythonProcessor : IParser
+    public class PythonProcessor(ICycloneDXBomParser cycloneDXBomParser) : IParser
     {
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
 
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private readonly ICycloneDXBomParser _cycloneDXBomParser;
-
-        public PythonProcessor(ICycloneDXBomParser cycloneDXBomParser)
-        {
-            _cycloneDXBomParser = cycloneDXBomParser;
-        }
+        private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
 
         public Bom ParsePackageFile(CommonAppSettings appSettings)
         {
@@ -43,7 +38,6 @@ namespace LCT.PackageIdentifier
             Bom bom = new Bom();
             List<Component> listComponentForBOM;
             List<Dependency> dependencies = new List<Dependency>();
-            Bom templateDetails = new Bom();
             List<string> listOfTemplateBomfilePaths = new List<string>();
             foreach (string config in configFiles)
             {
@@ -74,7 +68,7 @@ namespace LCT.PackageIdentifier
             bom = RemoveExcludedComponents(appSettings, bom);
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
 
-            if (bom != null)
+            if (bom != null && bom.Components != null && bom.Components.Count != 0)
             {
                 AddSiemensDirectProperty(ref bom);
             }
@@ -82,10 +76,10 @@ namespace LCT.PackageIdentifier
             return bom;
         }
 
-        public void AddSiemensDirectProperty(ref Bom bom)
+        public static void AddSiemensDirectProperty(ref Bom bom)
         {
             List<string> pythonDirectDependencies = new List<string>();
-            pythonDirectDependencies.AddRange(bom.Dependencies?.Select(x => x.Ref)?.ToList() ?? new List<string>());
+            pythonDirectDependencies.AddRange(bom.Dependencies?.Select(x => x.Ref).ToList() ?? new List<string>());
             var bomComponentsList = bom.Components;
             foreach (var component in bomComponentsList)
             {
@@ -302,7 +296,7 @@ namespace LCT.PackageIdentifier
             int noOfExcludedComponents = 0;
             if (appSettings?.SW360?.ExcludeComponents != null)
             {
-                componentForBOM = CommonHelper.RemoveExcludedComponents(componentForBOM, appSettings?.SW360?.ExcludeComponents, ref noOfExcludedComponents);
+                componentForBOM = CommonHelper.RemoveExcludedComponents(componentForBOM, appSettings.SW360?.ExcludeComponents, ref noOfExcludedComponents);
                 dependenciesForBOM = CommonHelper.RemoveInvalidDependenciesAndReferences(componentForBOM, dependenciesForBOM);
                 BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents;
 
@@ -387,10 +381,9 @@ namespace LCT.PackageIdentifier
             List<Component> modifiedBOM = new List<Component>();
 
             foreach (var component in componentsForBOM)
-            {
-                string jfrogPackageNameWhlExten = Dataconstant.PackageNameNotFoundInJfrog;
-                string jfrogRepoPath = Dataconstant.JfrogRepoPathNotFound;
-                string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper, out jfrogPackageNameWhlExten, out jfrogRepoPath);
+            {                
+                
+                string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper, out string jfrogPackageNameWhlExten, out string jfrogRepoPath);
 
                 var hashes = aqlResultList.FirstOrDefault(x => x.Properties.Any(p => p.Key == "pypi.normalized.name" && p.Value == component.Name) && x.Properties.Any(p => p.Key == "pypi.version" && p.Value == component.Version));
 

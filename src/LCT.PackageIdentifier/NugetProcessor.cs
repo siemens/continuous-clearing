@@ -33,7 +33,7 @@ using Directory = System.IO.Directory;
 
 namespace LCT.PackageIdentifier
 {
-    public class NugetProcessor(ICycloneDXBomParser cycloneDXBomParser, IFrameworkPackages frameworkPackages, ICompositionBuilder compositionBuilder) : CycloneDXBomParser, IParser
+    public partial class NugetProcessor(ICycloneDXBomParser cycloneDXBomParser, IFrameworkPackages frameworkPackages, ICompositionBuilder compositionBuilder) : CycloneDXBomParser, IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
@@ -356,7 +356,7 @@ namespace LCT.PackageIdentifier
             return aqlResult;
         }
 
-        public string GetJfrogRepoPath(AqlResult aqlResult)
+        public static string GetJfrogRepoPath(AqlResult aqlResult)
         {
             if (string.IsNullOrEmpty(aqlResult.Path) || aqlResult.Path.Equals("."))
             {
@@ -434,7 +434,7 @@ namespace LCT.PackageIdentifier
             int noOfExcludedComponents = 0;
             if (appSettings?.SW360?.ExcludeComponents != null)
             {
-                componentForBOM = CommonHelper.RemoveExcludedComponents(componentForBOM, appSettings?.SW360?.ExcludeComponents, ref noOfExcludedComponents);
+                componentForBOM = CommonHelper.RemoveExcludedComponents(componentForBOM, appSettings.SW360?.ExcludeComponents, ref noOfExcludedComponents);
                 dependenciesForBOM = CommonHelper.RemoveInvalidDependenciesAndReferences(componentForBOM, dependenciesForBOM);
                 BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents;
 
@@ -571,7 +571,7 @@ namespace LCT.PackageIdentifier
         private static void CreateFileForMultipleVersions(List<Component> componentsWithMultipleVersions, CommonAppSettings appSettings)
         {
             MultipleVersions multipleVersions = new MultipleVersions();
-            IFileOperations fileOperations = new FileOperations();
+            FileOperations fileOperations = new FileOperations();
             string defaultProjectName = CommonIdentiferHelper.GetDefaultProjectName(appSettings);
             string bomFullPath = $"{appSettings.Directory.OutputFolder}\\{defaultProjectName}_Bom.cdx.json";
             string filePath = $"{appSettings.Directory.OutputFolder}\\{defaultProjectName}_{FileConstant.multipleversionsFileName}";
@@ -695,7 +695,7 @@ namespace LCT.PackageIdentifier
                 var list = ParsePackageConfig(filepath, appSettings);
                 if (list != null)
                 {
-                    NugetDevDependencyParser.NugetDirectDependencies.AddRange(list?.Select(x => x.ID + " " + x.Version));
+                    NugetDevDependencyParser.NugetDirectDependencies.AddRange(list.Select(x => x.ID + " " + x.Version));
                 }
 
                 listofComponents.AddRange(list);
@@ -739,9 +739,9 @@ namespace LCT.PackageIdentifier
         {
             try
             {
-                var packageDetails = Regex.Match(library, @"packages\\(.+?)\\lib").Groups[1].Value;
+                var packageDetails = PackageDetailsRegex().Match(library).Groups[1].Value;
 
-                Match m = Regex.Match(packageDetails, @"\d+");
+                Match m = PackageDetailsMatchRegex().Match(packageDetails);
                 if (m.Success)
                     version = packageDetails[m.Index..];
                 else
@@ -1052,6 +1052,11 @@ namespace LCT.PackageIdentifier
             // Add compositions to the BOM
             _compositionBuilder.AddCompositionsToBom(bom, _listofFrameworkPackagesInInputFiles);
         }
+
+        [GeneratedRegex(@"packages\\(.+?)\\lib")]
+        private static partial Regex PackageDetailsRegex();
+        [GeneratedRegex(@"\d+")]
+        private static partial Regex PackageDetailsMatchRegex();
 
         #endregion
     }

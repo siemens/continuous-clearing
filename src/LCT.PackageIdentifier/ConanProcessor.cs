@@ -36,6 +36,7 @@ namespace LCT.PackageIdentifier
         #region fields
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ICycloneDXBomParser _cycloneDXBomParser;
+        private static readonly char[] SplitChars = { '/', '@' };
         #endregion
 
         #region constructor
@@ -115,10 +116,8 @@ namespace LCT.PackageIdentifier
         }
 
 
-        public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM,
-            CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
+        public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM,CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
-            // get the  component list from Jfrog for given repo + internal repo
             string[] repoList = CommonHelper.GetRepoList(appSettings);
             List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(repoList, jFrogService);
             Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
@@ -126,76 +125,12 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in componentsForBOM)
             {
-                string jfrogRepoPath = Dataconstant.JfrogRepoPathNotFound;
-                string repoName = GetArtifactoryRepoName(aqlResultList, component, out jfrogRepoPath);
-                string jfrogpackageName = $"{component.Name}/{component.Version}";
-                Logger.Debug($"Repo Name for the package {jfrogpackageName} is {repoName}");
-                var hashes = aqlResultList.FirstOrDefault(x => x.Path.Contains(jfrogpackageName, StringComparison.OrdinalIgnoreCase));
-                Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = repoName };
-                Property jfrogRepoPathProperty = new() { Name = Dataconstant.Cdx_JfrogRepoPath, Value = jfrogRepoPath };
-                Component componentVal = component;
-                if (artifactoryrepo.Value == appSettings.Conan.DevDepRepo)
-                {
-                    BomCreator.bomKpiData.DevdependencyComponents++;
-                }
-                if (appSettings.Conan.Artifactory.ThirdPartyRepos != null)
-                {
-
-                    foreach (var thirdPartyRepo in appSettings.Conan.Artifactory.ThirdPartyRepos)
-                    {
-                        if (artifactoryrepo.Value == thirdPartyRepo.Name)
-                        {
-                            BomCreator.bomKpiData.ThirdPartyRepoComponents++;
-                            break;
-                        }
-                    }
-                }
-                if (artifactoryrepo.Value == appSettings.Conan.ReleaseRepo)
-                {
-                    BomCreator.bomKpiData.ReleaseRepoComponents++;
-                }
-
-                if (artifactoryrepo.Value == Dataconstant.NotFoundInJFrog || artifactoryrepo.Value == "")
-                {
-                    BomCreator.bomKpiData.UnofficialComponents++;
-                }
-
-                if (componentVal.Properties?.Count == null || componentVal.Properties?.Count <= 0)
-                {
-                    componentVal.Properties = new List<Property>();
-                }
-                componentVal.Properties.Add(artifactoryrepo);
-                componentVal.Properties.Add(projectType);
-                componentVal.Properties.Add(jfrogRepoPathProperty);
-                componentVal.Description = null;
-                if (hashes != null)
-                {
-                    componentVal.Hashes = new List<Hash>()
-                {
-
-                new()
-                 {
-                  Alg = Hash.HashAlgorithm.MD5,
-                  Content = hashes.MD5
-                },
-                new()
-                {
-                  Alg = Hash.HashAlgorithm.SHA_1,
-                  Content = hashes.SHA1
-                 },
-                 new()
-                 {
-                  Alg = Hash.HashAlgorithm.SHA_256,
-                  Content = hashes.SHA256
-                  }
-                  };
-
-                }
-                modifiedBOM.Add(componentVal);
+                Component updatedComponent = UpdateComponentDetails(component, aqlResultList, appSettings, projectType);
+                modifiedBOM.Add(updatedComponent);
             }
 
             return modifiedBOM;
-        }
+        }       
 
         public static bool IsDevDependency(ConanPackage component, List<string> buildNodeIds, ref int noOfDevDependent)
         {
@@ -212,11 +147,70 @@ namespace LCT.PackageIdentifier
         #endregion
 
         #region private methods
+        private static Component UpdateComponentDetails(Component component, List<AqlResult> aqlResultList, CommonAppSettings appSettings, Property projectType)
+        {            
+            string repoName = GetArtifactoryRepoName(aqlResultList, component, out string jfrogRepoPath);
+            string jfrogpackageName = $"{component.Name}/{component.Version}";
+            Logger.Debug($"Repo Name for the package {jfrogpackageName} is {repoName}");
+
+            var hashes = aqlResultList.FirstOrDefault(x => x.Path.Contains(jfrogpackageName, StringComparison.OrdinalIgnoreCase));
+            Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = repoName };
+            Property jfrogRepoPathProperty = new() { Name = Dataconstant.Cdx_JfrogRepoPath, Value = jfrogRepoPath };
+
+            UpdateBomKpiData(appSettings, artifactoryrepo.Value);
+
+            if (component.Properties?.Count == null || component.Properties?.Count <= 0)
+            {
+                component.Properties = new List<Property>();
+            }
+
+            component.Properties.Add(artifactoryrepo);
+            component.Properties.Add(projectType);
+            component.Properties.Add(jfrogRepoPathProperty);
+            component.Description = null;
+
+            if (hashes != null)
+            {
+                component.Hashes = GetComponentHashes(hashes);
+            }
+
+            return component;
+        }
+
+        private static void UpdateBomKpiData(CommonAppSettings appSettings, string repoValue)
+        {
+            if (repoValue == appSettings.Conan.DevDepRepo)
+            {
+                BomCreator.bomKpiData.DevdependencyComponents++;
+            }
+            else if (appSettings.Conan.Artifactory.ThirdPartyRepos != null && appSettings.Conan.Artifactory.ThirdPartyRepos.Any(repo => repo.Name == repoValue))
+            {
+                BomCreator.bomKpiData.ThirdPartyRepoComponents++;
+            }
+            else if (repoValue == appSettings.Conan.ReleaseRepo)
+            {
+                BomCreator.bomKpiData.ReleaseRepoComponents++;
+            }
+            else if (repoValue == Dataconstant.NotFoundInJFrog || string.IsNullOrEmpty(repoValue))
+            {
+                BomCreator.bomKpiData.UnofficialComponents++;
+            }
+        }
+
+        private static List<Hash> GetComponentHashes(AqlResult hashes)
+        {
+            return new List<Hash>
+    {
+        new() { Alg = Hash.HashAlgorithm.MD5, Content = hashes.MD5 },
+        new() { Alg = Hash.HashAlgorithm.SHA_1, Content = hashes.SHA1 },
+        new() { Alg = Hash.HashAlgorithm.SHA_256, Content = hashes.SHA256 }
+    };
+        }
 
         public static void CreateFileForMultipleVersions(List<Component> componentsWithMultipleVersions, CommonAppSettings appSettings)
         {
             MultipleVersions multipleVersions = new MultipleVersions();
-            IFileOperations fileOperations = new FileOperations();
+            FileOperations fileOperations = new FileOperations();
             string defaultProjectName = CommonIdentiferHelper.GetDefaultProjectName(appSettings);
             string bomFullPath = $"{appSettings.Directory.OutputFolder}\\{defaultProjectName}_Bom.cdx.json";
 
@@ -385,26 +379,9 @@ namespace LCT.PackageIdentifier
 
         private static void GetPackagesForBom(ref List<Component> lstComponentForBOM, ref int noOfDevDependent, List<ConanPackage> nodePackages)
         {
-            var rootNode = nodePackages.FirstOrDefault();
-            if (rootNode != null && (!rootNode.Dependencies.Any() || rootNode.Dependencies == null))
-            {
-                throw new ArgumentNullException(nameof(nodePackages), "Dependency(requires) node name details not present in the root node.");
-            }
+            ValidateRootNode(nodePackages);
 
-            ConanPackage package = nodePackages.Where(x => x.Id == "0").FirstOrDefault();
-            List<string> directDependencies = new List<string>();
-            if (package != null)
-            {
-                if (package.Dependencies != null)
-                {
-                    directDependencies.AddRange(package.Dependencies);
-                }
-
-                if (package.DevDependencies != null)
-                {
-                    directDependencies.AddRange(package.DevDependencies);
-                }
-            }
+            List<string> directDependencies = GetDirectDependencies(nodePackages);
 
             // Ignoring the root node as it is the package information node and we are anyways considering all
             // nodes in the lock file.
@@ -432,8 +409,8 @@ namespace LCT.PackageIdentifier
 
                 if (packageName.Contains('/'))
                 {
-                    components.Name = packageName.Split(new char[] { '/', '@' })[0];
-                    components.Version = packageName.Split(new char[] { '/', '@' })[1];
+                    components.Name = packageName.Split(SplitChars)[0];
+                    components.Version = packageName.Split(SplitChars)[1];
                 }
                 else
                 {
@@ -470,7 +447,34 @@ namespace LCT.PackageIdentifier
                     .SelectMany(y => y.DevDependencies)
                     .ToList();
         }
+        private static void ValidateRootNode(List<ConanPackage> nodePackages)
+        {
+            var rootNode = nodePackages.FirstOrDefault();
+            if (rootNode != null && (rootNode.Dependencies.Count == 0 || rootNode.Dependencies == null))
+            {
+                throw new ArgumentNullException(nameof(nodePackages), "Dependency(requires) node name details not present in the root node.");
+            }
+        }
+        private static List<string> GetDirectDependencies(List<ConanPackage> nodePackages)
+        {
+            List<string> directDependencies = new List<string>();
+            ConanPackage package = nodePackages.FirstOrDefault(x => x.Id == "0");
 
+            if (package != null)
+            {
+                if (package.Dependencies != null)
+                {
+                    directDependencies.AddRange(package.Dependencies);
+                }
+
+                if (package.DevDependencies != null)
+                {
+                    directDependencies.AddRange(package.DevDependencies);
+                }
+            }
+
+            return directDependencies;
+        }
         private static bool IsInternalConanComponent(List<AqlResult> aqlResultList, Component component)
         {
             string jfrogcomponentPath = $"{component.Name}/{component.Version}";
@@ -483,7 +487,7 @@ namespace LCT.PackageIdentifier
             return false;
         }
 
-        public string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component, out string jfrogRepoPath)
+        public static string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component, out string jfrogRepoPath)
         {
             string jfrogcomponentPath = $"{component.Name}/{component.Version}";
             jfrogRepoPath = Dataconstant.JfrogRepoPathNotFound;
@@ -574,7 +578,7 @@ namespace LCT.PackageIdentifier
         {
             foreach (var component in componentsForBOM)
             {
-                // todo: check existence of property and add new
+                // check existence of property and add new
                 component.Properties = new List<Property>();
                 Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
                 Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.ManullayAdded };

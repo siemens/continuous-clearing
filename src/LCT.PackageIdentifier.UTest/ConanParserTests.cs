@@ -35,14 +35,12 @@ namespace LCT.PackageIdentifier.UTest
             string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 
             string[] Includes = { "conan.lock" };
-
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 Conan = new Config() { Include = Includes },
                 SW360 = new SW360(),
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = packagefilepath
                 }
@@ -68,13 +66,11 @@ namespace LCT.PackageIdentifier.UTest
 
             string[] Includes = { "conan.lock" };
 
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 Conan = new Config() { Include = Includes },
                 SW360 = new SW360(),
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = packagefilepath
                 }
@@ -101,13 +97,12 @@ namespace LCT.PackageIdentifier.UTest
             string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 
             string[] Includes = { "conan.lock" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 Conan = new Config() { Include = Includes },
                 SW360 = new SW360() { ExcludeComponents = ["openldap:2.6.4-shared-ossl3.1", "libcurl:7.87.0-shared-ossl3.1"] },
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = packagefilepath
                 }
@@ -150,9 +145,8 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component };
             ComponentIdentification componentIdentification = new() { comparisonBOMData = components };
             string[] repoList = { "internalrepo1", "internalrepo2" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+           
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360(),
                 Conan = new Config
@@ -199,9 +193,8 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component };
             string[] repoList = { "internalrepo1", "internalrepo2" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "Conan",
                 SW360 = new SW360(),
@@ -252,9 +245,8 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component };
             string[] repoList = { "internalrepo1", "internalrepo2" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "Conan",
                 SW360 = new SW360(),
@@ -304,14 +296,13 @@ namespace LCT.PackageIdentifier.UTest
             string[] Includes = { "SBOM_ConanCATemplate.cdx.json" };
             string packagefilepath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"));
 
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "CONAN",
                 Conan = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }
@@ -338,12 +329,10 @@ namespace LCT.PackageIdentifier.UTest
                 new Component { Name = "ComponentB", Version = "1.0.0", Description = "DescriptionB" },
                 new Component { Name = "ComponentB", Version = "2.0.0", Description = "DescriptionB" }
             };
-
-            var folderAction = new Mock<IFolderAction>();
-            var fileOperations = new Mock<IFileOperations>();
-            var appSettings = new CommonAppSettings(folderAction.Object, fileOperations.Object)
+                        
+            var appSettings = new CommonAppSettings()
             {
-                Directory = new LCT.Common.Directory(folderAction.Object, fileOperations.Object)
+                Directory = new LCT.Common.Directory()
                 {
                     OutputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }
@@ -384,11 +373,9 @@ namespace LCT.PackageIdentifier.UTest
                 new Component { Name = "ComponentB", Version = "2.0.0", Description = "DescriptionB" }
             };
 
-            var folderAction = new Mock<IFolderAction>();
-            var fileOperations = new Mock<IFileOperations>();
-            var appSettings = new CommonAppSettings(folderAction.Object, fileOperations.Object)
+            var appSettings = new CommonAppSettings()
             {
-                Directory = new LCT.Common.Directory(folderAction.Object, fileOperations.Object)
+                Directory = new LCT.Common.Directory()
                 {
                     OutputFolder = outputFolder
                 }

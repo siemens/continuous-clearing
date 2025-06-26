@@ -29,26 +29,19 @@ namespace LCT.PackageIdentifier.UTest
             //Arrange
             string projectName = "Test";
             ProjectReleases projectReleases = new ProjectReleases();
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            projectReleases.clearingState = "CLOSED";
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string OutFolder = Path.GetDirectoryName(exePath);
+            projectReleases.ClearingState = "CLOSED";
             projectReleases.Name = projectName;
             mockISw360ProjectService.Setup(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<String>(), It.IsAny<string>(), projectReleases))
                 .ReturnsAsync(projectName);
-
-            mockIFileOperations.Setup(x => x.ValidateFilePath(It.IsAny<string>()))
-                .Callback((string message) => { })
-                .Verifiable();
-
-            mockIFolderAction.Setup(x => x.ValidateFolderPath(It.IsAny<string>()))
-                .Callback((string message) => { })
-                .Verifiable();
-            var CommonAppSettings = new CommonAppSettings(mockIFolderAction.Object, mockIFileOperations.Object)
+           
+            var CommonAppSettings = new CommonAppSettings()
             {
                 SW360 = new SW360() { ProjectName = "Test" },
-                Directory = new LCT.Common.Directory(mockIFolderAction.Object, mockIFileOperations.Object)
+                Directory = new LCT.Common.Directory()
                 {
-                    InputFolder = ""
+                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }
             };
             //Act
@@ -65,26 +58,18 @@ namespace LCT.PackageIdentifier.UTest
             //Arrange
             string projectName = null;
             ProjectReleases projectReleases = new ProjectReleases();
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string OutFolder = Path.GetDirectoryName(exePath);
 
             mockISw360ProjectService.Setup(x => x.GetProjectNameByProjectIDFromSW360(It.IsAny<string>(), It.IsAny<string>(), projectReleases))
-                .ReturnsAsync(projectName);
+                .ReturnsAsync(projectName);           
 
-            mockIFileOperations.Setup(x => x.ValidateFilePath(It.IsAny<string>()))
-                .Callback((string message) => { })
-                .Verifiable();
-
-            mockIFolderAction.Setup(x => x.ValidateFolderPath(It.IsAny<string>()))
-                .Callback((string message) => { })
-                .Verifiable();
-
-            var CommonAppSettings = new CommonAppSettings(mockIFolderAction.Object, mockIFileOperations.Object)
+            var CommonAppSettings = new CommonAppSettings()
             {
                 SW360 = new SW360() { ProjectName = "Test" },
-                Directory = new LCT.Common.Directory(mockIFolderAction.Object, mockIFileOperations.Object)
+                Directory = new LCT.Common.Directory()
                 {
-                    InputFolder = ""
+                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }
             };
             //Act && Assert
