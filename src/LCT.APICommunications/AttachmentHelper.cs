@@ -1,10 +1,11 @@
-// --------------------------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.APICommunications.Model;
+using LCT.Common.Model;
 using log4net;
 using Newtonsoft.Json;
 using System;
@@ -12,6 +13,7 @@ using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Security;
+using Level = log4net.Core.Level;
 
 namespace LCT.APICommunications
 {
@@ -44,7 +46,7 @@ namespace LCT.APICommunications
         /// <param name="attachmentType">attachmentType</param>
         /// <param name="attachmentFile">attachmentFile</param>
         /// <returns>attached api url</returns>
-        public string AttachComponentSourceToSW360(AttachReport attachReport)
+        public string AttachComponentSourceToSW360(AttachReport attachReport, ComparisonBomData comparisonBomData)
         {
             Uri url = new Uri($"{sw360ReleaseApi}/{attachReport.ReleaseId}/{ApiConstant.Attachments}");
             string releaseAttachementApi = url.AbsoluteUri;
@@ -83,8 +85,10 @@ namespace LCT.APICommunications
                     requestStream.Write(endBytes, 0, endBytes.Length);
                     requestStream.Close();
                     using WebResponse response = request.GetResponse();
+                    HttpWebResponse httpResponse = (HttpWebResponse)response;
+                    HandleAcceptedStatus(httpResponse, comparisonBomData);
                     using StreamReader reader = new StreamReader(response.GetResponseStream());
-                    reader.ReadToEnd();
+                    reader.ReadToEnd();                    
                 }
             }
             catch (UriFormatException ex)
@@ -151,6 +155,17 @@ namespace LCT.APICommunications
         private static string CreateFormDataBoundary()
         {
             return "---------------------------" + DateTime.Now.Ticks.ToString("x");
+        }
+        private static void HandleAcceptedStatus(HttpWebResponse httpResponse, ComparisonBomData component)
+        {
+            if (httpResponse.StatusCode == HttpStatusCode.Accepted)
+            {
+                Logger.Logger.Log(null, Level.Warn, $"Moderation request is created while uploading source code in SW360. Please request {component.ReleaseCreatedBy} or the license clearing team to approve the moderation request.", null);
+            }
+            else
+            {
+                Logger.Debug($"HTTP Status Code: {httpResponse.StatusCode}");
+            }
         }
     }
 }

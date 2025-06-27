@@ -52,5 +52,23 @@ namespace LCT.SW360PackageCreator.UTest
             //Assert
             Assert.That(string.IsNullOrEmpty(path));
         }
+        [TestCase]
+        public async Task DownloadReleaseAttachmentSourceForNPMByPassingInvalidVersion_ProvidedvalidComparisonBomData_ReturnsEmptyString()
+        {
+            //Arrange
+            var lstComparisonBomData = new ComparisonBomData()
+            {
+                Name = "core-js",
+                Version = "v3.6.0"
+            };
+            var localPathforDownload = $"{Path.GetTempPath()}/ClearingTool/DownloadedFiles/";
+            IPackageDownloader packageDownloader = new PackageDownloader();
+
+            //Act
+            string path = await packageDownloader.DownloadPackage(lstComparisonBomData, localPathforDownload);
+
+            //Assert
+            Assert.That(string.IsNullOrEmpty(path));
+        }
     }
 }

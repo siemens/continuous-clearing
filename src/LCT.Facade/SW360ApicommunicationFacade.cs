@@ -132,9 +132,9 @@ namespace LCT.Facade
             return await m_sw360ApiCommunication.UpdateComponent(componentId, httpContent);
         }
 
-        public string AttachComponentSourceToSW360(AttachReport attachReport)
+        public string AttachComponentSourceToSW360(AttachReport attachReport,ComparisonBomData comparisonBomData)
         {
-            return m_sw360ApiCommunication.AttachComponentSourceToSW360(attachReport);
+            return m_sw360ApiCommunication.AttachComponentSourceToSW360(attachReport,comparisonBomData);
         }
 
         public Task<string> GetReleaseByCompoenentName(string componentName)
