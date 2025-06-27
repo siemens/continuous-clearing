@@ -70,7 +70,7 @@ namespace LCT.PackageIdentifier
             BomCreator.bomKpiData.ComponentsInComparisonBOM = bom.Components.Count;
             Logger.Debug($"ParsePackageFile():End");
 
-            if (bom != null && bom.Components != null && bom.Components.Count != 0)
+            if (bom != null)
             {
                 AddSiemensDirectProperty(ref bom);
             }

@@ -151,21 +151,24 @@ namespace LCT.SW360PackageCreator
         {
             bool isInternalComponent = false;
 
+            if (package.Properties == null)
+                return isInternalComponent;
+
             foreach (var property in package.Properties)
             {
-                if ((property.Name?.ToLower()).Equals(Dataconstant.Cdx_ProjectType, StringComparison.CurrentCultureIgnoreCase))
+                if (string.Equals(property.Name, Dataconstant.Cdx_ProjectType, StringComparison.CurrentCultureIgnoreCase))
                 {
                     componentsData.ProjectType = property.Value;
                 }
-                if ((property.Name?.ToLower()).Equals(Dataconstant.Cdx_IsInternal, StringComparison.CurrentCultureIgnoreCase))
+                if (string.Equals(property.Name, Dataconstant.Cdx_IsInternal, StringComparison.CurrentCultureIgnoreCase))
                 {
                     _ = bool.TryParse(property.Value, out isInternalComponent);
                 }
-                if ((property.Name?.ToLower()).Equals(Dataconstant.Cdx_IsDevelopment, StringComparison.CurrentCultureIgnoreCase))
+                if (string.Equals(property.Name, Dataconstant.Cdx_IsDevelopment, StringComparison.CurrentCultureIgnoreCase))
                 {
                     componentsData.IsDev = property.Value;
                 }
-                if ((property.Name?.ToLower()).Equals(Dataconstant.Cdx_ExcludeComponent, StringComparison.CurrentCultureIgnoreCase))
+                if (string.Equals(property.Name, Dataconstant.Cdx_ExcludeComponent, StringComparison.CurrentCultureIgnoreCase))
                 {
                     componentsData.ExcludeComponent = property.Value;
                 }

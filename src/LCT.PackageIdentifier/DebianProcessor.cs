@@ -74,7 +74,7 @@ namespace LCT.PackageIdentifier
 
         private static void AddSiemensDirectProperty(ref Bom bom)
         {
-            List<string> debianDirectDependencies = [.. bom.Dependencies?.Select(x => x.Ref)?.ToList() ?? new List<string>()];
+            List<string> debianDirectDependencies = [.. bom.Dependencies?.Select(x => x.Ref).ToList() ?? new List<string>()];
             var bomComponentsList = bom.Components;
             foreach (var component in bomComponentsList)
             {
