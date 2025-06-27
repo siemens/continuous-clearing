@@ -78,7 +78,6 @@ namespace LCT.SW360PackageCreator
             Result result = ListTagsOfComponent(component);
 
             string[] taglist;
-
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 taglist = result?.StdOut?.Split("\r\n") ?? Array.Empty<string>();
@@ -87,6 +86,7 @@ namespace LCT.SW360PackageCreator
             {
                 taglist = result?.StdOut?.Split("\n") ?? Array.Empty<string>();
             }
+            string baseVersion = GetBaseVersion(component.Version);
 
             foreach (string item in taglist)
             {
@@ -107,13 +107,33 @@ namespace LCT.SW360PackageCreator
                     {
                         return tag;
                     }
+                    else if (tag.Contains(baseVersion))
+                    {
+                        return tag;
+                    }
                 }
             }
 
             Logger.Debug($"componentName - given version:{component.Version}, correctVersion:{correctVersion}");
             return correctVersion;
         }
-
+        private static string GetBaseVersion(string version)
+        {
+            try
+            {
+                var parsedVersion = Version.Parse(version);
+                if (parsedVersion.Build == 0 && parsedVersion.Revision == -1)
+                {
+                    return $"{parsedVersion.Major}.{parsedVersion.Minor}";
+                }
+                return version;
+            }
+            catch (FormatException)
+            {
+                Logger.Debug($"Invalid version format: {version}");
+                return version; 
+            }
+        }
         private bool CheckIfAlreadyDownloaded(ComparisonBomData component, string tagVersion, out string downloadedPath)
         {
             downloadedPath = string.Empty;

@@ -572,13 +572,11 @@ namespace LCT.SW360PackageCreator
         }
 
         public static string GetComponentDownloadUrl(ComparisonBomData mapper, Components item, IRepository repo, ReleasesInfo releasesInfo)
-        {
-            //IF Release already exists in SW360 , tool will not update any field.
-            //Hence do not need to find DOWNLOAD URL URL here and this REDUCE the exeuction time
+        {          
 
             if (mapper.ReleaseStatus.Equals(Dataconstant.Available))
             {
-                return releasesInfo?.SourceCodeDownloadUrl ?? string.Empty;
+                return !string.IsNullOrEmpty(releasesInfo?.SourceCodeDownloadUrl) ? releasesInfo.SourceCodeDownloadUrl : repo.FormGitCloneUrl(mapper.SourceUrl, item.Name, item.Version);
             }
             return repo.FormGitCloneUrl(mapper.SourceUrl, item.Name, item.Version);
         }
