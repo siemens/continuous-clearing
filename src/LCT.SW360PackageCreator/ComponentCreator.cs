@@ -35,7 +35,8 @@ namespace LCT.SW360PackageCreator
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        public static CreatorKpiData kpiData = new();
+        private static readonly CreatorKpiData s_kpiData = new();
+        public static CreatorKpiData KpiData => s_kpiData;
         public List<ComparisonBomData> UpdatedCompareBomData { get; set; } = new List<ComparisonBomData>();
         public List<ReleaseLinked> ReleasesFoundInCbom { get; set; } = new List<ReleaseLinked>();
         public List<Components> ComponentsNotLinked { get; set; } = new List<Components>();
@@ -90,12 +91,12 @@ namespace LCT.SW360PackageCreator
                     Components component = await GetSourceUrl(componentsData.Name, componentsData.Version, componentsData.ProjectType, item.BomRef);
                     componentsData.SourceUrl = component.SourceUrl;
 
-                    if (componentsData.ProjectType.ToUpperInvariant() == "ALPINE")
+                    if (componentsData.ProjectType.Equals("ALPINE", StringComparison.InvariantCultureIgnoreCase))
                     {
                         componentsData.AlpineSourceData = component.AlpineSourceData;
                     }
 
-                    if (componentsData.ProjectType.ToUpperInvariant() == "DEBIAN")
+                    if (componentsData.ProjectType.Equals("DEBIAN", StringComparison.InvariantCultureIgnoreCase))
                     {
                         componentsData = component;
                     }
@@ -111,7 +112,7 @@ namespace LCT.SW360PackageCreator
         private void UpdateToLocalBomFile(Components componentsData, string currName, string currVersion)
         {
             Component currBom;
-            if (componentsData.ProjectType.ToLowerInvariant() == "debian" &&
+            if (componentsData.ProjectType.Equals("debian", StringComparison.InvariantCultureIgnoreCase) &&
                 (currName != componentsData.Name || currVersion != componentsData.Version))
             {
                 Logger.Debug($"Source name found for binary package {currName}-{currVersion} --" +
@@ -130,7 +131,7 @@ namespace LCT.SW360PackageCreator
 
                 componentsData.Version = $"{componentsData.Version}.debian";
             }
-            else if (componentsData.ProjectType.ToLowerInvariant() == "debian")
+            else if (componentsData.ProjectType.Equals("debian", StringComparison.InvariantCultureIgnoreCase))
             {
                 //Append .debian to all Debian type component releases
                 currBom = bom.Components?.Find(val => val.Name == currName && val.Version == currVersion);
@@ -152,19 +153,19 @@ namespace LCT.SW360PackageCreator
 
             foreach (var property in package.Properties)
             {
-                if (property.Name?.ToLower() == Dataconstant.Cdx_ProjectType.ToLower())
+                if ((property.Name?.ToLower()).Equals(Dataconstant.Cdx_ProjectType, StringComparison.CurrentCultureIgnoreCase))
                 {
                     componentsData.ProjectType = property.Value;
                 }
-                if (property.Name?.ToLower() == Dataconstant.Cdx_IsInternal.ToLower())
+                if ((property.Name?.ToLower()).Equals(Dataconstant.Cdx_IsInternal, StringComparison.CurrentCultureIgnoreCase))
                 {
                     _ = bool.TryParse(property.Value, out isInternalComponent);
                 }
-                if (property.Name?.ToLower() == Dataconstant.Cdx_IsDevelopment.ToLower())
+                if ((property.Name?.ToLower()).Equals(Dataconstant.Cdx_IsDevelopment, StringComparison.CurrentCultureIgnoreCase))
                 {
                     componentsData.IsDev = property.Value;
                 }
-                if (property.Name?.ToLower() == Dataconstant.Cdx_ExcludeComponent.ToLower())
+                if ((property.Name?.ToLower()).Equals(Dataconstant.Cdx_ExcludeComponent, StringComparison.CurrentCultureIgnoreCase))
                 {
                     componentsData.ExcludeComponent = property.Value;
                 }
@@ -253,13 +254,13 @@ namespace LCT.SW360PackageCreator
                 FileConstant.ComponentsWithoutSrcFileName, appSettings.SW360.ProjectName);
 
             // write Kpi Data
-            kpiData = creatorHelper.GetCreatorKpiData(UpdatedCompareBomData);
+            var kpiData = creatorHelper.GetCreatorKpiData(UpdatedCompareBomData);            
             fileOperations.WriteContentToFile(kpiData, bomGenerationPath,
                 FileConstant.CreatorKpiDataFileName, appSettings.SW360.ProjectName);
 
             // write kpi info to console table 
             creatorHelper.WriteCreatorKpiDataToConsole(kpiData);
-
+            UpdateKpiData(kpiData);
             //write download url not found list to kpi 
             creatorHelper.WriteSourceNotFoundListToConsole(UpdatedCompareBomData, appSettings);
 
@@ -680,6 +681,29 @@ namespace LCT.SW360PackageCreator
             // Removes duplicate
             bom.Components = bom.Components?.GroupBy(x => new { x.Name, x.Version }).Select(y => y.First()).ToList();
             return components.GroupBy(x => new { x.Name, x.Version }).Select(y => y.First()).ToList();
+        }
+
+        /// <summary>
+        /// Updates the static KPI data with the provided data
+        /// </summary>
+        /// <param name="kpiData">The KPI data to update with</param>
+        public static void UpdateKpiData(CreatorKpiData kpiData)
+        {
+            if (kpiData == null) return;
+            
+            // Copy properties from the provided kpiData to the static instance
+            s_kpiData.ComponentsReadFromComparisonBOM = kpiData.ComponentsReadFromComparisonBOM;
+            s_kpiData.ComponentsOrReleasesCreatedNewlyInSw360 = kpiData.ComponentsOrReleasesCreatedNewlyInSw360;
+            s_kpiData.ComponentsOrReleasesExistingInSw360 = kpiData.ComponentsOrReleasesExistingInSw360;
+            s_kpiData.ComponentsOrReleasesNotCreatedInSw360 = kpiData.ComponentsOrReleasesNotCreatedInSw360;
+            s_kpiData.ComponentsWithoutSourceDownloadUrl = kpiData.ComponentsWithoutSourceDownloadUrl;
+            s_kpiData.ComponentsWithSourceDownloadUrl = kpiData.ComponentsWithSourceDownloadUrl;
+            s_kpiData.ComponentsWithoutPackageUrl = kpiData.ComponentsWithoutPackageUrl;
+            s_kpiData.ComponentsWithoutSourceAndPackageUrl = kpiData.ComponentsWithoutSourceAndPackageUrl;
+            s_kpiData.ComponentsUploadedInFossology = kpiData.ComponentsUploadedInFossology;
+            s_kpiData.ComponentsNotUploadedInFossology = kpiData.ComponentsNotUploadedInFossology;
+            s_kpiData.TotalDuplicateAndInValidComponents = kpiData.TotalDuplicateAndInValidComponents;
+            s_kpiData.TimeTakenByComponentCreator = kpiData.TimeTakenByComponentCreator;
         }
 
     }

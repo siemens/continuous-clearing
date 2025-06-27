@@ -33,7 +33,7 @@ using Directory = System.IO.Directory;
 
 namespace LCT.PackageIdentifier
 {
-    public class NugetProcessor(ICycloneDXBomParser cycloneDXBomParser, IFrameworkPackages frameworkPackages, ICompositionBuilder compositionBuilder) : CycloneDXBomParser, IParser
+    public partial class NugetProcessor(ICycloneDXBomParser cycloneDXBomParser, IFrameworkPackages frameworkPackages, ICompositionBuilder compositionBuilder) : CycloneDXBomParser, IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
@@ -237,76 +237,92 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in componentsForBOM)
             {
-                string jfrogpackageName = $"{component.Name}.{component.Version}{ApiConstant.NugetExtension}";
-                var hashes = aqlResultList.FirstOrDefault(x => x.Name == jfrogpackageName);
-
-                string jfrogRepoPath = string.Empty;
-                AqlResult finalRepoData = GetJfrogArtifactoryRepoDetials(aqlResultList, component, bomhelper, out jfrogRepoPath);
-                Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = finalRepoData.Repo };
-                Property siemensfileNameProp = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = finalRepoData?.Name ?? Dataconstant.PackageNameNotFoundInJfrog };
-                Property jfrogRepoPathProp = new() { Name = Dataconstant.Cdx_JfrogRepoPath, Value = jfrogRepoPath };
-                Component componentVal = component;
-                if (artifactoryrepo.Value == appSettings.Nuget.DevDepRepo)
-                {
-                    BomCreator.bomKpiData.DevdependencyComponents++;
-                }
-                if (appSettings.Nuget.Artifactory.ThirdPartyRepos != null)
-                {
-                    foreach (var thirdPartyRepo in appSettings.Nuget.Artifactory.ThirdPartyRepos)
-                    {
-                        if (artifactoryrepo.Value == thirdPartyRepo.Name)
-                        {
-                            BomCreator.bomKpiData.ThirdPartyRepoComponents++;
-                            break;
-                        }
-                    }
-                }
-                if (artifactoryrepo.Value == appSettings.Nuget.ReleaseRepo)
-                {
-                    BomCreator.bomKpiData.ReleaseRepoComponents++;
-                }
-
-                if (artifactoryrepo.Value == Dataconstant.NotFoundInJFrog || artifactoryrepo.Value == "")
-                {
-                    BomCreator.bomKpiData.UnofficialComponents++;
-                }
-                if (componentVal.Properties?.Count == null || componentVal.Properties?.Count <= 0)
-                {
-                    componentVal.Properties = new List<Property>();
-                }
-                componentVal.Properties.Add(artifactoryrepo);
-                componentVal.Properties.Add(projectType);
-                componentVal.Properties.Add(siemensfileNameProp);
-                componentVal.Properties.Add(jfrogRepoPathProp);
-                componentVal.Description = null;
-                if (hashes != null)
-                {
-                    componentVal.Hashes = new List<Hash>()
-                {
-
-                new()
-                 {
-                  Alg = Hash.HashAlgorithm.MD5,
-                  Content = hashes.MD5
-                },
-                new()
-                {
-                  Alg = Hash.HashAlgorithm.SHA_1,
-                  Content = hashes.SHA1
-                 },
-                 new()
-                 {
-                  Alg = Hash.HashAlgorithm.SHA_256,
-                  Content = hashes.SHA256
-                  }
-                  };
-                }
-                modifiedBOM.Add(componentVal);
+                var processedComponent = ProcessNugetComponent(component, aqlResultList, bomhelper, appSettings, projectType);
+                modifiedBOM.Add(processedComponent);
             }
             return modifiedBOM;
         }
 
-        public AqlResult GetJfrogArtifactoryRepoDetials(List<AqlResult> aqlResultList,
+        private static Component ProcessNugetComponent(Component component, List<AqlResult> aqlResultList, IBomHelper bomhelper, CommonAppSettings appSettings, Property projectType)
+        {
+            string jfrogpackageName = $"{component.Name}.{component.Version}{ApiConstant.NugetExtension}";
+            var hashes = aqlResultList.FirstOrDefault(x => x.Name == jfrogpackageName);
+
+            string jfrogRepoPath = string.Empty;
+            AqlResult finalRepoData = GetJfrogArtifactoryRepoDetials(aqlResultList, component, bomhelper, out jfrogRepoPath);
+            Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = finalRepoData.Repo };
+            Property siemensfileNameProp = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = finalRepoData?.Name ?? Dataconstant.PackageNameNotFoundInJfrog };
+            Property jfrogRepoPathProp = new() { Name = Dataconstant.Cdx_JfrogRepoPath, Value = jfrogRepoPath };
+            Component componentVal = component;
+
+            UpdateNugetKpiDataBasedOnRepo(artifactoryrepo.Value, appSettings);
+
+            if (componentVal.Properties?.Count == null || componentVal.Properties?.Count <= 0)
+            {
+                componentVal.Properties = new List<Property>();
+            }
+            componentVal.Properties.Add(artifactoryrepo);
+            componentVal.Properties.Add(projectType);
+            componentVal.Properties.Add(siemensfileNameProp);
+            componentVal.Properties.Add(jfrogRepoPathProp);
+            componentVal.Description = null;
+
+            if (hashes != null)
+            {
+                componentVal.Hashes = new List<Hash>()
+                {
+                    new()
+                    {
+                        Alg = Hash.HashAlgorithm.MD5,
+                        Content = hashes.MD5
+                    },
+                    new()
+                    {
+                        Alg = Hash.HashAlgorithm.SHA_1,
+                        Content = hashes.SHA1
+                    },
+                    new()
+                    {
+                        Alg = Hash.HashAlgorithm.SHA_256,
+                        Content = hashes.SHA256
+                    }
+                };
+            }
+
+            return componentVal;
+        }
+
+        private static void UpdateNugetKpiDataBasedOnRepo(string repoValue, CommonAppSettings appSettings)
+        {
+            if (repoValue == appSettings.Nuget.DevDepRepo)
+            {
+                BomCreator.bomKpiData.DevdependencyComponents++;
+            }
+            
+            if (appSettings.Nuget.Artifactory.ThirdPartyRepos != null)
+            {
+                foreach (var thirdPartyRepo in appSettings.Nuget.Artifactory.ThirdPartyRepos)
+                {
+                    if (repoValue == thirdPartyRepo.Name)
+                    {
+                        BomCreator.bomKpiData.ThirdPartyRepoComponents++;
+                        break;
+                    }
+                }
+            }
+            
+            if (repoValue == appSettings.Nuget.ReleaseRepo)
+            {
+                BomCreator.bomKpiData.ReleaseRepoComponents++;
+            }
+
+            if (repoValue == Dataconstant.NotFoundInJFrog || repoValue == "")
+            {
+                BomCreator.bomKpiData.UnofficialComponents++;
+            }
+        }
+
+        public static AqlResult GetJfrogArtifactoryRepoDetials(List<AqlResult> aqlResultList,
                                              Component component,
                                              IBomHelper bomHelper, out string jfrogRepoPath)
         {
@@ -356,7 +372,7 @@ namespace LCT.PackageIdentifier
             return aqlResult;
         }
 
-        public string GetJfrogRepoPath(AqlResult aqlResult)
+        public static string GetJfrogRepoPath(AqlResult aqlResult)
         {
             if (string.IsNullOrEmpty(aqlResult.Path) || aqlResult.Path.Equals("."))
             {
@@ -434,7 +450,7 @@ namespace LCT.PackageIdentifier
             int noOfExcludedComponents = 0;
             if (appSettings?.SW360?.ExcludeComponents != null)
             {
-                componentForBOM = CommonHelper.RemoveExcludedComponents(componentForBOM, appSettings?.SW360?.ExcludeComponents, ref noOfExcludedComponents);
+                componentForBOM = CommonHelper.RemoveExcludedComponents(componentForBOM, appSettings.SW360?.ExcludeComponents, ref noOfExcludedComponents);
                 dependenciesForBOM = CommonHelper.RemoveInvalidDependenciesAndReferences(componentForBOM, dependenciesForBOM);
                 BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents;
 
@@ -452,7 +468,7 @@ namespace LCT.PackageIdentifier
                 Property siemensDirect = new() { Name = Dataconstant.Cdx_SiemensDirect, Value = "false" };
 
                 var isDirectDep = NugetDevDependencyParser.NugetDirectDependencies
-                    .Exists(x => x.Contains(component.Name) && x.Contains(component.Version));
+                    .Any(x => x.Contains(component.Name) && x.Contains(component.Version));
 
                 if (isDirectDep) { siemensDirect.Value = "true"; }
 
@@ -571,7 +587,7 @@ namespace LCT.PackageIdentifier
         private static void CreateFileForMultipleVersions(List<Component> componentsWithMultipleVersions, CommonAppSettings appSettings)
         {
             MultipleVersions multipleVersions = new MultipleVersions();
-            IFileOperations fileOperations = new FileOperations();
+            FileOperations fileOperations = new FileOperations();
             string defaultProjectName = CommonIdentiferHelper.GetDefaultProjectName(appSettings);
             string bomFullPath = $"{appSettings.Directory.OutputFolder}\\{defaultProjectName}_Bom.cdx.json";
             string filePath = $"{appSettings.Directory.OutputFolder}\\{defaultProjectName}_{FileConstant.multipleversionsFileName}";
@@ -695,7 +711,7 @@ namespace LCT.PackageIdentifier
                 var list = ParsePackageConfig(filepath, appSettings);
                 if (list != null)
                 {
-                    NugetDevDependencyParser.NugetDirectDependencies.AddRange(list?.Select(x => x.ID + " " + x.Version));
+                    NugetDevDependencyParser.AddRangeDirectDependencies(list.Select(x => x.ID + " " + x.Version));
                 }
 
                 listofComponents.AddRange(list);
@@ -739,9 +755,9 @@ namespace LCT.PackageIdentifier
         {
             try
             {
-                var packageDetails = Regex.Match(library, @"packages\\(.+?)\\lib").Groups[1].Value;
+                var packageDetails = PackageDetailsRegex().Match(library).Groups[1].Value;
 
-                Match m = Regex.Match(packageDetails, @"\d+");
+                Match m = PackageDetailsMatchRegex().Match(packageDetails);
                 if (m.Success)
                     version = packageDetails[m.Index..];
                 else
@@ -1052,7 +1068,10 @@ namespace LCT.PackageIdentifier
             // Add compositions to the BOM
             _compositionBuilder.AddCompositionsToBom(bom, _listofFrameworkPackagesInInputFiles);
         }
-
+        [GeneratedRegex(@"packages\\(.+?)\\lib")]
+        private static partial Regex PackageDetailsRegex();
+        [GeneratedRegex(@"\d+")]
+        private static partial Regex PackageDetailsMatchRegex();
         #endregion
     }
 }

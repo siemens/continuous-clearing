@@ -65,7 +65,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             // Act
-            _mavenProcessor.AddSiemensDirectProperty(ref bom);
+            MavenProcessor.AddSiemensDirectProperty(ref bom);
 
             // Assert
             Assert.AreEqual("true", bom.Components[0].Properties[0].Value);
@@ -105,7 +105,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             // Act
-            _mavenProcessor.AddSiemensDirectProperty(ref bom);
+            MavenProcessor.AddSiemensDirectProperty(ref bom);
 
             // Assert
             Assert.AreEqual("false", bom.Components[0].Properties[0].Value);
@@ -122,14 +122,13 @@ namespace LCT.PackageIdentifier.UTest
             string[] Includes = { "*_Maven.cdx.json" };
             string[] Excludes = { "lol" };
 
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "MAVEN",
                 Maven = new Config() { Include = Includes, Exclude = Excludes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = filepath
                 }
@@ -158,9 +157,8 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             ComponentIdentification component = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+           
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360(),
                 Maven = new Config
@@ -207,9 +205,8 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             ComponentIdentification component = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360(),
                 Maven = new Config
@@ -258,9 +255,8 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             ComponentIdentification componentIdentification = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360(),
                 Maven = new Config
@@ -309,9 +305,8 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "Maven",
                 SW360 = new SW360(),
@@ -361,9 +356,8 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "Maven",
                 SW360 = new SW360(),
@@ -409,15 +403,13 @@ namespace LCT.PackageIdentifier.UTest
             string filepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles", "MavenDevDependency", "WithDev"));
             string[] Includes = { "*.cdx.json" };
             string[] Excludes = { "lol" };
-
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "MAVEN",
                 Maven = new Config() { Include = Includes, Exclude = Excludes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = filepath
                 }
@@ -442,14 +434,12 @@ namespace LCT.PackageIdentifier.UTest
             string[] Includes = { "*.cdx.json" };
             string[] Excludes = { "lol" };
 
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "MAVEN",
                 Maven = new Config() { Include = Includes, Exclude = Excludes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = filepath
                 }
@@ -458,7 +448,7 @@ namespace LCT.PackageIdentifier.UTest
             MavenProcessor MavenProcessor = new MavenProcessor(cycloneDXBomParser.Object);
 
             //Act
-            Bom bom = MavenProcessor.ParsePackageFile(appSettings);
+            MavenProcessor.ParsePackageFile(appSettings);
 
             //Assert
             Assert.That(BomCreator.bomKpiData.DevDependentComponents, Is.EqualTo(3), "Returns the count of components");
@@ -475,15 +465,13 @@ namespace LCT.PackageIdentifier.UTest
             string filepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
             string[] Includes = { "CycloneDX_Maven.cdx.json", "SBOMTemplate_Maven.cdx.json", "SBOM_MavenCATemplate.cdx.json" };
             string[] Excludes = { "lol" };
-
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+                        
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "MAVEN",
                 Maven = new Config() { Include = Includes, Exclude = Excludes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = filepath,
 
@@ -510,17 +498,14 @@ namespace LCT.PackageIdentifier.UTest
             string[] Includes = { "CycloneDX_Maven.cdx.json" };
             string[] Excludes = { "lol" };
 
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "MAVEN",
                 Maven = new Config() { Include = Includes, Exclude = Excludes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = filepath,
-
                 }
             };
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();

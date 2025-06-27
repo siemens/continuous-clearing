@@ -36,7 +36,7 @@ namespace LCT.Services
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         readonly ISW360ApicommunicationFacade m_SW360ApiCommunicationFacade;
         readonly ISW360CommonService m_SW360CommonService;
-        private static IEnvironmentHelper environmentHelper;
+        private static EnvironmentHelper environmentHelper = new EnvironmentHelper();
 
         public Sw360CreatorService(ISW360ApicommunicationFacade sw360ApiCommunicationFacade)
         {
@@ -275,14 +275,14 @@ namespace LCT.Services
                 Dictionary<string, ReleaseLinked> linkedReleasesUniqueDict = new Dictionary<string, ReleaseLinked>();
                 foreach (var release in finalReleasesToBeLinked)
                 {
-                    if (!linkedReleasesUniqueDict.ContainsKey(release.ReleaseId))
+                    if (!linkedReleasesUniqueDict.TryGetValue(release.ReleaseId, out ReleaseLinked value))
                     {
                         linkedReleasesUniqueDict.Add(release.ReleaseId, release);
                     }
                     else
                     {
                         Logger.Debug("Duplicate entries found in finalReleasesToBeLinked: " + release.Name + ":" + release.ReleaseId +
-                            " , with :" + linkedReleasesUniqueDict[release.ReleaseId].Name + ":" + linkedReleasesUniqueDict[release.ReleaseId].ReleaseId);
+                            " , with :" + value.Name + ":" + value.ReleaseId);
                     }
                 }
 
@@ -371,8 +371,8 @@ namespace LCT.Services
             var listofSw360Releases = responseData?.Embedded?.Sw360Releases ?? new List<Sw360Releases>();
             for (int i = 0; i < listofSw360Releases.Count; i++)
             {
-                if (listofSw360Releases[i].Name?.ToLowerInvariant() == componentName.ToLowerInvariant()
-                    && listofSw360Releases[i].Version?.ToLowerInvariant() == componentVersion.ToLowerInvariant())
+                if ((listofSw360Releases[i].Name?.ToLowerInvariant()).Equals(componentName, StringComparison.InvariantCultureIgnoreCase)
+                    && (listofSw360Releases[i].Version?.ToLowerInvariant()).Equals(componentVersion, StringComparison.InvariantCultureIgnoreCase))
                 {
                     string urlofreleaseid = listofSw360Releases[i]?.Links?.Self?.Href ?? string.Empty;
                     releaseid = CommonHelper.GetSubstringOfLastOccurance(urlofreleaseid, "/");
@@ -787,8 +787,7 @@ namespace LCT.Services
             return updateRelease;
         }
         public async Task<FossTriggerStatus> TriggerFossologyProcessForValidation(string releaseId, string sw360link)
-        {
-            environmentHelper = new EnvironmentHelper();
+        {            
             FossTriggerStatus fossTriggerStatus = null;
             try
             {

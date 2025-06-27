@@ -31,12 +31,10 @@ namespace LCT.Common.UTest
             System.IO.Directory.CreateDirectory(tempDir);
 
             tempLogFile = Path.Combine(tempDir, "catool.log");
-            File.WriteAllText(tempLogFile, "test log content");
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            appSettings = new CommonAppSettings(folderAction, fileOperations)
+            File.WriteAllText(tempLogFile, "test log content");            
+            appSettings = new CommonAppSettings()
             {
-                Directory = new Directory(folderAction, fileOperations)
+                Directory = new Directory()
                 {
                     LogFolder = tempDir // Mocked LogFolder
                 }

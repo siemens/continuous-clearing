@@ -42,7 +42,7 @@ namespace LCT.PackageIdentifier
 
         public static Stopwatch BomStopWatch { get; set; }
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
+        private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
 
         private readonly ISettingsManager _settingsManager;
         private readonly IBomCreator _bomCreator;
@@ -82,20 +82,20 @@ namespace LCT.PackageIdentifier
 
             if (!m_Verbose && CommonHelper.IsAzureDevOpsDebugEnabled())
                 m_Verbose = true;
-
-            CommonAppSettings appSettings = _settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
-            ProjectReleases projectReleases = new ProjectReleases();
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
-            LogFolderInitialisation(appSettings);
+            CommonHelper.DefaultLogFolderInitialisation(FileConstant.BomCreatorLog, m_Verbose);
+            CommonAppSettings appSettings = _settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
+            ProjectReleases projectReleases = new ProjectReleases();
+            string _ = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.BomCreatorLog, m_Verbose);                        
 
             _settingsManager.CheckRequiredArgsToRun(appSettings, "Identifer");
 
             Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Package Identifier >>>>>====================", null);
             Logger.Logger.Log(null, Level.Notice, $"\nStart of Package Identifier execution: {DateTime.Now}", null);
 
-            if (appSettings.ProjectType.ToUpperInvariant() == "ALPINE")
+            if (appSettings.ProjectType.Equals("ALPINE", StringComparison.InvariantCultureIgnoreCase))
             {
                 Logger.Error($"\nPlease note that the Alpine feature is currently in preview state. This means it's available for testing and evaluation purposes. While functional, it may not yet include all planned features and could encounter occasional issues. Your feedback during this preview phase is appreciated as we work towards its official release. Thank you for exploring Alpine with us.");
             }
@@ -127,7 +127,7 @@ namespace LCT.PackageIdentifier
                 await _bomCreator.GenerateBom(appSettings, new BomHelper(), new FileOperations(), projectReleases, caToolInformation);
             }
 
-            if (appSettings?.Telemetry?.Enable == true)
+            if (appSettings.Telemetry?.Enable == true)
             {
                 TelemetryHelper telemetryHelper = new TelemetryHelper(appSettings);
                 telemetryHelper.StartTelemetry(caToolInformation.CatoolVersion, BomCreator.bomKpiData, TelemetryConstant.IdentifierKpiData);
@@ -180,28 +180,6 @@ namespace LCT.PackageIdentifier
             {
                 environmentHelper.CallEnvironmentExit(-1);
             }
-        }
-
-        private static void LogFolderInitialisation(CommonAppSettings appSettings)
-        {
-            string FolderPath;
-            if (!string.IsNullOrEmpty(appSettings.Directory.LogFolder))
-            {
-                Log4Net.Init(FileConstant.BomCreatorLog, appSettings.Directory.LogFolder, m_Verbose);
-            }
-            else
-            {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    FolderPath = FileConstant.LogFolder;
-                }
-                else
-                {
-                    FolderPath = "/var/log";
-                }
-
-                Log4Net.Init(FileConstant.BomCreatorLog, FolderPath, m_Verbose);
-            }
-        }
+        }       
     }
 }

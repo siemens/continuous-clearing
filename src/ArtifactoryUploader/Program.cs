@@ -35,7 +35,7 @@ namespace ArtifactoryUploader
         private static bool m_Verbose = false;
         public static Stopwatch UploaderStopWatch { get; set; }
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
+        private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
         static async Task Main(string[] args)
         {
             UploaderStopWatch = new Stopwatch();
@@ -44,7 +44,7 @@ namespace ArtifactoryUploader
             if (!m_Verbose && CommonHelper.IsAzureDevOpsDebugEnabled())
                 m_Verbose = true;
 
-            ISettingsManager settingsManager = new SettingsManager();
+            SettingsManager settingsManager = new SettingsManager();
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             Log4Net.CatoolCurrentDirectory = System.IO.Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
@@ -93,7 +93,7 @@ namespace ArtifactoryUploader
             await PackageUploader.UploadPackageToArtifactory(appSettings);
 
             // Initialize telemetry with CATool version and instrumentation key only if Telemetry is enabled in appsettings
-            if (appSettings.Telemetry.Enable == true)
+            if (appSettings.Telemetry.Enable)
             {
                 TelemetryHelper telemetryHelper = new TelemetryHelper(appSettings);
                 telemetryHelper.StartTelemetry(caToolInformation.CatoolVersion, PackageUploader.uploaderKpiData, TelemetryConstant.ArtifactoryUploaderKpiData);

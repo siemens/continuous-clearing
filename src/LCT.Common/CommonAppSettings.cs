@@ -20,9 +20,6 @@ namespace LCT.Common
     [ExcludeFromCodeCoverage]
     public class CommonAppSettings
     {
-        private readonly IFolderAction folderAction;
-        private readonly IFileOperations fileOperations;
-
         public static string PackageUrlApi { get; set; } = $"https://www.nuget.org/api/v2/package/";
         public static string SourceURLNugetApi { get; set; } = $"https://api.nuget.org/v3-flatcontainer/";
         public static string SourceURLMavenApi { get; set; } = $"https://repo.maven.apache.org/maven2/";
@@ -35,17 +32,8 @@ namespace LCT.Common
         private string m_ProjectType;
         public CommonAppSettings()
         {
-            folderAction = new FolderAction();
-            fileOperations = new FileOperations();
-            Directory = new Directory(folderAction, fileOperations);
-        }
-
-        public CommonAppSettings(IFolderAction iFolderAction, IFileOperations ifileOperations)
-        {
-            folderAction = iFolderAction;
-            fileOperations = ifileOperations;
-            Directory = new Directory(folderAction, fileOperations);
-        }
+            Directory = new Directory();
+        }        
 
         public int TimeOut { get; set; } = 200;
         public string ProjectType
@@ -90,9 +78,13 @@ namespace LCT.Common
     public class SW360
     {
         private string m_URL;
-        private string m_Token;
-        private string m_ProjectName;
-        private string m_ProjectID;
+        public string ProjectName { get; set; }
+        public string ProjectID { get; set; }
+        public string AuthTokenType { get; set; } = "Bearer";
+        public string Token { get; set; }
+        public Fossology Fossology { get; set; }
+        public bool IgnoreDevDependency { get; set; } = true;
+        public List<string> ExcludeComponents { get; set; }
         public string URL
         {
             get
@@ -107,43 +99,6 @@ namespace LCT.Common
                 }
             }
         }
-        public string ProjectName
-        {
-            get
-            {
-                return m_ProjectName;
-            }
-            set
-            {
-                m_ProjectName = value;
-            }
-        }
-        public string ProjectID
-        {
-            get
-            {
-                return m_ProjectID;
-            }
-            set
-            {
-                m_ProjectID = value;
-            }
-        }
-        public string AuthTokenType { get; set; } = "Bearer";
-        public string Token
-        {
-            get
-            {
-                return m_Token;
-            }
-            set
-            {
-                m_Token = value;
-            }
-        }
-        public Fossology Fossology { get; set; }
-        public bool IgnoreDevDependency { get; set; } = true;
-        public List<string> ExcludeComponents { get; set; }
 
     }
     public class Fossology
@@ -192,18 +147,11 @@ namespace LCT.Common
         public bool DryRun { get; set; } = false;
     }
     public class Directory
-    {
-        private readonly IFolderAction folderAction;
-        private readonly IFileOperations fileOperations;
+    {        
         private string m_InputFolder;
         private string m_OutputFolder;
         private string m_LogFolder;
-
-        public Directory(IFolderAction folderAction, IFileOperations fileOperations)
-        {
-            this.folderAction = folderAction;
-            this.fileOperations = fileOperations;
-        }
+        
         public string InputFolder
         {
             get
@@ -215,6 +163,7 @@ namespace LCT.Common
                 if (!AppDomain.CurrentDomain.FriendlyName.Contains("SW360PackageCreator") &&
                     !AppDomain.CurrentDomain.FriendlyName.Contains("ArtifactoryUploader"))
                 {
+                    var folderAction = new FolderAction();
                     folderAction.ValidateFolderPath(value);
                     m_InputFolder = value;
                 }
@@ -231,6 +180,7 @@ namespace LCT.Common
             {
                 try
                 {
+                    var folderAction = new FolderAction();
                     m_OutputFolder = value;
                     folderAction.ValidateFolderPath(value);
                 }
@@ -252,6 +202,7 @@ namespace LCT.Common
                 try
                 {
                     m_LogFolder = value;
+                    var folderAction = new FolderAction();
                     folderAction.ValidateFolderPath(value);
                 }
                 catch (DirectoryNotFoundException)
