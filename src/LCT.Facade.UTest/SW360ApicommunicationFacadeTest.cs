@@ -6,6 +6,7 @@
 
 using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
+using LCT.Common.Model;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -371,11 +372,12 @@ namespace LCT.Facade.UTest
             //Arrange 
             AttachReport attachReport = new AttachReport();
             Mock<ISw360ApiCommunication> mockSw360comm = new Mock<ISw360ApiCommunication>();
-            mockSw360comm.Setup(x => x.AttachComponentSourceToSW360(It.IsAny<AttachReport>())).Returns("SuccessInfo");
-
-            //Act          
+            mockSw360comm.Setup(x => x.AttachComponentSourceToSW360(It.IsAny<AttachReport>(), It.IsAny<ComparisonBomData>())).Returns("SuccessInfo");
+            ComparisonBomData comparisonBomData = new ComparisonBomData();
+            
+            //Act 
             sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object);
-            string actual = sW360ApicommunicationFacade.AttachComponentSourceToSW360(attachReport);
+            string actual = sW360ApicommunicationFacade.AttachComponentSourceToSW360(attachReport,comparisonBomData);
 
             //Assert
             Assert.That(actual, Is.EqualTo("SuccessInfo"));

@@ -45,5 +45,7 @@ namespace LCT.Services.Interface
 
         Task<bool> UpdateSW360ReleaseContent(Components component, string fossUrl);
         Task<FossTriggerStatus> TriggerFossologyProcessForValidation(string releaseId, string sw360link);
+        public string AttachSourcesToReleasesCreated(string releaseId, Dictionary<string, string> attachmentUrlList,ComparisonBomData comparisonBomData);
+        Task<bool> UpdateSourceCodeDownloadURLForExistingRelease(ComparisonBomData cbomData, Dictionary<string, string> attachmentUrlList, string releaseId);
     }
 }
