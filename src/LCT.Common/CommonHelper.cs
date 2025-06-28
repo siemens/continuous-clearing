@@ -405,6 +405,25 @@ namespace LCT.Common
 
             return maskedArgs;
         }
+
+        public static Bom RemoveExcludedComponentsFromBom(CommonAppSettings appSettings, Bom cycloneDXBOM, Action<int> updateKpiCallback = null)
+        {
+            List<Component> componentForBOM = cycloneDXBOM.Components.ToList();
+            List<Dependency> dependenciesForBOM = cycloneDXBOM.Dependencies?.ToList() ?? new List<Dependency>();
+            int noOfExcludedComponents = 0;
+            
+            if (appSettings?.SW360?.ExcludeComponents != null)
+            {
+                componentForBOM = RemoveExcludedComponents(componentForBOM, appSettings.SW360?.ExcludeComponents, ref noOfExcludedComponents);
+                dependenciesForBOM = RemoveInvalidDependenciesAndReferences(componentForBOM, dependenciesForBOM);
+                updateKpiCallback?.Invoke(noOfExcludedComponents);
+            }
+            
+            cycloneDXBOM.Components = componentForBOM;
+            cycloneDXBOM.Dependencies = dependenciesForBOM;
+            return cycloneDXBOM;
+        }
+
         #endregion
 
         #region private

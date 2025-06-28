@@ -43,20 +43,8 @@ namespace LCT.Common
                 InitializeAndTrackEvent(TelemetryConstant.ToolName, catoolVersion, telemetryFor
                                                     , appSettings_);
                 TrackKpiDataTelemetry(telemetryFor, kpiData);
-            }
-            catch (ArgumentNullException ex)
-            {
-                Logger.Error($"An error occurred: {ex.Message}");
-                TrackException(ex);
-                environmentHelper.CallEnvironmentExit(-1);
-            }
-            catch (InvalidOperationException ex)
-            {
-                Logger.Error($"An error occurred: {ex.Message}");
-                TrackException(ex);
-                environmentHelper.CallEnvironmentExit(-1);
-            }
-            catch (Exception ex) when (ex is FormatException)
+            }            
+            catch (Exception ex)
             {
                 Logger.Error($"An error occurred: {ex.Message}");
                 TrackException(ex);

@@ -525,6 +525,282 @@ namespace LCT.Common.UTest
             }
 
         }
+
+        [Test]
+        public void RemoveExcludedComponentsFromBom_WithNullAppSettings_ReturnsUnchangedBom()
+        {
+            // Arrange
+            var bom = new Bom
+            {
+                Components = new List<Component>
+                {
+                    new Component { Name = "Component1", Version = "1.0", Properties = new List<Property>() },
+                    new Component { Name = "Component2", Version = "2.0", Properties = new List<Property>() }
+                },
+                Dependencies = new List<Dependency>
+                {
+                    new Dependency { Ref = "ref1" },
+                    new Dependency { Ref = "ref2" }
+                }
+            };
+            CommonAppSettings appSettings = null;
+
+            // Act
+            var result = CommonHelper.RemoveExcludedComponentsFromBom(appSettings, bom);
+
+            // Assert
+            Assert.AreEqual(2, result.Components.Count);
+            Assert.AreEqual(2, result.Dependencies.Count);
+            Assert.AreEqual("Component1", result.Components.First().Name);
+            Assert.AreEqual("Component2", result.Components.Last().Name);
+        }
+
+        [Test]
+        public void RemoveExcludedComponentsFromBom_WithNullSW360_ReturnsUnchangedBom()
+        {
+            // Arrange
+            var bom = new Bom
+            {
+                Components = new List<Component>
+                {
+                    new Component { Name = "Component1", Version = "1.0", Properties = new List<Property>() },
+                    new Component { Name = "Component2", Version = "2.0", Properties = new List<Property>() }
+                },
+                Dependencies = new List<Dependency>
+                {
+                    new Dependency { Ref = "ref1" },
+                    new Dependency { Ref = "ref2" }
+                }
+            };
+            var appSettings = new CommonAppSettings { SW360 = null };
+
+            // Act
+            var result = CommonHelper.RemoveExcludedComponentsFromBom(appSettings, bom);
+
+            // Assert
+            Assert.AreEqual(2, result.Components.Count);
+            Assert.AreEqual(2, result.Dependencies.Count);
+        }
+
+        [Test]
+        public void RemoveExcludedComponentsFromBom_WithNullExcludeComponents_ReturnsUnchangedBom()
+        {
+            // Arrange
+            var bom = new Bom
+            {
+                Components = new List<Component>
+                {
+                    new Component { Name = "Component1", Version = "1.0", Properties = new List<Property>() },
+                    new Component { Name = "Component2", Version = "2.0", Properties = new List<Property>() }
+                },
+                Dependencies = new List<Dependency>
+                {
+                    new Dependency { Ref = "ref1" },
+                    new Dependency { Ref = "ref2" }
+                }
+            };
+            var appSettings = new CommonAppSettings
+            {
+                SW360 = new SW360 { ExcludeComponents = null }
+            };
+
+            // Act
+            var result = CommonHelper.RemoveExcludedComponentsFromBom(appSettings, bom);
+
+            // Assert
+            Assert.AreEqual(2, result.Components.Count);
+            Assert.AreEqual(2, result.Dependencies.Count);
+        }
+
+        [Test]
+        public void RemoveExcludedComponentsFromBom_WithExcludedComponents_RemovesComponentsAndCallsCallback()
+        {
+            // Arrange
+            var bom = new Bom
+            {
+                Components = new List<Component>
+                {
+                    new Component { Name = "Component1", Version = "1.0", Properties = new List<Property>() },
+                    new Component { Name = "Component2", Version = "2.0", Properties = new List<Property>() },
+                    new Component { Name = "Component3", Version = "3.0", Properties = new List<Property>() }
+                },
+                Dependencies = new List<Dependency>
+                {
+                    new Dependency { Ref = "ref1" },
+                    new Dependency { Ref = "ref2" }
+                }
+            };
+            var appSettings = new CommonAppSettings
+            {
+                SW360 = new SW360
+                {
+                    ExcludeComponents = new List<string> { "Component1:*", "Component2:2.0" }
+                }
+            };
+            int callbackInvokedWith = -1;
+
+            // Act
+            var result = CommonHelper.RemoveExcludedComponentsFromBom(appSettings, bom, 
+                count => callbackInvokedWith = count);
+
+            // Assert
+            Assert.AreEqual(3, result.Components.Count);
+            Assert.AreEqual(2, callbackInvokedWith);
+        }
+
+        [Test]
+        public void RemoveExcludedComponentsFromBom_WithNullDependencies_HandlesNullDependencies()
+        {
+            // Arrange
+            var bom = new Bom
+            {
+                Components = new List<Component>
+                {
+                    new Component { Name = "Component1", Version = "1.0", Properties = new List<Property>() }
+                },
+                Dependencies = null
+            };
+            var appSettings = new CommonAppSettings
+            {
+                SW360 = new SW360
+                {
+                    ExcludeComponents = new List<string> { "Component1:*" }
+                }
+            };
+
+            // Act
+            var result = CommonHelper.RemoveExcludedComponentsFromBom(appSettings, bom);
+
+            // Assert
+            Assert.AreEqual(1, result.Components.Count);
+            Assert.IsNotNull(result.Dependencies);
+            Assert.AreEqual(0, result.Dependencies.Count);
+        }
+
+        [Test]
+        public void RemoveExcludedComponentsFromBom_WithoutCallback_DoesNotThrowException()
+        {
+            // Arrange
+            var bom = new Bom
+            {
+                Components = new List<Component>
+                {
+                    new Component { Name = "Component1", Version = "1.0", Properties = new List<Property>() }
+                },
+                Dependencies = new List<Dependency>()
+            };
+            var appSettings = new CommonAppSettings
+            {
+                SW360 = new SW360
+                {
+                    ExcludeComponents = new List<string> { "Component1:*" }
+                }
+            };
+
+            // Act & Assert
+            Assert.DoesNotThrow(() => 
+                CommonHelper.RemoveExcludedComponentsFromBom(appSettings, bom, null));
+        }
+
+        [Test]
+        public void RemoveExcludedComponentsFromBom_WithValidComponentsAndDependencies_RemovesInvalidDependencies()
+        {
+            // Arrange
+            var bom = new Bom
+            {
+                Components = new List<Component>
+                {
+                    new Component { Name = "Component1", Version = "1.0", BomRef = "ref1", Properties = new List<Property>() },
+                    new Component { Name = "Component2", Version = "2.0", BomRef = "ref2", Properties = new List<Property>() }
+                },
+                Dependencies = new List<Dependency>
+                {
+                    new Dependency { Ref = "ref1" }, // Valid - component exists
+                    new Dependency { Ref = "ref2" }, // Valid - component exists
+                    new Dependency { Ref = "ref3" }  // Invalid - component doesn't exist
+                }
+            };
+            var appSettings = new CommonAppSettings
+            {
+                SW360 = new SW360
+                {
+                    ExcludeComponents = new List<string>() // No exclusions
+                }
+            };
+
+            // Act
+            var result = CommonHelper.RemoveExcludedComponentsFromBom(appSettings, bom);
+
+            // Assert
+            Assert.AreEqual(2, result.Components.Count);
+            Assert.AreEqual(2, result.Dependencies.Count); // Invalid dependency should be removed
+            Assert.IsTrue(result.Dependencies.All(d => d.Ref == "ref1" || d.Ref == "ref2"));
+        }
+
+        [Test]
+        public void RemoveExcludedComponentsFromBom_WithEmptyComponents_ReturnsEmptyComponents()
+        {
+            // Arrange
+            var bom = new Bom
+            {
+                Components = new List<Component>(),
+                Dependencies = new List<Dependency>
+                {
+                    new Dependency { Ref = "ref1" }
+                }
+            };
+            var appSettings = new CommonAppSettings
+            {
+                SW360 = new SW360
+                {
+                    ExcludeComponents = new List<string> { "Component1:*" }
+                }
+            };
+            int callbackInvokedWith = -1;
+
+            // Act
+            var result = CommonHelper.RemoveExcludedComponentsFromBom(appSettings, bom, 
+                count => callbackInvokedWith = count);
+
+            // Assert
+            Assert.AreEqual(0, result.Components.Count);
+            Assert.AreEqual(0, result.Dependencies.Count); // Dependencies removed because no valid components
+            Assert.AreEqual(0, callbackInvokedWith); // No components to exclude
+        }
+
+        [Test]
+        public void RemoveExcludedComponentsFromBom_WithPurlBasedExclusion_ExcludesCorrectComponents()
+        {
+            // Arrange
+            var bom = new Bom
+            {
+                Components = new List<Component>
+                {
+                    new Component { Name = "Component1", Version = "1.0", Purl = "pkg:npm/Component1@1.0", Properties = new List<Property>() },
+                    new Component { Name = "Component2", Version = "2.0", Purl = "pkg:npm/Component2@2.0", Properties = new List<Property>() }
+                },
+                Dependencies = new List<Dependency>()
+            };
+            var appSettings = new CommonAppSettings
+            {
+                SW360 = new SW360
+                {
+                    ExcludeComponents = new List<string> { "pkg:npm/Component1@1.0" }
+                }
+            };
+            int callbackInvokedWith = -1;
+
+            // Act
+            var result = CommonHelper.RemoveExcludedComponentsFromBom(appSettings, bom, 
+                count => callbackInvokedWith = count);
+
+            // Assert
+            Assert.AreEqual(2, result.Components.Count);
+            Assert.AreEqual(1, callbackInvokedWith);
+            // Verify that the excluded component has the exclusion property
+            var excludedComponent = result.Components.First(c => c.Name == "Component1");
+            Assert.IsTrue(excludedComponent.Properties.Any(p => p.Name == Dataconstant.Cdx_ExcludeComponent && p.Value == "true"));
+        }
     }
 
     public class TestObject
