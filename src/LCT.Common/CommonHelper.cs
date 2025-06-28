@@ -424,6 +424,47 @@ namespace LCT.Common
             return cycloneDXBOM;
         }
 
+        /// <summary>
+        /// Processes components to add internal identification properties
+        /// </summary>
+        /// <param name="components">List of components to process</param>
+        /// <param name="isInternalPredicate">Function to determine if a component is internal</param>
+        /// <returns>Tuple containing (processedComponents, internalComponents)</returns>
+        public static (List<Component> processedComponents, List<Component> internalComponents) ProcessInternalComponentIdentification(
+            List<Component> components, 
+            Func<Component, bool> isInternalPredicate)
+        {
+            List<Component> internalComponents = new List<Component>();
+            var processedComponents = new List<Component>();
+
+            foreach (Component component in components)
+            {
+                var currentIterationItem = component;
+                bool isTrue = isInternalPredicate(currentIterationItem);
+                
+                if (currentIterationItem.Properties?.Count == null || currentIterationItem.Properties?.Count <= 0)
+                {
+                    currentIterationItem.Properties = new List<Property>();
+                }
+
+                Property isInternal = new() { Name = Dataconstant.Cdx_IsInternal, Value = "false" };
+                if (isTrue)
+                {
+                    internalComponents.Add(currentIterationItem);
+                    isInternal.Value = "true";
+                }
+                else
+                {
+                    isInternal.Value = "false";
+                }
+
+                currentIterationItem.Properties.Add(isInternal);
+                processedComponents.Add(currentIterationItem);
+            }
+
+            return (processedComponents, internalComponents);
+        }
+
         #endregion
 
         #region private

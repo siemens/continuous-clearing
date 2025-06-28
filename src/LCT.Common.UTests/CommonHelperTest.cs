@@ -800,6 +800,269 @@ namespace LCT.Common.UTest
             // Verify that the excluded component has the exclusion property
             var excludedComponent = result.Components.First(c => c.Name == "Component1");
             Assert.IsTrue(excludedComponent.Properties.Any(p => p.Name == Dataconstant.Cdx_ExcludeComponent && p.Value == "true"));
+        }        
+
+        [Test]
+        public void ProcessInternalComponentIdentification_WithEmptyComponents_ReturnsEmptyLists()
+        {
+            // Arrange
+            List<Component> components = new List<Component>();
+            Func<Component, bool> predicate = component => true;
+
+            // Act
+            var (processedComponents, internalComponents) = CommonHelper.ProcessInternalComponentIdentification(components, predicate);
+
+            // Assert
+            Assert.AreEqual(0, processedComponents.Count);
+            Assert.AreEqual(0, internalComponents.Count);
+        }        
+
+        [Test]
+        public void ProcessInternalComponentIdentification_WithAllInternalComponents_ReturnsAllAsInternal()
+        {
+            // Arrange
+            List<Component> components = new List<Component>
+            {
+                new Component { Name = "Component1", Version = "1.0", Properties = new List<Property>() },
+                new Component { Name = "Component2", Version = "2.0", Properties = new List<Property>() }
+            };
+            Func<Component, bool> predicate = component => true; // All are internal
+
+            // Act
+            var (processedComponents, internalComponents) = CommonHelper.ProcessInternalComponentIdentification(components, predicate);
+
+            // Assert
+            Assert.AreEqual(2, processedComponents.Count);
+            Assert.AreEqual(2, internalComponents.Count);
+            
+            // Verify all components have the internal property set to true
+            foreach (var component in processedComponents)
+            {
+                var internalProperty = component.Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsInternal);
+                Assert.IsNotNull(internalProperty);
+                Assert.AreEqual("true", internalProperty.Value);
+            }
+        }
+
+        [Test]
+        public void ProcessInternalComponentIdentification_WithNoInternalComponents_ReturnsNoneAsInternal()
+        {
+            // Arrange
+            List<Component> components = new List<Component>
+            {
+                new Component { Name = "Component1", Version = "1.0", Properties = new List<Property>() },
+                new Component { Name = "Component2", Version = "2.0", Properties = new List<Property>() }
+            };
+            Func<Component, bool> predicate = component => false; // None are internal
+
+            // Act
+            var (processedComponents, internalComponents) = CommonHelper.ProcessInternalComponentIdentification(components, predicate);
+
+            // Assert
+            Assert.AreEqual(2, processedComponents.Count);
+            Assert.AreEqual(0, internalComponents.Count);
+            
+            // Verify all components have the internal property set to false
+            foreach (var component in processedComponents)
+            {
+                var internalProperty = component.Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsInternal);
+                Assert.IsNotNull(internalProperty);
+                Assert.AreEqual("false", internalProperty.Value);
+            }
+        }
+
+        [Test]
+        public void ProcessInternalComponentIdentification_WithMixedComponents_ReturnsMixedResults()
+        {
+            // Arrange
+            List<Component> components = new List<Component>
+            {
+                new Component { Name = "InternalComponent", Version = "1.0", Properties = new List<Property>() },
+                new Component { Name = "ExternalComponent", Version = "2.0", Properties = new List<Property>() },
+                new Component { Name = "AnotherInternal", Version = "3.0", Properties = new List<Property>() }
+            };
+            Func<Component, bool> predicate = component => component.Name.Contains("Internal");
+
+            // Act
+            var (processedComponents, internalComponents) = CommonHelper.ProcessInternalComponentIdentification(components, predicate);
+
+            // Assert
+            Assert.AreEqual(3, processedComponents.Count);
+            Assert.AreEqual(2, internalComponents.Count);
+            
+            // Verify internal components
+            Assert.IsTrue(internalComponents.All(c => c.Name.Contains("Internal")));
+            
+            // Verify properties are set correctly
+            var internalComp1 = processedComponents.FirstOrDefault(c => c.Name == "InternalComponent");
+            var externalComp = processedComponents.FirstOrDefault(c => c.Name == "ExternalComponent");
+            var internalComp2 = processedComponents.FirstOrDefault(c => c.Name == "AnotherInternal");
+            
+            Assert.AreEqual("true", internalComp1.Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsInternal)?.Value);
+            Assert.AreEqual("false", externalComp.Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsInternal)?.Value);
+            Assert.AreEqual("true", internalComp2.Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsInternal)?.Value);
+        }
+
+        [Test]
+        public void ProcessInternalComponentIdentification_WithNullProperties_InitializesProperties()
+        {
+            // Arrange
+            List<Component> components = new List<Component>
+            {
+                new Component { Name = "Component1", Version = "1.0", Properties = null },
+                new Component { Name = "Component2", Version = "2.0" } // Properties not set
+            };
+            Func<Component, bool> predicate = component => component.Name == "Component1";
+
+            // Act
+            var (processedComponents, internalComponents) = CommonHelper.ProcessInternalComponentIdentification(components, predicate);
+
+            // Assert
+            Assert.AreEqual(2, processedComponents.Count);
+            Assert.AreEqual(1, internalComponents.Count);
+            
+            // Verify properties were initialized and set correctly
+            foreach (var component in processedComponents)
+            {
+                Assert.IsNotNull(component.Properties);
+                Assert.IsTrue(component.Properties.Count > 0);
+                
+                var internalProperty = component.Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsInternal);
+                Assert.IsNotNull(internalProperty);
+                
+                if (component.Name == "Component1")
+                {
+                    Assert.AreEqual("true", internalProperty.Value);
+                }
+                else
+                {
+                    Assert.AreEqual("false", internalProperty.Value);
+                }
+            }
+        }
+
+        [Test]
+        public void ProcessInternalComponentIdentification_WithExistingProperties_AddsInternalProperty()
+        {
+            // Arrange
+            var existingProperty = new Property { Name = "ExistingProperty", Value = "ExistingValue" };
+            List<Component> components = new List<Component>
+            {
+                new Component 
+                { 
+                    Name = "Component1", 
+                    Version = "1.0", 
+                    Properties = new List<Property> { existingProperty } 
+                }
+            };
+            Func<Component, bool> predicate = component => true;
+
+            // Act
+            var (processedComponents, internalComponents) = CommonHelper.ProcessInternalComponentIdentification(components, predicate);
+
+            // Assert
+            Assert.AreEqual(1, processedComponents.Count);
+            Assert.AreEqual(1, internalComponents.Count);
+            
+            var component = processedComponents.First();
+            Assert.AreEqual(2, component.Properties.Count);
+            
+            // Verify existing property is preserved
+            var existingProp = component.Properties.FirstOrDefault(p => p.Name == "ExistingProperty");
+            Assert.IsNotNull(existingProp);
+            Assert.AreEqual("ExistingValue", existingProp.Value);
+            
+            // Verify internal property is added
+            var internalProp = component.Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsInternal);
+            Assert.IsNotNull(internalProp);
+            Assert.AreEqual("true", internalProp.Value);
+        }
+
+        [Test]
+        public void ProcessInternalComponentIdentification_WithEmptyPropertiesList_AddsInternalProperty()
+        {
+            // Arrange
+            List<Component> components = new List<Component>
+            {
+                new Component 
+                { 
+                    Name = "Component1", 
+                    Version = "1.0", 
+                    Properties = new List<Property>() // Empty but not null
+                }
+            };
+            Func<Component, bool> predicate = component => false;
+
+            // Act
+            var (processedComponents, internalComponents) = CommonHelper.ProcessInternalComponentIdentification(components, predicate);
+
+            // Assert
+            Assert.AreEqual(1, processedComponents.Count);
+            Assert.AreEqual(0, internalComponents.Count);
+            
+            var component = processedComponents.First();
+            Assert.AreEqual(1, component.Properties.Count);
+            
+            var internalProp = component.Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsInternal);
+            Assert.IsNotNull(internalProp);
+            Assert.AreEqual("false", internalProp.Value);
+        }
+
+        [Test]
+        public void ProcessInternalComponentIdentification_WithComplexPredicate_WorksCorrectly()
+        {
+            // Arrange
+            List<Component> components = new List<Component>
+            {
+                new Component { Name = "Component1", Version = "1.0", Properties = new List<Property>() },
+                new Component { Name = "Component2", Version = "2.0", Properties = new List<Property>() },
+                new Component { Name = "Component3", Version = "1.5", Properties = new List<Property>() }
+            };
+            // Complex predicate: internal if version starts with "1"
+            Func<Component, bool> predicate = component => component.Version.StartsWith("1");
+
+            // Act
+            var (processedComponents, internalComponents) = CommonHelper.ProcessInternalComponentIdentification(components, predicate);
+
+            // Assert
+            Assert.AreEqual(3, processedComponents.Count);
+            Assert.AreEqual(2, internalComponents.Count);
+            
+            // Verify the correct components are identified as internal
+            Assert.IsTrue(internalComponents.Any(c => c.Name == "Component1"));
+            Assert.IsTrue(internalComponents.Any(c => c.Name == "Component3"));
+            Assert.IsFalse(internalComponents.Any(c => c.Name == "Component2"));
+        }
+
+        [Test]
+        public void ProcessInternalComponentIdentification_PreservesOriginalComponentData()
+        {
+            // Arrange
+            List<Component> components = new List<Component>
+            {
+                new Component 
+                { 
+                    Name = "Component1", 
+                    Version = "1.0", 
+                    BomRef = "ref1",
+                    Purl = "pkg:npm/component1@1.0",
+                    Properties = new List<Property>() 
+                }
+            };
+            Func<Component, bool> predicate = component => true;
+
+            // Act
+            var (processedComponents, internalComponents) = CommonHelper.ProcessInternalComponentIdentification(components, predicate);
+
+            // Assert
+            var processedComponent = processedComponents.First();
+            Assert.AreEqual("Component1", processedComponent.Name);
+            Assert.AreEqual("1.0", processedComponent.Version);
+            Assert.AreEqual("ref1", processedComponent.BomRef);
+            Assert.AreEqual("pkg:npm/component1@1.0", processedComponent.Purl);
+            
+            // Should have added one property (internal) to the existing empty list
+            Assert.AreEqual(1, processedComponent.Properties.Count);
         }
     }
 
