@@ -154,21 +154,8 @@ namespace LCT.PackageIdentifier
 
             UpdateBomKpiData(appSettings, artifactoryrepo.Value);
 
-            if (component.Properties?.Count == null || component.Properties?.Count <= 0)
-            {
-                component.Properties = new List<Property>();
-            }
-
-            component.Properties.Add(artifactoryrepo);
-            component.Properties.Add(projectType);
-            component.Properties.Add(jfrogFileNameProperty);
-            component.Properties.Add(jfrogRepoPathProperty);
-            component.Description = null;
-
-            if (hashes != null)
-            {
-                component.Hashes = GetComponentHashes(hashes);
-            }
+            // Use common helper to set component properties and hashes
+            CommonHelper.SetComponentPropertiesAndHashes(component, artifactoryrepo, projectType, jfrogFileNameProperty, jfrogRepoPathProperty, hashes);
 
             return component;
         }
@@ -191,16 +178,6 @@ namespace LCT.PackageIdentifier
             {
                 BomCreator.bomKpiData.UnofficialComponents++;
             }
-        }
-
-        private static List<Hash> GetComponentHashes(AqlResult hashes)
-        {
-            return new List<Hash>
-    {
-        new() { Alg = Hash.HashAlgorithm.MD5, Content = hashes.MD5 },
-        new() { Alg = Hash.HashAlgorithm.SHA_1, Content = hashes.SHA1 },
-        new() { Alg = Hash.HashAlgorithm.SHA_256, Content = hashes.SHA256 }
-    };
         }
         public List<DebianPackage> ParseCycloneDX(string filePath, ref Bom bom)
         {

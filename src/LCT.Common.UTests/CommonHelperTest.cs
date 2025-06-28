@@ -1064,6 +1064,314 @@ namespace LCT.Common.UTest
             // Should have added one property (internal) to the existing empty list
             Assert.AreEqual(1, processedComponent.Properties.Count);
         }
+
+        #region SetComponentPropertiesAndHashes Tests
+
+        [Test]
+        public void SetComponentPropertiesAndHashes_WithNullProperties_InitializesPropertiesList()
+        {
+            // Arrange
+            var component = new Component 
+            { 
+                Name = "TestComponent", 
+                Version = "1.0", 
+                Properties = null,
+                Description = "Original Description"
+            };
+            var artifactoryRepo = new Property { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = "test-repo" };
+            var projectType = new Property { Name = Dataconstant.Cdx_ProjectType, Value = "npm" };
+            var siemensFileName = new Property { Name = Dataconstant.Cdx_Siemensfilename, Value = "test-file.tgz" };
+            var jfrogRepoPath = new Property { Name = Dataconstant.Cdx_JfrogRepoPath, Value = "test-repo/path/file.tgz" };
+
+            // Act
+            CommonHelper.SetComponentPropertiesAndHashes(component, artifactoryRepo, projectType, siemensFileName, jfrogRepoPath);
+
+            // Assert
+            Assert.IsNotNull(component.Properties);
+            Assert.AreEqual(4, component.Properties.Count);
+            Assert.IsNull(component.Description);
+            Assert.IsNull(component.Hashes);
+        }
+
+        [Test]
+        public void SetComponentPropertiesAndHashes_WithEmptyProperties_AddsStandardProperties()
+        {
+            // Arrange
+            var component = new Component 
+            { 
+                Name = "TestComponent", 
+                Version = "1.0", 
+                Properties = new List<Property>(),
+                Description = "Original Description"
+            };
+            var artifactoryRepo = new Property { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = "test-repo" };
+            var projectType = new Property { Name = Dataconstant.Cdx_ProjectType, Value = "maven" };
+            var siemensFileName = new Property { Name = Dataconstant.Cdx_Siemensfilename, Value = "test-file.jar" };
+            var jfrogRepoPath = new Property { Name = Dataconstant.Cdx_JfrogRepoPath, Value = "test-repo/path/file.jar" };
+
+            // Act
+            CommonHelper.SetComponentPropertiesAndHashes(component, artifactoryRepo, projectType, siemensFileName, jfrogRepoPath);
+
+            // Assert
+            Assert.IsNotNull(component.Properties);
+            Assert.AreEqual(4, component.Properties.Count);
+            Assert.AreEqual("test-repo", component.Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_ArtifactoryRepoName)?.Value);
+            Assert.AreEqual("maven", component.Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_ProjectType)?.Value);
+            Assert.AreEqual("test-file.jar", component.Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_Siemensfilename)?.Value);
+            Assert.AreEqual("test-repo/path/file.jar", component.Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_JfrogRepoPath)?.Value);
+            Assert.IsNull(component.Description);
+        }
+
+        [Test]
+        public void SetComponentPropertiesAndHashes_WithExistingProperties_PreservesAndAddsProperties()
+        {
+            // Arrange
+            var existingProperty = new Property { Name = "ExistingProperty", Value = "ExistingValue" };
+            var component = new Component 
+            { 
+                Name = "TestComponent", 
+                Version = "1.0", 
+                Properties = new List<Property> { existingProperty },
+                Description = "Original Description"
+            };
+            var artifactoryRepo = new Property { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = "python-repo" };
+            var projectType = new Property { Name = Dataconstant.Cdx_ProjectType, Value = "python" };
+            var siemensFileName = new Property { Name = Dataconstant.Cdx_Siemensfilename, Value = "test-package.whl" };
+            var jfrogRepoPath = new Property { Name = Dataconstant.Cdx_JfrogRepoPath, Value = "python-repo/path/package.whl" };
+
+            // Act
+            CommonHelper.SetComponentPropertiesAndHashes(component, artifactoryRepo, projectType, siemensFileName, jfrogRepoPath);
+
+            // Assert
+            Assert.IsNotNull(component.Properties);
+            Assert.AreEqual(5, component.Properties.Count);
+            
+            // Verify existing property is preserved
+            Assert.IsTrue(component.Properties.Any(p => p.Name == "ExistingProperty" && p.Value == "ExistingValue"));
+            
+            // Verify new properties are added
+            Assert.IsTrue(component.Properties.Any(p => p.Name == Dataconstant.Cdx_ArtifactoryRepoName && p.Value == "python-repo"));
+            Assert.IsTrue(component.Properties.Any(p => p.Name == Dataconstant.Cdx_ProjectType && p.Value == "python"));
+            Assert.IsTrue(component.Properties.Any(p => p.Name == Dataconstant.Cdx_Siemensfilename && p.Value == "test-package.whl"));
+            Assert.IsTrue(component.Properties.Any(p => p.Name == Dataconstant.Cdx_JfrogRepoPath && p.Value == "python-repo/path/package.whl"));
+            
+            Assert.IsNull(component.Description);
+        }
+
+        [Test]
+        public void SetComponentPropertiesAndHashes_WithValidHashes_AddsHashesToComponent()
+        {
+            // Arrange
+            var component = new Component 
+            { 
+                Name = "TestComponent", 
+                Version = "1.0", 
+                Properties = new List<Property>(),
+                Description = "Original Description"
+            };
+            var artifactoryRepo = new Property { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = "test-repo" };
+            var projectType = new Property { Name = Dataconstant.Cdx_ProjectType, Value = "nuget" };
+            var siemensFileName = new Property { Name = Dataconstant.Cdx_Siemensfilename, Value = "test-package.nupkg" };
+            var jfrogRepoPath = new Property { Name = Dataconstant.Cdx_JfrogRepoPath, Value = "nuget-repo/path/package.nupkg" };
+            
+            // Create a test hash object that matches the expected structure
+            var hashes = new TestHashObject
+            {
+                MD5 = "5d41402abc4b2a76b9719d911017c592",
+                SHA1 = "aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d",
+                SHA256 = "2cf24dba4f21d4288074e297f7719e34d3e7e0cbfb1c4a1b8d1f8e8b7a6e9c9d"
+            };
+
+            // Act
+            CommonHelper.SetComponentPropertiesAndHashes(component, artifactoryRepo, projectType, siemensFileName, jfrogRepoPath, hashes);
+
+            // Assert
+            Assert.IsNotNull(component.Properties);
+            Assert.AreEqual(4, component.Properties.Count);
+            Assert.IsNull(component.Description);
+            
+            // Verify hashes are set correctly
+            Assert.IsNotNull(component.Hashes);
+            Assert.AreEqual(3, component.Hashes.Count);
+            
+            var md5Hash = component.Hashes.FirstOrDefault(h => h.Alg == Hash.HashAlgorithm.MD5);
+            Assert.IsNotNull(md5Hash);
+            Assert.AreEqual("5d41402abc4b2a76b9719d911017c592", md5Hash.Content);
+            
+            var sha1Hash = component.Hashes.FirstOrDefault(h => h.Alg == Hash.HashAlgorithm.SHA_1);
+            Assert.IsNotNull(sha1Hash);
+            Assert.AreEqual("aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d", sha1Hash.Content);
+            
+            var sha256Hash = component.Hashes.FirstOrDefault(h => h.Alg == Hash.HashAlgorithm.SHA_256);
+            Assert.IsNotNull(sha256Hash);
+            Assert.AreEqual("2cf24dba4f21d4288074e297f7719e34d3e7e0cbfb1c4a1b8d1f8e8b7a6e9c9d", sha256Hash.Content);
+        }
+
+        [Test]
+        public void SetComponentPropertiesAndHashes_WithNullHashes_DoesNotSetHashes()
+        {
+            // Arrange
+            var component = new Component 
+            { 
+                Name = "TestComponent", 
+                Version = "1.0", 
+                Properties = new List<Property>(),
+                Description = "Original Description"
+            };
+            var artifactoryRepo = new Property { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = "debian-repo" };
+            var projectType = new Property { Name = Dataconstant.Cdx_ProjectType, Value = "debian" };
+            var siemensFileName = new Property { Name = Dataconstant.Cdx_Siemensfilename, Value = "test-package.deb" };
+            var jfrogRepoPath = new Property { Name = Dataconstant.Cdx_JfrogRepoPath, Value = "debian-repo/path/package.deb" };
+
+            // Act
+            CommonHelper.SetComponentPropertiesAndHashes(component, artifactoryRepo, projectType, siemensFileName, jfrogRepoPath, null);
+
+            // Assert
+            Assert.IsNotNull(component.Properties);
+            Assert.AreEqual(4, component.Properties.Count);
+            Assert.IsNull(component.Description);
+            Assert.IsNull(component.Hashes);
+        }
+
+        [Test]
+        public void SetComponentPropertiesAndHashes_WithExistingHashes_ReplacesHashes()
+        {
+            // Arrange
+            var existingHash = new Hash { Alg = Hash.HashAlgorithm.MD5, Content = "oldmd5hash" };
+            var component = new Component 
+            { 
+                Name = "TestComponent", 
+                Version = "1.0", 
+                Properties = new List<Property>(),
+                Description = "Original Description",
+                Hashes = new List<Hash> { existingHash }
+            };
+            var artifactoryRepo = new Property { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = "test-repo" };
+            var projectType = new Property { Name = Dataconstant.Cdx_ProjectType, Value = "conan" };
+            var siemensFileName = new Property { Name = Dataconstant.Cdx_Siemensfilename, Value = "test-package.tgz" };
+            var jfrogRepoPath = new Property { Name = Dataconstant.Cdx_JfrogRepoPath, Value = "conan-repo/path/package.tgz" };
+            
+            // Create a test hash object that matches the expected structure
+            var newHashes = new TestHashObject
+            {
+                MD5 = "newmd5hash",
+                SHA1 = "newsha1hash",
+                SHA256 = "newsha256hash"
+            };
+
+            // Act
+            CommonHelper.SetComponentPropertiesAndHashes(component, artifactoryRepo, projectType, siemensFileName, jfrogRepoPath, newHashes);
+
+            // Assert
+            Assert.IsNotNull(component.Properties);
+            Assert.AreEqual(4, component.Properties.Count);
+            Assert.IsNull(component.Description);
+            
+            // Verify hashes are replaced, not appended
+            Assert.IsNotNull(component.Hashes);
+            Assert.AreEqual(3, component.Hashes.Count);
+            Assert.IsFalse(component.Hashes.Any(h => h.Content == "oldmd5hash"));
+            Assert.IsTrue(component.Hashes.Any(h => h.Content == "newmd5hash"));
+        }
+
+        [Test]
+        public void SetComponentPropertiesAndHashes_AlwaysClearsDescription()
+        {
+            // Arrange
+            var component = new Component 
+            { 
+                Name = "TestComponent", 
+                Version = "1.0", 
+                Properties = new List<Property>(),
+                Description = "This description should be cleared"
+            };
+            var artifactoryRepo = new Property { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = "test-repo" };
+            var projectType = new Property { Name = Dataconstant.Cdx_ProjectType, Value = "alpine" };
+            var siemensFileName = new Property { Name = Dataconstant.Cdx_Siemensfilename, Value = "test-package.apk" };
+            var jfrogRepoPath = new Property { Name = Dataconstant.Cdx_JfrogRepoPath, Value = "alpine-repo/path/package.apk" };
+
+            // Act
+            CommonHelper.SetComponentPropertiesAndHashes(component, artifactoryRepo, projectType, siemensFileName, jfrogRepoPath);
+
+            // Assert
+            Assert.IsNull(component.Description);
+        }
+
+        [Test]
+        public void SetComponentPropertiesAndHashes_WithAllParametersNull_HandlesGracefully()
+        {
+            // Arrange
+            var component = new Component 
+            { 
+                Name = "TestComponent", 
+                Version = "1.0", 
+                Properties = new List<Property>(),
+                Description = "Original Description"
+            };
+
+            // Act & Assert - Should not throw exception
+            Assert.DoesNotThrow(() => 
+                CommonHelper.SetComponentPropertiesAndHashes(component, null, null, null, null, null));
+                
+            // Verify basic behavior
+            Assert.IsNotNull(component.Properties);
+            Assert.AreEqual(4, component.Properties.Count); // 4 null properties added
+            Assert.IsNull(component.Description);
+            Assert.IsNull(component.Hashes);
+        }
+
+        [Test]
+        public void SetComponentPropertiesAndHashes_WithPartialHashData_HandlesPartialHashes()
+        {
+            // Arrange
+            var component = new Component 
+            { 
+                Name = "TestComponent", 
+                Version = "1.0", 
+                Properties = new List<Property>(),
+                Description = "Original Description"
+            };
+            var artifactoryRepo = new Property { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = "test-repo" };
+            var projectType = new Property { Name = Dataconstant.Cdx_ProjectType, Value = "npm" };
+            var siemensFileName = new Property { Name = Dataconstant.Cdx_Siemensfilename, Value = "test-package.tgz" };
+            var jfrogRepoPath = new Property { Name = Dataconstant.Cdx_JfrogRepoPath, Value = "npm-repo/path/package.tgz" };
+            
+            // Hashes with some null values
+            var partialHashes = new TestHashObject
+            {
+                MD5 = "validmd5hash",
+                SHA1 = null,
+                SHA256 = "validsha256hash"
+            };
+
+            // Act
+            CommonHelper.SetComponentPropertiesAndHashes(component, artifactoryRepo, projectType, siemensFileName, jfrogRepoPath, partialHashes);
+
+            // Assert
+            Assert.IsNotNull(component.Properties);
+            Assert.AreEqual(4, component.Properties.Count);
+            Assert.IsNull(component.Description);
+            
+            // Verify hashes are set even with null values
+            Assert.IsNotNull(component.Hashes);
+            Assert.AreEqual(3, component.Hashes.Count);
+            
+            var md5Hash = component.Hashes.FirstOrDefault(h => h.Alg == Hash.HashAlgorithm.MD5);
+            Assert.IsNotNull(md5Hash);
+            Assert.AreEqual("validmd5hash", md5Hash.Content);
+            
+            var sha1Hash = component.Hashes.FirstOrDefault(h => h.Alg == Hash.HashAlgorithm.SHA_1);
+            Assert.IsNotNull(sha1Hash);
+            Assert.IsNull(sha1Hash.Content);
+            
+            var sha256Hash = component.Hashes.FirstOrDefault(h => h.Alg == Hash.HashAlgorithm.SHA_256);
+            Assert.IsNotNull(sha256Hash);
+            Assert.AreEqual("validsha256hash", sha256Hash.Content);
+        }
+
+        #endregion
+
+        // ...existing code...
     }
 
     public class TestObject
@@ -1072,5 +1380,12 @@ namespace LCT.Common.UTest
         public string Property1 { get; set; }
 
         public string Property2 { get; set; }
+    }
+
+    public class TestHashObject
+    {
+        public string MD5 { get; set; }
+        public string SHA1 { get; set; }
+        public string SHA256 { get; set; }
     }
 }

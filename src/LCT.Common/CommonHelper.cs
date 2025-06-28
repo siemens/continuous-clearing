@@ -465,6 +465,61 @@ namespace LCT.Common
             return (processedComponents, internalComponents);
         }
 
+        /// <summary>
+        /// Sets standard component properties and hashes for JFrog components
+        /// </summary>
+        /// <param name="component">Component to update</param>
+        /// <param name="artifactoryRepo">Artifactory repository name</param>
+        /// <param name="projectType">Project type property</param>
+        /// <param name="siemensFileName">Siemens filename property</param>
+        /// <param name="jfrogRepoPath">JFrog repository path property</param>
+        /// <param name="hashes">Optional AQL result containing hash values</param>
+        public static void SetComponentPropertiesAndHashes(Component component, 
+            Property artifactoryRepo, 
+            Property projectType, 
+            Property siemensFileName, 
+            Property jfrogRepoPath, 
+            dynamic hashes = null)
+        {
+            // Initialize properties list if needed
+            if (component.Properties?.Count == null || component.Properties?.Count <= 0)
+            {
+                component.Properties = new List<Property>();
+            }
+
+            // Add standard properties
+            component.Properties.Add(artifactoryRepo);
+            component.Properties.Add(projectType);
+            component.Properties.Add(siemensFileName);
+            component.Properties.Add(jfrogRepoPath);
+            
+            // Clear description
+            component.Description = null;
+
+            // Add hashes if available
+            if (hashes != null)
+            {
+                component.Hashes = new List<Hash>()
+                {
+                    new()
+                    {
+                        Alg = Hash.HashAlgorithm.MD5,
+                        Content = hashes.MD5
+                    },
+                    new()
+                    {
+                        Alg = Hash.HashAlgorithm.SHA_1,
+                        Content = hashes.SHA1
+                    },
+                    new()
+                    {
+                        Alg = Hash.HashAlgorithm.SHA_256,
+                        Content = hashes.SHA256
+                    }
+                };
+            }
+        }
+
         #endregion
 
         #region private

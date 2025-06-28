@@ -369,37 +369,8 @@ namespace LCT.PackageIdentifier
 
             UpdatePythonKpiDataBasedOnRepo(artifactoryrepo.Value, appSettings);
 
-            if (componentVal.Properties?.Count == null || componentVal.Properties?.Count <= 0)
-            {
-                componentVal.Properties = new List<Property>();
-            }
-            componentVal.Properties.Add(artifactoryrepo);
-            componentVal.Properties.Add(projectType);
-            componentVal.Properties.Add(fileNameProperty);
-            componentVal.Properties.Add(jfrogRepoPathProperty);
-            componentVal.Description = null;
-
-            if (hashes != null)
-            {
-                componentVal.Hashes = new List<Hash>()
-                {
-                    new()
-                    {
-                        Alg = Hash.HashAlgorithm.MD5,
-                        Content = hashes.MD5
-                    },
-                    new()
-                    {
-                        Alg = Hash.HashAlgorithm.SHA_1,
-                        Content = hashes.SHA1
-                    },
-                    new()
-                    {
-                        Alg = Hash.HashAlgorithm.SHA_256,
-                        Content = hashes.SHA256
-                    }
-                };
-            }
+            // Use common helper to set component properties and hashes
+            CommonHelper.SetComponentPropertiesAndHashes(componentVal, artifactoryrepo, projectType, fileNameProperty, jfrogRepoPathProperty, hashes);
 
             return componentVal;
         }
