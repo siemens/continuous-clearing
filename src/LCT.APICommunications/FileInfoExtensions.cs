@@ -25,17 +25,11 @@ namespace LCT.APICommunications
                                             string mimeType,
                                             string formKey)
         {
-            if (file == null)
-            {
-                throw new ArgumentNullException(nameof(file));
-            }
+            ArgumentNullException.ThrowIfNull(file);
 
             CheckIfFileExists(file);
 
-            if (stream == null)
-            {
-                throw new ArgumentNullException(nameof(stream));
-            }
+            ArgumentNullException.ThrowIfNull(stream);
 
             if (string.IsNullOrEmpty(mimeBoundary))
             {

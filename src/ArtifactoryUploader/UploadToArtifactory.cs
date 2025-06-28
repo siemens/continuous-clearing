@@ -23,7 +23,7 @@ using System.Threading.Tasks;
 
 namespace LCT.ArtifactoryUploader
 {
-    public class UploadToArtifactory
+    public static class UploadToArtifactory
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static IJFrogService JFrogService { get; set; }
@@ -58,7 +58,7 @@ namespace LCT.ArtifactoryUploader
 
                     if (aqlResult != null)
                     {
-                        components.SrcRepoPathWithFullName = aqlResult.Repo + "/" + aqlResult.Path + "/" + aqlResult.Name;
+                        components.SrcRepoPathWithFullName = aqlResult.Repo + Dataconstant.ForwardSlash + aqlResult.Path + Dataconstant.ForwardSlash + aqlResult.Name;
                         components.PypiOrNpmCompName = aqlResult.Name;
                     }
                     else
@@ -160,17 +160,17 @@ namespace LCT.ArtifactoryUploader
                 switch (componentType.ToLower())
                 {
                     case "npm":
-                        return GetRepoName(packageType, appSettings.Npm.ReleaseRepo, appSettings.Npm.DevDepRepo, appSettings.Npm.Artifactory.ThirdPartyRepos.Where(x => x.Upload.Equals(true)).FirstOrDefault()?.Name);
+                        return GetRepoName(packageType, appSettings.Npm.ReleaseRepo, appSettings.Npm.DevDepRepo, appSettings.Npm.Artifactory.ThirdPartyRepos.FirstOrDefault(x => x.Upload)?.Name);
                     case "nuget":
-                        return GetRepoName(packageType, appSettings.Nuget.ReleaseRepo, appSettings.Nuget.DevDepRepo, appSettings.Nuget.Artifactory.ThirdPartyRepos.Where(x => x.Upload.Equals(true)).FirstOrDefault()?.Name);
+                        return GetRepoName(packageType, appSettings.Nuget.ReleaseRepo, appSettings.Nuget.DevDepRepo, appSettings.Nuget.Artifactory.ThirdPartyRepos.FirstOrDefault(x => x.Upload)?.Name);
                     case "maven":
-                        return GetRepoName(packageType, appSettings.Maven.ReleaseRepo, appSettings.Maven.DevDepRepo, appSettings.Maven.Artifactory.ThirdPartyRepos.Where(x => x.Upload.Equals(true)).FirstOrDefault()?.Name);
+                        return GetRepoName(packageType, appSettings.Maven.ReleaseRepo, appSettings.Maven.DevDepRepo, appSettings.Maven.Artifactory.ThirdPartyRepos.FirstOrDefault(x => x.Upload)?.Name);
                     case "poetry":
-                        return GetRepoName(packageType, appSettings.Poetry.ReleaseRepo, appSettings.Poetry.DevDepRepo, appSettings.Poetry.Artifactory.ThirdPartyRepos.Where(x => x.Upload.Equals(true)).FirstOrDefault()?.Name);
+                        return GetRepoName(packageType, appSettings.Poetry.ReleaseRepo, appSettings.Poetry.DevDepRepo, appSettings.Poetry.Artifactory.ThirdPartyRepos.FirstOrDefault(x => x.Upload)?.Name);
                     case "conan":
-                        return GetRepoName(packageType, appSettings.Conan.ReleaseRepo, appSettings.Conan.DevDepRepo, appSettings.Conan.Artifactory.ThirdPartyRepos.Where(x => x.Upload.Equals(true)).FirstOrDefault()?.Name);
+                        return GetRepoName(packageType, appSettings.Conan.ReleaseRepo, appSettings.Conan.DevDepRepo, appSettings.Conan.Artifactory.ThirdPartyRepos.FirstOrDefault(x => x.Upload)?.Name);
                     case "debian":
-                        return GetRepoName(packageType, appSettings.Debian.ReleaseRepo, appSettings.Debian.DevDepRepo, appSettings.Debian.Artifactory.ThirdPartyRepos.Where(x => x.Upload.Equals(true)).FirstOrDefault()?.Name);
+                        return GetRepoName(packageType, appSettings.Debian.ReleaseRepo, appSettings.Debian.DevDepRepo, appSettings.Debian.Artifactory.ThirdPartyRepos.FirstOrDefault(x => x.Upload)?.Name);
                 }
             }
 
@@ -419,9 +419,9 @@ namespace LCT.ArtifactoryUploader
             {
                 foreach (var repo in repoList.Where(r => !string.IsNullOrWhiteSpace(r)))
                 {
-                    if (repoCache.ContainsKey(repo))
+                    if (repoCache.TryGetValue(repo, out IList<AqlResult> value))
                     {
-                        aqlResultList.AddRange(repoCache[repo]);
+                        aqlResultList.AddRange(value);
                     }
                     else
                     {
@@ -440,9 +440,9 @@ namespace LCT.ArtifactoryUploader
             {
                 foreach (var repo in repoList.Where(r => !string.IsNullOrWhiteSpace(r)))
                 {
-                    if (repoCache.ContainsKey(repo))
+                    if (repoCache.TryGetValue(repo, out IList<AqlResult> value))
                     {
-                        aqlResultList.AddRange(repoCache[repo]);
+                        aqlResultList.AddRange(value);
                     }
                     else
                     {
@@ -499,9 +499,9 @@ namespace LCT.ArtifactoryUploader
             {
                 foreach (var repo in repoList.Where(r => !string.IsNullOrWhiteSpace(r)))
                 {
-                    if (repoCache.ContainsKey(repo))
+                    if (repoCache.TryGetValue(repo, out IList<AqlResult> value))
                     {
-                        aqlResultList.AddRange(repoCache[repo]);
+                        aqlResultList.AddRange(value);
                     }
                     else
                     {

@@ -24,10 +24,10 @@ namespace LCT.APICommunications.Model
         public string Version { get; set; }
 
         [JsonProperty("state")]
-        public string state { get; set; }
+        public string State { get; set; }
 
         [JsonProperty("clearingState")]
-        public string clearingState { get; set; }
+        public string ClearingState { get; set; }
 
         [JsonProperty("_embedded")]
         public ReleaseEmbedded Embedded { get; set; }

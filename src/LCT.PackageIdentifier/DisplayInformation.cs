@@ -77,7 +77,7 @@ namespace LCT.PackageIdentifier
             string totalString = string.Empty;
             if (appSettings?.SW360?.ExcludeComponents != null)
             {
-                totalString = string.Join(",", appSettings?.SW360?.ExcludeComponents?.ToList());
+                totalString = string.Join(",", appSettings.SW360?.ExcludeComponents?.ToList());
             }
             return totalString;
         }

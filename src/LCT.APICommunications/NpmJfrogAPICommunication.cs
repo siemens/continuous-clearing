@@ -20,7 +20,7 @@ namespace LCT.APICommunications
     {
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static int TimeoutInSec { get; set; }
-        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
+        private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
         public NpmJfrogApiCommunication(string repoDomainName, string srcrepoName, ArtifactoryCredentials repoCredentials, int timeout) : base(repoDomainName, srcrepoName, repoCredentials, timeout)
         {
             TimeoutInSec = timeout;

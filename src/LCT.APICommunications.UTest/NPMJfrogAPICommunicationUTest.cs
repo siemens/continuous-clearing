@@ -99,10 +99,7 @@ namespace LCT.APICommunications.UTest
             var component = new ComponentsToArtifactory { PackageInfoApiUrl = "http://dummyurl.com" };
 
             var jfrogApiCommunication = new NpmJfrogApiCommunication("", "", repoCredentials, 100);
-            typeof(NpmJfrogApiCommunication)
-                .GetField("environmentHelper", BindingFlags.NonPublic | BindingFlags.Static)
-                ?.SetValue(null, new Mock<IEnvironmentHelper>().Object);
-
+           
             // Act
             var response = await jfrogApiCommunication.GetPackageInfo(component);
 

@@ -135,9 +135,8 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             ComponentIdentification component = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360(),
                 Npm = new Config
@@ -196,9 +195,8 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             ComponentIdentification component = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360(),
                 Npm = new Config
@@ -259,9 +257,8 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             ComponentIdentification componentIdentification = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo1" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360(),
                 Npm = new Config
@@ -322,9 +319,8 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo1" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "NPM",
                 SW360 = new SW360(),
@@ -387,9 +383,8 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+           
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "NPM",
                 SW360 = new SW360(),

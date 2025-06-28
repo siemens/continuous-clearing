@@ -40,7 +40,7 @@ namespace AritfactoryUploader.UTest
             //string comparisonBOMPath = outFolder + @"\ArtifactoryUTTestFiles\CyclonedxBom.json";
 
             CommonAppSettings commonAppSettings = new CommonAppSettings();
-            commonAppSettings.Directory = new LCT.Common.Directory(new FolderAction(), new FileOperations())
+            commonAppSettings.Directory = new LCT.Common.Directory()
             {
                 OutputFolder = Path.GetFullPath(Path.Combine(outFolder, "ArtifactoryUTTestFiles"))
             };

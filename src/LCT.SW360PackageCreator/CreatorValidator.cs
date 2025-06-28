@@ -31,18 +31,17 @@ namespace LCT.SW360PackageCreator
     public static class CreatorValidator
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
+        
         public static async Task<int> ValidateAppSettings(CommonAppSettings appSettings, ISw360ProjectService sw360ProjectService, ProjectReleases projectReleases)
         {
             string sw360ProjectName = await sw360ProjectService.GetProjectNameByProjectIDFromSW360(appSettings.SW360.ProjectID, appSettings.SW360.ProjectName, projectReleases);
 
-            return CommonHelper.ValidateSw360Project(sw360ProjectName, projectReleases?.clearingState, projectReleases?.Name, appSettings);
+            return CommonHelper.ValidateSw360Project(sw360ProjectName, projectReleases?.ClearingState, projectReleases?.Name, appSettings);
         }
         public static async Task TriggerFossologyValidation(CommonAppSettings appSettings, ISW360ApicommunicationFacade sW360ApicommunicationFacade, IEnvironmentHelper environmentHelper)
         {
             ISW360CommonService sw360CommonService = new SW360CommonService(sW360ApicommunicationFacade);
-            ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sW360ApicommunicationFacade, sw360CommonService);
-            ISW360Service sw360Service = new Sw360Service(sW360ApicommunicationFacade, sw360CommonService, environmentHelper);
+            ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sW360ApicommunicationFacade, sw360CommonService);            
 
             try
             {
@@ -68,7 +67,7 @@ namespace LCT.SW360PackageCreator
         private static async Task<ReleasesAllDetails.Sw360Release> FindValidRelease(ISW360ApicommunicationFacade sW360ApicommunicationFacade)
         {
             int page = 0;
-            int pageEntries = 40;
+            const int pageEntries = 40;
             int pageCount = 0;
 
             while (pageCount < 10)
@@ -83,7 +82,7 @@ namespace LCT.SW360PackageCreator
 
                 var validRelease = releaseResponse.Embedded?.Sw360releases?.FirstOrDefault(release =>
                     release?.ClearingState == "APPROVED" &&
-                    release?.AllReleasesEmbedded?.Sw360attachments != null &&
+                    release.AllReleasesEmbedded?.Sw360attachments != null &&
                     release.AllReleasesEmbedded.Sw360attachments.Any(attachments =>
                         attachments.Count != 0 &&
                         attachments.Count(attachment => attachment?.AttachmentType == "SOURCE") == 1));
@@ -105,7 +104,7 @@ namespace LCT.SW360PackageCreator
         private static bool MoveToNextPage(ReleasesAllDetails releaseResponse, ref int page, ref int pageCount)
         {
             int currentPage = page;
-            int totalPages = (int)(releaseResponse?.Page?.TotalPages ?? 0);
+            int totalPages = releaseResponse?.Page?.TotalPages ?? 0;
 
             if (currentPage < totalPages - 1)
             {
