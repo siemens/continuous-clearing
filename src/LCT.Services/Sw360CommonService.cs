@@ -23,23 +23,18 @@ namespace LCT.Services
     /// <summary>
     /// The class SW360CommonService provides the common services
     /// </summary>
-    public class SW360CommonService : ISW360CommonService
+    /// <remarks>
+    /// constructor for the class SW360CommonService
+    /// </remarks>
+    /// <param name="sw360ApiCommunicationFacade"></param>
+    public class SW360CommonService(ISW360ApicommunicationFacade sw360ApiCommunicationFacade) : ISW360CommonService
     {
 
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private readonly ISW360ApicommunicationFacade m_SW360ApiCommunicationFacade;
+        private readonly ISW360ApicommunicationFacade m_SW360ApiCommunicationFacade = sw360ApiCommunicationFacade;
         private readonly List<string> externalIdKeyList = new List<string>() { "?package-url=", "?purl.id=" };
 
         #region constructor
-
-        /// <summary>
-        /// constructor for the class SW360CommonService
-        /// </summary>
-        /// <param name="sw360ApiCommunicationFacade"></param>
-        public SW360CommonService(ISW360ApicommunicationFacade sw360ApiCommunicationFacade)
-        {
-            m_SW360ApiCommunicationFacade = sw360ApiCommunicationFacade;
-        }
 
         #endregion
 
@@ -189,7 +184,7 @@ namespace LCT.Services
                 var listofSw360Releases = responseData?.Embedded?.Sw360Releases ?? new List<Sw360Releases>();
                 for (int i = 0; i < listofSw360Releases.Count; i++)
                 {
-                    if ((listofSw360Releases[i].Version?.ToLowerInvariant()).Equals(componentVersion, StringComparison.InvariantCultureIgnoreCase))
+                    if (listofSw360Releases[i].Version != null &&listofSw360Releases[i].Version.Equals(componentVersion, StringComparison.InvariantCultureIgnoreCase))
                     {
                         string urlofreleaseid = listofSw360Releases[i]?.Links?.Self?.Href ?? string.Empty;
                         releaseId = CommonHelper.GetSubstringOfLastOccurance(urlofreleaseid, "/");

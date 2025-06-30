@@ -17,6 +17,7 @@ using Moq;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace LCT.PackageIdentifier.UTest
@@ -520,6 +521,231 @@ namespace LCT.PackageIdentifier.UTest
             Assert.IsTrue(isUpdated, "Checks For Updated Property In List ");
 
         }
+
+        #region UpdateKpiDataBasedOnRepo Tests
+
+        [Test]
+        public void UpdateKpiDataBasedOnRepo_DevDepRepo_IncrementsDevdependencyComponents()
+        {
+            // Arrange
+            BomCreator.bomKpiData.DevdependencyComponents = 0;
+            var appSettings = CreateTestAppSettings();
+            appSettings.Maven.DevDepRepo = "dev-repo";
+            string repoValue = "dev-repo";
+
+            // Act
+            var method = typeof(MavenProcessor).GetMethod("UpdateKpiDataBasedOnRepo", BindingFlags.NonPublic | BindingFlags.Static);
+            method.Invoke(null, new object[] { repoValue, appSettings });
+
+            // Assert
+            Assert.AreEqual(1, BomCreator.bomKpiData.DevdependencyComponents);
+        }
+
+        [Test]
+        public void UpdateKpiDataBasedOnRepo_ThirdPartyRepo_IncrementsThirdPartyRepoComponents()
+        {
+            // Arrange
+            BomCreator.bomKpiData.ThirdPartyRepoComponents = 0;
+            var appSettings = CreateTestAppSettings();
+            appSettings.Maven.Artifactory.ThirdPartyRepos = new List<ThirdPartyRepo>
+            {
+                new ThirdPartyRepo { Name = "third-party-repo-1", Upload = true },
+                new ThirdPartyRepo { Name = "third-party-repo-2", Upload = false }
+            };
+            string repoValue = "third-party-repo-1";
+
+            // Act
+            var method = typeof(MavenProcessor).GetMethod("UpdateKpiDataBasedOnRepo", BindingFlags.NonPublic | BindingFlags.Static);
+            method.Invoke(null, new object[] { repoValue, appSettings });
+
+            // Assert
+            Assert.AreEqual(1, BomCreator.bomKpiData.ThirdPartyRepoComponents);
+        }
+
+        [Test]
+        public void UpdateKpiDataBasedOnRepo_ReleaseRepo_IncrementsReleaseRepoComponents()
+        {
+            // Arrange
+            BomCreator.bomKpiData.ReleaseRepoComponents = 0;
+            var appSettings = CreateTestAppSettings();
+            appSettings.Maven.ReleaseRepo = "release-repo";
+            string repoValue = "release-repo";
+
+            // Act
+            var method = typeof(MavenProcessor).GetMethod("UpdateKpiDataBasedOnRepo", BindingFlags.NonPublic | BindingFlags.Static);
+            method.Invoke(null, new object[] { repoValue, appSettings });
+
+            // Assert
+            Assert.AreEqual(1, BomCreator.bomKpiData.ReleaseRepoComponents);
+        }
+
+        [Test]
+        public void UpdateKpiDataBasedOnRepo_NotFoundInJFrog_IncrementsUnofficialComponents()
+        {
+            // Arrange
+            BomCreator.bomKpiData.UnofficialComponents = 0;
+            var appSettings = CreateTestAppSettings();
+            string repoValue = Dataconstant.NotFoundInJFrog;
+
+            // Act
+            var method = typeof(MavenProcessor).GetMethod("UpdateKpiDataBasedOnRepo", BindingFlags.NonPublic | BindingFlags.Static);
+            method.Invoke(null, new object[] { repoValue, appSettings });
+
+            // Assert
+            Assert.AreEqual(1, BomCreator.bomKpiData.UnofficialComponents);
+        }
+
+        [Test]
+        public void UpdateKpiDataBasedOnRepo_EmptyRepoValue_IncrementsUnofficialComponents()
+        {
+            // Arrange
+            BomCreator.bomKpiData.UnofficialComponents = 0;
+            var appSettings = CreateTestAppSettings();
+            string repoValue = "";
+
+            // Act
+            var method = typeof(MavenProcessor).GetMethod("UpdateKpiDataBasedOnRepo", BindingFlags.NonPublic | BindingFlags.Static);
+            method.Invoke(null, new object[] { repoValue, appSettings });
+
+            // Assert
+            Assert.AreEqual(1, BomCreator.bomKpiData.UnofficialComponents);
+        }
+
+        [Test]
+        public void UpdateKpiDataBasedOnRepo_ThirdPartyReposNull_DoesNotIncrementThirdPartyComponents()
+        {
+            // Arrange
+            BomCreator.bomKpiData.ThirdPartyRepoComponents = 0;
+            BomCreator.bomKpiData.UnofficialComponents = 0;
+            var appSettings = CreateTestAppSettings();
+            appSettings.Maven.Artifactory.ThirdPartyRepos = null;
+            string repoValue = "some-repo";
+
+            // Act
+            var method = typeof(MavenProcessor).GetMethod("UpdateKpiDataBasedOnRepo", BindingFlags.NonPublic | BindingFlags.Static);
+            method.Invoke(null, new object[] { repoValue, appSettings });
+
+            // Assert
+            Assert.AreEqual(0, BomCreator.bomKpiData.ThirdPartyRepoComponents);
+        }        
+
+        [Test]
+        public void UpdateKpiDataBasedOnRepo_DevDepRepoTakesPrecedence_OverThirdPartyRepo()
+        {
+            // Arrange
+            BomCreator.bomKpiData.DevdependencyComponents = 0;
+            BomCreator.bomKpiData.ThirdPartyRepoComponents = 0;
+            var appSettings = CreateTestAppSettings();
+            appSettings.Maven.DevDepRepo = "shared-repo";
+            appSettings.Maven.Artifactory.ThirdPartyRepos = new List<ThirdPartyRepo>
+            {
+                new ThirdPartyRepo { Name = "shared-repo", Upload = true }
+            };
+            string repoValue = "shared-repo";
+
+            // Act
+            var method = typeof(MavenProcessor).GetMethod("UpdateKpiDataBasedOnRepo", BindingFlags.NonPublic | BindingFlags.Static);
+            method.Invoke(null, new object[] { repoValue, appSettings });
+
+            // Assert
+            Assert.AreEqual(1, BomCreator.bomKpiData.DevdependencyComponents);
+            Assert.AreEqual(0, BomCreator.bomKpiData.ThirdPartyRepoComponents);
+        }
+
+        [Test]
+        public void UpdateKpiDataBasedOnRepo_ThirdPartyRepoTakesPrecedence_OverReleaseRepo()
+        {
+            // Arrange
+            BomCreator.bomKpiData.ThirdPartyRepoComponents = 0;
+            BomCreator.bomKpiData.ReleaseRepoComponents = 0;
+            var appSettings = CreateTestAppSettings();
+            appSettings.Maven.ReleaseRepo = "shared-repo";
+            appSettings.Maven.Artifactory.ThirdPartyRepos = new List<ThirdPartyRepo>
+            {
+                new ThirdPartyRepo { Name = "shared-repo", Upload = true }
+            };
+            string repoValue = "shared-repo";
+
+            // Act
+            var method = typeof(MavenProcessor).GetMethod("UpdateKpiDataBasedOnRepo", BindingFlags.NonPublic | BindingFlags.Static);
+            method.Invoke(null, new object[] { repoValue, appSettings });
+
+            // Assert
+            Assert.AreEqual(1, BomCreator.bomKpiData.ThirdPartyRepoComponents);
+            Assert.AreEqual(0, BomCreator.bomKpiData.ReleaseRepoComponents);
+        }
+
+        [Test]
+        public void UpdateKpiDataBasedOnRepo_MultipleThirdPartyRepos_MatchesCorrectRepo()
+        {
+            // Arrange
+            BomCreator.bomKpiData.ThirdPartyRepoComponents = 0;
+            var appSettings = CreateTestAppSettings();
+            appSettings.Maven.Artifactory.ThirdPartyRepos = new List<ThirdPartyRepo>
+            {
+                new ThirdPartyRepo { Name = "repo-1", Upload = true },
+                new ThirdPartyRepo { Name = "repo-2", Upload = false },
+                new ThirdPartyRepo { Name = "repo-3", Upload = true }
+            };
+            string repoValue = "repo-2";
+
+            // Act
+            var method = typeof(MavenProcessor).GetMethod("UpdateKpiDataBasedOnRepo", BindingFlags.NonPublic | BindingFlags.Static);
+            method.Invoke(null, new object[] { repoValue, appSettings });
+
+            // Assert
+            Assert.AreEqual(1, BomCreator.bomKpiData.ThirdPartyRepoComponents);
+        }
+
+        [Test]
+        public void UpdateKpiDataBasedOnRepo_CaseSensitive_RepoNameMatching()
+        {
+            // Arrange
+            BomCreator.bomKpiData.ThirdPartyRepoComponents = 0;
+            BomCreator.bomKpiData.UnofficialComponents = 0;
+            var appSettings = CreateTestAppSettings();
+            appSettings.Maven.Artifactory.ThirdPartyRepos = new List<ThirdPartyRepo>
+            {
+                new ThirdPartyRepo { Name = "Repo-Name", Upload = true }
+            };
+            string repoValue = "Not Found in JFrogRepo"; // Different case
+
+            // Act
+            var method = typeof(MavenProcessor).GetMethod("UpdateKpiDataBasedOnRepo", BindingFlags.NonPublic | BindingFlags.Static);
+            method.Invoke(null, new object[] { repoValue, appSettings });
+
+            // Assert
+            Assert.AreEqual(0, BomCreator.bomKpiData.ThirdPartyRepoComponents);
+            Assert.AreEqual(1, BomCreator.bomKpiData.UnofficialComponents);
+        }
+
+        [SetUp]
+        public void ResetBomKpiData()
+        {
+            // Reset KPI data before each test to ensure clean state
+            BomCreator.bomKpiData.DevdependencyComponents = 0;
+            BomCreator.bomKpiData.ThirdPartyRepoComponents = 0;
+            BomCreator.bomKpiData.ReleaseRepoComponents = 0;
+            BomCreator.bomKpiData.UnofficialComponents = 0;
+        }
+
+        private CommonAppSettings CreateTestAppSettings()
+        {
+            return new CommonAppSettings
+            {
+                Maven = new Config
+                {
+                    DevDepRepo = "default-dev-repo",
+                    ReleaseRepo = "default-release-repo",
+                    Artifactory = new Artifactory
+                    {
+                        ThirdPartyRepos = new List<ThirdPartyRepo>()
+                    }
+                }
+            };
+        }
+
+        #endregion
 
     }
 }

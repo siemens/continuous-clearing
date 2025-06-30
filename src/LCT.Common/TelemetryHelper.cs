@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -43,14 +44,8 @@ namespace LCT.Common
                 InitializeAndTrackEvent(TelemetryConstant.ToolName, catoolVersion, telemetryFor
                                                     , appSettings_);
                 TrackKpiDataTelemetry(telemetryFor, kpiData);
-            }
-            catch (ArgumentNullException ex)
-            {
-                Logger.Error($"An error occurred: {ex.Message}");
-                TrackException(ex);
-                environmentHelper.CallEnvironmentExit(-1);
-            }
-            catch (Exception ex)
+            }            
+            catch (Exception ex ) when (ex is ArgumentNullException or IOException)
             {
                 Logger.Error($"An error occurred: {ex.Message}");
                 TrackException(ex);

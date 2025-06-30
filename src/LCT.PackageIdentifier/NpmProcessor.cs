@@ -392,7 +392,7 @@ namespace LCT.PackageIdentifier
             return modifiedBOM;
         }
 
-        private Component ProcessComponent(Component component, List<AqlResult> aqlResultList, IBomHelper bomhelper, CommonAppSettings appSettings, Property projectType)
+        private static Component ProcessComponent(Component component, List<AqlResult> aqlResultList, IBomHelper bomhelper, CommonAppSettings appSettings, Property projectType)
         {
             string jfrogpackageName = bomhelper.GetFullNameOfComponent(component);
 
