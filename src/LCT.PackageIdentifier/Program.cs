@@ -38,7 +38,7 @@ namespace LCT.PackageIdentifier
     [ExcludeFromCodeCoverage]
     public class Program
     {
-        private static bool m_Verbose = false;
+        private bool m_Verbose = false;
 
         public static Stopwatch BomStopWatch { get; set; }
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);

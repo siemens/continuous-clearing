@@ -72,7 +72,7 @@ namespace LCT.PackageIdentifier
         }
 
 
-        public List<Component> ParsePackageLockJson(string filepath, CommonAppSettings appSettings)
+        public static List<Component> ParsePackageLockJson(string filepath, CommonAppSettings appSettings)
         {
             List<BundledComponents> bundledComponents = new List<BundledComponents>();
             List<Component> lstComponentForBOM = new List<Component>();
@@ -401,7 +401,7 @@ namespace LCT.PackageIdentifier
             AqlResult finalRepoData = GetJfrogArtifactoryRepoDetials(aqlResultList, component, bomhelper, out jfrogRepoPath);
             Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = finalRepoData.Repo };
 
-            Property siemensfileNameProp = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = finalRepoData?.Name ?? Dataconstant.PackageNameNotFoundInJfrog };
+            Property siemensfileNameProp = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = finalRepoData.Name ?? Dataconstant.PackageNameNotFoundInJfrog };
             Property jfrogRepoPathProp = new() { Name = Dataconstant.Cdx_JfrogRepoPath, Value = jfrogRepoPath };
             Component componentVal = component;
 
@@ -607,7 +607,7 @@ namespace LCT.PackageIdentifier
             return false;
         }
 
-        public AqlResult GetJfrogArtifactoryRepoDetials(List<AqlResult> aqlResultList,
+        public static AqlResult GetJfrogArtifactoryRepoDetials(List<AqlResult> aqlResultList,
                                                                 Component component,
                                                                 IBomHelper bomHelper,
                                                                 out string jfrogRepoPath)

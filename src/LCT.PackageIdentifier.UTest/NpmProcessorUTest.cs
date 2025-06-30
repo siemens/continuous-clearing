@@ -66,7 +66,7 @@ namespace LCT.PackageIdentifier.UTest
             var npmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
 
             // Act
-            var result = npmProcessor.GetJfrogArtifactoryRepoDetials(aqlResultList, component, bomHelperMock.Object, out string repoPath);
+            var result = NpmProcessor.GetJfrogArtifactoryRepoDetials(aqlResultList, component, bomHelperMock.Object, out string repoPath);
 
             // Assert
             Assert.NotNull(result);
@@ -115,7 +115,7 @@ namespace LCT.PackageIdentifier.UTest
             var npmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
 
             // Act
-            var result = npmProcessor.GetJfrogArtifactoryRepoDetials(aqlResultList, component, bomHelperMock.Object, out string repoPath);
+            var result = NpmProcessor.GetJfrogArtifactoryRepoDetials(aqlResultList, component, bomHelperMock.Object, out string repoPath);
 
             // Assert
             Assert.NotNull(result);

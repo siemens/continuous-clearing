@@ -555,7 +555,7 @@ namespace LCT.SW360PackageCreator
 
         private static string GetComponentAvailabilityStatus(List<Components> componentsAvailable, Components component)
         {
-            return componentsAvailable.Exists(x => x.Name.ToLowerInvariant() == component.Name.ToLowerInvariant()
+            return componentsAvailable.Exists(x => x.Name.Equals(component.Name, StringComparison.InvariantCultureIgnoreCase)
             || x.ComponentExternalId.Equals(component.ComponentExternalId, StringComparison.InvariantCultureIgnoreCase)) ? Dataconstant.Available : Dataconstant.NotAvailable;
         }
 

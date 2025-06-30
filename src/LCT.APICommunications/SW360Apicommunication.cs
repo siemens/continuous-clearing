@@ -51,7 +51,7 @@ namespace LCT.APICommunications
         private readonly string sw360UsersApi;
         private readonly int timeOut;
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
+        private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
         #endregion
 
         #region PUBLIC METHODS

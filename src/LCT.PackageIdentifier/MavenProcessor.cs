@@ -70,7 +70,7 @@ namespace LCT.PackageIdentifier
             BomCreator.bomKpiData.ComponentsInComparisonBOM = bom.Components.Count;
             Logger.Debug($"ParsePackageFile():End");
 
-            if (bom != null)
+            if (bom.Components != null)
             {
                 AddSiemensDirectProperty(ref bom);
             }
@@ -251,11 +251,10 @@ namespace LCT.PackageIdentifier
         }
 
         public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM,
-                                                                           CommonAppSettings appSettings,
-                                                                           IJFrogService jFrogService,
-                                                                           IBomHelper bomhelper)
+                                                                   CommonAppSettings appSettings,
+                                                                   IJFrogService jFrogService,
+                                                                   IBomHelper bomhelper)
         {
-
             // get the  component list from Jfrog for given repo + internal repo
             string[] repoList = CommonHelper.GetRepoList(appSettings);
             List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(repoList, jFrogService);
@@ -273,32 +272,10 @@ namespace LCT.PackageIdentifier
                 Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = finalRepoData?.Repo };
 
                 Component componentVal = component;
-                if (artifactoryrepo.Value == appSettings.Maven.DevDepRepo)
-                {
-                    BomCreator.bomKpiData.DevdependencyComponents++;
-                }
-                if (appSettings.Maven.Artifactory.ThirdPartyRepos != null)
-                {
-                    foreach (var thirdPartyRepo in appSettings.Maven.Artifactory.ThirdPartyRepos)
-                    {
-                        if (artifactoryrepo.Value == thirdPartyRepo.Name)
-                        {
-                            BomCreator.bomKpiData.ThirdPartyRepoComponents++;
-                            break;
-                        }
-                    }
 
-                }
-                if (artifactoryrepo.Value == appSettings.Maven.ReleaseRepo)
-                {
-                    BomCreator.bomKpiData.ReleaseRepoComponents++;
-                }
+                // Extract KPI update logic to helper method
+                UpdateKpiDataBasedOnRepo(artifactoryrepo.Value, appSettings);
 
-                if (artifactoryrepo.Value == Dataconstant.NotFoundInJFrog || artifactoryrepo.Value == "")
-                {
-                    BomCreator.bomKpiData.UnofficialComponents++;
-                }
-                
                 // Use common helper to set component properties and hashes
                 CommonHelper.SetComponentPropertiesAndHashes(componentVal, artifactoryrepo, projectType, siemensfileNameProp, jfrogRepoPathProp, hashes);
 
@@ -306,7 +283,7 @@ namespace LCT.PackageIdentifier
             }
 
             return modifiedBOM;
-        }
+        }        
 
         public async Task<ComponentIdentification> IdentificationOfInternalComponents(
            ComponentIdentification componentData, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
@@ -328,7 +305,42 @@ namespace LCT.PackageIdentifier
 
             return componentData;
         }
+        /// <summary>
+        /// Updates KPI data based on the repository value
+        /// </summary>
+        /// <param name="repoValue">The repository value to check</param>
+        /// <param name="appSettings">Application settings containing repository configurations</param>
+        private static void UpdateKpiDataBasedOnRepo(string repoValue, CommonAppSettings appSettings)
+        {
+            if (repoValue == appSettings.Maven.DevDepRepo)
+            {
+                BomCreator.bomKpiData.DevdependencyComponents++;
+                return;
+            }
 
+            if (appSettings.Maven.Artifactory.ThirdPartyRepos != null)
+            {
+                foreach (var thirdPartyRepo in appSettings.Maven.Artifactory.ThirdPartyRepos)
+                {
+                    if (repoValue == thirdPartyRepo.Name)
+                    {
+                        BomCreator.bomKpiData.ThirdPartyRepoComponents++;
+                        return;
+                    }
+                }
+            }
+
+            if (repoValue == appSettings.Maven.ReleaseRepo)
+            {
+                BomCreator.bomKpiData.ReleaseRepoComponents++;
+                return;
+            }
+
+            if (repoValue == Dataconstant.NotFoundInJFrog || repoValue == "")
+            {
+                BomCreator.bomKpiData.UnofficialComponents++;
+            }
+        }
         private static bool IsInternalMavenComponent(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
         {
             string jfrogcomponentName = $"{component.Name}-{component.Version}";

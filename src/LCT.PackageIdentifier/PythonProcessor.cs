@@ -37,8 +37,7 @@ namespace LCT.PackageIdentifier
             List<PythonPackage> listofComponents = new List<PythonPackage>();
             Bom bom = new Bom();
             List<Component> listComponentForBOM;
-            List<Dependency> dependencies = new List<Dependency>();
-            Bom templateDetails = new Bom();
+            List<Dependency> dependencies = new List<Dependency>();           
             List<string> listOfTemplateBomfilePaths = new List<string>();
             foreach (string config in configFiles)
             {
@@ -69,7 +68,7 @@ namespace LCT.PackageIdentifier
             bom = RemoveExcludedComponents(appSettings, bom);
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
 
-            if (bom != null)
+            if (bom.Components != null)
             {
                 AddSiemensDirectProperty(ref bom);
             }
