@@ -30,7 +30,7 @@ namespace LCT.Common
 
             telemetry_ = new LCT.Telemetry.Telemetry(TelemetryConstant.Type, new Dictionary<string, string>
                 {
-                { "ConnectionString", appSettings?.Telemetry?.ApplicationInsightConnectionString ?? string.Empty }
+                { "ConnectionString", appSettings?.Telemetry?.ApplicationInsightsConnectionString ?? string.Empty }
             });
         }
 

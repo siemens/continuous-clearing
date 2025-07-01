@@ -73,7 +73,7 @@ namespace LCT.Common
     public class Telemetry
     {
         public bool Enable { get; set; } = true;
-        public string ApplicationInsightConnectionString { get; set; }
+        public string ApplicationInsightsConnectionString { get; set; }
     }
     public class SW360
     {
