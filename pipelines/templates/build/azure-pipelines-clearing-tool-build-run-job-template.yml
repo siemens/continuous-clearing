@@ -56,7 +56,7 @@ jobs:
     displayName: ${{ parameters.jobDisplayName }}
     steps:
       - checkout: self
-      - checkout: git://Continuous-Clearing/ca-tool-config-and-testdata@refs/heads/main
+      - checkout: git://Continuous-Clearing/ca-tool-config-and-testdata@refs/heads/Telemetryperameternamechange
 
       - template: ../azure-pipelines-start-sw360-fossology-containers-template.yml
         parameters:
