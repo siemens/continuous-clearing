@@ -228,7 +228,7 @@ Description for the settings in appSettings.json file
 | 2    | ProjectType                               | Type of the project                                           | Yes             | `Nuget`, `NPM`, `Poetry`, `Conan`, `Alpine`, `Debian`, `Maven`                         |
 | 3    | MultipleProjectType                       | Whether multiple project types are supported                  | No              | `False`                                                                    |
 | 4    | Telemetry.Enable                          | Enable telemetry                                              | No              | `False`                                                                    |
-| 5    | Telemetry.ApplicationInsightInstrumentKey | Application Insights instrumentation key                      | No              | `123-456-789-123-123`                                                     |
+| 5    | Telemetry.ApplicationInsightConnectionString | Application Insights instrumentation key                      | No              | `123-456-789-123-123`                                                     |
 | 6    | SW360.URL                                 | URL of the SW360 server                                       | Yes             | [https://sw360.example.com](https://sw360.example.com)                   |
 | 7    | SW360.ProjectName                         | Name of the SW360 project                                     | Yes             | `MyProject`                                                                |
 | 8    | SW360.ProjectID                           | ID of the SW360 project                                       | Yes             | `57362e4179ce4e839f286ddf0b91d177`                                         |
