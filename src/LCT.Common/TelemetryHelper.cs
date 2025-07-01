@@ -20,12 +20,11 @@ namespace LCT.Common
     {
         private readonly ILog Logger;
         private readonly LCT.Telemetry.Telemetry telemetry_;
-        private readonly EnvironmentHelper environmentHelper;
+        private readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
         private readonly CommonAppSettings appSettings_;
 
         public TelemetryHelper(CommonAppSettings appSettings)
-        {
-            environmentHelper = new EnvironmentHelper();
+        {            
             Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
             appSettings_ = appSettings ?? new CommonAppSettings();
 
