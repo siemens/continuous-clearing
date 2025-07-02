@@ -39,6 +39,7 @@ namespace LCT.Common.Constants
         public const string NotCreated = "Not Created";
         public const string NotUploaded = "Not Uploaded";
         public const string NewClearing = "NEW_CLEARING";
+        public const string Approved = "APPROVED";
         public const string NotAvailable = "Not Available";
         public const string NotConfigured = "Not Configured";
         public const string AlreadyUploaded = "Already Uploaded";
