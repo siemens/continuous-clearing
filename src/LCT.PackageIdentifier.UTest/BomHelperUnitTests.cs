@@ -177,9 +177,7 @@ namespace LCT.PackageIdentifier.UTest
                 }
             };
 
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "DEBIAN",
                 Debian = new Config
@@ -235,9 +233,7 @@ namespace LCT.PackageIdentifier.UTest
                 }
             };
 
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "NPM",
                 Npm = new Config
@@ -305,10 +301,8 @@ namespace LCT.PackageIdentifier.UTest
                  Version="1",
                 }
             };
-
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "Nuget",
                 Nuget = new Config
@@ -367,9 +361,7 @@ namespace LCT.PackageIdentifier.UTest
                 }
             };
 
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "POETRY",
                 Poetry = new Config
@@ -439,9 +431,7 @@ namespace LCT.PackageIdentifier.UTest
                 }
             };
 
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "Conan",
                 Conan = new Config
@@ -497,9 +487,8 @@ namespace LCT.PackageIdentifier.UTest
                 }
             };
 
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "MAVEN",
                 Maven = new Config

@@ -9,7 +9,7 @@ using System.Reflection;
 
 namespace LCT.PackageIdentifier
 {
-    public class DisplayInformation
+    public static class DisplayInformation
     {
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static string DisplayIncludeFiles(CommonAppSettings appSettings)
@@ -77,7 +77,7 @@ namespace LCT.PackageIdentifier
             string totalString = string.Empty;
             if (appSettings?.SW360?.ExcludeComponents != null)
             {
-                totalString = string.Join(",", appSettings?.SW360?.ExcludeComponents?.ToList());
+                totalString = string.Join(",", appSettings.SW360?.ExcludeComponents?.ToList());
             }
             return totalString;
         }

@@ -23,23 +23,18 @@ namespace LCT.Services
     /// <summary>
     /// The class SW360CommonService provides the common services
     /// </summary>
-    public class SW360CommonService : ISW360CommonService
+    /// <remarks>
+    /// constructor for the class SW360CommonService
+    /// </remarks>
+    /// <param name="sw360ApiCommunicationFacade"></param>
+    public class SW360CommonService(ISW360ApicommunicationFacade sw360ApiCommunicationFacade) : ISW360CommonService
     {
 
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private readonly ISW360ApicommunicationFacade m_SW360ApiCommunicationFacade;
+        private readonly ISW360ApicommunicationFacade m_SW360ApiCommunicationFacade = sw360ApiCommunicationFacade;
         private readonly List<string> externalIdKeyList = new List<string>() { "?package-url=", "?purl.id=" };
 
         #region constructor
-
-        /// <summary>
-        /// constructor for the class SW360CommonService
-        /// </summary>
-        /// <param name="sw360ApiCommunicationFacade"></param>
-        public SW360CommonService(ISW360ApicommunicationFacade sw360ApiCommunicationFacade)
-        {
-            m_SW360ApiCommunicationFacade = sw360ApiCommunicationFacade;
-        }
 
         #endregion
 
@@ -189,7 +184,7 @@ namespace LCT.Services
                 var listofSw360Releases = responseData?.Embedded?.Sw360Releases ?? new List<Sw360Releases>();
                 for (int i = 0; i < listofSw360Releases.Count; i++)
                 {
-                    if (listofSw360Releases[i].Version?.ToLowerInvariant() == componentVersion.ToLowerInvariant())
+                    if (listofSw360Releases[i].Version != null &&listofSw360Releases[i].Version.Equals(componentVersion, StringComparison.InvariantCultureIgnoreCase))
                     {
                         string urlofreleaseid = listofSw360Releases[i]?.Links?.Self?.Href ?? string.Empty;
                         releaseId = CommonHelper.GetSubstringOfLastOccurance(urlofreleaseid, "/");
@@ -227,17 +222,13 @@ namespace LCT.Services
                 {
                     var purlids = JsonConvert.DeserializeObject<List<string>>(packageUrl);
 
-                    if (releaseCollection.ContainsKey(purlids.Count) && releaseCollection[purlids.Count].Name.ToLower().Equals(name.ToLower()))
+                    if (releaseCollection.TryGetValue(purlids.Count, out Sw360Releases value) && value.Name.ToLower().Equals(name.ToLower()))
                     {
                         // Do nothing
                     }
-                    else if (releaseCollection.ContainsKey(purlids.Count))
+                    else if (!releaseCollection.TryAdd(purlids.Count, release))
                     {
                         releaseCollection[1] = release;
-                    }
-                    else
-                    {
-                        releaseCollection.Add(purlids.Count, release);
                     }
                 }
                 catch (JsonReaderException)
@@ -268,17 +259,13 @@ namespace LCT.Services
                 {
                     var purlids = JsonConvert.DeserializeObject<List<string>>(packageUrl);
 
-                    if (componentCollection.ContainsKey(purlids.Count) && componentCollection[purlids.Count].Name.ToLower().Equals(name.ToLower()))
+                    if (componentCollection.TryGetValue(purlids.Count, out Sw360Components value) && value.Name.ToLower().Equals(name.ToLower()))
                     {
                         // Do nothing
                     }
-                    else if (componentCollection.ContainsKey(purlids.Count))
+                    else if (!componentCollection.TryAdd(purlids.Count, componentsData))
                     {
                         componentCollection[1] = componentsData;
-                    }
-                    else
-                    {
-                        componentCollection.Add(purlids.Count, componentsData);
                     }
                 }
                 catch (JsonReaderException)
@@ -336,33 +323,25 @@ namespace LCT.Services
 
         private static void UpdateCollection(string name, ref Dictionary<int, Sw360Components> componentCollection, Sw360Components components)
         {
-            if (componentCollection.ContainsKey(1) && componentCollection[1].Name.ToLower().Equals(name.ToLower()))
+            if (componentCollection.TryGetValue(1, out Sw360Components value) && value.Name.ToLower().Equals(name.ToLower()))
             {
                 // Do nothing
             }
-            else if (componentCollection.ContainsKey(1))
+            else if (!componentCollection.TryAdd(1, components))
             {
                 componentCollection[1] = components;
-            }
-            else
-            {
-                componentCollection.Add(1, components);
             }
         }
 
         private static void UpdateCollection(string name, ref Dictionary<int, Sw360Releases> releaseCollection, Sw360Releases release)
         {
-            if (releaseCollection.ContainsKey(1) && releaseCollection[1].Name.ToLower().Equals(name.ToLower()))
+            if (releaseCollection.TryGetValue(1, out Sw360Releases value) && value.Name.ToLower().Equals(name.ToLower()))
             {
                 // Do nothing
             }
-            else if (releaseCollection.ContainsKey(1))
+            else if (!releaseCollection.TryAdd(1, release))
             {
                 releaseCollection[1] = release;
-            }
-            else
-            {
-                releaseCollection.Add(1, release);
             }
         }
 

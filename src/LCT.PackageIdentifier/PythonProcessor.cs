@@ -24,17 +24,12 @@ using Component = CycloneDX.Models.Component;
 
 namespace LCT.PackageIdentifier
 {
-    public class PythonProcessor : IParser
+    public class PythonProcessor(ICycloneDXBomParser cycloneDXBomParser) : IParser
     {
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
 
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private readonly ICycloneDXBomParser _cycloneDXBomParser;
-
-        public PythonProcessor(ICycloneDXBomParser cycloneDXBomParser)
-        {
-            _cycloneDXBomParser = cycloneDXBomParser;
-        }
+        private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
 
         public Bom ParsePackageFile(CommonAppSettings appSettings)
         {
@@ -42,8 +37,7 @@ namespace LCT.PackageIdentifier
             List<PythonPackage> listofComponents = new List<PythonPackage>();
             Bom bom = new Bom();
             List<Component> listComponentForBOM;
-            List<Dependency> dependencies = new List<Dependency>();
-            Bom templateDetails = new Bom();
+            List<Dependency> dependencies = new List<Dependency>();           
             List<string> listOfTemplateBomfilePaths = new List<string>();
             foreach (string config in configFiles)
             {
@@ -74,7 +68,7 @@ namespace LCT.PackageIdentifier
             bom = RemoveExcludedComponents(appSettings, bom);
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
 
-            if (bom != null)
+            if (bom.Components != null)
             {
                 AddSiemensDirectProperty(ref bom);
             }
@@ -82,10 +76,10 @@ namespace LCT.PackageIdentifier
             return bom;
         }
 
-        public void AddSiemensDirectProperty(ref Bom bom)
+        public static void AddSiemensDirectProperty(ref Bom bom)
         {
             List<string> pythonDirectDependencies = new List<string>();
-            pythonDirectDependencies.AddRange(bom.Dependencies?.Select(x => x.Ref)?.ToList() ?? new List<string>());
+            pythonDirectDependencies.AddRange(bom.Dependencies?.Select(x => x.Ref).ToList() ?? new List<string>());
             var bomComponentsList = bom.Components;
             foreach (var component in bomComponentsList)
             {
@@ -297,19 +291,8 @@ namespace LCT.PackageIdentifier
         private static Bom RemoveExcludedComponents(CommonAppSettings appSettings,
             Bom cycloneDXBOM)
         {
-            List<Component> componentForBOM = cycloneDXBOM.Components.ToList();
-            List<Dependency> dependenciesForBOM = cycloneDXBOM.Dependencies?.ToList() ?? new List<Dependency>();
-            int noOfExcludedComponents = 0;
-            if (appSettings?.SW360?.ExcludeComponents != null)
-            {
-                componentForBOM = CommonHelper.RemoveExcludedComponents(componentForBOM, appSettings?.SW360?.ExcludeComponents, ref noOfExcludedComponents);
-                dependenciesForBOM = CommonHelper.RemoveInvalidDependenciesAndReferences(componentForBOM, dependenciesForBOM);
-                BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents;
-
-            }
-            cycloneDXBOM.Components = componentForBOM;
-            cycloneDXBOM.Dependencies = dependenciesForBOM;
-            return cycloneDXBOM;
+            return CommonHelper.RemoveExcludedComponentsFromBom(appSettings, cycloneDXBOM, 
+                noOfExcludedComponents => BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents);
         }
 
         public async Task<ComponentIdentification> IdentificationOfInternalComponents(ComponentIdentification componentData, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
@@ -318,37 +301,15 @@ namespace LCT.PackageIdentifier
             List<AqlResult> aqlResultList =
                 await bomhelper.GetPypiListOfComponentsFromRepo(appSettings.Poetry.Artifactory.InternalRepos, jFrogService);
 
-            // find the components in the list of internal components
-            List<Component> internalComponents = new List<Component>();
-            var internalComponentStatusUpdatedList = new List<Component>();
             var inputIterationList = componentData.comparisonBOMData;
+            
+            // Use the common helper method
+            var (processedComponents, internalComponents) = CommonHelper.ProcessInternalComponentIdentification(
+                inputIterationList, 
+                component => IsInternalPythonComponent(aqlResultList, component, bomhelper));
 
-            foreach (Component component in inputIterationList)
-            {
-                var currentIterationItem = component;
-                bool isTrue = IsInternalPythonComponent(aqlResultList, currentIterationItem, bomhelper);
-                if (currentIterationItem.Properties?.Count == null || currentIterationItem.Properties?.Count <= 0)
-                {
-                    currentIterationItem.Properties = new List<Property>();
-                }
-
-                Property isInternal = new() { Name = Dataconstant.Cdx_IsInternal, Value = "false" };
-                if (isTrue)
-                {
-                    internalComponents.Add(currentIterationItem);
-                    isInternal.Value = "true";
-                }
-                else
-                {
-                    isInternal.Value = "false";
-                }
-
-                currentIterationItem.Properties.Add(isInternal);
-                internalComponentStatusUpdatedList.Add(currentIterationItem);
-            }
-
-            // update the comparision bom data
-            componentData.comparisonBOMData = internalComponentStatusUpdatedList;
+            // update the comparison bom data
+            componentData.comparisonBOMData = processedComponents;
             componentData.internalComponents = internalComponents;
 
             return componentData;
@@ -388,76 +349,59 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in componentsForBOM)
             {
-                string jfrogPackageNameWhlExten = Dataconstant.PackageNameNotFoundInJfrog;
-                string jfrogRepoPath = Dataconstant.JfrogRepoPathNotFound;
-                string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper, out jfrogPackageNameWhlExten, out jfrogRepoPath);
-
-                var hashes = aqlResultList.FirstOrDefault(x => x.Properties.Any(p => p.Key == "pypi.normalized.name" && p.Value == component.Name) && x.Properties.Any(p => p.Key == "pypi.version" && p.Value == component.Version));
-
-                Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = repoName };
-                Property fileNameProperty = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = jfrogPackageNameWhlExten };
-                Property jfrogRepoPathProperty = new() { Name = Dataconstant.Cdx_JfrogRepoPath, Value = jfrogRepoPath };
-                Component componentVal = component;
-                if (artifactoryrepo.Value == appSettings.Poetry.DevDepRepo)
-                {
-                    BomCreator.bomKpiData.DevdependencyComponents++;
-                }
-                if (appSettings.Poetry.Artifactory.ThirdPartyRepos != null)
-                {
-                    foreach (var thirdPartyRepo in appSettings.Poetry.Artifactory.ThirdPartyRepos)
-                    {
-                        if (artifactoryrepo.Value == thirdPartyRepo.Name)
-                        {
-                            BomCreator.bomKpiData.ThirdPartyRepoComponents++;
-                            break;
-                        }
-                    }
-                }
-                if (artifactoryrepo.Value == appSettings.Poetry.ReleaseRepo)
-                {
-                    BomCreator.bomKpiData.ReleaseRepoComponents++;
-                }
-
-                if (artifactoryrepo.Value == Dataconstant.NotFoundInJFrog || artifactoryrepo.Value == "")
-                {
-                    BomCreator.bomKpiData.UnofficialComponents++;
-                }
-
-                if (componentVal.Properties?.Count == null || componentVal.Properties?.Count <= 0)
-                {
-                    componentVal.Properties = new List<Property>();
-                }
-                componentVal.Properties.Add(artifactoryrepo);
-                componentVal.Properties.Add(projectType);
-                componentVal.Properties.Add(fileNameProperty);
-                componentVal.Properties.Add(jfrogRepoPathProperty);
-                componentVal.Description = null;
-                if (hashes != null)
-                {
-                    componentVal.Hashes = new List<Hash>()
-                {
-
-                new()
-                 {
-                  Alg = Hash.HashAlgorithm.MD5,
-                  Content = hashes.MD5
-                },
-                new()
-                {
-                  Alg = Hash.HashAlgorithm.SHA_1,
-                  Content = hashes.SHA1
-                 },
-                 new()
-                 {
-                  Alg = Hash.HashAlgorithm.SHA_256,
-                  Content = hashes.SHA256
-                  }
-                  };
-
-                }
-                modifiedBOM.Add(componentVal);
+                var processedComponent = ProcessPythonComponent(component, aqlResultList, bomhelper, appSettings, projectType);
+                modifiedBOM.Add(processedComponent);
             }
             return modifiedBOM;
+        }
+
+        private static Component ProcessPythonComponent(Component component, List<AqlResult> aqlResultList, IBomHelper bomhelper, CommonAppSettings appSettings, Property projectType)
+        {
+            string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper, out string jfrogPackageNameWhlExten, out string jfrogRepoPath);
+
+            var hashes = aqlResultList.FirstOrDefault(x => x.Properties.Any(p => p.Key == "pypi.normalized.name" && p.Value == component.Name) && x.Properties.Any(p => p.Key == "pypi.version" && p.Value == component.Version));
+
+            Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = repoName };
+            Property fileNameProperty = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = jfrogPackageNameWhlExten };
+            Property jfrogRepoPathProperty = new() { Name = Dataconstant.Cdx_JfrogRepoPath, Value = jfrogRepoPath };
+            Component componentVal = component;
+
+            UpdatePythonKpiDataBasedOnRepo(artifactoryrepo.Value, appSettings);
+
+            // Use common helper to set component properties and hashes
+            CommonHelper.SetComponentPropertiesAndHashes(componentVal, artifactoryrepo, projectType, fileNameProperty, jfrogRepoPathProperty, hashes);
+
+            return componentVal;
+        }
+
+        private static void UpdatePythonKpiDataBasedOnRepo(string repoValue, CommonAppSettings appSettings)
+        {
+            if (repoValue == appSettings.Poetry.DevDepRepo)
+            {
+                BomCreator.bomKpiData.DevdependencyComponents++;
+            }
+            
+            if (appSettings.Poetry.Artifactory.ThirdPartyRepos != null)
+            {
+                foreach (var thirdPartyRepo in appSettings.Poetry.Artifactory.ThirdPartyRepos)
+                {
+                    if (repoValue == thirdPartyRepo.Name)
+                    {
+                        BomCreator.bomKpiData.ThirdPartyRepoComponents++;
+                        break;
+                    }
+                }
+            }
+            
+            if (repoValue == appSettings.Poetry.ReleaseRepo)
+            {
+                BomCreator.bomKpiData.ReleaseRepoComponents++;
+            }
+
+            if (repoValue == Dataconstant.NotFoundInJFrog || repoValue == "")
+            {
+                BomCreator.bomKpiData.UnofficialComponents++;
+            }
         }
 
         private static string GetArtifactoryRepoName(List<AqlResult> aqlResultList,

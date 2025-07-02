@@ -21,7 +21,7 @@ using System.Reflection;
 
 namespace LCT.ArtifactoryUploader
 {
-    public class PackageUploadInformation
+    public static class PackageUploadInformation
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static DisplayPackagesInfo GetComponentsToBePackages()
@@ -60,55 +60,33 @@ namespace LCT.ArtifactoryUploader
         {
             List<ComponentsToArtifactory> uploadedPackages = new List<ComponentsToArtifactory>();
 
-            foreach (var item in displayPackagesInfo.JfrogFoundPackagesConan)
-            {
-                if (item.ResponseMessage?.StatusCode == HttpStatusCode.OK)
-                {
-                    uploadedPackages.Add(item);
-                }
-            }
-
-            foreach (var item in displayPackagesInfo.JfrogFoundPackagesMaven)
-            {
-                if (item.ResponseMessage?.StatusCode == HttpStatusCode.OK)
-                {
-                    uploadedPackages.Add(item);
-                }
-            }
-
-            foreach (var item in displayPackagesInfo.JfrogFoundPackagesNpm)
-            {
-                if (item.ResponseMessage?.StatusCode == HttpStatusCode.OK)
-                {
-                    uploadedPackages.Add(item);
-                }
-            }
-
-            foreach (var item in displayPackagesInfo.JfrogFoundPackagesNuget)
-            {
-                if (item.ResponseMessage?.StatusCode == HttpStatusCode.OK)
-                {
-                    uploadedPackages.Add(item);
-                }
-            }
-
-            foreach (var item in displayPackagesInfo.JfrogFoundPackagesPython)
-            {
-                if (item.ResponseMessage?.StatusCode == HttpStatusCode.OK)
-                {
-                    uploadedPackages.Add(item);
-                }
-            }
-
-            foreach (var item in displayPackagesInfo.JfrogFoundPackagesDebian)
-            {
-                if (item.ResponseMessage?.StatusCode == HttpStatusCode.OK)
-                {
-                    uploadedPackages.Add(item);
-                }
-            }
+            // Use a helper method to process each package type
+            AddSuccessfulPackages(uploadedPackages, displayPackagesInfo.JfrogFoundPackagesConan);
+            AddSuccessfulPackages(uploadedPackages, displayPackagesInfo.JfrogFoundPackagesMaven);
+            AddSuccessfulPackages(uploadedPackages, displayPackagesInfo.JfrogFoundPackagesNpm);
+            AddSuccessfulPackages(uploadedPackages, displayPackagesInfo.JfrogFoundPackagesNuget);
+            AddSuccessfulPackages(uploadedPackages, displayPackagesInfo.JfrogFoundPackagesPython);
+            AddSuccessfulPackages(uploadedPackages, displayPackagesInfo.JfrogFoundPackagesDebian);
 
             return uploadedPackages;
+        }
+
+        /// <summary>
+        /// Helper method to add packages with successful status codes to the uploaded packages list
+        /// </summary>
+        /// <param name="uploadedPackages">The list to add successful packages to</param>
+        /// <param name="packages">The packages to check</param>
+        private static void AddSuccessfulPackages(List<ComponentsToArtifactory> uploadedPackages, List<ComponentsToArtifactory> packages)
+        {
+            if (packages == null) return;
+
+            foreach (var item in packages)
+            {
+                if (item.ResponseMessage?.StatusCode == HttpStatusCode.OK)
+                {
+                    uploadedPackages.Add(item);
+                }
+            }
         }
         public static void DisplayPackageUploadInformation(DisplayPackagesInfo displayPackagesInfo)
         {
@@ -124,7 +102,7 @@ namespace LCT.ArtifactoryUploader
         }
         private static void DisplaySortedForeachComponents(List<ComponentsToArtifactory> unknownPackages, List<ComponentsToArtifactory> JfrogNotFoundPackages, List<ComponentsToArtifactory> SucessfullPackages, List<ComponentsToArtifactory> JfrogFoundPackages, string name, string filename)
         {
-            if (unknownPackages.Any() || JfrogNotFoundPackages.Any() || SucessfullPackages.Any() || JfrogFoundPackages.Any())
+            if (unknownPackages.Count != 0 || JfrogNotFoundPackages.Count != 0 || SucessfullPackages.Count != 0 || JfrogFoundPackages.Count != 0)
             {
                 Logger.Info("\n" + name + ":\n");
                 DisplayErrorForUnknownPackages(unknownPackages, name, filename);
@@ -137,7 +115,7 @@ namespace LCT.ArtifactoryUploader
         public static void DisplayErrorForJfrogFoundPackages(List<ComponentsToArtifactory> JfrogFoundPackages)
         {
 
-            if (JfrogFoundPackages.Any())
+            if (JfrogFoundPackages.Count != 0)
             {
 
                 foreach (var jfrogFoundPackage in JfrogFoundPackages)
@@ -166,7 +144,7 @@ namespace LCT.ArtifactoryUploader
         public static void DisplayErrorForJfrogPackages(List<ComponentsToArtifactory> JfrogNotFoundPackages)
         {
 
-            if (JfrogNotFoundPackages.Any())
+            if (JfrogNotFoundPackages.Count != 0)
             {
 
                 foreach (var jfrogNotFoundPackage in JfrogNotFoundPackages)
@@ -181,7 +159,7 @@ namespace LCT.ArtifactoryUploader
         private static void DisplayErrorForSucessfullPackages(List<ComponentsToArtifactory> SucessfullPackages)
         {
 
-            if (SucessfullPackages.Any())
+            if (SucessfullPackages.Count != 0)
             {
 
                 foreach (var sucessfullPackage in SucessfullPackages)
@@ -198,7 +176,7 @@ namespace LCT.ArtifactoryUploader
             IFileOperations fileOperations = new FileOperations();
             var filename = Path.Combine(filepath, $"Artifactory_{FileConstant.artifactoryReportNotApproved}");
 
-            if (unknownPackages.Any())
+            if (unknownPackages.Count != 0)
             {
                 var packageHandlers = new Dictionary<string, Action<List<ComponentsToArtifactory>, ProjectResponse, IFileOperations, string, string>>
         {

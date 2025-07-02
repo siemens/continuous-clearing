@@ -34,8 +34,8 @@ namespace LCT.SW360PackageCreator
     [ExcludeFromCodeCoverage]
     public class Program
     {
-        public static Stopwatch CreatorStopWatch { get; set; }
         private static bool m_Verbose = false;
+        public static Stopwatch CreatorStopWatch { get; set; }
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
 
@@ -49,15 +49,14 @@ namespace LCT.SW360PackageCreator
             if (!m_Verbose && CommonHelper.IsAzureDevOpsDebugEnabled())
                 m_Verbose = true;
 
-            ISettingsManager settingsManager = new SettingsManager();
+            SettingsManager settingsManager = new SettingsManager();
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
             CommonHelper.DefaultLogFolderInitialisation(FileConstant.ComponentCreatorLog, m_Verbose);
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
 
-            ISW360ApicommunicationFacade sW360ApicommunicationFacade;
-            ISw360ProjectService sw360ProjectService = Getsw360ProjectServiceObject(appSettings, out sW360ApicommunicationFacade);
+            ISw360ProjectService sw360ProjectService = Getsw360ProjectServiceObject(appSettings, out ISW360ApicommunicationFacade sW360ApicommunicationFacade);
             ProjectReleases projectReleases = new ProjectReleases();
 
             string FolderPath = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.ComponentCreatorLog, m_Verbose);
@@ -102,10 +101,10 @@ namespace LCT.SW360PackageCreator
             }
             await InitiatePackageCreatorProcess(appSettings, sw360ProjectService, sW360ApicommunicationFacade);
             // Initialize telemetry with CATool version and instrumentation key only if Telemetry is enabled in appsettings
-            if (appSettings.Telemetry.Enable == true)
+            if (appSettings.Telemetry.Enable)
             {
                 TelemetryHelper telemetryHelper = new TelemetryHelper(appSettings);
-                telemetryHelper.StartTelemetry(caToolInformation.CatoolVersion, ComponentCreator.kpiData, TelemetryConstant.CreatorKpiData);
+                telemetryHelper.StartTelemetry(caToolInformation.CatoolVersion, ComponentCreator.KpiData, TelemetryConstant.CreatorKpiData);
             }
             Logger.Logger.Log(null, Level.Notice, $"End of Package Creator execution: {DateTime.Now}\n", null);
 
@@ -160,7 +159,7 @@ namespace LCT.SW360PackageCreator
             ICreatorHelper creatorHelper = new CreatorHelper(_packageDownloderList);
 
             // parsing the input file
-            IComponentCreator componentCreator = new ComponentCreator();
+            ComponentCreator componentCreator = new ComponentCreator();
             List<ComparisonBomData> parsedBomData = await componentCreator.CycloneDxBomParser(appSettings, sw360Service, cycloneDXBomParser, creatorHelper);
 
             // initializing Component creation 
