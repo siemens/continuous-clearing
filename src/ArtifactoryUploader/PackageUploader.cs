@@ -81,7 +81,6 @@ namespace LCT.ArtifactoryUploader
             // set the error code
             if (uploaderKpiData.PackagesNotUploadedDueToError > 0 || uploaderKpiData.PackagesNotExistingInRemoteCache > 0)
             {
-                EnvironmentHelper environmentHelper = new EnvironmentHelper();
                 environmentHelper.CallEnvironmentExit(2);
                 Logger.Debug("Setting ExitCode to 2");
             }
@@ -152,9 +151,9 @@ namespace LCT.ArtifactoryUploader
 
             // Log the settings for the project
             Logger.Logger.Log(null, Level.Notice,
-                $"\tDEVDEP_REPO_NAME:\t{project.DevDepRepo}\n" +
+                $"\tDEVDEP_REPO_NAME:\t{devDepRepoName}\n" +
                 $"\tTHIRD_PARTY_REPO_NAME:\t{thirdPartyRepoName}\n" +
-                $"\tRELEASE_REPO_NAME:\t{project.ReleaseRepo}\n" +
+                $"\tRELEASE_REPO_NAME:\t{releaseRepoName}\n" +
                 $"\tConfig:\n" +
                 $"\t\tExclude:\t\t{excludeList}\n" +
                 $"\t\tInclude:\t\t{includeList}\n", null);

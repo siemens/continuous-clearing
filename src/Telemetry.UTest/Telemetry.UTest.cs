@@ -27,10 +27,10 @@ namespace LCT.Telemetry.UTest
             string telemetryType = "1";
             configuration = new Dictionary<string, string>
             {
-                { "InstrumentationKey", "1" }
+                { "ConnectionString", "1" }
             };
             _telemetry = new LCT.Telemetry.Telemetry(telemetryType, configuration);
-            aiConfig.InstrumentationKey = "1";
+            aiConfig.ConnectionString = $"InstrumentationKey=1";
             _mockTelemetryClient = new TelemetryClient(aiConfig);
         }
         [Test]

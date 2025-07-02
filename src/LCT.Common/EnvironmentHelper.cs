@@ -11,14 +11,14 @@ namespace LCT.Common
 {
     public class EnvironmentHelper : IEnvironmentHelper
     {
-        public void CallEnvironmentExit(int code)
+        public void CallEnvironmentExit(int exitCode)
         {
-            if (code == -1 || code == 0)
+            if (exitCode == -1 || exitCode == 0)
             {
                 PipelineArtifactUploader.UploadLogs();
-                EnvironmentExit(code);
+                EnvironmentExit(exitCode);
             }
-            else if (code == 2)
+            else if (exitCode == 2)
             {
                 Environment.ExitCode = 2;
             }

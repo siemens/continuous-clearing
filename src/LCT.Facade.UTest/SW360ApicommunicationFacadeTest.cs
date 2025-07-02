@@ -36,7 +36,7 @@ namespace LCT.Facade.UTest
             mockSw360comm.Setup(x => x.GetProjects()).ReturnsAsync("TestProject");
 
             //Act          
-            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object, false);
+            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object);
             string actual = await sW360ApicommunicationFacade.GetProjects();
 
             //Assert
@@ -52,7 +52,7 @@ namespace LCT.Facade.UTest
             mockSw360comm.Setup(x => x.GetSw360Users()).ReturnsAsync("TestUser");
 
             //Act          
-            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object, false);
+            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object);
             string actual = await sW360ApicommunicationFacade.GetSw360Users();
 
             //Assert
@@ -67,7 +67,7 @@ namespace LCT.Facade.UTest
             mockSw360comm.Setup(x => x.GetProjectsByName(It.IsAny<string>())).ReturnsAsync("ProjectInfo");
 
             //Act          
-            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object, false);
+            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object);
             string actual = await sW360ApicommunicationFacade.GetProjectsByName("Test");
 
             //Assert
@@ -83,7 +83,7 @@ namespace LCT.Facade.UTest
             mockSw360comm.Setup(x => x.GetProjectById(It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
 
             //Act          
-            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object, false);
+            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object);
             HttpResponseMessage actual = await sW360ApicommunicationFacade.GetProjectById("ewehieiwriosdjkhdjksdfd");
 
             //Assert
@@ -98,7 +98,7 @@ namespace LCT.Facade.UTest
             mockSw360comm.Setup(x => x.GetReleases()).ReturnsAsync("Zone.js_v1.0.0");
 
             //Act          
-            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object, false);
+            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object);
             string actual = await sW360ApicommunicationFacade.GetReleases();
 
             //Assert
@@ -114,7 +114,7 @@ namespace LCT.Facade.UTest
             mockSw360comm.Setup(x => x.GetReleaseById(It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
 
             //Act          
-            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object, false);
+            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object);
             HttpResponseMessage actual = await sW360ApicommunicationFacade.GetReleaseById("8454858hjfjkdshldsfhiruewi");
 
             //Assert
@@ -130,7 +130,7 @@ namespace LCT.Facade.UTest
             mockSw360comm.Setup(x => x.GetReleaseByCompoenentName(It.IsAny<string>())).ReturnsAsync("httpResponseMessage");
 
             //Act          
-            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object, false);
+            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object);
             string actual = await sW360ApicommunicationFacade.GetReleaseByCompoenentName("8454858hjfjkdshldsfhiruewi");
 
             //Assert
@@ -146,7 +146,7 @@ namespace LCT.Facade.UTest
             mockSw360comm.Setup(x => x.CheckFossologyProcessStatus(It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
 
             //Act          
-            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object, false);
+            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object);
             HttpResponseMessage actual = await sW360ApicommunicationFacade.CheckFossologyProcessStatus(@"http:\\8454858hjfjkdshldsfhiruewi");
 
             //Assert
@@ -162,7 +162,7 @@ namespace LCT.Facade.UTest
             mockSw360comm.Setup(x => x.UpdateComponent(It.IsAny<string>(), It.IsAny<HttpContent>())).ReturnsAsync(httpResponseMessage);
             StringContent content = new StringContent(JsonConvert.SerializeObject("string content"), Encoding.UTF8, "application/json");
             //Act          
-            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object, false);
+            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object);
             HttpResponseMessage actual = await sW360ApicommunicationFacade.UpdateComponent(@"http:\\8454858hjfjkdshldsfhiruewi", content);
 
             //Assert
@@ -178,7 +178,7 @@ namespace LCT.Facade.UTest
             mockSw360comm.Setup(x => x.UpdateComponent(It.IsAny<string>(), It.IsAny<HttpContent>())).ReturnsAsync(httpResponseMessage);
             StringContent content = new StringContent(JsonConvert.SerializeObject("string content"), Encoding.UTF8, "application/json");
             //Act          
-            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object, true);
+            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object);
             HttpResponseMessage actual = await sW360ApicommunicationFacade.UpdateComponent(@"http:\\8454858hjfjkdshldsfhiruewi", content);
 
             //Assert
@@ -194,7 +194,7 @@ namespace LCT.Facade.UTest
             mockSw360comm.Setup(x => x.GetReleaseByLink(It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
 
             //Act          
-            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object, false);
+            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object);
             HttpResponseMessage actual = await sW360ApicommunicationFacade.GetReleaseByLink(
                 "http://md2pdvnc:8095/group/guest/components/-/component/release/detailRelease/51b3523a1b038d6b4caadc1ada38667c/51b3523a1b038d6b4caadc1ada46ca38#/tab-Summary");
 
@@ -211,7 +211,7 @@ namespace LCT.Facade.UTest
             mockSw360comm.Setup(x => x.LinkReleasesToProject(It.IsAny<HttpContent>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
 
             //Act          
-            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object, true);
+            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object);
             StringContent content = new StringContent(JsonConvert.SerializeObject("{ \"12345\" : { \"releaseRelation\" : \"UNKNOWN\", \"comment\" : \"Test Comment 1\" }, \"54321\" : { \"releaseRelation\" : \"UNKNOWN\", \"comment\" : \"Test Comment 2\" } }"), Encoding.UTF8, "application/json");
             HttpResponseMessage actual = await sW360ApicommunicationFacade.LinkReleasesToProject(content, "ieuroejfklsndksdoldmfiosdfowemlfiwe");
 
@@ -228,7 +228,7 @@ namespace LCT.Facade.UTest
             mockSw360comm.Setup(x => x.LinkReleasesToProject(It.IsAny<HttpContent>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
 
             //Act          
-            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object, false);
+            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object);
             StringContent content = new StringContent(JsonConvert.SerializeObject("{ \"12345\" : { \"releaseRelation\" : \"UNKNOWN\", \"comment\" : \"Test Comment 1\" }, \"54321\" : { \"releaseRelation\" : \"UNKNOWN\", \"comment\" : \"Test Comment 2\" } }"), Encoding.UTF8, "application/json");
             HttpResponseMessage actual = await sW360ApicommunicationFacade.LinkReleasesToProject(content, "ieuroejfklsndksdoldmfiosdfowemlfiwe");
 
@@ -236,10 +236,8 @@ namespace LCT.Facade.UTest
             Assert.That(actual.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         }
 
-        [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public async Task CreateComponent_OnNonTestMode_ForGivenReleaseIdArray_ReturnsHttpResponse(bool testmode)
+        [Test]        
+        public async Task CreateComponent_OnNonTestMode_ForGivenReleaseIdArray_ReturnsHttpResponse()
         {
             //Arrange 
             CreateComponent createComponent = new CreateComponent();
@@ -248,7 +246,7 @@ namespace LCT.Facade.UTest
             mockSw360comm.Setup(x => x.CreateComponent(It.IsAny<CreateComponent>())).ReturnsAsync(httpResponseMessage);
 
             //Act          
-            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object, testmode);
+            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object);
             HttpResponseMessage actual = await sW360ApicommunicationFacade.CreateComponent(createComponent);
 
             //Assert
@@ -265,7 +263,7 @@ namespace LCT.Facade.UTest
             mockSw360comm.Setup(x => x.CreateRelease(It.IsAny<Releases>())).ReturnsAsync(httpResponseMessage);
 
             //Act          
-            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object, true);
+            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object);
             HttpResponseMessage actual = await sW360ApicommunicationFacade.CreateRelease(releases);
 
             //Assert
@@ -282,7 +280,7 @@ namespace LCT.Facade.UTest
             mockSw360comm.Setup(x => x.CreateRelease(It.IsAny<Releases>())).ReturnsAsync(httpResponseMessage);
 
             //Act          
-            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object, false);
+            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object);
             HttpResponseMessage actual = await sW360ApicommunicationFacade.CreateRelease(releases);
 
             //Assert
@@ -297,7 +295,7 @@ namespace LCT.Facade.UTest
             mockSw360comm.Setup(x => x.GetReleaseOfComponentById(It.IsAny<string>())).ReturnsAsync("{name:zone.js,version:0.1.1}");
 
             //Act          
-            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object, false);
+            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object);
             string actual = await sW360ApicommunicationFacade.GetReleaseOfComponentById("ewifwekfnlskifklsdfklsdijf");
 
             //Assert
@@ -313,7 +311,7 @@ namespace LCT.Facade.UTest
             mockSw360comm.Setup(x => x.GetReleaseAttachments(It.IsAny<string>())).ReturnsAsync("{name:zone.js,version:0.1.1,type:Binary}");
 
             //Act          
-            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object, false);
+            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object);
             string actual = await sW360ApicommunicationFacade.GetReleaseAttachments("ewifwekfnlskifklsdfklsdijf");
 
             //Assert
@@ -328,7 +326,7 @@ namespace LCT.Facade.UTest
             mockSw360comm.Setup(x => x.GetAttachmentInfo(It.IsAny<string>())).ReturnsAsync("{name:zone.js,version:0.1.1,type:Binary}");
 
             //Act          
-            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object, false);
+            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object);
             string actual = await sW360ApicommunicationFacade.GetAttachmentInfo("ewifwekfnlskifklsdfklsdijf");
 
             //Assert
@@ -343,7 +341,7 @@ namespace LCT.Facade.UTest
             mockSw360comm.Setup(x => x.DownloadAttachmentUsingWebClient(It.IsAny<string>(), It.IsAny<string>()));
 
             //Act          
-            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object, false);
+            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object);
             sW360ApicommunicationFacade.DownloadAttachmentUsingWebClient("", "zone.js_1.0.0_source.zip");
 
             //Assert
@@ -351,9 +349,7 @@ namespace LCT.Facade.UTest
         }
 
         [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public async Task UpdateRelease_OnNonTestMode_ForGivenReleaseId_ReturnsHttpResponse(bool testMode)
+        public async Task UpdateRelease_OnNonTestMode_ForGivenReleaseId_ReturnsHttpResponse()
         {
             //Arrange 
             string uploadContent = string.Empty;
@@ -363,7 +359,7 @@ namespace LCT.Facade.UTest
             mockSw360comm.Setup(x => x.UpdateRelease(It.IsAny<string>(), It.IsAny<HttpContent>())).ReturnsAsync(httpResponseMessage);
 
             //Act          
-            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object, testMode);
+            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object);
             HttpResponseMessage actual = await sW360ApicommunicationFacade.UpdateRelease("ReleasjndaIdsdjflsd394392io", content);
 
             //Assert
@@ -378,8 +374,9 @@ namespace LCT.Facade.UTest
             Mock<ISw360ApiCommunication> mockSw360comm = new Mock<ISw360ApiCommunication>();
             mockSw360comm.Setup(x => x.AttachComponentSourceToSW360(It.IsAny<AttachReport>(), It.IsAny<ComparisonBomData>())).Returns("SuccessInfo");
             ComparisonBomData comparisonBomData = new ComparisonBomData();
-            //Act          
-            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object, false);
+            
+            //Act 
+            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object);
             string actual = sW360ApicommunicationFacade.AttachComponentSourceToSW360(attachReport,comparisonBomData);
 
             //Assert
@@ -395,7 +392,7 @@ namespace LCT.Facade.UTest
             mockSw360comm.Setup(x => x.GetComponentDetailsByUrl(It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
 
             //Act          
-            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object, false);
+            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object);
             HttpResponseMessage actual = await sW360ApicommunicationFacade.GetComponentDetailsByUrl("http://localhost:8090/group/guest/components/-/component/detail/df4b068f87dfd9e09a1e016b4b148b49#/tab-Releases");
 
             //Assert
@@ -410,7 +407,7 @@ namespace LCT.Facade.UTest
             mockSw360comm.Setup(x => x.GetComponentByName(It.IsAny<string>())).ReturnsAsync("ComponentInfo");
 
             //Act          
-            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object, false);
+            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object);
             string actual = await sW360ApicommunicationFacade.GetComponentByName("Zone.js");
 
             //Assert
@@ -426,7 +423,7 @@ namespace LCT.Facade.UTest
             mockSw360comm.Setup(x => x.GetComponentUsingName(It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
 
             //Act          
-            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object, false);
+            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object);
             HttpResponseMessage actual = await sW360ApicommunicationFacade.GetComponentUsingName("@angular/animation");
 
             //Assert
@@ -443,7 +440,7 @@ namespace LCT.Facade.UTest
             mockSw360comm.Setup(x => x.UpdateLinkedRelease(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<UpdateLinkedRelease>())).ReturnsAsync(httpResponseMessage);
 
             //Act          
-            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object, false);
+            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object);
             HttpResponseMessage actual = await sW360ApicommunicationFacade.UpdateLinkedRelease("ProejctID945u4t", "Releasdsaindsds", updateLinkedRelease);
 
             //Assert
@@ -459,7 +456,7 @@ namespace LCT.Facade.UTest
             mockSw360comm.Setup(x => x.GetReleaseByExternalId(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
 
             //Act          
-            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object, false);
+            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object);
             HttpResponseMessage actual = await sW360ApicommunicationFacade.GetReleaseByExternalId("pkg:npm:@angular/animation@1.0.0");
 
             //Assert
@@ -475,7 +472,7 @@ namespace LCT.Facade.UTest
             mockSw360comm.Setup(x => x.GetComponentByExternalId(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
 
             //Act          
-            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object, false);
+            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object);
             HttpResponseMessage actual = await sW360ApicommunicationFacade.GetComponentByExternalId("pkg:npm:@angular/animation");
 
             //Assert
@@ -492,7 +489,7 @@ namespace LCT.Facade.UTest
             mockSw360comm.Setup(x => x.GetProjectsByTag(It.IsAny<string>())).ReturnsAsync(httpResponseMessage);
 
             //Act          
-            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object, false);
+            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object);
             HttpResponseMessage actual = await sW360ApicommunicationFacade.GetProjectsByTag("SI DG EA-P&R");
 
             //Assert

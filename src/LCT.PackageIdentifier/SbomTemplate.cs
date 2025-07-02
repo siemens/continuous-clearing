@@ -33,7 +33,7 @@ namespace LCT.PackageIdentifier
         public static string GetFilePathForTemplate(List<string> filePaths)
         {
             string firstFilePath = string.Empty;
-            if (filePaths != null && filePaths.Any())
+            if (filePaths != null && filePaths.Count != 0)
             {
                 firstFilePath = filePaths.First();
                 if (filePaths.Count > 1)

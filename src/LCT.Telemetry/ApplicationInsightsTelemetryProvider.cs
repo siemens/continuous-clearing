@@ -15,16 +15,16 @@ namespace LCT.Telemetry
 
         public ApplicationInsightsTelemetryProvider(Dictionary<string, string> configuration)
         {
-            var instrumentationKey = configuration.GetValueOrDefault("InstrumentationKey")
-                                 ?? Environment.GetEnvironmentVariable("TelemetryInstrumentationKey");
+            var ConnectionString = configuration.GetValueOrDefault("ConnectionString")
+                                 ?? Environment.GetEnvironmentVariable("TelemetryConnectionString");
 
-            if (string.IsNullOrEmpty(instrumentationKey))
+            if (string.IsNullOrEmpty(ConnectionString))
             {
                 throw new InvalidOperationException("Application Insights Instrumentation Key is missing or invalid.");
             }
 
             var aiConfig = TelemetryConfiguration.CreateDefault();
-            aiConfig.InstrumentationKey = instrumentationKey;
+            aiConfig.ConnectionString = $"InstrumentationKey={ConnectionString}";
 
             _telemetryClient = new TelemetryClient(aiConfig);
         }

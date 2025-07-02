@@ -77,7 +77,7 @@ namespace LCT.SW360PackageCreator.UTest
             //Arrange
             string projectName = "Test";
             ProjectReleases projectReleases = new ProjectReleases();
-            projectReleases.clearingState = "CLOSED";
+            projectReleases.ClearingState = "CLOSED";
             projectReleases.Name = projectName;
             var CommonAppSettings = new CommonAppSettings()
             {
