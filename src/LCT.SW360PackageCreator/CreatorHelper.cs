@@ -55,7 +55,7 @@ namespace LCT.SW360PackageCreator
             {
                 if (comparionBomData.ApprovedStatus == "APPROVED")
                 {
-                    Logger.Info($"Component {comparionBomData.Name} with version {comparionBomData.Version} is approved and will be skipped.");
+                    Logger.Debug($"Component {comparionBomData.Name} with version {comparionBomData.Version} is in approved state.");
                     continue;
                 }
                 if ((comparionBomData.DownloadUrl == Dataconstant.DownloadUrlNotFound || string.IsNullOrEmpty(comparionBomData.DownloadUrl)) && !comparionBomData.SourceAttachmentStatus)
