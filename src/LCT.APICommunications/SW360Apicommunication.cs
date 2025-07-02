@@ -142,7 +142,7 @@ namespace LCT.APICommunications
         public async Task<string> GetReleases()
         {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(true, "SW360 releases details could not be retrieved");
+            httpClient.SetLogWarnings(true, "Unable to retrieve details for SW360 releases.");
             var result = string.Empty;
             try
             {
@@ -368,7 +368,7 @@ namespace LCT.APICommunications
         public async Task<HttpResponseMessage> GetAllReleasesWithAllData(int page, int pageEntries)
         {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(true, "SW360 releases full details could not be retrieved");
+            httpClient.SetLogWarnings(true, "Unable to retrieve full details for SW360 releases.");
             string url = $"{sw360ReleaseApi}?page={page}&allDetails=true&page_entries={pageEntries}";
             return await httpClient.GetAsync(url);
         }
