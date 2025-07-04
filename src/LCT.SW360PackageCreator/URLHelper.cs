@@ -29,6 +29,7 @@ using YamlDotNet.Core;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 using Directory = System.IO.Directory;
+using File = System.IO.File;
 
 namespace LCT.SW360PackageCreator
 {

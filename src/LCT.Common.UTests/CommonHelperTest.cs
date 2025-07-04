@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using File = System.IO.File;
 
 namespace LCT.Common.UTest
 {

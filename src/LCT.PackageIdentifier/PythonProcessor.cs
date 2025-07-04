@@ -25,12 +25,13 @@ using Component = CycloneDX.Models.Component;
 
 namespace LCT.PackageIdentifier
 {
-    public class PythonProcessor(ICycloneDXBomParser cycloneDXBomParser) : IParser
+    public class PythonProcessor(ICycloneDXBomParser cycloneDXBomParser,ISpdxBomParser spdxBomParser) : IParser
     {
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
 
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
+        private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
 
         public Bom ParsePackageFile(CommonAppSettings appSettings)
         {
@@ -50,11 +51,8 @@ namespace LCT.PackageIdentifier
                 {
                     listofComponents.AddRange(ExtractDetailsForPoetryLockfile(config, dependencies));
                 }
-                else if (config.EndsWith(FileConstant.CycloneDXFileExtension) && !config.EndsWith(FileConstant.SBOMTemplateFileExtension))
-                {
-                    listofComponents.AddRange(ExtractDetailsFromJson(config, appSettings, ref dependencies));
-                }
-                else if (config.EndsWith(FileConstant.SPDXFileExtension) && !config.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                else if ((config.EndsWith(FileConstant.CycloneDXFileExtension) || config.EndsWith(FileConstant.SPDXFileExtension))
+         && !config.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     listofComponents.AddRange(ExtractDetailsFromJson(config, appSettings, ref dependencies));
                 }

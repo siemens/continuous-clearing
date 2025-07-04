@@ -30,7 +30,7 @@ namespace LCT.PackageIdentifier.UTest
         [SetUp]
         public void Setup()
         {
-            _mavenProcessor = new MavenProcessor(Mock.Of<ICycloneDXBomParser>());
+            _mavenProcessor = new MavenProcessor(Mock.Of<ICycloneDXBomParser>(), Mock.Of<ISpdxBomParser>());
         }
 
         [Test]
@@ -135,7 +135,8 @@ namespace LCT.PackageIdentifier.UTest
                 }
             };
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-            MavenProcessor MavenProcessor = new MavenProcessor(cycloneDXBomParser.Object);
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            MavenProcessor MavenProcessor = new MavenProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
 
             //Act
             Bom bom = MavenProcessor.ParsePackageFile(appSettings);
@@ -185,9 +186,9 @@ namespace LCT.PackageIdentifier.UTest
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("junit");
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             // Act
-            MavenProcessor mavenProcessor = new MavenProcessor(cycloneDXBomParser.Object);
+            MavenProcessor mavenProcessor = new MavenProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             var actual = await mavenProcessor.IdentificationOfInternalComponents(component, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
             // Assert
@@ -233,9 +234,9 @@ namespace LCT.PackageIdentifier.UTest
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("junit");
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             // Act
-            MavenProcessor mavenProcessor = new MavenProcessor(cycloneDXBomParser.Object);
+            MavenProcessor mavenProcessor = new MavenProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             var actual = await mavenProcessor.IdentificationOfInternalComponents(component, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
             // Assert
@@ -283,9 +284,9 @@ namespace LCT.PackageIdentifier.UTest
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("junit/junit");
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             // Act
-            MavenProcessor mavenProcessor = new MavenProcessor(cycloneDXBomParser.Object);
+            MavenProcessor mavenProcessor = new MavenProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             var actual = await mavenProcessor.IdentificationOfInternalComponents(
                 componentIdentification, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -334,9 +335,9 @@ namespace LCT.PackageIdentifier.UTest
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("junit/junit");
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             // Act
-            MavenProcessor mavenProcessor = new MavenProcessor(cycloneDXBomParser.Object);
+            MavenProcessor mavenProcessor = new MavenProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             var actual = await mavenProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -385,9 +386,9 @@ namespace LCT.PackageIdentifier.UTest
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("junit");
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             // Act
-            MavenProcessor mavenProcessor = new MavenProcessor(cycloneDXBomParser.Object);
+            MavenProcessor mavenProcessor = new MavenProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             var actual = await mavenProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -416,7 +417,8 @@ namespace LCT.PackageIdentifier.UTest
                 }
             };
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-            MavenProcessor MavenProcessor = new MavenProcessor(cycloneDXBomParser.Object);
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            MavenProcessor MavenProcessor = new MavenProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
 
             //Act
             MavenProcessor.ParsePackageFile(appSettings);
@@ -446,7 +448,8 @@ namespace LCT.PackageIdentifier.UTest
                 }
             };
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-            MavenProcessor MavenProcessor = new MavenProcessor(cycloneDXBomParser.Object);
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            MavenProcessor MavenProcessor = new MavenProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
 
             //Act
             MavenProcessor.ParsePackageFile(appSettings);
@@ -479,7 +482,8 @@ namespace LCT.PackageIdentifier.UTest
                 }
             };
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-            MavenProcessor MavenProcessor = new MavenProcessor(cycloneDXBomParser.Object);
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            MavenProcessor MavenProcessor = new MavenProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
 
             //Act
             Bom bom = MavenProcessor.ParsePackageFile(appSettings);
@@ -510,7 +514,8 @@ namespace LCT.PackageIdentifier.UTest
                 }
             };
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-            MavenProcessor MavenProcessor = new MavenProcessor(cycloneDXBomParser.Object);
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            MavenProcessor MavenProcessor = new MavenProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
 
             //Act
             Bom bom = MavenProcessor.ParsePackageFile(appSettings);
