@@ -18,6 +18,7 @@ using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using Level = log4net.Core.Level;
+using File = System.IO.File;
 
 namespace LCT.Common
 {
@@ -517,6 +518,17 @@ namespace LCT.Common
                         Content = hashes.SHA256
                     }
                 };
+            }
+        }
+        public static void AddSpdxSBomFileNameProperty(ref Bom bom, string filePath)
+        {
+            string filename = Path.GetFileName(filePath);
+            var bomComponentsList = bom.Components;
+            foreach (var component in bomComponentsList)
+            {
+                var spdxFileName = new Property { Name = Dataconstant.Cdx_SpdxFileName, Value = filename };
+                component.Properties ??= new List<Property>();
+                component.Properties.Add(spdxFileName);
             }
         }
 

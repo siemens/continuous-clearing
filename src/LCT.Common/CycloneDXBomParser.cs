@@ -15,6 +15,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
+
 namespace LCT.Common
 {
     public class CycloneDXBomParser : ICycloneDXBomParser

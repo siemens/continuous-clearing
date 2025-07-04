@@ -24,16 +24,18 @@ using System.Linq;
 using System.Reflection;
 using System.Security;
 using System.Threading.Tasks;
+using File = System.IO.File;
 
 namespace LCT.PackageIdentifier
 {
     /// <summary>
     /// Parses the NPM Packages
     /// </summary>
-    public class NpmProcessor(ICycloneDXBomParser cycloneDXBomParser) : CycloneDXBomParser, IParser
+    public class NpmProcessor(ICycloneDXBomParser cycloneDXBomParser,ISpdxBomParser spdxBomParser) : CycloneDXBomParser, IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
+        private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
         private const string Bundled = "bundled";
         private const string Dependencies = "dependencies";
         private const string Dev = "dev";
@@ -474,6 +476,20 @@ namespace LCT.PackageIdentifier
                         BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += bom.Components.Count;
                         componentsForBOM.AddRange(bom.Components);
                         dependencies = bom.Dependencies;
+                    }
+                }
+                else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
+                {
+                    bom = _spdxBomParser.ParseSPDXBom(filepath);
+                    bom = RemoveExcludedComponents(appSettings, bom);
+                    CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
+                    AddingIdentifierType(bom.Components, "SpdxFile");
+                    BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += bom.Components.Count;
+                    componentsForBOM.AddRange(bom.Components);
+                    dependencies = bom.Dependencies;
+                    if (bom.Components != null)
+                    {
+                        CommonHelper.AddSpdxSBomFileNameProperty(ref bom, filepath);
                     }
                 }
                 else

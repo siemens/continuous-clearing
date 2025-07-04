@@ -8,6 +8,8 @@ using CycloneDX.Models;
 using LCT.APICommunications;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
+using LCT.Common.Constants;
+using LCT.Common.Interface;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
@@ -213,6 +215,23 @@ namespace LCT.PackageIdentifier
             }
 
             return aqlResultList;
+        }
+        public static Bom ParseBomFile(string filePath, ISpdxBomParser spdxBomParser, ICycloneDXBomParser cycloneDXBomParser)
+        {
+            if (filePath.EndsWith(FileConstant.SPDXFileExtension))
+            {
+                Bom bom;
+                bom = spdxBomParser.ParseSPDXBom(filePath);
+                if (bom != null)
+                {
+                    CommonHelper.AddSpdxSBomFileNameProperty(ref bom, filePath);
+                }
+                return bom;
+            }
+            else
+            {
+                return cycloneDXBomParser.ParseCycloneDXBom(filePath);
+            }
         }
 
         #endregion

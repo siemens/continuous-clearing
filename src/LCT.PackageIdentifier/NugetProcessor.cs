@@ -30,14 +30,16 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using Directory = System.IO.Directory;
+using File = System.IO.File;
 
 namespace LCT.PackageIdentifier
 {
-    public partial class NugetProcessor(ICycloneDXBomParser cycloneDXBomParser, IFrameworkPackages frameworkPackages, ICompositionBuilder compositionBuilder) : CycloneDXBomParser, IParser
+    public partial class NugetProcessor(ICycloneDXBomParser cycloneDXBomParser, IFrameworkPackages frameworkPackages, ICompositionBuilder compositionBuilder,ISpdxBomParser spdxBomParser) : CycloneDXBomParser, IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
+        private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
         private readonly IFrameworkPackages _frameworkPackages = frameworkPackages;
         private readonly ICompositionBuilder _compositionBuilder = compositionBuilder;
         private Dictionary<string, Dictionary<string, NuGetVersion>> _listofFrameworkPackages = new Dictionary<string, Dictionary<string, NuGetVersion>>();
@@ -453,6 +455,7 @@ namespace LCT.PackageIdentifier
             ref Bom bom,
             List<string> listOfTemplateBomfilePaths)
         {
+            List<Component> componentsForBOM = new List<Component>();
             if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
                 listOfTemplateBomfilePaths.Add(filepath);
@@ -466,8 +469,22 @@ namespace LCT.PackageIdentifier
                 Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
                 bom = _cycloneDXBomParser.ParseCycloneDXBom(filepath);
                 CycloneDXBomParser.CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
-                var componentsForBOM = new List<Component>(bom.Components);
+                componentsForBOM.AddRange(bom.Components);
                 CommonHelper.GetDetailsForManuallyAdded(componentsForBOM, listComponentForBOM);
+            }
+            else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
+            {                                    
+                bom = _spdxBomParser.ParseSPDXBom(filepath);
+                CycloneDXBomParser.CheckValidComponentsForProjectType(
+                        bom.Components, appSettings.ProjectType);
+                componentsForBOM.AddRange(bom.Components);
+                CommonHelper.GetDetailsForManuallyAdded(componentsForBOM,
+                    listComponentForBOM);
+                if (bom != null)
+                {
+                    CommonHelper.AddSpdxSBomFileNameProperty(ref bom, filepath);
+                }
+
             }
             else
             {
