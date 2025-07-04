@@ -48,6 +48,11 @@ namespace LCT.SW360PackageCreator
 
             foreach (ComparisonBomData comparionBomData in comparisionBomDataList)
             {
+                if (comparionBomData.ApprovedStatus == Dataconstant.Approved)
+                {
+                    Logger.Debug($"Component {comparionBomData.Name} with version {comparionBomData.Version} is skipped from the 'list of components without a source download URL' because it is in the approved state.");
+                    continue;
+                }
                 if ((comparionBomData.DownloadUrl == Dataconstant.DownloadUrlNotFound || string.IsNullOrEmpty(comparionBomData.DownloadUrl)) && !comparionBomData.SourceAttachmentStatus)
                 {
                     comparionBomData.ReleaseID = string.IsNullOrEmpty(comparionBomData.ReleaseLink) ?
