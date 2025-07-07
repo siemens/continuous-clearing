@@ -484,6 +484,7 @@ namespace LCT.PackageIdentifier
                 {
                     CommonHelper.AddSpdxSBomFileNameProperty(ref bom, filepath);
                 }
+                BomHelper.NamingConventionOfSPDXFile(filepath, appSettings);
 
             }
             else

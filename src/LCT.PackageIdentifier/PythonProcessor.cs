@@ -193,6 +193,7 @@ namespace LCT.PackageIdentifier
                 {
                     CommonHelper.AddSpdxSBomFileNameProperty(ref bom, filePath);
                 }
+                BomHelper.NamingConventionOfSPDXFile(filePath, appSettings);
             }
             else
             {
