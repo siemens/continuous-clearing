@@ -258,11 +258,10 @@ namespace LCT.PackageIdentifier
 
             return aqlResultList;
         }
-        public static Bom ParseBomFile(string filePath, ISpdxBomParser spdxBomParser, ICycloneDXBomParser cycloneDXBomParser, CommonAppSettings appSettings)
+        public static Bom ParseBomFile(string filePath, ISpdxBomParser spdxBomParser, ICycloneDXBomParser cycloneDXBomParser)
         {
             if (filePath.EndsWith(FileConstant.SPDXFileExtension))
             {
-                BomHelper.NamingConventionOfSPDXFile(filePath, appSettings);
                 Bom bom;
                 bom = spdxBomParser.ParseSPDXBom(filePath);
                 CommonHelper.AddSpdxSBomFileNameProperty(ref bom, filePath);
