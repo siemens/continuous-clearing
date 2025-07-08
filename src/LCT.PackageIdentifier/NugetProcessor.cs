@@ -476,6 +476,7 @@ namespace LCT.PackageIdentifier
             }
             else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
             {
+                BomHelper.NamingConventionOfSPDXFile(filepath, appSettings);
                 Bom bomList = _spdxBomParser.ParseSPDXBom(filepath);
                 CycloneDXBomParser.CheckValidComponentsForProjectType(
                         bomList.Components, appSettings.ProjectType);                

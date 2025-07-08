@@ -251,6 +251,7 @@ namespace LCT.PackageIdentifier
                 else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
                 {
                     string filename = Path.GetFileName(filepath); // e.g., "example.spdx.sbom.json"                    
+                    BomHelper.NamingConventionOfSPDXFile(filepath, appSettings);
                     bom = _spdxBomParser.ParseSPDXBom(filepath);
                     CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
                     GetDetailsforManuallyAddedComp(bom.Components);

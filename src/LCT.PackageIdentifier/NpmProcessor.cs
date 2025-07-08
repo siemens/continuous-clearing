@@ -480,6 +480,7 @@ namespace LCT.PackageIdentifier
                 }
                 else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
                 {
+                    BomHelper.NamingConventionOfSPDXFile(filepath, appSettings);
                     bom = _spdxBomParser.ParseSPDXBom(filepath);
                     bom = RemoveExcludedComponents(appSettings, bom);
                     CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
