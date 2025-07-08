@@ -238,7 +238,7 @@ namespace LCT.Common
         {
             foreach (var component in componentsForBOM)
             {
-                component.Properties = new List<Property>();
+                component.Properties ??= new List<Property>();
                 Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
                 Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.ManullayAdded };
                 component.Properties.Add(isDev);
@@ -522,14 +522,19 @@ namespace LCT.Common
         }
         public static void AddSpdxSBomFileNameProperty(ref Bom bom, string filePath)
         {
-            string filename = Path.GetFileName(filePath);
-            var bomComponentsList = bom.Components;
-            foreach (var component in bomComponentsList)
+            if (bom.Components != null)
             {
-                var spdxFileName = new Property { Name = Dataconstant.Cdx_SpdxFileName, Value = filename };
-                component.Properties ??= new List<Property>();
-                component.Properties.Add(spdxFileName);
+                string filename = Path.GetFileName(filePath);
+                var bomComponentsList = bom.Components;
+                foreach (var component in bomComponentsList)
+                {
+                    var spdxFileName = new Property { Name = Dataconstant.Cdx_SpdxFileName, Value = filename };
+                    component.Properties ??= new List<Property>();
+                    component.Properties.Add(spdxFileName);
+                }
+                bom.Components = bomComponentsList;
             }
+            
         }
 
         #endregion

@@ -20,8 +20,8 @@ namespace LCT.Common
         public  Bom ParseSPDXBom(string filePath)
         {
             Bom bom = new Bom();
-            SpdxBomData spdxBomData = null;
-            string json = string.Empty;
+            SpdxBomData spdxBomData;
+            string json;
 
             try
             {
@@ -83,63 +83,195 @@ namespace LCT.Common
         }
         private static void ConvertSpdxDataToBom(SpdxBomData spdxData, ref Bom bom)
         {
-            List<Component> lstComponentForBOM = new List<Component>();
-            List<Dependency> lstDependenciesForBOM = new List<Dependency>();
-            var compIndex = new Dictionary<string, Component>();
-            if (spdxData?.Packages != null)
+            if (spdxData?.Packages == null)
             {
-                foreach (var package in spdxData.Packages)
-                {
-                    // Check if package has external references with PACKAGE-MANAGER category and purl type
-                    if (package.ExternalRefs != null)
-                    {
-                        var purlRef = package.ExternalRefs.FirstOrDefault(er =>
-                            er.ReferenceCategory?.Equals("PACKAGE-MANAGER", StringComparison.OrdinalIgnoreCase) == true &&
-                            er.ReferenceType?.Equals("purl", StringComparison.OrdinalIgnoreCase) == true);
-
-                        if (purlRef != null)
-                        {
-                            var component = new Component
-                            {
-                                Name = package.Name,
-                                Version = package.VersionInfo,
-                                Type = Component.Classification.Library
-
-                            };
-                            var purl = package.ExternalRefs?.FirstOrDefault(r => r.ReferenceType.Equals("purl", StringComparison.OrdinalIgnoreCase))?.ReferenceLocator;
-                            var bomRef=!string.IsNullOrEmpty(purl) ? purl:package.SPDXID;
-                            if (!string.IsNullOrEmpty(purl))
-                                component.Purl = purl;
-                            if (!string.IsNullOrEmpty(bomRef))
-                                component.BomRef = bomRef;
-                            lstComponentForBOM.Add(component);
-                            compIndex[package.SPDXID] = component;
-                        }
-                    }
-                }
+                Logger.Warn("SPDX data or packages is null. No components to convert.");
+                return;
             }
 
-            bom.Components = lstComponentForBOM;
-            var groupedDependencies = new Dictionary<string, Dependency>();
-            foreach (var rel in spdxData.Relationships)
-            {
-                if (rel.RelationshipType == "DEPENDS_ON" &&
-                    compIndex.TryGetValue(rel.SpdxElementId, out var parent) &&
-                    compIndex.TryGetValue(rel.RelatedSpdxElement, out var child))
-                {
-                    var dependency=new Dependency
-                    {
-                        Ref = parent.BomRef,
-                        Dependencies = new List<Dependency> { new Dependency { Ref = child.BomRef } }
-                    };
-                    lstDependenciesForBOM.Add(dependency);
-                }
-                
-            }
-            bom.Dependencies = lstDependenciesForBOM;
-            // Log the number of components added for debugging
-            Logger.Info($"Converted {lstComponentForBOM.Count} packages to BOM components");
+            var (components, componentIndex) = ProcessSpdxPackages(spdxData.Packages);
+            var dependencies = ProcessSpdxRelationships(spdxData.Relationships, componentIndex);
+            //var allDependencies = EnsureAllComponentsHaveDependencies(components, dependencies);
+
+            bom.Components = components;
+            bom.Dependencies = dependencies;
         }
-       
+
+        private static (List<Component> components, Dictionary<string, Component> componentIndex) ProcessSpdxPackages(IEnumerable<Package> packages)
+        {
+            var components = new List<Component>();
+            var componentIndex = new Dictionary<string, Component>();
+
+            foreach (var package in packages)
+            {
+                var component = CreateComponentFromPackage(package);
+                if (component != null)
+                {
+                    components.Add(component);
+                    componentIndex[package.SPDXID] = component;
+                }
+            }
+
+            return (components, componentIndex);
+        }
+
+        private static Component CreateComponentFromPackage(Package package)
+        {
+            if (package.ExternalRefs == null)
+                return null;
+
+            var purlRef = GetPurlReference(package.ExternalRefs);
+            if (purlRef == null)
+                return null;
+
+            var purl = purlRef.ReferenceLocator;
+            var bomRef = !string.IsNullOrEmpty(purl) ? purl : package.SPDXID;
+
+            var component = new Component
+            {
+                Name = package.Name,
+                Version = package.VersionInfo,
+                Type = Component.Classification.Library,
+                Manufacturer = new OrganizationalEntity()
+            };
+
+            if (!string.IsNullOrEmpty(purl))
+            {
+                component.Purl = purl;
+                component.BomRef = purl;
+            }
+
+            if (!string.IsNullOrEmpty(bomRef))
+            {
+                component.Manufacturer.BomRef = bomRef;
+            }
+
+            return component;
+        }
+
+        private static ExternalRef GetPurlReference(IEnumerable<ExternalRef> externalRefs)
+        {
+            return externalRefs.FirstOrDefault(er =>
+                er.ReferenceCategory?.Equals("PACKAGE-MANAGER", StringComparison.OrdinalIgnoreCase) == true &&
+                er.ReferenceType?.Equals("purl", StringComparison.OrdinalIgnoreCase) == true);
+        }
+
+        private static List<Dependency> ProcessSpdxRelationships(IEnumerable<Relationship> relationships, Dictionary<string, Component> componentIndex)
+        {
+            if (relationships == null)
+            {
+                Logger.Info("No relationships found in SPDX data.");
+                return new List<Dependency>();
+            }
+
+            var supportedRelationshipTypes = GetSupportedRelationshipTypes();
+            var dependencyMap = BuildDependencyMap(relationships, componentIndex, supportedRelationshipTypes);
+
+            return ConvertDependencyMapToCycloneDx(dependencyMap);
+        }
+
+        private static HashSet<string> GetSupportedRelationshipTypes()
+        {
+            return new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+    {
+        "DEPENDENCY_OF",
+        "DEV_DEPENDENCY_OF",
+        "DEPENDS_ON",
+        "RUNTIME_DEPENDENCY_OF"
+    };
+        }
+
+        private static Dictionary<string, List<(string bomRef, string relationshipType)>> BuildDependencyMap(
+            IEnumerable<Relationship> relationships,
+            Dictionary<string, Component> componentIndex,
+            HashSet<string> supportedRelationshipTypes)
+        {
+            var dependencyMap = new Dictionary<string, List<(string bomRef, string relationshipType)>>();
+
+            foreach (var relationship in relationships)
+            {
+                if (!IsValidRelationship(relationship, supportedRelationshipTypes, componentIndex))
+                    continue;
+
+                var (dependentRef, dependencyRef) = GetDependencyRefs(relationship, componentIndex);
+                if (string.IsNullOrEmpty(dependentRef) || string.IsNullOrEmpty(dependencyRef))
+                    continue;
+
+                AddToDependencyMap(dependencyMap, dependentRef, dependencyRef, relationship.RelationshipType);
+            }
+
+            return dependencyMap;
+        }
+
+        private static bool IsValidRelationship(Relationship relationship, HashSet<string> supportedTypes, Dictionary<string, Component> componentIndex)
+        {
+            return supportedTypes.Contains(relationship.RelationshipType) &&
+                   componentIndex.ContainsKey(relationship.SpdxElementId) &&
+                   componentIndex.ContainsKey(relationship.RelatedSpdxElement);
+        }
+
+        private static (string dependentRef, string dependencyRef) GetDependencyRefs(Relationship relationship, Dictionary<string, Component> componentIndex)
+        {
+            var parentComponent = componentIndex[relationship.SpdxElementId];
+            var childComponent = componentIndex[relationship.RelatedSpdxElement];
+
+            var parentBomRef = parentComponent.Manufacturer.BomRef;
+            var childBomRef = childComponent.Manufacturer.BomRef;
+
+            // For DEPENDENCY_OF, DEV_DEPENDENCY_OF, RUNTIME_DEPENDENCY_OF
+            // A DEPENDENCY_OF B means A is a dependency of B
+            // So B depends on A, meaning B (child) depends on A (parent)
+            return (dependentRef: childBomRef, dependencyRef: parentBomRef);
+        }
+
+        private static void AddToDependencyMap(
+            Dictionary<string, List<(string bomRef, string relationshipType)>> dependencyMap,
+            string dependentRef,
+            string dependencyRef,
+            string relationshipType)
+        {
+            if (!dependencyMap.TryGetValue(dependentRef, out var dependencies))
+            {
+                dependencies = new List<(string bomRef, string relationshipType)>();
+                dependencyMap[dependentRef] = dependencies;
+            }
+
+            if (!dependencies.Any(d => d.bomRef == dependencyRef))
+            {
+                dependencies.Add((dependencyRef, relationshipType));
+            }
+        }
+
+        private static List<Dependency> ConvertDependencyMapToCycloneDx(Dictionary<string, List<(string bomRef, string relationshipType)>> dependencyMap)
+        {
+            return dependencyMap.Select(kvp => new Dependency
+            {
+                Ref = kvp.Key,
+                Dependencies = kvp.Value.Select(dep => new Dependency { Ref = dep.bomRef }).ToList(),
+                Provides = kvp.Value.Select(dep => new Provides { Ref = dep.relationshipType }).ToList()
+            }).ToList();
+        }
+
+        private static List<Dependency> EnsureAllComponentsHaveDependencies(List<Component> components, List<Dependency> existingDependencies)
+        {
+            var allDependencies = new List<Dependency>(existingDependencies);
+            var existingDependencyRefs = new HashSet<string>(existingDependencies.Select(d => d.Ref));
+
+            foreach (var component in components)
+            {
+                var bomRef = component.Manufacturer.BomRef;
+                if (!string.IsNullOrEmpty(bomRef) && !existingDependencyRefs.Contains(bomRef))
+                {
+                    allDependencies.Add(new Dependency
+                    {
+                        Ref = bomRef,
+                        Dependencies = new List<Dependency>()
+                    });
+                }
+            }
+
+            return allDependencies;
+        }        
+
     }
 }
