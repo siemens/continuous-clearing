@@ -122,11 +122,15 @@ namespace LCT.PackageIdentifier
                     if (filepath.EndsWith(FileConstant.SPDXFileExtension))
                     {
                         bomList = _spdxBomParser.ParseSPDXBom(filepath);
+
                         if (bomList.Components != null)
                         {
                             CommonHelper.AddSpdxSBomFileNameProperty(ref bomList, filepath);
                         }
                         BomHelper.NamingConventionOfSPDXFile(filepath, appSettings);
+
+                        CommonHelper.AddSpdxSBomFileNameProperty(ref bomList, filepath);
+
                     }
                     else
                     {
