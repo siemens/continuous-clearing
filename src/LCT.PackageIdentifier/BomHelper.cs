@@ -222,10 +222,7 @@ namespace LCT.PackageIdentifier
             {
                 Bom bom;
                 bom = spdxBomParser.ParseSPDXBom(filePath);
-                if (bom != null)
-                {
-                    CommonHelper.AddSpdxSBomFileNameProperty(ref bom, filePath);
-                }
+                CommonHelper.AddSpdxSBomFileNameProperty(ref bom, filePath);
                 return bom;
             }
             else

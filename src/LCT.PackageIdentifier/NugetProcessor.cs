@@ -52,6 +52,7 @@ namespace LCT.PackageIdentifier
             Logger.Debug($"ParsePackageFile():Start");
             List<Component> listComponentForBOM = new List<Component>();
             Bom bom = new Bom();
+            bom.Dependencies = new List<Dependency>();
             if (DetectDeploymentType(appSettings))
             {
                 isSelfContainedProject = true;
@@ -455,7 +456,7 @@ namespace LCT.PackageIdentifier
             ref Bom bom,
             List<string> listOfTemplateBomfilePaths)
         {
-            List<Component> componentsForBOM = new List<Component>();
+            List<Component> componentsForBOM = new List<Component>();            
             if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
                 listOfTemplateBomfilePaths.Add(filepath);
@@ -467,31 +468,30 @@ namespace LCT.PackageIdentifier
                 !filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
                 Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
-                bom = _cycloneDXBomParser.ParseCycloneDXBom(filepath);
-                CycloneDXBomParser.CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
-                componentsForBOM.AddRange(bom.Components);
+                Bom bomList = _cycloneDXBomParser.ParseCycloneDXBom(filepath);
+                CycloneDXBomParser.CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
+                componentsForBOM.AddRange(bomList.Components);
+                bom.Dependencies.AddRange(bomList.Dependencies);
                 CommonHelper.GetDetailsForManuallyAdded(componentsForBOM, listComponentForBOM);
             }
             else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
-            {                                    
-                bom = _spdxBomParser.ParseSPDXBom(filepath);
+            {
+                Bom bomList = _spdxBomParser.ParseSPDXBom(filepath);
                 CycloneDXBomParser.CheckValidComponentsForProjectType(
-                        bom.Components, appSettings.ProjectType);
-                componentsForBOM.AddRange(bom.Components);
+                        bomList.Components, appSettings.ProjectType);                
+                CommonHelper.AddSpdxSBomFileNameProperty(ref bomList, filepath);
+                componentsForBOM.AddRange(bomList.Components);
+                bom.Dependencies.AddRange(bomList.Dependencies);
                 CommonHelper.GetDetailsForManuallyAdded(componentsForBOM,
-                    listComponentForBOM);
-                if (bom != null)
-                {
-                    CommonHelper.AddSpdxSBomFileNameProperty(ref bom, filepath);
-                }
+                    listComponentForBOM);                                
 
             }
             else
             {
                 Logger.Debug($"ParsingInputFileForBOM():Found as Package File");
                 var listofComponents = new List<NugetPackage>();
-                ParseInputFiles(appSettings, filepath, listofComponents);
                 var dependencies = new List<Dependency>();
+                ParseInputFiles(appSettings, filepath, listofComponents);                
                 ConvertToCycloneDXModel(listComponentForBOM, listofComponents, dependencies);
 
                 if (bom.Dependencies == null || bom.Dependencies.Count == 0)

@@ -475,7 +475,7 @@ namespace LCT.PackageIdentifier
                         AddingIdentifierType(bom.Components, "CycloneDXFile");
                         BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += bom.Components.Count;
                         componentsForBOM.AddRange(bom.Components);
-                        dependencies = bom.Dependencies;
+                        dependencies.AddRange(bom.Dependencies);
                     }
                 }
                 else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
@@ -486,11 +486,8 @@ namespace LCT.PackageIdentifier
                     AddingIdentifierType(bom.Components, "SpdxFile");
                     BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += bom.Components.Count;
                     componentsForBOM.AddRange(bom.Components);
-                    dependencies = bom.Dependencies;
-                    if (bom.Components != null)
-                    {
-                        CommonHelper.AddSpdxSBomFileNameProperty(ref bom, filepath);
-                    }
+                    dependencies.AddRange(bom.Dependencies);                    
+                    CommonHelper.AddSpdxSBomFileNameProperty(ref bom, filepath);
                 }
                 else
                 {
