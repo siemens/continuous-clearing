@@ -257,13 +257,13 @@ namespace LCT.PackageIdentifier
             }
 
             return aqlResultList;
-        }
-        public static Bom ParseBomFile(string filePath, ISpdxBomParser spdxBomParser, ICycloneDXBomParser cycloneDXBomParser)
+        }        public static Bom ParseBomFile(string filePath, ISpdxBomParser spdxBomParser, ICycloneDXBomParser cycloneDXBomParser, CommonAppSettings appSettings)
         {
             if (filePath.EndsWith(FileConstant.SPDXFileExtension))
             {
-                Bom bom;
+               Bom bom;
                 bom = spdxBomParser.ParseSPDXBom(filePath);
+                BomHelper.NamingConventionOfSPDXFile(filePath, appSettings);
                 CommonHelper.AddSpdxSBomFileNameProperty(ref bom, filePath);
                 return bom;
             }
