@@ -3,6 +3,8 @@
 //
 //  SPDX-License-Identifier: MIT
 // --------------------------------------------------------------------------------------------------------------------
+using LCT.Common;
+using LCT.Common.Interface;
 using log4net;
 using System;
 using System.IO;
@@ -60,20 +62,20 @@ namespace LCT.PackageIdentifier
                     return false;
                 }
 
-                PrintCertificateInfo(certificate);
+                LogCertificateInfo(certificate);
 
                 bool IsValid = ValidateSignedFileFromCertificate(documentPath, signaturePath, certificate);
-                if (IsValid)
-                {
-                    Logger.Info($"SPDX file validated successfully!!");
-                }
-                else
-                {
-                    Logger.Warn($"SPDX file Not validated successfully!!");
-                }
                 return IsValid;
 
             }
+            //IF System.FormatException is thrown, it indicates that the PEM content is not a valid certificate.
+            catch (FormatException ex)
+            {
+                Logger.Debug($"Error loading PEM content: {ex.Message}");
+                Logger.Debug("Attempting to load as public key...");
+                return ValidateSignedFileFromPublicKey(documentPath, signaturePath, pemFilePath);
+            }
+            //IF System.Security.Cryptography.CryptographicException is thrown, it indicates that the PEM content is not a valid certificate.
             catch (CryptographicException ex)
             {
                 Logger.Debug($"Error loading as certificate: {ex.Message}");
@@ -154,7 +156,15 @@ namespace LCT.PackageIdentifier
                     return false;
                 }
 
-                byte[] publicKeyBytes = Convert.FromBase64String(base64Key);
+                byte[] publicKeyBytes;
+                if (IsBase64String(base64Key))
+                {
+                    publicKeyBytes = Convert.FromBase64String(base64Key);
+                }
+                else
+                {
+                    publicKeyBytes = File.ReadAllBytes(publicKeyPath);
+                }
 
                 // Try ECDSA
                 if (TryVerifyEcdsa(documentData, signature, publicKeyBytes))
@@ -277,7 +287,7 @@ namespace LCT.PackageIdentifier
         /// Prints certificate information to the console.
         /// </summary>
         /// <param name="certificate">The X509Certificate2 object.</param>
-        private static void PrintCertificateInfo(X509Certificate2 certificate)
+        private static void LogCertificateInfo(X509Certificate2 certificate)
         {
             Logger.Debug("Certificate loaded successfully.");
             Logger.Debug($"Subject: {certificate.Subject}");
@@ -286,6 +296,16 @@ namespace LCT.PackageIdentifier
             Logger.Debug($"Valid To: {certificate.NotAfter}");
             Logger.Debug($"Thumbprint: {certificate.Thumbprint}");
             Logger.Debug($"Algorithm: {certificate.SignatureAlgorithm.FriendlyName}");
+        }
+
+        /// <summary>
+        /// Checks if a string is a valid Base64-encoded string.
+        /// </summary>
+        /// <param name="s">The string to check.</param>
+        private static bool IsBase64String(string s)
+        {
+            Span<byte> buffer = new Span<byte>(new byte[s.Length]);
+            return Convert.TryFromBase64String(s, buffer, out _);
         }
     }
 }

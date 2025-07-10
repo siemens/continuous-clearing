@@ -137,6 +137,11 @@ namespace LCT.PackageIdentifier
             else
             {
                 bool isValidFile = PemSignatureVerifier.ValidatePem(filepath, foundFiles.TryGetValue($"{filename}.sig", out string pemFile) ? pemFile : string.Empty, foundFiles.TryGetValue($"{filename}.pem", out string sigFile) ? sigFile : string.Empty);
+                if (!isValidFile)
+                {
+                    Logger.Error($"SPDX file validation failed");
+                    environmentHelper.CallEnvironmentExit(-1);
+                }
             }
         }
         public static string GetHashCodeUsingNpmView(string name, string version)
@@ -257,11 +262,12 @@ namespace LCT.PackageIdentifier
             }
 
             return aqlResultList;
-        }        public static Bom ParseBomFile(string filePath, ISpdxBomParser spdxBomParser, ICycloneDXBomParser cycloneDXBomParser, CommonAppSettings appSettings)
+        }
+        public static Bom ParseBomFile(string filePath, ISpdxBomParser spdxBomParser, ICycloneDXBomParser cycloneDXBomParser, CommonAppSettings appSettings)
         {
             if (filePath.EndsWith(FileConstant.SPDXFileExtension))
             {
-               Bom bom;
+                Bom bom;
                 bom = spdxBomParser.ParseSPDXBom(filePath);
                 BomHelper.NamingConventionOfSPDXFile(filePath, appSettings);
                 CommonHelper.AddSpdxSBomFileNameProperty(ref bom, filePath);
