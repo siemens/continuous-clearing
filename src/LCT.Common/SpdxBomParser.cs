@@ -1,4 +1,4 @@
-﻿// Ignore Spelling: LCT Spdx
+﻿// Ignore Spelling: LCT Spdx Bom
 
 using CycloneDX.Json;
 using CycloneDX.Models;
@@ -19,6 +19,7 @@ namespace LCT.Common
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public  Bom ParseSPDXBom(string filePath)
         {
+            Logger.Debug($"Starting SPDX BOM parsing for file: {filePath}");
             Bom bom = new Bom();
             SpdxBomData spdxBomData;
             string json;
@@ -31,7 +32,7 @@ namespace LCT.Common
                     spdxBomData = JsonConvert.DeserializeObject<SpdxBomData>(json);
                     if (!IsValidSpdxVersion(spdxBomData))
                     {
-                        Logger.Error($"Invalid SPDX version. Expected 'SPDX-2.3', but found '{spdxBomData?.SpdxVersion}'. Only SPDX version 2.3 is supported.");
+                        Logger.Warn($"    Invalid SPDX version found in this file path {filePath}. Expected 'SPDX-2.3', but found '{spdxBomData?.SpdxVersion}'. Only SPDX version 2.3 is supported.");
                         return bom; // Return empty BOM
                     }
                     // Convert SpdxBomData to Bom here
@@ -53,15 +54,15 @@ namespace LCT.Common
             catch (JsonReaderException ex)
             {
                 Logger.Error("JSON reader exception in reading SPDX BOM", ex);
-            }            
-
+            }
+            Logger.Debug($"SPDX BOM parsing completed. Final BOM contains {bom.Components?.Count ?? 0} components and {bom.Dependencies?.Count ?? 0} dependencies");
             return bom;
         }
         private static bool IsValidSpdxVersion(SpdxBomData spdxData)
         {
             if (spdxData == null)
             {
-                Logger.Error("SPDX data is null");
+                Logger.Debug("SPDX data is null");
                 return false;
             }
 
@@ -69,7 +70,7 @@ namespace LCT.Common
 
             if (string.IsNullOrEmpty(spdxData.SpdxVersion))
             {
-                Logger.Error("SPDX version is null or empty");
+                Logger.Debug("SPDX version is null or empty");
                 return false;
             }
 
@@ -77,12 +78,13 @@ namespace LCT.Common
 
             if (!isValid)
             {
-                Logger.Warn($"SPDX version validation failed. Expected: '{EXPECTED_SPDX_VERSION}', Found: '{spdxData.SpdxVersion}'");
+                Logger.Debug($"SPDX version validation failed. Expected: '{EXPECTED_SPDX_VERSION}', Found: '{spdxData.SpdxVersion}'");
             }
             return isValid;
         }
         private static void ConvertSpdxDataToBom(SpdxBomData spdxData, ref Bom bom)
         {
+            Logger.Debug("Starting SPDX data to BOM conversion...");
             if (spdxData?.Packages == null)
             {
                 Logger.Warn("SPDX data or packages is null. No components to convert.");
@@ -91,14 +93,19 @@ namespace LCT.Common
 
             var (components, componentIndex) = ProcessSpdxPackages(spdxData.Packages);
             var dependencies = ProcessSpdxRelationships(spdxData.Relationships, componentIndex);
-            //var allDependencies = EnsureAllComponentsHaveDependencies(components, dependencies);
-
+            CleanupComponentManufacturerData(components);
             bom.Components = components;
             bom.Dependencies = dependencies;
+            Logger.Debug($"BOM conversion completed. Components: {components.Count}, Dependencies: {dependencies.Count}");
+        }
+        private static void CleanupComponentManufacturerData(List<Component> components)
+        {
+            components.ForEach(component => component.Manufacturer = null);
         }
 
         private static (List<Component> components, Dictionary<string, Component> componentIndex) ProcessSpdxPackages(IEnumerable<Package> packages)
         {
+            Logger.Debug("ProcessSpdxPackages():Starting SPDX package processing...");
             var components = new List<Component>();
             var componentIndex = new Dictionary<string, Component>();
 
@@ -109,14 +116,16 @@ namespace LCT.Common
                 {
                     components.Add(component);
                     componentIndex[package.SPDXID] = component;
+                    Logger.Debug($"Successfully created component for package: {package.Name}");
                 }
             }
-
+            Logger.Debug($"ProcessSpdxPackages():Package processing completed.");
             return (components, componentIndex);
         }
 
         private static Component CreateComponentFromPackage(Package package)
         {
+            Logger.Debug($"CreateComponentFromPackage():Creating component from package: {package.Name}");
             if (package.ExternalRefs == null)
                 return null;
 
@@ -126,7 +135,7 @@ namespace LCT.Common
 
             var purl = purlRef.ReferenceLocator;
             var bomRef = !string.IsNullOrEmpty(purl) ? purl : package.SPDXID;
-
+            Logger.Debug($"Creating component with PURL: {purl}, BOM Ref: {bomRef}");
             var component = new Component
             {
                 Name = package.Name,
@@ -145,7 +154,7 @@ namespace LCT.Common
             {
                 component.Manufacturer.BomRef = bomRef;
             }
-
+            Logger.Debug($"CreateComponentFromPackage():Component created successfully for package: {package.Name}");
             return component;
         }
 
@@ -160,7 +169,7 @@ namespace LCT.Common
         {
             if (relationships == null)
             {
-                Logger.Info("No relationships found in SPDX data.");
+                Logger.Debug("No relationships found in SPDX data.");
                 return new List<Dependency>();
             }
 
@@ -244,34 +253,12 @@ namespace LCT.Common
 
         private static List<Dependency> ConvertDependencyMapToCycloneDx(Dictionary<string, List<(string bomRef, string relationshipType)>> dependencyMap)
         {
-            return dependencyMap.Select(kvp => new Dependency
+            return [.. dependencyMap.Select(kvp => new Dependency
             {
                 Ref = kvp.Key,
-                Dependencies = kvp.Value.Select(dep => new Dependency { Ref = dep.bomRef }).ToList(),
-                Provides = kvp.Value.Select(dep => new Provides { Ref = dep.relationshipType }).ToList()
-            }).ToList();
-        }
-
-        private static List<Dependency> EnsureAllComponentsHaveDependencies(List<Component> components, List<Dependency> existingDependencies)
-        {
-            var allDependencies = new List<Dependency>(existingDependencies);
-            var existingDependencyRefs = new HashSet<string>(existingDependencies.Select(d => d.Ref));
-
-            foreach (var component in components)
-            {
-                var bomRef = component.Manufacturer.BomRef;
-                if (!string.IsNullOrEmpty(bomRef) && !existingDependencyRefs.Contains(bomRef))
-                {
-                    allDependencies.Add(new Dependency
-                    {
-                        Ref = bomRef,
-                        Dependencies = new List<Dependency>()
-                    });
-                }
-            }
-
-            return allDependencies;
-        }        
+                Dependencies = [.. kvp.Value.Select(dep => new Dependency { Ref = dep.bomRef })]
+            })];
+        }       
 
     }
 }

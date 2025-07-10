@@ -470,24 +470,37 @@ namespace LCT.PackageIdentifier
                     {
                         Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
                         bom = ParseCycloneDXBom(filepath);
-                        bom = RemoveExcludedComponents(appSettings, bom);
-                        CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
-                        AddingIdentifierType(bom.Components, "CycloneDXFile");
-                        BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += bom.Components.Count;
-                        componentsForBOM.AddRange(bom.Components);
-                        dependencies.AddRange(bom.Dependencies);
+                        if (bom?.Components != null)
+                        {
+                            bom = RemoveExcludedComponents(appSettings, bom);
+                            CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
+                            AddingIdentifierType(bom.Components, "CycloneDXFile");
+                            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += bom.Components.Count;
+                            componentsForBOM.AddRange(bom.Components);                            
+                        }
+                        if (bom?.Dependencies != null)
+                        {
+                            dependencies.AddRange(bom.Dependencies);
+                        }
                     }
                 }
                 else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
                 {
                     bom = _spdxBomParser.ParseSPDXBom(filepath);
-                    bom = RemoveExcludedComponents(appSettings, bom);
-                    CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
-                    AddingIdentifierType(bom.Components, "SpdxFile");
-                    BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += bom.Components.Count;
-                    componentsForBOM.AddRange(bom.Components);
-                    dependencies.AddRange(bom.Dependencies);                    
-                    CommonHelper.AddSpdxSBomFileNameProperty(ref bom, filepath);
+                    if (bom?.Components != null) 
+                    {
+                        bom = RemoveExcludedComponents(appSettings, bom);
+                        CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
+                        AddingIdentifierType(bom.Components, "SpdxFile");
+                        BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += bom.Components.Count;
+                        componentsForBOM.AddRange(bom.Components);                        
+                        CommonHelper.AddSpdxSBomFileNameProperty(ref bom, filepath);
+                    }
+                    if (bom?.Dependencies!=null)
+                    {
+                        dependencies.AddRange(bom.Dependencies);
+                    }
+                   
                 }
                 else
                 {
@@ -495,17 +508,14 @@ namespace LCT.PackageIdentifier
                     var components = ParsePackageLockJson(filepath, appSettings);
                     AddingIdentifierType(components, "PackageFile");
                     componentsForBOM.AddRange(components);
+                    GetDependencyDetails(components, dependencies);
                 }
             }
             string templateFilePath = SbomTemplate.GetFilePathForTemplate(listOfTemplateBomfilePaths);
-            SbomTemplate.ProcessTemplateFile(templateFilePath, _cycloneDXBomParser, componentsForBOM, appSettings.ProjectType);
-            if (dependencies != null)
-            {
-                GetdependencyDetails(componentsForBOM, dependencies);
-            }
+            SbomTemplate.ProcessTemplateFile(templateFilePath, _cycloneDXBomParser, componentsForBOM, appSettings.ProjectType);            
         }
 
-        public static void GetdependencyDetails(List<Component> componentsForBOM, List<Dependency> dependencies)
+        public static void GetDependencyDetails(List<Component> componentsForBOM, List<Dependency> dependencies)
         {
             List<Dependency> dependencyList = new();
 

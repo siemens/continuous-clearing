@@ -281,7 +281,7 @@ namespace LCT.PackageIdentifier
         {
             Bom bom = BomHelper.ParseBomFile(filePath, _spdxBomParser, _cycloneDXBomParser);
 
-            foreach (var componentsInfo in bom.Components)
+            foreach (var componentsInfo in bom?.Components)
             {
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;
                 DebianPackage package = new DebianPackage

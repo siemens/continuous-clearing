@@ -522,7 +522,7 @@ namespace LCT.Common
         }
         public static void AddSpdxSBomFileNameProperty(ref Bom bom, string filePath)
         {
-            if (bom.Components != null)
+            if (bom?.Components != null)
             {
                 string filename = Path.GetFileName(filePath);
                 var bomComponentsList = bom.Components;

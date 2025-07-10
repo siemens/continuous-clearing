@@ -249,12 +249,18 @@ namespace LCT.PackageIdentifier
                     componentsForBOM.AddRange(components);
                 }
                 else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
-                {
-                    string filename = Path.GetFileName(filepath); // e.g., "example.spdx.sbom.json"                    
+                {                  
                     bom = _spdxBomParser.ParseSPDXBom(filepath);
-                    CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
-                    GetDetailsforManuallyAddedComp(bom.Components);
-                    componentsForBOM.AddRange(bom.Components);
+                    if (bom?.Components!=null)
+                    {
+                        CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
+                        GetDetailsforManuallyAddedComp(bom.Components);
+                        componentsForBOM.AddRange(bom.Components);
+                    }
+                    if (bom?.Dependencies != null)
+                    {
+                        dependencies.AddRange(bom.Dependencies);
+                    }
                 }
                 else if (filepath.EndsWith(FileConstant.CycloneDXFileExtension)
                     && !filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))

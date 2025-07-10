@@ -112,7 +112,7 @@ namespace LCT.PackageIdentifier
         private void ExtractDetailsForJson(string filePath, ref List<AlpinePackage> alpinePackages, List<Dependency> dependenciesForBOM)
         {
             Bom bom = BomHelper.ParseBomFile(filePath, _spdxBomParser, _cycloneDXBomParser);
-            foreach (var componentsInfo in bom.Components)
+            foreach (var componentsInfo in bom?.Components)
             {
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;
                 AlpinePackage package = new AlpinePackage
@@ -134,7 +134,7 @@ namespace LCT.PackageIdentifier
                     Logger.Debug($"ExtractDetailsForJson():InvalidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
                 }
             }
-            if (bom.Dependencies != null)
+            if (bom?.Dependencies != null)
             {
                 dependenciesForBOM.AddRange(bom.Dependencies);
             }

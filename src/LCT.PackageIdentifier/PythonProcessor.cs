@@ -197,7 +197,7 @@ namespace LCT.PackageIdentifier
             }
             CycloneDXBomParser.CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
 
-            foreach (var componentsInfo in bom.Components)
+            foreach (var componentsInfo in bom?.Components)
             {
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;
                 PythonPackage package = new PythonPackage
@@ -220,7 +220,7 @@ namespace LCT.PackageIdentifier
                 }
             }
 
-            if (bom.Dependencies != null)
+            if (bom?.Dependencies != null)
             {
                 dependencies.AddRange(bom.Dependencies);
             }

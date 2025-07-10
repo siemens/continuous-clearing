@@ -469,22 +469,35 @@ namespace LCT.PackageIdentifier
             {
                 Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
                 Bom bomList = _cycloneDXBomParser.ParseCycloneDXBom(filepath);
-                CycloneDXBomParser.CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
-                componentsForBOM.AddRange(bomList.Components);
-                bom.Dependencies.AddRange(bomList.Dependencies);
-                CommonHelper.GetDetailsForManuallyAdded(componentsForBOM, listComponentForBOM);
+                if (bomList?.Components != null)
+                {
+                    CycloneDXBomParser.CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
+                    componentsForBOM.AddRange(bomList.Components);                    
+                    CommonHelper.GetDetailsForManuallyAdded(componentsForBOM, listComponentForBOM);
+                }
+                if (bomList?.Dependencies != null)
+                {
+                    bom.Dependencies.AddRange(bomList.Dependencies);
+                }
+
+
             }
             else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
             {
                 Bom bomList = _spdxBomParser.ParseSPDXBom(filepath);
-                CycloneDXBomParser.CheckValidComponentsForProjectType(
-                        bomList.Components, appSettings.ProjectType);                
-                CommonHelper.AddSpdxSBomFileNameProperty(ref bomList, filepath);
-                componentsForBOM.AddRange(bomList.Components);
-                bom.Dependencies.AddRange(bomList.Dependencies);
-                CommonHelper.GetDetailsForManuallyAdded(componentsForBOM,
-                    listComponentForBOM);                                
-
+                if (bomList?.Components != null)
+                {
+                    CycloneDXBomParser.CheckValidComponentsForProjectType(
+                        bomList.Components, appSettings.ProjectType);
+                    CommonHelper.AddSpdxSBomFileNameProperty(ref bomList, filepath);
+                    componentsForBOM.AddRange(bomList.Components);                   
+                    CommonHelper.GetDetailsForManuallyAdded(componentsForBOM,
+                        listComponentForBOM);
+                }
+                if (bomList?.Dependencies != null)
+                {
+                    bom.Dependencies.AddRange(bomList.Dependencies);
+                }
             }
             else
             {
