@@ -476,7 +476,9 @@ namespace LCT.PackageIdentifier
                     CommonHelper.GetDetailsForManuallyAdded(componentsForBOM, listComponentForBOM,filepath);
                 }                    
                 if(bomList.Dependencies!=null)
-                bom.Dependencies.AddRange(bomList.Dependencies);
+                {
+                    bom.Dependencies.AddRange(bomList.Dependencies);
+                }                
             }
             else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
             {

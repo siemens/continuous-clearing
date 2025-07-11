@@ -133,7 +133,7 @@ namespace LCT.PackageIdentifier
                     Logger.Debug($"ExtractDetailsForJson():InvalidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
                 }
             }
-            if (bom?.Dependencies != null)
+            if (bom.Dependencies != null)
             {
                 dependenciesForBOM.AddRange(bom.Dependencies);
             }
