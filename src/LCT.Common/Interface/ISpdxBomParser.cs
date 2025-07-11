@@ -1,9 +1,12 @@
-﻿using CycloneDX.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2025 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+
+// Ignore Spelling: Spdx Bom LCT
+
+using CycloneDX.Models;
 
 namespace LCT.Common.Interface
 {

@@ -1,4 +1,10 @@
-﻿// Ignore Spelling: LCT Spdx Bom
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2025 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+
+// Ignore Spelling: LCT Spdx Bom
 
 using CycloneDX.Json;
 using CycloneDX.Models;
