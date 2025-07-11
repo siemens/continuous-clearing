@@ -19,7 +19,7 @@ namespace LCT.PackageIdentifier
     /// Provides methods to verify digital signatures using PEM-encoded certificates or public keys.
     /// Supports RSA, ECDSA, and DSA algorithms.
     /// </summary>
-    public class PemSignatureVerifier
+    public static class PemSignatureVerifier
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -34,8 +34,8 @@ namespace LCT.PackageIdentifier
         public static bool ValidatePem(string documentPath, string signaturePath, string pemFilePath)
         {
             string pemContent = File.ReadAllText(pemFilePath).Trim();
-            string certHeader = "-----BEGIN CERTIFICATE-----";
-            string certFooter = "-----END CERTIFICATE-----";
+            const string certHeader = "-----BEGIN CERTIFICATE-----";
+            const string certFooter = "-----END CERTIFICATE-----";
             string base64Content;
 
             int headerIndex = pemContent.IndexOf(certHeader, StringComparison.Ordinal);
@@ -183,7 +183,8 @@ namespace LCT.PackageIdentifier
             }
             catch (Exception ex)
             {
-                throw new Exception($"Verification failed: {ex.Message}", ex);
+                Logger.Error($"Error validating signed file: {ex.Message}", ex);
+                return false;
             }
         }
 
@@ -236,8 +237,10 @@ namespace LCT.PackageIdentifier
                     return ecdsa.VerifyData(data, signature, HashAlgorithmName.SHA256);
                 }
             }
-            catch
+            catch (Exception ex) when (ex is CryptographicException || ex is FormatException)
             {
+                Logger.Debug($"ECDSA verification failed: {ex.Message}");
+                // If ECDSA verification fails, we can try RSA or DSA
                 return false;
             }
         }
@@ -255,8 +258,10 @@ namespace LCT.PackageIdentifier
                     return rsa.VerifyData(data, signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
                 }
             }
-            catch
+            catch (Exception ex) when (ex is CryptographicException || ex is FormatException)
             {
+                Logger.Debug($"RSA verification failed: {ex.Message}");
+                // If RSA verification fails, we can try DSA
                 return false;
             }
         }
@@ -276,8 +281,9 @@ namespace LCT.PackageIdentifier
                         return true;
                 }
             }
-            catch
+            catch (Exception ex) when (ex is CryptographicException || ex is FormatException)
             {
+                Logger.Debug($"DSA verification failed: {ex.Message}");
                 return false;
             }
             return false;

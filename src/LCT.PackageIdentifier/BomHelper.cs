@@ -139,8 +139,8 @@ namespace LCT.PackageIdentifier
                 bool isValidFile = PemSignatureVerifier.ValidatePem(filepath, foundFiles.TryGetValue($"{filename}.sig", out string pemFile) ? pemFile : string.Empty, foundFiles.TryGetValue($"{filename}.pem", out string sigFile) ? sigFile : string.Empty);
                 if (!isValidFile)
                 {
-                    Logger.Error($"SPDX file validation failed");
-                    environmentHelper.CallEnvironmentExit(-1);
+                    Logger.Warn($"SPDX file validation failed for " +
+                                 $"'{filename}'. Please ensure that the signature and PEM files are valid.");
                 }
             }
         }
