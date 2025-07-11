@@ -181,9 +181,29 @@ namespace LCT.PackageIdentifier
                 Logger.Debug("Unsupported or invalid public key format.");
                 return false;
             }
-            catch (Exception ex)
+            catch (IOException ex)
             {
-                Logger.Error($"Error validating signed file: {ex.Message}", ex);
+                Logger.Error($"Error reading file during signature validation: {ex.Message}", ex);
+                return false;
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                Logger.Error($"Access denied while reading file during signature validation: {ex.Message}", ex);
+                return false;
+            }
+            catch (CryptographicException ex)
+            {
+                Logger.Error($"Cryptographic error during signature validation: {ex.Message}", ex);
+                return false;
+            }
+            catch (FormatException ex)
+            {
+                Logger.Error($"Invalid format during signature validation: {ex.Message}", ex);
+                return false;
+            }
+            catch (ArgumentException ex)
+            {
+                Logger.Error($"Invalid argument during signature validation: {ex.Message}", ex);
                 return false;
             }
         }

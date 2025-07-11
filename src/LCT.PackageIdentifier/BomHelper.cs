@@ -33,7 +33,7 @@ namespace LCT.PackageIdentifier
     public class BomHelper : IBomHelper
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
+        private static EnvironmentHelper environmentHelper = new EnvironmentHelper();
 
         #region public methods
 
@@ -100,15 +100,31 @@ namespace LCT.PackageIdentifier
 
         public static void NamingConventionOfSPDXFile(string filepath, CommonAppSettings appSettings)
         {
-            string filename = Path.GetFileName(filepath); // e.g., "example.spdx.sbom.json"
-            string missing = String.Empty;
+            string filename = Path.GetFileName(filepath);
             var relatedExtensions = new[] { $"{filename}.pem", $"{filename}.sig" };
 
             var foundFiles = new Dictionary<string, string>();
             var missingFiles = new List<string>();
+            
+            CheckFileExistence(appSettings.Directory.InputFolder, relatedExtensions, foundFiles, missingFiles);
+
+            if (missingFiles.Count > 0)
+            {
+                HandleMissingFiles(missingFiles, filename);
+                environmentHelper.CallEnvironmentExit(-1);
+            }
+            else
+            {
+                ValidateFoundFiles(filepath, filename, foundFiles);
+            }
+        }
+
+        private static void CheckFileExistence(string inputFolder, string[] relatedExtensions, 
+            Dictionary<string, string> foundFiles, List<string> missingFiles)
+        {
             foreach (var related in relatedExtensions)
             {
-                string relatedFile = Path.Combine(appSettings.Directory.InputFolder, related);
+                string relatedFile = Path.Combine(inputFolder, related);
                 if (File.Exists(relatedFile))
                 {
                     foundFiles[related] = relatedFile;
@@ -118,30 +134,32 @@ namespace LCT.PackageIdentifier
                     missingFiles.Add(related);
                 }
             }
+        }
 
-            if (missingFiles.Count > 0)
+        private static void HandleMissingFiles(List<string> missingFiles, string filename)
+        {
+            foreach (var missingFile in missingFiles)
             {
-                foreach (var missingFile in missingFiles)
+                if (missingFile.EndsWith(".sig", StringComparison.OrdinalIgnoreCase))
                 {
-                    if (missingFile.EndsWith(".sig", StringComparison.OrdinalIgnoreCase))
-                    {
-                        Logger.Error($"Naming Convention Error: The certificate file(s) for the SPDX document '{filename}' are missing. Please ensure that signature files are named in the format '{filename}.sig'.");
-                    }
-                    else if (missingFile.EndsWith(".pem", StringComparison.OrdinalIgnoreCase))
-                    {
-                        Logger.Error($"Naming Convention Error: The certificate file(s) for the SPDX document '{filename}' are missing. Please ensure that .pem files are named in the format '{filename}.pem'.");
-                    }
+                    Logger.Error($"Naming Convention Error: The certificate file(s) for the SPDX document '{filename}' are missing. Please ensure that signature files are named in the format '{filename}.sig'.");
                 }
-                environmentHelper.CallEnvironmentExit(-1);
+                else if (missingFile.EndsWith(".pem", StringComparison.OrdinalIgnoreCase))
+                {
+                    Logger.Error($"Naming Convention Error: The certificate file(s) for the SPDX document '{filename}' are missing. Please ensure that .pem files are named in the format '{filename}.pem'.");
+                }
             }
-            else
+        }
+
+        private static void ValidateFoundFiles(string filepath, string filename, Dictionary<string, string> foundFiles)
+        {
+            string sigFilePath = foundFiles.TryGetValue($"{filename}.sig", out string sigFile) ? sigFile : string.Empty;
+            string pemFilePath = foundFiles.TryGetValue($"{filename}.pem", out string pemFile) ? pemFile : string.Empty;
+            
+            bool isValidFile = PemSignatureVerifier.ValidatePem(filepath, sigFilePath, pemFilePath);
+            if (!isValidFile)
             {
-                bool isValidFile = PemSignatureVerifier.ValidatePem(filepath, foundFiles.TryGetValue($"{filename}.sig", out string pemFile) ? pemFile : string.Empty, foundFiles.TryGetValue($"{filename}.pem", out string sigFile) ? sigFile : string.Empty);
-                if (!isValidFile)
-                {
-                    Logger.Warn($"SPDX file validation failed for " +
-                                 $"'{filename}'. Please ensure that the signature and PEM files are valid.");
-                }
+                Logger.Warn($"SPDX file validation failed for '{filename}'. Please ensure that the signature and PEM files are valid.");
             }
         }
         public static string GetHashCodeUsingNpmView(string name, string version)
