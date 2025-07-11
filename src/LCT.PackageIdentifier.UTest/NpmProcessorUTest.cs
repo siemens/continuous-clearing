@@ -436,7 +436,7 @@ namespace LCT.PackageIdentifier.UTest
         }
 
         [Test]
-        public void GetdependencyDetailsOfAComponent_ReturnsListOfDependency_SuccessFully()
+        public void GetDependencyDetailsOfAComponent_ReturnsListOfDependency_SuccessFully()
         {
             // Arrange
             Component component = new Component
@@ -476,7 +476,7 @@ namespace LCT.PackageIdentifier.UTest
 
             //Act
 
-            NpmProcessor.GetdependencyDetails(componentsForBOM, dependencyList);
+            NpmProcessor.GetDependencyDetails(componentsForBOM, dependencyList);
 
             //Assert
             Assert.That(expectedDependencyList.Count, Is.EqualTo(dependencyList.Count));

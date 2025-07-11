@@ -468,24 +468,27 @@ namespace LCT.PackageIdentifier
                 !filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
                 Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
-                Bom bomList = _cycloneDXBomParser.ParseCycloneDXBom(filepath);
-                CycloneDXBomParser.CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
-                componentsForBOM.AddRange(bomList.Components);
+                Bom bomList = _cycloneDXBomParser.ParseCycloneDXBom(filepath);                
+                if (bomList.Components != null)
+                {
+                    CycloneDXBomParser.CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
+                    componentsForBOM.AddRange(bomList.Components);
+                    CommonHelper.GetDetailsForManuallyAdded(componentsForBOM, listComponentForBOM,filepath);
+                }                    
+                if(bomList.Dependencies!=null)
                 bom.Dependencies.AddRange(bomList.Dependencies);
-                CommonHelper.GetDetailsForManuallyAdded(componentsForBOM, listComponentForBOM);
             }
             else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
             {
                 BomHelper.NamingConventionOfSPDXFile(filepath, appSettings);
                 Bom bomList = _spdxBomParser.ParseSPDXBom(filepath);
+                bomList.Properties = new List<Property>();
                 CycloneDXBomParser.CheckValidComponentsForProjectType(
-                        bomList.Components, appSettings.ProjectType);                
-                CommonHelper.AddSpdxSBomFileNameProperty(ref bomList, filepath);
+                        bomList.Components, appSettings.ProjectType);
                 componentsForBOM.AddRange(bomList.Components);
-                bom.Dependencies.AddRange(bomList.Dependencies);
                 CommonHelper.GetDetailsForManuallyAdded(componentsForBOM,
-                    listComponentForBOM);                                
-
+                    listComponentForBOM,filepath);
+                bom.Dependencies.AddRange(bomList.Dependencies);
             }
             else
             {

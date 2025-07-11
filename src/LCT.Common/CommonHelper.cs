@@ -234,11 +234,17 @@ namespace LCT.Common
             return component.Properties.Exists(x => x.Name == constant);
         }
 
-        public static void GetDetailsForManuallyAdded(List<Component> componentsForBOM, List<Component> listComponentForBOM)
+        public static void GetDetailsForManuallyAdded(List<Component> componentsForBOM, List<Component> listComponentForBOM,string filePath)
         {
             foreach (var component in componentsForBOM)
             {
-                component.Properties ??= new List<Property>();
+                string filename = Path.GetFileName(filePath);
+                component.Properties = new List<Property>();
+                if (filePath.EndsWith(FileConstant.SPDXFileExtension))
+                {
+                    var spdxFileName = new Property { Name = Dataconstant.Cdx_SpdxFileName, Value = filename };
+                    component.Properties.Add(spdxFileName);
+                }
                 Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
                 Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.ManullayAdded };
                 component.Properties.Add(isDev);
@@ -522,7 +528,7 @@ namespace LCT.Common
         }
         public static void AddSpdxSBomFileNameProperty(ref Bom bom, string filePath)
         {
-            if (bom.Components != null)
+            if (bom?.Components != null)
             {
                 string filename = Path.GetFileName(filePath);
                 var bomComponentsList = bom.Components;
