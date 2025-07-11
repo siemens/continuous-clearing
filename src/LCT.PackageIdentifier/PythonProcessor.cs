@@ -9,6 +9,7 @@ using LCT.APICommunications;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Interface;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
@@ -24,12 +25,13 @@ using Component = CycloneDX.Models.Component;
 
 namespace LCT.PackageIdentifier
 {
-    public class PythonProcessor(ICycloneDXBomParser cycloneDXBomParser) : IParser
+    public class PythonProcessor(ICycloneDXBomParser cycloneDXBomParser,ISpdxBomParser spdxBomParser) : IParser
     {
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
 
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
+        private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
 
         public Bom ParsePackageFile(CommonAppSettings appSettings)
         {
@@ -49,7 +51,8 @@ namespace LCT.PackageIdentifier
                 {
                     listofComponents.AddRange(ExtractDetailsForPoetryLockfile(config, dependencies));
                 }
-                else if (config.EndsWith(FileConstant.CycloneDXFileExtension) && !config.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                else if ((config.EndsWith(FileConstant.CycloneDXFileExtension) || config.EndsWith(FileConstant.SPDXFileExtension))
+         && !config.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     listofComponents.AddRange(ExtractDetailsFromJson(config, appSettings, ref dependencies));
                 }
@@ -181,8 +184,17 @@ namespace LCT.PackageIdentifier
 
         private List<PythonPackage> ExtractDetailsFromJson(string filePath, CommonAppSettings appSettings, ref List<Dependency> dependencies)
         {
+            Bom bom;
             List<PythonPackage> PythonPackages = new List<PythonPackage>();
-            Bom bom = _cycloneDXBomParser.ParseCycloneDXBom(filePath);
+            if (filePath.EndsWith(FileConstant.SPDXFileExtension))
+            {
+                bom = _spdxBomParser.ParseSPDXBom(filePath);
+                CommonHelper.AddSpdxSBomFileNameProperty(ref bom, filePath);
+            }
+            else
+            {
+                bom = _cycloneDXBomParser.ParseCycloneDXBom(filePath);
+            }
             CycloneDXBomParser.CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
 
             foreach (var componentsInfo in bom.Components)

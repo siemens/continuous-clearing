@@ -7,6 +7,7 @@
 using CycloneDX.Models;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
+using LCT.Common.Interface;
 using LCT.PackageIdentifier.Interface;
 using LCT.Services.Interface;
 using Moq;
@@ -22,6 +23,7 @@ namespace LCT.PackageIdentifier.UTest
         private Mock<IJFrogService> _mockJFrogService;
         private Mock<IBomHelper> _mockBomHelper;
         private Mock<ICycloneDXBomParser> _mockCycloneDxBomParser;
+        private Mock<ISpdxBomParser> _mockspdxBomParser;
 
         [SetUp]
         public void Setup()
@@ -29,7 +31,8 @@ namespace LCT.PackageIdentifier.UTest
             _mockJFrogService = new Mock<IJFrogService>();
             _mockBomHelper = new Mock<IBomHelper>();
             _mockCycloneDxBomParser = new Mock<ICycloneDXBomParser>();
-            _conanProcessor = new ConanProcessor(_mockCycloneDxBomParser.Object);
+            _mockspdxBomParser = new Mock<ISpdxBomParser>();
+            _conanProcessor = new ConanProcessor(_mockCycloneDxBomParser.Object, _mockspdxBomParser.Object);
         }
 
         [Test]

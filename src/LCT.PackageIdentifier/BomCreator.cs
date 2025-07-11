@@ -38,6 +38,7 @@ namespace LCT.PackageIdentifier
         public static readonly BomKpiData bomKpiData = new();
         ComponentIdentification componentData;
         private readonly ICycloneDXBomParser CycloneDXBomParser;
+        private readonly ISpdxBomParser SpdxBomParser;
         public IJFrogService JFrogService { get; set; }
         public IBomHelper BomHelper { get; set; }
 
@@ -46,11 +47,12 @@ namespace LCT.PackageIdentifier
 
         public static Jfrog jfrog { get; set; } = new Jfrog();
         public static SW360 sw360 { get; set; } = new SW360();
-        public BomCreator(ICycloneDXBomParser cycloneDXBomParser, IFrameworkPackages frameworkPackages, ICompositionBuilder compositionBuilder)
+        public BomCreator(ICycloneDXBomParser cycloneDXBomParser, IFrameworkPackages frameworkPackages, ICompositionBuilder compositionBuilder,ISpdxBomParser spdxBomParser)
         {
             CycloneDXBomParser = cycloneDXBomParser;
             _frameworkPackages = frameworkPackages;
             _compositionBuilder = compositionBuilder;
+            SpdxBomParser = spdxBomParser;
         }
 
         public async Task GenerateBom(CommonAppSettings appSettings,
@@ -155,25 +157,25 @@ namespace LCT.PackageIdentifier
             switch (appSettings.ProjectType.ToUpperInvariant())
             {
                 case "NPM":
-                    parser = new NpmProcessor(CycloneDXBomParser);
+                    parser = new NpmProcessor(CycloneDXBomParser, SpdxBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 case "NUGET":
-                    parser = new NugetProcessor(CycloneDXBomParser, _frameworkPackages, _compositionBuilder);
+                    parser = new NugetProcessor(CycloneDXBomParser, _frameworkPackages, _compositionBuilder,SpdxBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 case "MAVEN":
-                    parser = new MavenProcessor(CycloneDXBomParser);
+                    parser = new MavenProcessor(CycloneDXBomParser, SpdxBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 case "DEBIAN":
-                    parser = new DebianProcessor(CycloneDXBomParser);
+                    parser = new DebianProcessor(CycloneDXBomParser, SpdxBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 case "ALPINE":
-                    parser = new AlpineProcessor(CycloneDXBomParser);
+                    parser = new AlpineProcessor(CycloneDXBomParser, SpdxBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 case "POETRY":
-                    parser = new PythonProcessor(CycloneDXBomParser);
+                    parser = new PythonProcessor(CycloneDXBomParser, SpdxBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 case "CONAN":
-                    parser = new ConanProcessor(CycloneDXBomParser);
+                    parser = new ConanProcessor(CycloneDXBomParser, SpdxBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 default:
                     Logger.Error($"GenerateBom():Invalid ProjectType - {appSettings.ProjectType}");

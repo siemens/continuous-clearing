@@ -30,14 +30,16 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using Directory = System.IO.Directory;
+using File = System.IO.File;
 
 namespace LCT.PackageIdentifier
 {
-    public partial class NugetProcessor(ICycloneDXBomParser cycloneDXBomParser, IFrameworkPackages frameworkPackages, ICompositionBuilder compositionBuilder) : CycloneDXBomParser, IParser
+    public partial class NugetProcessor(ICycloneDXBomParser cycloneDXBomParser, IFrameworkPackages frameworkPackages, ICompositionBuilder compositionBuilder,ISpdxBomParser spdxBomParser) : CycloneDXBomParser, IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
+        private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
         private readonly IFrameworkPackages _frameworkPackages = frameworkPackages;
         private readonly ICompositionBuilder _compositionBuilder = compositionBuilder;
         private Dictionary<string, Dictionary<string, NuGetVersion>> _listofFrameworkPackages = new Dictionary<string, Dictionary<string, NuGetVersion>>();
@@ -50,6 +52,7 @@ namespace LCT.PackageIdentifier
             Logger.Debug($"ParsePackageFile():Start");
             List<Component> listComponentForBOM = new List<Component>();
             Bom bom = new Bom();
+            bom.Dependencies = new List<Dependency>();
             if (DetectDeploymentType(appSettings))
             {
                 isSelfContainedProject = true;
@@ -453,6 +456,7 @@ namespace LCT.PackageIdentifier
             ref Bom bom,
             List<string> listOfTemplateBomfilePaths)
         {
+            List<Component> componentsForBOM = new List<Component>();            
             if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
                 listOfTemplateBomfilePaths.Add(filepath);
@@ -464,17 +468,35 @@ namespace LCT.PackageIdentifier
                 !filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
                 Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
-                bom = _cycloneDXBomParser.ParseCycloneDXBom(filepath);
-                CycloneDXBomParser.CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
-                var componentsForBOM = new List<Component>(bom.Components);
-                CommonHelper.GetDetailsForManuallyAdded(componentsForBOM, listComponentForBOM);
+                Bom bomList = _cycloneDXBomParser.ParseCycloneDXBom(filepath);                
+                if (bomList.Components != null)
+                {
+                    CycloneDXBomParser.CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
+                    componentsForBOM.AddRange(bomList.Components);
+                    CommonHelper.GetDetailsForManuallyAdded(componentsForBOM, listComponentForBOM,filepath);
+                }                    
+                if(bomList.Dependencies!=null)
+                {
+                    bom.Dependencies.AddRange(bomList.Dependencies);
+                }                
+            }
+            else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
+            {
+                Bom bomList = _spdxBomParser.ParseSPDXBom(filepath);
+                bomList.Properties = new List<Property>();
+                CycloneDXBomParser.CheckValidComponentsForProjectType(
+                        bomList.Components, appSettings.ProjectType);
+                componentsForBOM.AddRange(bomList.Components);
+                CommonHelper.GetDetailsForManuallyAdded(componentsForBOM,
+                    listComponentForBOM,filepath);
+                bom.Dependencies.AddRange(bomList.Dependencies);
             }
             else
             {
                 Logger.Debug($"ParsingInputFileForBOM():Found as Package File");
                 var listofComponents = new List<NugetPackage>();
-                ParseInputFiles(appSettings, filepath, listofComponents);
                 var dependencies = new List<Dependency>();
+                ParseInputFiles(appSettings, filepath, listofComponents);                
                 ConvertToCycloneDXModel(listComponentForBOM, listofComponents, dependencies);
 
                 if (bom.Dependencies == null || bom.Dependencies.Count == 0)

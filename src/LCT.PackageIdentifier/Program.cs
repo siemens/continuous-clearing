@@ -71,6 +71,7 @@ namespace LCT.PackageIdentifier
             services.AddTransient<ISettingsManager, SettingsManager>();
             services.AddTransient<ICycloneDXBomParser, CycloneDXBomParser>();
             services.AddTransient<IBomCreator, BomCreator>();
+            services.AddTransient<ISpdxBomParser, SpdxBomParser>();
             services.AddTransient<Program>();
             services.AddScoped<ICompositionBuilder, CompositionBuilder>();
         }

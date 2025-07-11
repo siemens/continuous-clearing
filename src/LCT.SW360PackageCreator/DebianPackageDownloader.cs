@@ -17,6 +17,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Directory = System.IO.Directory;
+using File = System.IO.File;
 
 namespace LCT.SW360PackageCreator
 {

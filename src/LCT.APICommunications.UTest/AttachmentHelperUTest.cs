@@ -3,6 +3,7 @@ using LCT.Common.Model;
 using Moq;
 using System.Net;
 using System.Security;
+using File = System.IO.File;
 
 namespace LCT.APICommunications.UTest
 {
