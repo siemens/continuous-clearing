@@ -468,36 +468,26 @@ namespace LCT.PackageIdentifier
                 !filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
                 Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
-                Bom bomList = _cycloneDXBomParser.ParseCycloneDXBom(filepath);
-                if (bomList?.Components != null)
+                Bom bomList = _cycloneDXBomParser.ParseCycloneDXBom(filepath);                
+                if (bomList.Components != null)
                 {
                     CycloneDXBomParser.CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
-                    componentsForBOM.AddRange(bomList.Components);                    
-                    CommonHelper.GetDetailsForManuallyAdded(componentsForBOM, listComponentForBOM);
-                }
-                if (bomList?.Dependencies != null)
-                {
-                    bom.Dependencies.AddRange(bomList.Dependencies);
-                }
-
-
+                    componentsForBOM.AddRange(bomList.Components);
+                    CommonHelper.GetDetailsForManuallyAdded(componentsForBOM, listComponentForBOM,filepath);
+                }                    
+                if(bomList.Dependencies!=null)
+                bom.Dependencies.AddRange(bomList.Dependencies);
             }
             else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
             {
                 Bom bomList = _spdxBomParser.ParseSPDXBom(filepath);
-                if (bomList?.Components != null)
-                {
-                    CycloneDXBomParser.CheckValidComponentsForProjectType(
+                bomList.Properties = new List<Property>();
+                CycloneDXBomParser.CheckValidComponentsForProjectType(
                         bomList.Components, appSettings.ProjectType);
-                    CommonHelper.AddSpdxSBomFileNameProperty(ref bomList, filepath);
-                    componentsForBOM.AddRange(bomList.Components);                   
-                    CommonHelper.GetDetailsForManuallyAdded(componentsForBOM,
-                        listComponentForBOM);
-                }
-                if (bomList?.Dependencies != null)
-                {
-                    bom.Dependencies.AddRange(bomList.Dependencies);
-                }
+                componentsForBOM.AddRange(bomList.Components);
+                CommonHelper.GetDetailsForManuallyAdded(componentsForBOM,
+                    listComponentForBOM,filepath);
+                bom.Dependencies.AddRange(bomList.Dependencies);
             }
             else
             {

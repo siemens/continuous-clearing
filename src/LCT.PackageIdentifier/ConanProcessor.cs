@@ -251,16 +251,11 @@ namespace LCT.PackageIdentifier
                 else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
                 {                  
                     bom = _spdxBomParser.ParseSPDXBom(filepath);
-                    if (bom?.Components!=null)
-                    {
-                        CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
-                        GetDetailsforManuallyAddedComp(bom.Components);
-                        componentsForBOM.AddRange(bom.Components);
-                    }
-                    if (bom?.Dependencies != null)
-                    {
-                        dependencies.AddRange(bom.Dependencies);
-                    }
+                    CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
+                    GetDetailsforManuallyAddedComp(bom.Components);
+                    CommonHelper.AddSpdxSBomFileNameProperty(ref bom, filepath);
+                    componentsForBOM.AddRange(bom.Components);
+                    dependencies.AddRange(bom.Dependencies);
                 }
                 else if (filepath.EndsWith(FileConstant.CycloneDXFileExtension)
                     && !filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))

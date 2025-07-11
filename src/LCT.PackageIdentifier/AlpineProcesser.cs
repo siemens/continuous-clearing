@@ -36,7 +36,6 @@ namespace LCT.PackageIdentifier
             List<string> configFiles;
             List<AlpinePackage> listofComponents = new List<AlpinePackage>();
             Bom bom = new Bom();
-            List<Component> listComponentForBOM = new List<Component>();
             List<Dependency> dependenciesForBOM = new();
 
             configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Alpine);
@@ -57,7 +56,7 @@ namespace LCT.PackageIdentifier
 
             int initialCount = listofComponents.Count;
             GetDistinctComponentList(ref listofComponents);
-            listComponentForBOM = FormComponentReleaseExternalID(listofComponents);
+            List<Component> listComponentForBOM = FormComponentReleaseExternalID(listofComponents);
             BomCreator.bomKpiData.DuplicateComponents = initialCount - listComponentForBOM.Count;
 
             bom.Components = listComponentForBOM;
@@ -112,7 +111,7 @@ namespace LCT.PackageIdentifier
         private void ExtractDetailsForJson(string filePath, ref List<AlpinePackage> alpinePackages, List<Dependency> dependenciesForBOM)
         {
             Bom bom = BomHelper.ParseBomFile(filePath, _spdxBomParser, _cycloneDXBomParser);
-            foreach (var componentsInfo in bom?.Components)
+            foreach (var componentsInfo in bom.Components)
             {
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;
                 AlpinePackage package = new AlpinePackage

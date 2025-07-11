@@ -21,6 +21,8 @@ namespace LCT.Common
         {
             Logger.Debug($"Starting SPDX BOM parsing for file: {filePath}");
             Bom bom = new Bom();
+            bom.Components = new List<Component>();
+            bom.Dependencies = new List<Dependency>();
             SpdxBomData spdxBomData;
             string json;
 

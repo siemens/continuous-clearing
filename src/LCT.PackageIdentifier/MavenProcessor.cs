@@ -254,10 +254,20 @@ namespace LCT.PackageIdentifier
             }
             else
             {
-                component.Properties = new List<Property>();
-                component.Properties.Add(isDev);
-                component.Properties.Add(identifierType);
-                componentsToBOM.Add(component);
+                if (CommonHelper.ComponentPropertyCheck(component, Dataconstant.Cdx_SpdxFileName))
+                {
+                    component.Properties.Add(isDev);
+                    component.Properties.Add(identifierType);
+                    componentsToBOM.Add(component);
+                }
+                else
+                {
+                    component.Properties = new List<Property>();
+                    component.Properties.Add(isDev);
+                    component.Properties.Add(identifierType);
+                    componentsToBOM.Add(component);
+                }
+                
             }
         }
 

@@ -470,43 +470,34 @@ namespace LCT.PackageIdentifier
                     {
                         Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
                         bom = ParseCycloneDXBom(filepath);
-                        if (bom?.Components != null)
+                        if (bom.Components != null)
                         {
                             bom = RemoveExcludedComponents(appSettings, bom);
                             CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
-                            AddingIdentifierType(bom.Components, "CycloneDXFile");
+                            AddingIdentifierType(bom.Components, "CycloneDXFile",filepath);
                             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += bom.Components.Count;
-                            componentsForBOM.AddRange(bom.Components);                            
-                        }
-                        if (bom?.Dependencies != null)
-                        {
-                            dependencies.AddRange(bom.Dependencies);
-                        }
+                            componentsForBOM.AddRange(bom.Components);
+                        }                            
+                        if(bom.Dependencies!=null)
+                        dependencies.AddRange(bom.Dependencies);
                     }
                 }
                 else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
                 {
-                    bom = _spdxBomParser.ParseSPDXBom(filepath);
-                    if (bom?.Components != null) 
-                    {
-                        bom = RemoveExcludedComponents(appSettings, bom);
-                        CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
-                        AddingIdentifierType(bom.Components, "SpdxFile");
-                        BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += bom.Components.Count;
-                        componentsForBOM.AddRange(bom.Components);                        
-                        CommonHelper.AddSpdxSBomFileNameProperty(ref bom, filepath);
-                    }
-                    if (bom?.Dependencies!=null)
-                    {
-                        dependencies.AddRange(bom.Dependencies);
-                    }
-                   
+                    bom = _spdxBomParser.ParseSPDXBom(filepath);                    
+                    bom = RemoveExcludedComponents(appSettings, bom);
+                    CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
+                    AddingIdentifierType(bom.Components, "SpdxFile",filepath);
+                    BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += bom.Components.Count;
+                    componentsForBOM.AddRange(bom.Components);
+                    dependencies.AddRange(bom.Dependencies);
+
                 }
                 else
                 {
                     Logger.Debug($"ParsingInputFileForBOM():Found as Package File");
                     var components = ParsePackageLockJson(filepath, appSettings);
-                    AddingIdentifierType(components, "PackageFile");
+                    AddingIdentifierType(components, "PackageFile",filepath);
                     componentsForBOM.AddRange(components);
                     GetDependencyDetails(components, dependencies);
                 }
@@ -686,7 +677,7 @@ namespace LCT.PackageIdentifier
             return components;
         }
 
-        private static void AddingIdentifierType(List<Component> components, string identifiedBy)
+        private static void AddingIdentifierType(List<Component> components, string identifiedBy,string filePath)
         {
             foreach (var component in components)
             {
@@ -701,6 +692,12 @@ namespace LCT.PackageIdentifier
                 }
                 else
                 {
+                    string filename = Path.GetFileName(filePath);
+                    if (identifiedBy == "SpdxFile")
+                    {
+                        var spdxFileName = new Property { Name = Dataconstant.Cdx_SpdxFileName, Value = filename };
+                        component.Properties.Add(spdxFileName);
+                    }
                     isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
                     identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.ManullayAdded };
                     component.Properties.Add(isDev);

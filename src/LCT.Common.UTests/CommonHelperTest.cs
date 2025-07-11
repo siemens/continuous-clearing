@@ -142,9 +142,9 @@ namespace LCT.Common.UTest
             componentsForBOM.Add(new Component() { Name = "Component1", Version = "1.0" });
             componentsForBOM.Add(new Component() { Name = "Component2", Version = "2.0" });
             List<Component> listComponentForBOM = new List<Component>();
-
+            string filePath = "C:\\catool\\sbom.spdx.sbom.json";
             //Act
-            CommonHelper.GetDetailsForManuallyAdded(componentsForBOM, listComponentForBOM);
+            CommonHelper.GetDetailsForManuallyAdded(componentsForBOM, listComponentForBOM, filePath);
 
             //Assert
             Assert.AreEqual(2, listComponentForBOM.Count);
