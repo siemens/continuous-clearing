@@ -8,14 +8,18 @@ using CycloneDX.Models;
 using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
+using LCT.Common.Constants;
 using LCT.Common.Interface;
 using LCT.Common.Model;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
+using LCT.Services;
 using LCT.Services.Interface;
 using Moq;
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace LCT.PackageIdentifier.UTest
@@ -568,6 +572,82 @@ namespace LCT.PackageIdentifier.UTest
 
             string hashcode = BomHelper.GetHashCodeUsingNpmView(name, version);
             Assert.That(expectedhashcode, Is.EqualTo(hashcode));
+        }
+
+        [Test]
+        public void NamingConventionOfSPDXFile_WithValidPemFiles_CallsValidatePem()
+        {
+            // Arrange
+            var tempDir = Path.GetTempPath();
+            var testFile = Path.Combine(tempDir, "test-file.spdx");
+            var sigFile = Path.Combine(tempDir, "test-file.spdx.sig");
+            var pemFile = Path.Combine(tempDir, "test-file.spdx.pem");
+            var appSettings = new CommonAppSettings()
+            {
+                Directory = new LCT.Common.Directory()
+                {
+                    InputFolder = tempDir
+                }
+            };
+
+            try
+            {
+                // Create test files with valid content
+                System.IO.File.WriteAllText(testFile, "valid spdx content");
+                System.IO.File.WriteAllText(sigFile, "dummy signature");
+                System.IO.File.WriteAllText(pemFile, "dummy pem content");
+
+                // Act - This will trigger the ValidatePem call
+                Assert.DoesNotThrow(() => BomHelper.NamingConventionOfSPDXFile(testFile, appSettings));
+            }
+            finally
+            {
+                // Cleanup
+                if (System.IO.File.Exists(testFile)) System.IO.File.Delete(testFile);
+                if (System.IO.File.Exists(sigFile)) System.IO.File.Delete(sigFile);
+                if (System.IO.File.Exists(pemFile)) System.IO.File.Delete(pemFile);
+            }
+        }
+
+        [Test]
+        public void NamingConventionOfSPDXFile_WithMissingPemFiles_CallsValidatePemWithEmptyStrings()
+        {
+            // Arrange
+            var tempDir = Path.GetTempPath();
+            var testFile = Path.Combine(tempDir, "test-missing.spdx");
+            var appSettings = new CommonAppSettings()
+            {
+                Directory = new LCT.Common.Directory()
+                {
+                    InputFolder = tempDir
+                }
+            };
+
+            // Mock the static environmentHelper to prevent actual exit
+            var mockEnvironmentHelper = new Mock<IEnvironmentHelper>();
+            var field = typeof(BomHelper).GetField("environmentHelper", BindingFlags.NonPublic | BindingFlags.Static);
+            var originalEnvironmentHelper = field?.GetValue(null);
+            field?.SetValue(null, mockEnvironmentHelper.Object);
+
+            try
+            {
+                // Create only the main file, no .sig or .pem files
+                System.IO.File.WriteAllText(testFile, "valid spdx content");
+
+                // Act - This will trigger the ValidatePem call with empty strings
+                Assert.DoesNotThrow(() => BomHelper.NamingConventionOfSPDXFile(testFile, appSettings));
+                
+                // Verify environment exit was called due to missing files
+                mockEnvironmentHelper.Verify(x => x.CallEnvironmentExit(-1), Times.Once);
+            }
+            finally
+            {
+                // Cleanup
+                if (System.IO.File.Exists(testFile)) System.IO.File.Delete(testFile);
+                
+                // Restore original environmentHelper
+                field?.SetValue(null, originalEnvironmentHelper);
+            }
         }
     }
 }
