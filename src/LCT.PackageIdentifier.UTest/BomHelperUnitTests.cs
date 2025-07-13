@@ -610,6 +610,5 @@ namespace LCT.PackageIdentifier.UTest
             }
         }
 
-
     }
 }
