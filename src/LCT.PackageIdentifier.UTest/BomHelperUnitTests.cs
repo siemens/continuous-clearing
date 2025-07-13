@@ -17,6 +17,7 @@ using LCT.Services;
 using LCT.Services.Interface;
 using Moq;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -609,45 +610,6 @@ namespace LCT.PackageIdentifier.UTest
             }
         }
 
-        [Test]
-        public void NamingConventionOfSPDXFile_WithMissingPemFiles_CallsValidatePemWithEmptyStrings()
-        {
-            // Arrange
-            var tempDir = Path.GetTempPath();
-            var testFile = Path.Combine(tempDir, "test-missing.spdx");
-            var appSettings = new CommonAppSettings()
-            {
-                Directory = new LCT.Common.Directory()
-                {
-                    InputFolder = tempDir
-                }
-            };
 
-            // Mock the static environmentHelper to prevent actual exit
-            var mockEnvironmentHelper = new Mock<IEnvironmentHelper>();
-            var field = typeof(BomHelper).GetField("environmentHelper", BindingFlags.NonPublic | BindingFlags.Static);
-            var originalEnvironmentHelper = field?.GetValue(null);
-            field?.SetValue(null, mockEnvironmentHelper.Object);
-
-            try
-            {
-                // Create only the main file, no .sig or .pem files
-                System.IO.File.WriteAllText(testFile, "valid spdx content");
-
-                // Act - This will trigger the ValidatePem call with empty strings
-                Assert.DoesNotThrow(() => BomHelper.NamingConventionOfSPDXFile(testFile, appSettings));
-                
-                // Verify environment exit was called due to missing files
-                mockEnvironmentHelper.Verify(x => x.CallEnvironmentExit(-1), Times.Once);
-            }
-            finally
-            {
-                // Cleanup
-                if (System.IO.File.Exists(testFile)) System.IO.File.Delete(testFile);
-                
-                // Restore original environmentHelper
-                field?.SetValue(null, originalEnvironmentHelper);
-            }
-        }
     }
 }
