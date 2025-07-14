@@ -1311,6 +1311,5 @@ namespace LCT.PackageIdentifier.UTest
             Assert.AreEqual("false", result.Components.First().Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsDevelopment)?.Value);
         }
 
-
     }
 }
