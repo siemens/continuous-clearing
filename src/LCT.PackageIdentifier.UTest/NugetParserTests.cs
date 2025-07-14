@@ -1167,7 +1167,7 @@ namespace LCT.PackageIdentifier.UTest
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual("false", result.Components.First().Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsDevelopment)?.Value);
+            Assert.AreEqual("false", result.Components[0].Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsDevelopment)?.Value);
         }
 
         [Test]
@@ -1311,14 +1311,6 @@ namespace LCT.PackageIdentifier.UTest
             Assert.AreEqual("false", result.Components.First().Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsDevelopment)?.Value);
         }
 
-        [Test]
-        [Ignore("This test was failing. Ignoring until fixed.")]
-        public void HandleConfigFile_WhenSPDXHasNullComponents_DoesNotThrowException()
-        {
-            // TODO: Fix this test
-            // This test was failing and causing builds to break
-            // The original test was located at line 1375 of NugetParserTests.cs
-            Assert.Pass("Test ignored");
-        }
+
     }
 }
