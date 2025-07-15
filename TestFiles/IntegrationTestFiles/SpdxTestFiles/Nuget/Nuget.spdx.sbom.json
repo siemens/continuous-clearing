@@ -1,0 +1,4071 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "D:\\CADashboard\\FrontEnd-Continuous-Clearing-Dashboard\\Backend\\src\\LCD.RestApi",
+  "documentNamespace": "https://anchore.com/syft/dir/D-%5CCADashboard%5CFrontEnd-Continuous-Clearing-Dashboard%5CBackend%5Csrc%5CLCD.RestApi-8f5c00a4-dc91-4712-8632-7ec6259a1931",
+  "creationInfo": {
+    "licenseListVersion": "3.24",
+    "creators": [ "Organization: Anchore, Inc", "Tool: syft-1.10.0" ],
+    "created": "2025-07-09T08:28:52Z"
+  },
+  "packages": [
+    {
+      "name": "Azure.Core",
+      "SPDXID": "SPDXRef-Package-dotnet-Azure.Core-c61bb1f4ad999203",
+      "versionInfo": "1.42.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Azure.Core:Azure.Core:1.42.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Azure.Core@1.42.0"
+        }
+      ]
+    },
+    {
+      "name": "Azure.Extensions.AspNetCore.Configuration.Secrets",
+      "SPDXID": "SPDXRef-Package-dotnet-Azure.Extensions.AspNetCore.Configuration.Secrets-27d47a5ae454f840",
+      "versionInfo": "1.3.2",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Azure.Extensions.AspNetCore.Configuration.Secrets:Azure.Extensions.AspNetCore.Configuration.Secrets:1.3.2:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Azure.Extensions.AspNetCore.Configuration.Secrets@1.3.2"
+        }
+      ]
+    },
+    {
+      "name": "Azure.Extensions.AspNetCore.Configuration.Secrets",
+      "SPDXID": "SPDXRef-Package-dotnet-Azure.Extensions.AspNetCore.Configuration.Secrets-669740453091c021",
+      "versionInfo": "1.300.224.41501",
+      "supplier": "Organization: Microsoft Corporation",
+      "originator": "Organization: Microsoft Corporation",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\Azure.Extensions.AspNetCore.Configuration.Secrets.dll",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Azure.Extensions.AspNetCore.Configuration.Secrets:Azure.Extensions.AspNetCore.Configuration.Secrets:1.300.224.41501:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Azure.Extensions.AspNetCore.Configuration.Secrets@1.300.224.41501"
+        }
+      ]
+    },
+    {
+      "name": "Azure.Identity",
+      "SPDXID": "SPDXRef-Package-dotnet-Azure.Identity-206b6c703f1522e0",
+      "versionInfo": "1.12.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Azure.Identity:Azure.Identity:1.12.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Azure.Identity@1.12.0"
+        }
+      ]
+    },
+    {
+      "name": "Azure.Security.KeyVault.Secrets",
+      "SPDXID": "SPDXRef-Package-dotnet-Azure.Security.KeyVault.Secrets-16d1d497e8ad1ed1",
+      "versionInfo": "4.6.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Azure.Security.KeyVault.Secrets:Azure.Security.KeyVault.Secrets:4.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Azure.Security.KeyVault.Secrets@4.6.0"
+        }
+      ]
+    },
+    {
+      "name": "Json.NET",
+      "SPDXID": "SPDXRef-Package-dotnet-Json.NET-9869806433ca9f08",
+      "versionInfo": "13.0.3.27908",
+      "supplier": "Organization: Newtonsoft",
+      "originator": "Organization: Newtonsoft",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\Newtonsoft.Json.dll",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Json.NET:Json.NET:13.0.3.27908:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Json.NET@13.0.3.27908"
+        }
+      ]
+    },
+    {
+      "name": "LCD.BusinessLogic",
+      "SPDXID": "SPDXRef-Package-dotnet-LCD.BusinessLogic-261972be4601c6b4",
+      "versionInfo": "1.0.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:LCD.BusinessLogic:LCD.BusinessLogic:1.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/LCD.BusinessLogic@1.0.0"
+        }
+      ]
+    },
+    {
+      "name": "LCD.BusinessLogic",
+      "SPDXID": "SPDXRef-Package-dotnet-LCD.BusinessLogic-e924d99c33b0aa76",
+      "versionInfo": "1.0.0.0",
+      "supplier": "Organization: LCD.BusinessLogic",
+      "originator": "Organization: LCD.BusinessLogic",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.BusinessLogic.dll",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:LCD.BusinessLogic:LCD.BusinessLogic:1.0.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/LCD.BusinessLogic@1.0.0.0"
+        }
+      ]
+    },
+    {
+      "name": "LCD.Common",
+      "SPDXID": "SPDXRef-Package-dotnet-LCD.Common-775f7d96c1d1d95e",
+      "versionInfo": "1.0.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:LCD.Common:LCD.Common:1.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/LCD.Common@1.0.0"
+        }
+      ]
+    },
+    {
+      "name": "LCD.Common",
+      "SPDXID": "SPDXRef-Package-dotnet-LCD.Common-34d4c7ee9f67fe88",
+      "versionInfo": "1.0.0.0",
+      "supplier": "Organization: LCD.Common",
+      "originator": "Organization: LCD.Common",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.Common.dll",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:LCD.Common:LCD.Common:1.0.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/LCD.Common@1.0.0.0"
+        }
+      ]
+    },
+    {
+      "name": "LCD.RestApi",
+      "SPDXID": "SPDXRef-Package-dotnet-LCD.RestApi-e7be35b906cd0e09",
+      "versionInfo": "1.0.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:LCD.RestApi:LCD.RestApi:1.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/LCD.RestApi@1.0.0"
+        }
+      ]
+    },
+    {
+      "name": "LCD.RestApi",
+      "SPDXID": "SPDXRef-Package-dotnet-LCD.RestApi-21556d9244ebd327",
+      "versionInfo": "1.0.0.0",
+      "supplier": "Organization: LCD.RestApi",
+      "originator": "Organization: LCD.RestApi",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.dll",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:LCD.RestApi:LCD.RestApi:1.0.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/LCD.RestApi@1.0.0.0"
+        }
+      ]
+    },
+    {
+      "name": "LCD.RestApi",
+      "SPDXID": "SPDXRef-Package-dotnet-LCD.RestApi-32e784d3fe414695",
+      "versionInfo": "1.0.0.0",
+      "supplier": "Organization: LCD.RestApi",
+      "originator": "Organization: LCD.RestApi",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.exe",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:LCD.RestApi:LCD.RestApi:1.0.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/LCD.RestApi@1.0.0.0"
+        }
+      ]
+    },
+    {
+      "name": "LCD.RestApi",
+      "SPDXID": "SPDXRef-Package-dotnet-LCD.RestApi-309ccd906723e2cd",
+      "versionInfo": "1.0.0.0",
+      "supplier": "Organization: LCD.RestApi",
+      "originator": "Organization: LCD.RestApi",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\obj\\Debug\\net8.0\\LCD.RestApi.dll",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:LCD.RestApi:LCD.RestApi:1.0.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/LCD.RestApi@1.0.0.0"
+        }
+      ]
+    },
+    {
+      "name": "LCD.RestApi",
+      "SPDXID": "SPDXRef-Package-dotnet-LCD.RestApi-870a7cb204c0eaf6",
+      "versionInfo": "1.0.0.0",
+      "supplier": "Organization: LCD.RestApi",
+      "originator": "Organization: LCD.RestApi",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\obj\\Debug\\net8.0\\apphost.exe",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:LCD.RestApi:LCD.RestApi:1.0.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/LCD.RestApi@1.0.0.0"
+        }
+      ]
+    },
+    {
+      "name": "LCD.RestApi",
+      "SPDXID": "SPDXRef-Package-dotnet-LCD.RestApi-213a551c5971d923",
+      "versionInfo": "1.0.0.0",
+      "supplier": "Organization: LCD.RestApi",
+      "originator": "Organization: LCD.RestApi",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\obj\\Debug\\net8.0\\ref\\LCD.RestApi.dll",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:LCD.RestApi:LCD.RestApi:1.0.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/LCD.RestApi@1.0.0.0"
+        }
+      ]
+    },
+    {
+      "name": "LCD.RestApi",
+      "SPDXID": "SPDXRef-Package-dotnet-LCD.RestApi-5b37d25ddc8bcbcc",
+      "versionInfo": "1.0.0.0",
+      "supplier": "Organization: LCD.RestApi",
+      "originator": "Organization: LCD.RestApi",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\obj\\Debug\\net8.0\\refint\\LCD.RestApi.dll",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:LCD.RestApi:LCD.RestApi:1.0.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/LCD.RestApi@1.0.0.0"
+        }
+      ]
+    },
+    {
+      "name": "LCT.APICommunications",
+      "SPDXID": "SPDXRef-Package-dotnet-LCT.APICommunications-2b1311633e94f85b",
+      "versionInfo": "1.0.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:LCT.APICommunications:LCT.APICommunications:1.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/LCT.APICommunications@1.0.0"
+        }
+      ]
+    },
+    {
+      "name": "LCT.APICommunications",
+      "SPDXID": "SPDXRef-Package-dotnet-LCT.APICommunications-5677084816727420",
+      "versionInfo": "1.0.0.0",
+      "supplier": "Organization: LCT.APICommunications",
+      "originator": "Organization: LCT.APICommunications",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCT.APICommunications.dll",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:LCT.APICommunications:LCT.APICommunications:1.0.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/LCT.APICommunications@1.0.0.0"
+        }
+      ]
+    },
+    {
+      "name": "Microsoft Azure Client Pipeline",
+      "SPDXID": "SPDXRef-Package-dotnet-Microsoft-Azure-Client-Pipeline-2538e982084cdeed",
+      "versionInfo": "1.4200.24.40104",
+      "supplier": "Organization: Microsoft Corporation",
+      "originator": "Organization: Microsoft Corporation",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\Azure.Core.dll",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Microsoft_Azure_Client_Pipeline:Microsoft_Azure_Client_Pipeline:1.4200.24.40104:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Microsoft%20Azure%20Client%20Pipeline@1.4200.24.40104"
+        }
+      ]
+    },
+    {
+      "name": "Microsoft Azure.Identity Component",
+      "SPDXID": "SPDXRef-Package-dotnet-Microsoft-Azure.Identity-Component-847da442dde093b2",
+      "versionInfo": "1.1200.24.31701",
+      "supplier": "Organization: Microsoft Corporation",
+      "originator": "Organization: Microsoft Corporation",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\Azure.Identity.dll",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Microsoft_Azure.Identity_Component:Microsoft_Azure.Identity_Component:1.1200.24.31701:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Microsoft%20Azure.Identity%20Component@1.1200.24.31701"
+        }
+      ]
+    },
+    {
+      "name": "Microsoft Azure.Security.KeyVault.Secrets client library",
+      "SPDXID": "SPDXRef-Package-dotnet-Microsoft-Azure.Security.KeyVault.Secrets-client-library-8904bca1101ee07e",
+      "versionInfo": "4.600.24.11403",
+      "supplier": "Organization: Microsoft Corporation",
+      "originator": "Organization: Microsoft Corporation",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\Azure.Security.KeyVault.Secrets.dll",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Microsoft_Azure.Security.KeyVault.Secrets_client_library:Microsoft_Azure.Security.KeyVault.Secrets_client_library:4.600.24.11403:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Microsoft%20Azure.Security.KeyVault.Secrets%20client%20library@4.600.24.11403"
+        }
+      ]
+    },
+    {
+      "name": "Microsoft.AspNetCore.SpaProxy",
+      "SPDXID": "SPDXRef-Package-dotnet-Microsoft.AspNetCore.SpaProxy-db4ff461d4406ef7",
+      "versionInfo": "8.0.8",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Microsoft.AspNetCore.SpaProxy:Microsoft.AspNetCore.SpaProxy:8.0.8:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Microsoft.AspNetCore.SpaProxy@8.0.8"
+        }
+      ]
+    },
+    {
+      "name": "Microsoft.AspNetCore.SpaProxy",
+      "SPDXID": "SPDXRef-Package-dotnet-Microsoft.AspNetCore.SpaProxy-987e3630aaebba2a",
+      "versionInfo": "8.0.824.36908",
+      "supplier": "Organization: Microsoft Corporation",
+      "originator": "Organization: Microsoft Corporation",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\Microsoft.AspNetCore.SpaProxy.dll",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Microsoft.AspNetCore.SpaProxy:Microsoft.AspNetCore.SpaProxy:8.0.824.36908:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Microsoft.AspNetCore.SpaProxy@8.0.824.36908"
+        }
+      ]
+    },
+    {
+      "name": "Microsoft.Bcl.AsyncInterfaces",
+      "SPDXID": "SPDXRef-Package-dotnet-Microsoft.Bcl.AsyncInterfaces-d058f6442265991e",
+      "versionInfo": "8.0.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Microsoft.Bcl.AsyncInterfaces:Microsoft.Bcl.AsyncInterfaces:8.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Microsoft.Bcl.AsyncInterfaces@8.0.0"
+        }
+      ]
+    },
+    {
+      "name": "Microsoft.Bcl.AsyncInterfaces",
+      "SPDXID": "SPDXRef-Package-dotnet-Microsoft.Bcl.AsyncInterfaces-7d1a0e0498005874",
+      "versionInfo": "8.0.23.53103",
+      "supplier": "Organization: Microsoft Corporation",
+      "originator": "Organization: Microsoft Corporation",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\Microsoft.Bcl.AsyncInterfaces.dll",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Microsoft.Bcl.AsyncInterfaces:Microsoft.Bcl.AsyncInterfaces:8.0.23.53103:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Microsoft.Bcl.AsyncInterfaces@8.0.23.53103"
+        }
+      ]
+    },
+    {
+      "name": "Microsoft.Extensions.ApiDescription.Server",
+      "SPDXID": "SPDXRef-Package-dotnet-Microsoft.Extensions.ApiDescription.Server-a3a3e9653747c0e0",
+      "versionInfo": "8.0.8",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Microsoft.Extensions.ApiDescription.Server:Microsoft.Extensions.ApiDescription.Server:8.0.8:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Microsoft.Extensions.ApiDescription.Server@8.0.8"
+        }
+      ]
+    },
+    {
+      "name": "Microsoft.Extensions.Configuration",
+      "SPDXID": "SPDXRef-Package-dotnet-Microsoft.Extensions.Configuration-2a09afa692d99e41",
+      "versionInfo": "8.0.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Microsoft.Extensions.Configuration:Microsoft.Extensions.Configuration:8.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Microsoft.Extensions.Configuration@8.0.0"
+        }
+      ]
+    },
+    {
+      "name": "Microsoft.Extensions.Configuration.Abstractions",
+      "SPDXID": "SPDXRef-Package-dotnet-Microsoft.Extensions.Configuration.Abstractions-8226b0efac1b47fa",
+      "versionInfo": "8.0.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Microsoft.Extensions.Configuration.Abstractions:Microsoft.Extensions.Configuration.Abstractions:8.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Microsoft.Extensions.Configuration.Abstractions@8.0.0"
+        }
+      ]
+    },
+    {
+      "name": "Microsoft.Extensions.Configuration.Binder",
+      "SPDXID": "SPDXRef-Package-dotnet-Microsoft.Extensions.Configuration.Binder-177d8a64f847c24d",
+      "versionInfo": "8.0.2",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Microsoft.Extensions.Configuration.Binder:Microsoft.Extensions.Configuration.Binder:8.0.2:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Microsoft.Extensions.Configuration.Binder@8.0.2"
+        }
+      ]
+    },
+    {
+      "name": "Microsoft.Extensions.Configuration.Binder",
+      "SPDXID": "SPDXRef-Package-dotnet-Microsoft.Extensions.Configuration.Binder-7d83331c6f5bb473",
+      "versionInfo": "8.0.724.31311",
+      "supplier": "Organization: Microsoft Corporation",
+      "originator": "Organization: Microsoft Corporation",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\Microsoft.Extensions.Configuration.Binder.dll",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Microsoft.Extensions.Configuration.Binder:Microsoft.Extensions.Configuration.Binder:8.0.724.31311:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Microsoft.Extensions.Configuration.Binder@8.0.724.31311"
+        }
+      ]
+    },
+    {
+      "name": "Microsoft.Extensions.DependencyInjection",
+      "SPDXID": "SPDXRef-Package-dotnet-Microsoft.Extensions.DependencyInjection-51ada073fdd0b0c2",
+      "versionInfo": "8.0.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Microsoft.Extensions.DependencyInjection:Microsoft.Extensions.DependencyInjection:8.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Microsoft.Extensions.DependencyInjection@8.0.0"
+        }
+      ]
+    },
+    {
+      "name": "Microsoft.Extensions.DependencyInjection.Abstractions",
+      "SPDXID": "SPDXRef-Package-dotnet-Microsoft.Extensions.DependencyInjection.Abstractions-ab27bfcf867df6e8",
+      "versionInfo": "8.0.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Microsoft.Extensions.DependencyInjection.Abstractions:Microsoft.Extensions.DependencyInjection.Abstractions:8.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Microsoft.Extensions.DependencyInjection.Abstractions@8.0.0"
+        }
+      ]
+    },
+    {
+      "name": "Microsoft.Extensions.Diagnostics",
+      "SPDXID": "SPDXRef-Package-dotnet-Microsoft.Extensions.Diagnostics-75fa03626b065ae8",
+      "versionInfo": "8.0.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Microsoft.Extensions.Diagnostics:Microsoft.Extensions.Diagnostics:8.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Microsoft.Extensions.Diagnostics@8.0.0"
+        }
+      ]
+    },
+    {
+      "name": "Microsoft.Extensions.Diagnostics.Abstractions",
+      "SPDXID": "SPDXRef-Package-dotnet-Microsoft.Extensions.Diagnostics.Abstractions-0d9943e6bce1bac2",
+      "versionInfo": "8.0.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Microsoft.Extensions.Diagnostics.Abstractions:Microsoft.Extensions.Diagnostics.Abstractions:8.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Microsoft.Extensions.Diagnostics.Abstractions@8.0.0"
+        }
+      ]
+    },
+    {
+      "name": "Microsoft.Extensions.Http",
+      "SPDXID": "SPDXRef-Package-dotnet-Microsoft.Extensions.Http-1bb9fa0f581797f1",
+      "versionInfo": "8.0.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Microsoft.Extensions.Http:Microsoft.Extensions.Http:8.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Microsoft.Extensions.Http@8.0.0"
+        }
+      ]
+    },
+    {
+      "name": "Microsoft.Extensions.Logging",
+      "SPDXID": "SPDXRef-Package-dotnet-Microsoft.Extensions.Logging-163085750182b152",
+      "versionInfo": "8.0.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Microsoft.Extensions.Logging:Microsoft.Extensions.Logging:8.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Microsoft.Extensions.Logging@8.0.0"
+        }
+      ]
+    },
+    {
+      "name": "Microsoft.Extensions.Logging.Abstractions",
+      "SPDXID": "SPDXRef-Package-dotnet-Microsoft.Extensions.Logging.Abstractions-a9bbe98cedb560bb",
+      "versionInfo": "8.0.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Microsoft.Extensions.Logging.Abstractions:Microsoft.Extensions.Logging.Abstractions:8.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Microsoft.Extensions.Logging.Abstractions@8.0.0"
+        }
+      ]
+    },
+    {
+      "name": "Microsoft.Extensions.Logging.Log4Net.AspNetCore",
+      "SPDXID": "SPDXRef-Package-dotnet-Microsoft.Extensions.Logging.Log4Net.AspNetCore-af43b92294145086",
+      "versionInfo": "8.0.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Microsoft.Extensions.Logging.Log4Net.AspNetCore:Microsoft.Extensions.Logging.Log4Net.AspNetCore:8.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Microsoft.Extensions.Logging.Log4Net.AspNetCore@8.0.0"
+        }
+      ]
+    },
+    {
+      "name": "Microsoft.Extensions.Logging.Log4Net.AspNetCore",
+      "SPDXID": "SPDXRef-Package-dotnet-Microsoft.Extensions.Logging.Log4Net.AspNetCore-dd2cf95ce2fb1a20",
+      "versionInfo": "8.0.0.0",
+      "supplier": "Organization: Huor Swords",
+      "originator": "Organization: Huor Swords",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\Microsoft.Extensions.Logging.Log4Net.AspNetCore.dll",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Microsoft.Extensions.Logging.Log4Net.AspNetCore:Microsoft.Extensions.Logging.Log4Net.AspNetCore:8.0.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Microsoft.Extensions.Logging.Log4Net.AspNetCore@8.0.0.0"
+        }
+      ]
+    },
+    {
+      "name": "Microsoft.Extensions.Options",
+      "SPDXID": "SPDXRef-Package-dotnet-Microsoft.Extensions.Options-814353794b615b62",
+      "versionInfo": "8.0.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Microsoft.Extensions.Options:Microsoft.Extensions.Options:8.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Microsoft.Extensions.Options@8.0.0"
+        }
+      ]
+    },
+    {
+      "name": "Microsoft.Extensions.Options.ConfigurationExtensions",
+      "SPDXID": "SPDXRef-Package-dotnet-Microsoft.Extensions.Options.ConfigurationExtensions-af8896636f5c9a10",
+      "versionInfo": "8.0.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Microsoft.Extensions.Options.ConfigurationExtensions:Microsoft.Extensions.Options.ConfigurationExtensions:8.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Microsoft.Extensions.Options.ConfigurationExtensions@8.0.0"
+        }
+      ]
+    },
+    {
+      "name": "Microsoft.Extensions.Primitives",
+      "SPDXID": "SPDXRef-Package-dotnet-Microsoft.Extensions.Primitives-dd566c86589d7a22",
+      "versionInfo": "8.0.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Microsoft.Extensions.Primitives:Microsoft.Extensions.Primitives:8.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Microsoft.Extensions.Primitives@8.0.0"
+        }
+      ]
+    },
+    {
+      "name": "Microsoft.Identity.Client",
+      "SPDXID": "SPDXRef-Package-dotnet-Microsoft.Identity.Client-c6c765b6b155d9e1",
+      "versionInfo": "4.64.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Microsoft.Identity.Client:Microsoft.Identity.Client:4.64.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Microsoft.Identity.Client@4.64.0"
+        }
+      ]
+    },
+    {
+      "name": "Microsoft.Identity.Client",
+      "SPDXID": "SPDXRef-Package-dotnet-Microsoft.Identity.Client-d03892c11dfc9f39",
+      "versionInfo": "4.64.0.0",
+      "supplier": "Organization: Microsoft Corporation",
+      "originator": "Organization: Microsoft Corporation",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\Microsoft.Identity.Client.dll",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Microsoft.Identity.Client:Microsoft.Identity.Client:4.64.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Microsoft.Identity.Client@4.64.0.0"
+        }
+      ]
+    },
+    {
+      "name": "Microsoft.Identity.Client.Extensions.Msal",
+      "SPDXID": "SPDXRef-Package-dotnet-Microsoft.Identity.Client.Extensions.Msal-5b5e9b2d511cdd2f",
+      "versionInfo": "4.64.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Microsoft.Identity.Client.Extensions.Msal:Microsoft.Identity.Client.Extensions.Msal:4.64.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Microsoft.Identity.Client.Extensions.Msal@4.64.0"
+        }
+      ]
+    },
+    {
+      "name": "Microsoft.Identity.Client.Extensions.Msal",
+      "SPDXID": "SPDXRef-Package-dotnet-Microsoft.Identity.Client.Extensions.Msal-b47d3933fd352c1c",
+      "versionInfo": "4.64.0.0",
+      "supplier": "Organization: Microsoft Corporation",
+      "originator": "Organization: Microsoft Corporation",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\Microsoft.Identity.Client.Extensions.Msal.dll",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Microsoft.Identity.Client.Extensions.Msal:Microsoft.Identity.Client.Extensions.Msal:4.64.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Microsoft.Identity.Client.Extensions.Msal@4.64.0.0"
+        }
+      ]
+    },
+    {
+      "name": "Microsoft.IdentityModel.Abstractions",
+      "SPDXID": "SPDXRef-Package-dotnet-Microsoft.IdentityModel.Abstractions-b31fd5e20c6dc924",
+      "versionInfo": "8.0.2",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Microsoft.IdentityModel.Abstractions:Microsoft.IdentityModel.Abstractions:8.0.2:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Microsoft.IdentityModel.Abstractions@8.0.2"
+        }
+      ]
+    },
+    {
+      "name": "Microsoft.IdentityModel.Abstractions",
+      "SPDXID": "SPDXRef-Package-dotnet-Microsoft.IdentityModel.Abstractions-f71e82acdb51e76f",
+      "versionInfo": "8.0.2.50822",
+      "supplier": "Organization: Microsoft Corporation.",
+      "originator": "Organization: Microsoft Corporation.",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\Microsoft.IdentityModel.Abstractions.dll",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Microsoft.IdentityModel.Abstractions:Microsoft.IdentityModel.Abstractions:8.0.2.50822:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Microsoft.IdentityModel.Abstractions@8.0.2.50822"
+        }
+      ]
+    },
+    {
+      "name": "Microsoft.OpenApi",
+      "SPDXID": "SPDXRef-Package-dotnet-Microsoft.OpenApi-b24856fb78b59bf7",
+      "versionInfo": "1.6.18",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Microsoft.OpenApi:Microsoft.OpenApi:1.6.18:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Microsoft.OpenApi@1.6.18"
+        }
+      ]
+    },
+    {
+      "name": "Microsoft.OpenApi",
+      "SPDXID": "SPDXRef-Package-dotnet-Microsoft.OpenApi-58d00334867174b9",
+      "versionInfo": "1.6.18.0",
+      "supplier": "Organization: Microsoft",
+      "originator": "Organization: Microsoft",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\Microsoft.OpenApi.dll",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Microsoft.OpenApi:Microsoft.OpenApi:1.6.18.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Microsoft.OpenApi@1.6.18.0"
+        }
+      ]
+    },
+    {
+      "name": "Newtonsoft.Json",
+      "SPDXID": "SPDXRef-Package-dotnet-Newtonsoft.Json-6b6efb577f0e93e7",
+      "versionInfo": "13.0.3",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Newtonsoft.Json:Newtonsoft.Json:13.0.3:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Newtonsoft.Json@13.0.3"
+        }
+      ]
+    },
+    {
+      "name": "Polly",
+      "SPDXID": "SPDXRef-Package-dotnet-Polly-767d305088ebd74b",
+      "versionInfo": "8.4.1",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Polly:Polly:8.4.1:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Polly@8.4.1"
+        }
+      ]
+    },
+    {
+      "name": "Polly",
+      "SPDXID": "SPDXRef-Package-dotnet-Polly-3e8a503307428a49",
+      "versionInfo": "8.4.1.3582",
+      "supplier": "Organization: App vNext",
+      "originator": "Organization: App vNext",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\Polly.dll",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Polly:Polly:8.4.1.3582:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Polly@8.4.1.3582"
+        }
+      ]
+    },
+    {
+      "name": "Polly.Core",
+      "SPDXID": "SPDXRef-Package-dotnet-Polly.Core-7ab08088ff87820e",
+      "versionInfo": "8.4.1",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Polly.Core:Polly.Core:8.4.1:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Polly.Core@8.4.1"
+        }
+      ]
+    },
+    {
+      "name": "Polly.Core",
+      "SPDXID": "SPDXRef-Package-dotnet-Polly.Core-1bb8a06f77ab0a17",
+      "versionInfo": "8.4.1.3582",
+      "supplier": "Organization: App vNext",
+      "originator": "Organization: App vNext",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\Polly.Core.dll",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Polly.Core:Polly.Core:8.4.1.3582:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Polly.Core@8.4.1.3582"
+        }
+      ]
+    },
+    {
+      "name": "Swashbuckle.AspNetCore",
+      "SPDXID": "SPDXRef-Package-dotnet-Swashbuckle.AspNetCore-54f239bb94b2db17",
+      "versionInfo": "6.7.3",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Swashbuckle.AspNetCore:Swashbuckle.AspNetCore:6.7.3:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Swashbuckle.AspNetCore@6.7.3"
+        }
+      ]
+    },
+    {
+      "name": "Swashbuckle.AspNetCore.Swagger",
+      "SPDXID": "SPDXRef-Package-dotnet-Swashbuckle.AspNetCore.Swagger-322828ba5e3163d2",
+      "versionInfo": "6.7.3",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Swashbuckle.AspNetCore.Swagger:Swashbuckle.AspNetCore.Swagger:6.7.3:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Swashbuckle.AspNetCore.Swagger@6.7.3"
+        }
+      ]
+    },
+    {
+      "name": "Swashbuckle.AspNetCore.Swagger",
+      "SPDXID": "SPDXRef-Package-dotnet-Swashbuckle.AspNetCore.Swagger-a24e77bd706b81e3",
+      "versionInfo": "6.7.3.685",
+      "supplier": "Organization: https://github.com/domaindrivendev/Swashbuckle.AspNetCore",
+      "originator": "Organization: https://github.com/domaindrivendev/Swashbuckle.AspNetCore",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\Swashbuckle.AspNetCore.Swagger.dll",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Swashbuckle.AspNetCore.Swagger:Swashbuckle.AspNetCore.Swagger:6.7.3.685:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Swashbuckle.AspNetCore.Swagger@6.7.3.685"
+        }
+      ]
+    },
+    {
+      "name": "Swashbuckle.AspNetCore.SwaggerGen",
+      "SPDXID": "SPDXRef-Package-dotnet-Swashbuckle.AspNetCore.SwaggerGen-d70ef3eeeb1af866",
+      "versionInfo": "6.7.3",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Swashbuckle.AspNetCore.SwaggerGen:Swashbuckle.AspNetCore.SwaggerGen:6.7.3:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Swashbuckle.AspNetCore.SwaggerGen@6.7.3"
+        }
+      ]
+    },
+    {
+      "name": "Swashbuckle.AspNetCore.SwaggerGen",
+      "SPDXID": "SPDXRef-Package-dotnet-Swashbuckle.AspNetCore.SwaggerGen-3ca17d090d0aea42",
+      "versionInfo": "6.7.3.685",
+      "supplier": "Organization: https://github.com/domaindrivendev/Swashbuckle.AspNetCore",
+      "originator": "Organization: https://github.com/domaindrivendev/Swashbuckle.AspNetCore",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\Swashbuckle.AspNetCore.SwaggerGen.dll",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Swashbuckle.AspNetCore.SwaggerGen:Swashbuckle.AspNetCore.SwaggerGen:6.7.3.685:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Swashbuckle.AspNetCore.SwaggerGen@6.7.3.685"
+        }
+      ]
+    },
+    {
+      "name": "Swashbuckle.AspNetCore.SwaggerUI",
+      "SPDXID": "SPDXRef-Package-dotnet-Swashbuckle.AspNetCore.SwaggerUI-8d8aceda3bae2b8d",
+      "versionInfo": "6.7.3",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Swashbuckle.AspNetCore.SwaggerUI:Swashbuckle.AspNetCore.SwaggerUI:6.7.3:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Swashbuckle.AspNetCore.SwaggerUI@6.7.3"
+        }
+      ]
+    },
+    {
+      "name": "Swashbuckle.AspNetCore.SwaggerUI",
+      "SPDXID": "SPDXRef-Package-dotnet-Swashbuckle.AspNetCore.SwaggerUI-3b5e462cb8a6d608",
+      "versionInfo": "6.7.3.685",
+      "supplier": "Organization: https://github.com/domaindrivendev/Swashbuckle.AspNetCore",
+      "originator": "Organization: https://github.com/domaindrivendev/Swashbuckle.AspNetCore",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\Swashbuckle.AspNetCore.SwaggerUI.dll",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:Swashbuckle.AspNetCore.SwaggerUI:Swashbuckle.AspNetCore.SwaggerUI:6.7.3.685:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Swashbuckle.AspNetCore.SwaggerUI@6.7.3.685"
+        }
+      ]
+    },
+    {
+      "name": "System.ClientModel",
+      "SPDXID": "SPDXRef-Package-dotnet-System.ClientModel-64980f307aa1ee01",
+      "versionInfo": "1.0.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:System.ClientModel:System.ClientModel:1.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/System.ClientModel@1.0.0"
+        }
+      ]
+    },
+    {
+      "name": "System.ClientModel",
+      "SPDXID": "SPDXRef-Package-dotnet-System.ClientModel-1416ae6fcb0cf357",
+      "versionInfo": "1.0.24.5302",
+      "supplier": "Organization: Microsoft Corporation",
+      "originator": "Organization: Microsoft Corporation",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\System.ClientModel.dll",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:System.ClientModel:System.ClientModel:1.0.24.5302:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/System.ClientModel@1.0.24.5302"
+        }
+      ]
+    },
+    {
+      "name": "System.Configuration.ConfigurationManager",
+      "SPDXID": "SPDXRef-Package-dotnet-System.Configuration.ConfigurationManager-acfd142366dc1744",
+      "versionInfo": "8.0.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:System.Configuration.ConfigurationManager:System.Configuration.ConfigurationManager:8.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/System.Configuration.ConfigurationManager@8.0.0"
+        }
+      ]
+    },
+    {
+      "name": "System.Configuration.ConfigurationManager",
+      "SPDXID": "SPDXRef-Package-dotnet-System.Configuration.ConfigurationManager-7b8d221393ccdbe7",
+      "versionInfo": "8.0.23.53103",
+      "supplier": "Organization: Microsoft Corporation",
+      "originator": "Organization: Microsoft Corporation",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\System.Configuration.ConfigurationManager.dll",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:System.Configuration.ConfigurationManager:System.Configuration.ConfigurationManager:8.0.23.53103:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/System.Configuration.ConfigurationManager@8.0.23.53103"
+        }
+      ]
+    },
+    {
+      "name": "System.Diagnostics.DiagnosticSource",
+      "SPDXID": "SPDXRef-Package-dotnet-System.Diagnostics.DiagnosticSource-3c860c6c4b9407b7",
+      "versionInfo": "8.0.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:System.Diagnostics.DiagnosticSource:System.Diagnostics.DiagnosticSource:8.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/System.Diagnostics.DiagnosticSource@8.0.0"
+        }
+      ]
+    },
+    {
+      "name": "System.Diagnostics.EventLog",
+      "SPDXID": "SPDXRef-Package-dotnet-System.Diagnostics.EventLog-68435eb5fb1ef4b0",
+      "versionInfo": "8.0.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:System.Diagnostics.EventLog:System.Diagnostics.EventLog:8.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/System.Diagnostics.EventLog@8.0.0"
+        }
+      ]
+    },
+    {
+      "name": "System.Memory",
+      "SPDXID": "SPDXRef-Package-dotnet-System.Memory-e464f97da25ae62f",
+      "versionInfo": "4.5.4",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:System.Memory:System.Memory:4.5.4:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/System.Memory@4.5.4"
+        }
+      ]
+    },
+    {
+      "name": "System.Memory.Data",
+      "SPDXID": "SPDXRef-Package-dotnet-System.Memory.Data-463d2b94dbc38c6d",
+      "versionInfo": "8.0.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:System.Memory.Data:System.Memory.Data:8.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/System.Memory.Data@8.0.0"
+        }
+      ]
+    },
+    {
+      "name": "System.Memory.Data",
+      "SPDXID": "SPDXRef-Package-dotnet-System.Memory.Data-6bc462a9031e01ab",
+      "versionInfo": "8.0.23.53103",
+      "supplier": "Organization: Microsoft Corporation",
+      "originator": "Organization: Microsoft Corporation",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\System.Memory.Data.dll",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:System.Memory.Data:System.Memory.Data:8.0.23.53103:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/System.Memory.Data@8.0.23.53103"
+        }
+      ]
+    },
+    {
+      "name": "System.Numerics.Vectors",
+      "SPDXID": "SPDXRef-Package-dotnet-System.Numerics.Vectors-3371cb5ab782bb92",
+      "versionInfo": "4.5.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:System.Numerics.Vectors:System.Numerics.Vectors:4.5.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/System.Numerics.Vectors@4.5.0"
+        }
+      ]
+    },
+    {
+      "name": "System.Security.AccessControl",
+      "SPDXID": "SPDXRef-Package-dotnet-System.Security.AccessControl-fdfcccee725f0b2d",
+      "versionInfo": "6.0.1",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:System.Security.AccessControl:System.Security.AccessControl:6.0.1:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/System.Security.AccessControl@6.0.1"
+        }
+      ]
+    },
+    {
+      "name": "System.Security.Cryptography.ProtectedData",
+      "SPDXID": "SPDXRef-Package-dotnet-System.Security.Cryptography.ProtectedData-99c7130b49244292",
+      "versionInfo": "8.0.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:System.Security.Cryptography.ProtectedData:System.Security.Cryptography.ProtectedData:8.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/System.Security.Cryptography.ProtectedData@8.0.0"
+        }
+      ]
+    },
+    {
+      "name": "System.Security.Cryptography.ProtectedData",
+      "SPDXID": "SPDXRef-Package-dotnet-System.Security.Cryptography.ProtectedData-d904a8148910c4b4",
+      "versionInfo": "8.0.23.53103",
+      "supplier": "Organization: Microsoft Corporation",
+      "originator": "Organization: Microsoft Corporation",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\System.Security.Cryptography.ProtectedData.dll",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:System.Security.Cryptography.ProtectedData:System.Security.Cryptography.ProtectedData:8.0.23.53103:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/System.Security.Cryptography.ProtectedData@8.0.23.53103"
+        }
+      ]
+    },
+    {
+      "name": "System.Security.Permissions",
+      "SPDXID": "SPDXRef-Package-dotnet-System.Security.Permissions-f3b184b77989e003",
+      "versionInfo": "8.0.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:System.Security.Permissions:System.Security.Permissions:8.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/System.Security.Permissions@8.0.0"
+        }
+      ]
+    },
+    {
+      "name": "System.Security.Permissions",
+      "SPDXID": "SPDXRef-Package-dotnet-System.Security.Permissions-e938a30a3184939d",
+      "versionInfo": "8.0.23.53103",
+      "supplier": "Organization: Microsoft Corporation",
+      "originator": "Organization: Microsoft Corporation",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\System.Security.Permissions.dll",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:System.Security.Permissions:System.Security.Permissions:8.0.23.53103:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/System.Security.Permissions@8.0.23.53103"
+        }
+      ]
+    },
+    {
+      "name": "System.Text.Encodings.Web",
+      "SPDXID": "SPDXRef-Package-dotnet-System.Text.Encodings.Web-8df60c0bd11f5526",
+      "versionInfo": "8.0.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:System.Text.Encodings.Web:System.Text.Encodings.Web:8.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/System.Text.Encodings.Web@8.0.0"
+        }
+      ]
+    },
+    {
+      "name": "System.Text.Json",
+      "SPDXID": "SPDXRef-Package-dotnet-System.Text.Json-18b12713a87f3621",
+      "versionInfo": "8.0.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:System.Text.Json:System.Text.Json:8.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/System.Text.Json@8.0.0"
+        }
+      ]
+    },
+    {
+      "name": "System.Threading.Tasks.Extensions",
+      "SPDXID": "SPDXRef-Package-dotnet-System.Threading.Tasks.Extensions-cd0f66bd51d6e25b",
+      "versionInfo": "4.5.4",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:System.Threading.Tasks.Extensions:System.Threading.Tasks.Extensions:4.5.4:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/System.Threading.Tasks.Extensions@4.5.4"
+        }
+      ]
+    },
+    {
+      "name": "System.Windows.Extensions",
+      "SPDXID": "SPDXRef-Package-dotnet-System.Windows.Extensions-1df02e4095102de8",
+      "versionInfo": "8.0.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:System.Windows.Extensions:System.Windows.Extensions:8.0.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/System.Windows.Extensions@8.0.0"
+        }
+      ]
+    },
+    {
+      "name": "System.Windows.Extensions",
+      "SPDXID": "SPDXRef-Package-dotnet-System.Windows.Extensions-1ec04dbda4c0fad0",
+      "versionInfo": "8.0.23.53103",
+      "supplier": "Organization: Microsoft Corporation",
+      "originator": "Organization: Microsoft Corporation",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\System.Windows.Extensions.dll",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:System.Windows.Extensions:System.Windows.Extensions:8.0.23.53103:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/System.Windows.Extensions@8.0.23.53103"
+        }
+      ]
+    },
+    {
+      "name": "System.Windows.Extensions",
+      "SPDXID": "SPDXRef-Package-dotnet-System.Windows.Extensions-15e4f26b250e37a0",
+      "versionInfo": "8.0.23.53103",
+      "supplier": "Organization: Microsoft Corporation",
+      "originator": "Organization: Microsoft Corporation",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\runtimes\\win\\lib\\net8.0\\System.Windows.Extensions.dll",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:System.Windows.Extensions:System.Windows.Extensions:8.0.23.53103:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/System.Windows.Extensions@8.0.23.53103"
+        }
+      ]
+    },
+    {
+      "name": "log4net",
+      "SPDXID": "SPDXRef-Package-dotnet-log4net-9a8fb5cc58f744d6",
+      "versionInfo": "2.0.17",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:log4net:log4net:2.0.17:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/log4net@2.0.17"
+        }
+      ]
+    },
+    {
+      "name": "log4net",
+      "SPDXID": "SPDXRef-Package-dotnet-log4net-eb8a5a9e2773e80c",
+      "versionInfo": "2.0.17.0",
+      "supplier": "Organization: The Apache Software Foundation",
+      "originator": "Organization: The Apache Software Foundation",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from dotnet project assets file: \\bin\\Debug\\net8.0\\log4net.dll",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:log4net:log4net:2.0.17.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/log4net@2.0.17.0"
+        }
+      ]
+    },
+    {
+      "name": "D:\\CADashboard\\FrontEnd-Continuous-Clearing-Dashboard\\Backend\\src\\LCD.RestApi",
+      "SPDXID": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "primaryPackagePurpose": "FILE"
+    }
+  ],
+  "files": [
+    {
+      "fileName": "\\bin\\Debug\\net8.0\\Azure.Core.dll",
+      "SPDXID": "SPDXRef-File--bin-Debug-net8.0-Azure.Core.dll-35fa442bab976072",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    },
+    {
+      "fileName": "\\bin\\Debug\\net8.0\\Azure.Extensions.AspNetCore.Configuration.Secrets.dll",
+      "SPDXID": "SPDXRef-File--bin-Debug-net8.0-Azure.Extensions.AspNetCore.Configuration.Secrets.dll-478644764014c1ae",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    },
+    {
+      "fileName": "\\bin\\Debug\\net8.0\\Azure.Identity.dll",
+      "SPDXID": "SPDXRef-File--bin-Debug-net8.0-Azure.Identity.dll-81490ade04d28079",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    },
+    {
+      "fileName": "\\bin\\Debug\\net8.0\\Azure.Security.KeyVault.Secrets.dll",
+      "SPDXID": "SPDXRef-File--bin-Debug-net8.0-Azure.Security.KeyVault.Secrets.dll-db5e7a2beda8e8d6",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    },
+    {
+      "fileName": "\\bin\\Debug\\net8.0\\LCD.BusinessLogic.dll",
+      "SPDXID": "SPDXRef-File--bin-Debug-net8.0-LCD.BusinessLogic.dll-02d8cd4b8a916e77",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    },
+    {
+      "fileName": "\\bin\\Debug\\net8.0\\LCD.Common.dll",
+      "SPDXID": "SPDXRef-File--bin-Debug-net8.0-LCD.Common.dll-4229d7479d4a30ad",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    },
+    {
+      "fileName": "\\bin\\Debug\\net8.0\\LCD.RestApi.deps.json",
+      "SPDXID": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    },
+    {
+      "fileName": "\\bin\\Debug\\net8.0\\LCD.RestApi.dll",
+      "SPDXID": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.dll-f5c511c917c436a0",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    },
+    {
+      "fileName": "\\bin\\Debug\\net8.0\\LCD.RestApi.exe",
+      "SPDXID": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.exe-dcf1e95c8771f2fe",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    },
+    {
+      "fileName": "\\bin\\Debug\\net8.0\\LCT.APICommunications.dll",
+      "SPDXID": "SPDXRef-File--bin-Debug-net8.0-LCT.APICommunications.dll-cfada7300802b475",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    },
+    {
+      "fileName": "\\bin\\Debug\\net8.0\\Microsoft.AspNetCore.SpaProxy.dll",
+      "SPDXID": "SPDXRef-File--bin-Debug-net8.0-Microsoft.AspNetCore.SpaProxy.dll-027bab7dcfe26e6e",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    },
+    {
+      "fileName": "\\bin\\Debug\\net8.0\\Microsoft.Bcl.AsyncInterfaces.dll",
+      "SPDXID": "SPDXRef-File--bin-Debug-net8.0-Microsoft.Bcl.AsyncInterfaces.dll-5686659edd623b9a",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    },
+    {
+      "fileName": "\\bin\\Debug\\net8.0\\Microsoft.Extensions.Configuration.Binder.dll",
+      "SPDXID": "SPDXRef-File--bin-Debug-net8.0-Microsoft.Extensions.Configuration.Binder.dll-9417f2b17702fcd4",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    },
+    {
+      "fileName": "\\bin\\Debug\\net8.0\\Microsoft.Extensions.Logging.Log4Net.AspNetCore.dll",
+      "SPDXID": "SPDXRef-File--bin-Debug-net8.0-Microsoft.Extensions.Logging.Log4Net.AspNetCore.dll-def89e7febb0ca8f",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    },
+    {
+      "fileName": "\\bin\\Debug\\net8.0\\Microsoft.Identity.Client.Extensions.Msal.dll",
+      "SPDXID": "SPDXRef-File--bin-Debug-net8.0-Microsoft.Identity.Client.Extensions.Msal.dll-c0f48f6fc278bea8",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    },
+    {
+      "fileName": "\\bin\\Debug\\net8.0\\Microsoft.Identity.Client.dll",
+      "SPDXID": "SPDXRef-File--bin-Debug-net8.0-Microsoft.Identity.Client.dll-65c3cac0130fe9f4",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    },
+    {
+      "fileName": "\\bin\\Debug\\net8.0\\Microsoft.IdentityModel.Abstractions.dll",
+      "SPDXID": "SPDXRef-File--bin-Debug-net8.0-Microsoft.IdentityModel.Abstractions.dll-542e246702bec5c8",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    },
+    {
+      "fileName": "\\bin\\Debug\\net8.0\\Microsoft.OpenApi.dll",
+      "SPDXID": "SPDXRef-File--bin-Debug-net8.0-Microsoft.OpenApi.dll-07071d55cf34b043",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    },
+    {
+      "fileName": "\\bin\\Debug\\net8.0\\Newtonsoft.Json.dll",
+      "SPDXID": "SPDXRef-File--bin-Debug-net8.0-Newtonsoft.Json.dll-f83505b7eb46d8f4",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    },
+    {
+      "fileName": "\\bin\\Debug\\net8.0\\Polly.Core.dll",
+      "SPDXID": "SPDXRef-File--bin-Debug-net8.0-Polly.Core.dll-19620354ba24f8d4",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    },
+    {
+      "fileName": "\\bin\\Debug\\net8.0\\Polly.dll",
+      "SPDXID": "SPDXRef-File--bin-Debug-net8.0-Polly.dll-ae1c2ffd5b8578c6",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    },
+    {
+      "fileName": "\\bin\\Debug\\net8.0\\Swashbuckle.AspNetCore.Swagger.dll",
+      "SPDXID": "SPDXRef-File--bin-Debug-net8.0-Swashbuckle.AspNetCore.Swagger.dll-a5d7eab19d15e3f2",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    },
+    {
+      "fileName": "\\bin\\Debug\\net8.0\\Swashbuckle.AspNetCore.SwaggerGen.dll",
+      "SPDXID": "SPDXRef-File--bin-Debug-net8.0-Swashbuckle.AspNetCore.SwaggerGen.dll-7b9d83ebf6eab7f6",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    },
+    {
+      "fileName": "\\bin\\Debug\\net8.0\\Swashbuckle.AspNetCore.SwaggerUI.dll",
+      "SPDXID": "SPDXRef-File--bin-Debug-net8.0-Swashbuckle.AspNetCore.SwaggerUI.dll-90a3314d4d4d3e78",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    },
+    {
+      "fileName": "\\bin\\Debug\\net8.0\\System.ClientModel.dll",
+      "SPDXID": "SPDXRef-File--bin-Debug-net8.0-System.ClientModel.dll-d87361000f8a1bf8",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    },
+    {
+      "fileName": "\\bin\\Debug\\net8.0\\System.Configuration.ConfigurationManager.dll",
+      "SPDXID": "SPDXRef-File--bin-Debug-net8.0-System.Configuration.ConfigurationManager.dll-e6b7124c037d64fb",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    },
+    {
+      "fileName": "\\bin\\Debug\\net8.0\\System.Memory.Data.dll",
+      "SPDXID": "SPDXRef-File--bin-Debug-net8.0-System.Memory.Data.dll-4e38df336e543555",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    },
+    {
+      "fileName": "\\bin\\Debug\\net8.0\\System.Security.Cryptography.ProtectedData.dll",
+      "SPDXID": "SPDXRef-File--bin-Debug-net8.0-System.Security.Cryptography.ProtectedData.dll-7c6ffc8196a87147",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    },
+    {
+      "fileName": "\\bin\\Debug\\net8.0\\System.Security.Permissions.dll",
+      "SPDXID": "SPDXRef-File--bin-Debug-net8.0-System.Security.Permissions.dll-3e0c85f8cee513b5",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    },
+    {
+      "fileName": "\\bin\\Debug\\net8.0\\System.Windows.Extensions.dll",
+      "SPDXID": "SPDXRef-File--bin-Debug-net8.0-System.Windows.Extensions.dll-c54595a41b072e3c",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    },
+    {
+      "fileName": "\\bin\\Debug\\net8.0\\log4net.dll",
+      "SPDXID": "SPDXRef-File--bin-Debug-net8.0-log4net.dll-ff66cbdf8b766201",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    },
+    {
+      "fileName": "\\bin\\Debug\\net8.0\\runtimes\\win\\lib\\net8.0\\System.Windows.Extensions.dll",
+      "SPDXID": "SPDXRef-File--bin-Debug-net8.0-runtimes-win-lib-net8.0-System.Windows.Extensions.dll-88bdaf8a84ffe53a",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    },
+    {
+      "fileName": "\\obj\\Debug\\net8.0\\LCD.RestApi.dll",
+      "SPDXID": "SPDXRef-File--obj-Debug-net8.0-LCD.RestApi.dll-8ae0826e4dd4eaa3",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    },
+    {
+      "fileName": "\\obj\\Debug\\net8.0\\apphost.exe",
+      "SPDXID": "SPDXRef-File--obj-Debug-net8.0-apphost.exe-c032a2701fb84049",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    },
+    {
+      "fileName": "\\obj\\Debug\\net8.0\\ref\\LCD.RestApi.dll",
+      "SPDXID": "SPDXRef-File--obj-Debug-net8.0-ref-LCD.RestApi.dll-5857bd773cd39681",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    },
+    {
+      "fileName": "\\obj\\Debug\\net8.0\\refint\\LCD.RestApi.dll",
+      "SPDXID": "SPDXRef-File--obj-Debug-net8.0-refint-LCD.RestApi.dll-b93278da8997129d",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0000000000000000000000000000000000000000"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [ "NOASSERTION" ],
+      "copyrightText": ""
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Diagnostics.Abstractions-0d9943e6bce1bac2",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Diagnostics-75fa03626b065ae8",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Logging-163085750182b152",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Http-1bb9fa0f581797f1",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Logging-163085750182b152",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Logging.Log4Net.AspNetCore-af43b92294145086",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Azure.Security.KeyVault.Secrets-16d1d497e8ad1ed1",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Azure.Extensions.AspNetCore.Configuration.Secrets-27d47a5ae454f840",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Azure.Security.KeyVault.Secrets-16d1d497e8ad1ed1",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.RestApi-e7be35b906cd0e09",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Configuration.Binder-177d8a64f847c24d",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Logging.Log4Net.AspNetCore-af43b92294145086",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Configuration.Binder-177d8a64f847c24d",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Options.ConfigurationExtensions-af8896636f5c9a10",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Configuration.Binder-177d8a64f847c24d",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.RestApi-e7be35b906cd0e09",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Text.Json-18b12713a87f3621",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Azure.Security.KeyVault.Secrets-16d1d497e8ad1ed1",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Text.Json-18b12713a87f3621",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Azure.Identity-206b6c703f1522e0",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Text.Json-18b12713a87f3621",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-System.Memory.Data-463d2b94dbc38c6d",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Text.Json-18b12713a87f3621",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-System.ClientModel-64980f307aa1ee01",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Text.Json-18b12713a87f3621",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Azure.Core-c61bb1f4ad999203",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Http-1bb9fa0f581797f1",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCT.APICommunications-2b1311633e94f85b",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Windows.Extensions-1df02e4095102de8",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-System.Security.Permissions-f3b184b77989e003",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Azure.Identity-206b6c703f1522e0",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.RestApi-e7be35b906cd0e09",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-LCD.BusinessLogic-261972be4601c6b4",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.RestApi-e7be35b906cd0e09",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Azure.Extensions.AspNetCore.Configuration.Secrets-27d47a5ae454f840",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.RestApi-e7be35b906cd0e09",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Configuration-2a09afa692d99e41",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Azure.Extensions.AspNetCore.Configuration.Secrets-27d47a5ae454f840",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Configuration-2a09afa692d99e41",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Diagnostics-75fa03626b065ae8",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Configuration-2a09afa692d99e41",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Logging.Log4Net.AspNetCore-af43b92294145086",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Configuration-2a09afa692d99e41",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.RestApi-e7be35b906cd0e09",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-LCT.APICommunications-2b1311633e94f85b",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.Common-775f7d96c1d1d95e",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Swashbuckle.AspNetCore.Swagger-322828ba5e3163d2",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Swashbuckle.AspNetCore-54f239bb94b2db17",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Swashbuckle.AspNetCore.Swagger-322828ba5e3163d2",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Swashbuckle.AspNetCore.SwaggerGen-d70ef3eeeb1af866",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Numerics.Vectors-3371cb5ab782bb92",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Azure.Core-c61bb1f4ad999203",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Diagnostics.DiagnosticSource-3c860c6c4b9407b7",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Diagnostics.Abstractions-0d9943e6bce1bac2",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Diagnostics.DiagnosticSource-3c860c6c4b9407b7",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Azure.Core-c61bb1f4ad999203",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Diagnostics.DiagnosticSource-3c860c6c4b9407b7",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Identity.Client-c6c765b6b155d9e1",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Memory.Data-463d2b94dbc38c6d",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-System.ClientModel-64980f307aa1ee01",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Memory.Data-463d2b94dbc38c6d",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Azure.Core-c61bb1f4ad999203",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Memory.Data-463d2b94dbc38c6d",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.RestApi-e7be35b906cd0e09",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.DependencyInjection-51ada073fdd0b0c2",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Logging-163085750182b152",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Swashbuckle.AspNetCore-54f239bb94b2db17",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.RestApi-e7be35b906cd0e09",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Identity.Client.Extensions.Msal-5b5e9b2d511cdd2f",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Azure.Identity-206b6c703f1522e0",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Identity.Client.Extensions.Msal-5b5e9b2d511cdd2f",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.RestApi-e7be35b906cd0e09",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.ClientModel-64980f307aa1ee01",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Azure.Core-c61bb1f4ad999203",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Diagnostics.EventLog-68435eb5fb1ef4b0",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-System.Configuration.ConfigurationManager-acfd142366dc1744",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Newtonsoft.Json-6b6efb577f0e93e7",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.BusinessLogic-261972be4601c6b4",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Newtonsoft.Json-6b6efb577f0e93e7",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCT.APICommunications-2b1311633e94f85b",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Newtonsoft.Json-6b6efb577f0e93e7",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.RestApi-e7be35b906cd0e09",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Diagnostics-75fa03626b065ae8",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Http-1bb9fa0f581797f1",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Polly-767d305088ebd74b",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.BusinessLogic-261972be4601c6b4",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-LCD.Common-775f7d96c1d1d95e",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.BusinessLogic-261972be4601c6b4",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Polly.Core-7ab08088ff87820e",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Polly-767d305088ebd74b",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Options-814353794b615b62",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Diagnostics.Abstractions-0d9943e6bce1bac2",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Options-814353794b615b62",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Logging-163085750182b152",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Options-814353794b615b62",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Http-1bb9fa0f581797f1",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Options-814353794b615b62",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Options.ConfigurationExtensions-af8896636f5c9a10",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Configuration.Abstractions-8226b0efac1b47fa",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Configuration.Binder-177d8a64f847c24d",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Configuration.Abstractions-8226b0efac1b47fa",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Http-1bb9fa0f581797f1",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Configuration.Abstractions-8226b0efac1b47fa",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Configuration-2a09afa692d99e41",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Configuration.Abstractions-8226b0efac1b47fa",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Logging.Log4Net.AspNetCore-af43b92294145086",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Configuration.Abstractions-8226b0efac1b47fa",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Options.ConfigurationExtensions-af8896636f5c9a10",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Swashbuckle.AspNetCore.SwaggerUI-8d8aceda3bae2b8d",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Swashbuckle.AspNetCore-54f239bb94b2db17",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Text.Encodings.Web-8df60c0bd11f5526",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-System.Text.Json-18b12713a87f3621",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Text.Encodings.Web-8df60c0bd11f5526",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Azure.Core-c61bb1f4ad999203",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Security.Cryptography.ProtectedData-99c7130b49244292",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Azure.Identity-206b6c703f1522e0",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Security.Cryptography.ProtectedData-99c7130b49244292",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Identity.Client.Extensions.Msal-5b5e9b2d511cdd2f",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Security.Cryptography.ProtectedData-99c7130b49244292",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-System.Configuration.ConfigurationManager-acfd142366dc1744",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-log4net-9a8fb5cc58f744d6",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.BusinessLogic-261972be4601c6b4",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-log4net-9a8fb5cc58f744d6",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCT.APICommunications-2b1311633e94f85b",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-log4net-9a8fb5cc58f744d6",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Logging.Log4Net.AspNetCore-af43b92294145086",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.ApiDescription.Server-a3a3e9653747c0e0",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Swashbuckle.AspNetCore-54f239bb94b2db17",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.ApiDescription.Server-a3a3e9653747c0e0",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.RestApi-e7be35b906cd0e09",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Logging.Abstractions-a9bbe98cedb560bb",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Logging-163085750182b152",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Logging.Abstractions-a9bbe98cedb560bb",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Http-1bb9fa0f581797f1",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.DependencyInjection.Abstractions-ab27bfcf867df6e8",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Diagnostics.Abstractions-0d9943e6bce1bac2",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.DependencyInjection.Abstractions-ab27bfcf867df6e8",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Http-1bb9fa0f581797f1",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.DependencyInjection.Abstractions-ab27bfcf867df6e8",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.DependencyInjection-51ada073fdd0b0c2",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.DependencyInjection.Abstractions-ab27bfcf867df6e8",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Options-814353794b615b62",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.DependencyInjection.Abstractions-ab27bfcf867df6e8",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Logging.Abstractions-a9bbe98cedb560bb",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.DependencyInjection.Abstractions-ab27bfcf867df6e8",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Options.ConfigurationExtensions-af8896636f5c9a10",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Configuration.ConfigurationManager-acfd142366dc1744",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.BusinessLogic-261972be4601c6b4",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Configuration.ConfigurationManager-acfd142366dc1744",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCT.APICommunications-2b1311633e94f85b",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Configuration.ConfigurationManager-acfd142366dc1744",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-log4net-9a8fb5cc58f744d6",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Logging.Log4Net.AspNetCore-af43b92294145086",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.RestApi-e7be35b906cd0e09",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Options.ConfigurationExtensions-af8896636f5c9a10",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Diagnostics-75fa03626b065ae8",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.OpenApi-b24856fb78b59bf7",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Swashbuckle.AspNetCore.Swagger-322828ba5e3163d2",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.OpenApi-b24856fb78b59bf7",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.RestApi-e7be35b906cd0e09",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.IdentityModel.Abstractions-b31fd5e20c6dc924",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Identity.Client-c6c765b6b155d9e1",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.IdentityModel.Abstractions-b31fd5e20c6dc924",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.RestApi-e7be35b906cd0e09",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Azure.Core-c61bb1f4ad999203",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Azure.Security.KeyVault.Secrets-16d1d497e8ad1ed1",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Azure.Core-c61bb1f4ad999203",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Azure.Identity-206b6c703f1522e0",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Azure.Core-c61bb1f4ad999203",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Azure.Extensions.AspNetCore.Configuration.Secrets-27d47a5ae454f840",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Azure.Core-c61bb1f4ad999203",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.RestApi-e7be35b906cd0e09",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Identity.Client-c6c765b6b155d9e1",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Azure.Identity-206b6c703f1522e0",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Identity.Client-c6c765b6b155d9e1",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Identity.Client.Extensions.Msal-5b5e9b2d511cdd2f",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Identity.Client-c6c765b6b155d9e1",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.RestApi-e7be35b906cd0e09",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Threading.Tasks.Extensions-cd0f66bd51d6e25b",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Azure.Security.KeyVault.Secrets-16d1d497e8ad1ed1",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Threading.Tasks.Extensions-cd0f66bd51d6e25b",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Azure.Identity-206b6c703f1522e0",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Threading.Tasks.Extensions-cd0f66bd51d6e25b",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Azure.Core-c61bb1f4ad999203",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Bcl.AsyncInterfaces-d058f6442265991e",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Azure.Core-c61bb1f4ad999203",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Bcl.AsyncInterfaces-d058f6442265991e",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.RestApi-e7be35b906cd0e09",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Swashbuckle.AspNetCore.SwaggerGen-d70ef3eeeb1af866",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Swashbuckle.AspNetCore-54f239bb94b2db17",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.AspNetCore.SpaProxy-db4ff461d4406ef7",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.RestApi-e7be35b906cd0e09",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Primitives-dd566c86589d7a22",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Configuration-2a09afa692d99e41",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Primitives-dd566c86589d7a22",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Options-814353794b615b62",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Primitives-dd566c86589d7a22",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Configuration.Abstractions-8226b0efac1b47fa",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Primitives-dd566c86589d7a22",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Options.ConfigurationExtensions-af8896636f5c9a10",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Memory-e464f97da25ae62f",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Azure.Security.KeyVault.Secrets-16d1d497e8ad1ed1",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Memory-e464f97da25ae62f",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Azure.Identity-206b6c703f1522e0",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Security.Permissions-f3b184b77989e003",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCT.APICommunications-2b1311633e94f85b",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Security.AccessControl-fdfcccee725f0b2d",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCT.APICommunications-2b1311633e94f85b",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Security.AccessControl-fdfcccee725f0b2d",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.RestApi-e7be35b906cd0e09",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Diagnostics.Abstractions-0d9943e6bce1bac2",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.ClientModel-1416ae6fcb0cf357",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-System.ClientModel.dll-d87361000f8a1bf8",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Windows.Extensions-15e4f26b250e37a0",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-runtimes-win-lib-net8.0-System.Windows.Extensions.dll-88bdaf8a84ffe53a",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Logging-163085750182b152",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Azure.Security.KeyVault.Secrets-16d1d497e8ad1ed1",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Configuration.Binder-177d8a64f847c24d",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Text.Json-18b12713a87f3621",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Polly.Core-1bb8a06f77ab0a17",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-Polly.Core.dll-19620354ba24f8d4",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Http-1bb9fa0f581797f1",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Windows.Extensions-1df02e4095102de8",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Windows.Extensions-1ec04dbda4c0fad0",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-System.Windows.Extensions.dll-c54595a41b072e3c",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Azure.Identity-206b6c703f1522e0",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-LCD.RestApi-213a551c5971d923",
+      "relatedSpdxElement": "SPDXRef-File--obj-Debug-net8.0-ref-LCD.RestApi.dll-5857bd773cd39681",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-LCD.RestApi-21556d9244ebd327",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.dll-f5c511c917c436a0",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft-Azure-Client-Pipeline-2538e982084cdeed",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-Azure.Core.dll-35fa442bab976072",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-LCD.BusinessLogic-261972be4601c6b4",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Azure.Extensions.AspNetCore.Configuration.Secrets-27d47a5ae454f840",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Configuration-2a09afa692d99e41",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-LCT.APICommunications-2b1311633e94f85b",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-LCD.RestApi-309ccd906723e2cd",
+      "relatedSpdxElement": "SPDXRef-File--obj-Debug-net8.0-LCD.RestApi.dll-8ae0826e4dd4eaa3",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Swashbuckle.AspNetCore.Swagger-322828ba5e3163d2",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-LCD.RestApi-32e784d3fe414695",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.exe-dcf1e95c8771f2fe",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Numerics.Vectors-3371cb5ab782bb92",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-LCD.Common-34d4c7ee9f67fe88",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.Common.dll-4229d7479d4a30ad",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Swashbuckle.AspNetCore.SwaggerUI-3b5e462cb8a6d608",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-Swashbuckle.AspNetCore.SwaggerUI.dll-90a3314d4d4d3e78",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Diagnostics.DiagnosticSource-3c860c6c4b9407b7",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Swashbuckle.AspNetCore.SwaggerGen-3ca17d090d0aea42",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-Swashbuckle.AspNetCore.SwaggerGen.dll-7b9d83ebf6eab7f6",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Polly-3e8a503307428a49",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-Polly.dll-ae1c2ffd5b8578c6",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Memory.Data-463d2b94dbc38c6d",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.DependencyInjection-51ada073fdd0b0c2",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Swashbuckle.AspNetCore-54f239bb94b2db17",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-LCT.APICommunications-5677084816727420",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCT.APICommunications.dll-cfada7300802b475",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.OpenApi-58d00334867174b9",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-Microsoft.OpenApi.dll-07071d55cf34b043",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-LCD.RestApi-5b37d25ddc8bcbcc",
+      "relatedSpdxElement": "SPDXRef-File--obj-Debug-net8.0-refint-LCD.RestApi.dll-b93278da8997129d",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Identity.Client.Extensions.Msal-5b5e9b2d511cdd2f",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.ClientModel-64980f307aa1ee01",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Azure.Extensions.AspNetCore.Configuration.Secrets-669740453091c021",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-Azure.Extensions.AspNetCore.Configuration.Secrets.dll-478644764014c1ae",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Diagnostics.EventLog-68435eb5fb1ef4b0",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Newtonsoft.Json-6b6efb577f0e93e7",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Memory.Data-6bc462a9031e01ab",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-System.Memory.Data.dll-4e38df336e543555",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Diagnostics-75fa03626b065ae8",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Polly-767d305088ebd74b",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-LCD.Common-775f7d96c1d1d95e",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Polly.Core-7ab08088ff87820e",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Configuration.ConfigurationManager-7b8d221393ccdbe7",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-System.Configuration.ConfigurationManager.dll-e6b7124c037d64fb",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Bcl.AsyncInterfaces-7d1a0e0498005874",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-Microsoft.Bcl.AsyncInterfaces.dll-5686659edd623b9a",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Configuration.Binder-7d83331c6f5bb473",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-Microsoft.Extensions.Configuration.Binder.dll-9417f2b17702fcd4",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Options-814353794b615b62",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Configuration.Abstractions-8226b0efac1b47fa",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft-Azure.Identity-Component-847da442dde093b2",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-Azure.Identity.dll-81490ade04d28079",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-LCD.RestApi-870a7cb204c0eaf6",
+      "relatedSpdxElement": "SPDXRef-File--obj-Debug-net8.0-apphost.exe-c032a2701fb84049",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft-Azure.Security.KeyVault.Secrets-client-library-8904bca1101ee07e",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-Azure.Security.KeyVault.Secrets.dll-db5e7a2beda8e8d6",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Swashbuckle.AspNetCore.SwaggerUI-8d8aceda3bae2b8d",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Text.Encodings.Web-8df60c0bd11f5526",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Json.NET-9869806433ca9f08",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-Newtonsoft.Json.dll-f83505b7eb46d8f4",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.AspNetCore.SpaProxy-987e3630aaebba2a",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-Microsoft.AspNetCore.SpaProxy.dll-027bab7dcfe26e6e",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Security.Cryptography.ProtectedData-99c7130b49244292",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-log4net-9a8fb5cc58f744d6",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Swashbuckle.AspNetCore.Swagger-a24e77bd706b81e3",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-Swashbuckle.AspNetCore.Swagger.dll-a5d7eab19d15e3f2",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.ApiDescription.Server-a3a3e9653747c0e0",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Logging.Abstractions-a9bbe98cedb560bb",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.DependencyInjection.Abstractions-ab27bfcf867df6e8",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Configuration.ConfigurationManager-acfd142366dc1744",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Logging.Log4Net.AspNetCore-af43b92294145086",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Options.ConfigurationExtensions-af8896636f5c9a10",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.OpenApi-b24856fb78b59bf7",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.IdentityModel.Abstractions-b31fd5e20c6dc924",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Identity.Client.Extensions.Msal-b47d3933fd352c1c",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-Microsoft.Identity.Client.Extensions.Msal.dll-c0f48f6fc278bea8",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Azure.Core-c61bb1f4ad999203",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Identity.Client-c6c765b6b155d9e1",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Threading.Tasks.Extensions-cd0f66bd51d6e25b",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Identity.Client-d03892c11dfc9f39",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-Microsoft.Identity.Client.dll-65c3cac0130fe9f4",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Bcl.AsyncInterfaces-d058f6442265991e",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Swashbuckle.AspNetCore.SwaggerGen-d70ef3eeeb1af866",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Security.Cryptography.ProtectedData-d904a8148910c4b4",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-System.Security.Cryptography.ProtectedData.dll-7c6ffc8196a87147",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.AspNetCore.SpaProxy-db4ff461d4406ef7",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Logging.Log4Net.AspNetCore-dd2cf95ce2fb1a20",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-Microsoft.Extensions.Logging.Log4Net.AspNetCore.dll-def89e7febb0ca8f",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.Extensions.Primitives-dd566c86589d7a22",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Memory-e464f97da25ae62f",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-LCD.RestApi-e7be35b906cd0e09",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-LCD.BusinessLogic-e924d99c33b0aa76",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.BusinessLogic.dll-02d8cd4b8a916e77",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Security.Permissions-e938a30a3184939d",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-System.Security.Permissions.dll-3e0c85f8cee513b5",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-log4net-eb8a5a9e2773e80c",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-log4net.dll-ff66cbdf8b766201",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Security.Permissions-f3b184b77989e003",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-Microsoft.IdentityModel.Abstractions-f71e82acdb51e76f",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-Microsoft.IdentityModel.Abstractions.dll-542e246702bec5c8",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dotnet-System.Security.AccessControl-fdfcccee725f0b2d",
+      "relatedSpdxElement": "SPDXRef-File--bin-Debug-net8.0-LCD.RestApi.deps.json-f186d51e32dd0135",
+      "relationshipType": "OTHER",
+      "comment": "evident-by: indicates the package's existence is evident by the given file"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Azure.Core-c61bb1f4ad999203",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Azure.Extensions.AspNetCore.Configuration.Secrets-27d47a5ae454f840",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Azure.Extensions.AspNetCore.Configuration.Secrets-669740453091c021",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Azure.Identity-206b6c703f1522e0",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Azure.Security.KeyVault.Secrets-16d1d497e8ad1ed1",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Json.NET-9869806433ca9f08",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.BusinessLogic-261972be4601c6b4",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.BusinessLogic-e924d99c33b0aa76",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.Common-775f7d96c1d1d95e",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.Common-34d4c7ee9f67fe88",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.RestApi-e7be35b906cd0e09",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.RestApi-21556d9244ebd327",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.RestApi-32e784d3fe414695",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.RestApi-309ccd906723e2cd",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.RestApi-870a7cb204c0eaf6",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.RestApi-213a551c5971d923",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCD.RestApi-5b37d25ddc8bcbcc",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCT.APICommunications-2b1311633e94f85b",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-LCT.APICommunications-5677084816727420",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft-Azure-Client-Pipeline-2538e982084cdeed",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft-Azure.Identity-Component-847da442dde093b2",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft-Azure.Security.KeyVault.Secrets-client-library-8904bca1101ee07e",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.AspNetCore.SpaProxy-db4ff461d4406ef7",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.AspNetCore.SpaProxy-987e3630aaebba2a",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Bcl.AsyncInterfaces-d058f6442265991e",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Bcl.AsyncInterfaces-7d1a0e0498005874",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.ApiDescription.Server-a3a3e9653747c0e0",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Configuration-2a09afa692d99e41",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Configuration.Abstractions-8226b0efac1b47fa",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Configuration.Binder-177d8a64f847c24d",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Configuration.Binder-7d83331c6f5bb473",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.DependencyInjection-51ada073fdd0b0c2",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.DependencyInjection.Abstractions-ab27bfcf867df6e8",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Diagnostics-75fa03626b065ae8",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Diagnostics.Abstractions-0d9943e6bce1bac2",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Http-1bb9fa0f581797f1",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Logging-163085750182b152",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Logging.Abstractions-a9bbe98cedb560bb",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Logging.Log4Net.AspNetCore-af43b92294145086",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Logging.Log4Net.AspNetCore-dd2cf95ce2fb1a20",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Options-814353794b615b62",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Options.ConfigurationExtensions-af8896636f5c9a10",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Extensions.Primitives-dd566c86589d7a22",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Identity.Client-c6c765b6b155d9e1",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Identity.Client-d03892c11dfc9f39",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Identity.Client.Extensions.Msal-5b5e9b2d511cdd2f",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.Identity.Client.Extensions.Msal-b47d3933fd352c1c",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.IdentityModel.Abstractions-b31fd5e20c6dc924",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.IdentityModel.Abstractions-f71e82acdb51e76f",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.OpenApi-b24856fb78b59bf7",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Microsoft.OpenApi-58d00334867174b9",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Newtonsoft.Json-6b6efb577f0e93e7",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Polly-767d305088ebd74b",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Polly-3e8a503307428a49",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Polly.Core-7ab08088ff87820e",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Polly.Core-1bb8a06f77ab0a17",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Swashbuckle.AspNetCore-54f239bb94b2db17",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Swashbuckle.AspNetCore.Swagger-322828ba5e3163d2",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Swashbuckle.AspNetCore.Swagger-a24e77bd706b81e3",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Swashbuckle.AspNetCore.SwaggerGen-d70ef3eeeb1af866",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Swashbuckle.AspNetCore.SwaggerGen-3ca17d090d0aea42",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Swashbuckle.AspNetCore.SwaggerUI-8d8aceda3bae2b8d",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-Swashbuckle.AspNetCore.SwaggerUI-3b5e462cb8a6d608",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-System.ClientModel-64980f307aa1ee01",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-System.ClientModel-1416ae6fcb0cf357",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-System.Configuration.ConfigurationManager-acfd142366dc1744",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-System.Configuration.ConfigurationManager-7b8d221393ccdbe7",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-System.Diagnostics.DiagnosticSource-3c860c6c4b9407b7",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-System.Diagnostics.EventLog-68435eb5fb1ef4b0",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-System.Memory-e464f97da25ae62f",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-System.Memory.Data-463d2b94dbc38c6d",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-System.Memory.Data-6bc462a9031e01ab",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-System.Numerics.Vectors-3371cb5ab782bb92",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-System.Security.AccessControl-fdfcccee725f0b2d",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-System.Security.Cryptography.ProtectedData-99c7130b49244292",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-System.Security.Cryptography.ProtectedData-d904a8148910c4b4",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-System.Security.Permissions-f3b184b77989e003",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-System.Security.Permissions-e938a30a3184939d",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-System.Text.Encodings.Web-8df60c0bd11f5526",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-System.Text.Json-18b12713a87f3621",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-System.Threading.Tasks.Extensions-cd0f66bd51d6e25b",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-System.Windows.Extensions-1df02e4095102de8",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-System.Windows.Extensions-1ec04dbda4c0fad0",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-System.Windows.Extensions-15e4f26b250e37a0",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-log4net-9a8fb5cc58f744d6",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relatedSpdxElement": "SPDXRef-Package-dotnet-log4net-eb8a5a9e2773e80c",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-DocumentRoot-Directory-D--CADashboard-FrontEnd-Continuous-Clearing-Dashboard-Backend-src-LCD.RestApi",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}
