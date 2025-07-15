@@ -1,4 +1,9 @@
-﻿// Ignore Spelling: Spdx Bom LCT
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2025 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+// Ignore Spelling: Spdx Bom LCT
 
 using LCT.Common.Interface;
 using LCT.Common.Model;

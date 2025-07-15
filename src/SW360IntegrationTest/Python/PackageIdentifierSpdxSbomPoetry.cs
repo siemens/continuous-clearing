@@ -3,15 +3,15 @@
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
-using CycloneDX.Models;
 using NUnit.Framework;
 using System.IO;
 using TestUtilities;
+using CycloneDX.Models;
 
 namespace SW360IntegrationTest.Python
 {
-    [TestFixture, Order(23)]
-    public class PackageIdentifierInitialPython
+    [TestFixture, Order(42)]
+    public class PackageIdentifierSpdxSbomPoetry
     {
         private string CCTLocalBomTestFile { get; set; }
         private string OutFolder { get; set; }
@@ -22,11 +22,11 @@ namespace SW360IntegrationTest.Python
         {
             OutFolder = TestHelper.OutFolder;
 
-            CCTLocalBomTestFile = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "src", "SW360IntegrationTest", "PackageIdentifierTestFiles", "Python", "CCTLocalBOMPythonInitial.json"));
+            CCTLocalBomTestFile = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "src", "SW360IntegrationTest", "PackageIdentifierTestFiles", "Python", "CCTLocalBOMPoetrySpdxSbom.json"));
 
-            if (!Directory.Exists(Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs"))))
+            if (!Directory.Exists(Path.GetFullPath(Path.Combine(OutFolder, "..", "SpdxBOMs"))))
             {
-                Directory.CreateDirectory(Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs")));
+                Directory.CreateDirectory(Path.GetFullPath(Path.Combine(OutFolder, "..", "SpdxBOMs")));
             }
             testParameters = new TestParamNuget();
         }
@@ -34,8 +34,8 @@ namespace SW360IntegrationTest.Python
         [Test, Order(1)]
         public void RunBOMCreatorexe_ProvidedPackageJsonFilePath_ReturnsSuccess()
         {
-            string packagejsonPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles", "SystemTest1stIterationData", "Python"));
-            string bomPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs"));
+            string packagejsonPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles", "SpdxTestFiles", "Poetry"));
+            string bomPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "SpdxBOMs"));
 
             // Test BOM Creator ran with exit code 0
             Assert.AreEqual(0, TestHelper.RunBOMCreatorExe(new string[]{
@@ -65,7 +65,7 @@ namespace SW360IntegrationTest.Python
             expected.Read(CCTLocalBomTestFile);
 
             // Actual
-            string generatedBOM = Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs", $"{testParameters.SW360ProjectName}_Bom.cdx.json"));
+            string generatedBOM = Path.GetFullPath(Path.Combine(OutFolder, "..", "SpdxBOMs", $"{testParameters.SW360ProjectName}_Bom.cdx.json"));
             if (File.Exists(generatedBOM))
             {
                 fileExist = true;

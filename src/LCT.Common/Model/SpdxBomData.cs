@@ -43,7 +43,7 @@ namespace LCT.Common.Model
         [JsonProperty("relationships")]
         public List<Relationship> Relationships { get; set; }
     }
-
+    [ExcludeFromCodeCoverage]
     public class Checksum
     {
         [JsonProperty("algorithm")]
@@ -52,7 +52,7 @@ namespace LCT.Common.Model
         [JsonProperty("checksumValue")]
         public string ChecksumValue { get; set; }
     }
-
+    [ExcludeFromCodeCoverage]
     public class CreationInfo
     {
         [JsonProperty("licenseListVersion")]
@@ -64,7 +64,7 @@ namespace LCT.Common.Model
         [JsonProperty("created")]
         public DateTime Created { get; set; }
     }
-
+    [ExcludeFromCodeCoverage]
     public class ExternalRef
     {
         [JsonProperty("referenceCategory")]
@@ -76,7 +76,7 @@ namespace LCT.Common.Model
         [JsonProperty("referenceLocator")]
         public string ReferenceLocator { get; set; }
     }
-
+    [ExcludeFromCodeCoverage]
     public class File
     {
         [JsonProperty("fileName")]
@@ -99,7 +99,7 @@ namespace LCT.Common.Model
         [JsonProperty("copyrightText")]
         public string CopyrightText { get; set; }
     }
-
+    [ExcludeFromCodeCoverage]
     public class Package
     {
         [JsonProperty("name")]
@@ -137,7 +137,7 @@ namespace LCT.Common.Model
         [JsonProperty("externalRefs")]
         public List<ExternalRef> ExternalRefs { get; set; }
     }
-
+    [ExcludeFromCodeCoverage]
     public class Relationship
     {
         [JsonProperty("spdxElementId")]
