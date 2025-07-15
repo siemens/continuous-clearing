@@ -16,6 +16,7 @@ using LCT.Services.Interface;
 using log4net;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -291,6 +292,7 @@ namespace LCT.PackageIdentifier
                     PurlID = componentsInfo.Purl,
 
                 };
+                SetSpdxComponentDetails(filePath, package);
 
                 if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
                 {
@@ -344,10 +346,29 @@ namespace LCT.PackageIdentifier
                 Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.Discovered };
                 Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
                 component.Properties = new List<Property> { identifierType, isDev };
+                AddSpdxComponentProperties(prop, component);
 
                 listComponentForBOM.Add(component);
             }
             return listComponentForBOM;
+        }
+        private static void AddSpdxComponentProperties(DebianPackage prop, Component component)
+        {
+            if (prop.SpdxComponent)
+            {
+                string fileName = Path.GetFileName(prop.SpdxFilePath);
+                var spdxFileName = new Property { Name = Dataconstant.Cdx_SpdxFileName, Value = fileName };
+                component.Properties ??= new List<Property>();
+                component.Properties.Add(spdxFileName);
+            }
+        }
+        private static void SetSpdxComponentDetails(string filePath, DebianPackage package)
+        {
+            if (filePath.EndsWith(FileConstant.SPDXFileExtension))
+            {
+                package.SpdxFilePath = filePath;
+                package.SpdxComponent = true;
+            }
         }
 
         #endregion
