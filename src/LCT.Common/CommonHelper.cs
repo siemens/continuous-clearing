@@ -266,31 +266,44 @@ namespace LCT.Common
         }
         public static string[] GetRepoList(CommonAppSettings appSettings)
         {
-            var projectTypeMappings = new Dictionary<string, Func<Artifactory>>
-        {
-        { "CONAN", () => appSettings.Conan?.Artifactory },
-        { "NPM", () => appSettings.Npm?.Artifactory },
-        { "NUGET", () => appSettings.Nuget?.Artifactory },
-        { "POETRY", () => appSettings.Poetry?.Artifactory },
-        { "DEBIAN", () => appSettings.Debian?.Artifactory },
-        { "MAVEN", () => appSettings.Maven?.Artifactory }
-        };
-
-            if (projectTypeMappings.TryGetValue(appSettings.ProjectType.ToUpperInvariant(), out var getArtifactory))
+            var projectTypeMappings = new Dictionary<string, Func<Config>>
+    {
+        { "CONAN", () => appSettings.Conan },
+        { "NPM", () => appSettings.Npm },
+        { "NUGET", () => appSettings.Nuget },
+        { "POETRY", () => appSettings.Poetry },
+        { "DEBIAN", () => appSettings.Debian },
+        { "MAVEN", () => appSettings.Maven }
+    };
+            if (projectTypeMappings.TryGetValue(appSettings.ProjectType.ToUpperInvariant(), out var getConfig))
             {
-                var artifactory = getArtifactory();
-                if (artifactory != null)
+                var config = getConfig();
+                if (config != null)
                 {
-                    return (artifactory.InternalRepos ?? Array.Empty<string>())
-                        .Concat(artifactory.DevRepos ?? Array.Empty<string>())
-                        .Concat(artifactory.RemoteRepos ?? Array.Empty<string>())
-                        .Concat(artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? Array.Empty<string>())
-                        .ToArray();
+                    var repoList = new List<string>();
+                    if (!string.IsNullOrEmpty(config.ReleaseRepo))
+                    { repoList.Add(config.ReleaseRepo);
+                    }
+
+                    if (!string.IsNullOrEmpty(config.DevDepRepo))
+                    {
+                        repoList.Add(config.DevDepRepo);
+                    }
+
+                    if (config.Artifactory != null)
+                    {
+                        repoList.AddRange(config.Artifactory.InternalRepos ?? Array.Empty<string>());
+                        repoList.AddRange(config.Artifactory.DevRepos ?? Array.Empty<string>());
+                        repoList.AddRange(config.Artifactory.RemoteRepos ?? Array.Empty<string>());
+                        repoList.AddRange(config.Artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? Array.Empty<string>());
+                    }
+
+                    return [.. repoList.Where(repo => !string.IsNullOrEmpty(repo)).Distinct()];
                 }
             }
 
             return Array.Empty<string>();
-        }        
+        }
         public static string LogFolderInitialisation(CommonAppSettings appSettings, string logFileName, bool m_Verbose)
         {
             string FolderPath = DefaultLogPath;
