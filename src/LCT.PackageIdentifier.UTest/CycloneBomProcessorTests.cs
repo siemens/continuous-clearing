@@ -12,6 +12,7 @@ using LCT.Common.Model;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
+using File = System.IO.File;
 
 namespace LCT.PackageIdentifier.UTest
 {

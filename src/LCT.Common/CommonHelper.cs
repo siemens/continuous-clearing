@@ -18,6 +18,7 @@ using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using Level = log4net.Core.Level;
+using File = System.IO.File;
 
 namespace LCT.Common
 {
@@ -233,11 +234,17 @@ namespace LCT.Common
             return component.Properties.Exists(x => x.Name == constant);
         }
 
-        public static void GetDetailsForManuallyAdded(List<Component> componentsForBOM, List<Component> listComponentForBOM)
+        public static void GetDetailsForManuallyAdded(List<Component> componentsForBOM, List<Component> listComponentForBOM,string filePath)
         {
             foreach (var component in componentsForBOM)
             {
+                string filename = Path.GetFileName(filePath);
                 component.Properties = new List<Property>();
+                if (filePath.EndsWith(FileConstant.SPDXFileExtension))
+                {
+                    var spdxFileName = new Property { Name = Dataconstant.Cdx_SpdxFileName, Value = filename };
+                    component.Properties.Add(spdxFileName);
+                }
                 Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
                 Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.ManullayAdded };
                 component.Properties.Add(isDev);
@@ -531,6 +538,22 @@ namespace LCT.Common
                     }
                 };
             }
+        }
+        public static void AddSpdxSBomFileNameProperty(ref Bom bom, string filePath)
+        {
+            if (bom?.Components != null)
+            {
+                string filename = Path.GetFileName(filePath);
+                var bomComponentsList = bom.Components;
+                foreach (var component in bomComponentsList)
+                {
+                    var spdxFileName = new Property { Name = Dataconstant.Cdx_SpdxFileName, Value = filename };
+                    component.Properties ??= new List<Property>();
+                    component.Properties.Add(spdxFileName);
+                }
+                bom.Components = bomComponentsList;
+            }
+            
         }
 
         #endregion

@@ -14,6 +14,7 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
 
+
 namespace LCT.PackageIdentifier.UTest
 {
     [TestFixture]
@@ -30,8 +31,9 @@ namespace LCT.PackageIdentifier.UTest
 
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             cycloneDXBomParser.Setup(x => x.ParseCycloneDXBom(It.IsAny<string>())).Returns(bom);
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();            
 
-            _alpineProcessor = new AlpineProcessor(cycloneDXBomParser.Object);
+            _alpineProcessor = new AlpineProcessor(cycloneDXBomParser.Object,spdxBomParser.Object);
         }
 
         [Test]

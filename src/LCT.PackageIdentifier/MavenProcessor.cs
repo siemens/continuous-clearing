@@ -8,6 +8,7 @@ using LCT.APICommunications;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Interface;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
@@ -20,11 +21,12 @@ using System.Threading.Tasks;
 
 namespace LCT.PackageIdentifier
 {
-    public class MavenProcessor(ICycloneDXBomParser cycloneDXBomParser) : CycloneDXBomParser, IParser
+    public class MavenProcessor(ICycloneDXBomParser cycloneDXBomParser, ISpdxBomParser spdxBomParser) : CycloneDXBomParser, IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
+        private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
 
         public Bom ParsePackageFile(CommonAppSettings appSettings)
         {
@@ -116,7 +118,16 @@ namespace LCT.PackageIdentifier
             {
                 if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
-                    Bom bomList = ParseCycloneDXBom(filepath);
+                    Bom bomList;
+                    if (filepath.EndsWith(FileConstant.SPDXFileExtension))
+                    {
+                        bomList = _spdxBomParser.ParseSPDXBom(filepath);
+                        CommonHelper.AddSpdxSBomFileNameProperty(ref bomList, filepath);
+                    }
+                    else
+                    {
+                        bomList = ParseCycloneDXBom(filepath);
+                    }
 
                     if (bomList?.Components != null)
                     {
@@ -129,7 +140,7 @@ namespace LCT.PackageIdentifier
                     }
 
                     AddComponentsToBom(bomList, componentsForBOM, componentsToBOM, dependenciesForBOM);
-                }
+                }                
             }
         }
 
@@ -243,10 +254,20 @@ namespace LCT.PackageIdentifier
             }
             else
             {
-                component.Properties = new List<Property>();
-                component.Properties.Add(isDev);
-                component.Properties.Add(identifierType);
-                componentsToBOM.Add(component);
+                if (CommonHelper.ComponentPropertyCheck(component, Dataconstant.Cdx_SpdxFileName))
+                {
+                    component.Properties.Add(isDev);
+                    component.Properties.Add(identifierType);
+                    componentsToBOM.Add(component);
+                }
+                else
+                {
+                    component.Properties = new List<Property>();
+                    component.Properties.Add(isDev);
+                    component.Properties.Add(identifierType);
+                    componentsToBOM.Add(component);
+                }
+                
             }
         }
 

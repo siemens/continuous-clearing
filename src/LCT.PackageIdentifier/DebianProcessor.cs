@@ -9,12 +9,14 @@ using LCT.APICommunications;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Interface;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -25,10 +27,11 @@ namespace LCT.PackageIdentifier
     /// <summary>
     /// The DebianProcessor class
     /// </summary>
-    public class DebianProcessor(ICycloneDXBomParser cycloneDXBomParser) : IParser
+    public class DebianProcessor(ICycloneDXBomParser cycloneDXBomParser,ISpdxBomParser spdxBomParser) : IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
+        private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
 
         #region public method
@@ -277,7 +280,7 @@ namespace LCT.PackageIdentifier
 
         private Bom ExtractDetailsForJson(string filePath, ref List<DebianPackage> debianPackages)
         {
-            Bom bom = _cycloneDXBomParser.ParseCycloneDXBom(filePath);
+            Bom bom = BomHelper.ParseBomFile(filePath, _spdxBomParser, _cycloneDXBomParser);
 
             foreach (var componentsInfo in bom.Components)
             {
@@ -289,6 +292,7 @@ namespace LCT.PackageIdentifier
                     PurlID = componentsInfo.Purl,
 
                 };
+                SetSpdxComponentDetails(filePath, package);
 
                 if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
                 {
@@ -342,10 +346,29 @@ namespace LCT.PackageIdentifier
                 Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.Discovered };
                 Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
                 component.Properties = new List<Property> { identifierType, isDev };
+                AddSpdxComponentProperties(prop, component);
 
                 listComponentForBOM.Add(component);
             }
             return listComponentForBOM;
+        }
+        private static void AddSpdxComponentProperties(DebianPackage prop, Component component)
+        {
+            if (prop.SpdxComponent)
+            {
+                string fileName = Path.GetFileName(prop.SpdxFilePath);
+                var spdxFileName = new Property { Name = Dataconstant.Cdx_SpdxFileName, Value = fileName };
+                component.Properties ??= new List<Property>();
+                component.Properties.Add(spdxFileName);
+            }
+        }
+        private static void SetSpdxComponentDetails(string filePath, DebianPackage package)
+        {
+            if (filePath.EndsWith(FileConstant.SPDXFileExtension))
+            {
+                package.SpdxFilePath = filePath;
+                package.SpdxComponent = true;
+            }
         }
 
         #endregion

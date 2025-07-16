@@ -9,12 +9,14 @@ using LCT.APICommunications;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Interface;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -24,12 +26,13 @@ using Component = CycloneDX.Models.Component;
 
 namespace LCT.PackageIdentifier
 {
-    public class PythonProcessor(ICycloneDXBomParser cycloneDXBomParser) : IParser
+    public class PythonProcessor(ICycloneDXBomParser cycloneDXBomParser,ISpdxBomParser spdxBomParser) : IParser
     {
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
 
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
+        private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
 
         public Bom ParsePackageFile(CommonAppSettings appSettings)
         {
@@ -49,7 +52,8 @@ namespace LCT.PackageIdentifier
                 {
                     listofComponents.AddRange(ExtractDetailsForPoetryLockfile(config, dependencies));
                 }
-                else if (config.EndsWith(FileConstant.CycloneDXFileExtension) && !config.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                else if ((config.EndsWith(FileConstant.CycloneDXFileExtension) || config.EndsWith(FileConstant.SPDXFileExtension))
+         && !config.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     listofComponents.AddRange(ExtractDetailsFromJson(config, appSettings, ref dependencies));
                 }
@@ -181,8 +185,16 @@ namespace LCT.PackageIdentifier
 
         private List<PythonPackage> ExtractDetailsFromJson(string filePath, CommonAppSettings appSettings, ref List<Dependency> dependencies)
         {
+            Bom bom;
             List<PythonPackage> PythonPackages = new List<PythonPackage>();
-            Bom bom = _cycloneDXBomParser.ParseCycloneDXBom(filePath);
+            if (filePath.EndsWith(FileConstant.SPDXFileExtension))
+            {
+                bom = _spdxBomParser.ParseSPDXBom(filePath);
+            }
+            else
+            {
+                bom = _cycloneDXBomParser.ParseCycloneDXBom(filePath);
+            }
             CycloneDXBomParser.CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
 
             foreach (var componentsInfo in bom.Components)
@@ -194,6 +206,7 @@ namespace LCT.PackageIdentifier
                     Version = componentsInfo.Version,
                     PurlID = componentsInfo.Purl,
                 };
+                SetSpdxComponentDetails(filePath, package);
 
                 if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["POETRY"]))
                 {
@@ -279,7 +292,7 @@ namespace LCT.PackageIdentifier
                     devDependency,
                     identifierType
                 };
-
+                AddSpdxComponentProperties(prop, component);
                 component.Type = Component.Classification.Library;
                 component.BomRef = component.Purl;
 
@@ -457,6 +470,24 @@ namespace LCT.PackageIdentifier
             }
 
             return $"{aqlResult.Repo}/{aqlResult.Path}/{aqlResult.Name}";
+        }
+        private static void AddSpdxComponentProperties(PythonPackage prop, Component component)
+        {
+            if (prop.SpdxComponent)
+            {
+                string fileName = Path.GetFileName(prop.SpdxFilePath);
+                var spdxFileName = new Property { Name = Dataconstant.Cdx_SpdxFileName, Value = fileName };
+                component.Properties ??= new List<Property>();
+                component.Properties.Add(spdxFileName);
+            }
+        }
+        private static void SetSpdxComponentDetails(string filePath, PythonPackage package)
+        {
+            if (filePath.EndsWith(FileConstant.SPDXFileExtension))
+            {
+                package.SpdxFilePath = filePath;
+                package.SpdxComponent = true;
+            }
         }
         #endregion
     }

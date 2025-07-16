@@ -62,8 +62,8 @@ namespace LCT.PackageIdentifier.UTest
             var component = new Component { Name = "component", Version = "1.0.0" };
             bomHelperMock.Setup(b => b.GetFullNameOfComponent(component)).Returns("component");
             var expectedRepoPath = "repo1/path/to/component-1.0.0.tgz";
-
-            var npmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            var npmProcessor = new NpmProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
 
             // Act
             var result = NpmProcessor.GetJfrogArtifactoryRepoDetials(aqlResultList, component, bomHelperMock.Object, out string repoPath);
@@ -111,8 +111,8 @@ namespace LCT.PackageIdentifier.UTest
             var component = new Component { Name = "component", Version = "3.0.0" };
             var bomHelperMock = new Mock<IBomHelper>();
             bomHelperMock.Setup(b => b.GetFullNameOfComponent(component)).Returns("component");
-
-            var npmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            var npmProcessor = new NpmProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
 
             // Act
             var result = NpmProcessor.GetJfrogArtifactoryRepoDetials(aqlResultList, component, bomHelperMock.Object, out string repoPath);
@@ -174,9 +174,9 @@ namespace LCT.PackageIdentifier.UTest
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations");
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             // Act
-            NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
+            NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             var actual = await npmProcessor.IdentificationOfInternalComponents(component, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
             // Assert
@@ -234,9 +234,10 @@ namespace LCT.PackageIdentifier.UTest
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations");
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
 
             // Act
-            NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
+            NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             var actual = await npmProcessor.IdentificationOfInternalComponents(component, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
             // Assert
@@ -296,9 +297,9 @@ namespace LCT.PackageIdentifier.UTest
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations/common");
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             // Act
-            NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
+            NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             var actual = await npmProcessor.IdentificationOfInternalComponents(
                 componentIdentification, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -360,9 +361,9 @@ namespace LCT.PackageIdentifier.UTest
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations/common");
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             // Act
-            NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
+            NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             var actual = await npmProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -424,9 +425,9 @@ namespace LCT.PackageIdentifier.UTest
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations");
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             // Act
-            NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
+            NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             var actual = await npmProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -435,7 +436,7 @@ namespace LCT.PackageIdentifier.UTest
         }
 
         [Test]
-        public void GetdependencyDetailsOfAComponent_ReturnsListOfDependency_SuccessFully()
+        public void GetDependencyDetailsOfAComponent_ReturnsListOfDependency_SuccessFully()
         {
             // Arrange
             Component component = new Component
@@ -475,7 +476,7 @@ namespace LCT.PackageIdentifier.UTest
 
             //Act
 
-            NpmProcessor.GetdependencyDetails(componentsForBOM, dependencyList);
+            NpmProcessor.GetDependencyDetails(componentsForBOM, dependencyList);
 
             //Assert
             Assert.That(expectedDependencyList.Count, Is.EqualTo(dependencyList.Count));
