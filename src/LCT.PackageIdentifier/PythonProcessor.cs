@@ -190,12 +190,13 @@ namespace LCT.PackageIdentifier
             if (filePath.EndsWith(FileConstant.SPDXFileExtension))
             {
                 bom = _spdxBomParser.ParseSPDXBom(filePath);
+                CommonHelper.CheckValidComponentsFromSpdxfile(bom.Components, appSettings.ProjectType);
             }
             else
             {
                 bom = _cycloneDXBomParser.ParseCycloneDXBom(filePath);
-            }
-            CycloneDXBomParser.CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
+                CycloneDXBomParser.CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
+            }            
 
             foreach (var componentsInfo in bom.Components)
             {
@@ -213,6 +214,10 @@ namespace LCT.PackageIdentifier
                     BomCreator.bomKpiData.DebianComponents++;
                     PythonPackages.Add(package);
                     Logger.Debug($"ExtractDetailsFromJson():ValidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
+                }else if (componentsInfo.Publisher == "SpdxSbomParser")
+                {
+                    BomCreator.bomKpiData.DebianComponents++;
+                    PythonPackages.Add(package);
                 }
                 else
                 {
@@ -362,8 +367,16 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in componentsForBOM)
             {
-                var processedComponent = ProcessPythonComponent(component, aqlResultList, bomhelper, appSettings, projectType);
-                modifiedBOM.Add(processedComponent);
+                if (component.Publisher != "SpdxSbomParser")
+                {
+                    var processedComponent = ProcessPythonComponent(component, aqlResultList, bomhelper, appSettings, projectType);
+                    modifiedBOM.Add(processedComponent);
+                }
+                else
+                {
+                    modifiedBOM.Add(component);
+                }
+                
             }
             return modifiedBOM;
         }

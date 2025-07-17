@@ -102,8 +102,16 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in componentsForBOM)
             {
-                Component updatedComponent = UpdateComponentDetails(component, aqlResultList, appSettings, projectType);
-                modifiedBOM.Add(updatedComponent);
+                if (component.Publisher != "SpdxSbomParser")
+                {
+                    Component updatedComponent = UpdateComponentDetails(component, aqlResultList, appSettings, projectType);
+                    modifiedBOM.Add(updatedComponent);
+                }
+                else
+                {
+                    modifiedBOM.Add(component);
+                }
+                
             }
 
             return modifiedBOM;
@@ -251,7 +259,8 @@ namespace LCT.PackageIdentifier
                 else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
                 {                  
                     bom = _spdxBomParser.ParseSPDXBom(filepath);
-                    CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
+                    CommonHelper.CheckValidComponentsFromSpdxfile(bom.Components, appSettings.ProjectType);
+                    //CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
                     GetDetailsforManuallyAddedComp(bom.Components);
                     CommonHelper.AddSpdxSBomFileNameProperty(ref bom, filepath);
                     componentsForBOM.AddRange(bom.Components);

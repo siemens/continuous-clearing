@@ -122,6 +122,7 @@ namespace LCT.PackageIdentifier
                     if (filepath.EndsWith(FileConstant.SPDXFileExtension))
                     {
                         bomList = _spdxBomParser.ParseSPDXBom(filepath);
+                        CommonHelper.CheckValidComponentsFromSpdxfile(bomList.Components, appSettings.ProjectType);
                         CommonHelper.AddSpdxSBomFileNameProperty(ref bomList, filepath);
                     }
                     else
@@ -284,23 +285,31 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in componentsForBOM)
             {
-                string jfrogpackageName = $"{component.Name}-{component.Version}{ApiConstant.MavenExtension}";
-                var hashes = aqlResultList.FirstOrDefault(x => x.Name == jfrogpackageName);
+                if (component.Publisher != "SpdxSbomParser")
+                {
+                    string jfrogpackageName = $"{component.Name}-{component.Version}{ApiConstant.MavenExtension}";
+                    var hashes = aqlResultList.FirstOrDefault(x => x.Name == jfrogpackageName);
 
-                AqlResult finalRepoData = GetJfrogArtifactoryRepoDetials(aqlResultList, component, bomhelper, out string jfrogRepoPath);
-                Property siemensfileNameProp = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = finalRepoData?.Name ?? Dataconstant.PackageNameNotFoundInJfrog };
-                Property jfrogRepoPathProp = new() { Name = Dataconstant.Cdx_JfrogRepoPath, Value = jfrogRepoPath };
-                Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = finalRepoData?.Repo };
+                    AqlResult finalRepoData = GetJfrogArtifactoryRepoDetials(aqlResultList, component, bomhelper, out string jfrogRepoPath);
+                    Property siemensfileNameProp = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = finalRepoData?.Name ?? Dataconstant.PackageNameNotFoundInJfrog };
+                    Property jfrogRepoPathProp = new() { Name = Dataconstant.Cdx_JfrogRepoPath, Value = jfrogRepoPath };
+                    Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = finalRepoData?.Repo };
 
-                Component componentVal = component;
+                    Component componentVal = component;
 
-                // Extract KPI update logic to helper method
-                UpdateKpiDataBasedOnRepo(artifactoryrepo.Value, appSettings);
+                    // Extract KPI update logic to helper method
+                    UpdateKpiDataBasedOnRepo(artifactoryrepo.Value, appSettings);
 
-                // Use common helper to set component properties and hashes
-                CommonHelper.SetComponentPropertiesAndHashes(componentVal, artifactoryrepo, projectType, siemensfileNameProp, jfrogRepoPathProp, hashes);
+                    // Use common helper to set component properties and hashes
+                    CommonHelper.SetComponentPropertiesAndHashes(componentVal, artifactoryrepo, projectType, siemensfileNameProp, jfrogRepoPathProp, hashes);
 
-                modifiedBOM.Add(componentVal);
+                    modifiedBOM.Add(componentVal);
+                }
+                else
+                {
+                    modifiedBOM.Add(component);
+                }
+                
             }
 
             return modifiedBOM;

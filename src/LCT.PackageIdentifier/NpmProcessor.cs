@@ -387,8 +387,16 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in componentsForBOM)
             {
-                var processedComponent = ProcessComponent(component, aqlResultList, bomhelper, appSettings, projectType);
-                modifiedBOM.Add(processedComponent);
+                if (component.Publisher != "SpdxSbomParser")
+                {
+                    var processedComponent = ProcessComponent(component, aqlResultList, bomhelper, appSettings, projectType);
+                    modifiedBOM.Add(processedComponent);
+                }
+                else
+                {
+                    modifiedBOM.Add(component);
+                }
+                    
             }
 
             return modifiedBOM;
@@ -517,7 +525,8 @@ namespace LCT.PackageIdentifier
         {
             bom = _spdxBomParser.ParseSPDXBom(filepath);
             bom = RemoveExcludedComponents(appSettings, bom);
-            CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
+            CommonHelper.CheckValidComponentsFromSpdxfile(bom.Components, appSettings.ProjectType);
+            //CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
             AddingIdentifierType(bom.Components, "SpdxFile", filepath);
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += bom.Components.Count;
             componentsForBOM.AddRange(bom.Components);
@@ -695,11 +704,16 @@ namespace LCT.PackageIdentifier
                     components.Add(componentsInfo);
                     Logger.Debug($"GetExcludedComponentsList():ValidComponent For NPM : Component Details : {componentsInfo.Name} @ {componentsInfo.Version} @ {componentsInfo.Purl}");
                 }
+                else if (componentsInfo.Publisher == "SpdxSbomParser")
+                {
+                    components.Add(componentsInfo);
+                }
                 else
                 {
                     BomCreator.bomKpiData.ComponentsExcluded++;
                     Logger.Debug($"GetExcludedComponentsList():InvalidComponent For NPM : Component Details : {componentsInfo.Name} @ {componentsInfo.Version} @ {componentsInfo.Purl}");
                 }
+
             }
             return components;
         }

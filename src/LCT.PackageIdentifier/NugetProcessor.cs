@@ -240,8 +240,15 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in componentsForBOM)
             {
-                var processedComponent = ProcessNugetComponent(component, aqlResultList, bomhelper, appSettings, projectType);
-                modifiedBOM.Add(processedComponent);
+                if (component.Publisher != "SpdxSbomParser")
+                {
+                    var processedComponent = ProcessNugetComponent(component, aqlResultList, bomhelper, appSettings, projectType);
+                    modifiedBOM.Add(processedComponent);
+                }
+                else
+                {
+                    modifiedBOM.Add(component);
+                }                
             }
             return modifiedBOM;
         }
@@ -483,9 +490,9 @@ namespace LCT.PackageIdentifier
             else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
             {
                 Bom bomList = _spdxBomParser.ParseSPDXBom(filepath);
-                bomList.Properties = new List<Property>();
-                CycloneDXBomParser.CheckValidComponentsForProjectType(
-                        bomList.Components, appSettings.ProjectType);
+                CommonHelper.CheckValidComponentsFromSpdxfile(bomList.Components,appSettings.ProjectType);
+                //CycloneDXBomParser.CheckValidComponentsForProjectType(
+                //        bomList.Components, appSettings.ProjectType);
                 componentsForBOM.AddRange(bomList.Components);
                 CommonHelper.GetDetailsForManuallyAdded(componentsForBOM,
                     listComponentForBOM,filepath);

@@ -446,27 +446,35 @@ namespace LCT.Common
 
             foreach (Component component in components)
             {
-                var currentIterationItem = component;
-                bool isTrue = isInternalPredicate(currentIterationItem);
-                
-                if (currentIterationItem.Properties?.Count == null || currentIterationItem.Properties?.Count <= 0)
+                if (component.Publisher != "SpdxSbomParser")
                 {
-                    currentIterationItem.Properties = new List<Property>();
-                }
+                    var currentIterationItem = component;
+                    bool isTrue = isInternalPredicate(currentIterationItem);
 
-                Property isInternal = new() { Name = Dataconstant.Cdx_IsInternal, Value = "false" };
-                if (isTrue)
-                {
-                    internalComponents.Add(currentIterationItem);
-                    isInternal.Value = "true";
+                    if (currentIterationItem.Properties?.Count == null || currentIterationItem.Properties?.Count <= 0)
+                    {
+                        currentIterationItem.Properties = new List<Property>();
+                    }
+
+                    Property isInternal = new() { Name = Dataconstant.Cdx_IsInternal, Value = "false" };
+                    if (isTrue)
+                    {
+                        internalComponents.Add(currentIterationItem);
+                        isInternal.Value = "true";
+                    }
+                    else
+                    {
+                        isInternal.Value = "false";
+                    }
+
+                    currentIterationItem.Properties.Add(isInternal);
+                    processedComponents.Add(currentIterationItem);
                 }
                 else
                 {
-                    isInternal.Value = "false";
+                    processedComponents.Add(component);
                 }
-
-                currentIterationItem.Properties.Add(isInternal);
-                processedComponents.Add(currentIterationItem);
+                
             }
 
             return (processedComponents, internalComponents);
@@ -607,7 +615,23 @@ namespace LCT.Common
             }
 
         }
-        #endregion
+        public static void CheckValidComponentsFromSpdxfile(List<Component> bom, string projectType)
+        {
+            foreach (var component in bom.ToList())
+            {
+                if (!string.IsNullOrEmpty(component.Name) && !string.IsNullOrEmpty(component.Version)
+                    && !string.IsNullOrEmpty(component.Purl) &&
+                    component.Purl.Contains(Dataconstant.PurlCheck()[projectType.ToUpper()]))
+                {
+                    //Taking Valid Components for perticular projects
+                }
+                else
+                {
+                    component.Publisher = "SpdxSbomParser";
+                }
+            }
+        }
+            #endregion
     }
 }
 

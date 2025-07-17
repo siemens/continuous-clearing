@@ -178,10 +178,11 @@ namespace LCT.PackageIdentifier
                     parser = new ConanProcessor(CycloneDXBomParser, SpdxBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 default:
-                    Logger.Error($"GenerateBom():Invalid ProjectType - {appSettings.ProjectType}");
-                    break;
+                    Logger.Logger.Log(null, Level.Debug, $"Unsupported project type: {appSettings.ProjectType}", null);
+                    parser = new UnsupportedProjectProcessor(SpdxBomParser);
+                    return await ComponentIdentificationForUnsupportedProjects(appSettings, parser);
             }
-            return new Bom();
+           
         }
 
         private async Task<Bom> ComponentIdentification(CommonAppSettings appSettings, IParser parser)
@@ -231,7 +232,53 @@ namespace LCT.PackageIdentifier
             }
             return bom;
         }
+        private async Task<Bom> ComponentIdentificationForUnsupportedProjects(CommonAppSettings appSettings, IParser parser)
+        {
+            ComponentIdentification lstOfComponents;
+            List<Component> components;
+            Metadata metadata;
+            Bom bom = new Bom();
+            try
+            {
+                //Parsing the input file
+                bom = parser.ParsePackageFile(appSettings);
+                metadata = bom.Metadata;
+                componentData = new ComponentIdentification()
+                {
+                    comparisonBOMData = bom.Components,
+                    internalComponents = new List<Component>()
+                };
 
+                if (appSettings.Jfrog != null)
+                {
+                    //Identification of internal components
+                    Logger.Logger.Log(null, Level.Notice, $"Identifying the internal components", null);
+                    lstOfComponents = await parser.IdentificationOfInternalComponents(componentData, appSettings, JFrogService, BomHelper);
+                    components = lstOfComponents.comparisonBOMData;
+                    //Setting the artifactory repo info
+                    components = await parser.GetJfrogRepoDetailsOfAComponent(components, appSettings, JFrogService, BomHelper);
+                    bom.Components = components;
+                }
+                else
+                {
+                    Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
+                    foreach (var component in bom.Components)
+                    {
+                        bool propertyExists = component.Properties.Any(p => p.Name == Dataconstant.Cdx_ProjectType);
+                        if (!propertyExists)
+                        {
+                            component.Properties.Add(projectType);
+                        }
+                    }
+                }
+                bom.Metadata = metadata;
+            }
+            catch (HttpRequestException ex)
+            {
+                Logger.Debug($"ComponentIdentification: {ex}");
+            }
+            return bom;
+        }
         public async Task<bool> CheckJFrogConnection(CommonAppSettings appSettings)
         {
             if (appSettings.Jfrog != null)

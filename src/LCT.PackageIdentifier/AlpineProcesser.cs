@@ -50,7 +50,7 @@ namespace LCT.PackageIdentifier
                 else
                 {
                     Logger.Debug($"ParsePackageFile():FileName: " + filepath);
-                    listofComponents.AddRange(ParseCycloneDX(filepath, dependenciesForBOM));
+                    listofComponents.AddRange(ParseCycloneDX(filepath, dependenciesForBOM,appSettings));
                 }
 
             }
@@ -85,7 +85,11 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in componentsForBOM)
             {
-                CycloneBomProcessor.SetProperties(appSettings, component, ref modifiedBOM);
+                if (component.Publisher != "SpdxSbomParser")
+                {
+                    CycloneBomProcessor.SetProperties(appSettings, component, ref modifiedBOM);
+                }               
+                    
             }
             await Task.Yield();
             return modifiedBOM;
@@ -102,16 +106,16 @@ namespace LCT.PackageIdentifier
 
         #region private methods
 
-        public List<AlpinePackage> ParseCycloneDX(string filePath, List<Dependency> dependenciesForBOM)
+        public List<AlpinePackage> ParseCycloneDX(string filePath, List<Dependency> dependenciesForBOM,CommonAppSettings appSettings)
         {
             List<AlpinePackage> alpinePackages = new List<AlpinePackage>();
-            ExtractDetailsForJson(filePath, ref alpinePackages, dependenciesForBOM);
+            ExtractDetailsForJson(filePath, ref alpinePackages, dependenciesForBOM,appSettings);
             return alpinePackages;
         }
 
-        private void ExtractDetailsForJson(string filePath, ref List<AlpinePackage> alpinePackages, List<Dependency> dependenciesForBOM)
+        private void ExtractDetailsForJson(string filePath, ref List<AlpinePackage> alpinePackages, List<Dependency> dependenciesForBOM,CommonAppSettings appSettings)
         {
-            Bom bom = BomHelper.ParseBomFile(filePath, _spdxBomParser, _cycloneDXBomParser);
+            Bom bom = BomHelper.ParseBomFile(filePath, _spdxBomParser, _cycloneDXBomParser,appSettings);
             foreach (var componentsInfo in bom.Components)
             {
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;
@@ -128,6 +132,9 @@ namespace LCT.PackageIdentifier
 
                     alpinePackages.Add(package);
                     Logger.Debug($"ExtractDetailsForJson():ValidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
+                }else if (componentsInfo.Publisher == "SpdxSbomParser")
+                {
+                    alpinePackages.Add(package);
                 }
                 else
                 {
