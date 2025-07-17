@@ -1110,7 +1110,7 @@ namespace LCT.Common.UTest
 
             // Assert - Existing properties are preserved
             var componentWithExisting = testBom.Components.First();
-            Assert.AreEqual(2, componentWithExisting.Properties.Count);
+            Assert.AreEqual(3, componentWithExisting.Properties.Count);
             Assert.IsTrue(componentWithExisting.Properties.Any(p => p.Name == "ExistingProperty"));
         }
 
@@ -1214,9 +1214,9 @@ namespace LCT.Common.UTest
             // Assert - Properties should be initialized and property added
             var component = bomWithNullProps.Components.First();
             Assert.IsNotNull(component.Properties);
-            Assert.AreEqual(1, component.Properties.Count);
-            Assert.AreEqual(Dataconstant.Cdx_SpdxFileName, component.Properties.First().Name);
-            Assert.AreEqual("TestFile.spdx.json", component.Properties.First().Value);
+            Assert.AreEqual(2, component.Properties.Count);
+            Assert.AreEqual(Dataconstant.Cdx_SpdxFileName, component.Properties[0].Name);
+            Assert.AreEqual("TestFile.spdx.json", component.Properties[0].Value);
         }
 
         [Test]

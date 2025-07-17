@@ -114,7 +114,7 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in componentsForBOM)
             {
-                if (component.Publisher != "SpdxSbomParser")
+                if (component.Publisher != Dataconstant.UnsupportedPackageType)
                 {
                     Component updatedComponent = UpdateComponentDetails(component, aqlResultList, appSettings, bomhelper, projectType);
                     modifiedBOM.Add(updatedComponent);
@@ -347,27 +347,28 @@ namespace LCT.PackageIdentifier
                     Purl = GetReleaseExternalId(prop.Name, prop.Version)
                 };
                 component.BomRef = component.Purl;
-                component.Type = Component.Classification.Library;
-
-                //For Debian projects we will be considering CycloneDX file reading components as Discovered
-                //since it's Discovered from syft Tool
-                Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.Discovered };
+                component.Type = Component.Classification.Library;                
                 Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
-                component.Properties = new List<Property> { identifierType, isDev };
-                AddSpdxComponentProperties(prop, component);
-
+                component.Properties = new List<Property> {isDev };
+                AddComponentProperties(prop, component);
                 listComponentForBOM.Add(component);
             }
             return listComponentForBOM;
         }
-        private static void AddSpdxComponentProperties(DebianPackage prop, Component component)
+        private static void AddComponentProperties(DebianPackage prop, Component component)
         {
             if (prop.SpdxComponent)
             {
                 string fileName = Path.GetFileName(prop.SpdxFilePath);
-                var spdxFileName = new Property { Name = Dataconstant.Cdx_SpdxFileName, Value = fileName };
-                component.Properties ??= new List<Property>();
-                component.Properties.Add(spdxFileName);
+                CommonHelper.AddSpdxComponentProperties(fileName, component);
+            }
+            else
+            {
+                //For Debian projects we will be considering CycloneDX file reading components as Discovered
+                //since it's Discovered from syft Tool
+                Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.Discovered };
+                component.Properties.Add(identifierType);
+
             }
         }
         private static void SetSpdxComponentDetails(string filePath, DebianPackage package)

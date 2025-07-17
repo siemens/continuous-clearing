@@ -102,7 +102,7 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in componentsForBOM)
             {
-                if (component.Publisher != "SpdxSbomParser")
+                if (component.Publisher != Dataconstant.UnsupportedPackageType)
                 {
                     Component updatedComponent = UpdateComponentDetails(component, aqlResultList, appSettings, projectType);
                     modifiedBOM.Add(updatedComponent);

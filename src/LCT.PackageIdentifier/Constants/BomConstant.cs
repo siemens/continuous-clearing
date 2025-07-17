@@ -19,6 +19,5 @@ namespace LCT.PackageIdentifier.Constants
         public const string PackageConfigFileName = "packages.config";
         public const string PackageLockJsonFileName = "packages.lock.json";
         public const int MaxDegreeOfParallelism = 2;
-        public static string[] SupportedProjects = new[] { "NPM", "NUGET", "MAVEN", "DEBIAN", "ALPINE", "POETRY", "CONAN" };
     }
 }

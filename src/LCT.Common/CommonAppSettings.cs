@@ -60,15 +60,8 @@ namespace LCT.Common
         public Config Alpine { get; set; }
         public Config Poetry { get; set; }
         public Config Conan { get; set; }
-
-        public UnsupportedProjectConfig UnsupporedProjectDetails { get; set; }
         public string Mode { get; set; } = string.Empty;
-        public class UnsupportedProjectConfig
-        {
-            public string[] Include { get; set; } = { "*.spdx.sbom.json" };
-            public bool UnsupportedProject { get; set; } = false;
-
-        }
+       
         public bool IsTestMode
         {
             get

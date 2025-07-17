@@ -66,6 +66,8 @@ namespace LCT.PackageIdentifier.Model
 
         [DisplayName(@"Components Updated From SBOM Template")]
         public int ComponentsUpdatedFromSBOMTemplateFile { get; set; }
+        [DisplayName(@"Unsupported Components Identified From Spdx")]
+        public int UnsupportedComponentsFromSpdxFile { get; set; }
 
         public string ProjectSummaryLink { get; set; }
     }

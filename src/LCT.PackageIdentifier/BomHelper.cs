@@ -67,7 +67,8 @@ namespace LCT.PackageIdentifier
             }
             printList.Add(CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ComponentsinSBOMTemplateFile)), bomKpiData.ComponentsinSBOMTemplateFile);
             printList.Add(CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ComponentsUpdatedFromSBOMTemplateFile)), bomKpiData.ComponentsUpdatedFromSBOMTemplateFile);
-            printList.Add(CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ComponentsInComparisonBOM)), bomKpiData.ComponentsInComparisonBOM);
+            printList.Add(CommonHelper.Convert(bomKpiData, nameof(bomKpiData.UnsupportedComponentsFromSpdxFile)), bomKpiData.UnsupportedComponentsFromSpdxFile);
+            printList.Add(CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ComponentsInComparisonBOM)), bomKpiData.ComponentsInComparisonBOM);            
             Dictionary<string, double> printTimingList = new Dictionary<string, double>()
             {
                 { "PackageIdentifier",bomKpiData.TimeTakenByBomCreator }

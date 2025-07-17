@@ -214,7 +214,7 @@ namespace LCT.PackageIdentifier
                     BomCreator.bomKpiData.DebianComponents++;
                     PythonPackages.Add(package);
                     Logger.Debug($"ExtractDetailsFromJson():ValidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
-                }else if (componentsInfo.Publisher == "SpdxSbomParser")
+                }else if (componentsInfo.Publisher == Dataconstant.UnsupportedPackageType)
                 {
                     BomCreator.bomKpiData.DebianComponents++;
                     PythonPackages.Add(package);
@@ -253,51 +253,18 @@ namespace LCT.PackageIdentifier
 
         private static List<Component> FormComponentReleaseExternalID(List<PythonPackage> listOfComponents)
         {
-            List<Component> listComponentForBOM = new List<Component>();
-            Property devDependency;
+            List<Component> listComponentForBOM = new List<Component>();            
 
             foreach (var prop in listOfComponents)
-            {
-                if (prop.Isdevdependent)
-                {
-                    devDependency = new()
-                    {
-                        Name = Dataconstant.Cdx_IsDevelopment,
-                        Value = "true"
-                    };
-                }
-                else
-                {
-                    devDependency = new()
-                    {
-                        Name = Dataconstant.Cdx_IsDevelopment,
-                        Value = "false"
-                    };
-                }
+            {               
 
                 Component component = new Component
                 {
                     Name = prop.Name,
                     Version = prop.Version,
                     Purl = GetReleaseExternalId(prop.Name, prop.Version),
-                };
-
-                Property identifierType;
-                if (prop.FoundType == Dataconstant.Discovered)
-                {
-                    identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.Discovered };
-                }
-                else
-                {
-                    identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.ManullayAdded };
-                }
-
-                component.Properties = new List<Property>
-                {
-                    devDependency,
-                    identifierType
-                };
-                AddSpdxComponentProperties(prop, component);
+                };                
+                AddComponentProperties(prop, component);
                 component.Type = Component.Classification.Library;
                 component.BomRef = component.Purl;
 
@@ -367,7 +334,7 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in componentsForBOM)
             {
-                if (component.Publisher != "SpdxSbomParser")
+                if (component.Publisher != Dataconstant.UnsupportedPackageType)
                 {
                     var processedComponent = ProcessPythonComponent(component, aqlResultList, bomhelper, appSettings, projectType);
                     modifiedBOM.Add(processedComponent);
@@ -484,15 +451,45 @@ namespace LCT.PackageIdentifier
 
             return $"{aqlResult.Repo}/{aqlResult.Path}/{aqlResult.Name}";
         }
-        private static void AddSpdxComponentProperties(PythonPackage prop, Component component)
+        private static void AddComponentProperties(PythonPackage prop, Component component)
         {
+            // Add development dependency property
+            var devDependency = new Property
+            {
+                Name = Dataconstant.Cdx_IsDevelopment,
+                Value = prop.Isdevdependent ? "true" : "false"
+            };
+
+            // Initialize component properties if null
+            component.Properties ??= new List<Property>();
+
+            // Add SPDX-related properties if applicable
             if (prop.SpdxComponent)
             {
-                string fileName = Path.GetFileName(prop.SpdxFilePath);
-                var spdxFileName = new Property { Name = Dataconstant.Cdx_SpdxFileName, Value = fileName };
-                component.Properties ??= new List<Property>();
-                component.Properties.Add(spdxFileName);
+                AddSpdxProperties(prop, component);
             }
+            else
+            {
+                AddIdentifierTypeProperty(prop, component, devDependency);
+            }
+        }
+
+        private static void AddSpdxProperties(PythonPackage prop, Component component)
+        {
+            string fileName = Path.GetFileName(prop.SpdxFilePath);
+            CommonHelper.AddSpdxComponentProperties(fileName, component);
+        }
+
+        private static void AddIdentifierTypeProperty(PythonPackage prop, Component component, Property devDependency)
+        {
+            var identifierType = new Property
+            {
+                Name = Dataconstant.Cdx_IdentifierType,
+                Value = prop.FoundType == Dataconstant.Discovered ? Dataconstant.Discovered : Dataconstant.ManullayAdded
+            };
+
+            component.Properties.Add(devDependency);
+            component.Properties.Add(identifierType);
         }
         private static void SetSpdxComponentDetails(string filePath, PythonPackage package)
         {

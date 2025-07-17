@@ -90,13 +90,7 @@ namespace LCT.PackageIdentifier
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
             CommonHelper.DefaultLogFolderInitialisation(FileConstant.BomCreatorLog, m_Verbose);
             CommonAppSettings appSettings = _settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
-            ProjectReleases projectReleases = new ProjectReleases();
-            appSettings.UnsupporedProjectDetails = new();            
-            if (!BomConstant.SupportedProjects.Contains(appSettings.ProjectType.ToUpperInvariant()))
-            {
-                appSettings.UnsupporedProjectDetails.UnsupportedProject = true;
-                Logger.Logger.Log(null, Level.Debug, $"Unsupported project type: {appSettings.ProjectType}", null);
-            }
+            ProjectReleases projectReleases = new ProjectReleases();           
             string _ = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.BomCreatorLog, m_Verbose);                        
 
             _settingsManager.CheckRequiredArgsToRun(appSettings, "Identifer");

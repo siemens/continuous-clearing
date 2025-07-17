@@ -128,17 +128,16 @@ namespace LCT.PackageIdentifier
                     else
                     {
                         bomList = ParseCycloneDXBom(filepath);
-                    }
-
-                    if (bomList?.Components != null)
-                    {
-                        CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
-                    }
-                    else
-                    {
-                        Logger.Warn("No components found in the BOM file : " + filepath);
-                        continue;
-                    }
+                        if (bomList?.Components != null)
+                        {
+                            CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
+                        }
+                        else
+                        {
+                            Logger.Warn("No components found in the BOM file : " + filepath);
+                            continue;
+                        }
+                    }                  
 
                     AddComponentsToBom(bomList, componentsForBOM, componentsToBOM, dependenciesForBOM);
                 }                
@@ -240,6 +239,7 @@ namespace LCT.PackageIdentifier
         {
             Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.Discovered };
             Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = devValue };
+            Property spdxIdentifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.SpdxImport };
 
             if (CommonHelper.ComponentPropertyCheck(component, Dataconstant.Cdx_IdentifierType))
             {
@@ -258,7 +258,7 @@ namespace LCT.PackageIdentifier
                 if (CommonHelper.ComponentPropertyCheck(component, Dataconstant.Cdx_SpdxFileName))
                 {
                     component.Properties.Add(isDev);
-                    component.Properties.Add(identifierType);
+                    component.Properties.Add(spdxIdentifierType);
                     componentsToBOM.Add(component);
                 }
                 else
@@ -285,7 +285,7 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in componentsForBOM)
             {
-                if (component.Publisher != "SpdxSbomParser")
+                if (component.Publisher != Dataconstant.UnsupportedPackageType)
                 {
                     string jfrogpackageName = $"{component.Name}-{component.Version}{ApiConstant.MavenExtension}";
                     var hashes = aqlResultList.FirstOrDefault(x => x.Name == jfrogpackageName);

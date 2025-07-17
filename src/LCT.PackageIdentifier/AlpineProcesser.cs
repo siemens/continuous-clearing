@@ -85,7 +85,7 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in componentsForBOM)
             {
-                if (component.Publisher != "SpdxSbomParser")
+                if (component.Publisher != Dataconstant.UnsupportedPackageType)
                 {
                     CycloneBomProcessor.SetProperties(appSettings, component, ref modifiedBOM);
                 }               
@@ -132,7 +132,7 @@ namespace LCT.PackageIdentifier
 
                     alpinePackages.Add(package);
                     Logger.Debug($"ExtractDetailsForJson():ValidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
-                }else if (componentsInfo.Publisher == "SpdxSbomParser")
+                }else if (componentsInfo.Publisher == Dataconstant.UnsupportedPackageType)
                 {
                     alpinePackages.Add(package);
                 }
@@ -186,22 +186,24 @@ namespace LCT.PackageIdentifier
                     Purl = GetReleaseExternalId(prop.Name, prop.Version)
                 };
                 component.BomRef = $"{Dataconstant.PurlCheck()["ALPINE"]}{Dataconstant.ForwardSlash}{prop.Name}@{prop.Version}?{distro}";
-                component.Type = Component.Classification.Library;
-                Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.Discovered };
-                component.Properties = new List<Property> { identifierType };
-                AddSpdxComponentProperties(prop, component);
+                component.Type = Component.Classification.Library;                
+                AddComponentProperties(prop, component);
                 listComponentForBOM.Add(component);
             }
             return listComponentForBOM;
         }
-        private static void AddSpdxComponentProperties(AlpinePackage prop, Component component)
+        private static void AddComponentProperties(AlpinePackage prop, Component component)
         {
             if (prop.SpdxComponent)
             {
                 string fileName = Path.GetFileName(prop.SpdxFilePath);
-                var spdxFileName = new Property { Name = Dataconstant.Cdx_SpdxFileName, Value = fileName };
-                component.Properties ??= new List<Property>();
-                component.Properties.Add(spdxFileName);
+                CommonHelper.AddSpdxComponentProperties(fileName, component);               
+            }
+            else
+            {
+                Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.Discovered };
+                component.Properties ??= new List<Property> ();
+                component.Properties.Add(identifierType);
             }
         }
         private static void SetSpdxComponentDetails(string filePath, AlpinePackage package)
