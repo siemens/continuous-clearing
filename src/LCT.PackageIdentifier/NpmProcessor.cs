@@ -395,7 +395,8 @@ namespace LCT.PackageIdentifier
                 else
                 {
                     modifiedBOM.Add(component);
-                }                    
+                } 
+                
             }
             return modifiedBOM;
         }
