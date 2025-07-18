@@ -397,7 +397,6 @@ namespace LCT.PackageIdentifier
                     modifiedBOM.Add(component);
                 }                    
             }
-
             return modifiedBOM;
         }
 
