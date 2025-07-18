@@ -14,6 +14,7 @@ using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
+using Microsoft.ComponentDetection.Detectors.Linux.Contracts;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -23,6 +24,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Tommy;
 using Component = CycloneDX.Models.Component;
+using Dependency = CycloneDX.Models.Dependency;
 
 namespace LCT.PackageIdentifier
 {
@@ -128,7 +130,8 @@ namespace LCT.PackageIdentifier
                     PurlID = Dataconstant.PurlCheck()["POETRY"] + "/" + node["name"].ToString() + "@" + node["version"].ToString(),
                     // By Default Tommy.TomlLazy is coming instead of Null or empty
                     Isdevdependent = (node["category"].ToString() != "main" && node["category"].ToString() != "Tommy.TomlLazy"),
-                    FoundType = Dataconstant.Discovered
+                    FoundType = Dataconstant.Discovered,
+                    SpdxComponentDetails=new SpdxComponentInfo()
                 };
 
                 if (pythonPackage.Isdevdependent)
@@ -206,8 +209,9 @@ namespace LCT.PackageIdentifier
                     Name = componentsInfo.Name,
                     Version = componentsInfo.Version,
                     PurlID = componentsInfo.Purl,
+                    SpdxComponentDetails = new SpdxComponentInfo(),
                 };
-                SetSpdxComponentDetails(filePath, package);
+                SetSpdxComponentDetails(filePath, package, componentsInfo);
 
                 if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["POETRY"]))
                 {
@@ -216,7 +220,6 @@ namespace LCT.PackageIdentifier
                     Logger.Debug($"ExtractDetailsFromJson():ValidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
                 }else if (componentsInfo.Publisher == Dataconstant.UnsupportedPackageType)
                 {
-                    BomCreator.bomKpiData.DebianComponents++;
                     PythonPackages.Add(package);
                 }
                 else
@@ -262,11 +265,20 @@ namespace LCT.PackageIdentifier
                 {
                     Name = prop.Name,
                     Version = prop.Version,
-                    Purl = GetReleaseExternalId(prop.Name, prop.Version),
-                };                
+                };
+                if (prop.SpdxComponentDetails.ValidSpdxPurlId)
+                {
+                    component.Purl = prop.PurlID;
+                    component.BomRef = prop.PurlID;
+                    component.Publisher = Dataconstant.UnsupportedPackageType;
+                }
+                else
+                {
+                    component.Purl = GetReleaseExternalId(prop.Name, prop.Version);
+                    component.BomRef = component.Purl;
+                }
                 AddComponentProperties(prop, component);
                 component.Type = Component.Classification.Library;
-                component.BomRef = component.Purl;
 
                 listComponentForBOM.Add(component);
             }
@@ -453,20 +465,18 @@ namespace LCT.PackageIdentifier
         }
         private static void AddComponentProperties(PythonPackage prop, Component component)
         {
-            // Add development dependency property
             var devDependency = new Property
             {
                 Name = Dataconstant.Cdx_IsDevelopment,
                 Value = prop.Isdevdependent ? "true" : "false"
             };
 
-            // Initialize component properties if null
             component.Properties ??= new List<Property>();
 
-            // Add SPDX-related properties if applicable
-            if (prop.SpdxComponent)
+            if (prop.SpdxComponentDetails.SpdxComponent)
             {
                 AddSpdxProperties(prop, component);
+                component.Properties.Add(devDependency);
             }
             else
             {
@@ -476,7 +486,7 @@ namespace LCT.PackageIdentifier
 
         private static void AddSpdxProperties(PythonPackage prop, Component component)
         {
-            string fileName = Path.GetFileName(prop.SpdxFilePath);
+            string fileName = Path.GetFileName(prop.SpdxComponentDetails.SpdxFilePath);
             CommonHelper.AddSpdxComponentProperties(fileName, component);
         }
 
@@ -491,12 +501,16 @@ namespace LCT.PackageIdentifier
             component.Properties.Add(devDependency);
             component.Properties.Add(identifierType);
         }
-        private static void SetSpdxComponentDetails(string filePath, PythonPackage package)
+        private static void SetSpdxComponentDetails(string filePath, PythonPackage package,Component componentInfo)
         {
             if (filePath.EndsWith(FileConstant.SPDXFileExtension))
             {
-                package.SpdxFilePath = filePath;
-                package.SpdxComponent = true;
+                package.SpdxComponentDetails.SpdxFilePath = filePath;
+                package.SpdxComponentDetails.SpdxComponent = true;
+            }
+            if (componentInfo.Publisher == Dataconstant.UnsupportedPackageType)
+            {
+                package.SpdxComponentDetails.ValidSpdxPurlId = true;
             }
         }
         #endregion

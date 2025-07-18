@@ -1285,7 +1285,7 @@ namespace LCT.Common.UTest
             // Assert
             var component = testBom.Components.First();
             var spdxFileNameProperties = component.Properties.Where(p => p.Name == Dataconstant.Cdx_SpdxFileName);
-            Assert.AreEqual(2, spdxFileNameProperties.Count()); // Method adds property each time it's called
+            Assert.AreEqual(1, spdxFileNameProperties.Count());
         }
 
         [Test]

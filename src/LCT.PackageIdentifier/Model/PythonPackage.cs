@@ -19,8 +19,7 @@ namespace LCT.PackageIdentifier.Model
         public bool Isdevdependent { get; set; }
         public string FoundType { get; set; }
         public string Filepath { get; set; }
-        public bool SpdxComponent { get; set; } = false;
-        public string SpdxFilePath { get; set; }
+        public SpdxComponentInfo SpdxComponentDetails { get; set; }
 
     }
 }

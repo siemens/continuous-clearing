@@ -298,15 +298,18 @@ namespace LCT.PackageIdentifier
                     Name = componentsInfo.Name,
                     Version = componentsInfo.Version,
                     PurlID = componentsInfo.Purl,
-
+                    SpdxComponentDetails = new SpdxComponentInfo(),
                 };
-                SetSpdxComponentDetails(filePath, package);
+                SetSpdxComponentDetails(filePath, package,componentsInfo);
 
                 if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
                 {
                     BomCreator.bomKpiData.DebianComponents++;
                     debianPackages.Add(package);
                     Logger.Debug($"ExtractDetailsForJson():ValidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
+                }else if (componentsInfo.Publisher == Dataconstant.UnsupportedPackageType)
+                {
+                    debianPackages.Add(package);
                 }
                 else
                 {
@@ -344,9 +347,18 @@ namespace LCT.PackageIdentifier
                 {
                     Name = prop.Name,
                     Version = prop.Version,
-                    Purl = GetReleaseExternalId(prop.Name, prop.Version)
                 };
-                component.BomRef = component.Purl;
+                if (prop.SpdxComponentDetails.ValidSpdxPurlId)
+                {
+                    component.Purl = prop.PurlID;
+                    component.BomRef = prop.PurlID;
+                    component.Publisher = Dataconstant.UnsupportedPackageType;
+                }
+                else
+                {
+                    component.Purl = GetReleaseExternalId(prop.Name, prop.Version);
+                    component.BomRef = component.Purl;
+                }                
                 component.Type = Component.Classification.Library;                
                 Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
                 component.Properties = new List<Property> {isDev };
@@ -357,9 +369,9 @@ namespace LCT.PackageIdentifier
         }
         private static void AddComponentProperties(DebianPackage prop, Component component)
         {
-            if (prop.SpdxComponent)
+            if (prop.SpdxComponentDetails.SpdxComponent)
             {
-                string fileName = Path.GetFileName(prop.SpdxFilePath);
+                string fileName = Path.GetFileName(prop.SpdxComponentDetails.SpdxFilePath);
                 CommonHelper.AddSpdxComponentProperties(fileName, component);
             }
             else
@@ -371,12 +383,16 @@ namespace LCT.PackageIdentifier
 
             }
         }
-        private static void SetSpdxComponentDetails(string filePath, DebianPackage package)
+        private static void SetSpdxComponentDetails(string filePath, DebianPackage package,Component componentInfo)
         {
             if (filePath.EndsWith(FileConstant.SPDXFileExtension))
             {
-                package.SpdxFilePath = filePath;
-                package.SpdxComponent = true;
+                package.SpdxComponentDetails.SpdxFilePath = filePath;
+                package.SpdxComponentDetails.SpdxComponent = true;
+            }
+            if (componentInfo.Publisher == Dataconstant.UnsupportedPackageType)
+            {
+                package.SpdxComponentDetails.ValidSpdxPurlId = true;
             }
         }
 

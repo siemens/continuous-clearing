@@ -228,14 +228,7 @@ namespace LCT.PackageIdentifier
 
                     }
                 }
-                foreach (var component in bom.Components)
-                {
-                    if (component.Publisher == Dataconstant.UnsupportedPackageType)
-                    {
-                        bomKpiData.UnsupportedComponentsFromSpdxFile++;
-                        component.Publisher=null;
-                    }
-                }
+                RevertUnnessaryDataForSPDXComponents(bom, bomKpiData);
                 bom.Metadata = metadata;
             }
             catch (HttpRequestException ex)
@@ -274,6 +267,17 @@ namespace LCT.PackageIdentifier
             }
             return true;
 
+        }
+        private static void RevertUnnessaryDataForSPDXComponents(Bom bom, BomKpiData bomKpiData)
+        {
+            foreach (var component in bom.Components)
+            {
+                if (component.Publisher == Dataconstant.UnsupportedPackageType)
+                {
+                    bomKpiData.UnsupportedComponentsFromSpdxFile++;
+                    component.Publisher = null;
+                }
+            }
         }
     }
 }

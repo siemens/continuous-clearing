@@ -567,11 +567,21 @@ namespace LCT.Common
         public static void AddSpdxComponentProperties(string fileName, Component component)
         {
             component.Properties ??= new List<Property>();
-            var spdxFileName = new Property { Name = Dataconstant.Cdx_SpdxFileName, Value = fileName };
-            var identifierType = new Property { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.SpdxImport };
-            component.Properties.Add(spdxFileName);
-            component.Properties.Add(identifierType);
+            UpdateOrAddProperty(component.Properties, Dataconstant.Cdx_SpdxFileName, fileName);
+            UpdateOrAddProperty(component.Properties, Dataconstant.Cdx_IdentifierType, Dataconstant.SpdxImport);
+        }
 
+        private static void UpdateOrAddProperty(List<Property> properties, string propertyName, string propertyValue)
+        {
+            var existingProperty = properties.FirstOrDefault(p => p.Name == propertyName);
+            if (existingProperty != null)
+            {
+                existingProperty.Value = propertyValue;
+            }
+            else
+            {
+                properties.Add(new Property { Name = propertyName, Value = propertyValue });
+            }
         }
 
         #endregion

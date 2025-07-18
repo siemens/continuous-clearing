@@ -176,13 +176,21 @@ namespace LCT.PackageIdentifier
                 Name = Dataconstant.Cdx_JfrogRepoPath,
                 Value = Dataconstant.JfrogRepoPathNotFound
             };
-            component.Properties.Add(internalType);
-            component.Properties.Add(artifactoryrepo);
-            component.Properties.Add(projectType);
-            component.Properties.Add(isDevelopment);
-            component.Properties.Add(isDirect);
-            component.Properties.Add(filname);
-            component.Properties.Add(jfrogRepoPathProperty);
+            if (component.Publisher==Dataconstant.UnsupportedPackageType)
+            {
+                component.Properties.Add(isDirect);
+                component.Properties.Add(isDevelopment);
+            }
+            else
+            {
+                component.Properties.Add(internalType);
+                component.Properties.Add(artifactoryrepo);
+                component.Properties.Add(projectType);
+                component.Properties.Add(isDevelopment);
+                component.Properties.Add(isDirect);
+                component.Properties.Add(filname);
+                component.Properties.Add(jfrogRepoPathProperty);
+            }            
             component.Description = null;
             componentForBOM.Add(component);
         }

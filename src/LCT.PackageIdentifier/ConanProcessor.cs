@@ -260,7 +260,6 @@ namespace LCT.PackageIdentifier
                 {                  
                     bom = _spdxBomParser.ParseSPDXBom(filepath);
                     CommonHelper.CheckValidComponentsFromSpdxfile(bom.Components, appSettings.ProjectType);
-                    //CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
                     GetDetailsforManuallyAddedComp(bom.Components);
                     CommonHelper.AddSpdxSBomFileNameProperty(ref bom, filepath);
                     componentsForBOM.AddRange(bom.Components);
@@ -507,6 +506,9 @@ namespace LCT.PackageIdentifier
                 {
                     components.Add(componentsInfo);
                     Logger.Debug($"GetExcludedComponentsList():ValidComponent For CONAN : Component Details : {componentsInfo.Name} @ {componentsInfo.Version} @ {componentsInfo.Purl}");
+                }else if(componentsInfo.Publisher==Dataconstant.UnsupportedPackageType)
+                {
+                    components.Add(componentsInfo);
                 }
                 else
                 {
