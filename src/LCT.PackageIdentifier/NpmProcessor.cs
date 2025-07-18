@@ -522,6 +522,7 @@ namespace LCT.PackageIdentifier
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += bom.Components.Count;
             componentsForBOM.AddRange(bom.Components);
             dependencies.AddRange(bom.Dependencies);
+            BomHelper.NamingConventionOfSPDXFile(filepath, appSettings);
         }
 
         private static void ProcessPackageFile(string filepath, CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref List<Dependency> dependencies)

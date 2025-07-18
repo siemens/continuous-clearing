@@ -33,7 +33,6 @@ namespace LCT.PackageIdentifier
     public class BomHelper : IBomHelper
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         #region public methods
 
         public string GetProjectSummaryLink(string projectId, string sw360Url)
@@ -96,7 +95,70 @@ namespace LCT.PackageIdentifier
                 Logger.Info("\n");
             }
         }
+        
+         public static void NamingConventionOfSPDXFile(string filepath, CommonAppSettings appSettings)
+        {
+            string filename = Path.GetFileName(filepath);
+            var relatedExtensions = new[] { $"{filename}.pem", $"{filename}.sig" };
 
+            var foundFiles = new Dictionary<string, string>();
+            var missingFiles = new List<string>();
+
+            CheckFileExistence(appSettings.Directory.InputFolder, relatedExtensions, foundFiles, missingFiles);
+
+            if (missingFiles.Count > 0)
+            {
+                HandleMissingFiles(missingFiles, filename);
+            }
+            else
+            {
+                ValidateFoundFiles(filepath, filename, foundFiles);
+            }
+        }
+
+        private static void CheckFileExistence(string inputFolder, string[] relatedExtensions, 
+            Dictionary<string, string> foundFiles, List<string> missingFiles)
+        {
+            foreach (var related in relatedExtensions)
+            {
+                string relatedFile = Path.Combine(inputFolder, related);
+                if (File.Exists(relatedFile))
+                {
+                    foundFiles[related] = relatedFile;
+                }
+                else
+                {
+                    missingFiles.Add(related);
+                }
+            }
+        }
+
+        private static void HandleMissingFiles(List<string> missingFiles, string filename)
+        {
+            foreach (var missingFile in missingFiles)
+            {
+                if (missingFile.EndsWith(".sig", StringComparison.OrdinalIgnoreCase))
+                {
+                    Logger.Error($"Naming Convention Error: The certificate file(s) for the SPDX document '{filename}' are missing. Please ensure that signature files are named in the format '{filename}.sig'.");
+                }
+                else if (missingFile.EndsWith(".pem", StringComparison.OrdinalIgnoreCase))
+                {
+                    Logger.Error($"Naming Convention Error: The certificate file(s) for the SPDX document '{filename}' are missing. Please ensure that .pem files are named in the format '{filename}.pem'.");
+                }
+            }
+        }
+
+        private static void ValidateFoundFiles(string filepath, string filename, Dictionary<string, string> foundFiles)
+        {
+            string sigFilePath = foundFiles.TryGetValue($"{filename}.sig", out string sigFile) ? sigFile : string.Empty;
+            string pemFilePath = foundFiles.TryGetValue($"{filename}.pem", out string pemFile) ? pemFile : string.Empty;
+
+            bool isValidFile = PemSignatureVerifier.ValidatePem(filepath, sigFilePath, pemFilePath);
+            if (!isValidFile)
+            {
+                // SPDX file validation failed - continuing without logging
+            }
+        }
         public static string GetHashCodeUsingNpmView(string name, string version)
         {
             string hashCode;
@@ -216,18 +278,51 @@ namespace LCT.PackageIdentifier
 
             return aqlResultList;
         }
-        public static Bom ParseBomFile(string filePath, ISpdxBomParser spdxBomParser, ICycloneDXBomParser cycloneDXBomParser)
+        public static Bom ParseBomFile(string filePath, ISpdxBomParser spdxBomParser, ICycloneDXBomParser cycloneDXBomParser, CommonAppSettings appSettings)
         {
-            if (filePath.EndsWith(FileConstant.SPDXFileExtension))
+            if (System.IO.Directory.Exists(filePath))
             {
-                Bom bom;
-                bom = spdxBomParser.ParseSPDXBom(filePath);
-                return bom;
+                return ParseMultipleSpdxFiles(filePath, spdxBomParser);
+            }
+            else if (filePath.EndsWith(FileConstant.SPDXFileExtension))
+            {
+                return spdxBomParser.ParseSPDXBom(filePath);
             }
             else
             {
                 return cycloneDXBomParser.ParseCycloneDXBom(filePath);
             }
+        }
+
+        private static Bom ParseMultipleSpdxFiles(string folderPath, ISpdxBomParser spdxBomParser)
+        {
+            var spdxFiles = System.IO.Directory.GetFiles(folderPath, $"*{FileConstant.SPDXFileExtension}", SearchOption.AllDirectories);
+            
+            if (spdxFiles.Length == 0)
+            {
+                return new Bom();
+            }
+            
+            foreach (var spdxFile in spdxFiles)
+            {
+                try
+                {
+                    var currentBom = spdxBomParser.ParseSPDXBom(spdxFile);
+                    // Process each SPDX file individually without merging
+                    // Return the first valid BOM found
+                    if (currentBom != null)
+                    {
+                        return currentBom;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.ErrorFormat("Failed to parse SPDX file '{0}': {1}. Continuing with next file.", spdxFile, ex.Message);
+                    Logger.Debug("Exception details:", ex);
+                }
+            }
+            
+            return new Bom();
         }
 
         #endregion

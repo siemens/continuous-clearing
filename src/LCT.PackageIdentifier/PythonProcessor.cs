@@ -189,6 +189,7 @@ namespace LCT.PackageIdentifier
             List<PythonPackage> PythonPackages = new List<PythonPackage>();
             if (filePath.EndsWith(FileConstant.SPDXFileExtension))
             {
+                BomHelper.NamingConventionOfSPDXFile(filePath, appSettings);
                 bom = _spdxBomParser.ParseSPDXBom(filePath);
             }
             else

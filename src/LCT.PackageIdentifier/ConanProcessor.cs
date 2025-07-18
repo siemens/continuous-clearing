@@ -249,7 +249,8 @@ namespace LCT.PackageIdentifier
                     componentsForBOM.AddRange(components);
                 }
                 else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
-                {                  
+                {
+                    BomHelper.NamingConventionOfSPDXFile(filepath, appSettings);
                     bom = _spdxBomParser.ParseSPDXBom(filepath);
                     CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
                     GetDetailsforManuallyAddedComp(bom.Components);
