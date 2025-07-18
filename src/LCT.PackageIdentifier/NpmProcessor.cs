@@ -712,7 +712,6 @@ namespace LCT.PackageIdentifier
                     BomCreator.bomKpiData.ComponentsExcluded++;
                     Logger.Debug($"GetExcludedComponentsList():InvalidComponent For NPM : Component Details : {componentsInfo.Name} @ {componentsInfo.Version} @ {componentsInfo.Purl}");
                 }
-
             }
             return components;
         }

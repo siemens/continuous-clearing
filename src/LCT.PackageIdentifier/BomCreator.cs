@@ -182,7 +182,6 @@ namespace LCT.PackageIdentifier
                     break;
             }
             return new Bom();
-
         }
 
         private async Task<Bom> ComponentIdentification(CommonAppSettings appSettings, IParser parser)
@@ -236,8 +235,7 @@ namespace LCT.PackageIdentifier
                 Logger.Debug($"ComponentIdentification: {ex}");
             }
             return bom;
-        }
-       
+        }       
         public async Task<bool> CheckJFrogConnection(CommonAppSettings appSettings)
         {
             if (appSettings.Jfrog != null)

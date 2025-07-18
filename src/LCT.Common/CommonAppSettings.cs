@@ -60,8 +60,7 @@ namespace LCT.Common
         public Config Alpine { get; set; }
         public Config Poetry { get; set; }
         public Config Conan { get; set; }
-        public string Mode { get; set; } = string.Empty;
-       
+        public string Mode { get; set; } = string.Empty;       
         public bool IsTestMode
         {
             get
