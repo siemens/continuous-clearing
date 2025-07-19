@@ -664,7 +664,26 @@ namespace LCT.Common
                 }
             }
         }
-            #endregion
+        public static Component CreateComponentWithProperties(
+    string name,
+    string version,
+    string purlId,
+    bool isValidSpdxPurlId,
+    string releaseExternalId,
+    string unsupportedPackageType)
+        {
+            Component component = new Component
+            {
+                Name = name,
+                Version = version,
+                Purl = isValidSpdxPurlId ? purlId : releaseExternalId,
+                BomRef = isValidSpdxPurlId ? purlId : releaseExternalId,
+                Publisher = isValidSpdxPurlId ? unsupportedPackageType : null,
+                Type = Component.Classification.Library
+            };  
+            return component;
+        }
+        #endregion
     }
 }
 
