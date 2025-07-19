@@ -31,6 +31,13 @@ namespace LCT.PackageIdentifier.UTest
         public void Setup()
         {
             _mavenProcessor = new MavenProcessor(Mock.Of<ICycloneDXBomParser>(), Mock.Of<ISpdxBomParser>());
+            
+            // Reset KPI data before each test to ensure clean state
+            BomCreator.bomKpiData.DevdependencyComponents = 0;
+            BomCreator.bomKpiData.ThirdPartyRepoComponents = 0;
+            BomCreator.bomKpiData.ReleaseRepoComponents = 0;
+            BomCreator.bomKpiData.UnofficialComponents = 0;
+            BomCreator.bomKpiData.ComponentsExcludedSW360 = 0;
         }
 
         [Test]
@@ -527,6 +534,150 @@ namespace LCT.PackageIdentifier.UTest
 
         }
 
+        [Test]
+        public void ParsePackageFile_WithExcludedComponents_RemovesExcludedComponentsAndUpdatesBomKpi()
+        {
+            // Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string filepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
+            string[] Includes = { "CycloneDX_Maven.cdx.json" };
+            string[] Excludes = { "lol" };
+
+            // Reset BOM KPI data
+            BomCreator.bomKpiData.ComponentsExcludedSW360 = 0;
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                ProjectType = "MAVEN",
+                Maven = new Config() { Include = Includes, Exclude = Excludes },
+                SW360 = new SW360() 
+                { 
+                    IgnoreDevDependency = true,
+                    // Use the actual component from the test data: joda-time/joda-time:2.9.2
+                    ExcludeComponents = new List<string> { "joda-time:2.9.2" }
+                },
+                Directory = new LCT.Common.Directory()
+                {
+                    InputFolder = filepath,
+                }
+            };
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            MavenProcessor mavenProcessor = new MavenProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
+
+            // Act
+            Bom bom = mavenProcessor.ParsePackageFile(appSettings);
+
+            // Assert
+            Assert.IsNotNull(bom, "BOM should not be null");
+            Assert.IsNotNull(bom.Components, "Components should not be null");
+            Assert.IsTrue(bom.Components.Count > 0, "BOM should have components");
+            
+            // Verify that the excluded component has the exclude property set
+            // The component should still be in the BOM but marked as excluded
+            var excludedComponent = bom.Components.Find(c => 
+                c.Name == "joda-time" && 
+                c.Version == "2.9.2");
+            
+            Assert.IsNotNull(excludedComponent, "joda-time component should exist in the BOM");
+            
+            // Component should have the exclude property
+            bool hasExcludeProperty = excludedComponent.Properties?.Exists(p => 
+                p.Name == Dataconstant.Cdx_ExcludeComponent && p.Value == "true") ?? false;
+            Assert.IsTrue(hasExcludeProperty, "Excluded component should have exclude property set to true");
+
+            // Verify that BOM KPI data was updated with excluded components count
+            Assert.That(BomCreator.bomKpiData.ComponentsExcludedSW360, Is.EqualTo(1), 
+                "ComponentsExcludedSW360 should be exactly 1 when one component is excluded");
+        }
+
+        [Test]
+        public void ParsePackageFile_WithNullExcludedComponents_DoesNotCallRemoveExcludedComponents()
+        {
+            // Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string filepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
+            string[] Includes = { "CycloneDX_Maven.cdx.json" };
+            string[] Excludes = { "lol" };
+
+            // Reset BOM KPI data
+            int initialExcludedCount = BomCreator.bomKpiData.ComponentsExcludedSW360;
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                ProjectType = "MAVEN",
+                Maven = new Config() { Include = Includes, Exclude = Excludes },
+                SW360 = new SW360() 
+                { 
+                    IgnoreDevDependency = true,
+                    ExcludeComponents = null // Null excluded components
+                },
+                Directory = new LCT.Common.Directory()
+                {
+                    InputFolder = filepath,
+                }
+            };
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            MavenProcessor mavenProcessor = new MavenProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
+
+            // Act
+            Bom bom = mavenProcessor.ParsePackageFile(appSettings);
+
+            // Assert
+            Assert.IsNotNull(bom, "BOM should not be null");
+            Assert.IsNotNull(bom.Components, "Components should not be null");
+            
+            // Verify that excluded components logic was not executed
+            Assert.That(BomCreator.bomKpiData.ComponentsExcludedSW360, Is.EqualTo(initialExcludedCount), 
+                "ComponentsExcludedSW360 should not be incremented when ExcludeComponents is null");
+        }
+
+        [Test]
+        public void ParsePackageFile_WithEmptyExcludedComponents_DoesNotCallRemoveExcludedComponents()
+        {
+            // Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string filepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
+            string[] Includes = { "CycloneDX_Maven.cdx.json" };
+            string[] Excludes = { "lol" };
+
+            // Reset BOM KPI data
+            int initialExcludedCount = BomCreator.bomKpiData.ComponentsExcludedSW360;
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                ProjectType = "MAVEN",
+                Maven = new Config() { Include = Includes, Exclude = Excludes },
+                SW360 = new SW360() 
+                { 
+                    IgnoreDevDependency = true,
+                    ExcludeComponents = new List<string>() // Empty list
+                },
+                Directory = new LCT.Common.Directory()
+                {
+                    InputFolder = filepath,
+                }
+            };
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            MavenProcessor mavenProcessor = new MavenProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
+
+            // Act
+            Bom bom = mavenProcessor.ParsePackageFile(appSettings);
+
+            // Assert
+            Assert.IsNotNull(bom, "BOM should not be null");
+            Assert.IsNotNull(bom.Components, "Components should not be null");
+            
+            // Since the exclude list is empty but not null, the method will be called but no components will be excluded
+            Assert.That(BomCreator.bomKpiData.ComponentsExcludedSW360, Is.EqualTo(initialExcludedCount), 
+                "ComponentsExcludedSW360 should not be incremented when ExcludeComponents is empty");
+        }
+
         #region UpdateKpiDataBasedOnRepo Tests
 
         [Test]
@@ -722,16 +873,6 @@ namespace LCT.PackageIdentifier.UTest
             // Assert
             Assert.AreEqual(0, BomCreator.bomKpiData.ThirdPartyRepoComponents);
             Assert.AreEqual(1, BomCreator.bomKpiData.UnofficialComponents);
-        }
-
-        [SetUp]
-        public void ResetBomKpiData()
-        {
-            // Reset KPI data before each test to ensure clean state
-            BomCreator.bomKpiData.DevdependencyComponents = 0;
-            BomCreator.bomKpiData.ThirdPartyRepoComponents = 0;
-            BomCreator.bomKpiData.ReleaseRepoComponents = 0;
-            BomCreator.bomKpiData.UnofficialComponents = 0;
         }
 
         private CommonAppSettings CreateTestAppSettings()

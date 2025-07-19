@@ -387,10 +387,17 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in componentsForBOM)
             {
-                var processedComponent = ProcessComponent(component, aqlResultList, bomhelper, appSettings, projectType);
-                modifiedBOM.Add(processedComponent);
+                if (component.Publisher != Dataconstant.UnsupportedPackageType)
+                {
+                    var processedComponent = ProcessComponent(component, aqlResultList, bomhelper, appSettings, projectType);
+                    modifiedBOM.Add(processedComponent);
+                }
+                else
+                {
+                    modifiedBOM.Add(component);
+                } 
+                
             }
-
             return modifiedBOM;
         }
 
@@ -517,7 +524,7 @@ namespace LCT.PackageIdentifier
         {
             bom = _spdxBomParser.ParseSPDXBom(filepath);
             bom = RemoveExcludedComponents(appSettings, bom);
-            CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
+            CommonHelper.CheckValidComponentsFromSpdxfile(bom.Components, appSettings.ProjectType);
             AddingIdentifierType(bom.Components, "SpdxFile", filepath);
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += bom.Components.Count;
             componentsForBOM.AddRange(bom.Components);
@@ -695,6 +702,10 @@ namespace LCT.PackageIdentifier
                     components.Add(componentsInfo);
                     Logger.Debug($"GetExcludedComponentsList():ValidComponent For NPM : Component Details : {componentsInfo.Name} @ {componentsInfo.Version} @ {componentsInfo.Purl}");
                 }
+                else if (componentsInfo.Publisher == Dataconstant.UnsupportedPackageType)
+                {
+                    components.Add(componentsInfo);
+                }
                 else
                 {
                     BomCreator.bomKpiData.ComponentsExcluded++;
@@ -719,16 +730,18 @@ namespace LCT.PackageIdentifier
                 }
                 else
                 {
-                    string filename = Path.GetFileName(filePath);
+                    string fileName = Path.GetFileName(filePath);
                     if (identifiedBy == "SpdxFile")
                     {
-                        var spdxFileName = new Property { Name = Dataconstant.Cdx_SpdxFileName, Value = filename };
-                        component.Properties.Add(spdxFileName);
+                        CommonHelper.AddSpdxComponentProperties(fileName, component);
+                    }
+                    else
+                    {                        
+                        identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.ManullayAdded };                        
+                        component.Properties.Add(identifierType);
                     }
                     isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
-                    identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.ManullayAdded };
                     component.Properties.Add(isDev);
-                    component.Properties.Add(identifierType);
                 }
             }
         }

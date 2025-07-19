@@ -50,7 +50,7 @@ namespace LCT.PackageIdentifier
                 if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     Logger.Debug($"ParsePackageFile():FileName: " + filepath);
-                    var list = ParseCycloneDX(filepath, ref bom);
+                    var list = ParseCycloneDX(filepath, ref bom,appSettings);
                     listofComponents.AddRange(list);
                 }
             }
@@ -114,8 +114,16 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in componentsForBOM)
             {
-                Component updatedComponent = UpdateComponentDetails(component, aqlResultList, appSettings, bomhelper, projectType);
-                modifiedBOM.Add(updatedComponent);
+                if (component.Publisher != Dataconstant.UnsupportedPackageType)
+                {
+                    Component updatedComponent = UpdateComponentDetails(component, aqlResultList, appSettings, bomhelper, projectType);
+                    modifiedBOM.Add(updatedComponent);
+                }
+                else
+                {
+                    modifiedBOM.Add(component);
+                }
+                
             }
 
             return modifiedBOM;
@@ -182,10 +190,10 @@ namespace LCT.PackageIdentifier
                 BomCreator.bomKpiData.UnofficialComponents++;
             }
         }
-        public List<DebianPackage> ParseCycloneDX(string filePath, ref Bom bom)
+        public List<DebianPackage> ParseCycloneDX(string filePath, ref Bom bom,CommonAppSettings appSettings)
         {
             List<DebianPackage> debianPackages = new List<DebianPackage>();
-            bom = ExtractDetailsForJson(filePath, ref debianPackages);
+            bom = ExtractDetailsForJson(filePath, ref debianPackages,appSettings);
             return debianPackages;
         }
         public static string GetArtifactoryRepoName(List<AqlResult> aqlResultList,
@@ -278,9 +286,9 @@ namespace LCT.PackageIdentifier
             return false;
         }
 
-        private Bom ExtractDetailsForJson(string filePath, ref List<DebianPackage> debianPackages)
+        private Bom ExtractDetailsForJson(string filePath, ref List<DebianPackage> debianPackages,CommonAppSettings appSettings)
         {
-            Bom bom = BomHelper.ParseBomFile(filePath, _spdxBomParser, _cycloneDXBomParser);
+            Bom bom = BomHelper.ParseBomFile(filePath, _spdxBomParser, _cycloneDXBomParser,appSettings);
 
             foreach (var componentsInfo in bom.Components)
             {
@@ -290,15 +298,18 @@ namespace LCT.PackageIdentifier
                     Name = componentsInfo.Name,
                     Version = componentsInfo.Version,
                     PurlID = componentsInfo.Purl,
-
+                    SpdxComponentDetails = new SpdxComponentInfo(),
                 };
-                SetSpdxComponentDetails(filePath, package);
+                SetSpdxComponentDetails(filePath, package,componentsInfo);
 
                 if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
                 {
                     BomCreator.bomKpiData.DebianComponents++;
                     debianPackages.Add(package);
                     Logger.Debug($"ExtractDetailsForJson():ValidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
+                }else if (componentsInfo.Publisher == Dataconstant.UnsupportedPackageType)
+                {
+                    debianPackages.Add(package);
                 }
                 else
                 {
@@ -325,49 +336,54 @@ namespace LCT.PackageIdentifier
 
             return $"{Dataconstant.PurlCheck()["DEBIAN"]}{Dataconstant.ForwardSlash}{name}@{version}?arch=source";
         }
-
         private static List<Component> FormComponentReleaseExternalID(List<DebianPackage> listOfComponents)
         {
             List<Component> listComponentForBOM = new List<Component>();
 
             foreach (var prop in listOfComponents)
             {
-                Component component = new Component
-                {
-                    Name = prop.Name,
-                    Version = prop.Version,
-                    Purl = GetReleaseExternalId(prop.Name, prop.Version)
-                };
-                component.BomRef = component.Purl;
-                component.Type = Component.Classification.Library;
-
-                //For Debian projects we will be considering CycloneDX file reading components as Discovered
-                //since it's Discovered from syft Tool
-                Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.Discovered };
+                string releaseExternalId = GetReleaseExternalId(prop.Name, prop.Version);
+                Component component = CommonHelper.CreateComponentWithProperties(
+                    prop.Name,
+                    prop.Version,
+                    prop.PurlID,
+                    prop.SpdxComponentDetails.ValidSpdxPurlId,
+                    releaseExternalId,
+                    Dataconstant.UnsupportedPackageType
+                );
                 Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
-                component.Properties = new List<Property> { identifierType, isDev };
-                AddSpdxComponentProperties(prop, component);
-
+                component.Properties = new List<Property> { isDev };
+                AddComponentProperties(prop, component);
                 listComponentForBOM.Add(component);
             }
             return listComponentForBOM;
-        }
-        private static void AddSpdxComponentProperties(DebianPackage prop, Component component)
+        }       
+        private static void AddComponentProperties(DebianPackage prop, Component component)
         {
-            if (prop.SpdxComponent)
+            if (prop.SpdxComponentDetails.SpdxComponent)
             {
-                string fileName = Path.GetFileName(prop.SpdxFilePath);
-                var spdxFileName = new Property { Name = Dataconstant.Cdx_SpdxFileName, Value = fileName };
-                component.Properties ??= new List<Property>();
-                component.Properties.Add(spdxFileName);
+                string fileName = Path.GetFileName(prop.SpdxComponentDetails.SpdxFilePath);
+                CommonHelper.AddSpdxComponentProperties(fileName, component);
+            }
+            else
+            {
+                //For Debian projects we will be considering CycloneDX file reading components as Discovered
+                //since it's Discovered from syft Tool
+                Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.Discovered };
+                component.Properties.Add(identifierType);
+
             }
         }
-        private static void SetSpdxComponentDetails(string filePath, DebianPackage package)
+        private static void SetSpdxComponentDetails(string filePath, DebianPackage package,Component componentInfo)
         {
             if (filePath.EndsWith(FileConstant.SPDXFileExtension))
             {
-                package.SpdxFilePath = filePath;
-                package.SpdxComponent = true;
+                package.SpdxComponentDetails.SpdxFilePath = filePath;
+                package.SpdxComponentDetails.SpdxComponent = true;
+            }
+            if (componentInfo.Publisher == Dataconstant.UnsupportedPackageType)
+            {
+                package.SpdxComponentDetails.ValidSpdxPurlId = true;
             }
         }
 

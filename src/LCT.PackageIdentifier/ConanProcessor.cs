@@ -102,8 +102,16 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in componentsForBOM)
             {
-                Component updatedComponent = UpdateComponentDetails(component, aqlResultList, appSettings, projectType);
-                modifiedBOM.Add(updatedComponent);
+                if (component.Publisher != Dataconstant.UnsupportedPackageType)
+                {
+                    Component updatedComponent = UpdateComponentDetails(component, aqlResultList, appSettings, projectType);
+                    modifiedBOM.Add(updatedComponent);
+                }
+                else
+                {
+                    modifiedBOM.Add(component);
+                }
+                
             }
 
             return modifiedBOM;
@@ -251,7 +259,7 @@ namespace LCT.PackageIdentifier
                 else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
                 {                  
                     bom = _spdxBomParser.ParseSPDXBom(filepath);
-                    CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
+                    CommonHelper.CheckValidComponentsFromSpdxfile(bom.Components, appSettings.ProjectType);
                     GetDetailsforManuallyAddedComp(bom.Components);
                     CommonHelper.AddSpdxSBomFileNameProperty(ref bom, filepath);
                     componentsForBOM.AddRange(bom.Components);
@@ -498,6 +506,9 @@ namespace LCT.PackageIdentifier
                 {
                     components.Add(componentsInfo);
                     Logger.Debug($"GetExcludedComponentsList():ValidComponent For CONAN : Component Details : {componentsInfo.Name} @ {componentsInfo.Version} @ {componentsInfo.Purl}");
+                }else if(componentsInfo.Publisher==Dataconstant.UnsupportedPackageType)
+                {
+                    components.Add(componentsInfo);
                 }
                 else
                 {

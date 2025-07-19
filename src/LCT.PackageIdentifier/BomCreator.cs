@@ -216,13 +216,18 @@ namespace LCT.PackageIdentifier
                     Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
                     foreach (var component in bom.Components)
                     {
-                        bool propertyExists = component.Properties.Any(p => p.Name == Dataconstant.Cdx_ProjectType);
-                        if (!propertyExists)
+                        if (component.Publisher != Dataconstant.UnsupportedPackageType)
                         {
-                            component.Properties.Add(projectType);
+                            bool propertyExists = component.Properties.Any(p => p.Name == Dataconstant.Cdx_ProjectType);
+                            if (!propertyExists)
+                            {
+                                component.Properties.Add(projectType);
+                            }
                         }
+
                     }
                 }
+                RevertUnnessaryDataForSPDXComponents(bom, bomKpiData);
                 bom.Metadata = metadata;
             }
             catch (HttpRequestException ex)
@@ -230,8 +235,7 @@ namespace LCT.PackageIdentifier
                 Logger.Debug($"ComponentIdentification: {ex}");
             }
             return bom;
-        }
-
+        }       
         public async Task<bool> CheckJFrogConnection(CommonAppSettings appSettings)
         {
             if (appSettings.Jfrog != null)
@@ -261,6 +265,17 @@ namespace LCT.PackageIdentifier
             }
             return true;
 
+        }
+        private static void RevertUnnessaryDataForSPDXComponents(Bom bom, BomKpiData bomKpiData)
+        {
+            foreach (var component in bom.Components)
+            {
+                if (component.Publisher == Dataconstant.UnsupportedPackageType)
+                {
+                    bomKpiData.UnsupportedComponentsFromSpdxFile++;
+                    component.Publisher = null;
+                }
+            }
         }
     }
 }

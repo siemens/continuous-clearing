@@ -246,5 +246,156 @@ namespace LCT.PackageIdentifier.UTest
             Assert.That(0, Is.EqualTo(files.Components.Count), "Returns Zero components in BOM");
 
         }
+
+        [Test]
+        public void SetProperties_ComponentWithUnsupportedPackageType_AddsOnlyDirectAndDevelopmentProperties()
+        {
+            // Arrange
+            List<Component> componentForBOM = new List<Component>();
+            Component component = new Component()
+            {
+                Name = "unsupported-component",
+                Version = "1.0.0",
+                Publisher = Dataconstant.UnsupportedPackageType
+            };
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                ProjectType = "NPM"
+            };
+
+            string repo = "test-repo";
+
+            // Act
+            CycloneBomProcessor.SetProperties(appSettings, component, ref componentForBOM, repo);
+
+            // Assert
+            Assert.That(componentForBOM.Count, Is.EqualTo(1), "Should add one component to the BOM");
+            
+            Component resultComponent = componentForBOM[0];
+            Assert.That(resultComponent.Properties.Count, Is.EqualTo(2), "Should have exactly 2 properties for unsupported package type");
+            
+            // Verify only isDirect and isDevelopment properties are added
+            bool hasDirectProperty = false;
+            bool hasDevelopmentProperty = false;
+            
+            foreach (var property in resultComponent.Properties)
+            {
+                if (property.Name == Dataconstant.Cdx_SiemensDirect && property.Value == "true")
+                    hasDirectProperty = true;
+                else if (property.Name == Dataconstant.Cdx_IsDevelopment && property.Value == "false")
+                    hasDevelopmentProperty = true;
+            }
+            
+            Assert.IsTrue(hasDirectProperty, "Should have siemens:direct property set to true");
+            Assert.IsTrue(hasDevelopmentProperty, "Should have development property set to false");
+            
+            // Verify that other properties are NOT added
+            foreach (var property in resultComponent.Properties)
+            {
+                Assert.AreNotEqual(Dataconstant.Cdx_ProjectType, property.Name, "Should not have project type property");
+                Assert.AreNotEqual(Dataconstant.Cdx_ArtifactoryRepoName, property.Name, "Should not have artifactory repo property");
+                Assert.AreNotEqual(Dataconstant.Cdx_IsInternal, property.Name, "Should not have internal property");
+                Assert.AreNotEqual(Dataconstant.Cdx_Siemensfilename, property.Name, "Should not have filename property");
+                Assert.AreNotEqual(Dataconstant.Cdx_JfrogRepoPath, property.Name, "Should not have jfrog repo path property");
+            }
+            
+            Assert.IsNull(resultComponent.Description, "Description should be set to null");
+        }
+
+        [Test]
+        public void SetProperties_ComponentWithSupportedPackageType_AddsAllProperties()
+        {
+            // Arrange
+            List<Component> componentForBOM = new List<Component>();
+            Component component = new Component()
+            {
+                Name = "supported-component",
+                Version = "2.0.0",
+                Publisher = "npm" // Not unsupported package type
+            };
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                ProjectType = "NPM"
+            };
+
+            string repo = "test-repo";
+
+            // Act
+            CycloneBomProcessor.SetProperties(appSettings, component, ref componentForBOM, repo);
+
+            // Assert
+            Assert.That(componentForBOM.Count, Is.EqualTo(1), "Should add one component to the BOM");
+            
+            Component resultComponent = componentForBOM[0];
+            Assert.That(resultComponent.Properties.Count, Is.EqualTo(7), "Should have exactly 7 properties for supported package type");
+            
+            // Verify all expected properties are added
+            var propertyDict = new Dictionary<string, string>();
+            foreach (var property in resultComponent.Properties)
+            {
+                propertyDict[property.Name] = property.Value;
+            }
+            
+            Assert.IsTrue(propertyDict.ContainsKey(Dataconstant.Cdx_IsInternal), "Should have internal property");
+            Assert.AreEqual("false", propertyDict[Dataconstant.Cdx_IsInternal], "Internal property should be false");
+            
+            Assert.IsTrue(propertyDict.ContainsKey(Dataconstant.Cdx_ArtifactoryRepoName), "Should have artifactory repo property");
+            Assert.AreEqual(repo, propertyDict[Dataconstant.Cdx_ArtifactoryRepoName], "Artifactory repo should match input");
+            
+            Assert.IsTrue(propertyDict.ContainsKey(Dataconstant.Cdx_ProjectType), "Should have project type property");
+            Assert.AreEqual("NPM", propertyDict[Dataconstant.Cdx_ProjectType], "Project type should match app settings");
+            
+            Assert.IsTrue(propertyDict.ContainsKey(Dataconstant.Cdx_IsDevelopment), "Should have development property");
+            Assert.AreEqual("false", propertyDict[Dataconstant.Cdx_IsDevelopment], "Development property should be false");
+            
+            Assert.IsTrue(propertyDict.ContainsKey(Dataconstant.Cdx_SiemensDirect), "Should have siemens direct property");
+            Assert.AreEqual("true", propertyDict[Dataconstant.Cdx_SiemensDirect], "Siemens direct property should be true");
+            
+            Assert.IsTrue(propertyDict.ContainsKey(Dataconstant.Cdx_Siemensfilename), "Should have filename property");
+            Assert.AreEqual(Dataconstant.PackageNameNotFoundInJfrog, propertyDict[Dataconstant.Cdx_Siemensfilename], "Filename should be default value");
+            
+            Assert.IsTrue(propertyDict.ContainsKey(Dataconstant.Cdx_JfrogRepoPath), "Should have jfrog repo path property");
+            Assert.AreEqual(Dataconstant.JfrogRepoPathNotFound, propertyDict[Dataconstant.Cdx_JfrogRepoPath], "JFrog repo path should be default value");
+            
+            Assert.IsNull(resultComponent.Description, "Description should be set to null");
+        }
+
+        [Test]
+        public void SetProperties_ComponentWithNullPublisher_AddsAllProperties()
+        {
+            // Arrange
+            List<Component> componentForBOM = new List<Component>();
+            Component component = new Component()
+            {
+                Name = "null-publisher-component",
+                Version = "3.0.0",
+                Publisher = null // Null publisher should go to else branch
+            };
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                ProjectType = "MAVEN"
+            };
+
+            string repo = "maven-repo";
+
+            // Act
+            CycloneBomProcessor.SetProperties(appSettings, component, ref componentForBOM, repo);
+
+            // Assert
+            Assert.That(componentForBOM.Count, Is.EqualTo(1), "Should add one component to the BOM");
+            
+            Component resultComponent = componentForBOM[0];
+            Assert.That(resultComponent.Properties.Count, Is.EqualTo(7), "Should have exactly 7 properties for non-unsupported package type");
+            
+            // Verify project type matches app settings
+            var projectTypeProperty = resultComponent.Properties.Find(p => p.Name == Dataconstant.Cdx_ProjectType);
+            Assert.IsNotNull(projectTypeProperty, "Should have project type property");
+            Assert.AreEqual("MAVEN", projectTypeProperty.Value, "Project type should match app settings");
+            
+            Assert.IsNull(resultComponent.Description, "Description should be set to null");
+        }
     }
 }

@@ -238,17 +238,19 @@ namespace LCT.Common
         {
             foreach (var component in componentsForBOM)
             {
-                string filename = Path.GetFileName(filePath);
+                string fileName = Path.GetFileName(filePath);
                 component.Properties = new List<Property>();
                 if (filePath.EndsWith(FileConstant.SPDXFileExtension))
                 {
-                    var spdxFileName = new Property { Name = Dataconstant.Cdx_SpdxFileName, Value = filename };
-                    component.Properties.Add(spdxFileName);
+                    AddSpdxComponentProperties(fileName, component);
                 }
-                Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
-                Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.ManullayAdded };
+                else
+                {
+                    Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.ManullayAdded };
+                    component.Properties.Add(identifierType);
+                }
+                Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };                
                 component.Properties.Add(isDev);
-                component.Properties.Add(identifierType);
                 listComponentForBOM.Add(component);
             }
         }
@@ -459,27 +461,35 @@ namespace LCT.Common
 
             foreach (Component component in components)
             {
-                var currentIterationItem = component;
-                bool isTrue = isInternalPredicate(currentIterationItem);
-                
-                if (currentIterationItem.Properties?.Count == null || currentIterationItem.Properties?.Count <= 0)
+                if (component.Publisher != Dataconstant.UnsupportedPackageType)
                 {
-                    currentIterationItem.Properties = new List<Property>();
-                }
+                    var currentIterationItem = component;
+                    bool isTrue = isInternalPredicate(currentIterationItem);
 
-                Property isInternal = new() { Name = Dataconstant.Cdx_IsInternal, Value = "false" };
-                if (isTrue)
-                {
-                    internalComponents.Add(currentIterationItem);
-                    isInternal.Value = "true";
+                    if (currentIterationItem.Properties?.Count == null || currentIterationItem.Properties?.Count <= 0)
+                    {
+                        currentIterationItem.Properties = new List<Property>();
+                    }
+
+                    Property isInternal = new() { Name = Dataconstant.Cdx_IsInternal, Value = "false" };
+                    if (isTrue)
+                    {
+                        internalComponents.Add(currentIterationItem);
+                        isInternal.Value = "true";
+                    }
+                    else
+                    {
+                        isInternal.Value = "false";
+                    }
+
+                    currentIterationItem.Properties.Add(isInternal);
+                    processedComponents.Add(currentIterationItem);
                 }
                 else
                 {
-                    isInternal.Value = "false";
+                    processedComponents.Add(component);
                 }
-
-                currentIterationItem.Properties.Add(isInternal);
-                processedComponents.Add(currentIterationItem);
+                
             }
 
             return (processedComponents, internalComponents);
@@ -546,14 +556,32 @@ namespace LCT.Common
                 string filename = Path.GetFileName(filePath);
                 var bomComponentsList = bom.Components;
                 foreach (var component in bomComponentsList)
-                {
-                    var spdxFileName = new Property { Name = Dataconstant.Cdx_SpdxFileName, Value = filename };
+                {                    
                     component.Properties ??= new List<Property>();
-                    component.Properties.Add(spdxFileName);
+                    AddSpdxComponentProperties(filename, component);                    
                 }
                 bom.Components = bomComponentsList;
             }
             
+        }
+        public static void AddSpdxComponentProperties(string fileName, Component component)
+        {
+            component.Properties ??= new List<Property>();
+            UpdateOrAddProperty(component.Properties, Dataconstant.Cdx_SpdxFileName, fileName);
+            UpdateOrAddProperty(component.Properties, Dataconstant.Cdx_IdentifierType, Dataconstant.SpdxImport);
+        }
+
+        private static void UpdateOrAddProperty(List<Property> properties, string propertyName, string propertyValue)
+        {
+            var existingProperty = properties.FirstOrDefault(p => p.Name == propertyName);
+            if (existingProperty != null)
+            {
+                existingProperty.Value = propertyValue;
+            }
+            else
+            {
+                properties.Add(new Property { Name = propertyName, Value = propertyValue });
+            }
         }
 
         #endregion
@@ -619,6 +647,41 @@ namespace LCT.Common
                 }
             }
 
+        }
+        public static void CheckValidComponentsFromSpdxfile(List<Component> bom, string projectType)
+        {
+            foreach (var component in bom.ToList())
+            {
+                if (!string.IsNullOrEmpty(component.Name) && !string.IsNullOrEmpty(component.Version)
+                    && !string.IsNullOrEmpty(component.Purl) &&
+                    component.Purl.Contains(Dataconstant.PurlCheck()[projectType.ToUpper()]))
+                {
+                    //Taking Valid Components for perticular projects
+                }
+                else
+                {
+                    component.Publisher = Dataconstant.UnsupportedPackageType;
+                }
+            }
+        }
+        public static Component CreateComponentWithProperties(
+    string name,
+    string version,
+    string purlId,
+    bool isValidSpdxPurlId,
+    string releaseExternalId,
+    string unsupportedPackageType)
+        {
+            Component component = new Component
+            {
+                Name = name,
+                Version = version,
+                Purl = isValidSpdxPurlId ? purlId : releaseExternalId,
+                BomRef = isValidSpdxPurlId ? purlId : releaseExternalId,
+                Publisher = isValidSpdxPurlId ? unsupportedPackageType : null,
+                Type = Component.Classification.Library
+            };  
+            return component;
         }
         #endregion
     }

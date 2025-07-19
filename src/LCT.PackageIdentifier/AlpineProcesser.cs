@@ -12,11 +12,13 @@ using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Security.Policy;
 using System.Threading.Tasks;
 
 namespace LCT.PackageIdentifier
@@ -50,7 +52,7 @@ namespace LCT.PackageIdentifier
                 else
                 {
                     Logger.Debug($"ParsePackageFile():FileName: " + filepath);
-                    listofComponents.AddRange(ParseCycloneDX(filepath, dependenciesForBOM));
+                    listofComponents.AddRange(ParseCycloneDX(filepath, dependenciesForBOM,appSettings));
                 }
 
             }
@@ -102,16 +104,16 @@ namespace LCT.PackageIdentifier
 
         #region private methods
 
-        public List<AlpinePackage> ParseCycloneDX(string filePath, List<Dependency> dependenciesForBOM)
+        public List<AlpinePackage> ParseCycloneDX(string filePath, List<Dependency> dependenciesForBOM,CommonAppSettings appSettings)
         {
             List<AlpinePackage> alpinePackages = new List<AlpinePackage>();
-            ExtractDetailsForJson(filePath, ref alpinePackages, dependenciesForBOM);
+            ExtractDetailsForJson(filePath, ref alpinePackages, dependenciesForBOM,appSettings);
             return alpinePackages;
         }
 
-        private void ExtractDetailsForJson(string filePath, ref List<AlpinePackage> alpinePackages, List<Dependency> dependenciesForBOM)
+        private void ExtractDetailsForJson(string filePath, ref List<AlpinePackage> alpinePackages, List<Dependency> dependenciesForBOM,CommonAppSettings appSettings)
         {
-            Bom bom = BomHelper.ParseBomFile(filePath, _spdxBomParser, _cycloneDXBomParser);
+            Bom bom = BomHelper.ParseBomFile(filePath, _spdxBomParser, _cycloneDXBomParser,appSettings);
             foreach (var componentsInfo in bom.Components)
             {
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;
@@ -120,14 +122,18 @@ namespace LCT.PackageIdentifier
                     Name = componentsInfo.Name,
                     Version = componentsInfo.Version,
                     PurlID = componentsInfo.Purl,
+                    SpdxComponentDetails=new SpdxComponentInfo(),
                 };
-                SetSpdxComponentDetails(filePath, package);
+                SetSpdxComponentDetails(filePath, package, componentsInfo);
 
                 if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["ALPINE"]))
                 {
 
                     alpinePackages.Add(package);
                     Logger.Debug($"ExtractDetailsForJson():ValidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
+                }else if (componentsInfo.Publisher == Dataconstant.UnsupportedPackageType)
+                {
+                    alpinePackages.Add(package);
                 }
                 else
                 {
@@ -160,9 +166,12 @@ namespace LCT.PackageIdentifier
 
         private static string GetDistro(AlpinePackage alpinePackage)
         {
-            var distro = alpinePackage.PurlID;
-            distro = distro.Substring(distro.LastIndexOf("distro"));
-            return distro;
+            var distroIndex = alpinePackage.PurlID.LastIndexOf("distro");
+            if (distroIndex == -1)
+            {
+                return string.Empty;
+            }
+            return alpinePackage.PurlID[distroIndex..];
         }
 
         private static List<Component> FormComponentReleaseExternalID(List<AlpinePackage> listOfComponents)
@@ -175,34 +184,49 @@ namespace LCT.PackageIdentifier
                 Component component = new Component
                 {
                     Name = prop.Name,
-                    Version = prop.Version,
-                    Purl = GetReleaseExternalId(prop.Name, prop.Version)
+                    Version = prop.Version                   
                 };
-                component.BomRef = $"{Dataconstant.PurlCheck()["ALPINE"]}{Dataconstant.ForwardSlash}{prop.Name}@{prop.Version}?{distro}";
-                component.Type = Component.Classification.Library;
-                Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.Discovered };
-                component.Properties = new List<Property> { identifierType };
-                AddSpdxComponentProperties(prop, component);
+                if (prop.SpdxComponentDetails.ValidSpdxPurlId)
+                {
+                    component.Purl=prop.PurlID;
+                    component.BomRef = prop.PurlID;
+                    component.Publisher = Dataconstant.UnsupportedPackageType;
+                }
+                else
+                {
+                    component.Purl = GetReleaseExternalId(prop.Name, prop.Version);
+                    component.BomRef = string.IsNullOrEmpty(distro) ? $"{Dataconstant.PurlCheck()["ALPINE"]}{Dataconstant.ForwardSlash}{prop.Name}@{prop.Version}" : $"{Dataconstant.PurlCheck()["ALPINE"]}{Dataconstant.ForwardSlash}{prop.Name}@{prop.Version}?{distro}";
+                }                
+                component.Type = Component.Classification.Library;                
+                AddComponentProperties(prop, component);
                 listComponentForBOM.Add(component);
             }
             return listComponentForBOM;
         }
-        private static void AddSpdxComponentProperties(AlpinePackage prop, Component component)
+        private static void AddComponentProperties(AlpinePackage prop, Component component)
         {
-            if (prop.SpdxComponent)
+            if (prop.SpdxComponentDetails.SpdxComponent)
             {
-                string fileName = Path.GetFileName(prop.SpdxFilePath);
-                var spdxFileName = new Property { Name = Dataconstant.Cdx_SpdxFileName, Value = fileName };
-                component.Properties ??= new List<Property>();
-                component.Properties.Add(spdxFileName);
+                string fileName = Path.GetFileName(prop.SpdxComponentDetails.SpdxFilePath);
+                CommonHelper.AddSpdxComponentProperties(fileName, component);               
+            }
+            else
+            {
+                Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.Discovered };
+                component.Properties ??= new List<Property> ();
+                component.Properties.Add(identifierType);
             }
         }
-        private static void SetSpdxComponentDetails(string filePath, AlpinePackage package)
+        private static void SetSpdxComponentDetails(string filePath, AlpinePackage package,Component componentInfo)
         {
             if (filePath.EndsWith(FileConstant.SPDXFileExtension))
             {
-                package.SpdxFilePath = filePath;
-                package.SpdxComponent = true;
+                package.SpdxComponentDetails.SpdxFilePath = filePath;
+                package.SpdxComponentDetails.SpdxComponent = true;
+            }
+            if(componentInfo.Publisher == Dataconstant.UnsupportedPackageType)
+            {
+                package.SpdxComponentDetails.ValidSpdxPurlId = true;
             }
         }
 
