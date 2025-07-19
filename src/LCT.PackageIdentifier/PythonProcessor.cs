@@ -253,33 +253,23 @@ namespace LCT.PackageIdentifier
 
             return $"{Dataconstant.PurlCheck()["POETRY"]}{Dataconstant.ForwardSlash}{name}@{version}";
         }
-
+                
         private static List<Component> FormComponentReleaseExternalID(List<PythonPackage> listOfComponents)
         {
-            List<Component> listComponentForBOM = new List<Component>();            
+            List<Component> listComponentForBOM = new List<Component>();
 
             foreach (var prop in listOfComponents)
-            {               
-
-                Component component = new Component
-                {
-                    Name = prop.Name,
-                    Version = prop.Version,
-                };
-                if (prop.SpdxComponentDetails.ValidSpdxPurlId)
-                {
-                    component.Purl = prop.PurlID;
-                    component.BomRef = prop.PurlID;
-                    component.Publisher = Dataconstant.UnsupportedPackageType;
-                }
-                else
-                {
-                    component.Purl = GetReleaseExternalId(prop.Name, prop.Version);
-                    component.BomRef = component.Purl;
-                }
+            {
+                string releaseExternalId = GetReleaseExternalId(prop.Name, prop.Version);
+                Component component = CommonHelper.CreateComponentWithProperties(
+                    prop.Name,
+                    prop.Version,
+                    prop.PurlID,
+                    prop.SpdxComponentDetails.ValidSpdxPurlId,
+                    releaseExternalId,
+                    Dataconstant.UnsupportedPackageType
+                );
                 AddComponentProperties(prop, component);
-                component.Type = Component.Classification.Library;
-
                 listComponentForBOM.Add(component);
             }
             return listComponentForBOM;

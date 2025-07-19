@@ -336,37 +336,28 @@ namespace LCT.PackageIdentifier
 
             return $"{Dataconstant.PurlCheck()["DEBIAN"]}{Dataconstant.ForwardSlash}{name}@{version}?arch=source";
         }
-
         private static List<Component> FormComponentReleaseExternalID(List<DebianPackage> listOfComponents)
         {
             List<Component> listComponentForBOM = new List<Component>();
 
             foreach (var prop in listOfComponents)
             {
-                Component component = new Component
-                {
-                    Name = prop.Name,
-                    Version = prop.Version,
-                };
-                if (prop.SpdxComponentDetails.ValidSpdxPurlId)
-                {
-                    component.Purl = prop.PurlID;
-                    component.BomRef = prop.PurlID;
-                    component.Publisher = Dataconstant.UnsupportedPackageType;
-                }
-                else
-                {
-                    component.Purl = GetReleaseExternalId(prop.Name, prop.Version);
-                    component.BomRef = component.Purl;
-                }                
-                component.Type = Component.Classification.Library;                
+                string releaseExternalId = GetReleaseExternalId(prop.Name, prop.Version);
+                Component component = CommonHelper.CreateComponentWithProperties(
+                    prop.Name,
+                    prop.Version,
+                    prop.PurlID,
+                    prop.SpdxComponentDetails.ValidSpdxPurlId,
+                    releaseExternalId,
+                    Dataconstant.UnsupportedPackageType
+                );
                 Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
-                component.Properties = new List<Property> {isDev };
+                component.Properties = new List<Property> { isDev };
                 AddComponentProperties(prop, component);
                 listComponentForBOM.Add(component);
             }
             return listComponentForBOM;
-        }
+        }       
         private static void AddComponentProperties(DebianPackage prop, Component component)
         {
             if (prop.SpdxComponentDetails.SpdxComponent)
