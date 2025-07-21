@@ -45,14 +45,14 @@ namespace LCT.PackageIdentifier
             {
                 if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
+                    Logger.Debug($"ParsePackageFile():Template file detected: {filepath}");
                     listOfTemplateBomfilePaths.Add(filepath);
                 }
                 else
                 {
-                    Logger.Debug($"ParsePackageFile():FileName: " + filepath);
                     listofComponents.AddRange(ParseCycloneDX(filepath, dependenciesForBOM));
+                    IdentifiedAlpinePackages(filepath, listofComponents, dependenciesForBOM);
                 }
-
             }
 
             int initialCount = listofComponents.Count;
@@ -127,7 +127,6 @@ namespace LCT.PackageIdentifier
                 {
 
                     alpinePackages.Add(package);
-                    Logger.Debug($"ExtractDetailsForJson():ValidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
                 }
                 else
                 {
@@ -204,6 +203,33 @@ namespace LCT.PackageIdentifier
                 package.SpdxFilePath = filePath;
                 package.SpdxComponent = true;
             }
+        }
+        private static void IdentifiedAlpinePackages(string filepath, List<AlpinePackage> packages, List<Dependency> dependencies)
+        {
+
+            if (packages == null || packages.Count == 0)
+            {
+                // Log a message indicating no packages were found
+                Logger.Debug($"No Alpine packages were found in the file: {filepath}");
+                return;
+            }
+
+            // Build the table
+            var logBuilder = new System.Text.StringBuilder();
+            logBuilder.AppendLine(LogHandlingHelper.LogSeparator);
+            logBuilder.AppendLine($" Alpine PACKAGES FOUND IN FILE: {filepath}");
+            logBuilder.AppendLine(LogHandlingHelper.LogSeparator);
+            logBuilder.AppendLine($"| {"Name",-40} | {"Version",-20} | {"PURL",-60} | {"Dependencies",-60} |");
+            logBuilder.AppendLine(LogHandlingHelper.LogHeaderSeparator);
+
+            foreach (var package in packages)
+            {
+                logBuilder.AppendLine($"| {package.Name,-40} | {package.Version,-20} | {package.PurlID,-60} | {dependencies,-60} |");
+            }
+
+            logBuilder.AppendLine(LogHandlingHelper.LogSeparator);
+
+            Logger.Debug(logBuilder.ToString());
         }
 
         #endregion

@@ -57,7 +57,7 @@ namespace LCT.Common.UTest
         public void LogFolderInitialisation_WhenLogFileExists_CopiesLogAndReturnsFolder()
         {
             // Act
-            string result = CommonHelper.LogFolderInitialisation(appSettings, "catool.log", false);
+            string result = CommonHelper.LogFolderInitialization(appSettings, "catool.log", false);
 
             // Assert
             Assert.AreEqual(tempDir, result);
@@ -69,7 +69,7 @@ namespace LCT.Common.UTest
             Log4Net.CatoolLogPath = "C:\\catool\\fds.log";
 
             // Act
-            string result = CommonHelper.LogFolderInitialisation(appSettings, "catool.log", false);
+            string result = CommonHelper.LogFolderInitialization(appSettings, "catool.log", false);
 
             // Assert
             Assert.IsNotEmpty(result);
@@ -514,7 +514,7 @@ namespace LCT.Common.UTest
 
 
             // Act
-            CommonHelper.DefaultLogFolderInitialisation(logFileName, m_Verbose);
+            CommonHelper.DefaultLogFolderInitialization(logFileName, m_Verbose);
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {

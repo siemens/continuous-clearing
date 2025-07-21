@@ -28,7 +28,7 @@ namespace LCT.Common
         public static string PyPiURL { get; set; } = $"https://pypi.org/pypi/";
         public static string SourceURLConan { get; set; } = "https://raw.githubusercontent.com/conan-io/conan-center-index/master/recipes/";
         public static string AlpineAportsGitURL { get; set; } = $"https://gitlab.alpinelinux.org/alpine/aports.git";
-
+        public bool Verbose { get; set; } = false;
         private string m_ProjectType;
         public CommonAppSettings()
         {

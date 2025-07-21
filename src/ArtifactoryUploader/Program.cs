@@ -48,10 +48,10 @@ namespace ArtifactoryUploader
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             Log4Net.CatoolCurrentDirectory = System.IO.Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
-            CommonHelper.DefaultLogFolderInitialisation(FileConstant.ArtifactoryUploaderLog, m_Verbose);
+            CommonHelper.DefaultLogFolderInitialization(FileConstant.ArtifactoryUploaderLog, m_Verbose);
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
 
-            string FolderPath = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.ArtifactoryUploaderLog, m_Verbose);
+            string FolderPath = CommonHelper.LogFolderInitialization(appSettings, FileConstant.ArtifactoryUploaderLog, m_Verbose);
             Logger.Logger.Log(null, Level.Debug, $"log manager initiated folder path: {FolderPath}", null);
             settingsManager.CheckRequiredArgsToRun(appSettings, "Uploader");
 

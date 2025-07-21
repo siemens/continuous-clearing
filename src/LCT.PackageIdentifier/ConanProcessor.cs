@@ -39,6 +39,7 @@ namespace LCT.PackageIdentifier
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
         private static readonly char[] SplitChars = { '/', '@' };
+        private List<Component> listOfInternalComponents = new List<Component>();
 
         #endregion
         #region constructor
@@ -47,6 +48,7 @@ namespace LCT.PackageIdentifier
         #region public methods
         public Bom ParsePackageFile(CommonAppSettings appSettings)
         {
+            Logger.Debug($"ParsePackageFile():Started Parseing input File for conan components.");
             List<Component> componentsForBOM;
             Bom bom = new Bom();
 
@@ -66,13 +68,14 @@ namespace LCT.PackageIdentifier
 
             bom.Components = componentsForBOM;
             bom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(bom.Components, bom.Dependencies);
-            Logger.Debug($"ParsePackageFile():End");
+            Logger.Debug($"ParsePackageFile():Completed Parseing input File for conan components.\n");
             return bom;
         }
 
         public async Task<ComponentIdentification> IdentificationOfInternalComponents(ComponentIdentification componentData, CommonAppSettings appSettings,
             IJFrogService jFrogService, IBomHelper bomhelper)
         {
+            Logger.Debug("IdentificationOfInternalComponents(): Starting identification of internal components.");
             // get the  component list from Jfrog for given repository
             List<AqlResult> aqlResultList =
                 await bomhelper.GetListOfComponentsFromRepo(appSettings.Conan.Artifactory.InternalRepos, jFrogService);
@@ -87,13 +90,16 @@ namespace LCT.PackageIdentifier
             // update the comparison bom data
             componentData.comparisonBOMData = processedComponents;
             componentData.internalComponents = internalComponents;
-
+            listOfInternalComponents = internalComponents;
+            Logger.Debug($"IdentificationOfInternalComponents(): identified internal components:{internalComponents.Count}.");
+            Logger.Debug($"IdentificationOfInternalComponents(): Completed identification of internal components\n");
             return componentData;
         }
 
 
         public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
+            Logger.Debug("GetJfrogRepoDetailsOfAComponent():Starting to retrieve JFrog repository details for components.\n");
             // get the  component list from Jfrog for given repo + internal repo
             string[] repoList = CommonHelper.GetRepoList(appSettings);
             List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(repoList, jFrogService);
@@ -105,7 +111,8 @@ namespace LCT.PackageIdentifier
                 Component updatedComponent = UpdateComponentDetails(component, aqlResultList, appSettings, projectType);
                 modifiedBOM.Add(updatedComponent);
             }
-
+            LogHandlingHelper.IdentifierComponentsData(componentsForBOM, listOfInternalComponents);
+            Logger.Debug("GetJfrogRepoDetailsOfAComponent():Completed retrieving JFrog repository details for components.\n");
             return modifiedBOM;
         }
 
@@ -230,6 +237,7 @@ namespace LCT.PackageIdentifier
         }
         private void ParsingInputFileForBOM(CommonAppSettings appSettings, ref Bom bom)
         {
+            Logger.Debug("ParsingInputFileForBOM():Starting parsing of input files for BOM.");
             List<string> configFiles;
             List<Dependency> dependencies = new List<Dependency>();
             List<Component> componentsForBOM = new List<Component>();
@@ -239,32 +247,37 @@ namespace LCT.PackageIdentifier
             {
                 if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
+                    Logger.Debug($"ParsingInputFileForBOM():Template BOM file detected: {filepath}");
                     listOfTemplateBomfilePaths.Add(filepath);
                 }
                 if (filepath.ToLower().EndsWith("conan.lock"))
                 {
-                    Logger.Debug($"ParsingInputFileForBOM():FileName: " + filepath);
+                    Logger.Debug($"ParsingInputFileForBOM():conan.lock file detected: {filepath}");
                     var components = ParsePackageLockJson(filepath, ref dependencies);
                     AddingIdentifierType(components, "PackageFile");
                     componentsForBOM.AddRange(components);
+                    LogHandlingHelper.IdentifierInputFileComponents(filepath, components);
                 }
                 else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
-                {                  
+                {
+                    Logger.Debug($"ParsingInputFileForBOM():Spdx file detected: {filepath}");
                     bom = _spdxBomParser.ParseSPDXBom(filepath);
                     CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
                     GetDetailsforManuallyAddedComp(bom.Components);
                     CommonHelper.AddSpdxSBomFileNameProperty(ref bom, filepath);
                     componentsForBOM.AddRange(bom.Components);
                     dependencies.AddRange(bom.Dependencies);
+                    LogHandlingHelper.IdentifierInputFileComponents(filepath, bom.Components);
                 }
                 else if (filepath.EndsWith(FileConstant.CycloneDXFileExtension)
                     && !filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
-                    Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
+                    Logger.Debug($"ParsingInputFileForBOM():CycloneDX file detected: {filepath}");
                     bom = _cycloneDXBomParser.ParseCycloneDXBom(filepath);
                     CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
                     GetDetailsforManuallyAddedComp(bom.Components);
                     componentsForBOM.AddRange(bom.Components);
+                    LogHandlingHelper.IdentifierInputFileComponents(filepath, bom.Components);
                 }
             }
 
@@ -287,6 +300,7 @@ namespace LCT.PackageIdentifier
 
             bom = RemoveExcludedComponents(appSettings, bom);
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
+            Logger.Debug("ParsingInputFileForBOM():Completed parsing of input files for BOM.");
         }
 
         private static List<Component> ParsePackageLockJson(string filepath, ref List<Dependency> dependencies)
@@ -318,17 +332,17 @@ namespace LCT.PackageIdentifier
             catch (JsonReaderException ex)
             {
                 Environment.ExitCode = -1;
-                Logger.Error($"ParsePackageFile():", ex);
+                LogHandlingHelper.ExceptionErrorHandling("Error occurred while parsing the package lock JSON file.", "ParsePackageLockJson()", ex, $"File Path: {filepath}");
             }
             catch (IOException ex)
             {
                 Environment.ExitCode = -1;
-                Logger.Error($"ParsePackageFile():", ex);
+                LogHandlingHelper.ExceptionErrorHandling("I/O error occurred while accessing the package lock JSON file.", "ParsePackageLockJson()", ex, $"File Path: {filepath}");
             }
             catch (SecurityException ex)
             {
                 Environment.ExitCode = -1;
-                Logger.Error($"ParsePackageFile():", ex);
+                LogHandlingHelper.ExceptionErrorHandling("Security error occurred while accessing the package lock JSON file.", "ParsePackageLockJson()", ex, $"File Path: {filepath}");
             }
 
             return lstComponentForBOM;
@@ -497,7 +511,6 @@ namespace LCT.PackageIdentifier
                 if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["CONAN"]))
                 {
                     components.Add(componentsInfo);
-                    Logger.Debug($"GetExcludedComponentsList():ValidComponent For CONAN : Component Details : {componentsInfo.Name} @ {componentsInfo.Version} @ {componentsInfo.Purl}");
                 }
                 else
                 {
