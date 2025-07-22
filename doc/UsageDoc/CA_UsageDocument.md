@@ -239,7 +239,6 @@ example.spdx.sbom.json.pem # Public certificate file
 1. The system automatically detects SPDX SBOM files in the input directory
 2. For each SBOM file, it locates corresponding `.sig` and `.pem` files
 3. Performs signature verification using the public certificate
-4. Generates validation reports and logs any issues encountered
 
 ### **Configuring the Continuous Clearing Tool**
 
