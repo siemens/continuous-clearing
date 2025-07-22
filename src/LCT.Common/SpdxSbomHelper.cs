@@ -83,16 +83,6 @@ namespace LCT.Common
             {
                 properties.Add(new Property { Name = propertyName, Value = propertyValue });
             }
-        }
-        public static void ProcessUnsupportedComponents(
-            Bom listUnsupportedComponentsForBom,
-            ref int totalUnsupportedComponents,ref int totalUnsupportedDuplicateComponents)
-        {
-            totalUnsupportedComponents = listUnsupportedComponentsForBom.Components.Count;
-            listUnsupportedComponentsForBom.Components = listUnsupportedComponentsForBom.Components.Distinct(new ComponentEqualityComparer()).ToList();
-            totalUnsupportedDuplicateComponents = totalUnsupportedComponents - listUnsupportedComponentsForBom.Components.Count;
-            AddDevelopmentProperty(listUnsupportedComponentsForBom.Components);
-        }
-
+        }    
     }
 }
