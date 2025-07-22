@@ -192,7 +192,7 @@ namespace LCT.PackageIdentifier
             List<Component> components;
             Metadata metadata;
             Bom bom = new Bom();
-            Bom unSupportedBomList = new Bom { Components = new List<Component>(),Dependencies = new List<Dependency>() }; ;
+            Bom unSupportedBomList = new Bom { Components = new List<Component>(),Dependencies = new List<Dependency>() };
             try
             {
                 //Parsing the input file
