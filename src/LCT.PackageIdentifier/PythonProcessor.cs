@@ -63,10 +63,14 @@ namespace LCT.PackageIdentifier
 
 
             int initialCount = listofComponents.Count;
+            int totalUnsupportedComponents = ListUnsupportedComponentsForBom.Components.Count;
             GetDistinctComponentList(ref listofComponents);
             listComponentForBOM = FormComponentReleaseExternalID(listofComponents);
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += ListUnsupportedComponentsForBom.Components.Count;
+            ListUnsupportedComponentsForBom.Components = ListUnsupportedComponentsForBom.Components.Distinct(new ComponentEqualityComparer()).ToList();
             BomCreator.bomKpiData.DuplicateComponents = initialCount - listComponentForBOM.Count;
             BomCreator.bomKpiData.ComponentsInComparisonBOM = listComponentForBOM.Count;
+            BomCreator.bomKpiData.DuplicateComponents += totalUnsupportedComponents - ListUnsupportedComponentsForBom.Components.Count;
             bom.Components = listComponentForBOM;
             bom.Dependencies = dependencies;
             string templateFilePath = SbomTemplate.GetFilePathForTemplate(listOfTemplateBomfilePaths);
@@ -77,11 +81,7 @@ namespace LCT.PackageIdentifier
             if (bom.Components != null)
             {
                 AddSiemensDirectProperty(ref bom);
-            }
-            int totalUnsupportedComponents = ListUnsupportedComponentsForBom.Components.Count;
-            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += ListUnsupportedComponentsForBom.Components.Count;
-            ListUnsupportedComponentsForBom.Components = ListUnsupportedComponentsForBom.Components.Distinct(new ComponentEqualityComparer()).ToList();
-            BomCreator.bomKpiData.DuplicateComponents += totalUnsupportedComponents - ListUnsupportedComponentsForBom.Components.Count;
+            } 
             SpdxSbomHelper.AddDevelopmentProperty(ListUnsupportedComponentsForBom.Components);
             AddSiemensDirectProperty(ref ListUnsupportedComponentsForBom);
             unSupportedBomList.Components = ListUnsupportedComponentsForBom.Components;
@@ -221,7 +221,7 @@ namespace LCT.PackageIdentifier
                     PurlID = componentsInfo.Purl,
                     SpdxComponentDetails = new SpdxComponentInfo(),
                 };
-                SetSpdxComponentDetails(filePath, package, componentsInfo);
+                SetSpdxComponentDetails(filePath, package);
 
                 if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["POETRY"]))
                 {
@@ -487,7 +487,7 @@ namespace LCT.PackageIdentifier
             component.Properties.Add(devDependency);
             component.Properties.Add(identifierType);
         }
-        private static void SetSpdxComponentDetails(string filePath, PythonPackage package,Component componentInfo)
+        private static void SetSpdxComponentDetails(string filePath, PythonPackage package)
         {
             if (filePath.EndsWith(FileConstant.SPDXFileExtension))
             {

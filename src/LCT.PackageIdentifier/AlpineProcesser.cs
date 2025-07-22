@@ -128,7 +128,7 @@ namespace LCT.PackageIdentifier
                     PurlID = componentsInfo.Purl,
                     SpdxComponentDetails=new SpdxComponentInfo(),
                 };
-                SetSpdxComponentDetails(filePath, package, componentsInfo);
+                SetSpdxComponentDetails(filePath, package);
 
                 if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["ALPINE"]))
                 {
@@ -210,7 +210,7 @@ namespace LCT.PackageIdentifier
                 component.Properties.Add(identifierType);
             }
         }
-        private static void SetSpdxComponentDetails(string filePath, AlpinePackage package,Component componentInfo)
+        private static void SetSpdxComponentDetails(string filePath, AlpinePackage package)
         {
             if (filePath.EndsWith(FileConstant.SPDXFileExtension))
             {

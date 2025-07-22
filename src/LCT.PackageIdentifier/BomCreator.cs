@@ -14,7 +14,6 @@ using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
-using Microsoft.ComponentDetection.Detectors.Linux.Contracts;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -23,9 +22,9 @@ using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
+using Dependency = CycloneDX.Models.Dependency;
 using Directory = System.IO.Directory;
 using Level = log4net.Core.Level;
-using Dependency = CycloneDX.Models.Dependency;
 using Metadata = CycloneDX.Models.Metadata;
 
 
@@ -38,7 +37,7 @@ namespace LCT.PackageIdentifier
     public class BomCreator : IBomCreator
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        public static BomKpiData bomKpiData = new();
+        public readonly static BomKpiData bomKpiData = new();
         ComponentIdentification componentData;
         private readonly ICycloneDXBomParser CycloneDXBomParser;
         private readonly ISpdxBomParser SpdxBomParser;

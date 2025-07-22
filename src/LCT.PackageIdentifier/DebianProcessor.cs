@@ -300,7 +300,7 @@ namespace LCT.PackageIdentifier
                     PurlID = componentsInfo.Purl,
                     SpdxComponentDetails = new SpdxComponentInfo(),
                 };
-                SetSpdxComponentDetails(filePath, package,componentsInfo);
+                SetSpdxComponentDetails(filePath, package);
 
                 if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
                 {
@@ -369,7 +369,7 @@ namespace LCT.PackageIdentifier
 
             }
         }
-        private static void SetSpdxComponentDetails(string filePath, DebianPackage package,Component componentInfo)
+        private static void SetSpdxComponentDetails(string filePath, DebianPackage package)
         {
             if (filePath.EndsWith(FileConstant.SPDXFileExtension))
             {
