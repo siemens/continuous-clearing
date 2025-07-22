@@ -14,7 +14,6 @@ using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
-using Microsoft.ComponentDetection.Detectors.Linux.Contracts;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -35,8 +34,9 @@ namespace LCT.PackageIdentifier
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
+        private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
 
-        public Bom ParsePackageFile(CommonAppSettings appSettings)
+        public Bom ParsePackageFile(CommonAppSettings appSettings,ref Bom unSupportedBomList)
         {
             List<string> configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Poetry);
             List<PythonPackage> listofComponents = new List<PythonPackage>();
@@ -78,6 +78,13 @@ namespace LCT.PackageIdentifier
             {
                 AddSiemensDirectProperty(ref bom);
             }
+            int totalUnsupportedComponents = ListUnsupportedComponentsForBom.Components.Count;
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += ListUnsupportedComponentsForBom.Components.Count;
+            ListUnsupportedComponentsForBom.Components = ListUnsupportedComponentsForBom.Components.Distinct(new ComponentEqualityComparer()).ToList();
+            BomCreator.bomKpiData.DuplicateComponents += totalUnsupportedComponents - ListUnsupportedComponentsForBom.Components.Count;
+            SpdxSbomHelper.AddDevelopmentProperty(ListUnsupportedComponentsForBom.Components);
+            AddSiemensDirectProperty(ref ListUnsupportedComponentsForBom);
+            unSupportedBomList.Components = ListUnsupportedComponentsForBom.Components;
             bom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(bom.Components, bom.Dependencies);
             return bom;
         }
@@ -192,8 +199,11 @@ namespace LCT.PackageIdentifier
             List<PythonPackage> PythonPackages = new List<PythonPackage>();
             if (filePath.EndsWith(FileConstant.SPDXFileExtension))
             {
+                List<Component> listUnsupportedComponents = new List<Component>();
                 bom = _spdxBomParser.ParseSPDXBom(filePath);
-                CommonHelper.CheckValidComponentsFromSpdxfile(bom.Components, appSettings.ProjectType);
+                SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bom.Components, appSettings.ProjectType,ref listUnsupportedComponents);
+                SpdxSbomHelper.AddSpdxPropertysForUnsupportedComponents(ref listUnsupportedComponents, filePath);
+                ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents);
             }
             else
             {
@@ -218,9 +228,6 @@ namespace LCT.PackageIdentifier
                     BomCreator.bomKpiData.DebianComponents++;
                     PythonPackages.Add(package);
                     Logger.Debug($"ExtractDetailsFromJson():ValidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
-                }else if (componentsInfo.Publisher == Dataconstant.UnsupportedPackageType)
-                {
-                    PythonPackages.Add(package);
                 }
                 else
                 {
@@ -253,7 +260,7 @@ namespace LCT.PackageIdentifier
 
             return $"{Dataconstant.PurlCheck()["POETRY"]}{Dataconstant.ForwardSlash}{name}@{version}";
         }
-                
+
         private static List<Component> FormComponentReleaseExternalID(List<PythonPackage> listOfComponents)
         {
             List<Component> listComponentForBOM = new List<Component>();
@@ -264,10 +271,7 @@ namespace LCT.PackageIdentifier
                 Component component = CommonHelper.CreateComponentWithProperties(
                     prop.Name,
                     prop.Version,
-                    prop.PurlID,
-                    prop.SpdxComponentDetails.ValidSpdxPurlId,
-                    releaseExternalId,
-                    Dataconstant.UnsupportedPackageType
+                    releaseExternalId
                 );
                 AddComponentProperties(prop, component);
                 listComponentForBOM.Add(component);
@@ -336,16 +340,8 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in componentsForBOM)
             {
-                if (component.Publisher != Dataconstant.UnsupportedPackageType)
-                {
-                    var processedComponent = ProcessPythonComponent(component, aqlResultList, bomhelper, appSettings, projectType);
-                    modifiedBOM.Add(processedComponent);
-                }
-                else
-                {
-                    modifiedBOM.Add(component);
-                }
-                
+                var processedComponent = ProcessPythonComponent(component, aqlResultList, bomhelper, appSettings, projectType);
+                modifiedBOM.Add(processedComponent);
             }
             return modifiedBOM;
         }
@@ -477,7 +473,7 @@ namespace LCT.PackageIdentifier
         private static void AddSpdxProperties(PythonPackage prop, Component component)
         {
             string fileName = Path.GetFileName(prop.SpdxComponentDetails.SpdxFilePath);
-            CommonHelper.AddSpdxComponentProperties(fileName, component);
+            SpdxSbomHelper.AddSpdxComponentProperties(fileName, component);
         }
 
         private static void AddIdentifierTypeProperty(PythonPackage prop, Component component, Property devDependency)
@@ -497,10 +493,6 @@ namespace LCT.PackageIdentifier
             {
                 package.SpdxComponentDetails.SpdxFilePath = filePath;
                 package.SpdxComponentDetails.SpdxComponent = true;
-            }
-            if (componentInfo.Publisher == Dataconstant.UnsupportedPackageType)
-            {
-                package.SpdxComponentDetails.ValidSpdxPurlId = true;
             }
         }
         #endregion

@@ -36,13 +36,5 @@ namespace LCT.PackageIdentifier.Model
         public string PackageUrl { get; set; }
         public string SourceUrl { get; set; }
         public string DownloadUrl { get; set; }
-    }
-    [ExcludeFromCodeCoverage]
-    public class SpdxComponentInfo
-    {
-        public bool SpdxComponent { get; set; } = false;
-        public string SpdxFilePath { get; set; }
-        public bool ValidSpdxPurlId { get; set; }=false;
-
-    }
+    }    
 }

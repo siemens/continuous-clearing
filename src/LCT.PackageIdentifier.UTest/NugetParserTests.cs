@@ -35,7 +35,7 @@ namespace LCT.PackageIdentifier.UTest
         private Mock<IFrameworkPackages> _frameworkPackages;
         private Mock<ICompositionBuilder> _compositionBuilder;
         private ISpdxBomParser _spdxBomParser;
-
+        private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
         [SetUp]
         public void Setup()
         {
@@ -1068,7 +1068,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             //Act
-            Bom listofcomponents = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object,_spdxBomParser).ParsePackageFile(appSettings);
+            Bom listofcomponents = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object,_spdxBomParser).ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
@@ -1100,7 +1100,7 @@ namespace LCT.PackageIdentifier.UTest
 
 
             //Act
-            Bom listofcomponents = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser).ParsePackageFile(appSettings);
+            Bom listofcomponents = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser).ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
             var IsDevDependency =
                 listofcomponents.Components.Find(a => a.Name == "SonarAnalyzer.CSharp")
                 .Properties[0].Value;
@@ -1165,7 +1165,7 @@ namespace LCT.PackageIdentifier.UTest
                 .Returns(bom);
 
             // Act
-            var result = _nugetProcessor.ParsePackageFile(appSettings);
+            var result = _nugetProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             // Assert
             Assert.IsNotNull(result);
@@ -1207,7 +1207,7 @@ namespace LCT.PackageIdentifier.UTest
                 .Verifiable();
 
             // Act
-            var result = _nugetProcessor.ParsePackageFile(appSettings);
+            var result = _nugetProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             // Assert
             _frameworkPackages.Verify(x => x.GetFrameworkPackages(It.IsAny<List<string>>()), Times.Once);
@@ -1272,7 +1272,7 @@ namespace LCT.PackageIdentifier.UTest
                 .Returns(bom);
 
             // Act
-            var result = _nugetProcessor.ParsePackageFile(appSettings);
+            var result = _nugetProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             // Assert
             Assert.IsNotNull(result);
@@ -1305,7 +1305,7 @@ namespace LCT.PackageIdentifier.UTest
                 .Returns(new Dictionary<string, Dictionary<string, NuGetVersion>>());
 
             // Act
-            var result = _nugetProcessor.ParsePackageFile(appSettings);
+            var result = _nugetProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             // Assert
             _frameworkPackages.Verify(x => x.GetFrameworkPackages(It.IsAny<List<string>>()), Times.Once);

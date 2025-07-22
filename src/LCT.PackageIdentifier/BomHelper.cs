@@ -217,13 +217,14 @@ namespace LCT.PackageIdentifier
 
             return aqlResultList;
         }
-        public static Bom ParseBomFile(string filePath, ISpdxBomParser spdxBomParser, ICycloneDXBomParser cycloneDXBomParser,CommonAppSettings appSettings)
+        public static Bom ParseBomFile(string filePath, ISpdxBomParser spdxBomParser, ICycloneDXBomParser cycloneDXBomParser,CommonAppSettings appSettings,ref List<Component> listUnsupportedComponents)
         {
             if (filePath.EndsWith(FileConstant.SPDXFileExtension))
             {
                 Bom bom;
                 bom = spdxBomParser.ParseSPDXBom(filePath);
-                CommonHelper.CheckValidComponentsFromSpdxfile(bom.Components, appSettings.ProjectType);
+                SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bom.Components, appSettings.ProjectType,ref listUnsupportedComponents);
+                SpdxSbomHelper.AddSpdxPropertysForUnsupportedComponents(ref listUnsupportedComponents, filePath);
                 return bom;
             }
             else

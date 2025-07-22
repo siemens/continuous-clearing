@@ -26,7 +26,7 @@ namespace LCT.PackageIdentifier.UTest
     public class MavenParserTests
     {
         private MavenProcessor _mavenProcessor;
-
+        private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
         [SetUp]
         public void Setup()
         {
@@ -146,7 +146,7 @@ namespace LCT.PackageIdentifier.UTest
             MavenProcessor MavenProcessor = new MavenProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
 
             //Act
-            Bom bom = MavenProcessor.ParsePackageFile(appSettings);
+            Bom bom = MavenProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(bom.Components.Count, Is.EqualTo(1), "Returns the count of components");
@@ -428,7 +428,7 @@ namespace LCT.PackageIdentifier.UTest
             MavenProcessor MavenProcessor = new MavenProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
 
             //Act
-            MavenProcessor.ParsePackageFile(appSettings);
+            MavenProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(BomCreator.bomKpiData.DevDependentComponents, Is.EqualTo(9), "Returns the count of components");
@@ -459,7 +459,7 @@ namespace LCT.PackageIdentifier.UTest
             MavenProcessor MavenProcessor = new MavenProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
 
             //Act
-            MavenProcessor.ParsePackageFile(appSettings);
+            MavenProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(BomCreator.bomKpiData.DevDependentComponents, Is.EqualTo(3), "Returns the count of components");
@@ -493,7 +493,7 @@ namespace LCT.PackageIdentifier.UTest
             MavenProcessor MavenProcessor = new MavenProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
 
             //Act
-            Bom bom = MavenProcessor.ParsePackageFile(appSettings);
+            Bom bom = MavenProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(bom.Components.Count), "Checks for no of components");
@@ -525,7 +525,7 @@ namespace LCT.PackageIdentifier.UTest
             MavenProcessor MavenProcessor = new MavenProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
 
             //Act
-            Bom bom = MavenProcessor.ParsePackageFile(appSettings);
+            Bom bom = MavenProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             bool isUpdated = bom.Components.Exists(x => x.Properties != null && x.Properties.Exists(x => x.Name == Dataconstant.Cdx_IdentifierType && x.Value == Dataconstant.Discovered));
 
@@ -567,7 +567,7 @@ namespace LCT.PackageIdentifier.UTest
             MavenProcessor mavenProcessor = new MavenProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
 
             // Act
-            Bom bom = mavenProcessor.ParsePackageFile(appSettings);
+            Bom bom = mavenProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             // Assert
             Assert.IsNotNull(bom, "BOM should not be null");
@@ -624,7 +624,7 @@ namespace LCT.PackageIdentifier.UTest
             MavenProcessor mavenProcessor = new MavenProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
 
             // Act
-            Bom bom = mavenProcessor.ParsePackageFile(appSettings);
+            Bom bom = mavenProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             // Assert
             Assert.IsNotNull(bom, "BOM should not be null");
@@ -667,7 +667,7 @@ namespace LCT.PackageIdentifier.UTest
             MavenProcessor mavenProcessor = new MavenProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
 
             // Act
-            Bom bom = mavenProcessor.ParsePackageFile(appSettings);
+            Bom bom = mavenProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             // Assert
             Assert.IsNotNull(bom, "BOM should not be null");

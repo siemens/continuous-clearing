@@ -26,6 +26,7 @@ namespace LCT.PackageIdentifier.UTest
     [TestFixture]
     public class ConanParserTests
     {
+        private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
         [TestCase]
         public void ParseLockFile_GivenAInputFilePath_ReturnsSuccess()
         {
@@ -49,7 +50,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             //Act
-            Bom listofcomponents = new ConanProcessor(cycloneDXBomParser.Object,spdxBomParser.Object).ParsePackageFile(appSettings);
+            Bom listofcomponents = new ConanProcessor(cycloneDXBomParser.Object,spdxBomParser.Object).ParsePackageFile(appSettings,ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(expectedNoOfcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
@@ -80,7 +81,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             //Act
-            Bom listofcomponents = new ConanProcessor(cycloneDXBomParser.Object,spdxBomParser.Object).ParsePackageFile(appSettings);
+            Bom listofcomponents = new ConanProcessor(cycloneDXBomParser.Object,spdxBomParser.Object).ParsePackageFile(appSettings,ref ListUnsupportedComponentsForBom);
             var IsDevDependency = listofcomponents.Components.Find(a => a.Name == "googletest")
                 .Properties.First(x => x.Name == "internal:siemens:clearing:development").Value;
 
@@ -112,7 +113,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             //Act
-            Bom listofcomponents = new ConanProcessor(cycloneDXBomParser.Object,spdxBomParser.Object).ParsePackageFile(appSettings);
+            Bom listofcomponents = new ConanProcessor(cycloneDXBomParser.Object,spdxBomParser.Object).ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(totalComponentsAfterExclusion, Is.EqualTo(listofcomponents.Components.Count), "Checks if the excluded components have been removed");
@@ -310,7 +311,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = conanProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = conanProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");

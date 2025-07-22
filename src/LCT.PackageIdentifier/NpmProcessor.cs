@@ -36,6 +36,7 @@ namespace LCT.PackageIdentifier
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
+        private readonly static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
         private const string Bundled = "bundled";
         private const string Dependencies = "dependencies";
         private const string Dev = "dev";
@@ -45,18 +46,22 @@ namespace LCT.PackageIdentifier
         private const string Requires = "requires";
         private const string Name = "name";
 
-        public Bom ParsePackageFile(CommonAppSettings appSettings)
+        public Bom ParsePackageFile(CommonAppSettings appSettings,ref Bom unSupportedBomList)
         {
             List<Component> componentsForBOM = new List<Component>();
             Bom bom = new Bom();
             List<Dependency> dependencies = new List<Dependency>();
             int totalComponentsIdentified = 0;
+            int totalUnsupportedComponentsIdentified = 0;
 
             ParsingInputFileForBOM(appSettings, ref componentsForBOM, ref bom, ref dependencies);
             totalComponentsIdentified = componentsForBOM.Count;
+            totalUnsupportedComponentsIdentified=ListUnsupportedComponentsForBom.Components.Count;
             componentsForBOM = GetExcludedComponentsList(componentsForBOM);
             componentsForBOM = componentsForBOM.Distinct(new ComponentEqualityComparer()).ToList();
+            ListUnsupportedComponentsForBom.Components=ListUnsupportedComponentsForBom.Components.Distinct(new ComponentEqualityComparer()).ToList();
             BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - componentsForBOM.Count;
+            BomCreator.bomKpiData.DuplicateComponents += totalUnsupportedComponentsIdentified - ListUnsupportedComponentsForBom.Components.Count;
             var componentsWithMultipleVersions = componentsForBOM.GroupBy(s => s.Name)
                               .Where(g => g.Count() > 1).SelectMany(g => g).ToList();
 
@@ -69,6 +74,7 @@ namespace LCT.PackageIdentifier
             bom.Dependencies = dependencies;
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
             bom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(bom.Components, bom.Dependencies);
+            unSupportedBomList.Components = ListUnsupportedComponentsForBom.Components;
             Logger.Debug($"ParsePackageFile():End");
             return bom;
         }
@@ -387,16 +393,8 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in componentsForBOM)
             {
-                if (component.Publisher != Dataconstant.UnsupportedPackageType)
-                {
-                    var processedComponent = ProcessComponent(component, aqlResultList, bomhelper, appSettings, projectType);
-                    modifiedBOM.Add(processedComponent);
-                }
-                else
-                {
-                    modifiedBOM.Add(component);
-                } 
-                
+                var processedComponent = ProcessComponent(component, aqlResultList, bomhelper, appSettings, projectType);
+                modifiedBOM.Add(processedComponent);
             }
             return modifiedBOM;
         }
@@ -522,13 +520,17 @@ namespace LCT.PackageIdentifier
 
         private void ProcessSPDXFile(string filepath, CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom, ref List<Dependency> dependencies)
         {
+            List<Component> listUnsupportedComponents = new List<Component>();
             bom = _spdxBomParser.ParseSPDXBom(filepath);
             bom = RemoveExcludedComponents(appSettings, bom);
-            CommonHelper.CheckValidComponentsFromSpdxfile(bom.Components, appSettings.ProjectType);
+            SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bom.Components, appSettings.ProjectType,ref listUnsupportedComponents);
             AddingIdentifierType(bom.Components, "SpdxFile", filepath);
+            AddingIdentifierType(listUnsupportedComponents, "SpdxFile", filepath);
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += bom.Components.Count;
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += listUnsupportedComponents.Count;
             componentsForBOM.AddRange(bom.Components);
-            dependencies.AddRange(bom.Dependencies);
+            dependencies.AddRange(bom.Dependencies);            
+            ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents);
         }
 
         private static void ProcessPackageFile(string filepath, CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref List<Dependency> dependencies)
@@ -701,11 +703,7 @@ namespace LCT.PackageIdentifier
                 {
                     components.Add(componentsInfo);
                     Logger.Debug($"GetExcludedComponentsList():ValidComponent For NPM : Component Details : {componentsInfo.Name} @ {componentsInfo.Version} @ {componentsInfo.Purl}");
-                }
-                else if (componentsInfo.Publisher == Dataconstant.UnsupportedPackageType)
-                {
-                    components.Add(componentsInfo);
-                }
+                }               
                 else
                 {
                     BomCreator.bomKpiData.ComponentsExcluded++;
@@ -733,7 +731,7 @@ namespace LCT.PackageIdentifier
                     string fileName = Path.GetFileName(filePath);
                     if (identifiedBy == "SpdxFile")
                     {
-                        CommonHelper.AddSpdxComponentProperties(fileName, component);
+                        SpdxSbomHelper.AddSpdxComponentProperties(fileName, component);
                     }
                     else
                     {                        

@@ -14,6 +14,7 @@ using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
+using Microsoft.ComponentDetection.Detectors.Linux.Contracts;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -24,6 +25,8 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Directory = System.IO.Directory;
 using Level = log4net.Core.Level;
+using Dependency = CycloneDX.Models.Dependency;
+using Metadata = CycloneDX.Models.Metadata;
 
 
 namespace LCT.PackageIdentifier
@@ -35,7 +38,7 @@ namespace LCT.PackageIdentifier
     public class BomCreator : IBomCreator
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        public static readonly BomKpiData bomKpiData = new();
+        public static BomKpiData bomKpiData = new();
         ComponentIdentification componentData;
         private readonly ICycloneDXBomParser CycloneDXBomParser;
         private readonly ISpdxBomParser SpdxBomParser;
@@ -190,10 +193,11 @@ namespace LCT.PackageIdentifier
             List<Component> components;
             Metadata metadata;
             Bom bom = new Bom();
+            Bom unSupportedBomList = new Bom { Components = new List<Component>(),Dependencies = new List<Dependency>() }; ;
             try
             {
                 //Parsing the input file
-                bom = parser.ParsePackageFile(appSettings);
+                bom = parser.ParsePackageFile(appSettings,ref unSupportedBomList);
                 metadata = bom.Metadata;
                 componentData = new ComponentIdentification()
                 {
@@ -216,24 +220,22 @@ namespace LCT.PackageIdentifier
                     Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
                     foreach (var component in bom.Components)
                     {
-                        if (component.Publisher != Dataconstant.UnsupportedPackageType)
+                        bool propertyExists = component.Properties.Any(p => p.Name == Dataconstant.Cdx_ProjectType);
+                        if (!propertyExists)
                         {
-                            bool propertyExists = component.Properties.Any(p => p.Name == Dataconstant.Cdx_ProjectType);
-                            if (!propertyExists)
-                            {
-                                component.Properties.Add(projectType);
-                            }
+                            component.Properties.Add(projectType);
                         }
 
                     }
                 }
-                RevertUnnessaryDataForSPDXComponents(bom, bomKpiData);
                 bom.Metadata = metadata;
             }
             catch (HttpRequestException ex)
             {
                 Logger.Debug($"ComponentIdentification: {ex}");
             }
+            bomKpiData.UnsupportedComponentsFromSpdxFile = unSupportedBomList.Components.Count;
+            bom.Components.AddRange(unSupportedBomList.Components);
             return bom;
         }       
         public async Task<bool> CheckJFrogConnection(CommonAppSettings appSettings)
@@ -265,17 +267,6 @@ namespace LCT.PackageIdentifier
             }
             return true;
 
-        }
-        private static void RevertUnnessaryDataForSPDXComponents(Bom bom, BomKpiData bomKpiData)
-        {
-            foreach (var component in bom.Components)
-            {
-                if (component.Publisher == Dataconstant.UnsupportedPackageType)
-                {
-                    bomKpiData.UnsupportedComponentsFromSpdxFile++;
-                    component.Publisher = null;
-                }
-            }
-        }
+        }        
     }
 }

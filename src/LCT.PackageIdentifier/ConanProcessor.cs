@@ -39,17 +39,18 @@ namespace LCT.PackageIdentifier
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
         private static readonly char[] SplitChars = { '/', '@' };
+        private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
 
         #endregion
         #region constructor
         #endregion
 
         #region public methods
-        public Bom ParsePackageFile(CommonAppSettings appSettings)
+        public Bom ParsePackageFile(CommonAppSettings appSettings,ref Bom unSupportedBomList)
         {
             List<Component> componentsForBOM;
             Bom bom = new Bom();
-
+            int totalUnsupportedComponentsIdentified = 0;
             ParsingInputFileForBOM(appSettings, ref bom);
             componentsForBOM = bom.Components;
 
@@ -66,6 +67,11 @@ namespace LCT.PackageIdentifier
 
             bom.Components = componentsForBOM;
             bom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(bom.Components, bom.Dependencies);
+            totalUnsupportedComponentsIdentified = ListUnsupportedComponentsForBom.Components.Count;
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += ListUnsupportedComponentsForBom.Components.Count;
+            ListUnsupportedComponentsForBom.Components = ListUnsupportedComponentsForBom.Components.Distinct(new ComponentEqualityComparer()).ToList();
+            BomCreator.bomKpiData.DuplicateComponents += totalUnsupportedComponentsIdentified - ListUnsupportedComponentsForBom.Components.Count;
+            unSupportedBomList.Components = ListUnsupportedComponentsForBom.Components;
             Logger.Debug($"ParsePackageFile():End");
             return bom;
         }
@@ -102,16 +108,8 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in componentsForBOM)
             {
-                if (component.Publisher != Dataconstant.UnsupportedPackageType)
-                {
-                    Component updatedComponent = UpdateComponentDetails(component, aqlResultList, appSettings, projectType);
-                    modifiedBOM.Add(updatedComponent);
-                }
-                else
-                {
-                    modifiedBOM.Add(component);
-                }
-                
+                Component updatedComponent = UpdateComponentDetails(component, aqlResultList, appSettings, projectType);
+                modifiedBOM.Add(updatedComponent);
             }
 
             return modifiedBOM;
@@ -257,13 +255,16 @@ namespace LCT.PackageIdentifier
                     componentsForBOM.AddRange(components);
                 }
                 else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
-                {                  
+                {
+                    List<Component> listUnsupportedComponents = new List<Component>();
                     bom = _spdxBomParser.ParseSPDXBom(filepath);
-                    CommonHelper.CheckValidComponentsFromSpdxfile(bom.Components, appSettings.ProjectType);
-                    GetDetailsforManuallyAddedComp(bom.Components);
-                    CommonHelper.AddSpdxSBomFileNameProperty(ref bom, filepath);
+                    SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bom.Components, appSettings.ProjectType,ref listUnsupportedComponents);
+                    SpdxSbomHelper.AddSpdxSBomFileNameProperty(ref bom, filepath);
                     componentsForBOM.AddRange(bom.Components);
                     dependencies.AddRange(bom.Dependencies);
+                    SpdxSbomHelper.AddSpdxPropertysForUnsupportedComponents(ref listUnsupportedComponents,filepath);
+                    SpdxSbomHelper.AddDevelopmentProperty(listUnsupportedComponents);
+                    ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents);
                 }
                 else if (filepath.EndsWith(FileConstant.CycloneDXFileExtension)
                     && !filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
@@ -506,9 +507,6 @@ namespace LCT.PackageIdentifier
                 {
                     components.Add(componentsInfo);
                     Logger.Debug($"GetExcludedComponentsList():ValidComponent For CONAN : Component Details : {componentsInfo.Name} @ {componentsInfo.Version} @ {componentsInfo.Purl}");
-                }else if(componentsInfo.Publisher==Dataconstant.UnsupportedPackageType)
-                {
-                    components.Add(componentsInfo);
                 }
                 else
                 {
@@ -568,7 +566,7 @@ namespace LCT.PackageIdentifier
                 component.Properties.Add(isDev);
                 component.Properties.Add(identifierType);
             }
-        }
+        }             
 
         #endregion
     }

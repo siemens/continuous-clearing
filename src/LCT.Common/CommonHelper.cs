@@ -242,7 +242,7 @@ namespace LCT.Common
                 component.Properties = new List<Property>();
                 if (filePath.EndsWith(FileConstant.SPDXFileExtension))
                 {
-                    AddSpdxComponentProperties(fileName, component);
+                    SpdxSbomHelper.AddSpdxComponentProperties(fileName, component);
                 }
                 else
                 {
@@ -461,35 +461,27 @@ namespace LCT.Common
 
             foreach (Component component in components)
             {
-                if (component.Publisher != Dataconstant.UnsupportedPackageType)
+                var currentIterationItem = component;
+                bool isTrue = isInternalPredicate(currentIterationItem);
+
+                if (currentIterationItem.Properties?.Count == null || currentIterationItem.Properties?.Count <= 0)
                 {
-                    var currentIterationItem = component;
-                    bool isTrue = isInternalPredicate(currentIterationItem);
+                    currentIterationItem.Properties = new List<Property>();
+                }
 
-                    if (currentIterationItem.Properties?.Count == null || currentIterationItem.Properties?.Count <= 0)
-                    {
-                        currentIterationItem.Properties = new List<Property>();
-                    }
-
-                    Property isInternal = new() { Name = Dataconstant.Cdx_IsInternal, Value = "false" };
-                    if (isTrue)
-                    {
-                        internalComponents.Add(currentIterationItem);
-                        isInternal.Value = "true";
-                    }
-                    else
-                    {
-                        isInternal.Value = "false";
-                    }
-
-                    currentIterationItem.Properties.Add(isInternal);
-                    processedComponents.Add(currentIterationItem);
+                Property isInternal = new() { Name = Dataconstant.Cdx_IsInternal, Value = "false" };
+                if (isTrue)
+                {
+                    internalComponents.Add(currentIterationItem);
+                    isInternal.Value = "true";
                 }
                 else
                 {
-                    processedComponents.Add(component);
+                    isInternal.Value = "false";
                 }
-                
+
+                currentIterationItem.Properties.Add(isInternal);
+                processedComponents.Add(currentIterationItem);
             }
 
             return (processedComponents, internalComponents);
@@ -558,32 +550,12 @@ namespace LCT.Common
                 foreach (var component in bomComponentsList)
                 {                    
                     component.Properties ??= new List<Property>();
-                    AddSpdxComponentProperties(filename, component);                    
+                    SpdxSbomHelper.AddSpdxComponentProperties(filename, component);                    
                 }
                 bom.Components = bomComponentsList;
             }
             
         }
-        public static void AddSpdxComponentProperties(string fileName, Component component)
-        {
-            component.Properties ??= new List<Property>();
-            UpdateOrAddProperty(component.Properties, Dataconstant.Cdx_SpdxFileName, fileName);
-            UpdateOrAddProperty(component.Properties, Dataconstant.Cdx_IdentifierType, Dataconstant.SpdxImport);
-        }
-
-        private static void UpdateOrAddProperty(List<Property> properties, string propertyName, string propertyValue)
-        {
-            var existingProperty = properties.FirstOrDefault(p => p.Name == propertyName);
-            if (existingProperty != null)
-            {
-                existingProperty.Value = propertyValue;
-            }
-            else
-            {
-                properties.Add(new Property { Name = propertyName, Value = propertyValue });
-            }
-        }
-
         #endregion
 
         #region private
@@ -646,41 +618,20 @@ namespace LCT.Common
                     }
                 }
             }
-
-        }
-        public static void CheckValidComponentsFromSpdxfile(List<Component> bom, string projectType)
-        {
-            foreach (var component in bom.ToList())
-            {
-                if (!string.IsNullOrEmpty(component.Name) && !string.IsNullOrEmpty(component.Version)
-                    && !string.IsNullOrEmpty(component.Purl) &&
-                    component.Purl.Contains(Dataconstant.PurlCheck()[projectType.ToUpper()]))
-                {
-                    //Taking Valid Components for perticular projects
-                }
-                else
-                {
-                    component.Publisher = Dataconstant.UnsupportedPackageType;
-                }
-            }
         }
         public static Component CreateComponentWithProperties(
     string name,
     string version,
-    string purlId,
-    bool isValidSpdxPurlId,
-    string releaseExternalId,
-    string unsupportedPackageType)
+    string releaseExternalId)
         {
             Component component = new Component
             {
                 Name = name,
                 Version = version,
-                Purl = isValidSpdxPurlId ? purlId : releaseExternalId,
-                BomRef = isValidSpdxPurlId ? purlId : releaseExternalId,
-                Publisher = isValidSpdxPurlId ? unsupportedPackageType : null,
+                Purl = releaseExternalId,
+                BomRef = releaseExternalId,
                 Type = Component.Classification.Library
-            };  
+            };
             return component;
         }
         #endregion

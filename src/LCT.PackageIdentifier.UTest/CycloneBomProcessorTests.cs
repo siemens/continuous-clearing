@@ -248,62 +248,6 @@ namespace LCT.PackageIdentifier.UTest
         }
 
         [Test]
-        public void SetProperties_ComponentWithUnsupportedPackageType_AddsOnlyDirectAndDevelopmentProperties()
-        {
-            // Arrange
-            List<Component> componentForBOM = new List<Component>();
-            Component component = new Component()
-            {
-                Name = "unsupported-component",
-                Version = "1.0.0",
-                Publisher = Dataconstant.UnsupportedPackageType
-            };
-
-            CommonAppSettings appSettings = new CommonAppSettings()
-            {
-                ProjectType = "NPM"
-            };
-
-            string repo = "test-repo";
-
-            // Act
-            CycloneBomProcessor.SetProperties(appSettings, component, ref componentForBOM, repo);
-
-            // Assert
-            Assert.That(componentForBOM.Count, Is.EqualTo(1), "Should add one component to the BOM");
-            
-            Component resultComponent = componentForBOM[0];
-            Assert.That(resultComponent.Properties.Count, Is.EqualTo(2), "Should have exactly 2 properties for unsupported package type");
-            
-            // Verify only isDirect and isDevelopment properties are added
-            bool hasDirectProperty = false;
-            bool hasDevelopmentProperty = false;
-            
-            foreach (var property in resultComponent.Properties)
-            {
-                if (property.Name == Dataconstant.Cdx_SiemensDirect && property.Value == "true")
-                    hasDirectProperty = true;
-                else if (property.Name == Dataconstant.Cdx_IsDevelopment && property.Value == "false")
-                    hasDevelopmentProperty = true;
-            }
-            
-            Assert.IsTrue(hasDirectProperty, "Should have siemens:direct property set to true");
-            Assert.IsTrue(hasDevelopmentProperty, "Should have development property set to false");
-            
-            // Verify that other properties are NOT added
-            foreach (var property in resultComponent.Properties)
-            {
-                Assert.AreNotEqual(Dataconstant.Cdx_ProjectType, property.Name, "Should not have project type property");
-                Assert.AreNotEqual(Dataconstant.Cdx_ArtifactoryRepoName, property.Name, "Should not have artifactory repo property");
-                Assert.AreNotEqual(Dataconstant.Cdx_IsInternal, property.Name, "Should not have internal property");
-                Assert.AreNotEqual(Dataconstant.Cdx_Siemensfilename, property.Name, "Should not have filename property");
-                Assert.AreNotEqual(Dataconstant.Cdx_JfrogRepoPath, property.Name, "Should not have jfrog repo path property");
-            }
-            
-            Assert.IsNull(resultComponent.Description, "Description should be set to null");
-        }
-
-        [Test]
         public void SetProperties_ComponentWithSupportedPackageType_AddsAllProperties()
         {
             // Arrange

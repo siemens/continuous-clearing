@@ -459,38 +459,7 @@ namespace LCT.PackageIdentifier.UTest
             Assert.That(result.Count, Is.EqualTo(1));
             Assert.That(result[0].Properties, Is.Not.Null);
             Assert.That(result[0].Properties.Count, Is.GreaterThan(0));
-        }
-
-        [Test]
-        public async Task GetJfrogRepoDetailsOfAComponent_WithUnsupportedComponent_ReturnsUnmodifiedComponent()
-        {
-            // Arrange
-            var component1 = new Component
-            {
-                Name = "unsupported-component",
-                Version = "1.0.0",
-                Publisher = Dataconstant.UnsupportedPackageType
-            };
-            var components = new List<Component> { component1 };
-
-            var appSettings = new CommonAppSettings
-            {
-                ProjectType = "CONAN",
-                Conan = new Config()
-            };
-
-            var aqlResults = new List<AqlResult>();
-            _mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
-                .ReturnsAsync(aqlResults);
-
-            // Act
-            var result = await _conanProcessor.GetJfrogRepoDetailsOfAComponent(components, appSettings, _mockJFrogService.Object, _mockBomHelper.Object);
-
-            // Assert
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count, Is.EqualTo(1));
-            Assert.That(result[0].Publisher, Is.EqualTo(Dataconstant.UnsupportedPackageType));
-        }
+        }        
 
         #endregion
         

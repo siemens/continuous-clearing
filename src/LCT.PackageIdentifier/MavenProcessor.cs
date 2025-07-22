@@ -27,8 +27,9 @@ namespace LCT.PackageIdentifier
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
+        private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
 
-        public Bom ParsePackageFile(CommonAppSettings appSettings)
+        public Bom ParsePackageFile(CommonAppSettings appSettings,ref Bom unSupportedBomList)
         {
             List<Component> componentsForBOM = new();
             List<Component> componentsToBOM = new();
@@ -76,6 +77,13 @@ namespace LCT.PackageIdentifier
             {
                 AddSiemensDirectProperty(ref bom);
             }
+            int totalUnsupportedComponents = ListUnsupportedComponentsForBom.Components.Count;
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += ListUnsupportedComponentsForBom.Components.Count;
+            ListUnsupportedComponentsForBom.Components = ListUnsupportedComponentsForBom.Components.Distinct(new ComponentEqualityComparer()).ToList();
+            BomCreator.bomKpiData.DuplicateComponents += totalUnsupportedComponents - ListUnsupportedComponentsForBom.Components.Count;
+            SpdxSbomHelper.AddDevelopmentProperty(ListUnsupportedComponentsForBom.Components);
+            AddSiemensDirectProperty(ref ListUnsupportedComponentsForBom);
+            unSupportedBomList.Components = ListUnsupportedComponentsForBom.Components;
             bom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(bom.Components, bom.Dependencies);
             RemoveTypeJarSuffix(bom);
             return bom;
@@ -121,9 +129,12 @@ namespace LCT.PackageIdentifier
                     Bom bomList;
                     if (filepath.EndsWith(FileConstant.SPDXFileExtension))
                     {
+                        List<Component> listUnsupportedComponents = new List<Component>();
                         bomList = _spdxBomParser.ParseSPDXBom(filepath);
-                        CommonHelper.CheckValidComponentsFromSpdxfile(bomList.Components, appSettings.ProjectType);
-                        CommonHelper.AddSpdxSBomFileNameProperty(ref bomList, filepath);
+                        SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bomList.Components, appSettings.ProjectType,ref listUnsupportedComponents);
+                        SpdxSbomHelper.AddSpdxSBomFileNameProperty(ref bomList, filepath);
+                        SpdxSbomHelper.AddSpdxPropertysForUnsupportedComponents(ref listUnsupportedComponents, filepath);
+                        ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents);
                     }
                     else
                     {
@@ -285,31 +296,23 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in componentsForBOM)
             {
-                if (component.Publisher != Dataconstant.UnsupportedPackageType)
-                {
-                    string jfrogpackageName = $"{component.Name}-{component.Version}{ApiConstant.MavenExtension}";
-                    var hashes = aqlResultList.FirstOrDefault(x => x.Name == jfrogpackageName);
+                string jfrogpackageName = $"{component.Name}-{component.Version}{ApiConstant.MavenExtension}";
+                var hashes = aqlResultList.FirstOrDefault(x => x.Name == jfrogpackageName);
 
-                    AqlResult finalRepoData = GetJfrogArtifactoryRepoDetials(aqlResultList, component, bomhelper, out string jfrogRepoPath);
-                    Property siemensfileNameProp = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = finalRepoData?.Name ?? Dataconstant.PackageNameNotFoundInJfrog };
-                    Property jfrogRepoPathProp = new() { Name = Dataconstant.Cdx_JfrogRepoPath, Value = jfrogRepoPath };
-                    Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = finalRepoData?.Repo };
+                AqlResult finalRepoData = GetJfrogArtifactoryRepoDetials(aqlResultList, component, bomhelper, out string jfrogRepoPath);
+                Property siemensfileNameProp = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = finalRepoData?.Name ?? Dataconstant.PackageNameNotFoundInJfrog };
+                Property jfrogRepoPathProp = new() { Name = Dataconstant.Cdx_JfrogRepoPath, Value = jfrogRepoPath };
+                Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = finalRepoData?.Repo };
 
-                    Component componentVal = component;
+                Component componentVal = component;
 
-                    // Extract KPI update logic to helper method
-                    UpdateKpiDataBasedOnRepo(artifactoryrepo.Value, appSettings);
+                // Extract KPI update logic to helper method
+                UpdateKpiDataBasedOnRepo(artifactoryrepo.Value, appSettings);
 
-                    // Use common helper to set component properties and hashes
-                    CommonHelper.SetComponentPropertiesAndHashes(componentVal, artifactoryrepo, projectType, siemensfileNameProp, jfrogRepoPathProp, hashes);
+                // Use common helper to set component properties and hashes
+                CommonHelper.SetComponentPropertiesAndHashes(componentVal, artifactoryrepo, projectType, siemensfileNameProp, jfrogRepoPathProp, hashes);
 
-                    modifiedBOM.Add(componentVal);
-                }
-                else
-                {
-                    modifiedBOM.Add(component);
-                }
-                
+                modifiedBOM.Add(componentVal);
             }
 
             return modifiedBOM;

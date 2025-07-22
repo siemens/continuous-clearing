@@ -45,9 +45,10 @@ namespace LCT.PackageIdentifier
         private Dictionary<string, Dictionary<string, NuGetVersion>> _listofFrameworkPackages = new Dictionary<string, Dictionary<string, NuGetVersion>>();
         private readonly Dictionary<string, Dictionary<string, NuGetVersion>> _listofFrameworkPackagesInInputFiles = new Dictionary<string, Dictionary<string, NuGetVersion>>();
         private bool isSelfContainedProject = false;
+        private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(),Dependencies=new List<Dependency>() };
 
         #region public methods
-        public Bom ParsePackageFile(CommonAppSettings appSettings)
+        public Bom ParsePackageFile(CommonAppSettings appSettings,ref Bom unSupportedBomList)
         {
             Logger.Debug($"ParsePackageFile():Start");
             List<Component> listComponentForBOM = new List<Component>();
@@ -70,6 +71,7 @@ namespace LCT.PackageIdentifier
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
             bom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(bom.Components, bom.Dependencies);
             AddCompositionDetails(bom);
+            unSupportedBomList.Components = ListUnsupportedComponentsForBom.Components;
             Logger.Debug($"ParsePackageFile():End");
             return bom;
         }
@@ -240,15 +242,8 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in componentsForBOM)
             {
-                if (component.Publisher != Dataconstant.UnsupportedPackageType)
-                {
-                    var processedComponent = ProcessNugetComponent(component, aqlResultList, bomhelper, appSettings, projectType);
-                    modifiedBOM.Add(processedComponent);
-                }
-                else
-                {
-                    modifiedBOM.Add(component);
-                }                
+                var processedComponent = ProcessNugetComponent(component, aqlResultList, bomhelper, appSettings, projectType);
+                modifiedBOM.Add(processedComponent);
             }
             return modifiedBOM;
         }
@@ -489,11 +484,20 @@ namespace LCT.PackageIdentifier
             }
             else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
             {
+                List<Component> listUnsupportedComponents = new List<Component>();
                 Bom bomList = _spdxBomParser.ParseSPDXBom(filepath);
-                CommonHelper.CheckValidComponentsFromSpdxfile(bomList.Components,appSettings.ProjectType);               
+                SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bomList.Components,appSettings.ProjectType,ref listUnsupportedComponents);               
                 componentsForBOM.AddRange(bomList.Components);
                 CommonHelper.GetDetailsForManuallyAdded(componentsForBOM,listComponentForBOM,filepath);
                 bom.Dependencies.AddRange(bomList.Dependencies);
+                string fileName = Path.GetFileName(filepath);
+                foreach (var component in listUnsupportedComponents)
+                {
+                    SpdxSbomHelper.AddSpdxComponentProperties(fileName, component);
+                    Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
+                    component.Properties.Add(isDev);
+                }
+                ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents);
             }
             else
             {
@@ -522,17 +526,20 @@ namespace LCT.PackageIdentifier
             List<string> listOfTemplateBomfilePaths,
             ref int totalComponentsIdentified)
         {
+            var totalUnsupportedComponentsIdentified = 0;
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = listComponentForBOM.Count;
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += ListUnsupportedComponentsForBom.Components.Count;
             totalComponentsIdentified = listComponentForBOM.Count;
+            totalUnsupportedComponentsIdentified = ListUnsupportedComponentsForBom.Components.Count;
 
             listComponentForBOM = KeepUniqueNonDevComponents(listComponentForBOM);
             listComponentForBOM = listComponentForBOM.Distinct(new ComponentEqualityComparer()).ToList();
-
+            ListUnsupportedComponentsForBom.Components = ListUnsupportedComponentsForBom.Components.Distinct(new ComponentEqualityComparer()).ToList();
             if (BomCreator.bomKpiData.DuplicateComponents == 0)
             {
-                BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - listComponentForBOM.Count;
+                BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - listComponentForBOM.Count;                
             }
-
+            BomCreator.bomKpiData.DuplicateComponents += totalUnsupportedComponentsIdentified - ListUnsupportedComponentsForBom.Components.Count;
             BomCreator.bomKpiData.DevDependentComponents = listComponentForBOM.Count(s => s.Properties[0].Value == "true");
             bom.Components = listComponentForBOM;
 
@@ -545,6 +552,7 @@ namespace LCT.PackageIdentifier
             {
                 AddSiemensDirectProperty(ref bom);
             }
+            AddSiemensDirectProperty(ref ListUnsupportedComponentsForBom);
         }
 
 

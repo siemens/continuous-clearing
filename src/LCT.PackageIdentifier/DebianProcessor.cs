@@ -33,10 +33,11 @@ namespace LCT.PackageIdentifier
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
+        private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
 
         #region public method
 
-        public Bom ParsePackageFile(CommonAppSettings appSettings)
+        public Bom ParsePackageFile(CommonAppSettings appSettings,ref Bom unSupportedBomList)
         {
             List<string> configFiles;
             List<DebianPackage> listofComponents = new List<DebianPackage>();
@@ -56,10 +57,13 @@ namespace LCT.PackageIdentifier
             }
 
             int initialCount = listofComponents.Count;
+            int totalUnsupportedComponents = ListUnsupportedComponentsForBom.Components.Count;
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += ListUnsupportedComponentsForBom.Components.Count;
             GetDistinctComponentList(ref listofComponents);
             listComponentForBOM = FormComponentReleaseExternalID(listofComponents);
             BomCreator.bomKpiData.DuplicateComponents = initialCount - listComponentForBOM.Count;
-
+            ListUnsupportedComponentsForBom.Components = ListUnsupportedComponentsForBom.Components.Distinct(new ComponentEqualityComparer()).ToList();
+            BomCreator.bomKpiData.DuplicateComponents += totalUnsupportedComponents - ListUnsupportedComponentsForBom.Components.Count;
             bom.Components = listComponentForBOM;
             string templateFilePath = SbomTemplate.GetFilePathForTemplate(listOfTemplateBomfilePaths);
             SbomTemplate.ProcessTemplateFile(templateFilePath, _cycloneDXBomParser, bom.Components, appSettings.ProjectType);
@@ -71,7 +75,10 @@ namespace LCT.PackageIdentifier
             {
                 AddSiemensDirectProperty(ref bom);
             }
+            SpdxSbomHelper.AddDevelopmentProperty(ListUnsupportedComponentsForBom.Components);
+            AddSiemensDirectProperty(ref ListUnsupportedComponentsForBom);
             bom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(bom.Components, bom.Dependencies);
+            unSupportedBomList.Components = ListUnsupportedComponentsForBom.Components;
             return bom;
         }
 
@@ -114,16 +121,8 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in componentsForBOM)
             {
-                if (component.Publisher != Dataconstant.UnsupportedPackageType)
-                {
-                    Component updatedComponent = UpdateComponentDetails(component, aqlResultList, appSettings, bomhelper, projectType);
-                    modifiedBOM.Add(updatedComponent);
-                }
-                else
-                {
-                    modifiedBOM.Add(component);
-                }
-                
+                Component updatedComponent = UpdateComponentDetails(component, aqlResultList, appSettings, bomhelper, projectType);
+                modifiedBOM.Add(updatedComponent);
             }
 
             return modifiedBOM;
@@ -288,7 +287,8 @@ namespace LCT.PackageIdentifier
 
         private Bom ExtractDetailsForJson(string filePath, ref List<DebianPackage> debianPackages,CommonAppSettings appSettings)
         {
-            Bom bom = BomHelper.ParseBomFile(filePath, _spdxBomParser, _cycloneDXBomParser,appSettings);
+            List<Component> listUnsupportedComponents = new List<Component>();
+            Bom bom = BomHelper.ParseBomFile(filePath, _spdxBomParser, _cycloneDXBomParser,appSettings,ref listUnsupportedComponents);
 
             foreach (var componentsInfo in bom.Components)
             {
@@ -307,9 +307,6 @@ namespace LCT.PackageIdentifier
                     BomCreator.bomKpiData.DebianComponents++;
                     debianPackages.Add(package);
                     Logger.Debug($"ExtractDetailsForJson():ValidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
-                }else if (componentsInfo.Publisher == Dataconstant.UnsupportedPackageType)
-                {
-                    debianPackages.Add(package);
                 }
                 else
                 {
@@ -317,6 +314,7 @@ namespace LCT.PackageIdentifier
                     Logger.Debug($"ExtractDetailsForJson():InvalidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
                 }
             }
+            ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents);
             return bom;
         }
 
@@ -346,10 +344,7 @@ namespace LCT.PackageIdentifier
                 Component component = CommonHelper.CreateComponentWithProperties(
                     prop.Name,
                     prop.Version,
-                    prop.PurlID,
-                    prop.SpdxComponentDetails.ValidSpdxPurlId,
-                    releaseExternalId,
-                    Dataconstant.UnsupportedPackageType
+                    releaseExternalId
                 );
                 Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
                 component.Properties = new List<Property> { isDev };
@@ -357,13 +352,13 @@ namespace LCT.PackageIdentifier
                 listComponentForBOM.Add(component);
             }
             return listComponentForBOM;
-        }       
+        }
         private static void AddComponentProperties(DebianPackage prop, Component component)
         {
             if (prop.SpdxComponentDetails.SpdxComponent)
             {
                 string fileName = Path.GetFileName(prop.SpdxComponentDetails.SpdxFilePath);
-                CommonHelper.AddSpdxComponentProperties(fileName, component);
+                SpdxSbomHelper.AddSpdxComponentProperties(fileName, component);
             }
             else
             {
@@ -380,10 +375,6 @@ namespace LCT.PackageIdentifier
             {
                 package.SpdxComponentDetails.SpdxFilePath = filePath;
                 package.SpdxComponentDetails.SpdxComponent = true;
-            }
-            if (componentInfo.Publisher == Dataconstant.UnsupportedPackageType)
-            {
-                package.SpdxComponentDetails.ValidSpdxPurlId = true;
             }
         }
 
