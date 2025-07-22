@@ -57,5 +57,6 @@ namespace LCT.Common.Constants
         public static readonly string[] Nuget_DeploymentType_DetectionExt = ["*.csproj", "*.Build.props"];
         public static readonly string[] Nuget_DeploymentType_DetectionTags = ["SelfContained"];
         public const string backUpKey = "Backup";
+        public const string SPDXFileExtension = ".spdx.sbom.json";
     }
 }

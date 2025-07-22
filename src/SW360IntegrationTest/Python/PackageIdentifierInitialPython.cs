@@ -1,10 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright company="Siemens AG">
-//   Copyright (C) Siemens AG 2023. All rights reserved. 
-// </copyright>
-//<license>MIT</license>
+// SPDX-FileCopyrightText: 2025 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
-
 using CycloneDX.Models;
 using NUnit.Framework;
 using System.IO;

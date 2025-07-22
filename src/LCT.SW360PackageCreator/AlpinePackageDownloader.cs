@@ -17,6 +17,7 @@ using System.IO.Compression;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
+using File = System.IO.File;
 
 namespace LCT.SW360PackageCreator
 {

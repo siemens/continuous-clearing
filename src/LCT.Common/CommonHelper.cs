@@ -18,6 +18,7 @@ using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using Level = log4net.Core.Level;
+using File = System.IO.File;
 
 namespace LCT.Common
 {
@@ -233,11 +234,17 @@ namespace LCT.Common
             return component.Properties.Exists(x => x.Name == constant);
         }
 
-        public static void GetDetailsForManuallyAdded(List<Component> componentsForBOM, List<Component> listComponentForBOM)
+        public static void GetDetailsForManuallyAdded(List<Component> componentsForBOM, List<Component> listComponentForBOM,string filePath)
         {
             foreach (var component in componentsForBOM)
             {
+                string filename = Path.GetFileName(filePath);
                 component.Properties = new List<Property>();
+                if (filePath.EndsWith(FileConstant.SPDXFileExtension))
+                {
+                    var spdxFileName = new Property { Name = Dataconstant.Cdx_SpdxFileName, Value = filename };
+                    component.Properties.Add(spdxFileName);
+                }
                 Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
                 Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.ManullayAdded };
                 component.Properties.Add(isDev);
@@ -259,31 +266,44 @@ namespace LCT.Common
         }
         public static string[] GetRepoList(CommonAppSettings appSettings)
         {
-            var projectTypeMappings = new Dictionary<string, Func<Artifactory>>
-        {
-        { "CONAN", () => appSettings.Conan?.Artifactory },
-        { "NPM", () => appSettings.Npm?.Artifactory },
-        { "NUGET", () => appSettings.Nuget?.Artifactory },
-        { "POETRY", () => appSettings.Poetry?.Artifactory },
-        { "DEBIAN", () => appSettings.Debian?.Artifactory },
-        { "MAVEN", () => appSettings.Maven?.Artifactory }
-        };
-
-            if (projectTypeMappings.TryGetValue(appSettings.ProjectType.ToUpperInvariant(), out var getArtifactory))
+            var projectTypeMappings = new Dictionary<string, Func<Config>>
+    {
+        { "CONAN", () => appSettings.Conan },
+        { "NPM", () => appSettings.Npm },
+        { "NUGET", () => appSettings.Nuget },
+        { "POETRY", () => appSettings.Poetry },
+        { "DEBIAN", () => appSettings.Debian },
+        { "MAVEN", () => appSettings.Maven }
+    };
+            if (projectTypeMappings.TryGetValue(appSettings.ProjectType.ToUpperInvariant(), out var getConfig))
             {
-                var artifactory = getArtifactory();
-                if (artifactory != null)
+                var config = getConfig();
+                if (config != null)
                 {
-                    return (artifactory.InternalRepos ?? Array.Empty<string>())
-                        .Concat(artifactory.DevRepos ?? Array.Empty<string>())
-                        .Concat(artifactory.RemoteRepos ?? Array.Empty<string>())
-                        .Concat(artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? Array.Empty<string>())
-                        .ToArray();
+                    var repoList = new List<string>();
+                    if (!string.IsNullOrEmpty(config.ReleaseRepo))
+                    { repoList.Add(config.ReleaseRepo);
+                    }
+
+                    if (!string.IsNullOrEmpty(config.DevDepRepo))
+                    {
+                        repoList.Add(config.DevDepRepo);
+                    }
+
+                    if (config.Artifactory != null)
+                    {
+                        repoList.AddRange(config.Artifactory.InternalRepos ?? Array.Empty<string>());
+                        repoList.AddRange(config.Artifactory.DevRepos ?? Array.Empty<string>());
+                        repoList.AddRange(config.Artifactory.RemoteRepos ?? Array.Empty<string>());
+                        repoList.AddRange(config.Artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? Array.Empty<string>());
+                    }
+
+                    return [.. repoList.Where(repo => !string.IsNullOrEmpty(repo)).Distinct()];
                 }
             }
 
             return Array.Empty<string>();
-        }        
+        }
         public static string LogFolderInitialisation(CommonAppSettings appSettings, string logFileName, bool m_Verbose)
         {
             string FolderPath = DefaultLogPath;
@@ -518,6 +538,22 @@ namespace LCT.Common
                     }
                 };
             }
+        }
+        public static void AddSpdxSBomFileNameProperty(ref Bom bom, string filePath)
+        {
+            if (bom?.Components != null)
+            {
+                string filename = Path.GetFileName(filePath);
+                var bomComponentsList = bom.Components;
+                foreach (var component in bomComponentsList)
+                {
+                    var spdxFileName = new Property { Name = Dataconstant.Cdx_SpdxFileName, Value = filename };
+                    component.Properties ??= new List<Property>();
+                    component.Properties.Add(spdxFileName);
+                }
+                bom.Components = bomComponentsList;
+            }
+            
         }
 
         #endregion

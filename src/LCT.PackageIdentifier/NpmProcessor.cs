@@ -24,16 +24,18 @@ using System.Linq;
 using System.Reflection;
 using System.Security;
 using System.Threading.Tasks;
+using File = System.IO.File;
 
 namespace LCT.PackageIdentifier
 {
     /// <summary>
     /// Parses the NPM Packages
     /// </summary>
-    public class NpmProcessor(ICycloneDXBomParser cycloneDXBomParser) : CycloneDXBomParser, IParser
+    public class NpmProcessor(ICycloneDXBomParser cycloneDXBomParser,ISpdxBomParser spdxBomParser) : CycloneDXBomParser, IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
+        private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
         private const string Bundled = "bundled";
         private const string Dependencies = "dependencies";
         private const string Dev = "dev";
@@ -451,48 +453,87 @@ namespace LCT.PackageIdentifier
 
         private void ParsingInputFileForBOM(CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom, ref List<Dependency> dependencies)
         {
-            List<string> configFiles;
-            configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Npm);
+            List<string> configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Npm);
             List<string> listOfTemplateBomfilePaths = new List<string>();
+
             foreach (string filepath in configFiles)
             {
                 if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     listOfTemplateBomfilePaths.Add(filepath);
+                    continue;
                 }
-                Logger.Debug($"ParsingInputFileForBOM():FileName: " + filepath);
 
-                if (filepath.EndsWith(FileConstant.CycloneDXFileExtension))
-                {
-                    if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
-                    {
-                        Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
-                        bom = ParseCycloneDXBom(filepath);
-                        bom = RemoveExcludedComponents(appSettings, bom);
-                        CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
-                        AddingIdentifierType(bom.Components, "CycloneDXFile");
-                        BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += bom.Components.Count;
-                        componentsForBOM.AddRange(bom.Components);
-                        dependencies = bom.Dependencies;
-                    }
-                }
-                else
-                {
-                    Logger.Debug($"ParsingInputFileForBOM():Found as Package File");
-                    var components = ParsePackageLockJson(filepath, appSettings);
-                    AddingIdentifierType(components, "PackageFile");
-                    componentsForBOM.AddRange(components);
-                }
+                Logger.Debug($"ParsingInputFileForBOM():FileName: " + filepath);
+                ProcessFileBasedOnType(filepath, appSettings, ref componentsForBOM, ref bom, ref dependencies);
             }
+
             string templateFilePath = SbomTemplate.GetFilePathForTemplate(listOfTemplateBomfilePaths);
             SbomTemplate.ProcessTemplateFile(templateFilePath, _cycloneDXBomParser, componentsForBOM, appSettings.ProjectType);
-            if (dependencies != null)
+        }
+
+        private void ProcessFileBasedOnType(string filepath, CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom, ref List<Dependency> dependencies)
+        {
+            if (filepath.EndsWith(FileConstant.CycloneDXFileExtension))
             {
-                GetdependencyDetails(componentsForBOM, dependencies);
+                ProcessCycloneDXFile(filepath, appSettings, ref componentsForBOM, ref bom, ref dependencies);
+            }
+            else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
+            {
+                ProcessSPDXFile(filepath, appSettings, ref componentsForBOM, ref bom, ref dependencies);
+            }
+            else
+            {
+                ProcessPackageFile(filepath, appSettings, ref componentsForBOM, ref dependencies);
             }
         }
 
-        public static void GetdependencyDetails(List<Component> componentsForBOM, List<Dependency> dependencies)
+        private void ProcessCycloneDXFile(string filepath, CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom, ref List<Dependency> dependencies)
+        {
+            if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+            {
+                return;
+            }
+
+            Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
+            bom = ParseCycloneDXBom(filepath);
+
+            if (bom.Components != null)
+            {
+                bom = RemoveExcludedComponents(appSettings, bom);
+                CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
+                AddingIdentifierType(bom.Components, "CycloneDXFile", filepath);
+                BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += bom.Components.Count;
+                componentsForBOM.AddRange(bom.Components);
+            }
+
+            if (bom.Dependencies != null)
+            {
+                dependencies.AddRange(bom.Dependencies);
+            }
+        }
+
+        private void ProcessSPDXFile(string filepath, CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom, ref List<Dependency> dependencies)
+        {
+            bom = _spdxBomParser.ParseSPDXBom(filepath);
+            bom = RemoveExcludedComponents(appSettings, bom);
+            CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
+            AddingIdentifierType(bom.Components, "SpdxFile", filepath);
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += bom.Components.Count;
+            componentsForBOM.AddRange(bom.Components);
+            dependencies.AddRange(bom.Dependencies);
+        }
+
+        private static void ProcessPackageFile(string filepath, CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref List<Dependency> dependencies)
+        {
+            Logger.Debug($"ParsingInputFileForBOM():Found as Package File");
+            var components = ParsePackageLockJson(filepath, appSettings);
+            AddingIdentifierType(components, "PackageFile", filepath);
+            componentsForBOM.AddRange(components);
+            GetDependencyDetails(components, dependencies);
+        }
+
+        public static void GetDependencyDetails(List<Component> componentsForBOM, List<Dependency> dependencies)
         {
             List<Dependency> dependencyList = new();
 
@@ -663,7 +704,7 @@ namespace LCT.PackageIdentifier
             return components;
         }
 
-        private static void AddingIdentifierType(List<Component> components, string identifiedBy)
+        private static void AddingIdentifierType(List<Component> components, string identifiedBy,string filePath)
         {
             foreach (var component in components)
             {
@@ -678,6 +719,12 @@ namespace LCT.PackageIdentifier
                 }
                 else
                 {
+                    string filename = Path.GetFileName(filePath);
+                    if (identifiedBy == "SpdxFile")
+                    {
+                        var spdxFileName = new Property { Name = Dataconstant.Cdx_SpdxFileName, Value = filename };
+                        component.Properties.Add(spdxFileName);
+                    }
                     isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
                     identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.ManullayAdded };
                     component.Properties.Add(isDev);

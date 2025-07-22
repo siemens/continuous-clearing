@@ -7,11 +7,13 @@
 using CycloneDX.Models;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Interface;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -22,14 +24,11 @@ namespace LCT.PackageIdentifier
     /// <summary>
     /// The AlpineProcessor class
     /// </summary>
-    public class AlpineProcessor : IParser
+    public class AlpineProcessor(ICycloneDXBomParser cycloneDXBomParser, ISpdxBomParser spdxBomParser) : IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private readonly ICycloneDXBomParser _cycloneDXBomParser;
-        public AlpineProcessor(ICycloneDXBomParser cycloneDXBomParser)
-        {
-            _cycloneDXBomParser = cycloneDXBomParser;
-        }
+        private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
+        private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
 
         #region public method
 
@@ -38,7 +37,6 @@ namespace LCT.PackageIdentifier
             List<string> configFiles;
             List<AlpinePackage> listofComponents = new List<AlpinePackage>();
             Bom bom = new Bom();
-            List<Component> listComponentForBOM;
             List<Dependency> dependenciesForBOM = new();
 
             configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Alpine);
@@ -59,7 +57,7 @@ namespace LCT.PackageIdentifier
 
             int initialCount = listofComponents.Count;
             GetDistinctComponentList(ref listofComponents);
-            listComponentForBOM = FormComponentReleaseExternalID(listofComponents);
+            List<Component> listComponentForBOM = FormComponentReleaseExternalID(listofComponents);
             BomCreator.bomKpiData.DuplicateComponents = initialCount - listComponentForBOM.Count;
 
             bom.Components = listComponentForBOM;
@@ -113,7 +111,7 @@ namespace LCT.PackageIdentifier
 
         private void ExtractDetailsForJson(string filePath, ref List<AlpinePackage> alpinePackages, List<Dependency> dependenciesForBOM)
         {
-            Bom bom = _cycloneDXBomParser.ParseCycloneDXBom(filePath);
+            Bom bom = BomHelper.ParseBomFile(filePath, _spdxBomParser, _cycloneDXBomParser);
             foreach (var componentsInfo in bom.Components)
             {
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;
@@ -123,6 +121,7 @@ namespace LCT.PackageIdentifier
                     Version = componentsInfo.Version,
                     PurlID = componentsInfo.Purl,
                 };
+                SetSpdxComponentDetails(filePath, package);
 
                 if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["ALPINE"]))
                 {
@@ -183,9 +182,28 @@ namespace LCT.PackageIdentifier
                 component.Type = Component.Classification.Library;
                 Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.Discovered };
                 component.Properties = new List<Property> { identifierType };
+                AddSpdxComponentProperties(prop, component);
                 listComponentForBOM.Add(component);
             }
             return listComponentForBOM;
+        }
+        private static void AddSpdxComponentProperties(AlpinePackage prop, Component component)
+        {
+            if (prop.SpdxComponent)
+            {
+                string fileName = Path.GetFileName(prop.SpdxFilePath);
+                var spdxFileName = new Property { Name = Dataconstant.Cdx_SpdxFileName, Value = fileName };
+                component.Properties ??= new List<Property>();
+                component.Properties.Add(spdxFileName);
+            }
+        }
+        private static void SetSpdxComponentDetails(string filePath, AlpinePackage package)
+        {
+            if (filePath.EndsWith(FileConstant.SPDXFileExtension))
+            {
+                package.SpdxFilePath = filePath;
+                package.SpdxComponent = true;
+            }
         }
 
         #endregion
