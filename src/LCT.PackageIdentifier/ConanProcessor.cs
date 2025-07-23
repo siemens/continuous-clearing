@@ -71,7 +71,9 @@ namespace LCT.PackageIdentifier
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += ListUnsupportedComponentsForBom.Components.Count;
             ListUnsupportedComponentsForBom.Components = ListUnsupportedComponentsForBom.Components.Distinct(new ComponentEqualityComparer()).ToList();
             BomCreator.bomKpiData.DuplicateComponents += totalUnsupportedComponentsIdentified - ListUnsupportedComponentsForBom.Components.Count;
+            ListUnsupportedComponentsForBom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(ListUnsupportedComponentsForBom.Components, ListUnsupportedComponentsForBom.Dependencies);
             unSupportedBomList.Components = ListUnsupportedComponentsForBom.Components;
+            unSupportedBomList.Dependencies = ListUnsupportedComponentsForBom.Dependencies;
             Logger.Debug($"ParsePackageFile():End");
             return bom;
         }
@@ -256,15 +258,16 @@ namespace LCT.PackageIdentifier
                 }
                 else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
                 {
-                    List<Component> listUnsupportedComponents = new List<Component>();
+                    Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
                     bom = _spdxBomParser.ParseSPDXBom(filepath);
-                    SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bom.Components, appSettings.ProjectType,ref listUnsupportedComponents);
+                    SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bom, appSettings.ProjectType,ref listUnsupportedComponents);
                     SpdxSbomHelper.AddSpdxSBomFileNameProperty(ref bom, filepath);
                     componentsForBOM.AddRange(bom.Components);
                     dependencies.AddRange(bom.Dependencies);
-                    SpdxSbomHelper.AddSpdxPropertysForUnsupportedComponents(ref listUnsupportedComponents,filepath);
-                    SpdxSbomHelper.AddDevelopmentProperty(listUnsupportedComponents);
-                    ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents);
+                    SpdxSbomHelper.AddSpdxPropertysForUnsupportedComponents(listUnsupportedComponents.Components,filepath);
+                    SpdxSbomHelper.AddDevelopmentProperty(listUnsupportedComponents.Components);
+                    ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
+                    ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
                 }
                 else if (filepath.EndsWith(FileConstant.CycloneDXFileExtension)
                     && !filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))

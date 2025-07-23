@@ -73,6 +73,7 @@ namespace LCT.PackageIdentifier
             bom = RemoveExcludedComponents(appSettings, bom);
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
             unSupportedBomList.Components = ListUnsupportedComponentsForBom.Components;
+            unSupportedBomList.Dependencies = ListUnsupportedComponentsForBom.Dependencies;
             return bom;
         }
 
@@ -116,7 +117,7 @@ namespace LCT.PackageIdentifier
 
         private void ExtractDetailsForJson(string filePath, ref List<AlpinePackage> alpinePackages, List<Dependency> dependenciesForBOM,CommonAppSettings appSettings)
         {
-            List<Component> listUnsupportedComponents = new List<Component>();
+            Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
             Bom bom = BomHelper.ParseBomFile(filePath, _spdxBomParser, _cycloneDXBomParser,appSettings,ref listUnsupportedComponents);
             foreach (var componentsInfo in bom.Components)
             {
@@ -146,7 +147,8 @@ namespace LCT.PackageIdentifier
             {
                 dependenciesForBOM.AddRange(bom.Dependencies);
             }
-            ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents);
+            ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
+            ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
         }
 
         private static void GetDistinctComponentList(ref List<AlpinePackage> listofComponents)

@@ -82,9 +82,12 @@ namespace LCT.PackageIdentifier
             ListUnsupportedComponentsForBom.Components = ListUnsupportedComponentsForBom.Components.Distinct(new ComponentEqualityComparer()).ToList();
             BomCreator.bomKpiData.DuplicateComponents += totalUnsupportedComponents - ListUnsupportedComponentsForBom.Components.Count;
             SpdxSbomHelper.AddDevelopmentProperty(ListUnsupportedComponentsForBom.Components);
-            AddSiemensDirectProperty(ref ListUnsupportedComponentsForBom);
-            unSupportedBomList.Components = ListUnsupportedComponentsForBom.Components;
+            ListUnsupportedComponentsForBom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(ListUnsupportedComponentsForBom.Components, bom.Dependencies);
+            AddSiemensDirectProperty(ref ListUnsupportedComponentsForBom);            
             bom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(bom.Components, bom.Dependencies);
+            ListUnsupportedComponentsForBom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(ListUnsupportedComponentsForBom.Components, ListUnsupportedComponentsForBom.Dependencies);
+            unSupportedBomList.Components = ListUnsupportedComponentsForBom.Components;
+            unSupportedBomList.Dependencies = ListUnsupportedComponentsForBom.Dependencies;
             RemoveTypeJarSuffix(bom);
             return bom;
         }
@@ -129,12 +132,13 @@ namespace LCT.PackageIdentifier
                     Bom bomList;
                     if (filepath.EndsWith(FileConstant.SPDXFileExtension))
                     {
-                        List<Component> listUnsupportedComponents = new List<Component>();
+                        Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
                         bomList = _spdxBomParser.ParseSPDXBom(filepath);
-                        SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bomList.Components, appSettings.ProjectType,ref listUnsupportedComponents);
+                        SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bomList, appSettings.ProjectType, ref listUnsupportedComponents);
                         SpdxSbomHelper.AddSpdxSBomFileNameProperty(ref bomList, filepath);
-                        SpdxSbomHelper.AddSpdxPropertysForUnsupportedComponents(ref listUnsupportedComponents, filepath);
-                        ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents);
+                        SpdxSbomHelper.AddSpdxPropertysForUnsupportedComponents(listUnsupportedComponents.Components, filepath);
+                        ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
+                        ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
                     }
                     else
                     {

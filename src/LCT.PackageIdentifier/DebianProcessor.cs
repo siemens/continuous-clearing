@@ -78,7 +78,9 @@ namespace LCT.PackageIdentifier
             SpdxSbomHelper.AddDevelopmentProperty(ListUnsupportedComponentsForBom.Components);
             AddSiemensDirectProperty(ref ListUnsupportedComponentsForBom);
             bom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(bom.Components, bom.Dependencies);
+            ListUnsupportedComponentsForBom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(ListUnsupportedComponentsForBom.Components, ListUnsupportedComponentsForBom.Dependencies);
             unSupportedBomList.Components = ListUnsupportedComponentsForBom.Components;
+            unSupportedBomList.Dependencies = ListUnsupportedComponentsForBom.Dependencies;
             return bom;
         }
 
@@ -287,7 +289,7 @@ namespace LCT.PackageIdentifier
 
         private Bom ExtractDetailsForJson(string filePath, ref List<DebianPackage> debianPackages,CommonAppSettings appSettings)
         {
-            List<Component> listUnsupportedComponents = new List<Component>();
+            Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
             Bom bom = BomHelper.ParseBomFile(filePath, _spdxBomParser, _cycloneDXBomParser,appSettings,ref listUnsupportedComponents);
 
             foreach (var componentsInfo in bom.Components)
@@ -314,7 +316,8 @@ namespace LCT.PackageIdentifier
                     Logger.Debug($"ExtractDetailsForJson():InvalidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
                 }
             }
-            ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents);
+            ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
+            ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
             return bom;
         }
 

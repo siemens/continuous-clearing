@@ -74,7 +74,9 @@ namespace LCT.PackageIdentifier
             bom.Dependencies = dependencies;
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
             bom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(bom.Components, bom.Dependencies);
+            ListUnsupportedComponentsForBom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(ListUnsupportedComponentsForBom.Components, ListUnsupportedComponentsForBom.Dependencies);
             unSupportedBomList.Components = ListUnsupportedComponentsForBom.Components;
+            unSupportedBomList.Dependencies = ListUnsupportedComponentsForBom.Dependencies;
             Logger.Debug($"ParsePackageFile():End");
             return bom;
         }
@@ -520,17 +522,18 @@ namespace LCT.PackageIdentifier
 
         private void ProcessSPDXFile(string filepath, CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom, ref List<Dependency> dependencies)
         {
-            List<Component> listUnsupportedComponents = new List<Component>();
+            Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
             bom = _spdxBomParser.ParseSPDXBom(filepath);
             bom = RemoveExcludedComponents(appSettings, bom);
-            SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bom.Components, appSettings.ProjectType,ref listUnsupportedComponents);
+            SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bom, appSettings.ProjectType,ref listUnsupportedComponents);
             AddingIdentifierType(bom.Components, "SpdxFile", filepath);
-            AddingIdentifierType(listUnsupportedComponents, "SpdxFile", filepath);
+            AddingIdentifierType(listUnsupportedComponents.Components, "SpdxFile", filepath);
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += bom.Components.Count;
-            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += listUnsupportedComponents.Count;
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += listUnsupportedComponents.Components.Count;
             componentsForBOM.AddRange(bom.Components);
-            dependencies.AddRange(bom.Dependencies);            
-            ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents);
+            dependencies.AddRange(bom.Dependencies);
+            ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
+            ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
         }
 
         private static void ProcessPackageFile(string filepath, CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref List<Dependency> dependencies)

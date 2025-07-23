@@ -71,7 +71,9 @@ namespace LCT.PackageIdentifier
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
             bom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(bom.Components, bom.Dependencies);
             AddCompositionDetails(bom);
+            ListUnsupportedComponentsForBom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(ListUnsupportedComponentsForBom.Components, ListUnsupportedComponentsForBom.Dependencies);
             unSupportedBomList.Components = ListUnsupportedComponentsForBom.Components;
+            unSupportedBomList.Dependencies = ListUnsupportedComponentsForBom.Dependencies;
             Logger.Debug($"ParsePackageFile():End");
             return bom;
         }
@@ -483,21 +485,22 @@ namespace LCT.PackageIdentifier
                 }                
             }
             else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
-            {
-                List<Component> listUnsupportedComponents = new List<Component>();
+            {                
+                Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
                 Bom bomList = _spdxBomParser.ParseSPDXBom(filepath);
-                SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bomList.Components,appSettings.ProjectType,ref listUnsupportedComponents);               
+                SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bomList,appSettings.ProjectType,ref listUnsupportedComponents);               
                 componentsForBOM.AddRange(bomList.Components);
                 CommonHelper.GetDetailsForManuallyAdded(componentsForBOM,listComponentForBOM,filepath);
                 bom.Dependencies.AddRange(bomList.Dependencies);
                 string fileName = Path.GetFileName(filepath);
-                foreach (var component in listUnsupportedComponents)
+                foreach (var component in listUnsupportedComponents.Components)
                 {
                     SpdxSbomHelper.AddSpdxComponentProperties(fileName, component);
                     Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
                     component.Properties.Add(isDev);
                 }
-                ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents);
+                ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
+                ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
             }
             else
             {

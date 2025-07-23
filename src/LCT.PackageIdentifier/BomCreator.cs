@@ -235,6 +235,7 @@ namespace LCT.PackageIdentifier
             }
             bomKpiData.UnsupportedComponentsFromSpdxFile = unSupportedBomList.Components.Count;
             bom.Components.AddRange(unSupportedBomList.Components);
+            bom.Dependencies.AddRange(unSupportedBomList.Dependencies);
             return bom;
         }       
         public async Task<bool> CheckJFrogConnection(CommonAppSettings appSettings)

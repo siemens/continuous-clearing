@@ -86,6 +86,8 @@ namespace LCT.PackageIdentifier
             AddSiemensDirectProperty(ref ListUnsupportedComponentsForBom);
             unSupportedBomList.Components = ListUnsupportedComponentsForBom.Components;
             bom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(bom.Components, bom.Dependencies);
+            ListUnsupportedComponentsForBom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(ListUnsupportedComponentsForBom.Components, ListUnsupportedComponentsForBom.Dependencies);
+            unSupportedBomList.Dependencies = ListUnsupportedComponentsForBom.Dependencies;
             return bom;
         }
 
@@ -199,11 +201,12 @@ namespace LCT.PackageIdentifier
             List<PythonPackage> PythonPackages = new List<PythonPackage>();
             if (filePath.EndsWith(FileConstant.SPDXFileExtension))
             {
-                List<Component> listUnsupportedComponents = new List<Component>();
+                Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
                 bom = _spdxBomParser.ParseSPDXBom(filePath);
-                SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bom.Components, appSettings.ProjectType,ref listUnsupportedComponents);
-                SpdxSbomHelper.AddSpdxPropertysForUnsupportedComponents(ref listUnsupportedComponents, filePath);
-                ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents);
+                SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bom, appSettings.ProjectType,ref listUnsupportedComponents);
+                SpdxSbomHelper.AddSpdxPropertysForUnsupportedComponents(listUnsupportedComponents.Components, filePath);
+                ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
+                ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
             }
             else
             {

@@ -14,10 +14,11 @@ namespace LCT.Common
 {
     public static class SpdxSbomHelper
     {
-        public static void CheckValidComponentsFromSpdxfile(List<Component> bom, string projectType,ref List<Component> listOfUnsupportedComponents)
+        public static void CheckValidComponentsFromSpdxfile(Bom bom, string projectType,ref Bom listOfUnsupportedComponents)
         {
             List<Component> listUnsupportedComponents = new List<Component>();
-            foreach (var component in bom.ToList())
+            List<Dependency> listUnsupportedDependencies = new List<Dependency>();
+            foreach (var component in bom.Components.ToList())
             {
                 if (!string.IsNullOrEmpty(component.Name) && !string.IsNullOrEmpty(component.Version)
                     && !string.IsNullOrEmpty(component.Purl) &&
@@ -27,13 +28,23 @@ namespace LCT.Common
                 }
                 else
                 {
-                    bom.Remove(component);
+                    bom.Components.Remove(component);
                     listUnsupportedComponents.Add(component);
                 }
             }
-            listOfUnsupportedComponents.AddRange(listUnsupportedComponents);
+            foreach (var dependency in bom.Dependencies.ToList())
+            {
+                if (string.IsNullOrEmpty(dependency.Ref) ||
+                    !dependency.Ref.Contains(Dataconstant.PurlCheck()[projectType.ToUpper()]))
+                {
+                    bom.Dependencies.Remove(dependency);
+                    listUnsupportedDependencies.Add(dependency);
+                }
+            }
+            listOfUnsupportedComponents.Components.AddRange(listUnsupportedComponents);
+            listOfUnsupportedComponents.Dependencies.AddRange(listUnsupportedDependencies);
         }
-        public static void AddSpdxPropertysForUnsupportedComponents(ref List<Component> UnsupportedComponentList, string filePath)
+        public static void AddSpdxPropertysForUnsupportedComponents(List<Component> UnsupportedComponentList, string filePath)
         {
             string filename = Path.GetFileName(filePath);
             foreach (var component in UnsupportedComponentList)
