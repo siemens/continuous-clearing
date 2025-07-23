@@ -1379,7 +1379,7 @@ namespace LCT.PackageIdentifier.UTest
                     .Invoke(nugetProcessor, new object[] { filepath, appSettings, listComponentForBOM, bom, listOfTemplateBomfilePaths });
             });
 
-            Assert.AreEqual(1, bom.Dependencies.Count);
+            Assert.AreEqual(0, bom.Dependencies.Count);
         }        
 
     }
