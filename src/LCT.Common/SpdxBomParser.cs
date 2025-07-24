@@ -110,7 +110,14 @@ namespace LCT.Common
         {
             var devDependencyBomRefs = relationships
                 .Where(rel => rel.RelationshipType.Equals("DEV_DEPENDENCY_OF", StringComparison.OrdinalIgnoreCase))
-                .Select(rel => componentIndex.ContainsKey(rel.SpdxElementId) ? componentIndex[rel.SpdxElementId].BomRef : null)
+                .Select(rel =>
+                {
+                    if (componentIndex.TryGetValue(rel.SpdxElementId, out var component))
+                    {
+                        return component.BomRef;
+                    }
+                    return null;
+                })
                 .Where(bomRef => !string.IsNullOrEmpty(bomRef))
                 .ToList();
 
