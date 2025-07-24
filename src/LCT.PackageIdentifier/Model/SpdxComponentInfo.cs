@@ -12,6 +12,7 @@ namespace LCT.PackageIdentifier.Model
     {
         public bool SpdxComponent { get; set; } = false;
         public string SpdxFilePath { get; set; }
+        public bool DevComponent { get; set; } = false;
 
     }
 }

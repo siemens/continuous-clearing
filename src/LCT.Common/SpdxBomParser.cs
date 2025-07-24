@@ -100,11 +100,25 @@ namespace LCT.Common
             }
 
             var (components, componentIndex) = ProcessSpdxPackages(spdxData.Packages);
-            var dependencies = ProcessSpdxRelationships(spdxData.Relationships, componentIndex);
+            var dependencies = ProcessSpdxRelationships(spdxData.Relationships, componentIndex);            
             CleanupComponentManufacturerData(components);
             bom.Components = components;
             bom.Dependencies = dependencies;
             Logger.Debug($"BOM conversion completed. Components: {components.Count}, Dependencies: {dependencies.Count}");
+        }
+        private static void AddDevelopmentPropertyToComponents(List<Component> components, IEnumerable<Relationship> relationships, Dictionary<string, Component> componentIndex)
+        {
+            var devDependencyBomRefs = relationships
+                .Where(rel => rel.RelationshipType.Equals("DEV_DEPENDENCY_OF", StringComparison.OrdinalIgnoreCase))
+                .Select(rel => componentIndex.ContainsKey(rel.SpdxElementId) ? componentIndex[rel.SpdxElementId].BomRef : null)
+                .Where(bomRef => !string.IsNullOrEmpty(bomRef))
+                .ToList();
+
+            foreach (var component in components)
+            {
+                var isDevDependency = devDependencyBomRefs.Contains(component.BomRef);
+                SpdxSbomHelper.AddDevelopmentProperty(component, isDevDependency);
+            }
         }
         private static void CleanupComponentManufacturerData(List<Component> components)
         {
@@ -183,7 +197,7 @@ namespace LCT.Common
 
             var supportedRelationshipTypes = GetSupportedRelationshipTypes();
             var dependencyMap = BuildDependencyMap(relationships, componentIndex, supportedRelationshipTypes);
-
+            AddDevelopmentPropertyToComponents(componentIndex.Values.ToList(), relationships, componentIndex);
             return ConvertDependencyMapToCycloneDx(dependencyMap);
         }
 

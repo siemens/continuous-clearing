@@ -265,7 +265,6 @@ namespace LCT.PackageIdentifier
                     componentsForBOM.AddRange(bom.Components);
                     dependencies.AddRange(bom.Dependencies);
                     SpdxSbomHelper.AddSpdxPropertysForUnsupportedComponents(listUnsupportedComponents.Components,filepath);
-                    SpdxSbomHelper.AddDevelopmentProperty(listUnsupportedComponents.Components);
                     ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
                     ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
                 }

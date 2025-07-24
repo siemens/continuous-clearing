@@ -129,7 +129,7 @@ namespace LCT.PackageIdentifier
                     PurlID = componentsInfo.Purl,
                     SpdxComponentDetails=new SpdxComponentInfo(),
                 };
-                SetSpdxComponentDetails(filePath, package);
+                SetSpdxComponentDetails(filePath, package,componentsInfo);
 
                 if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["ALPINE"]))
                 {
@@ -203,21 +203,23 @@ namespace LCT.PackageIdentifier
             if (prop.SpdxComponentDetails.SpdxComponent)
             {
                 string fileName = Path.GetFileName(prop.SpdxComponentDetails.SpdxFilePath);
-                SpdxSbomHelper.AddSpdxComponentProperties(fileName, component);               
+                SpdxSbomHelper.AddSpdxComponentProperties(fileName, component);
+                SpdxSbomHelper.AddDevelopmentPropertyForSpdx(prop.SpdxComponentDetails.DevComponent, component);               
             }
             else
             {
                 Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.Discovered };
-                component.Properties ??= new List<Property> ();
+                component.Properties ??= new List<Property>();
                 component.Properties.Add(identifierType);
             }
         }
-        private static void SetSpdxComponentDetails(string filePath, AlpinePackage package)
+        private static void SetSpdxComponentDetails(string filePath, AlpinePackage package,Component componentInfo)
         {
             if (filePath.EndsWith(FileConstant.SPDXFileExtension))
             {
                 package.SpdxComponentDetails.SpdxFilePath = filePath;
                 package.SpdxComponentDetails.SpdxComponent = true;
+                package.SpdxComponentDetails.DevComponent= componentInfo.Properties?.Any(x => x.Name == Dataconstant.Cdx_IsDevelopment && x.Value == "true") ?? false;
             }
         }
 

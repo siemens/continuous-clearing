@@ -81,8 +81,7 @@ namespace LCT.PackageIdentifier
             if (bom.Components != null)
             {
                 AddSiemensDirectProperty(ref bom);
-            } 
-            SpdxSbomHelper.AddDevelopmentProperty(ListUnsupportedComponentsForBom.Components);
+            }
             AddSiemensDirectProperty(ref ListUnsupportedComponentsForBom);
             unSupportedBomList.Components = ListUnsupportedComponentsForBom.Components;
             bom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(bom.Components, bom.Dependencies);
@@ -204,6 +203,7 @@ namespace LCT.PackageIdentifier
                 Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
                 bom = _spdxBomParser.ParseSPDXBom(filePath);
                 SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bom, appSettings.ProjectType,ref listUnsupportedComponents);
+                SpdxSbomHelper.AddSpdxSBomFileNameProperty(ref bom, filePath);
                 SpdxSbomHelper.AddSpdxPropertysForUnsupportedComponents(listUnsupportedComponents.Components, filePath);
                 ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
                 ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
@@ -224,7 +224,7 @@ namespace LCT.PackageIdentifier
                     PurlID = componentsInfo.Purl,
                     SpdxComponentDetails = new SpdxComponentInfo(),
                 };
-                SetSpdxComponentDetails(filePath, package);
+                SetSpdxComponentDetails(filePath, package,componentsInfo);
 
                 if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["POETRY"]))
                 {
@@ -477,6 +477,7 @@ namespace LCT.PackageIdentifier
         {
             string fileName = Path.GetFileName(prop.SpdxComponentDetails.SpdxFilePath);
             SpdxSbomHelper.AddSpdxComponentProperties(fileName, component);
+            SpdxSbomHelper.AddDevelopmentPropertyForSpdx(prop.SpdxComponentDetails.DevComponent, component);
         }
 
         private static void AddIdentifierTypeProperty(PythonPackage prop, Component component, Property devDependency)
@@ -490,12 +491,13 @@ namespace LCT.PackageIdentifier
             component.Properties.Add(devDependency);
             component.Properties.Add(identifierType);
         }
-        private static void SetSpdxComponentDetails(string filePath, PythonPackage package)
+        private static void SetSpdxComponentDetails(string filePath, PythonPackage package,Component componentInfo)
         {
             if (filePath.EndsWith(FileConstant.SPDXFileExtension))
             {
                 package.SpdxComponentDetails.SpdxFilePath = filePath;
                 package.SpdxComponentDetails.SpdxComponent = true;
+                package.SpdxComponentDetails.DevComponent = componentInfo.Properties?.Any(x => x.Name == Dataconstant.Cdx_IsDevelopment && x.Value == "true") ?? false;
             }
         }
         #endregion

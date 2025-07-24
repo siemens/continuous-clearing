@@ -75,13 +75,10 @@ namespace LCT.Common
             UpdateOrAddProperty(component.Properties, Dataconstant.Cdx_SpdxFileName, fileName);
             UpdateOrAddProperty(component.Properties, Dataconstant.Cdx_IdentifierType, Dataconstant.SpdxImport);
         }
-        public static void AddDevelopmentProperty(List<Component> componentsForBOM)
+        public static void AddDevelopmentPropertyForSpdx(bool devValue, Component component)
         {
-            foreach (var component in componentsForBOM)
-            {
-                component.Properties ??= new List<Property>();
-                UpdateOrAddProperty(component.Properties, Dataconstant.Cdx_IsDevelopment, "false");
-            }
+            component.Properties ??= new List<Property>();
+            UpdateOrAddProperty(component.Properties, Dataconstant.Cdx_IsDevelopment, devValue.ToString());
         }
         private static void UpdateOrAddProperty(List<Property> properties, string propertyName, string propertyValue)
         {
@@ -94,6 +91,17 @@ namespace LCT.Common
             {
                 properties.Add(new Property { Name = propertyName, Value = propertyValue });
             }
-        }    
+        }
+        public static void AddDevelopmentProperty(Component component, bool isDevDependency)
+        {
+            component.Properties ??= new List<Property>();
+
+            // Add the property
+            component.Properties.Add(new Property
+            {
+                Name = Dataconstant.Cdx_IsDevelopment,
+                Value = isDevDependency ? "true" : "false"
+            });
+        }
     }
 }

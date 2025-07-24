@@ -75,7 +75,6 @@ namespace LCT.PackageIdentifier
             {
                 AddSiemensDirectProperty(ref bom);
             }
-            SpdxSbomHelper.AddDevelopmentProperty(ListUnsupportedComponentsForBom.Components);
             AddSiemensDirectProperty(ref ListUnsupportedComponentsForBom);
             bom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(bom.Components, bom.Dependencies);
             ListUnsupportedComponentsForBom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(ListUnsupportedComponentsForBom.Components, ListUnsupportedComponentsForBom.Dependencies);
@@ -302,7 +301,7 @@ namespace LCT.PackageIdentifier
                     PurlID = componentsInfo.Purl,
                     SpdxComponentDetails = new SpdxComponentInfo(),
                 };
-                SetSpdxComponentDetails(filePath, package);
+                SetSpdxComponentDetails(filePath, package,componentsInfo);
 
                 if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
                 {
@@ -362,6 +361,7 @@ namespace LCT.PackageIdentifier
             {
                 string fileName = Path.GetFileName(prop.SpdxComponentDetails.SpdxFilePath);
                 SpdxSbomHelper.AddSpdxComponentProperties(fileName, component);
+                SpdxSbomHelper.AddDevelopmentPropertyForSpdx(prop.SpdxComponentDetails.DevComponent, component);
             }
             else
             {
@@ -372,12 +372,13 @@ namespace LCT.PackageIdentifier
 
             }
         }
-        private static void SetSpdxComponentDetails(string filePath, DebianPackage package)
+        private static void SetSpdxComponentDetails(string filePath, DebianPackage package,Component componentInfo)
         {
             if (filePath.EndsWith(FileConstant.SPDXFileExtension))
             {
                 package.SpdxComponentDetails.SpdxFilePath = filePath;
                 package.SpdxComponentDetails.SpdxComponent = true;
+                package.SpdxComponentDetails.DevComponent = componentInfo.Properties?.Any(x => x.Name == Dataconstant.Cdx_IsDevelopment && x.Value == "true") ?? false;
             }
         }
 
