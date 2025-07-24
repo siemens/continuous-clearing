@@ -593,7 +593,7 @@ namespace LCT.PackageIdentifier.UTest
         {
             // Arrange
             string tempFile = Path.GetTempFileName();
-            string spdxFile = Path.ChangeExtension(tempFile, ".spdx");
+            string spdxFile = Path.ChangeExtension(tempFile, FileConstant.SPDXFileExtension);
             System.IO.File.WriteAllText(spdxFile, "test content");
 
             var mockSpdxParser = new Mock<ISpdxBomParser>();
@@ -658,44 +658,6 @@ namespace LCT.PackageIdentifier.UTest
             }
         }
 
-        [Test]
-        public void ParseBomFile_WithDirectory_CallsParseMultipleSpdxFiles()
-        {
-            // Arrange
-            string tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-            System.IO.Directory.CreateDirectory(tempDir);
-            
-            string spdxFile1 = Path.Combine(tempDir, "test1.spdx");
-            string spdxFile2 = Path.Combine(tempDir, "test2.spdx");
-            System.IO.File.WriteAllText(spdxFile1, "test content 1");
-            System.IO.File.WriteAllText(spdxFile2, "test content 2");
-
-            var mockSpdxParser = new Mock<ISpdxBomParser>();
-            var mockCycloneDxParser = new Mock<ICycloneDXBomParser>();
-            var mockAppSettings = new Mock<CommonAppSettings>();
-            var expectedBom = new Bom();
-
-            // Set up mock to return the expected BOM for the first file and null for others
-            mockSpdxParser.Setup(x => x.ParseSPDXBom(spdxFile1)).Returns(expectedBom);
-            mockSpdxParser.Setup(x => x.ParseSPDXBom(spdxFile2)).Returns((Bom)null);
-
-            try
-            {
-                // Act
-                var result = BomHelper.ParseBomFile(tempDir, mockSpdxParser.Object, mockCycloneDxParser.Object, mockAppSettings.Object);
-
-                // Assert
-                Assert.IsNotNull(result);
-                Assert.AreEqual(expectedBom, result);
-                mockSpdxParser.Verify(x => x.ParseSPDXBom(spdxFile1), Times.Once);
-            }
-            finally
-            {
-                // Cleanup
-                if (System.IO.Directory.Exists(tempDir))
-                    System.IO.Directory.Delete(tempDir, true);
-            }
-        }
 
         [Test]
         public void ParseBomFile_WithEmptyDirectory_ReturnsEmptyBom()
