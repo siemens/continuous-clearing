@@ -740,9 +740,9 @@ namespace LCT.PackageIdentifier
                     {                        
                         identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.ManullayAdded };                        
                         component.Properties.Add(identifierType);
-                    }
-                    isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
-                    component.Properties.Add(isDev);
+                        isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
+                        component.Properties.Add(isDev);
+                    }                    
                 }
             }
         }

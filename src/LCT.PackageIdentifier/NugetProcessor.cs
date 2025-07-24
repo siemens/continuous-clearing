@@ -495,9 +495,7 @@ namespace LCT.PackageIdentifier
                 string fileName = Path.GetFileName(filepath);
                 foreach (var component in listUnsupportedComponents.Components)
                 {
-                    SpdxSbomHelper.AddSpdxComponentProperties(fileName, component);
-                    Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
-                    component.Properties.Add(isDev);
+                    SpdxSbomHelper.AddSpdxComponentProperties(fileName, component);                   
                 }
                 ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
                 ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
