@@ -274,7 +274,7 @@ namespace LCT.PackageIdentifier
             {
                 using (var rsa = RSA.Create())
                 {
-                    rsa.ImportRSAPublicKey(publicKeyBytes, out _);
+                    rsa.ImportSubjectPublicKeyInfo(publicKeyBytes, out _);
                     return rsa.VerifyData(data, signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
                 }
             }
