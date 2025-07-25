@@ -51,7 +51,7 @@ namespace LCT.PackageIdentifier
                 }
                 else
                 {
-                    listofComponents.AddRange(ParseCycloneDX(filepath, dependenciesForBOM));
+                    listofComponents.AddRange(ParseCycloneDX(filepath, dependenciesForBOM,appSettings));
                     IdentifiedAlpinePackages(filepath, listofComponents, dependenciesForBOM);
                 }
             }

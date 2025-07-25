@@ -498,10 +498,9 @@ namespace LCT.PackageIdentifier
                 }                
             }
             else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
-            {                
-                Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
             {
                 Logger.Debug($"HandleConfigFile():Spdx sbom file detected: {filepath}");
+                Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };                
                 Bom bomList = _spdxBomParser.ParseSPDXBom(filepath);
                 LogHandlingHelper.IdentifierInputFileComponents(filepath, bomList.Components);
                 SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bomList,appSettings.ProjectType,ref listUnsupportedComponents);               
