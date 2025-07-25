@@ -211,7 +211,7 @@ namespace LCT.PackageIdentifier.UTest
             mockIProcessor.Setup(x => x.GetJfrogArtifactoryRepoInfo(It.IsAny<CommonAppSettings>(), It.IsAny<ArtifactoryCredentials>(), It.IsAny<Component>(), It.IsAny<string>())).ReturnsAsync(lstComponentForBOM);
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
-            
+
             IParser parser = new DebianProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             Mock<IJFrogService> jFrogService = new Mock<IJFrogService>();
             Mock<IBomHelper> bomHelper = new Mock<IBomHelper>();
@@ -305,7 +305,7 @@ namespace LCT.PackageIdentifier.UTest
                  Version="1",
                 }
             };
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "Nuget",
@@ -339,7 +339,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<IFrameworkPackages> frameworkPackages = new Mock<IFrameworkPackages>();
             Mock<ICompositionBuilder> compositionBuilder = new Mock<ICompositionBuilder>();
             Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
-            IParser parser = new NugetProcessor(cycloneDXBomParser.Object, frameworkPackages.Object, compositionBuilder.Object,spdxBomParser.Object);
+            IParser parser = new NugetProcessor(cycloneDXBomParser.Object, frameworkPackages.Object, compositionBuilder.Object, spdxBomParser.Object);
             Mock<IJFrogService> jFrogService = new Mock<IJFrogService>();
             Mock<IBomHelper> bomHelper = new Mock<IBomHelper>();
             bomHelper.Setup(x => x.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>())).ReturnsAsync(aqlResultList);
@@ -490,7 +490,7 @@ namespace LCT.PackageIdentifier.UTest
                 }
             };
 
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "MAVEN",
@@ -693,7 +693,7 @@ namespace LCT.PackageIdentifier.UTest
             // Arrange
             string tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
             System.IO.Directory.CreateDirectory(tempDir);
-            
+
             string spdxFile = Path.Combine(tempDir, "invalid.spdx");
             System.IO.File.WriteAllText(spdxFile, "invalid content");
 
@@ -726,7 +726,7 @@ namespace LCT.PackageIdentifier.UTest
             // Arrange
             string tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
             System.IO.Directory.CreateDirectory(tempDir);
-            
+
             string spdxFile = Path.Combine(tempDir, "test.spdx");
             System.IO.File.WriteAllText(spdxFile, "test content");
 
@@ -757,11 +757,11 @@ namespace LCT.PackageIdentifier.UTest
             // Arrange
             string tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
             System.IO.Directory.CreateDirectory(tempDir);
-            
+
             string spdxFile = Path.Combine(tempDir, "test.spdx");
             string pemFile = Path.Combine(tempDir, "test.spdx.pem");
             string sigFile = Path.Combine(tempDir, "test.spdx.sig");
-            
+
             System.IO.File.WriteAllText(spdxFile, "test content");
             System.IO.File.WriteAllText(pemFile, "test pem content");
             System.IO.File.WriteAllText(sigFile, "test sig content");
@@ -874,5 +874,56 @@ namespace LCT.PackageIdentifier.UTest
             Assert.Contains(expectedResults[0], result);
             Assert.Contains(expectedResults[1], result);
         }
+
+
+        [Test]
+        public void ParseMultipleSpdxFiles_WithSomeInvalidAndSomeValidFiles_ReturnsFirstValidBom()
+        {
+            // Arrange
+            string tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            System.IO.Directory.CreateDirectory(tempDir);
+            string invalidSpdxFile = Path.Combine(tempDir, "invalid1.spdx");
+            string validSpdxFile = Path.Combine(tempDir, "valid1.spdx");
+            System.IO.File.WriteAllText(invalidSpdxFile, "invalid content");
+            System.IO.File.WriteAllText(validSpdxFile, "valid content");
+
+            var mockSpdxParser = new Mock<ISpdxBomParser>();
+            var expectedBom = new Bom();
+
+            mockSpdxParser.Setup(x => x.ParseSPDXBom(It.Is<string>(s => s.EndsWith("invalid1.spdx"))))
+                          .Throws(new Exception("Invalid SPDX file"));
+            mockSpdxParser.Setup(x => x.ParseSPDXBom(It.Is<string>(s => s.EndsWith("valid1.spdx"))))
+                          .Returns(expectedBom);
+
+            try
+            {
+                // Act
+                Bom result = null;
+                try
+                {
+                    result = typeof(BomHelper)
+                        .GetMethod("ParseMultipleSpdxFiles", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+                        .Invoke(null, new object[] { tempDir, mockSpdxParser.Object }) as Bom;
+                }
+                catch (System.Reflection.TargetInvocationException ex)
+                {
+                    // If the method under test throws, unwrap and rethrow the inner exception for clarity
+                    throw ex.InnerException ?? ex;
+                }
+
+                // Assert
+                Assert.IsNotNull(result);
+                Assert.AreEqual(expectedBom, result);
+                mockSpdxParser.Verify(x => x.ParseSPDXBom(It.IsAny<string>()), Times.Exactly(2));
+            }
+            finally
+            {
+                if (System.IO.Directory.Exists(tempDir))
+                    System.IO.Directory.Delete(tempDir, true);
+            }
+        }
     }
 }
+
+
+
