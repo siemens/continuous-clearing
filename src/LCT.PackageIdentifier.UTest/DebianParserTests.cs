@@ -29,7 +29,7 @@ namespace LCT.PackageIdentifier.UTest
         private Mock<IJFrogService> _mockJFrogService;
         private Mock<ICycloneDXBomParser> _mockCycloneDXBomParser;
         private Mock<ISpdxBomParser> _spdxBomParser;
-
+        private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
         [SetUp]
         public void Setup()
         {
@@ -143,7 +143,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = _debianProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = _debianProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(expectednoofcomponents,
@@ -173,7 +173,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = _debianProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = _debianProcessor.ParsePackageFile(appSettings,ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
@@ -200,7 +200,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            _debianProcessor.ParsePackageFile(appSettings);
+            _debianProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(duplicateComponents, Is.EqualTo(BomCreator.bomKpiData.DuplicateComponents), "Checks for no of duplicate components");
@@ -229,7 +229,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = _debianProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = _debianProcessor.ParsePackageFile(appSettings,ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.AreEqual(sourceName, listofcomponents.Components[0].Name + "_" + listofcomponents.Components[0].Version, "Checks component name and version");
@@ -258,7 +258,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = _debianProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = _debianProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
@@ -286,7 +286,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = _debianProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = _debianProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
             bool isUpdated = listofcomponents.Components.Exists(x => x.Properties != null && x.Properties.Exists(x => x.Name == Dataconstant.Cdx_IdentifierType && x.Value == Dataconstant.Discovered));
 
             //Assert

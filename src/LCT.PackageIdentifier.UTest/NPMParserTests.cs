@@ -12,6 +12,7 @@ using LCT.Common.Model;
 using LCT.PackageIdentifier.Model;
 using Moq;
 using NUnit.Framework;
+using System.Collections.Generic;
 using System.IO;
 
 namespace LCT.PackageIdentifier.UTest
@@ -20,6 +21,7 @@ namespace LCT.PackageIdentifier.UTest
     [TestFixture]
     public class NPMParserTests
     {
+        private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
         [Test]
         public void ParsePackageFile_PackageLockWithDuplicateComponents_ReturnsCountOfDuplicates()
         {
@@ -47,7 +49,7 @@ namespace LCT.PackageIdentifier.UTest
             NpmProcessor NpmProcessor = new NpmProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
 
             //Act
-            NpmProcessor.ParsePackageFile(appSettings);
+            NpmProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(2974, Is.EqualTo(BomCreator.bomKpiData.DuplicateComponents), "Returns the count of duplicate components");
@@ -79,7 +81,7 @@ namespace LCT.PackageIdentifier.UTest
             NpmProcessor NpmProcessor = new NpmProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
 
             //Act
-            Bom bom = NpmProcessor.ParsePackageFile(appSettings);
+            Bom bom = NpmProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(10, Is.EqualTo(bom.Components.Count), "Returns the count of components");
@@ -116,7 +118,7 @@ namespace LCT.PackageIdentifier.UTest
             NpmProcessor NpmProcessor = new NpmProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
 
             //Act
-            NpmProcessor.ParsePackageFile(appSettings);
+            NpmProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(0, Is.EqualTo(bomKpiData.DuplicateComponents), "Returns the count of duplicate components as zero");
@@ -147,7 +149,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = npmProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = npmProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
@@ -180,7 +182,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = npmProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = npmProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
@@ -212,7 +214,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = npmProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = npmProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             bool isUpdated = listofcomponents.Components.Exists(x => x.Properties != null && x.Properties.Exists(x => x.Name == Dataconstant.Cdx_IdentifierType && x.Value == Dataconstant.ManullayAdded));
 

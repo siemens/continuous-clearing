@@ -21,7 +21,7 @@ namespace LCT.PackageIdentifier.UTest
     public class AlpineParserTests
     {
         private readonly AlpineProcessor _alpineProcessor;
-
+        private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
         public AlpineParserTests()
         {
             List<Component> components = new List<Component>();
@@ -59,7 +59,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings,ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count),
@@ -89,7 +89,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count),
@@ -118,7 +118,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            _alpineProcessor.ParsePackageFile(appSettings);
+            _alpineProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(duplicateComponents, Is.EqualTo(BomCreator.bomKpiData.DuplicateComponents),
@@ -147,7 +147,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.AreEqual(sourceName, listofcomponents.Components[0].Name + "_" +
@@ -178,7 +178,7 @@ namespace LCT.PackageIdentifier.UTest
 
 
             //Act
-            Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings,ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count),
@@ -207,7 +207,7 @@ namespace LCT.PackageIdentifier.UTest
 
 
             //Act
-            Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
             bool isUpdated = listofcomponents.Components.Exists(x => x.Properties != null
             && x.Properties.Exists(x => x.Name == Dataconstant.Cdx_IdentifierType
             && x.Value == Dataconstant.Discovered));

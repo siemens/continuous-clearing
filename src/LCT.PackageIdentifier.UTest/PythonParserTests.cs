@@ -25,6 +25,7 @@ namespace LCT.PackageIdentifier.UTest
     class PythonParserTests
     {
         readonly PythonProcessor pythonProcessor;
+        private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
         public PythonParserTests()
         {
 
@@ -59,7 +60,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = pythonProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = pythonProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
@@ -87,7 +88,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = pythonProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = pythonProcessor.ParsePackageFile(appSettings,ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(expectednoofcomponents,
@@ -115,7 +116,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = pythonProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = pythonProcessor.ParsePackageFile(appSettings,ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
@@ -142,7 +143,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            pythonProcessor.ParsePackageFile(appSettings);
+            pythonProcessor.ParsePackageFile(appSettings,ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(duplicateComponents, Is.EqualTo(BomCreator.bomKpiData.DuplicateComponents), "Checks for no of duplicate components");
@@ -171,7 +172,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = pythonProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = pythonProcessor.ParsePackageFile(appSettings,ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
@@ -199,7 +200,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = pythonProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = pythonProcessor.ParsePackageFile(appSettings,ref ListUnsupportedComponentsForBom);
 
             bool isUpdated = listofcomponents.Components.Exists(x => x.Properties != null && x.Properties.Exists(x => x.Name == Dataconstant.Cdx_IdentifierType && x.Value == Dataconstant.ManullayAdded));
 
@@ -495,7 +496,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = pythonProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = pythonProcessor.ParsePackageFile(appSettings,ref ListUnsupportedComponentsForBom);
 
             //Assert  Need to change this after python package clearence implementaion
             Assert.True(listofcomponents.Components.Count == 0 || listofcomponents.Components.Count == 4);

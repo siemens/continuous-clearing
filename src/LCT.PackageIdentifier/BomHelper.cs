@@ -67,7 +67,8 @@ namespace LCT.PackageIdentifier
             }
             printList.Add(CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ComponentsinSBOMTemplateFile)), bomKpiData.ComponentsinSBOMTemplateFile);
             printList.Add(CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ComponentsUpdatedFromSBOMTemplateFile)), bomKpiData.ComponentsUpdatedFromSBOMTemplateFile);
-            printList.Add(CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ComponentsInComparisonBOM)), bomKpiData.ComponentsInComparisonBOM);
+            printList.Add(CommonHelper.Convert(bomKpiData, nameof(bomKpiData.UnsupportedComponentsFromSpdxFile)), bomKpiData.UnsupportedComponentsFromSpdxFile);
+            printList.Add(CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ComponentsInComparisonBOM)), bomKpiData.ComponentsInComparisonBOM);            
             Dictionary<string, double> printTimingList = new Dictionary<string, double>()
             {
                 { "PackageIdentifier",bomKpiData.TimeTakenByBomCreator }
@@ -216,12 +217,14 @@ namespace LCT.PackageIdentifier
 
             return aqlResultList;
         }
-        public static Bom ParseBomFile(string filePath, ISpdxBomParser spdxBomParser, ICycloneDXBomParser cycloneDXBomParser)
+        public static Bom ParseBomFile(string filePath, ISpdxBomParser spdxBomParser, ICycloneDXBomParser cycloneDXBomParser,CommonAppSettings appSettings,ref Bom listUnsupportedComponents)
         {
             if (filePath.EndsWith(FileConstant.SPDXFileExtension))
             {
                 Bom bom;
                 bom = spdxBomParser.ParseSPDXBom(filePath);
+                SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bom, appSettings.ProjectType,ref listUnsupportedComponents);
+                SpdxSbomHelper.AddSpdxPropertysForUnsupportedComponents(listUnsupportedComponents.Components, filePath);
                 return bom;
             }
             else

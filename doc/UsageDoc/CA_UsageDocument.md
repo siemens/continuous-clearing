@@ -208,7 +208,37 @@ Users have the flexibility to generate a basic SBOM even if connections to SW360
       After successful execution, output.sbom.cdx.json (*CycloneDX.json*) file will be created in specified directory
 
       Resulted output.sbom.cdx.json file will be having the list of installed packages  and the same file will be used as  an input to Continuous clearing tool - Package identifier via the input directory parameter. The remaining process is same as other project types.
+## SPDX v2.3 Support
+The Package Identifier now supports processing SPDX v2.3 format SBOM files. This feature enables:
 
+- Automatic detection of SPDX files with `.spdx.sbom.json` suffix from the input directory
+- Conversion of SPDX files to CycloneDX SBOM format while preserving all relationships
+- Addition of custom property "internal:siemens:clearing:spdx-file-name" in the converted CycloneDX SBOM
+- Support for both single and multiple SPDX file processing
+
+### File Naming Convention
+- SPDX files should use the suffix: `.spdx.sbom.json`
+- Example: `component.spdx.sbom.json`
+
+## SPDX SBOM Signature Validator
+The tool now includes automated validation of SPDX SBOM signatures and certificates to ensure integrity and authenticity.
+
+### Features
+- Automatic detection and processing of signature (`.sig`) and certificate (`.pem`) files
+- Cryptographic validation of SBOM files against their signatures
+- Certificate validation using public key infrastructure
+- Comprehensive error reporting and logging
+
+### File Naming Convention
+For each SPDX SBOM file, the following associated files are expected:
+example.spdx.sbom.json # SBOM file
+example.spdx.sbom.json.sig # Signature file
+example.spdx.sbom.json.pem # Public certificate file
+
+### Validation Process
+1. The system automatically detects SPDX SBOM files in the input directory
+2. For each SBOM file, it locates corresponding `.sig` and `.pem` files
+3. Performs signature verification using the public certificate
 
 ### **Configuring the Continuous Clearing Tool**
 

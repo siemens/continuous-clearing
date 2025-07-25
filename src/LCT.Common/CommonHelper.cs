@@ -238,17 +238,19 @@ namespace LCT.Common
         {
             foreach (var component in componentsForBOM)
             {
-                string filename = Path.GetFileName(filePath);
+                string fileName = Path.GetFileName(filePath);
                 component.Properties = new List<Property>();
                 if (filePath.EndsWith(FileConstant.SPDXFileExtension))
                 {
-                    var spdxFileName = new Property { Name = Dataconstant.Cdx_SpdxFileName, Value = filename };
-                    component.Properties.Add(spdxFileName);
+                    SpdxSbomHelper.AddSpdxComponentProperties(fileName, component);
                 }
-                Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
-                Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.ManullayAdded };
+                else
+                {
+                    Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.ManullayAdded };
+                    component.Properties.Add(identifierType);
+                }
+                Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };                
                 component.Properties.Add(isDev);
-                component.Properties.Add(identifierType);
                 listComponentForBOM.Add(component);
             }
         }
@@ -461,7 +463,7 @@ namespace LCT.Common
             {
                 var currentIterationItem = component;
                 bool isTrue = isInternalPredicate(currentIterationItem);
-                
+
                 if (currentIterationItem.Properties?.Count == null || currentIterationItem.Properties?.Count <= 0)
                 {
                     currentIterationItem.Properties = new List<Property>();
@@ -546,16 +548,14 @@ namespace LCT.Common
                 string filename = Path.GetFileName(filePath);
                 var bomComponentsList = bom.Components;
                 foreach (var component in bomComponentsList)
-                {
-                    var spdxFileName = new Property { Name = Dataconstant.Cdx_SpdxFileName, Value = filename };
+                {                    
                     component.Properties ??= new List<Property>();
-                    component.Properties.Add(spdxFileName);
+                    SpdxSbomHelper.AddSpdxComponentProperties(filename, component);                    
                 }
                 bom.Components = bomComponentsList;
             }
             
         }
-
         #endregion
 
         #region private
@@ -618,7 +618,21 @@ namespace LCT.Common
                     }
                 }
             }
-
+        }
+        public static Component CreateComponentWithProperties(
+    string name,
+    string version,
+    string releaseExternalId)
+        {
+            Component component = new Component
+            {
+                Name = name,
+                Version = version,
+                Purl = releaseExternalId,
+                BomRef = releaseExternalId,
+                Type = Component.Classification.Library
+            };
+            return component;
         }
         #endregion
     }
