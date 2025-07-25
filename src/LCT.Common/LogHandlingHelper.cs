@@ -120,16 +120,16 @@ namespace LCT.Common
             // Take only the first `maxLines` lines
             return string.Join("\n", lines.Take(maxLines));
         }
-        //private static string TruncateContent(string content, int maxLinesToShow)
-        //{
-        //    var lines = content.Split(NewLineSeparator, StringSplitOptions.None);
-        //    if (lines.Length > maxLinesToShow)
-        //    {
-        //        return string.Join("\n", lines.Take(maxLinesToShow)) +
-        //               $"\n... [Content truncated. Showing first {maxLinesToShow} lines. Enable verbose mode to see full content.]";
-        //    }
-        //    return content;
-        //}
+        private static string TruncateContent(string content, int maxLinesToShow)
+        {
+            var lines = content.Split(NewLineSeparator, StringSplitOptions.None);
+            if (lines.Length > maxLinesToShow)
+            {
+                return string.Join("\n", lines.Take(maxLinesToShow)) +
+                       $"\n... [Content truncated. Showing first {maxLinesToShow} lines. Enable verbose mode to see full content.]";
+            }
+            return content;
+        }
         private static void BuildErrorLog(StringBuilder logBuilder, string context, string details, string message, string additionalDetails, Exception ex = null)
         {
             logBuilder.AppendLine(LogSeparator);

@@ -32,11 +32,12 @@ namespace LCT.ArtifactoryUploader
                                                                                                       CommonAppSettings appSettings,
                                                                                                       DisplayPackagesInfo displayPackagesInfo)
         {
-            Logger.Debug("Starting GetComponentsToBeUploadedToArtifactory() method");
+            Logger.Debug("GetComponentsToBeUploadedToArtifactory():Starting to get component data for upload to artifactory");
             List<ComponentsToArtifactory> componentsToBeUploaded = new List<ComponentsToArtifactory>();
 
             foreach (var item in comparisonBomData)
             {
+                Logger.Debug($"GetComponentsToBeUploadedToArtifactory():Identifying data for this component name-{item.Name},version-{item.Version} ");
                 var packageType = GetPackageType(item);
                 if (packageType != PackageType.Unknown)
                 {
@@ -73,6 +74,7 @@ namespace LCT.ArtifactoryUploader
                     components.JfrogPackageName = GetJfrogPackageName(components);
                     components.JfrogRepoPath=GetJfrogRepPath(components);
                     componentsToBeUploaded.Add(components);
+                    Logger.Debug($"GetComponentsToBeUploadedToArtifactory():Component identified as unknown package type,name-{item.Name},version-{item.Version}");
                 }
                 else
                 {
@@ -81,8 +83,33 @@ namespace LCT.ArtifactoryUploader
                     await AddUnknownPackagesAsync(item, displayPackagesInfo);
                 }
             }
-            Logger.Debug("Ending GetComponentsToBeUploadedToArtifactory() method");
+            ValidComponentsIdentifiedToBeUpload(componentsToBeUploaded);
+            Logger.Debug("GetComponentsToBeUploadedToArtifactory():Completed to getting component data for upload to artifactory");
             return componentsToBeUploaded;
+        }
+        private static void ValidComponentsIdentifiedToBeUpload(List<ComponentsToArtifactory> componentsToBeUploaded)
+        {
+            if (componentsToBeUploaded == null || componentsToBeUploaded.Count == 0)
+            {
+                Logger.Debug("No components to be uploaded to Artifactory.");
+                return;
+            }
+
+            var logBuilder = new System.Text.StringBuilder();
+            logBuilder.AppendLine("================================================================================================================");
+            logBuilder.AppendLine(" Components to be Uploaded to Artifactory");
+            logBuilder.AppendLine("================================================================================================================");
+            logBuilder.AppendLine($"| {"Name",-50} | {"Version",-15} | {"ComponentType",-15} | {"PackageType",-20} | {"SrcRepoName",-20} | {"DestRepoName",-20} |");
+            logBuilder.AppendLine("----------------------------------------------------------------------------------------------------------------");
+
+            foreach (var component in componentsToBeUploaded)
+            {
+                logBuilder.AppendLine($"| {component.Name,-50} | {component.Version,-15} | {component.ComponentType,-15} | {component.PackageType,-20} | {component.SrcRepoName,-20} | {component.DestRepoName,-20} |");
+            }
+
+            logBuilder.AppendLine("================================================================================================================");
+
+            Logger.Debug(logBuilder.ToString());
         }
         private static string GetComponentType(Component item)
         {
@@ -520,20 +547,23 @@ namespace LCT.ArtifactoryUploader
                         .Find(p => p.Name == propertyName)?
                         .Value?
                         .ToUpperInvariant();
-
+            Logger.Debug($"GetPackageType(): Determining package type for Component - Name: {item.Name}, Version: {item.Version}");
             if (GetPropertyValue(Dataconstant.Cdx_ClearingState) == "APPROVED")
             {
+                Logger.Debug($"GetPackageType(): Package type determined as Clearing state is APPROVED");
                 return PackageType.ClearedThirdParty;
             }
             else if (GetPropertyValue(Dataconstant.Cdx_IsInternal) == "TRUE")
             {
+                Logger.Debug($"GetPackageType(): Package type determined as Internal");
                 return PackageType.Internal;
             }
             else if (GetPropertyValue(Dataconstant.Cdx_IsDevelopment) == "TRUE")
             {
+                Logger.Debug($"GetPackageType(): Package type determined as Development");
                 return PackageType.Development;
             }
-
+            Logger.Debug($"GetPackageType(): Package type determined as Unknown");
             return PackageType.Unknown;
         }
 

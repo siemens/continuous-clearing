@@ -220,14 +220,14 @@ namespace LCT.PackageIdentifier
         {
             if (filePath.EndsWith(FileConstant.SPDXFileExtension))
             {
-                Logger.Debug($"ParsePackageFile():Spdx file detected: {filePath}");
+                Logger.Debug($"ParseBomFile():Spdx file detected: {filePath}");
                 Bom bom;
                 bom = spdxBomParser.ParseSPDXBom(filePath);
                 return bom;
             }
             else
             {
-                Logger.Debug($"ParsePackageFile():CycloneDX file detected: {filePath}");
+                Logger.Debug($"ParseBomFile():CycloneDX file detected: {filePath}");
                 return cycloneDXBomParser.ParseCycloneDXBom(filePath);
             }
         }

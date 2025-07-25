@@ -4,6 +4,7 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using LCT.Common;
 using LCT.PackageIdentifier.Model.NugetModel;
 using log4net;
 using Microsoft.Build.Evaluation;
@@ -20,6 +21,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text.Json;
+using Directory = System.IO.Directory;
 
 namespace LCT.PackageIdentifier
 {
@@ -84,31 +86,31 @@ namespace LCT.PackageIdentifier
             }
             catch (InvalidProjectFileException ex)
             {
-                Logger.Debug($"IsTestProject(): Failed to read project file : " + projectPath, ex);
+                LogHandlingHelper.ExceptionErrorHandling("Evaluate Test Project", "IsTestProject()", ex, $"Failed to read project file: {projectPath}");
                 Logger.Warn($"Failed to read project file, evaluation fails for : " + projectPath);
                 return false;
             }
             catch (InvalidOperationException ex)
             {
-                Logger.Debug($"IsTestProject(): Failed to read project file : " + projectPath, ex);
+                LogHandlingHelper.ExceptionErrorHandling("Evaluate Test Project", "IsTestProject()", ex, $"Failed to read project file: {projectPath}");
                 Logger.Warn($"Failed to read project file, Maybe there is already an equivalent project loaded in the project collection " + projectPath);
                 return false;
             }
             catch (MissingFieldException ex)
             {
-                Logger.Debug($"IsTestProject(): Failed to read project file : " + projectPath, ex);
+                LogHandlingHelper.ExceptionErrorHandling("Evaluate Test Project", "IsTestProject()", ex, $"Failed to read project file: {projectPath}");
                 Logger.Warn($"Unable to read project file : " + projectPath);
                 return false;
             }
             catch (ArgumentException ex)
             {
-                Logger.Debug($"IsTestProject(): Failed to read project file : " + projectPath, ex);
+                LogHandlingHelper.ExceptionErrorHandling("Evaluate Test Project", "IsTestProject()", ex, $"Failed to read project file: {projectPath}");
                 Logger.Warn($"Unable to read project file : " + projectPath);
                 return false;
             }
             catch (IOException ex)
             {
-                Logger.Debug($"IsTestProject(): Failed to read project file : " + projectPath, ex);
+                LogHandlingHelper.ExceptionErrorHandling("Evaluate Test Project", "IsTestProject()", ex, $"Failed to read project file: {projectPath}");
                 Logger.Warn($"Unable to read project file : " + projectPath);
                 return false;
             }
@@ -173,7 +175,7 @@ namespace LCT.PackageIdentifier
             }
             catch (InvalidProjectFileException ex)
             {
-                Logger.Debug($"ParseJsonFile():InvalidProjectFileException : ", ex);
+                LogHandlingHelper.ExceptionErrorHandling("InvalidProjectFileException", "ParseJsonFile()", ex, $"File Path: {filePath}");
                 Logger.Warn($"InvalidProjectFileException : While parsing project asset file : " + filePath + " Error : " + ex.Message + "\n");
             }
         }
@@ -335,6 +337,7 @@ namespace LCT.PackageIdentifier
             int count = foundFiles.Count();
             if (count == 0)
             {
+                LogHandlingHelper.BasicErrorHandling("Calculate hash of package", "CalculateHashOfPackage()", $"Unable to find NuGet package {nuGetComponent.PackageUrl} in {packagePath}", "");
                 Logger.Error("Unable to find NuGet package " + nuGetComponent.PackageUrl + " in " + packagePath);
                 return;
             }

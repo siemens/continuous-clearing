@@ -40,6 +40,7 @@ namespace LCT.SW360PackageCreator
         }
         public static async Task TriggerFossologyValidation(CommonAppSettings appSettings, ISW360ApicommunicationFacade sW360ApicommunicationFacade, IEnvironmentHelper environmentHelper)
         {
+            Logger.Debug("TriggerFossologyValidation(): Starting trigger fossology validation process.");
             ISW360CommonService sw360CommonService = new SW360CommonService(sW360ApicommunicationFacade);
             ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sW360ApicommunicationFacade, sw360CommonService);            
 
@@ -49,18 +50,25 @@ namespace LCT.SW360PackageCreator
 
                 if (validRelease != null)
                 {
+                    Logger.Debug($"TriggerFossologyValidation(): Valid release found. Identified component Name-{validRelease.Name},Version-{validRelease.Version}.");
                     await TriggerFossologyProcessForRelease(validRelease, appSettings, sw360CreatorService);
                 }
                 else
                 {
-                    Logger.Debug($"TriggerFossologyValidation(): Fossology URL validation failed");
-                    Logger.Error("Fossology URL validation failed due to release not found from SW360");
+                    Logger.Debug($"TriggerFossologyValidation(): No valid release found. Fossology URL validation failed");
+                    Logger.Error("Fossology URL validation failed due to valid release not found from SW360");
                     environmentHelper.CallEnvironmentExit(-1);
                 }
+                Logger.Debug("TriggerFossologyValidation(): Completed trigger fossology validation process.");
             }
             catch (AggregateException ex)
             {
-                Logger.Debug($"\tError in TriggerFossologyValidation--{ex}");
+                LogHandlingHelper.ExceptionErrorHandling("Fossology Validation", $"MethodName:TriggerFossologyValidation()", ex, "");
+            }
+            catch (HttpRequestException ex)
+            {
+                Logger.Error($"TriggerFossologyValidation(): {ex.Message}");
+                LogHandlingHelper.ExceptionErrorHandling("Fossology Validation", "TriggerFossologyValidation()", ex, "Investigate the exception details to identify the root cause.");
             }
         }
 
@@ -138,35 +146,37 @@ namespace LCT.SW360PackageCreator
             try
             {
                 var responseData = await sW360ApicommunicationFacade.GetAllReleasesWithAllData(page, pageEntries);
+                await LogHandlingHelper.HttpResponseHandling("Get All Releases Details", $"MethodName:GetAllReleasesDetails()", responseData);
                 string response = responseData?.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
                 releaseResponse = JsonConvert.DeserializeObject<ReleasesAllDetails>(response);
             }
             catch (HttpRequestException ex)
             {
-                Logger.Debug($"GetAllReleasesDetails():", ex);
+                LogHandlingHelper.ExceptionErrorHandling("Get All Releases Details", $"MethodName:GetAllReleasesDetails()", ex, "Investigate the exception details to identify the root cause.");
             }
             catch (InvalidOperationException ex)
             {
-                Logger.Debug($"GetAllReleasesDetails():", ex);
+                LogHandlingHelper.ExceptionErrorHandling("Get All Releases Details", $"MethodName:GetAllReleasesDetails()", ex, "Investigate the exception details to identify the root cause.");
             }
             catch (UriFormatException ex)
             {
-                Logger.Debug($"GetAllReleasesDetails():", ex);
+                LogHandlingHelper.ExceptionErrorHandling("Get All Releases Details", $"MethodName:GetAllReleasesDetails()", ex, "Investigate the exception details to identify the root cause.");
             }
             catch (TaskCanceledException ex)
             {
-                Logger.Debug($"GetAllReleasesDetails():", ex);
+                LogHandlingHelper.ExceptionErrorHandling("Get All Releases Details", $"MethodName:GetAllReleasesDetails()", ex, "Investigate the exception details to identify the root cause.");
             }
 
             return releaseResponse;
         }
         public static async Task<bool> FossologyUrlValidation(CommonAppSettings appSettings, HttpClient client, IEnvironmentHelper environmentHelper)
         {
+            Logger.Debug("FossologyUrlValidation(): Starting Fossology URL validation process.");
             string url = appSettings.SW360.Fossology.URL;
             if (string.IsNullOrEmpty(url))
             {
-                Logger.Error($"Fossology URL is not provided, Please make sure to add Fossology URL in appsettings.");
-                Logger.Debug($"FossologyUrlValidation() : Fossology URL not provided in appsettings");
+                Logger.Error($"Fossology URL is not provided. Please make sure to add Fossology URL in appsettings.");
+                LogHandlingHelper.BasicErrorHandling("Fossology URL Validation", "FossologyUrlValidation", "Fossology URL is not provided. Please ensure the Fossology URL is configured in appsettings.", "Add a valid Fossology URL in the appsettings configuration.");
                 environmentHelper.CallEnvironmentExit(-1);
                 return false;
             }
@@ -181,41 +191,46 @@ namespace LCT.SW360PackageCreator
                     // Send GET request to validate Fossology URL
                     try
                     {
+                        await LogHandlingHelper.HttpRequestHandling("Fossology URL Validation", $"Methodname:FossologyUrlValidation()", client, url);
                         HttpResponseMessage response = await client.GetAsync(new Uri(appSettings.SW360.Fossology.URL));
+                        await LogHandlingHelper.HttpResponseHandling("Fossology URL Validation", $"Methodname:FossologyUrlValidation()", response);
                         if (response.IsSuccessStatusCode)
                         {
-                            // Fossology URL is valid                                   
+                            // Fossology URL is valid
+                            Logger.Debug($"FossologyUrlValidation(): Fossology URL validation successful.");
+                            Logger.Debug("FossologyUrlValidation(): Completed Fossology URL validation process.");
                             return true;
                         }
                         else
                         {
                             // Fossology URL is not valid                                   
-                            Logger.Error($"Fossology URL is not valid ,please make sure to add valid fossologyurl in appsettings..");
-                            Logger.Debug($"FossologyUrlValidation() : Fossology URL is not valid.");
+                            Logger.Error($"Fossology URL is not valid. Please make sure to add a valid Fossology URL in appsettings.");
+                            LogHandlingHelper.ExceptionErrorHandling("Fossology URL Validation", $"Methodname:FossologyUrlValidation()", new Exception($"Fossology URL not working. Received HTTP status code: {response.StatusCode}. URL: {url}"), $"Ensure the Fossology URL is accessible and returns a successful response. URL: {url}");
                             environmentHelper.CallEnvironmentExit(-1);
                         }
                     }
                     catch (HttpRequestException ex)
                     {
                         // Fossology URL is not valid                                   
-                        Logger.Error($"Fossology URL is not working ,please check once try again....");
-                        Logger.Debug($"FossologyUrlValidation() : Fossology URL is not valid.{ex}");
+                        Logger.Error($"Fossology URL is not working. Please check and try again.");
+                        LogHandlingHelper.ExceptionErrorHandling("Fossology URL Validation", $"Methodname:FossologyUrlValidation()", ex, "Check the network connection and ensure the Fossology server is reachable.");
                         environmentHelper.CallEnvironmentExit(-1);
                     }
                 }
                 else
                 {
-                    Logger.Debug($"FossologyUrlValidation() : Fossology URL is not valid");
-                    Logger.Error($"Fossology URL is not valid ,please check once try again....");
+                    Logger.Debug($"FossologyUrlValidation(): Fossology URL is not valid.");
+                    LogHandlingHelper.BasicErrorHandling("Fossology URL Validation", $"Methodname:FossologyUrlValidation()", $"Fossology URL does not match the expected production or staging URLs. URL: {url}", "Ensure the Fossology URL matches the configured production or staging URLs.");
                     environmentHelper.CallEnvironmentExit(-1);
                 }
             }
             else
             {
-                Logger.Error($"Fossology URL is not provided ,Please make sure to add fossologyurl in appsettings..");
-                Logger.Debug($"FossologyUrlValidation() : Fossologyurl not provided in appsettings");
+                Logger.Error($"Fossology URL is not valid. Please make sure to add a valid Fossology URL in appsettings.");
+                LogHandlingHelper.BasicErrorHandling("Fossology URL Validation", $"Methodname:FossologyUrlValidation()", "The provided Fossology URL is not a valid absolute URI.", "Check the Fossology URL format in the appsettings configuration.");
                 environmentHelper.CallEnvironmentExit(-1);
             }
+            Logger.Debug("FossologyUrlValidation(): Completed Fossology URL validation process with failure.");
             return false;
         }
 

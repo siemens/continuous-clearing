@@ -6,6 +6,7 @@
 
 using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
+using LCT.Common;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -41,6 +42,7 @@ namespace LCT.APICommunications
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
             string url = $"{DomainName}/api/security/apiKey";
+            await LogHandlingHelper.HttpRequestHandling("JFrog Connection validation", $"Methodname:CheckConnection()", httpClient, url);
             return await httpClient.GetAsync(url);
         }
 
@@ -63,6 +65,7 @@ namespace LCT.APICommunications
             string aqlQueryToBody = query.ToString();
             string uri = $"{DomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}";
             HttpContent httpContent = new StringContent(aqlQueryToBody);
+            await LogHandlingHelper.HttpRequestHandling("Get component data from jfrog repository", $"MethodName:GetInternalComponentDataByRepo()", httpClient, uri, httpContent);
             return await httpClient.PostAsync(uri, httpContent);
         }
         public async Task<HttpResponseMessage> GetNpmComponentDataByRepo(string repoName)
@@ -79,6 +82,7 @@ namespace LCT.APICommunications
             string aqlQueryToBody = query.ToString();
             string uri = $"{DomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}";
             HttpContent httpContent = new StringContent(aqlQueryToBody);
+            await LogHandlingHelper.HttpRequestHandling("Get Npm component data from jfrog repository", $"MethodName:GetNpmComponentDataByRepo()", httpClient, uri, httpContent);
             return await httpClient.PostAsync(uri, httpContent);
         }
         public async Task<HttpResponseMessage> GetPypiComponentDataByRepo(string repoName)
@@ -95,6 +99,7 @@ namespace LCT.APICommunications
             string aqlQueryToBody = query.ToString();
             string uri = $"{DomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}";
             HttpContent httpContent = new StringContent(aqlQueryToBody);
+            await LogHandlingHelper.HttpRequestHandling("Get poetry component data from jfrog repository", $"MethodName:GetPypiComponentDataByRepo()", httpClient, uri, httpContent);
             return await httpClient.PostAsync(uri, httpContent);
         }
 
@@ -213,7 +218,7 @@ namespace LCT.APICommunications
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
             TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
             httpClient.Timeout = timeOutInSec;
-
+            await LogHandlingHelper.HttpRequestHandling("Get package information from jfrog repository", $"MethodName:ExecuteSearchAqlAsync()", httpClient, uri, httpContent);
             return await httpClient.PostAsync(uri, httpContent);
         }
 

@@ -147,6 +147,7 @@ namespace LCT.PackageIdentifier
             // update the comparison bom data
             componentData.comparisonBOMData = processedComponents;
             componentData.internalComponents = internalComponents;
+            listOfInternalComponents = internalComponents;
             Logger.Debug($"IdentificationOfInternalComponents(): identified internal components:{internalComponents.Count}.");
             Logger.Debug($"IdentificationOfInternalComponents(): Completed identification of internal components.\n");
             return componentData;

@@ -22,6 +22,7 @@ namespace LCT.Common
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public Bom ParseCycloneDXBom(string filePath)
         {
+            Logger.Debug("ParseCycloneDXBom():Parsing CycloneDX Bom File started");
             Bom bom = new Bom();
             string json = string.Empty;
             try
@@ -43,16 +44,20 @@ namespace LCT.Common
             }
             catch (UnauthorizedAccessException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("Unauthorized access while reading the CycloneDX BOM file.", "ParseCycloneDXBom()", ex, $"File Path: {filePath}");
                 Logger.Error("Exception in reading cycloneDx bom", ex);
             }
             catch (FileNotFoundException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("File not found while reading the CycloneDX BOM file.", "ParseCycloneDXBom()", ex, $"File Path: {filePath}");
                 Logger.Error("Exception in reading cycloneDx bom", ex);
             }
             catch (JsonReaderException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("Error occurred while reading the CycloneDX BOM file.", "ParseCycloneDXBom()", ex, $"File Path: {filePath}");
                 Logger.Error("Exception in reading cycloneDx bom", ex);
             }
+            Logger.Debug("ParseCycloneDXBom():Parseing CycloneDX Bom File completed\n");
             return bom;
         }
 

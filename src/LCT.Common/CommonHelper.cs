@@ -108,7 +108,8 @@ namespace LCT.Common
         {
             if (string.IsNullOrWhiteSpace(value))
             {
-                throw new ArgumentException($"Invalid value for {name} - {value}");
+                Logger.Error($"The provided value for '{name}' is null, empty, or whitespace. Value: '{value}'");
+                LogHandlingHelper.ExceptionErrorHandling("CheckNullOrEmpty()", $"Validation failed for parameter: {name}", new ArgumentException($"Invalid value for {name} - {value}"), $"The provided value for '{name}' is null, empty, or whitespace.");
             }
         }
 

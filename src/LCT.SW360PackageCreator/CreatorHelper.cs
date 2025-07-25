@@ -69,6 +69,7 @@ namespace LCT.SW360PackageCreator
         {
             Dictionary<string, string> AttachmentUrlList = new Dictionary<string, string>();
             string localPathforDownload = GetDownloadPathForComponetType(component);
+            Logger.Debug($"DownloadReleaseAttachmentSource():local path for download release attachment:{localPathforDownload}");
             if (!component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["MAVEN"]))
             {
                 ServicePointManager.Expect100Continue = true;
@@ -93,6 +94,18 @@ namespace LCT.SW360PackageCreator
                 await DownloadDependencyList(component);
                 GetAttachmentUrlListForMvn(localPathforDownload, component, ref AttachmentUrlList);
 
+            }
+            if (AttachmentUrlList.Count > 0)
+            {
+                Logger.Debug($"Attachments found for ComponentName: {component.Name}, Version: {component.Version}");
+                foreach (var attachment in AttachmentUrlList)
+                {
+                    Logger.Debug($"DownloadReleaseAttachmentSource(): Attachment Key: {attachment.Key}, Attachment URL: {attachment.Value}");
+                }
+            }
+            else
+            {
+                Logger.Debug($"DownloadReleaseAttachmentSource(): No attachments found for ComponentName: {component.Name}, Version: {component.Version}");
             }
             return AttachmentUrlList;
         }
@@ -130,7 +143,7 @@ namespace LCT.SW360PackageCreator
             {
                 AttachmentUrlList.Add(SOURCE, downloadPath);
             }
-
+            Logger.Debug($"GetAttachmentUrlList():Downloaded release attachment path:Name-{component.Name},Version-{component.Version},DownloadPath-{downloadPath}");
             return downloadPath;
         }
 
@@ -144,22 +157,23 @@ namespace LCT.SW360PackageCreator
             p.StartInfo.RedirectStandardInput = true;
             p.StartInfo.UseShellExecute = false;
             p.StartInfo.CreateNoWindow = true;
-
+            Logger.Debug($"DownloadDependencyList(): Start - ComponentName: {component.Name}, Version: {component.Version}, Group: {component.Group}");
             if (isWindows)
             {
                 p.StartInfo.FileName = Path.Combine(@"cmd.exe");
                 p.StartInfo.Arguments = $"/c mvn org.apache.maven.plugins:maven-dependency-plugin:copy -Dartifact={component.Group}:{component.Name}:{component.Version}:jar:sources -DoutputDirectory={localPathforDownload}";
-
+                Logger.Debug($"DownloadDependencyList(): Windows OS detected. Command: {p.StartInfo.Arguments}");
             }
             else
             {
                 p.StartInfo.FileName = Path.Combine(@"mvn");
                 p.StartInfo.Arguments = $"org.apache.maven.plugins:maven-dependency-plugin:copy -Dartifact={component.Group}:{component.Name}:{component.Version}:jar:sources -DoutputDirectory={localPathforDownload}";
-
+                Logger.Debug($"DownloadDependencyList(): Non-Windows OS detected. Command: {p.StartInfo.Arguments}");
             }
 
             var processResult = ProcessAsyncHelper.RunAsync(p.StartInfo);
             await processResult;
+            Logger.Debug($"DownloadDependencyList(): Dependency downloaded successfully for ComponentName: {component.Name}, Version: {component.Version}");
         }
 
         public static void GetAttachmentUrlListForMvn(string localPathforDownload, ComparisonBomData component,
@@ -191,11 +205,11 @@ namespace LCT.SW360PackageCreator
             }
             catch (WebException ex)
             {
-                Logger.Debug($"GetAttachmentUrlListForPython :WebException :Release Name : {component.Name}@{component.Version}-PackageUrl: ,Error {ex}");
+                LogHandlingHelper.ExceptionErrorHandling("GetAttachmentUrlList", $"MethodName:GetAttachmentUrlList(), Release Name: {component.Name}@{component.Version}, SourceUrl: {component.SourceUrl}", ex, "A network error occurred while trying to download the attachment.");
             }
             catch (UriFormatException ex)
             {
-                Logger.Debug($"GetAttachmentUrlListForPython:Release Name : {component.Name}@{component.Version}: Error {ex}");
+                LogHandlingHelper.ExceptionErrorHandling("GetAttachmentUrlList", $"MethodName:GetAttachmentUrlList(), Release Name: {component.Name}@{component.Version}, SourceUrl: {component.SourceUrl}", ex, "The provided URL is not in a valid format.");
             }
 
             return downloadPath;
@@ -204,14 +218,15 @@ namespace LCT.SW360PackageCreator
 
         public async Task<List<ComparisonBomData>> SetContentsForComparisonBOM(List<Components> lstComponentForBOM, ISW360Service sw360Service)
         {
-            Logger.Debug($"SetContentsForComparisonBOM():Start");
+            Logger.Debug($"SetContentsForComparisonBOM():Starting to identify available components data in SW360");
             Logger.Logger.Log(null, Level.Notice, $"Collecting comparison BOM Data...", null);
             componentsAvailableInSw360 = await sw360Service.GetAvailableReleasesInSw360(lstComponentForBOM);
 
             //Checking components count before getting status of individual comp details
             List<ComparisonBomData> comparisonBomData = await GetComparisionBomItems(lstComponentForBOM, sw360Service);
 
-            Logger.Debug($"SetContentsForComparisonBOM():End");
+            LogHandlingHelper.SW360AvailableComponentsList(componentsAvailableInSw360);
+            Logger.Debug($"SetContentsForComparisonBOM():Completed of the sw360 data for available components");
             return comparisonBomData;
         }
 
@@ -342,7 +357,7 @@ namespace LCT.SW360PackageCreator
                 }
                 catch (JsonSerializationException ex)
                 {
-                    Logger.Debug($"GetUpdatedComponentsDetails() For Component = {comBom.Name} : {ex}");
+                    LogHandlingHelper.ExceptionErrorHandling("GetUpdatedComponentsDetails", $"MethodName:GetUpdatedComponentsDetails(), ComponentName:{comBom.Name}, Version:{comBom.Version}", ex, "An error occurred while serializing or deserializing JSON data for the component.");
                 }
             }
             return bom;
@@ -368,10 +383,12 @@ namespace LCT.SW360PackageCreator
             }
             catch (IOException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("GetDownloadPathForComponetType", $"MethodName:GetDownloadPathForComponetType(), ComponentName:{component.Name}, ReleaseExternalId:{component.ReleaseExternalId}", ex, "An I/O error occurred while determining the download path for the component.");
                 Logger.Error($"GetDownloadPathForComponetType() ", ex);
             }
             catch (UnauthorizedAccessException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("GetDownloadPathForComponetType", $"MethodName:GetDownloadPathForComponetType(), ComponentName:{component.Name}, ReleaseExternalId:{component.ReleaseExternalId}", ex, "Unauthorized access occurred while determining the download path for the component.");
                 Logger.Error($"GetDownloadPathForComponetType() ", ex);
             }
 

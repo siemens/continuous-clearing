@@ -25,7 +25,7 @@ namespace LCT.Common
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public  Bom ParseSPDXBom(string filePath)
         {
-            Logger.Debug($"Starting SPDX BOM parsing for file: {filePath}");
+            Logger.Debug($"ParseSPDXBom():Starting SPDX BOM parsing for file: {filePath}");
             Bom bom = new Bom();
             bom.Components = new List<Component>();
             bom.Dependencies = new List<Dependency>();
@@ -53,14 +53,17 @@ namespace LCT.Common
             }           
             catch (UnauthorizedAccessException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("Unauthorized access while reading the Spdx BOM file.", "ParseSPDXBom()", ex, $"File Path: {filePath}");
                 Logger.Error("Unauthorized access exception in reading SPDX BOM", ex);
             }
             catch (FileNotFoundException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("File not found while reading the Spdx BOM file.", "ParseSPDXBom()", ex, $"File Path: {filePath}");
                 Logger.Error("File not found exception in reading SPDX BOM", ex);
             }
             catch (JsonReaderException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("Error occurred while reading the Spdx BOM file.", "ParseSPDXBom()", ex, $"File Path: {filePath}");
                 Logger.Error("JSON reader exception in reading SPDX BOM", ex);
             }
             Logger.Debug($"SPDX BOM parsing completed. Final BOM contains {bom.Components?.Count ?? 0} components and {bom.Dependencies?.Count ?? 0} dependencies");

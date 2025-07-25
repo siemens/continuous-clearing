@@ -10,6 +10,7 @@ using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
+using LCT.Common.Model;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
@@ -33,9 +34,10 @@ namespace LCT.PackageIdentifier
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
-
+        private List<Component> listOfInternalComponents = new List<Component>();
         public Bom ParsePackageFile(CommonAppSettings appSettings)
         {
+            Logger.Debug("ParsePackageFile():Starting to parse package files for BOM.");
             List<string> configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Poetry);
             List<PythonPackage> listofComponents = new List<PythonPackage>();
             Bom bom = new Bom();
@@ -46,16 +48,20 @@ namespace LCT.PackageIdentifier
             {
                 if (config.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
+                    Logger.Debug($"ParsePackageFile():Template BOM file detected: {config}");
                     listOfTemplateBomfilePaths.Add(config);
                 }
                 if (config.ToLower().EndsWith("poetry.lock"))
                 {
+                    Logger.Debug($"ParsePackageFile():Poetry lock file detected: {config}");
                     listofComponents.AddRange(ExtractDetailsForPoetryLockfile(config, dependencies));
+                    IdentifiedPythonPackages(config, listofComponents);
                 }
                 else if ((config.EndsWith(FileConstant.CycloneDXFileExtension) || config.EndsWith(FileConstant.SPDXFileExtension))
          && !config.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
-                    listofComponents.AddRange(ExtractDetailsFromJson(config, appSettings, ref dependencies));
+                    listofComponents.AddRange(ExtractDetailsFromJson(config, appSettings, ref dependencies));                    
+                    IdentifiedPythonPackages(config, listofComponents);
                 }
             }
 
@@ -189,10 +195,12 @@ namespace LCT.PackageIdentifier
             List<PythonPackage> PythonPackages = new List<PythonPackage>();
             if (filePath.EndsWith(FileConstant.SPDXFileExtension))
             {
+                Logger.Debug($"ExtractDetailsFromJson():Spdx file detected: {filePath}");
                 bom = _spdxBomParser.ParseSPDXBom(filePath);
             }
             else
             {
+                Logger.Debug($"ExtractDetailsFromJson():CycloneDx file detected: {filePath}");
                 bom = _cycloneDXBomParser.ParseCycloneDXBom(filePath);
             }
             CycloneDXBomParser.CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
@@ -460,6 +468,35 @@ namespace LCT.PackageIdentifier
             }
 
             return repoName;
+        }
+        private static void IdentifiedPythonPackages(string filepath, List<PythonPackage> packages)
+        {
+
+            if (packages == null || packages.Count == 0)
+            {
+                // Log a message indicating no packages were found
+                Logger.Debug($"No Python packages were found in the file: {filepath}");
+                return;
+            }
+
+            // Build the table
+            var logBuilder = new System.Text.StringBuilder();
+            logBuilder.AppendLine(LogHandlingHelper.LogSeparator);
+            logBuilder.AppendLine($" PYTHON PACKAGES FOUND IN FILE: {filepath}");
+            logBuilder.AppendLine(LogHandlingHelper.LogSeparator);
+            logBuilder.AppendLine($"| {"Name",-40} | {"Version",-20} | {"PURL",-60} | {"DevDependent",-15} |");
+            logBuilder.AppendLine(LogHandlingHelper.LogHeaderSeparator);
+
+            foreach (var package in packages)
+            {
+                string devDependent = package.Isdevdependent ? "true" : "false";
+                logBuilder.AppendLine($"| {package.Name,-40} | {package.Version,-20} | {package.PurlID,-60} | {devDependent,-15} |");
+            }
+
+            logBuilder.AppendLine(LogHandlingHelper.LogSeparator);
+
+            // Log the table
+            Logger.Debug(logBuilder.ToString());
         }
 
         private static string GetJfrogRepoPath(AqlResult aqlResult)

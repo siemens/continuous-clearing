@@ -34,6 +34,7 @@ namespace LCT.ArtifactoryUploader
 
         public static async Task UploadPackageToArtifactory(CommonAppSettings appSettings)
         {
+            Logger.Debug($"UploadPackageToArtifactory():Upload package to artifactory process has started");
             //Reading the CycloneBOM data
             var bomFilePath = Path.Combine(appSettings.Directory.OutputFolder, appSettings.SW360.ProjectName + "_" + FileConstant.BomFileName);
             Bom m_ComponentsInBOM = PackageUploadHelper.GetComponentListFromComparisonBOM(bomFilePath, environmentHelper);
@@ -76,7 +77,7 @@ namespace LCT.ArtifactoryUploader
                 TimeSpan.FromMilliseconds(Program.UploaderStopWatch.ElapsedMilliseconds).TotalSeconds;
             PackageUploadHelper.WriteCreatorKpiDataToConsole(uploaderKpiData);
 
-            Logger.Debug($"UploadPackageToArtifactory():End");
+            Logger.Debug($"UploadPackageToArtifactory():Upload package to artifactory process has completed");
 
             // set the error code
             if (uploaderKpiData.PackagesNotUploadedDueToError > 0 || uploaderKpiData.PackagesNotExistingInRemoteCache > 0)
@@ -94,7 +95,7 @@ namespace LCT.ArtifactoryUploader
                 .Select(item => item.Properties.First(x => x.Name == Dataconstant.Cdx_ProjectType).Value)
                 .Distinct()
                 .ToList();
-
+            Logger.Debug($"Project Types found in BOM: {string.Join(", ", projectTypes)}");
             foreach (var projectType in projectTypes)
             {
                 Logger.Info($"{projectType}:\n\t");
@@ -125,6 +126,7 @@ namespace LCT.ArtifactoryUploader
         {
             if (project == null)
             {
+                Logger.Debug("DisplayPackageSettings(): Configuration for the project is null. Please ensure the project settings are properly configured in the appsettings.");
                 Logger.Warn("DisplayPackageSettings(): Config is null.");
                 return;
             }
@@ -133,22 +135,22 @@ namespace LCT.ArtifactoryUploader
             string includeList = !string.IsNullOrEmpty(project.Include?.FirstOrDefault())
                 ? string.Join(", ", project.Include)
                 : Dataconstant.NotConfigured;
-
+            Logger.Debug($"DisplayPackageSettings(): Include files list from appsettings:{includeList}");
             string excludeList = !string.IsNullOrEmpty(project.Exclude?.FirstOrDefault())
                 ? string.Join(", ", project.Exclude)
                 : Dataconstant.NotConfigured;
-
+            Logger.Debug($"DisplayPackageSettings(): Exclude files list from appsettings:{excludeList}");
             string devDepRepoName = !string.IsNullOrEmpty(project.DevDepRepo)
                 ? project.DevDepRepo
                 : Dataconstant.NotConfigured;
-
+            Logger.Debug($"DisplayPackageSettings(): Dev Dependency Repository Name from appsettings:{devDepRepoName}");
             string releaseRepoName = !string.IsNullOrEmpty(project.ReleaseRepo)
                 ? project.ReleaseRepo
                 : Dataconstant.NotConfigured;
-
+            Logger.Debug($"DisplayPackageSettings(): Release Repository Name from appsettings:{releaseRepoName}");
             string thirdPartyRepoName = project.Artifactory?.ThirdPartyRepos?
                 .FirstOrDefault(repo => repo.Upload)?.Name ?? Dataconstant.NotConfigured;
-
+            Logger.Debug($"Third Party Repository Name from appsettings: {thirdPartyRepoName}");
             // Log the settings for the project
             Logger.Logger.Log(null, Level.Notice,
                 $"\tDEVDEP_REPO_NAME:\t{devDepRepoName}\n" +
