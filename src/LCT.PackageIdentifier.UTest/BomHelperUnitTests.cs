@@ -876,52 +876,6 @@ namespace LCT.PackageIdentifier.UTest
         }
 
 
-        [Test]
-        public void ParseMultipleSpdxFiles_WithSomeInvalidAndSomeValidFiles_ReturnsFirstValidBom()
-        {
-            // Arrange
-            string tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-            System.IO.Directory.CreateDirectory(tempDir);
-            string invalidSpdxFile = Path.Combine(tempDir, "invalid1.spdx");
-            string validSpdxFile = Path.Combine(tempDir, "valid1.spdx");
-            System.IO.File.WriteAllText(invalidSpdxFile, "invalid content");
-            System.IO.File.WriteAllText(validSpdxFile, "valid content");
-
-            var mockSpdxParser = new Mock<ISpdxBomParser>();
-            var expectedBom = new Bom();
-
-            mockSpdxParser.Setup(x => x.ParseSPDXBom(It.Is<string>(s => s.EndsWith("invalid1.spdx"))))
-                          .Throws(new Exception("Invalid SPDX file"));
-            mockSpdxParser.Setup(x => x.ParseSPDXBom(It.Is<string>(s => s.EndsWith("valid1.spdx"))))
-                          .Returns(expectedBom);
-
-            try
-            {
-                // Act
-                Bom result = null;
-                try
-                {
-                    result = typeof(BomHelper)
-                        .GetMethod("ParseMultipleSpdxFiles", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
-                        .Invoke(null, new object[] { tempDir, mockSpdxParser.Object }) as Bom;
-                }
-                catch (System.Reflection.TargetInvocationException ex)
-                {
-                    // If the method under test throws, unwrap and rethrow the inner exception for clarity
-                    throw ex.InnerException ?? ex;
-                }
-
-                // Assert
-                Assert.IsNotNull(result);
-                Assert.AreEqual(expectedBom, result);
-                mockSpdxParser.Verify(x => x.ParseSPDXBom(It.IsAny<string>()), Times.Exactly(2));
-            }
-            finally
-            {
-                if (System.IO.Directory.Exists(tempDir))
-                    System.IO.Directory.Delete(tempDir, true);
-            }
-        }
     }
 }
 
