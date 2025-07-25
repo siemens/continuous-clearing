@@ -50,7 +50,7 @@ namespace LCT.PackageIdentifier
                 if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     Logger.Debug($"ParsePackageFile():FileName: " + filepath);
-                    var list = ParseCycloneDX(filepath, ref bom);
+                    var list = ParseCycloneDX(filepath, ref bom,appSettings);
                     listofComponents.AddRange(list);
                 }
             }
@@ -182,10 +182,10 @@ namespace LCT.PackageIdentifier
                 BomCreator.bomKpiData.UnofficialComponents++;
             }
         }
-        public List<DebianPackage> ParseCycloneDX(string filePath, ref Bom bom)
+       public List<DebianPackage> ParseCycloneDX(string filePath, ref Bom bom,CommonAppSettings appSettings)
         {
             List<DebianPackage> debianPackages = new List<DebianPackage>();
-            bom = ExtractDetailsForJson(filePath, ref debianPackages);
+            bom = ExtractDetailsForJson(filePath, ref debianPackages,appSettings);
             return debianPackages;
         }
         public static string GetArtifactoryRepoName(List<AqlResult> aqlResultList,
@@ -278,9 +278,9 @@ namespace LCT.PackageIdentifier
             return false;
         }
 
-        private Bom ExtractDetailsForJson(string filePath, ref List<DebianPackage> debianPackages)
+        private Bom ExtractDetailsForJson(string filePath, ref List<DebianPackage> debianPackages,CommonAppSettings appSettings)
         {
-            Bom bom = BomHelper.ParseBomFile(filePath, _spdxBomParser, _cycloneDXBomParser);
+            Bom bom = BomHelper.ParseBomFile(filePath, _spdxBomParser, _cycloneDXBomParser, appSettings);
 
             foreach (var componentsInfo in bom.Components)
             {

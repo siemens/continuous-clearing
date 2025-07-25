@@ -1355,7 +1355,7 @@ namespace LCT.PackageIdentifier.UTest
             var filepath = "test.spdx.sbom.json";
             var appSettings = new CommonAppSettings { ProjectType = "NUGET" };
             var listComponentForBOM = new List<Component>();
-            var bom = new Bom { Components=new List<Component>(),Dependencies = new List<Dependency>() };
+            var bom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
             var listOfTemplateBomfilePaths = new List<string>();
 
             var mockSpdxBomParser = new Mock<ISpdxBomParser>();
@@ -1363,11 +1363,15 @@ namespace LCT.PackageIdentifier.UTest
             {
                 Components = new List<Component>(),
                 Dependencies = new List<Dependency>
-        {
-            new Dependency { Ref = "spdx-dependency" }
-        }
+                {
+                    new Dependency { Ref = "spdx-dependency" }
+                }
             };
             mockSpdxBomParser.Setup(x => x.ParseSPDXBom(filepath)).Returns(testBom);
+
+            // Use a valid temporary directory to avoid DirectoryNotFoundException
+            string tempDir = Path.GetTempPath();
+            appSettings.Directory = new LCT.Common.Directory { InputFolder = tempDir };
 
             var nugetProcessor = new NugetProcessor(_cycloneDXBomParser, _frameworkPackages.Object, _compositionBuilder.Object, mockSpdxBomParser.Object);
 
