@@ -165,9 +165,11 @@ namespace LCT.PackageIdentifier.UTest
             // Arrange
             var nonExistentPath = Path.Combine(_tempDirectory, "nonexistent.txt");
 
-            // Act & Assert
-            Assert.Throws<FileNotFoundException>(() => 
-                PemSignatureVerifier.ValidatePem(nonExistentPath, _testSignaturePath, _testCertificatePath));
+            // Act
+            var result = PemSignatureVerifier.ValidatePem(nonExistentPath, _testSignaturePath, _testCertificatePath);
+
+            // Assert
+            Assert.IsFalse(result, "Non-existent document should return false");
         }
 
         [Test]
@@ -176,9 +178,11 @@ namespace LCT.PackageIdentifier.UTest
             // Arrange
             var nonExistentPath = Path.Combine(_tempDirectory, "nonexistent.sig");
 
-            // Act & Assert
-            Assert.Throws<FileNotFoundException>(() => 
-                PemSignatureVerifier.ValidatePem(_testDocumentPath, nonExistentPath, _testCertificatePath));
+            // Act
+            var result = PemSignatureVerifier.ValidatePem(_testDocumentPath, nonExistentPath, _testCertificatePath);
+
+            // Assert
+            Assert.IsFalse(result, "Non-existent signature should return false");
         }
 
         [Test]
@@ -187,9 +191,11 @@ namespace LCT.PackageIdentifier.UTest
             // Arrange
             var nonExistentPath = Path.Combine(_tempDirectory, "nonexistent.pem");
 
-            // Act & Assert
-            Assert.Throws<FileNotFoundException>(() => 
-                PemSignatureVerifier.ValidatePem(_testDocumentPath, _testSignaturePath, nonExistentPath));
+            // Act
+            var result = PemSignatureVerifier.ValidatePem(_testDocumentPath, _testSignaturePath, nonExistentPath);
+
+            // Assert
+            Assert.IsFalse(result, "Non-existent PEM file should return false");
         }
 
         [Test]

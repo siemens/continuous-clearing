@@ -315,7 +315,7 @@ namespace LCT.PackageIdentifier
                         return currentBom;
                     }
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (!(ex is OutOfMemoryException))
                 {
                     Logger.ErrorFormat("Failed to parse SPDX file '{0}': {1}. Continuing with next file.", spdxFile, ex.Message);
                     Logger.Debug("Exception details:", ex);
