@@ -39,6 +39,7 @@ namespace LCT.PackageIdentifier
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
         private static readonly char[] SplitChars = { '/', '@' };
+        private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
         private List<Component> listOfInternalComponents = new List<Component>();
 
         #endregion
@@ -46,12 +47,12 @@ namespace LCT.PackageIdentifier
         #endregion
 
         #region public methods
-        public Bom ParsePackageFile(CommonAppSettings appSettings)
+        public Bom ParsePackageFile(CommonAppSettings appSettings,ref Bom unSupportedBomList)
         {
             Logger.Debug($"ParsePackageFile():Started Parseing input File for conan components.");
             List<Component> componentsForBOM;
             Bom bom = new Bom();
-
+            int totalUnsupportedComponentsIdentified = 0;
             ParsingInputFileForBOM(appSettings, ref bom);
             componentsForBOM = bom.Components;
 
@@ -68,6 +69,13 @@ namespace LCT.PackageIdentifier
 
             bom.Components = componentsForBOM;
             bom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(bom.Components, bom.Dependencies);
+            totalUnsupportedComponentsIdentified = ListUnsupportedComponentsForBom.Components.Count;
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += ListUnsupportedComponentsForBom.Components.Count;
+            ListUnsupportedComponentsForBom.Components = ListUnsupportedComponentsForBom.Components.Distinct(new ComponentEqualityComparer()).ToList();
+            BomCreator.bomKpiData.DuplicateComponents += totalUnsupportedComponentsIdentified - ListUnsupportedComponentsForBom.Components.Count;
+            ListUnsupportedComponentsForBom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(ListUnsupportedComponentsForBom.Components, ListUnsupportedComponentsForBom.Dependencies);
+            unSupportedBomList.Components = ListUnsupportedComponentsForBom.Components;
+            unSupportedBomList.Dependencies = ListUnsupportedComponentsForBom.Dependencies;            
             Logger.Debug($"ParsePackageFile():Completed Parseing input File for conan components.\n");
             return bom;
         }
@@ -261,12 +269,15 @@ namespace LCT.PackageIdentifier
                 else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
                 {
                     Logger.Debug($"ParsingInputFileForBOM():Spdx file detected: {filepath}");
+                    Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
                     bom = _spdxBomParser.ParseSPDXBom(filepath);
-                    CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
-                    GetDetailsforManuallyAddedComp(bom.Components);
-                    CommonHelper.AddSpdxSBomFileNameProperty(ref bom, filepath);
+                    SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bom, appSettings.ProjectType,ref listUnsupportedComponents);
+                    SpdxSbomHelper.AddSpdxSBomFileNameProperty(ref bom, filepath);
                     componentsForBOM.AddRange(bom.Components);
                     dependencies.AddRange(bom.Dependencies);
+                    SpdxSbomHelper.AddSpdxPropertysForUnsupportedComponents(listUnsupportedComponents.Components,filepath);
+                    ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
+                    ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
                     LogHandlingHelper.IdentifierInputFileComponents(filepath, bom.Components);
                 }
                 else if (filepath.EndsWith(FileConstant.CycloneDXFileExtension)
@@ -570,7 +581,7 @@ namespace LCT.PackageIdentifier
                 component.Properties.Add(isDev);
                 component.Properties.Add(identifierType);
             }
-        }
+        }             
 
         #endregion
     }

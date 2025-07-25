@@ -22,8 +22,10 @@ using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
+using Dependency = CycloneDX.Models.Dependency;
 using Directory = System.IO.Directory;
 using Level = log4net.Core.Level;
+using Metadata = CycloneDX.Models.Metadata;
 
 
 namespace LCT.PackageIdentifier
@@ -35,7 +37,7 @@ namespace LCT.PackageIdentifier
     public class BomCreator : IBomCreator
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        public static readonly BomKpiData bomKpiData = new();
+        public readonly static BomKpiData bomKpiData = new();
         ComponentIdentification componentData;
         private readonly ICycloneDXBomParser CycloneDXBomParser;
         private readonly ISpdxBomParser SpdxBomParser;
@@ -194,10 +196,11 @@ namespace LCT.PackageIdentifier
             List<Component> components;
             Metadata metadata;
             Bom bom = new Bom();
+            Bom unSupportedBomList = new Bom { Components = new List<Component>(),Dependencies = new List<Dependency>() };
             try
             {
                 //Parsing the input file
-                bom = parser.ParsePackageFile(appSettings);
+                bom = parser.ParsePackageFile(appSettings,ref unSupportedBomList);
                 metadata = bom.Metadata;
                 componentData = new ComponentIdentification()
                 {
@@ -225,6 +228,7 @@ namespace LCT.PackageIdentifier
                         {
                             component.Properties.Add(projectType);
                         }
+
                     }
                 }
                 bom.Metadata = metadata;
@@ -233,10 +237,12 @@ namespace LCT.PackageIdentifier
             {
                 LogHandlingHelper.ExceptionErrorHandling("An error occurred during component identification.", "ComponentIdentification()", ex);
             }
+            bomKpiData.UnsupportedComponentsFromSpdxFile = unSupportedBomList.Components.Count;
+            bom.Components.AddRange(unSupportedBomList.Components);
+            bom.Dependencies.AddRange(unSupportedBomList.Dependencies);
             Logger.Debug("ComponentIdentification():Component identification process for BOM file has completed.");
             return bom;
-        }
-
+        }       
         public async Task<bool> CheckJFrogConnection(CommonAppSettings appSettings)
         {
             Logger.Debug("CheckJFrogConnection():Validating JFrog Connection has started");
@@ -273,6 +279,6 @@ namespace LCT.PackageIdentifier
             Logger.Debug("CheckJFrogConnection():Validating JFrog Connection has completed\n");
             return true;
 
-        }
+        }        
     }
 }

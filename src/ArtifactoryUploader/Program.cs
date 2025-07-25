@@ -24,6 +24,7 @@ using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -65,7 +66,7 @@ namespace ArtifactoryUploader
             else
                 Logger.Logger.Log(null, Level.Alert, $"Artifactory Uploader is running in dry-run mode, no packages will be moved \n", null);
 
-            var bomFilePath = Path.Combine(appSettings.Directory.OutputFolder, appSettings.SW360.ProjectName + "_" + FileConstant.BomFileName);
+            string bomFilePath = GetBomFilePath(appSettings);
 
             Logger.Logger.Log(null, Level.Info, $"Input Parameters used in Artifactory Uploader:\n\t", null);
             Logger.Logger.Log(null, Level.Notice, $"\tBomFilePath:\t\t {bomFilePath}\n\t" +
@@ -114,7 +115,7 @@ namespace ArtifactoryUploader
             catoolInfo.CatoolVersion = $"{versionFromProj.Major}.{versionFromProj.Minor}.{versionFromProj.Build}";
             catoolInfo.CatoolRunningLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
             return catoolInfo;
-        }        
+        }
 
         private static IJFrogService GetJfrogService(CommonAppSettings appSettings)
         {
@@ -128,6 +129,24 @@ namespace ArtifactoryUploader
                 new JfrogAqlApiCommunicationFacade(jfrogAqlApiCommunication);
             IJFrogService jFrogService = new JFrogService(jFrogApiCommunicationFacade);
             return jFrogService;
+        }
+
+        private static string GetBomFilePath(CommonAppSettings appSettings)
+        {
+            if (!string.IsNullOrWhiteSpace(appSettings.SW360.ProjectName))
+            {
+                return Path.Combine(appSettings.Directory.OutputFolder, appSettings.SW360.ProjectName + "_" + FileConstant.BomFileName);
+            }
+            else
+            {
+                // If project name is not provided, look for the latest BOM file in the output folder that does not contain the backup key
+                var bomFiles = System.IO.Directory.GetFiles(
+                    appSettings.Directory.OutputFolder,
+                    $"*{FileConstant.BomFileName}*",
+                    SearchOption.TopDirectoryOnly);
+                return bomFiles
+                    .FirstOrDefault(f => !Path.GetFileName(f).Contains(FileConstant.backUpKey));
+            }
         }
     }
 }

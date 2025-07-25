@@ -27,8 +27,9 @@ namespace LCT.PackageIdentifier
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
+        private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
         private List<Component> listOfInternalComponents = new List<Component>();
-        public Bom ParsePackageFile(CommonAppSettings appSettings)
+        public Bom ParsePackageFile(CommonAppSettings appSettings,ref Bom unSupportedBomList)
         {
             Logger.Debug("ParsePackageFile():Starting to parse the package file for Maven components.");
             List<Component> componentsForBOM = new();
@@ -76,7 +77,15 @@ namespace LCT.PackageIdentifier
             {
                 AddSiemensDirectProperty(ref bom);
             }
+            int totalUnsupportedComponents = ListUnsupportedComponentsForBom.Components.Count;
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += ListUnsupportedComponentsForBom.Components.Count;
+            ListUnsupportedComponentsForBom.Components = ListUnsupportedComponentsForBom.Components.Distinct(new ComponentEqualityComparer()).ToList();
+            BomCreator.bomKpiData.DuplicateComponents += totalUnsupportedComponents - ListUnsupportedComponentsForBom.Components.Count;
+            AddSiemensDirectProperty(ref ListUnsupportedComponentsForBom);            
             bom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(bom.Components, bom.Dependencies);
+            ListUnsupportedComponentsForBom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(ListUnsupportedComponentsForBom.Components, ListUnsupportedComponentsForBom.Dependencies);
+            unSupportedBomList.Components = ListUnsupportedComponentsForBom.Components;
+            unSupportedBomList.Dependencies = ListUnsupportedComponentsForBom.Dependencies;
             RemoveTypeJarSuffix(bom);
             Logger.Debug($"ParsePackageFile():Completed parsing the package file.\n");
             return bom;
@@ -149,23 +158,27 @@ namespace LCT.PackageIdentifier
                     Bom bomList;
                     if (filepath.EndsWith(FileConstant.SPDXFileExtension))
                     {
+                        Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
                         bomList = _spdxBomParser.ParseSPDXBom(filepath);
-                        CommonHelper.AddSpdxSBomFileNameProperty(ref bomList, filepath);
+                        SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bomList, appSettings.ProjectType, ref listUnsupportedComponents);
+                        SpdxSbomHelper.AddSpdxSBomFileNameProperty(ref bomList, filepath);
+                        SpdxSbomHelper.AddSpdxPropertysForUnsupportedComponents(listUnsupportedComponents.Components, filepath);
+                        ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
+                        ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
                     }
                     else
                     {
                         bomList = ParseCycloneDXBom(filepath);
-                    }
-
-                    if (bomList?.Components != null)
-                    {
-                        CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
-                    }
-                    else
-                    {
-                        Logger.Warn("No components found in the BOM file : " + filepath);
-                        continue;
-                    }
+                        if (bomList?.Components != null)
+                        {
+                            CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
+                        }
+                        else
+                        {
+                            Logger.Warn("No components found in the BOM file : " + filepath);
+                            continue;
+                        }
+                    }                  
 
                     AddComponentsToBom(bomList, componentsForBOM, componentsToBOM, dependenciesForBOM);
                     IdentifiedMavenComponents(filepath, bomList.Components, bomList.Dependencies);
@@ -269,6 +282,7 @@ namespace LCT.PackageIdentifier
         {
             Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.Discovered };
             Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = devValue };
+            Property spdxIdentifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.SpdxImport };
 
             if (CommonHelper.ComponentPropertyCheck(component, Dataconstant.Cdx_IdentifierType))
             {
@@ -287,7 +301,7 @@ namespace LCT.PackageIdentifier
                 if (CommonHelper.ComponentPropertyCheck(component, Dataconstant.Cdx_SpdxFileName))
                 {
                     component.Properties.Add(isDev);
-                    component.Properties.Add(identifierType);
+                    component.Properties.Add(spdxIdentifierType);
                     componentsToBOM.Add(component);
                 }
                 else
