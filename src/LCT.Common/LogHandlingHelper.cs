@@ -8,7 +8,7 @@ using CycloneDX.Models;
 using LCT.Common.Model;
 using System.Text;
 using System.Threading.Tasks;
-using CycloneDX.Models.Vulnerabilities;
+using System.Text.Json;
 
 namespace LCT.Common
 {
@@ -101,35 +101,41 @@ namespace LCT.Common
                 }
                 if (!Log4Net.Verbose)
                 {
-                    return "";
+                    try
+                    {
+                        using var jsonDoc = JsonDocument.Parse(response);
+                        string minifiedJson = JsonSerializer.Serialize(jsonDoc.RootElement);
+                        int targetLines = 1000;
+                        int chunkSize = (int)Math.Ceiling((double)minifiedJson.Length / targetLines);
+                        string[] convertedLines = new string[targetLines];
+
+                        for (int i = 0; i < targetLines; i++)
+                        {
+                            int start = i * chunkSize;
+                            if (start >= minifiedJson.Length)
+                            {
+                                lines[i] = "";
+                            }
+                            else
+                            {
+                                int length = Math.Min(chunkSize, minifiedJson.Length - start);
+                                convertedLines[i] = minifiedJson.Substring(start, length);
+                            }
+                        }
+                        return string.Join(Environment.NewLine, convertedLines.Where(l => !string.IsNullOrEmpty(l)));
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error($"Error processing JSON response: {ex.Message}");
+                        return response;
+                    }
+
                 }
             }
 
             return response;
-        }
-        public static async Task<string> TruncateTopLinesAsync(HttpResponseMessage response, int maxLines)
-        {
-            if (response?.Content == null)
-            {
-                return string.Empty;
-            }
-
-            string content = await response.Content.ReadAsStringAsync();
-            var lines = content.Split(new[] { '\n' }, StringSplitOptions.None);
-
-            // Take only the first `maxLines` lines
-            return string.Join("\n", lines.Take(maxLines));
-        }
-        private static string TruncateContent(string content, int maxLinesToShow)
-        {
-            var lines = content.Split(NewLineSeparator, StringSplitOptions.None);
-            if (lines.Length > maxLinesToShow)
-            {
-                return string.Join("\n", lines.Take(maxLinesToShow)) +
-                       $"\n... [Content truncated. Showing first {maxLinesToShow} lines. Enable verbose mode to see full content.]";
-            }
-            return content;
-        }
+        }       
+        
         private static void BuildErrorLog(StringBuilder logBuilder, string context, string details, string message, string additionalDetails, Exception ex = null)
         {
             logBuilder.AppendLine(LogSeparator);

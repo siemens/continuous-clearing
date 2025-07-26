@@ -110,27 +110,7 @@ namespace LCT.APICommunications
             try
             {
                 result = await httpClient.GetAsync(projectsByTagUrl);
-                await LogHandlingHelper.HttpResponseHandling("Response of get all releases", $"MethodName:GetReleases()", result);
-                var content = await result.Content.ReadAsStringAsync();
-                using var jsonDoc = JsonDocument.Parse(content);
-                string minifiedJson = System.Text.Json.JsonSerializer.Serialize(jsonDoc.RootElement);
-                // Split the minified JSON into 1000 lines (equal length chunks)
-                int targetLines = 100;
-                int chunkSize = (int)Math.Ceiling((double)minifiedJson.Length / targetLines);
-                string[] lines = new string[targetLines];
-                for (int i = 0; i < targetLines; i++)
-                {
-                    int start = i * chunkSize;
-                    if (start >= minifiedJson.Length)
-                    {
-                        lines[i] = ""; // Empty line if content is over
-                    }
-                    else
-                    {
-                        int length = Math.Min(chunkSize, minifiedJson.Length - start);
-                        lines[i] = minifiedJson.Substring(start, length);
-                    }
-                }               
+                await LogHandlingHelper.HttpResponseHandling("Get sw360 Project details", $"MethodName:GetProjectById()", result);                
                 result.EnsureSuccessStatusCode();
             }
             catch (HttpRequestException ex)

@@ -40,8 +40,7 @@ namespace LCT.Services
             try
             {
                 httpResponseMessage = await m_JFrogApiCommunicationFacade.GetInternalComponentDataByRepo(repoName);
-                string truncateResponse = await LogHandlingHelper.TruncateTopLinesAsync(httpResponseMessage, 1000);
-                LogHandlingHelper.HttpResponseOfStringContent("Get component data by repo", $"MethodName:GetInternalComponentDataByRepo()", truncateResponse, "");
+                await LogHandlingHelper.HttpResponseHandling("Get component data by repo", $"MethodName:GetInternalComponentDataByRepo()", httpResponseMessage);
                 if (httpResponseMessage == null || !httpResponseMessage.IsSuccessStatusCode)
                 {
                     return new List<AqlResult>();
@@ -84,8 +83,7 @@ namespace LCT.Services
             try
             {
                 httpResponseMessage = await m_JFrogApiCommunicationFacade.GetPackageInfo(component);
-                string truncateResponse = await LogHandlingHelper.TruncateTopLinesAsync(httpResponseMessage, 1000);
-                LogHandlingHelper.HttpResponseOfStringContent("Get package info", $"MethodName:GetPackageInfo()", truncateResponse, "");
+                await LogHandlingHelper.HttpResponseHandling("Get package info", $"MethodName:GetPackageInfo()", httpResponseMessage);
                 httpResponseMessage.EnsureSuccessStatusCode();
 
                 string stringData = httpResponseMessage.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
@@ -123,8 +121,7 @@ namespace LCT.Services
             try
             {
                 httpResponseMessage = await apiCall(repoName);
-                string truncateResponse = await LogHandlingHelper.TruncateTopLinesAsync(httpResponseMessage, 1000);
-                LogHandlingHelper.HttpResponseOfStringContent(operationName, $"MethodName:{methodName}", truncateResponse, "");
+                await LogHandlingHelper.HttpResponseHandling(operationName, $"MethodName:GetComponentDataByRepoAsync()", httpResponseMessage);
                 if (httpResponseMessage == null || !httpResponseMessage.IsSuccessStatusCode)
                 { 
                     return new List<AqlResult>();
