@@ -6,16 +6,20 @@
 
 using CycloneDX.Models;
 using LCT.Common.Constants;
+using log4net;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace LCT.Common
 {
     public static class SpdxSbomHelper
     {
+        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static void CheckValidComponentsFromSpdxfile(Bom bom, string projectType,ref Bom listOfUnsupportedComponents)
         {
+            Logger.Debug("CheckValidComponentsFromSpdxfile():Start identifying Supported and unsupported packages from spdx input files");
             List<Component> listUnsupportedComponents = new List<Component>();
             List<Dependency> listUnsupportedDependencies = new List<Dependency>();
             foreach (var component in bom.Components.ToList())
@@ -43,6 +47,9 @@ namespace LCT.Common
             }
             listOfUnsupportedComponents.Components.AddRange(listUnsupportedComponents);
             listOfUnsupportedComponents.Dependencies.AddRange(listUnsupportedDependencies);
+            Logger.Debug($"CheckValidComponentsFromSpdxfile():Total identified unsupported Components:{listUnsupportedComponents.Count}");
+            Logger.Debug($"CheckValidComponentsFromSpdxfile():Total identified unsupported Dependencies:{listUnsupportedDependencies.Count}");
+            Logger.Debug("CheckValidComponentsFromSpdxfile():Completed the Supported and unsupported packages from spdx input files");
         }
         public static void AddSpdxPropertysForUnsupportedComponents(List<Component> UnsupportedComponentList, string filePath)
         {

@@ -29,6 +29,7 @@ namespace LCT.PackageIdentifier
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
         private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
         private List<Component> listOfInternalComponents = new List<Component>();
+        private readonly IEnvironmentHelper _environmentHelper = new EnvironmentHelper();
         public Bom ParsePackageFile(CommonAppSettings appSettings,ref Bom unSupportedBomList)
         {
             Logger.Debug("ParsePackageFile():Starting to parse the package file for Maven components.");
@@ -40,7 +41,7 @@ namespace LCT.PackageIdentifier
             List<Dependency> dependenciesForBOM = new();
             List<string> configFiles;
 
-            configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Maven);
+            configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Maven,_environmentHelper);
             List<string> listOfTemplateBomfilePaths = GetTemplateBomFilePaths(configFiles);
             ProcessBomFiles(configFiles, componentsForBOM, componentsToBOM, dependenciesForBOM, appSettings);
 
@@ -105,7 +106,7 @@ namespace LCT.PackageIdentifier
                 RemoveTypeJarSuffixFromDependency(dependency);
             }
         }
-        public static void IdentifiedMavenComponents(string filePath, List<Component> components, List<Dependency> dependencies)
+        public static void IdentifiedMavenComponents(string filePath, List<Component> components)
         {
             if (components == null || components.Count == 0)
             {
@@ -118,13 +119,13 @@ namespace LCT.PackageIdentifier
             logBuilder.AppendLine($"\n{LogHandlingHelper.LogSeparator}");
             logBuilder.AppendLine($" COMPONENTS FOUND IN FILE: {filePath}");
             logBuilder.AppendLine($"{LogHandlingHelper.LogSeparator}");
-            logBuilder.AppendLine($"| {"Name",-40} | {"Version",-40} | {"PURL",-100} | {"DevDependent",-15} | {"Dependencies",-60} |");
+            logBuilder.AppendLine($"| {"Name",-40} | {"Version",-40} | {"PURL",-100} | {"DevDependent",-15} |");
             logBuilder.AppendLine($"{LogHandlingHelper.LogHeaderSeparator}");
 
             foreach (var component in components)
             {
                 string devDependent = component.Properties?.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsDevelopment)?.Value ?? "false";
-                logBuilder.AppendLine($"| {component.Name,-40} | {component.Version,-40} | {component.Purl,-100} | {devDependent,-15} | {dependencies,-60} |");
+                logBuilder.AppendLine($"| {component.Name,-40} | {component.Version,-40} | {component.Purl,-100} | {devDependent,-15} |");
             }
 
             logBuilder.AppendLine($"{LogHandlingHelper.LogSeparator}");
@@ -160,10 +161,12 @@ namespace LCT.PackageIdentifier
                     {
                         Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
                         bomList = _spdxBomParser.ParseSPDXBom(filepath);
+                        IdentifiedMavenComponents(filepath, bomList.Components);
                         SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bomList, appSettings.ProjectType, ref listUnsupportedComponents);
                         SpdxSbomHelper.AddSpdxSBomFileNameProperty(ref bomList, filepath);
                         SpdxSbomHelper.AddSpdxPropertysForUnsupportedComponents(listUnsupportedComponents.Components, filepath);
                         ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
+                        IdentifiedMavenComponents(filepath, listUnsupportedComponents.Components);
                         ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
                     }
                     else
@@ -181,7 +184,7 @@ namespace LCT.PackageIdentifier
                     }                  
 
                     AddComponentsToBom(bomList, componentsForBOM, componentsToBOM, dependenciesForBOM);
-                    IdentifiedMavenComponents(filepath, bomList.Components, bomList.Dependencies);
+                    IdentifiedMavenComponents(filepath, bomList.Components);
                 }                
             }
         }

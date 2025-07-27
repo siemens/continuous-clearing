@@ -71,6 +71,7 @@ namespace LCT.PackageIdentifier
             services.AddTransient<ICycloneDXBomParser, CycloneDXBomParser>();
             services.AddTransient<IBomCreator, BomCreator>();
             services.AddTransient<ISpdxBomParser, SpdxBomParser>();
+            services.AddTransient<IEnvironmentHelper, EnvironmentHelper>();
             services.AddTransient<Program>();
             services.AddScoped<ICompositionBuilder, CompositionBuilder>();
         }
@@ -88,7 +89,7 @@ namespace LCT.PackageIdentifier
             string logFileNameWithTimestamp = $"{FileConstant.BomCreatorLog}_{DateTime.Now:yyyyMMdd_HHmmss}.log";
             CommonHelper.DefaultLogFolderInitialization(logFileNameWithTimestamp, m_Verbose);
             Logger.Logger.Log(null, Level.Notice, $"====================<<<<< Package Identifier >>>>>====================", null);
-            CommonAppSettings appSettings = _settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
+            CommonAppSettings appSettings = _settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName,environmentHelper);
             Log4Net.AppendVerboseValue(appSettings);
             ProjectReleases projectReleases = new ProjectReleases();
             string _ = CommonHelper.LogFolderInitialization(appSettings, logFileNameWithTimestamp, m_Verbose);

@@ -157,7 +157,7 @@ namespace LCT.Common
         {
             string oldFile = Path.Combine(folderPath, fileName);
             string newFile = string.Format("{0}/{1:MM-dd-yyyy_HHmm_ss}_{2}_{3}", folderPath, DateTime.Now, FileConstant.backUpKey, fileName);
-            Logger.Debug($"BackupTheGivenFile():oldFile{oldFile},newFile{newFile}");
+            Logger.Debug($"BackupTheGivenFile():start backup for oldFile{oldFile},newFile{newFile}");
             try
             {
                 if (File.Exists(oldFile))
@@ -202,7 +202,7 @@ namespace LCT.Common
                 Logger.Debug($"{operationName}(): Starting to write content to file. FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
 
                 string filePath = Path.Combine(folderPath, fileNameWithExtension);
-                Logger.Debug($"Generated FilePath: {filePath}");
+                Logger.Debug($"Generated FilePath with filename for writing data: {filePath}");
 
                 BackupTheGivenFile(folderPath, fileNameWithExtension);
                 File.WriteAllText(filePath, content);

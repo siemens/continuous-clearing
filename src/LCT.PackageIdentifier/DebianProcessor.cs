@@ -35,7 +35,7 @@ namespace LCT.PackageIdentifier
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
         private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
         private List<Component> listOfInternalComponents = new List<Component>();
-
+        private readonly IEnvironmentHelper _environmentHelper = new EnvironmentHelper();
         #region public method
 
         public Bom ParsePackageFile(CommonAppSettings appSettings,ref Bom unSupportedBomList)
@@ -45,7 +45,7 @@ namespace LCT.PackageIdentifier
             Bom bom = new Bom();
             List<Component> listComponentForBOM;
 
-            configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Debian);
+            configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Debian,_environmentHelper);
             List<string> listOfTemplateBomfilePaths = new List<string>();
             foreach (string filepath in configFiles)
             {
@@ -54,7 +54,7 @@ namespace LCT.PackageIdentifier
                     Logger.Debug($"ParsePackageFile():FileName: " + filepath);
                     var list = ParseCycloneDX(filepath, ref bom,appSettings);
                     listofComponents.AddRange(list);
-                    DebianPackagesList(filepath, listofComponents);
+                    DebianPackagesList(filepath, list);
                 }
                 else if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
@@ -355,6 +355,7 @@ namespace LCT.PackageIdentifier
             }
             ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
             ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
+            LogHandlingHelper.IdentifierInputFileComponents(filePath, listUnsupportedComponents.Components);
             return bom;
         }
 

@@ -99,41 +99,52 @@ namespace LCT.Common
                 {
                     return response;
                 }
-                if (!Log4Net.Verbose)
+                if (Log4Net.Verbose)
                 {
                     try
                     {
                         using var jsonDoc = JsonDocument.Parse(response);
-                        string minifiedJson = JsonSerializer.Serialize(jsonDoc.RootElement);
-                        int targetLines = 1000;
-                        int chunkSize = (int)Math.Ceiling((double)minifiedJson.Length / targetLines);
-                        string[] convertedLines = new string[targetLines];
+                        string formattedJson = JsonSerializer.Serialize(jsonDoc.RootElement, new JsonSerializerOptions
+                        {
+                            WriteIndented = true // Format JSON for better readability
+                        });
+
+                        // Split the formatted JSON into lines
+                        var formattedLines = formattedJson.Split(Environment.NewLine, StringSplitOptions.None);
+
+                        // If the response has fewer than 1000 lines, return it as is
+                        if (formattedLines.Length <= 1000)
+                        {
+                            return formattedJson;
+                        }
+
+                        // Compress the content into up to 1000 lines
+                        int targetLines = Math.Min(1000, lines.Length);
+                        int chunkSize = (int)Math.Ceiling((double)formattedLines.Length / targetLines);
+                        string[] compressedLines = new string[targetLines];
 
                         for (int i = 0; i < targetLines; i++)
                         {
                             int start = i * chunkSize;
-                            if (start >= minifiedJson.Length)
-                            {
-                                lines[i] = "";
-                            }
-                            else
-                            {
-                                int length = Math.Min(chunkSize, minifiedJson.Length - start);
-                                convertedLines[i] = minifiedJson.Substring(start, length);
-                            }
+                            int end = Math.Min(start + chunkSize, formattedLines.Length);
+
+                            // Combine multiple lines into one for compression
+                            compressedLines[i] = string.Join(" ", formattedLines.Skip(start).Take(end - start));
                         }
-                        return string.Join(Environment.NewLine, convertedLines.Where(l => !string.IsNullOrEmpty(l)));
+
+                        // Return the compressed and formatted JSON
+                        return string.Join(Environment.NewLine, compressedLines.Where(l => !string.IsNullOrEmpty(l)));
                     }
-                    catch (Exception ex)
+                    catch (JsonException ex)
                     {
-                        Logger.Error($"Error processing JSON response: {ex.Message}");
+                        ExceptionErrorHandling("Processing json response", $"Methodname:GetResponseContentAsync()", ex, "Api response processing");
                         return response;
                     }
 
                 }
             }
 
-            return response;
+            return "";
         }       
         
         private static void BuildErrorLog(StringBuilder logBuilder, string context, string details, string message, string additionalDetails, Exception ex = null)

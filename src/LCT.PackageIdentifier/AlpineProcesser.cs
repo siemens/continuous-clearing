@@ -30,7 +30,7 @@ namespace LCT.PackageIdentifier
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
         private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
-
+        private readonly IEnvironmentHelper _environmentHelper = new EnvironmentHelper();
         #region public method
 
         public Bom ParsePackageFile(CommonAppSettings appSettings,ref Bom unSupportedBomList)
@@ -40,7 +40,7 @@ namespace LCT.PackageIdentifier
             Bom bom = new Bom();
             List<Dependency> dependenciesForBOM = new();
 
-            configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Alpine);
+            configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Alpine, _environmentHelper);
             List<string> listOfTemplateBomfilePaths = new List<string>();
             foreach (string filepath in configFiles)
             {
@@ -52,7 +52,7 @@ namespace LCT.PackageIdentifier
                 else
                 {
                     listofComponents.AddRange(ParseCycloneDX(filepath, dependenciesForBOM,appSettings));
-                    IdentifiedAlpinePackages(filepath, listofComponents, dependenciesForBOM);
+                    IdentifiedAlpinePackages(filepath, listofComponents);
                 }
             }
 
@@ -148,6 +148,7 @@ namespace LCT.PackageIdentifier
             }
             ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
             ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
+            LogHandlingHelper.IdentifierInputFileComponents(filePath, listUnsupportedComponents.Components);
         }
 
         private static void GetDistinctComponentList(ref List<AlpinePackage> listofComponents)
@@ -221,7 +222,7 @@ namespace LCT.PackageIdentifier
                 package.SpdxComponentDetails.DevComponent= componentInfo.Properties?.Any(x => x.Name == Dataconstant.Cdx_IsDevelopment && x.Value == "true") ?? false;
             }
         }
-        private static void IdentifiedAlpinePackages(string filepath, List<AlpinePackage> packages, List<Dependency> dependencies)
+        private static void IdentifiedAlpinePackages(string filepath, List<AlpinePackage> packages)
         {
 
             if (packages == null || packages.Count == 0)
@@ -236,12 +237,12 @@ namespace LCT.PackageIdentifier
             logBuilder.AppendLine(LogHandlingHelper.LogSeparator);
             logBuilder.AppendLine($" Alpine PACKAGES FOUND IN FILE: {filepath}");
             logBuilder.AppendLine(LogHandlingHelper.LogSeparator);
-            logBuilder.AppendLine($"| {"Name",-40} | {"Version",-20} | {"PURL",-60} | {"Dependencies",-60} |");
+            logBuilder.AppendLine($"| {"Name",-40} | {"Version",-20} | {"PURL",-60} |");
             logBuilder.AppendLine(LogHandlingHelper.LogHeaderSeparator);
 
             foreach (var package in packages)
             {
-                logBuilder.AppendLine($"| {package.Name,-40} | {package.Version,-20} | {package.PurlID,-60} | {dependencies,-60} |");
+                logBuilder.AppendLine($"| {package.Name,-40} | {package.Version,-20} | {package.PurlID,-60} |");
             }
 
             logBuilder.AppendLine(LogHandlingHelper.LogSeparator);

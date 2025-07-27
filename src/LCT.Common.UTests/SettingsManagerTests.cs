@@ -31,9 +31,10 @@ namespace LCT.Common.UTest
             // Arrange
             string[] args = null;
             string jsonSettingsFileName = "settings.json";
+            EnvironmentHelper helper = new EnvironmentHelper();
 
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => _settingsManager.ReadConfiguration<object>(args, jsonSettingsFileName));
+            Assert.Throws<ArgumentNullException>(() => _settingsManager.ReadConfiguration<object>(args, jsonSettingsFileName, helper));
         }
 
         [Test]

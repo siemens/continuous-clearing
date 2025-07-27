@@ -47,6 +47,7 @@ namespace LCT.PackageIdentifier
         private bool isSelfContainedProject = false;
         private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(),Dependencies=new List<Dependency>() };
         private List<Component> listOfInternalComponents = new List<Component>();
+        private readonly IEnvironmentHelper _environmentHelper = new EnvironmentHelper();
 
         #region public methods
         public Bom ParsePackageFile(CommonAppSettings appSettings,ref Bom unSupportedBomList)
@@ -449,7 +450,7 @@ namespace LCT.PackageIdentifier
                                     ref List<Component> listComponentForBOM,
                                     ref Bom bom)
         {
-            var configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Nuget);
+            var configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Nuget, _environmentHelper);
             if (!isSelfContainedProject)
             {
                 GetFrameworkPackagesForAllConfigLockFiles(configFiles);
@@ -514,6 +515,7 @@ namespace LCT.PackageIdentifier
                 }
                 ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
                 ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
+                LogHandlingHelper.IdentifierInputFileComponents(filepath, listUnsupportedComponents.Components);
             }
             else
             {
@@ -521,7 +523,7 @@ namespace LCT.PackageIdentifier
                 var listofComponents = new List<NugetPackage>();
                 var dependencies = new List<Dependency>();
                 ParseInputFiles(appSettings, filepath, listofComponents);
-                LogHandlingHelper.IdentifierInputFileComponents(filepath, listComponentForBOM);
+                IdentifiedNugetPackages(filepath, listofComponents);
                 ConvertToCycloneDXModel(listComponentForBOM, listofComponents, dependencies);                
                 if (bom.Dependencies == null || bom.Dependencies.Count == 0)
                 {
@@ -534,7 +536,33 @@ namespace LCT.PackageIdentifier
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = listComponentForBOM.Count;
             }
         }
+        private static void IdentifiedNugetPackages(string filepath, List<NugetPackage> packages)
+        {
 
+            if (packages == null || packages.Count == 0)
+            {
+                // Log a message indicating no packages were found
+                Logger.Debug($"No Nuget packages were found in the file: {filepath}");
+                return;
+            }
+
+            // Build the table
+            var logBuilder = new System.Text.StringBuilder();
+            logBuilder.AppendLine(LogHandlingHelper.LogSeparator);
+            logBuilder.AppendLine($" Nuget PACKAGES FOUND IN FILE: {filepath}");
+            logBuilder.AppendLine(LogHandlingHelper.LogSeparator);
+            logBuilder.AppendLine($"| {"Name",-40} | {"Version",-20} |");
+            logBuilder.AppendLine(LogHandlingHelper.LogHeaderSeparator);
+
+            foreach (var package in packages)
+            {
+                logBuilder.AppendLine($"| {package.ID,-40} | {package.Version,-20} |");
+            }
+
+            logBuilder.AppendLine(LogHandlingHelper.LogSeparator);
+
+            Logger.Debug(logBuilder.ToString());
+        }
         private void PostProcessBOM(
             CommonAppSettings appSettings,
             ref List<Component> listComponentForBOM,

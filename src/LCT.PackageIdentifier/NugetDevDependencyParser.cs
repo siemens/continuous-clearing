@@ -169,7 +169,7 @@ namespace LCT.PackageIdentifier
                         }
                     }
 
-                    Logger.Debug($"ParseJsonFile():Asset file found components: " + components.Count);
+                    Logger.Debug($"ParseJsonFile():Total identified components from asset file: " + components.Count);
                 }
 
             }

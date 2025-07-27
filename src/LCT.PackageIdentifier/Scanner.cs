@@ -24,38 +24,58 @@ namespace LCT.PackageIdentifier
     {
 
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
-        public static List<string> FileScanner(string rootPath, Config config)
-        {
 
-            string[] foundConfigFiles;
-            IFileOperations fileOperations = new FileOperations();
+        public static List<string> FileScanner(string rootPath, Config config, IEnvironmentHelper environmentHelper)
+        {
+            ValidateInputs(rootPath, config, environmentHelper);
+
+            Logger.Logger.Log(null, Level.Notice, $"Directory Location: Packages are read from the below locations:", null);
+
             List<string> allFoundConfigFiles = new List<string>();
+            IFileOperations fileOperations = new FileOperations();
+
+            foreach (string includePattern in config.Include)
+            {
+                ProcessIncludePattern(rootPath, includePattern, config, fileOperations, allFoundConfigFiles);
+            }
+
+            if (allFoundConfigFiles.Count == 0)
+            {
+                HandleNoValidFilesFound(environmentHelper);
+            }
+
+            return allFoundConfigFiles;
+        }
+
+        private static void ValidateInputs(string rootPath, Config config, IEnvironmentHelper environmentHelper)
+        {
             if (config?.Include == null && config?.Exclude == null)
             {
                 LogHandlingHelper.BasicErrorHandling("File Scanning", "FileScanner()", "Inclusion/Exclusion list is not provided. Unable to identify the files.", "Please check if you have provided a valid settings file with inclusion/exclusion patterns.");
-                Logger.Error("Inclusion/Exclusion list is not provided!!Unable to identify the files\nPlease check if you have given a valid settings file");
+                Logger.Error("Inclusion/Exclusion list is not provided!! Unable to identify the files\nPlease check if you have given a valid settings file");
                 environmentHelper.CallEnvironmentExit(-1);
-
             }
+
             if (string.IsNullOrWhiteSpace(rootPath))
             {
                 LogHandlingHelper.BasicErrorHandling("File Scanning", "FileScanner()", "No root path provided.", "Provide a valid input file path.");
-                Logger.Error("No root path given.Provide a valid input file path");
+                Logger.Error("No root path given. Provide a valid input file path");
                 environmentHelper.CallEnvironmentExit(-1);
             }
 
             if (!System.IO.Directory.Exists(rootPath))
             {
                 LogHandlingHelper.BasicErrorHandling("File Scanning", "FileScanner()", "Root path does not exist.", "Provide a valid path.");
-                Logger.Error("Root path does not exist.Provide a valid  path");
+                Logger.Error("Root path does not exist. Provide a valid path");
                 environmentHelper.CallEnvironmentExit(-1);
             }
+        }
 
-            Logger.Logger.Log(null, Level.Notice, $"Directory Location: Packages are read from the below locations:", null);
-            foreach (string includePattern in config.Include)
+        private static void ProcessIncludePattern(string rootPath, string includePattern, Config config, IFileOperations fileOperations, List<string> allFoundConfigFiles)
+        {
+            try
             {
-                foundConfigFiles = System.IO.Directory.GetFiles(rootPath, includePattern, SearchOption.AllDirectories);
+                string[] foundConfigFiles = System.IO.Directory.GetFiles(rootPath, includePattern, SearchOption.AllDirectories);
 
                 if (foundConfigFiles != null && foundConfigFiles.Length > 0)
                 {
@@ -65,17 +85,25 @@ namespace LCT.PackageIdentifier
                     }
                 }
             }
-
-            if (allFoundConfigFiles.Count == 0)
+            catch (ArgumentNullException ex)
             {
-                LogHandlingHelper.BasicErrorHandling("File scanning failed due to no valid input files found.", "FileScanner()", $"The provided package file path does not contain any valid input files. Please check the input path and inclusion/exclusion patterns.", "provide valid input files");
-                Logger.Error("Provided package file path do not contain valid input files.");
-                environmentHelper.CallEnvironmentExit(-1);
+                Logger.Error($"Error occurred while scanning files with pattern '{includePattern}' in path '{rootPath}': {ex.Message}");
+                LogHandlingHelper.BasicErrorHandling("File Scanning", "FileScanner()", $"Error occurred while scanning files with pattern '{includePattern}' in path '{rootPath}'.", "Check the input path and inclusion patterns.");
+                throw; 
             }
+            catch (NullReferenceException ex)
+            {
+                Logger.Error($"Error occurred while scanning files with pattern '{includePattern}' in path '{rootPath}': {ex.Message}");
+                LogHandlingHelper.BasicErrorHandling("File Scanning", "FileScanner()", $"Error occurred while scanning files with pattern '{includePattern}' in path '{rootPath}'.", "Check the input path and inclusion patterns.");
+                throw; 
+            }
+        }
 
-
-            return allFoundConfigFiles;
-
+        private static void HandleNoValidFilesFound(IEnvironmentHelper environmentHelper)
+        {
+            LogHandlingHelper.BasicErrorHandling("File scanning failed due to no valid input files found.", "FileScanner()", $"The provided package file path does not contain any valid input files. Please check the input path and inclusion/exclusion patterns.", "Provide valid input files");
+            Logger.Error("Provided package file path does not contain valid input files.");
+            environmentHelper.CallEnvironmentExit(-1);
         }
 
         private static void CheckingForExcludedFiles(Config config, IFileOperations fileOperations, List<string> allFoundConfigFiles, string configFile)

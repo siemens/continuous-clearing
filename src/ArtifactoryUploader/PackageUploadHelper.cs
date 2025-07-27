@@ -241,7 +241,7 @@ namespace LCT.ArtifactoryUploader
                                                              ComponentsToArtifactory item,
                                                              int timeout,
                                                              DisplayPackagesInfo displayPackagesInfo)
-        {
+        {            
             var packageType = item.PackageType;
             if (item.SrcRepoName != null
                 && !(item.SrcRepoName.Equals(item.DestRepoName, StringComparison.OrdinalIgnoreCase))
@@ -249,6 +249,7 @@ namespace LCT.ArtifactoryUploader
             {
                 if (!(item.SrcRepoName.Contains("Not Found in JFrog")))
                 {
+                    Logger.Debug($"PackageUploadToArtifactory():{item.Name} and {item.Version}  contains Source repository:{item.SrcRepoName} and Destination Repository:{item.DestRepoName} ,So now started upload package process .");
                     await SourceRepoFoundToUploadArtifactory(packageType, uploaderKpiData, item, timeout, displayPackagesInfo);
                 }
                 else
@@ -256,14 +257,16 @@ namespace LCT.ArtifactoryUploader
                     uploaderKpiData.PackagesNotExistingInRemoteCache++;
                     item.DestRepoName = null;
                     await JfrogNotFoundPackagesAsync(item, displayPackagesInfo);
+                    Logger.Debug($"PackageUploadToArtifactory():{item.Name} and {item.Version}  is not found in any jfrog repository.");
                 }
             }
             else
             {
+                Logger.Debug($"PackageUploadToArtifactory():{item.Name} and {item.Version} is identified in source:{item.SrcRepoName} and destination{item.DestRepoName} repositories");
                 IncrementCountersBasedOnPackageType(uploaderKpiData, packageType, true);
                 await SucessfullPackagesAsync(item, displayPackagesInfo);
                 item.DestRepoName = null;
-            }
+            }            
         }
 
         private static async Task SourceRepoFoundToUploadArtifactory(PackageType packageType, UploaderKpiData uploaderKpiData, ComponentsToArtifactory item, int timeout, DisplayPackagesInfo displayPackagesInfo)

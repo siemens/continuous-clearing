@@ -41,7 +41,7 @@ namespace LCT.PackageIdentifier
         private static readonly char[] SplitChars = { '/', '@' };
         private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
         private List<Component> listOfInternalComponents = new List<Component>();
-
+        private readonly IEnvironmentHelper _environmentHelper = new EnvironmentHelper();
         #endregion
         #region constructor
         #endregion
@@ -249,7 +249,7 @@ namespace LCT.PackageIdentifier
             List<string> configFiles;
             List<Dependency> dependencies = new List<Dependency>();
             List<Component> componentsForBOM = new List<Component>();
-            configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Conan);
+            configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Conan,_environmentHelper);
             List<string> listOfTemplateBomfilePaths = new List<string>();
             foreach (string filepath in configFiles)
             {
@@ -516,6 +516,7 @@ namespace LCT.PackageIdentifier
 
         private static List<Component> GetExcludedComponentsList(List<Component> componentsForBOM)
         {
+            Logger.Debug($"GetExcludedComponentsList():Start process of remove invalid components from full list of components");
             List<Component> components = new List<Component>();
             foreach (Component componentsInfo in componentsForBOM)
             {
@@ -529,6 +530,7 @@ namespace LCT.PackageIdentifier
                     Logger.Debug($"GetExcludedComponentsList():InvalidComponent For CONAN : Component Details : {componentsInfo.Name} @ {componentsInfo.Version} @ {componentsInfo.Purl}");
                 }
             }
+            Logger.Debug($"GetExcludedComponentsList():Completed the process of remove invalid components from full list of components");
             return components;
         }
 

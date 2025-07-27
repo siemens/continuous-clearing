@@ -46,6 +46,7 @@ namespace LCT.PackageIdentifier
         private const string Requires = "requires";
         private const string Name = "name";
         private List<Component> listOfInternalComponents = new List<Component>();
+        private readonly IEnvironmentHelper _environmentHelper = new EnvironmentHelper();
 
         public Bom ParsePackageFile(CommonAppSettings appSettings,ref Bom unSupportedBomList)
         {
@@ -472,7 +473,7 @@ namespace LCT.PackageIdentifier
 
         private void ParsingInputFileForBOM(CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom, ref List<Dependency> dependencies)
         {
-            List<string> configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Npm);
+            List<string> configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Npm, _environmentHelper);
             List<string> listOfTemplateBomfilePaths = new List<string>();
 
             foreach (string filepath in configFiles)
@@ -548,6 +549,7 @@ namespace LCT.PackageIdentifier
             ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
             ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
             LogHandlingHelper.IdentifierInputFileComponents(filepath, bom.Components);
+            LogHandlingHelper.IdentifierInputFileComponents(filepath, listUnsupportedComponents.Components);
         }
 
         private static void ProcessPackageFile(string filepath, CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref List<Dependency> dependencies)
@@ -717,13 +719,13 @@ namespace LCT.PackageIdentifier
 
         private static List<Component> GetExcludedComponentsList(List<Component> componentsForBOM)
         {
+            Logger.Debug($"GetExcludedComponentsList():Start process of remove invalid components from full list of components");
             List<Component> components = new List<Component>();
             foreach (Component componentsInfo in componentsForBOM)
             {
                 if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["NPM"]))
                 {
                     components.Add(componentsInfo);
-                    Logger.Debug($"GetExcludedComponentsList():ValidComponent For NPM : Component Details : {componentsInfo.Name} @ {componentsInfo.Version} @ {componentsInfo.Purl}");
                 }               
                 else
                 {
@@ -731,6 +733,7 @@ namespace LCT.PackageIdentifier
                     Logger.Debug($"GetExcludedComponentsList():InvalidComponent For NPM : Component Details : {componentsInfo.Name} @ {componentsInfo.Version} @ {componentsInfo.Purl}");
                 }
             }
+            Logger.Debug($"GetExcludedComponentsList():Completed the process of remove invalid components from full list of components");
             return components;
         }
 

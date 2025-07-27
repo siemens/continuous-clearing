@@ -107,7 +107,7 @@ namespace LCT.Common
             CleanupComponentManufacturerData(components);
             bom.Components = components;
             bom.Dependencies = dependencies;
-            Logger.Debug($"BOM conversion completed. Components: {components.Count}, Dependencies: {dependencies.Count}");
+            Logger.Debug($"SBOM conversion completed. Components: {components.Count}, Dependencies: {dependencies.Count}");
         }
         private static void AddDevelopmentPropertyToComponents(List<Component> components, IEnumerable<Relationship> relationships, Dictionary<string, Component> componentIndex)
         {
@@ -148,16 +148,15 @@ namespace LCT.Common
                 {
                     components.Add(component);
                     componentIndex[package.SPDXID] = component;
-                    Logger.Debug($"Successfully created component for package: {package.Name}");
                 }
             }
+            Logger.Debug($"ProcessSpdxPackages():Total components identified :{components.Count}.");
             Logger.Debug($"ProcessSpdxPackages():Package processing completed.");
             return (components, componentIndex);
         }
 
         private static Component CreateComponentFromPackage(Package package)
         {
-            Logger.Debug($"CreateComponentFromPackage():Creating component from package: {package.Name}");
             if (package.ExternalRefs == null)
                 return null;
 
@@ -167,7 +166,6 @@ namespace LCT.Common
 
             var purl = purlRef.ReferenceLocator;
             var bomRef = !string.IsNullOrEmpty(purl) ? purl : package.SPDXID;
-            Logger.Debug($"Creating component with PURL: {purl}, BOM Ref: {bomRef}");
             var component = new Component
             {
                 Name = package.Name,
@@ -186,7 +184,6 @@ namespace LCT.Common
             {
                 component.Manufacturer.BomRef = bomRef;
             }
-            Logger.Debug($"CreateComponentFromPackage():Component created successfully for package: {package.Name}");
             return component;
         }
 

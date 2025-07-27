@@ -30,7 +30,7 @@ namespace LCT.Common
         /// </summary>
         /// <param name="args">args</param>
         /// <returns>AppSettings</returns>
-        public T ReadConfiguration<T>(string[] args, string jsonSettingsFileName)
+        public T ReadConfiguration<T>(string[] args, string jsonSettingsFileName,IEnvironmentHelper environmentHelper)
         {
             Logger.Debug("ReadConfiguration():Start reading configuration.");
 
@@ -65,13 +65,13 @@ namespace LCT.Common
             {
                 LogHandlingHelper.ExceptionErrorHandling("ReadConfiguration()", $"Failed to load configuration file. Please verify the JSON format in: {settingsFilePath}", ex, "InvalidDataException occurred while loading configuration.");
                 Logger.Error($"Failed to load configuration file. Please verify the JSON format in: {settingsFilePath}");
-                throw new InvalidDataException($"Failed to load configuration file. Please verify the JSON format in: {settingsFilePath}");
+                return default;
             }
             catch (FormatException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("ReadConfiguration()", $"Configuration file contains invalid format. Please check for missing quotes or invalid syntax in: {settingsFilePath}", ex, "FormatException occurred while loading configuration.");
                 Logger.Error($"Configuration file contains invalid format. Please check for missing quotes or invalid syntax in: {settingsFilePath}");
-                throw new FormatException($"Configuration file contains invalid format. Please check for missing quotes or invalid syntax in: {settingsFilePath}");
+                return default;
             }
 
 
@@ -80,7 +80,7 @@ namespace LCT.Common
             if (appSettings == null)
             {
                 LogHandlingHelper.ExceptionErrorHandling("ReadConfiguration()", $"Failed to load application settings. The configuration object is null.", new InvalidDataException(nameof(appSettings)), $"The application settings could not be loaded. Ensure the configuration file is valid and contains the required settings.");
-                throw new InvalidDataException(nameof(appSettings));
+                return default;
             }
 
             Logger.Debug($"ReadConfiguration():Successfully completed configuration reading.");

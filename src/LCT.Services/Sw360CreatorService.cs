@@ -79,7 +79,7 @@ namespace LCT.Services
                 //Component creation Success 
                 if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.Conflict)
                 {
-                    Logger.Debug($"CreateComponentBasesOFswComaprisonBOM(): start Identifying componentId for creaeing release");
+                    Logger.Debug($"CreateComponentBasesOFswComaprisonBOM(): Start Identifying componentId for creating release due to issue occured");
                     string componentId = await GetComponentId(componentInfo.Name);
                     Logger.Debug($"GetComponentId(): Identified componentId for creating release is :{componentId}");
                     componentCreateStatus.ReleaseStatus = await CreateReleaseForComponent(componentInfo, componentId, attachmentUrlList);
@@ -182,6 +182,7 @@ namespace LCT.Services
                 }
                 else if (response.StatusCode == HttpStatusCode.Conflict)
                 {
+                    Logger.Debug($"CreateReleaseForComponent():while creating release we are getting  this issue {response.StatusCode}");
                     releaseId = await GetReleaseIdToLinkToProject(componentInfo.Name, componentInfo.Version, componentInfo.ReleaseExternalId, componentId);
                     Logger.Debug($"CreateReleaseForComponent():Release already exists for component -->" +
                         $"{componentInfo.Name} - {componentInfo.Version}. No changes made by tool");

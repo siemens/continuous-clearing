@@ -249,9 +249,9 @@ namespace LCT.Common
                 {
                     Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.ManullayAdded };
                     component.Properties.Add(identifierType);
-                }
-                Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };                
-                component.Properties.Add(isDev);
+                    Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
+                    component.Properties.Add(isDev);
+                }                
                 listComponentForBOM.Add(component);
             }
         }

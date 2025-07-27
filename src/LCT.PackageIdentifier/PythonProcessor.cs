@@ -37,10 +37,11 @@ namespace LCT.PackageIdentifier
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
         private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
         private List<Component> listOfInternalComponents = new List<Component>();
+        private readonly IEnvironmentHelper _environmentHelper = new EnvironmentHelper();
         public Bom ParsePackageFile(CommonAppSettings appSettings,ref Bom unSupportedBomList)
         {
             Logger.Debug("ParsePackageFile():Starting to parse package files for BOM.");
-            List<string> configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Poetry);
+            List<string> configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Poetry,_environmentHelper);
             List<PythonPackage> listofComponents = new List<PythonPackage>();
             Bom bom = new Bom();
             List<Component> listComponentForBOM;
@@ -57,13 +58,11 @@ namespace LCT.PackageIdentifier
                 {
                     Logger.Debug($"ParsePackageFile():Poetry lock file detected: {config}");
                     listofComponents.AddRange(ExtractDetailsForPoetryLockfile(config, dependencies));
-                    IdentifiedPythonPackages(config, listofComponents);
                 }
                 else if ((config.EndsWith(FileConstant.CycloneDXFileExtension) || config.EndsWith(FileConstant.SPDXFileExtension))
          && !config.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
-                    listofComponents.AddRange(ExtractDetailsFromJson(config, appSettings, ref dependencies));                    
-                    IdentifiedPythonPackages(config, listofComponents);
+                    listofComponents.AddRange(ExtractDetailsFromJson(config, appSettings, ref dependencies));
                 }
             }
 
@@ -125,6 +124,7 @@ namespace LCT.PackageIdentifier
         {
             List<PythonPackage> PythonPackages;
             PythonPackages = GetPackagesFromTOMLFile(filePath, dependencies);
+            IdentifiedPythonPackages(filePath, PythonPackages);
             return PythonPackages;
         }
 
@@ -214,6 +214,7 @@ namespace LCT.PackageIdentifier
                 SpdxSbomHelper.AddSpdxPropertysForUnsupportedComponents(listUnsupportedComponents.Components, filePath);
                 ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
                 ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
+                LogHandlingHelper.IdentifierInputFileComponents(filePath, listUnsupportedComponents.Components);
             }
             else
             {
@@ -238,7 +239,6 @@ namespace LCT.PackageIdentifier
                 {
                     BomCreator.bomKpiData.DebianComponents++;
                     PythonPackages.Add(package);
-                    Logger.Debug($"ExtractDetailsFromJson():ValidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
                 }
                 else
                 {
@@ -251,7 +251,7 @@ namespace LCT.PackageIdentifier
             {
                 dependencies.AddRange(bom.Dependencies);
             }
-
+            IdentifiedPythonPackages(filePath, PythonPackages);
             return PythonPackages;
         }
 

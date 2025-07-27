@@ -140,11 +140,14 @@ namespace LCT.PackageIdentifier
             bool fileExists = files.Length > 0 && files.Any(file => Path.GetFileName(file).Equals(bomFileName, StringComparison.OrdinalIgnoreCase));
             if (fileExists && appSettings.MultipleProjectType)
             {
+                Logger.Debug($"WriteContentToCycloneDxBOM():Start process for appending components due multiple project type {appSettings.MultipleProjectType}.");
                 string existingFilePath = files.FirstOrDefault(file => Path.GetFileName(file).Equals(bomFileName, StringComparison.OrdinalIgnoreCase));
+                Logger.Debug($"WriteContentToCycloneDxBOM():Identified existing file for appending components.{existingFilePath}");
                 listOfComponentsToBom = fileOperations.CombineComponentsFromExistingBOM(listOfComponentsToBom, existingFilePath);
                 bomKpiData.ComponentsInComparisonBOM = listOfComponentsToBom.Components.Count;
                 string formattedString = CommonHelper.AddSpecificValuesToBOMFormat(listOfComponentsToBom);
                 fileOperations.WriteContentToOutputBomFile(formattedString, outputFolderPath, FileConstant.BomFileName, defaultProjectName);
+                Logger.Debug($"WriteContentToCycloneDxBOM():Completed the appending components process.");
             }
             else
             {
