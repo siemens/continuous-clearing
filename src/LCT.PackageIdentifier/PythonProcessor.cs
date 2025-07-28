@@ -313,7 +313,7 @@ namespace LCT.PackageIdentifier
             // update the comparison bom data
             componentData.comparisonBOMData = processedComponents;
             componentData.internalComponents = internalComponents;
-
+            listOfInternalComponents = internalComponents;
             return componentData;
         }
 
@@ -354,6 +354,7 @@ namespace LCT.PackageIdentifier
                 var processedComponent = ProcessPythonComponent(component, aqlResultList, bomhelper, appSettings, projectType);
                 modifiedBOM.Add(processedComponent);
             }
+            LogHandlingHelper.IdentifierComponentsData(componentsForBOM, listOfInternalComponents);
             return modifiedBOM;
         }
 

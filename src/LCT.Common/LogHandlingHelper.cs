@@ -21,6 +21,10 @@ namespace LCT.Common
         public const string LogSeparator = "============================================================================================================================================";
         public const string LogHeaderSeparator = "--------------------------------------------------------------------------------------------------------------------------------------------";
         public const string MaskedValue = "*****";
+        private static readonly JsonSerializerOptions CachedJsonSerializerOptions = new JsonSerializerOptions
+        {
+            WriteIndented = true 
+        };
         public static ILog Logger
         {
             get => _logger;
@@ -52,7 +56,7 @@ namespace LCT.Common
 
             // Build the log message
             var logBuilder = new System.Text.StringBuilder();
-            AppendLogHeader(logBuilder, context, details);
+            AppendLogHeaders(logBuilder, context, details);
             AppendRequestDetails(logBuilder, requestMethod, requestUrl, requestHeaders);
             AppendResponseDetails(logBuilder, response, reasonPhrase, responseContent);
             AppendAdditionalDetails(logBuilder, additionalDetails);
@@ -104,21 +108,15 @@ namespace LCT.Common
                     try
                     {
                         using var jsonDoc = JsonDocument.Parse(response);
-                        string formattedJson = JsonSerializer.Serialize(jsonDoc.RootElement, new JsonSerializerOptions
-                        {
-                            WriteIndented = true // Format JSON for better readability
-                        });
+                        string formattedJson = JsonSerializer.Serialize(jsonDoc.RootElement, CachedJsonSerializerOptions);
 
-                        // Split the formatted JSON into lines
                         var formattedLines = formattedJson.Split(Environment.NewLine, StringSplitOptions.None);
 
-                        // If the response has fewer than 1000 lines, return it as is
                         if (formattedLines.Length <= 1000)
                         {
                             return formattedJson;
                         }
 
-                        // Compress the content into up to 1000 lines
                         int targetLines = Math.Min(1000, lines.Length);
                         int chunkSize = (int)Math.Ceiling((double)formattedLines.Length / targetLines);
                         string[] compressedLines = new string[targetLines];
@@ -128,11 +126,9 @@ namespace LCT.Common
                             int start = i * chunkSize;
                             int end = Math.Min(start + chunkSize, formattedLines.Length);
 
-                            // Combine multiple lines into one for compression
                             compressedLines[i] = string.Join(" ", formattedLines.Skip(start).Take(end - start));
                         }
 
-                        // Return the compressed and formatted JSON
                         return string.Join(Environment.NewLine, compressedLines.Where(l => !string.IsNullOrEmpty(l)));
                     }
                     catch (JsonException ex)
@@ -145,8 +141,7 @@ namespace LCT.Common
             }
 
             return "";
-        }       
-        
+        }        
         private static void BuildErrorLog(StringBuilder logBuilder, string context, string details, string message, string additionalDetails, Exception ex = null)
         {
             logBuilder.AppendLine(LogSeparator);
@@ -197,7 +192,7 @@ namespace LCT.Common
 
             logBuilder.AppendLine(LogSeparator);
         }
-        private static void AppendLogHeader(StringBuilder logBuilder, string context, string details)
+        private static void AppendLogHeaders(StringBuilder logBuilder, string context, string details)
         {
             logBuilder.AppendLine($"\n{LogSeparator}");
             logBuilder.AppendLine(" HTTP API RESPONSE DETAILS");

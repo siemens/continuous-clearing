@@ -91,12 +91,6 @@ namespace LCT.PackageIdentifier
                 LogHandlingHelper.BasicErrorHandling("File Scanning", "FileScanner()", $"Error occurred while scanning files with pattern '{includePattern}' in path '{rootPath}'.", "Check the input path and inclusion patterns.");
                 throw; 
             }
-            catch (NullReferenceException ex)
-            {
-                Logger.Error($"Error occurred while scanning files with pattern '{includePattern}' in path '{rootPath}': {ex.Message}");
-                LogHandlingHelper.BasicErrorHandling("File Scanning", "FileScanner()", $"Error occurred while scanning files with pattern '{includePattern}' in path '{rootPath}'.", "Check the input path and inclusion patterns.");
-                throw; 
-            }
         }
 
         private static void HandleNoValidFilesFound(IEnvironmentHelper environmentHelper)

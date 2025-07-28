@@ -46,7 +46,7 @@ namespace LCT.SW360PackageCreator.Interfaces
         /// <param name="componentName"></param>
         /// <param name="componenVersion"></param>
         /// <returns>string</returns>
-        Task<string> GetSourceUrlForPythonPackage(string componentName, string componenVersion);
+        Task<string> GetSourceUrlForPythonPackage(string componentName, string componentVersion);
 
 
         /// <summary>
