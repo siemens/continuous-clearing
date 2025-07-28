@@ -52,21 +52,21 @@ namespace LCT.PackageIdentifier
             if (config?.Include == null && config?.Exclude == null)
             {
                 LogHandlingHelper.BasicErrorHandling("File Scanning", "FileScanner()", "Inclusion/Exclusion list is not provided. Unable to identify the files.", "Please check if you have provided a valid settings file with inclusion/exclusion patterns.");
-                Logger.Error("Inclusion/Exclusion list is not provided!! Unable to identify the files\nPlease check if you have given a valid settings file");
+                Logger.Error($"Inlude:{config?.Include} or Exclude:{config?.Exclude} in config is found to be empty,Inclusion/Exclusion list is not provided!!Unable to identify the files\nPlease check if you have given a valid settings file");
                 environmentHelper.CallEnvironmentExit(-1);
             }
 
             if (string.IsNullOrWhiteSpace(rootPath))
             {
-                LogHandlingHelper.BasicErrorHandling("File Scanning", "FileScanner()", "No root path provided.", "Provide a valid input file path.");
-                Logger.Error("No root path given. Provide a valid input file path");
+                LogHandlingHelper.BasicErrorHandling("File Scanning", "FileScanner()", $"No root path provided at{nameof(rootPath)} - {rootPath}.", "Provide a valid input file path.");
+                Logger.Error($"Invalid value for the {nameof(rootPath)} - {rootPath},No root path given.Provide a valid input file path");
                 environmentHelper.CallEnvironmentExit(-1);
             }
 
             if (!System.IO.Directory.Exists(rootPath))
             {
-                LogHandlingHelper.BasicErrorHandling("File Scanning", "FileScanner()", "Root path does not exist.", "Provide a valid path.");
-                Logger.Error("Root path does not exist. Provide a valid path");
+                LogHandlingHelper.BasicErrorHandling("File Scanning", "FileScanner()", $"Root path does not exist at {rootPath}.", "Provide a valid path.");
+                Logger.Error($"The {nameof(rootPath)}  is not found at this path - {rootPath},Root path does not exist.Provide a valid  path");
                 environmentHelper.CallEnvironmentExit(-1);
             }
         }
