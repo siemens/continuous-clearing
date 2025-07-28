@@ -38,6 +38,7 @@ namespace LCT.Common
                             && File.Exists(Log4Net.CatoolLogPath)
                             && Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") != "true")
             {
+                Logger.Debug($"Uploading artifact log file path:{Log4Net.CatoolLogPath}");
                 Logger.Debug("====================<<<<< Exit >>>>>====================");
                 LogManager.Shutdown();
                 Console.WriteLine($"##vso[artifact.upload containerfolder={LogContainerFolderName};artifactname={LogArtifactFolderName}]{Log4Net.CatoolLogPath}");
@@ -61,6 +62,7 @@ namespace LCT.Common
                             && File.Exists(FileOperations.CatoolBomFilePath)
                             && Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") != "true")
             {
+                Logger.Debug($"Uploading artifact Bom file path:{FileOperations.CatoolBomFilePath}");
                 Console.WriteLine($"##vso[artifact.upload containerfolder={BomContainerFolderName};artifactname={BomArtifactFolderName}]{FileOperations.CatoolBomFilePath}");
             }
             else if (envType == EnvironmentType.Unknown)
