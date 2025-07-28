@@ -51,8 +51,7 @@ namespace LCT.PackageIdentifier
                 }
                 else
                 {
-                    listofComponents.AddRange(ParseCycloneDX(filepath, dependenciesForBOM,appSettings));
-                    IdentifiedAlpinePackages(filepath, listofComponents);
+                    listofComponents.AddRange(ParseCycloneDX(filepath, dependenciesForBOM,appSettings));                    
                 }
             }
 
@@ -149,7 +148,12 @@ namespace LCT.PackageIdentifier
             ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
             ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
         }
+               
 
+        private static string GetReleaseExternalId(string name, string version)
+        {
+            return BomHelper.GetReleaseExternalId(name, version, Dataconstant.PurlCheck()["ALPINE"]);
+        }
         private static void GetDistinctComponentList(ref List<AlpinePackage> listofComponents)
         {
             int initialCount = listofComponents.Count;
@@ -157,14 +161,6 @@ namespace LCT.PackageIdentifier
 
             if (listofComponents.Count != initialCount)
                 BomCreator.bomKpiData.DuplicateComponents = initialCount - listofComponents.Count;
-        }
-
-        private static string GetReleaseExternalId(string name, string version)
-        {
-            version = WebUtility.UrlEncode(version);
-            version = version.Replace("%3A", ":");
-
-            return $"{Dataconstant.PurlCheck()["ALPINE"]}{Dataconstant.ForwardSlash}{name}@{version}?arch=source";
         }
 
         private static string GetDistro(AlpinePackage alpinePackage)
@@ -220,34 +216,7 @@ namespace LCT.PackageIdentifier
                 package.SpdxComponentDetails.SpdxComponent = true;
                 package.SpdxComponentDetails.DevComponent= componentInfo.Properties?.Any(x => x.Name == Dataconstant.Cdx_IsDevelopment && x.Value == "true") ?? false;
             }
-        }
-        private static void IdentifiedAlpinePackages(string filepath, List<AlpinePackage> packages)
-        {
-
-            if (packages == null || packages.Count == 0)
-            {
-                // Log a message indicating no packages were found
-                Logger.Debug($"No Alpine packages were found in the file: {filepath}");
-                return;
-            }
-
-            // Build the table
-            var logBuilder = new System.Text.StringBuilder();
-            logBuilder.AppendLine(LogHandlingHelper.LogSeparator);
-            logBuilder.AppendLine($" Alpine PACKAGES FOUND IN FILE: {filepath}");
-            logBuilder.AppendLine(LogHandlingHelper.LogSeparator);
-            logBuilder.AppendLine($"| {"Name",-40} | {"Version",-20} | {"PURL",-60} |");
-            logBuilder.AppendLine(LogHandlingHelper.LogHeaderSeparator);
-
-            foreach (var package in packages)
-            {
-                logBuilder.AppendLine($"| {package.Name,-40} | {package.Version,-20} | {package.PurlID,-60} |");
-            }
-
-            logBuilder.AppendLine(LogHandlingHelper.LogSeparator);
-
-            Logger.Debug(logBuilder.ToString());
-        }
+        }       
 
         #endregion
     }

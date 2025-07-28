@@ -628,7 +628,7 @@ namespace LCT.Common
 
             // Log the table
             Logger.Debug(logBuilder.ToString());
-        }
+        }        
         public static DateTime GetISTTime()
         {
             TimeZoneInfo istTimeZone = TimeZoneInfo.FindSystemTimeZoneById("India Standard Time");

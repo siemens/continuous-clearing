@@ -971,7 +971,7 @@ namespace LCT.PackageIdentifier
             }
             catch (ArgumentNullException ex)
             {
-                Logger.Debug($"Error in GetFrameworkPackagesForAllConfigLockFiles:", ex);
+                LogHandlingHelper.ExceptionErrorHandling("Get Framework Packages", $"MethodName:GetFrameworkPackagesForAllConfigLockFiles(),argument null exception", ex, "");
             }
         }
 
@@ -997,11 +997,12 @@ namespace LCT.PackageIdentifier
             }
             catch (IOException ex)
             {
-                Logger.Debug($"GetUniqueTargetFrameworkKeysForConfigFile: IO error while reading the config file '{configFile}':", ex);
+                LogHandlingHelper.ExceptionErrorHandling("Get Unique Target Framework Keys", $"MethodName:GetUniqueTargetFrameworkKeysForConfigFile(),IO error while reading the config file '{configFile}'", ex, "");
+                
             }
             catch (ArgumentNullException ex)
             {
-                Logger.Debug($"Error in GetUniqueTargetFrameworkKeysForConfigFile:", ex);
+                LogHandlingHelper.ExceptionErrorHandling("Get Unique Target Framework Keys", $"MethodName:GetUniqueTargetFrameworkKeysForConfigFile(),Argument null exception while reading the config file '{configFile}'", ex, "");
             }
             return uniqueKeys;
         }
@@ -1031,11 +1032,11 @@ namespace LCT.PackageIdentifier
                 }
                 catch (IOException ex)
                 {
-                    Logger.Debug($"IO error while Loading project file path :{projectFilePath} Error : {ex.Message}");
+                    LogHandlingHelper.ExceptionErrorHandling("Identify deployment type", $"MethodName:DetectDeploymentType(),IO error while Loading project file path :{projectFilePath} Error", ex, "");
                 }
                 catch (ArgumentException ex)
                 {
-                    Logger.Debug($"IO error while Loading project file path :{projectFilePath} Error : {ex.Message}");
+                    LogHandlingHelper.ExceptionErrorHandling("Identify deployment type", $"MethodName:DetectDeploymentType(),Argument exception while Loading project file path :{projectFilePath} Error", ex, "");                    
                 }
             }
 

@@ -54,7 +54,6 @@ namespace LCT.PackageIdentifier
                     Logger.Debug($"ParsePackageFile():FileName: " + filepath);
                     var list = ParseCycloneDX(filepath, ref bom,appSettings);
                     listofComponents.AddRange(list);
-                    DebianPackagesList(filepath, list);
                 }
                 else if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
@@ -183,35 +182,7 @@ namespace LCT.PackageIdentifier
             CommonHelper.SetComponentPropertiesAndHashes(component, artifactoryrepo, projectType, jfrogFileNameProperty, jfrogRepoPathProperty, hashes);
 
             return component;
-        }
-        public static void DebianPackagesList(string filePath, List<DebianPackage> packages)
-        {
-
-            if (packages == null || packages.Count == 0)
-            {
-
-                Logger.Debug($"No Debian packages were found in the file: {filePath}");
-                return;
-            }
-
-            // Build the table
-            var logBuilder = new System.Text.StringBuilder();
-            logBuilder.AppendLine(LogHandlingHelper.LogSeparator);
-            logBuilder.AppendLine($" DEBIAN PACKAGES FOUND IN FILE: {filePath}");
-            logBuilder.AppendLine(LogHandlingHelper.LogSeparator);
-            logBuilder.AppendLine($"| {"Name",-40} | {"Version",-20} | {"PURL",-60} |");
-            logBuilder.AppendLine(LogHandlingHelper.LogHeaderSeparator);
-
-            foreach (var package in packages)
-            {
-                logBuilder.AppendLine($"| {package.Name,-40} | {package.Version,-20} | {package.PurlID,-60} |");
-            }
-
-            logBuilder.AppendLine(LogHandlingHelper.LogSeparator);
-
-            // Log the table
-            Logger.Debug(logBuilder.ToString());
-        }
+        }        
         private static void UpdateBomKpiData(CommonAppSettings appSettings, string repoValue)
         {
             if (repoValue == appSettings.Debian.DevDepRepo)
@@ -376,10 +347,7 @@ namespace LCT.PackageIdentifier
 
         private static string GetReleaseExternalId(string name, string version)
         {
-            version = WebUtility.UrlEncode(version);
-            version = version.Replace("%3A", ":");
-
-            return $"{Dataconstant.PurlCheck()["DEBIAN"]}{Dataconstant.ForwardSlash}{name}@{version}?arch=source";
+            return BomHelper.GetReleaseExternalId(name, version, Dataconstant.PurlCheck()["DEBIAN"]);
         }
         private static List<Component> FormComponentReleaseExternalID(List<DebianPackage> listOfComponents)
         {
