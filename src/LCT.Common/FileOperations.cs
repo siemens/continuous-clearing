@@ -301,7 +301,6 @@ namespace LCT.Common
             }
             Logger.Debug($"WriteContentToMultipleVersionsFile():Completed writing content to the file.");
             return "success";
-
         }
 
         private static void UpdateCompositions(ref Bom components, ref Bom comparisonData)
