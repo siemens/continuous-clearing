@@ -19,7 +19,7 @@ namespace LCT.Common
     /// </summary>
     [ExcludeFromCodeCoverage]
     public class CommonAppSettings
-    {
+    {        
         public static string PackageUrlApi { get; set; } = $"https://www.nuget.org/api/v2/package/";
         public static string SourceURLNugetApi { get; set; } = $"https://api.nuget.org/v3-flatcontainer/";
         public static string SourceURLMavenApi { get; set; } = $"https://repo.maven.apache.org/maven2/";
@@ -151,7 +151,7 @@ namespace LCT.Common
         private string m_InputFolder;
         private string m_OutputFolder;
         private string m_LogFolder;
-        
+        private readonly IEnvironmentHelper environmentHelper = new EnvironmentHelper();
         public string InputFolder
         {
             get
@@ -164,7 +164,7 @@ namespace LCT.Common
                     !AppDomain.CurrentDomain.FriendlyName.Contains("ArtifactoryUploader"))
                 {
                     var folderAction = new FolderAction();
-                    folderAction.ValidateFolderPath(value);
+                    folderAction.ValidateFolderPath(value, environmentHelper);
                     m_InputFolder = value;
                 }
             }
@@ -182,7 +182,7 @@ namespace LCT.Common
                 {
                     var folderAction = new FolderAction();
                     m_OutputFolder = value;
-                    folderAction.ValidateFolderPath(value);
+                    folderAction.ValidateFolderPath(value,environmentHelper);
                 }
                 catch (DirectoryNotFoundException)
                 {
@@ -203,7 +203,7 @@ namespace LCT.Common
                 {
                     m_LogFolder = value;
                     var folderAction = new FolderAction();
-                    folderAction.ValidateFolderPath(value);
+                    folderAction.ValidateFolderPath(value,environmentHelper);
                 }
                 catch (DirectoryNotFoundException)
                 {

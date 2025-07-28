@@ -21,36 +21,38 @@ namespace LCT.PackageIdentifier
         public static string GetRepodetailsFromPerticularOrder(List<AqlResult> aqlResults)
         {
             Logger.Debug("GetRepodetailsFromPerticularOrder(): Starting repository details retrieval from AQL results.");
+
             if (aqlResults == null)
             {
                 Logger.Debug("GetRepodetailsFromPerticularOrder(): No repositories identified from aqlresult. Returning 'Not Found in Repo'.");
                 return NotFoundInRepo;
             }
+
             Logger.Debug($"GetRepodetailsFromPerticularOrder(): Total repositories identified from AQL result: {aqlResults.Count}");
-            if (aqlResults.Find(x => x.Repo.Contains("release"))?.Repo != null)
+            var repoKeywords = new[] { "release", "devdep", "dev" };
+            string repo = FindRepositoryByKeywords(aqlResults, repoKeywords);
+
+            if (repo != null)
             {
-                string repo = aqlResults.Find(x => x.Repo.Contains("release"))?.Repo;
-                Logger.Debug($"GetRepodetailsFromPerticularOrder(): Found repository containing 'release': {repo}");
+                Logger.Debug($"GetRepodetailsFromPerticularOrder(): Found repository: {repo}");
                 return repo;
             }
-            else if (aqlResults.Find(x => x.Repo.Contains("devdep"))?.Repo != null)
+            repo = aqlResults.FirstOrDefault()?.Repo ?? NotFoundInRepo;
+            Logger.Debug($"GetRepodetailsFromPerticularOrder(): No specific repository found. Returning repository or 'Not Found in Repo': {repo}");
+            return repo;
+        }
+
+        private static string FindRepositoryByKeywords(List<AqlResult> aqlResults, string[] keywords)
+        {
+            foreach (var keyword in keywords)
             {
-                string repo = aqlResults.Find(x => x.Repo.Contains("devdep"))?.Repo;
-                Logger.Debug($"GetRepodetailsFromPerticularOrder(): Found repository containing 'devdep': {repo}");
-                return repo;
+                var repo = aqlResults.Find(x => x.Repo.Contains(keyword))?.Repo;
+                if (repo != null)
+                {
+                    return repo;
+                }
             }
-            else if (aqlResults.Find(x => x.Repo.Contains("dev"))?.Repo != null)
-            {
-                string repo = aqlResults.Find(x => x.Repo.Contains("dev"))?.Repo;
-                Logger.Debug($"GetRepodetailsFromPerticularOrder(): Found repository containing 'dev': {repo}");
-                return repo;
-            }
-            else
-            {
-                string repo = aqlResults.FirstOrDefault()?.Repo ?? NotFoundInRepo;
-                Logger.Debug($"GetRepodetailsFromPerticularOrder(): No specific repository found. Returning repository or 'Not Found in Repo': {repo}");
-                return repo;
-            }
+            return null;
         }
         public static string GetBomFileName(CommonAppSettings appSettings)
         {

@@ -4,7 +4,10 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using LCT.Common.Interface;
+using Moq;
 using NUnit.Framework;
+using System;
 using System.IO;
 
 namespace LCT.Common.UTest
@@ -14,22 +17,18 @@ namespace LCT.Common.UTest
     {
 
         [Test]
-        public void ValidateFolderPath_WhenFolderPathIsEmpty_ThrowsArgumentException()
+        public void ValidateFolderPath_WhenFolderPathIsEmpty_ApplicationExit()
         {
-            //Arrange
+            // Arrange
             var folderAction = new FolderAction();
-            //Assert
-            Assert.Throws<System.ArgumentException>(() => folderAction.ValidateFolderPath(""));
-        }
+            Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
+            environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));
 
-        [Test]
-        public void ValidateFolderPath_WhenFolderPathIsNotProper_ThrowsDirectoryNotFoundException()
-        {
-            //Arrange
-            var folderAction = new FolderAction();
-            //Assert
-            Assert.Throws<System.IO.DirectoryNotFoundException>(() => folderAction.ValidateFolderPath("test"));
+            // Act & Assert
+            folderAction.ValidateFolderPath("", environmentHelperMock.Object);
+            environmentHelperMock.Verify(x => x.CallEnvironmentExit(-1), Times.Exactly(2));
         }
+        
 
         [Test]
         public void ZipFileToTargetDirectory_WhenPathIsNotProper_ReturnsFalse()

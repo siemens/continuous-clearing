@@ -30,12 +30,12 @@ namespace LCT.Common
         {
             if (string.IsNullOrWhiteSpace(filePath))
             {
-                HandleValidationError("Validation failed for file path.", new ArgumentException($"Invalid value for the {nameof(filePath)} - {filePath}"), "The provided file path is null, empty, or consists only of whitespace.", _environmentHelper);
+                HandleValidationError("Given file path is empty or null", new ArgumentException($"Invalid value for the {nameof(filePath)} - {filePath}"), "Provide valid file path", _environmentHelper,filePath);
             }
 
             if (!File.Exists(filePath))
             {
-                HandleValidationError("Validation failed for file path.", new ArgumentException($"Invalid value for the {nameof(filePath)} - {filePath}"), "The provided file path is null, empty, or consists only of whitespace.", _environmentHelper);
+                HandleValidationError("File not exist in given path", new ArgumentException($"Invalid value for the {nameof(filePath)} - {filePath}"), $"Provide valid file path", _environmentHelper,filePath);
             }
         }
 
@@ -357,9 +357,10 @@ namespace LCT.Common
             var newDependencies = source.Dependencies.Where(d => !target.Dependencies.Contains(d));
             target.Dependencies.AddRange(newDependencies);
         }
-        private static void HandleValidationError(string message, Exception exception, string additionalDetails, IEnvironmentHelper environmentHelper)
+        private static void HandleValidationError(string message, Exception exception, string additionalDetails, IEnvironmentHelper environmentHelper,string filePath)
         {
-            LogHandlingHelper.ExceptionErrorHandling("Validation Error", message, exception, additionalDetails);
+            LogHandlingHelper.ExceptionErrorHandling($"Validation for filepath {filePath}", message, exception, additionalDetails);
+            Logger.Error($"{message}- {filePath}");
             environmentHelper.CallEnvironmentExit(-1);
         }
     }

@@ -65,18 +65,20 @@ namespace LCT.Common
         /// Validates the folder path given
         /// </summary>
         /// <param name="folderPath"></param>
-        public void ValidateFolderPath(string folderPath)
+        public void ValidateFolderPath(string folderPath,IEnvironmentHelper environmentHelper)
         {
             if (string.IsNullOrWhiteSpace(folderPath))
             {
-                LogHandlingHelper.ExceptionErrorHandling("Validation Error", "Validation failed for folder path.", new ArgumentException($"Invalid value for folderPath - {folderPath}"), "The provided folder path is null, empty, or consists only of whitespace.");
-                throw new ArgumentException($"Invalid value for folderPath -{folderPath}");
+                LogHandlingHelper.ExceptionErrorHandling("folder path validation in the appsettings file", "Method:ValidateFolderPath()", new ArgumentException($"Invalid value for folderPath - {folderPath}"), "The provided folder path is null, empty, or consists only of whitespace.");
+                Logger.Error($"The folder path provided in the appsettings file (Input folder path, Output folder path, or Log folder path) is null, empty, or consists only of whitespace.");
+                environmentHelper.CallEnvironmentExit(-1);
             }
 
             if (!System.IO.Directory.Exists(folderPath))
             {
-                LogHandlingHelper.ExceptionErrorHandling("Validation Error", "Folder path does not exist.", new DirectoryNotFoundException($"Invalid folder path - {folderPath}"), $"Ensure the folder exists at the specified path: {folderPath}");
-                throw new DirectoryNotFoundException($"Invalid folder path -{folderPath}");
+                LogHandlingHelper.ExceptionErrorHandling("folder path validation in the appsettings file", "Method:ValidateFolderPath()", new DirectoryNotFoundException($"Invalid folder path - {folderPath}"), $"Ensure the folder exists at the specified path: {folderPath}");
+                Logger.Error($"The folder path provided in the appsettings file (Input folder path, Output folder path, or Log folder path) is null, empty, or consists only of whitespace.\"");
+                environmentHelper.CallEnvironmentExit(-1);
             }
         }
 
