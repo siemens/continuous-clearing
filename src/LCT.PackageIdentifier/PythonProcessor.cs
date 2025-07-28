@@ -97,6 +97,7 @@ namespace LCT.PackageIdentifier
 
         public static void AddSiemensDirectProperty(ref Bom bom)
         {
+            Logger.Debug("AddSiemensDirectProperty(): Starting to add SiemensDirect property to BOM components.");
             List<string> pythonDirectDependencies = new List<string>();
             pythonDirectDependencies.AddRange(bom.Dependencies?.Select(x => x.Ref).ToList() ?? new List<string>());
             var bomComponentsList = bom.Components;
@@ -105,6 +106,7 @@ namespace LCT.PackageIdentifier
                 Property siemensDirect = new() { Name = Dataconstant.Cdx_SiemensDirect, Value = "false" };
                 if (pythonDirectDependencies.Exists(x => x.Contains(component.Name) && x.Contains(component.Version)))
                 {
+                    Logger.Debug($"AddSiemensDirectProperty(): Component [Name: {component.Name}, Version: {component.Version}] is a direct dependency. Setting SiemensDirect property to true.");
                     siemensDirect.Value = "true";
                 }
 
@@ -114,7 +116,7 @@ namespace LCT.PackageIdentifier
 
                 if (!isPropExists) { component.Properties.Add(siemensDirect); }
             }
-
+            Logger.Debug("AddSiemensDirectProperty(): Completed adding SiemensDirect property to BOM components.");
             bom.Components = bomComponentsList;
         }
 
@@ -322,6 +324,7 @@ namespace LCT.PackageIdentifier
             string jfrogcomponentName = bomHelper.GetFullNameOfComponent(component);
             if (aqlResultList.Exists(x => x.Properties.Any(p => p.Key == "pypi.normalized.name" && p.Value == jfrogcomponentName) && x.Properties.Any(p => p.Key == "pypi.version" && p.Value == component.Version)))
             {
+                Logger.Debug($"IsInternalPythonComponent(): Component [Name: {component.Name}, Version: {component.Version}] is internal,Found in JFrog repository with full name: {jfrogcomponentName}.");
                 return true;
             }
 
@@ -413,11 +416,12 @@ namespace LCT.PackageIdentifier
                                                      out string jfrogPackageName,
                                                      out string jfrogRepoPath)
         {
+            Logger.Debug($"GetArtifactoryRepoName(): Starting identify JFrog repository details retrieval for component [Name: {component.Name}, Version: {component.Version}].");
             jfrogPackageName = Dataconstant.PackageNameNotFoundInJfrog;
             jfrogRepoPath = Dataconstant.JfrogRepoPathNotFound;
             string jfrogPackageNameWhlExten = GetJfrogNameOfPypiComponent(
                 component.Name, component.Version, aqlResultList);
-
+            Logger.Debug($"GetArtifactoryRepoName(): Searching for component in JFrog repository with name: {jfrogPackageNameWhlExten}.");
             var aqlResults = aqlResultList.FindAll(x => x.Name.Equals(
                 jfrogPackageNameWhlExten, StringComparison.OrdinalIgnoreCase));
             jfrogPackageName = jfrogPackageNameWhlExten;
@@ -428,6 +432,7 @@ namespace LCT.PackageIdentifier
             {
                 string fullName = bomHelper.GetFullNameOfComponent(component);
                 string fullNameVersion = GetJfrogNameOfPypiComponent(fullName, component.Version, aqlResultList);
+                Logger.Debug($"GetArtifactoryRepoName(): Searching for component in JFrog repository with name: {fullNameVersion}.");
                 if (!fullNameVersion.Equals(jfrogPackageNameWhlExten, StringComparison.OrdinalIgnoreCase))
                 {
                     var aqllist = aqlResultList.FindAll(x => x.Name.Contains(fullNameVersion, StringComparison.OrdinalIgnoreCase)
@@ -442,6 +447,7 @@ namespace LCT.PackageIdentifier
             {
                 var aqlResult = aqlResults.FirstOrDefault(x => x.Repo.Equals(repoName));
                 jfrogRepoPath = GetJfrogRepoPath(aqlResult);
+                Logger.Debug($"GetJfrogArtifactoryRepoDetials(): JFrog repository path: {jfrogRepoPath}.");
             }
 
             if (string.IsNullOrEmpty(jfrogPackageName))

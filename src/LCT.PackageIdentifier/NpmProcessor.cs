@@ -538,6 +538,7 @@ namespace LCT.PackageIdentifier
             Logger.Debug($"ProcessSPDXFile():CycloneDX file detected: {filepath}");
             Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
             bom = _spdxBomParser.ParseSPDXBom(filepath);
+            LogHandlingHelper.IdentifierInputFileComponents(filepath, bom.Components);
             bom = RemoveExcludedComponents(appSettings, bom);
             SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bom, appSettings.ProjectType,ref listUnsupportedComponents);
             AddingIdentifierType(bom.Components, "SpdxFile", filepath);
@@ -548,8 +549,6 @@ namespace LCT.PackageIdentifier
             dependencies.AddRange(bom.Dependencies);
             ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
             ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
-            LogHandlingHelper.IdentifierInputFileComponents(filepath, bom.Components);
-            LogHandlingHelper.IdentifierInputFileComponents(filepath, listUnsupportedComponents.Components);
         }
 
         private static void ProcessPackageFile(string filepath, CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref List<Dependency> dependencies)
@@ -674,6 +673,7 @@ namespace LCT.PackageIdentifier
             string jfrogcomponentName = bomHelper.GetFullNameOfComponent(component);
             if (aqlResultList.Exists(x => x.Properties.Any(p => p.Key == "npm.name" && p.Value == jfrogcomponentName) && x.Properties.Any(p => p.Key == "npm.version" && p.Value == component.Version)))
             {
+                Logger.Debug($"IsInternalNpmComponent(): Component [Name: {component.Name}, Version: {component.Version}] is internal,Found in JFrog repository with full name: {jfrogcomponentName}.");
                 return true;
             }
 
@@ -685,10 +685,11 @@ namespace LCT.PackageIdentifier
                                                                 IBomHelper bomHelper,
                                                                 out string jfrogRepoPath)
         {
+            Logger.Debug($"GetJfrogArtifactoryRepoDetials(): Starting identify JFrog repository details retrieval for component [Name: {component.Name}, Version: {component.Version}].");
             AqlResult aqlResult = new AqlResult();
             jfrogRepoPath = Dataconstant.JfrogRepoPathNotFound;
             string jfrogpackageName = bomHelper.GetFullNameOfComponent(component);
-
+            Logger.Debug($"GetJfrogArtifactoryRepoDetials(): Searching for component in JFrog repository with name: {jfrogpackageName}.");
             var aqlResults = aqlResultList.FindAll(x => x.Properties.Any(p => p.Key == "npm.name" && p.Value == jfrogpackageName) && x.Properties.Any(p => p.Key == "npm.version" && p.Value == component.Version));
 
             string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults);
@@ -698,6 +699,7 @@ namespace LCT.PackageIdentifier
             {
                 aqlResult = aqlResults.FirstOrDefault(x => x.Repo.Equals(repoName));
                 jfrogRepoPath = GetJfrogRepoPath(aqlResult);
+                Logger.Debug($"GetJfrogArtifactoryRepoDetials(): JFrog repository path: {jfrogRepoPath}.");
             }
 
             if (aqlResult != null)

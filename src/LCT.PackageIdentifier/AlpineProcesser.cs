@@ -148,7 +148,6 @@ namespace LCT.PackageIdentifier
             }
             ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
             ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
-            LogHandlingHelper.IdentifierInputFileComponents(filePath, listUnsupportedComponents.Components);
         }
 
         private static void GetDistinctComponentList(ref List<AlpinePackage> listofComponents)

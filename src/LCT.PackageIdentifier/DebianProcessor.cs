@@ -92,6 +92,7 @@ namespace LCT.PackageIdentifier
 
         private static void AddSiemensDirectProperty(ref Bom bom)
         {
+            Logger.Debug("AddSiemensDirectProperty(): Starting to add SiemensDirect property to BOM components.");
             List<string> debianDirectDependencies = [.. bom.Dependencies?.Select(x => x.Ref).ToList() ?? new List<string>()];
             var bomComponentsList = bom.Components;
             foreach (var component in bomComponentsList)
@@ -99,16 +100,17 @@ namespace LCT.PackageIdentifier
                 Property siemensDirect = new() { Name = Dataconstant.Cdx_SiemensDirect, Value = "false" };
                 if (debianDirectDependencies.Exists(x => x.Contains(component.Name) && x.Contains(component.Version)))
                 {
+                    Logger.Debug($"AddSiemensDirectProperty(): Component [Name: {component.Name}, Version: {component.Version}] is a direct dependency. Setting SiemensDirect property to true.");
                     siemensDirect.Value = "true";
                 }
                 component.Properties ??= new List<Property>();
                 bool isPropExists = component.Properties.Exists(
                     x => x.Name.Equals(Dataconstant.Cdx_SiemensDirect));
-
                 if (!isPropExists) { component.Properties.Add(siemensDirect); }
             }
 
             bom.Components = bomComponentsList;
+            Logger.Debug("AddSiemensDirectProperty(): Completed adding SiemensDirect property to BOM components.");
         }
 
         public static Bom RemoveExcludedComponents(CommonAppSettings appSettings, Bom cycloneDXBOM)
@@ -241,9 +243,11 @@ namespace LCT.PackageIdentifier
                                                      out string jfrogRepoPackageName,
                                                      out string jfrogRepoPath)
         {
+            Logger.Debug($"GetArtifactoryRepoName(): Starting identify JFrog repository details retrieval for component [Name: {component.Name}, Version: {component.Version}].");
             jfrogRepoPath = Dataconstant.JfrogRepoPathNotFound;
             jfrogRepoPackageName = Dataconstant.PackageNameNotFoundInJfrog;
             string jfrogcomponentName = GetJfrogcomponentNameVersionCombined(component.Name, component.Version);
+            Logger.Debug($"GetArtifactoryRepoName(): Searching for component in JFrog repository with name: {jfrogcomponentName}.");
             var aqlResults = aqlResultList.FindAll(x => x.Name.Contains(
                 jfrogcomponentName, StringComparison.OrdinalIgnoreCase));
 
@@ -257,6 +261,7 @@ namespace LCT.PackageIdentifier
             {
                 string fullName = bomHelper.GetFullNameOfComponent(component);
                 string fullNameVersion = GetJfrogcomponentNameVersionCombined(fullName, component.Version);
+                Logger.Debug($"GetArtifactoryRepoName(): Searching for component in JFrog repository with name: {fullNameVersion}.");
                 if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase))
                 {
                     aqlResults = aqlResultList.FindAll(x => x.Name.Contains(
@@ -273,13 +278,13 @@ namespace LCT.PackageIdentifier
             {
                 var aqlResult = aqlResults.FirstOrDefault(x => x.Repo.Equals(repoName));
                 jfrogRepoPath = GetJfrogRepoPath(aqlResult);
+                Logger.Debug($"GetJfrogArtifactoryRepoDetials(): JFrog repository path: {jfrogRepoPath}.");
             }
 
             if (string.IsNullOrEmpty(jfrogRepoPackageName))
             {
                 jfrogRepoPackageName = Dataconstant.PackageNameNotFoundInJfrog;
             }
-
             return repoName;
         }
 
@@ -310,6 +315,7 @@ namespace LCT.PackageIdentifier
             if (aqlResultList.Exists(
                 x => x.Name.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase)))
             {
+                Logger.Debug($"IsInternalDebianComponent(): Component [Name: {component.Name}, Version: {component.Version}] is internal,Found in JFrog repository with full name: {jfrogcomponentName}.");
                 return true;
             }
 
@@ -319,6 +325,7 @@ namespace LCT.PackageIdentifier
                 && aqlResultList.Exists(
                     x => x.Name.Equals(fullNameVersion, StringComparison.OrdinalIgnoreCase)))
             {
+                Logger.Debug($"IsInternalDebianComponent(): Component [Name: {component.Name}, Version: {component.Version}] is internal,Found in JFrog repository with full name: {fullNameVersion}.");
                 return true;
             }
 
@@ -355,7 +362,6 @@ namespace LCT.PackageIdentifier
             }
             ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
             ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
-            LogHandlingHelper.IdentifierInputFileComponents(filePath, listUnsupportedComponents.Components);
             return bom;
         }
 

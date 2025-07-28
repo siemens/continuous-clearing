@@ -316,24 +316,29 @@ namespace LCT.PackageIdentifier
                                              Component component,
                                              IBomHelper bomHelper, out string jfrogRepoPath)
         {
+            Logger.Debug($"GetJfrogArtifactoryRepoDetials(): Starting identify JFrog repository details retrieval for component [Name: {component.Name}, Version: {component.Version}].");
             AqlResult aqlResult = new AqlResult();
             jfrogRepoPath = string.Empty;
             string jfrogcomponentName = $"{component.Name}-{component.Version}.nupkg";
 
+            Logger.Debug($"GetJfrogArtifactoryRepoDetials(): Searching for component in JFrog repository with name: {jfrogcomponentName}.");
             var aqlResults = aqlResultList.FindAll(x => x.Name.Equals(
                 jfrogcomponentName, StringComparison.OrdinalIgnoreCase));
             if (aqlResults == null || aqlResults.Count <= 0)
             {
+                Logger.Debug($"GetJfrogArtifactoryRepoDetials(): Component not found with name: {jfrogcomponentName}. Trying alternate name format.");
                 jfrogcomponentName = $"{component.Name}.{component.Version}.nupkg";
                 aqlResults = aqlResultList.FindAll(x => x.Name.Equals(
                 jfrogcomponentName, StringComparison.OrdinalIgnoreCase));
             }
             string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults);
-
+            Logger.Debug($"GetJfrogArtifactoryRepoDetials(): Repository name identified: {repoName}.");
 
             if (repoName.Equals(NotFoundInRepo, StringComparison.OrdinalIgnoreCase))
             {
+                Logger.Debug($"GetJfrogArtifactoryRepoDetials(): Repository name not found for component. ");
                 string fullName = bomHelper.GetFullNameOfComponent(component);
+                Logger.Debug($"GetJfrogArtifactoryRepoDetials(): Get full name for component:{fullName} ");
                 string fullNameVersion = $"{fullName}-{component.Version}.nupkg";
                 if (fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase))
                 {
@@ -354,11 +359,13 @@ namespace LCT.PackageIdentifier
             {
                 aqlResult = aqlResults.FirstOrDefault(x => x.Repo.Equals(repoName));
                 jfrogRepoPath = GetJfrogRepoPath(aqlResult);
+                Logger.Debug($"GetJfrogArtifactoryRepoDetials(): JFrog repository path: {jfrogRepoPath}.");
             }
             if (aqlResult != null)
             {
                 aqlResult.Repo ??= repoName;
             }
+            Logger.Debug($"GetJfrogArtifactoryRepoDetials(): Completed repository details retrieval for component [Name: {component.Name}, Version: {component.Version}].");
             return aqlResult;
         }
 
@@ -396,9 +403,11 @@ namespace LCT.PackageIdentifier
 
         private static bool IsInternalNugetComponent(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
         {
+            Logger.Debug($"IsInternalNugetComponent(): Checking if component [Name: {component.Name}, Version: {component.Version}] is an internal NuGet component.");
             string jfrogcomponentName = $"{component.Name}.{component.Version}.nupkg";
             if (aqlResultList.Exists(x => x.Name.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase)))
             {
+                Logger.Debug($"IsInternalNugetComponent(): Component [Name: {component.Name}, Version: {component.Version}] found in JFrog repository with name: {jfrogcomponentName}.");
                 return true;
             }
 
@@ -408,8 +417,10 @@ namespace LCT.PackageIdentifier
                 && aqlResultList.Exists(
                 x => x.Name.Equals(fullNameVersion, StringComparison.OrdinalIgnoreCase)))
             {
+                Logger.Debug($"IsInternalNugetComponent(): Component [Name: {component.Name}, Version: {component.Version}] is internal,Found in JFrog repository with full name: {fullNameVersion}.");
                 return true;
             }
+            Logger.Debug($"IsInternalNugetComponent(): Component [Name: {component.Name}, Version: {component.Version}] is not an internal NuGet component.");
             return false;
         }
 
@@ -421,6 +432,7 @@ namespace LCT.PackageIdentifier
 
         public static void AddSiemensDirectProperty(ref Bom bom)
         {
+            Logger.Debug("AddSiemensDirectProperty(): Starting to add SiemensDirect property to BOM components.");
             var bomComponentsList = bom.Components;
             foreach (var component in bomComponentsList)
             {
@@ -428,7 +440,7 @@ namespace LCT.PackageIdentifier
 
                 var isDirectDep = NugetDevDependencyParser.NugetDirectDependencies
                     .Any(x => x.Contains(component.Name) && x.Contains(component.Version));
-
+                Logger.Debug($"AddSiemensDirectProperty(): Component [Name: {component.Name}, Version: {component.Version}] is a direct dependency. Setting SiemensDirect property to {isDirectDep}.");
                 if (isDirectDep) { siemensDirect.Value = "true"; }
 
                 component.Properties ??= new List<Property>();
@@ -440,6 +452,7 @@ namespace LCT.PackageIdentifier
             }
 
             bom.Components = bomComponentsList;
+            Logger.Debug("AddSiemensDirectProperty(): Completed adding SiemensDirect property to BOM components.");
         }
 
         #endregion
@@ -515,7 +528,6 @@ namespace LCT.PackageIdentifier
                 }
                 ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
                 ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
-                LogHandlingHelper.IdentifierInputFileComponents(filepath, listUnsupportedComponents.Components);
             }
             else
             {

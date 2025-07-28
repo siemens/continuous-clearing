@@ -196,16 +196,19 @@ namespace LCT.Common
 
         private static List<Dependency> ProcessSpdxRelationships(IEnumerable<Relationship> relationships, Dictionary<string, Component> componentIndex)
         {
+            Logger.Debug("ProcessSpdxRelationships(): Starting SPDX relationships processing...");
             if (relationships == null)
             {
-                Logger.Debug("No relationships found in SPDX data.");
+                Logger.Debug("ProcessSpdxRelationships(): No relationships found in SPDX data.");
                 return new List<Dependency>();
             }
-
             var supportedRelationshipTypes = GetSupportedRelationshipTypes();
             var dependencyMap = BuildDependencyMap(relationships, componentIndex, supportedRelationshipTypes);
             AddDevelopmentPropertyToComponents(componentIndex.Values.ToList(), relationships, componentIndex);
-            return ConvertDependencyMapToCycloneDx(dependencyMap);
+            var cycloneDxDependencies = ConvertDependencyMapToCycloneDx(dependencyMap);
+            Logger.Debug($"ProcessSpdxRelationships(): Converted dependency map to CycloneDX format with {cycloneDxDependencies.Count} dependencies.");
+            Logger.Debug("ProcessSpdxRelationships(): SPDX relationships processing completed.");
+            return cycloneDxDependencies;
         }
 
         private static HashSet<string> GetSupportedRelationshipTypes()
@@ -223,21 +226,19 @@ namespace LCT.Common
             IEnumerable<Relationship> relationships,
             Dictionary<string, Component> componentIndex,
             HashSet<string> supportedRelationshipTypes)
-        {
+        {            
             var dependencyMap = new Dictionary<string, List<(string bomRef, string relationshipType)>>();
 
             foreach (var relationship in relationships)
             {
                 if (!IsValidRelationship(relationship, supportedRelationshipTypes, componentIndex))
                     continue;
-
                 var (dependentRef, dependencyRef) = GetDependencyRefs(relationship, componentIndex);
                 if (string.IsNullOrEmpty(dependentRef) || string.IsNullOrEmpty(dependencyRef))
                     continue;
-
+                Logger.Debug($"BuildDependencyMap(): Adding relationship to dependency map: DependentRef={dependentRef}, DependencyRef={dependencyRef}, Type={relationship.RelationshipType}");
                 AddToDependencyMap(dependencyMap, dependentRef, dependencyRef, relationship.RelationshipType);
-            }
-
+            }            
             return dependencyMap;
         }
 
@@ -250,15 +251,13 @@ namespace LCT.Common
 
         private static (string dependentRef, string dependencyRef) GetDependencyRefs(Relationship relationship, Dictionary<string, Component> componentIndex)
         {
+            Logger.Debug($"GetDependencyRefs(): Resolving dependency references for relationship: {relationship.SpdxElementId} -> {relationship.RelatedSpdxElement}");
             var parentComponent = componentIndex[relationship.SpdxElementId];
             var childComponent = componentIndex[relationship.RelatedSpdxElement];
 
             var parentBomRef = parentComponent.Manufacturer.BomRef;
             var childBomRef = childComponent.Manufacturer.BomRef;
-
-            // For DEPENDENCY_OF, DEV_DEPENDENCY_OF, RUNTIME_DEPENDENCY_OF
-            // A DEPENDENCY_OF B means A is a dependency of B
-            // So B depends on A, meaning B (child) depends on A (parent)
+            Logger.Debug($"GetDependencyRefs(): Resolved dependency references for relationship: ParentBomRef={parentBomRef}, ChildBomRef={childBomRef}");
             return (dependentRef: childBomRef, dependencyRef: parentBomRef);
         }
 
@@ -272,6 +271,7 @@ namespace LCT.Common
             {
                 dependencies = new List<(string bomRef, string relationshipType)>();
                 dependencyMap[dependentRef] = dependencies;
+                Logger.Debug($"AddToDependencyMap(): Created new dependency list for DependentRef={dependentRef}");
             }
 
             if (!dependencies.Any(d => d.bomRef == dependencyRef))

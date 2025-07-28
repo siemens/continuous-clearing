@@ -34,6 +34,7 @@ namespace LCT.Common
                 {
                     bom.Components.Remove(component);
                     listUnsupportedComponents.Add(component);
+                    Logger.Debug($"CheckValidComponentsFromSpdxfile():Name:{component.Name},Version:{component.Version},Purl:{component.Purl} identified as a unsupported component");
                 }
             }
             foreach (var dependency in bom.Dependencies.ToList())

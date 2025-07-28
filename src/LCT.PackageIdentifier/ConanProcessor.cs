@@ -271,14 +271,14 @@ namespace LCT.PackageIdentifier
                     Logger.Debug($"ParsingInputFileForBOM():Spdx file detected: {filepath}");
                     Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
                     bom = _spdxBomParser.ParseSPDXBom(filepath);
+                    LogHandlingHelper.IdentifierInputFileComponents(filepath, bom.Components);
                     SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bom, appSettings.ProjectType,ref listUnsupportedComponents);
                     SpdxSbomHelper.AddSpdxSBomFileNameProperty(ref bom, filepath);
                     componentsForBOM.AddRange(bom.Components);
                     dependencies.AddRange(bom.Dependencies);
                     SpdxSbomHelper.AddSpdxPropertysForUnsupportedComponents(listUnsupportedComponents.Components,filepath);
                     ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
-                    ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
-                    LogHandlingHelper.IdentifierInputFileComponents(filepath, bom.Components);
+                    ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);                    
                 }
                 else if (filepath.EndsWith(FileConstant.CycloneDXFileExtension)
                     && !filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
@@ -491,6 +491,7 @@ namespace LCT.PackageIdentifier
             if (aqlResultList.Exists(
                 x => x.Path.Contains(jfrogcomponentPath, StringComparison.OrdinalIgnoreCase)))
             {
+                Logger.Debug($"IsInternalConanComponent(): Component [Name: {component.Name}, Version: {component.Version}] is internal,Found in JFrog repository with full name: {jfrogcomponentPath}.");
                 return true;
             }
 
@@ -499,7 +500,9 @@ namespace LCT.PackageIdentifier
 
         public static string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component, out string jfrogRepoPath)
         {
+            Logger.Debug($"GetArtifactoryRepoName(): Starting identify JFrog repository details retrieval for component [Name: {component.Name}, Version: {component.Version}].");
             string jfrogcomponentPath = $"{component.Name}/{component.Version}";
+            Logger.Debug($"GetArtifactoryRepoName(): Searching for component in JFrog repository with name: {jfrogcomponentPath}.");
             jfrogRepoPath = Dataconstant.JfrogRepoPathNotFound;
             var conanPackagePath = aqlResultList.FirstOrDefault(x => x.Path.Contains(jfrogcomponentPath) && x.Name.Contains("package.tgz"));
             if (conanPackagePath != null)
@@ -510,7 +513,6 @@ namespace LCT.PackageIdentifier
                 jfrogcomponentPath, StringComparison.OrdinalIgnoreCase));
 
             string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqllist);
-
             return repoName;
         }
 
