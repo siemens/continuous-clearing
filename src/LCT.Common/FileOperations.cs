@@ -9,6 +9,7 @@ using LCT.Common.Constants;
 using LCT.Common.Interface;
 using log4net;
 using Newtonsoft.Json;
+using NuGet.Protocol.Plugins;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -25,17 +26,18 @@ namespace LCT.Common
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static string CatoolBomFilePath { get; set; }
-        private readonly IEnvironmentHelper _environmentHelper = new EnvironmentHelper();
         public void ValidateFilePath(string filePath)
         {
             if (string.IsNullOrWhiteSpace(filePath))
             {
-                HandleValidationError("Given file path is empty or null", new ArgumentException($"Invalid value for the {nameof(filePath)} - {filePath}"), "Provide valid file path", _environmentHelper,filePath);
+                LogHandlingHelper.ExceptionErrorHandling($"Given file path is empty or null", "Method:ValidateFilePath()", new ArgumentException($"Invalid value for the {nameof(filePath)} - {filePath}"), "Provide valid file path");
+                throw new ArgumentException($"Invalid value for the {nameof(filePath)} - {filePath}");                
             }
 
             if (!File.Exists(filePath))
             {
-                HandleValidationError("File not exist in given path", new ArgumentException($"Invalid value for the {nameof(filePath)} - {filePath}"), $"Provide valid file path", _environmentHelper,filePath);
+                LogHandlingHelper.ExceptionErrorHandling($"File not exist in given path", "Method:ValidateFilePath()", new FileNotFoundException($"Invalid value for the {nameof(filePath)} - {filePath}"), "Provide valid file path");
+                throw new FileNotFoundException($"The {nameof(filePath)}  is not found at this path- {filePath}");                
             }
         }
 
@@ -355,12 +357,6 @@ namespace LCT.Common
             // Add only unique dependencies using LINQ
             var newDependencies = source.Dependencies.Where(d => !target.Dependencies.Contains(d));
             target.Dependencies.AddRange(newDependencies);
-        }
-        private static void HandleValidationError(string message, Exception exception, string additionalDetails, IEnvironmentHelper environmentHelper,string filePath)
-        {
-            LogHandlingHelper.ExceptionErrorHandling($"Validation for filepath {filePath}", message, exception, additionalDetails);
-            Logger.Error($"{message}- {filePath}");
-            environmentHelper.CallEnvironmentExit(-1);
-        }
+        }       
     }
 }
