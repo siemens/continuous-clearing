@@ -57,8 +57,6 @@ namespace ArtifactoryUploader
             string FolderPath = CommonHelper.LogFolderInitialization(appSettings, logFileNameWithTimestamp, m_Verbose);
             Logger.Logger.Log(null, Level.Debug, $"log manager initiated folder name: {FolderPath}", null);
             settingsManager.CheckRequiredArgsToRun(appSettings, "Uploader");
-
-            Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Artifactory Uploader >>>>>====================", null);
             Logger.Logger.Log(null, Level.Notice, $"\nStart of Artifactory Uploader execution: {DateTime.Now}", null);
 
             if (!appSettings.Jfrog.DryRun)

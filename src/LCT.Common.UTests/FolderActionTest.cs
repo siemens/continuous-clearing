@@ -25,11 +25,20 @@ namespace LCT.Common.UTest
             environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));
 
             // Act & Assert
-            folderAction.ValidateFolderPath("", environmentHelperMock.Object);
-            environmentHelperMock.Verify(x => x.CallEnvironmentExit(-1), Times.Exactly(2));
+            Assert.Throws<System.IO.DirectoryNotFoundException>(() => folderAction.ValidateFolderPath("", environmentHelperMock.Object));
+            environmentHelperMock.Verify(x => x.CallEnvironmentExit(-1), Times.Exactly(1));
         }
-        
 
+        [Test]
+        public void ValidateFolderPath_WhenFolderPathIsNotProper_ThrowsDirectoryNotFoundException()
+        {
+            //Arrange
+            var folderAction = new FolderAction();
+            Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
+            environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));
+            //Assert
+            Assert.Throws<System.IO.DirectoryNotFoundException>(() => folderAction.ValidateFolderPath("test", environmentHelperMock.Object));
+        }
         [Test]
         public void ZipFileToTargetDirectory_WhenPathIsNotProper_ReturnsFalse()
         {

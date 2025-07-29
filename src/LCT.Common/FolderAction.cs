@@ -70,15 +70,14 @@ namespace LCT.Common
             if (string.IsNullOrWhiteSpace(folderPath))
             {
                 LogHandlingHelper.ExceptionErrorHandling("folder path validation in the appsettings file", "Method:ValidateFolderPath()", new ArgumentException($"Invalid value for folderPath - {folderPath}"), "The provided folder path is null, empty, or consists only of whitespace.");
-                Logger.Error($"The folder path provided in the appsettings file (Input folder path, Output folder path, or Log folder path) is null, empty, or consists only of whitespace.");
+                Logger.Error($"The folder path provided in the appsettings file (Input folder path or Output folder path) is null, empty, or consists only of whitespace.");
                 environmentHelper.CallEnvironmentExit(-1);
             }
 
             if (!System.IO.Directory.Exists(folderPath))
             {
                 LogHandlingHelper.ExceptionErrorHandling("folder path validation in the appsettings file", "Method:ValidateFolderPath()", new DirectoryNotFoundException($"Invalid folder path - {folderPath}"), $"Ensure the folder exists at the specified path: {folderPath}");
-                Logger.Error($"The folder path provided in the appsettings file (Input folder path, Output folder path, or Log folder path) is null, empty, or consists only of whitespace.\"");
-                environmentHelper.CallEnvironmentExit(-1);
+                throw new DirectoryNotFoundException($"Invalid folder path -{folderPath}");
             }
         }
 
