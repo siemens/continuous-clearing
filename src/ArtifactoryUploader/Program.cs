@@ -65,7 +65,7 @@ namespace ArtifactoryUploader
                 Logger.Logger.Log(null, Level.Alert, $"Artifactory Uploader is running in dry-run mode, no packages will be moved \n", null);
 
             string bomFilePath = GetBomFilePath(appSettings);
-
+            Logger.Debug($"Main():Identified bom file with path:{bomFilePath}");
             Logger.Logger.Log(null, Level.Info, $"Input Parameters used in Artifactory Uploader:\n\t", null);
             Logger.Logger.Log(null, Level.Notice, $"\tBomFilePath:\t\t {bomFilePath}\n\t" +
                 $"CaToolVersion\t\t {caToolInformation.CatoolVersion}\n\t" +

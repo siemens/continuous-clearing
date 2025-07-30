@@ -48,6 +48,7 @@ namespace LCT.SW360PackageCreator
             ISW360Service sw360Service, ICycloneDXBomParser cycloneDXBomParser, ICreatorHelper creatorHelper)
         {
             var bomFilePath = Path.Combine(appSettings.Directory.OutputFolder, appSettings.SW360.ProjectName + "_" + FileConstant.BomFileName);
+            Logger.Debug($"CycloneDxBomParser():Identified bom file with path:{bomFilePath}");
             bom = cycloneDXBomParser.ParseCycloneDXBom(bomFilePath);
             // Log the components in a tabular format
             LogHandlingHelper.ListOfBomFileComponents(bomFilePath, bom?.Components ?? new List<Component>());
@@ -80,6 +81,7 @@ namespace LCT.SW360PackageCreator
                 }
                 else if ((componentsData.IsDev == "true" && appSettings.SW360.IgnoreDevDependency) || componentsData.ExcludeComponent == "true")
                 {
+                    Logger.Debug($"{item.Name}-{item.Version} found as Dev or Exclude component. ");
                     //do nothing
                 }
                 else
