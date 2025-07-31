@@ -151,78 +151,7 @@ namespace LCT.Common
             }
 
             return "";
-        }
-        public static void LogWebRequestAndResponse(
-    string context,
-    string details,
-    HttpWebRequest request,
-    HttpWebResponse response,
-    string additionalDetails = null)
-        {
-            var logBuilder = new StringBuilder();
-
-            // Log the context and details
-            AppendLogHeader(logBuilder, context, details, "HTTP WEB REQUEST AND RESPONSE DETAILS");
-
-            // Log the request details
-            logBuilder.AppendLine("REQUEST DETAILS");
-            logBuilder.AppendLine(LogHeaderSeparator);
-            logBuilder.AppendLine($"| {"Method",-20} | {request.Method,-100} |");
-            logBuilder.AppendLine($"| {"URL",-20} | {request.RequestUri,-100} |");
-
-            // Log request headers
-            if (request.Headers != null)
-            {
-                logBuilder.AppendLine(LogHeaderSeparator);
-                logBuilder.AppendLine(" REQUEST HEADERS");
-                logBuilder.AppendLine(LogHeaderSeparator);
-                foreach (string headerKey in request.Headers.AllKeys)
-                {
-                    string headerValue = request.Headers[headerKey];
-                    if (headerKey.Contains("authorization", StringComparison.OrdinalIgnoreCase) ||
-                        headerKey.Contains("token", StringComparison.OrdinalIgnoreCase) ||
-                        headerValue.Contains("bearer", StringComparison.OrdinalIgnoreCase))
-                    {
-                        headerValue = MaskedValue; // Mask sensitive values
-                    }
-                    logBuilder.AppendLine($"| {headerKey,-20} | {headerValue,-100} |");
-                }
-            }
-
-            // Log the response details
-            logBuilder.AppendLine(LogHeaderSeparator);
-            logBuilder.AppendLine("RESPONSE DETAILS");
-            logBuilder.AppendLine(LogHeaderSeparator);
-            logBuilder.AppendLine($"| {"Status Code",-20} | {response.StatusCode,-100} |");
-            logBuilder.AppendLine($"| {"Status Description",-20} | {response.StatusDescription,-100} |");
-
-            // Log response headers
-            if (response.Headers != null)
-            {
-                logBuilder.AppendLine(LogHeaderSeparator);
-                logBuilder.AppendLine(" RESPONSE HEADERS");
-                logBuilder.AppendLine(LogHeaderSeparator);
-                foreach (string headerKey in response.Headers.AllKeys)
-                {
-                    logBuilder.AppendLine($"| {headerKey,-20} | {response.Headers[headerKey],-100} |");
-                }
-            }
-
-            // Log response content
-            using (StreamReader reader = new StreamReader(response.GetResponseStream()))
-            {
-                string responseContent = reader.ReadToEnd();
-                AppendContent(logBuilder, responseContent, "RESPONSE CONTENT");
-            }
-
-            // Append additional details if provided
-            AppendAdditionalDetails(logBuilder, additionalDetails);
-
-            logBuilder.AppendLine(LogSeparator);
-
-            // Log the constructed message
-            Logger.Debug(logBuilder.ToString());
-        }
+        }        
         private static bool IsValidJson(string input)
         {
             input = input.Trim();

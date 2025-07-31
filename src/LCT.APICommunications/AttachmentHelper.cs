@@ -89,7 +89,6 @@ namespace LCT.APICommunications
 
                     using WebResponse response = request.GetResponse();
                     HttpWebResponse httpResponse = (HttpWebResponse)response;
-                    LogHandlingHelper.LogWebRequestAndResponse("Attach Component Source",$"Uploading component source for ReleaseId: {attachReport.ReleaseId}",request,httpResponse);
                     HandleAcceptedStatus(httpResponse, comparisonBomData);
                     using StreamReader reader = new StreamReader(response.GetResponseStream());
                     reader.ReadToEnd();                    
