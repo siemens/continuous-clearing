@@ -556,6 +556,12 @@ namespace LCT.Common
             }
             
         }
+        public static void RemoveDuplicateAndAddProperty(ref List<Property> properties, string propertyName, string propertyValue)
+        {
+            properties ??= new List<Property>();
+            properties.RemoveAll(p => p.Name == propertyName);
+            properties.Add(new Property { Name = propertyName, Value = propertyValue });
+        }
         #endregion
 
         #region private
