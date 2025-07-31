@@ -262,7 +262,7 @@ namespace LCT.ArtifactoryUploader
             }
             else
             {
-                Logger.Debug($"PackageUploadToArtifactory():{item.Name} and {item.Version} is identified in source:{item.SrcRepoName} and destination{item.DestRepoName} repositories");
+                Logger.Debug($"PackageUploadToArtifactory():{item.Name} and {item.Version} is identified in source:{item.SrcRepoName} and destination:{item.DestRepoName} repositories");
                 IncrementCountersBasedOnPackageType(uploaderKpiData, packageType, true);
                 await SucessfullPackagesAsync(item, displayPackagesInfo);
                 item.DestRepoName = null;

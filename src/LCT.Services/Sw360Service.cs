@@ -360,10 +360,11 @@ namespace LCT.Services
                     ReleaseLink = sw360Release.Links?.Self?.Href,
                     ReleaseExternalId = component.ReleaseExternalId,
                     ComponentExternalId = component.ComponentExternalId
-                });
-                Logger.Debug($"CheckAvailabilityByNameAndVersion():Completed to identifying release through name and version : Release exist -{isReleaseAvailable}, name - {component.Name}, version - {component.Version}");
+                });                
                 isReleaseAvailable = true;
             }
+            Logger.Debug($"CheckAvailabilityByName():Identified Component status through name and version :{isReleaseAvailable}");
+            Logger.Debug($"CheckAvailabilityByNameAndVersion():Completed to identifying release through name and version :  name - {component.Name}, version - {component.Version},Release exist status -{isReleaseAvailable}");
             return isReleaseAvailable;
         }
 
@@ -405,6 +406,7 @@ namespace LCT.Services
                 });
                 isComponentAvailable = true;
             }
+            Logger.Debug($"CheckAvailabilityByName():Identified Component status through name :{isComponentAvailable}");
             Logger.Debug($"CheckAvailabilityByName():Completed to identifying component through name: component exist-{isComponentAvailable},Component name - {component.Name}");
             return isComponentAvailable;
         }
@@ -429,6 +431,7 @@ namespace LCT.Services
                         ReleaseExternalId = string.Empty
                     });
                 }
+                Logger.Debug($"CheckComponentExistenceByExternalId():Identified Component status through External Id :{componentstatus.isComponentExist}");
             }
             catch (HttpRequestException ex)
             {
@@ -465,6 +468,7 @@ namespace LCT.Services
                         ComponentExternalId = componentToBomData.ComponentExternalId
                     });
                 }
+                Logger.Debug($"CheckReleaseExistenceByExternalId():Identified release status through External Id :{releaseStatus.isReleaseExist}");
             }
             catch (HttpRequestException ex)
             {
@@ -478,7 +482,7 @@ namespace LCT.Services
                 LogHandlingHelper.ExceptionErrorHandling("GetReleaseDataByExternalId",$"MethodName:GetReleaseDataByExternalId()",ex,"Multiple errors occurred while processing the request. Please investigate the inner exceptions for more details.");
                 Logger.Error($"CheckReleaseExistenceByExternalId():", ex);
             }
-            Logger.Debug($"CheckReleaseExistenceByExternalId():Completed to identifying release through External Id :Name - {componentToBomData.Name}, version - {componentToBomData.Version}");
+            Logger.Debug($"CheckReleaseExistenceByExternalId():Completed to identifying release through External Id :Name - {componentToBomData.Name}, version - {componentToBomData.Version},release exist status-{releaseStatus.isReleaseExist}");
             return releaseStatus.isReleaseExist;
         }
     }

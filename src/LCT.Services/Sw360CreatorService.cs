@@ -79,7 +79,7 @@ namespace LCT.Services
                 //Component creation Success 
                 if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.Conflict)
                 {
-                    Logger.Debug($"CreateComponentBasesOFswComaprisonBOM(): Start Identifying componentId for creating release due to issue occured");
+                    Logger.Debug($"CreateComponentBasesOFswComaprisonBOM(): Start Identifying componentId for creating release");
                     string componentId = await GetComponentId(componentInfo.Name);
                     Logger.Debug($"GetComponentId(): Identified componentId for creating release is :{componentId}");
                     componentCreateStatus.ReleaseStatus = await CreateReleaseForComponent(componentInfo, componentId, attachmentUrlList);

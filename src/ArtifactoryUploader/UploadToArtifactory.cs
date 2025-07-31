@@ -96,7 +96,7 @@ namespace LCT.ArtifactoryUploader
             }
 
             var logBuilder = new System.Text.StringBuilder();
-            logBuilder.AppendLine("================================================================================================================");
+            logBuilder.AppendLine($"\n================================================================================================================");
             logBuilder.AppendLine(" Components to be Uploaded to Artifactory");
             logBuilder.AppendLine("================================================================================================================");
             logBuilder.AppendLine($"| {"Name",-50} | {"Version",-15} | {"ComponentType",-15} | {"PackageType",-20} | {"SrcRepoName",-20} | {"DestRepoName",-20} |");

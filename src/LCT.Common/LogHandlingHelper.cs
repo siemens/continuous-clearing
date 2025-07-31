@@ -9,6 +9,8 @@ using LCT.Common.Model;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json;
+using System.IO;
+using System.Net;
 
 namespace LCT.Common
 {
@@ -94,54 +96,151 @@ namespace LCT.Common
 
         private static string GetResponseContentAsync(string response)
         {
-
             if (!string.IsNullOrEmpty(response))
             {
                 response = MaskSensitiveData(response);
                 var lines = response.Split(NewLineSeparator, StringSplitOptions.None);
-                if (lines.Length <= 100)
+
+                if (lines.Length <= 200)
                 {
                     return response;
                 }
+
                 if (Log4Net.Verbose)
                 {
                     try
                     {
-                        using var jsonDoc = JsonDocument.Parse(response);
-                        string formattedJson = JsonSerializer.Serialize(jsonDoc.RootElement, CachedJsonSerializerOptions);
-
-                        var formattedLines = formattedJson.Split(Environment.NewLine, StringSplitOptions.None);
-
-                        if (formattedLines.Length <= 1000)
+                        if (IsValidJson(response))
                         {
-                            return formattedJson;
+                            using var jsonDoc = JsonDocument.Parse(response);
+                            string formattedJson = JsonSerializer.Serialize(jsonDoc.RootElement, CachedJsonSerializerOptions);
+
+                            var formattedLines = formattedJson.Split(Environment.NewLine, StringSplitOptions.None);
+
+                            if (formattedLines.Length <= 1000)
+                            {
+                                return formattedJson;
+                            }
+
+                            int targetLines = Math.Min(1000, lines.Length);
+                            int chunkSize = (int)Math.Ceiling((double)formattedLines.Length / targetLines);
+                            string[] compressedLines = new string[targetLines];
+
+                            for (int i = 0; i < targetLines; i++)
+                            {
+                                int start = i * chunkSize;
+                                int end = Math.Min(start + chunkSize, formattedLines.Length);
+
+                                compressedLines[i] = string.Join(" ", formattedLines.Skip(start).Take(end - start));
+                            }
+
+                            return string.Join(Environment.NewLine, compressedLines.Where(l => !string.IsNullOrEmpty(l)));
                         }
-
-                        int targetLines = Math.Min(1000, lines.Length);
-                        int chunkSize = (int)Math.Ceiling((double)formattedLines.Length / targetLines);
-                        string[] compressedLines = new string[targetLines];
-
-                        for (int i = 0; i < targetLines; i++)
+                        else
                         {
-                            int start = i * chunkSize;
-                            int end = Math.Min(start + chunkSize, formattedLines.Length);
-
-                            compressedLines[i] = string.Join(" ", formattedLines.Skip(start).Take(end - start));
+                            Logger.Debug("GetResponseContentAsync(): Response is not valid JSON. Returning raw response.");
+                            return response;
                         }
-
-                        return string.Join(Environment.NewLine, compressedLines.Where(l => !string.IsNullOrEmpty(l)));
                     }
                     catch (JsonException ex)
                     {
-                        ExceptionErrorHandling("Processing json response", $"Methodname:GetResponseContentAsync()", ex, "Api response processing");
+                        ExceptionErrorHandling("Processing JSON response", $"Methodname:GetResponseContentAsync()", ex, "API response processing");
                         return response;
                     }
-
                 }
             }
 
             return "";
-        }        
+        }
+        public static void LogWebRequestAndResponse(
+    string context,
+    string details,
+    HttpWebRequest request,
+    HttpWebResponse response,
+    string additionalDetails = null)
+        {
+            var logBuilder = new StringBuilder();
+
+            // Log the context and details
+            AppendLogHeader(logBuilder, context, details, "HTTP WEB REQUEST AND RESPONSE DETAILS");
+
+            // Log the request details
+            logBuilder.AppendLine("REQUEST DETAILS");
+            logBuilder.AppendLine(LogHeaderSeparator);
+            logBuilder.AppendLine($"| {"Method",-20} | {request.Method,-100} |");
+            logBuilder.AppendLine($"| {"URL",-20} | {request.RequestUri,-100} |");
+
+            // Log request headers
+            if (request.Headers != null)
+            {
+                logBuilder.AppendLine(LogHeaderSeparator);
+                logBuilder.AppendLine(" REQUEST HEADERS");
+                logBuilder.AppendLine(LogHeaderSeparator);
+                foreach (string headerKey in request.Headers.AllKeys)
+                {
+                    string headerValue = request.Headers[headerKey];
+                    if (headerKey.Contains("authorization", StringComparison.OrdinalIgnoreCase) ||
+                        headerKey.Contains("token", StringComparison.OrdinalIgnoreCase) ||
+                        headerValue.Contains("bearer", StringComparison.OrdinalIgnoreCase))
+                    {
+                        headerValue = MaskedValue; // Mask sensitive values
+                    }
+                    logBuilder.AppendLine($"| {headerKey,-20} | {headerValue,-100} |");
+                }
+            }
+
+            // Log the response details
+            logBuilder.AppendLine(LogHeaderSeparator);
+            logBuilder.AppendLine("RESPONSE DETAILS");
+            logBuilder.AppendLine(LogHeaderSeparator);
+            logBuilder.AppendLine($"| {"Status Code",-20} | {response.StatusCode,-100} |");
+            logBuilder.AppendLine($"| {"Status Description",-20} | {response.StatusDescription,-100} |");
+
+            // Log response headers
+            if (response.Headers != null)
+            {
+                logBuilder.AppendLine(LogHeaderSeparator);
+                logBuilder.AppendLine(" RESPONSE HEADERS");
+                logBuilder.AppendLine(LogHeaderSeparator);
+                foreach (string headerKey in response.Headers.AllKeys)
+                {
+                    logBuilder.AppendLine($"| {headerKey,-20} | {response.Headers[headerKey],-100} |");
+                }
+            }
+
+            // Log response content
+            using (StreamReader reader = new StreamReader(response.GetResponseStream()))
+            {
+                string responseContent = reader.ReadToEnd();
+                AppendContent(logBuilder, responseContent, "RESPONSE CONTENT");
+            }
+
+            // Append additional details if provided
+            AppendAdditionalDetails(logBuilder, additionalDetails);
+
+            logBuilder.AppendLine(LogSeparator);
+
+            // Log the constructed message
+            Logger.Debug(logBuilder.ToString());
+        }
+        private static bool IsValidJson(string input)
+        {
+            input = input.Trim();
+            if ((input.StartsWith("{") && input.EndsWith("}")) || 
+                (input.StartsWith("[") && input.EndsWith("]")))   
+            {
+                try
+                {
+                    JsonDocument.Parse(input);
+                    return true;
+                }
+                catch (JsonException)
+                {
+                    return false;
+                }                
+            }
+            return false;
+        }
         private static void BuildErrorLog(StringBuilder logBuilder, string context, string details, string message, string additionalDetails, Exception ex = null)
         {
             logBuilder.AppendLine(LogSeparator);
