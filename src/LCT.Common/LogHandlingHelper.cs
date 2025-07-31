@@ -96,67 +96,84 @@ namespace LCT.Common
 
         private static string GetResponseContentAsync(string response)
         {
-            if (!string.IsNullOrEmpty(response))
+            if (string.IsNullOrEmpty(response))
             {
-                response = MaskSensitiveData(response);
-                var lines = response.Split(NewLineSeparator, StringSplitOptions.None);
-
-                if (lines.Length <= 200)
-                {
-                    return response;
-                }
-
-                if (Log4Net.Verbose)
-                {
-                    try
-                    {
-                        if (IsValidJson(response))
-                        {
-                            using var jsonDoc = JsonDocument.Parse(response);
-                            string formattedJson = JsonSerializer.Serialize(jsonDoc.RootElement, CachedJsonSerializerOptions);
-
-                            var formattedLines = formattedJson.Split(Environment.NewLine, StringSplitOptions.None);
-
-                            if (formattedLines.Length <= 1000)
-                            {
-                                return formattedJson;
-                            }
-
-                            int targetLines = Math.Min(1000, lines.Length);
-                            int chunkSize = (int)Math.Ceiling((double)formattedLines.Length / targetLines);
-                            string[] compressedLines = new string[targetLines];
-
-                            for (int i = 0; i < targetLines; i++)
-                            {
-                                int start = i * chunkSize;
-                                int end = Math.Min(start + chunkSize, formattedLines.Length);
-
-                                compressedLines[i] = string.Join(" ", formattedLines.Skip(start).Take(end - start));
-                            }
-
-                            return string.Join(Environment.NewLine, compressedLines.Where(l => !string.IsNullOrEmpty(l)));
-                        }
-                        else
-                        {
-                            Logger.Debug("GetResponseContentAsync(): Response is not valid JSON. Returning raw response.");
-                            return response;
-                        }
-                    }
-                    catch (JsonException ex)
-                    {
-                        ExceptionErrorHandling("Processing JSON response", $"Methodname:GetResponseContentAsync()", ex, "API response processing");
-                        return response;
-                    }
-                }
+                return string.Empty;
             }
 
-            return "";
-        }        
+            response = MaskSensitiveData(response);
+            var lines = response.Split(NewLineSeparator, StringSplitOptions.None);
+
+            if (lines.Length <= 200)
+            {
+                return response;
+            }
+
+            if (!Log4Net.Verbose)
+            {
+                return string.Empty;
+            }
+
+            return ProcessVerboseResponse(response, lines);
+        }
+
+        private static string ProcessVerboseResponse(string response, string[] lines)
+        {
+            try
+            {
+                if (IsValidJson(response))
+                {
+                    return FormatJsonResponse(response, lines);
+                }
+                else
+                {
+                    Logger.Debug("GetResponseContentAsync(): Response is not valid JSON. Returning raw response.");
+                    return response;
+                }
+            }
+            catch (JsonException ex)
+            {
+                ExceptionErrorHandling("Processing JSON response", "Methodname:GetResponseContentAsync()", ex, "API response processing");
+                return response;
+            }
+        }
+
+        private static string FormatJsonResponse(string response, string[] lines)
+        {
+            using var jsonDoc = JsonDocument.Parse(response);
+            string formattedJson = JsonSerializer.Serialize(jsonDoc.RootElement, CachedJsonSerializerOptions);
+
+            var formattedLines = formattedJson.Split(Environment.NewLine, StringSplitOptions.None);
+
+            if (formattedLines.Length <= 1000)
+            {
+                return formattedJson;
+            }
+
+            return CompressJsonLines(formattedLines, lines.Length);
+        }
+
+        private static string CompressJsonLines(string[] formattedLines, int originalLineCount)
+        {
+            int targetLines = Math.Min(1000, originalLineCount);
+            int chunkSize = (int)Math.Ceiling((double)formattedLines.Length / targetLines);
+            string[] compressedLines = new string[targetLines];
+
+            for (int i = 0; i < targetLines; i++)
+            {
+                int start = i * chunkSize;
+                int end = Math.Min(start + chunkSize, formattedLines.Length);
+
+                compressedLines[i] = string.Join(" ", formattedLines.Skip(start).Take(end - start));
+            }
+
+            return string.Join(Environment.NewLine, compressedLines.Where(l => !string.IsNullOrEmpty(l)));
+        }
         private static bool IsValidJson(string input)
         {
             input = input.Trim();
-            if ((input.StartsWith("{") && input.EndsWith("}")) || 
-                (input.StartsWith("[") && input.EndsWith("]")))   
+            if ((input.StartsWith('{') && input.EndsWith('}')) || 
+                (input.StartsWith('[') && input.EndsWith(']')))   
             {
                 try
                 {
