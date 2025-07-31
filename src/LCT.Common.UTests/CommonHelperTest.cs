@@ -1370,7 +1370,101 @@ namespace LCT.Common.UTest
             Assert.IsNotNull(sha256Hash);
             Assert.AreEqual("validsha256hash", sha256Hash.Content);
         }
+        [Test]
+        public void RemoveDuplicateAndAddProperty_WhenPropertiesIsNull_InitializesListAndAddsProperty()
+        {
+            // Arrange
+            List<Property> properties = null;
+            string propertyName = "TestProperty";
+            string propertyValue = "TestValue";
 
+            // Act
+            CommonHelper.RemoveDuplicateAndAddProperty( ref properties, propertyName, propertyValue);
+
+            // Assert
+            Assert.IsNotNull(properties);
+            Assert.AreEqual(1, properties.Count);
+            Assert.AreEqual(propertyName, properties[0].Name);
+            Assert.AreEqual(propertyValue, properties[0].Value);
+        }
+
+        [Test]
+        public void RemoveDuplicateAndAddProperty_WhenPropertyExists_UpdatesValue()
+        {
+            // Arrange
+            var properties = new List<Property>
+            {
+                new Property { Name = "TestProperty", Value = "OldValue" }
+            };
+            string propertyName = "TestProperty";
+            string propertyValue = "NewValue";
+
+            // Act
+            CommonHelper.RemoveDuplicateAndAddProperty(ref properties, propertyName, propertyValue);
+
+            // Assert
+            Assert.AreEqual(1, properties.Count);
+            Assert.AreEqual(propertyName, properties[0].Name);
+            Assert.AreEqual(propertyValue, properties[0].Value);
+        }
+
+        [Test]
+        public void RemoveDuplicateAndAddProperty_WhenMultiplePropertiesExist_RemovesDuplicatesAndAddsNewProperty()
+        {
+            // Arrange
+            var properties = new List<Property>
+            {
+                new Property { Name = "TestProperty", Value = "OldValue1" },
+                new Property { Name = "TestProperty", Value = "OldValue2" },
+                new Property { Name = "AnotherProperty", Value = "AnotherValue" }
+            };
+            string propertyName = "TestProperty";
+            string propertyValue = "NewValue";
+
+            // Act
+            CommonHelper.RemoveDuplicateAndAddProperty(ref properties, propertyName, propertyValue);
+
+            // Assert
+            Assert.AreEqual(2, properties.Count);
+            Assert.AreEqual(propertyName, properties.First(p => p.Name == propertyName).Name);
+            Assert.AreEqual(propertyValue, properties.First(p => p.Name == propertyName).Value);
+        }
+
+        [Test]
+        public void RemoveDuplicateAndAddProperty_WhenPropertyDoesNotExist_AddsNewProperty()
+        {
+            // Arrange
+            var properties = new List<Property>
+            {
+                new Property { Name = "AnotherProperty", Value = "AnotherValue" }
+            };
+            string propertyName = "TestProperty";
+            string propertyValue = "TestValue";
+
+            // Act
+            CommonHelper.RemoveDuplicateAndAddProperty(ref properties, propertyName, propertyValue);
+
+            // Assert
+            Assert.AreEqual(2, properties.Count);
+            Assert.IsTrue(properties.Any(p => p.Name == propertyName && p.Value == propertyValue));
+        }
+
+        [Test]
+        public void RemoveDuplicateAndAddProperty_WhenPropertiesIsEmpty_AddsNewProperty()
+        {
+            // Arrange
+            var properties = new List<Property>();
+            string propertyName = "TestProperty";
+            string propertyValue = "TestValue";
+
+            // Act
+            CommonHelper.RemoveDuplicateAndAddProperty(ref properties, propertyName, propertyValue);
+
+            // Assert
+            Assert.AreEqual(1, properties.Count);
+            Assert.AreEqual(propertyName, properties[0].Name);
+            Assert.AreEqual(propertyValue, properties[0].Value);
+        }
         #endregion
 
         // ...existing code...
