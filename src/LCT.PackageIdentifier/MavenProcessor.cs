@@ -28,9 +28,11 @@ namespace LCT.PackageIdentifier
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
         private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
-
+        private List<Component> listOfInternalComponents = new List<Component>();
+        private readonly IEnvironmentHelper _environmentHelper = new EnvironmentHelper();
         public Bom ParsePackageFile(CommonAppSettings appSettings,ref Bom unSupportedBomList)
         {
+            Logger.Debug("ParsePackageFile():Starting to parse the package file for Maven components.");
             List<Component> componentsForBOM = new();
             List<Component> componentsToBOM = new();
             List<Component> ListOfComponents = new();
@@ -39,7 +41,7 @@ namespace LCT.PackageIdentifier
             List<Dependency> dependenciesForBOM = new();
             List<string> configFiles;
 
-            configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Maven);
+            configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Maven,_environmentHelper);
             List<string> listOfTemplateBomfilePaths = GetTemplateBomFilePaths(configFiles);
             ProcessBomFiles(configFiles, componentsForBOM, componentsToBOM, dependenciesForBOM, appSettings);
 
@@ -70,8 +72,7 @@ namespace LCT.PackageIdentifier
             bom.Components = componentsForBOM;
             bom.Dependencies = dependenciesForBOM;
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
-            BomCreator.bomKpiData.ComponentsInComparisonBOM = bom.Components.Count;
-            Logger.Debug($"ParsePackageFile():End");
+            BomCreator.bomKpiData.ComponentsInComparisonBOM = bom.Components.Count;          
 
             if (bom.Components != null)
             {
@@ -87,6 +88,7 @@ namespace LCT.PackageIdentifier
             unSupportedBomList.Components = ListUnsupportedComponentsForBom.Components;
             unSupportedBomList.Dependencies = ListUnsupportedComponentsForBom.Dependencies;
             RemoveTypeJarSuffix(bom);
+            Logger.Debug($"ParsePackageFile():Completed parsing the package file.\n");
             return bom;
         }
         private static void RemoveTypeJarSuffix(Bom bom)
@@ -103,6 +105,33 @@ namespace LCT.PackageIdentifier
             {
                 RemoveTypeJarSuffixFromDependency(dependency);
             }
+        }
+        public static void IdentifiedMavenComponents(string filePath, List<Component> components)
+        {
+            if (components == null || components.Count == 0)
+            {
+                // Log a message indicating no components were found
+                Logger.Debug($"No components were found in the file: {filePath}");
+                return;
+            }
+            // Build the table
+            var logBuilder = new System.Text.StringBuilder();
+            logBuilder.AppendLine($"\n{LogHandlingHelper.LogSeparator}");
+            logBuilder.AppendLine($" COMPONENTS FOUND IN FILE: {filePath}");
+            logBuilder.AppendLine($"{LogHandlingHelper.LogSeparator}");
+            logBuilder.AppendLine($"| {"Name",-40} | {"Version",-40} | {"PURL",-100} | {"DevDependent",-15} |");
+            logBuilder.AppendLine($"{LogHandlingHelper.LogHeaderSeparator}");
+
+            foreach (var component in components)
+            {
+                string devDependent = component.Properties?.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsDevelopment)?.Value ?? "false";
+                logBuilder.AppendLine($"| {component.Name,-40} | {component.Version,-40} | {component.Purl,-100} | {devDependent,-15} |");
+            }
+
+            logBuilder.AppendLine($"{LogHandlingHelper.LogSeparator}");
+
+            // Log the table
+            Logger.Debug(logBuilder.ToString());
         }
         private static void RemoveTypeJarSuffixFromDependency(Dependency dependency)
         {
@@ -132,6 +161,7 @@ namespace LCT.PackageIdentifier
                     {
                         Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
                         bomList = _spdxBomParser.ParseSPDXBom(filepath);
+                        IdentifiedMavenComponents(filepath, bomList.Components);
                         SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bomList, appSettings.ProjectType, ref listUnsupportedComponents);
                         SpdxSbomHelper.AddSpdxSBomFileNameProperty(ref bomList, filepath);
                         SpdxSbomHelper.AddSpdxPropertysForUnsupportedComponents(listUnsupportedComponents.Components, filepath);
@@ -153,6 +183,7 @@ namespace LCT.PackageIdentifier
                     }                  
 
                     AddComponentsToBom(bomList, componentsForBOM, componentsToBOM, dependenciesForBOM);
+                    IdentifiedMavenComponents(filepath, bomList.Components);
                 }                
             }
         }
@@ -181,6 +212,7 @@ namespace LCT.PackageIdentifier
             {
                 if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
+                    Logger.Debug($"GetTemplateBomFilePaths():Template BOM file detected: {filepath}");
                     listOfTemplateBomfilePaths.Add(filepath);
                 }
             }
@@ -194,6 +226,7 @@ namespace LCT.PackageIdentifier
         }
         public static void AddSiemensDirectProperty(ref Bom bom)
         {
+            Logger.Debug("AddSiemensDirectProperty(): Starting to add SiemensDirect property to BOM components.");
             List<string> mavenDirectDependencies = new List<string>();
             mavenDirectDependencies.AddRange(bom.Dependencies?.Select(x => x.Ref).ToList() ?? new List<string>());
             var bomComponentsList = bom.Components;
@@ -202,6 +235,7 @@ namespace LCT.PackageIdentifier
                 Property siemensDirect = new() { Name = Dataconstant.Cdx_SiemensDirect, Value = "false" };
                 if (mavenDirectDependencies.Exists(x => x.Contains(component.Name) && x.Contains(component.Version)))
                 {
+                    Logger.Debug($"AddSiemensDirectProperty(): Component [Name: {component.Name}, Version: {component.Version}] is a direct dependency. Setting SiemensDirect property to true.");
                     siemensDirect.Value = "true";
                 }
 
@@ -209,7 +243,7 @@ namespace LCT.PackageIdentifier
                 bool isPropExists = component.Properties.Exists(x => x.Name.Equals(Dataconstant.Cdx_SiemensDirect));
                 if (!isPropExists) { component.Properties.Add(siemensDirect); }
             }
-
+            Logger.Debug("AddSiemensDirectProperty(): Completed adding SiemensDirect property to BOM components.");
             bom.Components = bomComponentsList;
         }
 
@@ -290,6 +324,7 @@ namespace LCT.PackageIdentifier
                                                                    IJFrogService jFrogService,
                                                                    IBomHelper bomhelper)
         {
+            Logger.Debug("GetJfrogRepoDetailsOfAComponent():Starting to retrieve JFrog repository details for components.\n");
             // get the  component list from Jfrog for given repo + internal repo
             string[] repoList = CommonHelper.GetRepoList(appSettings);
             List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(repoList, jFrogService);
@@ -299,6 +334,7 @@ namespace LCT.PackageIdentifier
             foreach (var component in componentsForBOM)
             {
                 string jfrogpackageName = $"{component.Name}-{component.Version}{ApiConstant.MavenExtension}";
+                Logger.Debug($"GetArtifactoryRepoName(): Searching for component in JFrog repository with name: {jfrogpackageName}.");
                 var hashes = aqlResultList.FirstOrDefault(x => x.Name == jfrogpackageName);
 
                 AqlResult finalRepoData = GetJfrogArtifactoryRepoDetials(aqlResultList, component, bomhelper, out string jfrogRepoPath);
@@ -316,14 +352,15 @@ namespace LCT.PackageIdentifier
 
                 modifiedBOM.Add(componentVal);
             }
-
+            LogHandlingHelper.IdentifierComponentsData(componentsForBOM, listOfInternalComponents);
+            Logger.Debug("GetJfrogRepoDetailsOfAComponent():Completed retrieving JFrog repository details for components.\n");
             return modifiedBOM;
         }        
 
         public async Task<ComponentIdentification> IdentificationOfInternalComponents(
            ComponentIdentification componentData, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
-
+            Logger.Debug("IdentificationOfInternalComponents(): Starting identification of internal components.");
             // get the  component list from Jfrog for given repo
             List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(appSettings.Maven.Artifactory.InternalRepos, jFrogService);
 
@@ -337,7 +374,9 @@ namespace LCT.PackageIdentifier
             // update the comparison bom data
             componentData.comparisonBOMData = processedComponents;
             componentData.internalComponents = internalComponents;
-
+            listOfInternalComponents = internalComponents;
+            Logger.Debug($"IdentificationOfInternalComponents(): identified internal components:{internalComponents.Count}.");
+            Logger.Debug($"IdentificationOfInternalComponents(): Completed identification of internal components.\n");
             return componentData;
         }
         /// <summary>
@@ -381,6 +420,7 @@ namespace LCT.PackageIdentifier
             string jfrogcomponentName = $"{component.Name}-{component.Version}";
             if (aqlResultList.Exists(x => x.Name.Contains(jfrogcomponentName, StringComparison.OrdinalIgnoreCase)))
             {
+                Logger.Debug($"IsInternalMavenComponent(): Component [Name: {component.Name}, Version: {component.Version}] is internal,Found in JFrog repository with full name: {jfrogcomponentName}.");
                 return true;
             }
 
@@ -389,6 +429,7 @@ namespace LCT.PackageIdentifier
             if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase) && aqlResultList.Exists(
                 x => x.Name.Contains(fullNameVersion, StringComparison.OrdinalIgnoreCase)))
             {
+                Logger.Debug($"IsInternalMavenComponent(): Component [Name: {component.Name}, Version: {component.Version}] is internal,Found in JFrog repository with full name: {fullNameVersion}.");
                 return true;
             }
 
@@ -403,7 +444,7 @@ namespace LCT.PackageIdentifier
             AqlResult aqlResult = new AqlResult();
             jfrogRepoPath = Dataconstant.JfrogRepoPathNotFound;
             string jfrogcomponentName = $"{component.Name}-{component.Version}.jar";
-
+            Logger.Debug($"GetJfrogArtifactoryRepoDetials(): Searching for component in JFrog repository with name: {jfrogcomponentName}.");
             var aqlResults = aqlResultList.FindAll(x => x.Name.Equals(
                 jfrogcomponentName, StringComparison.OrdinalIgnoreCase));
 
@@ -413,6 +454,7 @@ namespace LCT.PackageIdentifier
             {
                 string fullName = bomHelper.GetFullNameOfComponent(component);
                 string fullNameVersion = $"{fullName}-{component.Version}.jar";
+                Logger.Debug($"GetJfrogArtifactoryRepoDetials(): Searching for component in JFrog repository with name: {fullNameVersion}.");
                 if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase))
                 {
                     aqlResults = aqlResultList.FindAll(x => x.Name.Equals(
@@ -427,6 +469,7 @@ namespace LCT.PackageIdentifier
             {
                 aqlResult = aqlResults.FirstOrDefault(x => x.Repo.Equals(repoName));
                 jfrogRepoPath = GetJfrogRepoPath(aqlResult);
+                Logger.Debug($"GetJfrogArtifactoryRepoDetials(): JFrog repository path: {jfrogRepoPath}.");
             }
             if (aqlResult != null)
             {

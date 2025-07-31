@@ -53,14 +53,17 @@ namespace LCT.SW360PackageCreator
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
-            CommonHelper.DefaultLogFolderInitialisation(FileConstant.ComponentCreatorLog, m_Verbose);
-            CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
+            string logFileNameWithTimestamp = $"{FileConstant.ComponentCreatorLog}_{DateTime.Now:yyyyMMdd_HHmmss}.log";
+            CommonHelper.DefaultLogFolderInitialization(logFileNameWithTimestamp, m_Verbose);
+            Logger.Logger.Log(null, Level.Notice, $"====================<<<<< Package creator >>>>>====================", null);
+            CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName,environmentHelper);
+            Log4Net.AppendVerboseValue(appSettings);
 
             ISw360ProjectService sw360ProjectService = Getsw360ProjectServiceObject(appSettings, out ISW360ApicommunicationFacade sW360ApicommunicationFacade);
             ProjectReleases projectReleases = new ProjectReleases();
 
-            string FolderPath = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.ComponentCreatorLog, m_Verbose);
-            Logger.Logger.Log(null, Level.Debug, $"log manager initiated folder path: {FolderPath}", null);
+            string FolderPath = CommonHelper.LogFolderInitialization(appSettings, logFileNameWithTimestamp, m_Verbose);
+            Logger.Logger.Log(null, Level.Debug, $"log manager initiated folder name: {FolderPath}", null);
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             settingsManager.CheckRequiredArgsToRun(appSettings, "Creator");
             int isValid = await CreatorValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
@@ -69,8 +72,7 @@ namespace LCT.SW360PackageCreator
             {
                 environmentHelper.CallEnvironmentExit(-1);
             }
-
-            Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Package creator >>>>>====================", null);
+           
             Logger.Logger.Log(null, Level.Notice, $"\nStart of Package creator execution : {DateTime.Now}", null);
 
             if (appSettings.IsTestMode)

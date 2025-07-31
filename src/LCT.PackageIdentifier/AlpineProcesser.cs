@@ -30,7 +30,7 @@ namespace LCT.PackageIdentifier
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
         private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
-
+        private readonly IEnvironmentHelper _environmentHelper = new EnvironmentHelper();
         #region public method
 
         public Bom ParsePackageFile(CommonAppSettings appSettings,ref Bom unSupportedBomList)
@@ -40,20 +40,19 @@ namespace LCT.PackageIdentifier
             Bom bom = new Bom();
             List<Dependency> dependenciesForBOM = new();
 
-            configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Alpine);
+            configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Alpine, _environmentHelper);
             List<string> listOfTemplateBomfilePaths = new List<string>();
             foreach (string filepath in configFiles)
             {
                 if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
+                    Logger.Debug($"ParsePackageFile():Template file detected: {filepath}");
                     listOfTemplateBomfilePaths.Add(filepath);
                 }
                 else
                 {
-                    Logger.Debug($"ParsePackageFile():FileName: " + filepath);
-                    listofComponents.AddRange(ParseCycloneDX(filepath, dependenciesForBOM,appSettings));
+                    listofComponents.AddRange(ParseCycloneDX(filepath, dependenciesForBOM,appSettings));                    
                 }
-
             }
 
             int initialCount = listofComponents.Count;
@@ -135,7 +134,6 @@ namespace LCT.PackageIdentifier
                 {
 
                     alpinePackages.Add(package);
-                    Logger.Debug($"ExtractDetailsForJson():ValidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
                 }
                 else
                 {
@@ -150,7 +148,12 @@ namespace LCT.PackageIdentifier
             ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
             ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
         }
+               
 
+        private static string GetReleaseExternalId(string name, string version)
+        {
+            return BomHelper.GetReleaseExternalId(name, version, Dataconstant.PurlCheck()["ALPINE"]);
+        }
         private static void GetDistinctComponentList(ref List<AlpinePackage> listofComponents)
         {
             int initialCount = listofComponents.Count;
@@ -158,14 +161,6 @@ namespace LCT.PackageIdentifier
 
             if (listofComponents.Count != initialCount)
                 BomCreator.bomKpiData.DuplicateComponents = initialCount - listofComponents.Count;
-        }
-
-        private static string GetReleaseExternalId(string name, string version)
-        {
-            version = WebUtility.UrlEncode(version);
-            version = version.Replace("%3A", ":");
-
-            return $"{Dataconstant.PurlCheck()["ALPINE"]}{Dataconstant.ForwardSlash}{name}@{version}?arch=source";
         }
 
         private static string GetDistro(AlpinePackage alpinePackage)
@@ -221,7 +216,7 @@ namespace LCT.PackageIdentifier
                 package.SpdxComponentDetails.SpdxComponent = true;
                 package.SpdxComponentDetails.DevComponent= componentInfo.Properties?.Any(x => x.Name == Dataconstant.Cdx_IsDevelopment && x.Value == "true") ?? false;
             }
-        }
+        }       
 
         #endregion
     }

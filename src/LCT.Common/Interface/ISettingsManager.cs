@@ -17,7 +17,7 @@ namespace LCT.Common.Interface
         /// <param name="args">args</param>
         /// <param name="jsonSettingsFileName">jsonSettingsFileName</param>
         /// <returns>AppSettings</returns>
-        public T ReadConfiguration<T>(string[] args, string jsonSettingsFileName);
+        public T ReadConfiguration<T>(string[] args, string jsonSettingsFileName,IEnvironmentHelper environmentHelper);
 
         public void CheckRequiredArgsToRun(CommonAppSettings appSettings, string currentExe);
     }

@@ -31,9 +31,10 @@ namespace LCT.SW360PackageCreator
 
         public async Task<string> DownloadPackage(ComparisonBomData component, string localPathforDownload)
         {
+            Logger.Debug($"DownloadPackage():started Download package for component, Name-{component.Name},version-{component.Version}");
             string downloadPath = string.Empty;
             string CurrentDownloadFolder = GetCurrentDownloadFolderPath(localPathforDownload, component);
-
+            Logger.Debug($"DownloadPackage():Package downloading path :{CurrentDownloadFolder}");
             if (component.PatchURls != null)
             {
                 string patchedFolderPath = string.Empty;
@@ -57,11 +58,11 @@ namespace LCT.SW360PackageCreator
                 }
                 catch (DirectoryNotFoundException ex)
                 {
-                    Logger.Debug($"DownloadComponentPackage:DirectoryNotFoundException : Release Name : {component.Name}@{component.Version},Error {ex}");
+                    LogHandlingHelper.ExceptionErrorHandling("DownloadPackage", $"MethodName:DownloadPackage(), Release Name: {component.Name}@{component.Version}", ex, "The specified directory was not found while attempting to download the package.");
                 }
                 catch (IOException ex)
                 {
-                    Logger.Debug($"DownloadComponentPackage:IOException:Release Name : {component.Name}@{component.Version},Error {ex}");
+                    LogHandlingHelper.ExceptionErrorHandling("DownloadPackage", $"MethodName:DownloadPackage(), Release Name: {component.Name}@{component.Version}", ex, "An I/O error occurred while attempting to download the package.");
                 }
             }
             else
@@ -73,6 +74,7 @@ namespace LCT.SW360PackageCreator
             {
                 Logger.Error($"Failed to download source for {component.Name}-{component.Version}");
             }
+            Logger.Debug($"DownloadPackage():Completed Download package process, Name-{component.Name},version-{component.Version}");
             return downloadPath;
         }
 
@@ -99,7 +101,7 @@ namespace LCT.SW360PackageCreator
                 }
                 catch (ArgumentException ex)
                 {
-                    Logger.Debug($"GetFileDetails:Release Name : {component.Name}@{component.Version}: Error {ex}");
+                    LogHandlingHelper.ExceptionErrorHandling("GetFileDetails", $"MethodName:GetFileDetails(), Release Name: {component.Name}@{component.Version}, PatchUrl: {path}", ex, "An invalid argument was provided while processing the patch URLs.");
                 }
             }
 
@@ -150,11 +152,11 @@ namespace LCT.SW360PackageCreator
             }
             catch (WebException ex)
             {
-                Logger.Debug($"DownloadTarFileAndGetPath :WebException :Release Name : {component.Name}@{component.Version}-PackageUrl: ,Error {ex}");
+                LogHandlingHelper.ExceptionErrorHandling("DownloadTarFileAndGetPath", $"MethodName:DownloadTarFileAndGetPath(), Release Name: {component.Name}@{component.Version}, SourceUrl: {SourceUrl}", ex, "A network error occurred while trying to download the tar file.");
             }
             catch (UriFormatException ex)
             {
-                Logger.Debug($"DownloadTarFileAndGetPath:Release Name : {component.Name}@{component.Version}: Error {ex}");
+                LogHandlingHelper.ExceptionErrorHandling("DownloadTarFileAndGetPath", $"MethodName:DownloadTarFileAndGetPath(), Release Name: {component.Name}@{component.Version}, SourceUrl: {SourceUrl}", ex, "The provided URL is not in a valid format.");
             }
 
             return downloadPath;
@@ -162,6 +164,7 @@ namespace LCT.SW360PackageCreator
 
         public string ApplyPatchforComponents(ComparisonBomData component, string localDownloadPath, string fileName)
         {
+            Logger.Debug($"ApplyPatchforComponents():Started Applying patches for component, Name-{component.Name},version-{component.Version}");
             Result result;
             string patchedFile = string.Empty;
             result = _debianPatcher.ApplyPatch(component, localDownloadPath, fileName);
@@ -178,8 +181,9 @@ namespace LCT.SW360PackageCreator
                     patchedFile = GetPatchedFilePathByRetrying(localDownloadPath, component, fileName);
                 }
                 else
-                {
+                {                    
                     patchedFile = GetPatchedFileFromDownloadedFolder(localDownloadPath);
+                    Logger.Debug($"ApplyPatchforComponents():Patched file downloaded folder:{patchedFile}.");
                 }
             }
             else
@@ -191,7 +195,7 @@ namespace LCT.SW360PackageCreator
                 Thread.Sleep(2000);
                 patchedFile = GetPatchedFilePathByRetrying(localDownloadPath, component, fileName);
             }
-
+            Logger.Debug($"ApplyPatchforComponents():Completed Applying patches process for component, Name-{component.Name},version-{component.Version}");
             return patchedFile;
         }
 
@@ -234,7 +238,7 @@ namespace LCT.SW360PackageCreator
             }
             catch (IOException ex)
             {
-                Logger.Debug($"DeletePatchedFolder : Folder Name : {Path.GetDirectoryName(folderPath)},Error {ex}");
+                LogHandlingHelper.ExceptionErrorHandling("DeletePatchedFolderAndFile", $"MethodName:DeletePatchedFolderAndFile(), Folder Name: {Path.GetDirectoryName(folderPath)}", ex, "An I/O error occurred while trying to delete the folder.");
             }
             try
             {
@@ -246,7 +250,7 @@ namespace LCT.SW360PackageCreator
             }
             catch (IOException ex)
             {
-                Logger.Debug($"DeletePatchedFile:File Name : {Path.GetFileName(downloadPath)},Error {ex}");
+                LogHandlingHelper.ExceptionErrorHandling("DeletePatchedFolderAndFile", $"MethodName:DeletePatchedFolderAndFile(), File Name: {Path.GetFileName(downloadPath)}", ex, "An I/O error occurred while trying to delete the file.");
             }
         }
 
@@ -265,7 +269,7 @@ namespace LCT.SW360PackageCreator
             }
             catch (ArgumentException ex)
             {
-                Logger.Debug($"GetPatchedFileFromDownloadedFolder:DownloadPath : {currentDownloadFolder},Error {ex}");
+                LogHandlingHelper.ExceptionErrorHandling("GetPatchedFileFromDownloadedFolder", $"MethodName:GetPatchedFileFromDownloadedFolder(), DownloadPath: {currentDownloadFolder}", ex, "An invalid argument was provided while trying to access the downloaded folder.");
             }
             return patchedFilePath;
         }

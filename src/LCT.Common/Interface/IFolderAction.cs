@@ -30,6 +30,6 @@ namespace LCT.Common.Interface
         /// Validates the given folder path
         /// </summary>
         /// <param name="filePath"></param>
-        public void ValidateFolderPath(string folderPath);
+        public void ValidateFolderPath(string folderPath,IEnvironmentHelper environmentHelper);
     }
 }

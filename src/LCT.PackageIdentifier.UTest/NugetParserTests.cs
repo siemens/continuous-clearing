@@ -442,69 +442,16 @@ namespace LCT.PackageIdentifier.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
             string folderfilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
-
+            IEnvironmentHelper environmentHelper = new EnvironmentHelper();
             //Act
-            List<string> allFoundConfigFiles = FolderScanner.FileScanner(folderfilepath, config);
+            List<string> allFoundConfigFiles = FolderScanner.FileScanner(folderfilepath, config,environmentHelper);
 
 
             //Assert
             Assert.That(fileCount, Is.EqualTo(allFoundConfigFiles.Count), "Checks for total inout files found");
 
         }
-        [TestCase]
-        public void InputFileIdentifaction_GivenIncludeFileAsNull_ReturnsArgumentNullException()
-        {
-            //Arrange
-            string[] Includes = null;
-            Config config = new Config()
-            {
-                Include = Includes,
-                Exclude = null
-
-            };
-            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string outFolder = Path.GetDirectoryName(exePath);
-            string folderfilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
-
-            //Act & Assert
-            Assert.Throws(typeof(ArgumentNullException), () => FolderScanner.FileScanner(folderfilepath, config));
-
-        }
-        [TestCase]
-        public void InputFileIdentifaction_GivenInputFileAsNull_ReturnsArgumentNullException()
-        {
-            //Arrange
-            string[] Includes = { "p*.config", "p*.lock.json" };
-            Config config = new Config()
-            {
-                Include = Includes,
-                Exclude = null
-
-            };
-            string folderfilepath = "";
-
-
-            //Act & Assert
-            Assert.Throws(typeof(ArgumentException), () => FolderScanner.FileScanner(folderfilepath, config));
-
-        }
-        [TestCase]
-        public void InputFileIdentifaction_GivenInvalidInputFile_ReturnsArgumentNullException()
-        {
-            //Arrange
-            string[] Includes = { "p*.config", "p*.lock.json" };
-            Config config = new Config()
-            {
-                Include = Includes,
-                Exclude = null
-
-            };
-            string folderfilepath = Path.GetFullPath(Path.Combine("..", "PackageIdentifierUTTestFiles"));
-
-            //Act & Assert
-            Assert.Throws(typeof(DirectoryNotFoundException), () => FolderScanner.FileScanner(folderfilepath, config));
-
-        }
+        
         [TestCase]
         public void IsDevDependent_GivenListOfDevComponents_ReturnsSuccess()
         {

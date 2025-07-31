@@ -49,14 +49,14 @@ namespace ArtifactoryUploader
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             Log4Net.CatoolCurrentDirectory = System.IO.Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
-            CommonHelper.DefaultLogFolderInitialisation(FileConstant.ArtifactoryUploaderLog, m_Verbose);
-            CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
-
-            string FolderPath = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.ArtifactoryUploaderLog, m_Verbose);
-            Logger.Logger.Log(null, Level.Debug, $"log manager initiated folder path: {FolderPath}", null);
+            string logFileNameWithTimestamp = $"{FileConstant.ArtifactoryUploaderLog}_{DateTime.Now:yyyyMMdd_HHmmss}.log";
+            CommonHelper.DefaultLogFolderInitialization(logFileNameWithTimestamp, m_Verbose);
+            Logger.Logger.Log(null, Level.Notice, $"====================<<<<< Artifactory Uploader >>>>>====================", null);
+            CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName,environmentHelper);
+            Log4Net.AppendVerboseValue(appSettings);
+            string FolderPath = CommonHelper.LogFolderInitialization(appSettings, logFileNameWithTimestamp, m_Verbose);
+            Logger.Logger.Log(null, Level.Debug, $"log manager initiated folder name: {FolderPath}", null);
             settingsManager.CheckRequiredArgsToRun(appSettings, "Uploader");
-
-            Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Artifactory Uploader >>>>>====================", null);
             Logger.Logger.Log(null, Level.Notice, $"\nStart of Artifactory Uploader execution: {DateTime.Now}", null);
 
             if (!appSettings.Jfrog.DryRun)
@@ -65,7 +65,7 @@ namespace ArtifactoryUploader
                 Logger.Logger.Log(null, Level.Alert, $"Artifactory Uploader is running in dry-run mode, no packages will be moved \n", null);
 
             string bomFilePath = GetBomFilePath(appSettings);
-
+            Logger.Debug($"Main():Identified bom file with path:{bomFilePath}");
             Logger.Logger.Log(null, Level.Info, $"Input Parameters used in Artifactory Uploader:\n\t", null);
             Logger.Logger.Log(null, Level.Notice, $"\tBomFilePath:\t\t {bomFilePath}\n\t" +
                 $"CaToolVersion\t\t {caToolInformation.CatoolVersion}\n\t" +

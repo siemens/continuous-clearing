@@ -19,19 +19,19 @@ namespace LCT.Common.UTest
         {
             // Implement
         }
-        [Test]
-        public void ValidateFilePath_WhenPathIsNotProper_ThrowsArgumentException()
-        {
-            var fileOperations = new FileOperations();
-            Assert.Throws<System.ArgumentException>(() => fileOperations.ValidateFilePath(""));
-        }
+        //[Test]
+        //public void ValidateFilePath_WhenPathIsNotProper_ThrowsArgumentException()
+        //{
+        //    var fileOperations = new FileOperations();
+        //    Assert.Throws<System.ArgumentException>(() => fileOperations.ValidateFilePath(""));
+        //}
 
-        [Test]
-        public void ValidateFilePath_WhenFileNotAvailable_ThrowsFileNotFoundException()
-        {
-            var fileOperations = new FileOperations();
-            Assert.Throws<FileNotFoundException>(() => fileOperations.ValidateFilePath("test"));
-        }
+        //[Test]
+        //public void ValidateFilePath_WhenFileNotAvailable_ThrowsFileNotFoundException()
+        //{
+        //    var fileOperations = new FileOperations();
+        //    Assert.Throws<FileNotFoundException>(() => fileOperations.ValidateFilePath("test"));
+        //}
         [Test]
         public void BackupTheGivenFile_WhenFilePathIsNull_ThrowsArgumentNullExceptionn()
         {

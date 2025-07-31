@@ -71,6 +71,7 @@ namespace LCT.PackageIdentifier
             services.AddTransient<ICycloneDXBomParser, CycloneDXBomParser>();
             services.AddTransient<IBomCreator, BomCreator>();
             services.AddTransient<ISpdxBomParser, SpdxBomParser>();
+            services.AddTransient<IEnvironmentHelper, EnvironmentHelper>();
             services.AddTransient<Program>();
             services.AddScoped<ICompositionBuilder, CompositionBuilder>();
         }
@@ -85,14 +86,15 @@ namespace LCT.PackageIdentifier
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
-            CommonHelper.DefaultLogFolderInitialisation(FileConstant.BomCreatorLog, m_Verbose);
-            CommonAppSettings appSettings = _settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
+            string logFileNameWithTimestamp = $"{FileConstant.BomCreatorLog}_{DateTime.Now:yyyyMMdd_HHmmss}.log";
+            CommonHelper.DefaultLogFolderInitialization(logFileNameWithTimestamp, m_Verbose);
+            Logger.Logger.Log(null, Level.Notice, $"====================<<<<< Package Identifier >>>>>====================", null);
+            CommonAppSettings appSettings = _settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName,environmentHelper);
+            Log4Net.AppendVerboseValue(appSettings);
             ProjectReleases projectReleases = new ProjectReleases();
-            string _ = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.BomCreatorLog, m_Verbose);                        
+            string _ = CommonHelper.LogFolderInitialization(appSettings, logFileNameWithTimestamp, m_Verbose);
 
             _settingsManager.CheckRequiredArgsToRun(appSettings, "Identifer");
-
-            Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Package Identifier >>>>>====================", null);
             Logger.Logger.Log(null, Level.Notice, $"\nStart of Package Identifier execution: {DateTime.Now}", null);
 
             if (appSettings.ProjectType.Equals("ALPINE", StringComparison.InvariantCultureIgnoreCase))

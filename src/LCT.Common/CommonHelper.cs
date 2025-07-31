@@ -108,7 +108,8 @@ namespace LCT.Common
         {
             if (string.IsNullOrWhiteSpace(value))
             {
-                throw new ArgumentException($"Invalid value for {name} - {value}");
+                Logger.Error($"The provided value for '{name}' is null, empty, or whitespace. Value: '{value}'");
+                LogHandlingHelper.ExceptionErrorHandling("CheckNullOrEmpty()", $"Validation failed for parameter: {name}", new ArgumentException($"Invalid value for {name} - {value}"), $"The provided value for '{name}' is null, empty, or whitespace.");
             }
         }
 
@@ -248,9 +249,9 @@ namespace LCT.Common
                 {
                     Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.ManullayAdded };
                     component.Properties.Add(identifierType);
-                }
-                Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };                
-                component.Properties.Add(isDev);
+                    Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
+                    component.Properties.Add(isDev);
+                }                
                 listComponentForBOM.Add(component);
             }
         }
@@ -306,7 +307,7 @@ namespace LCT.Common
 
             return Array.Empty<string>();
         }
-        public static string LogFolderInitialisation(CommonAppSettings appSettings, string logFileName, bool m_Verbose)
+        public static string LogFolderInitialization(CommonAppSettings appSettings, string logFileName, bool m_Verbose)
         {
             string FolderPath = DefaultLogPath;
             if (!string.IsNullOrEmpty(appSettings.Directory.LogFolder))
@@ -344,7 +345,7 @@ namespace LCT.Common
             }
             return FolderPath;
         }        
-        public static void DefaultLogFolderInitialisation(string logFileName, bool m_Verbose)
+        public static void DefaultLogFolderInitialization(string logFileName, bool m_Verbose)
         {
             string FolderPath;
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -584,6 +585,7 @@ namespace LCT.Common
                     {
                         component.Properties.Add(excludeProperty);
                         noOfExcludedComponents++;
+                        Logger.Debug($"Component excluded due to PURL match: Name = {component.Name}, Version = {component.Version}, PURL = {component.Purl}");
                     }
                 }
             }           
@@ -615,6 +617,7 @@ namespace LCT.Common
                     {
                         noOfExcludedComponents++;
                         component.Properties.Add(excludeProperty);
+                        Logger.Debug($"Component excluded due to Name and Version match: Name = {component.Name}, Version = {component.Version}, Group = {component.Group}");
                     }
                 }
             }
