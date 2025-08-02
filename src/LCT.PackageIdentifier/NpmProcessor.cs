@@ -522,6 +522,7 @@ namespace LCT.PackageIdentifier
 
         private void ProcessSPDXFile(string filepath, CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom, ref List<Dependency> dependencies)
         {
+            BomHelper.NamingConventionOfSPDXFile(filepath, appSettings);
             Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
             bom = _spdxBomParser.ParseSPDXBom(filepath);
             bom = RemoveExcludedComponents(appSettings, bom);

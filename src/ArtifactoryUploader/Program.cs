@@ -137,14 +137,25 @@ namespace ArtifactoryUploader
             }
             else
             {
+                string filepath = string.Empty;
                 // If project name is not provided, look for the latest BOM file in the output folder that does not contain the backup key
                 var bomFiles = System.IO.Directory.GetFiles(
                     appSettings.Directory.OutputFolder,
                     $"*{FileConstant.BomFileName}*",
                     SearchOption.TopDirectoryOnly);
-                return bomFiles
+                filepath = bomFiles
                     .FirstOrDefault(f => !Path.GetFileName(f).Contains(FileConstant.backUpKey));
+
+                if (!string.IsNullOrEmpty(filepath))
+                {
+                    string projectName = string.Empty;
+                    projectName = Path.GetFileName(filepath).Replace("_" + FileConstant.BomFileName, "");
+                    appSettings.SW360.ProjectName = projectName;
+                    return filepath;
+                }
             }
+
+            return string.Empty;
         }
     }
 }

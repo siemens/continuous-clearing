@@ -200,6 +200,7 @@ namespace LCT.PackageIdentifier
             List<PythonPackage> PythonPackages = new List<PythonPackage>();
             if (filePath.EndsWith(FileConstant.SPDXFileExtension))
             {
+                BomHelper.NamingConventionOfSPDXFile(filePath, appSettings);
                 Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
                 bom = _spdxBomParser.ParseSPDXBom(filePath);
                 SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bom, appSettings.ProjectType,ref listUnsupportedComponents);

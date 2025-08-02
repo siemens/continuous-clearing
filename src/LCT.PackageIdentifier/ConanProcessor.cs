@@ -258,6 +258,7 @@ namespace LCT.PackageIdentifier
                 }
                 else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
                 {
+                    BomHelper.NamingConventionOfSPDXFile(filepath, appSettings);
                     Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
                     bom = _spdxBomParser.ParseSPDXBom(filepath);
                     SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bom, appSettings.ProjectType,ref listUnsupportedComponents);
