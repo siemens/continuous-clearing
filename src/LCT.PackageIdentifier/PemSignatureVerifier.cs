@@ -4,8 +4,8 @@
 //  SPDX-License-Identifier: MIT
 // --------------------------------------------------------------------------------------------------------------------
 using LCT.Common;
-using LCT.Common.Interface;
 using log4net;
+using log4net.Core;
 using System;
 using System.IO;
 using System.Linq;
@@ -65,6 +65,11 @@ namespace LCT.PackageIdentifier
                 LogCertificateInfo(certificate);
 
                 bool IsValid = ValidateSignedFileFromCertificate(documentPath, signaturePath, certificate);
+
+                if (!IsValid)
+                {
+                    IsCertificateValid(certificate);
+                }
                 return IsValid;
 
             }
@@ -322,6 +327,28 @@ namespace LCT.PackageIdentifier
             Logger.Debug($"Valid To: {certificate.NotAfter}");
             Logger.Debug($"Thumbprint: {certificate.Thumbprint}");
             Logger.Debug($"Algorithm: {certificate.SignatureAlgorithm.FriendlyName}");
+        }
+
+        /// <summary>
+        /// Verifies the validity of the specified X.509 certificate by checking its signature.
+        /// </summary>
+        /// <remarks>This method checks whether the certificate's signature is valid and signed by a
+        /// trusted authority. It does not verify whether the certificate is self-signed or issued by a trusted root
+        /// certificate authority.</remarks>
+        /// <param name="certificate">The X.509 certificate to validate. Must not be <see langword="null"/>.</param>
+        private static void IsCertificateValid(X509Certificate2 certificate)
+        {
+            // Check if certificate has a valid signature (self-signed or trusted root not checked here)
+            try
+            {
+                certificate.Verify(); // Verifies if the certificate is valid and signed by a trusted authority
+                Logger.Logger.Log(null, Level.Info, $"SPDX Certificate is valid.", null);
+            }
+            catch (CryptographicException ex)
+            {
+                Logger.Debug($"Certificate signature verification failed: {ex.Message}");
+                Environment.ExitCode = -1;
+            }
         }
 
         /// <summary>

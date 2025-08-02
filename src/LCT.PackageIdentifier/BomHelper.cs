@@ -157,7 +157,8 @@ namespace LCT.PackageIdentifier
             bool isValidFile = PemSignatureVerifier.ValidatePem(filepath, sigFilePath, pemFilePath);
             if (!isValidFile)
             {
-                // SPDX file validation failed - continuing without logging
+                Logger.Warn($"The signature of the SPDX file '{filename}' is not valid. Please check the signature and certificate files.");
+                Logger.Warn($"Currently processing the SPDX file '{filename}' without signature verification.");
             }
         }
         public static string GetHashCodeUsingNpmView(string name, string version)
