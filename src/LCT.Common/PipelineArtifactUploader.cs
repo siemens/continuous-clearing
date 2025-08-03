@@ -67,5 +67,22 @@ namespace LCT.Common
             }
 
         }
+
+        /// <summary>
+        /// Prints a warning message to the console in a format suitable for Azure Pipelines.
+        /// </summary>
+        /// <remarks>This method formats the warning message specifically for Azure Pipelines when the
+        /// application  is running in that environment and not inside a container. If these conditions are not met, 
+        /// the method does not produce any output.</remarks>
+        /// <param name="content">The warning message to be displayed. Cannot be null or empty.</param>
+        public static void PrintWarning(string content)
+        {
+            EnvironmentType envType = RuntimeEnvironment.GetEnvironment();
+            if (envType == EnvironmentType.AzurePipeline
+                            && Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") != "true")
+            {
+                Console.WriteLine($"##[warning]{content}");
+            }
+        }
     }
 }

@@ -6,6 +6,7 @@
 
 using LCT.APICommunications.Model;
 using LCT.Common;
+using LCT.Common.ComplianceValidator;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
 using LCT.Common.Model;
@@ -23,6 +24,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net.Http;
 using System.Reflection;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Directory = System.IO.Directory;
 
@@ -38,6 +40,7 @@ namespace LCT.SW360PackageCreator
         public static Stopwatch CreatorStopWatch { get; set; }
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
+        private static List<ComparisonBomData> parsedBomData;
 
         protected Program() { }
 
@@ -100,6 +103,10 @@ namespace LCT.SW360PackageCreator
                     await CreatorValidator.TriggerFossologyValidation(appSettings, sW360ApicommunicationFacade, environmentHelper);
             }
             await InitiatePackageCreatorProcess(appSettings, sw360ProjectService, sW360ApicommunicationFacade);
+
+            //Look for Compliance exceptions and print them with warnings 
+            await ComplianceCheckForAllFoundComponents();
+
             // Initialize telemetry with CATool version and instrumentation key only if Telemetry is enabled in appsettings
             if (appSettings.Telemetry.Enable)
             {
@@ -160,11 +167,24 @@ namespace LCT.SW360PackageCreator
 
             // parsing the input file
             ComponentCreator componentCreator = new ComponentCreator();
-            List<ComparisonBomData> parsedBomData = await componentCreator.CycloneDxBomParser(appSettings, sw360Service, cycloneDXBomParser, creatorHelper);
+            parsedBomData = await componentCreator.CycloneDxBomParser(appSettings, sw360Service, cycloneDXBomParser, creatorHelper);
 
             // initializing Component creation 
             await componentCreator.CreateComponentInSw360(appSettings, sw360CreatorService, sw360Service,
                  sw360ProjectService, new FileOperations(), creatorHelper, parsedBomData);
+        }
+
+        private static async Task ComplianceCheckForAllFoundComponents()
+        {
+            if (parsedBomData != null && parsedBomData.Count > 0)
+            {
+                IChecker compliance = new ComplianceCheck();
+                var complianceSettings = await compliance.LoadSettingsAsync("ComplianceValidator\\ComplianceSettings.json");
+                if (compliance.Check(complianceSettings, parsedBomData))
+                {
+                    PipelineArtifactUploader.PrintWarning(compliance.GetResults().ToString());
+                }
+            }
         }
     }
 }
