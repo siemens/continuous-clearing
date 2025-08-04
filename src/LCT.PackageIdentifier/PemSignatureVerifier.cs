@@ -301,8 +301,7 @@ namespace LCT.PackageIdentifier
                 using (var dsa = DSA.Create())
                 {
                     dsa.ImportSubjectPublicKeyInfo(publicKeyBytes, out _);
-                    if (dsa.VerifyData(data, signature, HashAlgorithmName.SHA256) ||
-                        dsa.VerifyData(data, signature, HashAlgorithmName.SHA1))
+                    if (dsa.VerifyData(data, signature, HashAlgorithmName.SHA256))
                         return true;
                 }
             }
