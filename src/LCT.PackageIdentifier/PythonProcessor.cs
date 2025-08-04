@@ -465,7 +465,6 @@ namespace LCT.PackageIdentifier
             if (prop.SpdxComponentDetails.SpdxComponent)
             {
                 AddSpdxProperties(prop, component);
-                component.Properties.Add(devDependency);
             }
             else
             {
@@ -482,14 +481,17 @@ namespace LCT.PackageIdentifier
 
         private static void AddIdentifierTypeProperty(PythonPackage prop, Component component, Property devDependency)
         {
-            var identifierType = new Property
-            {
-                Name = Dataconstant.Cdx_IdentifierType,
-                Value = prop.FoundType == Dataconstant.Discovered ? Dataconstant.Discovered : Dataconstant.ManullayAdded
-            };
+            component.Properties ??= new List<Property>();
 
-            component.Properties.Add(devDependency);
-            component.Properties.Add(identifierType);
+            string identifierTypeValue = prop.FoundType == Dataconstant.Discovered ? Dataconstant.Discovered : Dataconstant.ManullayAdded;
+            var properties = component.Properties;
+            CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
+                devDependency.Name,
+                devDependency.Value);
+            CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
+                Dataconstant.Cdx_IdentifierType,
+                identifierTypeValue);
+            component.Properties = properties;
         }
         private static void SetSpdxComponentDetails(string filePath, PythonPackage package,Component componentInfo)
         {

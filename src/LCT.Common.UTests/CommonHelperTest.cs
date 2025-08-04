@@ -1317,7 +1317,7 @@ namespace LCT.Common.UTest
                 
             // Verify basic behavior
             Assert.IsNotNull(component.Properties);
-            Assert.AreEqual(4, component.Properties.Count); // 4 null properties added
+            Assert.AreEqual(1, component.Properties.Count); 
             Assert.IsNull(component.Description);
             Assert.IsNull(component.Hashes);
         }

@@ -197,19 +197,17 @@ namespace LCT.PackageIdentifier
             List<string> mavenDirectDependencies = new List<string>();
             mavenDirectDependencies.AddRange(bom.Dependencies?.Select(x => x.Ref).ToList() ?? new List<string>());
             var bomComponentsList = bom.Components;
+
             foreach (var component in bomComponentsList)
             {
-                Property siemensDirect = new() { Name = Dataconstant.Cdx_SiemensDirect, Value = "false" };
-                if (mavenDirectDependencies.Exists(x => x.Contains(component.Name) && x.Contains(component.Version)))
-                {
-                    siemensDirect.Value = "true";
-                }
-
+                string siemensDirectValue = mavenDirectDependencies.Exists(x => x.Contains(component.Name) && x.Contains(component.Version))
+                    ? "true"
+                    : "false";
                 component.Properties ??= new List<Property>();
-                bool isPropExists = component.Properties.Exists(x => x.Name.Equals(Dataconstant.Cdx_SiemensDirect));
-                if (!isPropExists) { component.Properties.Add(siemensDirect); }
+                var properties = component.Properties;
+                CommonHelper.RemoveDuplicateAndAddProperty(ref properties,Dataconstant.Cdx_SiemensDirect,siemensDirectValue);
+                component.Properties = properties;
             }
-
             bom.Components = bomComponentsList;
         }
 
