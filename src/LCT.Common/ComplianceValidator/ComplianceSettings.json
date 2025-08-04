@@ -16,19 +16,6 @@
         "warningMessage": "Component 'Chromium Embedded Framework' source code must be manually uploaded",
         "recommendation": "Use Microsoft Edge WebView2 as a modern alternative to Chromium dependencies"
       }
-    },
-    {
-      "id": "babel",
-      "name": "babel",
-      "description": "babel browsers",
-      "purl": [
-        "pkg:npm/%40babel/plugin-bugfix-safari-id-destructuring-collision-in-function-expression",
-        "pkg:npm/babelcore"
-      ],
-      "complianceInstructions": {
-        "warningMessage": "Component 'babel' source code must be manually uploaded",
-        "recommendation": "Use bubble as a modern alternative to babel dependencies"
-      }
     }
   ]
 }
