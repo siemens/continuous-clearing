@@ -125,17 +125,9 @@ namespace LCT.PackageIdentifier
             {
                 if (dsa != null)
                 {
-                    // First try with SHA256 (secure)
-                    if (dsa.VerifyData(fileData, signatureData, HashAlgorithmName.SHA256))
+                    if (dsa.VerifyData(fileData, signatureData, HashAlgorithmName.SHA256) ||
+                        dsa.VerifyData(fileData, signatureData, HashAlgorithmName.SHA1))
                     {
-                        return true;
-                    }
-                    
-                    // Only fall back to SHA1 for legacy compatibility with warning
-                    Logger.Warn("Attempting DSA verification with SHA1 (weak hash algorithm) for legacy compatibility.");
-                    if (dsa.VerifyData(fileData, signatureData, HashAlgorithmName.SHA1))
-                    {
-                        Logger.Warn("DSA signature verified using SHA1. Consider upgrading to SHA256 for better security.");
                         return true;
                     }
                     return false;
@@ -309,23 +301,14 @@ namespace LCT.PackageIdentifier
                 using (var dsa = DSA.Create())
                 {
                     dsa.ImportSubjectPublicKeyInfo(publicKeyBytes, out _);
-                    
-                    // First try with SHA256 (secure)
-                    if (dsa.VerifyData(data, signature, HashAlgorithmName.SHA256))
+                    if (dsa.VerifyData(data, signature, HashAlgorithmName.SHA256) ||
+                        dsa.VerifyData(data, signature, HashAlgorithmName.SHA1))
                         return true;
-                    
-                    // Only fall back to SHA1 for legacy compatibility with warning
-                    Logger.Warn("Attempting DSA verification with SHA1 (weak hash algorithm) for legacy compatibility.");
-                    if (dsa.VerifyData(data, signature, HashAlgorithmName.SHA1))
-                    {
-                        Logger.Warn("DSA signature verified using SHA1. Consider upgrading to SHA256 for better security.");
-                        return true;
-                    }
                 }
             }
             catch (Exception ex) when (ex is CryptographicException || ex is FormatException)
             {
-                Logger.Debug("DSA verification failed", ex);
+                Logger.Debug($"DSA verification failed: {ex.Message}", ex);
                 return false;
             }
             return false;
