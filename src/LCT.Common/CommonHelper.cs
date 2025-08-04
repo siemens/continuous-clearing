@@ -17,8 +17,8 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
-using Level = log4net.Core.Level;
 using File = System.IO.File;
+using Level = log4net.Core.Level;
 
 namespace LCT.Common
 {
@@ -44,7 +44,7 @@ namespace LCT.Common
         }
 
         public static List<Component> RemoveExcludedComponents(List<Component> ComponentList, List<string> ExcludedComponents, ref int noOfExcludedComponents)
-        {            
+        {
             List<string> ExcludedComponentsFromPurl = ExcludedComponents?.Where(ec => ec.StartsWith("pkg:")).ToList();
             List<string> otherExcludedComponents = ExcludedComponents?.Where(ec => !ec.StartsWith("pkg:")).ToList();
 
@@ -234,7 +234,7 @@ namespace LCT.Common
             return component.Properties.Exists(x => x.Name == constant);
         }
 
-        public static void GetDetailsForManuallyAdded(List<Component> componentsForBOM, List<Component> listComponentForBOM,string filePath)
+        public static void GetDetailsForManuallyAdded(List<Component> componentsForBOM, List<Component> listComponentForBOM, string filePath)
         {
             foreach (var component in componentsForBOM)
             {
@@ -249,7 +249,7 @@ namespace LCT.Common
                     Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.ManullayAdded };
                     component.Properties.Add(identifierType);
                 }
-                Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };                
+                Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
                 component.Properties.Add(isDev);
                 listComponentForBOM.Add(component);
             }
@@ -284,7 +284,8 @@ namespace LCT.Common
                 {
                     var repoList = new List<string>();
                     if (!string.IsNullOrEmpty(config.ReleaseRepo))
-                    { repoList.Add(config.ReleaseRepo);
+                    {
+                        repoList.Add(config.ReleaseRepo);
                     }
 
                     if (!string.IsNullOrEmpty(config.DevDepRepo))
@@ -343,7 +344,7 @@ namespace LCT.Common
                 }
             }
             return FolderPath;
-        }        
+        }
         public static void DefaultLogFolderInitialisation(string logFileName, bool m_Verbose)
         {
             string FolderPath;
@@ -366,7 +367,7 @@ namespace LCT.Common
 
             invalidChars = string.Join(", ", foundInvalidChars.Select(c => $"'{c}'"));
             return foundInvalidChars.Count != 0;
-        }        
+        }
         public static int ValidateSw360Project(string sw360ProjectName, string clearingState, string Name, CommonAppSettings appSettings)
         {
             if (string.IsNullOrEmpty(sw360ProjectName))
@@ -416,12 +417,12 @@ namespace LCT.Common
                     if (i + 1 < args.Length)
                     {
                         maskedArgs[i + 1] = "******";
-                        skipNext = true; 
+                        skipNext = true;
                     }
                 }
                 else
                 {
-                    maskedArgs[i] = args[i]; 
+                    maskedArgs[i] = args[i];
                 }
             }
 
@@ -433,14 +434,14 @@ namespace LCT.Common
             List<Component> componentForBOM = cycloneDXBOM.Components.ToList();
             List<Dependency> dependenciesForBOM = cycloneDXBOM.Dependencies?.ToList() ?? new List<Dependency>();
             int noOfExcludedComponents = 0;
-            
+
             if (appSettings?.SW360?.ExcludeComponents != null)
             {
                 componentForBOM = RemoveExcludedComponents(componentForBOM, appSettings.SW360?.ExcludeComponents, ref noOfExcludedComponents);
                 dependenciesForBOM = RemoveInvalidDependenciesAndReferences(componentForBOM, dependenciesForBOM);
                 updateKpiCallback?.Invoke(noOfExcludedComponents);
             }
-            
+
             cycloneDXBOM.Components = componentForBOM;
             cycloneDXBOM.Dependencies = dependenciesForBOM;
             return cycloneDXBOM;
@@ -453,7 +454,7 @@ namespace LCT.Common
         /// <param name="isInternalPredicate">Function to determine if a component is internal</param>
         /// <returns>Tuple containing (processedComponents, internalComponents)</returns>
         public static (List<Component> processedComponents, List<Component> internalComponents) ProcessInternalComponentIdentification(
-            List<Component> components, 
+            List<Component> components,
             Func<Component, bool> isInternalPredicate)
         {
             List<Component> internalComponents = new List<Component>();
@@ -496,11 +497,11 @@ namespace LCT.Common
         /// <param name="siemensFileName">Siemens filename property</param>
         /// <param name="jfrogRepoPath">JFrog repository path property</param>
         /// <param name="hashes">Optional AQL result containing hash values</param>
-        public static void SetComponentPropertiesAndHashes(Component component, 
-            Property artifactoryRepo, 
-            Property projectType, 
-            Property siemensFileName, 
-            Property jfrogRepoPath, 
+        public static void SetComponentPropertiesAndHashes(Component component,
+            Property artifactoryRepo,
+            Property projectType,
+            Property siemensFileName,
+            Property jfrogRepoPath,
             dynamic hashes = null)
         {
             // Initialize properties list if needed
@@ -514,7 +515,7 @@ namespace LCT.Common
             component.Properties.Add(projectType);
             component.Properties.Add(siemensFileName);
             component.Properties.Add(jfrogRepoPath);
-            
+
             // Clear description
             component.Description = null;
 
@@ -548,13 +549,13 @@ namespace LCT.Common
                 string filename = Path.GetFileName(filePath);
                 var bomComponentsList = bom.Components;
                 foreach (var component in bomComponentsList)
-                {                    
+                {
                     component.Properties ??= new List<Property>();
-                    SpdxSbomHelper.AddSpdxComponentProperties(filename, component);                    
+                    SpdxSbomHelper.AddSpdxComponentProperties(filename, component);
                 }
                 bom.Components = bomComponentsList;
             }
-            
+
         }
         #endregion
 
@@ -586,7 +587,7 @@ namespace LCT.Common
                         noOfExcludedComponents++;
                     }
                 }
-            }           
+            }
         }
         private static string NormalizePurl(string purl)
         {

@@ -8,7 +8,6 @@ using LCT.Common.Interface;
 using LCT.Common.Model;
 using log4net;
 using log4net.Core;
-using NuGet.Protocol.Plugins;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,11 +33,6 @@ namespace LCT.Common.ComplianceValidator
         /// cref="ComplianceSettingsModel"/> object populated with the settings from the specified JSON file.</returns>
         public async Task<ComplianceSettingsModel> LoadSettingsAsync(string jsonFilePath)
         {
-            if (System.IO.File.Exists(jsonFilePath))
-            {
-                var res = System.IO.File.ReadAllText(jsonFilePath);
-            }
-
             using var stream = System.IO.File.OpenRead(jsonFilePath);
             var settings = await JsonSerializer.DeserializeAsync<ComplianceSettingsModel>(stream);
             return settings;
