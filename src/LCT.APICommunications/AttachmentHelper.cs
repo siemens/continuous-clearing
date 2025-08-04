@@ -86,12 +86,13 @@ namespace LCT.APICommunications
                     byte[] endBytes = System.Text.Encoding.UTF8.GetBytes($"--{boundary}--");
                     requestStream.Write(endBytes, 0, endBytes.Length);
                     requestStream.Close();
-
+                    LogHandlingHelper.LogHttpWebRequest("Attach Component Source", $"Uploading component source for ReleaseId: {attachReport.ReleaseId}", request);
                     using WebResponse response = request.GetResponse();
-                    HttpWebResponse httpResponse = (HttpWebResponse)response;
+                    HttpWebResponse httpResponse = (HttpWebResponse)response;                    
                     HandleAcceptedStatus(httpResponse, comparisonBomData);
                     using StreamReader reader = new StreamReader(response.GetResponseStream());
-                    reader.ReadToEnd();                    
+                    reader.ReadToEnd();
+                    LogHandlingHelper.LogHttpWebResponse("Attach Component Source", $"Response for attaching component source for ReleaseId: {attachReport.ReleaseId}", httpResponse);
                 }
             }
             catch (UriFormatException ex)

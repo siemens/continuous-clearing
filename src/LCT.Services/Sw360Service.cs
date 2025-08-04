@@ -324,7 +324,7 @@ namespace LCT.Services
                 else if (await CheckComponentExistenceByExternalId(component) ||
                          CheckAvailabilityByName(sw360ComponentList, component))
                 {
-                    Logger.Debug($"GetAvailableComponenentsList():  Component Exist : Release name - {component.Name}, version - {component.Version}");
+                    Logger.Debug($"GetAvailableComponenentsList():  Component Exist : Component name - {component.Name}, version - {component.Version}");
                 }
                 else
                 {
@@ -413,7 +413,7 @@ namespace LCT.Services
 
         private async Task<bool> CheckComponentExistenceByExternalId(Components componentToBomData)
         {
-            Logger.Debug($"CheckComponentExistenceByExternalId(): Component - {componentToBomData.Name}");
+            Logger.Debug($"CheckComponentExistenceByExternalId(): Starting to identifying component through ExternalId - {componentToBomData.Name}");
             ComponentStatus componentstatus = new ComponentStatus();
 
             try

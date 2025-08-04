@@ -793,7 +793,7 @@ namespace LCT.Common.UTest
             };
 
             // Act
-            LogHandlingHelper.ComponentDataForLogTable(methodName, initialItem, updatedItem);
+            LogHandlingHelper.ComponentDataForLogTable(methodName, initialItem, updatedItem,"");
 
             // Assert
             _mockLogger.Verify(logger => logger.Debug(It.Is<string>(log =>

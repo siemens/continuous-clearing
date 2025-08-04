@@ -382,7 +382,7 @@ namespace LCT.SW360PackageCreator
                 await ProcessReleaseAlreadyExist(item, sw360CreatorService, appSettings, createdStatus.ReleaseStatus);
 
                 UpdatedCompareBomData.Add(item);
-                LogHandlingHelper.ComponentDataForLogTable("CreateComponentAndReleaseWhenNotAvailable()", initialItem, item);
+                LogHandlingHelper.ComponentDataForLogTable("CreateComponentAndReleaseWhenNotAvailable()", initialItem, item,"Comparison the values before and after creating component and release");
             }
         }
 
@@ -447,7 +447,7 @@ namespace LCT.SW360PackageCreator
                 await ProcessReleaseAlreadyExist(item, sw360CreatorService, appSettings, releaseCreateStatus);
                 UpdatedCompareBomData.Add(item);
                 await sw360CreatorService.UpdatePurlIdForExistingComponent(item, componentId);
-                LogHandlingHelper.ComponentDataForLogTable("CreateReleaseWhenNotAvailable()", initialItem, item);
+                LogHandlingHelper.ComponentDataForLogTable("CreateReleaseWhenNotAvailable()", initialItem, item, "Comparison the values before and after creating release");
             }
         }
         public static async Task<bool> UpdateFossologyStatus(ComparisonBomData item, ISw360CreatorService sw360CreatorService, CommonAppSettings appSettings, string formattedName)
@@ -604,7 +604,7 @@ namespace LCT.SW360PackageCreator
                 }                
                 await sw360CreatorService.UpdatePurlIdForExistingComponent(item, componentId);
                 await sw360CreatorService.UpdatePurlIdForExistingRelease(item, releaseId, releasesInfo);
-                LogHandlingHelper.ComponentDataForLogTable("ComponentAndReleaseAvailable()", initialItem, item);
+                LogHandlingHelper.ComponentDataForLogTable("ComponentAndReleaseAvailable()", initialItem, item,"Comparison the values before and after component and release available");
             }
         }
         public static async Task IfAlreadyReleaseExistsUploadSourceCodeAndUrlInSW360(ComparisonBomData item, ReleasesInfo releasesInfo, string releaseId, ICreatorHelper creatorHelper, ISw360CreatorService sw360CreatorService)
