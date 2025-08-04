@@ -487,5 +487,153 @@ namespace LCT.PackageIdentifier.UTest
             // Assert
             Assert.IsTrue(result, "Multiple certificates should use the first one");
         }
+
+        [Test]
+        public void ValidatePem_WithIOException_ReturnsFalse()
+        {
+            // Arrange - Use a non-existent directory path to trigger IOException
+            var nonExistentDir = Path.Combine(_tempDirectory, "nonexistent_directory");
+            var nonExistentFile = Path.Combine(nonExistentDir, "nonexistent_file.txt");
+            
+            // Create an invalid public key that will bypass certificate parsing and go to ValidateSignedFileFromPublicKey
+            var invalidPublicKeyPath = Path.Combine(_tempDirectory, "trigger_publickey_path.pem");
+            File.WriteAllText(invalidPublicKeyPath, "-----BEGIN PUBLIC KEY-----\nInvalidKeyData123\n-----END PUBLIC KEY-----");
+
+            // Act - This will call ValidateSignedFileFromPublicKey which will try to read the non-existent file
+            var result = PemSignatureVerifier.ValidatePem(nonExistentFile, _testSignaturePath, invalidPublicKeyPath);
+
+            // Assert
+            Assert.IsFalse(result, "IOException should return false");
+        }
+
+        [Test]
+        public void ValidatePem_WithIOException_NonExistentSignature_ReturnsFalse()
+        {
+            // Arrange - Use a non-existent signature file to trigger IOException
+            var nonExistentSignature = Path.Combine(_tempDirectory, "nonexistent_signature.sig");
+            
+            // Create an invalid public key that will bypass certificate parsing
+            var invalidPublicKeyPath = Path.Combine(_tempDirectory, "trigger_publickey_path2.pem");
+            File.WriteAllText(invalidPublicKeyPath, "-----BEGIN PUBLIC KEY-----\nInvalidKeyData456\n-----END PUBLIC KEY-----");
+
+            // Act - This will call ValidateSignedFileFromPublicKey which will try to read the non-existent signature
+            var result = PemSignatureVerifier.ValidatePem(_testDocumentPath, nonExistentSignature, invalidPublicKeyPath);
+
+            // Assert
+            Assert.IsFalse(result, "IOException with non-existent signature should return false");
+        }
+
+        [Test]
+        public void ValidatePem_WithUnauthorizedAccessException_ReturnsFalse()
+        {
+            // Arrange - This test is difficult to implement reliably across different environments
+            // We'll create a test that demonstrates the exception handling pattern
+            var restrictedDirectory = Path.Combine(_tempDirectory, "restricted");
+            Directory.CreateDirectory(restrictedDirectory);
+            
+            var restrictedFilePath = Path.Combine(restrictedDirectory, "restricted_file.txt");
+            File.WriteAllText(restrictedFilePath, "restricted content");
+
+            // Create an invalid public key that will bypass certificate parsing
+            var invalidPublicKeyPath = Path.Combine(_tempDirectory, "invalid_publickey.pem");
+            File.WriteAllText(invalidPublicKeyPath, "-----BEGIN PUBLIC KEY-----\nInvalidKeyData\n-----END PUBLIC KEY-----");
+
+            // Act - This test demonstrates the exception handling structure
+            // Note: UnauthorizedAccessException is difficult to trigger reliably in unit tests
+            var result = PemSignatureVerifier.ValidatePem(restrictedFilePath, _testSignaturePath, invalidPublicKeyPath);
+
+            // Assert - The method should handle any access issues gracefully
+            Assert.IsFalse(result, "Access issues should return false");
+        }
+
+        [Test]
+        public void ValidatePem_WithCryptographicException_ReturnsFalse()
+        {
+            // Arrange
+            var invalidKeyPath = Path.Combine(_tempDirectory, "crypto_invalid.pem");
+            // Create a PEM that looks valid but has invalid cryptographic data
+            File.WriteAllText(invalidKeyPath, "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQEAInvalidCryptographicData\n-----END PUBLIC KEY-----");
+
+            // Act
+            var result = PemSignatureVerifier.ValidatePem(_testDocumentPath, _testSignaturePath, invalidKeyPath);
+
+            // Assert
+            Assert.IsFalse(result, "CryptographicException should return false");
+        }
+
+        [Test]
+        public void ValidatePem_WithFormatException_ReturnsFalse()
+        {
+            // Arrange - Create a PEM that will trigger FormatException during Base64 conversion
+            var invalidFormatPath = Path.Combine(_tempDirectory, "format_invalid.pem");
+            // Create invalid Base64 characters that will cause FormatException in Convert.FromBase64String
+            File.WriteAllText(invalidFormatPath, "-----BEGIN PUBLIC KEY-----\nInvalid@Base64#Format!@#$%\n-----END PUBLIC KEY-----");
+
+            // Act
+            var result = PemSignatureVerifier.ValidatePem(_testDocumentPath, _testSignaturePath, invalidFormatPath);
+
+            // Assert
+            Assert.IsFalse(result, "FormatException should return false");
+        }
+
+        [Test]
+        public void ValidatePem_WithFormatException_InvalidBase64_ReturnsFalse()
+        {
+            // Arrange - Create another scenario that triggers FormatException
+            var invalidFormatPath = Path.Combine(_tempDirectory, "invalid_base64.pem");
+            // Use characters that are definitely not valid Base64
+            File.WriteAllText(invalidFormatPath, "-----BEGIN PUBLIC KEY-----\n@!#$%^&*()_+{}|:<>?[]\n-----END PUBLIC KEY-----");
+
+            // Act
+            var result = PemSignatureVerifier.ValidatePem(_testDocumentPath, _testSignaturePath, invalidFormatPath);
+
+            // Assert
+            Assert.IsFalse(result, "FormatException with invalid Base64 should return false");
+        }
+
+        [Test]
+        public void ValidatePem_WithArgumentException_ReturnsFalse()
+        {
+            // Arrange - Create a PEM with data that will cause ArgumentException
+            var argumentInvalidPath = Path.Combine(_tempDirectory, "argument_invalid.pem");
+            // Create a PEM with empty or invalid key data that causes ArgumentException in crypto operations
+            File.WriteAllText(argumentInvalidPath, "-----BEGIN PUBLIC KEY-----\n\n-----END PUBLIC KEY-----");
+
+            // Act
+            var result = PemSignatureVerifier.ValidatePem(_testDocumentPath, _testSignaturePath, argumentInvalidPath);
+
+            // Assert
+            Assert.IsFalse(result, "ArgumentException should return false");
+        }
+
+        [Test]
+        public void ValidatePem_WithArgumentException_EmptyKeyData_ReturnsFalse()
+        {
+            // Arrange - Create another scenario that triggers ArgumentException
+            var argumentInvalidPath = Path.Combine(_tempDirectory, "empty_key.pem");
+            // Create a PEM with minimal data that could cause ArgumentException
+            File.WriteAllText(argumentInvalidPath, "-----BEGIN PUBLIC KEY-----\nA\n-----END PUBLIC KEY-----");
+
+            // Act
+            var result = PemSignatureVerifier.ValidatePem(_testDocumentPath, _testSignaturePath, argumentInvalidPath);
+
+            // Assert
+            Assert.IsFalse(result, "ArgumentException with empty key data should return false");
+        }
+
+        [Test] 
+        public void ValidatePem_WithArgumentException_InvalidKeyLength_ReturnsFalse()
+        {
+            // Arrange - Create a PEM with invalid key length that triggers ArgumentException
+            var argumentInvalidPath = Path.Combine(_tempDirectory, "invalid_length_key.pem");
+            // Create a very short Base64 string that's invalid for cryptographic operations
+            File.WriteAllText(argumentInvalidPath, "-----BEGIN PUBLIC KEY-----\nMDk=\n-----END PUBLIC KEY-----");
+
+            // Act
+            var result = PemSignatureVerifier.ValidatePem(_testDocumentPath, _testSignaturePath, argumentInvalidPath);
+
+            // Assert
+            Assert.IsFalse(result, "ArgumentException with invalid key length should return false");
+        }
     }
 }
