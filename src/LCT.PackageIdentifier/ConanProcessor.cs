@@ -81,18 +81,12 @@ namespace LCT.PackageIdentifier
         public async Task<ComponentIdentification> IdentificationOfInternalComponents(ComponentIdentification componentData, CommonAppSettings appSettings,
             IJFrogService jFrogService, IBomHelper bomhelper)
         {
-            // get the  component list from Jfrog for given repository
             List<AqlResult> aqlResultList =
                 await bomhelper.GetListOfComponentsFromRepo(appSettings.Conan.Artifactory.InternalRepos, jFrogService);
-
             var inputIterationList = componentData.comparisonBOMData;
-            
-            // Use the common helper method
             var (processedComponents, internalComponents) = CommonHelper.ProcessInternalComponentIdentification(
                 inputIterationList, 
                 component => IsInternalConanComponent(aqlResultList, component));
-
-            // update the comparison bom data
             componentData.comparisonBOMData = processedComponents;
             componentData.internalComponents = internalComponents;
 
@@ -526,19 +520,24 @@ namespace LCT.PackageIdentifier
             {
                 component.Properties ??= new List<Property>();
 
-                Property isDev;
-                Property identifierType;
                 if (identifiedBy == "PackageFile")
                 {
-                    identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.Discovered };
-                    component.Properties.Add(identifierType);
+                    var properties= component.Properties;
+                    CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
+                        Dataconstant.Cdx_IdentifierType,
+                        Dataconstant.Discovered);
+                    component.Properties = properties;
                 }
                 else
                 {
-                    isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
-                    identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.ManullayAdded };
-                    component.Properties.Add(isDev);
-                    component.Properties.Add(identifierType);
+                    var properties = component.Properties;
+                    CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
+                        Dataconstant.Cdx_IsDevelopment,
+                        "false");
+                    CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
+                        Dataconstant.Cdx_IdentifierType,
+                        Dataconstant.ManullayAdded);
+                    component.Properties = properties;
                 }
             }
         }
@@ -562,14 +561,19 @@ namespace LCT.PackageIdentifier
         {
             foreach (var component in componentsForBOM)
             {
-                // check existence of property and add new
-                component.Properties = new List<Property>();
-                Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
-                Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.ManullayAdded };
-                component.Properties.Add(isDev);
-                component.Properties.Add(identifierType);
+                // Initialize properties list if null, otherwise keep existing properties
+                component.Properties ??= new List<Property>();
+                var properties= component.Properties;
+                // Use helper method to safely add properties without duplicates
+                CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
+                    Dataconstant.Cdx_IsDevelopment,
+                    "false");
+                CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
+                    Dataconstant.Cdx_IdentifierType,
+                    Dataconstant.ManullayAdded);
+                component.Properties= properties;
             }
-        }             
+        }
 
         #endregion
     }

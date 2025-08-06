@@ -111,7 +111,7 @@ namespace AritfactoryUploader.UTest
             PackageUploadHelper.UpdateBomArtifactoryRepoUrl(ref bom, components);
 
             //Assert
-            var repoUrl = bom.Components.First(x => x.Properties[3].Name == Dataconstant.Cdx_ArtifactoryRepoName).Properties[3].Value;
+            var repoUrl = bom.Components.First(x => x.Properties[5].Name == Dataconstant.Cdx_ArtifactoryRepoName).Properties[5].Value;
             var repoPath = bom.Components.First(x => x.Properties[6].Name == Dataconstant.Cdx_JfrogRepoPath).Properties[6].Value;
             Assert.AreEqual("org1-npmjs-npm-remote", repoUrl);
             Assert.AreEqual("org1-npmjs-npm-remote/rxjs/-/rxjs-6.5.4.tgz", repoPath);

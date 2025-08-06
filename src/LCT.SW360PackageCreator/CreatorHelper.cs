@@ -316,29 +316,18 @@ namespace LCT.SW360PackageCreator
 
             foreach (ComparisonBomData comBom in updatedCompareBomData)
             {
-                if (string.IsNullOrEmpty(comBom.ReleaseLink))
-                {
-                    comBom.ReleaseLink = GetReleaseLink(componentsAvailableInSw360, comBom.Name, comBom.Version);
-                }
-
+                UpdateReleaseLink(comBom);
                 try
                 {
-                    List<Property> prop = new List<Property>
-                {
-                    new Property { Name = Dataconstant.Cdx_ClearingState, Value = comBom.ApprovedStatus },
-                     new Property { Name = Dataconstant.Cdx_ReleaseUrl, Value = comBom.ReleaseLink },
-                     new Property { Name = Dataconstant.Cdx_FossologyUrl, Value = comBom.FossologyLink ?? "" }
-                };
-
-                    if (!bom.Components.Exists(x => x.BomRef.Contains(Dataconstant.PurlCheck()["MAVEN"])))
-                    {
-                        bom.Components.Find(com => string.IsNullOrEmpty(com.Group) ? com.Name == comBom.Name && com.Version.Contains(comBom.Version)
-                        : $"{com.Group}{Dataconstant.ForwardSlash}{com.Name}" == comBom.Name && com.Version.Contains(comBom.Version))?.Properties.AddRange(prop);
-                    }
-                    else
-                    {
-                        bom.Components.Find(com => com.Name == comBom.Name && com.Version.Contains(comBom.Version))?.Properties.AddRange(prop);
-                    }
+                    var propertiesToUpdate = new Dictionary<string, string>
+            {
+                { Dataconstant.Cdx_ClearingState, comBom.ApprovedStatus },
+                { Dataconstant.Cdx_ReleaseUrl, comBom.ReleaseLink },
+                { Dataconstant.Cdx_FossologyUrl, comBom.FossologyLink ?? "" }
+            };
+                    
+                    Component component = FindMatchingComponent(bom, comBom);
+                    AddOrUpdateProperties(component, propertiesToUpdate);
                 }
                 catch (JsonSerializationException ex)
                 {
@@ -347,7 +336,38 @@ namespace LCT.SW360PackageCreator
             }
             return bom;
         }
+        private static Component FindMatchingComponent(Bom bom, ComparisonBomData comBom)
+        {
+            if (!bom.Components.Exists(x => x.BomRef.Contains(Dataconstant.PurlCheck()["MAVEN"])))
+            {
+                return bom.Components.Find(com =>
+                    string.IsNullOrEmpty(com.Group)
+                        ? com.Name == comBom.Name && com.Version.Contains(comBom.Version)
+                        : $"{com.Group}{Dataconstant.ForwardSlash}{com.Name}" == comBom.Name && com.Version.Contains(comBom.Version));
+            }
+            else
+            {
+                return bom.Components.Find(com => com.Name == comBom.Name && com.Version.Contains(comBom.Version));
+            }
+        }
+        private void UpdateReleaseLink(ComparisonBomData comBom)
+        {
+            if (string.IsNullOrEmpty(comBom.ReleaseLink))
+            {
+                comBom.ReleaseLink = GetReleaseLink(componentsAvailableInSw360, comBom.Name, comBom.Version);
+            }
+        }
+        private static void AddOrUpdateProperties(Component component,Dictionary<string,string> listOfProperties)
+        {
+            if (component == null) return;
+            foreach (var property in listOfProperties)
+            {
+                var properties = component.Properties;
+                CommonHelper.RemoveDuplicateAndAddProperty(ref properties, property.Key, property.Value);
+                component.Properties = properties;
+            }
 
+        }
         private static string GetDownloadPathForComponetType(ComparisonBomData component)
         {
             string localPathforDownload = string.Empty;

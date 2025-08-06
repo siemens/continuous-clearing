@@ -130,7 +130,7 @@ namespace LCT.Services
                     var sw360releasesdata = componentsRelease?.Embedded?.Sw360Releases ?? new List<Sw360Releases>();
 
                     //It's for Local Sw360 servers,making an API call with EscapeDataString..
-                    if (sw360releasesdata.Count == 0 && releaseExternalId.Contains(Dataconstant.PurlCheck()["NPM"]))
+                    if (sw360releasesdata.Count == 0 && (releaseExternalId.Contains(Dataconstant.PurlCheck()["NPM"]) || releaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]) || releaseExternalId.Contains(Dataconstant.PurlCheck()["ALPINE"])))
                     {
                         releaseExternalId = Uri.EscapeDataString(releaseExternalId);
                         httpResponseComponent = await m_SW360ApiCommunicationFacade.GetReleaseByExternalId(releaseExternalId, externalIdKey);

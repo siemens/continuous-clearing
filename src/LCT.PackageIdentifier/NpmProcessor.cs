@@ -717,18 +717,19 @@ namespace LCT.PackageIdentifier
             return components;
         }
 
-        private static void AddingIdentifierType(List<Component> components, string identifiedBy,string filePath)
+        private static void AddingIdentifierType(List<Component> components, string identifiedBy, string filePath)
         {
             foreach (var component in components)
             {
                 component.Properties ??= new List<Property>();
 
-                Property isDev;
-                Property identifierType;
                 if (identifiedBy == "PackageFile")
                 {
-                    identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.Discovered };
-                    component.Properties.Add(identifierType);
+                    var properties=component.Properties;
+                    CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
+                        Dataconstant.Cdx_IdentifierType,
+                        Dataconstant.Discovered);
+                    component.Properties = properties;
                 }
                 else
                 {
@@ -738,12 +739,16 @@ namespace LCT.PackageIdentifier
                         SpdxSbomHelper.AddSpdxComponentProperties(fileName, component);
                     }
                     else
-                    {                        
-                        identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.ManullayAdded };                        
-                        component.Properties.Add(identifierType);
-                        isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
-                        component.Properties.Add(isDev);
-                    }                    
+                    {
+                        var properties = component.Properties;
+                        CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
+                            Dataconstant.Cdx_IdentifierType,
+                            Dataconstant.ManullayAdded);
+                        CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
+                            Dataconstant.Cdx_IsDevelopment,
+                            "false");
+                        component.Properties = properties;
+                    }
                 }
             }
         }
