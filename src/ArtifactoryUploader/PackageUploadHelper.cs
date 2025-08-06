@@ -39,7 +39,6 @@ namespace LCT.ArtifactoryUploader
 
         private static bool SetWarningCode;
         public static Bom GetComponentListFromComparisonBOM(string comparisonBomFilePath,IEnvironmentHelper environmentHelper)
-
         {
             Logger.Debug("Starting GetComponentListFromComparisonBOM() method");
             Bom componentsToBoms = null;
