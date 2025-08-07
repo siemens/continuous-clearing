@@ -1,4 +1,10 @@
-﻿using LCT.Common;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2025 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// --------------------------------------------------------------------------------------------------------------------
+
+using LCT.Common;
 using LCT.Common.Constants;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
@@ -19,24 +25,51 @@ namespace LCT.PackageIdentifier
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
+        /// <summary>
+        /// Registers the default MSBuild instance for use within the application if it has not already been registered.
+        /// </summary>
+        /// <remarks>This method ensures that MSBuild is available for build-related operations by
+        /// registering the default instance if necessary. If MSBuild is already registered, no action is taken. After
+        /// registration, information about the MSBuild version and path is logged for diagnostic purposes. Derived
+        /// classes can override this method to customize the MSBuild registration process.</remarks>
         protected virtual void RegisterMSBuild()
         {
             if (!MSBuildLocator.IsRegistered)
             {
                 MSBuildLocator.RegisterDefaults();
-                // Log the Registred MSBUild version and path
             }
             // Log the Registered MSBuild version and path
             var instance = MSBuildLocator.QueryVisualStudioInstances().FirstOrDefault();
             Logger.Info($"MSBuild Registered Version: {instance.Version}");
-            Logger.Info($"MSBuild Registered Path: {instance.MSBuildPath}");
+            Logger.Debug($"MSBuild Registered Path: {instance.MSBuildPath}");
         }
 
+        /// <summary>
+        /// Loads a project from the specified file path using the provided global properties and project collection.
+        /// </summary>
+        /// <param name="projectFilePath">The full path to the project file to load. Cannot be <c>null</c> or empty.</param>
+        /// <param name="globalProperties">A dictionary of global properties to apply to the project during loading. May be <c>null</c> if no global
+        /// properties are required.</param>
+        /// <param name="projectCollection">The <see cref="ProjectCollection"/> instance to associate with the loaded project. Cannot be <c>null</c>.</param>
+        /// <returns>A <see cref="Project"/> instance representing the loaded project.</returns>
         protected virtual Project LoadProject(string projectFilePath, IDictionary<string, string> globalProperties, ProjectCollection projectCollection)
         {
             return new Project(projectFilePath, globalProperties, null, projectCollection);
         }
 
+
+        /// <summary>
+        /// Identifies the runtime information for a .NET project based on the specified application settings.
+        /// </summary>
+        /// <remarks>This method scans the input directory for NuGet asset files and attempts to determine
+        /// the runtime configuration by analyzing associated project files. If multiple valid runtime configurations
+        /// are found, a self-contained runtime with framework references is prioritized. If no valid project files are
+        /// found, the returned <see cref="RuntimeInfo"/> will contain an error message describing the issue.</remarks>
+        /// <param name="appSettings">The application settings that specify the input directory and NuGet exclusion rules used to locate and
+        /// filter asset files.</param>
+        /// <returns>A <see cref="RuntimeInfo"/> instance containing details about the identified runtime configuration. If no
+        /// valid runtime is found or an error occurs, the returned object will include an error message describing the
+        /// problem.</returns>
         public RuntimeInfo IdentifyRuntime(CommonAppSettings appSettings)
         {
             var info = new RuntimeInfo();
@@ -67,7 +100,7 @@ namespace LCT.PackageIdentifier
 
                 foreach (var assetsFile in assetsFiles)
                 {
-                    Logger.Info($"Processing assets file: {assetsFile}");
+                    Logger.Debug($"Processing assets file: {assetsFile}");
                     var csprojFilePath = GetProjectFilePathFromAssestJson(assetsFile);
 
                     if (!string.IsNullOrWhiteSpace(csprojFilePath) && File.Exists(csprojFilePath))
@@ -100,6 +133,18 @@ namespace LCT.PackageIdentifier
             }
         }
 
+        /// <summary>
+        /// Parses a .csproj project file and extracts runtime-related information, including target framework,
+        /// self-contained status, runtime identifiers, and framework references.
+        /// </summary>
+        /// <remarks>The method analyzes the specified project file to determine properties such as target
+        /// framework, self-contained deployment status, runtime identifiers, and framework references relevant to
+        /// runtime behavior. If the project file is invalid or cannot be loaded, error details are provided in the
+        /// result.</remarks>
+        /// <param name="projectFilePath">The full path to the .csproj file to parse. Must refer to an existing file; otherwise, an error message is
+        /// returned in the result.</param>
+        /// <returns>A <see cref="RuntimeInfo"/> object containing details about the project's runtime configuration. If the file
+        /// path is invalid or an error occurs during parsing, the returned object includes error information.</returns>
         private RuntimeInfo ParseCSProjFile(string projectFilePath)
         {
             var info = new RuntimeInfo();
@@ -186,7 +231,7 @@ namespace LCT.PackageIdentifier
                             TargetingPackVersion = targetingPackVersion
                         });
                         // We only need the first matching framework reference for the target framework
-                        break; 
+                        break;
                     }
                 }
             }
@@ -213,6 +258,14 @@ namespace LCT.PackageIdentifier
             return info;
         }
 
+        /// <summary>
+        /// Writes a detailed summary of the specified .NET runtime information to the application log.
+        /// </summary>
+        /// <remarks>The log output includes project metadata, self-contained deployment settings, runtime identifiers,
+        /// and framework references. If <paramref name="info"/> contains an error message, only error details are logged. This
+        /// method is intended for diagnostic and troubleshooting purposes.</remarks>
+        /// <param name="info">The <see cref="RuntimeInfo"/> object containing runtime details to be logged.  If <paramref name="info"/> is <see
+        /// langword="null"/>, an error message is logged and no further information is written.</param>
         private static void WriteDetailLog(RuntimeInfo info)
         {
             if (info == null)
@@ -221,49 +274,56 @@ namespace LCT.PackageIdentifier
                 return;
             }
 
-            Logger.Info("----- .NET Runtime Information Summary -----");
+            Logger.Debug("----- .NET Runtime Information Summary -----");
 
             if (!string.IsNullOrEmpty(info.ErrorMessage))
             {
                 Logger.Error($"Error: {info.ErrorMessage}");
                 if (!string.IsNullOrEmpty(info.ErrorDetails))
                     Logger.Error($"Details: {info.ErrorDetails}");
-                Logger.Info("--------------------------------------------");
+                Logger.Debug("--------------------------------------------");
                 return;
             }
 
-            Logger.Info($"Project Name      : {info.ProjectName}");
-            Logger.Info($"Project Path      : {info.ProjectPath}");
-            Logger.Info($"SelfContained     : {info.IsSelfContained.ToString()}");
-            Logger.Info($"Explicitly Set    : {info.SelfContainedExplicitlySet}");
-            Logger.Info($"Evaluated Value   : {info.SelfContainedEvaluated}");
-            Logger.Info($"Reason            : {info.SelfContainedReason}");
+            Logger.Debug($"Project Name      : {info.ProjectName}");
+            Logger.Debug($"Project Path      : {info.ProjectPath}");
+            Logger.Debug($"SelfContained     : {info.IsSelfContained.ToString()}");
+            Logger.Debug($"Explicitly Set    : {info.SelfContainedExplicitlySet}");
+            Logger.Debug($"Evaluated Value   : {info.SelfContainedEvaluated}");
+            Logger.Debug($"Reason            : {info.SelfContainedReason}");
 
-            Logger.Info("Runtime Identifiers:");
+            Logger.Debug("Runtime Identifiers:");
             if (info.RuntimeIdentifiers != null && info.RuntimeIdentifiers.Count > 0)
             {
                 foreach (var rid in info.RuntimeIdentifiers)
-                    Logger.Info($"  - {rid}");
+                    Logger.Debug($"  - {rid}");
             }
             else
             {
-                Logger.Info("  (None)");
+                Logger.Debug("  (None)");
             }
 
-            Logger.Info("Framework References:");
+            Logger.Debug("Framework References:");
             if (info.FrameworkReferences != null && info.FrameworkReferences.Count > 0)
             {
                 foreach (var fr in info.FrameworkReferences)
-                    Logger.Info($"  - {fr.Name} (TargetingPackVersion: {fr.TargetingPackVersion})");
+                    Logger.Debug($"  - {fr.Name} (TargetingPackVersion: {fr.TargetingPackVersion})");
             }
             else
             {
-                Logger.Info("  (None)");
+                Logger.Debug("  (None)");
             }
 
-            Logger.Info("--------------------------------------------");
+            Logger.Debug("--------------------------------------------");
         }
 
+        /// <summary>
+        /// Retrieves the project file path referenced in the specified <c>project.assets.json</c> file.
+        /// </summary>
+        /// <param name="assetsFile">The path to the <c>project.assets.json</c> file from which to extract the project file path. Must not be
+        /// <see langword="null"/> or empty.</param>
+        /// <returns>The full path to the project file as specified in the assets file, or <see langword="null"/> if the path
+        /// cannot be determined.</returns>
         private static string GetProjectFilePathFromAssestJson(string assetsFile)
         {
             // Read the project.assets.json file to find the project path
@@ -273,6 +333,14 @@ namespace LCT.PackageIdentifier
             return projectPath;
         }
 
+        /// <summary>
+        /// Determines whether the specified file path matches any of the provided exclusion patterns.
+        /// </summary>
+        /// <param name="filePath">The file path to evaluate against the exclusion patterns. Cannot be <c>null</c>.</param>
+        /// <param name="excludePatterns">An array of string patterns to check for exclusion. If <paramref name="excludePatterns"/> is <c>null</c> or
+        /// empty, no exclusion is applied.</param>
+        /// <returns><see langword="true"/> if <paramref name="filePath"/> contains any of the <paramref name="excludePatterns"/>
+        /// (case-insensitive); otherwise, <see langword="false"/>.</returns>
         private static bool IsExcluded(string filePath, string[] excludePatterns)
         {
             if (excludePatterns == null || excludePatterns.Length == 0)

@@ -35,6 +35,7 @@ namespace LCT.PackageIdentifier.UTest
         private Mock<IFrameworkPackages> _frameworkPackages;
         private Mock<ICompositionBuilder> _compositionBuilder;
         private ISpdxBomParser _spdxBomParser;
+        private Mock<IRuntimeIdentifier> _runtimeIdentifier;
         private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
         [SetUp]
         public void Setup()
@@ -44,7 +45,8 @@ namespace LCT.PackageIdentifier.UTest
             _frameworkPackages = new Mock<IFrameworkPackages>();
             _compositionBuilder = new Mock<ICompositionBuilder>();
             _spdxBomParser = new Mock<ISpdxBomParser>().Object;
-            _nugetProcessor = new NugetProcessor(_cycloneDXBomParser, _frameworkPackages.Object, _compositionBuilder.Object,_spdxBomParser);
+            _runtimeIdentifier = new Mock<IRuntimeIdentifier>();
+            _nugetProcessor = new NugetProcessor(_cycloneDXBomParser, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser, _runtimeIdentifier.Object);
         }
 
         [Test]
@@ -245,7 +247,7 @@ namespace LCT.PackageIdentifier.UTest
             };
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
-            var nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser);
+            var nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser, _runtimeIdentifier.Object);
 
             // Act
             NugetProcessor.AddSiemensDirectProperty(ref bom);
@@ -303,7 +305,7 @@ namespace LCT.PackageIdentifier.UTest
             };
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
-            var nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser);
+            var nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser, _runtimeIdentifier.Object);
 
             // Act
             NugetProcessor.AddSiemensDirectProperty(ref bom);
@@ -390,7 +392,7 @@ namespace LCT.PackageIdentifier.UTest
                 }
             };
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-            var nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser);
+            var nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser, _runtimeIdentifier.Object);
 
             // Act
             NugetProcessor.AddSiemensDirectProperty(ref bom);
@@ -409,7 +411,7 @@ namespace LCT.PackageIdentifier.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
             string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles", "packages.config"));
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 Nuget = new Config(),
@@ -528,7 +530,7 @@ namespace LCT.PackageIdentifier.UTest
             string outFolder = Path.GetDirectoryName(exePath);
             string csprojfilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
             string[] Excludes = null;
-           
+
             CommonAppSettings commonAppSettings = new CommonAppSettings()
             {
                 Nuget = new Config() { Exclude = Excludes },
@@ -628,7 +630,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             // Act
-            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser);
+            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser, _runtimeIdentifier.Object);
             var actual = await nugetProcessor.IdentificationOfInternalComponents(
                 component, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -678,7 +680,7 @@ namespace LCT.PackageIdentifier.UTest
 
             // Act
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object,_spdxBomParser);
+            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser, _runtimeIdentifier.Object);
             var actual = await nugetProcessor.IdentificationOfInternalComponents(component, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
             // Assert
@@ -699,7 +701,7 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             ComponentIdentification componentIdentification = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360(),
@@ -729,7 +731,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             // Act
-            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser);
+            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser, _runtimeIdentifier.Object);
             var actual = await nugetProcessor.IdentificationOfInternalComponents(
                 componentIdentification, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -780,7 +782,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             // Act  
-            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object,_spdxBomParser);
+            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser, _runtimeIdentifier.Object);
             var actual = await nugetProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -801,7 +803,7 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "NUGET",
@@ -831,7 +833,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             // Act
-            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser);
+            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser, _runtimeIdentifier.Object);
             var actual = await nugetProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -852,7 +854,7 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "NUGET",
@@ -882,7 +884,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             // Act
-            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object,_spdxBomParser);
+            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser, _runtimeIdentifier.Object);
             var actual = await nugetProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -903,7 +905,7 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "NUGET",
@@ -933,7 +935,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             // Act
-            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser);
+            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser, _runtimeIdentifier.Object);
             var actual = await nugetProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -954,7 +956,7 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "NUGET",
@@ -984,7 +986,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             // Act
-            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object,_spdxBomParser);
+            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser, _runtimeIdentifier.Object);
             var actual = await nugetProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -1006,7 +1008,7 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-           
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "NUGET",
@@ -1036,7 +1038,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             // Act
-            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser);
+            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser, _runtimeIdentifier.Object);
             var actual = await nugetProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -1055,7 +1057,7 @@ namespace LCT.PackageIdentifier.UTest
             string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 
             string[] Includes = { "project.assets.json" };
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 Nuget = new Config() { Include = Includes },
@@ -1067,8 +1069,13 @@ namespace LCT.PackageIdentifier.UTest
             };
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
+            var runtime = new RuntimeInfo();
+            _runtimeIdentifier
+               .Setup(x => x.IdentifyRuntime(appSettings))
+               .Returns(runtime);
+
             //Act
-            Bom listofcomponents = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object,_spdxBomParser).ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
+            Bom listofcomponents = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser, _runtimeIdentifier.Object).ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
@@ -1086,7 +1093,7 @@ namespace LCT.PackageIdentifier.UTest
 
             string[] Includes = { "project.assets.json" };
 
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 Nuget = new Config() { Include = Includes },
@@ -1098,9 +1105,13 @@ namespace LCT.PackageIdentifier.UTest
             };
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
+            var runtime = new RuntimeInfo();
+            _runtimeIdentifier
+               .Setup(x => x.IdentifyRuntime(appSettings))
+               .Returns(runtime);
 
             //Act
-            Bom listofcomponents = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser).ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
+            Bom listofcomponents = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser, _runtimeIdentifier.Object).ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
             var IsDevDependency =
                 listofcomponents.Components.Find(a => a.Name == "SonarAnalyzer.CSharp")
                 .Properties[0].Value;
@@ -1120,7 +1131,7 @@ namespace LCT.PackageIdentifier.UTest
             string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 
             string[] Includes = { "project.assets.json", "Nuget-SelfContained.csproj" };
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 Nuget = new Config() { Include = Includes },
@@ -1164,12 +1175,17 @@ namespace LCT.PackageIdentifier.UTest
                 .Setup(x => x.ParseCycloneDXBom(It.IsAny<string>()))
                 .Returns(bom);
 
+            var runtime = new RuntimeInfo();
+            _runtimeIdentifier
+               .Setup(x => x.IdentifyRuntime(appSettings))
+               .Returns(runtime);
+
             // Act
             var result = _nugetProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual("false", result.Components.First().Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsDevelopment)?.Value);
+            Assert.AreEqual("true", result.Components.First().Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsDevelopment)?.Value);
         }
 
         [Test]
@@ -1182,7 +1198,7 @@ namespace LCT.PackageIdentifier.UTest
 
             string[] Includes = { "project.assets.json", "Nuget.csproj" };
             string[] excludes = { "NugetSelfContainedProject" };
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 Nuget = new Config() { Include = Includes, Exclude = excludes },
@@ -1203,8 +1219,13 @@ namespace LCT.PackageIdentifier.UTest
                 .Returns(frameworkPackages);
 
             _compositionBuilder
-                .Setup(x => x.AddCompositionsToBom(It.IsAny<Bom>(), It.IsAny<Dictionary<string, Dictionary<string, NuGetVersion>>>()))
+                .Setup(x => x.AddCompositionsToBom(It.IsAny<Bom>(), It.IsAny<Dictionary<string, Dictionary<string, NuGetVersion>>>(), It.IsAny<RuntimeInfo>()))
                 .Verifiable();
+
+            var runtime = new RuntimeInfo();
+            _runtimeIdentifier
+               .Setup(x => x.IdentifyRuntime(appSettings))
+               .Returns(runtime);
 
             // Act
             var result = _nugetProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
@@ -1227,7 +1248,7 @@ namespace LCT.PackageIdentifier.UTest
 
             string[] Includes = { "project.assets.json" };
             string[] excludes = { "NugetSelfContainedProject" };
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 Nuget = new Config() { Include = Includes, Exclude = excludes },
@@ -1267,9 +1288,15 @@ namespace LCT.PackageIdentifier.UTest
             }
             };
 
+            var runtime = new RuntimeInfo();
+
             _mockCycloneDXBomParser
                 .Setup(x => x.ParseCycloneDXBom(It.IsAny<string>()))
                 .Returns(bom);
+
+            _runtimeIdentifier
+               .Setup(x => x.IdentifyRuntime(appSettings))
+               .Returns(runtime);
 
             // Act
             var result = _nugetProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
@@ -1289,7 +1316,7 @@ namespace LCT.PackageIdentifier.UTest
 
             string[] Includes = { "project.assets.json" };
             string[] excludes = { "NugetSelfContainedProject" };
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 Nuget = new Config() { Include = Includes, Exclude = excludes },
@@ -1304,6 +1331,11 @@ namespace LCT.PackageIdentifier.UTest
                 .Setup(x => x.GetFrameworkPackages(It.IsAny<List<string>>()))
                 .Returns(new Dictionary<string, Dictionary<string, NuGetVersion>>());
 
+            var runtime = new RuntimeInfo();
+            _runtimeIdentifier
+               .Setup(x => x.IdentifyRuntime(appSettings))
+               .Returns(runtime);
+
             // Act
             var result = _nugetProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
@@ -1311,7 +1343,7 @@ namespace LCT.PackageIdentifier.UTest
             _frameworkPackages.Verify(x => x.GetFrameworkPackages(It.IsAny<List<string>>()), Times.Once);
             Assert.IsNotNull(result);
             Assert.AreEqual("false", result.Components.First().Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsDevelopment)?.Value);
-        }        
+        }
 
         [Test]
         public void HandleConfigFile_WhenCycloneDXHasNullDependencies_DoesNotThrowException()
@@ -1334,7 +1366,7 @@ namespace LCT.PackageIdentifier.UTest
             };
             mockCycloneDXBomParser.Setup(x => x.ParseCycloneDXBom(filepath)).Returns(testBom);
 
-            var nugetProcessor = new NugetProcessor(mockCycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser);
+            var nugetProcessor = new NugetProcessor(mockCycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser, _runtimeIdentifier.Object);
 
             // Act & Assert
             Assert.DoesNotThrow(() =>
@@ -1346,8 +1378,8 @@ namespace LCT.PackageIdentifier.UTest
 
             Assert.AreEqual(0, bom.Dependencies.Count);
         }
-       
-        
+
+
         [Test]
         public void HandleConfigFile_WhenSPDXHasNullComponents_DoesNotThrowException()
         {
@@ -1355,7 +1387,7 @@ namespace LCT.PackageIdentifier.UTest
             var filepath = "test.spdx.sbom.json";
             var appSettings = new CommonAppSettings { ProjectType = "NUGET" };
             var listComponentForBOM = new List<Component>();
-            var bom = new Bom { Components=new List<Component>(),Dependencies = new List<Dependency>() };
+            var bom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
             var listOfTemplateBomfilePaths = new List<string>();
 
             var mockSpdxBomParser = new Mock<ISpdxBomParser>();
@@ -1369,7 +1401,7 @@ namespace LCT.PackageIdentifier.UTest
             };
             mockSpdxBomParser.Setup(x => x.ParseSPDXBom(filepath)).Returns(testBom);
 
-            var nugetProcessor = new NugetProcessor(_cycloneDXBomParser, _frameworkPackages.Object, _compositionBuilder.Object, mockSpdxBomParser.Object);
+            var nugetProcessor = new NugetProcessor(_cycloneDXBomParser, _frameworkPackages.Object, _compositionBuilder.Object, mockSpdxBomParser.Object, _runtimeIdentifier.Object);
 
             // Act & Assert
             Assert.DoesNotThrow(() =>
@@ -1380,7 +1412,7 @@ namespace LCT.PackageIdentifier.UTest
             });
 
             Assert.AreEqual(0, bom.Dependencies.Count);
-        }        
+        }
 
     }
 }

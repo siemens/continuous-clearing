@@ -70,7 +70,7 @@ namespace LCT.PackageIdentifier
         /// <returns>A runtime component identifier string.</returns>
         private string CreateRuntimeComponentIdentifier(string frameworkMoniker)
         {
-            if (_runtimeInfo.FrameworkReferences != null && _runtimeInfo.FrameworkReferences.Any(fr => fr.TargetFramework.Equals(frameworkMoniker, StringComparison.OrdinalIgnoreCase)))
+            if (_runtimeInfo?.FrameworkReferences != null && _runtimeInfo.FrameworkReferences.Any(fr => fr.TargetFramework.Equals(frameworkMoniker, StringComparison.OrdinalIgnoreCase)))
             {
                 var frameworkRef = _runtimeInfo.FrameworkReferences.First(fr => fr.TargetFramework.Equals(frameworkMoniker, StringComparison.OrdinalIgnoreCase));
                 return $"{_basePurl}/{_config.RuntimePackage}@{frameworkRef.TargetingPackVersion}";

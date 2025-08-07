@@ -1,5 +1,10 @@
-﻿using System.Collections.Generic;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2025 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// --------------------------------------------------------------------------------------------------------------------
 
+using System.Collections.Generic;
 
 namespace LCT.PackageIdentifier.Model
 {
