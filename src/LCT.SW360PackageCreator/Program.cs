@@ -179,7 +179,20 @@ namespace LCT.SW360PackageCreator
             if (parsedBomData != null && parsedBomData.Count > 0)
             {
                 IChecker compliance = new ComplianceCheck();
-                var complianceSettings = await compliance.LoadSettingsAsync("ComplianceValidator\\ComplianceSettings.json");
+                ComplianceSettingsModel complianceSettings = new();
+                string baseDir = AppContext.BaseDirectory;
+                string[] foundFiles = Directory.GetFiles(baseDir, "ComplianceSettings.json", SearchOption.AllDirectories);
+
+                if (foundFiles.Length > 0)
+                {
+                    string settingsPath = foundFiles[0];
+                    complianceSettings = await compliance.LoadSettingsAsync(settingsPath);
+                }
+                else
+                {
+                    Logger.Debug("ComplianceSettings.json not found.");
+                }
+
                 if (compliance.Check(complianceSettings, parsedBomData))
                 {
                     PipelineArtifactUploader.PrintWarning(compliance.GetResults().ToString());
