@@ -80,6 +80,8 @@ namespace LCT.Common.Constants
         public const string ModerationRequestMessage = "Moderation request is created";
         public const string Cdx_SpdxFileName = "internal:siemens:clearing:spdx-file-name";
         public const string SpdxImport = "SPDXImport";
+        public const string Cdx_SiemensComponentName = "internal:siemens:clearing:siemens:component-name";
+
         public static Dictionary<string, string> PurlCheck()
         {
             return purlids;

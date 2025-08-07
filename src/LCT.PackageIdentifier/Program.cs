@@ -40,7 +40,8 @@ namespace LCT.PackageIdentifier
         private bool m_Verbose = false;
 
         public static Stopwatch BomStopWatch { get; set; }
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
         private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
 
         private readonly ISettingsManager _settingsManager;
@@ -88,7 +89,7 @@ namespace LCT.PackageIdentifier
             CommonHelper.DefaultLogFolderInitialisation(FileConstant.BomCreatorLog, m_Verbose);
             CommonAppSettings appSettings = _settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
             ProjectReleases projectReleases = new ProjectReleases();
-            string _ = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.BomCreatorLog, m_Verbose);                        
+            string _ = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.BomCreatorLog, m_Verbose);
 
             _settingsManager.CheckRequiredArgsToRun(appSettings, "Identifer");
 
@@ -180,6 +181,6 @@ namespace LCT.PackageIdentifier
             {
                 environmentHelper.CallEnvironmentExit(-1);
             }
-        }       
+        }
     }
 }
