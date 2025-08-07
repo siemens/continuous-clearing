@@ -7,6 +7,7 @@
 using CycloneDX.Models;
 using LCT.Common.Constants;
 using LCT.PackageIdentifier.Interface;
+using LCT.PackageIdentifier.Model;
 using NuGet.Versioning;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,7 @@ namespace LCT.PackageIdentifier
     {
         private readonly ComponentConfig _config;
         private readonly string _basePurl;
+        private RuntimeInfo _runtimeInfo;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CompositionBuilder"/> class.
@@ -37,8 +39,9 @@ namespace LCT.PackageIdentifier
         /// </summary>
         /// <param name="bom">The BOM to which compositions will be added.</param>
         /// <param name="frameworkPackages">Framework packages grouped by framework moniker.</param>
-        public void AddCompositionsToBom(Bom bom, Dictionary<string, Dictionary<string, NuGetVersion>> frameworkPackages)
+        public void AddCompositionsToBom(Bom bom, Dictionary<string, Dictionary<string, NuGetVersion>> frameworkPackages, RuntimeInfo runtimeInfo)
         {
+            _runtimeInfo = runtimeInfo;
             if (bom != null && frameworkPackages != null)
             {
                 bom.Compositions = frameworkPackages.Select(CreateComposition).ToList();
@@ -67,6 +70,11 @@ namespace LCT.PackageIdentifier
         /// <returns>A runtime component identifier string.</returns>
         private string CreateRuntimeComponentIdentifier(string frameworkMoniker)
         {
+            if (_runtimeInfo.FrameworkReferences != null && _runtimeInfo.FrameworkReferences.Any(fr => fr.TargetFramework.Equals(frameworkMoniker, StringComparison.OrdinalIgnoreCase)))
+            {
+                var frameworkRef = _runtimeInfo.FrameworkReferences.First(fr => fr.TargetFramework.Equals(frameworkMoniker, StringComparison.OrdinalIgnoreCase));
+                return $"{_basePurl}/{_config.RuntimePackage}@{frameworkRef.TargetingPackVersion}";
+            }
             var version = ExtractFrameworkVersion(frameworkMoniker);
             return $"{_basePurl}/{_config.RuntimePackage}@{version}";
         }
