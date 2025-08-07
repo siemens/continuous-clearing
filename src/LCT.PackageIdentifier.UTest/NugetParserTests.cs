@@ -1401,6 +1401,9 @@ namespace LCT.PackageIdentifier.UTest
             };
             mockSpdxBomParser.Setup(x => x.ParseSPDXBom(filepath)).Returns(testBom);
 
+            // Use a valid temporary directory to avoid DirectoryNotFoundException
+            string tempDir = Path.GetTempPath();
+            appSettings.Directory = new LCT.Common.Directory { InputFolder = tempDir };
             var nugetProcessor = new NugetProcessor(_cycloneDXBomParser, _frameworkPackages.Object, _compositionBuilder.Object, mockSpdxBomParser.Object, _runtimeIdentifier.Object);
 
             // Act & Assert

@@ -131,58 +131,16 @@ namespace LCT.PackageIdentifier
         }
         public static void SetProperties(CommonAppSettings appSettings, Component component, ref List<Component> componentForBOM, string repo = "Not Found in JFrogRepo")
         {
-            List<Property> propList = new();
-            if (component.Properties?.Count == null || component.Properties.Count <= 0)
-            {
-                component.Properties = propList;
-            }
-
-            Property projectType = new()
-            {
-                Name = Dataconstant.Cdx_ProjectType,
-                Value = appSettings.ProjectType
-            };
-
-            Property artifactoryrepo = new()
-            {
-                Name = Dataconstant.Cdx_ArtifactoryRepoName,
-                Value = repo
-            };
-
-            Property internalType = new()
-            {
-                Name = Dataconstant.Cdx_IsInternal,
-                Value = "false"
-            };
-
-            Property isDevelopment = new()
-            {
-                Name = Dataconstant.Cdx_IsDevelopment,
-                Value = "false"
-            };
-
-            Property isDirect = new()
-            {
-                Name = Dataconstant.Cdx_SiemensDirect,
-                Value = "true"
-            };
-            Property filname = new()
-            {
-                Name = Dataconstant.Cdx_Siemensfilename,
-                Value = Dataconstant.PackageNameNotFoundInJfrog
-            };
-            Property jfrogRepoPathProperty = new()
-            {
-                Name = Dataconstant.Cdx_JfrogRepoPath,
-                Value = Dataconstant.JfrogRepoPathNotFound
-            };
-            component.Properties.Add(internalType);
-            component.Properties.Add(artifactoryrepo);
-            component.Properties.Add(projectType);
-            component.Properties.Add(isDevelopment);
-            component.Properties.Add(isDirect);
-            component.Properties.Add(filname);
-            component.Properties.Add(jfrogRepoPathProperty);
+            component.Properties ??= new List<Property>();
+            var properties = component.Properties;
+            CommonHelper.RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_ProjectType, appSettings.ProjectType);
+            CommonHelper.RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_ArtifactoryRepoName, repo);
+            CommonHelper.RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_IsInternal, "false");
+            CommonHelper.RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_IsDevelopment, "false");
+            CommonHelper.RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_SiemensDirect, "true");
+            CommonHelper.RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_Siemensfilename, Dataconstant.PackageNameNotFoundInJfrog);
+            CommonHelper.RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_JfrogRepoPath, Dataconstant.JfrogRepoPathNotFound);
+            component.Properties = properties;
             component.Description = null;
             componentForBOM.Add(component);
         }

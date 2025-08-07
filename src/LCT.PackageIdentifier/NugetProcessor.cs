@@ -413,19 +413,17 @@ namespace LCT.PackageIdentifier
             var bomComponentsList = bom.Components;
             foreach (var component in bomComponentsList)
             {
-                Property siemensDirect = new() { Name = Dataconstant.Cdx_SiemensDirect, Value = "false" };
-
                 var isDirectDep = NugetDevDependencyParser.NugetDirectDependencies
                     .Any(x => x.Contains(component.Name) && x.Contains(component.Version));
 
-                if (isDirectDep) { siemensDirect.Value = "true"; }
+                string siemensDirectValue = isDirectDep ? "true" : "false";
 
                 component.Properties ??= new List<Property>();
-
-                bool isPropExists = component.Properties.Exists(
-                    x => x.Name.Equals(Dataconstant.Cdx_SiemensDirect));
-
-                if (!isPropExists) { component.Properties.Add(siemensDirect); }
+                var properties = component.Properties;
+                CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
+                    Dataconstant.Cdx_SiemensDirect,
+                    siemensDirectValue);
+                component.Properties = properties;
             }
 
             bom.Components = bomComponentsList;
@@ -489,6 +487,7 @@ namespace LCT.PackageIdentifier
             }
             else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
             {
+                BomHelper.NamingConventionOfSPDXFile(filepath, appSettings);
                 Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
                 Bom bomList = _spdxBomParser.ParseSPDXBom(filepath);
                 SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bomList, appSettings.ProjectType, ref listUnsupportedComponents);
