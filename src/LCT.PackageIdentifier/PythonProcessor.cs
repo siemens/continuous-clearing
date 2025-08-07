@@ -200,6 +200,7 @@ namespace LCT.PackageIdentifier
             List<PythonPackage> PythonPackages = new List<PythonPackage>();
             if (filePath.EndsWith(FileConstant.SPDXFileExtension))
             {
+                BomHelper.NamingConventionOfSPDXFile(filePath, appSettings);
                 Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
                 bom = _spdxBomParser.ParseSPDXBom(filePath);
                 SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bom, appSettings.ProjectType,ref listUnsupportedComponents);
@@ -465,7 +466,6 @@ namespace LCT.PackageIdentifier
             if (prop.SpdxComponentDetails.SpdxComponent)
             {
                 AddSpdxProperties(prop, component);
-                component.Properties.Add(devDependency);
             }
             else
             {
@@ -482,14 +482,17 @@ namespace LCT.PackageIdentifier
 
         private static void AddIdentifierTypeProperty(PythonPackage prop, Component component, Property devDependency)
         {
-            var identifierType = new Property
-            {
-                Name = Dataconstant.Cdx_IdentifierType,
-                Value = prop.FoundType == Dataconstant.Discovered ? Dataconstant.Discovered : Dataconstant.ManullayAdded
-            };
+            component.Properties ??= new List<Property>();
 
-            component.Properties.Add(devDependency);
-            component.Properties.Add(identifierType);
+            string identifierTypeValue = prop.FoundType == Dataconstant.Discovered ? Dataconstant.Discovered : Dataconstant.ManullayAdded;
+            var properties = component.Properties;
+            CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
+                devDependency.Name,
+                devDependency.Value);
+            CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
+                Dataconstant.Cdx_IdentifierType,
+                identifierTypeValue);
+            component.Properties = properties;
         }
         private static void SetSpdxComponentDetails(string filePath, PythonPackage package,Component componentInfo)
         {
