@@ -453,7 +453,6 @@ namespace LCT.PackageIdentifier.UTest
         #endregion
         
         #region Advanced Scenarios
-
         [Test]
         public void RuntimeInfo_AllPropertiesInitialized_HasCorrectValues()
         {
@@ -564,7 +563,6 @@ namespace LCT.PackageIdentifier.UTest
             Assert.IsTrue(result.IsSelfContained);
             Assert.IsTrue(result.FrameworkReferences.Any(fr => fr.Name == "Microsoft.NETCore.App"));
         }
-        
         #endregion
     }
 }

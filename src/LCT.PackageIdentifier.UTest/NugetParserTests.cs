@@ -1126,7 +1126,7 @@ namespace LCT.PackageIdentifier.UTest
         {
             // Arrange
             Mock<ICycloneDXBomParser> _mockCycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string exePath = Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
             string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 
