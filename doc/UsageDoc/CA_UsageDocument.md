@@ -48,6 +48,8 @@
     - [Binary Template Specific Parameters](#binary-template-specific-parameters)
     - [Docker Template Specific Parameters](#docker-template-specific-parameters)
 - [Troubleshoot](#troubleshoot)
+  - [Component Compliance Guidance](#component-compliance-guidance)
+  - [General](#general)
 - [Manual Update](#manual-update)
 - [Bug or Enhancements](#bug-or-enhancements)
 - [Glossary of Terms](#glossary-of-terms)
@@ -552,6 +554,19 @@ Both templates share common parameters with some implementation-specific differe
 | `branchName_powerUser` | string | '' | GitHub branch to build the Docker image from |:x:|
 
 # Troubleshoot
+
+## Component Compliance Guidance
+
+### Purpose
+To uphold our commitment to robust security, licensing adherence, and architectural best practices, the CC Tool has been enhanced to provide proactive guidance on third-party component usage. This feature aims to help development teams identify and address potential compliance considerations early in the project lifecycle, thereby reducing the need for compliance exceptions and streamlining the component selection process.
+
+### Functionality
+The Tool includes an intelligent scanning capability for projects. Specifically, when the tool detects the inclusion of certain components that may have specific compliance implications (e.g., those requiring particular scrutiny due to licensing, security, or architectural considerations, such as components based on Chromium), it will:
+
+1. Issue a Warning: A clear warning message will be displayed, indicating the presence of the identified component.
+2. Suggest Alternatives: Alongside the warning, the tool will provide a curated list of recommended alternative components. These alternatives have been vetted to align with our compliance standards and offer similar functionality, enabling teams to easily pivot to approved solutions.
+
+## General
 
 1. In case your pipeline takes a lot of time to run(more than 1 hour) when there are many components. It is advisable to increase the pipeline timeout and set it to a minimum of 1 hr.
 

@@ -5,7 +5,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using LCT.Common.Constants;
-using LCT.Common.Interface;
 using LCT.Common.Model;
 using System;
 using System.Collections.Generic;
@@ -33,7 +32,7 @@ namespace LCT.Common
         public CommonAppSettings()
         {
             Directory = new Directory();
-        }        
+        }
 
         public int TimeOut { get; set; } = 200;
         public string ProjectType
@@ -147,11 +146,11 @@ namespace LCT.Common
         public bool DryRun { get; set; } = false;
     }
     public class Directory
-    {        
+    {
         private string m_InputFolder;
         private string m_OutputFolder;
         private string m_LogFolder;
-        
+
         public string InputFolder
         {
             get
