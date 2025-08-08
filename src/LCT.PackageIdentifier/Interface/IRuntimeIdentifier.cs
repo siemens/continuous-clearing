@@ -11,6 +11,7 @@ namespace LCT.PackageIdentifier.Interface
 {
     public interface IRuntimeIdentifier
     {
+        void Register();
         RuntimeInfo IdentifyRuntime(CommonAppSettings appSettings);
     }
 }

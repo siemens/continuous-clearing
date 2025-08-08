@@ -44,10 +44,10 @@ namespace LCT.PackageIdentifier.UTest
                 // Use reflection to get the internal type
                 Assembly assembly = Assembly.GetAssembly(typeof(IRuntimeIdentifier));
                 runtimeIdentifierType = assembly.GetType("LCT.PackageIdentifier.DotnetRuntimeIdentifer");
-                
+
                 if (runtimeIdentifierType == null)
                     throw new InvalidOperationException("Could not locate the DotnetRuntimeIdentifer type");
-                    
+
                 runtimeIdentifier = Activator.CreateInstance(runtimeIdentifierType);
 
                 // Get private and protected methods
@@ -102,7 +102,7 @@ namespace LCT.PackageIdentifier.UTest
             string exePath = Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
             testFilesPath = Path.Combine(outFolder, "PackageIdentifierUTTestFiles");
-            
+
             // Setup app settings
             appSettings = new CommonAppSettings
             {
@@ -198,7 +198,7 @@ namespace LCT.PackageIdentifier.UTest
         {
             // Arrange
             string projectPath = Path.Combine(testFilesPath, "Nuget.csproj");
-            
+
             mockRuntimeIdentifier.Setup(r => r.IdentifyRuntime(It.IsAny<CommonAppSettings>()))
                 .Returns(new RuntimeInfo
                 {
@@ -229,7 +229,7 @@ namespace LCT.PackageIdentifier.UTest
         {
             // Arrange
             string projectPath = Path.Combine(testFilesPath, "NugetSelfContainedProject", "Nuget-SelfContained.csproj");
-            
+
             var frameworkReferences = new List<FrameworkReferenceInfo>
             {
                 new FrameworkReferenceInfo
@@ -278,7 +278,7 @@ namespace LCT.PackageIdentifier.UTest
                     ErrorMessage = "Error loading project file: Invalid project file",
                     ErrorDetails = "Details: Error code at 10, 15"
                 });
-            
+
             // Act
             var result = mockRuntimeIdentifier.Object.IdentifyRuntime(appSettings);
 
@@ -298,7 +298,7 @@ namespace LCT.PackageIdentifier.UTest
                     ErrorMessage = "Error registering MSBuildLocator or reading assets files",
                     ErrorDetails = "Test exception"
                 });
-            
+
             // Act
             var result = mockRuntimeIdentifier.Object.IdentifyRuntime(appSettings);
 
@@ -368,7 +368,7 @@ namespace LCT.PackageIdentifier.UTest
 
             // Arrange
             string filePath = "C:\\path\\to\\project.assets.json";
-            
+
             // Act & Assert
             Assert.IsFalse(testableIdentifier.IsExcluded(filePath, null), "Should return false for null patterns");
             Assert.IsFalse(testableIdentifier.IsExcluded(filePath, Array.Empty<string>()), "Should return false for empty patterns");
@@ -384,9 +384,9 @@ namespace LCT.PackageIdentifier.UTest
             // Arrange
             string filePath = "C:\\path\\to\\project.assets.json";
             string[] patterns = { "TO\\PROJECT" };  // Mixed case to test case insensitivity
-            
+
             // Act & Assert
-            Assert.IsTrue(testableIdentifier.IsExcluded(filePath, patterns), 
+            Assert.IsTrue(testableIdentifier.IsExcluded(filePath, patterns),
                 "Should return true when path contains pattern (case-insensitive)");
         }
 
@@ -400,9 +400,9 @@ namespace LCT.PackageIdentifier.UTest
             // Arrange
             string filePath = "C:\\path\\to\\project.assets.json";
             string[] patterns = { "non-matching-pattern" };
-            
+
             // Act & Assert
-            Assert.IsFalse(testableIdentifier.IsExcluded(filePath, patterns), 
+            Assert.IsFalse(testableIdentifier.IsExcluded(filePath, patterns),
                 "Should return false when path doesn't contain any patterns");
         }
 
@@ -410,7 +410,7 @@ namespace LCT.PackageIdentifier.UTest
         public void RuntimeInfo_LoggingPaths_AreCorrectlyFormatted()
         {
             // This tests that a RuntimeInfo object formats paths correctly in logs
-            
+
             // Arrange
             var info = new RuntimeInfo
             {
@@ -451,7 +451,7 @@ namespace LCT.PackageIdentifier.UTest
         }
 
         #endregion
-        
+
         #region Advanced Scenarios
         [Test]
         public void RuntimeInfo_AllPropertiesInitialized_HasCorrectValues()
@@ -521,7 +521,7 @@ namespace LCT.PackageIdentifier.UTest
             // This is a higher-level test demonstrating the prioritization logic
             // Arrange
             mockRuntimeIdentifier.Setup(r => r.IdentifyRuntime(It.IsAny<CommonAppSettings>()))
-                .Returns((CommonAppSettings settings) => 
+                .Returns((CommonAppSettings settings) =>
                 {
                     // Create a RuntimeInfo that simulates finding multiple project files
                     // with different configurations - prioritize self-contained with framework references
@@ -531,9 +531,9 @@ namespace LCT.PackageIdentifier.UTest
                         {
                             ProjectName = "PrioritizedProject",
                             IsSelfContained = true,
-                            FrameworkReferences = new List<FrameworkReferenceInfo> 
-                            { 
-                                new FrameworkReferenceInfo { Name = "Microsoft.NETCore.App" } 
+                            FrameworkReferences = new List<FrameworkReferenceInfo>
+                            {
+                                new FrameworkReferenceInfo { Name = "Microsoft.NETCore.App" }
                             }
                         };
                     }
@@ -547,7 +547,7 @@ namespace LCT.PackageIdentifier.UTest
                         };
                     }
                 });
-                
+
             var prioritizeSettings = new CommonAppSettings
             {
                 Directory = new LCT.Common.Directory { InputFolder = testFilesPath },

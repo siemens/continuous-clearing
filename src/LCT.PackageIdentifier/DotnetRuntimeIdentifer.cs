@@ -21,7 +21,7 @@ using Directory = System.IO.Directory;
 
 namespace LCT.PackageIdentifier
 {
-    internal class DotnetRuntimeIdentifer : IRuntimeIdentifier
+    public class DotnetRuntimeIdentifer : IRuntimeIdentifier
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -32,7 +32,7 @@ namespace LCT.PackageIdentifier
         /// registering the default instance if necessary. If MSBuild is already registered, no action is taken. After
         /// registration, information about the MSBuild version and path is logged for diagnostic purposes. Derived
         /// classes can override this method to customize the MSBuild registration process.</remarks>
-        protected virtual void RegisterMSBuild()
+        public virtual void Register()
         {
             if (!MSBuildLocator.IsRegistered)
             {
@@ -40,8 +40,8 @@ namespace LCT.PackageIdentifier
             }
             // Log the Registered MSBuild version and path
             var instance = MSBuildLocator.QueryVisualStudioInstances().FirstOrDefault();
-            Logger.Info($"MSBuild Registered Version: {instance.Version}");
-            Logger.Debug($"MSBuild Registered Path: {instance.MSBuildPath}");
+            Logger.Info($"MSBuild Registered Version: {instance?.Version}");
+            Logger.Debug($"MSBuild Registered Path: {instance?.MSBuildPath}");
         }
 
         /// <summary>
@@ -52,11 +52,10 @@ namespace LCT.PackageIdentifier
         /// properties are required.</param>
         /// <param name="projectCollection">The <see cref="ProjectCollection"/> instance to associate with the loaded project. Cannot be <c>null</c>.</param>
         /// <returns>A <see cref="Project"/> instance representing the loaded project.</returns>
-        protected virtual Project LoadProject(string projectFilePath, IDictionary<string, string> globalProperties, ProjectCollection projectCollection)
+        public Project LoadProject(string projectFilePath, IDictionary<string, string> globalProperties, ProjectCollection projectCollection)
         {
             return new Project(projectFilePath, globalProperties, null, projectCollection);
         }
-
 
         /// <summary>
         /// Identifies the runtime information for a .NET project based on the specified application settings.
@@ -76,8 +75,6 @@ namespace LCT.PackageIdentifier
 
             try
             {
-                // Register MSBuild Locator
-                RegisterMSBuild();
                 var assetsFiles = Directory.GetFiles(appSettings.Directory.InputFolder, FileConstant.NugetAssetFile, SearchOption.AllDirectories);
                 if (assetsFiles.Length == 0)
                 {
@@ -124,15 +121,30 @@ namespace LCT.PackageIdentifier
                 };
 
             }
-            catch (Exception ex)
+            catch (DirectoryNotFoundException ex)
             {
-                info.ErrorMessage = "Error registering MSBuildLocator or reading assets files";
-                info.ErrorDetails = ex.ToString();
+                info.ErrorMessage = "Directory not found";
+                info.ErrorDetails = $"The specified directory '{appSettings.Directory?.InputFolder}' was not found. Error: {ex.Message}";
+                WriteDetailLog(info);
+                return info;
+            }
+            catch (FileNotFoundException ex)
+            {
+                info.ErrorMessage = "File not found";
+                info.ErrorDetails = $"A required file could not be found. Error: {ex.Message}";
+                WriteDetailLog(info);
+                return info;
+            }
+            catch (Microsoft.Build.Exceptions.InvalidProjectFileException ex)
+            {
+                info.ErrorMessage = "Invalid project file";
+                info.ErrorDetails = $"Error parsing project file: {ex.Message}";
                 WriteDetailLog(info);
                 return info;
             }
         }
 
+        #region Private Methods
         /// <summary>
         /// Parses a .csproj project file and extracts runtime-related information, including target framework,
         /// self-contained status, runtime identifiers, and framework references.
@@ -156,106 +168,166 @@ namespace LCT.PackageIdentifier
                 return info;
             }
 
-            ProjectCollection projectCollection = null;
-            Project project = null;
-
             try
             {
-                projectCollection = new ProjectCollection();
-                var globalProperties = new Dictionary<string, string>
-                {
-                    { "Configuration", "Release" },
-                    { "Platform", "AnyCPU" }
-                };
+                using var projectCollection = new ProjectCollection();
+                var project = LoadProjectWithDefaultSettings(projectFilePath, projectCollection);
 
-                project = LoadProject(projectFilePath, globalProperties, projectCollection);
-
-                info.ProjectPath = project.FullPath;
-                info.ProjectName = Path.GetFileNameWithoutExtension(project.FullPath);
-                string targetFrameworkValue = project.GetPropertyValue("TargetFramework");
-
-                // Self-contained status
-                string selfContainedEvaluated = project.GetPropertyValue("SelfContained");
-                string runtimeIdentifier = project.GetPropertyValue("RuntimeIdentifier");
-                string runtimeIdentifiers = project.GetPropertyValue("RuntimeIdentifiers");
-
-                bool isSelfContained = false;
-                bool selfContainedExplicitlySet = project.GetProperty("SelfContained") != null;
-                bool selfContainedValueParsed = bool.TryParse(selfContainedEvaluated, out isSelfContained);
-                bool hasRuntimeIdentifier = !string.IsNullOrEmpty(runtimeIdentifier) || !string.IsNullOrEmpty(runtimeIdentifiers);
-
-                info.SelfContainedEvaluated = selfContainedEvaluated;
-                info.IsSelfContained = isSelfContained;
-                info.SelfContainedExplicitlySet = selfContainedExplicitlySet;
-                info.RuntimeIdentifiers = new List<string>();
-                if (!string.IsNullOrEmpty(runtimeIdentifier))
-                    info.RuntimeIdentifiers.Add(runtimeIdentifier);
-                if (!string.IsNullOrEmpty(runtimeIdentifiers))
-                    info.RuntimeIdentifiers.AddRange(runtimeIdentifiers.Split(';', StringSplitOptions.RemoveEmptyEntries));
-
-                if (selfContainedValueParsed)
-                {
-                    if (isSelfContained)
-                    {
-                        if (selfContainedExplicitlySet)
-                            info.SelfContainedReason = "'SelfContained' property is explicitly set to 'true'.";
-                        else if (hasRuntimeIdentifier)
-                            info.SelfContainedReason = "'SelfContained' property implicitly defaulted to 'true' because 'RuntimeIdentifier(s)' is specified for an executable project.";
-                        else
-                            info.SelfContainedReason = "'SelfContained' property implicitly defaulted to 'true' (uncommon without RID, check SDK defaults).";
-                    }
-                    else
-                    {
-                        if (selfContainedExplicitlySet)
-                            info.SelfContainedReason = "'SelfContained' property is explicitly set to 'false'.";
-                        else
-                            info.SelfContainedReason = "'SelfContained' property implicitly defaulted to 'false' (no explicit setting and no RuntimeIdentifier, or not an executable).";
-                    }
-                }
-                else
-                {
-                    info.SelfContainedReason = "Warning: 'SelfContained' property could not be parsed as a boolean. Its evaluated value is unexpected.";
-                }
-
-                // Framework references
-                info.FrameworkReferences = new List<FrameworkReferenceInfo>();
-                foreach (var item in project.Items.Where(i => i.ItemType == "KnownFrameworkReference"))
-                {
-                    if (item.GetMetadataValue("TargetFramework") == targetFrameworkValue)
-                    {
-                        string targetingPackVersion = item.GetMetadataValue("TargetingPackVersion");
-                        info.FrameworkReferences.Add(new FrameworkReferenceInfo
-                        {
-                            TargetFramework = targetFrameworkValue,
-                            Name = item.EvaluatedInclude,
-                            TargetingPackVersion = targetingPackVersion
-                        });
-                        // We only need the first matching framework reference for the target framework
-                        break;
-                    }
-                }
+                PopulateProjectInfo(info, project);
+                ProcessSelfContainedStatus(info, project);
+                ProcessRuntimeIdentifiers(info, project);
+                ProcessFrameworkReferences(info, project);
             }
             catch (Microsoft.Build.Exceptions.InvalidProjectFileException ex)
             {
-                info.ErrorMessage = $"Error loading project file: {ex.Message}";
-                info.ErrorDetails = $"Details: {ex.ErrorCode} at {ex.LineNumber}, {ex.ColumnNumber}";
+                HandleProjectFileException(info, ex);
             }
-            catch (Exception ex)
+            catch (ArgumentNullException ex)
             {
-                info.ErrorMessage = "An unexpected error occurred";
-                info.ErrorDetails = ex.ToString();
-            }
-            finally
-            {
-                if (project != null)
-                {
-                    projectCollection?.UnloadProject(project);
-                }
-                projectCollection?.Dispose();
+                info.ErrorMessage = "Argument null exception";
+                info.ErrorDetails = $"An argument was null when it should not have been. Error: {ex.Message}";
+                WriteDetailLog(info);
+                return info;
             }
 
             WriteDetailLog(info);
             return info;
+        }
+
+        /// <summary>
+        /// Loads a project with default settings for configuration and platform.
+        /// </summary>
+        /// <param name="projectFilePath"></param>
+        /// <param name="projectCollection"></param>
+        /// <returns></returns>
+        private Project LoadProjectWithDefaultSettings(string projectFilePath, ProjectCollection projectCollection)
+        {
+            var globalProperties = new Dictionary<string, string>
+            {
+                { "Configuration", "Release" },
+                { "Platform", "AnyCPU" }
+            };
+
+            return LoadProject(projectFilePath, globalProperties, projectCollection);
+        }
+
+        /// <summary>
+        /// Populates the <see cref="RuntimeInfo"/> object with project metadata such as path and name.
+        /// </summary>
+        /// <param name="info"></param>
+        /// <param name="project"></param>
+        private void PopulateProjectInfo(RuntimeInfo info, Project project)
+        {
+            info.ProjectPath = project.FullPath;
+            info.ProjectName = Path.GetFileNameWithoutExtension(project.FullPath);
+        }
+
+        /// <summary>
+        /// Processes the self-contained status of the project, determining whether it is self-contained
+        /// </summary>
+        /// <param name="info"></param>
+        /// <param name="project"></param>
+        private void ProcessSelfContainedStatus(RuntimeInfo info, Project project)
+        {
+            string selfContainedEvaluated = project.GetPropertyValue("SelfContained");
+            string runtimeIdentifier = project.GetPropertyValue("RuntimeIdentifier");
+            string runtimeIdentifiers = project.GetPropertyValue("RuntimeIdentifiers");
+
+            bool selfContainedExplicitlySet = project.GetProperty("SelfContained") != null;
+            bool.TryParse(selfContainedEvaluated, out bool isSelfContained);
+            bool hasRuntimeIdentifier = !string.IsNullOrEmpty(runtimeIdentifier) || !string.IsNullOrEmpty(runtimeIdentifiers);
+
+            info.SelfContainedEvaluated = selfContainedEvaluated;
+            info.IsSelfContained = isSelfContained;
+            info.SelfContainedExplicitlySet = selfContainedExplicitlySet;
+
+            SetSelfContainedReason(info, isSelfContained, selfContainedExplicitlySet, hasRuntimeIdentifier,
+                !string.IsNullOrEmpty(selfContainedEvaluated));
+        }
+
+        /// <summary>
+        /// Sets the reason for the self-contained status based on the evaluated value and project properties.
+        /// </summary>
+        /// <param name="info"></param>
+        /// <param name="isSelfContained"></param>
+        /// <param name="selfContainedExplicitlySet"></param>
+        /// <param name="hasRuntimeIdentifier"></param>
+        /// <param name="selfContainedValueParsed"></param>
+        private void SetSelfContainedReason(RuntimeInfo info, bool isSelfContained, bool selfContainedExplicitlySet,
+            bool hasRuntimeIdentifier, bool selfContainedValueParsed)
+        {
+            if (!selfContainedValueParsed)
+            {
+                info.SelfContainedReason = "Warning: 'SelfContained' property could not be parsed as a boolean. Its evaluated value is unexpected.";
+                return;
+            }
+
+            if (isSelfContained)
+            {
+                if (selfContainedExplicitlySet)
+                    info.SelfContainedReason = "'SelfContained' property is explicitly set to 'true'.";
+                else if (hasRuntimeIdentifier)
+                    info.SelfContainedReason = "'SelfContained' property implicitly defaulted to 'true' because 'RuntimeIdentifier(s)' is specified for an executable project.";
+                else
+                    info.SelfContainedReason = "'SelfContained' property implicitly defaulted to 'true' (uncommon without RID, check SDK defaults).";
+            }
+            else
+            {
+                if (selfContainedExplicitlySet)
+                    info.SelfContainedReason = "'SelfContained' property is explicitly set to 'false'.";
+                else
+                    info.SelfContainedReason = "'SelfContained' property implicitly defaulted to 'false' (no explicit setting and no RuntimeIdentifier, or not an executable).";
+            }
+        }
+
+        /// <summary>
+        /// Processes the runtime identifiers from the project file, extracting both single and multiple runtime identifiers.
+        /// </summary>
+        /// <param name="info"></param>
+        /// <param name="project"></param>
+        private void ProcessRuntimeIdentifiers(RuntimeInfo info, Project project)
+        {
+            string runtimeIdentifier = project.GetPropertyValue("RuntimeIdentifier");
+            string runtimeIdentifiers = project.GetPropertyValue("RuntimeIdentifiers");
+
+            if (!string.IsNullOrEmpty(runtimeIdentifier))
+                info.RuntimeIdentifiers.Add(runtimeIdentifier);
+
+            if (!string.IsNullOrEmpty(runtimeIdentifiers))
+                info.RuntimeIdentifiers.AddRange(runtimeIdentifiers.Split(';', StringSplitOptions.RemoveEmptyEntries));
+        }
+
+        /// <summary>
+        /// Processes the framework references from the project file, extracting relevant information such as target framework and targeting pack version.
+        /// </summary>
+        /// <param name="info"></param>
+        /// <param name="project"></param>
+        private void ProcessFrameworkReferences(RuntimeInfo info, Project project)
+        {
+            string targetFrameworkValue = project.GetPropertyValue("TargetFramework");
+            var frameworkReferences = project.Items
+                .Where(i => i.ItemType == "KnownFrameworkReference" &&
+                           i.GetMetadataValue("TargetFramework") == targetFrameworkValue)
+                .Take(1) // We only need the first matching framework reference
+                .Select(item => new FrameworkReferenceInfo
+                {
+                    TargetFramework = targetFrameworkValue,
+                    Name = item.EvaluatedInclude,
+                    TargetingPackVersion = item.GetMetadataValue("TargetingPackVersion")
+                });
+
+            info.FrameworkReferences.AddRange(frameworkReferences);
+        }
+
+        /// <summary>
+        /// Handles exceptions related to invalid project files, populating the provided <see cref="RuntimeInfo"/> with error details.
+        /// </summary>
+        /// <param name="info"></param>
+        /// <param name="ex"></param>
+        private void HandleProjectFileException(RuntimeInfo info, Microsoft.Build.Exceptions.InvalidProjectFileException ex)
+        {
+            info.ErrorMessage = $"Error loading project file: {ex.Message}";
+            info.ErrorDetails = $"Details: {ex.ErrorCode} at {ex.LineNumber}, {ex.ColumnNumber}";
         }
 
         /// <summary>
@@ -350,6 +422,6 @@ namespace LCT.PackageIdentifier
 
             return excludePatterns.Any(pattern => filePath.Contains(pattern, StringComparison.OrdinalIgnoreCase));
         }
+        #endregion
     }
-
 }
