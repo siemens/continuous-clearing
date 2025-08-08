@@ -112,7 +112,7 @@ namespace LCT.PackageIdentifier
             string listOfExcludeComponents = DisplayInformation.DisplayExcludeComponents(appSettings);
             string listOfInternalRepoList = DisplayInformation.GetInternalRepolist(appSettings);
 
-            DisplayInformation.LogInputParameters(caToolInformation, appSettings, listOfInternalRepoList, listOfInclude, listOfExclude, listOfExcludeComponents);
+            LoggerHelper.LogInputParameters(caToolInformation, appSettings, listOfInternalRepoList, listOfInclude, listOfExclude, listOfExcludeComponents);
             
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);

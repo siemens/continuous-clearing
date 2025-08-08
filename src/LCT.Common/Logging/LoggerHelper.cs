@@ -91,7 +91,45 @@ namespace LCT.Common.Logging
 
             WriteStyledPanel(content);
         }
+        public static void LogInputParameters(CatoolInfo caToolInformation, CommonAppSettings appSettings, string listOfInternalRepoList, string listOfInclude, string listOfExclude, string listOfExcludeComponents)
+        {
+            if (LoggerFactory.UseSpectreConsole)
+            {
+                DisplayInputParametersWithSpectreConsole(caToolInformation, appSettings, listOfInternalRepoList, listOfInclude, listOfExclude, listOfExcludeComponents);
+            }
+            else
+            {
+                LogInputParametersWithLog4net(caToolInformation, appSettings, listOfInternalRepoList, listOfInclude, listOfExclude, listOfExcludeComponents);
+            }
+        }
+        private static void LogInputParametersWithLog4net(CatoolInfo caToolInformation, CommonAppSettings appSettings, string listOfInternalRepoList, string listOfInclude, string listOfExclude, string listOfExcludeComponents)
+        {
+            var logMessage = $"Input Parameters used in Package Identifier:\n\t" +
+                $"CaToolVersion\t\t --> {caToolInformation.CatoolVersion}\n\t" +
+                $"CaToolRunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
+                $"PackageFilePath\t\t --> {appSettings.Directory.InputFolder}\n\t" +
+                $"BomFolderPath\t\t --> {appSettings.Directory.OutputFolder}\n\t";
 
+            if (appSettings.SW360 != null)
+            {
+                logMessage += $"SW360Url\t\t --> {appSettings.SW360.URL}\n\t" +
+                          $"SW360AuthTokenType\t --> {appSettings.SW360.AuthTokenType}\n\t" +
+                          $"SW360ProjectName\t --> {appSettings.SW360.ProjectName}\n\t" +
+                          $"SW360ProjectID\t\t --> {appSettings.SW360.ProjectID}\n\t" +
+                          $"ExcludeComponents\t --> {listOfExcludeComponents}\n\t";
+            }
+            if (appSettings.Jfrog != null)
+            {
+                logMessage += $"InternalRepoList\t --> {listOfInternalRepoList}\n\t";
+            }
+
+            logMessage += $"ProjectType\t\t --> {appSettings.ProjectType}\n\t" +
+                          $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t" +
+                          $"Include\t\t\t --> {listOfInclude}\n\t" +
+                          $"Exclude\t\t\t --> {listOfExclude}\n";
+
+            Logger.Logger.Log(null, Level.Notice, logMessage, null);
+        }
         private static string WrapPath(string path, int maxLength = 80, string prefix = "        ")
         {
             if (string.IsNullOrEmpty(path) || path.Length <= maxLength)
@@ -292,6 +330,18 @@ namespace LCT.Common.Logging
             }
         }
 
+        public static void WriteInternalComponentsTableInCli(List<Component> internalComponents)
+        {
+            if (LoggerFactory.UseSpectreConsole)
+            {
+                WriteInternalComponentsListTableToKpi(internalComponents);
+            }
+            else
+            {
+                //Writes internal component ist to kpi
+                WriteInternalComponentsListToKpi(internalComponents);
+            }
+        }
         public static void WriteInternalComponentsListTableToKpi(List<Component> internalComponents)
         {
             if (internalComponents?.Count > 0)
@@ -329,7 +379,26 @@ namespace LCT.Common.Logging
                 }, "* Internal Components Identified which will not be sent for clearing:", "Alert");
             }
         }
+        public static void WriteInternalComponentsListToKpi(List<Component> internalComponents)
+        {
+            const string Name = "Name";
+            const string Version = "Version";
 
+            if (internalComponents?.Count > 0)
+            {
+                Logger.Logger.Log(null, Level.Alert, "* Internal Components Identified which will not be sent for clearing:", null);
+                Logger.Logger.Log(null, Level.Alert, $"{"=",5}{string.Join("", Enumerable.Repeat("=", 98)),5}", null);
+                Logger.Logger.Log(null, Level.Alert, $"{"|",5}{Name,-45} {"|",5} {Version,35} {"|",10}", null);
+                Logger.Logger.Log(null, Level.Alert, $"{"=",5}{string.Join("", Enumerable.Repeat("=", 98)),5}", null);
+
+                foreach (var item in internalComponents)
+                {
+                    Logger.Logger.Log(null, Level.Alert, $"{"|",5}{item.Name,-45} {"|",5} {item.Version,35} {"|",10}", null);
+                    Logger.Logger.Log(null, Level.Alert, $"{"-",5}{string.Join("", Enumerable.Repeat("-", 98)),5}", null);
+                }
+                Logger.Info("\n");
+            }
+        }
         private static void WriteInternalComponentsListToKpiFallback(List<Component> internalComponents)
         {
             const string Name = "Name";

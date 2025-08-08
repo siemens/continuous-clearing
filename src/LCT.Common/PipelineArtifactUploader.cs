@@ -43,7 +43,7 @@ namespace LCT.Common
             }
             else if (envType == EnvironmentType.Unknown)
             {
-                Logger.Logger.Log(null, Level.Alert, $"Uploading of logs is not supported.", null);
+                Logger.Warn($"Uploading of logs is not supported.");
             }
 
         }
@@ -63,7 +63,7 @@ namespace LCT.Common
             }
             else if (envType == EnvironmentType.Unknown)
             {
-                Logger.Logger.Log(null, Level.Alert, $"Uploading of SBOM is not supported.", null);
+                Logger.Warn($"Uploading of SBOM is not supported.");
             }
 
         }

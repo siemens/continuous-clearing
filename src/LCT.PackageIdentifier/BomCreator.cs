@@ -116,16 +116,7 @@ namespace LCT.PackageIdentifier
 
             if (appSettings.Jfrog != null)
             {
-                if (LoggerFactory.UseSpectreConsole)
-                {
-                    LoggerHelper.WriteInternalComponentsListTableToKpi(componentData.internalComponents);
-                }
-                else
-                {
-                    //Writes internal component ist to kpi
-                    bomHelper.WriteInternalComponentsListToKpi(componentData.internalComponents);
-                }
-                
+                LoggerHelper.WriteInternalComponentsTableInCli(componentData.internalComponents);
             }
 
             Logger.Debug($"GenerateBom():End");
