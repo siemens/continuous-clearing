@@ -76,32 +76,7 @@ namespace LCT.PackageIdentifier
                 if (!string.IsNullOrEmpty(info.ErrorMessage))
                     return info;
 
-                // Process the valid asset files
-                List<RuntimeInfo> runtimeInfos = [];
-
-                foreach (var assetsFile in assetsFiles)
-                {
-                    Logger.Debug($"Processing assets file: {assetsFile}");
-                    var csprojFilePath = GetProjectFilePathFromAssestJson(assetsFile);
-
-                    if (!string.IsNullOrWhiteSpace(csprojFilePath) && File.Exists(csprojFilePath))
-                    {
-                        RuntimeInfo runtimeInfo = ParseCSProjFile(csprojFilePath);
-                        if (runtimeInfo != null)
-                        {
-                            runtimeInfos.Add(runtimeInfo);
-
-                            // Prioritize self-contained with framework references
-                            if (runtimeInfo.IsSelfContained && runtimeInfo.FrameworkReferences.Count > 0)
-                                return runtimeInfo;
-                        }
-                    }
-                }
-
-                return runtimeInfos.FirstOrDefault() ?? new RuntimeInfo
-                {
-                    ErrorMessage = "No valid project files found in the assets files."
-                };
+                return ProcessAssetFiles(assetsFiles);
             }
             catch (DirectoryNotFoundException ex)
             {
@@ -121,6 +96,52 @@ namespace LCT.PackageIdentifier
 
             WriteDetailLog(info);
             return info;
+        }
+
+        /// <summary>
+        /// Processes the asset files to extract runtime information.
+        /// </summary>
+        /// <param name="assetsFiles">Array of asset file paths to process.</param>
+        /// <returns>A RuntimeInfo object containing project details or error information.</returns>
+        private static RuntimeInfo ProcessAssetFiles(string[] assetsFiles)
+        {
+            List<RuntimeInfo> runtimeInfos = [];
+
+            foreach (var assetsFile in assetsFiles)
+            {
+                Logger.Debug($"Processing assets file: {assetsFile}");
+                var runtimeInfo = TryGetRuntimeInfoFromAssetFile(assetsFile);
+
+                if (runtimeInfo != null)
+                {
+                    runtimeInfos.Add(runtimeInfo);
+
+                    // Return early if we found a self-contained runtime with framework references
+                    if (runtimeInfo.IsSelfContained && runtimeInfo.FrameworkReferences.Count > 0)
+                        return runtimeInfo;
+                }
+            }
+
+            // Return the first runtime info found, or an error if none
+            return runtimeInfos.FirstOrDefault() ?? new RuntimeInfo
+            {
+                ErrorMessage = "No valid project files found in the assets files."
+            };
+        }
+
+        /// <summary>
+        /// Attempts to extract runtime information from an asset file.
+        /// </summary>
+        /// <param name="assetsFile">The asset file path.</param>
+        /// <returns>A RuntimeInfo object if successful, null otherwise.</returns>
+        private static RuntimeInfo TryGetRuntimeInfoFromAssetFile(string assetsFile)
+        {
+            var csprojFilePath = GetProjectFilePathFromAssestJson(assetsFile);
+
+            if (string.IsNullOrWhiteSpace(csprojFilePath) || !File.Exists(csprojFilePath))
+                return null;
+
+            return ParseCSProjFile(csprojFilePath);
         }
 
         /// <summary>
