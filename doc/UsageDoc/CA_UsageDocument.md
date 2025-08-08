@@ -209,7 +209,8 @@ Users have the flexibility to generate a basic SBOM even if connections to SW360
 
       Resulted output.sbom.cdx.json file will be having the list of installed packages  and the same file will be used as  an input to Continuous clearing tool - Package identifier via the input directory parameter. The remaining process is same as other project types.
 ## SPDX v2.3 Support
-The Package Identifier now supports processing SPDX v2.3 format SBOM files. This feature enables:
+
+The Package Identifier supports importing both supported and unsupported SPDX SBoMs and processes them correctly for inclusion in workflows.
 
 - Automatic detection of SPDX files with `.spdx.sbom.json` suffix from the input directory
 - Conversion of SPDX files to CycloneDX SBOM format while preserving all relationships
