@@ -52,7 +52,7 @@ namespace LCT.PackageIdentifier
         /// properties are required.</param>
         /// <param name="projectCollection">The <see cref="ProjectCollection"/> instance to associate with the loaded project. Cannot be <c>null</c>.</param>
         /// <returns>A <see cref="Project"/> instance representing the loaded project.</returns>
-        public Project LoadProject(string projectFilePath, IDictionary<string, string> globalProperties, ProjectCollection projectCollection)
+        public static Project LoadProject(string projectFilePath, IDictionary<string, string> globalProperties, ProjectCollection projectCollection)
         {
             return new Project(projectFilePath, globalProperties, null, projectCollection);
         }
@@ -62,37 +62,21 @@ namespace LCT.PackageIdentifier
         /// </summary>
         /// <remarks>This method scans the input directory for NuGet asset files and attempts to determine
         /// the runtime configuration by analyzing associated project files. If multiple valid runtime configurations
-        /// are found, a self-contained runtime with framework references is prioritized. If no valid project files are
-        /// found, the returned <see cref="RuntimeInfo"/> will contain an error message describing the issue.</remarks>
-        /// <param name="appSettings">The application settings that specify the input directory and NuGet exclusion rules used to locate and
-        /// filter asset files.</param>
-        /// <returns>A <see cref="RuntimeInfo"/> instance containing details about the identified runtime configuration. If no
-        /// valid runtime is found or an error occurs, the returned object will include an error message describing the
-        /// problem.</returns>
+        /// are found, a self-contained runtime with framework references is prioritized.</remarks>
+        /// <param name="appSettings">The application settings that specify the input directory and NuGet exclusion rules.</param>
+        /// <returns>A <see cref="RuntimeInfo"/> instance containing runtime configuration details or error information.</returns>
         public RuntimeInfo IdentifyRuntime(CommonAppSettings appSettings)
         {
             var info = new RuntimeInfo();
 
             try
             {
-                var assetsFiles = Directory.GetFiles(appSettings.Directory.InputFolder, FileConstant.NugetAssetFile, SearchOption.AllDirectories);
-                if (assetsFiles.Length == 0)
-                {
-                    info.ErrorMessage = "No " + FileConstant.NugetAssetFile + " files found in the specified directory.";
-                    WriteDetailLog(info);
+                // Find and filter assets files
+                var assetsFiles = FindAssetFiles(appSettings, info);
+                if (!string.IsNullOrEmpty(info.ErrorMessage))
                     return info;
-                }
 
-                // Filter out excluded files based on appSettings
-                assetsFiles = assetsFiles.Where(file => !IsExcluded(file, appSettings.Nuget?.Exclude)).ToArray();
-
-                if (assetsFiles.Length == 0)
-                {
-                    info.ErrorMessage = "No " + FileConstant.NugetAssetFile + " files found in the specified directory.";
-                    WriteDetailLog(info);
-                    return info;
-                }
-
+                // Process the valid asset files
                 List<RuntimeInfo> runtimeInfos = [];
 
                 foreach (var assetsFile in assetsFiles)
@@ -106,11 +90,10 @@ namespace LCT.PackageIdentifier
                         if (runtimeInfo != null)
                         {
                             runtimeInfos.Add(runtimeInfo);
-                        }
 
-                        if (runtimeInfo != null && runtimeInfo.IsSelfContained && runtimeInfo.FrameworkReferences.Count > 0)
-                        {
-                            return runtimeInfo;
+                            // Prioritize self-contained with framework references
+                            if (runtimeInfo.IsSelfContained && runtimeInfo.FrameworkReferences.Count > 0)
+                                return runtimeInfo;
                         }
                     }
                 }
@@ -119,29 +102,56 @@ namespace LCT.PackageIdentifier
                 {
                     ErrorMessage = "No valid project files found in the assets files."
                 };
-
             }
             catch (DirectoryNotFoundException ex)
             {
                 info.ErrorMessage = "Directory not found";
                 info.ErrorDetails = $"The specified directory '{appSettings.Directory?.InputFolder}' was not found. Error: {ex.Message}";
-                WriteDetailLog(info);
-                return info;
             }
             catch (FileNotFoundException ex)
             {
                 info.ErrorMessage = "File not found";
                 info.ErrorDetails = $"A required file could not be found. Error: {ex.Message}";
-                WriteDetailLog(info);
-                return info;
             }
             catch (Microsoft.Build.Exceptions.InvalidProjectFileException ex)
             {
                 info.ErrorMessage = "Invalid project file";
                 info.ErrorDetails = $"Error parsing project file: {ex.Message}";
-                WriteDetailLog(info);
-                return info;
             }
+
+            WriteDetailLog(info);
+            return info;
+        }
+
+        /// <summary>
+        /// Finds and filters NuGet asset files based on the provided application settings.
+        /// </summary>
+        /// <param name="appSettings">The application settings containing directory and exclusion rules.</param>
+        /// <param name="info">RuntimeInfo object to populate with error details if needed.</param>
+        /// <returns>An array of filtered asset file paths or empty array if error occurs.</returns>
+        private static string[] FindAssetFiles(CommonAppSettings appSettings, RuntimeInfo info)
+        {
+            // Get all asset files in the input folder
+            var assetsFiles = Directory.GetFiles(appSettings.Directory.InputFolder, FileConstant.NugetAssetFile, SearchOption.AllDirectories);
+
+            if (assetsFiles.Length == 0)
+            {
+                info.ErrorMessage = "No " + FileConstant.NugetAssetFile + " files found in the specified directory.";
+                WriteDetailLog(info);
+                return Array.Empty<string>();
+            }
+
+            // Filter out excluded files
+            var filteredFiles = assetsFiles.Where(file => !IsExcluded(file, appSettings.Nuget?.Exclude)).ToArray();
+
+            if (filteredFiles.Length == 0)
+            {
+                info.ErrorMessage = "No " + FileConstant.NugetAssetFile + " files found in the specified directory.";
+                WriteDetailLog(info);
+                return Array.Empty<string>();
+            }
+
+            return filteredFiles;
         }
 
         #region Private Methods
@@ -157,7 +167,7 @@ namespace LCT.PackageIdentifier
         /// returned in the result.</param>
         /// <returns>A <see cref="RuntimeInfo"/> object containing details about the project's runtime configuration. If the file
         /// path is invalid or an error occurs during parsing, the returned object includes error information.</returns>
-        private RuntimeInfo ParseCSProjFile(string projectFilePath)
+        private static RuntimeInfo ParseCSProjFile(string projectFilePath)
         {
             var info = new RuntimeInfo();
 
@@ -200,7 +210,7 @@ namespace LCT.PackageIdentifier
         /// <param name="projectFilePath"></param>
         /// <param name="projectCollection"></param>
         /// <returns></returns>
-        private Project LoadProjectWithDefaultSettings(string projectFilePath, ProjectCollection projectCollection)
+        private static Project LoadProjectWithDefaultSettings(string projectFilePath, ProjectCollection projectCollection)
         {
             var globalProperties = new Dictionary<string, string>
             {
@@ -216,7 +226,7 @@ namespace LCT.PackageIdentifier
         /// </summary>
         /// <param name="info"></param>
         /// <param name="project"></param>
-        private void PopulateProjectInfo(RuntimeInfo info, Project project)
+        private static void PopulateProjectInfo(RuntimeInfo info, Project project)
         {
             info.ProjectPath = project.FullPath;
             info.ProjectName = Path.GetFileNameWithoutExtension(project.FullPath);
@@ -227,22 +237,26 @@ namespace LCT.PackageIdentifier
         /// </summary>
         /// <param name="info"></param>
         /// <param name="project"></param>
-        private void ProcessSelfContainedStatus(RuntimeInfo info, Project project)
+        private static void ProcessSelfContainedStatus(RuntimeInfo info, Project project)
         {
             string selfContainedEvaluated = project.GetPropertyValue("SelfContained");
             string runtimeIdentifier = project.GetPropertyValue("RuntimeIdentifier");
             string runtimeIdentifiers = project.GetPropertyValue("RuntimeIdentifiers");
 
             bool selfContainedExplicitlySet = project.GetProperty("SelfContained") != null;
-            bool.TryParse(selfContainedEvaluated, out bool isSelfContained);
+
+            // Properly handle the TryParse result
+            bool isSelfContained = false;
+            bool parseSuccessful = !string.IsNullOrEmpty(selfContainedEvaluated) &&
+                                   bool.TryParse(selfContainedEvaluated, out isSelfContained);
+
             bool hasRuntimeIdentifier = !string.IsNullOrEmpty(runtimeIdentifier) || !string.IsNullOrEmpty(runtimeIdentifiers);
 
             info.SelfContainedEvaluated = selfContainedEvaluated;
             info.IsSelfContained = isSelfContained;
             info.SelfContainedExplicitlySet = selfContainedExplicitlySet;
 
-            SetSelfContainedReason(info, isSelfContained, selfContainedExplicitlySet, hasRuntimeIdentifier,
-                !string.IsNullOrEmpty(selfContainedEvaluated));
+            SetSelfContainedReason(info, isSelfContained, selfContainedExplicitlySet, hasRuntimeIdentifier, parseSuccessful);
         }
 
         /// <summary>
@@ -253,7 +267,7 @@ namespace LCT.PackageIdentifier
         /// <param name="selfContainedExplicitlySet"></param>
         /// <param name="hasRuntimeIdentifier"></param>
         /// <param name="selfContainedValueParsed"></param>
-        private void SetSelfContainedReason(RuntimeInfo info, bool isSelfContained, bool selfContainedExplicitlySet,
+        private static void SetSelfContainedReason(RuntimeInfo info, bool isSelfContained, bool selfContainedExplicitlySet,
             bool hasRuntimeIdentifier, bool selfContainedValueParsed)
         {
             if (!selfContainedValueParsed)
@@ -285,7 +299,7 @@ namespace LCT.PackageIdentifier
         /// </summary>
         /// <param name="info"></param>
         /// <param name="project"></param>
-        private void ProcessRuntimeIdentifiers(RuntimeInfo info, Project project)
+        private static void ProcessRuntimeIdentifiers(RuntimeInfo info, Project project)
         {
             string runtimeIdentifier = project.GetPropertyValue("RuntimeIdentifier");
             string runtimeIdentifiers = project.GetPropertyValue("RuntimeIdentifiers");
@@ -302,7 +316,7 @@ namespace LCT.PackageIdentifier
         /// </summary>
         /// <param name="info"></param>
         /// <param name="project"></param>
-        private void ProcessFrameworkReferences(RuntimeInfo info, Project project)
+        private static void ProcessFrameworkReferences(RuntimeInfo info, Project project)
         {
             string targetFrameworkValue = project.GetPropertyValue("TargetFramework");
             var frameworkReferences = project.Items
@@ -324,7 +338,7 @@ namespace LCT.PackageIdentifier
         /// </summary>
         /// <param name="info"></param>
         /// <param name="ex"></param>
-        private void HandleProjectFileException(RuntimeInfo info, Microsoft.Build.Exceptions.InvalidProjectFileException ex)
+        private static void HandleProjectFileException(RuntimeInfo info, Microsoft.Build.Exceptions.InvalidProjectFileException ex)
         {
             info.ErrorMessage = $"Error loading project file: {ex.Message}";
             info.ErrorDetails = $"Details: {ex.ErrorCode} at {ex.LineNumber}, {ex.ColumnNumber}";
