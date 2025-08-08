@@ -291,7 +291,7 @@ namespace LCT.Common
             if (level == Level.Fatal)
                 return "red bold";
             if (level == Level.Alert)
-                return "magenta";
+                return "yellow";
             if (level == Level.Critical)
                 return "red bold underline";
             if (level == Level.Emergency)

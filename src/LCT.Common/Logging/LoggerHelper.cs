@@ -7,19 +7,39 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using CycloneDX.Models;
-using Level=log4net.Core.Level;
+using Level = log4net.Core.Level;
 
 namespace LCT.Common.Logging
 {
     public class LoggerHelper
     {
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private static Dictionary<string, string> _colorCache = new Dictionary<string, string>();
+        private static readonly Dictionary<string, string> _colorCache = new Dictionary<string, string>();
         private static int _colorIndex = 0;
+
+        // Helper to get console width with fallback and subtract
+        private static int GetConsoleWidth(int subtract = 0, int fallback = 120)
+        {
+            return Console.WindowWidth > 0 ? Console.WindowWidth - subtract : fallback;
+        }
+
+        // Helper to safely execute Spectre.Console actions with fallback
+        private static void SafeSpectreAction(Action spectreAction, string fallbackMessage, string fallbackType = "Info")
+        {
+            try
+            {
+                spectreAction();
+            }
+            catch
+            {
+                WriteFallback(fallbackMessage, fallbackType);
+            }
+        }
+
         public static void DisplayInputParametersWithSpectreConsole(CatoolInfo caToolInformation, CommonAppSettings appSettings, string listOfInternalRepoList, string listOfInclude, string listOfExclude, string listOfExcludeComponents)
         {
-            int consoleWidth = Console.WindowWidth > 0 ? Console.WindowWidth - 10 : 110;
-            int maxPathLength = Math.Max(60, consoleWidth - 20); 
+            int consoleWidth = GetConsoleWidth(10, 110);
+            int maxPathLength = Math.Max(60, consoleWidth - 20);
 
             var content = $"Start of Package Identifier execution: [green]{DateTime.Now}[/]\n\n";
             content += $"[green]-[/] [yellow]Input Parameters used in Package Identifier:[/]\n\n";
@@ -100,11 +120,12 @@ namespace LCT.Common.Logging
 
             return string.Join($"\n{prefix}", lines);
         }
+
         public static void WriteStyledPanel(string content, string title = null, string borderStyle = "white", string headerStyle = "yellow")
         {
-            try
-            {                
-                int consoleWidth = Console.WindowWidth > 0 ? Console.WindowWidth - 4 : 120;
+            SafeSpectreAction(() =>
+            {
+                int consoleWidth = GetConsoleWidth(4, 120);
                 int panelWidth = Math.Min(consoleWidth, 150);
 
                 var panel = new Panel(content)
@@ -122,60 +143,40 @@ namespace LCT.Common.Logging
                 }
 
                 AnsiConsole.Write(panel);
-            }
-            catch
-            {
-                WriteFallback(content, title ?? "Panel");
-            }
+            }, content, title ?? "Panel");
         }
 
         public static void WriteHeader(string title)
         {
-            try
+            SafeSpectreAction(() =>
             {
                 var centeredText = title.PadLeft((Console.WindowWidth + title.Length) / 2);
                 AnsiConsole.MarkupLine($"[bold white]{Markup.Escape(centeredText)}[/]");
-            }
-            catch
-            {
-                WriteFallback(title, "Header");
-            }
-        }
-        public static void WriteFallback(string message, string messageType = "Info")
-        {
-            switch (messageType.ToLower())
-            {
-                case "warning":
-                    Console.WriteLine($"WARNING: {message}");
-                    break;
-                case "error":
-                    Console.WriteLine($"ERROR: {message}");
-                    break;
-                case "success":
-                    Console.WriteLine($"SUCCESS: {message}");
-                    break;
-                case "notice":
-                    Console.WriteLine($"NOTICE: {message}");
-                    break;
-                case "header":
-                    Console.WriteLine(message);
-                    break;
-                case "panel":
-                    Console.WriteLine(message);
-                    break;
-                default:
-                    Console.WriteLine(message);
-                    break;
-            }
+            }, title, "Header");
         }
 
+        public static void WriteFallback(string message, string messageType = "Info")
+        {
+            string prefix = messageType.ToLower() switch
+            {
+                "warning" => "WARNING: ",
+                "error" => "ERROR: ",
+                "success" => "SUCCESS: ",
+                "notice" => "NOTICE: ",
+                "header" => "",
+                "panel" => "",
+                "alert" => "",
+                _ => ""
+            };
+            Console.WriteLine($"{prefix}{message}");
+        }
 
         public static void WriteToSpectreConsoleTable(Dictionary<string, int> printData, Dictionary<string, double> printTimingData, string ProjectSummaryLink)
         {
-            try
+            SafeSpectreAction(() =>
             {
                 WriteHeader("SUMMARY");
-                int consoleWidth = Console.WindowWidth > 0 ? Console.WindowWidth - 6 : 120;
+                int consoleWidth = GetConsoleWidth(6, 120);
 
                 int maxValue = printData.Values.Max();
                 int barMaxWidth = Math.Max(20, 40);
@@ -218,22 +219,18 @@ namespace LCT.Common.Logging
                     WriteLine();
                     WriteInfoWithMarkup($"[blue]Project Summary: [/][white]{ProjectSummaryLink}[/]");
                 }
-            }
-            catch
-            {
-                DisplaySimpleSummary(printData, printTimingData);
-            }
+            }, "Package Summary Table", "Panel");
         }
 
         private static void DisplayTimingTable(Dictionary<string, double> printTimingData)
         {
-            int consoleWidth = Console.WindowWidth > 0 ? Console.WindowWidth - 6 : 120;
+            int consoleWidth = GetConsoleWidth(6, 120);
 
             var table = new Table()
                 .BorderColor(Color.Grey)
                 .Border(TableBorder.Rounded)
                 .Title("[yellow]Execution Timing[/]")
-                .Width(Math.Min(consoleWidth, 100)); 
+                .Width(Math.Min(consoleWidth, 100));
 
             table.AddColumn("[green]Operation[/]");
             table.AddColumn("[blue]Time (seconds)[/]");
@@ -294,17 +291,18 @@ namespace LCT.Common.Logging
                 }
             }
         }
+
         public static void WriteInternalComponentsListTableToKpi(List<Component> internalComponents)
         {
             if (internalComponents?.Count > 0)
             {
-                try
+                SafeSpectreAction(() =>
                 {
                     WriteLine();
                     WriteInfoWithMarkup("[yellow bold]* Internal Components Identified which will not be sent for clearing:[/]");
                     WriteLine();
 
-                    int consoleWidth = Console.WindowWidth > 0 ? Console.WindowWidth - 6 : 120;
+                    int consoleWidth = GetConsoleWidth(6, 120);
 
                     var table = new Table()
                         .BorderColor(Color.Yellow)
@@ -315,7 +313,6 @@ namespace LCT.Common.Logging
                     table.AddColumn(new TableColumn("[green bold]Name[/]").Width(60));
                     table.AddColumn(new TableColumn("[blue bold]Version[/]").Width(40));
 
-                    
                     foreach (var item in internalComponents)
                     {
                         string componentName = !string.IsNullOrEmpty(item.Name) ? item.Name : "N/A";
@@ -329,11 +326,7 @@ namespace LCT.Common.Logging
 
                     AnsiConsole.Write(table);
                     WriteLine();
-                }
-                catch (Exception)
-                {
-                    WriteInternalComponentsListToKpiFallback(internalComponents);
-                }
+                }, "* Internal Components Identified which will not be sent for clearing:", "Alert");
             }
         }
 
@@ -355,6 +348,7 @@ namespace LCT.Common.Logging
 
             WriteLine();
         }
+
         public static void SpectreConsoleInitialMessage()
         {
             if (LoggerFactory.UseSpectreConsole)
@@ -367,6 +361,7 @@ namespace LCT.Common.Logging
                 Logger.Logger.Log(null, Level.Notice, $"\nStart of Package Identifier execution: {DateTime.Now}", null);
             }
         }
+
         public static void ValidFilesInfoDisplayForCli(string configFile)
         {
             if (LoggerFactory.UseSpectreConsole)
@@ -377,8 +372,8 @@ namespace LCT.Common.Logging
             {
                 Logger.Info($"    Input file FOUND :{configFile}");
             }
-
         }
+
         public static void JfrogConnectionInfoDisplayForCli()
         {
             if (LoggerFactory.UseSpectreConsole)
@@ -389,29 +384,16 @@ namespace LCT.Common.Logging
             {
                 Logger.Info($"JFrog Connection was successfull!!");
             }
-
         }
+
         public static void WriteLine()
         {
-            try
-            {
-                AnsiConsole.WriteLine();
-            }
-            catch
-            {
-                Console.WriteLine();
-            }
+            SafeSpectreAction(() => AnsiConsole.WriteLine(), "", "Info");
         }
+
         public static void WriteInfoWithMarkup(string message)
         {
-            try
-            {
-                AnsiConsole.MarkupLine(message); 
-            }
-            catch
-            {
-                WriteFallback(message, "Info");
-            }
+            SafeSpectreAction(() => AnsiConsole.MarkupLine(message), message, "Info");
         }
     }
 }
