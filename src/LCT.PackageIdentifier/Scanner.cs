@@ -6,6 +6,7 @@
 
 using LCT.Common;
 using LCT.Common.Interface;
+using LCT.Common.Logging;
 using LCT.Common.Model;
 using log4net;
 using log4net.Core;
@@ -23,7 +24,7 @@ namespace LCT.PackageIdentifier
     public static class FolderScanner
     {
 
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
         public static List<string> FileScanner(string rootPath, Config config)
         {
@@ -79,8 +80,7 @@ namespace LCT.PackageIdentifier
         {
             if (!IsExcluded(configFile, config.Exclude))
             {
-                Logger.Logger.Log(null, Level.Info, $"    Input file FOUND :{configFile}", null);
-
+                LoggerHelper.ValidFilesInfoDisplayForCli(configFile);
                 allFoundConfigFiles.Add(configFile);
                 fileOperations.ValidateFilePath(configFile);
             }

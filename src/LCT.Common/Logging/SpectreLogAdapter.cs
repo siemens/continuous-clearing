@@ -1,8 +1,10 @@
-﻿using log4net;
+﻿using LCT.Common.Model;
+using log4net;
 using log4net.Core;
 using log4net.Repository;
 using Spectre.Console;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 
 namespace LCT.Common
@@ -11,11 +13,13 @@ namespace LCT.Common
     {
         private readonly string _loggerName;
         private readonly SpectreLogger _logger;
+        private readonly ILog _fileLogger;
 
         public SpectreLogAdapter(string loggerName)
         {
             _loggerName = loggerName ?? "Unknown";
             _logger = new SpectreLogger(_loggerName);
+            _fileLogger = LogManager.GetLogger(loggerName);
         }
 
         public bool IsDebugEnabled => true;
@@ -30,12 +34,14 @@ namespace LCT.Common
         #region Debug Methods
         public void Debug(object message)
         {
-            _logger.Log(null, Level.Debug, message, null);
+            //_logger.Log(null, Level.Debug, message, null);
+            _fileLogger.Debug(message);
         }
 
         public void Debug(object message, Exception exception)
         {
-            _logger.Log(null, Level.Debug, message, exception);
+            //_logger.Log(null, Level.Debug, message, exception);
+            _fileLogger.Debug(message);
         }
 
         public void DebugFormat(string format, params object[] args)
@@ -67,12 +73,14 @@ namespace LCT.Common
         #region Info Methods
         public void Info(object message)
         {
-            _logger.Log(null, Level.Info, message, null);
+            //_logger.Log(null, Level.Info, message, null);
+            _fileLogger.Info(message);
         }
 
         public void Info(object message, Exception exception)
         {
-            _logger.Log(null, Level.Info, message, exception);
+            //_logger.Log(null, Level.Info, message, exception);
+            _fileLogger.Info(message);
         }
 
         public void InfoFormat(string format, params object[] args)
@@ -104,12 +112,14 @@ namespace LCT.Common
         #region Warn Methods
         public void Warn(object message)
         {
-            _logger.Log(null, Level.Warn, message, null);
+            //_logger.Log(null, Level.Warn, message, null);
+            _fileLogger.Warn(message);
         }
 
         public void Warn(object message, Exception exception)
         {
-            _logger.Log(null, Level.Warn, message, exception);
+            //_logger.Log(null, Level.Warn, message, exception);
+            _fileLogger.Warn(message);
         }
 
         public void WarnFormat(string format, params object[] args)
@@ -141,12 +151,14 @@ namespace LCT.Common
         #region Error Methods
         public void Error(object message)
         {
-            _logger.Log(null, Level.Error, message, null);
+            //_logger.Log(null, Level.Error, message, null);
+            _fileLogger.Error(message);
         }
 
         public void Error(object message, Exception exception)
         {
-            _logger.Log(null, Level.Error, message, exception);
+            //_logger.Log(null, Level.Error, message, exception);
+            _fileLogger.Error(message);
         }
 
         public void ErrorFormat(string format, params object[] args)
@@ -173,17 +185,20 @@ namespace LCT.Common
         {
             _logger.Log(null, Level.Error, string.Format(provider, format, args), null);
         }
+        
         #endregion
 
         #region Fatal Methods
         public void Fatal(object message)
         {
-            _logger.Log(null, Level.Fatal, message, null);
+            //_logger.Log(null, Level.Fatal, message, null);
+            _fileLogger.Fatal(message);
         }
 
         public void Fatal(object message, Exception exception)
         {
-            _logger.Log(null, Level.Fatal, message, exception);
+            //_logger.Log(null, Level.Fatal, message, exception);
+            _fileLogger.Fatal(message);
         }
 
         public void FatalFormat(string format, params object[] args)
@@ -238,7 +253,7 @@ namespace LCT.Common
             string color = GetColorForLevel(level);
 
             // Format and display the message
-            AnsiConsole.MarkupLine($"[{color}][[{level.Name}]] {message}[/]");
+            AnsiConsole.MarkupLine($"[{color}] {message}[/]");
 
             if (exception != null)
             {
@@ -261,7 +276,7 @@ namespace LCT.Common
             }
         }
 
-        private string GetColorForLevel(Level level)
+        private static string GetColorForLevel(Level level)
         {
             if (level == Level.Debug)
                 return "blue";

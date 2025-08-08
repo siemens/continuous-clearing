@@ -18,7 +18,7 @@ namespace LCT.PackageIdentifier
     public static class CycloneBomProcessor
     {
 
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public static Bom SetMetadataInComparisonBOM(Bom bom,
                                                      CommonAppSettings appSettings,

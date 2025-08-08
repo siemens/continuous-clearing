@@ -19,6 +19,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using Level = log4net.Core.Level;
 using File = System.IO.File;
+using LCT.Common.Logging;
 
 namespace LCT.Common
 {
@@ -27,7 +28,7 @@ namespace LCT.Common
     /// </summary>
     public static class CommonHelper
     {
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly char[] InvalidProjectNameChars = new char[] { '/', '\\', '.' };
         public static string ProjectSummaryLink { get; set; }
         public static string DefaultLogPath { get; set; }
@@ -114,43 +115,51 @@ namespace LCT.Common
 
         public static void WriteToConsoleTable(Dictionary<string, int> printData, Dictionary<string, double> printTimingData)
         {
-            const string Count = "Count";
-            const string Feature = "Feature";
-            const string TimeTakenBy = "Time Taken By";
-            Logger.Info("\n");
-            Logger.Info("Summary :\n");
-            if (!string.IsNullOrWhiteSpace(ProjectSummaryLink)) { Logger.Info($"{ProjectSummaryLink}"); }
-            Logger.Info($"{"=",5}{string.Join("", Enumerable.Repeat("=", 88)),5}");
-            Logger.Info($"{"|",5}{Feature,-70} {"|",5} {Count,5} {"|",5}");
-            Logger.Info($"{"=",5}{string.Join("", Enumerable.Repeat("=", 88)),5}");
-            foreach (var item in printData)
+            if (LoggerFactory.UseSpectreConsole)
             {
-                if (item.Key == "Packages Not Uploaded Due To Error" || item.Key == "Packages Not Existing in Remote Cache")
+                LoggerHelper.WriteToSpectreConsoleTable(printData, printTimingData, ProjectSummaryLink);
+            }
+            else
+            {
+                const string Count = "Count";
+                const string Feature = "Feature";
+                const string TimeTakenBy = "Time Taken By";
+                Logger.Info("\n");
+                Logger.Info("Summary :\n");
+                if (!string.IsNullOrWhiteSpace(ProjectSummaryLink)) { Logger.Info($"{ProjectSummaryLink}"); }
+                Logger.Info($"{"=",5}{string.Join("", Enumerable.Repeat("=", 88)),5}");
+                Logger.Info($"{"|",5}{Feature,-70} {"|",5} {Count,5} {"|",5}");
+                Logger.Info($"{"=",5}{string.Join("", Enumerable.Repeat("=", 88)),5}");
+                foreach (var item in printData)
                 {
-                    if (item.Value > 0)
+                    if (item.Key == "Packages Not Uploaded Due To Error" || item.Key == "Packages Not Existing in Remote Cache")
                     {
-                        Logger.Error($"{"|",5}{item.Key,-70} {"|",5} {item.Value,5} {"|",5}");
-                        Logger.Error($"{"-",5}{string.Join("", Enumerable.Repeat("-", 88)),5}");
+                        if (item.Value > 0)
+                        {
+                            Logger.Error($"{"|",5}{item.Key,-70} {"|",5} {item.Value,5} {"|",5}");
+                            Logger.Error($"{"-",5}{string.Join("", Enumerable.Repeat("-", 88)),5}");
+                        }
+                        else
+                        {
+                            Logger.Info($"{"|",5}{item.Key,-70} {"|",5} {item.Value,5} {"|",5}");
+                            Logger.Info($"{"-",5}{string.Join("", Enumerable.Repeat("-", 88)),5}");
+                        }
                     }
                     else
                     {
+
                         Logger.Info($"{"|",5}{item.Key,-70} {"|",5} {item.Value,5} {"|",5}");
                         Logger.Info($"{"-",5}{string.Join("", Enumerable.Repeat("-", 88)),5}");
                     }
+
                 }
-                else
+
+                foreach (var item in printTimingData)
                 {
-
-                    Logger.Info($"{"|",5}{item.Key,-70} {"|",5} {item.Value,5} {"|",5}");
-                    Logger.Info($"{"-",5}{string.Join("", Enumerable.Repeat("-", 88)),5}");
+                    Logger.Info($"\n{TimeTakenBy,8} {item.Key,-5} {":",1} {item.Value,8} s\n");
                 }
-
             }
-
-            foreach (var item in printTimingData)
-            {
-                Logger.Info($"\n{TimeTakenBy,8} {item.Key,-5} {":",1} {item.Value,8} s\n");
-            }
+            
         }
 
         public static void WriteComponentsWithoutDownloadURLToKpi(List<ComparisonBomData> componentInfo, List<Components> lstReleaseNotCreated, string sw360URL)

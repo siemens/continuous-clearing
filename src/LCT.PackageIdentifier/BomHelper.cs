@@ -32,7 +32,7 @@ namespace LCT.PackageIdentifier
     /// </summary>
     public class BomHelper : IBomHelper
     {
-        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         #region public methods
 

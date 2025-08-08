@@ -23,7 +23,7 @@ namespace LCT.Common
     /// </summary>
     public class FileOperations : IFileOperations
     {
-        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static string CatoolBomFilePath { get; set; }
 
         public void ValidateFilePath(string filePath)
