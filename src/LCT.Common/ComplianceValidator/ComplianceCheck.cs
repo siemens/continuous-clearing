@@ -20,7 +20,7 @@ namespace LCT.Common.ComplianceValidator
     public class ComplianceCheck : IChecker
     {
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        public List<string> Warnings => [];
+        private List<string> Warnings = new();
 
         /// <summary>
         /// Asynchronously loads compliance settings from a JSON file.
@@ -53,6 +53,8 @@ namespace LCT.Common.ComplianceValidator
         /// <returns><see langword="true"/> if no compliance warnings are detected; otherwise, <see langword="false"/>.</returns>
         public bool Check(ComplianceSettingsModel settings, object data)
         {
+            Warnings = [];
+
             if (settings == null || data == null)
                 return false;
 
