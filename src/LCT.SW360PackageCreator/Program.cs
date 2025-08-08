@@ -178,7 +178,7 @@ namespace LCT.SW360PackageCreator
         {
             if (parsedBomData != null && parsedBomData.Count > 0)
             {
-                IChecker compliance = new ComplianceCheck();
+                ComplianceCheck compliance = new ComplianceCheck();
                 ComplianceSettingsModel complianceSettings = new();
                 string baseDir = AppContext.BaseDirectory;
                 string[] foundFiles = Directory.GetFiles(baseDir, "ComplianceSettings.json", SearchOption.AllDirectories);

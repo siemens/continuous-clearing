@@ -59,18 +59,41 @@ namespace LCT.Common.ComplianceValidator
             if (data is not List<ComparisonBomData> bomDataList)
                 return false;
 
-            // Build a lookup for PURL to ComplianceExceptionComponent
-            var purlToComponent = new Dictionary<string, ComplianceExceptionComponent>();
-            foreach (var comp in settings.ComplianceExceptionComponents ?? Enumerable.Empty<ComplianceExceptionComponent>())
+            var purlToComponent = BuildPurlToComponentMap(settings.ComplianceExceptionComponents);
+            var groupMap = GroupBomDataByWarningAndRecommendation(bomDataList, purlToComponent);
+
+            if (groupMap.Count > 0)
+            {
+                PrintWarning("*Compliance Exception occured");
+            }
+
+            bool hasWarning = false;
+            foreach (var kvp in groupMap)
+            {
+                hasWarning |= HandleGroup(kvp.Key.warning, kvp.Key.recommendation, kvp.Value);
+            }
+
+            return hasWarning;
+        }
+
+        private Dictionary<string, ComplianceExceptionComponent> BuildPurlToComponentMap(IEnumerable<ComplianceExceptionComponent> components)
+        {
+            var map = new Dictionary<string, ComplianceExceptionComponent>();
+            foreach (var comp in components ?? Enumerable.Empty<ComplianceExceptionComponent>())
             {
                 if (comp.Purl == null) continue;
                 foreach (var purl in comp.Purl.Where(p => !string.IsNullOrWhiteSpace(p)))
                 {
-                    purlToComponent[purl] = comp;
+                    map[purl] = comp;
                 }
             }
+            return map;
+        }
 
-            // Group by (warning, recommendation)
+        private Dictionary<(string warning, string recommendation), List<string>> GroupBomDataByWarningAndRecommendation(
+            List<ComparisonBomData> bomDataList,
+            Dictionary<string, ComplianceExceptionComponent> purlToComponent)
+        {
             var groupMap = new Dictionary<(string warning, string recommendation), List<string>>();
             foreach (var bom in bomDataList)
             {
@@ -88,39 +111,30 @@ namespace LCT.Common.ComplianceValidator
                     purlList.Add(bom.ComponentExternalId);
                 }
             }
+            return groupMap;
+        }
 
+        private bool HandleGroup(string warning, string recommendation, List<string> purls)
+        {
             bool hasWarning = false;
+            Warnings.Add(warning + Environment.NewLine);
 
-            if (groupMap.Count > 0)
+            if (!string.IsNullOrWhiteSpace(warning))
             {
-                PrintWarning("*Compliance Exception occured");
+                PrintWarning($"[WARNING] {warning}");
+                PrintWarning("Affected PURLs:");
+                foreach (var purl in purls)
+                {
+                    PrintWarning($"  {purl}");
+                }
+                hasWarning = true;
             }
-
-            foreach (var kvp in groupMap)
+            if (!string.IsNullOrWhiteSpace(recommendation))
             {
-                var warning = kvp.Key.warning;
-                Warnings.Add(warning + Environment.NewLine);
-                var recommendation = kvp.Key.recommendation;
-                var purls = kvp.Value;
-
-                if (!string.IsNullOrWhiteSpace(warning))
-                {
-                    PrintWarning($"[WARNING] {warning}");
-                    PrintWarning("Affected PURLs:");
-                    foreach (var purl in purls)
-                    {
-                        PrintWarning($"  {purl}");
-                    }
-                    hasWarning = true;
-                }
-                if (!string.IsNullOrWhiteSpace(recommendation))
-                {
-                    PrintRecommendation($"[RECOMMENDATION] {recommendation}");
-                }
-                Logger.Logger.Log(null, Level.Info, $"", null);
+                PrintRecommendation($"[RECOMMENDATION] {recommendation}");
             }
-
-            return !hasWarning;
+            Logger.Logger.Log(null, Level.Info, $"", null);
+            return hasWarning;
         }
 
         /// <summary>
