@@ -39,7 +39,6 @@ namespace LCT.ArtifactoryUploader
 
         private static bool SetWarningCode;
         public static Bom GetComponentListFromComparisonBOM(string comparisonBomFilePath,IEnvironmentHelper environmentHelper)
-
         {
             Logger.Debug("Starting GetComponentListFromComparisonBOM() method");
             Bom componentsToBoms = null;
@@ -432,10 +431,13 @@ namespace LCT.ArtifactoryUploader
             foreach (var component in componentsUploaded)
             {
                 var bomComponent = bom.Components.Find(x => x.Purl.Equals(component.Purl, StringComparison.OrdinalIgnoreCase));
-                if (component.DestRepoName != null && !component.DryRun)
+                if (bomComponent != null && component.DestRepoName != null && !component.DryRun)
                 {
-                    bomComponent.Properties.First(x => x.Name == Dataconstant.Cdx_ArtifactoryRepoName).Value = component.DestRepoName;
-                    bomComponent.Properties.First(x => x.Name == Dataconstant.Cdx_JfrogRepoPath).Value = component.JfrogRepoPath;
+                    bomComponent.Properties ??= new List<Property>();
+                    var properties = bomComponent.Properties;                    
+                    CommonHelper.RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_ArtifactoryRepoName, component.DestRepoName);
+                    CommonHelper.RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_JfrogRepoPath, component.JfrogRepoPath);
+                    bomComponent.Properties = properties;
                 }
             }
         }

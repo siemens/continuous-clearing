@@ -17,8 +17,8 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
-using File = System.IO.File;
 using Level = log4net.Core.Level;
+using File = System.IO.File;
 
 namespace LCT.Common
 {
@@ -239,18 +239,23 @@ namespace LCT.Common
             foreach (var component in componentsForBOM)
             {
                 string fileName = Path.GetFileName(filePath);
-                component.Properties = new List<Property>();
+                component.Properties ??= new List<Property>();
+
                 if (filePath.EndsWith(FileConstant.SPDXFileExtension))
                 {
                     SpdxSbomHelper.AddSpdxComponentProperties(fileName, component);
                 }
                 else
                 {
-                    Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.ManullayAdded };
-                    component.Properties.Add(identifierType);
+                    var properties = component.Properties;
+                    CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
+                        Dataconstant.Cdx_IdentifierType,
+                        Dataconstant.ManullayAdded);
+                    CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
+                        Dataconstant.Cdx_IsDevelopment,
+                        "false");
+                    component.Properties = properties;
                 }
-                Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
-                component.Properties.Add(isDev);
                 listComponentForBOM.Add(component);
             }
         }
@@ -453,9 +458,7 @@ namespace LCT.Common
         /// <param name="components">List of components to process</param>
         /// <param name="isInternalPredicate">Function to determine if a component is internal</param>
         /// <returns>Tuple containing (processedComponents, internalComponents)</returns>
-        public static (List<Component> processedComponents, List<Component> internalComponents) ProcessInternalComponentIdentification(
-            List<Component> components,
-            Func<Component, bool> isInternalPredicate)
+        public static (List<Component> processedComponents, List<Component> internalComponents) ProcessInternalComponentIdentification(List<Component> components, Func<Component, bool> isInternalPredicate)
         {
             List<Component> internalComponents = new List<Component>();
             var processedComponents = new List<Component>();
@@ -465,23 +468,17 @@ namespace LCT.Common
                 var currentIterationItem = component;
                 bool isTrue = isInternalPredicate(currentIterationItem);
 
-                if (currentIterationItem.Properties?.Count == null || currentIterationItem.Properties?.Count <= 0)
-                {
-                    currentIterationItem.Properties = new List<Property>();
-                }
+                currentIterationItem.Properties ??= new List<Property>();
 
-                Property isInternal = new() { Name = Dataconstant.Cdx_IsInternal, Value = "false" };
+                string isInternalValue = isTrue ? "true" : "false";
+                var properties = currentIterationItem.Properties;
+                CommonHelper.RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_IsInternal, isInternalValue);
+                currentIterationItem.Properties = properties;
                 if (isTrue)
                 {
                     internalComponents.Add(currentIterationItem);
-                    isInternal.Value = "true";
-                }
-                else
-                {
-                    isInternal.Value = "false";
                 }
 
-                currentIterationItem.Properties.Add(isInternal);
                 processedComponents.Add(currentIterationItem);
             }
 
@@ -498,48 +495,40 @@ namespace LCT.Common
         /// <param name="jfrogRepoPath">JFrog repository path property</param>
         /// <param name="hashes">Optional AQL result containing hash values</param>
         public static void SetComponentPropertiesAndHashes(Component component,
-            Property artifactoryRepo,
-            Property projectType,
-            Property siemensFileName,
-            Property jfrogRepoPath,
-            dynamic hashes = null)
+     Property artifactoryRepo,
+     Property projectType,
+     Property siemensFileName,
+     Property jfrogRepoPath,
+     dynamic hashes = null)
         {
-            // Initialize properties list if needed
-            if (component.Properties?.Count == null || component.Properties?.Count <= 0)
-            {
-                component.Properties = new List<Property>();
-            }
-
-            // Add standard properties
-            component.Properties.Add(artifactoryRepo);
-            component.Properties.Add(projectType);
-            component.Properties.Add(siemensFileName);
-            component.Properties.Add(jfrogRepoPath);
-
-            // Clear description
+            component.Properties ??= new List<Property>();
+            var properties = component.Properties;
+            RemoveDuplicateAndAddProperty(ref properties, artifactoryRepo?.Name, artifactoryRepo?.Value);
+            RemoveDuplicateAndAddProperty(ref properties, projectType?.Name, projectType?.Value);
+            RemoveDuplicateAndAddProperty(ref properties, siemensFileName?.Name, siemensFileName?.Value);
+            RemoveDuplicateAndAddProperty(ref properties, jfrogRepoPath?.Name, jfrogRepoPath?.Value);
+            component.Properties = properties;
             component.Description = null;
-
-            // Add hashes if available
             if (hashes != null)
             {
                 component.Hashes = new List<Hash>()
-                {
-                    new()
-                    {
-                        Alg = Hash.HashAlgorithm.MD5,
-                        Content = hashes.MD5
-                    },
-                    new()
-                    {
-                        Alg = Hash.HashAlgorithm.SHA_1,
-                        Content = hashes.SHA1
-                    },
-                    new()
-                    {
-                        Alg = Hash.HashAlgorithm.SHA_256,
-                        Content = hashes.SHA256
-                    }
-                };
+        {
+            new()
+            {
+                Alg = Hash.HashAlgorithm.MD5,
+                Content = hashes.MD5
+            },
+            new()
+            {
+                Alg = Hash.HashAlgorithm.SHA_1,
+                Content = hashes.SHA1
+            },
+            new()
+            {
+                Alg = Hash.HashAlgorithm.SHA_256,
+                Content = hashes.SHA256
+            }
+        };
             }
         }
         public static void AddSpdxSBomFileNameProperty(ref Bom bom, string filePath)
@@ -557,6 +546,12 @@ namespace LCT.Common
             }
 
         }
+        public static void RemoveDuplicateAndAddProperty(ref List<Property> properties, string propertyName, string propertyValue)
+        {
+            properties ??= new List<Property>();
+            properties.RemoveAll(p => p.Name == propertyName);
+            properties.Add(new Property { Name = propertyName, Value = propertyValue });
+        }
         #endregion
 
         #region private
@@ -573,17 +568,17 @@ namespace LCT.Common
 
         private static void AddExcludedComponentsPropertyFromPurl(List<Component> ComponentList, List<string> ExcludedComponentsFromPurl, ref int noOfExcludedComponents)
         {
-
-
             foreach (string excludedComponent in ExcludedComponentsFromPurl)
             {
-                Property excludeProperty = new() { Name = Dataconstant.Cdx_ExcludeComponent, Value = "true" };
                 foreach (var component in ComponentList)
                 {
                     string componentPurl = NormalizePurl(component.Purl);
                     if (component.Purl != null && componentPurl.Equals(excludedComponent, StringComparison.OrdinalIgnoreCase))
                     {
-                        component.Properties.Add(excludeProperty);
+                        component.Properties ??= new List<Property>();
+                        var properties = component.Properties;
+                        RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_ExcludeComponent, "true");
+                        component.Properties = properties;
                         noOfExcludedComponents++;
                     }
                 }
@@ -599,8 +594,6 @@ namespace LCT.Common
         }
         private static void AddExcludedComponentsPropertyFromNameAndVersion(List<Component> ComponentList, List<string> otherExcludedComponents, ref int noOfExcludedComponents)
         {
-
-            Property excludeProperty = new() { Name = Dataconstant.Cdx_ExcludeComponent, Value = "true" };
             foreach (string excludedComponent in otherExcludedComponents)
             {
                 string[] excludedcomponent = excludedComponent.ToLower().Split(':');
@@ -615,7 +608,10 @@ namespace LCT.Common
                         (component.Version.Contains(excludedcomponent[1], StringComparison.InvariantCultureIgnoreCase) || excludedcomponent[1].Equals("*", StringComparison.InvariantCultureIgnoreCase)))
                     {
                         noOfExcludedComponents++;
-                        component.Properties.Add(excludeProperty);
+                        component.Properties ??= new List<Property>();
+                        var properties = component.Properties;
+                        RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_ExcludeComponent, "true");
+                        component.Properties = properties;
                     }
                 }
             }
@@ -638,7 +634,3 @@ namespace LCT.Common
         #endregion
     }
 }
-
-
-
-
