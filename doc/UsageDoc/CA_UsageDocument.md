@@ -223,11 +223,7 @@ The Package Identifier now supports processing SPDX v2.3 format SBOM files. This
 ## SPDX SBOM Signature Validator
 The tool now includes automated validation of SPDX SBOM signatures and certificates to ensure integrity and authenticity.
 
-### Features
-- Automatic detection and processing of signature (`.sig`) and certificate (`.pem`) files
-- Cryptographic validation of SBOM files against their signatures
-- Certificate validation using public key infrastructure
-- Comprehensive error reporting and logging
+* Input file repository should contain **spdx.sbom.json** file
 
 ### File Naming Convention
 For each SPDX SBOM file, the following associated files are expected:
