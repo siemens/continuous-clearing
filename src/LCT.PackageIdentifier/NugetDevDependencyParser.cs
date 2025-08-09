@@ -4,6 +4,7 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using LCT.Common;
 using LCT.PackageIdentifier.Model.NugetModel;
 using log4net;
 using Microsoft.Build.Evaluation;
@@ -20,14 +21,15 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text.Json;
+using Directory = System.IO.Directory;
 
 namespace LCT.PackageIdentifier
 {
     public class NugetDevDependencyParser
     {
         private static NugetDevDependencyParser instance = null;
-        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
         private static readonly List<string> s_nugetDirectDependencies = new List<string>();
         public static IReadOnlyList<string> NugetDirectDependencies => s_nugetDirectDependencies;
 

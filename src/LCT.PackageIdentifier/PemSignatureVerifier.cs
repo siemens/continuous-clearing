@@ -21,7 +21,7 @@ namespace LCT.PackageIdentifier
     /// </summary>
     public static class PemSignatureVerifier
     {
-        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// Validates the signature of a document using a PEM-encoded certificate or public key file.

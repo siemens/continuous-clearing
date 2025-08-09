@@ -19,6 +19,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using Level = log4net.Core.Level;
 using File = System.IO.File;
+using LCT.Common.Logging;
 
 namespace LCT.Common
 {
@@ -27,7 +28,7 @@ namespace LCT.Common
     /// </summary>
     public static class CommonHelper
     {
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly char[] InvalidProjectNameChars = new char[] { '/', '\\', '.' };
         public static string ProjectSummaryLink { get; set; }
         public static string DefaultLogPath { get; set; }
@@ -151,6 +152,7 @@ namespace LCT.Common
             {
                 Logger.Info($"\n{TimeTakenBy,8} {item.Key,-5} {":",1} {item.Value,8} s\n");
             }
+
         }
 
         public static void WriteComponentsWithoutDownloadURLToKpi(List<ComparisonBomData> componentInfo, List<Components> lstReleaseNotCreated, string sw360URL)
