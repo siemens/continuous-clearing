@@ -10,6 +10,7 @@ using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
+using LCT.Common.Logging;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
@@ -75,7 +76,7 @@ namespace LCT.PackageIdentifier
             };
 
             CommonHelper.ProjectSummaryLink = bomKpiData.ProjectSummaryLink;
-            CommonHelper.WriteToConsoleTable(printList, printTimingList);
+            LoggerHelper.WriteToConsoleTable(printList, printTimingList, bomKpiData.ProjectSummaryLink);
         }
         public void WriteInternalComponentsListToKpi(List<Component> internalComponents)
         {

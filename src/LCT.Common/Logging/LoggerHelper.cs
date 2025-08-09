@@ -11,7 +11,7 @@ using Level = log4net.Core.Level;
 
 namespace LCT.Common.Logging
 {
-    public class LoggerHelper
+    public static class LoggerHelper
     {
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly Dictionary<string, string> _colorCache = new Dictionary<string, string>();
@@ -30,7 +30,14 @@ namespace LCT.Common.Logging
             {
                 spectreAction();
             }
-            catch
+            catch (Exception ex) when (
+                ex is InvalidOperationException ||
+                ex is ArgumentException ||
+                ex is System.IO.IOException ||
+                ex is TargetInvocationException ||
+                ex is NullReferenceException ||
+                ex is NotSupportedException
+            )
             {
                 WriteFallback(fallbackMessage, fallbackType);
             }
@@ -206,9 +213,75 @@ namespace LCT.Common.Logging
                 "alert" => "",
                 _ => ""
             };
-            Console.WriteLine($"{prefix}{message}");
-        }
 
+            string logMessage = $"{prefix}{message}";
+
+            switch (messageType.ToLower())
+            {
+                case "warning":
+                    Logger.Warn(logMessage);
+                    break;
+                case "error":
+                    Logger.Error(logMessage);
+                    break;
+                case "success":
+                case "notice":
+                case "header":
+                case "panel":
+                case "alert":
+                default:
+                    Logger.Info(logMessage);
+                    break;
+            }
+        }
+        public static void WriteToConsoleTable(Dictionary<string, int> printData, Dictionary<string, double> printTimingData,string ProjectSummaryLink)
+        {
+            if (LoggerFactory.UseSpectreConsole)
+            {
+                WriteToSpectreConsoleTable(printData, printTimingData, ProjectSummaryLink);
+            }
+            else
+            {
+                const string Count = "Count";
+                const string Feature = "Feature";
+                const string TimeTakenBy = "Time Taken By";
+                Logger.Info("\n");
+                Logger.Info("Summary :\n");
+                if (!string.IsNullOrWhiteSpace(ProjectSummaryLink)) { Logger.Info($"{ProjectSummaryLink}"); }
+                Logger.Info($"{"=",5}{string.Join("", Enumerable.Repeat("=", 88)),5}");
+                Logger.Info($"{"|",5}{Feature,-70} {"|",5} {Count,5} {"|",5}");
+                Logger.Info($"{"=",5}{string.Join("", Enumerable.Repeat("=", 88)),5}");
+                foreach (var item in printData)
+                {
+                    if (item.Key == "Packages Not Uploaded Due To Error" || item.Key == "Packages Not Existing in Remote Cache")
+                    {
+                        if (item.Value > 0)
+                        {
+                            Logger.Error($"{"|",5}{item.Key,-70} {"|",5} {item.Value,5} {"|",5}");
+                            Logger.Error($"{"-",5}{string.Join("", Enumerable.Repeat("-", 88)),5}");
+                        }
+                        else
+                        {
+                            Logger.Info($"{"|",5}{item.Key,-70} {"|",5} {item.Value,5} {"|",5}");
+                            Logger.Info($"{"-",5}{string.Join("", Enumerable.Repeat("-", 88)),5}");
+                        }
+                    }
+                    else
+                    {
+
+                        Logger.Info($"{"|",5}{item.Key,-70} {"|",5} {item.Value,5} {"|",5}");
+                        Logger.Info($"{"-",5}{string.Join("", Enumerable.Repeat("-", 88)),5}");
+                    }
+
+                }
+
+                foreach (var item in printTimingData)
+                {
+                    Logger.Info($"\n{TimeTakenBy,8} {item.Key,-5} {":",1} {item.Value,8} s\n");
+                }
+            }
+
+        }
         public static void WriteToSpectreConsoleTable(Dictionary<string, int> printData, Dictionary<string, double> printTimingData, string ProjectSummaryLink)
         {
             SafeSpectreAction(() =>
@@ -276,8 +349,20 @@ namespace LCT.Common.Logging
             foreach (var item in printTimingData)
             {
                 string timeFormatted = item.Value.ToString("F2");
-                Color timeColor = item.Value > 60 ? Color.Cyan1 :
-                                 item.Value > 30 ? Color.Yellow : Color.Green;
+
+                Color timeColor;
+                if (item.Value > 60)
+                {
+                    timeColor = Color.Cyan1;
+                }
+                else if (item.Value > 30)
+                {
+                    timeColor = Color.Yellow;
+                }
+                else
+                {
+                    timeColor = Color.Green;
+                }
 
                 string operationName = item.Key.Length > 50 ? string.Concat(item.Key.AsSpan(0, 47), "...") : item.Key;
                 table.AddRow(operationName, $"[{timeColor}]{timeFormatted}[/]");
@@ -306,29 +391,7 @@ namespace LCT.Common.Logging
             _colorIndex++;
 
             return assignedColor;
-        }
-
-        private static void DisplaySimpleSummary(Dictionary<string, int> printData, Dictionary<string, double> printTimingData)
-        {
-            WriteInfoWithMarkup("[green bold]Package Summary:[/]");
-            WriteLine();
-
-            foreach (var item in printData)
-            {
-                string color = GetColorForItem(item.Key, item.Value);
-                WriteInfoWithMarkup($"[{color}]{item.Key}: {item.Value}[/]");
-            }
-
-            if (printTimingData.Count != 0)
-            {
-                WriteLine();
-                WriteInfoWithMarkup("[yellow bold]Timing Summary:[/]");
-                foreach (var item in printTimingData)
-                {
-                    WriteInfoWithMarkup($"[cyan]{item.Key}: {item.Value:F2} seconds[/]");
-                }
-            }
-        }
+        }        
 
         public static void WriteInternalComponentsTableInCli(List<Component> internalComponents)
         {
@@ -399,25 +462,7 @@ namespace LCT.Common.Logging
                 Logger.Info("\n");
             }
         }
-        private static void WriteInternalComponentsListToKpiFallback(List<Component> internalComponents)
-        {
-            const string Name = "Name";
-            const string Version = "Version";
-
-            WriteFallback("* Internal Components Identified which will not be sent for clearing:", "Alert");
-            WriteFallback($"{"=",5}{string.Join("", Enumerable.Repeat("=", 98)),5}", "Alert");
-            WriteFallback($"{"|",5}{Name,-45} {"|",5} {Version,35} {"|",10}", "Alert");
-            WriteFallback($"{"=",5}{string.Join("", Enumerable.Repeat("=", 98)),5}", "Alert");
-
-            foreach (var item in internalComponents)
-            {
-                WriteFallback($"{"|",5}{item.Name,-45} {"|",5} {item.Version,35} {"|",10}", "Alert");
-                WriteFallback($"{"-",5}{string.Join("", Enumerable.Repeat("-", 98)),5}", "Alert");
-            }
-
-            WriteLine();
-        }
-
+        
         public static void SpectreConsoleInitialMessage()
         {
             if (LoggerFactory.UseSpectreConsole)
