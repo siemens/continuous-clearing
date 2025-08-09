@@ -78,26 +78,6 @@ namespace LCT.PackageIdentifier
             CommonHelper.ProjectSummaryLink = bomKpiData.ProjectSummaryLink;
             LoggerHelper.WriteToConsoleTable(printList, printTimingList, bomKpiData.ProjectSummaryLink);
         }
-        public void WriteInternalComponentsListToKpi(List<Component> internalComponents)
-        {
-            const string Name = "Name";
-            const string Version = "Version";
-
-            if (internalComponents?.Count > 0)
-            {
-                Logger.Logger.Log(null, Level.Alert, "* Internal Components Identified which will not be sent for clearing:", null);
-                Logger.Logger.Log(null, Level.Alert, $"{"=",5}{string.Join("", Enumerable.Repeat("=", 98)),5}", null);
-                Logger.Logger.Log(null, Level.Alert, $"{"|",5}{Name,-45} {"|",5} {Version,35} {"|",10}", null);
-                Logger.Logger.Log(null, Level.Alert, $"{"=",5}{string.Join("", Enumerable.Repeat("=", 98)),5}", null);
-
-                foreach (var item in internalComponents)
-                {
-                    Logger.Logger.Log(null, Level.Alert, $"{"|",5}{item.Name,-45} {"|",5} {item.Version,35} {"|",10}", null);
-                    Logger.Logger.Log(null, Level.Alert, $"{"-",5}{string.Join("", Enumerable.Repeat("-", 98)),5}", null);
-                }
-                Logger.Info("\n");
-            }
-        }
         public static void NamingConventionOfSPDXFile(string filepath, CommonAppSettings appSettings)
         {
             string filename = Path.GetFileName(filepath);

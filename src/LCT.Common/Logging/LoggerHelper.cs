@@ -223,64 +223,60 @@ namespace LCT.Common.Logging
                     break;
                 case "error":
                     Logger.Error(logMessage);
-                    break;
-                case "success":
-                case "notice":
-                case "header":
-                case "panel":
-                case "alert":
+                    break;                
                 default:
                     Logger.Info(logMessage);
                     break;
             }
         }
-        public static void WriteToConsoleTable(Dictionary<string, int> printData, Dictionary<string, double> printTimingData,string ProjectSummaryLink)
+        public static void WriteToConsoleTable(Dictionary<string, int> printData, Dictionary<string, double> printTimingData, string ProjectSummaryLink)
         {
             if (LoggerFactory.UseSpectreConsole)
             {
                 WriteToSpectreConsoleTable(printData, printTimingData, ProjectSummaryLink);
+                return;
+            }
+
+            const string Count = "Count";
+            const string Feature = "Feature";
+            const string TimeTakenBy = "Time Taken By";
+            Logger.Info("\n");
+            Logger.Info("Summary :\n");
+            if (!string.IsNullOrWhiteSpace(ProjectSummaryLink))
+            {
+                Logger.Info($"{ProjectSummaryLink}");
+            }
+            string separator = $"{"=",5}{string.Join("", Enumerable.Repeat("=", 88)),5}";
+            Logger.Info(separator);
+            Logger.Info($"{"|",5}{Feature,-70} {"|",5} {Count,5} {"|",5}");
+            Logger.Info(separator);
+
+            foreach (var item in printData)
+            {
+                LogTableRow(item.Key, item.Value);
+            }
+
+            foreach (var item in printTimingData)
+            {
+                Logger.Info($"\n{TimeTakenBy,8} {item.Key,-5} {":",1} {item.Value,8} s\n");
+            }
+        }
+
+        private static void LogTableRow(string key, int value)
+        {
+            string row = $"{"|",5}{key,-70} {"|",5} {value,5} {"|",5}";
+            string separator = $"{"-",5}{string.Join("", Enumerable.Repeat("-", 88)),5}";
+
+            if ((key == "Packages Not Uploaded Due To Error" || key == "Packages Not Existing in Remote Cache") && value > 0)
+            {
+                Logger.Error(row);
+                Logger.Error(separator);
             }
             else
             {
-                const string Count = "Count";
-                const string Feature = "Feature";
-                const string TimeTakenBy = "Time Taken By";
-                Logger.Info("\n");
-                Logger.Info("Summary :\n");
-                if (!string.IsNullOrWhiteSpace(ProjectSummaryLink)) { Logger.Info($"{ProjectSummaryLink}"); }
-                Logger.Info($"{"=",5}{string.Join("", Enumerable.Repeat("=", 88)),5}");
-                Logger.Info($"{"|",5}{Feature,-70} {"|",5} {Count,5} {"|",5}");
-                Logger.Info($"{"=",5}{string.Join("", Enumerable.Repeat("=", 88)),5}");
-                foreach (var item in printData)
-                {
-                    if (item.Key == "Packages Not Uploaded Due To Error" || item.Key == "Packages Not Existing in Remote Cache")
-                    {
-                        if (item.Value > 0)
-                        {
-                            Logger.Error($"{"|",5}{item.Key,-70} {"|",5} {item.Value,5} {"|",5}");
-                            Logger.Error($"{"-",5}{string.Join("", Enumerable.Repeat("-", 88)),5}");
-                        }
-                        else
-                        {
-                            Logger.Info($"{"|",5}{item.Key,-70} {"|",5} {item.Value,5} {"|",5}");
-                            Logger.Info($"{"-",5}{string.Join("", Enumerable.Repeat("-", 88)),5}");
-                        }
-                    }
-                    else
-                    {
-
-                        Logger.Info($"{"|",5}{item.Key,-70} {"|",5} {item.Value,5} {"|",5}");
-                        Logger.Info($"{"-",5}{string.Join("", Enumerable.Repeat("-", 88)),5}");
-                    }
-
-                }
-
-                foreach (var item in printTimingData)
-                {
-                    Logger.Info($"\n{TimeTakenBy,8} {item.Key,-5} {":",1} {item.Value,8} s\n");
-                }
+                Logger.Info(row);
+                Logger.Info(separator);
             }
-
         }
         public static void WriteToSpectreConsoleTable(Dictionary<string, int> printData, Dictionary<string, double> printTimingData, string ProjectSummaryLink)
         {

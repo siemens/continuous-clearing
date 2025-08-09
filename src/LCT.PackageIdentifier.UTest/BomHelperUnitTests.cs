@@ -542,25 +542,6 @@ namespace LCT.PackageIdentifier.UTest
             mock.Object.WriteBomKpiDataToConsole(new BomKpiData());
             mock.Verify(x => x.WriteBomKpiDataToConsole(It.IsAny<BomKpiData>()), Times.Once);
         }
-
-
-        [TestCase]
-        public void Test_WriteInternalComponentsListToKpi()
-        {
-            var lstComponentForBOM = new List<Component>()
-            {
-                new Component()
-                {
-                 Name="Test",
-                 Version="1",
-                }
-            };
-
-            IBomHelper helper = new BomHelper();
-            helper.WriteInternalComponentsListToKpi(lstComponentForBOM);
-            Assert.That(lstComponentForBOM.Count, Is.EqualTo(1));
-        }
-
         [TestCase]
         public void TestGetHashCodeUsingNpmView_InputNameAndVersion_ReturnsHashCode()
         {
