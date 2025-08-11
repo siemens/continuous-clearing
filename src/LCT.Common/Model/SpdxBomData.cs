@@ -8,9 +8,6 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LCT.Common.Model
 {
@@ -81,7 +78,7 @@ namespace LCT.Common.Model
     {
         [JsonProperty("fileName")]
         public string FileName { get; set; }
-        
+
         public string SPDXID { get; set; }
 
         [JsonProperty("fileTypes")]
@@ -104,7 +101,7 @@ namespace LCT.Common.Model
     {
         [JsonProperty("name")]
         public string Name { get; set; }
-        
+
         public string SPDXID { get; set; }
 
         [JsonProperty("versionInfo")]

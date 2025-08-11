@@ -24,7 +24,7 @@ namespace LCT.Common
         private readonly CommonAppSettings appSettings_;
 
         public TelemetryHelper(CommonAppSettings appSettings)
-        {            
+        {
             Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
             appSettings_ = appSettings ?? new CommonAppSettings();
 
@@ -43,8 +43,8 @@ namespace LCT.Common
                 InitializeAndTrackEvent(TelemetryConstant.ToolName, catoolVersion, telemetryFor
                                                     , appSettings_);
                 TrackKpiDataTelemetry(telemetryFor, kpiData);
-            }            
-            catch (Exception ex ) when (ex is ArgumentNullException or IOException)
+            }
+            catch (Exception ex) when (ex is ArgumentNullException or IOException)
             {
                 Logger.Error($"An error occurred: {ex.Message}");
                 TrackException(ex);

@@ -33,7 +33,6 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using UnitTestUtilities;
-using static System.Net.WebRequestMethods;
 
 
 namespace LCT.SW360PackageCreator.UTest
@@ -126,7 +125,7 @@ namespace LCT.SW360PackageCreator.UTest
         public async Task IfAlreadyReleaseExistsUploadSourceCodeAndUrlInSW360_ShouldAttachSourcesToReleases_WhenAttachmentUrlListIsNotEmpty()
         {
             // Arrange
-            var item = new ComparisonBomData { ApprovedStatus = Dataconstant.NewClearing,DownloadUrl= "http://example.com/source" };
+            var item = new ComparisonBomData { ApprovedStatus = Dataconstant.NewClearing, DownloadUrl = "http://example.com/source" };
             var releasesInfo = new ReleasesInfo { SourceCodeDownloadUrl = "http://example.com/download" };
             var releaseId = "release123";
             var attachmentUrlList = new Dictionary<string, string> { { "SOURCE", "http://example.com/source" } };
@@ -338,7 +337,7 @@ namespace LCT.SW360PackageCreator.UTest
         public async Task CreateComponentInSw360_ShouldCreateComponentsAndWriteFiles()
         {
             // Arrange
-           
+
             var appSettings = new CommonAppSettings
             {
                 SW360 = new SW360
@@ -514,8 +513,8 @@ namespace LCT.SW360PackageCreator.UTest
                 ReleaseID = "89768ae1b0ea9dc061328b8f32792cbd"
 
             };
-            
-           
+
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360() { URL = "http://localhost:8081/" },
@@ -543,8 +542,8 @@ namespace LCT.SW360PackageCreator.UTest
                 Name = "test",
                 Version = "1",
                 ReleaseID = "89768ae1b0ea9dc061328b8f32792cbd"
-            };            
-            
+            };
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360() { URL = "http://localhost:8081/" },
@@ -578,7 +577,7 @@ namespace LCT.SW360PackageCreator.UTest
                 {
                     new Component() { Name = "adduser",Version="3.118",Group="",Purl="pkg:deb/debian/adduser@3.118@arch=source",Properties = properties },
                 };
-                                   
+
             CommonAppSettings CommonAppSettings = new()
             {
                 SW360 = new SW360() { ProjectName = "Test" },
@@ -628,8 +627,8 @@ namespace LCT.SW360PackageCreator.UTest
                 {
                     new Component() { Name = "newtonsoft",Version="3.1.18",Group="",Purl="pkg:nuget/newtonsoft@3.1.18",Properties = properties },
                 };
-            
-           
+
+
             CommonAppSettings CommonAppSettings = new()
             {
                 SW360 = new SW360() { ProjectName = "Test" },
@@ -679,8 +678,8 @@ namespace LCT.SW360PackageCreator.UTest
                 {
                     new Component() { Name = "newtonsoft",Version="3.1.18",Group="",Purl="pkg:nuget/newtonsoft@3.1.18",Properties = properties }
                 };
-            
-            
+
+
             CommonAppSettings commonAppSettings = new CommonAppSettings()
             {
                 SW360 = new SW360() { IgnoreDevDependency = false, ProjectName = "Test" },
@@ -724,7 +723,7 @@ namespace LCT.SW360PackageCreator.UTest
                 {
                     new Component() { Name = "apk-tools",Version="2.12.9-r3",Group="",BomRef="pkg:apk/alpine/alpine-keys@2.4-r1?distro=alpine-3.16.2",Purl="pkg:apk/alpine/apk-tools@2.12.9-r3?arch=source",Properties = properties },
                 };
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
 
@@ -1077,7 +1076,7 @@ namespace LCT.SW360PackageCreator.UTest
                 ReleaseID = "89768ae1b0ea9dc061328b8f32792cbd"
             };
 
-           
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360() { URL = "http://localhost:8081/" },

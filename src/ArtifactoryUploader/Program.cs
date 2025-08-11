@@ -12,7 +12,6 @@ using LCT.APICommunications.Model;
 using LCT.ArtifactoryUploader;
 using LCT.Common;
 using LCT.Common.Constants;
-using LCT.Common.Interface;
 using LCT.Common.Model;
 using LCT.Facade;
 using LCT.Facade.Interfaces;

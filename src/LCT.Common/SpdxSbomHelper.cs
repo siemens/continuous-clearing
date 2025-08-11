@@ -14,7 +14,7 @@ namespace LCT.Common
 {
     public static class SpdxSbomHelper
     {
-        public static void CheckValidComponentsFromSpdxfile(Bom bom, string projectType,ref Bom listOfUnsupportedComponents)
+        public static void CheckValidComponentsFromSpdxfile(Bom bom, string projectType, ref Bom listOfUnsupportedComponents)
         {
             List<Component> listUnsupportedComponents = new List<Component>();
             List<Dependency> listUnsupportedDependencies = new List<Dependency>();

@@ -71,7 +71,7 @@ namespace LCT.ArtifactoryUploader
                     components.CopyPackageApiUrl = GetCopyURL(components);
                     components.MovePackageApiUrl = GetMoveURL(components);
                     components.JfrogPackageName = GetJfrogPackageName(components);
-                    components.JfrogRepoPath=GetJfrogRepPath(components);
+                    components.JfrogRepoPath = GetJfrogRepPath(components);
                     componentsToBeUploaded.Add(components);
                 }
                 else
