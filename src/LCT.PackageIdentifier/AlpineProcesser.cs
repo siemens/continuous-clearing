@@ -22,7 +22,7 @@ using System.Threading.Tasks;
 namespace LCT.PackageIdentifier
 {
     /// <summary>
-    /// The AlpineProcessor class
+    /// The Alpine Processor class
     /// </summary>
     public class AlpineProcessor(ICycloneDXBomParser cycloneDXBomParser, ISpdxBomParser spdxBomParser) : IParser
     {
