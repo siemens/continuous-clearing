@@ -88,7 +88,7 @@ namespace LCT.APICommunications
                     HttpWebResponse httpResponse = (HttpWebResponse)response;
                     HandleAcceptedStatus(httpResponse, comparisonBomData);
                     using StreamReader reader = new StreamReader(response.GetResponseStream());
-                    reader.ReadToEnd();                    
+                    reader.ReadToEnd();
                 }
             }
             catch (UriFormatException ex)

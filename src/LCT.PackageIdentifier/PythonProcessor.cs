@@ -27,7 +27,7 @@ using Dependency = CycloneDX.Models.Dependency;
 
 namespace LCT.PackageIdentifier
 {
-    public class PythonProcessor(ICycloneDXBomParser cycloneDXBomParser,ISpdxBomParser spdxBomParser) : IParser
+    public class PythonProcessor(ICycloneDXBomParser cycloneDXBomParser, ISpdxBomParser spdxBomParser) : IParser
     {
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
 
@@ -36,13 +36,13 @@ namespace LCT.PackageIdentifier
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
         private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
 
-        public Bom ParsePackageFile(CommonAppSettings appSettings,ref Bom unSupportedBomList)
+        public Bom ParsePackageFile(CommonAppSettings appSettings, ref Bom unSupportedBomList)
         {
             List<string> configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Poetry);
             List<PythonPackage> listofComponents = new List<PythonPackage>();
             Bom bom = new Bom();
             List<Component> listComponentForBOM;
-            List<Dependency> dependencies = new List<Dependency>();           
+            List<Dependency> dependencies = new List<Dependency>();
             List<string> listOfTemplateBomfilePaths = new List<string>();
             foreach (string config in configFiles)
             {
@@ -139,7 +139,7 @@ namespace LCT.PackageIdentifier
                     // By Default Tommy.TomlLazy is coming instead of Null or empty
                     Isdevdependent = (node["category"].ToString() != "main" && node["category"].ToString() != "Tommy.TomlLazy"),
                     FoundType = Dataconstant.Discovered,
-                    SpdxComponentDetails=new SpdxComponentInfo()
+                    SpdxComponentDetails = new SpdxComponentInfo()
                 };
 
                 if (pythonPackage.Isdevdependent)
@@ -203,7 +203,7 @@ namespace LCT.PackageIdentifier
                 BomHelper.NamingConventionOfSPDXFile(filePath, appSettings);
                 Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
                 bom = _spdxBomParser.ParseSPDXBom(filePath);
-                SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bom, appSettings.ProjectType,ref listUnsupportedComponents);
+                SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bom, appSettings.ProjectType, ref listUnsupportedComponents);
                 SpdxSbomHelper.AddSpdxSBomFileNameProperty(ref bom, filePath);
                 SpdxSbomHelper.AddSpdxPropertysForUnsupportedComponents(listUnsupportedComponents.Components, filePath);
                 ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
@@ -213,7 +213,7 @@ namespace LCT.PackageIdentifier
             {
                 bom = _cycloneDXBomParser.ParseCycloneDXBom(filePath);
                 CycloneDXBomParser.CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
-            }            
+            }
 
             foreach (var componentsInfo in bom.Components)
             {
@@ -225,7 +225,7 @@ namespace LCT.PackageIdentifier
                     PurlID = componentsInfo.Purl,
                     SpdxComponentDetails = new SpdxComponentInfo(),
                 };
-                SetSpdxComponentDetails(filePath, package,componentsInfo);
+                SetSpdxComponentDetails(filePath, package, componentsInfo);
 
                 if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["POETRY"]))
                 {
@@ -286,7 +286,7 @@ namespace LCT.PackageIdentifier
         private static Bom RemoveExcludedComponents(CommonAppSettings appSettings,
             Bom cycloneDXBOM)
         {
-            return CommonHelper.RemoveExcludedComponentsFromBom(appSettings, cycloneDXBOM, 
+            return CommonHelper.RemoveExcludedComponentsFromBom(appSettings, cycloneDXBOM,
                 noOfExcludedComponents => BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents);
         }
 
@@ -297,10 +297,10 @@ namespace LCT.PackageIdentifier
                 await bomhelper.GetPypiListOfComponentsFromRepo(appSettings.Poetry.Artifactory.InternalRepos, jFrogService);
 
             var inputIterationList = componentData.comparisonBOMData;
-            
+
             // Use the common helper method
             var (processedComponents, internalComponents) = CommonHelper.ProcessInternalComponentIdentification(
-                inputIterationList, 
+                inputIterationList,
                 component => IsInternalPythonComponent(aqlResultList, component, bomhelper));
 
             // update the comparison bom data
@@ -375,7 +375,7 @@ namespace LCT.PackageIdentifier
             {
                 BomCreator.bomKpiData.DevdependencyComponents++;
             }
-            
+
             if (appSettings.Poetry.Artifactory.ThirdPartyRepos != null)
             {
                 foreach (var thirdPartyRepo in appSettings.Poetry.Artifactory.ThirdPartyRepos)
@@ -387,7 +387,7 @@ namespace LCT.PackageIdentifier
                     }
                 }
             }
-            
+
             if (repoValue == appSettings.Poetry.ReleaseRepo)
             {
                 BomCreator.bomKpiData.ReleaseRepoComponents++;
@@ -494,7 +494,7 @@ namespace LCT.PackageIdentifier
                 identifierTypeValue);
             component.Properties = properties;
         }
-        private static void SetSpdxComponentDetails(string filePath, PythonPackage package,Component componentInfo)
+        private static void SetSpdxComponentDetails(string filePath, PythonPackage package, Component componentInfo)
         {
             if (filePath.EndsWith(FileConstant.SPDXFileExtension))
             {

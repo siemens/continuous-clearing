@@ -32,7 +32,7 @@ namespace LCT.PackageIdentifier
     /// <summary>
     /// Parses the Conan Packages
     /// </summary>
-    public class ConanProcessor(ICycloneDXBomParser cycloneDXBomParser,ISpdxBomParser spdxBomParser) : CycloneDXBomParser, IParser
+    public class ConanProcessor(ICycloneDXBomParser cycloneDXBomParser, ISpdxBomParser spdxBomParser) : CycloneDXBomParser, IParser
     {
         #region fields
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
@@ -46,7 +46,7 @@ namespace LCT.PackageIdentifier
         #endregion
 
         #region public methods
-        public Bom ParsePackageFile(CommonAppSettings appSettings,ref Bom unSupportedBomList)
+        public Bom ParsePackageFile(CommonAppSettings appSettings, ref Bom unSupportedBomList)
         {
             List<Component> componentsForBOM;
             Bom bom = new Bom();
@@ -85,7 +85,7 @@ namespace LCT.PackageIdentifier
                 await bomhelper.GetListOfComponentsFromRepo(appSettings.Conan.Artifactory.InternalRepos, jFrogService);
             var inputIterationList = componentData.comparisonBOMData;
             var (processedComponents, internalComponents) = CommonHelper.ProcessInternalComponentIdentification(
-                inputIterationList, 
+                inputIterationList,
                 component => IsInternalConanComponent(aqlResultList, component));
             componentData.comparisonBOMData = processedComponents;
             componentData.internalComponents = internalComponents;
@@ -255,11 +255,11 @@ namespace LCT.PackageIdentifier
                     BomHelper.NamingConventionOfSPDXFile(filepath, appSettings);
                     Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
                     bom = _spdxBomParser.ParseSPDXBom(filepath);
-                    SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bom, appSettings.ProjectType,ref listUnsupportedComponents);
+                    SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bom, appSettings.ProjectType, ref listUnsupportedComponents);
                     SpdxSbomHelper.AddSpdxSBomFileNameProperty(ref bom, filepath);
                     componentsForBOM.AddRange(bom.Components);
                     dependencies.AddRange(bom.Dependencies);
-                    SpdxSbomHelper.AddSpdxPropertysForUnsupportedComponents(listUnsupportedComponents.Components,filepath);
+                    SpdxSbomHelper.AddSpdxPropertysForUnsupportedComponents(listUnsupportedComponents.Components, filepath);
                     ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
                     ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
                 }
@@ -522,7 +522,7 @@ namespace LCT.PackageIdentifier
 
                 if (identifiedBy == "PackageFile")
                 {
-                    var properties= component.Properties;
+                    var properties = component.Properties;
                     CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
                         Dataconstant.Cdx_IdentifierType,
                         Dataconstant.Discovered);
@@ -553,7 +553,7 @@ namespace LCT.PackageIdentifier
 
         private static Bom RemoveExcludedComponents(CommonAppSettings appSettings, Bom cycloneDXBOM)
         {
-            return CommonHelper.RemoveExcludedComponentsFromBom(appSettings, cycloneDXBOM, 
+            return CommonHelper.RemoveExcludedComponentsFromBom(appSettings, cycloneDXBOM,
                 noOfExcludedComponents => BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents);
         }
 
@@ -563,7 +563,7 @@ namespace LCT.PackageIdentifier
             {
                 // Initialize properties list if null, otherwise keep existing properties
                 component.Properties ??= new List<Property>();
-                var properties= component.Properties;
+                var properties = component.Properties;
                 // Use helper method to safely add properties without duplicates
                 CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
                     Dataconstant.Cdx_IsDevelopment,
@@ -571,7 +571,7 @@ namespace LCT.PackageIdentifier
                 CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
                     Dataconstant.Cdx_IdentifierType,
                     Dataconstant.ManullayAdded);
-                component.Properties= properties;
+                component.Properties = properties;
             }
         }
 

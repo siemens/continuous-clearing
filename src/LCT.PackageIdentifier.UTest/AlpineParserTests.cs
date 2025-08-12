@@ -31,9 +31,9 @@ namespace LCT.PackageIdentifier.UTest
 
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             cycloneDXBomParser.Setup(x => x.ParseCycloneDXBom(It.IsAny<string>())).Returns(bom);
-            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();            
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
 
-            _alpineProcessor = new AlpineProcessor(cycloneDXBomParser.Object,spdxBomParser.Object);
+            _alpineProcessor = new AlpineProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
         }
 
         [Test]
@@ -46,7 +46,7 @@ namespace LCT.PackageIdentifier.UTest
 
             string[] Includes = { "*_Alpine.cdx.json" };
 
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "ALPINE",
@@ -59,7 +59,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings,ref ListUnsupportedComponentsForBom);
+            Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count),
@@ -75,7 +75,7 @@ namespace LCT.PackageIdentifier.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "CycloneDX_Alpine.cdx.json" };
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
 
@@ -105,7 +105,7 @@ namespace LCT.PackageIdentifier.UTest
             string OutFolder = Path.GetDirectoryName(exePath);
 
             string[] Includes = { "*_Alpine.cdx.json" };
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "ALPINE",
@@ -134,7 +134,7 @@ namespace LCT.PackageIdentifier.UTest
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "AlpineSourceDetails_Cyclonedx.cdx.json" };
 
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "ALPINE",
@@ -164,7 +164,7 @@ namespace LCT.PackageIdentifier.UTest
             string[] Includes = { "CycloneDX_Alpine.cdx.json", "SBOMTemplate_Alpine.cdx.json", "SBOM_AlpineCATemplate.cdx.json" };
             string packagefilepath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"));
 
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "ALPINE",
@@ -178,7 +178,7 @@ namespace LCT.PackageIdentifier.UTest
 
 
             //Act
-            Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings,ref ListUnsupportedComponentsForBom);
+            Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count),

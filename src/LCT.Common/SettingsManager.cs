@@ -125,7 +125,7 @@ namespace LCT.Common
         }
 
         public void CheckRequiredArgsToRun(CommonAppSettings appSettings, string currentExe)
-        {           
+        {
 
             if (currentExe == "Identifer")
             {
