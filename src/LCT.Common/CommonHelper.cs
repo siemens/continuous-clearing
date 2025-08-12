@@ -18,7 +18,7 @@ using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using File = System.IO.File;
-using LCT.Common.Logging;
+using Level = log4net.Core.Level;
 
 namespace LCT.Common
 {
