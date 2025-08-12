@@ -76,7 +76,7 @@ namespace LCT.Common.ComplianceValidator
             return hasWarning;
         }
 
-        private Dictionary<string, ComplianceExceptionComponent> BuildPurlToComponentMap(IEnumerable<ComplianceExceptionComponent> components)
+        private static Dictionary<string, ComplianceExceptionComponent> BuildPurlToComponentMap(IEnumerable<ComplianceExceptionComponent> components)
         {
             var map = new Dictionary<string, ComplianceExceptionComponent>();
             foreach (var comp in components ?? Enumerable.Empty<ComplianceExceptionComponent>())
@@ -90,7 +90,7 @@ namespace LCT.Common.ComplianceValidator
             return map;
         }
 
-        private Dictionary<(string warning, string recommendation), List<string>> GroupBomDataByWarningAndRecommendation(
+        private static Dictionary<(string warning, string recommendation), List<string>> GroupBomDataByWarningAndRecommendation(
             List<ComparisonBomData> bomDataList,
             Dictionary<string, ComplianceExceptionComponent> purlToComponent)
         {
