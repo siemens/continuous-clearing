@@ -29,13 +29,14 @@ using YamlDotNet.Core;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 using Directory = System.IO.Directory;
+using File = System.IO.File;
 
 namespace LCT.SW360PackageCreator
 {
     /// <summary>
     /// URL Helper
     /// </summary>
-    public class UrlHelper : IUrlHelper, IDisposable
+    public partial class UrlHelper : IUrlHelper, IDisposable
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly HttpClient httpClient = new HttpClient();
@@ -74,7 +75,7 @@ namespace LCT.SW360PackageCreator
                 AlpinePackage alpinePackSourceDetails = await GetAlpineSourceUrl(componentName, componenVersion, localPathforSourceRepo);
                 componentsData.AlpineSourceData = alpinePackSourceDetails.SourceDataForAlpine;
                 componentsData.Name = alpinePackSourceDetails.Name;
-                componentsData.Version = Regex.Replace(alpinePackSourceDetails.Version, @"^[0-9]+:", "");
+                componentsData.Version = AlpineComponentVersionRegex().Replace(alpinePackSourceDetails.Version, "");
                 componentsData.ReleaseExternalId = GetReleaseExternalIdForAlpine(alpinePackSourceDetails.Name, alpinePackSourceDetails.Version);
                 componentsData.ComponentExternalId = GetComponentExternalIdForAlpine(alpinePackSourceDetails.Name);
                 componentsData.SourceUrl = string.IsNullOrEmpty(alpinePackSourceDetails.SourceUrl) ? Dataconstant.SourceUrlNotFound : alpinePackSourceDetails.SourceUrl;
@@ -91,7 +92,7 @@ namespace LCT.SW360PackageCreator
 
             string[] getDistro = bomRef.Split("distro");
             string[] getDestroVersion = getDistro[1].Split("-");
-            var output = getDestroVersion[1].Substring(0, getDestroVersion[1].Length - 2);
+            var output = getDestroVersion[1][..^2];
             var distro = output + "-stable";
             return distro;
         }
@@ -139,8 +140,8 @@ namespace LCT.SW360PackageCreator
                         int sourceLength = apkBuildTxt.IndexOf("source=\"") + "source=\"".Length;
                         int txtLengthFrom = apkBuildTxt.Length - sourceLength;
                         string textFrom = apkBuildTxt.Substring(sourceLength, txtLengthFrom);
-                        int textLengthTo = textFrom.IndexOf("\"") - "\"".Length + 1;
-                        sourceData = textFrom.Substring(0, textLengthTo);
+                        int textLengthTo = textFrom.IndexOf('\"') - 1 + 1;
+                        sourceData = textFrom[..textLengthTo];
                     }
                 }
             }
@@ -171,17 +172,17 @@ namespace LCT.SW360PackageCreator
 
                 if (pkgVersionLine != null)
                 {
-                    string[] pkgVersionValue = Regex.Split(pkgVersionLine, @"\=");
+                    string[] pkgVersionValue = AlpinePackagelineRegex().Split(pkgVersionLine);
                     pkgVersion = pkgVersionValue[1];
                 }
                 if (pkgNameLine != null)
                 {
-                    string[] pkgNameData = Regex.Split(pkgNameLine, @"\=");
+                    string[] pkgNameData = AlpinePackagelineRegex().Split(pkgNameLine);
                     pkgName = pkgNameData[1];
                 }
                 if (_tzcodeverLine != null)
                 {
-                    string[] _tzcodeverValue = Regex.Split(_tzcodeverLine, @"\=");
+                    string[] _tzcodeverValue = AlpinePackagelineRegex().Split(_tzcodeverLine);
                     _tzcodever = _tzcodeverValue[1];
                     if (_tzcodeverLine.Contains("pkgver"))
                     {
@@ -190,12 +191,12 @@ namespace LCT.SW360PackageCreator
                 }
                 if (_commitLine != null)
                 {
-                    string[] _commit = Regex.Split(_commitLine, @"\=");
+                    string[] _commit = AlpinePackagelineRegex().Split(_commitLine);
                     _commitValue = _commit[1].Trim('"');
                 }
                 if (sourceData.Contains("https"))
                 {
-                    Match url = Regex.Match(sourceData, @"http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=$]*)?");
+                    Match url = AlpineSourceDataRegex().Match(sourceData);
                     string finalUrl = url.ToString();
                     sourceUrl = finalUrl.Replace("$pkgver", pkgVersion).Replace("$pkgname", pkgName).Replace("$_commit", _commitValue).Replace("$_tzcodever", _tzcodever);
                     if (pkgVersion == null && _commitValue == null && _tzcodever == null)
@@ -338,7 +339,7 @@ namespace LCT.SW360PackageCreator
             }
 
             componentsData.Name = debianPackSourceDetails.Name;
-            componentsData.Version = Regex.Replace(debianPackSourceDetails.Version, @"^[0-9]+:", "");
+            componentsData.Version = DebianComponentVersionRegex().Replace(debianPackSourceDetails.Version, "");
             componentsData.ReleaseExternalId = GetReleaseExternalId(debianPackSourceDetails.Name, debianPackSourceDetails.Version);
             componentsData.ComponentExternalId = GetComponentExternalId(debianPackSourceDetails.Name);
             componentsData.SourceUrl = string.IsNullOrEmpty(debianPackSourceDetails.SourceUrl) ? Dataconstant.SourceUrlNotFound : debianPackSourceDetails.SourceUrl;
@@ -436,7 +437,7 @@ namespace LCT.SW360PackageCreator
             var downLoadUrl = $"{CommonAppSettings.SourceURLConan}" + componentName + "/all/conandata.yml";
             var deserializer = new DeserializerBuilder().WithNamingConvention(UnderscoredNamingConvention.Instance).Build();
             string componentSrcURL = string.Empty;
-            Sources packageSourcesInfo = new Sources();
+
             using (HttpClient _httpClient = new HttpClient())
             {
                 try
@@ -445,10 +446,10 @@ namespace LCT.SW360PackageCreator
                     var response = await _httpClient.SendAsync(request);
                     response.EnsureSuccessStatusCode();
                     var jsonObject = await response.Content.ReadAsStringAsync();
-                    packageSourcesInfo = deserializer.Deserialize<Sources>(jsonObject);
+                    Sources packageSourcesInfo = deserializer.Deserialize<Sources>(jsonObject);
                     if (packageSourcesInfo.SourcesData.TryGetValue(componenVersion, out var release))
                     {
-                        if (release.Url.GetType().Name.ToLowerInvariant() == "string")
+                        if (release.Url.GetType().Name.Equals("string", StringComparison.InvariantCultureIgnoreCase))
                         {
                             componentSrcURL = release.Url.ToString();
                         }
@@ -899,6 +900,13 @@ namespace LCT.SW360PackageCreator
 
             _disposed = true;
         }
-
+        [GeneratedRegex(@"^[0-9]+:")]
+        private static partial Regex DebianComponentVersionRegex();
+        [GeneratedRegex(@"http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=$]*)?")]
+        private static partial Regex AlpineSourceDataRegex();
+        [GeneratedRegex(@"^[0-9]+:")]
+        private static partial Regex AlpineComponentVersionRegex();
+        [GeneratedRegex(@"\=")]
+        private static partial Regex AlpinePackagelineRegex();
     }
 }

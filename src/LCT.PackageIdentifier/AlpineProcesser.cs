@@ -7,11 +7,13 @@
 using CycloneDX.Models;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Interface;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -20,25 +22,22 @@ using System.Threading.Tasks;
 namespace LCT.PackageIdentifier
 {
     /// <summary>
-    /// The AlpineProcessor class
+    /// The Alpine Processor class
     /// </summary>
-    public class AlpineProcessor : IParser
+    public class AlpineProcessor(ICycloneDXBomParser cycloneDXBomParser, ISpdxBomParser spdxBomParser) : IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private readonly ICycloneDXBomParser _cycloneDXBomParser;
-        public AlpineProcessor(ICycloneDXBomParser cycloneDXBomParser)
-        {
-            _cycloneDXBomParser = cycloneDXBomParser;
-        }
+        private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
+        private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
+        private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
 
         #region public method
 
-        public Bom ParsePackageFile(CommonAppSettings appSettings)
+        public Bom ParsePackageFile(CommonAppSettings appSettings, ref Bom unSupportedBomList)
         {
             List<string> configFiles;
             List<AlpinePackage> listofComponents = new List<AlpinePackage>();
             Bom bom = new Bom();
-            List<Component> listComponentForBOM;
             List<Dependency> dependenciesForBOM = new();
 
             configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Alpine);
@@ -52,16 +51,19 @@ namespace LCT.PackageIdentifier
                 else
                 {
                     Logger.Debug($"ParsePackageFile():FileName: " + filepath);
-                    listofComponents.AddRange(ParseCycloneDX(filepath, dependenciesForBOM));
+                    listofComponents.AddRange(ParseCycloneDX(filepath, dependenciesForBOM, appSettings));
                 }
 
             }
 
             int initialCount = listofComponents.Count;
+            int totalUnsupportedComponents = ListUnsupportedComponentsForBom.Components.Count;
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += ListUnsupportedComponentsForBom.Components.Count;
             GetDistinctComponentList(ref listofComponents);
-            listComponentForBOM = FormComponentReleaseExternalID(listofComponents);
+            List<Component> listComponentForBOM = FormComponentReleaseExternalID(listofComponents);
             BomCreator.bomKpiData.DuplicateComponents = initialCount - listComponentForBOM.Count;
-
+            ListUnsupportedComponentsForBom.Components = ListUnsupportedComponentsForBom.Components.Distinct(new ComponentEqualityComparer()).ToList();
+            BomCreator.bomKpiData.DuplicateComponents += totalUnsupportedComponents - ListUnsupportedComponentsForBom.Components.Count;
             bom.Components = listComponentForBOM;
             bom.Dependencies = dependenciesForBOM;
             string templateFilePath = SbomTemplate.GetFilePathForTemplate(listOfTemplateBomfilePaths);
@@ -70,24 +72,15 @@ namespace LCT.PackageIdentifier
 
             bom = RemoveExcludedComponents(appSettings, bom);
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
+            unSupportedBomList.Components = ListUnsupportedComponentsForBom.Components;
+            unSupportedBomList.Dependencies = ListUnsupportedComponentsForBom.Dependencies;
             return bom;
         }
 
         public static Bom RemoveExcludedComponents(CommonAppSettings appSettings, Bom cycloneDXBOM)
         {
-            List<Component> componentForBOM = cycloneDXBOM.Components.ToList();
-            List<Dependency> dependenciesForBOM = cycloneDXBOM.Dependencies?.ToList() ?? new List<Dependency>();
-            int noOfExcludedComponents = 0;
-            if (appSettings?.SW360?.ExcludeComponents != null)
-            {
-                componentForBOM = CommonHelper.RemoveExcludedComponents(componentForBOM, appSettings?.SW360?.ExcludeComponents, ref noOfExcludedComponents);
-                dependenciesForBOM = CommonHelper.RemoveInvalidDependenciesAndReferences(componentForBOM, dependenciesForBOM);
-                BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents;
-
-            }
-            cycloneDXBOM.Components = componentForBOM;
-            cycloneDXBOM.Dependencies = dependenciesForBOM;
-            return cycloneDXBOM;
+            return CommonHelper.RemoveExcludedComponentsFromBom(appSettings, cycloneDXBOM,
+                noOfExcludedComponents => BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents);
         }
 
         public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM, CommonAppSettings appSettings,
@@ -115,16 +108,17 @@ namespace LCT.PackageIdentifier
 
         #region private methods
 
-        public List<AlpinePackage> ParseCycloneDX(string filePath, List<Dependency> dependenciesForBOM)
+        public List<AlpinePackage> ParseCycloneDX(string filePath, List<Dependency> dependenciesForBOM, CommonAppSettings appSettings)
         {
             List<AlpinePackage> alpinePackages = new List<AlpinePackage>();
-            ExtractDetailsForJson(filePath, ref alpinePackages, dependenciesForBOM);
+            ExtractDetailsForJson(filePath, ref alpinePackages, dependenciesForBOM, appSettings);
             return alpinePackages;
         }
 
-        private void ExtractDetailsForJson(string filePath, ref List<AlpinePackage> alpinePackages, List<Dependency> dependenciesForBOM)
+        private void ExtractDetailsForJson(string filePath, ref List<AlpinePackage> alpinePackages, List<Dependency> dependenciesForBOM, CommonAppSettings appSettings)
         {
-            Bom bom = _cycloneDXBomParser.ParseCycloneDXBom(filePath);
+            Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
+            Bom bom = BomHelper.ParseBomFile(filePath, _spdxBomParser, _cycloneDXBomParser, appSettings, ref listUnsupportedComponents);
             foreach (var componentsInfo in bom.Components)
             {
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;
@@ -133,7 +127,9 @@ namespace LCT.PackageIdentifier
                     Name = componentsInfo.Name,
                     Version = componentsInfo.Version,
                     PurlID = componentsInfo.Purl,
+                    SpdxComponentDetails = new SpdxComponentInfo(),
                 };
+                SetSpdxComponentDetails(filePath, package, componentsInfo);
 
                 if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["ALPINE"]))
                 {
@@ -151,6 +147,8 @@ namespace LCT.PackageIdentifier
             {
                 dependenciesForBOM.AddRange(bom.Dependencies);
             }
+            ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
+            ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
         }
 
         private static void GetDistinctComponentList(ref List<AlpinePackage> listofComponents)
@@ -172,9 +170,12 @@ namespace LCT.PackageIdentifier
 
         private static string GetDistro(AlpinePackage alpinePackage)
         {
-            var distro = alpinePackage.PurlID;
-            distro = distro.Substring(distro.LastIndexOf("distro"));
-            return distro;
+            var distroIndex = alpinePackage.PurlID.LastIndexOf("distro");
+            if (distroIndex == -1)
+            {
+                return string.Empty;
+            }
+            return alpinePackage.PurlID[distroIndex..];
         }
 
         private static List<Component> FormComponentReleaseExternalID(List<AlpinePackage> listOfComponents)
@@ -187,16 +188,39 @@ namespace LCT.PackageIdentifier
                 Component component = new Component
                 {
                     Name = prop.Name,
-                    Version = prop.Version,
-                    Purl = GetReleaseExternalId(prop.Name, prop.Version)
+                    Version = prop.Version
                 };
-                component.BomRef = $"{Dataconstant.PurlCheck()["ALPINE"]}{Dataconstant.ForwardSlash}{prop.Name}@{prop.Version}?{distro}";
+                component.Purl = GetReleaseExternalId(prop.Name, prop.Version);
+                component.BomRef = string.IsNullOrEmpty(distro) ? $"{Dataconstant.PurlCheck()["ALPINE"]}{Dataconstant.ForwardSlash}{prop.Name}@{prop.Version}" : $"{Dataconstant.PurlCheck()["ALPINE"]}{Dataconstant.ForwardSlash}{prop.Name}@{prop.Version}?{distro}";
                 component.Type = Component.Classification.Library;
-                Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.Discovered };
-                component.Properties = new List<Property> { identifierType };
+                AddComponentProperties(prop, component);
                 listComponentForBOM.Add(component);
             }
             return listComponentForBOM;
+        }
+        private static void AddComponentProperties(AlpinePackage prop, Component component)
+        {
+            if (prop.SpdxComponentDetails.SpdxComponent)
+            {
+                string fileName = Path.GetFileName(prop.SpdxComponentDetails.SpdxFilePath);
+                SpdxSbomHelper.AddSpdxComponentProperties(fileName, component);
+                SpdxSbomHelper.AddDevelopmentPropertyForSpdx(prop.SpdxComponentDetails.DevComponent, component);
+            }
+            else
+            {
+                Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.Discovered };
+                component.Properties ??= new List<Property>();
+                component.Properties.Add(identifierType);
+            }
+        }
+        private static void SetSpdxComponentDetails(string filePath, AlpinePackage package, Component componentInfo)
+        {
+            if (filePath.EndsWith(FileConstant.SPDXFileExtension))
+            {
+                package.SpdxComponentDetails.SpdxFilePath = filePath;
+                package.SpdxComponentDetails.SpdxComponent = true;
+                package.SpdxComponentDetails.DevComponent = componentInfo.Properties?.Any(x => x.Name == Dataconstant.Cdx_IsDevelopment && x.Value == "true") ?? false;
+            }
         }
 
         #endregion

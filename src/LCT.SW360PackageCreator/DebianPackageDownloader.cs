@@ -17,21 +17,17 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Directory = System.IO.Directory;
+using File = System.IO.File;
 
 namespace LCT.SW360PackageCreator
 {
     /// <summary>
     /// the DebianPackageDownloader class
     /// </summary>
-    public class DebianPackageDownloader : IPackageDownloader
+    public class DebianPackageDownloader(IDebianPatcher debianPatcher) : IPackageDownloader
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        readonly IDebianPatcher _debianPatcher;
-
-        public DebianPackageDownloader(IDebianPatcher debianPatcher)
-        {
-            _debianPatcher = debianPatcher;
-        }
+        readonly IDebianPatcher _debianPatcher = debianPatcher;
 
         public async Task<string> DownloadPackage(ComparisonBomData component, string localPathforDownload)
         {
@@ -43,9 +39,9 @@ namespace LCT.SW360PackageCreator
                 string patchedFolderPath = string.Empty;
                 Dictionary<string, string> fileInfo = await GetFileDetails(component, CurrentDownloadFolder);
 
-                if (fileInfo.ContainsKey("DSCFILE") && fileInfo["IsAllFileDownloaded"] == "YES")
+                if (fileInfo.TryGetValue("DSCFILE", out string dscFile) && fileInfo.TryGetValue("IsAllFileDownloaded", out string isAllFileDownloaded) && isAllFileDownloaded == "YES")
                 {
-                    patchedFolderPath = ApplyPatchforComponents(component, CurrentDownloadFolder, fileInfo["DSCFILE"]);
+                    patchedFolderPath = ApplyPatchforComponents(component, CurrentDownloadFolder, dscFile);
                 }
                 else
                 {

@@ -27,7 +27,9 @@ namespace LCT.PackageIdentifier
     {
         private static NugetDevDependencyParser instance = null;
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        public static List<string> NugetDirectDependencies = new List<string>();
+
+        private static readonly List<string> s_nugetDirectDependencies = new List<string>();
+        public static IReadOnlyList<string> NugetDirectDependencies => s_nugetDirectDependencies;
 
         private NugetDevDependencyParser()
         {
@@ -38,10 +40,7 @@ namespace LCT.PackageIdentifier
         {
             get
             {
-                if (instance == null)
-                {
-                    instance = new NugetDevDependencyParser();
-                }
+                instance ??= new NugetDevDependencyParser();
                 return instance;
             }
         }
@@ -192,7 +191,7 @@ namespace LCT.PackageIdentifier
             IEnumerable<JProperty> listChilds = projectFramworks.Children().OfType<JProperty>();
 
             //check has values
-            if (listChilds != null && listChilds.ToList()[0].HasValues)
+            if (listChilds.Any() && listChilds.First().HasValues)
             {
                 JToken projectDependencies = listChilds.ToList()[0].Value["dependencies"];
                 if (projectDependencies == null)
@@ -207,10 +206,7 @@ namespace LCT.PackageIdentifier
                 }
                 foreach (var child in directDepCollection)
                 {
-                    if (!NugetDirectDependencies.Contains(child.Name + " " + child.Value["version"]))
-                    {
-                        NugetDirectDependencies.Add(child.Name + " " + child.Value["version"]);
-                    }
+                    AddDirectDependency(child.Name + " " + child.Value["version"]);
                 }
             }
         }
@@ -361,6 +357,45 @@ namespace LCT.PackageIdentifier
 
             byte[] hash = hashAlgorithm.ComputeHash(fileStream);
             return Convert.ToHexString(hash).ToLowerInvariant();
+        }
+
+        /// <summary>
+        /// Adds a direct dependency to the collection if it doesn't already exist
+        /// </summary>
+        /// <param name="dependency">The dependency string to add</param>
+        public static void AddDirectDependency(string dependency)
+        {
+            if (!s_nugetDirectDependencies.Contains(dependency))
+            {
+                s_nugetDirectDependencies.Add(dependency);
+            }
+        }
+
+        /// <summary>
+        /// Adds multiple direct dependencies to the collection
+        /// </summary>
+        /// <param name="dependencies">The dependencies to add</param>
+        public static void AddRangeDirectDependencies(IEnumerable<string> dependencies)
+        {
+            s_nugetDirectDependencies.AddRange(dependencies);
+        }
+
+        /// <summary>
+        /// Clears all direct dependencies from the collection
+        /// </summary>
+        public static void ClearDirectDependencies()
+        {
+            s_nugetDirectDependencies.Clear();
+        }
+
+        /// <summary>
+        /// Sets the direct dependencies collection (primarily for testing)
+        /// </summary>
+        /// <param name="dependencies">The dependencies to set</param>
+        public static void SetDirectDependencies(IEnumerable<string> dependencies)
+        {
+            s_nugetDirectDependencies.Clear();
+            s_nugetDirectDependencies.AddRange(dependencies);
         }
     }
 }

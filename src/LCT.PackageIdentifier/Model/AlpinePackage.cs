@@ -14,5 +14,6 @@ namespace LCT.PackageIdentifier.Model
         public string Version { get; set; }
 
         public string PurlID { get; set; }
+        public SpdxComponentInfo SpdxComponentDetails { get; set; }
     }
 }

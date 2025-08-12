@@ -39,6 +39,7 @@ namespace LCT.Common.Constants
         public const string NotCreated = "Not Created";
         public const string NotUploaded = "Not Uploaded";
         public const string NewClearing = "NEW_CLEARING";
+        public const string Approved = "APPROVED";
         public const string NotAvailable = "Not Available";
         public const string NotConfigured = "Not Configured";
         public const string AlreadyUploaded = "Already Uploaded";
@@ -76,7 +77,9 @@ namespace LCT.Common.Constants
         public const string GithubUrl = "https://github.com/siemens/continuous-clearing";
         public const string StandardSbomUrl = "https://sbom.siemens.io/";
         public const string SbomSpecVersionString = "1.6";
-        public const string FossologyModerationMessage = "Moderation request is created";
+        public const string ModerationRequestMessage = "Moderation request is created";
+        public const string Cdx_SpdxFileName = "internal:siemens:clearing:spdx-file-name";
+        public const string SpdxImport = "SPDXImport";
         public static Dictionary<string, string> PurlCheck()
         {
             return purlids;

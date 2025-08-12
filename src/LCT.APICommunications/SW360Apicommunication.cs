@@ -7,7 +7,6 @@
 using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
 using LCT.Common;
-using LCT.Common.Interface;
 using LCT.Common.Model;
 using log4net;
 using Newtonsoft.Json;
@@ -36,39 +35,25 @@ namespace LCT.APICommunications
     /// <summary>
     /// Communicatest with SW360 API
     /// </summary>
-    public class SW360Apicommunication : ISw360ApiCommunication
+    public class SW360Apicommunication(SW360ConnectionSettings sw360ConnectionSettings) : ISw360ApiCommunication
     {
         #region VARIABLE DECLARATION
-        private readonly string sw360AuthTokenType;
-        private readonly string sw360AuthToken;
-        private readonly string sw360ComponentApi;
-        private readonly string sw360ReleaseApi;
-        private readonly string sw360ProjectsApi;
-        private readonly string sw360ReleaseNameApi;
-        private readonly string sw360ProjectByTagApi;
-        private readonly string sw360ReleaseByExternalId;
-        private readonly string sw360ComponentByExternalId;
-        private readonly string sw360UsersApi;
-        private readonly int timeOut;
+        private readonly string sw360AuthTokenType = sw360ConnectionSettings.SW360AuthTokenType;
+        private readonly string sw360AuthToken = sw360ConnectionSettings.Sw360Token;
+        private readonly string sw360ComponentApi = $"{sw360ConnectionSettings.SW360URL}{ApiConstant.Sw360ComponentApiSuffix}";
+        private readonly string sw360ReleaseApi = $"{sw360ConnectionSettings.SW360URL}{ApiConstant.Sw360ReleaseApiSuffix}";
+        private readonly string sw360ProjectsApi = $"{sw360ConnectionSettings.SW360URL}{ApiConstant.Sw360ProjectsApiSuffix}";
+        private readonly string sw360ReleaseNameApi = $"{sw360ConnectionSettings.SW360URL}{ApiConstant.Sw360ReleaseNameApiSuffix}";
+        private readonly string sw360ProjectByTagApi = $"{sw360ConnectionSettings.SW360URL}{ApiConstant.Sw360ProjectByTagApiSuffix}";
+        private readonly string sw360ReleaseByExternalId = $"{sw360ConnectionSettings.SW360URL}{ApiConstant.Sw360ReleaseByExternalId}";
+        private readonly string sw360ComponentByExternalId = $"{sw360ConnectionSettings.SW360URL}{ApiConstant.Sw360ComponentByExternalId}";
+        private readonly string sw360UsersApi = $"{sw360ConnectionSettings.SW360URL}{ApiConstant.Sw360UsersSuffix}";
+        private readonly int timeOut = sw360ConnectionSettings.Timeout;
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
-        #endregion
+        private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
 
+        #endregion
         #region PUBLIC METHODS
-        public SW360Apicommunication(SW360ConnectionSettings sw360ConnectionSettings)
-        {
-            sw360AuthTokenType = sw360ConnectionSettings.SW360AuthTokenType;
-            sw360AuthToken = sw360ConnectionSettings.Sw360Token;
-            timeOut = sw360ConnectionSettings.Timeout;
-            sw360ComponentApi = $"{sw360ConnectionSettings.SW360URL}{ApiConstant.Sw360ComponentApiSuffix}";
-            sw360ReleaseApi = $"{sw360ConnectionSettings.SW360URL}{ApiConstant.Sw360ReleaseApiSuffix}";
-            sw360ProjectsApi = $"{sw360ConnectionSettings.SW360URL}{ApiConstant.Sw360ProjectsApiSuffix}";
-            sw360ReleaseNameApi = $"{sw360ConnectionSettings.SW360URL}{ApiConstant.Sw360ReleaseNameApiSuffix}";
-            sw360ProjectByTagApi = $"{sw360ConnectionSettings.SW360URL}{ApiConstant.Sw360ProjectByTagApiSuffix}";
-            sw360ComponentByExternalId = $"{sw360ConnectionSettings.SW360URL}{ApiConstant.Sw360ComponentByExternalId}";
-            sw360ReleaseByExternalId = $"{sw360ConnectionSettings.SW360URL}{ApiConstant.Sw360ReleaseByExternalId}";
-            sw360UsersApi = $"{sw360ConnectionSettings.SW360URL}{ApiConstant.Sw360UsersSuffix}";
-        }
 
 
         public async Task<string> GetProjects()
@@ -142,7 +127,7 @@ namespace LCT.APICommunications
         public async Task<string> GetReleases()
         {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(true, "unable to get releases");
+            httpClient.SetLogWarnings(true, "Unable to retrieve details for SW360 releases.");
             var result = string.Empty;
             try
             {
@@ -329,11 +314,11 @@ namespace LCT.APICommunications
         }
 
 
-        public string AttachComponentSourceToSW360(AttachReport attachReport)
+        public string AttachComponentSourceToSW360(AttachReport attachReport, ComparisonBomData comparisonBomData)
         {
             AttachmentHelper attachmentHelper = new AttachmentHelper(sw360AuthTokenType, sw360AuthToken, sw360ReleaseApi);
 
-            return attachmentHelper.AttachComponentSourceToSW360(attachReport);
+            return attachmentHelper.AttachComponentSourceToSW360(attachReport, comparisonBomData);
         }
 
         public async Task<string> GetReleaseByCompoenentName(string componentName)
@@ -368,7 +353,7 @@ namespace LCT.APICommunications
         public async Task<HttpResponseMessage> GetAllReleasesWithAllData(int page, int pageEntries)
         {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(true, "unable to get all releases details");
+            httpClient.SetLogWarnings(true, "Unable to retrieve full details for SW360 releases.");
             string url = $"{sw360ReleaseApi}?page={page}&allDetails=true&page_entries={pageEntries}";
             return await httpClient.GetAsync(url);
         }

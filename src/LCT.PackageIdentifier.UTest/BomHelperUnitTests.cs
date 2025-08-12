@@ -8,6 +8,7 @@ using CycloneDX.Models;
 using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
+using LCT.Common.Constants;
 using LCT.Common.Interface;
 using LCT.Common.Model;
 using LCT.PackageIdentifier.Interface;
@@ -15,7 +16,9 @@ using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using Moq;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace LCT.PackageIdentifier.UTest
@@ -177,9 +180,7 @@ namespace LCT.PackageIdentifier.UTest
                 }
             };
 
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "DEBIAN",
                 Debian = new Config
@@ -209,8 +210,9 @@ namespace LCT.PackageIdentifier.UTest
             };
             mockIProcessor.Setup(x => x.GetJfrogArtifactoryRepoInfo(It.IsAny<CommonAppSettings>(), It.IsAny<ArtifactoryCredentials>(), It.IsAny<Component>(), It.IsAny<string>())).ReturnsAsync(lstComponentForBOM);
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
 
-            IParser parser = new DebianProcessor(cycloneDXBomParser.Object);
+            IParser parser = new DebianProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             Mock<IJFrogService> jFrogService = new Mock<IJFrogService>();
             Mock<IBomHelper> bomHelper = new Mock<IBomHelper>();
             bomHelper.Setup(x => x.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>())).ReturnsAsync(aqlResultList);
@@ -235,9 +237,7 @@ namespace LCT.PackageIdentifier.UTest
                 }
             };
 
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "NPM",
                 Npm = new Config
@@ -280,8 +280,8 @@ namespace LCT.PackageIdentifier.UTest
             };
             mockIProcessor.Setup(x => x.GetJfrogArtifactoryRepoInfo(It.IsAny<CommonAppSettings>(), It.IsAny<ArtifactoryCredentials>(), It.IsAny<Component>(), It.IsAny<string>())).ReturnsAsync(lstComponentForBOM);
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
-            IParser parser = new NpmProcessor(cycloneDXBomParser.Object);
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            IParser parser = new NpmProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             Mock<IJFrogService> jFrogService = new Mock<IJFrogService>();
             Mock<IBomHelper> bomHelper = new Mock<IBomHelper>();
             bomHelper.Setup(x => x.GetNpmListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>())).ReturnsAsync(aqlResultList);
@@ -306,9 +306,7 @@ namespace LCT.PackageIdentifier.UTest
                 }
             };
 
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "Nuget",
                 Nuget = new Config
@@ -340,9 +338,8 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             Mock<IFrameworkPackages> frameworkPackages = new Mock<IFrameworkPackages>();
             Mock<ICompositionBuilder> compositionBuilder = new Mock<ICompositionBuilder>();
-
-            IParser parser = new NugetProcessor(cycloneDXBomParser.Object, frameworkPackages.Object, compositionBuilder.Object);
-            //IParser parser = new NugetProcessor(cycloneDXBomParser.Object);
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            IParser parser = new NugetProcessor(cycloneDXBomParser.Object, frameworkPackages.Object, compositionBuilder.Object, spdxBomParser.Object);
             Mock<IJFrogService> jFrogService = new Mock<IJFrogService>();
             Mock<IBomHelper> bomHelper = new Mock<IBomHelper>();
             bomHelper.Setup(x => x.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>())).ReturnsAsync(aqlResultList);
@@ -367,9 +364,7 @@ namespace LCT.PackageIdentifier.UTest
                 }
             };
 
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "POETRY",
                 Poetry = new Config
@@ -413,8 +408,8 @@ namespace LCT.PackageIdentifier.UTest
             };
             mockIProcessor.Setup(x => x.GetJfrogArtifactoryRepoInfo(It.IsAny<CommonAppSettings>(), It.IsAny<ArtifactoryCredentials>(), It.IsAny<Component>(), It.IsAny<string>())).ReturnsAsync(lstComponentForBOM);
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
-            IParser parser = new PythonProcessor(cycloneDXBomParser.Object);
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            IParser parser = new PythonProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             Mock<IJFrogService> jFrogService = new Mock<IJFrogService>();
             Mock<IBomHelper> bomHelper = new Mock<IBomHelper>();
             bomHelper.Setup(x => x.GetPypiListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>())).ReturnsAsync(aqlResultList);
@@ -439,9 +434,7 @@ namespace LCT.PackageIdentifier.UTest
                 }
             };
 
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "Conan",
                 Conan = new Config
@@ -471,8 +464,8 @@ namespace LCT.PackageIdentifier.UTest
             };
             mockIProcessor.Setup(x => x.GetJfrogArtifactoryRepoInfo(It.IsAny<CommonAppSettings>(), It.IsAny<ArtifactoryCredentials>(), It.IsAny<Component>(), It.IsAny<string>())).ReturnsAsync(lstComponentForBOM);
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
-            IParser parser = new ConanProcessor(cycloneDXBomParser.Object);
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            IParser parser = new ConanProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             Mock<IJFrogService> jFrogService = new Mock<IJFrogService>();
             Mock<IBomHelper> bomHelper = new Mock<IBomHelper>();
             bomHelper.Setup(x => x.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>())).ReturnsAsync(aqlResultList);
@@ -497,9 +490,8 @@ namespace LCT.PackageIdentifier.UTest
                 }
             };
 
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "MAVEN",
                 Maven = new Config
@@ -529,8 +521,8 @@ namespace LCT.PackageIdentifier.UTest
             };
             mockIProcessor.Setup(x => x.GetJfrogArtifactoryRepoInfo(It.IsAny<CommonAppSettings>(), It.IsAny<ArtifactoryCredentials>(), It.IsAny<Component>(), It.IsAny<string>())).ReturnsAsync(lstComponentForBOM);
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
-            IParser parser = new MavenProcessor(cycloneDXBomParser.Object);
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            IParser parser = new MavenProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             Mock<IJFrogService> jFrogService = new Mock<IJFrogService>();
             Mock<IBomHelper> bomHelper = new Mock<IBomHelper>();
             bomHelper.Setup(x => x.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>())).ReturnsAsync(aqlResultList);
@@ -565,7 +557,7 @@ namespace LCT.PackageIdentifier.UTest
 
             IBomHelper helper = new BomHelper();
             helper.WriteInternalComponentsListToKpi(lstComponentForBOM);
-            Assert.AreEqual(true, true);
+            Assert.That(lstComponentForBOM.Count, Is.EqualTo(1));
         }
 
         [TestCase]
@@ -578,6 +570,349 @@ namespace LCT.PackageIdentifier.UTest
 
             string hashcode = BomHelper.GetHashCodeUsingNpmView(name, version);
             Assert.That(expectedhashcode, Is.EqualTo(hashcode));
+        }
+        [Test]
+        public void GetProjectSummaryLink_ReturnsCorrectUrl()
+        {
+            // Arrange
+            string projectId = "test-project-123";
+            string sw360Url = "https://sw360.example.com";
+            var bomHelper = new BomHelper();
+
+            // Act
+            string result = bomHelper.GetProjectSummaryLink(projectId, sw360Url);
+
+            // Assert
+            Assert.That(result, Does.Contain(sw360Url));
+            Assert.That(result, Does.Contain(projectId));
+        }
+
+        [Test]
+        public void ParseBomFile_WithSpdxFile_CallsSpdxParser()
+        {
+            // Arrange
+            string tempFile = Path.GetTempFileName();
+            string spdxFile = Path.ChangeExtension(tempFile, FileConstant.SPDXFileExtension);
+            System.IO.File.WriteAllText(spdxFile, "test content");
+
+            var mockSpdxParser = new Mock<ISpdxBomParser>();
+            var mockCycloneDxParser = new Mock<ICycloneDXBomParser>();
+            var appSettings = new CommonAppSettings { ProjectType = "NPM" };
+            var expectedBom = new Bom
+            {
+                Components = new List<Component>(),
+                Dependencies = new List<Dependency>()
+            };
+
+            mockSpdxParser.Setup(x => x.ParseSPDXBom(spdxFile)).Returns(expectedBom);
+
+            try
+            {
+                // Act
+                var listUnsupportedComponents = new Bom()
+                {
+                    Components = new List<Component>(),
+                    Dependencies = new List<Dependency>()
+                };
+                var result = BomHelper.ParseBomFile(spdxFile, mockSpdxParser.Object, mockCycloneDxParser.Object, appSettings, ref listUnsupportedComponents);
+
+                // Assert
+                Assert.AreEqual(expectedBom, result);
+                mockSpdxParser.Verify(x => x.ParseSPDXBom(spdxFile), Times.Once);
+                mockCycloneDxParser.Verify(x => x.ParseCycloneDXBom(It.IsAny<string>()), Times.Never);
+            }
+            finally
+            {
+                // Cleanup
+                if (System.IO.File.Exists(spdxFile))
+                    System.IO.File.Delete(spdxFile);
+                if (System.IO.File.Exists(tempFile))
+                    System.IO.File.Delete(tempFile);
+            }
+        }
+
+        [Test]
+        public void ParseBomFile_WithCycloneDxFile_CallsCycloneDxParser()
+        {
+            // Arrange
+            string tempFile = Path.GetTempFileName();
+            string cyclonDxFile = Path.ChangeExtension(tempFile, ".json");
+            System.IO.File.WriteAllText(cyclonDxFile, "test content");
+
+            var mockSpdxParser = new Mock<ISpdxBomParser>();
+            var mockCycloneDxParser = new Mock<ICycloneDXBomParser>();
+            var appSettings = new CommonAppSettings { ProjectType = "NPM" };
+            var expectedBom = new Bom
+            {
+                Components = new List<Component>(),
+                Dependencies = new List<Dependency>()
+            };
+
+            mockCycloneDxParser.Setup(x => x.ParseCycloneDXBom(cyclonDxFile)).Returns(expectedBom);
+
+            try
+            {
+                // Act
+                var listUnsupportedComponents = new Bom()
+                {
+                    Components = new List<Component>(),
+                    Dependencies = new List<Dependency>()
+                };
+                var result = BomHelper.ParseBomFile(cyclonDxFile, mockSpdxParser.Object, mockCycloneDxParser.Object, appSettings, ref listUnsupportedComponents);
+
+                // Assert
+                Assert.AreEqual(expectedBom, result);
+                mockCycloneDxParser.Verify(x => x.ParseCycloneDXBom(cyclonDxFile), Times.Once);
+                mockSpdxParser.Verify(x => x.ParseSPDXBom(It.IsAny<string>()), Times.Never);
+            }
+            finally
+            {
+                // Cleanup
+                if (System.IO.File.Exists(cyclonDxFile))
+                    System.IO.File.Delete(cyclonDxFile);
+                if (System.IO.File.Exists(tempFile))
+                    System.IO.File.Delete(tempFile);
+            }
+        }
+
+
+        [Test]
+        public void ParseBomFile_WithEmptyDirectory_ReturnsEmptyBom()
+        {
+            // Arrange
+            string tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            System.IO.Directory.CreateDirectory(tempDir);
+
+            var mockSpdxParser = new Mock<ISpdxBomParser>();
+            var mockCycloneDxParser = new Mock<ICycloneDXBomParser>();
+            var appSettings = new CommonAppSettings { ProjectType = "NPM" };
+
+            // Setup mock to return empty BOM with initialized collections
+            var emptyBom = new Bom
+            {
+                Components = new List<Component>(),
+                Dependencies = new List<Dependency>()
+            };
+            mockCycloneDxParser.Setup(x => x.ParseCycloneDXBom(It.IsAny<string>())).Returns(emptyBom);
+
+            try
+            {
+                // Act
+                var listUnsupportedComponents = new Bom()
+                {
+                    Components = new List<Component>(),
+                    Dependencies = new List<Dependency>()
+                };
+                var result = BomHelper.ParseBomFile(tempDir, mockSpdxParser.Object, mockCycloneDxParser.Object, appSettings, ref listUnsupportedComponents);
+
+                // Assert
+                Assert.IsNotNull(result);
+                Assert.IsInstanceOf<Bom>(result);
+            }
+            finally
+            {
+                // Cleanup
+                if (System.IO.Directory.Exists(tempDir))
+                    System.IO.Directory.Delete(tempDir, true);
+            }
+        }
+
+        [Test]
+        public void ParseBomFile_WithDirectoryContainingInvalidSpdxFiles_ReturnsEmptyBom()
+        {
+            // Arrange
+            string tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            System.IO.Directory.CreateDirectory(tempDir);
+
+
+            string spdxFile = Path.Combine(tempDir, "invalid.spdx.sbom.json");
+            System.IO.File.WriteAllText(spdxFile, "invalid content");
+
+            var mockSpdxParser = new Mock<ISpdxBomParser>();
+            var mockCycloneDxParser = new Mock<ICycloneDXBomParser>();
+            var appSettings = new CommonAppSettings { ProjectType = "NPM" };
+
+            // Setup to return empty BOM when parsing fails (as the real parser does)
+            var emptyBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
+            mockSpdxParser.Setup(x => x.ParseSPDXBom(spdxFile)).Returns(emptyBom);
+
+            try
+            {
+                // Act - test with the actual SPDX file, not the directory
+                var listUnsupportedComponents = new Bom()
+                {
+                    Components = new List<Component>(),
+                    Dependencies = new List<Dependency>()
+                };
+                var result = BomHelper.ParseBomFile(spdxFile, mockSpdxParser.Object, mockCycloneDxParser.Object, appSettings, ref listUnsupportedComponents);
+
+                // Assert
+                Assert.IsNotNull(result);
+                Assert.IsInstanceOf<Bom>(result);
+                Assert.IsNotNull(result.Components);
+                Assert.IsNotNull(result.Dependencies);
+            }
+            finally
+            {
+                // Cleanup
+                if (System.IO.Directory.Exists(tempDir))
+                    System.IO.Directory.Delete(tempDir, true);
+            }
+        }
+
+        [Test]
+        public void NamingConventionOfSPDXFile_WithMissingFiles_ContinuesWithoutException()
+        {
+            // Arrange
+            string tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            System.IO.Directory.CreateDirectory(tempDir);
+
+            string spdxFile = Path.Combine(tempDir, "test.spdx");
+            System.IO.File.WriteAllText(spdxFile, "test content");
+
+            var appSettings = new CommonAppSettings()
+            {
+                Directory = new LCT.Common.Directory()
+                {
+                    InputFolder = tempDir
+                }
+            };
+
+            try
+            {
+                // Act & Assert - should not throw exception
+                Assert.DoesNotThrow(() => BomHelper.NamingConventionOfSPDXFile(spdxFile, appSettings));
+            }
+            finally
+            {
+                // Cleanup
+                if (System.IO.Directory.Exists(tempDir))
+                    System.IO.Directory.Delete(tempDir, true);
+            }
+        }
+
+        [Test]
+        public void NamingConventionOfSPDXFile_WithExistingFiles_ValidatesFiles()
+        {
+            // Arrange
+            string tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            System.IO.Directory.CreateDirectory(tempDir);
+
+            string spdxFile = Path.Combine(tempDir, "test.spdx");
+            string pemFile = Path.Combine(tempDir, "test.spdx.pem");
+            string sigFile = Path.Combine(tempDir, "test.spdx.sig");
+
+            System.IO.File.WriteAllText(spdxFile, "test content");
+            System.IO.File.WriteAllText(pemFile, "test pem content");
+            System.IO.File.WriteAllText(sigFile, "test sig content");
+
+            var appSettings = new CommonAppSettings()
+            {
+                Directory = new LCT.Common.Directory()
+                {
+                    InputFolder = tempDir
+                }
+            };
+
+            try
+            {
+                // Act & Assert - should not throw exception
+                Assert.DoesNotThrow(() => BomHelper.NamingConventionOfSPDXFile(spdxFile, appSettings));
+            }
+            finally
+            {
+                // Cleanup
+                if (System.IO.Directory.Exists(tempDir))
+                    System.IO.Directory.Delete(tempDir, true);
+            }
+        }
+
+        [Test]
+        public async Task GetNpmListOfComponentsFromRepo_WithNullRepoList_ReturnsEmptyList()
+        {
+            // Arrange
+            string[] repoList = null;
+            var jFrogServiceMock = new Mock<IJFrogService>();
+            var bomHelper = new BomHelper();
+
+            // Act
+            var result = await bomHelper.GetNpmListOfComponentsFromRepo(repoList, jFrogServiceMock.Object);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsEmpty(result);
+        }
+
+        [Test]
+        public async Task GetNpmListOfComponentsFromRepo_WithValidRepoList_ReturnsComponents()
+        {
+            // Arrange
+            string[] repoList = new string[] { "npm-repo1", "npm-repo2" };
+            var jFrogServiceMock = new Mock<IJFrogService>();
+            var bomHelper = new BomHelper();
+            var expectedResults = new List<AqlResult>()
+            {
+                new AqlResult { Name = "npm-component1", Repo = "npm-repo1" },
+                new AqlResult { Name = "npm-component2", Repo = "npm-repo2" }
+            };
+
+            jFrogServiceMock.Setup(x => x.GetNpmComponentDataByRepo("npm-repo1"))
+                           .ReturnsAsync(new List<AqlResult> { expectedResults[0] });
+            jFrogServiceMock.Setup(x => x.GetNpmComponentDataByRepo("npm-repo2"))
+                           .ReturnsAsync(new List<AqlResult> { expectedResults[1] });
+
+            // Act
+            var result = await bomHelper.GetNpmListOfComponentsFromRepo(repoList, jFrogServiceMock.Object);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(2, result.Count);
+            Assert.Contains(expectedResults[0], result);
+            Assert.Contains(expectedResults[1], result);
+        }
+
+        [Test]
+        public async Task GetPypiListOfComponentsFromRepo_WithNullRepoList_ReturnsEmptyList()
+        {
+            // Arrange
+            string[] repoList = null;
+            var jFrogServiceMock = new Mock<IJFrogService>();
+            var bomHelper = new BomHelper();
+
+            // Act
+            var result = await bomHelper.GetPypiListOfComponentsFromRepo(repoList, jFrogServiceMock.Object);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsEmpty(result);
+        }
+
+        [Test]
+        public async Task GetPypiListOfComponentsFromRepo_WithValidRepoList_ReturnsComponents()
+        {
+            // Arrange
+            string[] repoList = new string[] { "pypi-repo1", "pypi-repo2" };
+            var jFrogServiceMock = new Mock<IJFrogService>();
+            var bomHelper = new BomHelper();
+            var expectedResults = new List<AqlResult>()
+            {
+                new AqlResult { Name = "pypi-component1", Repo = "pypi-repo1" },
+                new AqlResult { Name = "pypi-component2", Repo = "pypi-repo2" }
+            };
+
+            jFrogServiceMock.Setup(x => x.GetPypiComponentDataByRepo("pypi-repo1"))
+                           .ReturnsAsync(new List<AqlResult> { expectedResults[0] });
+            jFrogServiceMock.Setup(x => x.GetPypiComponentDataByRepo("pypi-repo2"))
+                           .ReturnsAsync(new List<AqlResult> { expectedResults[1] });
+
+            // Act
+            var result = await bomHelper.GetPypiListOfComponentsFromRepo(repoList, jFrogServiceMock.Object);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(2, result.Count);
+            Assert.Contains(expectedResults[0], result);
+            Assert.Contains(expectedResults[1], result);
         }
     }
 }

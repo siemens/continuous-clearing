@@ -20,7 +20,7 @@ namespace LCT.Common.UTest
             // Initialize real instances of your services
             appSettings = new CommonAppSettings
             {
-                Telemetry = new Telemetry { ApplicationInsightInstrumentKey = "R1WvRUkY0I6Z" },
+                Telemetry = new Telemetry { ApplicationInsightsConnectionString = "R1WvRUkY0I6Z" },
                 SW360 = new SW360
                 {
                     ProjectName = "ProjectName",

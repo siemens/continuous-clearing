@@ -1,5 +1,4 @@
 ﻿using LCT.Common;
-using LCT.Common.Interface;
 using LCT.Common.Model;
 using log4net.Appender;
 using log4net.Config;
@@ -33,9 +32,8 @@ namespace LCT.PackageIdentifier.UTest
             string listOfExcludeComponents = "component1,component2";
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "NPM",
                 SW360 = new SW360()
@@ -47,7 +45,7 @@ namespace LCT.PackageIdentifier.UTest
                     ExcludeComponents = new List<string> { "component1", "component2" }
                 },
 
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles")),
                     OutputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
@@ -95,12 +93,11 @@ namespace LCT.PackageIdentifier.UTest
             string listOfExcludeComponents = "component1,component2";
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "NPM",
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles")),
                     OutputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
@@ -144,13 +141,12 @@ namespace LCT.PackageIdentifier.UTest
             string listOfExcludeComponents = "component1,component2";
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "NPM",
                 Jfrog = new Jfrog(),
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles")),
                     OutputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))

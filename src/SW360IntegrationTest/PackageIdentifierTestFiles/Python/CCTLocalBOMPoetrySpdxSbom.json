@@ -1,0 +1,267 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:f7ce28be-a502-4d60-affa-e22fef840db6",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2025-07-15T04:34:37Z",
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "supplier": {
+            "name": "Siemens AG"
+          },
+          "name": "Clearing Automation Tool",
+          "version": "8.1.0",
+          "externalReferences": [
+            {
+              "url": "https://github.com/siemens/continuous-clearing",
+              "type": "website"
+            }
+          ]
+        }
+      ]
+    },
+    "component": {
+      "type": "application",
+      "name": "continuous-clearing",
+      "version": "v9.0.x"
+    },
+    "properties": [
+      {
+        "name": "siemens:profile",
+        "value": "clearing"
+      }
+    ]
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/attrs@22.1.0",
+      "name": "attrs",
+      "version": "22.1.0",
+      "purl": "pkg:pypi/attrs@22.1.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "ManuallyAdded"
+        },
+        {
+          "name": "internal:siemens:clearing:spdx-file-name",
+          "value": "Poetry.spdx.sbom.json"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/beautifulsoup4@4.11.1",
+      "name": "beautifulsoup4",
+      "version": "4.11.1",
+      "hashes": [
+        {
+          "alg": "MD5",
+          "content": "08cda1831119ea9e9386215da237bf49"
+        },
+        {
+          "alg": "SHA-1",
+          "content": "5823dfdfc01f91bff9832f143ffe6c675b1f780b"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "58d5c3d29f5a36ffeb94f02f0d786cd53014cf9b3b3951d42e0080d8a9498d30"
+        }
+      ],
+      "purl": "pkg:pypi/beautifulsoup4@4.11.1",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "ManuallyAdded"
+        },
+        {
+          "name": "internal:siemens:clearing:spdx-file-name",
+          "value": "Poetry.spdx.sbom.json"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "org1-pythonhosted-pypi-remote-cache"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "beautifulsoup4-4.11.1-py3-none-any.whl"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "org1-pythonhosted-pypi-remote-cache/9c/d8/909c4089dbe4ade9f9705f143c9f13f065049a9d5e7d34c828aefdd0a97c/beautifulsoup4-4.11.1-py3-none-any.whl"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/certifi@2022.6.15",
+      "name": "certifi",
+      "version": "2022.6.15",
+      "purl": "pkg:pypi/certifi@2022.6.15",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "ManuallyAdded"
+        },
+        {
+          "name": "internal:siemens:clearing:spdx-file-name",
+          "value": "Poetry.spdx.sbom.json"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/html5lib@1.1",
+      "name": "html5lib",
+      "version": "1.1",
+      "hashes": [
+        {
+          "alg": "MD5",
+          "content": "167ff642c4754015d78b21117a752342"
+        },
+        {
+          "alg": "SHA-1",
+          "content": "188a3653a14d2b7df7f4a64381355ef5e747b1b6"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "0d78f8fde1c230e99fe37986a60526d7049ed4bf8a9fadbad5f00e22e58e041d"
+        }
+      ],
+      "purl": "pkg:pypi/html5lib@1.1",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "ManuallyAdded"
+        },
+        {
+          "name": "internal:siemens:clearing:spdx-file-name",
+          "value": "Poetry.spdx.sbom.json"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "org1-pythonhosted-pypi-remote-cache"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "html5lib-1.1-py2.py3-none-any.whl"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "org1-pythonhosted-pypi-remote-cache/6c/dd/a834df6482147d48e225a49515aabc28974ad5a4ca3215c18a882565b028/html5lib-1.1-py2.py3-none-any.whl"
+        }
+      ]
+    }
+  ],
+  "dependencies": [],
+  "compositions": [],
+  "definitions": {
+    "standards": [
+      {
+        "bom-ref": "standard-bom",
+        "name": "Standard BOM",
+        "version": "3.0.0",
+        "description": "The Standard for Software Bills of Materials in Siemens",
+        "owner": "Siemens AG",
+        "externalReferences": [
+          {
+            "url": "https://sbom.siemens.io/",
+            "type": "website"
+          }
+        ]
+      }
+    ]
+  }
+}

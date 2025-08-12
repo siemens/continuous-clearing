@@ -24,16 +24,19 @@ using System.Linq;
 using System.Reflection;
 using System.Security;
 using System.Threading.Tasks;
+using File = System.IO.File;
 
 namespace LCT.PackageIdentifier
 {
     /// <summary>
     /// Parses the NPM Packages
     /// </summary>
-    public class NpmProcessor : CycloneDXBomParser, IParser
+    public class NpmProcessor(ICycloneDXBomParser cycloneDXBomParser, ISpdxBomParser spdxBomParser) : CycloneDXBomParser, IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private readonly ICycloneDXBomParser _cycloneDXBomParser;
+        private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
+        private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
+        private readonly static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
         private const string Bundled = "bundled";
         private const string Dependencies = "dependencies";
         private const string Dev = "dev";
@@ -42,23 +45,23 @@ namespace LCT.PackageIdentifier
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
         private const string Requires = "requires";
         private const string Name = "name";
-        public NpmProcessor(ICycloneDXBomParser cycloneDXBomParser)
-        {
-            _cycloneDXBomParser = cycloneDXBomParser;
-        }
 
-        public Bom ParsePackageFile(CommonAppSettings appSettings)
+        public Bom ParsePackageFile(CommonAppSettings appSettings, ref Bom unSupportedBomList)
         {
             List<Component> componentsForBOM = new List<Component>();
             Bom bom = new Bom();
             List<Dependency> dependencies = new List<Dependency>();
             int totalComponentsIdentified = 0;
+            int totalUnsupportedComponentsIdentified = 0;
 
             ParsingInputFileForBOM(appSettings, ref componentsForBOM, ref bom, ref dependencies);
             totalComponentsIdentified = componentsForBOM.Count;
+            totalUnsupportedComponentsIdentified = ListUnsupportedComponentsForBom.Components.Count;
             componentsForBOM = GetExcludedComponentsList(componentsForBOM);
             componentsForBOM = componentsForBOM.Distinct(new ComponentEqualityComparer()).ToList();
+            ListUnsupportedComponentsForBom.Components = ListUnsupportedComponentsForBom.Components.Distinct(new ComponentEqualityComparer()).ToList();
             BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - componentsForBOM.Count;
+            BomCreator.bomKpiData.DuplicateComponents += totalUnsupportedComponentsIdentified - ListUnsupportedComponentsForBom.Components.Count;
             var componentsWithMultipleVersions = componentsForBOM.GroupBy(s => s.Name)
                               .Where(g => g.Count() > 1).SelectMany(g => g).ToList();
 
@@ -71,12 +74,15 @@ namespace LCT.PackageIdentifier
             bom.Dependencies = dependencies;
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
             bom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(bom.Components, bom.Dependencies);
+            ListUnsupportedComponentsForBom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(ListUnsupportedComponentsForBom.Components, ListUnsupportedComponentsForBom.Dependencies);
+            unSupportedBomList.Components = ListUnsupportedComponentsForBom.Components;
+            unSupportedBomList.Dependencies = ListUnsupportedComponentsForBom.Dependencies;
             Logger.Debug($"ParsePackageFile():End");
             return bom;
         }
 
 
-        public List<Component> ParsePackageLockJson(string filepath, CommonAppSettings appSettings)
+        public static List<Component> ParsePackageLockJson(string filepath, CommonAppSettings appSettings)
         {
             List<BundledComponents> bundledComponents = new List<BundledComponents>();
             List<Component> lstComponentForBOM = new List<Component>();
@@ -136,10 +142,8 @@ namespace LCT.PackageIdentifier
             return lstComponentForBOM;
         }
 
-        private List<JToken> GetDirectDependenciesList(string filepath)
+        private static List<JToken> GetDirectDependenciesList(string filepath)
         {
-            string directoryName = Path.GetDirectoryName(filepath);
-            string packageJsonPath = $"{directoryName}\\{FileConstant.PackageJsonFileName}";
             string jsonContent = File.ReadAllText(filepath);
             var jsonDeserialized = JObject.Parse(jsonContent);
             List<JToken> dependencies = jsonDeserialized[Dependencies]?.ToList() ?? new List<JToken>();
@@ -153,7 +157,7 @@ namespace LCT.PackageIdentifier
         private static void CreateFileForMultipleVersions(List<Component> componentsWithMultipleVersions, CommonAppSettings appSettings)
         {
             MultipleVersions multipleVersions = new MultipleVersions();
-            IFileOperations fileOperations = new FileOperations();
+            FileOperations fileOperations = new FileOperations();
             string defaultProjectName = CommonIdentiferHelper.GetDefaultProjectName(appSettings);
             string bomFullPath = $"{appSettings.Directory.OutputFolder}\\{defaultProjectName}_Bom.cdx.json";
             string filePath = $"{appSettings.Directory.OutputFolder}\\{defaultProjectName}_{FileConstant.multipleversionsFileName}";
@@ -219,11 +223,7 @@ namespace LCT.PackageIdentifier
 
                 // dev components are not ignored and added as a part of SBOM 
                 // If package section has Dev or DevOptional as true , considering it as Dev Component
-                if (IsDevDependency(prop.Value[Dev], ref noOfDevDependent))
-                {
-                    isdev.Value = "true";
-                }
-                else if (IsDevDependency(prop.Value[DevOptional], ref noOfDevDependent))
+                if (IsDevDependency(prop.Value[Dev], ref noOfDevDependent) || IsDevDependency(prop.Value[DevOptional], ref noOfDevDependent))
                 {
                     isdev.Value = "true";
                 }
@@ -294,8 +294,7 @@ namespace LCT.PackageIdentifier
         }
         private static void CheckAndAddToBundleComponents(List<BundledComponents> bundledComponents, JProperty prop, Component components)
         {
-            if (prop.Value[Bundled] != null &&
-                  !(bundledComponents.Any(x => x.Name == components.Name && x.Version.ToLowerInvariant() == components.Version)))
+            if (prop.Value[Bundled] != null && (!bundledComponents.Any(x => x.Name == components.Name && x.Version.Equals(components.Version, StringComparison.OrdinalIgnoreCase))))
             {
                 BundledComponents component = new() { Name = components.Name, Version = components.Version };
                 bundledComponents.Add(component);
@@ -318,11 +317,7 @@ namespace LCT.PackageIdentifier
 
                 // dev components are not ignored and added as a part of SBOM 
                 // If package section has Dev or DevOptional as true , considering it as Dev Component 
-                if (IsDevDependency(prop.Value[Dev], ref noOfDevDependent))
-                {
-                    isdev.Value = "true";
-                }
-                else if (IsDevDependency(prop.Value[DevOptional], ref noOfDevDependent))
+                if (IsDevDependency(prop.Value[Dev], ref noOfDevDependent) || IsDevDependency(prop.Value[DevOptional], ref noOfDevDependent))
                 {
                     isdev.Value = "true";
                 }
@@ -374,37 +369,15 @@ namespace LCT.PackageIdentifier
             List<AqlResult> aqlResultList =
                 await bomhelper.GetNpmListOfComponentsFromRepo(appSettings.Npm.Artifactory.InternalRepos, jFrogService);
 
-            // find the components in the list of internal components
-            List<Component> internalComponents = new List<Component>();
-            var internalComponentStatusUpdatedList = new List<Component>();
             var inputIterationList = componentData.comparisonBOMData;
 
-            foreach (Component component in inputIterationList)
-            {
-                var currentIterationItem = component;
-                bool isTrue = IsInternalNpmComponent(aqlResultList, currentIterationItem, bomhelper);
-                if (currentIterationItem.Properties?.Count == null || currentIterationItem.Properties?.Count <= 0)
-                {
-                    currentIterationItem.Properties = new List<Property>();
-                }
+            // Use the common helper method
+            var (processedComponents, internalComponents) = CommonHelper.ProcessInternalComponentIdentification(
+                inputIterationList,
+                component => IsInternalNpmComponent(aqlResultList, component, bomhelper));
 
-                Property isInternal = new() { Name = Dataconstant.Cdx_IsInternal, Value = "false" };
-                if (isTrue)
-                {
-                    internalComponents.Add(currentIterationItem);
-                    isInternal.Value = "true";
-                }
-                else
-                {
-                    isInternal.Value = "false";
-                }
-
-                currentIterationItem.Properties.Add(isInternal);
-                internalComponentStatusUpdatedList.Add(currentIterationItem);
-            }
-
-            // update the comparision bom data
-            componentData.comparisonBOMData = internalComponentStatusUpdatedList;
+            // update the comparison bom data
+            componentData.comparisonBOMData = processedComponents;
             componentData.internalComponents = internalComponents;
 
             return componentData;
@@ -422,143 +395,158 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in componentsForBOM)
             {
+                var processedComponent = ProcessComponent(component, aqlResultList, bomhelper, appSettings, projectType);
+                modifiedBOM.Add(processedComponent);
+            }
+            return modifiedBOM;
+        }
 
-                string jfrogpackageName = bomhelper.GetFullNameOfComponent(component);
+        private static Component ProcessComponent(Component component, List<AqlResult> aqlResultList, IBomHelper bomhelper, CommonAppSettings appSettings, Property projectType)
+        {
+            string jfrogpackageName = bomhelper.GetFullNameOfComponent(component);
 
-                var hashes = aqlResultList.FirstOrDefault(x => x.Properties.Any(p => p.Key == "npm.name" && p.Value == jfrogpackageName) && x.Properties.Any(p => p.Key == "npm.version" && p.Value == component.Version));
-                string jfrogRepoPath = string.Empty;
-                AqlResult finalRepoData = GetJfrogArtifactoryRepoDetials(aqlResultList, component, bomhelper, out jfrogRepoPath);
-                Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = finalRepoData.Repo };
+            var hashes = aqlResultList.FirstOrDefault(x => x.Properties.Any(p => p.Key == "npm.name" && p.Value == jfrogpackageName) && x.Properties.Any(p => p.Key == "npm.version" && p.Value == component.Version));
+            string jfrogRepoPath = string.Empty;
+            AqlResult finalRepoData = GetJfrogArtifactoryRepoDetials(aqlResultList, component, bomhelper, out jfrogRepoPath);
+            Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = finalRepoData.Repo };
 
-                Property siemensfileNameProp = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = finalRepoData?.Name ?? Dataconstant.PackageNameNotFoundInJfrog };
-                Property jfrogRepoPathProp = new() { Name = Dataconstant.Cdx_JfrogRepoPath, Value = jfrogRepoPath };
-                Component componentVal = component;
-                if (artifactoryrepo.Value == appSettings.Npm.DevDepRepo)
-                {
-                    BomCreator.bomKpiData.DevdependencyComponents++;
-                }
-                if (appSettings.Npm.Artifactory.ThirdPartyRepos != null)
-                {
+            Property siemensfileNameProp = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = finalRepoData.Name ?? Dataconstant.PackageNameNotFoundInJfrog };
+            Property jfrogRepoPathProp = new() { Name = Dataconstant.Cdx_JfrogRepoPath, Value = jfrogRepoPath };
+            Component componentVal = component;
 
-                    foreach (var thirdPartyRepo in appSettings.Npm.Artifactory.ThirdPartyRepos)
-                    {
-                        if (artifactoryrepo.Value == thirdPartyRepo.Name)
-                        {
-                            BomCreator.bomKpiData.ThirdPartyRepoComponents++;
-                            break;
-                        }
-                    }
+            UpdateKpiDataBasedOnRepo(artifactoryrepo.Value, appSettings);
 
-                }
-                if (artifactoryrepo.Value == appSettings.Npm.ReleaseRepo)
-                {
-                    BomCreator.bomKpiData.ReleaseRepoComponents++;
-                }
+            // Use common helper to set component properties and hashes
+            CommonHelper.SetComponentPropertiesAndHashes(componentVal, artifactoryrepo, projectType, siemensfileNameProp, jfrogRepoPathProp, hashes);
 
-                if (artifactoryrepo.Value == Dataconstant.NotFoundInJFrog || artifactoryrepo.Value == "")
-                {
-                    BomCreator.bomKpiData.UnofficialComponents++;
-                }
+            return componentVal;
+        }
 
-                if (componentVal.Properties?.Count == null || componentVal.Properties?.Count <= 0)
-                {
-                    componentVal.Properties = new List<Property>();
-                }
-                componentVal.Properties.Add(artifactoryrepo);
-                componentVal.Properties.Add(projectType);
-                componentVal.Properties.Add(siemensfileNameProp);
-                componentVal.Properties.Add(jfrogRepoPathProp);
-                componentVal.Description = null;
-                if (hashes != null)
-                {
-                    componentVal.Hashes = new List<Hash>()
-                {
-
-                new()
-                 {
-                  Alg = Hash.HashAlgorithm.MD5,
-                  Content = hashes.MD5
-                },
-                new()
-                {
-                  Alg = Hash.HashAlgorithm.SHA_1,
-                  Content = hashes.SHA1
-                 },
-                 new()
-                 {
-                  Alg = Hash.HashAlgorithm.SHA_256,
-                  Content = hashes.SHA256
-                  }
-                  };
-
-                }
-                modifiedBOM.Add(componentVal);
+        private static void UpdateKpiDataBasedOnRepo(string repoValue, CommonAppSettings appSettings)
+        {
+            if (repoValue == appSettings.Npm.DevDepRepo)
+            {
+                BomCreator.bomKpiData.DevdependencyComponents++;
             }
 
-            return modifiedBOM;
+            if (appSettings.Npm.Artifactory.ThirdPartyRepos != null)
+            {
+                foreach (var thirdPartyRepo in appSettings.Npm.Artifactory.ThirdPartyRepos)
+                {
+                    if (repoValue == thirdPartyRepo.Name)
+                    {
+                        BomCreator.bomKpiData.ThirdPartyRepoComponents++;
+                        break;
+                    }
+                }
+            }
+
+            if (repoValue == appSettings.Npm.ReleaseRepo)
+            {
+                BomCreator.bomKpiData.ReleaseRepoComponents++;
+            }
+
+            if (repoValue == Dataconstant.NotFoundInJFrog || repoValue == "")
+            {
+                BomCreator.bomKpiData.UnofficialComponents++;
+            }
         }
 
         public static Bom RemoveExcludedComponents(CommonAppSettings appSettings, Bom cycloneDXBOM)
         {
-            List<Component> componentForBOM = cycloneDXBOM.Components.ToList();
-            List<Dependency> dependenciesForBOM = cycloneDXBOM.Dependencies?.ToList() ?? new List<Dependency>();
-            int noOfExcludedComponents = 0;
-            if (appSettings?.SW360?.ExcludeComponents != null)
-            {
-                componentForBOM = CommonHelper.RemoveExcludedComponents(componentForBOM, appSettings.SW360.ExcludeComponents, ref noOfExcludedComponents);
-                dependenciesForBOM = CommonHelper.RemoveInvalidDependenciesAndReferences(componentForBOM, dependenciesForBOM);
-                BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents;
-
-            }
-            cycloneDXBOM.Components = componentForBOM;
-            cycloneDXBOM.Dependencies = dependenciesForBOM;
-            return cycloneDXBOM;
+            return CommonHelper.RemoveExcludedComponentsFromBom(appSettings, cycloneDXBOM,
+                noOfExcludedComponents => BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents);
         }
 
         private void ParsingInputFileForBOM(CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom, ref List<Dependency> dependencies)
         {
-            List<string> configFiles;
-            configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Npm);
+            List<string> configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Npm);
             List<string> listOfTemplateBomfilePaths = new List<string>();
+
             foreach (string filepath in configFiles)
             {
                 if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     listOfTemplateBomfilePaths.Add(filepath);
+                    continue;
                 }
-                Logger.Debug($"ParsingInputFileForBOM():FileName: " + filepath);
 
-                if (filepath.EndsWith(FileConstant.CycloneDXFileExtension))
-                {
-                    if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
-                    {
-                        Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
-                        bom = ParseCycloneDXBom(filepath);
-                        bom = RemoveExcludedComponents(appSettings, bom);
-                        CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
-                        AddingIdentifierType(bom.Components, "CycloneDXFile");
-                        BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += bom.Components.Count;
-                        componentsForBOM.AddRange(bom.Components);
-                        dependencies = bom.Dependencies;
-                    }
-                }
-                else
-                {
-                    Logger.Debug($"ParsingInputFileForBOM():Found as Package File");
-                    var components = ParsePackageLockJson(filepath, appSettings);
-                    AddingIdentifierType(components, "PackageFile");
-                    componentsForBOM.AddRange(components);
-                }
+                Logger.Debug($"ParsingInputFileForBOM():FileName: " + filepath);
+                ProcessFileBasedOnType(filepath, appSettings, ref componentsForBOM, ref bom, ref dependencies);
             }
+
             string templateFilePath = SbomTemplate.GetFilePathForTemplate(listOfTemplateBomfilePaths);
             SbomTemplate.ProcessTemplateFile(templateFilePath, _cycloneDXBomParser, componentsForBOM, appSettings.ProjectType);
-            if (dependencies != null)
+        }
+
+        private void ProcessFileBasedOnType(string filepath, CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom, ref List<Dependency> dependencies)
+        {
+            if (filepath.EndsWith(FileConstant.CycloneDXFileExtension))
             {
-                GetdependencyDetails(componentsForBOM, dependencies);
+                ProcessCycloneDXFile(filepath, appSettings, ref componentsForBOM, ref bom, ref dependencies);
+            }
+            else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
+            {
+                ProcessSPDXFile(filepath, appSettings, ref componentsForBOM, ref bom, ref dependencies);
+            }
+            else
+            {
+                ProcessPackageFile(filepath, appSettings, ref componentsForBOM, ref dependencies);
             }
         }
 
-        public static void GetdependencyDetails(List<Component> componentsForBOM, List<Dependency> dependencies)
+        private void ProcessCycloneDXFile(string filepath, CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom, ref List<Dependency> dependencies)
+        {
+            if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+            {
+                return;
+            }
+
+            Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
+            bom = ParseCycloneDXBom(filepath);
+
+            if (bom.Components != null)
+            {
+                bom = RemoveExcludedComponents(appSettings, bom);
+                CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
+                AddingIdentifierType(bom.Components, "CycloneDXFile", filepath);
+                BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += bom.Components.Count;
+                componentsForBOM.AddRange(bom.Components);
+            }
+
+            if (bom.Dependencies != null)
+            {
+                dependencies.AddRange(bom.Dependencies);
+            }
+        }
+
+        private void ProcessSPDXFile(string filepath, CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom, ref List<Dependency> dependencies)
+        {
+            BomHelper.NamingConventionOfSPDXFile(filepath, appSettings);
+            Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
+            bom = _spdxBomParser.ParseSPDXBom(filepath);
+            bom = RemoveExcludedComponents(appSettings, bom);
+            SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bom, appSettings.ProjectType, ref listUnsupportedComponents);
+            AddingIdentifierType(bom.Components, "SpdxFile", filepath);
+            AddingIdentifierType(listUnsupportedComponents.Components, "SpdxFile", filepath);
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += bom.Components.Count;
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += listUnsupportedComponents.Components.Count;
+            componentsForBOM.AddRange(bom.Components);
+            dependencies.AddRange(bom.Dependencies);
+            ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
+            ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
+        }
+
+        private static void ProcessPackageFile(string filepath, CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref List<Dependency> dependencies)
+        {
+            Logger.Debug($"ParsingInputFileForBOM():Found as Package File");
+            var components = ParsePackageLockJson(filepath, appSettings);
+            AddingIdentifierType(components, "PackageFile", filepath);
+            componentsForBOM.AddRange(components);
+            GetDependencyDetails(components, dependencies);
+        }
+
+        public static void GetDependencyDetails(List<Component> componentsForBOM, List<Dependency> dependencies)
         {
             List<Dependency> dependencyList = new();
 
@@ -640,7 +628,7 @@ namespace LCT.PackageIdentifier
 
                     //check for duplicate components in the list
                     if (dependentProperty[Bundled] != null &&
-                       !(bundledComponents.Any(x => x.Name == sub.Name && x.Version.ToLowerInvariant() == version)))
+                       (!bundledComponents.Any(x => x.Name == sub.Name && x.Version.Equals(version, StringComparison.InvariantCultureIgnoreCase))))
                     {
                         BundledComponents component = new() { Name = sub.Name, Version = version };
                         bundledComponents.Add(component);
@@ -651,11 +639,10 @@ namespace LCT.PackageIdentifier
 
         private static List<Component> RemoveBundledComponentFromList(List<BundledComponents> bundledComponents, List<Component> lstComponentForBOM)
         {
-            List<Component> components = new List<Component>();
-            components.AddRange(lstComponentForBOM);
+            List<Component> components = [.. lstComponentForBOM];
 
             foreach (var componentsToBOM in lstComponentForBOM.Where(x => bundledComponents.Any(y => y.Name == x.Name &&
-                y.Version.ToLowerInvariant() == x.Version.ToLowerInvariant())))
+               y.Version.Equals(x.Version, StringComparison.InvariantCultureIgnoreCase))))
             {
                 components.Remove(componentsToBOM);
             }
@@ -674,7 +661,7 @@ namespace LCT.PackageIdentifier
             return false;
         }
 
-        public AqlResult GetJfrogArtifactoryRepoDetials(List<AqlResult> aqlResultList,
+        public static AqlResult GetJfrogArtifactoryRepoDetials(List<AqlResult> aqlResultList,
                                                                 Component component,
                                                                 IBomHelper bomHelper,
                                                                 out string jfrogRepoPath)
@@ -701,7 +688,7 @@ namespace LCT.PackageIdentifier
             return aqlResult;
         }
 
-        public string GetJfrogRepoPath(AqlResult aqlResult)
+        public static string GetJfrogRepoPath(AqlResult aqlResult)
         {
             if (string.IsNullOrEmpty(aqlResult.Path) || aqlResult.Path.Equals("."))
             {
@@ -730,28 +717,38 @@ namespace LCT.PackageIdentifier
             return components;
         }
 
-        private static void AddingIdentifierType(List<Component> components, string identifiedBy)
+        private static void AddingIdentifierType(List<Component> components, string identifiedBy, string filePath)
         {
             foreach (var component in components)
             {
-                if (component.Properties == null)
-                {
-                    component.Properties = new List<Property>();
-                }
+                component.Properties ??= new List<Property>();
 
-                Property isDev;
-                Property identifierType;
                 if (identifiedBy == "PackageFile")
                 {
-                    identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.Discovered };
-                    component.Properties.Add(identifierType);
+                    var properties = component.Properties;
+                    CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
+                        Dataconstant.Cdx_IdentifierType,
+                        Dataconstant.Discovered);
+                    component.Properties = properties;
                 }
                 else
                 {
-                    isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
-                    identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.ManullayAdded };
-                    component.Properties.Add(isDev);
-                    component.Properties.Add(identifierType);
+                    string fileName = Path.GetFileName(filePath);
+                    if (identifiedBy == "SpdxFile")
+                    {
+                        SpdxSbomHelper.AddSpdxComponentProperties(fileName, component);
+                    }
+                    else
+                    {
+                        var properties = component.Properties;
+                        CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
+                            Dataconstant.Cdx_IdentifierType,
+                            Dataconstant.ManullayAdded);
+                        CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
+                            Dataconstant.Cdx_IsDevelopment,
+                            "false");
+                        component.Properties = properties;
+                    }
                 }
             }
         }

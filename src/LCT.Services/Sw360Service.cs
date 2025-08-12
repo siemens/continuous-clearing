@@ -26,6 +26,7 @@ using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
+using File = System.IO.File;
 
 namespace LCT.Services
 {
@@ -145,8 +146,8 @@ namespace LCT.Services
                 var responseData = JsonConvert.DeserializeObject<ComponentsRelease>(response);
                 for (int index = 0; index < responseData?.Embedded?.Sw360Releases?.Count; index++)
                 {
-                    if (responseData.Embedded.Sw360Releases[index].Name.ToUpperInvariant() == componentName.ToUpperInvariant()
-                        && responseData.Embedded.Sw360Releases[index].Version.ToUpperInvariant() == version.ToLowerInvariant())
+                    if (responseData.Embedded.Sw360Releases[index].Name.Equals(componentName, StringComparison.InvariantCultureIgnoreCase)
+                        && responseData.Embedded.Sw360Releases[index].Version.Equals(version, StringComparison.InvariantCultureIgnoreCase))
                     {
                         href = responseData.Embedded.Sw360Releases[index].Links.Self.Href;
                         break;
@@ -206,7 +207,7 @@ namespace LCT.Services
             Sw360AttachmentHash attachmentHash = new Sw360AttachmentHash();
             for (int index = 0; index < sw360attachments?.Count; index++)
             {
-                if (sw360attachments[index].AttachmentType.ToUpperInvariant() == "SOURCE")
+                if (sw360attachments[index].AttachmentType.Equals("SOURCE", StringComparison.InvariantCultureIgnoreCase))
                 {
                     attachmentHash.AttachmentLink = sw360attachments[index]?.Links?.Self?.Href ?? string.Empty;
                     attachmentHash.HashCode = sw360attachments[index]?.Sha1 ?? string.Empty;
@@ -277,8 +278,9 @@ namespace LCT.Services
 
                 for (int index = 0; index < responseData?.Embedded?.Sw360Releases?.Count; index++)
                 {
-                    if (responseData.Embedded.Sw360Releases[index].Name.ToUpperInvariant() == componentName?.ToUpperInvariant()
-                        && responseData.Embedded.Sw360Releases[index].Version.ToLowerInvariant() == componetVersion.ToLowerInvariant())
+                    if (responseData.Embedded.Sw360Releases[index].Name.Equals(componentName?.ToUpperInvariant()
+, StringComparison.InvariantCultureIgnoreCase)
+                        && responseData.Embedded.Sw360Releases[index].Version.Equals(componetVersion, StringComparison.InvariantCultureIgnoreCase))
                     {
                         href = responseData.Embedded.Sw360Releases[index].Links.Self.Href;
                         releaseid = CommonHelper.GetSubstringOfLastOccurance(href, "/");

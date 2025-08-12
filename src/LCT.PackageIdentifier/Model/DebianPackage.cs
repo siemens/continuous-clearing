@@ -29,5 +29,6 @@ namespace LCT.PackageIdentifier.Model
         public string JsonText { get; set; }
 
         public bool IsRetryRequired { get; set; }
+        public SpdxComponentInfo SpdxComponentDetails { get; set; }
     }
 }

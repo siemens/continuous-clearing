@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -18,19 +19,18 @@ namespace LCT.Common
     public class TelemetryHelper
     {
         private readonly ILog Logger;
-        LCT.Telemetry.Telemetry telemetry_;
-        EnvironmentHelper environmentHelper;
-        CommonAppSettings appSettings_;
+        private readonly LCT.Telemetry.Telemetry telemetry_;
+        private readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
+        private readonly CommonAppSettings appSettings_;
 
         public TelemetryHelper(CommonAppSettings appSettings)
         {
-            environmentHelper = new EnvironmentHelper();
             Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
             appSettings_ = appSettings ?? new CommonAppSettings();
 
             telemetry_ = new LCT.Telemetry.Telemetry(TelemetryConstant.Type, new Dictionary<string, string>
                 {
-                { "InstrumentationKey", appSettings?.Telemetry?.ApplicationInsightInstrumentKey ?? string.Empty }
+                { "ConnectionString", appSettings?.Telemetry?.ApplicationInsightsConnectionString ?? string.Empty }
             });
         }
 
@@ -44,7 +44,7 @@ namespace LCT.Common
                                                     , appSettings_);
                 TrackKpiDataTelemetry(telemetryFor, kpiData);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is ArgumentNullException or IOException)
             {
                 Logger.Error($"An error occurred: {ex.Message}");
                 TrackException(ex);

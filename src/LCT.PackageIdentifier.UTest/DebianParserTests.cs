@@ -28,14 +28,16 @@ namespace LCT.PackageIdentifier.UTest
         private Mock<IBomHelper> _mockBomHelper;
         private Mock<IJFrogService> _mockJFrogService;
         private Mock<ICycloneDXBomParser> _mockCycloneDXBomParser;
-
+        private Mock<ISpdxBomParser> _spdxBomParser;
+        private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
         [SetUp]
         public void Setup()
         {
             _mockBomHelper = new Mock<IBomHelper>();
             _mockJFrogService = new Mock<IJFrogService>();
             _mockCycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-            _mdebianProcessor = new DebianProcessor(_mockCycloneDXBomParser.Object);
+            _spdxBomParser = new Mock<ISpdxBomParser>();
+            _mdebianProcessor = new DebianProcessor(_mockCycloneDXBomParser.Object, _spdxBomParser.Object);
         }
 
 
@@ -54,7 +56,7 @@ namespace LCT.PackageIdentifier.UTest
             _mockBomHelper.Setup(x => x.GetFullNameOfComponent(component)).Returns("component_1.deb");
 
             // Act
-            var repoName = _debianProcessor.GetArtifactoryRepoName(aqlResultList, component, _mockBomHelper.Object, out jfrogRepoPackageName, out jfrogRepoPath);
+            var repoName = DebianProcessor.GetArtifactoryRepoName(aqlResultList, component, _mockBomHelper.Object, out jfrogRepoPackageName, out jfrogRepoPath);
 
             // Assert
             Assert.AreEqual("repo1", repoName);
@@ -76,7 +78,7 @@ namespace LCT.PackageIdentifier.UTest
             string jfrogRepoPath;
 
             // Act
-            var repoName = _debianProcessor.GetArtifactoryRepoName(aqlResultList, component, _mockBomHelper.Object, out jfrogRepoPackageName, out jfrogRepoPath);
+            var repoName = DebianProcessor.GetArtifactoryRepoName(aqlResultList, component, _mockBomHelper.Object, out jfrogRepoPackageName, out jfrogRepoPath);
 
             // Assert
             Assert.AreEqual("Not Found in JFrogRepo", repoName);
@@ -98,7 +100,7 @@ namespace LCT.PackageIdentifier.UTest
             string jfrogRepoPath;
 
             // Act
-            var repoName = _debianProcessor.GetArtifactoryRepoName(aqlResultList, component, _mockBomHelper.Object, out jfrogRepoPackageName, out jfrogRepoPath);
+            var repoName = DebianProcessor.GetArtifactoryRepoName(aqlResultList, component, _mockBomHelper.Object, out jfrogRepoPackageName, out jfrogRepoPath);
 
             // Assert
             Assert.AreEqual("repo2", repoName);
@@ -115,8 +117,9 @@ namespace LCT.PackageIdentifier.UTest
 
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             cycloneDXBomParser.Setup(x => x.ParseCycloneDXBom(It.IsAny<string>())).Returns(bom);
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
 
-            _debianProcessor = new DebianProcessor(cycloneDXBomParser.Object);
+            _debianProcessor = new DebianProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
         }
 
         [Test]
@@ -127,21 +130,20 @@ namespace LCT.PackageIdentifier.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "*_Debian.cdx.json" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "DEBIAN",
                 Debian = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }
             };
 
             //Act
-            Bom listofcomponents = _debianProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = _debianProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(expectednoofcomponents,
@@ -159,21 +161,19 @@ namespace LCT.PackageIdentifier.UTest
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "CycloneDX_Debian.cdx.json" };
 
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "DEBIAN",
                 Debian = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }
             };
 
             //Act
-            Bom listofcomponents = _debianProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = _debianProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
@@ -188,21 +188,19 @@ namespace LCT.PackageIdentifier.UTest
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "*_Debian.cdx.json" };
 
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "DEBIAN",
                 Debian = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }
             };
 
             //Act
-            _debianProcessor.ParsePackageFile(appSettings);
+            _debianProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(duplicateComponents, Is.EqualTo(BomCreator.bomKpiData.DuplicateComponents), "Checks for no of duplicate components");
@@ -219,19 +217,19 @@ namespace LCT.PackageIdentifier.UTest
 
             IFolderAction folderAction = new FolderAction();
             IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "DEBIAN",
                 Debian = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }
             };
 
             //Act
-            Bom listofcomponents = _debianProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = _debianProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.AreEqual(sourceName, listofcomponents.Components[0].Name + "_" + listofcomponents.Components[0].Version, "Checks component name and version");
@@ -247,14 +245,12 @@ namespace LCT.PackageIdentifier.UTest
             string[] Includes = { "CycloneDX_Debian.cdx.json", "SBOMTemplate_Debian.cdx.json", "SBOM_DebianCATemplate.cdx.json" };
             string packagefilepath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"));
 
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "DEBIAN",
                 Debian = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = packagefilepath,
 
@@ -262,7 +258,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = _debianProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = _debianProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
@@ -277,14 +273,12 @@ namespace LCT.PackageIdentifier.UTest
             string[] Includes = { "CycloneDX_Debian.cdx.json", "SBOMTemplate_Debian.cdx.json" };
             string packagefilepath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"));
 
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "DEBIAN",
                 Debian = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = packagefilepath,
 
@@ -292,7 +286,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = _debianProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = _debianProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
             bool isUpdated = listofcomponents.Components.Exists(x => x.Properties != null && x.Properties.Exists(x => x.Name == Dataconstant.Cdx_IdentifierType && x.Value == Dataconstant.Discovered));
 
             //Assert

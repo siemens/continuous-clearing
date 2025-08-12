@@ -6,7 +6,6 @@
 
 using LCT.APICommunications.Model;
 using LCT.Common;
-using LCT.Common.Interface;
 using log4net;
 using System;
 using System.Net.Http;
@@ -21,7 +20,7 @@ namespace LCT.APICommunications
 
 
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
+        private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
         private static int TimeoutInSec { get; set; }
         public DebianJfrogAPICommunication(string repoDomainName, string srcrepoName, ArtifactoryCredentials repoCredentials, int timeout) : base(repoDomainName, srcrepoName, repoCredentials, timeout)
         {
@@ -57,7 +56,7 @@ namespace LCT.APICommunications
 
         public override async Task<HttpResponseMessage> MoveFromRepo(ComponentsToArtifactory component)
         {
-            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);            
+            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
             const HttpContent httpContent = null;
             return await httpClient.PostAsync(component.MovePackageApiUrl, httpContent);
         }

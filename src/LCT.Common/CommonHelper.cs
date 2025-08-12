@@ -17,6 +17,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
+using File = System.IO.File;
 using Level = log4net.Core.Level;
 
 namespace LCT.Common
@@ -44,7 +45,6 @@ namespace LCT.Common
 
         public static List<Component> RemoveExcludedComponents(List<Component> ComponentList, List<string> ExcludedComponents, ref int noOfExcludedComponents)
         {
-            List<Component> ExcludedList = new List<Component>();
             List<string> ExcludedComponentsFromPurl = ExcludedComponents?.Where(ec => ec.StartsWith("pkg:")).ToList();
             List<string> otherExcludedComponents = ExcludedComponents?.Where(ec => !ec.StartsWith("pkg:")).ToList();
 
@@ -234,15 +234,28 @@ namespace LCT.Common
             return component.Properties.Exists(x => x.Name == constant);
         }
 
-        public static void GetDetailsForManuallyAdded(List<Component> componentsForBOM, List<Component> listComponentForBOM)
+        public static void GetDetailsForManuallyAdded(List<Component> componentsForBOM, List<Component> listComponentForBOM, string filePath)
         {
             foreach (var component in componentsForBOM)
             {
-                component.Properties = new List<Property>();
-                Property isDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
-                Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.ManullayAdded };
-                component.Properties.Add(isDev);
-                component.Properties.Add(identifierType);
+                string fileName = Path.GetFileName(filePath);
+                component.Properties ??= new List<Property>();
+
+                if (filePath.EndsWith(FileConstant.SPDXFileExtension))
+                {
+                    SpdxSbomHelper.AddSpdxComponentProperties(fileName, component);
+                }
+                else
+                {
+                    var properties = component.Properties;
+                    CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
+                        Dataconstant.Cdx_IdentifierType,
+                        Dataconstant.ManullayAdded);
+                    CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
+                        Dataconstant.Cdx_IsDevelopment,
+                        "false");
+                    component.Properties = properties;
+                }
                 listComponentForBOM.Add(component);
             }
         }
@@ -260,31 +273,45 @@ namespace LCT.Common
         }
         public static string[] GetRepoList(CommonAppSettings appSettings)
         {
-            var projectTypeMappings = new Dictionary<string, Func<Artifactory>>
-        {
-        { "CONAN", () => appSettings.Conan?.Artifactory },
-        { "NPM", () => appSettings.Npm?.Artifactory },
-        { "NUGET", () => appSettings.Nuget?.Artifactory },
-        { "POETRY", () => appSettings.Poetry?.Artifactory },
-        { "DEBIAN", () => appSettings.Debian?.Artifactory },
-        { "MAVEN", () => appSettings.Maven?.Artifactory }
-        };
-
-            if (projectTypeMappings.TryGetValue(appSettings.ProjectType.ToUpperInvariant(), out var getArtifactory))
+            var projectTypeMappings = new Dictionary<string, Func<Config>>
+    {
+        { "CONAN", () => appSettings.Conan },
+        { "NPM", () => appSettings.Npm },
+        { "NUGET", () => appSettings.Nuget },
+        { "POETRY", () => appSettings.Poetry },
+        { "DEBIAN", () => appSettings.Debian },
+        { "MAVEN", () => appSettings.Maven }
+    };
+            if (projectTypeMappings.TryGetValue(appSettings.ProjectType.ToUpperInvariant(), out var getConfig))
             {
-                var artifactory = getArtifactory();
-                if (artifactory != null)
+                var config = getConfig();
+                if (config != null)
                 {
-                    return (artifactory.InternalRepos ?? Array.Empty<string>())
-                        .Concat(artifactory.DevRepos ?? Array.Empty<string>())
-                        .Concat(artifactory.RemoteRepos ?? Array.Empty<string>())
-                        .Concat(artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? Array.Empty<string>())
-                        .ToArray();
+                    var repoList = new List<string>();
+                    if (!string.IsNullOrEmpty(config.ReleaseRepo))
+                    {
+                        repoList.Add(config.ReleaseRepo);
+                    }
+
+                    if (!string.IsNullOrEmpty(config.DevDepRepo))
+                    {
+                        repoList.Add(config.DevDepRepo);
+                    }
+
+                    if (config.Artifactory != null)
+                    {
+                        repoList.AddRange(config.Artifactory.InternalRepos ?? Array.Empty<string>());
+                        repoList.AddRange(config.Artifactory.DevRepos ?? Array.Empty<string>());
+                        repoList.AddRange(config.Artifactory.RemoteRepos ?? Array.Empty<string>());
+                        repoList.AddRange(config.Artifactory.ThirdPartyRepos?.Select(repo => repo.Name) ?? Array.Empty<string>());
+                    }
+
+                    return [.. repoList.Where(repo => !string.IsNullOrEmpty(repo)).Distinct()];
                 }
             }
 
             return Array.Empty<string>();
-        }        
+        }
         public static string LogFolderInitialisation(CommonAppSettings appSettings, string logFileName, bool m_Verbose)
         {
             string FolderPath = DefaultLogPath;
@@ -322,7 +349,7 @@ namespace LCT.Common
                 }
             }
             return FolderPath;
-        }        
+        }
         public static void DefaultLogFolderInitialisation(string logFileName, bool m_Verbose)
         {
             string FolderPath;
@@ -345,7 +372,7 @@ namespace LCT.Common
 
             invalidChars = string.Join(", ", foundInvalidChars.Select(c => $"'{c}'"));
             return foundInvalidChars.Count != 0;
-        }        
+        }
         public static int ValidateSw360Project(string sw360ProjectName, string clearingState, string Name, CommonAppSettings appSettings)
         {
             if (string.IsNullOrEmpty(sw360ProjectName))
@@ -395,16 +422,135 @@ namespace LCT.Common
                     if (i + 1 < args.Length)
                     {
                         maskedArgs[i + 1] = "******";
-                        skipNext = true; 
+                        skipNext = true;
                     }
                 }
                 else
                 {
-                    maskedArgs[i] = args[i]; 
+                    maskedArgs[i] = args[i];
                 }
             }
 
             return maskedArgs;
+        }
+
+        public static Bom RemoveExcludedComponentsFromBom(CommonAppSettings appSettings, Bom cycloneDXBOM, Action<int> updateKpiCallback = null)
+        {
+            List<Component> componentForBOM = cycloneDXBOM.Components.ToList();
+            List<Dependency> dependenciesForBOM = cycloneDXBOM.Dependencies?.ToList() ?? new List<Dependency>();
+            int noOfExcludedComponents = 0;
+
+            if (appSettings?.SW360?.ExcludeComponents != null)
+            {
+                componentForBOM = RemoveExcludedComponents(componentForBOM, appSettings.SW360?.ExcludeComponents, ref noOfExcludedComponents);
+                dependenciesForBOM = RemoveInvalidDependenciesAndReferences(componentForBOM, dependenciesForBOM);
+                updateKpiCallback?.Invoke(noOfExcludedComponents);
+            }
+
+            cycloneDXBOM.Components = componentForBOM;
+            cycloneDXBOM.Dependencies = dependenciesForBOM;
+            return cycloneDXBOM;
+        }
+
+        /// <summary>
+        /// Processes components to add internal identification properties
+        /// </summary>
+        /// <param name="components">List of components to process</param>
+        /// <param name="isInternalPredicate">Function to determine if a component is internal</param>
+        /// <returns>Tuple containing (processedComponents, internalComponents)</returns>
+        public static (List<Component> processedComponents, List<Component> internalComponents) ProcessInternalComponentIdentification(List<Component> components, Func<Component, bool> isInternalPredicate)
+        {
+            List<Component> internalComponents = new List<Component>();
+            var processedComponents = new List<Component>();
+
+            foreach (Component component in components)
+            {
+                var currentIterationItem = component;
+                bool isTrue = isInternalPredicate(currentIterationItem);
+
+                currentIterationItem.Properties ??= new List<Property>();
+
+                string isInternalValue = isTrue ? "true" : "false";
+                var properties = currentIterationItem.Properties;
+                CommonHelper.RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_IsInternal, isInternalValue);
+                currentIterationItem.Properties = properties;
+                if (isTrue)
+                {
+                    internalComponents.Add(currentIterationItem);
+                }
+
+                processedComponents.Add(currentIterationItem);
+            }
+
+            return (processedComponents, internalComponents);
+        }
+
+        /// <summary>
+        /// Sets standard component properties and hashes for JFrog components
+        /// </summary>
+        /// <param name="component">Component to update</param>
+        /// <param name="artifactoryRepo">Artifactory repository name</param>
+        /// <param name="projectType">Project type property</param>
+        /// <param name="siemensFileName">Siemens filename property</param>
+        /// <param name="jfrogRepoPath">JFrog repository path property</param>
+        /// <param name="hashes">Optional AQL result containing hash values</param>
+        public static void SetComponentPropertiesAndHashes(Component component,
+     Property artifactoryRepo,
+     Property projectType,
+     Property siemensFileName,
+     Property jfrogRepoPath,
+     dynamic hashes = null)
+        {
+            component.Properties ??= new List<Property>();
+            var properties = component.Properties;
+            RemoveDuplicateAndAddProperty(ref properties, artifactoryRepo?.Name, artifactoryRepo?.Value);
+            RemoveDuplicateAndAddProperty(ref properties, projectType?.Name, projectType?.Value);
+            RemoveDuplicateAndAddProperty(ref properties, siemensFileName?.Name, siemensFileName?.Value);
+            RemoveDuplicateAndAddProperty(ref properties, jfrogRepoPath?.Name, jfrogRepoPath?.Value);
+            component.Properties = properties;
+            component.Description = null;
+            if (hashes != null)
+            {
+                component.Hashes = new List<Hash>()
+        {
+            new()
+            {
+                Alg = Hash.HashAlgorithm.MD5,
+                Content = hashes.MD5
+            },
+            new()
+            {
+                Alg = Hash.HashAlgorithm.SHA_1,
+                Content = hashes.SHA1
+            },
+            new()
+            {
+                Alg = Hash.HashAlgorithm.SHA_256,
+                Content = hashes.SHA256
+            }
+        };
+            }
+        }
+        public static void AddSpdxSBomFileNameProperty(ref Bom bom, string filePath)
+        {
+            if (bom?.Components != null)
+            {
+                string filename = Path.GetFileName(filePath);
+                var bomComponentsList = bom.Components;
+                foreach (var component in bomComponentsList)
+                {
+                    component.Properties ??= new List<Property>();
+                    SpdxSbomHelper.AddSpdxComponentProperties(filename, component);
+                }
+                bom.Components = bomComponentsList;
+            }
+
+        }
+        public static void RemoveDuplicateAndAddProperty(ref List<Property> properties, string propertyName, string propertyValue)
+        {
+            properties ??= new List<Property>();
+            properties.RemoveAll(p => p.Name == propertyName);
+            properties.Add(new Property { Name = propertyName, Value = propertyValue });
         }
         #endregion
 
@@ -420,24 +566,23 @@ namespace LCT.Common
             return sw360URL;
         }
 
-        private static List<Component> AddExcludedComponentsPropertyFromPurl(List<Component> ComponentList, List<string> ExcludedComponentsFromPurl, ref int noOfExcludedComponents)
+        private static void AddExcludedComponentsPropertyFromPurl(List<Component> ComponentList, List<string> ExcludedComponentsFromPurl, ref int noOfExcludedComponents)
         {
-
-
             foreach (string excludedComponent in ExcludedComponentsFromPurl)
             {
-                Property excludeProperty = new() { Name = Dataconstant.Cdx_ExcludeComponent, Value = "true" };
                 foreach (var component in ComponentList)
                 {
                     string componentPurl = NormalizePurl(component.Purl);
                     if (component.Purl != null && componentPurl.Equals(excludedComponent, StringComparison.OrdinalIgnoreCase))
                     {
-                        component.Properties.Add(excludeProperty);
+                        component.Properties ??= new List<Property>();
+                        var properties = component.Properties;
+                        RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_ExcludeComponent, "true");
+                        component.Properties = properties;
                         noOfExcludedComponents++;
                     }
                 }
             }
-            return ComponentList;
         }
         private static string NormalizePurl(string purl)
         {
@@ -447,10 +592,8 @@ namespace LCT.Common
             }
             return purl;
         }
-        private static List<Component> AddExcludedComponentsPropertyFromNameAndVersion(List<Component> ComponentList, List<string> otherExcludedComponents, ref int noOfExcludedComponents)
+        private static void AddExcludedComponentsPropertyFromNameAndVersion(List<Component> ComponentList, List<string> otherExcludedComponents, ref int noOfExcludedComponents)
         {
-
-            Property excludeProperty = new() { Name = Dataconstant.Cdx_ExcludeComponent, Value = "true" };
             foreach (string excludedComponent in otherExcludedComponents)
             {
                 string[] excludedcomponent = excludedComponent.ToLower().Split(':');
@@ -462,15 +605,31 @@ namespace LCT.Common
                         name = $"{component.Group}/{component.Name}";
                     }
                     if (excludedcomponent.Length > 0 && (Regex.IsMatch(name.ToLowerInvariant(), WildcardToRegex(excludedcomponent[0].ToLowerInvariant()))) &&
-                        (component.Version.ToLowerInvariant().Contains(excludedcomponent[1].ToLowerInvariant()) || excludedcomponent[1].ToLowerInvariant() == "*"))
+                        (component.Version.Contains(excludedcomponent[1], StringComparison.InvariantCultureIgnoreCase) || excludedcomponent[1].Equals("*", StringComparison.InvariantCultureIgnoreCase)))
                     {
                         noOfExcludedComponents++;
-                        component.Properties.Add(excludeProperty);
+                        component.Properties ??= new List<Property>();
+                        var properties = component.Properties;
+                        RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_ExcludeComponent, "true");
+                        component.Properties = properties;
                     }
                 }
             }
-
-            return ComponentList;
+        }
+        public static Component CreateComponentWithProperties(
+    string name,
+    string version,
+    string releaseExternalId)
+        {
+            Component component = new Component
+            {
+                Name = name,
+                Version = version,
+                Purl = releaseExternalId,
+                BomRef = releaseExternalId,
+                Type = Component.Classification.Library
+            };
+            return component;
         }
         #endregion
     }

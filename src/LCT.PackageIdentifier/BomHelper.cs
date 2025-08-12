@@ -8,6 +8,8 @@ using CycloneDX.Models;
 using LCT.APICommunications;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
+using LCT.Common.Constants;
+using LCT.Common.Interface;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
@@ -65,6 +67,7 @@ namespace LCT.PackageIdentifier
             }
             printList.Add(CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ComponentsinSBOMTemplateFile)), bomKpiData.ComponentsinSBOMTemplateFile);
             printList.Add(CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ComponentsUpdatedFromSBOMTemplateFile)), bomKpiData.ComponentsUpdatedFromSBOMTemplateFile);
+            printList.Add(CommonHelper.Convert(bomKpiData, nameof(bomKpiData.UnsupportedComponentsFromSpdxFile)), bomKpiData.UnsupportedComponentsFromSpdxFile);
             printList.Add(CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ComponentsInComparisonBOM)), bomKpiData.ComponentsInComparisonBOM);
             Dictionary<string, double> printTimingList = new Dictionary<string, double>()
             {
@@ -94,7 +97,70 @@ namespace LCT.PackageIdentifier
                 Logger.Info("\n");
             }
         }
+        public static void NamingConventionOfSPDXFile(string filepath, CommonAppSettings appSettings)
+        {
+            string filename = Path.GetFileName(filepath);
+            var relatedExtensions = new[] { $"{filename}.pem", $"{filename}.sig" };
 
+            var foundFiles = new Dictionary<string, string>();
+            var missingFiles = new List<string>();
+
+            CheckFileExistence(appSettings.Directory.InputFolder, relatedExtensions, foundFiles, missingFiles);
+
+            if (missingFiles.Count > 0)
+            {
+                HandleMissingFiles(missingFiles, filename);
+            }
+            else
+            {
+                ValidateFoundFiles(filepath, filename, foundFiles);
+            }
+        }
+
+        private static void CheckFileExistence(string inputFolder, string[] relatedExtensions,
+            Dictionary<string, string> foundFiles, List<string> missingFiles)
+        {
+            foreach (var related in relatedExtensions)
+            {
+                string relatedFile = Path.Combine(inputFolder, related);
+                if (File.Exists(relatedFile))
+                {
+                    foundFiles[related] = relatedFile;
+                }
+                else
+                {
+                    missingFiles.Add(related);
+                }
+            }
+        }
+
+        private static void HandleMissingFiles(List<string> missingFiles, string filename)
+        {
+            foreach (var missingFile in missingFiles)
+            {
+                if (missingFile.EndsWith(".sig", StringComparison.OrdinalIgnoreCase))
+                {
+                    Logger.Error($"Naming Convention Error: The certificate file(s) for the SPDX document '{filename}' are missing. Please ensure that signature files are named in the format '{filename}.sig'.");
+                }
+                else if (missingFile.EndsWith(".pem", StringComparison.OrdinalIgnoreCase))
+                {
+                    Logger.Error($"Naming Convention Error: The certificate file(s) for the SPDX document '{filename}' are missing. Please ensure that .pem files are named in the format '{filename}.pem'.");
+                }
+            }
+        }
+
+        private static void ValidateFoundFiles(string filepath, string filename, Dictionary<string, string> foundFiles)
+        {
+            string sigFilePath = foundFiles.TryGetValue($"{filename}.sig", out string sigFile) ? sigFile : string.Empty;
+            string pemFilePath = foundFiles.TryGetValue($"{filename}.pem", out string pemFile) ? pemFile : string.Empty;
+
+            bool isValidFile = PemSignatureVerifier.ValidatePem(filepath, sigFilePath, pemFilePath);
+            if (!isValidFile)
+            {
+                Logger.Warn($"The signature of the SPDX file '{filename}' is not valid. Please check the signature and certificate files.");
+                Logger.Warn($"Currently processing the SPDX file '{filename}' without signature verification.");
+            }
+        }
         public static string GetHashCodeUsingNpmView(string name, string version)
         {
             string hashCode;
@@ -213,6 +279,22 @@ namespace LCT.PackageIdentifier
             }
 
             return aqlResultList;
+        }
+
+        public static Bom ParseBomFile(string filePath, ISpdxBomParser spdxBomParser, ICycloneDXBomParser cycloneDXBomParser, CommonAppSettings appSettings, ref Bom listUnsupportedComponents)
+        {
+            if (filePath.EndsWith(FileConstant.SPDXFileExtension))
+            {
+                Bom bom;
+                bom = spdxBomParser.ParseSPDXBom(filePath);
+                SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bom, appSettings.ProjectType, ref listUnsupportedComponents);
+                SpdxSbomHelper.AddSpdxPropertysForUnsupportedComponents(listUnsupportedComponents.Components, filePath);
+                return bom;
+            }
+            else
+            {
+                return cycloneDXBomParser.ParseCycloneDXBom(filePath);
+            }
         }
 
         #endregion

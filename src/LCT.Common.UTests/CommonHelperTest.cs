@@ -6,7 +6,6 @@
 
 using CycloneDX.Models;
 using LCT.Common.Constants;
-using LCT.Common.Interface;
 using LCT.Common.Model;
 using log4net;
 using NUnit.Framework;
@@ -15,6 +14,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using File = System.IO.File;
 
 namespace LCT.Common.UTest
 {
@@ -32,11 +32,9 @@ namespace LCT.Common.UTest
 
             tempLogFile = Path.Combine(tempDir, "catool.log");
             File.WriteAllText(tempLogFile, "test log content");
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            appSettings = new CommonAppSettings(folderAction, fileOperations)
+            appSettings = new CommonAppSettings()
             {
-                Directory = new Directory(folderAction, fileOperations)
+                Directory = new Directory()
                 {
                     LogFolder = tempDir // Mocked LogFolder
                 }
@@ -143,9 +141,9 @@ namespace LCT.Common.UTest
             componentsForBOM.Add(new Component() { Name = "Component1", Version = "1.0" });
             componentsForBOM.Add(new Component() { Name = "Component2", Version = "2.0" });
             List<Component> listComponentForBOM = new List<Component>();
-
+            string filePath = "";
             //Act
-            CommonHelper.GetDetailsForManuallyAdded(componentsForBOM, listComponentForBOM);
+            CommonHelper.GetDetailsForManuallyAdded(componentsForBOM, listComponentForBOM, filePath);
 
             //Assert
             Assert.AreEqual(2, listComponentForBOM.Count);
@@ -527,6 +525,948 @@ namespace LCT.Common.UTest
             }
 
         }
+
+        [Test]
+        public void RemoveExcludedComponentsFromBom_WithNullAppSettings_ReturnsUnchangedBom()
+        {
+            // Arrange
+            var bom = new Bom
+            {
+                Components = new List<Component>
+                {
+                    new Component { Name = "Component1", Version = "1.0", Properties = new List<Property>() },
+                    new Component { Name = "Component2", Version = "2.0", Properties = new List<Property>() }
+                },
+                Dependencies = new List<Dependency>
+                {
+                    new Dependency { Ref = "ref1" },
+                    new Dependency { Ref = "ref2" }
+                }
+            };
+            CommonAppSettings appSettings = null;
+
+            // Act
+            var result = CommonHelper.RemoveExcludedComponentsFromBom(appSettings, bom);
+
+            // Assert
+            Assert.AreEqual(2, result.Components.Count);
+            Assert.AreEqual(2, result.Dependencies.Count);
+            Assert.AreEqual("Component1", result.Components.First().Name);
+            Assert.AreEqual("Component2", result.Components.Last().Name);
+        }
+
+        [Test]
+        public void RemoveExcludedComponentsFromBom_WithNullSW360_ReturnsUnchangedBom()
+        {
+            // Arrange
+            var bom = new Bom
+            {
+                Components = new List<Component>
+                {
+                    new Component { Name = "Component1", Version = "1.0", Properties = new List<Property>() },
+                    new Component { Name = "Component2", Version = "2.0", Properties = new List<Property>() }
+                },
+                Dependencies = new List<Dependency>
+                {
+                    new Dependency { Ref = "ref1" },
+                    new Dependency { Ref = "ref2" }
+                }
+            };
+            var appSettings = new CommonAppSettings { SW360 = null };
+
+            // Act
+            var result = CommonHelper.RemoveExcludedComponentsFromBom(appSettings, bom);
+
+            // Assert
+            Assert.AreEqual(2, result.Components.Count);
+            Assert.AreEqual(2, result.Dependencies.Count);
+        }
+
+        [Test]
+        public void RemoveExcludedComponentsFromBom_WithNullExcludeComponents_ReturnsUnchangedBom()
+        {
+            // Arrange
+            var bom = new Bom
+            {
+                Components = new List<Component>
+                {
+                    new Component { Name = "Component1", Version = "1.0", Properties = new List<Property>() },
+                    new Component { Name = "Component2", Version = "2.0", Properties = new List<Property>() }
+                },
+                Dependencies = new List<Dependency>
+                {
+                    new Dependency { Ref = "ref1" },
+                    new Dependency { Ref = "ref2" }
+                }
+            };
+            var appSettings = new CommonAppSettings
+            {
+                SW360 = new SW360 { ExcludeComponents = null }
+            };
+
+            // Act
+            var result = CommonHelper.RemoveExcludedComponentsFromBom(appSettings, bom);
+
+            // Assert
+            Assert.AreEqual(2, result.Components.Count);
+            Assert.AreEqual(2, result.Dependencies.Count);
+        }
+
+        [Test]
+        public void RemoveExcludedComponentsFromBom_WithExcludedComponents_RemovesComponentsAndCallsCallback()
+        {
+            // Arrange
+            var bom = new Bom
+            {
+                Components = new List<Component>
+                {
+                    new Component { Name = "Component1", Version = "1.0", Properties = new List<Property>() },
+                    new Component { Name = "Component2", Version = "2.0", Properties = new List<Property>() },
+                    new Component { Name = "Component3", Version = "3.0", Properties = new List<Property>() }
+                },
+                Dependencies = new List<Dependency>
+                {
+                    new Dependency { Ref = "ref1" },
+                    new Dependency { Ref = "ref2" }
+                }
+            };
+            var appSettings = new CommonAppSettings
+            {
+                SW360 = new SW360
+                {
+                    ExcludeComponents = new List<string> { "Component1:*", "Component2:2.0" }
+                }
+            };
+            int callbackInvokedWith = -1;
+
+            // Act
+            var result = CommonHelper.RemoveExcludedComponentsFromBom(appSettings, bom,
+                count => callbackInvokedWith = count);
+
+            // Assert
+            Assert.AreEqual(3, result.Components.Count);
+            Assert.AreEqual(2, callbackInvokedWith);
+        }
+
+        [Test]
+        public void RemoveExcludedComponentsFromBom_WithNullDependencies_HandlesNullDependencies()
+        {
+            // Arrange
+            var bom = new Bom
+            {
+                Components = new List<Component>
+                {
+                    new Component { Name = "Component1", Version = "1.0", Properties = new List<Property>() }
+                },
+                Dependencies = null
+            };
+            var appSettings = new CommonAppSettings
+            {
+                SW360 = new SW360
+                {
+                    ExcludeComponents = new List<string> { "Component1:*" }
+                }
+            };
+
+            // Act
+            var result = CommonHelper.RemoveExcludedComponentsFromBom(appSettings, bom);
+
+            // Assert
+            Assert.AreEqual(1, result.Components.Count);
+            Assert.IsNotNull(result.Dependencies);
+            Assert.AreEqual(0, result.Dependencies.Count);
+        }
+
+        [Test]
+        public void RemoveExcludedComponentsFromBom_WithoutCallback_DoesNotThrowException()
+        {
+            // Arrange
+            var bom = new Bom
+            {
+                Components = new List<Component>
+                {
+                    new Component { Name = "Component1", Version = "1.0", Properties = new List<Property>() }
+                },
+                Dependencies = new List<Dependency>()
+            };
+            var appSettings = new CommonAppSettings
+            {
+                SW360 = new SW360
+                {
+                    ExcludeComponents = new List<string> { "Component1:*" }
+                }
+            };
+
+            // Act & Assert
+            Assert.DoesNotThrow(() =>
+                CommonHelper.RemoveExcludedComponentsFromBom(appSettings, bom, null));
+        }
+
+        [Test]
+        public void RemoveExcludedComponentsFromBom_WithValidComponentsAndDependencies_RemovesInvalidDependencies()
+        {
+            // Arrange
+            var bom = new Bom
+            {
+                Components = new List<Component>
+                {
+                    new Component { Name = "Component1", Version = "1.0", BomRef = "ref1", Properties = new List<Property>() },
+                    new Component { Name = "Component2", Version = "2.0", BomRef = "ref2", Properties = new List<Property>() }
+                },
+                Dependencies = new List<Dependency>
+                {
+                    new Dependency { Ref = "ref1" }, // Valid - component exists
+                    new Dependency { Ref = "ref2" }, // Valid - component exists
+                    new Dependency { Ref = "ref3" }  // Invalid - component doesn't exist
+                }
+            };
+            var appSettings = new CommonAppSettings
+            {
+                SW360 = new SW360
+                {
+                    ExcludeComponents = new List<string>() // No exclusions
+                }
+            };
+
+            // Act
+            var result = CommonHelper.RemoveExcludedComponentsFromBom(appSettings, bom);
+
+            // Assert
+            Assert.AreEqual(2, result.Components.Count);
+            Assert.AreEqual(2, result.Dependencies.Count); // Invalid dependency should be removed
+            Assert.IsTrue(result.Dependencies.All(d => d.Ref == "ref1" || d.Ref == "ref2"));
+        }
+
+        [Test]
+        public void RemoveExcludedComponentsFromBom_WithEmptyComponents_ReturnsEmptyComponents()
+        {
+            // Arrange
+            var bom = new Bom
+            {
+                Components = new List<Component>(),
+                Dependencies = new List<Dependency>
+                {
+                    new Dependency { Ref = "ref1" }
+                }
+            };
+            var appSettings = new CommonAppSettings
+            {
+                SW360 = new SW360
+                {
+                    ExcludeComponents = new List<string> { "Component1:*" }
+                }
+            };
+            int callbackInvokedWith = -1;
+
+            // Act
+            var result = CommonHelper.RemoveExcludedComponentsFromBom(appSettings, bom,
+                count => callbackInvokedWith = count);
+
+            // Assert
+            Assert.AreEqual(0, result.Components.Count);
+            Assert.AreEqual(0, result.Dependencies.Count); // Dependencies removed because no valid components
+            Assert.AreEqual(0, callbackInvokedWith); // No components to exclude
+        }
+
+        [Test]
+        public void RemoveExcludedComponentsFromBom_WithPurlBasedExclusion_ExcludesCorrectComponents()
+        {
+            // Arrange
+            var bom = new Bom
+            {
+                Components = new List<Component>
+                {
+                    new Component { Name = "Component1", Version = "1.0", Purl = "pkg:npm/Component1@1.0", Properties = new List<Property>() },
+                    new Component { Name = "Component2", Version = "2.0", Purl = "pkg:npm/Component2@2.0", Properties = new List<Property>() }
+                },
+                Dependencies = new List<Dependency>()
+            };
+            var appSettings = new CommonAppSettings
+            {
+                SW360 = new SW360
+                {
+                    ExcludeComponents = new List<string> { "pkg:npm/Component1@1.0" }
+                }
+            };
+            int callbackInvokedWith = -1;
+
+            // Act
+            var result = CommonHelper.RemoveExcludedComponentsFromBom(appSettings, bom,
+                count => callbackInvokedWith = count);
+
+            // Assert
+            Assert.AreEqual(2, result.Components.Count);
+            Assert.AreEqual(1, callbackInvokedWith);
+            // Verify that the excluded component has the exclusion property
+            var excludedComponent = result.Components.First(c => c.Name == "Component1");
+            Assert.IsTrue(excludedComponent.Properties.Any(p => p.Name == Dataconstant.Cdx_ExcludeComponent && p.Value == "true"));
+        }
+
+        [Test]
+        public void ProcessInternalComponentIdentification_WithEmptyComponents_ReturnsEmptyLists()
+        {
+            // Arrange
+            List<Component> components = new List<Component>();
+            Func<Component, bool> predicate = component => true;
+
+            // Act
+            var (processedComponents, internalComponents) = CommonHelper.ProcessInternalComponentIdentification(components, predicate);
+
+            // Assert
+            Assert.AreEqual(0, processedComponents.Count);
+            Assert.AreEqual(0, internalComponents.Count);
+        }
+
+        [Test]
+        public void ProcessInternalComponentIdentification_WithAllInternalComponents_ReturnsAllAsInternal()
+        {
+            // Arrange
+            List<Component> components = new List<Component>
+            {
+                new Component { Name = "Component1", Version = "1.0", Properties = new List<Property>() },
+                new Component { Name = "Component2", Version = "2.0", Properties = new List<Property>() }
+            };
+            Func<Component, bool> predicate = component => true; // All are internal
+
+            // Act
+            var (processedComponents, internalComponents) = CommonHelper.ProcessInternalComponentIdentification(components, predicate);
+
+            // Assert
+            Assert.AreEqual(2, processedComponents.Count);
+            Assert.AreEqual(2, internalComponents.Count);
+
+            // Verify all components have the internal property set to true
+            foreach (var component in processedComponents)
+            {
+                var internalProperty = component.Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsInternal);
+                Assert.IsNotNull(internalProperty);
+                Assert.AreEqual("true", internalProperty.Value);
+            }
+        }
+
+        [Test]
+        public void ProcessInternalComponentIdentification_WithNoInternalComponents_ReturnsNoneAsInternal()
+        {
+            // Arrange
+            List<Component> components = new List<Component>
+            {
+                new Component { Name = "Component1", Version = "1.0", Properties = new List<Property>() },
+                new Component { Name = "Component2", Version = "2.0", Properties = new List<Property>() }
+            };
+            Func<Component, bool> predicate = component => false; // None are internal
+
+            // Act
+            var (processedComponents, internalComponents) = CommonHelper.ProcessInternalComponentIdentification(components, predicate);
+
+            // Assert
+            Assert.AreEqual(2, processedComponents.Count);
+            Assert.AreEqual(0, internalComponents.Count);
+
+            // Verify all components have the internal property set to false
+            foreach (var component in processedComponents)
+            {
+                var internalProperty = component.Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsInternal);
+                Assert.IsNotNull(internalProperty);
+                Assert.AreEqual("false", internalProperty.Value);
+            }
+        }
+
+        [Test]
+        public void ProcessInternalComponentIdentification_WithMixedComponents_ReturnsMixedResults()
+        {
+            // Arrange
+            List<Component> components = new List<Component>
+            {
+                new Component { Name = "InternalComponent", Version = "1.0", Properties = new List<Property>() },
+                new Component { Name = "ExternalComponent", Version = "2.0", Properties = new List<Property>() },
+                new Component { Name = "AnotherInternal", Version = "3.0", Properties = new List<Property>() }
+            };
+            Func<Component, bool> predicate = component => component.Name.Contains("Internal");
+
+            // Act
+            var (processedComponents, internalComponents) = CommonHelper.ProcessInternalComponentIdentification(components, predicate);
+
+            // Assert
+            Assert.AreEqual(3, processedComponents.Count);
+            Assert.AreEqual(2, internalComponents.Count);
+
+            // Verify internal components
+            Assert.IsTrue(internalComponents.All(c => c.Name.Contains("Internal")));
+
+            // Verify properties are set correctly
+            var internalComp1 = processedComponents.FirstOrDefault(c => c.Name == "InternalComponent");
+            var externalComp = processedComponents.FirstOrDefault(c => c.Name == "ExternalComponent");
+            var internalComp2 = processedComponents.FirstOrDefault(c => c.Name == "AnotherInternal");
+
+            Assert.AreEqual("true", internalComp1.Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsInternal)?.Value);
+            Assert.AreEqual("false", externalComp.Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsInternal)?.Value);
+            Assert.AreEqual("true", internalComp2.Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsInternal)?.Value);
+        }
+
+        [Test]
+        public void ProcessInternalComponentIdentification_WithNullProperties_InitializesProperties()
+        {
+            // Arrange
+            List<Component> components = new List<Component>
+            {
+                new Component { Name = "Component1", Version = "1.0", Properties = null },
+                new Component { Name = "Component2", Version = "2.0" } // Properties not set
+            };
+            Func<Component, bool> predicate = component => component.Name == "Component1";
+
+            // Act
+            var (processedComponents, internalComponents) = CommonHelper.ProcessInternalComponentIdentification(components, predicate);
+
+            // Assert
+            Assert.AreEqual(2, processedComponents.Count);
+            Assert.AreEqual(1, internalComponents.Count);
+
+            // Verify properties were initialized and set correctly
+            foreach (var component in processedComponents)
+            {
+                Assert.IsNotNull(component.Properties);
+                Assert.IsTrue(component.Properties.Count > 0);
+
+                var internalProperty = component.Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsInternal);
+                Assert.IsNotNull(internalProperty);
+
+                if (component.Name == "Component1")
+                {
+                    Assert.AreEqual("true", internalProperty.Value);
+                }
+                else
+                {
+                    Assert.AreEqual("false", internalProperty.Value);
+                }
+            }
+        }
+
+        [Test]
+        public void ProcessInternalComponentIdentification_WithExistingProperties_AddsInternalProperty()
+        {
+            // Arrange
+            var existingProperty = new Property { Name = "ExistingProperty", Value = "ExistingValue" };
+            List<Component> components = new List<Component>
+            {
+                new Component
+                {
+                    Name = "Component1",
+                    Version = "1.0",
+                    Properties = new List<Property> { existingProperty }
+                }
+            };
+            Func<Component, bool> predicate = component => true;
+
+            // Act
+            var (processedComponents, internalComponents) = CommonHelper.ProcessInternalComponentIdentification(components, predicate);
+
+            // Assert
+            Assert.AreEqual(1, processedComponents.Count);
+            Assert.AreEqual(1, internalComponents.Count);
+
+            var component = processedComponents.First();
+            Assert.AreEqual(2, component.Properties.Count);
+
+            // Verify existing property is preserved
+            var existingProp = component.Properties.FirstOrDefault(p => p.Name == "ExistingProperty");
+            Assert.IsNotNull(existingProp);
+            Assert.AreEqual("ExistingValue", existingProp.Value);
+
+            // Verify internal property is added
+            var internalProp = component.Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsInternal);
+            Assert.IsNotNull(internalProp);
+            Assert.AreEqual("true", internalProp.Value);
+        }
+
+        [Test]
+        public void ProcessInternalComponentIdentification_WithEmptyPropertiesList_AddsInternalProperty()
+        {
+            // Arrange
+            List<Component> components = new List<Component>
+            {
+                new Component
+                {
+                    Name = "Component1",
+                    Version = "1.0",
+                    Properties = new List<Property>() // Empty but not null
+                }
+            };
+            Func<Component, bool> predicate = component => false;
+
+            // Act
+            var (processedComponents, internalComponents) = CommonHelper.ProcessInternalComponentIdentification(components, predicate);
+
+            // Assert
+            Assert.AreEqual(1, processedComponents.Count);
+            Assert.AreEqual(0, internalComponents.Count);
+
+            var component = processedComponents.First();
+            Assert.AreEqual(1, component.Properties.Count);
+
+            var internalProp = component.Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsInternal);
+            Assert.IsNotNull(internalProp);
+            Assert.AreEqual("false", internalProp.Value);
+        }
+
+        [Test]
+        public void ProcessInternalComponentIdentification_WithComplexPredicate_WorksCorrectly()
+        {
+            // Arrange
+            List<Component> components = new List<Component>
+            {
+                new Component { Name = "Component1", Version = "1.0", Properties = new List<Property>() },
+                new Component { Name = "Component2", Version = "2.0", Properties = new List<Property>() },
+                new Component { Name = "Component3", Version = "1.5", Properties = new List<Property>() }
+            };
+            // Complex predicate: internal if version starts with "1"
+            Func<Component, bool> predicate = component => component.Version.StartsWith("1");
+
+            // Act
+            var (processedComponents, internalComponents) = CommonHelper.ProcessInternalComponentIdentification(components, predicate);
+
+            // Assert
+            Assert.AreEqual(3, processedComponents.Count);
+            Assert.AreEqual(2, internalComponents.Count);
+
+            // Verify the correct components are identified as internal
+            Assert.IsTrue(internalComponents.Any(c => c.Name == "Component1"));
+            Assert.IsTrue(internalComponents.Any(c => c.Name == "Component3"));
+            Assert.IsFalse(internalComponents.Any(c => c.Name == "Component2"));
+        }
+
+        [Test]
+        public void ProcessInternalComponentIdentification_PreservesOriginalComponentData()
+        {
+            // Arrange
+            List<Component> components = new List<Component>
+            {
+                new Component
+                {
+                    Name = "Component1",
+                    Version = "1.0",
+                    BomRef = "ref1",
+                    Purl = "pkg:npm/component1@1.0",
+                    Properties = new List<Property>()
+                }
+            };
+            Func<Component, bool> predicate = component => true;
+
+            // Act
+            var (processedComponents, internalComponents) = CommonHelper.ProcessInternalComponentIdentification(components, predicate);
+
+            // Assert
+            var processedComponent = processedComponents.First();
+            Assert.AreEqual("Component1", processedComponent.Name);
+            Assert.AreEqual("1.0", processedComponent.Version);
+            Assert.AreEqual("ref1", processedComponent.BomRef);
+            Assert.AreEqual("pkg:npm/component1@1.0", processedComponent.Purl);
+
+            // Should have added one property (internal) to the existing empty list
+            Assert.AreEqual(1, processedComponent.Properties.Count);
+        }
+
+
+        #region SetComponentPropertiesAndHashes Tests
+
+        [Test]
+        public void SetComponentPropertiesAndHashes_WithNullProperties_InitializesPropertiesList()
+        {
+            // Arrange
+            var component = new Component
+            {
+                Name = "TestComponent",
+                Version = "1.0",
+                Properties = null,
+                Description = "Original Description"
+            };
+            var artifactoryRepo = new Property { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = "test-repo" };
+            var projectType = new Property { Name = Dataconstant.Cdx_ProjectType, Value = "npm" };
+            var siemensFileName = new Property { Name = Dataconstant.Cdx_Siemensfilename, Value = "test-file.tgz" };
+            var jfrogRepoPath = new Property { Name = Dataconstant.Cdx_JfrogRepoPath, Value = "test-repo/path/file.tgz" };
+
+            // Act
+            CommonHelper.SetComponentPropertiesAndHashes(component, artifactoryRepo, projectType, siemensFileName, jfrogRepoPath);
+
+            // Assert
+            Assert.IsNotNull(component.Properties);
+            Assert.AreEqual(4, component.Properties.Count);
+            Assert.IsNull(component.Description);
+            Assert.IsNull(component.Hashes);
+        }
+
+        [Test]
+        public void SetComponentPropertiesAndHashes_WithEmptyProperties_AddsStandardProperties()
+        {
+            // Arrange
+            var component = new Component
+            {
+                Name = "TestComponent",
+                Version = "1.0",
+                Properties = new List<Property>(),
+                Description = "Original Description"
+            };
+            var artifactoryRepo = new Property { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = "test-repo" };
+            var projectType = new Property { Name = Dataconstant.Cdx_ProjectType, Value = "maven" };
+            var siemensFileName = new Property { Name = Dataconstant.Cdx_Siemensfilename, Value = "test-file.jar" };
+            var jfrogRepoPath = new Property { Name = Dataconstant.Cdx_JfrogRepoPath, Value = "test-repo/path/file.jar" };
+
+            // Act
+            CommonHelper.SetComponentPropertiesAndHashes(component, artifactoryRepo, projectType, siemensFileName, jfrogRepoPath);
+
+            // Assert
+            Assert.IsNotNull(component.Properties);
+            Assert.AreEqual(4, component.Properties.Count);
+            Assert.AreEqual("test-repo", component.Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_ArtifactoryRepoName)?.Value);
+            Assert.AreEqual("maven", component.Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_ProjectType)?.Value);
+            Assert.AreEqual("test-file.jar", component.Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_Siemensfilename)?.Value);
+            Assert.AreEqual("test-repo/path/file.jar", component.Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_JfrogRepoPath)?.Value);
+            Assert.IsNull(component.Description);
+        }
+
+        [Test]
+        public void SetComponentPropertiesAndHashes_WithExistingProperties_PreservesAndAddsProperties()
+        {
+            // Arrange
+            var existingProperty = new Property { Name = "ExistingProperty", Value = "ExistingValue" };
+            var component = new Component
+            {
+                Name = "TestComponent",
+                Version = "1.0",
+                Properties = new List<Property> { existingProperty },
+                Description = "Original Description"
+            };
+            var artifactoryRepo = new Property { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = "python-repo" };
+            var projectType = new Property { Name = Dataconstant.Cdx_ProjectType, Value = "python" };
+            var siemensFileName = new Property { Name = Dataconstant.Cdx_Siemensfilename, Value = "test-package.whl" };
+            var jfrogRepoPath = new Property { Name = Dataconstant.Cdx_JfrogRepoPath, Value = "python-repo/path/package.whl" };
+
+            // Act
+            CommonHelper.SetComponentPropertiesAndHashes(component, artifactoryRepo, projectType, siemensFileName, jfrogRepoPath);
+
+            // Assert
+            Assert.IsNotNull(component.Properties);
+            Assert.AreEqual(5, component.Properties.Count);
+
+            // Verify existing property is preserved
+            Assert.IsTrue(component.Properties.Any(p => p.Name == "ExistingProperty" && p.Value == "ExistingValue"));
+
+            // Verify new properties are added
+            Assert.IsTrue(component.Properties.Any(p => p.Name == Dataconstant.Cdx_ArtifactoryRepoName && p.Value == "python-repo"));
+            Assert.IsTrue(component.Properties.Any(p => p.Name == Dataconstant.Cdx_ProjectType && p.Value == "python"));
+            Assert.IsTrue(component.Properties.Any(p => p.Name == Dataconstant.Cdx_Siemensfilename && p.Value == "test-package.whl"));
+            Assert.IsTrue(component.Properties.Any(p => p.Name == Dataconstant.Cdx_JfrogRepoPath && p.Value == "python-repo/path/package.whl"));
+
+            Assert.IsNull(component.Description);
+        }
+
+        [Test]
+        public void SetComponentPropertiesAndHashes_WithValidHashes_AddsHashesToComponent()
+        {
+            // Arrange
+            var component = new Component
+            {
+                Name = "TestComponent",
+                Version = "1.0",
+                Properties = new List<Property>(),
+                Description = "Original Description"
+            };
+            var artifactoryRepo = new Property { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = "test-repo" };
+            var projectType = new Property { Name = Dataconstant.Cdx_ProjectType, Value = "nuget" };
+            var siemensFileName = new Property { Name = Dataconstant.Cdx_Siemensfilename, Value = "test-package.nupkg" };
+            var jfrogRepoPath = new Property { Name = Dataconstant.Cdx_JfrogRepoPath, Value = "nuget-repo/path/package.nupkg" };
+
+            // Create a test hash object that matches the expected structure
+            var hashes = new TestHashObject
+            {
+                MD5 = "5d41402abc4b2a76b9719d911017c592",
+                SHA1 = "aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d",
+                SHA256 = "2cf24dba4f21d4288074e297f7719e34d3e7e0cbfb1c4a1b8d1f8e8b7a6e9c9d"
+            };
+
+            // Act
+            CommonHelper.SetComponentPropertiesAndHashes(component, artifactoryRepo, projectType, siemensFileName, jfrogRepoPath, hashes);
+
+            // Assert
+            Assert.IsNotNull(component.Properties);
+            Assert.AreEqual(4, component.Properties.Count);
+            Assert.IsNull(component.Description);
+
+            // Verify hashes are set correctly
+            Assert.IsNotNull(component.Hashes);
+            Assert.AreEqual(3, component.Hashes.Count);
+
+            var md5Hash = component.Hashes.FirstOrDefault(h => h.Alg == Hash.HashAlgorithm.MD5);
+            Assert.IsNotNull(md5Hash);
+            Assert.AreEqual("5d41402abc4b2a76b9719d911017c592", md5Hash.Content);
+
+            var sha1Hash = component.Hashes.FirstOrDefault(h => h.Alg == Hash.HashAlgorithm.SHA_1);
+            Assert.IsNotNull(sha1Hash);
+            Assert.AreEqual("aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d", sha1Hash.Content);
+
+            var sha256Hash = component.Hashes.FirstOrDefault(h => h.Alg == Hash.HashAlgorithm.SHA_256);
+            Assert.IsNotNull(sha256Hash);
+            Assert.AreEqual("2cf24dba4f21d4288074e297f7719e34d3e7e0cbfb1c4a1b8d1f8e8b7a6e9c9d", sha256Hash.Content);
+        }
+
+        [Test]
+        public void SetComponentPropertiesAndHashes_WithNullHashes_DoesNotSetHashes()
+        {
+            // Arrange
+            var component = new Component
+            {
+                Name = "TestComponent",
+                Version = "1.0",
+                Properties = new List<Property>(),
+                Description = "Original Description"
+            };
+            var artifactoryRepo = new Property { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = "debian-repo" };
+            var projectType = new Property { Name = Dataconstant.Cdx_ProjectType, Value = "debian" };
+            var siemensFileName = new Property { Name = Dataconstant.Cdx_Siemensfilename, Value = "test-package.deb" };
+            var jfrogRepoPath = new Property { Name = Dataconstant.Cdx_JfrogRepoPath, Value = "debian-repo/path/package.deb" };
+
+            // Act
+            CommonHelper.SetComponentPropertiesAndHashes(component, artifactoryRepo, projectType, siemensFileName, jfrogRepoPath, null);
+
+            // Assert
+            Assert.IsNotNull(component.Properties);
+            Assert.AreEqual(4, component.Properties.Count);
+            Assert.IsNull(component.Description);
+            Assert.IsNull(component.Hashes);
+        }
+
+        [Test]
+        public void SetComponentPropertiesAndHashes_WithExistingHashes_ReplacesHashes()
+        {
+            // Arrange
+            var existingHash = new Hash { Alg = Hash.HashAlgorithm.MD5, Content = "oldmd5hash" };
+            var component = new Component
+            {
+                Name = "TestComponent",
+                Version = "1.0",
+                Properties = new List<Property>(),
+                Description = "Original Description",
+                Hashes = new List<Hash> { existingHash }
+            };
+            var artifactoryRepo = new Property { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = "test-repo" };
+            var projectType = new Property { Name = Dataconstant.Cdx_ProjectType, Value = "conan" };
+            var siemensFileName = new Property { Name = Dataconstant.Cdx_Siemensfilename, Value = "test-package.tgz" };
+            var jfrogRepoPath = new Property { Name = Dataconstant.Cdx_JfrogRepoPath, Value = "conan-repo/path/package.tgz" };
+
+            // Create a test hash object that matches the expected structure
+            var newHashes = new TestHashObject
+            {
+                MD5 = "newmd5hash",
+                SHA1 = "newsha1hash",
+                SHA256 = "newsha256hash"
+            };
+
+            // Act
+            CommonHelper.SetComponentPropertiesAndHashes(component, artifactoryRepo, projectType, siemensFileName, jfrogRepoPath, newHashes);
+
+            // Assert
+            Assert.IsNotNull(component.Properties);
+            Assert.AreEqual(4, component.Properties.Count);
+            Assert.IsNull(component.Description);
+
+            // Verify hashes are replaced, not appended
+            Assert.IsNotNull(component.Hashes);
+            Assert.AreEqual(3, component.Hashes.Count);
+            Assert.IsFalse(component.Hashes.Any(h => h.Content == "oldmd5hash"));
+            Assert.IsTrue(component.Hashes.Any(h => h.Content == "newmd5hash"));
+        }
+
+        [Test]
+        public void SetComponentPropertiesAndHashes_AlwaysClearsDescription()
+        {
+            // Arrange
+            var component = new Component
+            {
+                Name = "TestComponent",
+                Version = "1.0",
+                Properties = new List<Property>(),
+                Description = "This description should be cleared"
+            };
+            var artifactoryRepo = new Property { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = "test-repo" };
+            var projectType = new Property { Name = Dataconstant.Cdx_ProjectType, Value = "alpine" };
+            var siemensFileName = new Property { Name = Dataconstant.Cdx_Siemensfilename, Value = "test-package.apk" };
+            var jfrogRepoPath = new Property { Name = Dataconstant.Cdx_JfrogRepoPath, Value = "alpine-repo/path/package.apk" };
+
+            // Act
+            CommonHelper.SetComponentPropertiesAndHashes(component, artifactoryRepo, projectType, siemensFileName, jfrogRepoPath);
+
+            // Assert
+            Assert.IsNull(component.Description);
+        }
+
+        [Test]
+        public void SetComponentPropertiesAndHashes_WithAllParametersNull_HandlesGracefully()
+        {
+            // Arrange
+            var component = new Component
+            {
+                Name = "TestComponent",
+                Version = "1.0",
+                Properties = new List<Property>(),
+                Description = "Original Description"
+            };
+
+            // Act & Assert - Should not throw exception
+            Assert.DoesNotThrow(() =>
+                CommonHelper.SetComponentPropertiesAndHashes(component, null, null, null, null, null));
+
+            // Verify basic behavior
+            Assert.IsNotNull(component.Properties);
+            Assert.AreEqual(1, component.Properties.Count);
+            Assert.IsNull(component.Description);
+            Assert.IsNull(component.Hashes);
+        }
+
+        [Test]
+        public void SetComponentPropertiesAndHashes_WithPartialHashData_HandlesPartialHashes()
+        {
+            // Arrange
+            var component = new Component
+            {
+                Name = "TestComponent",
+                Version = "1.0",
+                Properties = new List<Property>(),
+                Description = "Original Description"
+            };
+            var artifactoryRepo = new Property { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = "test-repo" };
+            var projectType = new Property { Name = Dataconstant.Cdx_ProjectType, Value = "npm" };
+            var siemensFileName = new Property { Name = Dataconstant.Cdx_Siemensfilename, Value = "test-package.tgz" };
+            var jfrogRepoPath = new Property { Name = Dataconstant.Cdx_JfrogRepoPath, Value = "npm-repo/path/package.tgz" };
+
+            // Hashes with some null values
+            var partialHashes = new TestHashObject
+            {
+                MD5 = "validmd5hash",
+                SHA1 = null,
+                SHA256 = "validsha256hash"
+            };
+
+            // Act
+            CommonHelper.SetComponentPropertiesAndHashes(component, artifactoryRepo, projectType, siemensFileName, jfrogRepoPath, partialHashes);
+
+            // Assert
+            Assert.IsNotNull(component.Properties);
+            Assert.AreEqual(4, component.Properties.Count);
+            Assert.IsNull(component.Description);
+
+            // Verify hashes are set even with null values
+            Assert.IsNotNull(component.Hashes);
+            Assert.AreEqual(3, component.Hashes.Count);
+
+            var md5Hash = component.Hashes.FirstOrDefault(h => h.Alg == Hash.HashAlgorithm.MD5);
+            Assert.IsNotNull(md5Hash);
+            Assert.AreEqual("validmd5hash", md5Hash.Content);
+
+            var sha1Hash = component.Hashes.FirstOrDefault(h => h.Alg == Hash.HashAlgorithm.SHA_1);
+            Assert.IsNotNull(sha1Hash);
+            Assert.IsNull(sha1Hash.Content);
+
+            var sha256Hash = component.Hashes.FirstOrDefault(h => h.Alg == Hash.HashAlgorithm.SHA_256);
+            Assert.IsNotNull(sha256Hash);
+            Assert.AreEqual("validsha256hash", sha256Hash.Content);
+        }
+        [Test]
+        public void RemoveDuplicateAndAddProperty_WhenPropertiesIsNull_InitializesListAndAddsProperty()
+        {
+            // Arrange
+            List<Property> properties = null;
+            string propertyName = "TestProperty";
+            string propertyValue = "TestValue";
+
+            // Act
+            CommonHelper.RemoveDuplicateAndAddProperty(ref properties, propertyName, propertyValue);
+
+            // Assert
+            Assert.IsNotNull(properties);
+            Assert.AreEqual(1, properties.Count);
+            Assert.AreEqual(propertyName, properties[0].Name);
+            Assert.AreEqual(propertyValue, properties[0].Value);
+        }
+
+        [Test]
+        public void RemoveDuplicateAndAddProperty_WhenPropertyExists_UpdatesValue()
+        {
+            // Arrange
+            var properties = new List<Property>
+            {
+                new Property { Name = "TestProperty", Value = "OldValue" }
+            };
+            string propertyName = "TestProperty";
+            string propertyValue = "NewValue";
+
+            // Act
+            CommonHelper.RemoveDuplicateAndAddProperty(ref properties, propertyName, propertyValue);
+
+            // Assert
+            Assert.AreEqual(1, properties.Count);
+            Assert.AreEqual(propertyName, properties[0].Name);
+            Assert.AreEqual(propertyValue, properties[0].Value);
+        }
+
+        [Test]
+        public void RemoveDuplicateAndAddProperty_WhenMultiplePropertiesExist_RemovesDuplicatesAndAddsNewProperty()
+        {
+            // Arrange
+            var properties = new List<Property>
+            {
+                new Property { Name = "TestProperty", Value = "OldValue1" },
+                new Property { Name = "TestProperty", Value = "OldValue2" },
+                new Property { Name = "AnotherProperty", Value = "AnotherValue" }
+            };
+            string propertyName = "TestProperty";
+            string propertyValue = "NewValue";
+
+            // Act
+            CommonHelper.RemoveDuplicateAndAddProperty(ref properties, propertyName, propertyValue);
+
+            // Assert
+            Assert.AreEqual(2, properties.Count);
+            Assert.AreEqual(propertyName, properties.First(p => p.Name == propertyName).Name);
+            Assert.AreEqual(propertyValue, properties.First(p => p.Name == propertyName).Value);
+        }
+
+        [Test]
+        public void RemoveDuplicateAndAddProperty_WhenPropertyDoesNotExist_AddsNewProperty()
+        {
+            // Arrange
+            var properties = new List<Property>
+            {
+                new Property { Name = "AnotherProperty", Value = "AnotherValue" }
+            };
+            string propertyName = "TestProperty";
+            string propertyValue = "TestValue";
+
+            // Act
+            CommonHelper.RemoveDuplicateAndAddProperty(ref properties, propertyName, propertyValue);
+
+            // Assert
+            Assert.AreEqual(2, properties.Count);
+            Assert.IsTrue(properties.Any(p => p.Name == propertyName && p.Value == propertyValue));
+        }
+
+        [Test]
+        public void RemoveDuplicateAndAddProperty_WhenPropertiesIsEmpty_AddsNewProperty()
+        {
+            // Arrange
+            var properties = new List<Property>();
+            string propertyName = "TestProperty";
+            string propertyValue = "TestValue";
+
+            // Act
+            CommonHelper.RemoveDuplicateAndAddProperty(ref properties, propertyName, propertyValue);
+
+            // Assert
+            Assert.AreEqual(1, properties.Count);
+            Assert.AreEqual(propertyName, properties[0].Name);
+            Assert.AreEqual(propertyValue, properties[0].Value);
+        }
+        #endregion
+
+        // ...existing code...
     }
 
     public class TestObject
@@ -535,5 +1475,12 @@ namespace LCT.Common.UTest
         public string Property1 { get; set; }
 
         public string Property2 { get; set; }
+    }
+
+    public class TestHashObject
+    {
+        public string MD5 { get; set; }
+        public string SHA1 { get; set; }
+        public string SHA256 { get; set; }
     }
 }

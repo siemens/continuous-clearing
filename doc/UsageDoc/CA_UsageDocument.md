@@ -208,7 +208,34 @@ Users have the flexibility to generate a basic SBOM even if connections to SW360
       After successful execution, output.sbom.cdx.json (*CycloneDX.json*) file will be created in specified directory
 
       Resulted output.sbom.cdx.json file will be having the list of installed packages  and the same file will be used as  an input to Continuous clearing tool - Package identifier via the input directory parameter. The remaining process is same as other project types.
+## SPDX v2.3 Support
 
+The Package Identifier supports importing both supported and unsupported SPDX SBoMs and processes them correctly for inclusion in workflows.
+
+- Automatic detection of SPDX files with `.spdx.sbom.json` suffix from the input directory
+- Conversion of SPDX files to CycloneDX SBOM format while preserving all relationships
+- Addition of custom property "internal:siemens:clearing:spdx-file-name" in the converted CycloneDX SBOM
+- Support for both single and multiple SPDX file processing
+
+### File Naming Convention
+- SPDX files should use the suffix: `.spdx.sbom.json`
+- Example: `component.spdx.sbom.json`
+
+## SPDX SBOM Signature Validator
+The tool now includes automated validation of SPDX SBOM signatures and certificates to ensure integrity and authenticity.
+
+* Input file repository should contain **spdx.sbom.json** file
+
+### File Naming Convention
+For each SPDX SBOM file, the following associated files are expected:
+example.spdx.sbom.json # SBOM file
+example.spdx.sbom.json.sig # Signature file
+example.spdx.sbom.json.pem # Public certificate file
+
+### Validation Process
+1. The system automatically detects SPDX SBOM files in the input directory
+2. For each SBOM file, it locates corresponding `.sig` and `.pem` files
+3. Performs signature verification using the public certificate
 
 ### **Configuring the Continuous Clearing Tool**
 
@@ -228,7 +255,7 @@ Description for the settings in appSettings.json file
 | 2    | ProjectType                               | Type of the project                                           | Yes             | `Nuget`, `NPM`, `Poetry`, `Conan`, `Alpine`, `Debian`, `Maven`                         |
 | 3    | MultipleProjectType                       | Whether multiple project types are supported                  | No              | `False`                                                                    |
 | 4    | Telemetry.Enable                          | Enable telemetry                                              | No              | `False`                                                                    |
-| 5    | Telemetry.ApplicationInsightInstrumentKey | Application Insights instrumentation key                      | No              | `123-456-789-123-123`                                                     |
+| 5    | Telemetry.ApplicationInsightsConnectionString | Application Insights instrumentation key                      | No              | `123-456-789-123-123`                                                     |
 | 6    | SW360.URL                                 | URL of the SW360 server                                       | Yes             | [https://sw360.example.com](https://sw360.example.com)                   |
 | 7    | SW360.ProjectName                         | Name of the SW360 project                                     | Yes             | `MyProject`                                                                |
 | 8    | SW360.ProjectID                           | ID of the SW360 project                                       | Yes             | `57362e4179ce4e839f286ddf0b91d177`                                         |

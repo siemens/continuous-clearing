@@ -35,7 +35,8 @@ namespace LCT.SW360PackageCreator
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        public static CreatorKpiData kpiData = new();
+        private static readonly CreatorKpiData s_kpiData = new();
+        public static CreatorKpiData KpiData => s_kpiData;
         public List<ComparisonBomData> UpdatedCompareBomData { get; set; } = new List<ComparisonBomData>();
         public List<ReleaseLinked> ReleasesFoundInCbom { get; set; } = new List<ReleaseLinked>();
         public List<Components> ComponentsNotLinked { get; set; } = new List<Components>();
@@ -90,12 +91,12 @@ namespace LCT.SW360PackageCreator
                     Components component = await GetSourceUrl(componentsData.Name, componentsData.Version, componentsData.ProjectType, item.BomRef);
                     componentsData.SourceUrl = component.SourceUrl;
 
-                    if (componentsData.ProjectType.ToUpperInvariant() == "ALPINE")
+                    if (componentsData.ProjectType.Equals("ALPINE", StringComparison.InvariantCultureIgnoreCase))
                     {
                         componentsData.AlpineSourceData = component.AlpineSourceData;
                     }
 
-                    if (componentsData.ProjectType.ToUpperInvariant() == "DEBIAN")
+                    if (componentsData.ProjectType.Equals("DEBIAN", StringComparison.InvariantCultureIgnoreCase))
                     {
                         componentsData = component;
                     }
@@ -111,7 +112,7 @@ namespace LCT.SW360PackageCreator
         private void UpdateToLocalBomFile(Components componentsData, string currName, string currVersion)
         {
             Component currBom;
-            if (componentsData.ProjectType.ToLowerInvariant() == "debian" &&
+            if (componentsData.ProjectType.Equals("debian", StringComparison.InvariantCultureIgnoreCase) &&
                 (currName != componentsData.Name || currVersion != componentsData.Version))
             {
                 Logger.Debug($"Source name found for binary package {currName}-{currVersion} --" +
@@ -130,7 +131,7 @@ namespace LCT.SW360PackageCreator
 
                 componentsData.Version = $"{componentsData.Version}.debian";
             }
-            else if (componentsData.ProjectType.ToLowerInvariant() == "debian")
+            else if (componentsData.ProjectType.Equals("debian", StringComparison.InvariantCultureIgnoreCase))
             {
                 //Append .debian to all Debian type component releases
                 currBom = bom.Components?.Find(val => val.Name == currName && val.Version == currVersion);
@@ -150,21 +151,24 @@ namespace LCT.SW360PackageCreator
         {
             bool isInternalComponent = false;
 
+            if (package.Properties == null)
+                return isInternalComponent;
+
             foreach (var property in package.Properties)
             {
-                if (property.Name?.ToLower() == Dataconstant.Cdx_ProjectType.ToLower())
+                if (string.Equals(property.Name, Dataconstant.Cdx_ProjectType, StringComparison.CurrentCultureIgnoreCase))
                 {
                     componentsData.ProjectType = property.Value;
                 }
-                if (property.Name?.ToLower() == Dataconstant.Cdx_IsInternal.ToLower())
+                if (string.Equals(property.Name, Dataconstant.Cdx_IsInternal, StringComparison.CurrentCultureIgnoreCase))
                 {
                     _ = bool.TryParse(property.Value, out isInternalComponent);
                 }
-                if (property.Name?.ToLower() == Dataconstant.Cdx_IsDevelopment.ToLower())
+                if (string.Equals(property.Name, Dataconstant.Cdx_IsDevelopment, StringComparison.CurrentCultureIgnoreCase))
                 {
                     componentsData.IsDev = property.Value;
                 }
-                if (property.Name?.ToLower() == Dataconstant.Cdx_ExcludeComponent.ToLower())
+                if (string.Equals(property.Name, Dataconstant.Cdx_ExcludeComponent, StringComparison.CurrentCultureIgnoreCase))
                 {
                     componentsData.ExcludeComponent = property.Value;
                 }
@@ -253,13 +257,13 @@ namespace LCT.SW360PackageCreator
                 FileConstant.ComponentsWithoutSrcFileName, appSettings.SW360.ProjectName);
 
             // write Kpi Data
-            kpiData = creatorHelper.GetCreatorKpiData(UpdatedCompareBomData);
+            var kpiData = creatorHelper.GetCreatorKpiData(UpdatedCompareBomData);
             fileOperations.WriteContentToFile(kpiData, bomGenerationPath,
                 FileConstant.CreatorKpiDataFileName, appSettings.SW360.ProjectName);
 
             // write kpi info to console table 
             creatorHelper.WriteCreatorKpiDataToConsole(kpiData);
-
+            UpdateKpiData(kpiData);
             //write download url not found list to kpi 
             creatorHelper.WriteSourceNotFoundListToConsole(UpdatedCompareBomData, appSettings);
 
@@ -339,7 +343,7 @@ namespace LCT.SW360PackageCreator
 
             await CreateReleaseWhenNotAvailable(item, sw360CreatorService, creatorHelper, appSettings);
 
-            await ComponentAndReleaseAvailable(item, sw360Url, sw360CreatorService, appSettings);
+            await ComponentAndReleaseAvailable(item, sw360Url, sw360CreatorService, appSettings, creatorHelper);
         }
 
         private async Task CreateComponentAndReleaseWhenNotAvailable(ComparisonBomData item,
@@ -557,7 +561,7 @@ namespace LCT.SW360PackageCreator
             return uploadStatus;
         }
         private async Task ComponentAndReleaseAvailable(ComparisonBomData item,
-            string sw360Url, ISw360CreatorService sw360CreatorService, CommonAppSettings appSettings)
+            string sw360Url, ISw360CreatorService sw360CreatorService, CommonAppSettings appSettings, ICreatorHelper creatorHelper)
         {
             if (item.ComponentStatus == Dataconstant.Available && item.ReleaseStatus == Dataconstant.Available)
             {
@@ -577,15 +581,33 @@ namespace LCT.SW360PackageCreator
                 string componentId = CommonHelper.GetSubstringOfLastOccurance(releasesInfo.Links?.Sw360Component?.Href, "/");
                 item.ReleaseID = releaseId;
                 await GetUploadIdWhenReleaseExists(item, releasesInfo, appSettings);
+
+                // This method handles the upload of source code and updates the source code download URL for an existing release in SW360.If you don't want to upload source code just comment this method.
+                await IfAlreadyReleaseExistsUploadSourceCodeAndUrlInSW360(item, releasesInfo, releaseId, creatorHelper, sw360CreatorService);
                 UpdatedCompareBomData.Add(item);
-                if (IsReleaseAttachmentExist(releasesInfo))
+                if (IsReleaseAttachmentExist(releasesInfo) && !string.IsNullOrEmpty(item.ReleaseID))
                 {
                     await TriggeringFossologyUploadAndUpdateAdditionalData(item, sw360CreatorService, appSettings);
                 }
-
                 await sw360CreatorService.UpdatePurlIdForExistingComponent(item, componentId);
                 await sw360CreatorService.UpdatePurlIdForExistingRelease(item, releaseId, releasesInfo);
-
+            }
+        }
+        public static async Task IfAlreadyReleaseExistsUploadSourceCodeAndUrlInSW360(ComparisonBomData item, ReleasesInfo releasesInfo, string releaseId, ICreatorHelper creatorHelper, ISw360CreatorService sw360CreatorService)
+        {
+            if (item.ApprovedStatus == Dataconstant.NewClearing && !AreAttachmentsPresent(releasesInfo))
+            {
+                var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(item);
+                if (string.IsNullOrEmpty(releasesInfo.SourceCodeDownloadUrl))
+                {
+                    await sw360CreatorService.UpdateSourceCodeDownloadURLForExistingRelease(item, attachmentUrlList, releaseId);
+                }
+                if (attachmentUrlList != null && attachmentUrlList.Count > 0)
+                {
+                    string attachmentApiUrl = sw360CreatorService.AttachSourcesToReleasesCreated(releaseId, attachmentUrlList, item);
+                    item.ReleaseAttachmentLink = attachmentApiUrl;
+                    item.DownloadUrl = !attachmentUrlList.ContainsKey("SOURCE") ? Dataconstant.DownloadUrlNotFound : item.DownloadUrl;
+                }
             }
         }
         public static Task GetUploadIdWhenReleaseExists(ComparisonBomData item, ReleasesInfo releasesInfo = null, CommonAppSettings appSettings = null)
@@ -634,7 +656,7 @@ namespace LCT.SW360PackageCreator
             }
             else
             {
-                if (!(string.IsNullOrEmpty(item.DownloadUrl) || item.DownloadUrl.Equals(Dataconstant.DownloadUrlNotFound)))
+                if (!string.IsNullOrEmpty(item.ReleaseID) && (!string.IsNullOrEmpty(item.DownloadUrl) || item.DownloadUrl.Equals(Dataconstant.DownloadUrlNotFound)))
                 {
                     await TriggeringFossologyUploadAndUpdateAdditionalData(item, sw360CreatorService, appSettings);
                 }
@@ -645,7 +667,11 @@ namespace LCT.SW360PackageCreator
             var releaseAttachments = releasesInfo?.Embedded?.Sw360attachments ?? new List<Sw360Attachments>();
             return releaseAttachments.Any(x => x.AttachmentType.Equals("SOURCE"));
         }
-
+        public static bool AreAttachmentsPresent(ReleasesInfo releasesInfo)
+        {
+            var attachments = releasesInfo?.Embedded?.Sw360attachments ?? new List<Sw360Attachments>();
+            return attachments.Any(x => x.AttachmentType.Equals("SOURCE") || x.AttachmentType.Equals("SOURCE_SELF"));
+        }
         private void UpdateAttachmentURLInBOm(string sw360Url, ComparisonBomData item, string releaseId)
         {
             string attachmentUrl = $"{sw360Url}{ApiConstant.Sw360ReleaseApiSuffix}/{releaseId}/{ApiConstant.Attachments}";
@@ -680,6 +706,29 @@ namespace LCT.SW360PackageCreator
             // Removes duplicate
             bom.Components = bom.Components?.GroupBy(x => new { x.Name, x.Version }).Select(y => y.First()).ToList();
             return components.GroupBy(x => new { x.Name, x.Version }).Select(y => y.First()).ToList();
+        }
+
+        /// <summary>
+        /// Updates the static KPI data with the provided data
+        /// </summary>
+        /// <param name="kpiData">The KPI data to update with</param>
+        public static void UpdateKpiData(CreatorKpiData kpiData)
+        {
+            if (kpiData == null) return;
+
+            // Copy properties from the provided kpiData to the static instance
+            s_kpiData.ComponentsReadFromComparisonBOM = kpiData.ComponentsReadFromComparisonBOM;
+            s_kpiData.ComponentsOrReleasesCreatedNewlyInSw360 = kpiData.ComponentsOrReleasesCreatedNewlyInSw360;
+            s_kpiData.ComponentsOrReleasesExistingInSw360 = kpiData.ComponentsOrReleasesExistingInSw360;
+            s_kpiData.ComponentsOrReleasesNotCreatedInSw360 = kpiData.ComponentsOrReleasesNotCreatedInSw360;
+            s_kpiData.ComponentsWithoutSourceDownloadUrl = kpiData.ComponentsWithoutSourceDownloadUrl;
+            s_kpiData.ComponentsWithSourceDownloadUrl = kpiData.ComponentsWithSourceDownloadUrl;
+            s_kpiData.ComponentsWithoutPackageUrl = kpiData.ComponentsWithoutPackageUrl;
+            s_kpiData.ComponentsWithoutSourceAndPackageUrl = kpiData.ComponentsWithoutSourceAndPackageUrl;
+            s_kpiData.ComponentsUploadedInFossology = kpiData.ComponentsUploadedInFossology;
+            s_kpiData.ComponentsNotUploadedInFossology = kpiData.ComponentsNotUploadedInFossology;
+            s_kpiData.TotalDuplicateAndInValidComponents = kpiData.TotalDuplicateAndInValidComponents;
+            s_kpiData.TimeTakenByComponentCreator = kpiData.TimeTakenByComponentCreator;
         }
 
     }

@@ -33,7 +33,7 @@ namespace LCT.PackageIdentifier
         public static string GetFilePathForTemplate(List<string> filePaths)
         {
             string firstFilePath = string.Empty;
-            if (filePaths != null && filePaths.Any())
+            if (filePaths != null && filePaths.Count != 0)
             {
                 firstFilePath = filePaths.First();
                 if (filePaths.Count > 1)
@@ -60,27 +60,16 @@ namespace LCT.PackageIdentifier
         {
             try
             {
-                Property cdxIdentifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.TemplateAdded };
-                Property cdxIsDev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
-
                 Component bomComp = bom.Find(x => x.Name == sbomcomp.Name && x.Version == sbomcomp.Version);
                 if (bomComp == null)
                 {
-                    if (sbomcomp.Properties == null)
-                    {
-                        sbomcomp.Properties = new List<Property>();
-                        sbomcomp.Properties.Add(cdxIdentifierType);
-                        sbomcomp.Properties.Add(cdxIsDev);
-                        bom.Add(sbomcomp);
-                        BomCreator.bomKpiData.ComponentsinSBOMTemplateFile++;
-                    }
-                    else
-                    {
-                        sbomcomp.Properties.Add(cdxIdentifierType);
-                        sbomcomp.Properties.Add(cdxIsDev);
-                        bom.Add(sbomcomp);
-                        BomCreator.bomKpiData.ComponentsinSBOMTemplateFile++;
-                    }
+                    sbomcomp.Properties ??= new List<Property>();
+                    var properties = sbomcomp.Properties;
+                    CommonHelper.RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_IdentifierType, Dataconstant.TemplateAdded);
+                    CommonHelper.RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_IsDevelopment, "false");
+                    sbomcomp.Properties = properties;
+                    bom.Add(sbomcomp);
+                    BomCreator.bomKpiData.ComponentsinSBOMTemplateFile++;
                 }
                 else
                 {
@@ -89,21 +78,18 @@ namespace LCT.PackageIdentifier
             }
             catch (ArgumentException ex)
             {
-                Logger.Error($"AddComponentDetails():ArgumentException:Error from " + sbomcomp.Name + " : " + sbomcomp.Version, ex);
+                Logger.Error($"PropertyAdditionForTemplate():ArgumentException:Error from {sbomcomp.Name} : {sbomcomp.Version}", ex);
             }
             catch (InvalidOperationException ex)
             {
-                Logger.Error($"AddComponentDetails():InvalidOperationException:Error from " + sbomcomp.Name + " : " + sbomcomp.Version, ex);
+                Logger.Error($"PropertyAdditionForTemplate():InvalidOperationException:Error from {sbomcomp.Name} : {sbomcomp.Version}", ex);
             }
         }
 
         private static void TemplateComponentUpdation(Component sbomcomp, Component bomComp)
         {
-            bool isLicenseUpdated = false;
-            bool isPropertiesUpdated = false;
-
-            isLicenseUpdated = UpdateLicenseDetails(bomComp, sbomcomp);
-            isPropertiesUpdated = UpdatePropertiesDetails(bomComp, sbomcomp);
+            bool isLicenseUpdated = UpdateLicenseDetails(bomComp, sbomcomp);
+            bool isPropertiesUpdated = UpdatePropertiesDetails(bomComp, sbomcomp);
 
             if (isLicenseUpdated || isPropertiesUpdated)
             {

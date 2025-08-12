@@ -14,13 +14,14 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
 
+
 namespace LCT.PackageIdentifier.UTest
 {
     [TestFixture]
     public class AlpineParserTests
     {
         private readonly AlpineProcessor _alpineProcessor;
-
+        private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
         public AlpineParserTests()
         {
             List<Component> components = new List<Component>();
@@ -30,8 +31,9 @@ namespace LCT.PackageIdentifier.UTest
 
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             cycloneDXBomParser.Setup(x => x.ParseCycloneDXBom(It.IsAny<string>())).Returns(bom);
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
 
-            _alpineProcessor = new AlpineProcessor(cycloneDXBomParser.Object);
+            _alpineProcessor = new AlpineProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
         }
 
         [Test]
@@ -44,21 +46,20 @@ namespace LCT.PackageIdentifier.UTest
 
             string[] Includes = { "*_Alpine.cdx.json" };
 
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "ALPINE",
                 Alpine = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }
             };
 
             //Act
-            Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count),
@@ -74,22 +75,21 @@ namespace LCT.PackageIdentifier.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "CycloneDX_Alpine.cdx.json" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
 
                 ProjectType = "ALPINE",
                 Alpine = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }
             };
 
             //Act
-            Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count),
@@ -105,21 +105,20 @@ namespace LCT.PackageIdentifier.UTest
             string OutFolder = Path.GetDirectoryName(exePath);
 
             string[] Includes = { "*_Alpine.cdx.json" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "ALPINE",
                 Alpine = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }
             };
 
             //Act
-            _alpineProcessor.ParsePackageFile(appSettings);
+            _alpineProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(duplicateComponents, Is.EqualTo(BomCreator.bomKpiData.DuplicateComponents),
@@ -135,21 +134,20 @@ namespace LCT.PackageIdentifier.UTest
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "AlpineSourceDetails_Cyclonedx.cdx.json" };
 
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "ALPINE",
                 Alpine = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new Common.Directory(folderAction, fileOperations)
+                Directory = new Common.Directory()
                 {
                     InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }
             };
 
             //Act
-            Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.AreEqual(sourceName, listofcomponents.Components[0].Name + "_" +
@@ -166,14 +164,13 @@ namespace LCT.PackageIdentifier.UTest
             string[] Includes = { "CycloneDX_Alpine.cdx.json", "SBOMTemplate_Alpine.cdx.json", "SBOM_AlpineCATemplate.cdx.json" };
             string packagefilepath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"));
 
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "ALPINE",
                 Alpine = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new Common.Directory(folderAction, fileOperations)
+                Directory = new Common.Directory()
                 {
                     InputFolder = packagefilepath
                 }
@@ -181,7 +178,7 @@ namespace LCT.PackageIdentifier.UTest
 
 
             //Act
-            Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count),
@@ -197,14 +194,12 @@ namespace LCT.PackageIdentifier.UTest
             string[] Includes = { "CycloneDX_Alpine.cdx.json", "SBOMTemplate_Alpine.cdx.json" };
             string packagefilepath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"));
 
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "ALPINE",
                 Alpine = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new Common.Directory(folderAction, fileOperations)
+                Directory = new Common.Directory()
                 {
                     InputFolder = packagefilepath
                 }
@@ -212,7 +207,7 @@ namespace LCT.PackageIdentifier.UTest
 
 
             //Act
-            Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = _alpineProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
             bool isUpdated = listofcomponents.Components.Exists(x => x.Properties != null
             && x.Properties.Exists(x => x.Name == Dataconstant.Cdx_IdentifierType
             && x.Value == Dataconstant.Discovered));

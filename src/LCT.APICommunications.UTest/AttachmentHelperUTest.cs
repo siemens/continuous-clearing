@@ -1,7 +1,9 @@
 ﻿using LCT.APICommunications.Model;
+using LCT.Common.Model;
 using Moq;
 using System.Net;
 using System.Security;
+using File = System.IO.File;
 
 namespace LCT.APICommunications.UTest
 {
@@ -41,9 +43,9 @@ namespace LCT.APICommunications.UTest
             // Simulate valid response
             webRequestMock.Setup(x => x.GetRequestStream()).Returns(new MemoryStream());
             webRequestMock.Setup(x => x.GetResponse()).Returns(webResponseMock.Object);
-
+            ComparisonBomData comparisonBomData = new ComparisonBomData();
             // Act
-            var result = _attachmentHelper.AttachComponentSourceToSW360(attachReport);
+            var result = _attachmentHelper.AttachComponentSourceToSW360(attachReport, comparisonBomData);
 
             // Assert
             Assert.That(result, Is.EqualTo("https://api.mock.com/release/123/attachments"));
@@ -88,9 +90,9 @@ namespace LCT.APICommunications.UTest
                 AttachmentType = "Source",
                 AttachmentReleaseComment = "Test comment"
             };
-
+            ComparisonBomData comparisonBomData = new ComparisonBomData();
             // Act & Assert
-            Assert.DoesNotThrow(() => _attachmentHelper.AttachComponentSourceToSW360(attachReport));
+            Assert.DoesNotThrow(() => _attachmentHelper.AttachComponentSourceToSW360(attachReport, comparisonBomData));
         }
 
         [Test]
@@ -108,9 +110,9 @@ namespace LCT.APICommunications.UTest
             // Mock WebRequest behavior to throw SecurityException
             var webRequestMock = new Mock<HttpWebRequest>();
             webRequestMock.Setup(x => x.GetRequestStream()).Throws(new SecurityException());
-
+            ComparisonBomData comparisonBomData = new ComparisonBomData();
             // Act & Assert
-            Assert.DoesNotThrow(() => _attachmentHelper.AttachComponentSourceToSW360(attachReport));
+            Assert.DoesNotThrow(() => _attachmentHelper.AttachComponentSourceToSW360(attachReport, comparisonBomData));
         }
 
         [Test]
@@ -130,9 +132,9 @@ namespace LCT.APICommunications.UTest
             var webResponseMock = new Mock<WebResponse>();
             webRequestMock.Setup(x => x.GetRequestStream()).Throws(new WebException());
             webRequestMock.Setup(x => x.GetResponse()).Returns(webResponseMock.Object);
-
+            ComparisonBomData comparisonBomData = new ComparisonBomData();
             // Act & Assert
-            Assert.DoesNotThrow(() => _attachmentHelper.AttachComponentSourceToSW360(attachReport));
+            Assert.DoesNotThrow(() => _attachmentHelper.AttachComponentSourceToSW360(attachReport, comparisonBomData));
         }
 
         [Test]
@@ -150,9 +152,9 @@ namespace LCT.APICommunications.UTest
             // Mock WebRequest behavior to throw IOException
             var webRequestMock = new Mock<HttpWebRequest>();
             webRequestMock.Setup(x => x.GetRequestStream()).Throws(new IOException());
-
+            ComparisonBomData comparisonBomData = new ComparisonBomData();
             // Act & Assert
-            Assert.DoesNotThrow(() => _attachmentHelper.AttachComponentSourceToSW360(attachReport));
+            Assert.DoesNotThrow(() => _attachmentHelper.AttachComponentSourceToSW360(attachReport, comparisonBomData));
         }
     }
 }

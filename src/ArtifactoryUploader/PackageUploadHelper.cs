@@ -14,13 +14,13 @@ using LCT.APICommunications.Model;
 using LCT.ArtifactoryUploader.Model;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Interface;
 using LCT.Services.Interface;
 using log4net;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
@@ -37,7 +37,7 @@ namespace LCT.ArtifactoryUploader
         public static IJFrogService JFrogService { get; set; }
 
         private static bool SetWarningCode;
-        public static Bom GetComponentListFromComparisonBOM(string comparisonBomFilePath)
+        public static Bom GetComponentListFromComparisonBOM(string comparisonBomFilePath, IEnvironmentHelper environmentHelper)
         {
             Logger.Debug("Starting GetComponentListFromComparisonBOM() method");
             Bom componentsToBoms = null;
@@ -51,11 +51,13 @@ namespace LCT.ArtifactoryUploader
                 else
                 {
                     Logger.Error($"File not found: {comparisonBomFilePath}. Please provide a valid file path.");
+                    environmentHelper.CallEnvironmentExit(-1);
                 }
             }
             catch (JsonReaderException ex)
             {
                 Logger.Error($"Exception occurred in reading the comparison BOM: {ex.Message}");
+                environmentHelper.CallEnvironmentExit(-1);
             }
             return componentsToBoms;
         }
@@ -428,10 +430,13 @@ namespace LCT.ArtifactoryUploader
             foreach (var component in componentsUploaded)
             {
                 var bomComponent = bom.Components.Find(x => x.Purl.Equals(component.Purl, StringComparison.OrdinalIgnoreCase));
-                if (component.DestRepoName != null && !component.DryRun)
+                if (bomComponent != null && component.DestRepoName != null && !component.DryRun)
                 {
-                    bomComponent.Properties.First(x => x.Name == Dataconstant.Cdx_ArtifactoryRepoName).Value = component.DestRepoName;
-                    bomComponent.Properties.First(x => x.Name == Dataconstant.Cdx_JfrogRepoPath).Value = component.JfrogRepoPath;
+                    bomComponent.Properties ??= new List<Property>();
+                    var properties = bomComponent.Properties;
+                    CommonHelper.RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_ArtifactoryRepoName, component.DestRepoName);
+                    CommonHelper.RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_JfrogRepoPath, component.JfrogRepoPath);
+                    bomComponent.Properties = properties;
                 }
             }
         }

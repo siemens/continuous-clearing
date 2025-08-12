@@ -6,10 +6,7 @@
 
 
 using LCT.APICommunications.Model;
-using LCT.Common.Interface;
-using Moq;
 using System.Net;
-using System.Reflection;
 
 namespace LCT.APICommunications.UTest
 {
@@ -99,9 +96,6 @@ namespace LCT.APICommunications.UTest
             var component = new ComponentsToArtifactory { PackageInfoApiUrl = "http://dummyurl.com" };
 
             var jfrogApiCommunication = new NpmJfrogApiCommunication("", "", repoCredentials, 100);
-            typeof(NpmJfrogApiCommunication)
-                .GetField("environmentHelper", BindingFlags.NonPublic | BindingFlags.Static)
-                ?.SetValue(null, new Mock<IEnvironmentHelper>().Object);
 
             // Act
             var response = await jfrogApiCommunication.GetPackageInfo(component);

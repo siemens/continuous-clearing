@@ -1,0 +1,239 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:ccf1e2d1-c2fa-4e8f-aa7a-0aabe3516f0a",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2025-07-15T04:07:59Z",
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "supplier": {
+            "name": "Siemens AG"
+          },
+          "name": "Clearing Automation Tool",
+          "version": "8.1.0",
+          "externalReferences": [
+            {
+              "url": "https://github.com/siemens/continuous-clearing",
+              "type": "website"
+            }
+          ]
+        }
+      ]
+    },
+    "component": {
+      "type": "application",
+      "name": "continuous-clearing",
+      "version": "v9.0.x"
+    },
+    "properties": [
+      {
+        "name": "siemens:profile",
+        "value": "clearing"
+      }
+    ]
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "pkg:apk/alpine/apk-tools@2.12.9-r3?distro=alpine-3.16.2",
+      "name": "apk-tools",
+      "version": "2.12.9-r3",
+      "purl": "pkg:apk/alpine/apk-tools@2.12.9-r3?arch=source",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:spdx-file-name",
+          "value": "Alpine.spdx.sbom.json"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Alpine"
+        },
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:apk/alpine/busybox@1.35.0-r17?distro=alpine-3.16.2",
+      "name": "busybox",
+      "version": "1.35.0-r17",
+      "purl": "pkg:apk/alpine/busybox@1.35.0-r17?arch=source",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:spdx-file-name",
+          "value": "Alpine.spdx.sbom.json"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Alpine"
+        },
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:apk/alpine/musl@1.2.3-r0?distro=alpine-3.16.2",
+      "name": "musl",
+      "version": "1.2.3-r0",
+      "purl": "pkg:apk/alpine/musl@1.2.3-r0?arch=source",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:spdx-file-name",
+          "value": "Alpine.spdx.sbom.json"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Alpine"
+        },
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:apk/alpine/zlib@1.2.12-r3?distro=alpine-3.16.2",
+      "name": "zlib",
+      "version": "1.2.12-r3",
+      "purl": "pkg:apk/alpine/zlib@1.2.12-r3?arch=source",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:spdx-file-name",
+          "value": "Alpine.spdx.sbom.json"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Alpine"
+        },
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    }
+  ],
+  "dependencies": [],
+  "compositions": [],
+  "definitions": {
+    "standards": [
+      {
+        "bom-ref": "standard-bom",
+        "name": "Standard BOM",
+        "version": "3.0.0",
+        "description": "The Standard for Software Bills of Materials in Siemens",
+        "owner": "Siemens AG",
+        "externalReferences": [
+          {
+            "url": "https://sbom.siemens.io/",
+            "type": "website"
+          }
+        ]
+      }
+    ]
+  }
+}

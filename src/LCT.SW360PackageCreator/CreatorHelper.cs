@@ -27,6 +27,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Directory = System.IO.Directory;
+using File = System.IO.File;
 using Level = log4net.Core.Level;
 
 namespace LCT.SW360PackageCreator
@@ -34,18 +35,13 @@ namespace LCT.SW360PackageCreator
     /// <summary>
     /// CreatorHelper class
     /// </summary>
-    public class CreatorHelper : ICreatorHelper
+    public class CreatorHelper(IDictionary<string, IPackageDownloader> packageDownloderList) : ICreatorHelper
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly List<Components> lstReleaseNotCreated = new List<Components>();
         List<Components> componentsAvailableInSw360 = new List<Components>();
         private const string SOURCE = "SOURCE";
-        private readonly IDictionary<string, IPackageDownloader> _packageDownloderList;
-
-        public CreatorHelper(IDictionary<string, IPackageDownloader> packageDownloderList)
-        {
-            _packageDownloderList = packageDownloderList;
-        }
+        private readonly IDictionary<string, IPackageDownloader> _packageDownloderList = packageDownloderList;
 
         public List<ComparisonBomData> GetDownloadUrlNotFoundList(List<ComparisonBomData> comparisionBomDataList)
         {
@@ -53,6 +49,11 @@ namespace LCT.SW360PackageCreator
 
             foreach (ComparisonBomData comparionBomData in comparisionBomDataList)
             {
+                if (comparionBomData.ApprovedStatus == Dataconstant.Approved)
+                {
+                    Logger.Debug($"Component {comparionBomData.Name} with version {comparionBomData.Version} is skipped from the 'list of components without a source download URL' because it is in the approved state.");
+                    continue;
+                }
                 if ((comparionBomData.DownloadUrl == Dataconstant.DownloadUrlNotFound || string.IsNullOrEmpty(comparionBomData.DownloadUrl)) && !comparionBomData.SourceAttachmentStatus)
                 {
                     comparionBomData.ReleaseID = string.IsNullOrEmpty(comparionBomData.ReleaseLink) ?
@@ -204,12 +205,11 @@ namespace LCT.SW360PackageCreator
         public async Task<List<ComparisonBomData>> SetContentsForComparisonBOM(List<Components> lstComponentForBOM, ISW360Service sw360Service)
         {
             Logger.Debug($"SetContentsForComparisonBOM():Start");
-            List<ComparisonBomData> comparisonBomData = new List<ComparisonBomData>();
             Logger.Logger.Log(null, Level.Notice, $"Collecting comparison BOM Data...", null);
             componentsAvailableInSw360 = await sw360Service.GetAvailableReleasesInSw360(lstComponentForBOM);
 
             //Checking components count before getting status of individual comp details
-            comparisonBomData = await GetComparisionBomItems(lstComponentForBOM, sw360Service);
+            List<ComparisonBomData> comparisonBomData = await GetComparisionBomItems(lstComponentForBOM, sw360Service);
 
             Logger.Debug($"SetContentsForComparisonBOM():End");
             return comparisonBomData;
@@ -252,7 +252,7 @@ namespace LCT.SW360PackageCreator
                 else
                 {
                     mapper.DownloadUrl = GetComponentDownloadUrl(mapper, item, repo, releasesInfo);
-                } 
+                }
                 SetMapperStatus(mapper, releasesInfo);
                 Logger.Debug($"Sw360 availability status for Name {mapper.Name}: {mapper.ComponentExternalId}={mapper.ComponentStatus} - Version {mapper.Version}: {mapper.ReleaseExternalId}={mapper.ReleaseStatus}");
                 comparisonBomData.Add(mapper);
@@ -316,29 +316,18 @@ namespace LCT.SW360PackageCreator
 
             foreach (ComparisonBomData comBom in updatedCompareBomData)
             {
-                if (string.IsNullOrEmpty(comBom.ReleaseLink))
-                {
-                    comBom.ReleaseLink = GetReleaseLink(componentsAvailableInSw360, comBom.Name, comBom.Version);
-                }
-
+                UpdateReleaseLink(comBom);
                 try
                 {
-                    List<Property> prop = new List<Property>
-                {
-                    new Property { Name = Dataconstant.Cdx_ClearingState, Value = comBom.ApprovedStatus },
-                     new Property { Name = Dataconstant.Cdx_ReleaseUrl, Value = comBom.ReleaseLink },
-                     new Property { Name = Dataconstant.Cdx_FossologyUrl, Value = comBom.FossologyLink ?? "" }
-                };
+                    var propertiesToUpdate = new Dictionary<string, string>
+            {
+                { Dataconstant.Cdx_ClearingState, comBom.ApprovedStatus },
+                { Dataconstant.Cdx_ReleaseUrl, comBom.ReleaseLink },
+                { Dataconstant.Cdx_FossologyUrl, comBom.FossologyLink ?? "" }
+            };
 
-                    if (!bom.Components.Exists(x => x.BomRef.Contains(Dataconstant.PurlCheck()["MAVEN"])))
-                    {
-                        bom.Components.Find(com => string.IsNullOrEmpty(com.Group) ? com.Name == comBom.Name && com.Version.Contains(comBom.Version)
-                        : $"{com.Group}{Dataconstant.ForwardSlash}{com.Name}" == comBom.Name && com.Version.Contains(comBom.Version))?.Properties.AddRange(prop);
-                    }
-                    else
-                    {
-                        bom.Components.Find(com => com.Name == comBom.Name && com.Version.Contains(comBom.Version))?.Properties.AddRange(prop);
-                    }
+                    Component component = FindMatchingComponent(bom, comBom);
+                    AddOrUpdateProperties(component, propertiesToUpdate);
                 }
                 catch (JsonSerializationException ex)
                 {
@@ -347,7 +336,38 @@ namespace LCT.SW360PackageCreator
             }
             return bom;
         }
+        private static Component FindMatchingComponent(Bom bom, ComparisonBomData comBom)
+        {
+            if (!bom.Components.Exists(x => x.BomRef.Contains(Dataconstant.PurlCheck()["MAVEN"])))
+            {
+                return bom.Components.Find(com =>
+                    string.IsNullOrEmpty(com.Group)
+                        ? com.Name == comBom.Name && com.Version.Contains(comBom.Version)
+                        : $"{com.Group}{Dataconstant.ForwardSlash}{com.Name}" == comBom.Name && com.Version.Contains(comBom.Version));
+            }
+            else
+            {
+                return bom.Components.Find(com => com.Name == comBom.Name && com.Version.Contains(comBom.Version));
+            }
+        }
+        private void UpdateReleaseLink(ComparisonBomData comBom)
+        {
+            if (string.IsNullOrEmpty(comBom.ReleaseLink))
+            {
+                comBom.ReleaseLink = GetReleaseLink(componentsAvailableInSw360, comBom.Name, comBom.Version);
+            }
+        }
+        private static void AddOrUpdateProperties(Component component, Dictionary<string, string> listOfProperties)
+        {
+            if (component == null) return;
+            foreach (var property in listOfProperties)
+            {
+                var properties = component.Properties;
+                CommonHelper.RemoveDuplicateAndAddProperty(ref properties, property.Key, property.Value);
+                component.Properties = properties;
+            }
 
+        }
         private static string GetDownloadPathForComponetType(ComparisonBomData component)
         {
             string localPathforDownload = string.Empty;
@@ -561,15 +581,15 @@ namespace LCT.SW360PackageCreator
 
         private static string GetComponentAvailabilityStatus(List<Components> componentsAvailable, Components component)
         {
-            return componentsAvailable.Exists(x => x.Name.ToLowerInvariant() == component.Name.ToLowerInvariant()
-            || x.ComponentExternalId.ToLowerInvariant() == component.ComponentExternalId.ToLowerInvariant()) ? Dataconstant.Available : Dataconstant.NotAvailable;
+            return componentsAvailable.Exists(x => x.Name.Equals(component.Name, StringComparison.InvariantCultureIgnoreCase)
+            || x.ComponentExternalId.Equals(component.ComponentExternalId, StringComparison.InvariantCultureIgnoreCase)) ? Dataconstant.Available : Dataconstant.NotAvailable;
         }
 
         private string IsReleaseAvailable(string componentName, string componentVersion, string releaseExternalId)
         {
             if (componentsAvailableInSw360.Exists(
-                x => (x.Name.ToLowerInvariant() == componentName.ToLowerInvariant() && x.Version.ToLowerInvariant() == componentVersion.ToLowerInvariant())
-                || x.ReleaseExternalId.ToLowerInvariant() == releaseExternalId.ToLowerInvariant()))
+                x => (x.Name.Equals(componentName, StringComparison.InvariantCultureIgnoreCase) && x.Version.Equals(componentVersion, StringComparison.InvariantCultureIgnoreCase))
+                || x.ReleaseExternalId.Equals(releaseExternalId, StringComparison.InvariantCultureIgnoreCase)))
             {
                 return Dataconstant.Available;
             }
@@ -579,12 +599,10 @@ namespace LCT.SW360PackageCreator
 
         public static string GetComponentDownloadUrl(ComparisonBomData mapper, Components item, IRepository repo, ReleasesInfo releasesInfo)
         {
-            //IF Release already exists in SW360 , tool will not update any field.
-            //Hence do not need to find DOWNLOAD URL URL here and this REDUCE the exeuction time
 
             if (mapper.ReleaseStatus.Equals(Dataconstant.Available))
             {
-                return releasesInfo?.SourceCodeDownloadUrl ?? string.Empty;
+                return !string.IsNullOrEmpty(releasesInfo?.SourceCodeDownloadUrl) ? releasesInfo.SourceCodeDownloadUrl : repo.FormGitCloneUrl(mapper.SourceUrl, item.Name, item.Version);
             }
             return repo.FormGitCloneUrl(mapper.SourceUrl, item.Name, item.Version);
         }
@@ -613,8 +631,8 @@ namespace LCT.SW360PackageCreator
 
         public static string GetReleaseLink(List<Components> componentsAvailableInSw360, string name, string version)
         {
-            string releaseLink = componentsAvailableInSw360.Where(x => x.Name.Trim().ToLower() == name.Trim().ToLower()
-            && x.Version.Trim().ToLower() == version.Trim().ToLower()).Select(x => x.ReleaseLink).FirstOrDefault();
+            string releaseLink = componentsAvailableInSw360.Where(x => x.Name.Trim().Equals(name.Trim(), StringComparison.CurrentCultureIgnoreCase)
+            && x.Version.Trim().Equals(version.Trim(), StringComparison.CurrentCultureIgnoreCase)).Select(x => x.ReleaseLink).FirstOrDefault();
 
             if (releaseLink == null)
             {
@@ -628,8 +646,8 @@ namespace LCT.SW360PackageCreator
                     debianVersion = version?.Replace(".debian", "");
                 }
 
-                releaseLink = componentsAvailableInSw360.Where(x => x.Name.Trim().ToLower() == name.Trim().ToLower()
-                && x.Version.Trim().ToLower() == debianVersion).Select(x => x.ReleaseLink).FirstOrDefault();
+                releaseLink = componentsAvailableInSw360.Where(x => x.Name.Trim().Equals(name.Trim(), StringComparison.CurrentCultureIgnoreCase)
+                && x.Version.Trim().Equals(debianVersion, StringComparison.CurrentCultureIgnoreCase)).Select(x => x.ReleaseLink).FirstOrDefault();
             }
 
             return releaseLink ?? string.Empty;
@@ -640,8 +658,8 @@ namespace LCT.SW360PackageCreator
             ReleasesInfo releasesInfo = new ReleasesInfo();
 
             Components componentAvailable =
-                componentsAvailableInSw360.FirstOrDefault(x => x.Name.ToLowerInvariant() == item.Name.ToLowerInvariant()
-                && x.Version.ToLowerInvariant() == item.Version.ToLowerInvariant());
+                componentsAvailableInSw360.FirstOrDefault(x => x.Name.Equals(item.Name, StringComparison.InvariantCultureIgnoreCase)
+                && x.Version.Equals(item.Version, StringComparison.InvariantCultureIgnoreCase));
 
             if (componentAvailable != null)
             {

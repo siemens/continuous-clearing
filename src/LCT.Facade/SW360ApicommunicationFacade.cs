@@ -21,18 +21,15 @@ namespace LCT.Facade
     public class SW360ApicommunicationFacade : ISW360ApicommunicationFacade
     {
         private readonly ISw360ApiCommunication m_sw360ApiCommunication;
-        private readonly bool m_TestMode;
 
         public SW360ApicommunicationFacade(SW360ConnectionSettings sw360ConnectionSettings)
         {
             m_sw360ApiCommunication = new SW360Apicommunication(sw360ConnectionSettings);
-            m_TestMode = sw360ConnectionSettings.IsTestMode;
         }
 
-        public SW360ApicommunicationFacade(ISw360ApiCommunication sw360ApiCommunication, bool testMode)
+        public SW360ApicommunicationFacade(ISw360ApiCommunication sw360ApiCommunication)
         {
             m_sw360ApiCommunication = sw360ApiCommunication;
-            m_TestMode = testMode;
         }
 
         public Task<string> GetProjects()
@@ -132,9 +129,9 @@ namespace LCT.Facade
             return await m_sw360ApiCommunication.UpdateComponent(componentId, httpContent);
         }
 
-        public string AttachComponentSourceToSW360(AttachReport attachReport)
+        public string AttachComponentSourceToSW360(AttachReport attachReport, ComparisonBomData comparisonBomData)
         {
-            return m_sw360ApiCommunication.AttachComponentSourceToSW360(attachReport);
+            return m_sw360ApiCommunication.AttachComponentSourceToSW360(attachReport, comparisonBomData);
         }
 
         public Task<string> GetReleaseByCompoenentName(string componentName)

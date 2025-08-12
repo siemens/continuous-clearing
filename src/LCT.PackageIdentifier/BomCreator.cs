@@ -22,8 +22,10 @@ using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
+using Dependency = CycloneDX.Models.Dependency;
 using Directory = System.IO.Directory;
 using Level = log4net.Core.Level;
+using Metadata = CycloneDX.Models.Metadata;
 
 
 namespace LCT.PackageIdentifier
@@ -35,9 +37,10 @@ namespace LCT.PackageIdentifier
     public class BomCreator : IBomCreator
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        public static readonly BomKpiData bomKpiData = new();
+        public readonly static BomKpiData bomKpiData = new();
         ComponentIdentification componentData;
         private readonly ICycloneDXBomParser CycloneDXBomParser;
+        private readonly ISpdxBomParser SpdxBomParser;
         public IJFrogService JFrogService { get; set; }
         public IBomHelper BomHelper { get; set; }
 
@@ -46,11 +49,12 @@ namespace LCT.PackageIdentifier
 
         public static Jfrog jfrog { get; set; } = new Jfrog();
         public static SW360 sw360 { get; set; } = new SW360();
-        public BomCreator(ICycloneDXBomParser cycloneDXBomParser, IFrameworkPackages frameworkPackages, ICompositionBuilder compositionBuilder)
+        public BomCreator(ICycloneDXBomParser cycloneDXBomParser, IFrameworkPackages frameworkPackages, ICompositionBuilder compositionBuilder, ISpdxBomParser spdxBomParser)
         {
             CycloneDXBomParser = cycloneDXBomParser;
             _frameworkPackages = frameworkPackages;
             _compositionBuilder = compositionBuilder;
+            SpdxBomParser = spdxBomParser;
         }
 
         public async Task GenerateBom(CommonAppSettings appSettings,
@@ -125,7 +129,7 @@ namespace LCT.PackageIdentifier
 
         private static void WriteContentToCycloneDxBOM(CommonAppSettings appSettings, Bom listOfComponentsToBom, ref BomKpiData bomKpiData, string defaultProjectName)
         {
-            IFileOperations fileOperations = new FileOperations();
+            FileOperations fileOperations = new FileOperations();
             string bomFileName = CommonIdentiferHelper.GetBomFileName(appSettings);
 
             string outputFolderPath = appSettings.Directory.OutputFolder;
@@ -155,25 +159,25 @@ namespace LCT.PackageIdentifier
             switch (appSettings.ProjectType.ToUpperInvariant())
             {
                 case "NPM":
-                    parser = new NpmProcessor(CycloneDXBomParser);
+                    parser = new NpmProcessor(CycloneDXBomParser, SpdxBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 case "NUGET":
-                    parser = new NugetProcessor(CycloneDXBomParser, _frameworkPackages, _compositionBuilder);
+                    parser = new NugetProcessor(CycloneDXBomParser, _frameworkPackages, _compositionBuilder, SpdxBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 case "MAVEN":
-                    parser = new MavenProcessor(CycloneDXBomParser);
+                    parser = new MavenProcessor(CycloneDXBomParser, SpdxBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 case "DEBIAN":
-                    parser = new DebianProcessor(CycloneDXBomParser);
+                    parser = new DebianProcessor(CycloneDXBomParser, SpdxBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 case "ALPINE":
-                    parser = new AlpineProcessor(CycloneDXBomParser);
+                    parser = new AlpineProcessor(CycloneDXBomParser, SpdxBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 case "POETRY":
-                    parser = new PythonProcessor(CycloneDXBomParser);
+                    parser = new PythonProcessor(CycloneDXBomParser, SpdxBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 case "CONAN":
-                    parser = new ConanProcessor(CycloneDXBomParser);
+                    parser = new ConanProcessor(CycloneDXBomParser, SpdxBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 default:
                     Logger.Error($"GenerateBom():Invalid ProjectType - {appSettings.ProjectType}");
@@ -188,10 +192,11 @@ namespace LCT.PackageIdentifier
             List<Component> components;
             Metadata metadata;
             Bom bom = new Bom();
+            Bom unSupportedBomList = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
             try
             {
                 //Parsing the input file
-                bom = parser.ParsePackageFile(appSettings);
+                bom = parser.ParsePackageFile(appSettings, ref unSupportedBomList);
                 metadata = bom.Metadata;
                 componentData = new ComponentIdentification()
                 {
@@ -219,6 +224,7 @@ namespace LCT.PackageIdentifier
                         {
                             component.Properties.Add(projectType);
                         }
+
                     }
                 }
                 bom.Metadata = metadata;
@@ -227,9 +233,11 @@ namespace LCT.PackageIdentifier
             {
                 Logger.Debug($"ComponentIdentification: {ex}");
             }
+            bomKpiData.UnsupportedComponentsFromSpdxFile = unSupportedBomList.Components.Count;
+            bom.Components.AddRange(unSupportedBomList.Components);
+            bom.Dependencies.AddRange(unSupportedBomList.Dependencies);
             return bom;
         }
-
         public async Task<bool> CheckJFrogConnection(CommonAppSettings appSettings)
         {
             if (appSettings.Jfrog != null)

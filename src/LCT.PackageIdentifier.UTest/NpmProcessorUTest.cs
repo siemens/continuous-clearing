@@ -62,11 +62,11 @@ namespace LCT.PackageIdentifier.UTest
             var component = new Component { Name = "component", Version = "1.0.0" };
             bomHelperMock.Setup(b => b.GetFullNameOfComponent(component)).Returns("component");
             var expectedRepoPath = "repo1/path/to/component-1.0.0.tgz";
-
-            var npmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            var npmProcessor = new NpmProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
 
             // Act
-            var result = npmProcessor.GetJfrogArtifactoryRepoDetials(aqlResultList, component, bomHelperMock.Object, out string repoPath);
+            var result = NpmProcessor.GetJfrogArtifactoryRepoDetials(aqlResultList, component, bomHelperMock.Object, out string repoPath);
 
             // Assert
             Assert.NotNull(result);
@@ -111,11 +111,11 @@ namespace LCT.PackageIdentifier.UTest
             var component = new Component { Name = "component", Version = "3.0.0" };
             var bomHelperMock = new Mock<IBomHelper>();
             bomHelperMock.Setup(b => b.GetFullNameOfComponent(component)).Returns("component");
-
-            var npmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            var npmProcessor = new NpmProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
 
             // Act
-            var result = npmProcessor.GetJfrogArtifactoryRepoDetials(aqlResultList, component, bomHelperMock.Object, out string repoPath);
+            var result = NpmProcessor.GetJfrogArtifactoryRepoDetials(aqlResultList, component, bomHelperMock.Object, out string repoPath);
 
             // Assert
             Assert.NotNull(result);
@@ -135,9 +135,8 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             ComponentIdentification component = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360(),
                 Npm = new Config
@@ -175,9 +174,9 @@ namespace LCT.PackageIdentifier.UTest
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations");
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             // Act
-            NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
+            NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             var actual = await npmProcessor.IdentificationOfInternalComponents(component, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
             // Assert
@@ -196,9 +195,8 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             ComponentIdentification component = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360(),
                 Npm = new Config
@@ -236,9 +234,10 @@ namespace LCT.PackageIdentifier.UTest
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations");
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
 
             // Act
-            NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
+            NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             var actual = await npmProcessor.IdentificationOfInternalComponents(component, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
             // Assert
@@ -259,9 +258,8 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             ComponentIdentification componentIdentification = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo1" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360(),
                 Npm = new Config
@@ -299,9 +297,9 @@ namespace LCT.PackageIdentifier.UTest
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations/common");
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             // Act
-            NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
+            NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             var actual = await npmProcessor.IdentificationOfInternalComponents(
                 componentIdentification, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -322,9 +320,8 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo1" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "NPM",
                 SW360 = new SW360(),
@@ -364,9 +361,9 @@ namespace LCT.PackageIdentifier.UTest
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations/common");
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             // Act
-            NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
+            NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             var actual = await npmProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -387,9 +384,8 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "NPM",
                 SW360 = new SW360(),
@@ -429,9 +425,9 @@ namespace LCT.PackageIdentifier.UTest
                 .ReturnsAsync(results);
             mockBomHelper.Setup(m => m.GetFullNameOfComponent(It.IsAny<Component>())).Returns("animations");
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             // Act
-            NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object);
+            NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             var actual = await npmProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -440,7 +436,7 @@ namespace LCT.PackageIdentifier.UTest
         }
 
         [Test]
-        public void GetdependencyDetailsOfAComponent_ReturnsListOfDependency_SuccessFully()
+        public void GetDependencyDetailsOfAComponent_ReturnsListOfDependency_SuccessFully()
         {
             // Arrange
             Component component = new Component
@@ -480,7 +476,7 @@ namespace LCT.PackageIdentifier.UTest
 
             //Act
 
-            NpmProcessor.GetdependencyDetails(componentsForBOM, dependencyList);
+            NpmProcessor.GetDependencyDetails(componentsForBOM, dependencyList);
 
             //Assert
             Assert.That(expectedDependencyList.Count, Is.EqualTo(dependencyList.Count));

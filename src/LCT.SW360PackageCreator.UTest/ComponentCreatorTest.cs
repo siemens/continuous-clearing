@@ -43,10 +43,12 @@ namespace LCT.SW360PackageCreator.UTest
         private Mock<ISw360CreatorService> _mockSw360CreatorService;
         private CommonAppSettings _appSettings;
         private ComponentCreator _componentCreator;
+        private Mock<ICreatorHelper> _creatorHelperMock;
         [SetUp]
         public void Setup()
         {
             _mockSw360CreatorService = new Mock<ISw360CreatorService>();
+            _creatorHelperMock = new Mock<ICreatorHelper>();
             _appSettings = new CommonAppSettings
             {
                 SW360 = new SW360
@@ -58,6 +60,107 @@ namespace LCT.SW360PackageCreator.UTest
                 }
             };
             _componentCreator = new ComponentCreator();
+        }
+        [Test]
+        public async Task IfAlreadyReleaseExistsUploadSourceCodeAndUrlInSW360_ShouldNotDownloadAttachments_WhenApprovedStatusIsNotNewClearing()
+        {
+            // Arrange
+            var item = new ComparisonBomData { ApprovedStatus = "NotClearing" };
+            var releasesInfo = new ReleasesInfo();
+            var releaseId = "release123";
+
+            // Act
+            await ComponentCreator.IfAlreadyReleaseExistsUploadSourceCodeAndUrlInSW360(item, releasesInfo, releaseId, _creatorHelperMock.Object, _mockSw360CreatorService.Object);
+
+            // Assert
+            _creatorHelperMock.Verify(x => x.DownloadReleaseAttachmentSource(It.IsAny<ComparisonBomData>()), Times.Never);
+        }
+        [Test]
+        public async Task IfAlreadyReleaseExistsUploadSourceCodeAndUrlInSW360_ShouldNotDownloadAttachments_WhenAttachmentsArePresent()
+        {
+            // Arrange
+            var item = new ComparisonBomData { ApprovedStatus = Dataconstant.NewClearing };
+            var releasesInfo = new ReleasesInfo
+            {
+                Embedded = new AttachmentEmbedded
+                {
+                    Sw360attachments = new List<Sw360Attachments>
+                    {
+                        new Sw360Attachments { AttachmentType = "SOURCE" }
+                    }
+                }
+            };
+            var releaseId = "release123";
+
+            // Act
+            await ComponentCreator.IfAlreadyReleaseExistsUploadSourceCodeAndUrlInSW360(item, releasesInfo, releaseId, _creatorHelperMock.Object, _mockSw360CreatorService.Object);
+
+            // Assert
+            _creatorHelperMock.Verify(x => x.DownloadReleaseAttachmentSource(It.IsAny<ComparisonBomData>()), Times.Never);
+        }
+
+        [Test]
+        public async Task IfAlreadyReleaseExistsUploadSourceCodeAndUrlInSW360_ShouldUpdateSourceCodeDownloadURL_WhenSourceCodeDownloadUrlIsEmpty()
+        {
+            // Arrange
+            var item = new ComparisonBomData { ApprovedStatus = Dataconstant.NewClearing };
+            var releasesInfo = new ReleasesInfo { SourceCodeDownloadUrl = string.Empty };
+            var releaseId = "release123";
+            var attachmentUrlList = new Dictionary<string, string> { { "SOURCE", "http://example.com/source" } };
+
+            _creatorHelperMock.Setup(x => x.DownloadReleaseAttachmentSource(item))
+                .ReturnsAsync(attachmentUrlList);
+
+            _mockSw360CreatorService.Setup(x => x.UpdateSourceCodeDownloadURLForExistingRelease(item, attachmentUrlList, releaseId))
+                .ReturnsAsync(true);
+
+            // Act
+            await ComponentCreator.IfAlreadyReleaseExistsUploadSourceCodeAndUrlInSW360(item, releasesInfo, releaseId, _creatorHelperMock.Object, _mockSw360CreatorService.Object);
+
+            // Assert
+            _mockSw360CreatorService.Verify(x => x.UpdateSourceCodeDownloadURLForExistingRelease(item, attachmentUrlList, releaseId), Times.Once);
+        }
+
+        [Test]
+        public async Task IfAlreadyReleaseExistsUploadSourceCodeAndUrlInSW360_ShouldAttachSourcesToReleases_WhenAttachmentUrlListIsNotEmpty()
+        {
+            // Arrange
+            var item = new ComparisonBomData { ApprovedStatus = Dataconstant.NewClearing, DownloadUrl = "http://example.com/source" };
+            var releasesInfo = new ReleasesInfo { SourceCodeDownloadUrl = "http://example.com/download" };
+            var releaseId = "release123";
+            var attachmentUrlList = new Dictionary<string, string> { { "SOURCE", "http://example.com/source" } };
+
+            _creatorHelperMock.Setup(x => x.DownloadReleaseAttachmentSource(item))
+                .ReturnsAsync(attachmentUrlList);
+
+            _mockSw360CreatorService.Setup(x => x.AttachSourcesToReleasesCreated(releaseId, attachmentUrlList, item))
+                .Returns("http://example.com/attachment");
+
+            // Act
+            await ComponentCreator.IfAlreadyReleaseExistsUploadSourceCodeAndUrlInSW360(item, releasesInfo, releaseId, _creatorHelperMock.Object, _mockSw360CreatorService.Object);
+
+            // Assert
+            Assert.AreEqual("http://example.com/attachment", item.ReleaseAttachmentLink);
+            Assert.AreEqual("http://example.com/source", item.DownloadUrl);
+        }
+
+        [Test]
+        public async Task IfAlreadyReleaseExistsUploadSourceCodeAndUrlInSW360_ShouldNotAttachSources_WhenAttachmentUrlListIsEmpty()
+        {
+            // Arrange
+            var item = new ComparisonBomData { ApprovedStatus = Dataconstant.NewClearing };
+            var releasesInfo = new ReleasesInfo { SourceCodeDownloadUrl = "http://example.com/download" };
+            var releaseId = "release123";
+            var attachmentUrlList = new Dictionary<string, string>();
+
+            _creatorHelperMock.Setup(x => x.DownloadReleaseAttachmentSource(item))
+                .ReturnsAsync(attachmentUrlList);
+
+            // Act
+            await ComponentCreator.IfAlreadyReleaseExistsUploadSourceCodeAndUrlInSW360(item, releasesInfo, releaseId, _creatorHelperMock.Object, _mockSw360CreatorService.Object);
+
+            // Assert
+            Assert.IsNull(item.ReleaseAttachmentLink);
         }
 
         [Test]
@@ -234,8 +337,7 @@ namespace LCT.SW360PackageCreator.UTest
         public async Task CreateComponentInSw360_ShouldCreateComponentsAndWriteFiles()
         {
             // Arrange
-            var folderAction = new Mock<IFolderAction>();
-            var fileOperations = new Mock<IFileOperations>();
+
             var appSettings = new CommonAppSettings
             {
                 SW360 = new SW360
@@ -244,7 +346,7 @@ namespace LCT.SW360PackageCreator.UTest
                     ProjectID = "projectId",
                     ProjectName = "projectName"
                 },
-                Directory = new Common.Directory(folderAction.Object, fileOperations.Object)
+                Directory = new Common.Directory()
                 {
                     OutputFolder = "outputFolder"
                 },
@@ -380,9 +482,9 @@ namespace LCT.SW360PackageCreator.UTest
             string attachmentJson = Path.GetFullPath(Path.Combine(outFolder, "..", "..", "src", "LCT.SW360PackageCreator.UTest", "ComponentCreatorUTFiles", "Attachment.json"));
 
             string json = "";
-            if (File.Exists(attachmentJson))
+            if (System.IO.File.Exists(attachmentJson))
             {
-                json = File.ReadAllText(attachmentJson);
+                json = System.IO.File.ReadAllText(attachmentJson);
             }
 
             dynamic array = JsonConvert.DeserializeObject(json);
@@ -411,12 +513,12 @@ namespace LCT.SW360PackageCreator.UTest
                 ReleaseID = "89768ae1b0ea9dc061328b8f32792cbd"
 
             };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
+
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360() { URL = "http://localhost:8081/" },
-                Directory = new Common.Directory(folderAction, fileOperations)
+                Directory = new Common.Directory()
             };
             sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(fossTriggerStatus);
 
@@ -442,12 +544,10 @@ namespace LCT.SW360PackageCreator.UTest
                 ReleaseID = "89768ae1b0ea9dc061328b8f32792cbd"
             };
 
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360() { URL = "http://localhost:8081/" },
-                Directory = new Common.Directory(folderAction, fileOperations)
+                Directory = new Common.Directory()
             };
             sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>())).ThrowsAsync(new AggregateException());
 
@@ -478,12 +578,10 @@ namespace LCT.SW360PackageCreator.UTest
                     new Component() { Name = "adduser",Version="3.118",Group="",Purl="pkg:deb/debian/adduser@3.118@arch=source",Properties = properties },
                 };
 
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
             CommonAppSettings CommonAppSettings = new()
             {
                 SW360 = new SW360() { ProjectName = "Test" },
-                Directory = new Common.Directory(folderAction, fileOperations)
+                Directory = new Common.Directory()
                 {
                     OutputFolder = @"\Output"
                 }
@@ -529,12 +627,12 @@ namespace LCT.SW360PackageCreator.UTest
                 {
                     new Component() { Name = "newtonsoft",Version="3.1.18",Group="",Purl="pkg:nuget/newtonsoft@3.1.18",Properties = properties },
                 };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
+
+
             CommonAppSettings CommonAppSettings = new()
             {
                 SW360 = new SW360() { ProjectName = "Test" },
-                Directory = new Common.Directory(folderAction, fileOperations)
+                Directory = new Common.Directory()
                 {
                     OutputFolder = @"\Output"
                 }
@@ -580,12 +678,12 @@ namespace LCT.SW360PackageCreator.UTest
                 {
                     new Component() { Name = "newtonsoft",Version="3.1.18",Group="",Purl="pkg:nuget/newtonsoft@3.1.18",Properties = properties }
                 };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
+
+
             CommonAppSettings commonAppSettings = new CommonAppSettings()
             {
                 SW360 = new SW360() { IgnoreDevDependency = false, ProjectName = "Test" },
-                Directory = new Common.Directory(folderAction, fileOperations)
+                Directory = new Common.Directory()
                 {
                     OutputFolder = @"\Output"
                 }
@@ -625,13 +723,12 @@ namespace LCT.SW360PackageCreator.UTest
                 {
                     new Component() { Name = "apk-tools",Version="2.12.9-r3",Group="",BomRef="pkg:apk/alpine/alpine-keys@2.4-r1?distro=alpine-3.16.2",Purl="pkg:apk/alpine/apk-tools@2.12.9-r3?arch=source",Properties = properties },
                 };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
 
                 SW360 = new SW360() { ProjectName = "Test" },
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     OutputFolder = @"\Output"
                 }
@@ -979,12 +1076,11 @@ namespace LCT.SW360PackageCreator.UTest
                 ReleaseID = "89768ae1b0ea9dc061328b8f32792cbd"
             };
 
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360() { URL = "http://localhost:8081/" },
-                Directory = new Common.Directory(folderAction, fileOperations)
+                Directory = new Common.Directory()
             };
 
             sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(fossTriggerStatus);

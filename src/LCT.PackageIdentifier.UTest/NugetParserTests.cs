@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace LCT.PackageIdentifier.UTest
@@ -33,7 +34,8 @@ namespace LCT.PackageIdentifier.UTest
         private ICycloneDXBomParser _cycloneDXBomParser;
         private Mock<IFrameworkPackages> _frameworkPackages;
         private Mock<ICompositionBuilder> _compositionBuilder;
-
+        private ISpdxBomParser _spdxBomParser;
+        private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
         [SetUp]
         public void Setup()
         {
@@ -41,8 +43,8 @@ namespace LCT.PackageIdentifier.UTest
             _cycloneDXBomParser = new Mock<ICycloneDXBomParser>().Object;
             _frameworkPackages = new Mock<IFrameworkPackages>();
             _compositionBuilder = new Mock<ICompositionBuilder>();
-
-            _nugetProcessor = new NugetProcessor(_cycloneDXBomParser, _frameworkPackages.Object, _compositionBuilder.Object);
+            _spdxBomParser = new Mock<ISpdxBomParser>().Object;
+            _nugetProcessor = new NugetProcessor(_cycloneDXBomParser, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser);
         }
 
         [Test]
@@ -57,7 +59,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             // Act
-            var result = _nugetProcessor.GetJfrogRepoPath(aqlResult);
+            var result = NugetProcessor.GetJfrogRepoPath(aqlResult);
 
             // Assert
             Assert.AreEqual("my-repo/my-package", result);
@@ -75,7 +77,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             // Act
-            var result = _nugetProcessor.GetJfrogRepoPath(aqlResult);
+            var result = NugetProcessor.GetJfrogRepoPath(aqlResult);
 
             // Assert
             Assert.AreEqual("my-repo/my-package", result);
@@ -93,7 +95,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             // Act
-            var result = _nugetProcessor.GetJfrogRepoPath(aqlResult);
+            var result = NugetProcessor.GetJfrogRepoPath(aqlResult);
 
             // Assert
             Assert.AreEqual("my-repo/my-folder/my-package", result);
@@ -108,7 +110,7 @@ namespace LCT.PackageIdentifier.UTest
             string jfrogRepoPath;
 
             // Act
-            var result = _nugetProcessor.GetJfrogArtifactoryRepoDetials(aqlResultList, component, _mockBomHelper.Object, out jfrogRepoPath);
+            var result = NugetProcessor.GetJfrogArtifactoryRepoDetials(aqlResultList, component, _mockBomHelper.Object, out jfrogRepoPath);
 
             // Assert
             Assert.IsNotNull(result);
@@ -129,7 +131,7 @@ namespace LCT.PackageIdentifier.UTest
             string jfrogRepoPath;
 
             // Act
-            var result = _nugetProcessor.GetJfrogArtifactoryRepoDetials(aqlResultList, component, _mockBomHelper.Object, out jfrogRepoPath);
+            var result = NugetProcessor.GetJfrogArtifactoryRepoDetials(aqlResultList, component, _mockBomHelper.Object, out jfrogRepoPath);
 
             // Assert
             Assert.IsNotNull(result);
@@ -150,7 +152,7 @@ namespace LCT.PackageIdentifier.UTest
             string jfrogRepoPath;
 
             // Act
-            var result = _nugetProcessor.GetJfrogArtifactoryRepoDetials(aqlResultList, component, _mockBomHelper.Object, out jfrogRepoPath);
+            var result = NugetProcessor.GetJfrogArtifactoryRepoDetials(aqlResultList, component, _mockBomHelper.Object, out jfrogRepoPath);
 
             // Assert
             Assert.IsNotNull(result);
@@ -172,7 +174,7 @@ namespace LCT.PackageIdentifier.UTest
             string jfrogRepoPath;
 
             // Act
-            var result = _nugetProcessor.GetJfrogArtifactoryRepoDetials(aqlResultList, component, _mockBomHelper.Object, out jfrogRepoPath);
+            var result = NugetProcessor.GetJfrogArtifactoryRepoDetials(aqlResultList, component, _mockBomHelper.Object, out jfrogRepoPath);
 
             // Assert
             Assert.IsNotNull(result);
@@ -207,7 +209,7 @@ namespace LCT.PackageIdentifier.UTest
                 "Component2:2.0.0"
             };
 
-            NugetDevDependencyParser.NugetDirectDependencies = nugetDirectDependencies;
+            NugetDevDependencyParser.SetDirectDependencies(nugetDirectDependencies);
 
             var expectedBom = new Bom
             {
@@ -242,7 +244,8 @@ namespace LCT.PackageIdentifier.UTest
                 }
             };
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-            var nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object);
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            var nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser);
 
             // Act
             NugetProcessor.AddSiemensDirectProperty(ref bom);
@@ -280,7 +283,7 @@ namespace LCT.PackageIdentifier.UTest
                 "Component4:4.0.0"
             };
 
-            NugetDevDependencyParser.NugetDirectDependencies = nugetDirectDependencies;
+            NugetDevDependencyParser.SetDirectDependencies(nugetDirectDependencies);
 
             var expectedBom = new Bom
             {
@@ -299,7 +302,8 @@ namespace LCT.PackageIdentifier.UTest
                 }
             };
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-            var nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object);
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            var nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser);
 
             // Act
             NugetProcessor.AddSiemensDirectProperty(ref bom);
@@ -346,7 +350,7 @@ namespace LCT.PackageIdentifier.UTest
                 "Component2:2.0.0"
             };
 
-            NugetDevDependencyParser.NugetDirectDependencies = nugetDirectDependencies;
+            NugetDevDependencyParser.SetDirectDependencies(nugetDirectDependencies);
 
             var expectedBom = new Bom
             {
@@ -386,7 +390,7 @@ namespace LCT.PackageIdentifier.UTest
                 }
             };
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-            var nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object);
+            var nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser);
 
             // Act
             NugetProcessor.AddSiemensDirectProperty(ref bom);
@@ -406,13 +410,11 @@ namespace LCT.PackageIdentifier.UTest
             string outFolder = Path.GetDirectoryName(exePath);
             string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles", "packages.config"));
 
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 Nuget = new Config(),
                 SW360 = new SW360(),
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"))
                 }
@@ -526,13 +528,12 @@ namespace LCT.PackageIdentifier.UTest
             string outFolder = Path.GetDirectoryName(exePath);
             string csprojfilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
             string[] Excludes = null;
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings commonAppSettings = new CommonAppSettings(folderAction, fileOperations)
+
+            CommonAppSettings commonAppSettings = new CommonAppSettings()
             {
                 Nuget = new Config() { Exclude = Excludes },
                 SW360 = new SW360(),
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = csprojfilepath
                 }
@@ -567,11 +568,11 @@ namespace LCT.PackageIdentifier.UTest
 
             IFolderAction folderAction = new FolderAction();
             IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings commonAppSettings = new CommonAppSettings(folderAction, fileOperations)
+            CommonAppSettings commonAppSettings = new CommonAppSettings()
             {
                 Nuget = new Config() { Exclude = Excludes },
                 SW360 = new SW360() { ExcludeComponents = new List<string>() },
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = csprojfilepath
                 }
@@ -599,7 +600,7 @@ namespace LCT.PackageIdentifier.UTest
             string[] reooListArr = { "internalrepo1", "internalrepo1" };
             IFolderAction folderAction = new FolderAction();
             IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360(),
                 Nuget = new Config
@@ -627,7 +628,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             // Act
-            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object);
+            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser);
             var actual = await nugetProcessor.IdentificationOfInternalComponents(
                 component, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -649,7 +650,7 @@ namespace LCT.PackageIdentifier.UTest
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
             IFolderAction folderAction = new FolderAction();
             IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360(),
                 Nuget = new Config
@@ -677,7 +678,7 @@ namespace LCT.PackageIdentifier.UTest
 
             // Act
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object);
+            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser);
             var actual = await nugetProcessor.IdentificationOfInternalComponents(component, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
             // Assert
@@ -698,9 +699,8 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             ComponentIdentification componentIdentification = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360(),
                 Nuget = new Config
@@ -729,7 +729,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             // Act
-            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object);
+            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser);
             var actual = await nugetProcessor.IdentificationOfInternalComponents(
                 componentIdentification, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -751,9 +751,7 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
 
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "NUGET",
                 SW360 = new SW360(),
@@ -782,7 +780,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             // Act  
-            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object);
+            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser);
             var actual = await nugetProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -803,9 +801,8 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "NUGET",
                 SW360 = new SW360(),
@@ -834,7 +831,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             // Act
-            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object);
+            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser);
             var actual = await nugetProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -855,9 +852,8 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "NUGET",
                 SW360 = new SW360(),
@@ -886,7 +882,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             // Act
-            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object);
+            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser);
             var actual = await nugetProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -907,9 +903,8 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "NUGET",
                 SW360 = new SW360(),
@@ -938,7 +933,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             // Act
-            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object);
+            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser);
             var actual = await nugetProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -959,9 +954,8 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "NUGET",
                 SW360 = new SW360(),
@@ -990,7 +984,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             // Act
-            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object);
+            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser);
             var actual = await nugetProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -1012,9 +1006,8 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "NUGET",
                 SW360 = new SW360(),
@@ -1043,7 +1036,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             // Act
-            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object);
+            NugetProcessor nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser);
             var actual = await nugetProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -1062,13 +1055,12 @@ namespace LCT.PackageIdentifier.UTest
             string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 
             string[] Includes = { "project.assets.json" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 Nuget = new Config() { Include = Includes },
                 SW360 = new SW360(),
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = packagefilepath
                 }
@@ -1076,7 +1068,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
             //Act
-            Bom listofcomponents = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object).ParsePackageFile(appSettings);
+            Bom listofcomponents = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser).ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
@@ -1094,13 +1086,12 @@ namespace LCT.PackageIdentifier.UTest
 
             string[] Includes = { "project.assets.json" };
 
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 Nuget = new Config() { Include = Includes },
                 SW360 = new SW360(),
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = packagefilepath
                 }
@@ -1109,7 +1100,7 @@ namespace LCT.PackageIdentifier.UTest
 
 
             //Act
-            Bom listofcomponents = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object).ParsePackageFile(appSettings);
+            Bom listofcomponents = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser).ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
             var IsDevDependency =
                 listofcomponents.Components.Find(a => a.Name == "SonarAnalyzer.CSharp")
                 .Properties[0].Value;
@@ -1129,13 +1120,12 @@ namespace LCT.PackageIdentifier.UTest
             string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 
             string[] Includes = { "project.assets.json", "Nuget-SelfContained.csproj" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 Nuget = new Config() { Include = Includes },
                 SW360 = new SW360(),
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = packagefilepath
                 }
@@ -1175,7 +1165,7 @@ namespace LCT.PackageIdentifier.UTest
                 .Returns(bom);
 
             // Act
-            var result = _nugetProcessor.ParsePackageFile(appSettings);
+            var result = _nugetProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             // Assert
             Assert.IsNotNull(result);
@@ -1192,13 +1182,12 @@ namespace LCT.PackageIdentifier.UTest
 
             string[] Includes = { "project.assets.json", "Nuget.csproj" };
             string[] excludes = { "NugetSelfContainedProject" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 Nuget = new Config() { Include = Includes, Exclude = excludes },
                 SW360 = new SW360(),
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = packagefilepath
                 }
@@ -1218,7 +1207,7 @@ namespace LCT.PackageIdentifier.UTest
                 .Verifiable();
 
             // Act
-            var result = _nugetProcessor.ParsePackageFile(appSettings);
+            var result = _nugetProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             // Assert
             _frameworkPackages.Verify(x => x.GetFrameworkPackages(It.IsAny<List<string>>()), Times.Once);
@@ -1238,13 +1227,12 @@ namespace LCT.PackageIdentifier.UTest
 
             string[] Includes = { "project.assets.json" };
             string[] excludes = { "NugetSelfContainedProject" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 Nuget = new Config() { Include = Includes, Exclude = excludes },
                 SW360 = new SW360(),
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = packagefilepath
                 }
@@ -1284,7 +1272,7 @@ namespace LCT.PackageIdentifier.UTest
                 .Returns(bom);
 
             // Act
-            var result = _nugetProcessor.ParsePackageFile(appSettings);
+            var result = _nugetProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             // Assert
             Assert.IsNotNull(result);
@@ -1301,13 +1289,12 @@ namespace LCT.PackageIdentifier.UTest
 
             string[] Includes = { "project.assets.json" };
             string[] excludes = { "NugetSelfContainedProject" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 Nuget = new Config() { Include = Includes, Exclude = excludes },
                 SW360 = new SW360(),
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = packagefilepath
                 }
@@ -1318,12 +1305,85 @@ namespace LCT.PackageIdentifier.UTest
                 .Returns(new Dictionary<string, Dictionary<string, NuGetVersion>>());
 
             // Act
-            var result = _nugetProcessor.ParsePackageFile(appSettings);
+            var result = _nugetProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             // Assert
             _frameworkPackages.Verify(x => x.GetFrameworkPackages(It.IsAny<List<string>>()), Times.Once);
             Assert.IsNotNull(result);
             Assert.AreEqual("false", result.Components.First().Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsDevelopment)?.Value);
+        }
+
+        [Test]
+        public void HandleConfigFile_WhenCycloneDXHasNullDependencies_DoesNotThrowException()
+        {
+            // Arrange
+            var filepath = "test.cdx.json";
+            var appSettings = new CommonAppSettings { ProjectType = "NUGET" };
+            var listComponentForBOM = new List<Component>();
+            var bom = new Bom { Dependencies = new List<Dependency>() };
+            var listOfTemplateBomfilePaths = new List<string>();
+
+            var mockCycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            var testBom = new Bom
+            {
+                Components = new List<Component>
+        {
+            new Component { Name = "TestComponent", Version = "1.0.0",Purl="TestComponent@1.0.0" }
+        },
+                Dependencies = new List<Dependency>()
+            };
+            mockCycloneDXBomParser.Setup(x => x.ParseCycloneDXBom(filepath)).Returns(testBom);
+
+            var nugetProcessor = new NugetProcessor(mockCycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser);
+
+            // Act & Assert
+            Assert.DoesNotThrow(() =>
+            {
+                nugetProcessor.GetType()
+                    .GetMethod("HandleConfigFile", BindingFlags.NonPublic | BindingFlags.Instance)
+                    .Invoke(nugetProcessor, new object[] { filepath, appSettings, listComponentForBOM, bom, listOfTemplateBomfilePaths });
+            });
+
+            Assert.AreEqual(0, bom.Dependencies.Count);
+        }
+
+
+        [Test]
+        public void HandleConfigFile_WhenSPDXHasNullComponents_DoesNotThrowException()
+        {
+            // Arrange
+            var filepath = "test.spdx.sbom.json";
+            var appSettings = new CommonAppSettings { ProjectType = "NUGET" };
+            var listComponentForBOM = new List<Component>();
+            var bom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
+            var listOfTemplateBomfilePaths = new List<string>();
+
+            var mockSpdxBomParser = new Mock<ISpdxBomParser>();
+            var testBom = new Bom
+            {
+                Components = new List<Component>(),
+                Dependencies = new List<Dependency>
+        {
+            new Dependency { Ref = "spdx-dependency" }
+        }
+            };
+            mockSpdxBomParser.Setup(x => x.ParseSPDXBom(filepath)).Returns(testBom);
+
+            // Use a valid temporary directory to avoid DirectoryNotFoundException
+            string tempDir = Path.GetTempPath();
+            appSettings.Directory = new LCT.Common.Directory { InputFolder = tempDir };
+
+            var nugetProcessor = new NugetProcessor(_cycloneDXBomParser, _frameworkPackages.Object, _compositionBuilder.Object, mockSpdxBomParser.Object);
+
+            // Act & Assert
+            Assert.DoesNotThrow(() =>
+            {
+                nugetProcessor.GetType()
+                    .GetMethod("HandleConfigFile", BindingFlags.NonPublic | BindingFlags.Instance)
+                    .Invoke(nugetProcessor, new object[] { filepath, appSettings, listComponentForBOM, bom, listOfTemplateBomfilePaths });
+            });
+
+            Assert.AreEqual(0, bom.Dependencies.Count);
         }
 
     }

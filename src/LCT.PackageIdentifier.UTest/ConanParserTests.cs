@@ -19,12 +19,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using File = System.IO.File;
 
 namespace LCT.PackageIdentifier.UTest
 {
     [TestFixture]
     public class ConanParserTests
     {
+        private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
         [TestCase]
         public void ParseLockFile_GivenAInputFilePath_ReturnsSuccess()
         {
@@ -36,21 +38,19 @@ namespace LCT.PackageIdentifier.UTest
 
             string[] Includes = { "conan.lock" };
 
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 Conan = new Config() { Include = Includes },
                 SW360 = new SW360(),
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = packagefilepath
                 }
             };
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             //Act
-            Bom listofcomponents = new ConanProcessor(cycloneDXBomParser.Object).ParsePackageFile(appSettings);
+            Bom listofcomponents = new ConanProcessor(cycloneDXBomParser.Object, spdxBomParser.Object).ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(expectedNoOfcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
@@ -68,21 +68,20 @@ namespace LCT.PackageIdentifier.UTest
 
             string[] Includes = { "conan.lock" };
 
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 Conan = new Config() { Include = Includes },
                 SW360 = new SW360(),
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = packagefilepath
                 }
             };
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             //Act
-            Bom listofcomponents = new ConanProcessor(cycloneDXBomParser.Object).ParsePackageFile(appSettings);
+            Bom listofcomponents = new ConanProcessor(cycloneDXBomParser.Object, spdxBomParser.Object).ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
             var IsDevDependency = listofcomponents.Components.Find(a => a.Name == "googletest")
                 .Properties.First(x => x.Name == "internal:siemens:clearing:development").Value;
 
@@ -101,21 +100,20 @@ namespace LCT.PackageIdentifier.UTest
             string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 
             string[] Includes = { "conan.lock" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 Conan = new Config() { Include = Includes },
                 SW360 = new SW360() { ExcludeComponents = ["openldap:2.6.4-shared-ossl3.1", "libcurl:7.87.0-shared-ossl3.1"] },
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = packagefilepath
                 }
             };
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             //Act
-            Bom listofcomponents = new ConanProcessor(cycloneDXBomParser.Object).ParsePackageFile(appSettings);
+            Bom listofcomponents = new ConanProcessor(cycloneDXBomParser.Object, spdxBomParser.Object).ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(totalComponentsAfterExclusion, Is.EqualTo(listofcomponents.Components.Count), "Checks if the excluded components have been removed");
@@ -150,9 +148,8 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component };
             ComponentIdentification componentIdentification = new() { comparisonBOMData = components };
             string[] repoList = { "internalrepo1", "internalrepo2" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360(),
                 Conan = new Config
@@ -177,9 +174,9 @@ namespace LCT.PackageIdentifier.UTest
             mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             // Act
-            ConanProcessor conanProcessor = new ConanProcessor(cycloneDXBomParser.Object);
+            ConanProcessor conanProcessor = new ConanProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             var actual = await conanProcessor.IdentificationOfInternalComponents(componentIdentification, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
             // Assert
@@ -199,9 +196,8 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component };
             string[] repoList = { "internalrepo1", "internalrepo2" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "Conan",
                 SW360 = new SW360(),
@@ -227,9 +223,9 @@ namespace LCT.PackageIdentifier.UTest
             mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             // Act
-            ConanProcessor conanProcessor = new ConanProcessor(cycloneDXBomParser.Object);
+            ConanProcessor conanProcessor = new ConanProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             var actual = await conanProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
             var reponameActual = actual.First(x => x.Properties[0].Name == "internal:siemens:clearing:jfrog-repo-name").Properties[0].Value;
@@ -252,9 +248,8 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component };
             string[] repoList = { "internalrepo1", "internalrepo2" };
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "Conan",
                 SW360 = new SW360(),
@@ -280,9 +275,9 @@ namespace LCT.PackageIdentifier.UTest
             mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             // Act
-            ConanProcessor conanProcessor = new ConanProcessor(cycloneDXBomParser.Object);
+            ConanProcessor conanProcessor = new ConanProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             var actual = await conanProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -299,26 +294,24 @@ namespace LCT.PackageIdentifier.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-
-            ConanProcessor conanProcessor = new ConanProcessor(cycloneDXBomParser.Object);
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            ConanProcessor conanProcessor = new ConanProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             string[] Includes = { "SBOM_ConanCATemplate.cdx.json" };
             string packagefilepath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"));
 
-            IFolderAction folderAction = new FolderAction();
-            IFileOperations fileOperations = new FileOperations();
-            CommonAppSettings appSettings = new CommonAppSettings(folderAction, fileOperations)
+            CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "CONAN",
                 Conan = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory(folderAction, fileOperations)
+                Directory = new LCT.Common.Directory()
                 {
                     InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }
             };
 
             //Act
-            Bom listofcomponents = conanProcessor.ParsePackageFile(appSettings);
+            Bom listofcomponents = conanProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
@@ -339,11 +332,10 @@ namespace LCT.PackageIdentifier.UTest
                 new Component { Name = "ComponentB", Version = "2.0.0", Description = "DescriptionB" }
             };
 
-            var folderAction = new Mock<IFolderAction>();
-            var fileOperations = new Mock<IFileOperations>();
-            var appSettings = new CommonAppSettings(folderAction.Object, fileOperations.Object)
+
+            var appSettings = new CommonAppSettings()
             {
-                Directory = new LCT.Common.Directory(folderAction.Object, fileOperations.Object)
+                Directory = new LCT.Common.Directory()
                 {
                     OutputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }
@@ -384,11 +376,10 @@ namespace LCT.PackageIdentifier.UTest
                 new Component { Name = "ComponentB", Version = "2.0.0", Description = "DescriptionB" }
             };
 
-            var folderAction = new Mock<IFolderAction>();
-            var fileOperations = new Mock<IFileOperations>();
-            var appSettings = new CommonAppSettings(folderAction.Object, fileOperations.Object)
+
+            var appSettings = new CommonAppSettings()
             {
-                Directory = new LCT.Common.Directory(folderAction.Object, fileOperations.Object)
+                Directory = new LCT.Common.Directory()
                 {
                     OutputFolder = outputFolder
                 }

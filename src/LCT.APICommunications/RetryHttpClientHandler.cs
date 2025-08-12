@@ -48,7 +48,7 @@ namespace LCT.APICommunications
 
             if (!_initialRetryLogged && context["LogWarnings"] as bool? != false)
             {
-                Logger.Warn($"Retry attempt triggered for {operationInfo}: {(outcome.Exception != null ? outcome.Exception.Message : $"{outcome.Result.StatusCode}")}");
+                Logger.Warn($"Retry attempt initiated: {operationInfo} Error: {(outcome.Exception != null ? outcome.Exception.Message : $"{outcome.Result.StatusCode}")}");
             }
 
             context["RetryAttempt"] = attempt;

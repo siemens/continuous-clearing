@@ -15,7 +15,7 @@ namespace LCT.Common
 {
     public class ExceptionHandling
     {
-        public ExceptionHandling() { }
+        protected ExceptionHandling() { }
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public static void HttpException(HttpRequestException ex, HttpResponseMessage response, string exceptionSource)

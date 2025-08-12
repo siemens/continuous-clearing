@@ -29,12 +29,13 @@ namespace LCT.ArtifactoryUploader
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static readonly UploaderKpiData uploaderKpiData = new UploaderKpiData();
+        private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
 
         public static async Task UploadPackageToArtifactory(CommonAppSettings appSettings)
         {
             //Reading the CycloneBOM data
             var bomFilePath = Path.Combine(appSettings.Directory.OutputFolder, appSettings.SW360.ProjectName + "_" + FileConstant.BomFileName);
-            Bom m_ComponentsInBOM = PackageUploadHelper.GetComponentListFromComparisonBOM(bomFilePath);
+            Bom m_ComponentsInBOM = PackageUploadHelper.GetComponentListFromComparisonBOM(bomFilePath, environmentHelper);
 
             DisplayAllSettings(m_ComponentsInBOM.Components, appSettings);
             uploaderKpiData.ComponentInComparisonBOM = m_ComponentsInBOM.Components.Count;
@@ -79,7 +80,6 @@ namespace LCT.ArtifactoryUploader
             // set the error code
             if (uploaderKpiData.PackagesNotUploadedDueToError > 0 || uploaderKpiData.PackagesNotExistingInRemoteCache > 0)
             {
-                EnvironmentHelper environmentHelper = new EnvironmentHelper();
                 environmentHelper.CallEnvironmentExit(2);
                 Logger.Debug("Setting ExitCode to 2");
             }
@@ -150,9 +150,9 @@ namespace LCT.ArtifactoryUploader
 
             // Log the settings for the project
             Logger.Logger.Log(null, Level.Notice,
-                $"\tDEVDEP_REPO_NAME:\t{project.DevDepRepo}\n" +
+                $"\tDEVDEP_REPO_NAME:\t{devDepRepoName}\n" +
                 $"\tTHIRD_PARTY_REPO_NAME:\t{thirdPartyRepoName}\n" +
-                $"\tRELEASE_REPO_NAME:\t{project.ReleaseRepo}\n" +
+                $"\tRELEASE_REPO_NAME:\t{releaseRepoName}\n" +
                 $"\tConfig:\n" +
                 $"\t\tExclude:\t\t{excludeList}\n" +
                 $"\t\tInclude:\t\t{includeList}\n", null);

@@ -23,7 +23,7 @@ namespace LCT.Common
     {
         public string BasePath { get; private set; } = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private static IEnvironmentHelper environmentHelper = new EnvironmentHelper();
+        private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
 
         /// <summary>
         /// Reads the Configuration from input args and json setting file
@@ -127,8 +127,6 @@ namespace LCT.Common
 
         public void CheckRequiredArgsToRun(CommonAppSettings appSettings, string currentExe)
         {
-            Type type = appSettings.GetType();
-            PropertyInfo[] properties = type.GetProperties();
 
             if (currentExe == "Identifer")
             {
@@ -161,7 +159,7 @@ namespace LCT.Common
                         identifierReqParameters.Add($"{appSettings.ProjectType}.Artifactory.InternalRepos");
                     }
                 }
-                CheckForMissingParameter(appSettings, properties, identifierReqParameters);
+                CheckForMissingParameter(appSettings, identifierReqParameters);
             }
             else if (currentExe == "Creator")
             {
@@ -173,7 +171,7 @@ namespace LCT.Common
                 "SW360.URL",
                 "Directory.OutputFolder"
             };
-                CheckForMissingParameter(appSettings, properties, creatorReqParameters);
+                CheckForMissingParameter(appSettings, creatorReqParameters);
             }
             else
             {
@@ -184,60 +182,63 @@ namespace LCT.Common
                 "Directory.OutputFolder",
                 "Jfrog.Token",
             };
-                CheckForMissingParameter(appSettings, properties, uploaderReqParameters);
+                CheckForMissingParameter(appSettings, uploaderReqParameters);
             }
         }
 
-        private static void CheckForMissingParameter(CommonAppSettings appSettings, PropertyInfo[] properties, List<string> reqParameters)
+        private static void CheckForMissingParameter(CommonAppSettings appSettings, List<string> reqParameters)
         {
             StringBuilder missingParameters = new StringBuilder();
 
             foreach (string key in reqParameters)
             {
-                string[] parts = key.Split('.');
-                object currentObject = appSettings;
-                PropertyInfo property = null;
+                object currentObject = GetNestedPropertyValue(appSettings, key);
 
-                foreach (string part in parts)
+                if (IsMissingValue(currentObject))
                 {
-                    if (currentObject == null)
-                    {
-                        break;
-                    }
-
-                    property = currentObject.GetType().GetProperty(part, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-                    currentObject = property?.GetValue(currentObject);
-                }
-
-                if (currentObject is Array array)
-                {
-                    if (array.Length == 0 || string.IsNullOrWhiteSpace(array.GetValue(0)?.ToString()))
-                    {
-                        missingParameters.Append(key + "\n");
-                    }
-                }
-                else if (currentObject is IList<object> list)
-                {
-                    if (list.Count == 0 || string.IsNullOrWhiteSpace(list[0]?.ToString()))
-                    {
-                        missingParameters.Append(key + "\n");
-                    }
-                }
-                else
-                {
-                    string value = currentObject?.ToString();
-                    if (string.IsNullOrWhiteSpace(value))
-                    {
-                        missingParameters.Append(key + "\n");
-                    }
+                    missingParameters.Append(key + "\n");
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(missingParameters.ToString()))
+            if (missingParameters.Length > 0)
             {
                 ExceptionHandling.ArgumentException(missingParameters.ToString());
                 environmentHelper.CallEnvironmentExit(-1);
             }
+        }
+
+        private static object GetNestedPropertyValue(object obj, string key)
+        {
+            string[] parts = key.Split('.');
+            object currentObject = obj;
+
+            foreach (string part in parts)
+            {
+                if (currentObject == null)
+                {
+                    break;
+                }
+
+                PropertyInfo property = currentObject.GetType().GetProperty(part, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                currentObject = property?.GetValue(currentObject);
+            }
+
+            return currentObject;
+        }
+
+        private static bool IsMissingValue(object value)
+        {
+            if (value is Array array)
+            {
+                return array.Length == 0 || string.IsNullOrWhiteSpace(array.GetValue(0)?.ToString());
+            }
+
+            if (value is IList<object> list)
+            {
+                return list.Count == 0 || string.IsNullOrWhiteSpace(list[0]?.ToString());
+            }
+
+            return string.IsNullOrWhiteSpace(value?.ToString());
         }
         public static bool IsAzureDevOpsDebugEnabled()
         {

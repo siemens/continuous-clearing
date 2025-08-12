@@ -9,7 +9,6 @@ using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.Foss;
 using LCT.Common;
 using LCT.Common.Constants;
-using LCT.Common.Interface;
 using LCT.Common.Model;
 using LCT.Facade.Interfaces;
 using LCT.Services.Interface;
@@ -36,7 +35,7 @@ namespace LCT.Services
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         readonly ISW360ApicommunicationFacade m_SW360ApiCommunicationFacade;
         readonly ISW360CommonService m_SW360CommonService;
-        private static IEnvironmentHelper environmentHelper;
+        private static EnvironmentHelper environmentHelper = new EnvironmentHelper();
 
         public Sw360CreatorService(ISW360ApicommunicationFacade sw360ApiCommunicationFacade)
         {
@@ -167,7 +166,7 @@ namespace LCT.Services
                 //come here - if success to attch src code
                 if (response.IsSuccessStatusCode)
                 {
-                    releaseId = AttachSourceAndBinary(attachmentUrlList, createStatus, response);
+                    releaseId = AttachSourceAndBinary(attachmentUrlList, createStatus, response, componentInfo);
                 }
                 else if (response.StatusCode == HttpStatusCode.Conflict)
                 {
@@ -226,7 +225,7 @@ namespace LCT.Services
             return releaseId ?? string.Empty;
         }
 
-        private string AttachSourceAndBinary(Dictionary<string, string> attachmentUrlList, ReleaseCreateStatus createStatus, HttpResponseMessage response)
+        private string AttachSourceAndBinary(Dictionary<string, string> attachmentUrlList, ReleaseCreateStatus createStatus, HttpResponseMessage response, ComparisonBomData comparisonBomData)
         {
             string releaseId = string.Empty;
 
@@ -236,7 +235,7 @@ namespace LCT.Services
                 var responseData = JsonConvert.DeserializeObject<Releases>(responseString);
                 string href = responseData?.Links?.Self?.Href ?? string.Empty;
                 releaseId = CommonHelper.GetSubstringOfLastOccurance(href, "/");
-                createStatus.AttachmentApiUrl = AttachSourcesToReleasesCreated(releaseId, attachmentUrlList);
+                createStatus.AttachmentApiUrl = AttachSourcesToReleasesCreated(releaseId, attachmentUrlList, comparisonBomData);
             }
 
             return releaseId;
@@ -275,14 +274,14 @@ namespace LCT.Services
                 Dictionary<string, ReleaseLinked> linkedReleasesUniqueDict = new Dictionary<string, ReleaseLinked>();
                 foreach (var release in finalReleasesToBeLinked)
                 {
-                    if (!linkedReleasesUniqueDict.ContainsKey(release.ReleaseId))
+                    if (!linkedReleasesUniqueDict.TryGetValue(release.ReleaseId, out ReleaseLinked value))
                     {
                         linkedReleasesUniqueDict.Add(release.ReleaseId, release);
                     }
                     else
                     {
                         Logger.Debug("Duplicate entries found in finalReleasesToBeLinked: " + release.Name + ":" + release.ReleaseId +
-                            " , with :" + linkedReleasesUniqueDict[release.ReleaseId].Name + ":" + linkedReleasesUniqueDict[release.ReleaseId].ReleaseId);
+                            " , with :" + value.Name + ":" + value.ReleaseId);
                     }
                 }
 
@@ -371,8 +370,8 @@ namespace LCT.Services
             var listofSw360Releases = responseData?.Embedded?.Sw360Releases ?? new List<Sw360Releases>();
             for (int i = 0; i < listofSw360Releases.Count; i++)
             {
-                if (listofSw360Releases[i].Name?.ToLowerInvariant() == componentName.ToLowerInvariant()
-                    && listofSw360Releases[i].Version?.ToLowerInvariant() == componentVersion.ToLowerInvariant())
+                if (string.Equals(listofSw360Releases[i].Name, componentName, StringComparison.InvariantCultureIgnoreCase)
+                    && string.Equals(listofSw360Releases[i].Version, componentVersion, StringComparison.InvariantCultureIgnoreCase))
                 {
                     string urlofreleaseid = listofSw360Releases[i]?.Links?.Self?.Href ?? string.Empty;
                     releaseid = CommonHelper.GetSubstringOfLastOccurance(urlofreleaseid, "/");
@@ -413,7 +412,7 @@ namespace LCT.Services
         }
 
 
-        private string AttachSourcesToReleasesCreated(string releaseId, Dictionary<string, string> attachmentUrlList)
+        public string AttachSourcesToReleasesCreated(string releaseId, Dictionary<string, string> attachmentUrlList, ComparisonBomData comparisonBomData)
         {
             Logger.Debug($"AttachSourcesToReleasesCreated(): start");
 
@@ -428,7 +427,7 @@ namespace LCT.Services
                     ReleaseId = releaseId,
                     AttachmentReleaseComment = Dataconstant.ReleaseAttachmentComment
                 };
-                attachmentApiUrl = m_SW360ApiCommunicationFacade.AttachComponentSourceToSW360(attachReport);
+                attachmentApiUrl = m_SW360ApiCommunicationFacade.AttachComponentSourceToSW360(attachReport, comparisonBomData);
             }
 
             Logger.Debug($"AttachSourcesToReleasesCreated(): end");
@@ -584,7 +583,40 @@ namespace LCT.Services
                 return false;
             }
         }
+        public async Task<bool> UpdateSourceCodeDownloadURLForExistingRelease(ComparisonBomData cbomData, Dictionary<string, string> attachmentUrlList, string releaseId)
+        {
+            try
+            {
+                Releases release = new Releases
+                {
+                    SourceDownloadurl = GetSourceDownloadUrl(cbomData, attachmentUrlList)
+                };
 
+                StringContent content = new StringContent(JsonConvert.SerializeObject(release), Encoding.UTF8, "application/json");
+
+                HttpResponseMessage updateResponse = await m_SW360ApiCommunicationFacade.UpdateRelease(releaseId, content);
+                string responseContent = await updateResponse.Content.ReadAsStringAsync();
+                if (responseContent.Contains(Dataconstant.ModerationRequestMessage, StringComparison.OrdinalIgnoreCase))
+                {
+                    Logger.Logger.Log(null, Level.Warn, $"Moderation request is created while updating the SourceDownloadURL in SW360. Please request {cbomData.ReleaseCreatedBy} or the license clearing team to approve the moderation request.", null);
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                Logger.Error($"UpdateExternalIdForRelease(): {ex}");
+                return false;
+            }
+            catch (AggregateException ex)
+            {
+                Logger.Error($"UpdateExternalIdForRelease(): {ex}");
+                return false;
+            }
+        }
         private static string GetDecodedExternalId(string ReleaseExternalID)
         {
             string releaseID;
@@ -706,7 +738,7 @@ namespace LCT.Services
                 HttpResponseMessage response = await m_SW360ApiCommunicationFacade.UpdateRelease(releaseId, content);
                 string responseContent = await response.Content.ReadAsStringAsync();
                 Logger.Debug($"UpdateSW360ReleaseContent():Response of fossology Url updation in SW360:{responseContent}");
-                if (responseContent.Contains(Dataconstant.FossologyModerationMessage, StringComparison.OrdinalIgnoreCase))
+                if (responseContent.Contains(Dataconstant.ModerationRequestMessage, StringComparison.OrdinalIgnoreCase))
                 {
                     Logger.Logger.Log(null, Level.Warn, $"\t⏳ Moderation request is created while updating the Fossology URL in SW360. Please request {component.ReleaseCreatedBy} or the license clearing team to approve the moderation request.", null);
                 }
@@ -788,7 +820,6 @@ namespace LCT.Services
         }
         public async Task<FossTriggerStatus> TriggerFossologyProcessForValidation(string releaseId, string sw360link)
         {
-            environmentHelper = new EnvironmentHelper();
             FossTriggerStatus fossTriggerStatus = null;
             try
             {

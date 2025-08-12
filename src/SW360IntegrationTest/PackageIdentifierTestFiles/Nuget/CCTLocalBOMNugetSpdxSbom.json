@@ -1,0 +1,4541 @@
+{
+	"bomFormat": "CycloneDX",
+	"specVersion": "1.6",
+	"serialNumber": "urn:uuid:73d51373-1bda-4242-8f46-2df716c736d9",
+	"version": 1,
+	"metadata": {
+		"timestamp": "2025-07-15T04:32:56Z",
+		"tools": {
+			"components": [
+				{
+					"type": "application",
+					"supplier": {
+						"name": "Siemens AG"
+					},
+					"name": "Clearing Automation Tool",
+					"version": "8.1.0",
+					"externalReferences": [
+						{
+							"url": "https://github.com/siemens/continuous-clearing",
+							"type": "website"
+						}
+					]
+				}
+			]
+		},
+		"component": {
+			"type": "application",
+			"name": "continuous-clearing",
+			"version": "v9.0.x"
+		},
+		"properties": [
+			{
+				"name": "siemens:profile",
+				"value": "clearing"
+			}
+		]
+	},
+	"components": [
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Azure.Core@1.42.0",
+			"name": "Azure.Core",
+			"version": "1.42.0",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "2831f133e5192cd735a07541c057c9e4"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "5a5dc72a443c7d445e801a56880859e6e506d2d1"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "03e61c8186c820bcb9d1eae00bf414963a779a69373e7b7aabc5f2cc4b7e659e"
+				}
+			],
+			"purl": "pkg:nuget/Azure.Core@1.42.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "org1-nuget-nuget-remote-cache"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Azure.Core.1.42.0.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "org1-nuget-nuget-remote-cache/Azure.Core.1.42.0.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Azure.Extensions.AspNetCore.Configuration.Secrets@1.3.2",
+			"name": "Azure.Extensions.AspNetCore.Configuration.Secrets",
+			"version": "1.3.2",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "fcba6b4c45e7ce751c7bb3678b30ee54"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "6564c46a66d7a0d855497d2761e4a310a0eb08b4"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "21b8c1328cb3595696d291ffa99eeee921e949d7cc868d67df98d6828515b058"
+				}
+			],
+			"purl": "pkg:nuget/Azure.Extensions.AspNetCore.Configuration.Secrets@1.3.2",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Azure.Extensions.AspNetCore.Configuration.Secrets.1.3.2.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/Azure.Extensions.AspNetCore.Configuration.Secrets.1.3.2.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Azure.Extensions.AspNetCore.Configuration.Secrets@1.300.224.41501",
+			"name": "Azure.Extensions.AspNetCore.Configuration.Secrets",
+			"version": "1.300.224.41501",
+			"purl": "pkg:nuget/Azure.Extensions.AspNetCore.Configuration.Secrets@1.300.224.41501",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "Not Found in JFrogRepo"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Package name not found in Jfrog"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": ""
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Azure.Identity@1.12.0",
+			"name": "Azure.Identity",
+			"version": "1.12.0",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "adab55baf3435a0dc2c3a52cb5c82ce2"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "6670475969c64dae8b2b6bbcf8993640f690774c"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "1777452fcfc71ea62020dc5ef4e0241d6d3aeca3dcb0a80b8dc3d31e6a5f040a"
+				}
+			],
+			"purl": "pkg:nuget/Azure.Identity@1.12.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Azure.Identity.1.12.0.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/Azure.Identity.1.12.0.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Azure.Security.KeyVault.Secrets@4.6.0",
+			"name": "Azure.Security.KeyVault.Secrets",
+			"version": "4.6.0",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "703155b752b119c1eab4fe7b32045b00"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "1a1d669e0c5eb949330d3362b717411ad610f16b"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "ef68b39294bf2879ee8a8b8bf426b86aeb9e07fd3ae9197fee9e0bc97a409134"
+				}
+			],
+			"purl": "pkg:nuget/Azure.Security.KeyVault.Secrets@4.6.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Azure.Security.KeyVault.Secrets.4.6.0.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/Azure.Security.KeyVault.Secrets.4.6.0.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Json.NET@13.0.3.27908",
+			"name": "Json.NET",
+			"version": "13.0.3.27908",
+			"purl": "pkg:nuget/Json.NET@13.0.3.27908",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "Not Found in JFrogRepo"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Package name not found in Jfrog"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": ""
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/LCD.BusinessLogic@1.0.0",
+			"name": "LCD.BusinessLogic",
+			"version": "1.0.0",
+			"purl": "pkg:nuget/LCD.BusinessLogic@1.0.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "Not Found in JFrogRepo"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Package name not found in Jfrog"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": ""
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/LCD.BusinessLogic@1.0.0.0",
+			"name": "LCD.BusinessLogic",
+			"version": "1.0.0.0",
+			"purl": "pkg:nuget/LCD.BusinessLogic@1.0.0.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "Not Found in JFrogRepo"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Package name not found in Jfrog"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": ""
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/LCD.Common@1.0.0",
+			"name": "LCD.Common",
+			"version": "1.0.0",
+			"purl": "pkg:nuget/LCD.Common@1.0.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "Not Found in JFrogRepo"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Package name not found in Jfrog"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": ""
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/LCD.Common@1.0.0.0",
+			"name": "LCD.Common",
+			"version": "1.0.0.0",
+			"purl": "pkg:nuget/LCD.Common@1.0.0.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "Not Found in JFrogRepo"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Package name not found in Jfrog"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": ""
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/LCD.RestApi@1.0.0",
+			"name": "LCD.RestApi",
+			"version": "1.0.0",
+			"purl": "pkg:nuget/LCD.RestApi@1.0.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "Not Found in JFrogRepo"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Package name not found in Jfrog"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": ""
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/LCD.RestApi@1.0.0.0",
+			"name": "LCD.RestApi",
+			"version": "1.0.0.0",
+			"purl": "pkg:nuget/LCD.RestApi@1.0.0.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "Not Found in JFrogRepo"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Package name not found in Jfrog"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": ""
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/LCT.APICommunications@1.0.0",
+			"name": "LCT.APICommunications",
+			"version": "1.0.0",
+			"purl": "pkg:nuget/LCT.APICommunications@1.0.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "Not Found in JFrogRepo"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Package name not found in Jfrog"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": ""
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/LCT.APICommunications@1.0.0.0",
+			"name": "LCT.APICommunications",
+			"version": "1.0.0.0",
+			"purl": "pkg:nuget/LCT.APICommunications@1.0.0.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "Not Found in JFrogRepo"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Package name not found in Jfrog"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": ""
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Microsoft%20Azure%20Client%20Pipeline@1.4200.24.40104",
+			"name": "Microsoft Azure Client Pipeline",
+			"version": "1.4200.24.40104",
+			"purl": "pkg:nuget/Microsoft%20Azure%20Client%20Pipeline@1.4200.24.40104",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "Not Found in JFrogRepo"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Package name not found in Jfrog"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": ""
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Microsoft%20Azure.Identity%20Component@1.1200.24.31701",
+			"name": "Microsoft Azure.Identity Component",
+			"version": "1.1200.24.31701",
+			"purl": "pkg:nuget/Microsoft%20Azure.Identity%20Component@1.1200.24.31701",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "Not Found in JFrogRepo"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Package name not found in Jfrog"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": ""
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Microsoft%20Azure.Security.KeyVault.Secrets%20client%20library@4.600.24.11403",
+			"name": "Microsoft Azure.Security.KeyVault.Secrets client library",
+			"version": "4.600.24.11403",
+			"purl": "pkg:nuget/Microsoft%20Azure.Security.KeyVault.Secrets%20client%20library@4.600.24.11403",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "Not Found in JFrogRepo"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Package name not found in Jfrog"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": ""
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Microsoft.AspNetCore.SpaProxy@8.0.8",
+			"name": "Microsoft.AspNetCore.SpaProxy",
+			"version": "8.0.8",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "cc6737eceb5cc800ab8577947d57e983"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "50308976f227aa9f0a0e380205ddc121e57dd5f2"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "62435b7e79b79ab6834014c1968a4af05d870208844002592e94d7161d0fb400"
+				}
+			],
+			"purl": "pkg:nuget/Microsoft.AspNetCore.SpaProxy@8.0.8",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "org1-nuget-nuget-remote-cache"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Microsoft.AspNetCore.SpaProxy.8.0.8.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "org1-nuget-nuget-remote-cache/Microsoft.AspNetCore.SpaProxy.8.0.8.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Microsoft.AspNetCore.SpaProxy@8.0.824.36908",
+			"name": "Microsoft.AspNetCore.SpaProxy",
+			"version": "8.0.824.36908",
+			"purl": "pkg:nuget/Microsoft.AspNetCore.SpaProxy@8.0.824.36908",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "Not Found in JFrogRepo"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Package name not found in Jfrog"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": ""
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Microsoft.Bcl.AsyncInterfaces@8.0.0",
+			"name": "Microsoft.Bcl.AsyncInterfaces",
+			"version": "8.0.0",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "9876032db290071aaf7b96d523f8b2e8"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "6d2611bf4407c38b619331b39bd354423cd62792"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "f5a5a68b03092ab2abf68843d4a4aea25dfbcbe8dd0f13c625cb779b6fc1927c"
+				}
+			],
+			"purl": "pkg:nuget/Microsoft.Bcl.AsyncInterfaces@8.0.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Microsoft.Bcl.AsyncInterfaces.8.0.0.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/Microsoft.Bcl.AsyncInterfaces.8.0.0.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Microsoft.Bcl.AsyncInterfaces@8.0.23.53103",
+			"name": "Microsoft.Bcl.AsyncInterfaces",
+			"version": "8.0.23.53103",
+			"purl": "pkg:nuget/Microsoft.Bcl.AsyncInterfaces@8.0.23.53103",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "Not Found in JFrogRepo"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Package name not found in Jfrog"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": ""
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Microsoft.Extensions.ApiDescription.Server@8.0.8",
+			"name": "Microsoft.Extensions.ApiDescription.Server",
+			"version": "8.0.8",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "6f5c7774c65c12d19e49207cb165fe33"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "db36590deab5ec7bbaacae4018ef1fec28c2718f"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "2a3d4cc0823d20492dc0d186a6ab09d5772cc1735812105f27e120c13c611044"
+				}
+			],
+			"purl": "pkg:nuget/Microsoft.Extensions.ApiDescription.Server@8.0.8",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "org1-nuget-nuget-remote-cache"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Microsoft.Extensions.ApiDescription.Server.8.0.8.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "org1-nuget-nuget-remote-cache/Microsoft.Extensions.ApiDescription.Server.8.0.8.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Microsoft.Extensions.Configuration@8.0.0",
+			"name": "Microsoft.Extensions.Configuration",
+			"version": "8.0.0",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "2624ec72894d989f1aff513bd654a705"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "d139058202c1986ff5571d62f51fc4e89440fb08"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "f413ec012971ad5f229663028dd6f74e251c9b9bc56719019c023f7cd0521320"
+				}
+			],
+			"purl": "pkg:nuget/Microsoft.Extensions.Configuration@8.0.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Microsoft.Extensions.Configuration.8.0.0.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/Microsoft.Extensions.Configuration.8.0.0.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Microsoft.Extensions.Configuration.Abstractions@8.0.0",
+			"name": "Microsoft.Extensions.Configuration.Abstractions",
+			"version": "8.0.0",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "79dbcbeb0a25b47e8947622a797b572d"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "30104abe62ef97ab597cc5f3396b9a7984bf6f81"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "e1e0690e47fb309a334d99cec10bf071f81129019c3577b42bf905fa1e5197ca"
+				}
+			],
+			"purl": "pkg:nuget/Microsoft.Extensions.Configuration.Abstractions@8.0.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Microsoft.Extensions.Configuration.Abstractions.8.0.0.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/Microsoft.Extensions.Configuration.Abstractions.8.0.0.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Microsoft.Extensions.Configuration.Binder@8.0.2",
+			"name": "Microsoft.Extensions.Configuration.Binder",
+			"version": "8.0.2",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "df5ee554d590a9973f0489b153c731fa"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "cd4f46bea46b6b892df319dedaf74dd4097f8680"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "68607456ea02df861a74012aaf0a1a5cb739aa56b9e69b300d5db12d2991ed21"
+				}
+			],
+			"purl": "pkg:nuget/Microsoft.Extensions.Configuration.Binder@8.0.2",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Microsoft.Extensions.Configuration.Binder.8.0.2.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/Microsoft.Extensions.Configuration.Binder.8.0.2.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Microsoft.Extensions.Configuration.Binder@8.0.724.31311",
+			"name": "Microsoft.Extensions.Configuration.Binder",
+			"version": "8.0.724.31311",
+			"purl": "pkg:nuget/Microsoft.Extensions.Configuration.Binder@8.0.724.31311",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "Not Found in JFrogRepo"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Package name not found in Jfrog"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": ""
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Microsoft.Extensions.DependencyInjection@8.0.0",
+			"name": "Microsoft.Extensions.DependencyInjection",
+			"version": "8.0.0",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "c6ce23e8176b222fb26645563c87b00f"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "f748f3146f1e89a8517ebdeb6a3d261467dde78d"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "faa20347c851ceb7821cd103b5470f7d51d076eaf358fa3f9aabe2087efcf844"
+				}
+			],
+			"purl": "pkg:nuget/Microsoft.Extensions.DependencyInjection@8.0.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Microsoft.Extensions.DependencyInjection.8.0.0.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/Microsoft.Extensions.DependencyInjection.8.0.0.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Microsoft.Extensions.DependencyInjection.Abstractions@8.0.0",
+			"name": "Microsoft.Extensions.DependencyInjection.Abstractions",
+			"version": "8.0.0",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "dc933714094e700da97ca5e3add09cdc"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "809398561b04d7cdca33db456ebb0eefc8ef9596"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "ef92b31065a36d110b7332690a226e6fe96d35430c6f3e40ff529053ee5d80ff"
+				}
+			],
+			"purl": "pkg:nuget/Microsoft.Extensions.DependencyInjection.Abstractions@8.0.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Microsoft.Extensions.DependencyInjection.Abstractions-8.0.0.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/Microsoft.Extensions.DependencyInjection.Abstractions-8.0.0.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Microsoft.Extensions.Diagnostics@8.0.0",
+			"name": "Microsoft.Extensions.Diagnostics",
+			"version": "8.0.0",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "c0c481dba0ea2045674ba999eacbc18c"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "2a439056cd3f61dbe07179f09ea69abe35b9f7cd"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "7c12e56fdc407d38196f572907116cffd780f81941bc5f178340cc901a9d1c3e"
+				}
+			],
+			"purl": "pkg:nuget/Microsoft.Extensions.Diagnostics@8.0.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Microsoft.Extensions.Diagnostics.8.0.0.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/Microsoft.Extensions.Diagnostics.8.0.0.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Microsoft.Extensions.Diagnostics.Abstractions@8.0.0",
+			"name": "Microsoft.Extensions.Diagnostics.Abstractions",
+			"version": "8.0.0",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "1ec21a1bed6bc826b82c0a3562948d67"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "25bb4d3b0a85475bfed1467636b7c55f0f376461"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "5120f9b9939a6a132a8babbba30356c7f2d1e040eb3b0a8fac00229bb891a496"
+				}
+			],
+			"purl": "pkg:nuget/Microsoft.Extensions.Diagnostics.Abstractions@8.0.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Microsoft.Extensions.Diagnostics.Abstractions.8.0.0.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/Microsoft.Extensions.Diagnostics.Abstractions.8.0.0.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Microsoft.Extensions.Http@8.0.0",
+			"name": "Microsoft.Extensions.Http",
+			"version": "8.0.0",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "614247bd5dcfc9bf6a13f0b6b7c51fb0"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "7b928ce75d3d88a70daa8c0ac54de0b8a06cde59"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "520963ca938b95dd652fb93b8759e86b3373bf2107209c3eafeeae1b3b9c1526"
+				}
+			],
+			"purl": "pkg:nuget/Microsoft.Extensions.Http@8.0.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Microsoft.Extensions.Http.8.0.0.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/Microsoft.Extensions.Http.8.0.0.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Microsoft.Extensions.Logging@8.0.0",
+			"name": "Microsoft.Extensions.Logging",
+			"version": "8.0.0",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "da0886f552d867390f4ca04a8277c3f2"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "b1f3c21879e903f7a495656c7efd2a889de43052"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "31e8746745fb2b23841b897445605cb871e285c00172f0b27d45e06ac990f75a"
+				}
+			],
+			"purl": "pkg:nuget/Microsoft.Extensions.Logging@8.0.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Microsoft.Extensions.Logging.8.0.0.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/Microsoft.Extensions.Logging.8.0.0.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Microsoft.Extensions.Logging.Abstractions@8.0.0",
+			"name": "Microsoft.Extensions.Logging.Abstractions",
+			"version": "8.0.0",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "bf577a78808f5572f9c0bbdfb2dff8fb"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "7d820985ded6f0f7ff03864f53130190774cb3e1"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "26675d8de83c5394be8814f046554054b7881f1738cabacd82a54c381ec48cce"
+				}
+			],
+			"purl": "pkg:nuget/Microsoft.Extensions.Logging.Abstractions@8.0.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Microsoft.Extensions.Logging.Abstractions.8.0.0.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/Microsoft.Extensions.Logging.Abstractions.8.0.0.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Microsoft.Extensions.Logging.Log4Net.AspNetCore@8.0.0",
+			"name": "Microsoft.Extensions.Logging.Log4Net.AspNetCore",
+			"version": "8.0.0",
+			"purl": "pkg:nuget/Microsoft.Extensions.Logging.Log4Net.AspNetCore@8.0.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "org1-nuget-nuget-remote-cache"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "microsoft.extensions.logging.log4net.aspnetcore.8.0.0.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "org1-nuget-nuget-remote-cache/microsoft.extensions.logging.log4net.aspnetcore.8.0.0.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Microsoft.Extensions.Logging.Log4Net.AspNetCore@8.0.0.0",
+			"name": "Microsoft.Extensions.Logging.Log4Net.AspNetCore",
+			"version": "8.0.0.0",
+			"purl": "pkg:nuget/Microsoft.Extensions.Logging.Log4Net.AspNetCore@8.0.0.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "Not Found in JFrogRepo"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Package name not found in Jfrog"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": ""
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Microsoft.Extensions.Options@8.0.0",
+			"name": "Microsoft.Extensions.Options",
+			"version": "8.0.0",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "5c3c19fa0744af51f5486626c8929fc1"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "5a1354b6852d68af4aa0a1bbd769392a8136a473"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "9f69b82527a040a51394eb0a2d95141c728cabddba789d30f4df46f88dc5a05c"
+				}
+			],
+			"purl": "pkg:nuget/Microsoft.Extensions.Options@8.0.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Microsoft.Extensions.Options-8.0.0.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/Microsoft.Extensions.Options-8.0.0.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Microsoft.Extensions.Options.ConfigurationExtensions@8.0.0",
+			"name": "Microsoft.Extensions.Options.ConfigurationExtensions",
+			"version": "8.0.0",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "099f0c80b7d5f635dee2ead3f79f7f23"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "a5e0256088662c8a202cc54756db4f8166b82a48"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "03905bcf0d6488d9208ab939c7c932c7083d94b4dc4a78288de0fea1ca46d512"
+				}
+			],
+			"purl": "pkg:nuget/Microsoft.Extensions.Options.ConfigurationExtensions@8.0.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Microsoft.Extensions.Options.ConfigurationExtensions.8.0.0.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/Microsoft.Extensions.Options.ConfigurationExtensions.8.0.0.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Microsoft.Extensions.Primitives@8.0.0",
+			"name": "Microsoft.Extensions.Primitives",
+			"version": "8.0.0",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "7821d331df609f28a57841bb44fa8786"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "284248e91a8957fd64ebc40bd4bc5dc9804ea10e"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "154f2a8f70d1f1b0dd73573e59e199c7f3c265eaaa9ddc1e64cf5ea5ca578d2a"
+				}
+			],
+			"purl": "pkg:nuget/Microsoft.Extensions.Primitives@8.0.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Microsoft.Extensions.Primitives.8.0.0.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/Microsoft.Extensions.Primitives.8.0.0.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Microsoft.Identity.Client@4.64.0",
+			"name": "Microsoft.Identity.Client",
+			"version": "4.64.0",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "537573266c822a50d2088220fa0ab60e"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "a6736020f875851c3e02f1687038a6a19d4491ac"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "56c07bd8ef8425ac42adce4adb0d977714e15612033d5999c3797ceb0e8ed4f5"
+				}
+			],
+			"purl": "pkg:nuget/Microsoft.Identity.Client@4.64.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "org1-nuget-nuget-remote-cache"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Microsoft.Identity.Client.4.64.0.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "org1-nuget-nuget-remote-cache/Microsoft.Identity.Client.4.64.0.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Microsoft.Identity.Client@4.64.0.0",
+			"name": "Microsoft.Identity.Client",
+			"version": "4.64.0.0",
+			"purl": "pkg:nuget/Microsoft.Identity.Client@4.64.0.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "Not Found in JFrogRepo"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Package name not found in Jfrog"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": ""
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Microsoft.Identity.Client.Extensions.Msal@4.64.0",
+			"name": "Microsoft.Identity.Client.Extensions.Msal",
+			"version": "4.64.0",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "885ab8d5c040433abe6d6221e1cf8f1d"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "bf89636779de5450040f159102a1aca568dec0fb"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "74360811b4ae5788a36fd7e7ddd88e6b3f9312cf1c24c3f54dbe7f983f830068"
+				}
+			],
+			"purl": "pkg:nuget/Microsoft.Identity.Client.Extensions.Msal@4.64.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "org1-nuget-nuget-remote-cache"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Microsoft.Identity.Client.Extensions.Msal.4.64.0.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "org1-nuget-nuget-remote-cache/Microsoft.Identity.Client.Extensions.Msal.4.64.0.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Microsoft.Identity.Client.Extensions.Msal@4.64.0.0",
+			"name": "Microsoft.Identity.Client.Extensions.Msal",
+			"version": "4.64.0.0",
+			"purl": "pkg:nuget/Microsoft.Identity.Client.Extensions.Msal@4.64.0.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "Not Found in JFrogRepo"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Package name not found in Jfrog"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": ""
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Microsoft.IdentityModel.Abstractions@8.0.2",
+			"name": "Microsoft.IdentityModel.Abstractions",
+			"version": "8.0.2",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "739bc6e992677af60d0dfd09a01bf3d5"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "ad0064f52e3f843f31a36bc9a6c5590be62a6abf"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "8f7ed6598ad880834a567e5e5a1cad19a77b9361b040f09e9ae9895d4edc1ecc"
+				}
+			],
+			"purl": "pkg:nuget/Microsoft.IdentityModel.Abstractions@8.0.2",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Microsoft.IdentityModel.Abstractions.8.0.2.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/Microsoft.IdentityModel.Abstractions.8.0.2.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Microsoft.IdentityModel.Abstractions@8.0.2.50822",
+			"name": "Microsoft.IdentityModel.Abstractions",
+			"version": "8.0.2.50822",
+			"purl": "pkg:nuget/Microsoft.IdentityModel.Abstractions@8.0.2.50822",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "Not Found in JFrogRepo"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Package name not found in Jfrog"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": ""
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Microsoft.OpenApi@1.6.18",
+			"name": "Microsoft.OpenApi",
+			"version": "1.6.18",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "f88b296a8fac39c8221a058147162652"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "de58d57989a10f03ef1996323bfcc3d23e444f6a"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "3d4cc8c4e4ea1bedbf702b246d806c2b5fd11f18e9a9638a44435c5e07482b73"
+				}
+			],
+			"purl": "pkg:nuget/Microsoft.OpenApi@1.6.18",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "org1-nuget-nuget-remote-cache"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Microsoft.OpenApi.1.6.18.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "org1-nuget-nuget-remote-cache/Microsoft.OpenApi.1.6.18.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Microsoft.OpenApi@1.6.18.0",
+			"name": "Microsoft.OpenApi",
+			"version": "1.6.18.0",
+			"purl": "pkg:nuget/Microsoft.OpenApi@1.6.18.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "Not Found in JFrogRepo"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Package name not found in Jfrog"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": ""
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Newtonsoft.Json@13.0.3",
+			"name": "Newtonsoft.Json",
+			"version": "13.0.3",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "94d7f4cce0663c6a30340fe6fec831da"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "f418efd4238eb069cf38d1c86f4edc34444777dd"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "872fc189e638ab1056555b03aaa38f68bcb54286e221aa646eb1129babf63c77"
+				}
+			],
+			"purl": "pkg:nuget/Newtonsoft.Json@13.0.3",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Newtonsoft.Json.13.0.3.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/Newtonsoft.Json.13.0.3.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Polly@8.4.1",
+			"name": "Polly",
+			"version": "8.4.1",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "7f1fc7ae7c18c62f8ecf77eb999acdc9"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "e9ae80d15140320fba0556a4182333ed8877e470"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "08f170d23e9fd8fe4b7dca05007a354510e70b1e925e7a7c8331e7c180e76216"
+				}
+			],
+			"purl": "pkg:nuget/Polly@8.4.1",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Polly.8.4.1.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/Polly.8.4.1.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Polly@8.4.1.3582",
+			"name": "Polly",
+			"version": "8.4.1.3582",
+			"purl": "pkg:nuget/Polly@8.4.1.3582",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "Not Found in JFrogRepo"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Package name not found in Jfrog"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": ""
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Polly.Core@8.4.1",
+			"name": "Polly.Core",
+			"version": "8.4.1",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "2e3881b509968673d9615ea86072e7f9"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "96170bd9acd1ce6db4e7e1e9b3f3809dfa91b368"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "124b00dd4e5c9acae2da3a0cf9232d6ddc0e50c515c485d3f039c7e034802290"
+				}
+			],
+			"purl": "pkg:nuget/Polly.Core@8.4.1",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Polly.Core.8.4.1.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/Polly.Core.8.4.1.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Polly.Core@8.4.1.3582",
+			"name": "Polly.Core",
+			"version": "8.4.1.3582",
+			"purl": "pkg:nuget/Polly.Core@8.4.1.3582",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "Not Found in JFrogRepo"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Package name not found in Jfrog"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": ""
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Swashbuckle.AspNetCore@6.7.3",
+			"name": "Swashbuckle.AspNetCore",
+			"version": "6.7.3",
+			"purl": "pkg:nuget/Swashbuckle.AspNetCore@6.7.3",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "org1-nuget-nuget-remote-cache"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "swashbuckle.aspnetcore.6.7.3.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "org1-nuget-nuget-remote-cache/swashbuckle.aspnetcore.6.7.3.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Swashbuckle.AspNetCore.Swagger@6.7.3",
+			"name": "Swashbuckle.AspNetCore.Swagger",
+			"version": "6.7.3",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "ec721d87a3e1fef8e91824b50b1e7d7e"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "3c2a34933308d404b245ce9ba9cec87ecbae622d"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "69543d36eaa25b410584bc33d8b31ad798564d0ce6cf24b786eb80e36adb2523"
+				}
+			],
+			"purl": "pkg:nuget/Swashbuckle.AspNetCore.Swagger@6.7.3",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Swashbuckle.AspNetCore.Swagger.6.7.3.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/Swashbuckle.AspNetCore.Swagger.6.7.3.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Swashbuckle.AspNetCore.Swagger@6.7.3.685",
+			"name": "Swashbuckle.AspNetCore.Swagger",
+			"version": "6.7.3.685",
+			"purl": "pkg:nuget/Swashbuckle.AspNetCore.Swagger@6.7.3.685",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "Not Found in JFrogRepo"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Package name not found in Jfrog"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": ""
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Swashbuckle.AspNetCore.SwaggerGen@6.7.3",
+			"name": "Swashbuckle.AspNetCore.SwaggerGen",
+			"version": "6.7.3",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "78003a90a1c5ef35cdae26c25c54511b"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "9376ec00b3804ecea887dcfad2b8d3924144d387"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "2b6220d9ca7c0a5e6d2ee3e1486cf97b05b55ba035242f6b7d27d548335d2ee6"
+				}
+			],
+			"purl": "pkg:nuget/Swashbuckle.AspNetCore.SwaggerGen@6.7.3",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Swashbuckle.AspNetCore.SwaggerGen.6.7.3.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/Swashbuckle.AspNetCore.SwaggerGen.6.7.3.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Swashbuckle.AspNetCore.SwaggerGen@6.7.3.685",
+			"name": "Swashbuckle.AspNetCore.SwaggerGen",
+			"version": "6.7.3.685",
+			"purl": "pkg:nuget/Swashbuckle.AspNetCore.SwaggerGen@6.7.3.685",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "Not Found in JFrogRepo"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Package name not found in Jfrog"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": ""
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Swashbuckle.AspNetCore.SwaggerUI@6.7.3",
+			"name": "Swashbuckle.AspNetCore.SwaggerUI",
+			"version": "6.7.3",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "477ff9efcbb4476fd600365e015171c2"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "c5510a5a5976f72136d6e0c1dcfd4dceae659e53"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "38b705681b91c8186e9151382e2266d6490002366dcdf8468d11441c76c8d57e"
+				}
+			],
+			"purl": "pkg:nuget/Swashbuckle.AspNetCore.SwaggerUI@6.7.3",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Swashbuckle.AspNetCore.SwaggerUI.6.7.3.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/Swashbuckle.AspNetCore.SwaggerUI.6.7.3.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/Swashbuckle.AspNetCore.SwaggerUI@6.7.3.685",
+			"name": "Swashbuckle.AspNetCore.SwaggerUI",
+			"version": "6.7.3.685",
+			"purl": "pkg:nuget/Swashbuckle.AspNetCore.SwaggerUI@6.7.3.685",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "Not Found in JFrogRepo"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Package name not found in Jfrog"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": ""
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/System.ClientModel@1.0.0",
+			"name": "System.ClientModel",
+			"version": "1.0.0",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "b3e34347afb35df5eee09d58cd515069"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "f4ab51a6d0f06a29472691a9cc6df7bd2ce8307b"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "c876fbd8cfd9f0b79265e6bd4cac36783d1275812808dc15c3a677ebde520b66"
+				}
+			],
+			"purl": "pkg:nuget/System.ClientModel@1.0.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "System.ClientModel.1.0.0.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/System.ClientModel.1.0.0.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/System.ClientModel@1.0.24.5302",
+			"name": "System.ClientModel",
+			"version": "1.0.24.5302",
+			"purl": "pkg:nuget/System.ClientModel@1.0.24.5302",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "Not Found in JFrogRepo"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Package name not found in Jfrog"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": ""
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/System.Configuration.ConfigurationManager@8.0.0",
+			"name": "System.Configuration.ConfigurationManager",
+			"version": "8.0.0",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "d0ea4556e738fdc5a6dd36b66a8067bc"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "4a8413f4b1c2d2a3a8c10b76d263b9174185d321"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "c61963a9290d424f0332410e0526279fd9730921030eae323bdd748ada6daa21"
+				}
+			],
+			"purl": "pkg:nuget/System.Configuration.ConfigurationManager@8.0.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "System.Configuration.ConfigurationManager.8.0.0.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/System.Configuration.ConfigurationManager.8.0.0.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/System.Configuration.ConfigurationManager@8.0.23.53103",
+			"name": "System.Configuration.ConfigurationManager",
+			"version": "8.0.23.53103",
+			"purl": "pkg:nuget/System.Configuration.ConfigurationManager@8.0.23.53103",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "Not Found in JFrogRepo"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Package name not found in Jfrog"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": ""
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/System.Diagnostics.DiagnosticSource@8.0.0",
+			"name": "System.Diagnostics.DiagnosticSource",
+			"version": "8.0.0",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "79bc0d921bebe1fa6776889511ca5052"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "05e4dd5ecd867dc787122511cd05860b54f097bd"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "f9a38368311032a95ae516197aad0b87aea3fb190f631ca4ad5bd20a6250f95b"
+				}
+			],
+			"purl": "pkg:nuget/System.Diagnostics.DiagnosticSource@8.0.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "System.Diagnostics.DiagnosticSource.8.0.0.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/System.Diagnostics.DiagnosticSource.8.0.0.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/System.Diagnostics.EventLog@8.0.0",
+			"name": "System.Diagnostics.EventLog",
+			"version": "8.0.0",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "b32347516b79449ffdfcdc5e4e0e88f8"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "be3551188eafd64355ea65f5e68002f916a534aa"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "aedf3173791d769418e0711d82194178e2b881dc39c888f899c661015b64dbf6"
+				}
+			],
+			"purl": "pkg:nuget/System.Diagnostics.EventLog@8.0.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "System.Diagnostics.EventLog.8.0.0.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/System.Diagnostics.EventLog.8.0.0.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/System.Memory@4.5.4",
+			"name": "System.Memory",
+			"version": "4.5.4",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "8128dfe11ed0dc50447266386f9c60d7"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "0743af83114163ee2aa87368401a8421b90dda73"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "dec0847f33b8823e4260672d97d657411461c00ada3107ec7bbcb32a845eeb91"
+				}
+			],
+			"purl": "pkg:nuget/System.Memory@4.5.4",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "System.Memory.4.5.4.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/System.Memory.4.5.4.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/System.Memory.Data@8.0.0",
+			"name": "System.Memory.Data",
+			"version": "8.0.0",
+			"purl": "pkg:nuget/System.Memory.Data@8.0.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "org1-nuget-nuget-remote-cache"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "system.memory.data.8.0.0.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "org1-nuget-nuget-remote-cache/system.memory.data.8.0.0.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/System.Memory.Data@8.0.23.53103",
+			"name": "System.Memory.Data",
+			"version": "8.0.23.53103",
+			"purl": "pkg:nuget/System.Memory.Data@8.0.23.53103",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "Not Found in JFrogRepo"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Package name not found in Jfrog"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": ""
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/System.Numerics.Vectors@4.5.0",
+			"name": "System.Numerics.Vectors",
+			"version": "4.5.0",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "39ded0a965763bc5be721b4c0f263fde"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "275152f93582047359f20b7a5db37a90a61868ac"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "a9d49320581fda1b4f4be6212c68c01a22cdf228026099c20a8eabefcf90f9cf"
+				}
+			],
+			"purl": "pkg:nuget/System.Numerics.Vectors@4.5.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "System.Numerics.Vectors-4.5.0.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/System.Numerics.Vectors-4.5.0.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/System.Security.AccessControl@6.0.1",
+			"name": "System.Security.AccessControl",
+			"version": "6.0.1",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "bd9b2506dd7bfc858d39fee988187094"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "d564604796b2c7da97850e2e0ddf029009042abe"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "462e26f796417e8a4350655a85bbd4233b94cbd0f7150c1c5e9acfd88e885141"
+				}
+			],
+			"purl": "pkg:nuget/System.Security.AccessControl@6.0.1",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "System.Security.AccessControl.6.0.1.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/System.Security.AccessControl.6.0.1.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/System.Security.Cryptography.ProtectedData@8.0.0",
+			"name": "System.Security.Cryptography.ProtectedData",
+			"version": "8.0.0",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "257d1e3be7ca7ffb04e94ba43f3c381d"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "ba2dca57deefac2696d1a13cf1085fa96553bcc5"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "7dbd296bdb10c4dfa6af4be75e0d4881bc78f4268ea92f860e44df58d6e852fb"
+				}
+			],
+			"purl": "pkg:nuget/System.Security.Cryptography.ProtectedData@8.0.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "System.Security.Cryptography.ProtectedData.8.0.0.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/System.Security.Cryptography.ProtectedData.8.0.0.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/System.Security.Cryptography.ProtectedData@8.0.23.53103",
+			"name": "System.Security.Cryptography.ProtectedData",
+			"version": "8.0.23.53103",
+			"purl": "pkg:nuget/System.Security.Cryptography.ProtectedData@8.0.23.53103",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "Not Found in JFrogRepo"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Package name not found in Jfrog"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": ""
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/System.Security.Permissions@8.0.0",
+			"name": "System.Security.Permissions",
+			"version": "8.0.0",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "7adb01d08f9134a51e235ceb9e1807ab"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "5ea559651f827d95769b131542142fe3cd372629"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "f9850f63edc79d399f3cb673afee6a124d11a9a9426c564180b5de7b5c821f53"
+				}
+			],
+			"purl": "pkg:nuget/System.Security.Permissions@8.0.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "org1-nuget-nuget-remote-cache"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "System.Security.Permissions.8.0.0.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "org1-nuget-nuget-remote-cache/System.Security.Permissions.8.0.0.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/System.Security.Permissions@8.0.23.53103",
+			"name": "System.Security.Permissions",
+			"version": "8.0.23.53103",
+			"purl": "pkg:nuget/System.Security.Permissions@8.0.23.53103",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "Not Found in JFrogRepo"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Package name not found in Jfrog"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": ""
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/System.Text.Encodings.Web@8.0.0",
+			"name": "System.Text.Encodings.Web",
+			"version": "8.0.0",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "d28c2f0335e973c3df4ee5aad1b1d6a1"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "d67c2e5b14efa455f525df6985434b873d9b421f"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "21442442457da68d4b0b442caab8a5ab03733ef9dcfb8795beafa10afabc7ef1"
+				}
+			],
+			"purl": "pkg:nuget/System.Text.Encodings.Web@8.0.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "System.Text.Encodings.Web.8.0.0.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/System.Text.Encodings.Web.8.0.0.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/System.Text.Json@8.0.0",
+			"name": "System.Text.Json",
+			"version": "8.0.0",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "6b56cf424a32feffb78eebe482bfc284"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "05ac0e09616a66510f955b421d4639bbb483b570"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "5c57021cc5b5bb6fd6ba39563476885a46d6d709fc5b8908d1076bc0fb569a8c"
+				}
+			],
+			"purl": "pkg:nuget/System.Text.Json@8.0.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "System.Text.Json.8.0.0.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/System.Text.Json.8.0.0.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/System.Threading.Tasks.Extensions@4.5.4",
+			"name": "System.Threading.Tasks.Extensions",
+			"version": "4.5.4",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "c0d8da76dfdc9159b0a47c36d099d4c3"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "5ca708480099eeeace094f25df1b16614da2aac1"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "a304a963cc0796c5179f9c6b7d8022bbce3b2fa7c029eb6196f631f7b462d678"
+				}
+			],
+			"purl": "pkg:nuget/System.Threading.Tasks.Extensions@4.5.4",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "System.Threading.Tasks.Extensions-4.5.4.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/System.Threading.Tasks.Extensions-4.5.4.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/System.Windows.Extensions@8.0.0",
+			"name": "System.Windows.Extensions",
+			"version": "8.0.0",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "36dbfe369f8b1392fbcbd76441d69f23"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "3c74ab4b67a4a62d9a8e85a93565862a15dd522c"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "687933ecbb665030d14bbb3040cd22e9d0d5532b5108c61e03609f69e540d98d"
+				}
+			],
+			"purl": "pkg:nuget/System.Windows.Extensions@8.0.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "org1-nuget-nuget-remote-cache"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "System.Windows.Extensions.8.0.0.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "org1-nuget-nuget-remote-cache/System.Windows.Extensions.8.0.0.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/System.Windows.Extensions@8.0.23.53103",
+			"name": "System.Windows.Extensions",
+			"version": "8.0.23.53103",
+			"purl": "pkg:nuget/System.Windows.Extensions@8.0.23.53103",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "Not Found in JFrogRepo"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Package name not found in Jfrog"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": ""
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/log4net@2.0.17",
+			"name": "log4net",
+			"version": "2.0.17",
+			"hashes": [
+				{
+					"alg": "MD5",
+					"content": "c5d558943d10d35c10b8c8e40d56eecb"
+				},
+				{
+					"alg": "SHA-1",
+					"content": "8fbf613917e04643690ddcaab4f62ada5510032c"
+				},
+				{
+					"alg": "SHA-256",
+					"content": "4f8cf7cfc45fddecfc05067ad452ae35388bfe6a7a9918b4a3e0f7054d77b0ba"
+				}
+			],
+			"purl": "pkg:nuget/log4net@2.0.17",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "siparty-release-nuget-egll"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "log4net.2.0.17.nupkg"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": "siparty-release-nuget-egll/log4net.2.0.17.nupkg"
+				}
+			]
+		},
+		{
+			"type": "library",
+			"bom-ref": "pkg:nuget/log4net@2.0.17.0",
+			"name": "log4net",
+			"version": "2.0.17.0",
+			"purl": "pkg:nuget/log4net@2.0.17.0",
+			"properties": [
+				{
+					"name": "internal:siemens:clearing:spdx-file-name",
+					"value": "Nuget.spdx.sbom.json"
+				},
+				{
+					"name": "internal:siemens:clearing:development",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:identifier-type",
+					"value": "ManuallyAdded"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:direct",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:is-internal",
+					"value": "false"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-name",
+					"value": "Not Found in JFrogRepo"
+				},
+				{
+					"name": "internal:siemens:clearing:project-type",
+					"value": "Nuget"
+				},
+				{
+					"name": "internal:siemens:clearing:siemens:filename",
+					"value": "Package name not found in Jfrog"
+				},
+				{
+					"name": "internal:siemens:clearing:jfrog-repo-path",
+					"value": ""
+				}
+			]
+		}
+	],
+	"dependencies": [
+		{
+			"ref": "pkg:nuget/Microsoft.Extensions.Diagnostics@8.0.0",
+			"dependsOn": [
+				"pkg:nuget/Microsoft.Extensions.Diagnostics.Abstractions@8.0.0",
+				"pkg:nuget/Microsoft.Extensions.Configuration@8.0.0",
+				"pkg:nuget/Microsoft.Extensions.Options.ConfigurationExtensions@8.0.0"
+			]
+		},
+		{
+			"ref": "pkg:nuget/Microsoft.Extensions.Http@8.0.0",
+			"dependsOn": [
+				"pkg:nuget/Microsoft.Extensions.Logging@8.0.0",
+				"pkg:nuget/Microsoft.Extensions.Diagnostics@8.0.0",
+				"pkg:nuget/Microsoft.Extensions.Options@8.0.0",
+				"pkg:nuget/Microsoft.Extensions.Configuration.Abstractions@8.0.0",
+				"pkg:nuget/Microsoft.Extensions.Logging.Abstractions@8.0.0",
+				"pkg:nuget/Microsoft.Extensions.DependencyInjection.Abstractions@8.0.0"
+			]
+		},
+		{
+			"ref": "pkg:nuget/Microsoft.Extensions.Logging.Log4Net.AspNetCore@8.0.0",
+			"dependsOn": [
+				"pkg:nuget/Microsoft.Extensions.Logging@8.0.0",
+				"pkg:nuget/Microsoft.Extensions.Configuration.Binder@8.0.2",
+				"pkg:nuget/Microsoft.Extensions.Configuration@8.0.0",
+				"pkg:nuget/Microsoft.Extensions.Configuration.Abstractions@8.0.0",
+				"pkg:nuget/log4net@2.0.17"
+			]
+		},
+		{
+			"ref": "pkg:nuget/Azure.Extensions.AspNetCore.Configuration.Secrets@1.3.2",
+			"dependsOn": [
+				"pkg:nuget/Azure.Security.KeyVault.Secrets@4.6.0",
+				"pkg:nuget/Microsoft.Extensions.Configuration@8.0.0",
+				"pkg:nuget/Azure.Core@1.42.0"
+			]
+		},
+		{
+			"ref": "pkg:nuget/LCD.RestApi@1.0.0",
+			"dependsOn": [
+				"pkg:nuget/Azure.Security.KeyVault.Secrets@4.6.0",
+				"pkg:nuget/Microsoft.Extensions.Configuration.Binder@8.0.2",
+				"pkg:nuget/Azure.Identity@1.12.0",
+				"pkg:nuget/LCD.BusinessLogic@1.0.0",
+				"pkg:nuget/Azure.Extensions.AspNetCore.Configuration.Secrets@1.3.2",
+				"pkg:nuget/Microsoft.Extensions.Configuration@8.0.0",
+				"pkg:nuget/System.Memory.Data@8.0.0",
+				"pkg:nuget/Swashbuckle.AspNetCore@6.7.3",
+				"pkg:nuget/Microsoft.Identity.Client.Extensions.Msal@4.64.0",
+				"pkg:nuget/Newtonsoft.Json@13.0.3",
+				"pkg:nuget/Microsoft.Extensions.ApiDescription.Server@8.0.8",
+				"pkg:nuget/Microsoft.Extensions.Logging.Log4Net.AspNetCore@8.0.0",
+				"pkg:nuget/Microsoft.OpenApi@1.6.18",
+				"pkg:nuget/Microsoft.IdentityModel.Abstractions@8.0.2",
+				"pkg:nuget/Azure.Core@1.42.0",
+				"pkg:nuget/Microsoft.Identity.Client@4.64.0",
+				"pkg:nuget/Microsoft.Bcl.AsyncInterfaces@8.0.0",
+				"pkg:nuget/Microsoft.AspNetCore.SpaProxy@8.0.8",
+				"pkg:nuget/System.Security.AccessControl@6.0.1"
+			]
+		},
+		{
+			"ref": "pkg:nuget/Microsoft.Extensions.Options.ConfigurationExtensions@8.0.0",
+			"dependsOn": [
+				"pkg:nuget/Microsoft.Extensions.Configuration.Binder@8.0.2",
+				"pkg:nuget/Microsoft.Extensions.Options@8.0.0",
+				"pkg:nuget/Microsoft.Extensions.Configuration.Abstractions@8.0.0",
+				"pkg:nuget/Microsoft.Extensions.DependencyInjection.Abstractions@8.0.0",
+				"pkg:nuget/Microsoft.Extensions.Primitives@8.0.0"
+			]
+		},
+		{
+			"ref": "pkg:nuget/Azure.Security.KeyVault.Secrets@4.6.0",
+			"dependsOn": [
+				"pkg:nuget/System.Text.Json@8.0.0",
+				"pkg:nuget/Azure.Core@1.42.0",
+				"pkg:nuget/System.Threading.Tasks.Extensions@4.5.4",
+				"pkg:nuget/System.Memory@4.5.4"
+			]
+		},
+		{
+			"ref": "pkg:nuget/Azure.Identity@1.12.0",
+			"dependsOn": [
+				"pkg:nuget/System.Text.Json@8.0.0",
+				"pkg:nuget/Microsoft.Identity.Client.Extensions.Msal@4.64.0",
+				"pkg:nuget/System.Security.Cryptography.ProtectedData@8.0.0",
+				"pkg:nuget/Azure.Core@1.42.0",
+				"pkg:nuget/Microsoft.Identity.Client@4.64.0",
+				"pkg:nuget/System.Threading.Tasks.Extensions@4.5.4",
+				"pkg:nuget/System.Memory@4.5.4"
+			]
+		},
+		{
+			"ref": "pkg:nuget/System.Memory.Data@8.0.0",
+			"dependsOn": [
+				"pkg:nuget/System.Text.Json@8.0.0"
+			]
+		},
+		{
+			"ref": "pkg:nuget/System.ClientModel@1.0.0",
+			"dependsOn": [
+				"pkg:nuget/System.Text.Json@8.0.0",
+				"pkg:nuget/System.Memory.Data@8.0.0"
+			]
+		},
+		{
+			"ref": "pkg:nuget/Azure.Core@1.42.0",
+			"dependsOn": [
+				"pkg:nuget/System.Text.Json@8.0.0",
+				"pkg:nuget/System.Numerics.Vectors@4.5.0",
+				"pkg:nuget/System.Diagnostics.DiagnosticSource@8.0.0",
+				"pkg:nuget/System.Memory.Data@8.0.0",
+				"pkg:nuget/System.ClientModel@1.0.0",
+				"pkg:nuget/System.Text.Encodings.Web@8.0.0",
+				"pkg:nuget/System.Threading.Tasks.Extensions@4.5.4",
+				"pkg:nuget/Microsoft.Bcl.AsyncInterfaces@8.0.0"
+			]
+		},
+		{
+			"ref": "pkg:nuget/LCT.APICommunications@1.0.0",
+			"dependsOn": [
+				"pkg:nuget/Microsoft.Extensions.Http@8.0.0",
+				"pkg:nuget/Newtonsoft.Json@13.0.3",
+				"pkg:nuget/log4net@2.0.17",
+				"pkg:nuget/System.Configuration.ConfigurationManager@8.0.0",
+				"pkg:nuget/System.Security.Permissions@8.0.0",
+				"pkg:nuget/System.Security.AccessControl@6.0.1"
+			]
+		},
+		{
+			"ref": "pkg:nuget/System.Security.Permissions@8.0.0",
+			"dependsOn": [
+				"pkg:nuget/System.Windows.Extensions@8.0.0"
+			]
+		},
+		{
+			"ref": "pkg:nuget/LCD.Common@1.0.0",
+			"dependsOn": [
+				"pkg:nuget/LCT.APICommunications@1.0.0"
+			]
+		},
+		{
+			"ref": "pkg:nuget/Swashbuckle.AspNetCore@6.7.3",
+			"dependsOn": [
+				"pkg:nuget/Swashbuckle.AspNetCore.Swagger@6.7.3",
+				"pkg:nuget/Swashbuckle.AspNetCore.SwaggerUI@6.7.3",
+				"pkg:nuget/Microsoft.Extensions.ApiDescription.Server@8.0.8",
+				"pkg:nuget/Swashbuckle.AspNetCore.SwaggerGen@6.7.3"
+			]
+		},
+		{
+			"ref": "pkg:nuget/Swashbuckle.AspNetCore.SwaggerGen@6.7.3",
+			"dependsOn": [
+				"pkg:nuget/Swashbuckle.AspNetCore.Swagger@6.7.3"
+			]
+		},
+		{
+			"ref": "pkg:nuget/Microsoft.Extensions.Diagnostics.Abstractions@8.0.0",
+			"dependsOn": [
+				"pkg:nuget/System.Diagnostics.DiagnosticSource@8.0.0",
+				"pkg:nuget/Microsoft.Extensions.Options@8.0.0",
+				"pkg:nuget/Microsoft.Extensions.DependencyInjection.Abstractions@8.0.0"
+			]
+		},
+		{
+			"ref": "pkg:nuget/Microsoft.Identity.Client@4.64.0",
+			"dependsOn": [
+				"pkg:nuget/System.Diagnostics.DiagnosticSource@8.0.0",
+				"pkg:nuget/Microsoft.IdentityModel.Abstractions@8.0.2"
+			]
+		},
+		{
+			"ref": "pkg:nuget/Microsoft.Extensions.Logging@8.0.0",
+			"dependsOn": [
+				"pkg:nuget/Microsoft.Extensions.DependencyInjection@8.0.0",
+				"pkg:nuget/Microsoft.Extensions.Options@8.0.0",
+				"pkg:nuget/Microsoft.Extensions.Logging.Abstractions@8.0.0"
+			]
+		},
+		{
+			"ref": "pkg:nuget/System.Configuration.ConfigurationManager@8.0.0",
+			"dependsOn": [
+				"pkg:nuget/System.Diagnostics.EventLog@8.0.0",
+				"pkg:nuget/System.Security.Cryptography.ProtectedData@8.0.0"
+			]
+		},
+		{
+			"ref": "pkg:nuget/LCD.BusinessLogic@1.0.0",
+			"dependsOn": [
+				"pkg:nuget/Newtonsoft.Json@13.0.3",
+				"pkg:nuget/Polly@8.4.1",
+				"pkg:nuget/LCD.Common@1.0.0",
+				"pkg:nuget/log4net@2.0.17",
+				"pkg:nuget/System.Configuration.ConfigurationManager@8.0.0"
+			]
+		},
+		{
+			"ref": "pkg:nuget/Polly@8.4.1",
+			"dependsOn": [
+				"pkg:nuget/Polly.Core@8.4.1"
+			]
+		},
+		{
+			"ref": "pkg:nuget/Microsoft.Extensions.Configuration.Binder@8.0.2",
+			"dependsOn": [
+				"pkg:nuget/Microsoft.Extensions.Configuration.Abstractions@8.0.0"
+			]
+		},
+		{
+			"ref": "pkg:nuget/Microsoft.Extensions.Configuration@8.0.0",
+			"dependsOn": [
+				"pkg:nuget/Microsoft.Extensions.Configuration.Abstractions@8.0.0",
+				"pkg:nuget/Microsoft.Extensions.Primitives@8.0.0"
+			]
+		},
+		{
+			"ref": "pkg:nuget/System.Text.Json@8.0.0",
+			"dependsOn": [
+				"pkg:nuget/System.Text.Encodings.Web@8.0.0"
+			]
+		},
+		{
+			"ref": "pkg:nuget/Microsoft.Identity.Client.Extensions.Msal@4.64.0",
+			"dependsOn": [
+				"pkg:nuget/System.Security.Cryptography.ProtectedData@8.0.0",
+				"pkg:nuget/Microsoft.Identity.Client@4.64.0"
+			]
+		},
+		{
+			"ref": "pkg:nuget/Microsoft.Extensions.DependencyInjection@8.0.0",
+			"dependsOn": [
+				"pkg:nuget/Microsoft.Extensions.DependencyInjection.Abstractions@8.0.0"
+			]
+		},
+		{
+			"ref": "pkg:nuget/Microsoft.Extensions.Options@8.0.0",
+			"dependsOn": [
+				"pkg:nuget/Microsoft.Extensions.DependencyInjection.Abstractions@8.0.0",
+				"pkg:nuget/Microsoft.Extensions.Primitives@8.0.0"
+			]
+		},
+		{
+			"ref": "pkg:nuget/Microsoft.Extensions.Logging.Abstractions@8.0.0",
+			"dependsOn": [
+				"pkg:nuget/Microsoft.Extensions.DependencyInjection.Abstractions@8.0.0"
+			]
+		},
+		{
+			"ref": "pkg:nuget/log4net@2.0.17",
+			"dependsOn": [
+				"pkg:nuget/System.Configuration.ConfigurationManager@8.0.0"
+			]
+		},
+		{
+			"ref": "pkg:nuget/Swashbuckle.AspNetCore.Swagger@6.7.3",
+			"dependsOn": [
+				"pkg:nuget/Microsoft.OpenApi@1.6.18"
+			]
+		},
+		{
+			"ref": "pkg:nuget/Microsoft.Extensions.Configuration.Abstractions@8.0.0",
+			"dependsOn": [
+				"pkg:nuget/Microsoft.Extensions.Primitives@8.0.0"
+			]
+		}
+	],
+	"compositions": [],
+	"definitions": {
+		"standards": [
+			{
+				"bom-ref": "standard-bom",
+				"name": "Standard BOM",
+				"version": "3.0.0",
+				"description": "The Standard for Software Bills of Materials in Siemens",
+				"owner": "Siemens AG",
+				"externalReferences": [
+					{
+						"url": "https://sbom.siemens.io/",
+						"type": "website"
+					}
+				]
+			}
+		]
+	}
+}

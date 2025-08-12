@@ -1,0 +1,145 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "unknown",
+  "documentNamespace": "https://anchore.com/Clearing%20Automation%20Tool/unknown-source-type/unknown-a7765742-1e1f-4f17-b7c8-fdfacd263e26",
+  "creationInfo": {
+    "licenseListVersion": "3.25",
+    "creators": [ "Organization: Anchore, Inc", "Tool: Clearing Automation Tool-8.0.0" ],
+    "created": "2025-07-14T09:39:47Z"
+  },
+  "packages": [
+    {
+      "name": "apk-tools",
+      "SPDXID": "SPDXRef-Package-apk-apk-tools-pkg-apk-alpine-apk-tools-2.12.9-r3-distro-alpine-3.16.2",
+      "versionInfo": "2.12.9-r3",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from APK DB: ",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:apk/alpine/apk-tools@2.12.9-r3?arch=source&distro=alpine-3.16.2"
+        }
+      ]
+    },
+    {
+      "name": "busybox",
+      "SPDXID": "SPDXRef-Package-apk-busybox-pkg-apk-alpine-busybox-1.35.0-r17-distro-alpine-3.16.2",
+      "versionInfo": "1.35.0-r17",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from APK DB: ",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:apk/alpine/busybox@1.35.0-r17?arch=source&distro=alpine-3.16.2"
+        }
+      ]
+    },
+    {
+      "name": "continuous-clearing",
+      "SPDXID": "SPDXRef-Package-UnknownPackage-continuous-clearing-8e0a82bb89af36a3",
+      "versionInfo": "v9.0.x",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from the following paths: ",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "musl",
+      "SPDXID": "SPDXRef-Package-apk-musl-pkg-apk-alpine-musl-1.2.3-r0-distro-alpine-3.16.2",
+      "versionInfo": "1.2.3-r0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from APK DB: ",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:apk/alpine/musl@1.2.3-r0?arch=source&distro=alpine-3.16.2"
+        }
+      ]
+    },
+    {
+      "name": "zlib",
+      "SPDXID": "SPDXRef-Package-apk-zlib-pkg-apk-alpine-zlib-1.2.12-r3-distro-alpine-3.16.2",
+      "versionInfo": "1.2.12-r3",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from APK DB: ",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:apk/alpine/zlib@1.2.12-r3?arch=source&distro=alpine-3.16.2"
+        }
+      ]
+    },
+    {
+      "name": "",
+      "SPDXID": "SPDXRef-DocumentRoot-Unknown-",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "primaryPackagePurpose": "OTHER"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Unknown-",
+      "relatedSpdxElement": "SPDXRef-Package-apk-apk-tools-pkg-apk-alpine-apk-tools-2.12.9-r3-distro-alpine-3.16.2",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Unknown-",
+      "relatedSpdxElement": "SPDXRef-Package-apk-busybox-pkg-apk-alpine-busybox-1.35.0-r17-distro-alpine-3.16.2",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Unknown-",
+      "relatedSpdxElement": "SPDXRef-Package-UnknownPackage-continuous-clearing-8e0a82bb89af36a3",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Unknown-",
+      "relatedSpdxElement": "SPDXRef-Package-apk-musl-pkg-apk-alpine-musl-1.2.3-r0-distro-alpine-3.16.2",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Unknown-",
+      "relatedSpdxElement": "SPDXRef-Package-apk-zlib-pkg-apk-alpine-zlib-1.2.12-r3-distro-alpine-3.16.2",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-DocumentRoot-Unknown-",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}
