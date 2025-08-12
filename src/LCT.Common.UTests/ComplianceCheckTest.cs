@@ -1,4 +1,10 @@
-﻿using File = System.IO.File;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2025 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+
+using File = System.IO.File;
 using LCT.Common.ComplianceValidator;
 using LCT.Common.Model;
 using NUnit.Framework;

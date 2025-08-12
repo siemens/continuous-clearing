@@ -7,14 +7,18 @@
 
 using CycloneDX.Models;
 using LCT.APICommunications.Model;
+using LCT.Common.ComplianceValidator;
+using LCT.Common.Model;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using TestUtilities;
+using File=System.IO.File;
 
 namespace SW360IntegrationTest.Nuget
 {
@@ -169,6 +173,49 @@ namespace SW360IntegrationTest.Nuget
             Assert.AreEqual(expectedversion, version, "Test Project  Version");
             Assert.AreEqual(expecteddownloadurl, downloadurl, "Test download Url of Entity Framework");
             Assert.AreEqual(expectedexternalid, externalid, "Test component external id");
+        }
+
+        [Test, Order(5)]
+        public void ComplianceCheck_CefSharpComponents_TriggersExpectedWarning()
+        {
+            // Arrange
+            var complianceCheck = new ComplianceCheck();
+            var settings = new ComplianceSettingsModel
+            {
+                ComplianceExceptionComponents = new List<ComplianceExceptionComponent>
+                {
+                    new ComplianceExceptionComponent
+                    {
+                          Purl = new List<string>
+                          {
+                               "pkg:nuget/CefSharp.Common",
+                               "pkg:nuget/CefSharp.WinForms",
+                               "pkg:nuget/chromiumembeddedframework.runtime.win-x64",
+                               "pkg:nuget/chromiumembeddedframework.runtime.win-x86"
+                          },
+                         ComplianceInstructions = new ComplianceInstructions
+                         {
+                              WarningMessage = "Component 'Chromium Embedded Framework' source code must be manually uploaded",
+                              Recommendation = ""
+                         }
+                    }
+                }
+            };
+            var bomData = new List<ComparisonBomData>
+            {
+            new ComparisonBomData { ComponentExternalId = "pkg:nuget/CefSharp.Common" },
+            new ComparisonBomData { ComponentExternalId = "pkg:nuget/CefSharp.WinForms" },
+            new ComparisonBomData { ComponentExternalId = "pkg:nuget/chromiumembeddedframework.runtime.win-x64" },
+            new ComparisonBomData { ComponentExternalId = "pkg:nuget/chromiumembeddedframework.runtime.win-x86" }
+            };
+
+            // Act
+            var result = complianceCheck.Check(settings, bomData);
+            var warnings = complianceCheck.GetResults();
+
+            // Assert
+            Assert.IsFalse(result, "Compliance should fail due to exception.");
+            Assert.IsTrue(warnings.Any(w => w.Contains("Component 'Chromium Embedded Framework' source code must be manually uploaded")), "Expected warning not found.");
         }
 
         private string CCTComparisonBomTestFile { get; set; }
