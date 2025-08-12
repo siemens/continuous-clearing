@@ -28,7 +28,7 @@ namespace LCT.ArtifactoryUploader
     /// </summary>
     public static class PackageUploader
     {
-        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static readonly UploaderKpiData uploaderKpiData = new UploaderKpiData();
         private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
 

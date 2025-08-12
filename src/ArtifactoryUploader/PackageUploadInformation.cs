@@ -23,7 +23,7 @@ namespace LCT.ArtifactoryUploader
 {
     public static class PackageUploadInformation
     {
-        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static DisplayPackagesInfo GetComponentsToBePackages()
         {
             DisplayPackagesInfo displayPackagesInfo = new DisplayPackagesInfo();

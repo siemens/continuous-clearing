@@ -34,7 +34,7 @@ namespace LCT.SW360PackageCreator
     /// </summary>
     public class ComponentCreator : IComponentCreator
     {
-        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private static readonly CreatorKpiData s_kpiData = new();
         public static CreatorKpiData KpiData => s_kpiData;

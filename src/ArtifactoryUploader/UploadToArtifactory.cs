@@ -25,7 +25,7 @@ namespace LCT.ArtifactoryUploader
 {
     public static class UploadToArtifactory
     {
-        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static IJFrogService JFrogService { get; set; }
         private static readonly Dictionary<string, IList<AqlResult>> repoCache = new();
         public async static Task<List<ComponentsToArtifactory>> GetComponentsToBeUploadedToArtifactory(List<Component> comparisonBomData,

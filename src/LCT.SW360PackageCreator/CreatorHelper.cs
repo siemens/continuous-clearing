@@ -37,7 +37,7 @@ namespace LCT.SW360PackageCreator
     /// </summary>
     public class CreatorHelper(IDictionary<string, IPackageDownloader> packageDownloderList) : ICreatorHelper
     {
-        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly List<Components> lstReleaseNotCreated = new List<Components>();
         List<Components> componentsAvailableInSw360 = new List<Components>();
         private const string SOURCE = "SOURCE";

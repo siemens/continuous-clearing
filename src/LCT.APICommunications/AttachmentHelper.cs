@@ -5,6 +5,7 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.APICommunications.Model;
+using LCT.Common;
 using LCT.Common.Model;
 using log4net;
 using Newtonsoft.Json;
@@ -22,7 +23,7 @@ namespace LCT.APICommunications
     /// </summary>
     public class AttachmentHelper
     {
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly string fullPathOfAttachmentJSON = $"{Path.GetTempPath()}/ClearingTool/DownloadedFiles/Attachment.json";
         private readonly string sw360AuthToken;
         private readonly string sw360AuthTokenType;

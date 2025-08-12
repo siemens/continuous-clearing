@@ -34,7 +34,7 @@ namespace LCT.ArtifactoryUploader
     /// </summary>
     public static class PackageUploadHelper
     {
-        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static IJFrogService JFrogService { get; set; }
 
         private static bool SetWarningCode;

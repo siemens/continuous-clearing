@@ -8,6 +8,7 @@ using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
+using LCT.Common.Logging;
 using LCT.Common.Model;
 using LCT.Facade;
 using LCT.Facade.Interfaces;
@@ -69,9 +70,7 @@ namespace LCT.SW360PackageCreator
             {
                 environmentHelper.CallEnvironmentExit(-1);
             }
-
-            Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Package creator >>>>>====================", null);
-            Logger.Logger.Log(null, Level.Notice, $"\nStart of Package creator execution : {DateTime.Now}", null);
+            LoggerHelper.SpectreConsoleInitialMessage("Package creator");
 
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Alert, $"Package creator is running in TEST mode \n", null);

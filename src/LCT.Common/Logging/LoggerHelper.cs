@@ -459,16 +459,16 @@ namespace LCT.Common.Logging
             }
         }
         
-        public static void SpectreConsoleInitialMessage()
+        public static void SpectreConsoleInitialMessage(string message)
         {
             if (LoggerFactory.UseSpectreConsole)
             {
-                WriteHeader("PACKAGE IDENTIFIER");
+                WriteHeader($"{message}");
             }
             else
             {
-                Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Package Identifier >>>>>====================", null);
-                Logger.Logger.Log(null, Level.Notice, $"\nStart of Package Identifier execution: {DateTime.Now}", null);
+                Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< {message} >>>>>====================", null);
+                Logger.Logger.Log(null, Level.Notice, $"\nStart of {message} execution: {DateTime.Now}", null);
             }
         }
 
