@@ -12,7 +12,6 @@ using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
 using LCT.Common.Model;
-using LCT.Services;
 using LCT.Services.Interface;
 using LCT.Services.Model;
 using LCT.SW360PackageCreator.Interfaces;
@@ -258,7 +257,7 @@ namespace LCT.SW360PackageCreator
                 FileConstant.ComponentsWithoutSrcFileName, appSettings.SW360.ProjectName);
 
             // write Kpi Data
-            var kpiData = creatorHelper.GetCreatorKpiData(UpdatedCompareBomData);            
+            var kpiData = creatorHelper.GetCreatorKpiData(UpdatedCompareBomData);
             fileOperations.WriteContentToFile(kpiData, bomGenerationPath,
                 FileConstant.CreatorKpiDataFileName, appSettings.SW360.ProjectName);
 
@@ -344,7 +343,7 @@ namespace LCT.SW360PackageCreator
 
             await CreateReleaseWhenNotAvailable(item, sw360CreatorService, creatorHelper, appSettings);
 
-            await ComponentAndReleaseAvailable(item, sw360Url, sw360CreatorService, appSettings,creatorHelper);
+            await ComponentAndReleaseAvailable(item, sw360Url, sw360CreatorService, appSettings, creatorHelper);
         }
 
         private async Task CreateComponentAndReleaseWhenNotAvailable(ComparisonBomData item,
@@ -578,7 +577,7 @@ namespace LCT.SW360PackageCreator
                     ComponentsNotLinked.Add(new Components() { Name = item.Name, Version = item.Version });
                 }
 
-                ReleasesInfo releasesInfo = await sw360CreatorService.GetReleaseInfo(releaseId);                
+                ReleasesInfo releasesInfo = await sw360CreatorService.GetReleaseInfo(releaseId);
                 string componentId = CommonHelper.GetSubstringOfLastOccurance(releasesInfo.Links?.Sw360Component?.Href, "/");
                 item.ReleaseID = releaseId;
                 await GetUploadIdWhenReleaseExists(item, releasesInfo, appSettings);
@@ -589,7 +588,7 @@ namespace LCT.SW360PackageCreator
                 if (IsReleaseAttachmentExist(releasesInfo) && !string.IsNullOrEmpty(item.ReleaseID))
                 {
                     await TriggeringFossologyUploadAndUpdateAdditionalData(item, sw360CreatorService, appSettings);
-                }                
+                }
                 await sw360CreatorService.UpdatePurlIdForExistingComponent(item, componentId);
                 await sw360CreatorService.UpdatePurlIdForExistingRelease(item, releaseId, releasesInfo);
             }
@@ -716,7 +715,7 @@ namespace LCT.SW360PackageCreator
         public static void UpdateKpiData(CreatorKpiData kpiData)
         {
             if (kpiData == null) return;
-            
+
             // Copy properties from the provided kpiData to the static instance
             s_kpiData.ComponentsReadFromComparisonBOM = kpiData.ComponentsReadFromComparisonBOM;
             s_kpiData.ComponentsOrReleasesCreatedNewlyInSw360 = kpiData.ComponentsOrReleasesCreatedNewlyInSw360;

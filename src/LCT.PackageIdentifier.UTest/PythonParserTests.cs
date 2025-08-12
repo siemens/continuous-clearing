@@ -37,7 +37,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             cycloneDXBomParser.Setup(x => x.ParseCycloneDXBom(It.IsAny<string>())).Returns(bom);
-            pythonProcessor = new PythonProcessor(cycloneDXBomParser.Object,spdxBomParser.Object);
+            pythonProcessor = new PythonProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
         }
         [Test]
         public void ParseCycloneDXFile_GivenAMultipleInputFilePath_ReturnsCounts()
@@ -47,7 +47,7 @@ namespace LCT.PackageIdentifier.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "*_Python.cdx.json" };
-           
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "POETRY",
@@ -75,7 +75,7 @@ namespace LCT.PackageIdentifier.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "CycloneDX_Python.cdx.json" };
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "POETRY",
@@ -88,7 +88,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = pythonProcessor.ParsePackageFile(appSettings,ref ListUnsupportedComponentsForBom);
+            Bom listofcomponents = pythonProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(expectednoofcomponents,
@@ -103,7 +103,7 @@ namespace LCT.PackageIdentifier.UTest
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "CycloneDX_Python.cdx.json" };
             List<string> excludeComponents = ["attrs:22.2.0"];
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "POETRY",
@@ -116,7 +116,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = pythonProcessor.ParsePackageFile(appSettings,ref ListUnsupportedComponentsForBom);
+            Bom listofcomponents = pythonProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
@@ -143,7 +143,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            pythonProcessor.ParsePackageFile(appSettings,ref ListUnsupportedComponentsForBom);
+            pythonProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(duplicateComponents, Is.EqualTo(BomCreator.bomKpiData.DuplicateComponents), "Checks for no of duplicate components");
@@ -172,7 +172,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = pythonProcessor.ParsePackageFile(appSettings,ref ListUnsupportedComponentsForBom);
+            Bom listofcomponents = pythonProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
@@ -186,7 +186,7 @@ namespace LCT.PackageIdentifier.UTest
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "CycloneDX_Python.cdx.json", "SBOMTemplate_Python.cdx.json" };
             string packagefilepath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"));
-           
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "Poetry",
@@ -200,7 +200,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = pythonProcessor.ParsePackageFile(appSettings,ref ListUnsupportedComponentsForBom);
+            Bom listofcomponents = pythonProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             bool isUpdated = listofcomponents.Components.Exists(x => x.Properties != null && x.Properties.Exists(x => x.Name == Dataconstant.Cdx_IdentifierType && x.Value == Dataconstant.ManullayAdded));
 
@@ -220,7 +220,7 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             ComponentIdentification component = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-           
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360(),
@@ -263,7 +263,7 @@ namespace LCT.PackageIdentifier.UTest
             // Act
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
-            PythonProcessor pyProcessor = new PythonProcessor(cycloneDXBomParser.Object,spdxBomParser.Object);
+            PythonProcessor pyProcessor = new PythonProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             var actual = await pyProcessor.IdentificationOfInternalComponents(
                 component, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -283,7 +283,7 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             ComponentIdentification component = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-           
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360(),
@@ -325,7 +325,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             // Act
-            PythonProcessor pyProcessor = new PythonProcessor(cycloneDXBomParser.Object,spdxBomParser.Object);
+            PythonProcessor pyProcessor = new PythonProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             var actual = await pyProcessor.IdentificationOfInternalComponents(
                 component, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -345,7 +345,7 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-           
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "POETRY",
@@ -388,7 +388,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             // Act
-            PythonProcessor pyProcessor = new PythonProcessor(cycloneDXBomParser.Object,spdxBomParser.Object);
+            PythonProcessor pyProcessor = new PythonProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             var actual = await pyProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -408,7 +408,7 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-           
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "POETRY",
@@ -451,7 +451,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             // Act
-            PythonProcessor pyProcessor = new PythonProcessor(cycloneDXBomParser.Object,spdxBomParser.Object);
+            PythonProcessor pyProcessor = new PythonProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             var actual = await pyProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -483,7 +483,7 @@ namespace LCT.PackageIdentifier.UTest
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "poetry.lock" };
 
-           
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "Poetry",
@@ -496,7 +496,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = pythonProcessor.ParsePackageFile(appSettings,ref ListUnsupportedComponentsForBom);
+            Bom listofcomponents = pythonProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert  Need to change this after python package clearence implementaion
             Assert.True(listofcomponents.Components.Count == 0 || listofcomponents.Components.Count == 4);
@@ -518,14 +518,14 @@ namespace LCT.PackageIdentifier.UTest
                     new Component { Name = "component1", Version = "1.0.0" },
                     new Component { Name = "component2", Version = "2.0.0" }
                 }
-            };           
+            };
 
             var expectedProperties = new List<Property>
             {
                 new Property { Name = Dataconstant.Cdx_SiemensDirect, Value = "true" },
                 new Property { Name = Dataconstant.Cdx_SiemensDirect, Value = "true" }
             };
-            
+
 
             // Act
             PythonProcessor.AddSiemensDirectProperty(ref bom);
@@ -551,14 +551,14 @@ namespace LCT.PackageIdentifier.UTest
                     new Component { Name = "component1", Version = "1.0.0" },
                     new Component { Name = "component2", Version = "2.0.0" }
                 }
-            };           
+            };
 
             var expectedProperties = new List<Property>
             {
                 new Property { Name = Dataconstant.Cdx_SiemensDirect, Value = "false" },
                 new Property { Name = Dataconstant.Cdx_SiemensDirect, Value = "false" }
             };
-            
+
 
             // Act
             PythonProcessor.AddSiemensDirectProperty(ref bom);
@@ -601,13 +601,13 @@ namespace LCT.PackageIdentifier.UTest
                     }
                 }
             };
-          
+
 
             var expectedProperties = new List<Property>
             {
                 new Property { Name = Dataconstant.Cdx_SiemensDirect, Value = "true" }
             };
-            
+
 
             // Act
             PythonProcessor.AddSiemensDirectProperty(ref bom);

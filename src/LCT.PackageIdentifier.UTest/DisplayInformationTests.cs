@@ -1,5 +1,4 @@
 ﻿using LCT.Common;
-using LCT.Common.Interface;
 using LCT.Common.Model;
 using log4net.Appender;
 using log4net.Config;

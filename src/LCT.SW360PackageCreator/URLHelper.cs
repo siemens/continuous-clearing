@@ -437,7 +437,7 @@ namespace LCT.SW360PackageCreator
             var downLoadUrl = $"{CommonAppSettings.SourceURLConan}" + componentName + "/all/conandata.yml";
             var deserializer = new DeserializerBuilder().WithNamingConvention(UnderscoredNamingConvention.Instance).Build();
             string componentSrcURL = string.Empty;
-            
+
             using (HttpClient _httpClient = new HttpClient())
             {
                 try

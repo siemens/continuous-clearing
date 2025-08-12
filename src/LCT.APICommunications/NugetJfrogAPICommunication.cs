@@ -6,7 +6,6 @@
 
 using LCT.APICommunications.Model;
 using LCT.Common;
-using LCT.Common.Interface;
 using log4net;
 using System;
 using System.Net.Http;

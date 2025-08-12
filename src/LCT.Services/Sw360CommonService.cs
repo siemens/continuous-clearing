@@ -184,7 +184,7 @@ namespace LCT.Services
                 var listofSw360Releases = responseData?.Embedded?.Sw360Releases ?? new List<Sw360Releases>();
                 for (int i = 0; i < listofSw360Releases.Count; i++)
                 {
-                    if (listofSw360Releases[i].Version != null &&listofSw360Releases[i].Version.Equals(componentVersion, StringComparison.InvariantCultureIgnoreCase))
+                    if (listofSw360Releases[i].Version != null && listofSw360Releases[i].Version.Equals(componentVersion, StringComparison.InvariantCultureIgnoreCase))
                     {
                         string urlofreleaseid = listofSw360Releases[i]?.Links?.Self?.Href ?? string.Empty;
                         releaseId = CommonHelper.GetSubstringOfLastOccurance(urlofreleaseid, "/");

@@ -6,7 +6,6 @@
 
 // Ignore Spelling: LCT Spdx Bom
 
-using CycloneDX.Json;
 using CycloneDX.Models;
 using LCT.Common.Interface;
 using LCT.Common.Model;
@@ -23,7 +22,7 @@ namespace LCT.Common
     public class SpdxBomParser : ISpdxBomParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        public  Bom ParseSPDXBom(string filePath)
+        public Bom ParseSPDXBom(string filePath)
         {
             Logger.Debug($"Starting SPDX BOM parsing for file: {filePath}");
             Bom bom = new Bom();
@@ -50,7 +49,7 @@ namespace LCT.Common
                 {
                     Logger.Error($"File not found: {filePath}. Please provide a valid file path.");
                 }
-            }           
+            }
             catch (UnauthorizedAccessException ex)
             {
                 Logger.Error("Unauthorized access exception in reading SPDX BOM", ex);
@@ -100,7 +99,7 @@ namespace LCT.Common
             }
 
             var (components, componentIndex) = ProcessSpdxPackages(spdxData.Packages);
-            var dependencies = ProcessSpdxRelationships(spdxData.Relationships, componentIndex);            
+            var dependencies = ProcessSpdxRelationships(spdxData.Relationships, componentIndex);
             CleanupComponentManufacturerData(components);
             bom.Components = components;
             bom.Dependencies = dependencies;
@@ -287,7 +286,7 @@ namespace LCT.Common
                 Ref = kvp.Key,
                 Dependencies = [.. kvp.Value.Select(dep => new Dependency { Ref = dep.bomRef })]
             })];
-        }       
+        }
 
     }
 }

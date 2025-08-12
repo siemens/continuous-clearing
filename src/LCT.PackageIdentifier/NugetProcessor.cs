@@ -34,7 +34,7 @@ using File = System.IO.File;
 
 namespace LCT.PackageIdentifier
 {
-    public partial class NugetProcessor(ICycloneDXBomParser cycloneDXBomParser, IFrameworkPackages frameworkPackages, ICompositionBuilder compositionBuilder,ISpdxBomParser spdxBomParser) : CycloneDXBomParser, IParser
+    public partial class NugetProcessor(ICycloneDXBomParser cycloneDXBomParser, IFrameworkPackages frameworkPackages, ICompositionBuilder compositionBuilder, ISpdxBomParser spdxBomParser) : CycloneDXBomParser, IParser
     {
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
@@ -45,10 +45,10 @@ namespace LCT.PackageIdentifier
         private Dictionary<string, Dictionary<string, NuGetVersion>> _listofFrameworkPackages = new Dictionary<string, Dictionary<string, NuGetVersion>>();
         private readonly Dictionary<string, Dictionary<string, NuGetVersion>> _listofFrameworkPackagesInInputFiles = new Dictionary<string, Dictionary<string, NuGetVersion>>();
         private bool isSelfContainedProject = false;
-        private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(),Dependencies=new List<Dependency>() };
+        private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
 
         #region public methods
-        public Bom ParsePackageFile(CommonAppSettings appSettings,ref Bom unSupportedBomList)
+        public Bom ParsePackageFile(CommonAppSettings appSettings, ref Bom unSupportedBomList)
         {
             Logger.Debug($"ParsePackageFile():Start");
             List<Component> listComponentForBOM = new List<Component>();
@@ -276,7 +276,7 @@ namespace LCT.PackageIdentifier
             {
                 BomCreator.bomKpiData.DevdependencyComponents++;
             }
-            
+
             if (appSettings.Nuget.Artifactory.ThirdPartyRepos != null)
             {
                 foreach (var thirdPartyRepo in appSettings.Nuget.Artifactory.ThirdPartyRepos)
@@ -288,7 +288,7 @@ namespace LCT.PackageIdentifier
                     }
                 }
             }
-            
+
             if (repoValue == appSettings.Nuget.ReleaseRepo)
             {
                 BomCreator.bomKpiData.ReleaseRepoComponents++;
@@ -367,10 +367,10 @@ namespace LCT.PackageIdentifier
             List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(appSettings.Nuget.Artifactory.InternalRepos, jFrogService);
 
             var inputIterationList = componentData.comparisonBOMData;
-            
+
             // Use the common helper method
             var (processedComponents, internalComponents) = CommonHelper.ProcessInternalComponentIdentification(
-                inputIterationList, 
+                inputIterationList,
                 component => IsInternalNugetComponent(aqlResultList, component, bomhelper));
 
             // update the comparison bom data
@@ -401,7 +401,7 @@ namespace LCT.PackageIdentifier
 
         public static Bom RemoveExcludedComponents(CommonAppSettings appSettings, Bom cycloneDXBOM)
         {
-            return CommonHelper.RemoveExcludedComponentsFromBom(appSettings, cycloneDXBOM, 
+            return CommonHelper.RemoveExcludedComponentsFromBom(appSettings, cycloneDXBOM,
                 noOfExcludedComponents => BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents);
         }
 
@@ -458,7 +458,7 @@ namespace LCT.PackageIdentifier
             ref Bom bom,
             List<string> listOfTemplateBomfilePaths)
         {
-            List<Component> componentsForBOM = new List<Component>();            
+            List<Component> componentsForBOM = new List<Component>();
             if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
                 listOfTemplateBomfilePaths.Add(filepath);
@@ -470,31 +470,31 @@ namespace LCT.PackageIdentifier
                 !filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
                 Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
-                Bom bomList = _cycloneDXBomParser.ParseCycloneDXBom(filepath);                
+                Bom bomList = _cycloneDXBomParser.ParseCycloneDXBom(filepath);
                 if (bomList.Components != null)
                 {
                     CycloneDXBomParser.CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
                     componentsForBOM.AddRange(bomList.Components);
-                    CommonHelper.GetDetailsForManuallyAdded(componentsForBOM, listComponentForBOM,filepath);
-                }                    
-                if(bomList.Dependencies!=null)
+                    CommonHelper.GetDetailsForManuallyAdded(componentsForBOM, listComponentForBOM, filepath);
+                }
+                if (bomList.Dependencies != null)
                 {
                     bom.Dependencies.AddRange(bomList.Dependencies);
-                }                
+                }
             }
             else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
-            {                
+            {
                 BomHelper.NamingConventionOfSPDXFile(filepath, appSettings);
                 Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
                 Bom bomList = _spdxBomParser.ParseSPDXBom(filepath);
-                SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bomList,appSettings.ProjectType,ref listUnsupportedComponents);               
+                SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bomList, appSettings.ProjectType, ref listUnsupportedComponents);
                 componentsForBOM.AddRange(bomList.Components);
-                CommonHelper.GetDetailsForManuallyAdded(componentsForBOM,listComponentForBOM,filepath);
+                CommonHelper.GetDetailsForManuallyAdded(componentsForBOM, listComponentForBOM, filepath);
                 bom.Dependencies.AddRange(bomList.Dependencies);
                 string fileName = Path.GetFileName(filepath);
                 foreach (var component in listUnsupportedComponents.Components)
                 {
-                    SpdxSbomHelper.AddSpdxComponentProperties(fileName, component);                   
+                    SpdxSbomHelper.AddSpdxComponentProperties(fileName, component);
                 }
                 ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
                 ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
@@ -504,7 +504,7 @@ namespace LCT.PackageIdentifier
                 Logger.Debug($"ParsingInputFileForBOM():Found as Package File");
                 var listofComponents = new List<NugetPackage>();
                 var dependencies = new List<Dependency>();
-                ParseInputFiles(appSettings, filepath, listofComponents);                
+                ParseInputFiles(appSettings, filepath, listofComponents);
                 ConvertToCycloneDXModel(listComponentForBOM, listofComponents, dependencies);
 
                 if (bom.Dependencies == null || bom.Dependencies.Count == 0)
@@ -537,7 +537,7 @@ namespace LCT.PackageIdentifier
             ListUnsupportedComponentsForBom.Components = ListUnsupportedComponentsForBom.Components.Distinct(new ComponentEqualityComparer()).ToList();
             if (BomCreator.bomKpiData.DuplicateComponents == 0)
             {
-                BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - listComponentForBOM.Count;                
+                BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - listComponentForBOM.Count;
             }
             BomCreator.bomKpiData.DuplicateComponents += totalUnsupportedComponentsIdentified - ListUnsupportedComponentsForBom.Components.Count;
             BomCreator.bomKpiData.DevDependentComponents = listComponentForBOM.Count(s => s.Properties[0].Value == "true");

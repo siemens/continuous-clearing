@@ -27,7 +27,7 @@ namespace LCT.PackageIdentifier
     /// <summary>
     /// The DebianProcessor class
     /// </summary>
-    public class DebianProcessor(ICycloneDXBomParser cycloneDXBomParser,ISpdxBomParser spdxBomParser) : IParser
+    public class DebianProcessor(ICycloneDXBomParser cycloneDXBomParser, ISpdxBomParser spdxBomParser) : IParser
     {
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
@@ -37,7 +37,7 @@ namespace LCT.PackageIdentifier
 
         #region public method
 
-        public Bom ParsePackageFile(CommonAppSettings appSettings,ref Bom unSupportedBomList)
+        public Bom ParsePackageFile(CommonAppSettings appSettings, ref Bom unSupportedBomList)
         {
             List<string> configFiles;
             List<DebianPackage> listofComponents = new List<DebianPackage>();
@@ -51,7 +51,7 @@ namespace LCT.PackageIdentifier
                 if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     Logger.Debug($"ParsePackageFile():FileName: " + filepath);
-                    var list = ParseCycloneDX(filepath, ref bom,appSettings);
+                    var list = ParseCycloneDX(filepath, ref bom, appSettings);
                     listofComponents.AddRange(list);
                 }
             }
@@ -106,7 +106,7 @@ namespace LCT.PackageIdentifier
 
         public static Bom RemoveExcludedComponents(CommonAppSettings appSettings, Bom cycloneDXBOM)
         {
-            return CommonHelper.RemoveExcludedComponentsFromBom(appSettings, cycloneDXBOM, 
+            return CommonHelper.RemoveExcludedComponentsFromBom(appSettings, cycloneDXBOM,
                 noOfExcludedComponents => BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents);
         }
 
@@ -137,10 +137,10 @@ namespace LCT.PackageIdentifier
                 await bomhelper.GetListOfComponentsFromRepo(appSettings.Debian.Artifactory.InternalRepos, jFrogService);
 
             var inputIterationList = componentData.comparisonBOMData;
-            
+
             // Use the common helper method
             var (processedComponents, internalComponents) = CommonHelper.ProcessInternalComponentIdentification(
-                inputIterationList, 
+                inputIterationList,
                 component => IsInternalDebianComponent(aqlResultList, component, bomhelper));
 
             // update the comparison bom data
@@ -190,10 +190,10 @@ namespace LCT.PackageIdentifier
                 BomCreator.bomKpiData.UnofficialComponents++;
             }
         }
-        public List<DebianPackage> ParseCycloneDX(string filePath, ref Bom bom,CommonAppSettings appSettings)
+        public List<DebianPackage> ParseCycloneDX(string filePath, ref Bom bom, CommonAppSettings appSettings)
         {
             List<DebianPackage> debianPackages = new List<DebianPackage>();
-            bom = ExtractDetailsForJson(filePath, ref debianPackages,appSettings);
+            bom = ExtractDetailsForJson(filePath, ref debianPackages, appSettings);
             return debianPackages;
         }
         public static string GetArtifactoryRepoName(List<AqlResult> aqlResultList,
@@ -286,10 +286,10 @@ namespace LCT.PackageIdentifier
             return false;
         }
 
-        private Bom ExtractDetailsForJson(string filePath, ref List<DebianPackage> debianPackages,CommonAppSettings appSettings)
+        private Bom ExtractDetailsForJson(string filePath, ref List<DebianPackage> debianPackages, CommonAppSettings appSettings)
         {
             Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
-            Bom bom = BomHelper.ParseBomFile(filePath, _spdxBomParser, _cycloneDXBomParser,appSettings,ref listUnsupportedComponents);
+            Bom bom = BomHelper.ParseBomFile(filePath, _spdxBomParser, _cycloneDXBomParser, appSettings, ref listUnsupportedComponents);
 
             foreach (var componentsInfo in bom.Components)
             {
@@ -301,7 +301,7 @@ namespace LCT.PackageIdentifier
                     PurlID = componentsInfo.Purl,
                     SpdxComponentDetails = new SpdxComponentInfo(),
                 };
-                SetSpdxComponentDetails(filePath, package,componentsInfo);
+                SetSpdxComponentDetails(filePath, package, componentsInfo);
 
                 if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
                 {
@@ -367,12 +367,12 @@ namespace LCT.PackageIdentifier
             {
                 //For Debian projects we will be considering CycloneDX file reading components as Discovered
                 //since it's Discovered from syft Tool                
-                var properties=component.Properties;
-                CommonHelper.RemoveDuplicateAndAddProperty(ref properties,Dataconstant.Cdx_IdentifierType,Dataconstant.Discovered);
+                var properties = component.Properties;
+                CommonHelper.RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_IdentifierType, Dataconstant.Discovered);
                 component.Properties = properties;
             }
         }
-        private static void SetSpdxComponentDetails(string filePath, DebianPackage package,Component componentInfo)
+        private static void SetSpdxComponentDetails(string filePath, DebianPackage package, Component componentInfo)
         {
             if (filePath.EndsWith(FileConstant.SPDXFileExtension))
             {

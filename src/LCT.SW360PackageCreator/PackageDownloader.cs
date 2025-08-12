@@ -131,7 +131,7 @@ namespace LCT.SW360PackageCreator
             catch (FormatException)
             {
                 Logger.Debug($"Invalid version format: {version}");
-                return version; 
+                return version;
             }
         }
         private bool CheckIfAlreadyDownloaded(ComparisonBomData component, string tagVersion, out string downloadedPath)

@@ -19,7 +19,6 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace LCT.PackageIdentifier.UTest
@@ -580,10 +579,10 @@ namespace LCT.PackageIdentifier.UTest
             var mockSpdxParser = new Mock<ISpdxBomParser>();
             var mockCycloneDxParser = new Mock<ICycloneDXBomParser>();
             var appSettings = new CommonAppSettings { ProjectType = "NPM" };
-            var expectedBom = new Bom 
-            { 
-                Components = new List<Component>(), 
-                Dependencies = new List<Dependency>() 
+            var expectedBom = new Bom
+            {
+                Components = new List<Component>(),
+                Dependencies = new List<Dependency>()
             };
 
             mockSpdxParser.Setup(x => x.ParseSPDXBom(spdxFile)).Returns(expectedBom);
@@ -591,10 +590,10 @@ namespace LCT.PackageIdentifier.UTest
             try
             {
                 // Act
-                var listUnsupportedComponents = new Bom() 
-                { 
-                    Components = new List<Component>(), 
-                    Dependencies = new List<Dependency>() 
+                var listUnsupportedComponents = new Bom()
+                {
+                    Components = new List<Component>(),
+                    Dependencies = new List<Dependency>()
                 };
                 var result = BomHelper.ParseBomFile(spdxFile, mockSpdxParser.Object, mockCycloneDxParser.Object, appSettings, ref listUnsupportedComponents);
 
@@ -624,10 +623,10 @@ namespace LCT.PackageIdentifier.UTest
             var mockSpdxParser = new Mock<ISpdxBomParser>();
             var mockCycloneDxParser = new Mock<ICycloneDXBomParser>();
             var appSettings = new CommonAppSettings { ProjectType = "NPM" };
-            var expectedBom = new Bom 
-            { 
-                Components = new List<Component>(), 
-                Dependencies = new List<Dependency>() 
+            var expectedBom = new Bom
+            {
+                Components = new List<Component>(),
+                Dependencies = new List<Dependency>()
             };
 
             mockCycloneDxParser.Setup(x => x.ParseCycloneDXBom(cyclonDxFile)).Returns(expectedBom);
@@ -635,10 +634,10 @@ namespace LCT.PackageIdentifier.UTest
             try
             {
                 // Act
-                var listUnsupportedComponents = new Bom() 
-                { 
-                    Components = new List<Component>(), 
-                    Dependencies = new List<Dependency>() 
+                var listUnsupportedComponents = new Bom()
+                {
+                    Components = new List<Component>(),
+                    Dependencies = new List<Dependency>()
                 };
                 var result = BomHelper.ParseBomFile(cyclonDxFile, mockSpdxParser.Object, mockCycloneDxParser.Object, appSettings, ref listUnsupportedComponents);
 
@@ -668,22 +667,22 @@ namespace LCT.PackageIdentifier.UTest
             var mockSpdxParser = new Mock<ISpdxBomParser>();
             var mockCycloneDxParser = new Mock<ICycloneDXBomParser>();
             var appSettings = new CommonAppSettings { ProjectType = "NPM" };
-            
+
             // Setup mock to return empty BOM with initialized collections
-            var emptyBom = new Bom 
-            { 
-                Components = new List<Component>(), 
-                Dependencies = new List<Dependency>() 
+            var emptyBom = new Bom
+            {
+                Components = new List<Component>(),
+                Dependencies = new List<Dependency>()
             };
             mockCycloneDxParser.Setup(x => x.ParseCycloneDXBom(It.IsAny<string>())).Returns(emptyBom);
 
             try
             {
                 // Act
-                var listUnsupportedComponents = new Bom() 
-                { 
-                    Components = new List<Component>(), 
-                    Dependencies = new List<Dependency>() 
+                var listUnsupportedComponents = new Bom()
+                {
+                    Components = new List<Component>(),
+                    Dependencies = new List<Dependency>()
                 };
                 var result = BomHelper.ParseBomFile(tempDir, mockSpdxParser.Object, mockCycloneDxParser.Object, appSettings, ref listUnsupportedComponents);
 
@@ -721,10 +720,10 @@ namespace LCT.PackageIdentifier.UTest
             try
             {
                 // Act - test with the actual SPDX file, not the directory
-                var listUnsupportedComponents = new Bom() 
-                { 
-                    Components = new List<Component>(), 
-                    Dependencies = new List<Dependency>() 
+                var listUnsupportedComponents = new Bom()
+                {
+                    Components = new List<Component>(),
+                    Dependencies = new List<Dependency>()
                 };
                 var result = BomHelper.ParseBomFile(spdxFile, mockSpdxParser.Object, mockCycloneDxParser.Object, appSettings, ref listUnsupportedComponents);
 
