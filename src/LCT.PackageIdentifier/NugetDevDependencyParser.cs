@@ -27,7 +27,7 @@ namespace LCT.PackageIdentifier
     {
         private static NugetDevDependencyParser instance = null;
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        
+
         private static readonly List<string> s_nugetDirectDependencies = new List<string>();
         public static IReadOnlyList<string> NugetDirectDependencies => s_nugetDirectDependencies;
 

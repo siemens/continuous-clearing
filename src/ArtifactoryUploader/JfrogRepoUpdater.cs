@@ -10,11 +10,9 @@ using LCT.APICommunications.Model.AQL;
 using LCT.ArtifactoryUploader.Model;
 using LCT.Common.Constants;
 using LCT.Services.Interface;
-using log4net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace LCT.ArtifactoryUploader

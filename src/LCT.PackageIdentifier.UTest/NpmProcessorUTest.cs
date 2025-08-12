@@ -135,7 +135,7 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             ComponentIdentification component = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360(),
@@ -195,7 +195,7 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             ComponentIdentification component = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360(),
@@ -258,7 +258,7 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             ComponentIdentification componentIdentification = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo1" };
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360(),
@@ -320,7 +320,7 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo1" };
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "NPM",
@@ -384,7 +384,7 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-           
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "NPM",

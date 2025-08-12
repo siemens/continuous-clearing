@@ -49,8 +49,8 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build . --file Dockerfile --tag ${{ github.repository }}:continuous-clearing-v8.1.0
-          docker save ${{ github.repository }}:continuous-clearing-v8.1.0 -o continuous-clearing-v8.1.0.tar
+          docker build . --file Dockerfile --tag ${{ github.repository }}:continuous-clearing-v8.2.0
+          docker save ${{ github.repository }}:continuous-clearing-v8.2.0 -o continuous-clearing-v8.2.0.tar
 
       - name: Upload Docker Image
         uses: actions/upload-artifact@v4
@@ -74,7 +74,7 @@ jobs:
 
       - name: Pack NuGet Package
         run: |
-          nuget pack CA.nuspec -Version 8.1.0
+          nuget pack CA.nuspec -Version 8.2.0
 
       - name: Upload NuGet Package
         uses: actions/upload-artifact@v4
@@ -114,8 +114,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v8.1.0
-          release_name: Release v8.1.0
+          tag_name: v8.2.0
+          release_name: Release v8.2.0
           body: |
             ${{ github.event.head_commit.message }}
           draft: true
@@ -123,7 +123,7 @@ jobs:
 
       - name: Compress Full Build Output into ZIP
         run: |
-          powershell -Command "& {Compress-Archive -Path ${{ github.workspace }}/out/* -DestinationPath ${{ github.workspace }}/continuous-clearing-v8.1.0.zip}"
+          powershell -Command "& {Compress-Archive -Path ${{ github.workspace }}/out/* -DestinationPath ${{ github.workspace }}/continuous-clearing-v8.2.0.zip}"
 
       - name: Upload Full Build Output ZIP to Release
         uses: actions/upload-release-asset@v1
@@ -131,8 +131,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/continuous-clearing-v8.1.0.zip
-          asset_name: continuous-clearing-v8.1.0.zip
+          asset_path: ${{ github.workspace }}/continuous-clearing-v8.2.0.zip
+          asset_name: continuous-clearing-v8.2.0.zip
           asset_content_type: application/zip
 
       - name: Upload Docker Image(tar) to Release
@@ -141,8 +141,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./continuous-clearing-v8.1.0.tar
-          asset_name: continuous-clearing-v8.1.0.tar
+          asset_path: ./continuous-clearing-v8.2.0.tar
+          asset_name: continuous-clearing-v8.2.0.tar
           asset_content_type: application/x-tar
 
       - name: Upload NuGet Package to Release
@@ -151,8 +151,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./continuous-clearing.8.1.0.nupkg
-          asset_name: continuous-clearing.8.1.0.nupkg
+          asset_path: ./continuous-clearing.8.2.0.nupkg
+          asset_name: continuous-clearing.8.2.0.nupkg
           asset_content_type: application/octet-stream
 
       - name: Upload ReadmeOSS_nupkg file to Release 

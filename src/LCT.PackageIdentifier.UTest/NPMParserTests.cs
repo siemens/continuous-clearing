@@ -99,7 +99,7 @@ namespace LCT.PackageIdentifier.UTest
             string[] Includes = { "p*-lock.json" };
             string[] Excludes = { "node_modules" };
             BomKpiData bomKpiData = new BomKpiData();
-                        
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "NPM",
@@ -135,7 +135,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             string[] Includes = { "*_NPM.cdx.json" };
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "NPM",

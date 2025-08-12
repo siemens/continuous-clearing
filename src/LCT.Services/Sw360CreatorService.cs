@@ -9,7 +9,6 @@ using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.Foss;
 using LCT.Common;
 using LCT.Common.Constants;
-using LCT.Common.Interface;
 using LCT.Common.Model;
 using LCT.Facade.Interfaces;
 using LCT.Services.Interface;
@@ -236,7 +235,7 @@ namespace LCT.Services
                 var responseData = JsonConvert.DeserializeObject<Releases>(responseString);
                 string href = responseData?.Links?.Self?.Href ?? string.Empty;
                 releaseId = CommonHelper.GetSubstringOfLastOccurance(href, "/");
-                createStatus.AttachmentApiUrl = AttachSourcesToReleasesCreated(releaseId, attachmentUrlList,comparisonBomData);
+                createStatus.AttachmentApiUrl = AttachSourcesToReleasesCreated(releaseId, attachmentUrlList, comparisonBomData);
             }
 
             return releaseId;
@@ -428,7 +427,7 @@ namespace LCT.Services
                     ReleaseId = releaseId,
                     AttachmentReleaseComment = Dataconstant.ReleaseAttachmentComment
                 };
-                attachmentApiUrl = m_SW360ApiCommunicationFacade.AttachComponentSourceToSW360(attachReport,comparisonBomData);
+                attachmentApiUrl = m_SW360ApiCommunicationFacade.AttachComponentSourceToSW360(attachReport, comparisonBomData);
             }
 
             Logger.Debug($"AttachSourcesToReleasesCreated(): end");
@@ -587,10 +586,10 @@ namespace LCT.Services
         public async Task<bool> UpdateSourceCodeDownloadURLForExistingRelease(ComparisonBomData cbomData, Dictionary<string, string> attachmentUrlList, string releaseId)
         {
             try
-            {                
+            {
                 Releases release = new Releases
-                {                   
-                    SourceDownloadurl = GetSourceDownloadUrl(cbomData, attachmentUrlList)                    
+                {
+                    SourceDownloadurl = GetSourceDownloadUrl(cbomData, attachmentUrlList)
                 };
 
                 StringContent content = new StringContent(JsonConvert.SerializeObject(release), Encoding.UTF8, "application/json");
@@ -820,7 +819,7 @@ namespace LCT.Services
             return updateRelease;
         }
         public async Task<FossTriggerStatus> TriggerFossologyProcessForValidation(string releaseId, string sw360link)
-        {            
+        {
             FossTriggerStatus fossTriggerStatus = null;
             try
             {
