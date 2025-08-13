@@ -33,6 +33,47 @@ steps:
       command: 'login'
     displayName: "Docker login to ${{ parameters.dockerRegistry }}"
 
+  # -- SW360 IMAGE CACHE --
+  - task: Cache@2
+    displayName: 'Cache SW360 image'
+    inputs:
+      key: 'docker | "$(Agent.OS)" | sw360 | ${{ parameters.sw360DockerImage }}'
+      path: $(Pipeline.Workspace)/docker
+      cacheHitVar: SW360_CACHE_RESTORED
+
+  - script: |
+      docker load -i $(Pipeline.Workspace)/docker/sw360.tar
+    displayName: 'Restore SW360 Docker image from cache'
+    condition: and(not(canceled()), eq(variables.SW360_CACHE_RESTORED, 'true'))
+
+  - script: |
+      mkdir -p $(Pipeline.Workspace)/docker
+      docker pull ${{ parameters.sw360DockerImage }}
+      docker save -o $(Pipeline.Workspace)/docker/sw360.tar ${{ parameters.sw360DockerImage }}
+    displayName: 'Pull and cache SW360 Docker image'
+    condition: and(not(canceled()), not(failed()), ne(variables.SW360_CACHE_RESTORED, 'true'))
+
+  # -- FOSSOLGY IMAGE CACHE --
+  - task: Cache@2
+    displayName: 'Cache FOSSology image'
+    inputs:
+      key: 'docker | "$(Agent.OS)" | fossology | ${{ parameters.fossologyDockerImage }}'
+      path: $(Pipeline.Workspace)/docker
+      cacheHitVar: FOSS_CACHE_RESTORED
+
+  - script: |
+      docker load -i $(Pipeline.Workspace)/docker/fossology.tar
+    displayName: 'Restore FOSSology Docker image from cache'
+    condition: and(not(canceled()), eq(variables.FOSS_CACHE_RESTORED, 'true'))
+
+  - script: |
+      mkdir -p $(Pipeline.Workspace)/docker
+      docker pull ${{ parameters.fossologyDockerImage }}
+      docker save -o $(Pipeline.Workspace)/docker/fossology.tar ${{ parameters.fossologyDockerImage }}
+    displayName: 'Pull and cache FOSSology Docker image'
+    condition: and(not(canceled()), not(failed()), ne(variables.FOSS_CACHE_RESTORED, 'true'))
+
+  # -- CONTAINER STARTUP & HEALTHCHECKS --
   - script: |
       echo "Starting a new sw360 container..."
       CONTAINER_ID=$(docker run -dit --name sw360 --memory=5g -p ${{ parameters.sw360Port }}:8080 -p 5985:5984 -p 5435:5432 --add-host=host.docker.internal:host-gateway ${{ parameters.sw360DockerImage }})
