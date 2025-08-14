@@ -128,58 +128,7 @@ namespace LCT.PackageIdentifier
                     Logger.Error($"Naming Convention Error: The certificate file(s) for the SPDX document '{filename}' are missing. Please ensure that .pem files are named in the format '{filename}.pem'.");
                 }
             }
-        }
-        public static void NamingConventionOfSPDXFile(string filepath, CommonAppSettings appSettings)
-        {
-            string filename = Path.GetFileName(filepath);
-            var relatedExtensions = new[] { $"{filename}.pem", $"{filename}.sig" };
-
-            var foundFiles = new Dictionary<string, string>();
-            var missingFiles = new List<string>();
-
-            CheckFileExistence(appSettings.Directory.InputFolder, relatedExtensions, foundFiles, missingFiles);
-
-            if (missingFiles.Count > 0)
-            {
-                HandleMissingFiles(missingFiles, filename);
-            }
-            else
-            {
-                ValidateFoundFiles(filepath, filename, foundFiles);
-            }
-        }
-
-        private static void CheckFileExistence(string inputFolder, string[] relatedExtensions,
-            Dictionary<string, string> foundFiles, List<string> missingFiles)
-        {
-            foreach (var related in relatedExtensions)
-            {
-                string relatedFile = Path.Combine(inputFolder, related);
-                if (File.Exists(relatedFile))
-                {
-                    foundFiles[related] = relatedFile;
-                }
-                else
-                {
-                    missingFiles.Add(related);
-                }
-            }
-        }
-
-        private static void HandleMissingFiles(List<string> missingFiles, string filename)
-        {
-            foreach (var missingFile in missingFiles)
-            {
-                if (missingFile.EndsWith(".sig", StringComparison.OrdinalIgnoreCase))
-                {
-                    Logger.Error($"Naming Convention Error: The certificate file(s) for the SPDX document '{filename}' are missing. Please ensure that signature files are named in the format '{filename}.sig'.");
-                }
-                else if (missingFile.EndsWith(".pem", StringComparison.OrdinalIgnoreCase))
-                {
-                    Logger.Error($"Naming Convention Error: The certificate file(s) for the SPDX document '{filename}' are missing. Please ensure that .pem files are named in the format '{filename}.pem'.");
-                }
-            }
-        }
+        }        
 
         private static void ValidateFoundFiles(string filepath, string filename, Dictionary<string, string> foundFiles)
         {
