@@ -1,5 +1,4 @@
 ﻿using LCT.Common;
-using LCT.Common.Interface;
 using LCT.Common.Model;
 using log4net.Appender;
 using log4net.Config;
@@ -33,7 +32,7 @@ namespace LCT.PackageIdentifier.UTest
             string listOfExcludeComponents = "component1,component2";
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "NPM",
@@ -94,7 +93,7 @@ namespace LCT.PackageIdentifier.UTest
             string listOfExcludeComponents = "component1,component2";
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "NPM",
@@ -142,7 +141,7 @@ namespace LCT.PackageIdentifier.UTest
             string listOfExcludeComponents = "component1,component2";
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "NPM",

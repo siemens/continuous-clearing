@@ -271,38 +271,38 @@ namespace LCT.PackageIdentifier.UTest
 
             // Assert
             Assert.That(componentForBOM.Count, Is.EqualTo(1), "Should add one component to the BOM");
-            
+
             Component resultComponent = componentForBOM[0];
             Assert.That(resultComponent.Properties.Count, Is.EqualTo(7), "Should have exactly 7 properties for supported package type");
-            
+
             // Verify all expected properties are added
             var propertyDict = new Dictionary<string, string>();
             foreach (var property in resultComponent.Properties)
             {
                 propertyDict[property.Name] = property.Value;
             }
-            
+
             Assert.IsTrue(propertyDict.ContainsKey(Dataconstant.Cdx_IsInternal), "Should have internal property");
             Assert.AreEqual("false", propertyDict[Dataconstant.Cdx_IsInternal], "Internal property should be false");
-            
+
             Assert.IsTrue(propertyDict.ContainsKey(Dataconstant.Cdx_ArtifactoryRepoName), "Should have artifactory repo property");
             Assert.AreEqual(repo, propertyDict[Dataconstant.Cdx_ArtifactoryRepoName], "Artifactory repo should match input");
-            
+
             Assert.IsTrue(propertyDict.ContainsKey(Dataconstant.Cdx_ProjectType), "Should have project type property");
             Assert.AreEqual("NPM", propertyDict[Dataconstant.Cdx_ProjectType], "Project type should match app settings");
-            
+
             Assert.IsTrue(propertyDict.ContainsKey(Dataconstant.Cdx_IsDevelopment), "Should have development property");
             Assert.AreEqual("false", propertyDict[Dataconstant.Cdx_IsDevelopment], "Development property should be false");
-            
+
             Assert.IsTrue(propertyDict.ContainsKey(Dataconstant.Cdx_SiemensDirect), "Should have siemens direct property");
             Assert.AreEqual("true", propertyDict[Dataconstant.Cdx_SiemensDirect], "Siemens direct property should be true");
-            
+
             Assert.IsTrue(propertyDict.ContainsKey(Dataconstant.Cdx_Siemensfilename), "Should have filename property");
             Assert.AreEqual(Dataconstant.PackageNameNotFoundInJfrog, propertyDict[Dataconstant.Cdx_Siemensfilename], "Filename should be default value");
-            
+
             Assert.IsTrue(propertyDict.ContainsKey(Dataconstant.Cdx_JfrogRepoPath), "Should have jfrog repo path property");
             Assert.AreEqual(Dataconstant.JfrogRepoPathNotFound, propertyDict[Dataconstant.Cdx_JfrogRepoPath], "JFrog repo path should be default value");
-            
+
             Assert.IsNull(resultComponent.Description, "Description should be set to null");
         }
 
@@ -330,15 +330,15 @@ namespace LCT.PackageIdentifier.UTest
 
             // Assert
             Assert.That(componentForBOM.Count, Is.EqualTo(1), "Should add one component to the BOM");
-            
+
             Component resultComponent = componentForBOM[0];
             Assert.That(resultComponent.Properties.Count, Is.EqualTo(7), "Should have exactly 7 properties for non-unsupported package type");
-            
+
             // Verify project type matches app settings
             var projectTypeProperty = resultComponent.Properties.Find(p => p.Name == Dataconstant.Cdx_ProjectType);
             Assert.IsNotNull(projectTypeProperty, "Should have project type property");
             Assert.AreEqual("MAVEN", projectTypeProperty.Value, "Project type should match app settings");
-            
+
             Assert.IsNull(resultComponent.Description, "Description should be set to null");
         }
     }

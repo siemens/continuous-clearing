@@ -27,8 +27,8 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Directory = System.IO.Directory;
-using Level = log4net.Core.Level;
 using File = System.IO.File;
+using Level = log4net.Core.Level;
 
 namespace LCT.SW360PackageCreator
 {
@@ -252,7 +252,7 @@ namespace LCT.SW360PackageCreator
                 else
                 {
                     mapper.DownloadUrl = GetComponentDownloadUrl(mapper, item, repo, releasesInfo);
-                } 
+                }
                 SetMapperStatus(mapper, releasesInfo);
                 Logger.Debug($"Sw360 availability status for Name {mapper.Name}: {mapper.ComponentExternalId}={mapper.ComponentStatus} - Version {mapper.Version}: {mapper.ReleaseExternalId}={mapper.ReleaseStatus}");
                 comparisonBomData.Add(mapper);
@@ -325,7 +325,7 @@ namespace LCT.SW360PackageCreator
                 { Dataconstant.Cdx_ReleaseUrl, comBom.ReleaseLink },
                 { Dataconstant.Cdx_FossologyUrl, comBom.FossologyLink ?? "" }
             };
-                    
+
                     Component component = FindMatchingComponent(bom, comBom);
                     AddOrUpdateProperties(component, propertiesToUpdate);
                 }
@@ -357,7 +357,7 @@ namespace LCT.SW360PackageCreator
                 comBom.ReleaseLink = GetReleaseLink(componentsAvailableInSw360, comBom.Name, comBom.Version);
             }
         }
-        private static void AddOrUpdateProperties(Component component,Dictionary<string,string> listOfProperties)
+        private static void AddOrUpdateProperties(Component component, Dictionary<string, string> listOfProperties)
         {
             if (component == null) return;
             foreach (var property in listOfProperties)
@@ -598,7 +598,7 @@ namespace LCT.SW360PackageCreator
         }
 
         public static string GetComponentDownloadUrl(ComparisonBomData mapper, Components item, IRepository repo, ReleasesInfo releasesInfo)
-        {          
+        {
 
             if (mapper.ReleaseStatus.Equals(Dataconstant.Available))
             {

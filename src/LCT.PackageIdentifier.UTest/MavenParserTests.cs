@@ -31,7 +31,7 @@ namespace LCT.PackageIdentifier.UTest
         public void Setup()
         {
             _mavenProcessor = new MavenProcessor(Mock.Of<ICycloneDXBomParser>(), Mock.Of<ISpdxBomParser>());
-            
+
             // Reset KPI data before each test to ensure clean state
             BomCreator.bomKpiData.DevdependencyComponents = 0;
             BomCreator.bomKpiData.ThirdPartyRepoComponents = 0;
@@ -130,7 +130,7 @@ namespace LCT.PackageIdentifier.UTest
             string[] Includes = { "*_Maven.cdx.json" };
             string[] Excludes = { "lol" };
 
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "MAVEN",
@@ -166,7 +166,7 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             ComponentIdentification component = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-           
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360(),
@@ -214,7 +214,7 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             ComponentIdentification component = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360(),
@@ -264,7 +264,7 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component1 };
             ComponentIdentification componentIdentification = new() { comparisonBOMData = components };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360(),
@@ -314,7 +314,7 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "Maven",
@@ -365,7 +365,7 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component1 };
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "Maven",
@@ -412,7 +412,7 @@ namespace LCT.PackageIdentifier.UTest
             string filepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles", "MavenDevDependency", "WithDev"));
             string[] Includes = { "*.cdx.json" };
             string[] Excludes = { "lol" };
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "MAVEN",
@@ -476,7 +476,7 @@ namespace LCT.PackageIdentifier.UTest
             string filepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
             string[] Includes = { "CycloneDX_Maven.cdx.json", "SBOMTemplate_Maven.cdx.json", "SBOM_MavenCATemplate.cdx.json" };
             string[] Excludes = { "lol" };
-                        
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "MAVEN",
@@ -551,8 +551,8 @@ namespace LCT.PackageIdentifier.UTest
             {
                 ProjectType = "MAVEN",
                 Maven = new Config() { Include = Includes, Exclude = Excludes },
-                SW360 = new SW360() 
-                { 
+                SW360 = new SW360()
+                {
                     IgnoreDevDependency = true,
                     // Use the actual component from the test data: joda-time/joda-time:2.9.2
                     ExcludeComponents = new List<string> { "joda-time:2.9.2" }
@@ -573,22 +573,22 @@ namespace LCT.PackageIdentifier.UTest
             Assert.IsNotNull(bom, "BOM should not be null");
             Assert.IsNotNull(bom.Components, "Components should not be null");
             Assert.IsTrue(bom.Components.Count > 0, "BOM should have components");
-            
+
             // Verify that the excluded component has the exclude property set
             // The component should still be in the BOM but marked as excluded
-            var excludedComponent = bom.Components.Find(c => 
-                c.Name == "joda-time" && 
+            var excludedComponent = bom.Components.Find(c =>
+                c.Name == "joda-time" &&
                 c.Version == "2.9.2");
-            
+
             Assert.IsNotNull(excludedComponent, "joda-time component should exist in the BOM");
-            
+
             // Component should have the exclude property
-            bool hasExcludeProperty = excludedComponent.Properties?.Exists(p => 
+            bool hasExcludeProperty = excludedComponent.Properties?.Exists(p =>
                 p.Name == Dataconstant.Cdx_ExcludeComponent && p.Value == "true") ?? false;
             Assert.IsTrue(hasExcludeProperty, "Excluded component should have exclude property set to true");
 
             // Verify that BOM KPI data was updated with excluded components count
-            Assert.That(BomCreator.bomKpiData.ComponentsExcludedSW360, Is.EqualTo(1), 
+            Assert.That(BomCreator.bomKpiData.ComponentsExcludedSW360, Is.EqualTo(1),
                 "ComponentsExcludedSW360 should be exactly 1 when one component is excluded");
         }
 
@@ -609,8 +609,8 @@ namespace LCT.PackageIdentifier.UTest
             {
                 ProjectType = "MAVEN",
                 Maven = new Config() { Include = Includes, Exclude = Excludes },
-                SW360 = new SW360() 
-                { 
+                SW360 = new SW360()
+                {
                     IgnoreDevDependency = true,
                     ExcludeComponents = null // Null excluded components
                 },
@@ -629,9 +629,9 @@ namespace LCT.PackageIdentifier.UTest
             // Assert
             Assert.IsNotNull(bom, "BOM should not be null");
             Assert.IsNotNull(bom.Components, "Components should not be null");
-            
+
             // Verify that excluded components logic was not executed
-            Assert.That(BomCreator.bomKpiData.ComponentsExcludedSW360, Is.EqualTo(initialExcludedCount), 
+            Assert.That(BomCreator.bomKpiData.ComponentsExcludedSW360, Is.EqualTo(initialExcludedCount),
                 "ComponentsExcludedSW360 should not be incremented when ExcludeComponents is null");
         }
 
@@ -652,8 +652,8 @@ namespace LCT.PackageIdentifier.UTest
             {
                 ProjectType = "MAVEN",
                 Maven = new Config() { Include = Includes, Exclude = Excludes },
-                SW360 = new SW360() 
-                { 
+                SW360 = new SW360()
+                {
                     IgnoreDevDependency = true,
                     ExcludeComponents = new List<string>() // Empty list
                 },
@@ -672,9 +672,9 @@ namespace LCT.PackageIdentifier.UTest
             // Assert
             Assert.IsNotNull(bom, "BOM should not be null");
             Assert.IsNotNull(bom.Components, "Components should not be null");
-            
+
             // Since the exclude list is empty but not null, the method will be called but no components will be excluded
-            Assert.That(BomCreator.bomKpiData.ComponentsExcludedSW360, Is.EqualTo(initialExcludedCount), 
+            Assert.That(BomCreator.bomKpiData.ComponentsExcludedSW360, Is.EqualTo(initialExcludedCount),
                 "ComponentsExcludedSW360 should not be incremented when ExcludeComponents is empty");
         }
 
@@ -783,7 +783,7 @@ namespace LCT.PackageIdentifier.UTest
 
             // Assert
             Assert.AreEqual(0, BomCreator.bomKpiData.ThirdPartyRepoComponents);
-        }        
+        }
 
         [Test]
         public void UpdateKpiDataBasedOnRepo_DevDepRepoTakesPrecedence_OverThirdPartyRepo()

@@ -67,7 +67,7 @@ namespace LCT.PackageIdentifier
                     var properties = sbomcomp.Properties;
                     CommonHelper.RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_IdentifierType, Dataconstant.TemplateAdded);
                     CommonHelper.RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_IsDevelopment, "false");
-                    sbomcomp.Properties= properties;
+                    sbomcomp.Properties = properties;
                     bom.Add(sbomcomp);
                     BomCreator.bomKpiData.ComponentsinSBOMTemplateFile++;
                 }
@@ -87,7 +87,7 @@ namespace LCT.PackageIdentifier
         }
 
         private static void TemplateComponentUpdation(Component sbomcomp, Component bomComp)
-        {  
+        {
             bool isLicenseUpdated = UpdateLicenseDetails(bomComp, sbomcomp);
             bool isPropertiesUpdated = UpdatePropertiesDetails(bomComp, sbomcomp);
 

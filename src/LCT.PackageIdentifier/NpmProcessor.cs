@@ -31,7 +31,7 @@ namespace LCT.PackageIdentifier
     /// <summary>
     /// Parses the NPM Packages
     /// </summary>
-    public class NpmProcessor(ICycloneDXBomParser cycloneDXBomParser,ISpdxBomParser spdxBomParser) : CycloneDXBomParser, IParser
+    public class NpmProcessor(ICycloneDXBomParser cycloneDXBomParser, ISpdxBomParser spdxBomParser) : CycloneDXBomParser, IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
@@ -46,7 +46,7 @@ namespace LCT.PackageIdentifier
         private const string Requires = "requires";
         private const string Name = "name";
 
-        public Bom ParsePackageFile(CommonAppSettings appSettings,ref Bom unSupportedBomList)
+        public Bom ParsePackageFile(CommonAppSettings appSettings, ref Bom unSupportedBomList)
         {
             List<Component> componentsForBOM = new List<Component>();
             Bom bom = new Bom();
@@ -56,10 +56,10 @@ namespace LCT.PackageIdentifier
 
             ParsingInputFileForBOM(appSettings, ref componentsForBOM, ref bom, ref dependencies);
             totalComponentsIdentified = componentsForBOM.Count;
-            totalUnsupportedComponentsIdentified=ListUnsupportedComponentsForBom.Components.Count;
+            totalUnsupportedComponentsIdentified = ListUnsupportedComponentsForBom.Components.Count;
             componentsForBOM = GetExcludedComponentsList(componentsForBOM);
             componentsForBOM = componentsForBOM.Distinct(new ComponentEqualityComparer()).ToList();
-            ListUnsupportedComponentsForBom.Components=ListUnsupportedComponentsForBom.Components.Distinct(new ComponentEqualityComparer()).ToList();
+            ListUnsupportedComponentsForBom.Components = ListUnsupportedComponentsForBom.Components.Distinct(new ComponentEqualityComparer()).ToList();
             BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - componentsForBOM.Count;
             BomCreator.bomKpiData.DuplicateComponents += totalUnsupportedComponentsIdentified - ListUnsupportedComponentsForBom.Components.Count;
             var componentsWithMultipleVersions = componentsForBOM.GroupBy(s => s.Name)
@@ -143,7 +143,7 @@ namespace LCT.PackageIdentifier
         }
 
         private static List<JToken> GetDirectDependenciesList(string filepath)
-        {            
+        {
             string jsonContent = File.ReadAllText(filepath);
             var jsonDeserialized = JObject.Parse(jsonContent);
             List<JToken> dependencies = jsonDeserialized[Dependencies]?.ToList() ?? new List<JToken>();
@@ -370,10 +370,10 @@ namespace LCT.PackageIdentifier
                 await bomhelper.GetNpmListOfComponentsFromRepo(appSettings.Npm.Artifactory.InternalRepos, jFrogService);
 
             var inputIterationList = componentData.comparisonBOMData;
-            
+
             // Use the common helper method
             var (processedComponents, internalComponents) = CommonHelper.ProcessInternalComponentIdentification(
-                inputIterationList, 
+                inputIterationList,
                 component => IsInternalNpmComponent(aqlResultList, component, bomhelper));
 
             // update the comparison bom data
@@ -428,7 +428,7 @@ namespace LCT.PackageIdentifier
             {
                 BomCreator.bomKpiData.DevdependencyComponents++;
             }
-            
+
             if (appSettings.Npm.Artifactory.ThirdPartyRepos != null)
             {
                 foreach (var thirdPartyRepo in appSettings.Npm.Artifactory.ThirdPartyRepos)
@@ -440,7 +440,7 @@ namespace LCT.PackageIdentifier
                     }
                 }
             }
-            
+
             if (repoValue == appSettings.Npm.ReleaseRepo)
             {
                 BomCreator.bomKpiData.ReleaseRepoComponents++;
@@ -454,7 +454,7 @@ namespace LCT.PackageIdentifier
 
         public static Bom RemoveExcludedComponents(CommonAppSettings appSettings, Bom cycloneDXBOM)
         {
-            return CommonHelper.RemoveExcludedComponentsFromBom(appSettings, cycloneDXBOM, 
+            return CommonHelper.RemoveExcludedComponentsFromBom(appSettings, cycloneDXBOM,
                 noOfExcludedComponents => BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents);
         }
 
@@ -526,7 +526,7 @@ namespace LCT.PackageIdentifier
             Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
             bom = _spdxBomParser.ParseSPDXBom(filepath);
             bom = RemoveExcludedComponents(appSettings, bom);
-            SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bom, appSettings.ProjectType,ref listUnsupportedComponents);
+            SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bom, appSettings.ProjectType, ref listUnsupportedComponents);
             AddingIdentifierType(bom.Components, "SpdxFile", filepath);
             AddingIdentifierType(listUnsupportedComponents.Components, "SpdxFile", filepath);
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += bom.Components.Count;
@@ -707,7 +707,7 @@ namespace LCT.PackageIdentifier
                 {
                     components.Add(componentsInfo);
                     Logger.Debug($"GetExcludedComponentsList():ValidComponent For NPM : Component Details : {componentsInfo.Name} @ {componentsInfo.Version} @ {componentsInfo.Purl}");
-                }               
+                }
                 else
                 {
                     BomCreator.bomKpiData.ComponentsExcluded++;
@@ -725,7 +725,7 @@ namespace LCT.PackageIdentifier
 
                 if (identifiedBy == "PackageFile")
                 {
-                    var properties=component.Properties;
+                    var properties = component.Properties;
                     CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
                         Dataconstant.Cdx_IdentifierType,
                         Dataconstant.Discovered);

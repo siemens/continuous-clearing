@@ -1,22 +1,9 @@
-trigger:
-  branches:
-    include:
-      - main
-      - development
-      - release/*
-
-schedules:
-  - cron: "0 2 * * *"  # Runs daily at 2:00 AM UTC
-    displayName: Daily 2AM Run
-    branches:
-      include:
-        - main
-    always: true  # Ensures it runs even if there are no code changes
+trigger: none
 
 pr:
   branches:
     include:
-      - '*'
+      - main
   paths:
     include:
       - src/**
