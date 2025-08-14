@@ -41,7 +41,7 @@ steps:
   - task: Cache@2
     displayName: 'Cache SW360 image'
     inputs:
-      key: 'docker | "$(Agent.OS)" | sw360 | ${{ parameters.sw360DockerImage }}'
+      key: 'docker | "$(Agent.OS)" | sw360'
       path: $(Pipeline.Workspace)/docker
       cacheHitVar: SW360_CACHE_RESTORED
 
@@ -64,7 +64,7 @@ steps:
   - task: Cache@2
     displayName: 'Cache FOSSology image'
     inputs:
-      key: 'docker | "$(Agent.OS)" | fossology | ${{ parameters.fossologyDockerImage }}'
+      key: 'docker | "$(Agent.OS)" | fossology'
       path: $(Pipeline.Workspace)/docker
       cacheHitVar: FOSS_CACHE_RESTORED
 
