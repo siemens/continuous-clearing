@@ -60,8 +60,7 @@ namespace LCT.SW360PackageCreator
             ISw360ProjectService sw360ProjectService = Getsw360ProjectServiceObject(appSettings, out ISW360ApicommunicationFacade sW360ApicommunicationFacade);
             ProjectReleases projectReleases = new ProjectReleases();
 
-            string FolderPath = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.ComponentCreatorLog, m_Verbose);
-            Logger.Logger.Log(null, Level.Debug, $"log manager initiated folder path: {FolderPath}", null);
+            string _ = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.ComponentCreatorLog, m_Verbose);
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             settingsManager.CheckRequiredArgsToRun(appSettings, "Creator");
             int isValid = await CreatorValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
@@ -75,18 +74,7 @@ namespace LCT.SW360PackageCreator
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Alert, $"Package creator is running in TEST mode \n", null);
             var bomFilePath = Path.Combine(appSettings.Directory.OutputFolder, appSettings.SW360.ProjectName + "_" + FileConstant.BomFileName);
-            Logger.Logger.Log(null, Level.Notice, $"Input parameters used in Package Creator:\n\t" +
-              $"CaToolVersion\t\t --> {caToolInformation.CatoolVersion}\n\t" +
-              $"CaToolRunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
-              $"BomFilePath\t\t --> {bomFilePath}\n\t" +
-              $"SW360Url\t\t --> {appSettings.SW360.URL}\n\t" +
-              $"SW360AuthTokenType\t --> {appSettings.SW360.AuthTokenType}\n\t" +
-              $"SW360ProjectName\t --> {appSettings.SW360.ProjectName}\n\t" +
-              $"SW360ProjectID\t\t --> {appSettings.SW360.ProjectID}\n\t" +
-              $"FossologyURL\t\t --> {appSettings.SW360.Fossology.URL}\n\t" +
-              $"EnableFossTrigger\t --> {appSettings.SW360.Fossology.EnableTrigger}\n\t" +
-              $"IgnoreDevDependency\t --> {appSettings.SW360.IgnoreDevDependency}\n\t" +
-              $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t", null);
+            LoggerHelper.LogInputParameters(caToolInformation,appSettings,listOfInternalRepoList: "",listOfInclude: "",listOfExclude: "",listOfExcludeComponents: "",exeType: "Creator",bomFilePath: bomFilePath);
 
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);

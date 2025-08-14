@@ -10,6 +10,7 @@ using LCT.ArtifactoryUploader.Model;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
+using LCT.Common.Logging;
 using log4net;
 using Newtonsoft.Json;
 using System;
@@ -99,17 +100,91 @@ namespace LCT.ArtifactoryUploader
             DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesDebian, displayPackagesInfo.JfrogNotFoundPackagesDebian, displayPackagesInfo.SuccessfullPackagesDebian, displayPackagesInfo.JfrogFoundPackagesDebian, "Debian", localPathforartifactory);
 
         }
-        private static void DisplaySortedForeachComponents(List<ComponentsToArtifactory> unknownPackages, List<ComponentsToArtifactory> JfrogNotFoundPackages, List<ComponentsToArtifactory> SucessfullPackages, List<ComponentsToArtifactory> JfrogFoundPackages, string name, string filename)
+        private static void DisplaySortedForeachComponents(List<ComponentsToArtifactory> unknownPackages,
+    List<ComponentsToArtifactory> JfrogNotFoundPackages,
+    List<ComponentsToArtifactory> SucessfullPackages,
+    List<ComponentsToArtifactory> JfrogFoundPackages,
+    string name,
+    string filePath)
         {
-            if (unknownPackages.Count != 0 || JfrogNotFoundPackages.Count != 0 || SucessfullPackages.Count != 0 || JfrogFoundPackages.Count != 0)
+            if (unknownPackages.Count != 0 || JfrogNotFoundPackages.Count != 0 ||
+                SucessfullPackages.Count != 0 || JfrogFoundPackages.Count != 0)
             {
-                Logger.Info("\n" + name + ":\n");
-                DisplayErrorForUnknownPackages(unknownPackages, name, filename);
-                DisplayErrorForJfrogFoundPackages(JfrogFoundPackages);
-                DisplayErrorForJfrogPackages(JfrogNotFoundPackages);
-                DisplayErrorForSucessfullPackages(SucessfullPackages);
-            }
+                if (LoggerFactory.UseSpectreConsole)
+                {
+                    LoggerHelper.SafeSpectreAction(() =>
+                    {
+                        string content = $"[green]{name}[/]\n\n";
+                        if (unknownPackages.Count > 0)
+                        {
+                            content += $"\n";
+                            foreach (var package in unknownPackages)
+                            {
+                                content += $"⚠ [white]{package.Name}[/]-[cyan]{package.Version}[/] [yellow]Report not in Approved state[/]\n";
+                            }
+                        }
 
+                        if (JfrogFoundPackages.Count > 0)
+                        {
+                            content += $"\n";
+                            foreach (var package in JfrogFoundPackages)
+                            {
+                                if (package.ResponseMessage.ReasonPhrase == ApiConstant.ErrorInUpload)
+                                {
+                                    content += $"❌ [white]{package.Name}[/]-[cyan]{package.Version}[/] " +
+                                             $"[red]{package.OperationType} Failed![/] " +
+                                             $"[yellow]{package.SrcRepoName}[/] [white]⟶ [/] [yellow]{package.DestRepoName}[/]\n";
+                                }
+                                else if (package.ResponseMessage.ReasonPhrase == ApiConstant.PackageNotFound)
+                                {
+                                    content += $"⚠ [white]{package.Name}[/]-[cyan]{package.Version}[/] " +
+                                             $"not found in [yellow]{package.SrcRepoName}[/]\n";
+                                }
+                                else
+                                {
+                                    content += $"✓ [green]Successful{package.DryRunSuffix}[/] " +
+                                             $"[cyan]{package.OperationType}[/] " +
+                                             $"[white]{package.Name}[/]-[cyan]{package.Version}[/] " +
+                                             $"from [yellow]{package.SrcRepoName}[/] [white]⟶ [/] [yellow]{package.DestRepoName}[/]\n";
+                                }
+                            }
+                            content += "\n";
+                        }
+
+                        if (JfrogNotFoundPackages.Count > 0)
+                        {
+                            content += $"\n";
+                            foreach (var package in JfrogNotFoundPackages)
+                            {
+                                content += $"⚠ [white]{package.Name}[/]-[cyan]{package.Version}[/] [yellow]is not found in jfrog[/]\n";
+                            }
+                            content += "\n";
+                        }
+
+                        if (SucessfullPackages.Count > 0)
+                        {
+                            content += $"\n";
+                            foreach (var package in SucessfullPackages)
+                            {
+                                content += $"✓ [white]{package.Name}[/]-[cyan]{package.Version}[/] [green]is already uploaded[/]\n";
+                            }
+                        }
+
+                        LoggerHelper.WriteStyledPanel(content.TrimEnd(), $"", "blue", "yellow");
+                        LoggerHelper.WriteLine();
+
+                    }, $"Display {name} Package Information", "Info");
+                }
+                else
+                {
+                    // Existing log4net implementation
+                    Logger.Info("\n" + name + ":\n");
+                    DisplayErrorForUnknownPackages(unknownPackages, name, filePath);
+                    DisplayErrorForJfrogFoundPackages(JfrogFoundPackages);
+                    DisplayErrorForJfrogPackages(JfrogNotFoundPackages);
+                    DisplayErrorForSucessfullPackages(SucessfullPackages);
+                }
+            }
         }
         public static void DisplayErrorForJfrogFoundPackages(List<ComponentsToArtifactory> JfrogFoundPackages)
         {

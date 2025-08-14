@@ -15,6 +15,7 @@ using System.Net;
 using System.Reflection;
 using System.Security;
 using Level = log4net.Core.Level;
+using Directory = System.IO.Directory;
 
 namespace LCT.APICommunications
 {

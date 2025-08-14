@@ -12,6 +12,7 @@ using LCT.APICommunications.Model;
 using LCT.ArtifactoryUploader;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Logging;
 using LCT.Common.Model;
 using LCT.Facade;
 using LCT.Facade.Interfaces;
@@ -50,28 +51,17 @@ namespace ArtifactoryUploader
             Log4Net.CatoolCurrentDirectory = System.IO.Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
             CommonHelper.DefaultLogFolderInitialisation(FileConstant.ArtifactoryUploaderLog, m_Verbose);
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
-
-            string FolderPath = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.ArtifactoryUploaderLog, m_Verbose);
-            Logger.Logger.Log(null, Level.Debug, $"log manager initiated folder path: {FolderPath}", null);
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            string _ = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.ArtifactoryUploaderLog, m_Verbose);
+           
             settingsManager.CheckRequiredArgsToRun(appSettings, "Uploader");
-
-            Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Artifactory Uploader >>>>>====================", null);
-            Logger.Logger.Log(null, Level.Notice, $"\nStart of Artifactory Uploader execution: {DateTime.Now}", null);
-
+            string bomFilePath = GetBomFilePath(appSettings);
+            LoggerHelper.SpectreConsoleInitialMessage("Artifactory Uploader");
+            LoggerHelper.LogInputParameters(caToolInformation, appSettings, listOfInternalRepoList: "", listOfInclude: "", listOfExclude: "", listOfExcludeComponents: "", exeType: "Uploader", bomFilePath: bomFilePath);
             if (!appSettings.Jfrog.DryRun)
                 Logger.Logger.Log(null, Level.Alert, $"Artifactory Uploader is running in release mode !!! \n", null);
             else
                 Logger.Logger.Log(null, Level.Alert, $"Artifactory Uploader is running in dry-run mode, no packages will be moved \n", null);
-
-            string bomFilePath = GetBomFilePath(appSettings);
-
-            Logger.Logger.Log(null, Level.Info, $"Input Parameters used in Artifactory Uploader:\n\t", null);
-            Logger.Logger.Log(null, Level.Notice, $"\tBomFilePath:\t\t {bomFilePath}\n\t" +
-                $"CaToolVersion\t\t {caToolInformation.CatoolVersion}\n\t" +
-                $"CaToolRunningPath\t {caToolInformation.CatoolRunningLocation}\n\t" +
-                $"JFrogUrl:\t\t {appSettings.Jfrog.URL}\n\t" +
-                $"Dry-run:\t\t {appSettings.Jfrog.DryRun}\n\t" +
-                $"LogFolderPath:\t\t {Log4Net.CatoolLogPath}\n", null);
 
             //Validator method to check token validity
             ArtifactoryCredentials artifactoryCredentials = new ArtifactoryCredentials()

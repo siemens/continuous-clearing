@@ -8,6 +8,7 @@ using CycloneDX.Models;
 using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Logging;
 using LCT.Common.Model;
 using LCT.Facade;
 using LCT.Facade.Interfaces;
@@ -311,7 +312,6 @@ namespace LCT.SW360PackageCreator
             ISW360Service sw360Service, Bom bom)
         {
             //To get latest ReleaseLinks after component creation
-            Logger.Logger.Log(null, Level.Debug, $"GetUpdatedComponentsDetails", null);
             componentsAvailableInSw360 = await sw360Service.GetAvailableReleasesInSw360(ListofBomComponents);
 
             foreach (ComparisonBomData comBom in updatedCompareBomData)
@@ -554,7 +554,7 @@ namespace LCT.SW360PackageCreator
                 { "ComponentCreator",creatorKpiData.TimeTakenByComponentCreator }
             };
 
-            CommonHelper.WriteToConsoleTable(printList, printTimingList);
+            LoggerHelper.WriteToConsoleTable(printList, printTimingList,"");
         }
 
         public void WriteSourceNotFoundListToConsole(List<ComparisonBomData> comparisionBomDataList, CommonAppSettings appSetting)
@@ -576,7 +576,7 @@ namespace LCT.SW360PackageCreator
             // Removes common components
             sourceNotAvailable.RemoveAll(src => lstReleaseNotCreated.Any(rls => src.Name == rls.Name && src.Version == rls.Version));
 
-            CommonHelper.WriteComponentsWithoutDownloadURLToKpi(sourceNotAvailable, lstReleaseNotCreated, appSetting.SW360.URL);
+            LoggerHelper.WriteComponentsWithoutDownloadURLToKpi(sourceNotAvailable, lstReleaseNotCreated, appSetting.SW360.URL);
         }
 
         private static string GetComponentAvailabilityStatus(List<Components> componentsAvailable, Components component)

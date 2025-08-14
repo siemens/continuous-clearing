@@ -11,6 +11,7 @@ using LCT.APICommunications.Model.Foss;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
+using LCT.Common.Logging;
 using LCT.Common.Model;
 using LCT.Services.Interface;
 using LCT.Services.Model;
@@ -268,7 +269,7 @@ namespace LCT.SW360PackageCreator
             creatorHelper.WriteSourceNotFoundListToConsole(UpdatedCompareBomData, appSettings);
 
             //write list of components which are not linked
-            CommonHelper.WriteComponentsNotLinkedListInConsole(ComponentsNotLinked);
+            LoggerHelper.WriteComponentsNotLinkedListInConsole(ComponentsNotLinked);
 
             Logger.Debug($"CreateComponentInSw360():End");
         }

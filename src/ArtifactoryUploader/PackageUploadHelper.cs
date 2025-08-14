@@ -15,6 +15,7 @@ using LCT.ArtifactoryUploader.Model;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
+using LCT.Common.Logging;
 using LCT.Services.Interface;
 using log4net;
 using Newtonsoft.Json;
@@ -388,7 +389,7 @@ namespace LCT.ArtifactoryUploader
                 { "Artifactory Uploader",uploaderKpiData.TimeTakenByArtifactoryUploader }
             };
 
-            CommonHelper.WriteToConsoleTable(printList, printTimingList);
+            LoggerHelper.WriteToConsoleTable(printList, printTimingList, "");
         }
 
         private static void IncrementCountersBasedOnPackageType(UploaderKpiData uploaderKpiData, PackageType packageType, bool isSuccess)

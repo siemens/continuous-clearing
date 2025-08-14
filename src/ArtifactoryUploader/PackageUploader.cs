@@ -10,6 +10,7 @@ using LCT.APICommunications.Model;
 using LCT.ArtifactoryUploader.Model;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Logging;
 using LCT.Common.Model;
 using log4net;
 using System;
@@ -37,7 +38,7 @@ namespace LCT.ArtifactoryUploader
             var bomFilePath = Path.Combine(appSettings.Directory.OutputFolder, appSettings.SW360.ProjectName + "_" + FileConstant.BomFileName);
             Bom m_ComponentsInBOM = PackageUploadHelper.GetComponentListFromComparisonBOM(bomFilePath, environmentHelper);
 
-            DisplayAllSettings(m_ComponentsInBOM.Components, appSettings);
+            LoggerHelper.DisplayAllSettings(m_ComponentsInBOM.Components, appSettings);
             uploaderKpiData.ComponentInComparisonBOM = m_ComponentsInBOM.Components.Count;
 
             DisplayPackagesInfo displayPackagesInfo = PackageUploadInformation.GetComponentsToBePackages();
