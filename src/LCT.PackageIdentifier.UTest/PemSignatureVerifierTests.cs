@@ -10,8 +10,6 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using LCT.PackageIdentifier;
-using System.Reflection;
 
 namespace LCT.PackageIdentifier.UTest
 {
@@ -494,7 +492,7 @@ namespace LCT.PackageIdentifier.UTest
             // Arrange - Use a non-existent directory path to trigger IOException
             var nonExistentDir = Path.Combine(_tempDirectory, "nonexistent_directory");
             var nonExistentFile = Path.Combine(nonExistentDir, "nonexistent_file.txt");
-            
+
             // Create an invalid public key that will bypass certificate parsing and go to ValidateSignedFileFromPublicKey
             var invalidPublicKeyPath = Path.Combine(_tempDirectory, "trigger_publickey_path.pem");
             File.WriteAllText(invalidPublicKeyPath, "-----BEGIN PUBLIC KEY-----\nInvalidKeyData123\n-----END PUBLIC KEY-----");
@@ -511,7 +509,7 @@ namespace LCT.PackageIdentifier.UTest
         {
             // Arrange - Use a non-existent signature file to trigger IOException
             var nonExistentSignature = Path.Combine(_tempDirectory, "nonexistent_signature.sig");
-            
+
             // Create an invalid public key that will bypass certificate parsing
             var invalidPublicKeyPath = Path.Combine(_tempDirectory, "trigger_publickey_path2.pem");
             File.WriteAllText(invalidPublicKeyPath, "-----BEGIN PUBLIC KEY-----\nInvalidKeyData456\n-----END PUBLIC KEY-----");
@@ -530,7 +528,7 @@ namespace LCT.PackageIdentifier.UTest
             // We'll create a test that demonstrates the exception handling pattern
             var restrictedDirectory = Path.Combine(_tempDirectory, "restricted");
             Directory.CreateDirectory(restrictedDirectory);
-            
+
             var restrictedFilePath = Path.Combine(restrictedDirectory, "restricted_file.txt");
             File.WriteAllText(restrictedFilePath, "restricted content");
 
@@ -621,7 +619,7 @@ namespace LCT.PackageIdentifier.UTest
             Assert.IsFalse(result, "ArgumentException with empty key data should return false");
         }
 
-        [Test] 
+        [Test]
         public void ValidatePem_WithArgumentException_InvalidKeyLength_ReturnsFalse()
         {
             // Arrange - Create a PEM with invalid key length that triggers ArgumentException

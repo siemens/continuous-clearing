@@ -37,7 +37,7 @@ namespace LCT.PackageIdentifier.UTest
             _mockJFrogService = new Mock<IJFrogService>();
             _mockCycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             _spdxBomParser = new Mock<ISpdxBomParser>();
-            _mdebianProcessor = new DebianProcessor(_mockCycloneDXBomParser.Object,_spdxBomParser.Object);
+            _mdebianProcessor = new DebianProcessor(_mockCycloneDXBomParser.Object, _spdxBomParser.Object);
         }
 
 
@@ -130,7 +130,7 @@ namespace LCT.PackageIdentifier.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "*_Debian.cdx.json" };
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "DEBIAN",
@@ -160,7 +160,7 @@ namespace LCT.PackageIdentifier.UTest
 
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "CycloneDX_Debian.cdx.json" };
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "DEBIAN",
@@ -173,7 +173,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = _debianProcessor.ParsePackageFile(appSettings,ref ListUnsupportedComponentsForBom);
+            Bom listofcomponents = _debianProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
@@ -229,7 +229,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             //Act
-            Bom listofcomponents = _debianProcessor.ParsePackageFile(appSettings,ref ListUnsupportedComponentsForBom);
+            Bom listofcomponents = _debianProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.AreEqual(sourceName, listofcomponents.Components[0].Name + "_" + listofcomponents.Components[0].Version, "Checks component name and version");
@@ -244,7 +244,7 @@ namespace LCT.PackageIdentifier.UTest
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "CycloneDX_Debian.cdx.json", "SBOMTemplate_Debian.cdx.json", "SBOM_DebianCATemplate.cdx.json" };
             string packagefilepath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"));
-                        
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "DEBIAN",
@@ -272,7 +272,7 @@ namespace LCT.PackageIdentifier.UTest
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "CycloneDX_Debian.cdx.json", "SBOMTemplate_Debian.cdx.json" };
             string packagefilepath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"));
-                       
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "DEBIAN",

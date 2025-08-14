@@ -50,7 +50,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             //Act
-            Bom listofcomponents = new ConanProcessor(cycloneDXBomParser.Object,spdxBomParser.Object).ParsePackageFile(appSettings,ref ListUnsupportedComponentsForBom);
+            Bom listofcomponents = new ConanProcessor(cycloneDXBomParser.Object, spdxBomParser.Object).ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(expectedNoOfcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
@@ -68,7 +68,7 @@ namespace LCT.PackageIdentifier.UTest
 
             string[] Includes = { "conan.lock" };
 
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 Conan = new Config() { Include = Includes },
@@ -81,7 +81,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             //Act
-            Bom listofcomponents = new ConanProcessor(cycloneDXBomParser.Object,spdxBomParser.Object).ParsePackageFile(appSettings,ref ListUnsupportedComponentsForBom);
+            Bom listofcomponents = new ConanProcessor(cycloneDXBomParser.Object, spdxBomParser.Object).ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
             var IsDevDependency = listofcomponents.Components.Find(a => a.Name == "googletest")
                 .Properties.First(x => x.Name == "internal:siemens:clearing:development").Value;
 
@@ -100,7 +100,7 @@ namespace LCT.PackageIdentifier.UTest
             string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 
             string[] Includes = { "conan.lock" };
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 Conan = new Config() { Include = Includes },
@@ -113,7 +113,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             //Act
-            Bom listofcomponents = new ConanProcessor(cycloneDXBomParser.Object,spdxBomParser.Object).ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
+            Bom listofcomponents = new ConanProcessor(cycloneDXBomParser.Object, spdxBomParser.Object).ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
             Assert.That(totalComponentsAfterExclusion, Is.EqualTo(listofcomponents.Components.Count), "Checks if the excluded components have been removed");
@@ -148,7 +148,7 @@ namespace LCT.PackageIdentifier.UTest
             var components = new List<Component>() { component };
             ComponentIdentification componentIdentification = new() { comparisonBOMData = components };
             string[] repoList = { "internalrepo1", "internalrepo2" };
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360(),
@@ -176,7 +176,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             // Act
-            ConanProcessor conanProcessor = new ConanProcessor(cycloneDXBomParser.Object,spdxBomParser.Object);
+            ConanProcessor conanProcessor = new ConanProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             var actual = await conanProcessor.IdentificationOfInternalComponents(componentIdentification, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
             // Assert
@@ -196,7 +196,7 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component };
             string[] repoList = { "internalrepo1", "internalrepo2" };
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "Conan",
@@ -225,7 +225,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             // Act
-            ConanProcessor conanProcessor = new ConanProcessor(cycloneDXBomParser.Object,spdxBomParser.Object);
+            ConanProcessor conanProcessor = new ConanProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             var actual = await conanProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
             var reponameActual = actual.First(x => x.Properties[0].Name == "internal:siemens:clearing:jfrog-repo-name").Properties[0].Value;
@@ -248,7 +248,7 @@ namespace LCT.PackageIdentifier.UTest
             };
             var components = new List<Component>() { component };
             string[] repoList = { "internalrepo1", "internalrepo2" };
-            
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "Conan",
@@ -277,7 +277,7 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             // Act
-            ConanProcessor conanProcessor = new ConanProcessor(cycloneDXBomParser.Object,spdxBomParser.Object);
+            ConanProcessor conanProcessor = new ConanProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             var actual = await conanProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
@@ -295,10 +295,10 @@ namespace LCT.PackageIdentifier.UTest
             string OutFolder = Path.GetDirectoryName(exePath);
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
-            ConanProcessor conanProcessor = new ConanProcessor(cycloneDXBomParser.Object,spdxBomParser.Object);
+            ConanProcessor conanProcessor = new ConanProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             string[] Includes = { "SBOM_ConanCATemplate.cdx.json" };
             string packagefilepath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"));
-                        
+
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 ProjectType = "CONAN",
@@ -332,7 +332,7 @@ namespace LCT.PackageIdentifier.UTest
                 new Component { Name = "ComponentB", Version = "2.0.0", Description = "DescriptionB" }
             };
 
-            
+
             var appSettings = new CommonAppSettings()
             {
                 Directory = new LCT.Common.Directory()
@@ -376,7 +376,7 @@ namespace LCT.PackageIdentifier.UTest
                 new Component { Name = "ComponentB", Version = "2.0.0", Description = "DescriptionB" }
             };
 
-            
+
             var appSettings = new CommonAppSettings()
             {
                 Directory = new LCT.Common.Directory()

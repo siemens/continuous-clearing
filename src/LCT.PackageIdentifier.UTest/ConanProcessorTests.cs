@@ -16,12 +16,8 @@ using LCT.Services.Interface;
 using Moq;
 using NUnit.Framework;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using System;
 
 namespace LCT.PackageIdentifier.UTest
 {
@@ -67,7 +63,7 @@ namespace LCT.PackageIdentifier.UTest
             {
                 Name = "package",
                 Version = "1.0.0"
-            };            
+            };
 
             // Act
             var repoName = ConanProcessor.GetArtifactoryRepoName(aqlResultList, component, out string jfrogRepoPath);
@@ -459,10 +455,10 @@ namespace LCT.PackageIdentifier.UTest
             Assert.That(result.Count, Is.EqualTo(1));
             Assert.That(result[0].Properties, Is.Not.Null);
             Assert.That(result[0].Properties.Count, Is.GreaterThan(0));
-        }        
+        }
 
         #endregion
-        
+
         private static CommonAppSettings CreateTestAppSettings()
         {
             return new CommonAppSettings

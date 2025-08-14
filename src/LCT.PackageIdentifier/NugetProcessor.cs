@@ -34,20 +34,18 @@ using File = System.IO.File;
 
 namespace LCT.PackageIdentifier
 {
-    public partial class NugetProcessor(ICycloneDXBomParser cycloneDXBomParser, IFrameworkPackages frameworkPackages, ICompositionBuilder compositionBuilder, ISpdxBomParser spdxBomParser, IRuntimeIdentifier runtimeIdentifier) : CycloneDXBomParser, IParser
+    public partial class NugetProcessor(ICycloneDXBomParser cycloneDXBomParser, IFrameworkPackages frameworkPackages, ICompositionBuilder compositionBuilder, ISpdxBomParser spdxBomParser) : CycloneDXBomParser, IParser
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
-        private readonly IRuntimeIdentifier _runtimeIdentifier = runtimeIdentifier;
         private readonly IFrameworkPackages _frameworkPackages = frameworkPackages;
         private readonly ICompositionBuilder _compositionBuilder = compositionBuilder;
         private Dictionary<string, Dictionary<string, NuGetVersion>> _listofFrameworkPackages = new Dictionary<string, Dictionary<string, NuGetVersion>>();
         private readonly Dictionary<string, Dictionary<string, NuGetVersion>> _listofFrameworkPackagesInInputFiles = new Dictionary<string, Dictionary<string, NuGetVersion>>();
         private bool isSelfContainedProject = false;
         private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
-        private RuntimeInfo runtimeInfo = new();
 
         #region public methods
         public Bom ParsePackageFile(CommonAppSettings appSettings, ref Bom unSupportedBomList)
@@ -66,7 +64,6 @@ namespace LCT.PackageIdentifier
                 Logger.Debug($"Deployment type identified as Classic");
                 isSelfContainedProject = false;
             }
-
             ParsingInputFileForBOM(appSettings, ref listComponentForBOM, ref bom);
             var componentsWithMultipleVersions = bom.Components.GroupBy(s => s.Name).Where(g => g.Count() > 1).SelectMany(g => g).ToList();
 
@@ -948,14 +945,76 @@ namespace LCT.PackageIdentifier
             return uniqueKeys;
         }
 
-        private bool DetectDeploymentType(CommonAppSettings appSettings)
+        private static bool DetectDeploymentType(CommonAppSettings appSettings)
         {
-            //Regsister the runtime identifier
-            _runtimeIdentifier.Register();
+            string[] projectFiles = FileConstant.Nuget_DeploymentType_DetectionExt
+                .SelectMany(ext => Directory.GetFiles(appSettings.Directory.InputFolder, ext, SearchOption.AllDirectories))
+                .Where(file => !IsExcluded(file, appSettings.Nuget?.Exclude))
+                .ToArray();
 
-            runtimeInfo = new RuntimeInfo();
-            runtimeInfo = _runtimeIdentifier.IdentifyRuntime(appSettings);
-            return runtimeInfo.IsSelfContained;
+            bool isSelfContained = false;
+            bool isSingleFile = false;
+
+            foreach (var projectFilePath in projectFiles)
+            {
+                try
+                {
+                    (bool selfContained, bool singleFile) = CheckDeploymentTags(projectFilePath);
+                    isSelfContained |= selfContained;
+                    isSingleFile |= singleFile;
+                    if (isSelfContained || isSingleFile)
+                    {
+                        // Early exit if either is detected
+                        break;
+                    }
+                }
+                catch (IOException ex)
+                {
+                    Logger.Debug($"IO error while Loading project file path :{projectFilePath} Error : {ex.Message}");
+                }
+                catch (ArgumentException ex)
+                {
+                    Logger.Debug($"IO error while Loading project file path :{projectFilePath} Error : {ex.Message}");
+                }
+            }
+
+            return isSelfContained || isSingleFile;
+        }
+
+        private static (bool isSelfContained, bool isSingleFile) CheckDeploymentTags(string projectFilePath)
+        {
+            bool isSelfContained = false;
+            bool isSingleFile = false;
+
+            XDocument projectDocument = XDocument.Load(projectFilePath);
+            foreach (var tag in FileConstant.Nuget_DeploymentType_DetectionTags)
+            {
+                var element = projectDocument.Descendants(tag).FirstOrDefault();
+                if (element != null)
+                {
+                    bool result;
+                    switch (tag)
+                    {
+                        case "SelfContained":
+                            isSelfContained = bool.TryParse(element.Value, out result) && result;
+                            break;
+                        case "PublishSingleFile":
+                            isSingleFile = bool.TryParse(element.Value, out result) && result;
+                            break;
+                    }
+                }
+            }
+            return (isSelfContained, isSingleFile);
+        }
+
+        private static bool IsExcluded(string filePath, string[] excludePatterns)
+        {
+            if (excludePatterns == null || excludePatterns.Length == 0)
+            {
+                return false;
+            }
+
+            return excludePatterns.Any(pattern => filePath.Contains(pattern, StringComparison.OrdinalIgnoreCase));
         }
 
         private void AddCompositionDetails(Bom bom)
@@ -979,7 +1038,7 @@ namespace LCT.PackageIdentifier
 
             Logger.Warn($"Total Framework packages marked as development dependencies: {totalCount}");
             // Add compositions to the BOM
-            _compositionBuilder.AddCompositionsToBom(bom, _listofFrameworkPackagesInInputFiles, runtimeInfo);
+            _compositionBuilder.AddCompositionsToBom(bom, _listofFrameworkPackagesInInputFiles);
         }
         [GeneratedRegex(@"packages\\(.+?)\\lib")]
         private static partial Regex PackageDetailsRegex();

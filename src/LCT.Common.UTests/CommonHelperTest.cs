@@ -6,7 +6,6 @@
 
 using CycloneDX.Models;
 using LCT.Common.Constants;
-using LCT.Common.Interface;
 using LCT.Common.Model;
 using log4net;
 using NUnit.Framework;
@@ -32,7 +31,7 @@ namespace LCT.Common.UTest
             System.IO.Directory.CreateDirectory(tempDir);
 
             tempLogFile = Path.Combine(tempDir, "catool.log");
-            File.WriteAllText(tempLogFile, "test log content");            
+            File.WriteAllText(tempLogFile, "test log content");
             appSettings = new CommonAppSettings()
             {
                 Directory = new Directory()
@@ -641,7 +640,7 @@ namespace LCT.Common.UTest
             int callbackInvokedWith = -1;
 
             // Act
-            var result = CommonHelper.RemoveExcludedComponentsFromBom(appSettings, bom, 
+            var result = CommonHelper.RemoveExcludedComponentsFromBom(appSettings, bom,
                 count => callbackInvokedWith = count);
 
             // Assert
@@ -699,7 +698,7 @@ namespace LCT.Common.UTest
             };
 
             // Act & Assert
-            Assert.DoesNotThrow(() => 
+            Assert.DoesNotThrow(() =>
                 CommonHelper.RemoveExcludedComponentsFromBom(appSettings, bom, null));
         }
 
@@ -760,7 +759,7 @@ namespace LCT.Common.UTest
             int callbackInvokedWith = -1;
 
             // Act
-            var result = CommonHelper.RemoveExcludedComponentsFromBom(appSettings, bom, 
+            var result = CommonHelper.RemoveExcludedComponentsFromBom(appSettings, bom,
                 count => callbackInvokedWith = count);
 
             // Assert
@@ -792,7 +791,7 @@ namespace LCT.Common.UTest
             int callbackInvokedWith = -1;
 
             // Act
-            var result = CommonHelper.RemoveExcludedComponentsFromBom(appSettings, bom, 
+            var result = CommonHelper.RemoveExcludedComponentsFromBom(appSettings, bom,
                 count => callbackInvokedWith = count);
 
             // Assert
@@ -801,7 +800,7 @@ namespace LCT.Common.UTest
             // Verify that the excluded component has the exclusion property
             var excludedComponent = result.Components.First(c => c.Name == "Component1");
             Assert.IsTrue(excludedComponent.Properties.Any(p => p.Name == Dataconstant.Cdx_ExcludeComponent && p.Value == "true"));
-        }        
+        }
 
         [Test]
         public void ProcessInternalComponentIdentification_WithEmptyComponents_ReturnsEmptyLists()
@@ -816,7 +815,7 @@ namespace LCT.Common.UTest
             // Assert
             Assert.AreEqual(0, processedComponents.Count);
             Assert.AreEqual(0, internalComponents.Count);
-        }        
+        }
 
         [Test]
         public void ProcessInternalComponentIdentification_WithAllInternalComponents_ReturnsAllAsInternal()
@@ -835,7 +834,7 @@ namespace LCT.Common.UTest
             // Assert
             Assert.AreEqual(2, processedComponents.Count);
             Assert.AreEqual(2, internalComponents.Count);
-            
+
             // Verify all components have the internal property set to true
             foreach (var component in processedComponents)
             {
@@ -862,7 +861,7 @@ namespace LCT.Common.UTest
             // Assert
             Assert.AreEqual(2, processedComponents.Count);
             Assert.AreEqual(0, internalComponents.Count);
-            
+
             // Verify all components have the internal property set to false
             foreach (var component in processedComponents)
             {
@@ -890,15 +889,15 @@ namespace LCT.Common.UTest
             // Assert
             Assert.AreEqual(3, processedComponents.Count);
             Assert.AreEqual(2, internalComponents.Count);
-            
+
             // Verify internal components
             Assert.IsTrue(internalComponents.All(c => c.Name.Contains("Internal")));
-            
+
             // Verify properties are set correctly
             var internalComp1 = processedComponents.FirstOrDefault(c => c.Name == "InternalComponent");
             var externalComp = processedComponents.FirstOrDefault(c => c.Name == "ExternalComponent");
             var internalComp2 = processedComponents.FirstOrDefault(c => c.Name == "AnotherInternal");
-            
+
             Assert.AreEqual("true", internalComp1.Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsInternal)?.Value);
             Assert.AreEqual("false", externalComp.Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsInternal)?.Value);
             Assert.AreEqual("true", internalComp2.Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsInternal)?.Value);
@@ -921,16 +920,16 @@ namespace LCT.Common.UTest
             // Assert
             Assert.AreEqual(2, processedComponents.Count);
             Assert.AreEqual(1, internalComponents.Count);
-            
+
             // Verify properties were initialized and set correctly
             foreach (var component in processedComponents)
             {
                 Assert.IsNotNull(component.Properties);
                 Assert.IsTrue(component.Properties.Count > 0);
-                
+
                 var internalProperty = component.Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsInternal);
                 Assert.IsNotNull(internalProperty);
-                
+
                 if (component.Name == "Component1")
                 {
                     Assert.AreEqual("true", internalProperty.Value);
@@ -949,11 +948,11 @@ namespace LCT.Common.UTest
             var existingProperty = new Property { Name = "ExistingProperty", Value = "ExistingValue" };
             List<Component> components = new List<Component>
             {
-                new Component 
-                { 
-                    Name = "Component1", 
-                    Version = "1.0", 
-                    Properties = new List<Property> { existingProperty } 
+                new Component
+                {
+                    Name = "Component1",
+                    Version = "1.0",
+                    Properties = new List<Property> { existingProperty }
                 }
             };
             Func<Component, bool> predicate = component => true;
@@ -964,15 +963,15 @@ namespace LCT.Common.UTest
             // Assert
             Assert.AreEqual(1, processedComponents.Count);
             Assert.AreEqual(1, internalComponents.Count);
-            
+
             var component = processedComponents.First();
             Assert.AreEqual(2, component.Properties.Count);
-            
+
             // Verify existing property is preserved
             var existingProp = component.Properties.FirstOrDefault(p => p.Name == "ExistingProperty");
             Assert.IsNotNull(existingProp);
             Assert.AreEqual("ExistingValue", existingProp.Value);
-            
+
             // Verify internal property is added
             var internalProp = component.Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsInternal);
             Assert.IsNotNull(internalProp);
@@ -985,10 +984,10 @@ namespace LCT.Common.UTest
             // Arrange
             List<Component> components = new List<Component>
             {
-                new Component 
-                { 
-                    Name = "Component1", 
-                    Version = "1.0", 
+                new Component
+                {
+                    Name = "Component1",
+                    Version = "1.0",
                     Properties = new List<Property>() // Empty but not null
                 }
             };
@@ -1000,10 +999,10 @@ namespace LCT.Common.UTest
             // Assert
             Assert.AreEqual(1, processedComponents.Count);
             Assert.AreEqual(0, internalComponents.Count);
-            
+
             var component = processedComponents.First();
             Assert.AreEqual(1, component.Properties.Count);
-            
+
             var internalProp = component.Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsInternal);
             Assert.IsNotNull(internalProp);
             Assert.AreEqual("false", internalProp.Value);
@@ -1028,7 +1027,7 @@ namespace LCT.Common.UTest
             // Assert
             Assert.AreEqual(3, processedComponents.Count);
             Assert.AreEqual(2, internalComponents.Count);
-            
+
             // Verify the correct components are identified as internal
             Assert.IsTrue(internalComponents.Any(c => c.Name == "Component1"));
             Assert.IsTrue(internalComponents.Any(c => c.Name == "Component3"));
@@ -1041,13 +1040,13 @@ namespace LCT.Common.UTest
             // Arrange
             List<Component> components = new List<Component>
             {
-                new Component 
-                { 
-                    Name = "Component1", 
-                    Version = "1.0", 
+                new Component
+                {
+                    Name = "Component1",
+                    Version = "1.0",
                     BomRef = "ref1",
                     Purl = "pkg:npm/component1@1.0",
-                    Properties = new List<Property>() 
+                    Properties = new List<Property>()
                 }
             };
             Func<Component, bool> predicate = component => true;
@@ -1061,10 +1060,10 @@ namespace LCT.Common.UTest
             Assert.AreEqual("1.0", processedComponent.Version);
             Assert.AreEqual("ref1", processedComponent.BomRef);
             Assert.AreEqual("pkg:npm/component1@1.0", processedComponent.Purl);
-            
+
             // Should have added one property (internal) to the existing empty list
             Assert.AreEqual(1, processedComponent.Properties.Count);
-        }      
+        }
 
 
         #region SetComponentPropertiesAndHashes Tests
@@ -1073,10 +1072,10 @@ namespace LCT.Common.UTest
         public void SetComponentPropertiesAndHashes_WithNullProperties_InitializesPropertiesList()
         {
             // Arrange
-            var component = new Component 
-            { 
-                Name = "TestComponent", 
-                Version = "1.0", 
+            var component = new Component
+            {
+                Name = "TestComponent",
+                Version = "1.0",
                 Properties = null,
                 Description = "Original Description"
             };
@@ -1099,10 +1098,10 @@ namespace LCT.Common.UTest
         public void SetComponentPropertiesAndHashes_WithEmptyProperties_AddsStandardProperties()
         {
             // Arrange
-            var component = new Component 
-            { 
-                Name = "TestComponent", 
-                Version = "1.0", 
+            var component = new Component
+            {
+                Name = "TestComponent",
+                Version = "1.0",
                 Properties = new List<Property>(),
                 Description = "Original Description"
             };
@@ -1129,10 +1128,10 @@ namespace LCT.Common.UTest
         {
             // Arrange
             var existingProperty = new Property { Name = "ExistingProperty", Value = "ExistingValue" };
-            var component = new Component 
-            { 
-                Name = "TestComponent", 
-                Version = "1.0", 
+            var component = new Component
+            {
+                Name = "TestComponent",
+                Version = "1.0",
                 Properties = new List<Property> { existingProperty },
                 Description = "Original Description"
             };
@@ -1147,16 +1146,16 @@ namespace LCT.Common.UTest
             // Assert
             Assert.IsNotNull(component.Properties);
             Assert.AreEqual(5, component.Properties.Count);
-            
+
             // Verify existing property is preserved
             Assert.IsTrue(component.Properties.Any(p => p.Name == "ExistingProperty" && p.Value == "ExistingValue"));
-            
+
             // Verify new properties are added
             Assert.IsTrue(component.Properties.Any(p => p.Name == Dataconstant.Cdx_ArtifactoryRepoName && p.Value == "python-repo"));
             Assert.IsTrue(component.Properties.Any(p => p.Name == Dataconstant.Cdx_ProjectType && p.Value == "python"));
             Assert.IsTrue(component.Properties.Any(p => p.Name == Dataconstant.Cdx_Siemensfilename && p.Value == "test-package.whl"));
             Assert.IsTrue(component.Properties.Any(p => p.Name == Dataconstant.Cdx_JfrogRepoPath && p.Value == "python-repo/path/package.whl"));
-            
+
             Assert.IsNull(component.Description);
         }
 
@@ -1164,10 +1163,10 @@ namespace LCT.Common.UTest
         public void SetComponentPropertiesAndHashes_WithValidHashes_AddsHashesToComponent()
         {
             // Arrange
-            var component = new Component 
-            { 
-                Name = "TestComponent", 
-                Version = "1.0", 
+            var component = new Component
+            {
+                Name = "TestComponent",
+                Version = "1.0",
                 Properties = new List<Property>(),
                 Description = "Original Description"
             };
@@ -1175,7 +1174,7 @@ namespace LCT.Common.UTest
             var projectType = new Property { Name = Dataconstant.Cdx_ProjectType, Value = "nuget" };
             var siemensFileName = new Property { Name = Dataconstant.Cdx_Siemensfilename, Value = "test-package.nupkg" };
             var jfrogRepoPath = new Property { Name = Dataconstant.Cdx_JfrogRepoPath, Value = "nuget-repo/path/package.nupkg" };
-            
+
             // Create a test hash object that matches the expected structure
             var hashes = new TestHashObject
             {
@@ -1191,19 +1190,19 @@ namespace LCT.Common.UTest
             Assert.IsNotNull(component.Properties);
             Assert.AreEqual(4, component.Properties.Count);
             Assert.IsNull(component.Description);
-            
+
             // Verify hashes are set correctly
             Assert.IsNotNull(component.Hashes);
             Assert.AreEqual(3, component.Hashes.Count);
-            
+
             var md5Hash = component.Hashes.FirstOrDefault(h => h.Alg == Hash.HashAlgorithm.MD5);
             Assert.IsNotNull(md5Hash);
             Assert.AreEqual("5d41402abc4b2a76b9719d911017c592", md5Hash.Content);
-            
+
             var sha1Hash = component.Hashes.FirstOrDefault(h => h.Alg == Hash.HashAlgorithm.SHA_1);
             Assert.IsNotNull(sha1Hash);
             Assert.AreEqual("aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d", sha1Hash.Content);
-            
+
             var sha256Hash = component.Hashes.FirstOrDefault(h => h.Alg == Hash.HashAlgorithm.SHA_256);
             Assert.IsNotNull(sha256Hash);
             Assert.AreEqual("2cf24dba4f21d4288074e297f7719e34d3e7e0cbfb1c4a1b8d1f8e8b7a6e9c9d", sha256Hash.Content);
@@ -1213,10 +1212,10 @@ namespace LCT.Common.UTest
         public void SetComponentPropertiesAndHashes_WithNullHashes_DoesNotSetHashes()
         {
             // Arrange
-            var component = new Component 
-            { 
-                Name = "TestComponent", 
-                Version = "1.0", 
+            var component = new Component
+            {
+                Name = "TestComponent",
+                Version = "1.0",
                 Properties = new List<Property>(),
                 Description = "Original Description"
             };
@@ -1240,10 +1239,10 @@ namespace LCT.Common.UTest
         {
             // Arrange
             var existingHash = new Hash { Alg = Hash.HashAlgorithm.MD5, Content = "oldmd5hash" };
-            var component = new Component 
-            { 
-                Name = "TestComponent", 
-                Version = "1.0", 
+            var component = new Component
+            {
+                Name = "TestComponent",
+                Version = "1.0",
                 Properties = new List<Property>(),
                 Description = "Original Description",
                 Hashes = new List<Hash> { existingHash }
@@ -1252,7 +1251,7 @@ namespace LCT.Common.UTest
             var projectType = new Property { Name = Dataconstant.Cdx_ProjectType, Value = "conan" };
             var siemensFileName = new Property { Name = Dataconstant.Cdx_Siemensfilename, Value = "test-package.tgz" };
             var jfrogRepoPath = new Property { Name = Dataconstant.Cdx_JfrogRepoPath, Value = "conan-repo/path/package.tgz" };
-            
+
             // Create a test hash object that matches the expected structure
             var newHashes = new TestHashObject
             {
@@ -1268,7 +1267,7 @@ namespace LCT.Common.UTest
             Assert.IsNotNull(component.Properties);
             Assert.AreEqual(4, component.Properties.Count);
             Assert.IsNull(component.Description);
-            
+
             // Verify hashes are replaced, not appended
             Assert.IsNotNull(component.Hashes);
             Assert.AreEqual(3, component.Hashes.Count);
@@ -1280,10 +1279,10 @@ namespace LCT.Common.UTest
         public void SetComponentPropertiesAndHashes_AlwaysClearsDescription()
         {
             // Arrange
-            var component = new Component 
-            { 
-                Name = "TestComponent", 
-                Version = "1.0", 
+            var component = new Component
+            {
+                Name = "TestComponent",
+                Version = "1.0",
                 Properties = new List<Property>(),
                 Description = "This description should be cleared"
             };
@@ -1303,21 +1302,21 @@ namespace LCT.Common.UTest
         public void SetComponentPropertiesAndHashes_WithAllParametersNull_HandlesGracefully()
         {
             // Arrange
-            var component = new Component 
-            { 
-                Name = "TestComponent", 
-                Version = "1.0", 
+            var component = new Component
+            {
+                Name = "TestComponent",
+                Version = "1.0",
                 Properties = new List<Property>(),
                 Description = "Original Description"
             };
 
             // Act & Assert - Should not throw exception
-            Assert.DoesNotThrow(() => 
+            Assert.DoesNotThrow(() =>
                 CommonHelper.SetComponentPropertiesAndHashes(component, null, null, null, null, null));
-                
+
             // Verify basic behavior
             Assert.IsNotNull(component.Properties);
-            Assert.AreEqual(1, component.Properties.Count); 
+            Assert.AreEqual(1, component.Properties.Count);
             Assert.IsNull(component.Description);
             Assert.IsNull(component.Hashes);
         }
@@ -1326,10 +1325,10 @@ namespace LCT.Common.UTest
         public void SetComponentPropertiesAndHashes_WithPartialHashData_HandlesPartialHashes()
         {
             // Arrange
-            var component = new Component 
-            { 
-                Name = "TestComponent", 
-                Version = "1.0", 
+            var component = new Component
+            {
+                Name = "TestComponent",
+                Version = "1.0",
                 Properties = new List<Property>(),
                 Description = "Original Description"
             };
@@ -1337,7 +1336,7 @@ namespace LCT.Common.UTest
             var projectType = new Property { Name = Dataconstant.Cdx_ProjectType, Value = "npm" };
             var siemensFileName = new Property { Name = Dataconstant.Cdx_Siemensfilename, Value = "test-package.tgz" };
             var jfrogRepoPath = new Property { Name = Dataconstant.Cdx_JfrogRepoPath, Value = "npm-repo/path/package.tgz" };
-            
+
             // Hashes with some null values
             var partialHashes = new TestHashObject
             {
@@ -1353,19 +1352,19 @@ namespace LCT.Common.UTest
             Assert.IsNotNull(component.Properties);
             Assert.AreEqual(4, component.Properties.Count);
             Assert.IsNull(component.Description);
-            
+
             // Verify hashes are set even with null values
             Assert.IsNotNull(component.Hashes);
             Assert.AreEqual(3, component.Hashes.Count);
-            
+
             var md5Hash = component.Hashes.FirstOrDefault(h => h.Alg == Hash.HashAlgorithm.MD5);
             Assert.IsNotNull(md5Hash);
             Assert.AreEqual("validmd5hash", md5Hash.Content);
-            
+
             var sha1Hash = component.Hashes.FirstOrDefault(h => h.Alg == Hash.HashAlgorithm.SHA_1);
             Assert.IsNotNull(sha1Hash);
             Assert.IsNull(sha1Hash.Content);
-            
+
             var sha256Hash = component.Hashes.FirstOrDefault(h => h.Alg == Hash.HashAlgorithm.SHA_256);
             Assert.IsNotNull(sha256Hash);
             Assert.AreEqual("validsha256hash", sha256Hash.Content);
@@ -1379,7 +1378,7 @@ namespace LCT.Common.UTest
             string propertyValue = "TestValue";
 
             // Act
-            CommonHelper.RemoveDuplicateAndAddProperty( ref properties, propertyName, propertyValue);
+            CommonHelper.RemoveDuplicateAndAddProperty(ref properties, propertyName, propertyValue);
 
             // Assert
             Assert.IsNotNull(properties);
