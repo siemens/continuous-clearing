@@ -15,7 +15,7 @@ namespace LCT.Common
 {
     public static class PipelineArtifactUploader
     {
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public const string LogArtifactFolderName = "ContinuousClearing_Log";
         public const string BomArtifactFolderName = "ContinuousClearing_Bom";
         public const string LogContainerFolderName = "Container_Log";
@@ -43,7 +43,7 @@ namespace LCT.Common
             }
             else if (envType == EnvironmentType.Unknown)
             {
-                Logger.Logger.Log(null, Level.Alert, $"Uploading of logs is not supported.", null);
+                Logger.Warn($"Uploading of logs is not supported.");
             }
 
         }
@@ -63,7 +63,7 @@ namespace LCT.Common
             }
             else if (envType == EnvironmentType.Unknown)
             {
-                Logger.Logger.Log(null, Level.Alert, $"Uploading of SBOM is not supported.", null);
+                Logger.Warn($"Uploading of SBOM is not supported.");
             }
 
         }

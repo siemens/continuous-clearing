@@ -22,7 +22,7 @@ namespace LCT.Common
     public class SettingsManager : ISettingsManager
     {
         public string BasePath { get; private set; } = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
 
         /// <summary>
@@ -46,8 +46,7 @@ namespace LCT.Common
                 environmentHelper.CallEnvironmentExit(0);
             }
             string settingsFilePath = GetConfigFilePathFromArgs(args, jsonSettingsFileName);
-            Logger.Logger.Log(null, Level.Debug, $"Settings File: {settingsFilePath}", null);
-
+            Logger.Debug($"Settings File: {settingsFilePath}");
             //add ut for reading - add json and then cmd args
             IConfigurationBuilder settingsConfigBuilder = new ConfigurationBuilder()
                                                                     .SetBasePath(BasePath)
