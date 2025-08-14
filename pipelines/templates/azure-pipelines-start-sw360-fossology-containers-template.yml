@@ -32,11 +32,13 @@ steps:
       containerRegistry: ${{ parameters.dockerRegistry }}
       command: 'login'
     displayName: "Docker login to ${{ parameters.dockerRegistry }}"
-
-  - script: mkdir -p $(Pipeline.Workspace)/docker
-    displayName: 'Ensure Docker cache directory exists'
+  
 
   # -- SW360 IMAGE CACHE --
+  - script: |
+      mkdir -p $(Pipeline.Workspace)/siemens-docker-dev.jfrog.io/energy-dev/software-clearing/sw360/docker
+    displayName: 'Ensure SW360 cache folder tree exists'
+
   - task: Cache@2
     displayName: 'Cache SW360 image'
     inputs:
@@ -57,6 +59,10 @@ steps:
     condition: and(not(canceled()), not(failed()), ne(variables.SW360_CACHE_RESTORED, 'true'))
 
   # -- FOSSOLGY IMAGE CACHE --
+  - script: |
+      mkdir -p $(Pipeline.Workspace)/siemens-docker-dev.jfrog.io/energy-dev/software-clearing/fossy/docker
+    displayName: 'Ensure Fossology cache folder tree exists'
+
   - task: Cache@2
     displayName: 'Cache FOSSology image'
     inputs:
