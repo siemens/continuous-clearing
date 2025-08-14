@@ -7,7 +7,6 @@
 using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
 using LCT.Common;
-using LCT.Common.Interface;
 using LCT.Common.Model;
 using log4net;
 using Newtonsoft.Json;
@@ -315,11 +314,11 @@ namespace LCT.APICommunications
         }
 
 
-        public string AttachComponentSourceToSW360(AttachReport attachReport,ComparisonBomData comparisonBomData)
+        public string AttachComponentSourceToSW360(AttachReport attachReport, ComparisonBomData comparisonBomData)
         {
             AttachmentHelper attachmentHelper = new AttachmentHelper(sw360AuthTokenType, sw360AuthToken, sw360ReleaseApi);
 
-            return attachmentHelper.AttachComponentSourceToSW360(attachReport,comparisonBomData);
+            return attachmentHelper.AttachComponentSourceToSW360(attachReport, comparisonBomData);
         }
 
         public async Task<string> GetReleaseByCompoenentName(string componentName)

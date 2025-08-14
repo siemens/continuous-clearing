@@ -18,7 +18,7 @@ namespace LCT.PackageIdentifier.Interface
     /// </summary>
     public interface IParser
     {
-        public Bom ParsePackageFile(CommonAppSettings appSettings,ref Bom unSupportedBomList);
+        public Bom ParsePackageFile(CommonAppSettings appSettings, ref Bom unSupportedBomList);
         public Task<ComponentIdentification> IdentificationOfInternalComponents(
             ComponentIdentification componentData, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper);
         public Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper);

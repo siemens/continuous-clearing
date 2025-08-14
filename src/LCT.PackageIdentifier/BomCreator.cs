@@ -49,7 +49,7 @@ namespace LCT.PackageIdentifier
 
         public static Jfrog jfrog { get; set; } = new Jfrog();
         public static SW360 sw360 { get; set; } = new SW360();
-        public BomCreator(ICycloneDXBomParser cycloneDXBomParser, IFrameworkPackages frameworkPackages, ICompositionBuilder compositionBuilder,ISpdxBomParser spdxBomParser)
+        public BomCreator(ICycloneDXBomParser cycloneDXBomParser, IFrameworkPackages frameworkPackages, ICompositionBuilder compositionBuilder, ISpdxBomParser spdxBomParser)
         {
             CycloneDXBomParser = cycloneDXBomParser;
             _frameworkPackages = frameworkPackages;
@@ -162,7 +162,7 @@ namespace LCT.PackageIdentifier
                     parser = new NpmProcessor(CycloneDXBomParser, SpdxBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 case "NUGET":
-                    parser = new NugetProcessor(CycloneDXBomParser, _frameworkPackages, _compositionBuilder,SpdxBomParser);
+                    parser = new NugetProcessor(CycloneDXBomParser, _frameworkPackages, _compositionBuilder, SpdxBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 case "MAVEN":
                     parser = new MavenProcessor(CycloneDXBomParser, SpdxBomParser);
@@ -192,11 +192,11 @@ namespace LCT.PackageIdentifier
             List<Component> components;
             Metadata metadata;
             Bom bom = new Bom();
-            Bom unSupportedBomList = new Bom { Components = new List<Component>(),Dependencies = new List<Dependency>() };
+            Bom unSupportedBomList = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
             try
             {
                 //Parsing the input file
-                bom = parser.ParsePackageFile(appSettings,ref unSupportedBomList);
+                bom = parser.ParsePackageFile(appSettings, ref unSupportedBomList);
                 metadata = bom.Metadata;
                 componentData = new ComponentIdentification()
                 {
@@ -237,7 +237,7 @@ namespace LCT.PackageIdentifier
             bom.Components.AddRange(unSupportedBomList.Components);
             bom.Dependencies.AddRange(unSupportedBomList.Dependencies);
             return bom;
-        }       
+        }
         public async Task<bool> CheckJFrogConnection(CommonAppSettings appSettings)
         {
             if (appSettings.Jfrog != null)
@@ -267,6 +267,6 @@ namespace LCT.PackageIdentifier
             }
             return true;
 
-        }        
+        }
     }
 }

@@ -29,7 +29,7 @@ namespace LCT.PackageIdentifier
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
         private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
 
-        public Bom ParsePackageFile(CommonAppSettings appSettings,ref Bom unSupportedBomList)
+        public Bom ParsePackageFile(CommonAppSettings appSettings, ref Bom unSupportedBomList)
         {
             List<Component> componentsForBOM = new();
             List<Component> componentsToBOM = new();
@@ -81,7 +81,7 @@ namespace LCT.PackageIdentifier
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += ListUnsupportedComponentsForBom.Components.Count;
             ListUnsupportedComponentsForBom.Components = ListUnsupportedComponentsForBom.Components.Distinct(new ComponentEqualityComparer()).ToList();
             BomCreator.bomKpiData.DuplicateComponents += totalUnsupportedComponents - ListUnsupportedComponentsForBom.Components.Count;
-            AddSiemensDirectProperty(ref ListUnsupportedComponentsForBom);            
+            AddSiemensDirectProperty(ref ListUnsupportedComponentsForBom);
             bom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(bom.Components, bom.Dependencies);
             ListUnsupportedComponentsForBom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(ListUnsupportedComponentsForBom.Components, ListUnsupportedComponentsForBom.Dependencies);
             unSupportedBomList.Components = ListUnsupportedComponentsForBom.Components;
@@ -99,7 +99,7 @@ namespace LCT.PackageIdentifier
                 component.Purl = RemoveSuffix(component.Purl, suffix);
             }
 
-            foreach (var dependency in bom?.Dependencies ?? Enumerable.Empty<Dependency>()) 
+            foreach (var dependency in bom?.Dependencies ?? Enumerable.Empty<Dependency>())
             {
                 RemoveTypeJarSuffixFromDependency(dependency);
             }
@@ -151,10 +151,10 @@ namespace LCT.PackageIdentifier
                             Logger.Warn("No components found in the BOM file : " + filepath);
                             continue;
                         }
-                    }                  
+                    }
 
                     AddComponentsToBom(bomList, componentsForBOM, componentsToBOM, dependenciesForBOM);
-                }                
+                }
             }
         }
 
@@ -206,7 +206,7 @@ namespace LCT.PackageIdentifier
                     : "false";
                 component.Properties ??= new List<Property>();
                 var properties = component.Properties;
-                CommonHelper.RemoveDuplicateAndAddProperty(ref properties,Dataconstant.Cdx_SiemensDirect,siemensDirectValue);
+                CommonHelper.RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_SiemensDirect, siemensDirectValue);
                 component.Properties = properties;
             }
             bom.Components = bomComponentsList;
@@ -280,7 +280,7 @@ namespace LCT.PackageIdentifier
                     component.Properties.Add(identifierType);
                     componentsToBOM.Add(component);
                 }
-                
+
             }
         }
 
@@ -317,7 +317,7 @@ namespace LCT.PackageIdentifier
             }
 
             return modifiedBOM;
-        }        
+        }
 
         public async Task<ComponentIdentification> IdentificationOfInternalComponents(
            ComponentIdentification componentData, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
@@ -327,10 +327,10 @@ namespace LCT.PackageIdentifier
             List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(appSettings.Maven.Artifactory.InternalRepos, jFrogService);
 
             var inputIterationList = componentData.comparisonBOMData;
-            
+
             // Use the common helper method
             var (processedComponents, internalComponents) = CommonHelper.ProcessInternalComponentIdentification(
-                inputIterationList, 
+                inputIterationList,
                 component => IsInternalMavenComponent(aqlResultList, component, bomhelper));
 
             // update the comparison bom data

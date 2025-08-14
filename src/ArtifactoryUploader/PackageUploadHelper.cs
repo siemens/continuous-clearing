@@ -21,7 +21,6 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
@@ -38,7 +37,7 @@ namespace LCT.ArtifactoryUploader
         public static IJFrogService JFrogService { get; set; }
 
         private static bool SetWarningCode;
-        public static Bom GetComponentListFromComparisonBOM(string comparisonBomFilePath,IEnvironmentHelper environmentHelper)
+        public static Bom GetComponentListFromComparisonBOM(string comparisonBomFilePath, IEnvironmentHelper environmentHelper)
         {
             Logger.Debug("Starting GetComponentListFromComparisonBOM() method");
             Bom componentsToBoms = null;
@@ -434,7 +433,7 @@ namespace LCT.ArtifactoryUploader
                 if (bomComponent != null && component.DestRepoName != null && !component.DryRun)
                 {
                     bomComponent.Properties ??= new List<Property>();
-                    var properties = bomComponent.Properties;                    
+                    var properties = bomComponent.Properties;
                     CommonHelper.RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_ArtifactoryRepoName, component.DestRepoName);
                     CommonHelper.RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_JfrogRepoPath, component.JfrogRepoPath);
                     bomComponent.Properties = properties;
