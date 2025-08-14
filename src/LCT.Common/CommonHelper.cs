@@ -19,6 +19,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using File = System.IO.File;
 using Level = log4net.Core.Level;
+using File = System.IO.File;
 
 namespace LCT.Common
 {
@@ -634,7 +635,3 @@ namespace LCT.Common
         #endregion
     }
 }
-
-
-
-
