@@ -128,7 +128,7 @@ namespace LCT.PackageIdentifier
                     Logger.Error($"Naming Convention Error: The certificate file(s) for the SPDX document '{filename}' are missing. Please ensure that .pem files are named in the format '{filename}.pem'.");
                 }
             }
-        }
+        }        
 
         private static void ValidateFoundFiles(string filepath, string filename, Dictionary<string, string> foundFiles)
         {
