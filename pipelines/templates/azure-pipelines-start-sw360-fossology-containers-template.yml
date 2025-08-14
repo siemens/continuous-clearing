@@ -36,7 +36,7 @@ steps:
 
   # -- SW360 IMAGE CACHE --
   - script: |
-      mkdir -p $(Pipeline.Workspace)/siemens-docker-dev.jfrog.io/energy-dev/software-clearing/sw360/docker
+      mkdir -p $(Pipeline.Workspace)/siemens-docker-dev.jfrog.io/energy-dev/software-clearing/sw360
     displayName: 'Ensure SW360 cache folder tree exists'
 
   - task: Cache@2
@@ -60,7 +60,7 @@ steps:
 
   # -- FOSSOLGY IMAGE CACHE --
   - script: |
-      mkdir -p $(Pipeline.Workspace)/siemens-docker-dev.jfrog.io/energy-dev/software-clearing/fossy/docker
+      mkdir -p $(Pipeline.Workspace)/siemens-docker-dev.jfrog.io/energy-dev/software-clearing/fossy
     displayName: 'Ensure Fossology cache folder tree exists'
 
   - task: Cache@2
