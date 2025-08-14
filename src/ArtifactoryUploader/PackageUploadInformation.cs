@@ -137,8 +137,7 @@ namespace LCT.ArtifactoryUploader
                                 }
                                 else if (package.ResponseMessage.ReasonPhrase == ApiConstant.PackageNotFound)
                                 {
-                                    content += $"⚠ [white]{package.Name}[/]-[cyan]{package.Version}[/] " +
-                                             $"not found in [yellow]{package.SrcRepoName}[/]\n";
+                                    content += $"❌ Package [white]{package.Name}[/]-[cyan]{package.Version}[/] not found in [yellow]{package.SrcRepoName}[/],[red] Upload Failed!![/]\n";                                    
                                 }
                                 else
                                 {

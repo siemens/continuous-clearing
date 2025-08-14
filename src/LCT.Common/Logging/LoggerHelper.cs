@@ -392,8 +392,8 @@ namespace LCT.Common.Logging
                 int consoleWidth = GetConsoleWidth(10, 110);
                 int maxPathLength = Math.Max(60, consoleWidth - 20);
 
-                content = $"Start of {exeType} execution: [green]{DateTime.Now}[/]\n\n";
-                content += $"[green]-[/] [yellow]Input Parameters used in {exeType}[/]\n\n";
+                content = $"Start of Package Identifier execution: [green]{DateTime.Now}[/]\n\n";
+                content += $"[green]-[/] [yellow]Input Parameters used in Package Identifier[/]\n\n";
 
                 content += $"[green]-[/] [cyan]CaToolVersion[/]\n";
                 content += $"  └──✅ {caToolInformation.CatoolVersion}\n\n";
