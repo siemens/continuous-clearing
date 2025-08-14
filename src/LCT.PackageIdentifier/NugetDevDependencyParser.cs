@@ -33,7 +33,10 @@ namespace LCT.PackageIdentifier
 
         private NugetDevDependencyParser()
         {
-            MSBuildLocator.RegisterDefaults();
+            if (!MSBuildLocator.IsRegistered)
+            {
+                MSBuildLocator.RegisterDefaults();
+            }
         }
 
         public static NugetDevDependencyParser Instance
