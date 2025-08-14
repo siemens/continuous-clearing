@@ -33,10 +33,15 @@ steps:
       command: 'login'
     displayName: "Docker login to ${{ parameters.dockerRegistry }}"
   
+  - script: |
+      echo "Pipeline.Workspace: $(Pipeline.Workspace)"
+      ls -la $(Pipeline.Workspace)
+    displayName: 'Debug pipeline workspace'
 
   # -- SW360 IMAGE CACHE --
   - script: |
       mkdir -p $(Pipeline.Workspace)/siemens-docker-dev.jfrog.io/energy-dev/software-clearing/sw360
+      touch $(Pipeline.Workspace)/siemens-docker-dev.jfrog.io/energy-dev/software-clearing/sw360/.dummy
     displayName: 'Ensure SW360 cache folder tree exists'
 
   - task: Cache@2
