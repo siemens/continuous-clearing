@@ -165,5 +165,31 @@ namespace LCT.SW360PackageCreator
             await componentCreator.CreateComponentInSw360(appSettings, sw360CreatorService, sw360Service,
                  sw360ProjectService, new FileOperations(), creatorHelper, parsedBomData);
         }
+
+        private static async Task ComplianceCheckForAllFoundComponents()
+        {
+            if (parsedBomData != null && parsedBomData.Count > 0)
+            {
+                ComplianceCheck compliance = new ComplianceCheck();
+                ComplianceSettingsModel complianceSettings = new();
+                string baseDir = AppContext.BaseDirectory;
+                string[] foundFiles = Directory.GetFiles(baseDir, "ComplianceSettings.json", SearchOption.AllDirectories);
+
+                if (foundFiles.Length > 0)
+                {
+                    string settingsPath = foundFiles[0];
+                    complianceSettings = await compliance.LoadSettingsAsync(settingsPath);
+                }
+                else
+                {
+                    Logger.Debug("ComplianceSettings.json not found.");
+                }
+
+                if (compliance.Check(complianceSettings, parsedBomData))
+                {
+                    PipelineArtifactUploader.PrintWarning(compliance.GetResults().ToString());
+                }
+            }
+        }
     }
 }
