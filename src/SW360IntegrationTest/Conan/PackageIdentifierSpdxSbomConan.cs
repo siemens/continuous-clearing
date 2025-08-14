@@ -3,10 +3,10 @@
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
+using CycloneDX.Models;
 using NUnit.Framework;
 using System.IO;
 using TestUtilities;
-using CycloneDX.Models;
 namespace SW360IntegrationTest.Conan
 {
     [TestFixture, Order(37)]
