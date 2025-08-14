@@ -33,6 +33,9 @@ steps:
       command: 'login'
     displayName: "Docker login to ${{ parameters.dockerRegistry }}"
 
+  - script: mkdir -p $(Pipeline.Workspace)/docker
+    displayName: 'Ensure Docker cache directory exists'
+
   # -- SW360 IMAGE CACHE --
   - task: Cache@2
     displayName: 'Cache SW360 image'
