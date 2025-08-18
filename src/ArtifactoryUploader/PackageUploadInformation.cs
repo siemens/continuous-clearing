@@ -16,8 +16,10 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Text;
 
 namespace LCT.ArtifactoryUploader
 {
@@ -100,90 +102,147 @@ namespace LCT.ArtifactoryUploader
             DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesDebian, displayPackagesInfo.JfrogNotFoundPackagesDebian, displayPackagesInfo.SuccessfullPackagesDebian, displayPackagesInfo.JfrogFoundPackagesDebian, "Debian", localPathforartifactory);
 
         }
-        private static void DisplaySortedForeachComponents(List<ComponentsToArtifactory> unknownPackages,
+        private static void DisplaySortedForeachComponents(
+    List<ComponentsToArtifactory> unknownPackages,
     List<ComponentsToArtifactory> JfrogNotFoundPackages,
     List<ComponentsToArtifactory> SucessfullPackages,
     List<ComponentsToArtifactory> JfrogFoundPackages,
     string name,
     string filePath)
         {
-            if (unknownPackages.Count != 0 || JfrogNotFoundPackages.Count != 0 ||
-                SucessfullPackages.Count != 0 || JfrogFoundPackages.Count != 0)
+            if (!HasAnyPackages(unknownPackages, JfrogNotFoundPackages, SucessfullPackages, JfrogFoundPackages))
             {
-                if (LoggerFactory.UseSpectreConsole)
+                return;
+            }
+
+            if (LoggerFactory.UseSpectreConsole)
+            {
+                DisplayWithSpectreConsole(unknownPackages, JfrogNotFoundPackages, SucessfullPackages, JfrogFoundPackages, name);
+            }
+            else
+            {
+                DisplayWithLogger(unknownPackages, JfrogNotFoundPackages, SucessfullPackages, JfrogFoundPackages, name, filePath);
+            }
+        }
+
+        private static bool HasAnyPackages(params List<ComponentsToArtifactory>[] packageLists)
+        {
+            return packageLists.Any(list => list?.Count > 0);
+        }
+
+        private static void DisplayWithSpectreConsole(
+            List<ComponentsToArtifactory> unknownPackages,
+            List<ComponentsToArtifactory> JfrogNotFoundPackages,
+            List<ComponentsToArtifactory> SucessfullPackages,
+            List<ComponentsToArtifactory> JfrogFoundPackages,
+            string name)
+        {
+            LoggerHelper.SafeSpectreAction(() =>
+            {
+                var content = new StringBuilder($"[green]{name}[/]\n\n");
+                AppendPackageContent(content, unknownPackages, JfrogFoundPackages, JfrogNotFoundPackages, SucessfullPackages);
+
+                LoggerHelper.WriteStyledPanel(content.ToString().TrimEnd(), "", "blue", "yellow");
+                LoggerHelper.WriteLine();
+            }, $"Display {name} Package Information", "Info");
+        }
+
+        private static void AppendPackageContent(
+            StringBuilder content,
+            List<ComponentsToArtifactory> unknownPackages,
+            List<ComponentsToArtifactory> JfrogFoundPackages,
+            List<ComponentsToArtifactory> JfrogNotFoundPackages,
+            List<ComponentsToArtifactory> SucessfullPackages)
+        {
+            AppendUnknownPackages(content, unknownPackages);
+            AppendJfrogFoundPackages(content, JfrogFoundPackages);
+            AppendJfrogNotFoundPackages(content, JfrogNotFoundPackages);
+            AppendSuccessfulPackages(content, SucessfullPackages);
+        }
+
+        private static void AppendUnknownPackages(StringBuilder content, List<ComponentsToArtifactory> packages)
+        {
+            if (packages?.Count > 0)
+            {
+                content.AppendLine();
+                foreach (var package in packages)
                 {
-                    LoggerHelper.SafeSpectreAction(() =>
-                    {
-                        string content = $"[green]{name}[/]\n\n";
-                        if (unknownPackages.Count > 0)
-                        {
-                            content += $"\n";
-                            foreach (var package in unknownPackages)
-                            {
-                                content += $"⚠ [white]{package.Name}[/]-[cyan]{package.Version}[/] [yellow]Report not in Approved state[/]\n";
-                            }
-                        }
-
-                        if (JfrogFoundPackages.Count > 0)
-                        {
-                            content += $"\n";
-                            foreach (var package in JfrogFoundPackages)
-                            {
-                                if (package.ResponseMessage.ReasonPhrase == ApiConstant.ErrorInUpload)
-                                {
-                                    content += $"❌ [white]{package.Name}[/]-[cyan]{package.Version}[/] " +
-                                             $"[red]{package.OperationType} Failed![/] " +
-                                             $"[yellow]{package.SrcRepoName}[/] [white]⟶ [/] [yellow]{package.DestRepoName}[/]\n";
-                                }
-                                else if (package.ResponseMessage.ReasonPhrase == ApiConstant.PackageNotFound)
-                                {
-                                    content += $"❌ Package [white]{package.Name}[/]-[cyan]{package.Version}[/] not found in [yellow]{package.SrcRepoName}[/],[red] Upload Failed!![/]\n";                                    
-                                }
-                                else
-                                {
-                                    content += $"✓ [green]Successful{package.DryRunSuffix}[/] " +
-                                             $"[cyan]{package.OperationType}[/] " +
-                                             $"[white]{package.Name}[/]-[cyan]{package.Version}[/] " +
-                                             $"from [yellow]{package.SrcRepoName}[/] [white]⟶ [/] [yellow]{package.DestRepoName}[/]\n";
-                                }
-                            }
-                            content += "\n";
-                        }
-
-                        if (JfrogNotFoundPackages.Count > 0)
-                        {
-                            content += $"\n";
-                            foreach (var package in JfrogNotFoundPackages)
-                            {
-                                content += $"⚠ [white]{package.Name}[/]-[cyan]{package.Version}[/] [yellow]is not found in jfrog[/]\n";
-                            }
-                            content += "\n";
-                        }
-
-                        if (SucessfullPackages.Count > 0)
-                        {
-                            content += $"\n";
-                            foreach (var package in SucessfullPackages)
-                            {
-                                content += $"✓ [white]{package.Name}[/]-[cyan]{package.Version}[/] [green]is already uploaded[/]\n";
-                            }
-                        }
-
-                        LoggerHelper.WriteStyledPanel(content.TrimEnd(), $"", "blue", "yellow");
-                        LoggerHelper.WriteLine();
-
-                    }, $"Display {name} Package Information", "Info");
-                }
-                else
-                {
-                    // Existing log4net implementation
-                    Logger.Info("\n" + name + ":\n");
-                    DisplayErrorForUnknownPackages(unknownPackages, name, filePath);
-                    DisplayErrorForJfrogFoundPackages(JfrogFoundPackages);
-                    DisplayErrorForJfrogPackages(JfrogNotFoundPackages);
-                    DisplayErrorForSucessfullPackages(SucessfullPackages);
+                    content.AppendLine($"⚠ [white]{package.Name}[/]-[cyan]{package.Version}[/] [yellow]Report not in Approved state[/]");
                 }
             }
+        }
+
+        private static void AppendJfrogFoundPackages(StringBuilder content, List<ComponentsToArtifactory> packages)
+        {
+            if (packages?.Count > 0)
+            {
+                content.AppendLine();
+                foreach (var package in packages)
+                {
+                    content.AppendLine(FormatJfrogFoundPackage(package));
+                }
+                content.AppendLine();
+            }
+        }
+
+        private static string FormatJfrogFoundPackage(ComponentsToArtifactory package)
+        {
+            if (package.ResponseMessage.ReasonPhrase == ApiConstant.ErrorInUpload)
+            {
+                return $"❌ [white]{package.Name}[/]-[cyan]{package.Version}[/] " +
+                       $"[red]{package.OperationType} Failed![/] " +
+                       $"[yellow]{package.SrcRepoName}[/] [white]⟶ [/] [yellow]{package.DestRepoName}[/]";
+            }
+
+            if (package.ResponseMessage.ReasonPhrase == ApiConstant.PackageNotFound)
+            {
+                return $"❌ Package [white]{package.Name}[/]-[cyan]{package.Version}[/] not found in [yellow]{package.SrcRepoName}[/],[red] Upload Failed!![/]";
+            }
+
+            return $"✓ [green]Successful{package.DryRunSuffix}[/] " +
+                   $"[cyan]{package.OperationType}[/] " +
+                   $"[white]{package.Name}[/]-[cyan]{package.Version}[/] " +
+                   $"from [yellow]{package.SrcRepoName}[/] [white]⟶ [/] [yellow]{package.DestRepoName}[/]";
+        }
+
+        private static void AppendJfrogNotFoundPackages(StringBuilder content, List<ComponentsToArtifactory> packages)
+        {
+            if (packages?.Count > 0)
+            {
+                content.AppendLine();
+                foreach (var package in packages)
+                {
+                    content.AppendLine($"⚠ [white]{package.Name}[/]-[cyan]{package.Version}[/] [yellow]is not found in jfrog[/]");
+                }
+                content.AppendLine();
+            }
+        }
+
+        private static void AppendSuccessfulPackages(StringBuilder content, List<ComponentsToArtifactory> packages)
+        {
+            if (packages?.Count > 0)
+            {
+                content.AppendLine();
+                foreach (var package in packages)
+                {
+                    content.AppendLine($"✓ [white]{package.Name}[/]-[cyan]{package.Version}[/] [green]is already uploaded[/]");
+                }
+            }
+        }
+
+        private static void DisplayWithLogger(
+            List<ComponentsToArtifactory> unknownPackages,
+            List<ComponentsToArtifactory> JfrogNotFoundPackages,
+            List<ComponentsToArtifactory> SucessfullPackages,
+            List<ComponentsToArtifactory> JfrogFoundPackages,
+            string name,
+            string filePath)
+        {
+            Logger.Info($"\n{name}:\n");
+            DisplayErrorForUnknownPackages(unknownPackages, name, filePath);
+            DisplayErrorForJfrogFoundPackages(JfrogFoundPackages);
+            DisplayErrorForJfrogPackages(JfrogNotFoundPackages);
+            DisplayErrorForSucessfullPackages(SucessfullPackages);
         }
         public static void DisplayErrorForJfrogFoundPackages(List<ComponentsToArtifactory> JfrogFoundPackages)
         {

@@ -57,7 +57,8 @@ namespace ArtifactoryUploader
             settingsManager.CheckRequiredArgsToRun(appSettings, "Uploader");
             string bomFilePath = GetBomFilePath(appSettings);
             LoggerHelper.SpectreConsoleInitialMessage("Artifactory Uploader");
-            LoggerHelper.LogInputParameters(caToolInformation, appSettings, listOfInternalRepoList: "", listOfInclude: "", listOfExclude: "", listOfExcludeComponents: "", exeType: "Uploader", bomFilePath: bomFilePath);
+            ListofPerametersForCli listofPerameters = new ListofPerametersForCli();
+            LoggerHelper.LogInputParameters(caToolInformation, appSettings, listofPerameters, exeType: "Uploader", bomFilePath: bomFilePath);
             if (!appSettings.Jfrog.DryRun)
                 Logger.Logger.Log(null, Level.Alert, $"Artifactory Uploader is running in release mode !!! \n", null);
             else

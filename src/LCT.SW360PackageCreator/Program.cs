@@ -75,7 +75,8 @@ namespace LCT.SW360PackageCreator
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Alert, $"Package creator is running in TEST mode \n", null);
             var bomFilePath = Path.Combine(appSettings.Directory.OutputFolder, appSettings.SW360.ProjectName + "_" + FileConstant.BomFileName);
-            LoggerHelper.LogInputParameters(caToolInformation,appSettings,listOfInternalRepoList: "",listOfInclude: "",listOfExclude: "",listOfExcludeComponents: "",exeType: "Creator",bomFilePath: bomFilePath);
+            ListofPerametersForCli listofPerameters = new ListofPerametersForCli();
+            LoggerHelper.LogInputParameters(caToolInformation,appSettings,listofPerameters,exeType: "Creator",bomFilePath: bomFilePath);
 
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);

@@ -107,12 +107,15 @@ namespace LCT.PackageIdentifier
             {
                 await ValidateAppsettingsFile(appSettings, projectReleases);
             }
-            string listOfInclude = DisplayInformation.DisplayIncludeFiles(appSettings);
-            string listOfExclude = DisplayInformation.DisplayExcludeFiles(appSettings);
-            string listOfExcludeComponents = DisplayInformation.DisplayExcludeComponents(appSettings);
-            string listOfInternalRepoList = DisplayInformation.GetInternalRepolist(appSettings);
-
-            LoggerHelper.LogInputParameters(caToolInformation, appSettings, listOfInternalRepoList, listOfInclude, listOfExclude, listOfExcludeComponents, "Identifier");
+            
+            var listParameters = new ListofPerametersForCli
+            {
+                InternalRepoList = DisplayInformation.GetInternalRepolist(appSettings),
+                Include = DisplayInformation.DisplayIncludeFiles(appSettings),
+                Exclude = DisplayInformation.DisplayExcludeFiles(appSettings),
+                ExcludeComponents = DisplayInformation.DisplayExcludeComponents(appSettings)
+            };
+            LoggerHelper.LogInputParameters(caToolInformation, appSettings, listParameters, "Identifier");
             
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);

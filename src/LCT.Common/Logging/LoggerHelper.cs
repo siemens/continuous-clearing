@@ -52,72 +52,88 @@ namespace LCT.Common.Logging
                 {
                     WriteInfoWithMarkup("[yellow]Action Item required by the user:[/]\n");
 
-                    if (componentInfo.Count > 0)
-                    {
-                        WriteLine();
-                        WriteInfoWithMarkup("[yellow]* List of components without source download URL:[/]");
-                        WriteInfoWithMarkup("[yellow] Update the source download URL & Upload the source code manually if the SRC attachment is missing for the component[/]");
-                        WriteLine();
+                    DisplayComponentsWithoutUrl(componentInfo, sw360URL);
+                    DisplayNotCreatedComponents(lstReleaseNotCreated);
 
-                        var table = new Table()
-                            .BorderColor(Color.Yellow)
-                            .Border(TableBorder.Rounded)
-                            .Width(Math.Min(GetConsoleWidth(6, 120), 200))
-                            .Expand();
-
-                        table.AddColumns(
-                            new TableColumn("[green]Name[/]").Width(45),
-                            new TableColumn("[blue]Version[/]").Width(25),
-                            new TableColumn("[cyan]SW360 Release URL[/]").Width(120)
-                        );
-
-                        foreach (var item in componentInfo)
-                        {
-                            string link = Sw360URL(sw360URL, item.ReleaseID);
-                            table.AddRow(
-                                Markup.Escape(item.Name),
-                                Markup.Escape(item.Version),
-                                Markup.Escape(link)
-                            );
-                        }
-
-                        AnsiConsole.Write(table);
-                        WriteLine();
-                    }
-
-                    if (lstReleaseNotCreated.Count > 0)
-                    {
-                        WriteLine();
-                        WriteInfoWithMarkup("[yellow]* List of components or releases not created in SW360:[/]");
-                        WriteInfoWithMarkup("[yellow]  There could be network/SW360/FOSSology server problem. Check and Re-Run the pipeline.Check the logs for more details[/]");
-                        WriteLine();
-
-                        var table = new Table()
-                            .BorderColor(Color.Yellow)
-                            .Border(TableBorder.Rounded)
-                            .Width(Math.Min(GetConsoleWidth(6, 120), 120));
-
-                        table.AddColumns(
-                            new TableColumn("[green]Name[/]").Width(45),
-                            new TableColumn("[blue]Version[/]").Width(25)
-                        );
-
-                        foreach (var item in lstReleaseNotCreated)
-                        {
-                            table.AddRow(
-                                Markup.Escape(item.Name),
-                                Markup.Escape(item.Version)
-                            );
-                        }
-
-                        AnsiConsole.Write(table);
-                        WriteLine();
-                    }
-
-                    EnvironmentHelper environmentHelper = new EnvironmentHelper();
+                    var environmentHelper = new EnvironmentHelper();
                     environmentHelper.CallEnvironmentExit(2);
 
                 }, "Components Without Download URL", "Alert");
+            }
+        }
+
+        private static void DisplayComponentsWithoutUrl(List<ComparisonBomData> componentInfo, string sw360URL)
+        {
+            if (componentInfo.Count <= 0) return;
+
+            WriteLine();
+            WriteInfoWithMarkup("[yellow]* List of components without source download URL:[/]");
+            WriteInfoWithMarkup("[yellow] Update the source download URL & Upload the source code manually if the SRC attachment is missing for the component[/]");
+            WriteLine();
+
+            var table = CreateComponentTable(true);
+            PopulateComponentInfoTable(table, componentInfo, sw360URL);
+
+            AnsiConsole.Write(table);
+            WriteLine();
+        }
+
+        private static void DisplayNotCreatedComponents(List<Components> lstReleaseNotCreated)
+        {
+            if (lstReleaseNotCreated.Count <= 0) return;
+
+            WriteLine();
+            WriteInfoWithMarkup("[yellow]* List of components or releases not created in SW360:[/]");
+            WriteInfoWithMarkup("[yellow]  There could be network/SW360/FOSSology server problem. Check and Re-Run the pipeline.Check the logs for more details[/]");
+            WriteLine();
+
+            var table = CreateComponentTable(false);
+            PopulateNotCreatedComponentsTable(table, lstReleaseNotCreated);
+
+            AnsiConsole.Write(table);
+            WriteLine();
+        }
+
+        private static Table CreateComponentTable(bool includeUrl)
+        {
+            var table = new Table()
+                .BorderColor(Color.Yellow)
+                .Border(TableBorder.Rounded)
+                .Width(Math.Min(GetConsoleWidth(6, 120), includeUrl ? 200 : 120));
+
+            table.AddColumn(new TableColumn("[green]Name[/]").Width(45));
+            table.AddColumn(new TableColumn("[blue]Version[/]").Width(25));
+
+            if (includeUrl)
+            {
+                table.AddColumn(new TableColumn("[cyan]SW360 Release URL[/]").Width(120));
+                table.Expand();
+            }
+
+            return table;
+        }
+
+        private static void PopulateComponentInfoTable(Table table, List<ComparisonBomData> componentInfo, string sw360URL)
+        {
+            foreach (var item in componentInfo)
+            {
+                string link = Sw360URL(sw360URL, item.ReleaseID);
+                table.AddRow(
+                    Markup.Escape(item.Name),
+                    Markup.Escape(item.Version),
+                    Markup.Escape(link)
+                );
+            }
+        }
+
+        private static void PopulateNotCreatedComponentsTable(Table table, List<Components> components)
+        {
+            foreach (var item in components)
+            {
+                table.AddRow(
+                    Markup.Escape(item.Name),
+                    Markup.Escape(item.Version)
+                );
             }
         }
         public static void WriteComponentsNotLinkedListTableWithSpectre(List<Components> components)
@@ -252,98 +268,131 @@ namespace LCT.Common.Logging
         }
         public static void DisplayAllSettings(List<Component> componentsInBOM, CommonAppSettings appSettings)
         {
+            var projectTypes = GetProjectTypes(componentsInBOM);
+            var projectConfigMap = CreateProjectConfigMap(appSettings);
+
             if (LoggerFactory.UseSpectreConsole)
             {
-                SafeSpectreAction(() =>
-                {
-                    var projectTypes = componentsInBOM
-                        .Select(item => item.Properties.First(x => x.Name == Dataconstant.Cdx_ProjectType).Value)
-                        .Distinct()
-                        .ToList();
-
-                    string content = $"[green]Current Application Settings[/]\n\n";
-
-                    foreach (var projectType in projectTypes)
-                    {
-                        content += $"[green]-[/] [green]{projectType}[/]\n\n";
-
-                        var projectConfigMap = new Dictionary<string, Config>(StringComparer.OrdinalIgnoreCase)
-                {
-                    { "NPM", appSettings.Npm },
-                    { "NUGET", appSettings.Nuget },
-                    { "MAVEN", appSettings.Maven },
-                    { "DEBIAN", appSettings.Debian },
-                    { "POETRY", appSettings.Poetry },
-                    { "CONAN", appSettings.Conan }
-                };
-
-                        if (projectConfigMap.TryGetValue(projectType, out var config))
-                        {
-                            if (config != null)
-                            {
-                                content += $"  [cyan]DEVDEP_REPO_NAME[/]\n";
-                                content += $"  └──➤ {(!string.IsNullOrEmpty(config.DevDepRepo) ? config.DevDepRepo : Dataconstant.NotConfigured)}\n\n";
-
-                                var thirdPartyRepo = config.Artifactory?.ThirdPartyRepos?.FirstOrDefault(repo => repo.Upload)?.Name ?? Dataconstant.NotConfigured;
-                                content += $"  [cyan]THIRD_PARTY_REPO_NAME[/]\n";
-                                content += $"  └──➤ {thirdPartyRepo}\n\n";
-
-                                content += $"  [cyan]RELEASE_REPO_NAME[/]\n";
-                                content += $"  └──➤ {(!string.IsNullOrEmpty(config.ReleaseRepo) ? config.ReleaseRepo : Dataconstant.NotConfigured)}\n\n";
-
-                                content += $"  [cyan]Config[/]\n";
-
-                                string excludeList = !string.IsNullOrEmpty(config.Exclude?.FirstOrDefault())
-                                    ? string.Join(", ", config.Exclude)
-                                    : Dataconstant.NotConfigured;
-                                string includeList = !string.IsNullOrEmpty(config.Include?.FirstOrDefault())
-                                    ? string.Join(", ", config.Include)
-                                    : Dataconstant.NotConfigured;
-
-                                content += $"  ├──[white]Include[/]\n";
-                                content += $"  │   └──➤ {includeList}\n";
-                                content += $"  └──[white]Exclude[/]\n";
-                                content += $"      └──➤ {excludeList}\n\n";
-                            }
-                        }
-                        else
-                        {
-                            content += $"  └──[red]Invalid ProjectType[/]\n\n";
-                        }
-                    }
-
-                    WriteStyledPanel(content.TrimEnd(), "", "white");
-
-                }, "Current Application Settings", "Info");
+                DisplaySettingsWithSpectre(projectTypes, projectConfigMap);
             }
             else
             {
-                Logger.Info("Current Application Settings:");
+                DisplaySettingsWithLogger(projectTypes, projectConfigMap);
+            }
+        }
 
-                foreach (var projectType in componentsInBOM
-                    .Select(item => item.Properties.First(x => x.Name == Dataconstant.Cdx_ProjectType).Value)
-                    .Distinct())
-                {
-                    Logger.Info($"{projectType}:\n\t");
+        private static List<string> GetProjectTypes(List<Component> componentsInBOM)
+        {
+            return componentsInBOM
+                .Select(item => item.Properties.First(x => x.Name == Dataconstant.Cdx_ProjectType).Value)
+                .Distinct()
+                .ToList();
+        }
 
-                    var projectConfigMap = new Dictionary<string, Config>(StringComparer.OrdinalIgnoreCase)
+        private static Dictionary<string, Config> CreateProjectConfigMap(CommonAppSettings appSettings)
+        {
+            return new Dictionary<string, Config>(StringComparer.OrdinalIgnoreCase)
+    {
+        { "NPM", appSettings.Npm },
+        { "NUGET", appSettings.Nuget },
+        { "MAVEN", appSettings.Maven },
+        { "DEBIAN", appSettings.Debian },
+        { "POETRY", appSettings.Poetry },
+        { "CONAN", appSettings.Conan }
+    };
+        }
+
+        private static void DisplaySettingsWithSpectre(List<string> projectTypes, Dictionary<string, Config> projectConfigMap)
+        {
+            SafeSpectreAction(() =>
             {
-                { "NPM", appSettings.Npm },
-                { "NUGET", appSettings.Nuget },
-                { "MAVEN", appSettings.Maven },
-                { "DEBIAN", appSettings.Debian },
-                { "POETRY", appSettings.Poetry },
-                { "CONAN", appSettings.Conan }
-            };
+                var content = new StringBuilder()
+                    .AppendLine("[green]Current Application Settings[/]\n");
 
-                    if (projectConfigMap.TryGetValue(projectType, out var config))
-                    {
-                        DisplayPackageSettings(config);
-                    }
-                    else
-                    {
-                        Logger.ErrorFormat("DisplayAllSettings(): Invalid ProjectType - {0}", projectType);
-                    }
+                foreach (var projectType in projectTypes)
+                {
+                    AppendProjectTypeSettings(content, projectType, projectConfigMap);
+                }
+
+                WriteStyledPanel(content.ToString().TrimEnd(), "", "white");
+            }, "Current Application Settings", "Info");
+        }
+
+        private static void AppendProjectTypeSettings(StringBuilder content, string projectType, Dictionary<string, Config> projectConfigMap)
+        {
+            content.AppendLine($"[green]-[/] [green]{projectType}[/]\n");
+
+            if (projectConfigMap.TryGetValue(projectType, out var config))
+            {
+                if (config != null)
+                {
+                    AppendConfigSettings(content, config);
+                }
+            }
+            else
+            {
+                content.AppendLine($"  └──[red]Invalid ProjectType[/]\n");
+            }
+        }
+
+        private static void AppendConfigSettings(StringBuilder content, Config config)
+        {
+            AppendRepoSettings(content, config);
+            AppendIncludeExcludeSettings(content, config);
+        }
+
+        private static void AppendRepoSettings(StringBuilder content, Config config)
+        {
+            content
+                .AppendLine($"  [cyan]DEVDEP_REPO_NAME[/]")
+                .AppendLine($"  └──➤ {(!string.IsNullOrEmpty(config.DevDepRepo) ? config.DevDepRepo : Dataconstant.NotConfigured)}\n")
+                .AppendLine($"  [cyan]THIRD_PARTY_REPO_NAME[/]")
+                .AppendLine($"  └──➤ {GetThirdPartyRepoName(config)}\n")
+                .AppendLine($"  [cyan]RELEASE_REPO_NAME[/]")
+                .AppendLine($"  └──➤ {(!string.IsNullOrEmpty(config.ReleaseRepo) ? config.ReleaseRepo : Dataconstant.NotConfigured)}\n")
+                .AppendLine($"  [cyan]Config[/]");
+        }
+
+        private static string GetThirdPartyRepoName(Config config)
+        {
+            return config.Artifactory?.ThirdPartyRepos?
+                .FirstOrDefault(repo => repo.Upload)?.Name ?? Dataconstant.NotConfigured;
+        }
+
+        private static void AppendIncludeExcludeSettings(StringBuilder content, Config config)
+        {
+            var excludeList = GetFormattedList(config.Exclude);
+            var includeList = GetFormattedList(config.Include);
+
+            content
+                .AppendLine($"  ├──[white]Include[/]")
+                .AppendLine($"  │   └──➤ {includeList}")
+                .AppendLine($"  └──[white]Exclude[/]")
+                .AppendLine($"      └──➤ {excludeList}\n");
+        }
+
+        private static string GetFormattedList(string[] items)
+        {
+            return !string.IsNullOrEmpty(items?.FirstOrDefault())
+                ? string.Join(", ", items)
+                : Dataconstant.NotConfigured;
+        }
+
+        private static void DisplaySettingsWithLogger(List<string> projectTypes, Dictionary<string, Config> projectConfigMap)
+        {
+            Logger.Info("Current Application Settings:");
+
+            foreach (var projectType in projectTypes)
+            {
+                Logger.Info($"{projectType}:\n\t");
+
+                if (projectConfigMap.TryGetValue(projectType, out var config))
+                {
+                    DisplayPackageSettings(config);
+                }
+                else
+                {
+                    Logger.ErrorFormat("DisplayAllSettings(): Invalid ProjectType - {0}", projectType);
                 }
             }
         }
@@ -384,126 +433,187 @@ namespace LCT.Common.Logging
                 $"\t\tExclude:\t\t{excludeList}\n" +
                 $"\t\tInclude:\t\t{includeList}\n", null);
         }
-        public static void DisplayInputParametersWithSpectreConsole(CatoolInfo caToolInformation, CommonAppSettings appSettings, string listOfInternalRepoList, string listOfInclude, string listOfExclude, string listOfExcludeComponents, string exeType,string bomFilePath)
+        public static void DisplayInputParametersWithSpectreConsole(CatoolInfo caToolInformation, CommonAppSettings appSettings,
+    ListofPerametersForCli listofPerameters, string exeType, string bomFilePath)
         {
-            string content = string.Empty;
-            if (exeType== "Identifier") 
-            {
-                int consoleWidth = GetConsoleWidth(10, 110);
-                int maxPathLength = Math.Max(60, consoleWidth - 20);
-
-                content = $"Start of Package Identifier execution: [green]{DateTime.Now}[/]\n\n";
-                content += $"[green]-[/] [yellow]Input Parameters used in Package Identifier[/]\n\n";
-
-                content += $"[green]-[/] [cyan]CaToolVersion[/]\n";
-                content += $"  └──✅ {caToolInformation.CatoolVersion}\n\n";
-                content += $"[green]-[/] [cyan]CaToolRunningPath[/]\n";
-                content += $"  └──➤ {WrapPath(caToolInformation.CatoolRunningLocation, maxPathLength)}\n\n";
-                content += $"[green]-[/] [cyan]PackageFilePath[/]\n";
-                content += $"  └──➤ {WrapPath(appSettings.Directory.InputFolder, maxPathLength)}\n\n";
-                content += $"[green]-[/] [cyan]BomFolderPath[/]\n";
-                content += $"  └──➤ {WrapPath(appSettings.Directory.OutputFolder, maxPathLength)}\n\n";
-
-                if (appSettings.SW360 != null)
-                {
-                    content += $"[green]-[/] [cyan]SW360Url[/]\n";
-                    content += $"  └──➤ {appSettings.SW360.URL}\n\n";
-
-                    content += $"[green]-[/] [cyan]SW360AuthTokenType[/]\n";
-                    content += $"  └──➤ {appSettings.SW360.AuthTokenType}\n\n";
-
-                    content += $"[green]-[/] [cyan]SW360ProjectName[/]\n";
-                    content += $"  └──➤ {appSettings.SW360.ProjectName}\n\n";
-
-                    content += $"[green]-[/] [cyan]SW360ProjectID[/]\n";
-                    content += $"  └──➤ {appSettings.SW360.ProjectID}\n\n";
-
-                    content += $"[green]-[/] [cyan]ExcludeComponents[/]\n";
-                    content += $"  └──➤ {WrapPath(string.IsNullOrEmpty(listOfExcludeComponents) ? "None" : listOfExcludeComponents, maxPathLength)}\n\n";
-                }
-
-                if (appSettings.Jfrog != null)
-                {
-                    content += $"[green]-[/] [cyan]InternalRepoList[/]\n";
-                    content += $"  └──➤ {WrapPath(string.IsNullOrEmpty(listOfInternalRepoList) ? "None" : listOfInternalRepoList, maxPathLength)}\n\n";
-                }
-
-                content += $"[green]-[/] [cyan]ProjectType[/]\n";
-                content += $"  └──➤ {appSettings.ProjectType}\n\n";
-
-                content += $"[green]-[/] [cyan]LogFolderPath[/]\n";
-                content += $"  └──➤ {WrapPath(Log4Net.CatoolLogPath, maxPathLength)}\n\n";
-
-                content += $"[green]-[/] [cyan]Include[/]\n";
-                content += $"  └──➤ {WrapPath(string.IsNullOrEmpty(listOfInclude) ? "None" : listOfInclude, maxPathLength)}\n\n";
-
-                content += $"[green]-[/] [cyan]Exclude[/]\n";
-                content += $"  └──➤ {WrapPath(string.IsNullOrEmpty(listOfExclude) ? "None" : listOfExclude, maxPathLength)}";
-
-            }else if (exeType == "Creator")
-            {
-                int consoleWidth = GetConsoleWidth(10, 110);
-                int maxPathLength = Math.Max(60, consoleWidth - 20);
-
-                content = $"Start of Package Creater execution: [green]{DateTime.Now}[/]\n\n";
-                content += $"[green]-[/] [yellow]Input parameters used in Package Creater[/]\n\n";
-                content += $"[green]-[/] [cyan]CaToolVersion[/]\n";
-                content += $"  └──✅ {caToolInformation.CatoolVersion}\n\n";
-                content += $"[green]-[/] [cyan]CaToolRunningPath[/]\n";
-                content += $"  └──➤ {WrapPath(caToolInformation.CatoolRunningLocation, maxPathLength)}\n\n";
-                content += $"[green]-[/] [cyan]BomFilePath[/]\n";
-                content += $"  └──➤ {WrapPath(bomFilePath, maxPathLength)}\n\n";
-                content += $"[green]-[/] [cyan]SW360Url[/]\n";
-                content += $"  └──➤ {appSettings.SW360.URL}\n\n";
-                content += $"[green]-[/] [cyan]SW360AuthTokenType[/]\n";
-                content += $"  └──➤ {appSettings.SW360.AuthTokenType}\n\n";
-                content += $"[green]-[/] [cyan]SW360ProjectName[/]\n";
-                content += $"  └──➤ {appSettings.SW360.ProjectName}\n\n";
-                content += $"[green]-[/] [cyan]SW360ProjectID[/]\n";
-                content += $"  └──➤ {appSettings.SW360.ProjectID}\n\n";
-                content += $"[green]-[/] [cyan]FossologyURL[/]\n";
-                content += $"  └──➤ {appSettings.SW360.Fossology.URL}\n\n";
-                content += $"[green]-[/] [cyan]EnableFossTrigger[/]\n";
-                content += $"  └──➤ {appSettings.SW360.Fossology.EnableTrigger}\n\n";
-                content += $"[green]-[/] [cyan]IgnoreDevDependency[/]\n";
-                content += $"  └──➤ {appSettings.SW360.IgnoreDevDependency}\n\n";
-                content += $"[green]-[/] [cyan]LogFolderPath[/]\n";
-                content += $"  └──➤ {WrapPath(Log4Net.CatoolLogPath, maxPathLength)}\n\n";
-            }
-            else if (exeType == "Uploader")
-            {
-                int consoleWidth = GetConsoleWidth(10, 110);
-                int maxPathLength = Math.Max(60, consoleWidth - 20);
-
-                content = $"Start of {exeType} execution: [green]{DateTime.Now}[/]\n\n";
-                content += $"[green]-[/] [yellow]Input Parameters used in Artifactory Uploader[/]\n\n";
-                content += $"[green]-[/] [cyan]CaToolVersion[/]\n";
-                content += $"  └──✅ {caToolInformation.CatoolVersion}\n\n";
-                content += $"[green]-[/] [cyan]CaToolRunningPath[/]\n";
-                content += $"  └──➤ {WrapPath(caToolInformation.CatoolRunningLocation, maxPathLength)}\n\n";
-                content += $"[green]-[/] [cyan]BomFilePath[/]\n";
-                content += $"  └──➤ {WrapPath(bomFilePath, maxPathLength)}\n\n";
-                content += $"[green]-[/] [cyan]JFrogUrl[/]\n";
-                content += $"  └──➤ {appSettings.Jfrog.URL}\n\n";
-                content += $"[green]-[/] [cyan]Dry-run[/]\n";
-                content += $"  └──➤ {appSettings.Jfrog.DryRun}\n\n";
-                content += $"[green]-[/] [cyan]LogFolderPath[/]\n";
-                content += $"  └──➤ {WrapPath(Log4Net.CatoolLogPath, maxPathLength)}\n\n";
-            }
-             WriteStyledPanel(content);
+            string content = GenerateContentByExeType(caToolInformation, appSettings, listofPerameters, exeType, bomFilePath);
+            WriteStyledPanel(content);
         }
-        public static void LogInputParameters(CatoolInfo caToolInformation, CommonAppSettings appSettings, string listOfInternalRepoList=null, string listOfInclude = null, string listOfExclude = null, string listOfExcludeComponents = null,string exeType = null,string bomFilePath=null)
+
+        private static string GenerateContentByExeType(CatoolInfo caToolInformation, CommonAppSettings appSettings,
+            ListofPerametersForCli listofPerameters, string exeType, string bomFilePath)
         {
+            return exeType switch
+            {
+                "Identifier" => GenerateIdentifierContent(caToolInformation, appSettings, listofPerameters),
+                "Creator" => GenerateCreatorContent(caToolInformation, appSettings, bomFilePath),
+                "Uploader" => GenerateUploaderContent(caToolInformation, appSettings, bomFilePath),
+                _ => string.Empty
+            };
+        }
+
+        private static void AppendDirectoryInfo(StringBuilder content, CommonAppSettings appSettings, int maxPathLength)
+        {
+            content
+                .Append($"[green]-[/] [cyan]PackageFilePath[/]\n")
+                .Append($"  └──➤ {WrapPath(appSettings.Directory.InputFolder, maxPathLength)}\n\n")
+                .Append($"[green]-[/] [cyan]BomFolderPath[/]\n")
+                .Append($"  └──➤ {WrapPath(appSettings.Directory.OutputFolder, maxPathLength)}\n\n");
+        }
+
+        private static void AppendBasicInfo(StringBuilder content, CatoolInfo caToolInformation, int maxPathLength)
+        {
+            content
+                .Append($"[green]-[/] [cyan]CaToolVersion[/]\n")
+                .Append($"  └──✅ {caToolInformation.CatoolVersion}\n\n")
+                .Append($"[green]-[/] [cyan]CaToolRunningPath[/]\n")
+                .Append($"  └──➤ {WrapPath(caToolInformation.CatoolRunningLocation, maxPathLength)}\n\n");
+        }
+
+        private static void AppendSw360Info(StringBuilder content, CommonAppSettings appSettings,
+            ListofPerametersForCli listofPerameters, int maxPathLength)
+        {
+            content
+                .Append($"[green]-[/] [cyan]SW360Url[/]\n")
+                .Append($"  └──➤ {appSettings.SW360.URL}\n\n")
+                .Append($"[green]-[/] [cyan]SW360AuthTokenType[/]\n")
+                .Append($"  └──➤ {appSettings.SW360.AuthTokenType}\n\n")
+                .Append($"[green]-[/] [cyan]SW360ProjectName[/]\n")
+                .Append($"  └──➤ {appSettings.SW360.ProjectName}\n\n")
+                .Append($"[green]-[/] [cyan]SW360ProjectID[/]\n")
+                .Append($"  └──➤ {appSettings.SW360.ProjectID}\n\n")
+                .Append($"[green]-[/] [cyan]ExcludeComponents[/]\n")
+                .Append($"  └──➤ {WrapPath(string.IsNullOrEmpty(listofPerameters.ExcludeComponents) ? "None" : listofPerameters.ExcludeComponents, maxPathLength)}\n\n");
+        }
+
+        private static void AppendCommonInfo(StringBuilder content, CommonAppSettings appSettings,
+            ListofPerametersForCli listofPerameters, int maxPathLength)
+        {
+            content
+                .Append($"[green]-[/] [cyan]ProjectType[/]\n")
+                .Append($"  └──➤ {appSettings.ProjectType}\n\n")
+                .Append($"[green]-[/] [cyan]LogFolderPath[/]\n")
+                .Append($"  └──➤ {WrapPath(Log4Net.CatoolLogPath, maxPathLength)}\n\n")
+                .Append($"[green]-[/] [cyan]Include[/]\n")
+                .Append($"  └──➤ {WrapPath(string.IsNullOrEmpty(listofPerameters.Include) ? "None" : listofPerameters.Include, maxPathLength)}\n\n")
+                .Append($"[green]-[/] [cyan]Exclude[/]\n")
+                .Append($"  └──➤ {WrapPath(string.IsNullOrEmpty(listofPerameters.Exclude) ? "None" : listofPerameters.Exclude, maxPathLength)}");
+        }
+
+        private static string GenerateIdentifierContent(CatoolInfo caToolInformation, CommonAppSettings appSettings,
+            ListofPerametersForCli listofPerameters)
+        {
+            int consoleWidth = GetConsoleWidth(10, 110);
+            int maxPathLength = Math.Max(60, consoleWidth - 20);
+            var content = new StringBuilder();
+
+            content
+                .Append($"Start of Package Identifier execution: [green]{DateTime.Now}[/]\n\n")
+                .Append($"[green]-[/] [yellow]Input Parameters used in Package Identifier[/]\n\n");
+
+            AppendBasicInfo(content, caToolInformation, maxPathLength);
+            AppendDirectoryInfo(content, appSettings, maxPathLength);
+
+            if (appSettings.SW360 != null)
+            {
+                AppendSw360Info(content, appSettings, listofPerameters, maxPathLength);
+            }
+
+            if (appSettings.Jfrog != null)
+            {
+                content
+                    .Append($"[green]-[/] [cyan]InternalRepoList[/]\n")
+                    .Append($"  └──➤ {WrapPath(string.IsNullOrEmpty(listofPerameters.InternalRepoList) ? "None" : listofPerameters.InternalRepoList, maxPathLength)}\n\n");
+            }
+
+            AppendCommonInfo(content, appSettings, listofPerameters, maxPathLength);
+
+            return content.ToString();
+        }
+
+        private static string GenerateCreatorContent(CatoolInfo caToolInformation, CommonAppSettings appSettings, string bomFilePath)
+        {
+            int consoleWidth = GetConsoleWidth(10, 110);
+            int maxPathLength = Math.Max(60, consoleWidth - 20);
+            var content = new StringBuilder();
+
+            content
+                .Append($"Start of Package Creater execution: [green]{DateTime.Now}[/]\n\n")
+                .Append($"[green]-[/] [yellow]Input parameters used in Package Creater[/]\n\n");
+
+            AppendBasicInfo(content, caToolInformation, maxPathLength);
+            AppendCreatorSpecificInfo(content, appSettings, bomFilePath, maxPathLength);
+
+            return content.ToString();
+        }
+
+        private static string GenerateUploaderContent(CatoolInfo caToolInformation, CommonAppSettings appSettings, string bomFilePath)
+        {
+            int consoleWidth = GetConsoleWidth(10, 110);
+            int maxPathLength = Math.Max(60, consoleWidth - 20);
+            var content = new StringBuilder();
+
+            content
+                .Append($"Start of Uploader execution: [green]{DateTime.Now}[/]\n\n")
+                .Append($"[green]-[/] [yellow]Input Parameters used in Artifactory Uploader[/]\n\n");
+
+            AppendBasicInfo(content, caToolInformation, maxPathLength);
+            AppendUploaderSpecificInfo(content, appSettings, bomFilePath, maxPathLength);
+
+            return content.ToString();
+        }
+
+        private static void AppendCreatorSpecificInfo(StringBuilder content, CommonAppSettings appSettings,
+    string bomFilePath, int maxPathLength)
+        {
+            content
+                .Append($"[green]-[/] [cyan]BomFilePath[/]\n")
+                .Append($"  └──➤ {WrapPath(bomFilePath, maxPathLength)}\n\n")
+                .Append($"[green]-[/] [cyan]SW360Url[/]\n")
+                .Append($"  └──➤ {appSettings.SW360.URL}\n\n")
+                .Append($"[green]-[/] [cyan]SW360AuthTokenType[/]\n")
+                .Append($"  └──➤ {appSettings.SW360.AuthTokenType}\n\n")
+                .Append($"[green]-[/] [cyan]SW360ProjectName[/]\n")
+                .Append($"  └──➤ {appSettings.SW360.ProjectName}\n\n")
+                .Append($"[green]-[/] [cyan]SW360ProjectID[/]\n")
+                .Append($"  └──➤ {appSettings.SW360.ProjectID}\n\n")
+                .Append($"[green]-[/] [cyan]FossologyURL[/]\n")
+                .Append($"  └──➤ {appSettings.SW360.Fossology.URL}\n\n")
+                .Append($"[green]-[/] [cyan]EnableFossTrigger[/]\n")
+                .Append($"  └──➤ {appSettings.SW360.Fossology.EnableTrigger}\n\n")
+                .Append($"[green]-[/] [cyan]IgnoreDevDependency[/]\n")
+                .Append($"  └──➤ {appSettings.SW360.IgnoreDevDependency}\n\n")
+                .Append($"[green]-[/] [cyan]LogFolderPath[/]\n")
+                .Append($"  └──➤ {WrapPath(Log4Net.CatoolLogPath, maxPathLength)}\n\n");
+        }
+
+
+        private static void AppendUploaderSpecificInfo(StringBuilder content, CommonAppSettings appSettings,
+    string bomFilePath, int maxPathLength)
+        {
+            content
+                .Append($"[green]-[/] [cyan]BomFilePath[/]\n")
+                .Append($"  └──➤ {WrapPath(bomFilePath, maxPathLength)}\n\n")
+                .Append($"[green]-[/] [cyan]JFrogUrl[/]\n")
+                .Append($"  └──➤ {appSettings.Jfrog.URL}\n\n")
+                .Append($"[green]-[/] [cyan]Dry-run[/]\n")
+                .Append($"  └──➤ {appSettings.Jfrog.DryRun}\n\n")
+                .Append($"[green]-[/] [cyan]LogFolderPath[/]\n")
+                .Append($"  └──➤ {WrapPath(Log4Net.CatoolLogPath, maxPathLength)}\n\n");
+        }
+        public static void LogInputParameters(CatoolInfo caToolInformation, CommonAppSettings appSettings, ListofPerametersForCli listofPerameters, string exeType = null, string bomFilePath = null)
+        {
+
             if (LoggerFactory.UseSpectreConsole)
             {
-                DisplayInputParametersWithSpectreConsole(caToolInformation, appSettings, listOfInternalRepoList, listOfInclude, listOfExclude, listOfExcludeComponents,exeType,bomFilePath);
+                DisplayInputParametersWithSpectreConsole(caToolInformation, appSettings, listofPerameters, exeType, bomFilePath);
             }
             else
             {
-                LogInputParametersWithLog4net(caToolInformation, appSettings, listOfInternalRepoList, listOfInclude, listOfExclude, listOfExcludeComponents,exeType,bomFilePath);
+                LogInputParametersWithLog4net(caToolInformation, appSettings, listofPerameters, exeType, bomFilePath);
             }
         }
-        private static void LogInputParametersWithLog4net(CatoolInfo caToolInformation, CommonAppSettings appSettings, string listOfInternalRepoList, string listOfInclude, string listOfExclude, string listOfExcludeComponents,string exeType,string bomFilePath)
+        private static void LogInputParametersWithLog4net(CatoolInfo caToolInformation, CommonAppSettings appSettings, ListofPerametersForCli listofPerameters, string exeType, string bomFilePath)
         {
             if (exeType == "Identifier")
             {
@@ -519,20 +629,21 @@ namespace LCT.Common.Logging
                               $"SW360AuthTokenType\t --> {appSettings.SW360.AuthTokenType}\n\t" +
                               $"SW360ProjectName\t --> {appSettings.SW360.ProjectName}\n\t" +
                               $"SW360ProjectID\t\t --> {appSettings.SW360.ProjectID}\n\t" +
-                              $"ExcludeComponents\t --> {listOfExcludeComponents}\n\t";
+                              $"ExcludeComponents\t --> {listofPerameters.ExcludeComponents}\n\t";
                 }
                 if (appSettings.Jfrog != null)
                 {
-                    logMessage += $"InternalRepoList\t --> {listOfInternalRepoList}\n\t";
+                    logMessage += $"InternalRepoList\t --> {listofPerameters.InternalRepoList}\n\t";
                 }
 
                 logMessage += $"ProjectType\t\t --> {appSettings.ProjectType}\n\t" +
                               $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t" +
-                              $"Include\t\t\t --> {listOfInclude}\n\t" +
-                              $"Exclude\t\t\t --> {listOfExclude}\n";
+                              $"Include\t\t\t --> {listofPerameters.Include}\n\t" +
+                              $"Exclude\t\t\t --> {listofPerameters.Exclude}\n";
 
                 Logger.Logger.Log(null, Level.Notice, logMessage, null);
-            }else if (exeType == "Creator")
+            }
+            else if (exeType == "Creator")
             {
                 Logger.Logger.Log(null, Level.Notice, $"Input parameters used in Package Creator:\n\t" +
                               $"CaToolVersion\t\t --> {caToolInformation.CatoolVersion}\n\t" +
@@ -645,7 +756,7 @@ namespace LCT.Common.Logging
                     break;
                 case "error":
                     Logger.Error(logMessage);
-                    break;                
+                    break;
                 default:
                     Logger.Info(logMessage);
                     break;
@@ -809,7 +920,7 @@ namespace LCT.Common.Logging
             _colorIndex++;
 
             return assignedColor;
-        }        
+        }
 
         public static void WriteInternalComponentsTableInCli(List<Component> internalComponents)
         {
@@ -880,7 +991,7 @@ namespace LCT.Common.Logging
                 Logger.Info("\n");
             }
         }
-        
+
         public static void SpectreConsoleInitialMessage(string message)
         {
             if (LoggerFactory.UseSpectreConsole)
@@ -938,7 +1049,7 @@ namespace LCT.Common.Logging
                 Logger.Logger.Log(null, Level.Notice, $"\tInitiating FOSSology process for: Release : Name - {formattedName} , version - {item.Version}", null);
             }
         }
-        public static void WriteFossologystatusMessage(string message)
+        public static void WriteFossologyStatusMessage(string message)
         {
             if (LoggerFactory.UseSpectreConsole)
             {
@@ -962,7 +1073,7 @@ namespace LCT.Common.Logging
                 Logger.Error($"\t{message}");
             }
         }
-        public static void WriteComponentstatusMessage(string message,ComparisonBomData item)
+        public static void WriteComponentStatusMessage(string message, ComparisonBomData item)
         {
             if (LoggerFactory.UseSpectreConsole)
             {
@@ -971,6 +1082,18 @@ namespace LCT.Common.Logging
             else
             {
                 Logger.Logger.Log(null, Level.Notice, $"{message}: Name - {item.Name} , version - {item.Version}", null);
+            }
+        }
+
+        public static void WriteFossologySucessStatusMessage(string message, string formattedName,ComparisonBomData item)
+        {
+            if (LoggerFactory.UseSpectreConsole)
+            {
+                WriteInfoWithMarkup($"   [white]└──[/][green]{message}[/]: Name - [cyan]{formattedName}[/] , version - [cyan]{item.Version}[/]");
+            }
+            else
+            {
+                Logger.Logger.Log(null, Level.Info, $"\n{message} : Name - {formattedName}, version - {item.Version}", null);
             }
         }
     }
