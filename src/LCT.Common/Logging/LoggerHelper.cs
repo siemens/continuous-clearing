@@ -445,8 +445,8 @@ namespace LCT.Common.Logging
                 int consoleWidth = GetConsoleWidth(10, 110);
                 int maxPathLength = Math.Max(60, consoleWidth - 20);
 
-                content = $"Start of {exeType} execution: [green]{DateTime.Now}[/]\n\n";
-                content += $"[green]-[/] [yellow]Input parameters used in {exeType}[/]\n\n";
+                content = $"Start of Package Creater execution: [green]{DateTime.Now}[/]\n\n";
+                content += $"[green]-[/] [yellow]Input parameters used in Package Creater[/]\n\n";
                 content += $"[green]-[/] [cyan]CaToolVersion[/]\n";
                 content += $"  └──✅ {caToolInformation.CatoolVersion}\n\n";
                 content += $"[green]-[/] [cyan]CaToolRunningPath[/]\n";
@@ -926,6 +926,52 @@ namespace LCT.Common.Logging
         public static void WriteInfoWithMarkup(string message)
         {
             SafeSpectreAction(() => AnsiConsole.MarkupLine(message), message, "Info");
+        }
+        public static void WriteFossologyProcessInitializeMessage(string formattedName, ComparisonBomData item)
+        {
+            if (LoggerFactory.UseSpectreConsole)
+            {
+                Logger.Logger.Log(null, Level.Notice, $"  ├── Initiating FOSSology process for: Release : Name - [cyan]{formattedName}[/] , version - [cyan]{item.Version}[/]", null);
+            }
+            else
+            {
+                Logger.Logger.Log(null, Level.Notice, $"\tInitiating FOSSology process for: Release : Name - {formattedName} , version - {item.Version}", null);
+            }
+        }
+        public static void WriteFossologystatusMessage(string message)
+        {
+            if (LoggerFactory.UseSpectreConsole)
+            {
+                WriteInfoWithMarkup($"   [white]└──[/][yellow]{message}[/]");
+                Logger.Debug($"   └── {message}");
+            }
+            else
+            {
+                Logger.Warn($"\t{message}");
+            }
+        }
+        public static void WriteFossologyExceptionMessage(string message)
+        {
+            if (LoggerFactory.UseSpectreConsole)
+            {
+                WriteInfoWithMarkup($"   [white]└──[/][red]{message}[/]");
+                Logger.Debug($"   └── {message}");
+            }
+            else
+            {
+                Logger.Error($"\t{message}");
+            }
+        }
+        public static void WriteComponentstatusMessage(string message,ComparisonBomData item)
+        {
+            if (LoggerFactory.UseSpectreConsole)
+            {
+                WriteInfoWithMarkup($" {message}: Name - [cyan]{item.Name}[/] , version - [cyan]{item.Version}[/]");
+            }
+            else
+            {
+                Logger.Logger.Log(null, Level.Notice, $"{message}: Name - {item.Name} , version - {item.Version}", null);
+            }
         }
     }
 }

@@ -5,7 +5,9 @@ using log4net.Repository;
 using Spectre.Console;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Globalization;
+using Color = Spectre.Console.Color;
 
 namespace LCT.Common
 {
@@ -248,7 +250,8 @@ namespace LCT.Common
                     fileLogger.Info(message, exception);
                     break;
                 case "NOTICE":
-                    fileLogger.Info(message, exception);
+                    AnsiConsole.MarkupLine($"[white] {message}[/]");
+                    fileLogger.Debug(message, exception);
                     break;
                 case "WARN":
                     fileLogger.Warn(message, exception);
