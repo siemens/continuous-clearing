@@ -5,7 +5,9 @@ using log4net.Repository;
 using Spectre.Console;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Globalization;
+using Color = Spectre.Console.Color;
 
 namespace LCT.Common
 {
@@ -237,13 +239,44 @@ namespace LCT.Common
         }
 
         public void Log(Type callerStackBoundaryDeclaringType, Level level, object message, Exception exception)
-        {
-            // Choose color based on log level
-            string color = GetColorForLevel(level);
+        {           
+            var fileLogger = LogManager.GetLogger(_loggerName);
+            switch (level.Name.ToUpperInvariant())
+            {
+                case "DEBUG":
+                    fileLogger.Debug(message, exception);
+                    break;
+                case "INFO":
+                    fileLogger.Info(message, exception);
+                    break;
+                case "NOTICE":
+                    AnsiConsole.MarkupLine($"[white] {message}[/]");
+                    fileLogger.Debug(message, exception);
+                    break;
+                case "WARN":
+                    fileLogger.Warn(message, exception);
+                    break;
+                case "ERROR":
+                    fileLogger.Error(message, exception);
+                    break;
+                case "FATAL":
+                    fileLogger.Fatal(message, exception);
+                    break;
+                case "ALERT":
+                    fileLogger.Warn(message, exception);
+                    break;
+                case "CRITICAL":
+                    fileLogger.Fatal(message, exception);
+                    break;
+                case "EMERGENCY":
+                    fileLogger.Fatal(message, exception);
+                    break;
+                default:
+                    fileLogger.Info(message, exception);
+                    break;
+            }
 
-            // Format and display the message
-            AnsiConsole.MarkupLine($"[{color}] {message}[/]");
-
+            // Handle exception if present
             if (exception != null)
             {
                 AnsiConsole.WriteException(exception, new ExceptionSettings
@@ -263,31 +296,6 @@ namespace LCT.Common
                 });
             }
         }
-
-        private static string GetColorForLevel(Level level)
-        {
-            if (level == Level.Debug)
-                return "blue";
-            if (level == Level.Info)
-                return "green";
-            if (level == Level.Notice)
-                return "cyan";
-            if (level == Level.Warn)
-                return "yellow";
-            if (level == Level.Error)
-                return "red";
-            if (level == Level.Fatal)
-                return "red bold";
-            if (level == Level.Alert)
-                return "yellow";
-            if (level == Level.Critical)
-                return "red bold underline";
-            if (level == Level.Emergency)
-                return "red bold underline";
-
-            return "white";
-        }
-
         void ILogger.Log(LoggingEvent logEvent)
         {
             throw new NotImplementedException();

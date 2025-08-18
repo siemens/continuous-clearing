@@ -11,6 +11,7 @@ using LCT.APICommunications.Model.Foss;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
+using LCT.Common.Logging;
 using LCT.Common.Model;
 using LCT.Services.Interface;
 using LCT.Services.Model;
@@ -33,7 +34,7 @@ namespace LCT.SW360PackageCreator
     /// </summary>
     public class ComponentCreator : IComponentCreator
     {
-        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private static readonly CreatorKpiData s_kpiData = new();
         public static CreatorKpiData KpiData => s_kpiData;
@@ -268,7 +269,7 @@ namespace LCT.SW360PackageCreator
             creatorHelper.WriteSourceNotFoundListToConsole(UpdatedCompareBomData, appSettings);
 
             //write list of components which are not linked
-            CommonHelper.WriteComponentsNotLinkedListInConsole(ComponentsNotLinked);
+            LoggerHelper.WriteComponentsNotLinkedListInConsole(ComponentsNotLinked);
 
             Logger.Debug($"CreateComponentInSw360():End");
         }
@@ -351,7 +352,7 @@ namespace LCT.SW360PackageCreator
         {
             if (item.ComponentStatus == Dataconstant.NotAvailable && item.ReleaseStatus == Dataconstant.NotAvailable)
             {
-                Logger.Logger.Log(null, Level.Notice, $"Creating the Component & Release : Name - {item.Name} , version - {item.Version}", null);
+                LoggerHelper.WriteComponentstatusMessage("Creating the Component & Release ", item);
                 var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(item);
 
                 if (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]) && !attachmentUrlList.ContainsKey("SOURCE"))
@@ -390,7 +391,7 @@ namespace LCT.SW360PackageCreator
 
                 if (!fossologyUpload)
                 {
-                    Logger.Logger.Log(null, Level.Notice, $"\tInitiating FOSSology process for: Release : Name - {formattedName} , version - {item.Version}", null);
+                    LoggerHelper.WriteFossologyProcessInitializeMessage(formattedName,item);                    
                     string uploadId;
                     uploadId = await TriggerFossologyProcess(item, sw360CreatorService, appSettings);
 
@@ -400,7 +401,7 @@ namespace LCT.SW360PackageCreator
                     }
                     else
                     {
-                        await UpdateFossologyLinkAndStatus(item, sw360CreatorService, appSettings, formattedName, uploadId, "\t✅ Fossology upload completed successfully for release");
+                        await UpdateFossologyLinkAndStatus(item, sw360CreatorService, appSettings, formattedName, uploadId, "\t└── ✅ Fossology upload completed successfully for release");
                     }
                 }
             }
@@ -414,7 +415,7 @@ namespace LCT.SW360PackageCreator
         {
             if (item.ComponentStatus == Dataconstant.Available && item.ReleaseStatus == Dataconstant.NotAvailable)
             {
-                Logger.Logger.Log(null, Level.Notice, $"Creating Release : Name - {item.Name} , version - {item.Version}", null);
+                LoggerHelper.WriteComponentstatusMessage("Creating Release ",item);
                 var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(item);
 
                 if (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]) && !attachmentUrlList.ContainsKey("SOURCE"))
@@ -506,17 +507,20 @@ namespace LCT.SW360PackageCreator
                     }
                     if (fossResult.Status == "FAILURE" && string.IsNullOrEmpty(uploadId))
                     {
-                        Logger.Logger.Log(null, Level.Warn, $"\t❌ Fossology upload failed for release", null);
+                        string message = $" ❌ Fossology upload failed for release";
+                        LoggerHelper.WriteFossologystatusMessage(message);
                     }
                     else if (fossResult.Status == "PROCESSING" && string.IsNullOrEmpty(uploadId))
                     {
-                        Logger.Logger.Log(null, Level.Warn, $"\t⏳ Fossology upload is still processing. Upload ID is not yet available. Please wait and re-run the pipeline later.", null);
+                        string message = $" ⏳ Fossology upload is still processing. Upload ID is not yet available. Please wait and re-run the pipeline later.";
+                        LoggerHelper.WriteFossologystatusMessage(message);
                     }
                 }
                 else
                 {
                     var formattedName = GetFormattedName(item);
-                    Logger.Logger.Log(null, Level.Warn, $"\t❌ Fossology upload failed  for Release : Name - {formattedName} , version - {item.Version}", null);
+                    string message = $" ❌ Fossology upload failed  for Release : Name - {formattedName} , version - {item.Version}";
+                    LoggerHelper.WriteFossologystatusMessage(message);
                 }
             }
             catch (AggregateException ex)
@@ -565,7 +569,7 @@ namespace LCT.SW360PackageCreator
         {
             if (item.ComponentStatus == Dataconstant.Available && item.ReleaseStatus == Dataconstant.Available)
             {
-                Logger.Logger.Log(null, Level.Notice, $"Release exists in SW360 : Name - {item.Name} , version - {item.Version}", null);
+                LoggerHelper.WriteComponentstatusMessage("Release exists in SW360 ", item);
                 string releaseLink = item.ReleaseLink ?? string.Empty;
                 string releaseId = CommonHelper.GetSubstringOfLastOccurance(releaseLink, "/");
                 if (!string.IsNullOrWhiteSpace(releaseId))

@@ -4,6 +4,7 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using LCT.Common.Logging;
 using log4net;
 using log4net.Core;
 using System;
@@ -33,7 +34,8 @@ namespace LCT.Common
         }
         public static void FossologyException(HttpRequestException ex)
         {
-            Logger.Logger.Log(null, Level.Error, $"\tThe Fossology process could not be completed. Exception: {ex.Message}", null);
+            string message = $" The Fossology process could not be completed. Exception: {ex.Message}";
+            LoggerHelper.WriteFossologyExceptionMessage(message);
         }
 
         public static void ArgumentException(string message)

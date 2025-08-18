@@ -6,6 +6,7 @@
 using ICSharpCode.SharpZipLib.BZip2;
 using ICSharpCode.SharpZipLib.GZip;
 using ICSharpCode.SharpZipLib.Tar;
+using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Model;
 using LCT.SW360PackageCreator.Interfaces;
@@ -18,6 +19,7 @@ using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
 using File = System.IO.File;
+using Directory = System.IO.Directory;
 
 namespace LCT.SW360PackageCreator
 {
@@ -27,7 +29,7 @@ namespace LCT.SW360PackageCreator
     public class AlpinePackageDownloader : IPackageDownloader
     {
 
-        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
 
         public async Task<string> DownloadPackage(ComparisonBomData component, string localPathforDownload)

@@ -24,7 +24,7 @@ namespace LCT.Services
     /// </summary>
     public class Sw360ProjectService : ISw360ProjectService
     {
-        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         readonly ISW360ApicommunicationFacade m_SW360ApiCommunicationFacade;
 
 

@@ -93,7 +93,7 @@ namespace LCT.PackageIdentifier
             string _ = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.BomCreatorLog, m_Verbose);
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             _settingsManager.CheckRequiredArgsToRun(appSettings, "Identifer");
-            LoggerHelper.SpectreConsoleInitialMessage();
+            LoggerHelper.SpectreConsoleInitialMessage("Package Identifier");
             if (appSettings.ProjectType.Equals("ALPINE", StringComparison.InvariantCultureIgnoreCase))
             {
                 Logger.Error($"\nPlease note that the Alpine feature is currently in preview state. This means it's available for testing and evaluation purposes. While functional, it may not yet include all planned features and could encounter occasional issues. Your feedback during this preview phase is appreciated as we work towards its official release. Thank you for exploring Alpine with us.");
@@ -112,7 +112,7 @@ namespace LCT.PackageIdentifier
             string listOfExcludeComponents = DisplayInformation.DisplayExcludeComponents(appSettings);
             string listOfInternalRepoList = DisplayInformation.GetInternalRepolist(appSettings);
 
-            LoggerHelper.LogInputParameters(caToolInformation, appSettings, listOfInternalRepoList, listOfInclude, listOfExclude, listOfExcludeComponents);
+            LoggerHelper.LogInputParameters(caToolInformation, appSettings, listOfInternalRepoList, listOfInclude, listOfExclude, listOfExcludeComponents, "Identifier");
             
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);
