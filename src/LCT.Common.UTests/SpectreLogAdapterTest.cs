@@ -161,6 +161,42 @@ namespace LCT.Common.UTests
         {
             Assert.DoesNotThrow(() => _adapter.FatalFormat("Fatal {0}", "test"));
         }
+        [Test]
+        public void DebugFormat_WithTwoArguments_DoesNotThrow()
+        {
+            Assert.DoesNotThrow(() => _adapter.DebugFormat("Debug {0} {1}", "foo", 123));
+        }
+
+        [Test]
+        public void DebugFormat_WithThreeArguments_DoesNotThrow()
+        {
+            Assert.DoesNotThrow(() => _adapter.DebugFormat("Debug {0} {1} {2}", "foo", 123, "bar"));
+        }
+
+        [Test]
+        public void DebugFormat_WithFormatProvider_DoesNotThrow()
+        {
+            var provider = CultureInfo.InvariantCulture;
+            Assert.DoesNotThrow(() => _adapter.DebugFormat(provider, "Debug {0} {1}", new object[] { "foo", 123 }));
+        }
+        [Test]
+        public void InfoFormat_WithTwoArguments_DoesNotThrow()
+        {
+            Assert.DoesNotThrow(() => _adapter.InfoFormat("Info {0} {1}", "foo", 123));
+        }
+
+        [Test]
+        public void InfoFormat_WithThreeArguments_DoesNotThrow()
+        {
+            Assert.DoesNotThrow(() => _adapter.InfoFormat("Info {0} {1} {2}", "foo", 123, "bar"));
+        }
+
+        [Test]
+        public void InfoFormat_WithFormatProvider_DoesNotThrow()
+        {
+            var provider = CultureInfo.InvariantCulture;
+            Assert.DoesNotThrow(() => _adapter.InfoFormat(provider, "Info {0} {1}", new object[] { "foo", 123 }));
+        }
     }
 }
 
