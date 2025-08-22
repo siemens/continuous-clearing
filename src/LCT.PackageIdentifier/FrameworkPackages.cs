@@ -4,6 +4,7 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using LCT.Common;
 using LCT.PackageIdentifier.Interface;
 using log4net;
 using log4net.Core;
@@ -21,7 +22,7 @@ namespace LCT.PackageIdentifier
     public class FrameworkPackages : IFrameworkPackages
     {
         readonly Dictionary<string, Dictionary<string, NuGetVersion>> _foundFrameworkPackages = [];
-        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         #region public methods
         public Dictionary<string, Dictionary<string, NuGetVersion>> GetFrameworkPackages(List<string> lockFilePaths)
