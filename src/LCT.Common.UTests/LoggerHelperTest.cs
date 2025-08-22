@@ -120,7 +120,7 @@ namespace LCT.Common.Tests.Logging
             };
             LoggerFactory.UseSpectreConsole = false;
             Assert.DoesNotThrow(() =>
-                LoggerHelper.WriteToConsoleTable(printData, printTimingData, "http://summary.link")
+                LoggerHelper.WriteToConsoleTable(printData, printTimingData, "http://summary.link", "TestExeType")
             );
         }
 
@@ -139,7 +139,7 @@ namespace LCT.Common.Tests.Logging
                 { "Operation2", 65.0 }
             };
             Assert.DoesNotThrow(() =>
-                LoggerHelper.WriteToSpectreConsoleTable(printData, printTimingData, "http://summary.link")
+                LoggerHelper.WriteToSpectreConsoleTable(printData, printTimingData, "http://summary.link", "TestExeType")
             );
         }
 
