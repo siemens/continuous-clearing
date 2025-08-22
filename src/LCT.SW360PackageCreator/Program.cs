@@ -6,6 +6,7 @@
 
 using LCT.APICommunications.Model;
 using LCT.Common;
+using LCT.Common.ComplianceValidator;
 using LCT.Common.Constants;
 using LCT.Common.Model;
 using LCT.Facade;
@@ -37,7 +38,7 @@ namespace LCT.SW360PackageCreator
         public static Stopwatch CreatorStopWatch { get; set; }
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
-
+        private static List<ComparisonBomData> parsedBomData;
         protected Program() { }
 
         static async Task Main(string[] args)
@@ -164,6 +165,32 @@ namespace LCT.SW360PackageCreator
             // initializing Component creation 
             await componentCreator.CreateComponentInSw360(appSettings, sw360CreatorService, sw360Service,
                  sw360ProjectService, new FileOperations(), creatorHelper, parsedBomData);
+        }
+
+        private static async Task ComplianceCheckForAllFoundComponents()
+        {
+            if (parsedBomData != null && parsedBomData.Count > 0)
+            {
+                ComplianceCheck compliance = new ComplianceCheck();
+                ComplianceSettingsModel complianceSettings = new();
+                string baseDir = AppContext.BaseDirectory;
+                string[] foundFiles = Directory.GetFiles(baseDir, "ComplianceSettings.json", SearchOption.AllDirectories);
+
+                if (foundFiles.Length > 0)
+                {
+                    string settingsPath = foundFiles[0];
+                    complianceSettings = await compliance.LoadSettingsAsync(settingsPath);
+                }
+                else
+                {
+                    Logger.Debug("ComplianceSettings.json not found.");
+                }
+
+                if (compliance.Check(complianceSettings, parsedBomData))
+                {
+                    PipelineArtifactUploader.PrintWarning(compliance.GetResults().ToString());
+                }
+            }
         }
     }
 }

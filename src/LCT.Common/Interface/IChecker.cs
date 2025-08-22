@@ -13,9 +13,9 @@ namespace LCT.Common.Interface
 {
     public interface IChecker : IPrintRecommendation, IPrintWarning
     {
-        Task<ComplianceSettingsModel> LoadSettingsAsync(string filePath);
+        Task<ComplianceSettingsModel> LoadSettingsAsync(string jsonFilePath);
 
-        bool Check(ComplianceSettingsModel settings, Object input);
+        bool Check(ComplianceSettingsModel settings, Object data);
 
         List<string> GetResults();
     }
