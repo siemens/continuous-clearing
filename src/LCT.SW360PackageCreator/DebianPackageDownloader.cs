@@ -26,7 +26,7 @@ namespace LCT.SW360PackageCreator
     /// </summary>
     public class DebianPackageDownloader(IDebianPatcher debianPatcher) : IPackageDownloader
     {
-        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         readonly IDebianPatcher _debianPatcher = debianPatcher;
 
         public async Task<string> DownloadPackage(ComparisonBomData component, string localPathforDownload)

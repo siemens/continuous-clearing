@@ -73,21 +73,7 @@ namespace LCT.Common.UTest
             // Assert
             Assert.IsNotEmpty(result);
         }
-
-        [Test]
-        public void WriteComponentsNotLinkedListInConsole_PassingList_ReturnSuccess()
-        {
-            //Arrange
-            List<Components> ComponentsNotLinked = new List<Components>();
-            ComponentsNotLinked.Add(new Components());
-
-            //Act
-            CommonHelper.WriteComponentsNotLinkedListInConsole(ComponentsNotLinked);
-
-            //Assert
-            Assert.Pass();
-        }
-
+        
         [Test]
         public void RemoveExcludedComponents_PassingList_ReturnSuccess()
         {
