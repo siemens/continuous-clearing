@@ -1,0 +1,529 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:75f5173d-9858-4f40-a297-ba449a102722",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2025-08-13T09:47:02Z",
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "supplier": {
+            "name": "Siemens AG"
+          },
+          "name": "Clearing Automation Tool",
+          "version": "8.1.0",
+          "externalReferences": [
+            {
+              "url": "https://github.com/siemens/continuous-clearing",
+              "type": "website"
+            }
+          ]
+        }
+      ]
+    },
+    "component": {
+      "type": "application",
+      "name": "Test",
+      "version": "1.0"
+    },
+    "properties": [
+      {
+        "name": "siemens:profile",
+        "value": "clearing"
+      }
+    ]
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/CefSharp.Common@136.1.40",
+      "name": "CefSharp.Common",
+      "version": "136.1.40",
+      "purl": "pkg:nuget/CefSharp.Common@136.1.40",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NUGET"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": ""
+        },
+        {
+          "name": "internal:siemens:clearing:clearing-state",
+          "value": "NEW_CLEARING"
+        },
+        {
+          "name": "internal:siemens:clearing:sw360:release-url",
+          "value": "http://localhost:8090/resource/api/releases/216caaad95c141f6aacb6be62417fdba"
+        },
+        {
+          "name": "internal:siemens:clearing:fossology:url",
+          "value": ""
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/CefSharp.WinForms@136.1.40",
+      "name": "CefSharp.WinForms",
+      "version": "136.1.40",
+      "purl": "pkg:nuget/CefSharp.WinForms@136.1.40",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NUGET"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": ""
+        },
+        {
+          "name": "internal:siemens:clearing:clearing-state",
+          "value": "NEW_CLEARING"
+        },
+        {
+          "name": "internal:siemens:clearing:sw360:release-url",
+          "value": "http://localhost:8090/resource/api/releases/5460a3684ca944f8a4d867979362c76d"
+        },
+        {
+          "name": "internal:siemens:clearing:fossology:url",
+          "value": ""
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/chromiumembeddedframework.runtime.win-x64@136.1.4",
+      "name": "chromiumembeddedframework.runtime.win-x64",
+      "version": "136.1.4",
+      "purl": "pkg:nuget/chromiumembeddedframework.runtime.win-x64@136.1.4",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NUGET"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": ""
+        },
+        {
+          "name": "internal:siemens:clearing:clearing-state",
+          "value": "NEW_CLEARING"
+        },
+        {
+          "name": "internal:siemens:clearing:sw360:release-url",
+          "value": "http://localhost:8090/resource/api/releases/d5acc4abefea4007ae2be0b7bb151359"
+        },
+        {
+          "name": "internal:siemens:clearing:fossology:url",
+          "value": ""
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/chromiumembeddedframework.runtime.win-x86@136.1.4",
+      "name": "chromiumembeddedframework.runtime.win-x86",
+      "version": "136.1.4",
+      "purl": "pkg:nuget/chromiumembeddedframework.runtime.win-x86@136.1.4",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NUGET"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": ""
+        },
+        {
+          "name": "internal:siemens:clearing:clearing-state",
+          "value": "NEW_CLEARING"
+        },
+        {
+          "name": "internal:siemens:clearing:sw360:release-url",
+          "value": "http://localhost:8090/resource/api/releases/2b343f8f9137432f90544ad00cbb7559"
+        },
+        {
+          "name": "internal:siemens:clearing:fossology:url",
+          "value": ""
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/EmbedIO@3.5.2",
+      "name": "EmbedIO",
+      "version": "3.5.2",
+      "purl": "pkg:nuget/EmbedIO@3.5.2",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NUGET"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": ""
+        },
+        {
+          "name": "internal:siemens:clearing:clearing-state",
+          "value": "NEW_CLEARING"
+        },
+        {
+          "name": "internal:siemens:clearing:sw360:release-url",
+          "value": "http://localhost:8090/resource/api/releases/356b3acd6c85425ca0ffea8f3ba0702a"
+        },
+        {
+          "name": "internal:siemens:clearing:fossology:url",
+          "value": ""
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/GitVersion.MsBuild@5.12.0",
+      "name": "GitVersion.MsBuild",
+      "version": "5.12.0",
+      "purl": "pkg:nuget/GitVersion.MsBuild@5.12.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NUGET"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": ""
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/ILRepack.Lib.MSBuild.Task@2.0.40",
+      "name": "ILRepack.Lib.MSBuild.Task",
+      "version": "2.0.40",
+      "purl": "pkg:nuget/ILRepack.Lib.MSBuild.Task@2.0.40",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NUGET"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": ""
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/Siemens.TestAutomation.ServiceLocator@2.0.1",
+      "name": "Siemens.TestAutomation.ServiceLocator",
+      "version": "2.0.1",
+      "purl": "pkg:nuget/Siemens.TestAutomation.ServiceLocator@2.0.1",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NUGET"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": ""
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/System.ValueTuple@4.5.0",
+      "name": "System.ValueTuple",
+      "version": "4.5.0",
+      "purl": "pkg:nuget/System.ValueTuple@4.5.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NUGET"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": ""
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/Unosquare.Swan.Lite@3.1.0",
+      "name": "Unosquare.Swan.Lite",
+      "version": "3.1.0",
+      "purl": "pkg:nuget/Unosquare.Swan.Lite@3.1.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "NUGET"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": ""
+        }
+      ]
+    }
+  ],
+  "dependencies": [],
+  "compositions": [],
+  "definitions": {
+    "standards": [
+      {
+        "bom-ref": "standard-bom",
+        "name": "Standard BOM",
+        "version": "3.0.0",
+        "description": "The Standard for Software Bills of Materials in Siemens",
+        "owner": "Siemens AG",
+        "externalReferences": [
+          {
+            "url": "https://sbom.siemens.io/",
+            "type": "website"
+          }
+        ]
+      }
+    ]
+  }
+}
