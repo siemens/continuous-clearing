@@ -197,6 +197,85 @@ namespace LCT.Common.UTests
             var provider = CultureInfo.InvariantCulture;
             Assert.DoesNotThrow(() => _adapter.InfoFormat(provider, "Info {0} {1}", new object[] { "foo", 123 }));
         }
+        [Test]
+        public void WarnFormat_WithTwoArguments_DoesNotThrow()
+        {
+            Assert.DoesNotThrow(() => _adapter.WarnFormat("Warn {0} {1}", "foo", 123));
+        }
+
+        [Test]
+        public void WarnFormat_WithThreeArguments_DoesNotThrow()
+        {
+            Assert.DoesNotThrow(() => _adapter.WarnFormat("Warn {0} {1} {2}", "foo", 123, "bar"));
+        }
+
+        [Test]
+        public void WarnFormat_WithFormatProvider_DoesNotThrow()
+        {
+            var provider = CultureInfo.InvariantCulture;
+            Assert.DoesNotThrow(() => _adapter.WarnFormat(provider, "Warn {0} {1}", new object[] { "foo", 123 }));
+        }
+        [Test]
+        public void ErrorFormat_WithTwoArguments_DoesNotThrow()
+        {
+            Assert.DoesNotThrow(() => _adapter.ErrorFormat("Error {0} {1}", "foo", 123));
+        }
+
+        [Test]
+        public void ErrorFormat_WithThreeArguments_DoesNotThrow()
+        {
+            Assert.DoesNotThrow(() => _adapter.ErrorFormat("Error {0} {1} {2}", "foo", 123, "bar"));
+        }
+
+        [Test]
+        public void ErrorFormat_WithFormatProvider_DoesNotThrow()
+        {
+            var provider = CultureInfo.InvariantCulture;
+            Assert.DoesNotThrow(() => _adapter.ErrorFormat(provider, "Error {0} {1}", new object[] { "foo", 123 }));
+        }
+        [Test]
+        public void FatalFormat_WithTwoArguments_DoesNotThrow()
+        {
+            Assert.DoesNotThrow(() => _adapter.FatalFormat("Fatal {0} {1}", "foo", 123));
+        }
+
+        [Test]
+        public void FatalFormat_WithThreeArguments_DoesNotThrow()
+        {
+            Assert.DoesNotThrow(() => _adapter.FatalFormat("Fatal {0} {1} {2}", "foo", 123, "bar"));
+        }
+
+        [Test]
+        public void FatalFormat_WithFormatProvider_DoesNotThrow()
+        {
+            var provider = CultureInfo.InvariantCulture;
+            Assert.DoesNotThrow(() => _adapter.FatalFormat(provider, "Fatal {0} {1}", new object[] { "foo", 123 }));
+        }
+        [Test]
+        public void FatalFormat_WithParamsArray_DoesNotThrow()
+        {
+            Assert.DoesNotThrow(() => _adapter.FatalFormat("Fatal {0} {1} {2}", "foo", 123, "bar"));
+        }
+        [Test]
+        public void ErrorFormat_WithParamsArray_DoesNotThrow()
+        {
+            Assert.DoesNotThrow(() => _adapter.ErrorFormat("Error {0} {1} {2}", "foo", 123, "bar"));
+        }
+        [Test]
+        public void WarnFormat_WithParamsArray_DoesNotThrow()
+        {
+            Assert.DoesNotThrow(() => _adapter.WarnFormat("Warn {0} {1} {2}", "foo", 123, "bar"));
+        }
+        [Test]
+        public void InfoFormat_WithParamsArray_DoesNotThrow()
+        {
+            Assert.DoesNotThrow(() => _adapter.InfoFormat("Info {0} {1} {2}", "foo", 123, "bar"));
+        }
+        [Test]
+        public void DebugFormat_WithParamsArray_DoesNotThrow()
+        {
+            Assert.DoesNotThrow(() => _adapter.DebugFormat("Debug {0} {1} {2}", "foo", 123, "bar"));
+        }
     }
 }
 
