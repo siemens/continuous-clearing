@@ -6,6 +6,7 @@
 
 using LCT.APICommunications.Model;
 using LCT.Common;
+using LCT.Common.ComplianceValidator;
 using LCT.Common.Constants;
 using LCT.Common.Model;
 using LCT.Facade;
@@ -37,7 +38,7 @@ namespace LCT.SW360PackageCreator
         public static Stopwatch CreatorStopWatch { get; set; }
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
-
+        private static List<ComparisonBomData> parsedBomData;
         protected Program() { }
 
         static async Task Main(string[] args)
