@@ -54,11 +54,11 @@ namespace ArtifactoryUploader
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             string _ = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.ArtifactoryUploaderLog, m_Verbose);
            
-            settingsManager.CheckRequiredArgsToRun(appSettings, "Uploader");
+            settingsManager.CheckRequiredArgsToRun(appSettings, Dataconstant.Uploader);
             string bomFilePath = GetBomFilePath(appSettings);
             LoggerHelper.SpectreConsoleInitialMessage("Artifactory Uploader");
             ListofPerametersForCli listofPerameters = new ListofPerametersForCli();
-            LoggerHelper.LogInputParameters(caToolInformation, appSettings, listofPerameters, exeType: "Uploader", bomFilePath: bomFilePath);
+            LoggerHelper.LogInputParameters(caToolInformation, appSettings, listofPerameters, exeType: Dataconstant.Uploader, bomFilePath: bomFilePath);
             if (!appSettings.Jfrog.DryRun)
                 Logger.Logger.Log(null, Level.Alert, $"Artifactory Uploader is running in release mode !!! \n", null);
             else

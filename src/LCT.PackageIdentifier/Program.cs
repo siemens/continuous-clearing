@@ -92,7 +92,7 @@ namespace LCT.PackageIdentifier
             ProjectReleases projectReleases = new ProjectReleases();
             string _ = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.BomCreatorLog, m_Verbose);
             Console.OutputEncoding = System.Text.Encoding.UTF8;
-            _settingsManager.CheckRequiredArgsToRun(appSettings, "Identifer");
+            _settingsManager.CheckRequiredArgsToRun(appSettings, Dataconstant.Identifier);
             LoggerHelper.SpectreConsoleInitialMessage("Package Identifier");
             if (appSettings.ProjectType.Equals("ALPINE", StringComparison.InvariantCultureIgnoreCase))
             {
@@ -115,7 +115,7 @@ namespace LCT.PackageIdentifier
                 Exclude = DisplayInformation.DisplayExcludeFiles(appSettings),
                 ExcludeComponents = DisplayInformation.DisplayExcludeComponents(appSettings)
             };
-            LoggerHelper.LogInputParameters(caToolInformation, appSettings, listParameters, "Identifier");
+            LoggerHelper.LogInputParameters(caToolInformation, appSettings, listParameters, Dataconstant.Identifier);
             
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);

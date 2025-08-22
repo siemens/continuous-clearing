@@ -76,7 +76,7 @@ namespace LCT.PackageIdentifier
             };
 
             CommonHelper.ProjectSummaryLink = bomKpiData.ProjectSummaryLink;
-            LoggerHelper.WriteToConsoleTable(printList, printTimingList, bomKpiData.ProjectSummaryLink);
+            LoggerHelper.WriteToConsoleTable(printList, printTimingList, bomKpiData.ProjectSummaryLink, Dataconstant.Identifier);
         }
         public static void NamingConventionOfSPDXFile(string filepath, CommonAppSettings appSettings)
         {

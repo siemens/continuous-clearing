@@ -389,7 +389,7 @@ namespace LCT.ArtifactoryUploader
                 { "Artifactory Uploader",uploaderKpiData.TimeTakenByArtifactoryUploader }
             };
 
-            LoggerHelper.WriteToConsoleTable(printList, printTimingList, "");
+            LoggerHelper.WriteToConsoleTable(printList, printTimingList, "", Dataconstant.Uploader);
         }
 
         private static void IncrementCountersBasedOnPackageType(UploaderKpiData uploaderKpiData, PackageType packageType, bool isSuccess)

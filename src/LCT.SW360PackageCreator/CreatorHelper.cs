@@ -554,7 +554,7 @@ namespace LCT.SW360PackageCreator
                 { "ComponentCreator",creatorKpiData.TimeTakenByComponentCreator }
             };
 
-            LoggerHelper.WriteToConsoleTable(printList, printTimingList,"");
+            LoggerHelper.WriteToConsoleTable(printList, printTimingList,"", Dataconstant.Creator);
         }
 
         public void WriteSourceNotFoundListToConsole(List<ComparisonBomData> comparisionBomDataList, CommonAppSettings appSetting)
