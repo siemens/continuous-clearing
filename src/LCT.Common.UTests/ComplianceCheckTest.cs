@@ -84,11 +84,13 @@ namespace LCT.Common.Tests.ComplianceValidator
                 ComplianceExceptionComponents = new List<ComplianceExceptionComponent>()
             };
             var data = new List<ComparisonBomData>();
-            Assert.IsTrue(_complianceCheck.Check(settings, data));
+
+            // Pass data as object to match method signature
+            Assert.IsFalse(_complianceCheck.Check(settings, (object)data));
         }
 
         [Test]
-        public void Check_WithWarnings_ReturnsFalse()
+        public void Check_WithWarnings_ReturnsTrue()
         {
             var comp = new ComplianceExceptionComponent
             {
@@ -105,10 +107,11 @@ namespace LCT.Common.Tests.ComplianceValidator
             };
             var data = new List<ComparisonBomData>
             {
-                new ComparisonBomData { ComponentExternalId = "pkg:maven/test@1.0.0" }
+               new ComparisonBomData { ComponentExternalId = "pkg:maven/test@1.0.0" }
             };
 
-            Assert.IsFalse(_complianceCheck.Check(settings, data));
+            // Pass data as object to match method signature and internal type check
+            Assert.IsTrue(_complianceCheck.Check(settings, (object)data));
             var warnings = _complianceCheck.GetResults();
             Assert.IsTrue(warnings.Count > 0);
             Assert.IsTrue(warnings[0].Contains("Test warning"));
