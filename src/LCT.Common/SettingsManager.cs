@@ -127,7 +127,7 @@ namespace LCT.Common
         public void CheckRequiredArgsToRun(CommonAppSettings appSettings, string currentExe)
         {
 
-            if (currentExe == "Identifer")
+            if (currentExe == "Identifier")
             {
                 //Required parameters to run Package Identifier
                 List<string> identifierReqParameters = new List<string>()

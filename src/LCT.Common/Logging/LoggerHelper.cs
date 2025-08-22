@@ -19,13 +19,11 @@ namespace LCT.Common.Logging
         private static readonly Dictionary<string, string> _colorCache = new Dictionary<string, string>();
         private static int _colorIndex = 0;
 
-        // Helper to get console width with fallback and subtract
         private static int GetConsoleWidth(int subtract = 0, int fallback = 120)
         {
             return Console.WindowWidth > 0 ? Console.WindowWidth - subtract : fallback;
         }
 
-        // Helper to safely execute Spectre.Console actions with fallback
         public static void SafeSpectreAction(Action spectreAction, string fallbackMessage, string fallbackType = "Info")
         {
             try
@@ -283,10 +281,9 @@ namespace LCT.Common.Logging
 
         private static List<string> GetProjectTypes(List<Component> componentsInBOM)
         {
-            return componentsInBOM
+            return [.. componentsInBOM
                 .Select(item => item.Properties.First(x => x.Name == Dataconstant.Cdx_ProjectType).Value)
-                .Distinct()
-                .ToList();
+                .Distinct()];
         }
 
         private static Dictionary<string, Config> CreateProjectConfigMap(CommonAppSettings appSettings)
@@ -445,9 +442,9 @@ namespace LCT.Common.Logging
         {
             return exeType switch
             {
-                "Identifier" => GenerateIdentifierContent(caToolInformation, appSettings, listofPerameters),
-                "Creator" => GenerateCreatorContent(caToolInformation, appSettings, bomFilePath),
-                "Uploader" => GenerateUploaderContent(caToolInformation, appSettings, bomFilePath),
+                Dataconstant.Identifier => GenerateIdentifierContent(caToolInformation, appSettings, listofPerameters),
+                Dataconstant.Creator => GenerateCreatorContent(caToolInformation, appSettings, bomFilePath),
+                Dataconstant.Uploader => GenerateUploaderContent(caToolInformation, appSettings, bomFilePath),
                 _ => string.Empty
             };
         }
@@ -509,7 +506,7 @@ namespace LCT.Common.Logging
 
             content
                 .Append($"Start of Package Identifier execution: [green]{DateTime.Now}[/]\n\n")
-                .Append($"[green]-[/] [yellow]Input Parameters used in Package Identifier[/]\n\n");
+                .Append($"[green]-[/] [green]Input Parameters used in Package Identifier[/]\n\n");
 
             AppendBasicInfo(content, caToolInformation, maxPathLength);
             AppendDirectoryInfo(content, appSettings, maxPathLength);
@@ -539,7 +536,7 @@ namespace LCT.Common.Logging
 
             content
                 .Append($"Start of Package Creater execution: [green]{DateTime.Now}[/]\n\n")
-                .Append($"[green]-[/] [yellow]Input parameters used in Package Creater[/]\n\n");
+                .Append($"[green]-[/] [green]Input parameters used in Package Creater[/]\n\n");
 
             AppendBasicInfo(content, caToolInformation, maxPathLength);
             AppendCreatorSpecificInfo(content, appSettings, bomFilePath, maxPathLength);
@@ -555,7 +552,7 @@ namespace LCT.Common.Logging
 
             content
                 .Append($"Start of Uploader execution: [green]{DateTime.Now}[/]\n\n")
-                .Append($"[green]-[/] [yellow]Input Parameters used in Artifactory Uploader[/]\n\n");
+                .Append($"[green]-[/] [green]Input Parameters used in Artifactory Uploader[/]\n\n");
 
             AppendBasicInfo(content, caToolInformation, maxPathLength);
             AppendUploaderSpecificInfo(content, appSettings, bomFilePath, maxPathLength);
@@ -615,7 +612,7 @@ namespace LCT.Common.Logging
         }
         private static void LogInputParametersWithLog4net(CatoolInfo caToolInformation, CommonAppSettings appSettings, ListofPerametersForCli listofPerameters, string exeType, string bomFilePath)
         {
-            if (exeType == "Identifier")
+            if (exeType == Dataconstant.Identifier)
             {
                 var logMessage = $"Input Parameters used in Package Identifier:\n\t" +
                 $"CaToolVersion\t\t --> {caToolInformation.CatoolVersion}\n\t" +
@@ -643,7 +640,7 @@ namespace LCT.Common.Logging
 
                 Logger.Logger.Log(null, Level.Notice, logMessage, null);
             }
-            else if (exeType == "Creator")
+            else if (exeType == Dataconstant.Creator)
             {
                 Logger.Logger.Log(null, Level.Notice, $"Input parameters used in Package Creator:\n\t" +
                               $"CaToolVersion\t\t --> {caToolInformation.CatoolVersion}\n\t" +
@@ -658,7 +655,7 @@ namespace LCT.Common.Logging
                               $"IgnoreDevDependency\t --> {appSettings.SW360.IgnoreDevDependency}\n\t" +
                               $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t", null);
             }
-            else if (exeType == "Uploader")
+            else if (exeType == Dataconstant.Uploader)
             {
                 Logger.Logger.Log(null, Level.Info, $"Input Parameters used in Artifactory Uploader:\n\t", null);
                 Logger.Logger.Log(null, Level.Notice, $"\tBomFilePath:\t\t {bomFilePath}\n\t" +
@@ -723,12 +720,29 @@ namespace LCT.Common.Logging
                 AnsiConsole.Write(panel);
             }, content, title ?? "Panel");
         }
+        public static void WriteSummaryHeader(string title)
+        {
+            SafeSpectreAction(() =>
+            {
+                WriteLine(); // Add a new line before the header
+                var consoleWidth = GetConsoleWidth(0, 120);
+                var padding = (consoleWidth - title.Length) / 2;
+                var centeredText = title.PadLeft(padding + title.Length).PadRight(consoleWidth);
+                var bottomBorder = new string('═', consoleWidth); // Double line border character
 
+                // Write centered header and bottom border
+                AnsiConsole.MarkupLine($"[bold white]{Markup.Escape(centeredText)}[/]");
+                AnsiConsole.MarkupLine($"[yellow]{bottomBorder}[/]");
+            }, title, "Header");
+        }
         public static void WriteHeader(string title)
         {
             SafeSpectreAction(() =>
             {
-                var centeredText = title.PadLeft((Console.WindowWidth + title.Length) / 2);
+                WriteLine(); // Add a new line before the header
+                var consoleWidth = GetConsoleWidth(0, 120);
+                var padding = (consoleWidth - title.Length) / 2;
+                var centeredText = title.PadLeft(padding + title.Length).PadRight(consoleWidth);
                 AnsiConsole.MarkupLine($"[bold white]{Markup.Escape(centeredText)}[/]");
             }, title, "Header");
         }
@@ -762,11 +776,11 @@ namespace LCT.Common.Logging
                     break;
             }
         }
-        public static void WriteToConsoleTable(Dictionary<string, int> printData, Dictionary<string, double> printTimingData, string ProjectSummaryLink)
+        public static void WriteToConsoleTable(Dictionary<string, int> printData, Dictionary<string, double> printTimingData, string ProjectSummaryLink,string exeType)
         {
             if (LoggerFactory.UseSpectreConsole)
             {
-                WriteToSpectreConsoleTable(printData, printTimingData, ProjectSummaryLink);
+                WriteToSpectreConsoleTable(printData, printTimingData, ProjectSummaryLink,exeType);
                 return;
             }
 
@@ -811,14 +825,24 @@ namespace LCT.Common.Logging
                 Logger.Info(separator);
             }
         }
-        public static void WriteToSpectreConsoleTable(Dictionary<string, int> printData, Dictionary<string, double> printTimingData, string ProjectSummaryLink)
+
+        public static void WriteToSpectreConsoleTable(
+    Dictionary<string, int> printData,
+    Dictionary<string, double> printTimingData,
+    string ProjectSummaryLink,
+    string exeType)
         {
             SafeSpectreAction(() =>
             {
-                WriteHeader("SUMMARY");
+                WriteSummaryHeader("SUMMARY");
+                if (!string.IsNullOrWhiteSpace(ProjectSummaryLink))
+                {
+                    WriteLine();
+                    WriteInfoWithMarkup($"[blue]Project Summary: [/][white]{ProjectSummaryLink}[/]");
+                }
                 int consoleWidth = GetConsoleWidth(6, 120);
 
-                int maxValue = printData.Values.Max();
+                int maxValue = printData.Values.Count != 0 ? printData.Values.Max() : 0;
                 int barMaxWidth = Math.Max(20, 40);
 
                 var table = new Table()
@@ -829,77 +853,77 @@ namespace LCT.Common.Logging
 
                 table.AddColumn(new TableColumn("[green bold]Feature[/]"));
                 table.AddColumn(new TableColumn("[blue bold]Count[/]"));
+                table.AddRow("", "");
+
+                var legendColorMap = LegendMappings.GetLegendColorMap(exeType);
+                var tableKeyToLegend = LegendMappings.GetTableKeyToLegend(exeType);
+                var legendRow = LegendMappings.GetLegendRow(exeType);
 
                 foreach (var item in printData)
                 {
-                    string color = GetColorForItem(item.Key, item.Value);
-                    string formattedValue = item.Value.ToString().PadLeft(6);
-
-                    string formattedKey = item.Key;
+                    string legendLabel = GetLegendLabel(item.Key, tableKeyToLegend, legendColorMap);
+                    string color = legendLabel != null && legendColorMap.TryGetValue(legendLabel, out var mappedColor)
+                        ? mappedColor
+                        : GetColorForItem(item.Key, item.Value);
 
                     int barWidth = maxValue > 0 ? (int)((double)item.Value / maxValue * barMaxWidth) : 0;
-                    string visualBar = new('█', barWidth);
+                    string visualBar = barWidth > 0 ? new string('█', barWidth) : "";
 
                     table.AddRow(
-                        $"[white]{formattedKey}[/]",
-                        $"[{color}]{visualBar.PadRight(barMaxWidth + 2)}{formattedValue}[/]"
+                        $"[white]{item.Key}[/]",
+                        $"[{color}]{visualBar} {item.Value}[/]"
                     );
+                    table.AddRow("", "");
                 }
 
+                table.AddEmptyRow();
                 AnsiConsole.Write(table);
+
+                WriteLine();
+                var legendTable = new Table()
+                    .BorderColor(Color.White)
+                    .Border(TableBorder.None)
+                    .Width(Math.Min(consoleWidth, 200));
+
+                foreach (var _ in legendRow)
+                    legendTable.AddColumn(new TableColumn("").Width(33));
+                legendTable.AddRow(legendRow);
+
+                AnsiConsole.Write(legendTable);
+                WriteLine();
 
                 if (printTimingData.Count != 0)
                 {
                     WriteLine();
-                    DisplayTimingTable(printTimingData);
-                }
-
-                if (!string.IsNullOrWhiteSpace(ProjectSummaryLink))
-                {
+                    foreach (var item in printTimingData)
+                    {
+                        string timeFormatted = item.Value.ToString("F3");
+                        WriteInfoWithMarkup($"[white]Time Taken By {item.Key} : [/][green]{timeFormatted}[/][white] s[/]");
+                    }
                     WriteLine();
-                    WriteInfoWithMarkup($"[blue]Project Summary: [/][white]{ProjectSummaryLink}[/]");
                 }
             }, "Package Summary Table", "Panel");
         }
-
-        private static void DisplayTimingTable(Dictionary<string, double> printTimingData)
+        private static string GetLegendLabel(
+            string key,
+            (string[] Patterns, string LegendLabel)[] tableKeyToLegend,
+            Dictionary<string, string> legendColorMap)
         {
-            int consoleWidth = GetConsoleWidth(6, 120);
-
-            var table = new Table()
-                .BorderColor(Color.Grey)
-                .Border(TableBorder.Rounded)
-                .Title("[yellow]Execution Timing[/]")
-                .Width(Math.Min(consoleWidth, 100));
-
-            table.AddColumn("[green]Operation[/]");
-            table.AddColumn("[blue]Time (seconds)[/]");
-
-            foreach (var item in printTimingData)
+            foreach (var (patterns, legendLabel) in tableKeyToLegend)
             {
-                string timeFormatted = item.Value.ToString("F2");
-
-                Color timeColor;
-                if (item.Value > 60)
+                foreach (var pattern in patterns)
                 {
-                    timeColor = Color.Cyan1;
+                    if (key.Contains(pattern, StringComparison.OrdinalIgnoreCase))
+                        return legendLabel;
                 }
-                else if (item.Value > 30)
-                {
-                    timeColor = Color.Yellow;
-                }
-                else
-                {
-                    timeColor = Color.Green;
-                }
-
-                string operationName = item.Key.Length > 50 ? string.Concat(item.Key.AsSpan(0, 47), "...") : item.Key;
-                table.AddRow(operationName, $"[{timeColor}]{timeFormatted}[/]");
             }
-
-            AnsiConsole.Write(table);
+            foreach (var legendLabel in legendColorMap.Keys)
+            {
+                if (key.Contains(legendLabel, StringComparison.OrdinalIgnoreCase))
+                    return legendLabel;
+            }
+            return null;
         }
-
         private static string GetColorForItem(string key, int value)
         {
             if (key == "Packages Not Uploaded Due To Error" ||
@@ -913,7 +937,7 @@ namespace LCT.Common.Logging
                 return cachedColor;
             }
 
-            var colors = new[] { "blue", "purple", "magenta", "cyan", "yellow", "green", "teal", "lime", "aqua", "grey", "darkred", "darkcyan" };
+            var colors = new[] { "blue", "magenta", "yellow", "cyan", "teal", "purple"};
 
             string assignedColor = colors[_colorIndex % colors.Length];
             _colorCache[key] = assignedColor;
@@ -921,7 +945,6 @@ namespace LCT.Common.Logging
 
             return assignedColor;
         }
-
         public static void WriteInternalComponentsTableInCli(List<Component> internalComponents)
         {
             if (LoggerFactory.UseSpectreConsole)
@@ -991,7 +1014,23 @@ namespace LCT.Common.Logging
                 Logger.Info("\n");
             }
         }
+        public static void WriteTelemetryMessage(string message)
+        {
+            if (LoggerFactory.UseSpectreConsole)
+            {
+                Logger.Debug($"{message}");
+                WriteLine();
+                var content = new StringBuilder()
+                    .Append($"[yellow]{message}[/]");
 
+                WriteStyledPanel(content.ToString(), "", "yellow", "yellow");
+                WriteLine();
+            }
+            else
+            {
+                Logger.Warn(message);
+            }
+        }
         public static void SpectreConsoleInitialMessage(string message)
         {
             if (LoggerFactory.UseSpectreConsole)
@@ -1085,7 +1124,7 @@ namespace LCT.Common.Logging
             }
         }
 
-        public static void WriteFossologySucessStatusMessage(string message, string formattedName,ComparisonBomData item)
+        public static void WriteFossologySucessStatusMessage(string message, string formattedName, ComparisonBomData item)
         {
             if (LoggerFactory.UseSpectreConsole)
             {

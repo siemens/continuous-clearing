@@ -20,6 +20,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Text;
+using System.Xml.Linq;
 
 namespace LCT.ArtifactoryUploader
 {
@@ -117,7 +118,7 @@ namespace LCT.ArtifactoryUploader
 
             if (LoggerFactory.UseSpectreConsole)
             {
-                DisplayWithSpectreConsole(unknownPackages, JfrogNotFoundPackages, SucessfullPackages, JfrogFoundPackages, name);
+                DisplayWithSpectreConsole(unknownPackages, JfrogNotFoundPackages, SucessfullPackages, JfrogFoundPackages, name,filePath);
             }
             else
             {
@@ -135,12 +136,12 @@ namespace LCT.ArtifactoryUploader
             List<ComponentsToArtifactory> JfrogNotFoundPackages,
             List<ComponentsToArtifactory> SucessfullPackages,
             List<ComponentsToArtifactory> JfrogFoundPackages,
-            string name)
+            string name,string filepath)
         {
             LoggerHelper.SafeSpectreAction(() =>
             {
                 var content = new StringBuilder($"[green]{name}[/]\n\n");
-                AppendPackageContent(content, unknownPackages, JfrogFoundPackages, JfrogNotFoundPackages, SucessfullPackages);
+                AppendPackageContent(content, unknownPackages, JfrogFoundPackages, JfrogNotFoundPackages, SucessfullPackages,name,filepath);
 
                 LoggerHelper.WriteStyledPanel(content.ToString().TrimEnd(), "", "blue", "yellow");
                 LoggerHelper.WriteLine();
@@ -152,23 +153,21 @@ namespace LCT.ArtifactoryUploader
             List<ComponentsToArtifactory> unknownPackages,
             List<ComponentsToArtifactory> JfrogFoundPackages,
             List<ComponentsToArtifactory> JfrogNotFoundPackages,
-            List<ComponentsToArtifactory> SucessfullPackages)
+            List<ComponentsToArtifactory> SucessfullPackages,string name,string filePath)
         {
-            AppendUnknownPackages(content, unknownPackages);
+            AppendUnknownPackages(content, unknownPackages, name,filePath);
             AppendJfrogFoundPackages(content, JfrogFoundPackages);
             AppendJfrogNotFoundPackages(content, JfrogNotFoundPackages);
             AppendSuccessfulPackages(content, SucessfullPackages);
         }
 
-        private static void AppendUnknownPackages(StringBuilder content, List<ComponentsToArtifactory> packages)
+        private static void AppendUnknownPackages(StringBuilder content, List<ComponentsToArtifactory> packages,string name,string filepath)
         {
+            var filename = Path.Combine(filepath, $"Artifactory_{FileConstant.artifactoryReportNotApproved}");
             if (packages?.Count > 0)
             {
-                content.AppendLine();
-                foreach (var package in packages)
-                {
-                    content.AppendLine($"⚠ [white]{package.Name}[/]-[cyan]{package.Version}[/] [yellow]Report not in Approved state[/]");
-                }
+                content.AppendLine($"[yellow]Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}[/]\n");
+                DisplayErrorForUnknownPackages(packages, name, filepath);
             }
         }
 
@@ -302,6 +301,11 @@ namespace LCT.ArtifactoryUploader
 
             }
         }
+        private static void WarningMessageForNoPackages(string filename)
+        {
+            if (!LoggerFactory.UseSpectreConsole)
+                Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n");
+        }
         private static void DisplayErrorForUnknownPackages(List<ComponentsToArtifactory> unknownPackages, string name, string filepath)
         {
             ProjectResponse projectResponse = new ProjectResponse();
@@ -356,8 +360,7 @@ namespace LCT.ArtifactoryUploader
                 }
                 fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
             }
-            Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n");
-
+            WarningMessageForNoPackages(filename);
         }
         private static void GetNotApprovedNugetPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
         {
@@ -388,7 +391,7 @@ namespace LCT.ArtifactoryUploader
                 }
                 fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
             }
-            Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n");
+            WarningMessageForNoPackages(filename);
         }
         private static void GetNotApprovedConanPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
         {
@@ -422,7 +425,7 @@ namespace LCT.ArtifactoryUploader
                 }
                 fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
             }
-            Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n");
+            WarningMessageForNoPackages(filename);
 
         }
         private static void GetNotApprovedPythonPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
@@ -457,7 +460,7 @@ namespace LCT.ArtifactoryUploader
                 }
                 fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
             }
-            Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n");
+            WarningMessageForNoPackages(filename);
         }
         public static void GetNotApprovedDebianPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
         {
@@ -491,7 +494,7 @@ namespace LCT.ArtifactoryUploader
                 }
                 fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
             }
-            Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n");
+            WarningMessageForNoPackages(filename);
         }
         private static void GetNotApprovedMavenPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
         {
@@ -525,8 +528,8 @@ namespace LCT.ArtifactoryUploader
                 }
                 fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
             }
-            Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n");
-        }
+           WarningMessageForNoPackages(filename);
+        }       
 
     }
 }

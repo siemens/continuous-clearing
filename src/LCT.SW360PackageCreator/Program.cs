@@ -63,7 +63,7 @@ namespace LCT.SW360PackageCreator
 
             string _ = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.ComponentCreatorLog, m_Verbose);
             Console.OutputEncoding = System.Text.Encoding.UTF8;
-            settingsManager.CheckRequiredArgsToRun(appSettings, "Creator");
+            settingsManager.CheckRequiredArgsToRun(appSettings, Dataconstant.Creator);
             int isValid = await CreatorValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
 
             if (isValid == -1)
@@ -76,7 +76,7 @@ namespace LCT.SW360PackageCreator
                 Logger.Logger.Log(null, Level.Alert, $"Package creator is running in TEST mode \n", null);
             var bomFilePath = Path.Combine(appSettings.Directory.OutputFolder, appSettings.SW360.ProjectName + "_" + FileConstant.BomFileName);
             ListofPerametersForCli listofPerameters = new ListofPerametersForCli();
-            LoggerHelper.LogInputParameters(caToolInformation,appSettings,listofPerameters,exeType: "Creator",bomFilePath: bomFilePath);
+            LoggerHelper.LogInputParameters(caToolInformation,appSettings,listofPerameters,exeType: Dataconstant.Creator, bomFilePath: bomFilePath);
 
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);
