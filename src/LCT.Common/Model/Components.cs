@@ -65,6 +65,12 @@ namespace LCT.Common.Model
         public string ExcludeComponent { get; set; }
         [JsonIgnore]
         public string ReleaseCreatedBy { get; set; }
+        [JsonIgnore]
+        public bool InValidComponentByPurlid { get; set; }=false;
+        [JsonIgnore]
+        public string ComponentLink { get; set; }
+        [JsonIgnore]
+        public string ComponentID { get; set; }       
 
     }
 }

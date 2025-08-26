@@ -29,5 +29,6 @@ namespace LCT.Services.Interface
         Task<Sw360AttachmentHash> GetAttachmentDownloadLink(string releaseAttachmentUrl);
 
         Task<string> GetUploadDescriptionfromSW360(string componentName, string componetVersion, string sw360url);
+        Task<List<Components>> GetDuplicateComponentsByPurlId(List<Components> listOfComponentsToBom);
     }
 }
