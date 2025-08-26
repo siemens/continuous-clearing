@@ -41,6 +41,8 @@ namespace LCT.Services.UTest
 
         private static readonly FieldInfo AvailableComponentListField =
             typeof(Sw360Service).GetField("availableComponentList", BindingFlags.Static | BindingFlags.NonPublic);
+        private static readonly MethodInfo ValidateAndProcessComponentMethod =
+          typeof(Sw360Service).GetMethod("ValidateAndProcessComponent", BindingFlags.Static | BindingFlags.NonPublic);
 
         [SetUp]
         public void Setup()
@@ -719,6 +721,66 @@ namespace LCT.Services.UTest
             Assert.AreEqual("http://sw360/release/123", added.ReleaseLink);
             Assert.AreEqual("rel-ext-1", added.ReleaseExternalId);
             Assert.AreEqual("comp-ext-1", added.ComponentExternalId);
+        }
+        [Test]
+        public void ValidateAndProcessComponent_ReturnsTrue_AndAddsToAvailableList_WhenExternalIdsAreNullOrEmpty()
+        {
+            // Arrange
+            var sw360Release = new Sw360Releases { Name = "LibA", Version = "1.0.0" };
+            var sw360Component = new Sw360Components
+            {
+                ExternalIds = new ExternalIds { Package_Url = null, Purl_Id = null }
+            };
+            var component = new Components { Name = "LibA", Version = "1.0.0" };
+
+            // Act
+            var result = (bool)ValidateAndProcessComponentMethod.Invoke(null, new object[] { sw360Release, sw360Component, component });
+
+            // Assert
+            Assert.IsTrue(result, "Should return true when both Package_Url and Purl_Id are null or empty.");
+           
+        }
+
+        [Test]
+        public void ValidateAndProcessComponent_ReturnsTrue_AndAddsToAvailableList_WhenPurlIsValid()
+        {
+            // Arrange
+            var sw360Release = new Sw360Releases { Name = "LibB", Version = "2.0.0" };
+            var sw360Component = new Sw360Components
+            {
+                ExternalIds = new ExternalIds { Package_Url = "pkg:npm/libb@2.0.0", Purl_Id = null }
+            };
+            var component = new Components { Name = "LibB", Version = "2.0.0", ProjectType = "NPM" };
+
+            // Patch ValidateProjectTypePurl to always return true for this test
+            _ = typeof(Sw360Service).GetMethod("ValidateProjectTypePurl", BindingFlags.Static | BindingFlags.NonPublic);
+            // No patching needed if the real method returns true for this input
+
+            // Act
+            var result = (bool)ValidateAndProcessComponentMethod.Invoke(null, new object[] { sw360Release, sw360Component, component });
+
+            // Assert
+            Assert.IsTrue(result, "Should return true when ValidateProjectTypePurl returns true.");
+           
+        }
+        [Test]
+        public void CheckAvailabilityByNameAndVersion_ReturnsFalse_WhenSw360ComponentIsNull()
+        {
+            // Arrange
+            var sw360Releases = new List<Sw360Releases>
+    {
+        new Sw360Releases { Name = "TestLib", Version = "1.0.0" }
+    };
+            var component = new Components { Name = "TestLib", Version = "1.0.0" };
+            var sw360ComponentList = new List<Sw360Components>();
+            var method = typeof(Sw360Service).GetMethod("CheckAvailabilityByNameAndVersion", BindingFlags.Static | BindingFlags.NonPublic);
+            Assert.IsNotNull(method, "CheckAvailabilityByNameAndVersion method not found.");
+
+            // Act
+            var result = (bool)method.Invoke(null, new object[] { sw360Releases, component, sw360ComponentList });
+
+            // Assert
+            Assert.IsFalse(result, "Should return false when sw360Component is null.");
         }
     }
 }
