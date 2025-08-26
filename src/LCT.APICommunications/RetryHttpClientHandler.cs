@@ -3,6 +3,7 @@
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
+using LCT.Common;
 using log4net;
 using Polly;
 using System;
@@ -17,7 +18,7 @@ namespace LCT.APICommunications
     public class RetryHttpClientHandler : DelegatingHandler
     {
         private readonly AsyncPolicy<HttpResponseMessage> _retryPolicy;
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private bool _initialRetryLogged = false;
         public RetryHttpClientHandler()
         {

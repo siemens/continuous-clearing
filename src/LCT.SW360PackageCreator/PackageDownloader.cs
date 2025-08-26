@@ -24,7 +24,7 @@ namespace LCT.SW360PackageCreator
 {
     public class PackageDownloader : IPackageDownloader
     {
-        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly List<DownloadedSourceInfo> m_downloadedSourceInfos = new List<DownloadedSourceInfo>();
         private const string Source = "source";
 
