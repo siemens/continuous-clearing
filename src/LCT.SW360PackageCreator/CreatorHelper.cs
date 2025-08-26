@@ -208,7 +208,7 @@ namespace LCT.SW360PackageCreator
             Logger.Debug($"SetContentsForComparisonBOM():Start");
             Logger.Logger.Log(null, Level.Notice, $"Collecting comparison BOM Data...", null);
             componentsAvailableInSw360 = await sw360Service.GetAvailableReleasesInSw360(lstComponentForBOM);
-            DuplicateComponentsByPirlId=await sw360Service.GetDuplicateComponentsByPurlId(lstComponentForBOM);
+            DuplicateComponentsByPirlId=sw360Service.GetDuplicateComponentsByPurlId();
             //Checking components count before getting status of individual comp details
             List<ComparisonBomData> comparisonBomData = await GetComparisionBomItems(lstComponentForBOM, sw360Service);
 

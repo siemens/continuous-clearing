@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -25,6 +26,24 @@ namespace LCT.Services.UTest
     [TestFixture]
     internal class Sw360ServiceTest
     {
+        private static readonly MethodInfo ValidateProjectTypePurlMethod =
+          typeof(Sw360Service).GetMethod("ValidateProjectTypePurl", BindingFlags.Static | BindingFlags.NonPublic);
+
+        private static readonly MethodInfo HandleMismatchedPurlIdMethod =
+            typeof(Sw360Service).GetMethod("HandleMismatchedPurlId", BindingFlags.Static | BindingFlags.NonPublic);
+
+        private static readonly FieldInfo InvalidComponentsField =
+            typeof(Sw360Service).GetField("InvalidComponentsIdentifiedByPurlId", BindingFlags.Static | BindingFlags.NonPublic);
+        private static readonly MethodInfo RemoveInvalidComponentsByPurlIdMethod =
+           typeof(Sw360Service).GetMethod("RemoveInvalidComponentsByPurlId", BindingFlags.Static | BindingFlags.NonPublic);
+
+        [SetUp]
+        public void Setup()
+        {
+            // Clear the invalid list before each test
+            var list = (List<Components>)InvalidComponentsField.GetValue(null);
+            list.Clear();
+        }
 
         [Test]
         public async Task GetProjectNameByProjectIDFromSW360_ProvidedProjectIdReturnsProjectName()
@@ -494,6 +513,177 @@ namespace LCT.Services.UTest
 
             // Assert
             Assert.That(actual.AttachmentLink, Is.Null);
+        }
+        [Test]
+        public void ValidateProjectTypePurl_ReturnsFalse_WhenProjectTypeIsNull()
+        {
+            var sw360Component = new Sw360Components { ExternalIds = new ExternalIds() };
+            var component = new Components { ProjectType = null };
+
+            var result = (bool)ValidateProjectTypePurlMethod.Invoke(null, new object[] { sw360Component, component });
+
+            Assert.IsFalse(result);
+        }
+
+        [Test]
+        public void ValidateProjectTypePurl_ReturnsFalse_WhenProjectTypeNotInPurlCheck()
+        {
+            var sw360Component = new Sw360Components { ExternalIds = new ExternalIds() };
+            var component = new Components { ProjectType = "UNKNOWN" };
+
+            // Simulate PurlCheck not containing "UNKNOWN"
+            var originalPurlCheck = LCT.Common.Constants.Dataconstant.PurlCheck();
+
+            var result = (bool)ValidateProjectTypePurlMethod.Invoke(null, new object[] { sw360Component, component });
+
+            Assert.IsFalse(result);
+        }
+
+        [Test]
+        public void ValidateProjectTypePurl_ReturnsTrue_WhenPurlIdMatches_PackageUrl()
+        {
+            var sw360Component = new Sw360Components
+            {
+                ExternalIds = new ExternalIds { Package_Url = "pkg:npm/test" }
+            };
+            var component = new Components { ProjectType = "NPM" };
+
+            // Simulate PurlCheck containing "NPM"
+            var originalPurlCheck = LCT.Common.Constants.Dataconstant.PurlCheck();
+
+            var result = (bool)ValidateProjectTypePurlMethod.Invoke(null, new object[] { sw360Component, component });
+
+            Assert.IsTrue(result);
+        }
+
+        [Test]
+        public void ValidateProjectTypePurl_ReturnsTrue_WhenPurlIdMatches_PurlId()
+        {
+            var sw360Component = new Sw360Components
+            {
+                ExternalIds = new ExternalIds { Purl_Id = "pkg:npm/test" }
+            };
+            var component = new Components { ProjectType = "NPM" };
+
+            // Simulate PurlCheck containing "NPM"
+            var originalPurlCheck = LCT.Common.Constants.Dataconstant.PurlCheck();
+            var result = (bool)ValidateProjectTypePurlMethod.Invoke(null, new object[] { sw360Component, component });
+
+            Assert.IsTrue(result);
+        }
+
+        [Test]
+        public void ValidateProjectTypePurl_CallsHandleMismatchedPurlId_WhenNoMatch()
+        {
+            var sw360Component = new Sw360Components
+            {
+                ExternalIds = new ExternalIds { Package_Url = "pkg:maven/test", Purl_Id = "pkg:maven/test" },
+                Links = new Links { Self = new Self { Href = "http://test/component/123" } }
+            };
+            var component = new Components { ProjectType = "NPM" };
+
+            // Simulate PurlCheck containing "NPM"
+            var originalPurlCheck = LCT.Common.Constants.Dataconstant.PurlCheck();
+            var result = (bool)ValidateProjectTypePurlMethod.Invoke(null, new object[] { sw360Component, component });
+
+            Assert.IsFalse(result);
+            Assert.IsTrue(component.InValidComponentByPurlid);
+            Assert.AreEqual("http://test/component/123", component.ComponentLink);
+            Assert.AreEqual("123", component.ComponentID);
+
+            // Check that it was added to the invalid list
+            var list = (List<Components>)InvalidComponentsField.GetValue(null);
+            Assert.IsTrue(list.Contains(component));
+        }
+
+        [Test]
+        public void HandleMismatchedPurlId_SetsPropertiesAndAddsToInvalidList()
+        {
+            var sw360Component = new Sw360Components
+            {
+                Links = new Links { Self = new Self { Href = "http://test/component/456" } }
+            };
+            var component = new Components();
+
+            // Patch CommonHelper.GetSubstringOfLastOccurance for test if needed
+
+            HandleMismatchedPurlIdMethod.Invoke(null, new object[] { sw360Component, component });
+
+            Assert.IsTrue(component.InValidComponentByPurlid);
+            Assert.AreEqual("http://test/component/456", component.ComponentLink);
+            Assert.AreEqual("456", component.ComponentID);
+
+            var list = (List<Components>)InvalidComponentsField.GetValue(null);
+            Assert.IsTrue(list.Contains(component));
+        }
+        [Test]
+        public void RemoveInvalidComponentsByPurlId_NoInvalids_ListUnchanged()
+        {
+            var components = new List<Components>
+            {
+                new Components { Name = "apt", Version = "2.6.1", ReleaseExternalId = "pkg:deb/debian/apt@2.6.1?arch=source" },
+                new Components { Name = "libapt-pkg6.0", Version = "2.6.1", ReleaseExternalId = "pkg:deb/debian/libapt-pkg6.0@2.6.1?arch=source" }
+            };
+
+            RemoveInvalidComponentsByPurlIdMethod.Invoke(null, new object[] { components });
+
+            Assert.AreEqual(2, components.Count);
+        }
+
+        [Test]
+        public void RemoveInvalidComponentsByPurlId_OneMatch_RemovesComponent()
+        {
+            var invalid = new Components { Name = "apt", Version = "2.6.1", ReleaseExternalId = "pkg:deb/debian/apt@2.6.1?arch=source" };
+            var invalidList = (List<Components>)InvalidComponentsField.GetValue(null);
+            invalidList.Add(invalid);
+
+            var components = new List<Components>
+            {
+                new Components { Name = "apt", Version = "2.6.1", ReleaseExternalId = "pkg:deb/debian/apt@2.6.1?arch=source" },
+                new Components { Name = "libapt-pkg6.0", Version = "2.6.1", ReleaseExternalId = "pkg:deb/debian/libapt-pkg6.0@2.6.1?arch=source" }
+            };
+
+            RemoveInvalidComponentsByPurlIdMethod.Invoke(null, new object[] { components });
+
+            Assert.AreEqual(1, components.Count);
+            Assert.AreEqual("libapt-pkg6.0", components[0].Name);
+        }
+
+        [Test]
+        public void RemoveInvalidComponentsByPurlId_NoMatch_ListUnchanged()
+        {
+            var invalid = new Components { Name = "C", Version = "3.0", ReleaseExternalId = "ref3" };
+            var invalidList = (List<Components>)InvalidComponentsField.GetValue(null);
+            invalidList.Add(invalid);
+
+            var components = new List<Components>
+            {
+                new Components { Name = "apt", Version = "2.6.1", ReleaseExternalId = "pkg:deb/debian/apt@2.6.1?arch=source" },
+                new Components { Name = "libapt-pkg6.0", Version = "2.6.1", ReleaseExternalId = "pkg:deb/debian/libapt-pkg6.0@2.6.1?arch=source" }
+            };
+
+            RemoveInvalidComponentsByPurlIdMethod.Invoke(null, new object[] { components });
+
+            Assert.AreEqual(2, components.Count);
+        }
+
+        [Test]
+        public void RemoveInvalidComponentsByPurlId_MatchIsCaseInsensitiveAndTrimmed()
+        {
+            var invalid = new Components { Name = " apt ", Version = "2.6.1", ReleaseExternalId = "pkg:deb/debian/apt@2.6.1?arch=source" };
+            var invalidList = (List<Components>)InvalidComponentsField.GetValue(null);
+            invalidList.Add(invalid);
+
+            var components = new List<Components>
+            {
+                new Components { Name = "apt", Version = "2.6.1", ReleaseExternalId = "pkg:deb/debian/apt@2.6.1?arch=source" },
+                new Components { Name = "libapt-pkg6.0", Version = "2.6.1", ReleaseExternalId = "pkg:deb/debian/libapt-pkg6.0@2.6.1?arch=source" }
+            };
+
+            RemoveInvalidComponentsByPurlIdMethod.Invoke(null, new object[] { components });
+
+            Assert.AreEqual(1, components.Count);
+            Assert.AreEqual("libapt-pkg6.0", components[0].Name);
         }
     }
 }

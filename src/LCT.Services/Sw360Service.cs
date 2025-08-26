@@ -55,7 +55,7 @@ namespace LCT.Services
             m_SW360CommonService = sw360CommonService;
             environmentHelper = _environmentHelper;
         }
-        public async Task<List<Components>> GetDuplicateComponentsByPurlId(List<Components> listOfComponentsToBom)
+        public List<Components> GetDuplicateComponentsByPurlId()
         {
             return InvalidComponentsIdentifiedByPurlId;
         }
@@ -328,18 +328,21 @@ namespace LCT.Services
                     // Do Nothing or to be implemented
                 }
             }
-            if (InvalidComponentsIdentifiedByPurlId.Count != 0)
-            {
-                listOfComponentsToBom.RemoveAll(component =>
-                    InvalidComponentsIdentifiedByPurlId.Any(invalid =>
-                        invalid.Name?.Trim().Equals(component.Name?.Trim(), StringComparison.OrdinalIgnoreCase) == true &&
-                        invalid.Version?.Trim().Equals(component.Version?.Trim(), StringComparison.OrdinalIgnoreCase) == true &&
-                        invalid.ReleaseExternalId?.Equals(component.ReleaseExternalId) == true
-                    ));
-            }
+            RemoveInvalidComponentsByPurlId(listOfComponentsToBom);
             return availableComponentList;
         }
+        private static void RemoveInvalidComponentsByPurlId(List<Components> components)
+        {
+            if (InvalidComponentsIdentifiedByPurlId.Count == 0)
+                return;
 
+            components.RemoveAll(component =>
+                InvalidComponentsIdentifiedByPurlId.Any(invalid =>
+                    invalid.Name?.Trim().Equals(component.Name?.Trim(), StringComparison.OrdinalIgnoreCase) == true &&
+                    invalid.Version?.Trim().Equals(component.Version?.Trim(), StringComparison.OrdinalIgnoreCase) == true &&
+                    invalid.ReleaseExternalId?.Equals(component.ReleaseExternalId) == true
+                ));
+        }
         private static bool CheckAvailabilityByNameAndVersion(IList<Sw360Releases> sw360Releases, Components component, IList<Sw360Components> sw360ComponentList)
         {
             Logger.Debug($"CheckAvailabilityByNameAndVersion(): Starting check for component '{component?.Name}' version '{component?.Version}'");
@@ -386,7 +389,6 @@ namespace LCT.Services
 
         private static bool ValidateAndProcessComponent(Sw360Releases sw360Release, Sw360Components sw360Component, Components component)
         {
-            // If no external IDs exist, add to available list
             if (string.IsNullOrEmpty(sw360Component?.ExternalIds?.Package_Url)
                 && string.IsNullOrEmpty(sw360Component?.ExternalIds?.Purl_Id))
             {
@@ -394,11 +396,9 @@ namespace LCT.Services
                 return true;
             }
 
-            // Log external IDs for debugging
             Logger.Debug($"GetAvailableComponenentsList(): Component Name - {component.Name}, Version - {component.Version} " +
                         $"validating Externalids list - {sw360Component.ExternalIds?.Package_Url},{sw360Component.ExternalIds?.Purl_Id}");
 
-            // Validate project type and PURL
             if (!ValidateProjectTypePurl(sw360Component, component))
             {
                 return false;

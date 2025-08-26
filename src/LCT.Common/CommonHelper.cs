@@ -158,7 +158,7 @@ namespace LCT.Common
             const string Name = "Name";
             const string Version = "Version";
             const string URL = "SW360 Release URL";
-            const string ComponentURL = "SW360 Component URL";
+
             if (componentInfo.Count > 0 || lstReleaseNotCreated.Count > 0)
             {
                 Logger.Logger.Log(null, Level.Alert, "Action Item required by the user:\n", null);
@@ -210,9 +210,9 @@ namespace LCT.Common
                 Logger.Logger.Log(null, Level.Alert, "* List of components or releases not created in SW360 due to Invalid PuriIds found in Components ExternalID field in sw360", null);
                 Logger.Logger.Log(null, Level.Alert, "  Component Name already exists in SW360 with a different package type PurlId. Manually update the component details.", null);
 
-                int nameWidth = 45;
-                int versionWidth = 25;
-                int urlWidth = 120;
+                const int nameWidth = 45;
+                const int versionWidth = 25;
+                const int urlWidth = 120;
                 int totalWidth = nameWidth + versionWidth + urlWidth + 10; 
 
                 string border = new string('=', totalWidth);
