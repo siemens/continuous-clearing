@@ -36,6 +36,11 @@ namespace LCT.Services.UTest
             typeof(Sw360Service).GetField("InvalidComponentsIdentifiedByPurlId", BindingFlags.Static | BindingFlags.NonPublic);
         private static readonly MethodInfo RemoveInvalidComponentsByPurlIdMethod =
            typeof(Sw360Service).GetMethod("RemoveInvalidComponentsByPurlId", BindingFlags.Static | BindingFlags.NonPublic);
+        private static readonly MethodInfo AddToAvailableListMethod =
+           typeof(Sw360Service).GetMethod("AddToAvailableList", BindingFlags.Static | BindingFlags.NonPublic);
+
+        private static readonly FieldInfo AvailableComponentListField =
+            typeof(Sw360Service).GetField("availableComponentList", BindingFlags.Static | BindingFlags.NonPublic);
 
         [SetUp]
         public void Setup()
@@ -684,6 +689,36 @@ namespace LCT.Services.UTest
 
             Assert.AreEqual(1, components.Count);
             Assert.AreEqual("libapt-pkg6.0", components[0].Name);
+        }
+        [Test]
+        public void AddToAvailableList_AddsComponentWithCorrectProperties()
+        {
+            // Arrange
+            var sw360Release = new Sw360Releases
+            {
+                Name = "TestLib",
+                Version = "2.1.0",
+                // Simulate Links property with Self.Href
+                Links = new Links { Self = new Self { Href = "http://sw360/release/123" } }
+            };
+            var component = new Components
+            {
+                ReleaseExternalId = "rel-ext-1",
+                ComponentExternalId = "comp-ext-1"
+            };
+
+            // Act
+            AddToAvailableListMethod.Invoke(null, new object[] { sw360Release, component });
+
+            // Assert
+            var list = (List<Components>)AvailableComponentListField.GetValue(null);
+            Assert.AreEqual(1, list.Count);
+            var added = list[0];
+            Assert.AreEqual("TestLib", added.Name);
+            Assert.AreEqual("2.1.0", added.Version);
+            Assert.AreEqual("http://sw360/release/123", added.ReleaseLink);
+            Assert.AreEqual("rel-ext-1", added.ReleaseExternalId);
+            Assert.AreEqual("comp-ext-1", added.ComponentExternalId);
         }
     }
 }

@@ -213,7 +213,7 @@ namespace LCT.Common
                 const int nameWidth = 45;
                 const int versionWidth = 25;
                 const int urlWidth = 120;
-                int totalWidth = nameWidth + versionWidth + urlWidth + 10; 
+                const int totalWidth = nameWidth + versionWidth + urlWidth + 10; 
 
                 string border = new string('=', totalWidth);
                 string separator = new string('-', totalWidth);
