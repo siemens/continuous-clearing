@@ -835,74 +835,104 @@ namespace LCT.Common.Logging
             SafeSpectreAction(() =>
             {
                 WriteSummaryHeader("SUMMARY");
-                if (!string.IsNullOrWhiteSpace(ProjectSummaryLink))
-                {
-                    WriteLine();
-                    WriteInfoWithMarkup($"[blue]Project Summary: [/][white]{ProjectSummaryLink}[/]");
-                }
+                WriteProjectSummary(ProjectSummaryLink);
+
                 int consoleWidth = GetConsoleWidth(6, 120);
-
-                int maxValue = printData.Values.Count != 0 ? printData.Values.Max() : 0;
                 int barMaxWidth = Math.Max(20, 40);
+                int maxValue = printData.Values.Count != 0 ? printData.Values.Max() : 0;
 
-                var table = new Table()
-                    .BorderColor(Color.White)
-                    .Border(TableBorder.Rounded)
-                    .Width(Math.Min(consoleWidth, 200))
-                    .Expand();
-
-                table.AddColumn(new TableColumn("[green bold]Feature[/]"));
-                table.AddColumn(new TableColumn("[blue bold]Count[/]"));
-                table.AddRow("", "");
-
-                var legendColorMap = LegendMappings.GetLegendColorMap(exeType);
-                var tableKeyToLegend = LegendMappings.GetTableKeyToLegend(exeType);
-                var legendRow = LegendMappings.GetLegendRow(exeType);
-
-                foreach (var item in printData)
-                {
-                    string legendLabel = GetLegendLabel(item.Key, tableKeyToLegend, legendColorMap);
-                    string color = legendLabel != null && legendColorMap.TryGetValue(legendLabel, out var mappedColor)
-                        ? mappedColor
-                        : GetColorForItem(item.Key, item.Value);
-
-                    int barWidth = maxValue > 0 ? (int)((double)item.Value / maxValue * barMaxWidth) : 0;
-                    string visualBar = barWidth > 0 ? new string('█', barWidth) : "";
-
-                    table.AddRow(
-                        $"[white]{item.Key}[/]",
-                        $"[{color}]{visualBar} {item.Value}[/]"
-                    );
-                    table.AddRow("", "");
-                }
+                var table = CreateSummaryTable(consoleWidth);
+                AddSummaryRows(table, printData, exeType, maxValue, barMaxWidth);
 
                 table.AddEmptyRow();
                 AnsiConsole.Write(table);
 
                 WriteLine();
-                var legendTable = new Table()
-                    .BorderColor(Color.White)
-                    .Border(TableBorder.None)
-                    .Width(Math.Min(consoleWidth, 200));
+                WriteLegendTable(exeType, consoleWidth);
 
-                foreach (var _ in legendRow)
-                    legendTable.AddColumn(new TableColumn("").Width(33));
-                legendTable.AddRow(legendRow);
-
-                AnsiConsole.Write(legendTable);
-                WriteLine();
-
-                if (printTimingData.Count != 0)
-                {
-                    WriteLine();
-                    foreach (var item in printTimingData)
-                    {
-                        string timeFormatted = item.Value.ToString("F3");
-                        WriteInfoWithMarkup($"[white]Time Taken By {item.Key} : [/][green]{timeFormatted}[/][white] s[/]");
-                    }
-                    WriteLine();
-                }
+                WriteTimingData(printTimingData);
             }, "Package Summary Table", "Panel");
+        }
+
+        private static void WriteProjectSummary(string projectSummaryLink)
+        {
+            if (!string.IsNullOrWhiteSpace(projectSummaryLink))
+            {
+                WriteLine();
+                WriteInfoWithMarkup($"[blue]Project Summary: [/][white]{projectSummaryLink}[/]");
+            }
+        }
+
+        private static Table CreateSummaryTable(int consoleWidth)
+        {
+            var table = new Table()
+                .BorderColor(Color.White)
+                .Border(TableBorder.Rounded)
+                .Width(Math.Min(consoleWidth, 200))
+                .Expand();
+
+            table.AddColumn(new TableColumn("[green bold]Feature[/]"));
+            table.AddColumn(new TableColumn("[blue bold]Count[/]"));
+            table.AddRow("", "");
+            return table;
+        }
+
+        private static void AddSummaryRows(
+            Table table,
+            Dictionary<string, int> printData,
+            string exeType,
+            int maxValue,
+            int barMaxWidth)
+        {
+            var legendColorMap = LegendMappings.GetLegendColorMap(exeType);
+            var tableKeyToLegend = LegendMappings.GetTableKeyToLegend(exeType);
+
+            foreach (var item in printData)
+            {
+                string legendLabel = GetLegendLabel(item.Key, tableKeyToLegend, legendColorMap);
+                string color = legendLabel != null && legendColorMap.TryGetValue(legendLabel, out var mappedColor)
+                    ? mappedColor
+                    : GetColorForItem(item.Key, item.Value);
+
+                int barWidth = maxValue > 0 ? (int)((double)item.Value / maxValue * barMaxWidth) : 0;
+                string visualBar = barWidth > 0 ? new string('█', barWidth) : "";
+
+                table.AddRow(
+                    $"[white]{item.Key}[/]",
+                    $"[{color}]{visualBar} {item.Value}[/]"
+                );
+                table.AddRow("", "");
+            }
+        }
+
+        private static void WriteLegendTable(string exeType, int consoleWidth)
+        {
+            var legendRow = LegendMappings.GetLegendRow(exeType);
+            var legendTable = new Table()
+                .BorderColor(Color.White)
+                .Border(TableBorder.None)
+                .Width(Math.Min(consoleWidth, 200));
+
+            foreach (var _ in legendRow)
+                legendTable.AddColumn(new TableColumn("").Width(33));
+            legendTable.AddRow(legendRow);
+
+            AnsiConsole.Write(legendTable);
+            WriteLine();
+        }
+
+        private static void WriteTimingData(Dictionary<string, double> printTimingData)
+        {
+            if (printTimingData.Count == 0)
+                return;
+
+            WriteLine();
+            foreach (var item in printTimingData)
+            {
+                string timeFormatted = item.Value.ToString("F3");
+                WriteInfoWithMarkup($"[white]Time Taken By {item.Key} : [/][green]{timeFormatted}[/][white] s[/]");
+            }
+            WriteLine();
         }
         private static string GetLegendLabel(
             string key,
