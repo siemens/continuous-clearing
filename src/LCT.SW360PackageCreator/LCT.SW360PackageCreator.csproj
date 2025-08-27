@@ -35,6 +35,12 @@
 		<ProjectReference Include="..\LCT.Telemetry\LCT.Telemetry.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <None Update="Files\PackageKnown_purls.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
 	<ProjectExtensions>
 		<VisualStudio>
 			<UserProperties />

@@ -264,6 +264,76 @@ namespace LCT.Services
             }
             return fileName;
         }
+        public async Task<List<Components>> GetAvailablePackagesInSw360(List<Components> listOfComponentsToBom)
+        {
+            List<Components> availablePackagesList = new List<Components>();
+            IList<Sw360Packages> sw360packageList = await GetAvailablePackagesListFromSw360();
+
+            foreach (Components component in listOfComponentsToBom)
+            {
+                if (CheckPackageAvailabilityByPurl(sw360packageList, component, availablePackagesList))
+                {
+                    Logger.Debug($"GetAvailablePackagesList():  Package Exist : Package name - {component.Name}, version - {component.Version}");
+                }
+                else
+                {
+                    // Do Nothing or to be implemented
+                }
+            }
+
+            return availablePackagesList;
+        }
+        private static bool CheckPackageAvailabilityByPurl(IList<Sw360Packages> sw360Packages, Components component, List<Components> availablePackageList)
+        {
+            //checking for component existance with name 
+            bool isPackageAvailable = false;
+            Sw360Packages sw360Package =
+                sw360Packages.FirstOrDefault(x => x.Purl?.Trim().ToLowerInvariant() == component?.ReleaseExternalId?.Trim().ToLowerInvariant());
+            if (sw360Package != null)
+            {
+                availablePackageList.Add(new Components()
+                {
+                    Name = sw360Package.Name,
+                    Version = sw360Package.Version,
+                    Purl = sw360Package.Purl,
+                    PackageLink = sw360Package.Links?.Self?.Href,
+                    PackageStatus = Dataconstant.Available
+                });
+                isPackageAvailable = true;
+            }
+            return isPackageAvailable;
+        }
+        private static bool CheckPackageByPurl(IList<Sw360Packages> sw360Packages, ComparisonBomData component, List<ComparisonBomData> parsedBomData)
+        {
+            //checking for component existance with name 
+            bool isPackageAvailable = false;
+            Sw360Packages sw360Package =
+                sw360Packages.FirstOrDefault(x => x.Purl?.Trim().ToLowerInvariant() == component?.Purl?.Trim().ToLowerInvariant());
+            if (sw360Package != null)
+            {
+                component.PackageLink = sw360Package.Links?.Self?.Href;
+                component.PackageStatus = Dataconstant.Available;
+
+                isPackageAvailable = true;
+            }
+            return isPackageAvailable;
+        }
+        private async Task<IList<Sw360Packages>> GetAvailablePackagesListFromSw360()
+        {
+            IList<Sw360Packages> packagesList = new List<Sw360Packages>();
+            try
+            {
+                string responseBody = await m_SW360ApiCommunicationFacade.GetPackages();
+                var componentsDataModel = JsonConvert.DeserializeObject<PackagesModel>(responseBody);
+                packagesList = componentsDataModel?.Embedded?.Sw360packages;
+            }
+            catch (HttpRequestException ex)
+            {
+                Environment.ExitCode = -1;
+                Logger.Error($"GetAvailablePackagesListFromSw360():", ex);
+            }
+            return packagesList;
+        }
 
         [ExcludeFromCodeCoverage]
         public async Task<string> GetUploadDescriptionfromSW360(string componentName, string componetVersion, string sw360url)
@@ -331,29 +401,59 @@ namespace LCT.Services
         {
             //checking for release existance with name and version
             bool isReleaseAvailable = false;
-            Sw360Releases sw360Release =
-                sw360Releases.FirstOrDefault(x => x.Name?.Trim().ToLowerInvariant() == component?.Name?.Trim().ToLowerInvariant()
+            Sw360Releases sw360Release;
+            if (component.Sw360Name!=null)
+            {
+                sw360Release =
+                sw360Releases.FirstOrDefault(x => x.Name?.Trim().ToLowerInvariant() == component?.Sw360Name?.Trim().ToLowerInvariant()
                 && x.Version?.Trim().ToLowerInvariant() == component?.Version?.Trim().ToLowerInvariant());
-
-            if (sw360Release == null && component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
-            {
-                string debianVersion = $"{component?.Version?.Trim().ToLowerInvariant() ?? string.Empty}.debian";
-                sw360Release = sw360Releases.FirstOrDefault(x => x.Name?.Trim().ToLowerInvariant() == component?.Name?.Trim().ToLowerInvariant()
-                && x.Version?.Trim().ToLowerInvariant() == debianVersion);
-            }
-
-            if (sw360Release != null)
-            {
-                availableComponentList.Add(new Components()
+                if (sw360Release == null && component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
                 {
-                    Name = sw360Release.Name,
-                    Version = sw360Release.Version,
-                    ReleaseLink = sw360Release.Links?.Self?.Href,
-                    ReleaseExternalId = component.ReleaseExternalId,
-                    ComponentExternalId = component.ComponentExternalId
-                });
-                isReleaseAvailable = true;
+                    string debianVersion = $"{component?.Version?.Trim().ToLowerInvariant() ?? string.Empty}.debian";
+                    sw360Release = sw360Releases.FirstOrDefault(x => x.Name?.Trim().ToLowerInvariant() == component?.Name?.Trim().ToLowerInvariant()
+                    && x.Version?.Trim().ToLowerInvariant() == debianVersion);
+                }
+
+                if (sw360Release != null)
+                {
+                    availableComponentList.Add(new Components()
+                    {
+                        Name = component.Name,
+                        Version = sw360Release.Version,
+                        ReleaseLink = sw360Release.Links?.Self?.Href,
+                        ReleaseExternalId = component.ReleaseExternalId,
+                        ComponentExternalId = component.ComponentExternalId
+                    });
+                    isReleaseAvailable = true;
+                }
             }
+            else
+            {
+                sw360Release =
+                    sw360Releases.FirstOrDefault(x => x.Name?.Trim().ToLowerInvariant() == component?.Name?.Trim().ToLowerInvariant()
+                    && x.Version?.Trim().ToLowerInvariant() == component?.Version?.Trim().ToLowerInvariant());
+                if (sw360Release == null && component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
+                {
+                    string debianVersion = $"{component?.Version?.Trim().ToLowerInvariant() ?? string.Empty}.debian";
+                    sw360Release = sw360Releases.FirstOrDefault(x => x.Name?.Trim().ToLowerInvariant() == component?.Name?.Trim().ToLowerInvariant()
+                    && x.Version?.Trim().ToLowerInvariant() == debianVersion);
+                }
+
+                if (sw360Release != null)
+                {
+                    availableComponentList.Add(new Components()
+                    {
+                        Name = sw360Release.Name,
+                        Version = sw360Release.Version,
+                        ReleaseLink = sw360Release.Links?.Self?.Href,
+                        ReleaseExternalId = component.ReleaseExternalId,
+                        ComponentExternalId = component.ComponentExternalId
+                    });
+                    isReleaseAvailable = true;
+                }
+            }
+
+            
             return isReleaseAvailable;
         }
 
@@ -378,8 +478,40 @@ namespace LCT.Services
         {
             //checking for component existance with name 
             bool isComponentAvailable = false;
-            Sw360Components sw360Component =
-                sw360Components.FirstOrDefault(x => x.Name?.Trim().ToLowerInvariant() == component?.Name?.Trim().ToLowerInvariant());
+            Sw360Components sw360Component;
+            if (component.Sw360Name != null)
+            {
+                sw360Component = sw360Components.FirstOrDefault(x => x.Name?.Trim().ToLowerInvariant() == component?.Sw360Name?.Trim().ToLowerInvariant());
+                if (sw360Component != null)
+                {
+                    availableComponentList.Add(new Components()
+                    {
+                        Name = component.Name,
+                        Version = string.Empty,
+                        ReleaseLink = string.Empty,
+                        ComponentExternalId = component.ComponentExternalId,
+                        ReleaseExternalId = string.Empty
+                    });
+                    isComponentAvailable = true;
+                }
+            }
+            else
+            {
+                sw360Component = sw360Components.FirstOrDefault(x => x.Name?.Trim().ToLowerInvariant() == component?.Name?.Trim().ToLowerInvariant());
+                if (sw360Component != null)
+                {
+                    availableComponentList.Add(new Components()
+                    {
+                        Name = sw360Component.Name,
+                        Version = string.Empty,
+                        ReleaseLink = string.Empty,
+                        ComponentExternalId = component.ComponentExternalId,
+                        ReleaseExternalId = string.Empty
+                    });
+                    isComponentAvailable = true;
+                }
+            }
+               
             if (sw360Component != null)
             {
                 availableComponentList.Add(new Components()
@@ -402,18 +534,33 @@ namespace LCT.Services
 
             try
             {
-                componentstatus = await m_SW360CommonService.GetComponentDataByExternalId(componentToBomData.Name, componentToBomData.ComponentExternalId);
+                string name=componentToBomData.Name;
+                if (componentToBomData.Sw360Name != null)
+                {
+                    name= componentToBomData.Sw360Name;
+                }
+
+                componentstatus = await m_SW360CommonService.GetComponentDataByExternalId(name, componentToBomData.ComponentExternalId);
 
                 if (componentstatus.isComponentExist)
                 {
-                    availableComponentList.Add(new Components()
+                    if (componentToBomData.Sw360Name == null ||
+                        componentToBomData.Sw360Name.Trim().Equals(componentstatus.Sw360components.Name.Trim(), StringComparison.InvariantCultureIgnoreCase))
                     {
-                        Name = componentToBomData.Name,
-                        Version = string.Empty,
-                        ReleaseLink = string.Empty,
-                        ComponentExternalId = componentToBomData.ComponentExternalId,
-                        ReleaseExternalId = string.Empty
-                    });
+                        availableComponentList.Add(new Components()
+                        {
+                            Name = componentToBomData.Name,
+                            Version = string.Empty,
+                            ReleaseLink = string.Empty,
+                            ComponentExternalId = componentToBomData.ComponentExternalId,
+                            ReleaseExternalId = string.Empty
+                        });
+                    }
+                    else
+                    {
+                        componentstatus.isComponentExist = false;
+                    }
+                        
                 }
             }
             catch (HttpRequestException ex)
@@ -440,14 +587,22 @@ namespace LCT.Services
                 releaseStatus = await m_SW360CommonService.GetReleaseDataByExternalId(componentToBomData.Name, componentToBomData.Version, componentToBomData.ReleaseExternalId);
                 if (releaseStatus.isReleaseExist)
                 {
-                    availableComponentList.Add(new Components()
+                    if (componentToBomData.Sw360Name == null ||
+                        componentToBomData.Sw360Name.Trim().Equals(releaseStatus.sw360Releases.Name.Trim(), StringComparison.InvariantCultureIgnoreCase))
                     {
-                        Name = componentToBomData.Name,
-                        Version = componentToBomData.Version,
-                        ReleaseLink = releaseStatus.sw360Releases.Links?.Self?.Href,
-                        ReleaseExternalId = componentToBomData.ReleaseExternalId,
-                        ComponentExternalId = componentToBomData.ComponentExternalId
-                    });
+                        availableComponentList.Add(new Components()
+                        {
+                            Name = componentToBomData.Name,
+                            Version = componentToBomData.Version,
+                            ReleaseLink = releaseStatus.sw360Releases.Links?.Self?.Href,
+                            ReleaseExternalId = componentToBomData.ReleaseExternalId,
+                            ComponentExternalId = componentToBomData.ComponentExternalId
+                        });
+                    }
+                    else
+                    {
+                        releaseStatus.isReleaseExist = false;
+                    }
                 }
             }
             catch (HttpRequestException ex)

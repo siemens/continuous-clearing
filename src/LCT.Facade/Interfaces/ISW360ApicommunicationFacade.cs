@@ -8,6 +8,7 @@ using LCT.APICommunications.Model;
 using LCT.Common.Model;
 using System.Net.Http;
 using System.Threading.Tasks;
+using LCT.APICommunications;
 
 namespace LCT.Facade.Interfaces
 {
@@ -45,5 +46,10 @@ namespace LCT.Facade.Interfaces
         Task<HttpResponseMessage> GetReleaseByExternalId(string purlId, string externalIdKey = "");
         Task<HttpResponseMessage> GetComponentByExternalId(string purlId, string externalIdKey = "");
         Task<HttpResponseMessage> GetAllReleasesWithAllData(int page, int pageEntries);
+        Task<string> GetPackages();
+        Task<HttpResponseMessage> CreatePackage(CreatePackage createComponentContent);
+        Task<HttpResponseMessage> UpdatePackage(HttpContent httpContent, string packageId);
+        Task<HttpResponseMessage> LinkPackagesToProject(HttpContent httpContent, string sw360ProjectId);
+        Task<HttpResponseMessage> UpdateLinkedReleaseToProject(string projectId, string releaseId, AddLinkedRelease updateLinkedRelease);
     }
 }

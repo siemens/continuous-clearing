@@ -9,6 +9,7 @@ using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
 using LCT.Common.Model;
 using LCT.Facade.Interfaces;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -30,6 +31,10 @@ namespace LCT.Facade
         public SW360ApicommunicationFacade(ISw360ApiCommunication sw360ApiCommunication)
         {
             m_sw360ApiCommunication = sw360ApiCommunication;
+        }
+        public Task<string> GetPackages()
+        {
+            return m_sw360ApiCommunication.GetPackages();
         }
 
         public Task<string> GetProjects()
@@ -103,7 +108,10 @@ namespace LCT.Facade
         {
             return m_sw360ApiCommunication.GetReleaseOfComponentById(componentId);
         }
-
+        public async Task<HttpResponseMessage> LinkPackagesToProject(HttpContent httpContent, string sw360ProjectId)
+        {            
+            return await m_sw360ApiCommunication.LinkPackagesToProject(httpContent, sw360ProjectId);
+        }
         public Task<string> GetReleaseAttachments(string releaseAttachmentsUrl)
         {
             return m_sw360ApiCommunication.GetReleaseAttachments(releaseAttachmentsUrl);
@@ -171,6 +179,18 @@ namespace LCT.Facade
         public Task<HttpResponseMessage> GetAllReleasesWithAllData(int page, int pageEntries)
         {
             return m_sw360ApiCommunication.GetAllReleasesWithAllData(page, pageEntries);
+        }
+        public async Task<HttpResponseMessage> CreatePackage(CreatePackage createPackageContent)
+        {            
+            return await m_sw360ApiCommunication.CreatePackage(createPackageContent);
+        }
+        public async Task<HttpResponseMessage> UpdatePackage(HttpContent httpContent, string packageId)
+        {
+            return await m_sw360ApiCommunication.UpdatePackage(httpContent, packageId);
+        }
+        public Task<HttpResponseMessage> UpdateLinkedReleaseToProject(string projectId, string releaseId, AddLinkedRelease updateLinkedRelease)
+        {
+            return m_sw360ApiCommunication.UpdateLinkedReleaseToProject(projectId, releaseId, updateLinkedRelease);
         }
     }
 }

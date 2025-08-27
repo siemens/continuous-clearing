@@ -849,5 +849,216 @@ namespace LCT.Services
             }
             return fossTriggerStatus;
         }
+        public async Task<bool> LinkPackagesToProject(List<PackageLinked> packageListToLinkProject, string sw360ProjectId)
+        {
+            if (packageListToLinkProject.Count <= 0 && packageListToLinkProject.Count <= 0)
+            {
+                Logger.Debug($"No of package Id's to link - 0");
+                return true;
+            }
+            try
+            {
+                List<string> packageIds = new List<string>();
+
+                foreach (var release in packageListToLinkProject)
+                {
+                    if (!string.IsNullOrEmpty(release.PackageId))
+                    {
+                        packageIds.Add(release.PackageId);
+                    }
+                }
+
+                StringContent content = new StringContent(JsonConvert.SerializeObject(packageIds), Encoding.UTF8, "application/json");
+
+                var response = await m_SW360ApiCommunicationFacade.LinkPackagesToProject(content, sw360ProjectId);
+                if (!response.IsSuccessStatusCode)
+                {
+                    Logger.Error($"LinkPackagesToProject() : Linking releases to project Id {sw360ProjectId} is failed.");
+                    environmentHelper.CallEnvironmentExit(-1);
+                    return false;
+                }
+                return true;
+            }
+            catch (HttpRequestException ex)
+            {
+                Logger.Error($"LinkPackagesToProject():", ex);
+                environmentHelper.CallEnvironmentExit(-1);
+                return false;
+            }
+            catch (AggregateException ex)
+            {
+                Logger.Error($"LinkPackagesToProject():", ex);
+                environmentHelper.CallEnvironmentExit(-1);
+                return false;
+            }
+        }
+        public async Task<bool> UpdateReleasesToProject(List<ReleaseLinked> releasesTobeLinked, List<ReleaseLinked> manuallyLinkedReleases, string sw360ProjectId)
+        {
+            if (manuallyLinkedReleases.Count <= 0 && releasesTobeLinked.Count <= 0)
+            {
+                Logger.Debug($"No of release Id's to link - 0");
+                return true;
+            }
+            try
+            {
+                // Concatenate and remove duplicates from releasesTobeLinked and manuallyLinkedReleases
+                var finalReleasesToBeLinked = manuallyLinkedReleases.Concat(releasesTobeLinked).Distinct().ToList();
+                Logger.Debug($"No of release Id's to link - {finalReleasesToBeLinked.Count}");
+
+                // Create a dictionary to store unique releases
+                Dictionary<string, ReleaseLinked> linkedReleasesUniqueDict = new Dictionary<string, ReleaseLinked>();
+                foreach (var release in finalReleasesToBeLinked)
+                {
+                    if (!linkedReleasesUniqueDict.ContainsKey(release.ReleaseId))
+                    {
+                        linkedReleasesUniqueDict.Add(release.ReleaseId, release);
+                    }
+                    else
+                    {
+                        Logger.Debug("Duplicate entries found in finalReleasesToBeLinked: " + release.Name + ":" + release.ReleaseId +
+                            " , with :" + linkedReleasesUniqueDict[release.ReleaseId].Name + ":" + linkedReleasesUniqueDict[release.ReleaseId].ReleaseId);
+                    }
+                }
+
+                // Assign unique entries from the dictionary to finalReleasesToBeLinked
+                finalReleasesToBeLinked = linkedReleasesUniqueDict.Values.ToList();
+
+                // Loop through each release to send PATCH requests
+                foreach (var release in finalReleasesToBeLinked)
+                {
+                    // Create an AddLinkedRelease object for each release
+                    AddLinkedRelease addLinkedRelease = new AddLinkedRelease
+                    {
+                        ReleaseRelation = string.IsNullOrEmpty(release.Relation) ? Dataconstant.LinkedByCAToolReleaseRelationContained : release.Relation,
+                        Comment = manuallyLinkedReleases.Exists(r => r.ReleaseId == release.ReleaseId) ? release.Comment : Dataconstant.LinkedByCATool
+                    };
+
+                    // Send PATCH request to update the linked release to the project
+                    var response = await m_SW360ApiCommunicationFacade.UpdateLinkedReleaseToProject(sw360ProjectId, release.ReleaseId, addLinkedRelease);
+
+                    // Check if the response indicates failure
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        Environment.ExitCode = -1;
+                        Logger.Error($"UpdateReleasesToProject() : Failed to update release {release.ReleaseId} to project Id {sw360ProjectId}.");
+                        return false;
+                    }
+                }
+
+                // Return true if all releases were successfully updated
+                return true;
+            }
+            catch (HttpRequestException ex)
+            {
+                Logger.Error($"UpdateReleasesToProject():", ex);
+                Environment.ExitCode = -1;
+                return false;
+            }
+            catch (AggregateException ex)
+            {
+                Logger.Error($"UpdateReleasesToProject():", ex);
+                Environment.ExitCode = -1;
+                return false;
+            }
+
+        }
+        public async Task<PackageCreateStatus> CreatePackageBasesOFswComaprisonBOM(ComparisonBomData packageInfo)
+        {
+            Logger.Debug($"CreatePackageBasesOFswComaprisonBOM(): Name-{packageInfo.PackageName},version-{packageInfo.Version}");
+            PackageCreateStatus packageCreateStatus = new PackageCreateStatus
+            {
+                IsCreated = true,
+            };
+
+            try
+            {
+                CreatePackage crt = new CreatePackage
+                {
+                    ComponentType = ApiConstant.Oss,
+                    Name = packageInfo.PackageName,
+                    Version = packageInfo.Version,
+                    Purl = packageInfo.Purl,
+                    PackageType = ApiConstant.Library
+                };
+
+                // create component in sw360
+                HttpResponseMessage response = await m_SW360ApiCommunicationFacade.CreatePackage(crt);
+                response.EnsureSuccessStatusCode();
+                string result = response.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
+                //Component creation Success 
+                if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.Conflict)
+                {
+                    Logger.Debug($"Name - {packageInfo.PackageName},Version - {packageInfo.Version}");
+                    // Deserialize the response to get the href value
+                    var responseData = JsonConvert.DeserializeObject<dynamic>(result);
+                    packageInfo.PackageLink = responseData?._links?.self?.href ?? string.Empty;
+                    packageInfo.PackageId = CommonHelper.GetSubstringOfLastOccurance(packageInfo.PackageLink, "/");
+                    packageInfo.Purl = responseData?.purl ?? string.Empty;
+                    packageInfo.PackageStatus = Dataconstant.Available;
+                }
+                else
+                {
+                    packageCreateStatus.IsCreated = false;
+                    Logger.Debug($"CreatePackageBasesOFswComaprisonBOM():Component Name -{packageInfo.PackageName}- " +
+                   $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                Logger.Debug($"CreatePackageBasesOFswComaprisonBOM():", ex);
+                packageCreateStatus.IsCreated = false;
+
+            }
+
+            return packageCreateStatus;
+        }
+        public async Task<PackageUpdateStatus> UpdatePackagesWithReleases(ComparisonBomData packageInfo)
+        {
+            Logger.Debug($"UpdatePackagesWithReleases(): Name-{packageInfo.PackageName},version-{packageInfo.Version}");
+            PackageUpdateStatus packageUpdateStatus = new PackageUpdateStatus
+            {
+                IsUpdated = true,
+            };
+
+            try
+            {
+                UpdatePackage crt = new UpdatePackage
+                {
+                    ComponentType = ApiConstant.Oss,
+                    Name = packageInfo.PackageName,
+                    Version = packageInfo.Version,
+                    Purl = packageInfo.Purl,
+                    PackageType = ApiConstant.Library,
+                    ReleaseId = packageInfo.ReleaseID,
+                };
+
+                StringContent content = new StringContent(JsonConvert.SerializeObject(crt), Encoding.UTF8, "application/json");
+                // update package in sw360
+                HttpResponseMessage response = await m_SW360ApiCommunicationFacade.UpdatePackage(content, packageInfo.PackageId);
+                response.EnsureSuccessStatusCode();
+                string result = response.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
+
+                if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.Conflict)
+                {
+                    Logger.Debug($"Name - {packageInfo.PackageName},Version - {packageInfo.Version}");
+
+                }
+                else
+                {
+                    packageUpdateStatus.IsUpdated = false;
+                    Logger.Debug($"UpdatePackagesWithReleases():Package Name -{packageInfo.PackageName}- " +
+                   $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
+
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                Logger.Debug($"UpdatePackagesWithReleases", ex);
+                packageUpdateStatus.IsUpdated = false;
+
+            }
+
+            return packageUpdateStatus;
+        }
     }
 }

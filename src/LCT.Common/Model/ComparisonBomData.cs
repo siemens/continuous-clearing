@@ -39,6 +39,13 @@ namespace LCT.Common.Model
         public string ClearingState { get; set; }
         public string ReleaseCreatedBy { get; set; }
         public bool SourceAttachmentStatus { get; set; } = false;
+        public string Purl { get; set; }
+        public string PackageLink { get; set; }
+        public string PackageStatus { get; set; }
+        public string IsPackageCreated { get; set; }
+        public string PackageName { get; set; }
+        public string PackageId { get; set; }
+        public string Sw360Name { get; set; }
 
     }
 }

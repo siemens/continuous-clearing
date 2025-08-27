@@ -40,6 +40,7 @@ namespace LCT.SW360PackageCreator
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly List<Components> lstReleaseNotCreated = new List<Components>();
         List<Components> componentsAvailableInSw360 = new List<Components>();
+        List<Components> packagesAvailableInSw360 = new List<Components>();
         private const string SOURCE = "SOURCE";
         private readonly IDictionary<string, IPackageDownloader> _packageDownloderList = packageDownloderList;
 
@@ -206,6 +207,8 @@ namespace LCT.SW360PackageCreator
         {
             Logger.Debug($"SetContentsForComparisonBOM():Start");
             Logger.Logger.Log(null, Level.Notice, $"Collecting comparison BOM Data...", null);
+            packagesAvailableInSw360 = await sw360Service.GetAvailablePackagesInSw360(lstComponentForBOM);
+            await UpdateComponentNamesFromKnownPurls(lstComponentForBOM);
             componentsAvailableInSw360 = await sw360Service.GetAvailableReleasesInSw360(lstComponentForBOM);
 
             //Checking components count before getting status of individual comp details
@@ -214,7 +217,33 @@ namespace LCT.SW360PackageCreator
             Logger.Debug($"SetContentsForComparisonBOM():End");
             return comparisonBomData;
         }
+        private static async Task UpdateComponentNamesFromKnownPurls(List<Components> lstComponentForBOM)
+        {
+            string jsonFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Files", "PackageKnown_purls.json");
+            KnownPurls knownPurls = null;
 
+            if (File.Exists(jsonFilePath))
+            {
+                string jsonContent = await File.ReadAllTextAsync(jsonFilePath);
+                knownPurls = JsonConvert.DeserializeObject<KnownPurls>(jsonContent);
+            }
+            else
+            {
+                Logger.Error($"File not found: {jsonFilePath}");
+            }
+
+            foreach (var component in lstComponentForBOM)
+            {
+                foreach (var knownPurl in knownPurls.KnownPurlList)
+                {
+                    if (knownPurl.Purls.Contains(component.ComponentExternalId))
+                    {
+                        Logger.Logger.Log(null, Level.Debug, $"Component {component.Name} with ComponentExternalId {component.ComponentExternalId} matches known PURL for {knownPurl.Sw360Name}", null);
+                        component.Sw360Name = knownPurl.Sw360Name; // Assign SW360Name
+                    }
+                }
+            }
+        }
         private async Task<List<ComparisonBomData>> GetComparisionBomItems(List<Components> lstComponentForBOM, ISW360Service sw360Service)
         {
             List<ComparisonBomData> comparisonBomData = new();
@@ -236,6 +265,7 @@ namespace LCT.SW360PackageCreator
                 mapper.ComponentStatus = GetComponentAvailabilityStatus(componentsAvailableInSw360, item);
                 mapper.ReleaseStatus = IsReleaseAvailable(item.Name, item.Version, item.ReleaseExternalId);
                 mapper.AlpineSource = item.AlpineSourceData;
+                mapper.Sw360Name= item.Sw360Name;
 
                 if (!string.IsNullOrEmpty(item.ReleaseExternalId) && item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
                 {
@@ -254,12 +284,31 @@ namespace LCT.SW360PackageCreator
                     mapper.DownloadUrl = GetComponentDownloadUrl(mapper, item, repo, releasesInfo);
                 }
                 SetMapperStatus(mapper, releasesInfo);
+                mapper.Purl = item.Purl;
+                mapper.PackageStatus = GetPackageAvailabilityStatus(packagesAvailableInSw360, item);
+                mapper.IsPackageCreated = GetCreatedStatus(mapper.PackageStatus);
+                mapper.PackageName = item.PackageName;
+                mapper.PackageLink = GetPackagelink(packagesAvailableInSw360, item);
+                mapper.PackageId = CommonHelper.GetSubstringOfLastOccurance(mapper.PackageLink, "/");
                 Logger.Debug($"Sw360 availability status for Name {mapper.Name}: {mapper.ComponentExternalId}={mapper.ComponentStatus} - Version {mapper.Version}: {mapper.ReleaseExternalId}={mapper.ReleaseStatus}");
                 comparisonBomData.Add(mapper);
             }
             return comparisonBomData;
         }
-
+        private static string GetPackageAvailabilityStatus(List<Components> packagesAvailable, Components component)
+        {
+            return packagesAvailable.Exists(x => x.Purl.ToLowerInvariant() == component.Purl.ToLowerInvariant()) ? Dataconstant.Available : Dataconstant.NotAvailable;
+        }
+        private static string GetPackagelink(List<Components> packagesAvailable, Components component)
+        {
+            var matchingPackage = packagesAvailable.FirstOrDefault(x => x.Purl.ToLowerInvariant() == component.Purl.ToLowerInvariant());
+            return matchingPackage?.PackageLink;
+        }
+        private static string GetPackageName(List<Components> packagesAvailable, Components component)
+        {
+            var matchingPackage = packagesAvailable.FirstOrDefault(x => x.Purl.ToLowerInvariant() == component.Purl.ToLowerInvariant());
+            return matchingPackage?.Name;
+        }
         private static void SetDebianUrls(Components item, ReleasesInfo releasesInfo, ComparisonBomData mapper)
         {
             if ((string.IsNullOrEmpty(item.SourceUrl) || item.SourceUrl == Dataconstant.SourceUrlNotFound) && !string.IsNullOrEmpty(releasesInfo.SourceCodeDownloadUrl))

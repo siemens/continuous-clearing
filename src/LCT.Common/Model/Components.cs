@@ -65,6 +65,13 @@ namespace LCT.Common.Model
         public string ExcludeComponent { get; set; }
         [JsonIgnore]
         public string ReleaseCreatedBy { get; set; }
+        [JsonProperty("purl")]
+        public string Purl { get; set; }
+        public string PackageLink { get; set; }
+        [JsonIgnore]
+        public string PackageStatus { get; set; }
+        public string PackageName { get; set; }
+        public string Sw360Name { get; set; }
 
     }
 }

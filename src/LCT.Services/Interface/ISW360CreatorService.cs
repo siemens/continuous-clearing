@@ -47,5 +47,9 @@ namespace LCT.Services.Interface
         Task<FossTriggerStatus> TriggerFossologyProcessForValidation(string releaseId, string sw360link);
         public string AttachSourcesToReleasesCreated(string releaseId, Dictionary<string, string> attachmentUrlList, ComparisonBomData comparisonBomData);
         Task<bool> UpdateSourceCodeDownloadURLForExistingRelease(ComparisonBomData cbomData, Dictionary<string, string> attachmentUrlList, string releaseId);
+        Task<PackageCreateStatus> CreatePackageBasesOFswComaprisonBOM(ComparisonBomData componentInfo);
+        Task<PackageUpdateStatus> UpdatePackagesWithReleases(ComparisonBomData componentInfo);
+        Task<bool> LinkPackagesToProject(List<PackageLinked> packageListToLinkProject, string sw360ProjectId);
+        Task<bool> UpdateReleasesToProject(List<ReleaseLinked> releasesTobeLinked, List<ReleaseLinked> manuallyLinkedReleases, string sw360ProjectId);
     }
 }
