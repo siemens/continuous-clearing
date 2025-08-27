@@ -339,7 +339,8 @@ namespace LCT.PackageIdentifier.UTest
             Mock<IFrameworkPackages> frameworkPackages = new Mock<IFrameworkPackages>();
             Mock<ICompositionBuilder> compositionBuilder = new Mock<ICompositionBuilder>();
             Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
-            IParser parser = new NugetProcessor(cycloneDXBomParser.Object, frameworkPackages.Object, compositionBuilder.Object, spdxBomParser.Object);
+            Mock<IRuntimeIdentifier> runtimeIdentifier = new Mock<IRuntimeIdentifier>();
+            IParser parser = new NugetProcessor(cycloneDXBomParser.Object, frameworkPackages.Object, compositionBuilder.Object, spdxBomParser.Object, runtimeIdentifier.Object);
             Mock<IJFrogService> jFrogService = new Mock<IJFrogService>();
             Mock<IBomHelper> bomHelper = new Mock<IBomHelper>();
             bomHelper.Setup(x => x.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>())).ReturnsAsync(aqlResultList);

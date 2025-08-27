@@ -9,6 +9,7 @@ using NuGet.Versioning;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Linq;
+using LCT.PackageIdentifier.Model;
 
 namespace LCT.PackageIdentifier.UTest
 {
@@ -18,6 +19,7 @@ namespace LCT.PackageIdentifier.UTest
         private CompositionBuilder _builder;
         private ComponentConfig _config;
         private Bom _bom;
+        private RuntimeInfo _runtimeInfo;
 
         [SetUp]
         public void Setup()
@@ -30,6 +32,7 @@ namespace LCT.PackageIdentifier.UTest
             };
             _builder = new CompositionBuilder(_config);
             _bom = new Bom();
+            _runtimeInfo = new RuntimeInfo();
         }
 
         [Test]
@@ -44,7 +47,7 @@ namespace LCT.PackageIdentifier.UTest
             var builder = new CompositionBuilder();
 
             // Act
-            builder.AddCompositionsToBom(bom, frameworkPackages);
+            builder.AddCompositionsToBom(bom, frameworkPackages, _runtimeInfo);
 
             // Assert
             Assert.IsNotNull(bom.Compositions);
@@ -69,7 +72,7 @@ namespace LCT.PackageIdentifier.UTest
             var builder = new CompositionBuilder();
 
             // Act & Assert
-            Assert.DoesNotThrow(() => builder.AddCompositionsToBom(null, frameworkPackages));
+            Assert.DoesNotThrow(() => builder.AddCompositionsToBom(null, frameworkPackages, _runtimeInfo));
         }
 
         [Test]
@@ -80,7 +83,7 @@ namespace LCT.PackageIdentifier.UTest
             var builder = new CompositionBuilder();
 
             // Act
-            builder.AddCompositionsToBom(bom, null);
+            builder.AddCompositionsToBom(bom, null, _runtimeInfo);
 
             // Assert
             Assert.IsNull(bom.Compositions);
@@ -93,7 +96,7 @@ namespace LCT.PackageIdentifier.UTest
             var builder = new CompositionBuilder();
 
             // Act & Assert
-            Assert.DoesNotThrow(() => builder.AddCompositionsToBom(null, null));
+            Assert.DoesNotThrow(() => builder.AddCompositionsToBom(null, null, _runtimeInfo));
         }
 
         [Test]
@@ -110,7 +113,7 @@ namespace LCT.PackageIdentifier.UTest
             };
 
             // Act
-            _builder.AddCompositionsToBom(_bom, packages);
+            _builder.AddCompositionsToBom(_bom, packages, _runtimeInfo);
 
             // Assert
             Assert.IsNotNull(_bom.Compositions);
