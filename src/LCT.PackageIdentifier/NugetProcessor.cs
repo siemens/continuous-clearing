@@ -957,42 +957,6 @@ namespace LCT.PackageIdentifier
             return runtimeInfo.IsSelfContained;
         }
 
-        private static (bool isSelfContained, bool isSingleFile) CheckDeploymentTags(string projectFilePath)
-        {
-            bool isSelfContained = false;
-            bool isSingleFile = false;
-
-            XDocument projectDocument = XDocument.Load(projectFilePath);
-            foreach (var tag in FileConstant.Nuget_DeploymentType_DetectionTags)
-            {
-                var element = projectDocument.Descendants(tag).FirstOrDefault();
-                if (element != null)
-                {
-                    bool result;
-                    switch (tag)
-                    {
-                        case "SelfContained":
-                            isSelfContained = bool.TryParse(element.Value, out result) && result;
-                            break;
-                        case "PublishSingleFile":
-                            isSingleFile = bool.TryParse(element.Value, out result) && result;
-                            break;
-                    }
-                }
-            }
-            return (isSelfContained, isSingleFile);
-        }
-
-        private static bool IsExcluded(string filePath, string[] excludePatterns)
-        {
-            if (excludePatterns == null || excludePatterns.Length == 0)
-            {
-                return false;
-            }
-
-            return excludePatterns.Any(pattern => filePath.Contains(pattern, StringComparison.OrdinalIgnoreCase));
-        }
-
         private void AddCompositionDetails(Bom bom)
         {
             int totalCount = 0;

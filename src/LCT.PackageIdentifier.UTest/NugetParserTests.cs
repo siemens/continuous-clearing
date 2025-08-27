@@ -1069,6 +1069,11 @@ namespace LCT.PackageIdentifier.UTest
             };
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
+            var runtime = new RuntimeInfo();
+            _runtimeIdentifier
+               .Setup(x => x.IdentifyRuntime(appSettings))
+               .Returns(runtime);
+
             //Act
             Bom listofcomponents = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser, _runtimeIdentifier.Object).ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
@@ -1100,6 +1105,10 @@ namespace LCT.PackageIdentifier.UTest
             };
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
 
+            var runtime = new RuntimeInfo();
+            _runtimeIdentifier
+               .Setup(x => x.IdentifyRuntime(appSettings))
+               .Returns(runtime);
 
             //Act
             Bom listofcomponents = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser, _runtimeIdentifier.Object).ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
@@ -1166,12 +1175,17 @@ namespace LCT.PackageIdentifier.UTest
                 .Setup(x => x.ParseCycloneDXBom(It.IsAny<string>()))
                 .Returns(bom);
 
+            var runtime = new RuntimeInfo();
+            _runtimeIdentifier
+                .Setup(x => x.IdentifyRuntime(appSettings))
+                .Returns(runtime);
+
             // Act
             var result = _nugetProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual("false", result.Components.First().Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsDevelopment)?.Value);
+            Assert.AreEqual("true", result.Components.First().Properties.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsDevelopment)?.Value);
         }
 
         [Test]
@@ -1207,6 +1221,10 @@ namespace LCT.PackageIdentifier.UTest
             _compositionBuilder
                 .Setup(x => x.AddCompositionsToBom(It.IsAny<Bom>(), It.IsAny<Dictionary<string, Dictionary<string, NuGetVersion>>>(), It.IsAny<RuntimeInfo>()))
                 .Verifiable();
+            var runtime = new RuntimeInfo();
+            _runtimeIdentifier
+                .Setup(x => x.IdentifyRuntime(appSettings))
+                .Returns(runtime);
 
             // Act
             var result = _nugetProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
@@ -1273,6 +1291,11 @@ namespace LCT.PackageIdentifier.UTest
                 .Setup(x => x.ParseCycloneDXBom(It.IsAny<string>()))
                 .Returns(bom);
 
+            var runtime = new RuntimeInfo();
+            _runtimeIdentifier
+                .Setup(x => x.IdentifyRuntime(appSettings))
+                .Returns(runtime);
+
             // Act
             var result = _nugetProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
@@ -1305,6 +1328,11 @@ namespace LCT.PackageIdentifier.UTest
             _frameworkPackages
                 .Setup(x => x.GetFrameworkPackages(It.IsAny<List<string>>()))
                 .Returns(new Dictionary<string, Dictionary<string, NuGetVersion>>());
+
+            var runtime = new RuntimeInfo();
+            _runtimeIdentifier
+               .Setup(x => x.IdentifyRuntime(appSettings))
+               .Returns(runtime);
 
             // Act
             var result = _nugetProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
