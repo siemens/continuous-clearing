@@ -153,11 +153,12 @@ namespace LCT.Common
             }
         }
 
-        public static void WriteComponentsWithoutDownloadURLToKpi(List<ComparisonBomData> componentInfo, List<Components> lstReleaseNotCreated, string sw360URL)
+        public static void WriteComponentsWithoutDownloadURLToKpi(List<ComparisonBomData> componentInfo, List<Components> lstReleaseNotCreated, string sw360URL,List<Components> DuplicateComponentsByPurlId)
         {
             const string Name = "Name";
             const string Version = "Version";
             const string URL = "SW360 Release URL";
+
             if (componentInfo.Count > 0 || lstReleaseNotCreated.Count > 0)
             {
                 Logger.Logger.Log(null, Level.Alert, "Action Item required by the user:\n", null);
@@ -199,8 +200,38 @@ namespace LCT.Common
                 }
                 Logger.Info("\n");
             }
+            LogDuplicateComponentsByPurlId(DuplicateComponentsByPurlId, sw360URL);
+                                   
         }
+        private static void LogDuplicateComponentsByPurlId(List<Components> duplicateComponents, string sw360URL)
+        {
+            if (duplicateComponents.Count > 0)
+            {
+                Logger.Logger.Log(null, Level.Alert, "* List of components or releases not created in SW360 due to Invalid Purl ids found in Components ExternalID field in sw360", null);
+                Logger.Logger.Log(null, Level.Alert, "  Component Name already exists in SW360 with a different package type PurlId. Manually update the component details.", null);
 
+                const int nameWidth = 45;
+                const int versionWidth = 25;
+                const int urlWidth = 120;
+                const int totalWidth = nameWidth + versionWidth + urlWidth + 10; 
+
+                string border = new string('=', totalWidth);
+                string separator = new string('-', totalWidth);
+
+                Logger.Logger.Log(null, Level.Alert, border, null);
+                Logger.Logger.Log(null, Level.Alert, string.Format("| {0,-45} | {1,-25} | {2,-120} |", "Name", "Version", "SW360 Component URL"), null);
+                Logger.Logger.Log(null, Level.Alert, border, null);
+
+                foreach (var item in duplicateComponents)
+                {
+                    string link = Sw360ComponentURL(sw360URL, item.ComponentId);
+                    Logger.Logger.Log(null, Level.Alert, string.Format("| {0,-45} | {1,-25} | {2,-120} |", item.Name, item.Version, link), null);
+                    Logger.Logger.Log(null, Level.Alert, separator, null);
+                }
+
+                Logger.Info("\n");
+            }
+        }
         public static void WriteComponentsNotLinkedListInConsole(List<Components> components)
         {
             const string Name = "Name";
@@ -563,6 +594,11 @@ namespace LCT.Common
         private static string Sw360URL(string sw360Env, string releaseId)
         {
             string sw360URL = $"{sw360Env}{"/group/guest/components/-/component/release/detailRelease/"}{releaseId}";
+            return sw360URL;
+        }
+        private static string Sw360ComponentURL(string sw360Env, string componentId)
+        {
+            string sw360URL = $"{sw360Env}{"/group/guest/components/-/component/detail/"}{componentId}";
             return sw360URL;
         }
 
