@@ -330,6 +330,7 @@ namespace LCT.SW360PackageCreator
         public async Task<Components> GetSourceUrlForDebianPackage(string componentName, string componenVersion)
         {
             Components componentsData = new Components();
+            componentsData.PackageName=componentName;
             DebianPackage debianPackSourceDetails = await GetSourceUrl(componentName, componenVersion);
 
             if (debianPackSourceDetails.IsRetryRequired)
@@ -345,7 +346,7 @@ namespace LCT.SW360PackageCreator
             componentsData.SourceUrl = string.IsNullOrEmpty(debianPackSourceDetails.SourceUrl) ? Dataconstant.SourceUrlNotFound : debianPackSourceDetails.SourceUrl;
             componentsData.PatchURLs = debianPackSourceDetails.PatchURLs;
             componentsData.DownloadUrl = componentsData.SourceUrl.Equals(Dataconstant.SourceUrlNotFound) ? Dataconstant.DownloadUrlNotFound : componentsData.SourceUrl;
-
+            componentsData.Purl = componentsData.ReleaseExternalId;
 
             if (componentName != debianPackSourceDetails.Name || componenVersion != debianPackSourceDetails.Version)
             {

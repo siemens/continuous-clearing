@@ -369,11 +369,11 @@ namespace LCT.SW360PackageCreator
             Logger.Debug($"Reading Component Name - {item.Name} , version - {item.Version}");
             if (item.Sw360Name!=null)
             {
-                Logger.Info($"   ├── PurlId found in Known Purl file:Sw360Name-{item.Sw360Name},Name-{item.Name},Version-{item.Version}");
+                Logger.Info($"   ├── PurlId found in Known Purl file:Sw360Name - {item.Sw360Name},Name - {item.Name},Version - {item.Version}");
             }
             else
             {
-                Logger.Warn($"   ├── PurlId Not found in Known Purl file:Name-{item.Name},Version-{item.Version}");
+                Logger.Warn($"   ├── PurlId Not found in Known Purl file:Name - {item.Name},Version - {item.Version}");
             }
             await CreateComponentAndReleaseWhenNotAvailable(item, sw360CreatorService, creatorHelper, appSettings);
 
@@ -389,7 +389,7 @@ namespace LCT.SW360PackageCreator
             {
                 if (item.Sw360Name != null && item.ComponentStatus == Dataconstant.NotAvailable && item.ReleaseStatus == Dataconstant.NotAvailable)
                 {
-                    Logger.Logger.Log(null, Level.Error, $"Release Not created due to sw360 name is not found in sw360 :SW360Name-{item.Sw360Name}, Name - {item.Name} , version - {item.Version}", null);
+                    Logger.Logger.Log(null, Level.Error, $"   └── Release Not created due to sw360 name is not found in sw360 :SW360Name-{item.Sw360Name}, Name - {item.Name} , version - {item.Version}", null);
                     return;
                 }
                 else
@@ -468,7 +468,7 @@ namespace LCT.SW360PackageCreator
 
                 if (!fossologyUpload)
                 {
-                    Logger.Logger.Log(null, Level.Notice, $"\t└── Initiating FOSSology process for: Release : Name - {formattedName} , version - {item.Version}", null);
+                    Logger.Logger.Log(null, Level.Notice, $"\t├── Initiating FOSSology process for: Release : Name - {formattedName} , version - {item.Version}", null);
                     string uploadId;
                     uploadId = await TriggerFossologyProcess(item, sw360CreatorService, appSettings);
 
@@ -478,7 +478,7 @@ namespace LCT.SW360PackageCreator
                     }
                     else
                     {
-                        await UpdateFossologyLinkAndStatus(item, sw360CreatorService, appSettings, formattedName, uploadId, "\t└──   ✅ Fossology upload completed successfully for release");
+                        await UpdateFossologyLinkAndStatus(item, sw360CreatorService, appSettings, formattedName, uploadId, "\t└── ✅ Fossology upload completed successfully for release");
                     }
                 }
             }
@@ -492,9 +492,9 @@ namespace LCT.SW360PackageCreator
         {
             if (item.ComponentStatus == Dataconstant.Available && item.ReleaseStatus == Dataconstant.NotAvailable)
             {
-                if (item.Sw360Name != null && item.ComponentStatus == Dataconstant.Available && item.ReleaseStatus == Dataconstant.NotAvailable)
+                if (item.Sw360Name != null && item.ComponentStatus == Dataconstant.NotAvailable)
                 {
-                    Logger.Logger.Log(null, Level.Error, $"Release Not created due to sw360 name is not found in sw360 :SW360Name-{item.Sw360Name}, Name - {item.Name} , version - {item.Version}", null);
+                    Logger.Logger.Log(null, Level.Error, $"   └── Release Not created due to sw360 name is not found in sw360 :SW360Name-{item.Sw360Name}, Name - {item.Name} , version - {item.Version}", null);
                     return;
                 } else
                 {
@@ -535,8 +535,8 @@ namespace LCT.SW360PackageCreator
             else if (!string.IsNullOrEmpty(item.FossologyUploadId) && string.IsNullOrEmpty(item.FossologyLink))
             {
                 fossologyUpload = true;
-                Logger.Logger.Log(null, Level.Notice, $"\tInitiating FOSSology process for: Release : Name - {formattedName} , version - {item.Version}", null);
-                await UpdateFossologyLinkAndStatus(item, sw360CreatorService, appSettings, formattedName, item.FossologyUploadId, "\t└──   🔗 Fossology upload ID and URL successfully updated in SW360 for release");
+                Logger.Logger.Log(null, Level.Notice, $"\t├── Initiating FOSSology process for: Release : Name - {formattedName} , version - {item.Version}", null);
+                await UpdateFossologyLinkAndStatus(item, sw360CreatorService, appSettings, formattedName, item.FossologyUploadId, "\t└── 🔗 Fossology upload ID and URL successfully updated in SW360 for release");
             }
             return fossologyUpload;
         }
@@ -591,17 +591,17 @@ namespace LCT.SW360PackageCreator
                     }
                     if (fossResult.Status == "FAILURE" && string.IsNullOrEmpty(uploadId))
                     {
-                        Logger.Logger.Log(null, Level.Warn, $"\t└──   ❌ Fossology upload failed for release", null);
+                        Logger.Logger.Log(null, Level.Warn, $"\t└── ❌ Fossology upload failed for release", null);
                     }
                     else if (fossResult.Status == "PROCESSING" && string.IsNullOrEmpty(uploadId))
                     {
-                        Logger.Logger.Log(null, Level.Warn, $"\t└──   ⏳ Fossology upload is still processing. Upload ID is not yet available. Please wait and re-run the pipeline later.", null);
+                        Logger.Logger.Log(null, Level.Warn, $"\t└── ⏳ Fossology upload is still processing. Upload ID is not yet available. Please wait and re-run the pipeline later.", null);
                     }
                 }
                 else
                 {
                     var formattedName = GetFormattedName(item);
-                    Logger.Logger.Log(null, Level.Warn, $"\t└──   ❌ Fossology upload failed  for Release : Name - {formattedName} , version - {item.Version}", null);
+                    Logger.Logger.Log(null, Level.Warn, $"\t└── ❌ Fossology upload failed  for Release : Name - {formattedName} , version - {item.Version}", null);
                 }
             }
             catch (AggregateException ex)

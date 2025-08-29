@@ -510,20 +510,8 @@ namespace LCT.Services
                     });
                     isComponentAvailable = true;
                 }
-            }
-               
-            if (sw360Component != null)
-            {
-                availableComponentList.Add(new Components()
-                {
-                    Name = sw360Component.Name,
-                    Version = string.Empty,
-                    ReleaseLink = string.Empty,
-                    ComponentExternalId = component.ComponentExternalId,
-                    ReleaseExternalId = string.Empty
-                });
-                isComponentAvailable = true;
-            }
+            }               
+           
             return isComponentAvailable;
         }
 

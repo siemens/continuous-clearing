@@ -303,12 +303,7 @@ namespace LCT.SW360PackageCreator
         {
             var matchingPackage = packagesAvailable.FirstOrDefault(x => x.Purl.ToLowerInvariant() == component.Purl.ToLowerInvariant());
             return matchingPackage?.PackageLink;
-        }
-        private static string GetPackageName(List<Components> packagesAvailable, Components component)
-        {
-            var matchingPackage = packagesAvailable.FirstOrDefault(x => x.Purl.ToLowerInvariant() == component.Purl.ToLowerInvariant());
-            return matchingPackage?.Name;
-        }
+        }       
         private static void SetDebianUrls(Components item, ReleasesInfo releasesInfo, ComparisonBomData mapper)
         {
             if ((string.IsNullOrEmpty(item.SourceUrl) || item.SourceUrl == Dataconstant.SourceUrlNotFound) && !string.IsNullOrEmpty(releasesInfo.SourceCodeDownloadUrl))

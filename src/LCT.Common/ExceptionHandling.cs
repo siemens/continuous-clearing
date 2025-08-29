@@ -33,7 +33,7 @@ namespace LCT.Common
         }
         public static void FossologyException(HttpRequestException ex)
         {
-            Logger.Logger.Log(null, Level.Error, $"\t└──   The Fossology process could not be completed. Exception: {ex.Message}", null);
+            Logger.Logger.Log(null, Level.Error, $"\t└── The Fossology process could not be completed. Exception: {ex.Message}", null);
         }
 
         public static void ArgumentException(string message)

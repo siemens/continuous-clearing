@@ -740,7 +740,7 @@ namespace LCT.Services
                 Logger.Debug($"UpdateSW360ReleaseContent():Response of fossology Url updation in SW360:{responseContent}");
                 if (responseContent.Contains(Dataconstant.ModerationRequestMessage, StringComparison.OrdinalIgnoreCase))
                 {
-                    Logger.Logger.Log(null, Level.Warn, $"\t⏳ Moderation request is created while updating the Fossology URL in SW360. Please request {component.ReleaseCreatedBy} or the license clearing team to approve the moderation request.", null);
+                    Logger.Logger.Log(null, Level.Warn, $"\t└── ⏳ Moderation request is created while updating the Fossology URL in SW360. Please request {component.ReleaseCreatedBy} or the license clearing team to approve the moderation request.", null);
                 }
                 else
                 {
@@ -939,7 +939,6 @@ namespace LCT.Services
                     // Check if the response indicates failure
                     if (!response.IsSuccessStatusCode)
                     {
-                        Environment.ExitCode = -1;
                         Logger.Error($"UpdateReleasesToProject() : Failed to update release {release.ReleaseId} to project Id {sw360ProjectId}.");
                         return false;
                     }
@@ -999,7 +998,9 @@ namespace LCT.Services
                 else
                 {
                     packageCreateStatus.IsCreated = false;
-                    Logger.Debug($"CreatePackageBasesOFswComaprisonBOM():Component Name -{packageInfo.PackageName}- " +
+                    Logger.Debug($"CreatePackageBasesOFswComaprisonBOM():Package Name -{packageInfo.PackageName}-Version- {packageInfo.Version} not created due to"+
+                   $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
+                    Logger.Error($"CreatePackageBasesOFswComaprisonBOM():Package Name -{packageInfo.PackageName}-Version- {packageInfo.Version} not created due to" +
                    $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
                 }
             }
