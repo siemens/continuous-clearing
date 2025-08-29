@@ -66,11 +66,11 @@ namespace LCT.Common.Model
         [JsonIgnore]
         public string ReleaseCreatedBy { get; set; }
         [JsonIgnore]
-        public bool InValidComponentByPurlid { get; set; }=false;
+        public bool InvalidComponentByPurlId { get; set; }=false;
         [JsonIgnore]
         public string ComponentLink { get; set; }
         [JsonIgnore]
-        public string ComponentID { get; set; }       
+        public string ComponentId { get; set; }       
 
     }
 }

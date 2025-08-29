@@ -207,7 +207,7 @@ namespace LCT.Common
         {
             if (duplicateComponents.Count > 0)
             {
-                Logger.Logger.Log(null, Level.Alert, "* List of components or releases not created in SW360 due to Invalid PuriIds found in Components ExternalID field in sw360", null);
+                Logger.Logger.Log(null, Level.Alert, "* List of components or releases not created in SW360 due to Invalid Purl ids found in Components ExternalID field in sw360", null);
                 Logger.Logger.Log(null, Level.Alert, "  Component Name already exists in SW360 with a different package type PurlId. Manually update the component details.", null);
 
                 const int nameWidth = 45;
@@ -224,7 +224,7 @@ namespace LCT.Common
 
                 foreach (var item in duplicateComponents)
                 {
-                    string link = Sw360ComponentURL(sw360URL, item.ComponentID);
+                    string link = Sw360ComponentURL(sw360URL, item.ComponentId);
                     Logger.Logger.Log(null, Level.Alert, string.Format("| {0,-45} | {1,-25} | {2,-120} |", item.Name, item.Version, link), null);
                     Logger.Logger.Log(null, Level.Alert, separator, null);
                 }

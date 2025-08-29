@@ -594,9 +594,9 @@ namespace LCT.Services.UTest
             var result = (bool)ValidateProjectTypePurlMethod.Invoke(null, new object[] { sw360Component, component });
 
             Assert.IsFalse(result);
-            Assert.IsTrue(component.InValidComponentByPurlid);
+            Assert.IsTrue(component.InvalidComponentByPurlId);
             Assert.AreEqual("http://test/component/123", component.ComponentLink);
-            Assert.AreEqual("123", component.ComponentID);
+            Assert.AreEqual("123", component.ComponentId);
 
             // Check that it was added to the invalid list
             var list = (List<Components>)InvalidComponentsField.GetValue(null);
@@ -616,9 +616,9 @@ namespace LCT.Services.UTest
 
             HandleMismatchedPurlIdMethod.Invoke(null, new object[] { sw360Component, component });
 
-            Assert.IsTrue(component.InValidComponentByPurlid);
+            Assert.IsTrue(component.InvalidComponentByPurlId);
             Assert.AreEqual("http://test/component/456", component.ComponentLink);
-            Assert.AreEqual("456", component.ComponentID);
+            Assert.AreEqual("456", component.ComponentId);
 
             var list = (List<Components>)InvalidComponentsField.GetValue(null);
             Assert.IsTrue(list.Contains(component));

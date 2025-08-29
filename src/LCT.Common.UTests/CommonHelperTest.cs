@@ -1072,8 +1072,8 @@ namespace LCT.Common.UTest
             // Arrange
             var components = new List<Components>
             {
-                new Components { Name = "CompA", Version = "1.0", ComponentID = "cid1" },
-                new Components { Name = "CompB", Version = "2.0", ComponentID = "cid2" }
+                new Components { Name = "CompA", Version = "1.0", ComponentId = "cid1" },
+                new Components { Name = "CompB", Version = "2.0", ComponentId = "cid2" }
             };
             string sw360Url = "http://sw360";
 

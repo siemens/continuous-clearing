@@ -411,15 +411,15 @@ namespace LCT.Services
         private static bool ValidateProjectTypePurl(Sw360Components sw360Component, Components component)
         {
             if (string.IsNullOrEmpty(component?.ProjectType)
-                || !Dataconstant.PurlCheck().TryGetValue(component.ProjectType.ToUpperInvariant(), out string projectPurlId))
+                || !Dataconstant.PurlCheck().TryGetValue(component.ProjectType.ToUpperInvariant(), out string projectPurlCheckId))
             {
                 return false;
             }
 
-            Logger.Debug($"GetAvailableComponenentsList(): Validating with PURL ID: {projectPurlId}");
+            Logger.Debug($"GetAvailableComponenentsList(): Validating with PURL ID: {projectPurlCheckId}");
 
-            bool hasMatchingExternalId = sw360Component.ExternalIds.Package_Url?.Contains(projectPurlId, StringComparison.OrdinalIgnoreCase) == true
-                || sw360Component.ExternalIds.Purl_Id?.Contains(projectPurlId, StringComparison.OrdinalIgnoreCase) == true;
+            bool hasMatchingExternalId = sw360Component.ExternalIds.Package_Url?.Contains(projectPurlCheckId, StringComparison.OrdinalIgnoreCase) == true
+                || sw360Component.ExternalIds.Purl_Id?.Contains(projectPurlCheckId, StringComparison.OrdinalIgnoreCase) == true;
 
             if (!hasMatchingExternalId)
             {
@@ -436,9 +436,9 @@ namespace LCT.Services
             Logger.Debug($"GetAvailableComponenentsList(): Component Name '{component.Name}' PURL ID mismatched with SW360 component PURL ID");
             Logger.Warn($"Component Name '{component.Name}' already exists in SW360 with different package type PURL ID. Skipping this component.");
 
-            component.InValidComponentByPurlid = true;
+            component.InvalidComponentByPurlId = true;
             component.ComponentLink = sw360Component.Links?.Self?.Href;
-            component.ComponentID = CommonHelper.GetSubstringOfLastOccurance(component.ComponentLink, "/");
+            component.ComponentId = CommonHelper.GetSubstringOfLastOccurance(component.ComponentLink, "/");
             InvalidComponentsIdentifiedByPurlId.Add(component);
         }
 
