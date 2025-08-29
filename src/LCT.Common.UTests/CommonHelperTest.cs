@@ -1096,7 +1096,7 @@ namespace LCT.Common.UTest
             var messages = events.Select(e => e.RenderedMessage).ToList();
 
             // Assert
-            Assert.IsTrue(messages.Any(m => m.Contains("not created in SW360 due to Invalid PuriIds")), "Missing expected summary log.");
+            Assert.IsTrue(messages.Any(m => m.Contains("not created in SW360 due to Invalid Purl ids")), "Missing expected summary log.");
             Assert.IsTrue(messages.Any(m => m.Contains("Component Name already exists in SW360")), "Missing expected warning log.");
             Assert.IsTrue(messages.Any(m => m.Contains("CompA")), "Missing CompA in log.");
             Assert.IsTrue(messages.Any(m => m.Contains("CompB")), "Missing CompB in log.");
