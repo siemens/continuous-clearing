@@ -280,7 +280,8 @@ namespace LCT.Common
         { "NUGET", () => appSettings.Nuget },
         { "POETRY", () => appSettings.Poetry },
         { "DEBIAN", () => appSettings.Debian },
-        { "MAVEN", () => appSettings.Maven }
+        { "MAVEN", () => appSettings.Maven },
+        { "CHOCO", () => appSettings.Choco }
     };
             if (projectTypeMappings.TryGetValue(appSettings.ProjectType.ToUpperInvariant(), out var getConfig))
             {
