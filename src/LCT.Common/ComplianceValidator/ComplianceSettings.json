@@ -14,7 +14,7 @@
       ],
       "complianceInstructions": {
         "warningMessage": "Component 'Chromium Embedded Framework' source code must be manually uploaded",
-        "recommendation": "Use Microsoft Edge WebView2 as a modern alternative to Chromium dependencies"
+        "recommendation": "Use Microsoft Edge WebView2 as a modern alternative to Chromium dependencies. For further details, refer to the Wiki at: https://github.com/siemens/continuous-clearing/wiki#component-compliance-guidance."
       }
     }
   ]
