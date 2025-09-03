@@ -24,6 +24,7 @@ namespace LCT.Common.Constants
         {"POETRY", "pkg:pypi"},
         {"CONAN", "pkg:conan"},
         {"ALPINE", "pkg:apk/alpine"},
+        {"CARGO", "pkg:cargo"},
          };
 
         //Identified types

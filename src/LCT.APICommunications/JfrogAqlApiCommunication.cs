@@ -97,6 +97,22 @@ namespace LCT.APICommunications
             HttpContent httpContent = new StringContent(aqlQueryToBody);
             return await httpClient.PostAsync(uri, httpContent);
         }
+        public async Task<HttpResponseMessage> GetCargoComponentDataByRepo(string repoName)
+        {
+            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
+            TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
+            httpClient.Timeout = timeOutInSec;
+
+            StringBuilder query = new();
+            query.Append("items.find({\"repo\":\"");
+            query.Append($"{repoName}");
+            query.Append("\"}).include(\"repo\", \"path\", \"name\",\"@crate.name\",\"@crate.version\", \"actual_sha1\",\"actual_md5\",\"sha256\")");
+
+            string aqlQueryToBody = query.ToString();
+            string uri = $"{DomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}";
+            HttpContent httpContent = new StringContent(aqlQueryToBody);
+            return await httpClient.PostAsync(uri, httpContent);
+        }
 
         /// <summary>
         /// Gets the package information in the repo, via the name or path

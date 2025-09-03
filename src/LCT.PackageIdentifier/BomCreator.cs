@@ -179,6 +179,9 @@ namespace LCT.PackageIdentifier
                 case "CONAN":
                     parser = new ConanProcessor(CycloneDXBomParser, SpdxBomParser);
                     return await ComponentIdentification(appSettings, parser);
+                case "CARGO":
+                    parser = new CargoProcessor(CycloneDXBomParser, SpdxBomParser);
+                    return await ComponentIdentification(appSettings, parser);
                 default:
                     Logger.Error($"GenerateBom():Invalid ProjectType - {appSettings.ProjectType}");
                     break;

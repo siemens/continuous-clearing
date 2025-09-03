@@ -76,5 +76,6 @@ namespace LCT.APICommunications
         public const string ArtifactoryRepoName = "ArtifactoryRepoName";
         public const string JfrogArtifactoryApiSearchAql = $"/api/search/aql";
         public static readonly List<int> APIRetryIntervals = [5, 10, 30]; // in seconds
+        public const string CargoExtension = ".crate";
     }
 }
