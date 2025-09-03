@@ -113,6 +113,7 @@ namespace LCT.PackageIdentifier
 
         public static bool IsDevDependency(ConanPackage component, List<string> buildNodeIds, ref int noOfDevDependent)
         {
+            // This method is kept for backward compatibility but may not be used in Conan 2.0 processing
             var isDev = false;
             if (buildNodeIds != null && buildNodeIds.Contains(component.Id))
             {
@@ -304,20 +305,54 @@ namespace LCT.PackageIdentifier
             {
                 string jsonContent = File.ReadAllText(filepath);
                 var jsonDeserialized = JObject.Parse(jsonContent);
-                var nodes = jsonDeserialized["graph_lock"]["nodes"];
 
-                List<ConanPackage> nodePackages = new List<ConanPackage>();
-                foreach (var node in nodes)
+                // Check if this is a Conan 2.0 lock file by looking for the version field and requires array
+                if (jsonDeserialized["version"] != null && jsonDeserialized["requires"] != null)
                 {
-                    string nodeId = ((JProperty)node).Name;
-                    var conanPackage = JsonConvert.DeserializeObject<ConanPackage>(((JProperty)node).Value.ToString());
-                    conanPackage.Id = nodeId;
-                    nodePackages.Add(conanPackage);
+                    // Parse Conan 2.0 format
+                    var conan2LockFile = JsonConvert.DeserializeObject<Conan2LockFile>(jsonContent);
+                    
+                    List<string> allRequires = new List<string>();
+                    List<string> devRequires = new List<string>();
+
+                    // Collect all requires
+                    if (conan2LockFile.Requires != null)
+                    {
+                        allRequires.AddRange(conan2LockFile.Requires);
+                    }
+                    if (conan2LockFile.PythonRequires != null)
+                    {
+                        allRequires.AddRange(conan2LockFile.PythonRequires);
+                    }
+                    if (conan2LockFile.ConfigRequires != null)
+                    {
+                        allRequires.AddRange(conan2LockFile.ConfigRequires);
+                    }
+                    if (conan2LockFile.ToolRequires != null)
+                    {
+                        allRequires.AddRange(conan2LockFile.ToolRequires);
+                    }
+
+                    // Collect dev requires, currently only build_requires is considered as dev dependency
+                    if (conan2LockFile.BuildRequires != null)
+                    {
+                        devRequires.AddRange(conan2LockFile.BuildRequires);
+                        allRequires.AddRange(conan2LockFile.BuildRequires);
+                    }
+
+                    // Process all requires into components
+                    GetPackagesForBomFromConan2(ref lstComponentForBOM, ref noOfDevDependent, allRequires, devRequires);
+
+                    // Build dependencies - For Conan 2.0, we'll create a flat structure since transitive dependencies
+                    // are not explicitly defined in the simplified lock format
+                    GetDependencyDetailsFromConan2(lstComponentForBOM, dependencies);
                 }
-
-                GetPackagesForBom(ref lstComponentForBOM, ref noOfDevDependent, nodePackages);
-
-                GetDependecyDetails(lstComponentForBOM, nodePackages, dependencies);
+                else
+                {
+                    // Legacy Conan 1.0 format - this should be removed as per requirements
+                    Logger.Warn("Conan 1.0 format detected. Please upgrade to Conan 2.0 as Conan 1.0 support is deprecated.");
+                    throw new NotSupportedException("Conan 1.0 is no longer supported. Please upgrade to Conan 2.0.");
+                }
 
                 BomCreator.bomKpiData.DevDependentComponents += noOfDevDependent;
             }
@@ -340,132 +375,84 @@ namespace LCT.PackageIdentifier
             return lstComponentForBOM;
         }
 
-        private static void GetDependecyDetails(List<Component> componentsForBOM, List<ConanPackage> nodePackages, List<Dependency> dependencies)
+        private static void GetPackagesForBomFromConan2(ref List<Component> lstComponentForBOM, ref int noOfDevDependent, List<string> allRequires, List<string> devRequires)
         {
-            foreach (Component component in componentsForBOM)
-            {
-                var node = nodePackages.Find(x => x.Reference.Contains($"{component.Name}/{component.Version}"));
-                var dependencyNodes = new List<ConanPackage>();
-                if (node.Dependencies != null && node.Dependencies.Count > 0)
-                {
-                    dependencyNodes.AddRange(nodePackages.Where(x => node.Dependencies.Contains(x.Id)).ToList());
-                }
-                if (node.DevDependencies != null && node.DevDependencies.Count > 0)
-                {
-                    dependencyNodes.AddRange(nodePackages.Where(x => node.DevDependencies.Contains(x.Id)).ToList());
-                }
-                var dependency = new Dependency();
-                var subDependencies = componentsForBOM.Where(x => dependencyNodes.Exists(y => y.Reference.Contains($"{x.Name}/{x.Version}")))
-                                        .Select(x => new Dependency { Ref = x.Purl }).ToList();
-
-                dependency.Ref = component.Purl;
-                dependency.Dependencies = subDependencies;
-
-                if (subDependencies.Count > 0)
-                {
-                    dependencies.Add(dependency);
-                }
-            }
-        }
-
-        private static void GetPackagesForBom(ref List<Component> lstComponentForBOM, ref int noOfDevDependent, List<ConanPackage> nodePackages)
-        {
-            ValidateRootNode(nodePackages);
-
-            List<string> directDependencies = GetDirectDependencies(nodePackages);
-
-            // Ignoring the root node as it is the package information node and we are anyways considering all
-            // nodes in the lock file.
-            foreach (var component in nodePackages.Skip(1))
+            foreach (var require in allRequires)
             {
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += 1;
                 Property isdev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
 
-                if (string.IsNullOrEmpty(component.Reference))
+                if (string.IsNullOrEmpty(require))
                 {
                     BomCreator.bomKpiData.ComponentsinPackageLockJsonFile--;
                     continue;
                 }
 
-                Component components = new Component();
+                Component component = new Component();
 
-                // dev components are not ignored and added as a part of SBOM   
-                var buildNodeIds = GetBuildNodeIds(nodePackages);
-                if (IsDevDependency(component, buildNodeIds, ref noOfDevDependent))
+                // Check if this is a dev dependency
+                if (devRequires.Contains(require))
                 {
                     isdev.Value = "true";
+                    noOfDevDependent++;
                 }
 
-                string packageName = Convert.ToString(component.Reference);
+                // Parse Conan 2.0 require format: "packagename/version#hash%timestamp"
+                string packageName = require;
+                if (require.Contains('#'))
+                {
+                    packageName = require.Split('#')[0]; // Remove hash and timestamp
+                }
 
                 if (packageName.Contains('/'))
                 {
-                    components.Name = packageName.Split(SplitChars)[0];
-                    components.Version = packageName.Split(SplitChars)[1];
+                    component.Name = packageName.Split('/')[0];
+                    component.Version = packageName.Split('/')[1];
                 }
                 else
                 {
-                    components.Name = packageName;
+                    component.Name = packageName;
+                    component.Version = "latest"; // Default version if not specified
                 }
 
                 Property siemensFileName = new Property()
                 {
                     Name = Dataconstant.Cdx_Siemensfilename,
-                    Value = component.Reference
+                    Value = require
                 };
-                var isDirect = directDependencies.Contains(component.Id) ? "true" : "false";
+
+                // In Conan 2.0, all requires listed at the top level are considered direct dependencies
                 Property siemensDirect = new Property()
                 {
                     Name = Dataconstant.Cdx_SiemensDirect,
-                    Value = isDirect
+                    Value = "true"
                 };
 
-                components.Type = Component.Classification.Library;
-                components.Purl = $"{ApiConstant.ConanExternalID}{components.Name}@{components.Version}";
-                components.BomRef = $"{ApiConstant.ConanExternalID}{components.Name}@{components.Version}";
-                components.Properties = new List<Property>();
-                components.Properties.Add(isdev);
-                components.Properties.Add(siemensDirect);
-                components.Properties.Add(siemensFileName);
-                lstComponentForBOM.Add(components);
+                component.Type = Component.Classification.Library;
+                component.Purl = $"{ApiConstant.ConanExternalID}{component.Name}@{component.Version}";
+                component.BomRef = $"{ApiConstant.ConanExternalID}{component.Name}@{component.Version}";
+                component.Properties = new List<Property>();
+                component.Properties.Add(isdev);
+                component.Properties.Add(siemensDirect);
+                component.Properties.Add(siemensFileName);
+                lstComponentForBOM.Add(component);
             }
         }
 
-        private static List<string> GetBuildNodeIds(List<ConanPackage> nodePackages)
+        private static void GetDependencyDetailsFromConan2(List<Component> componentsForBOM, List<Dependency> dependencies)
         {
-            return nodePackages
-                    .Where(y => y.DevDependencies != null)
-                    .SelectMany(y => y.DevDependencies)
-                    .ToList();
-        }
-        private static void ValidateRootNode(List<ConanPackage> nodePackages)
-        {
-            var rootNode = nodePackages.FirstOrDefault();
-            if (rootNode != null && (rootNode.Dependencies.Count == 0 || rootNode.Dependencies == null))
+            // For Conan 2.0, we create a simplified dependency structure
+            // since the lock file format doesn't provide explicit transitive dependency mapping
+            foreach (Component component in componentsForBOM)
             {
-                throw new ArgumentNullException(nameof(nodePackages), "Dependency(requires) node name details not present in the root node.");
+                var dependency = new Dependency();
+                dependency.Ref = component.Purl;
+                dependency.Dependencies = new List<Dependency>(); // Empty for now as Conan 2.0 simplified format doesn't provide this detail
+
+                dependencies.Add(dependency);
             }
         }
-        private static List<string> GetDirectDependencies(List<ConanPackage> nodePackages)
-        {
-            List<string> directDependencies = new List<string>();
-            ConanPackage package = nodePackages.FirstOrDefault(x => x.Id == "0");
 
-            if (package != null)
-            {
-                if (package.Dependencies != null)
-                {
-                    directDependencies.AddRange(package.Dependencies);
-                }
-
-                if (package.DevDependencies != null)
-                {
-                    directDependencies.AddRange(package.DevDependencies);
-                }
-            }
-
-            return directDependencies;
-        }
         private static bool IsInternalConanComponent(List<AqlResult> aqlResultList, Component component)
         {
             string jfrogcomponentPath = $"{component.Name}/{component.Version}";

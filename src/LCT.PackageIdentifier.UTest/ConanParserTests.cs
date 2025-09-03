@@ -31,7 +31,7 @@ namespace LCT.PackageIdentifier.UTest
         public void ParseLockFile_GivenAInputFilePath_ReturnsSuccess()
         {
             //Arrange
-            int expectedNoOfcomponents = 17;
+            int expectedNoOfcomponents = 18; // Updated from 17 to 18 for Conan 2.0 format (17 requires + 1 build_require)
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
             string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
@@ -94,7 +94,7 @@ namespace LCT.PackageIdentifier.UTest
         public void ParseLockFile_GivenAInputFilePathExcludeComponent_ReturnComponentCount()
         {
             //Arrange
-            int totalComponentsAfterExclusion = 17;
+            int totalComponentsAfterExclusion = 16; // Updated from 17 to 16 since we're excluding 2 components from 18 total
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
             string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
