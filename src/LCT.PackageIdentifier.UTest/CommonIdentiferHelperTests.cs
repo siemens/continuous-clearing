@@ -96,7 +96,7 @@ namespace LCT.PackageIdentifier.UTest
             string result = CommonIdentiferHelper.GetBomFileName(appSettings);
 
             // Assert
-            Assert.AreEqual(FileConstant.basicSBOMName, result);
+            Assert.AreEqual(FileConstant.basicSBOMName + "_Bom.cdx.json", result);
         }
 
         [Test]
