@@ -415,7 +415,7 @@ namespace LCT.PackageIdentifier
                 noOfExcludedComponents => BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents);
         }
 
-        public static void AddSiemensDirectProperty(ref Bom bom)
+        public virtual void AddSiemensDirectProperty(ref Bom bom)
         {
             var bomComponentsList = bom.Components;
             foreach (var component in bomComponentsList)

@@ -248,7 +248,7 @@ namespace LCT.PackageIdentifier.UTest
             var nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser);
 
             // Act
-            NugetProcessor.AddSiemensDirectProperty(ref bom);
+            nugetProcessor.AddSiemensDirectProperty(ref bom);
 
             // Assert
             Assert.AreEqual(expectedBom.Components.Count, bom.Components.Count);
@@ -306,7 +306,7 @@ namespace LCT.PackageIdentifier.UTest
             var nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser);
 
             // Act
-            NugetProcessor.AddSiemensDirectProperty(ref bom);
+            nugetProcessor.AddSiemensDirectProperty(ref bom);
 
             // Assert
             // Assert
@@ -393,7 +393,7 @@ namespace LCT.PackageIdentifier.UTest
             var nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser);
 
             // Act
-            NugetProcessor.AddSiemensDirectProperty(ref bom);
+            nugetProcessor.AddSiemensDirectProperty(ref bom);
 
             // Assert
             Assert.AreEqual(expectedBom.Components.Count, bom.Components.Count);
