@@ -36,12 +36,6 @@
 		<None Include="PackageIdentifierUTTestFiles\NugetSelfContainedProject\Nuget-SelfContained.csproj">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Include="PackageIdentifierUTTestFiles\DotnetRuntimeProject\project.assets.json">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-		<None Include="PackageIdentifierUTTestFiles\DotnetRuntimeProject\Testing_Console.csproj">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -96,9 +90,6 @@
 		</None>
 		<None Update="PackageIdentifierUTTestFiles\CycloneDX_Python.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-		<None Update="PackageIdentifierUTTestFiles\DotnetRuntimeProject\project.assets.json">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Update="PackageIdentifierUTTestFiles\Duplicate_Cyclonedx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>

@@ -37,7 +37,7 @@ namespace LCT.PackageIdentifier.UTest
         public void Setup()
         {
             _identifier = new DotnetRuntimeIdentifer();
-            _testDir = Path.Combine(TestContext.CurrentContext.TestDirectory, "PackageIdentifierUTTestFiles\\DotnetRuntimeProject");
+            _testDir = Path.Combine(TestContext.CurrentContext.TestDirectory, "PackageIdentifierUTTestFiles");
             _appSettings = new CommonAppSettings
             {
                 Directory = new LCT.Common.Directory()
@@ -46,7 +46,7 @@ namespace LCT.PackageIdentifier.UTest
                 }
             };
             _assetsFilePath = Path.Combine(_testDir, "project.assets.json");
-            _csprojFilePath = Path.Combine(_testDir, "Testing_Console.csproj");
+            _csprojFilePath = Path.Combine(_testDir, "Nuget.csproj");
         }
 
         [Test]
@@ -104,7 +104,7 @@ namespace LCT.PackageIdentifier.UTest
                 // Since we can't directly modify LockFile.PackageSpec.RestoreMetadata.ProjectPath after reading,
                 // we need to update the JSON before NuGet reads it
                 json = json.Replace(
-                        "\"projectPath\": \"Testing_Console.csproj\"",
+                        "\"projectPath\": \"\"",
                         $"\"projectPath\": \"{_csprojFilePath.Replace("\\", "\\\\")}\"");
 
                 File.WriteAllText(modifiedAssetsFile, json);
