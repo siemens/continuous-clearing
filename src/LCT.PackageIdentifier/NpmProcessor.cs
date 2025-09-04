@@ -242,10 +242,22 @@ namespace LCT.PackageIdentifier
                 components.Purl = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
                 components.BomRef = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
 
+                // Extract license info using LicenseInfoExtractor
+                var licenseExtractor = new LicenseInfoExtractor();
+                string licenseId = licenseExtractor.ExtractLicense("npm", properties);
+                // Add license info in SBOM 'licenses' array format
+                components.Licenses = new List<LicenseChoice> {
+                    new LicenseChoice {
+                        License = new License {
+                            Id = string.IsNullOrWhiteSpace(licenseId) || licenseId == "Not Found" ? "NO-LICENSE-FOUND" : licenseId
+                        }
+                    }
+                };
+
                 CheckAndAddToBundleComponents(bundledComponents, prop, components);
                 string isDirect = GetIsDirect(directDependencies, prop);
                 Property siemensDirect = new Property() { Name = Dataconstant.Cdx_SiemensDirect, Value = isDirect };
-                components.Properties = new List<Property>();
+                components.Properties = components.Properties ?? new List<Property>();
                 components.Properties.Add(isdev);
                 components.Properties.Add(siemensDirect);
                 lstComponentForBOM.Add(components);
@@ -347,13 +359,24 @@ namespace LCT.PackageIdentifier
 
                 components.Description = folderPath;
                 components.Version = Convert.ToString(properties[Version]);
+                // Extract license info using LicenseInfoExtractor
+                var licenseExtractor = new LicenseInfoExtractor();
+                string licenseId = licenseExtractor.ExtractLicense("npm", properties);
+                // Add license info in SBOM 'licenses' array format
+                components.Licenses = new List<LicenseChoice> {
+                    new LicenseChoice {
+                        License = new License {
+                            Id = string.IsNullOrWhiteSpace(licenseId) || licenseId == "Not Found" ? "NO-LICENSE-FOUND" : licenseId
+                        }
+                    }
+                };
                 components.Manufacturer.BomRef = prop.Value[Requires]?.ToString();
                 components.Purl = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
                 components.BomRef = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
                 components.Type = Component.Classification.Library;
                 string isDirect = GetIsDirect(directDependenciesList, prop);
                 Property siemensDirect = new Property() { Name = Dataconstant.Cdx_SiemensDirect, Value = isDirect };
-                components.Properties = new List<Property>();
+                components.Properties = components.Properties ?? new List<Property>();
                 components.Properties.Add(isdev);
                 components.Properties.Add(siemensDirect);
                 lstComponentForBOM.Add(components);
