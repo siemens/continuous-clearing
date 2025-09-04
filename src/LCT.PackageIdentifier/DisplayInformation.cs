@@ -23,7 +23,8 @@ namespace LCT.PackageIdentifier
         { "DEBIAN", () => appSettings?.Debian?.Include },
         { "POETRY", () => appSettings?.Poetry?.Include },
         { "CONAN", () => appSettings?.Conan?.Include },
-        { "ALPINE", () => appSettings?.Alpine?.Include }
+        { "ALPINE", () => appSettings?.Alpine?.Include },
+        { "CHOCO", () => appSettings?.Choco?.Include }
     };
 
             if (includeMappings.TryGetValue(appSettings.ProjectType, out var getIncludeList))
@@ -52,7 +53,8 @@ namespace LCT.PackageIdentifier
         { "DEBIAN", () => appSettings?.Debian?.Exclude },
         { "POETRY", () => appSettings?.Poetry?.Exclude },
         { "CONAN", () => appSettings?.Conan?.Exclude },
-        { "ALPINE", () => appSettings?.Alpine?.Exclude }
+        { "ALPINE", () => appSettings?.Alpine?.Exclude },
+        { "CHOCO", () => appSettings?.Choco?.Exclude }
     };
 
             if (excludeMappings.TryGetValue(appSettings.ProjectType, out var getExcludeList))
@@ -94,7 +96,8 @@ namespace LCT.PackageIdentifier
         { "DEBIAN", () => appSettings?.Debian?.Artifactory.InternalRepos },
         { "POETRY", () => appSettings?.Poetry?.Artifactory.InternalRepos },
         { "CONAN", () => appSettings?.Conan?.Artifactory.InternalRepos },
-        { "ALPINE", () => appSettings?.Alpine?.Artifactory.InternalRepos }
+        { "ALPINE", () => appSettings?.Alpine?.Artifactory.InternalRepos },
+        { "CHOCO", () => appSettings?.Choco?.Artifactory.InternalRepos }
         };
 
             if (repoMapping.TryGetValue(appSettings.ProjectType, out var getRepos))

@@ -48,7 +48,7 @@ namespace LCT.PackageIdentifier
         private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
 
         #region public methods
-        public Bom ParsePackageFile(CommonAppSettings appSettings, ref Bom unSupportedBomList)
+        public virtual Bom ParsePackageFile(CommonAppSettings appSettings, ref Bom unSupportedBomList)
         {
             Logger.Debug($"ParsePackageFile():Start");
             List<Component> listComponentForBOM = new List<Component>();
@@ -362,10 +362,20 @@ namespace LCT.PackageIdentifier
         public async Task<ComponentIdentification> IdentificationOfInternalComponents(
             ComponentIdentification componentData, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
+            // get the component list from Jfrog for given repo
+            List<AqlResult> aqlResultList;
 
-            // get the  component list from Jfrog for given repo
-            List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(appSettings.Nuget.Artifactory.InternalRepos, jFrogService);
-
+            // If project type is CHOCO, then get the component list from CHOCO internal repo
+            // Since CHOCO repo also contains NUGET packages 
+            if (appSettings?.ProjectType != null && appSettings.ProjectType.Equals("CHOCO", StringComparison.InvariantCultureIgnoreCase))
+            {
+                aqlResultList = await bomhelper.GetListOfComponentsFromRepo(appSettings.Choco.Artifactory.InternalRepos, jFrogService);
+            }
+            else
+            {
+                // For NUGET project type, get the component list from NUGET internal repo
+                aqlResultList = await bomhelper.GetListOfComponentsFromRepo(appSettings.Nuget.Artifactory.InternalRepos, jFrogService);
+            }
             var inputIterationList = componentData.comparisonBOMData;
 
             // Use the common helper method
@@ -405,7 +415,7 @@ namespace LCT.PackageIdentifier
                 noOfExcludedComponents => BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents);
         }
 
-        public static void AddSiemensDirectProperty(ref Bom bom)
+        public virtual void AddSiemensDirectProperty(ref Bom bom)
         {
             var bomComponentsList = bom.Components;
             foreach (var component in bomComponentsList)
@@ -599,7 +609,7 @@ namespace LCT.PackageIdentifier
             }
         }
 
-        private static void ConvertToCycloneDXModel(List<Component> listComponentForBOM, List<NugetPackage> listofComponents, List<Dependency> dependencies)
+        public static void ConvertToCycloneDXModel(List<Component> listComponentForBOM, List<NugetPackage> listofComponents, List<Dependency> dependencies)
         {
             foreach (var prop in listofComponents)
             {
