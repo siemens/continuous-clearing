@@ -92,6 +92,27 @@ namespace LCT.PackageIdentifier
             foreach (var component in componentsForBOM)
             {
                 CycloneBomProcessor.SetProperties(appSettings, component, ref modifiedBOM);
+                // Extract license info for Alpine and set in SBOM 'licenses' array
+                string licenseId = "NO-LICENSE-FOUND";
+                if (component.Licenses != null && component.Licenses.Count > 0 && component.Licenses[0].License != null && !string.IsNullOrWhiteSpace(component.Licenses[0].License.Id))
+                {
+                    licenseId = component.Licenses[0].License.Id;
+                }
+                else if (component.Properties != null)
+                {
+                    var licenseProp = component.Properties.FirstOrDefault(p => p.Name.ToLower().Contains("license"));
+                    if (licenseProp != null && !string.IsNullOrWhiteSpace(licenseProp.Value))
+                    {
+                        licenseId = licenseProp.Value;
+                    }
+                }
+                component.Licenses = new List<LicenseChoice> {
+                    new LicenseChoice {
+                        License = new License {
+                            Id = string.IsNullOrWhiteSpace(licenseId) ? "NO-LICENSE-FOUND" : licenseId
+                        }
+                    }
+                };
             }
             await Task.Yield();
             return modifiedBOM;
