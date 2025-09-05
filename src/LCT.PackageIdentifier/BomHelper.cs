@@ -10,6 +10,7 @@ using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
+using LCT.Common.Logging;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
@@ -32,7 +33,7 @@ namespace LCT.PackageIdentifier
     /// </summary>
     public class BomHelper : IBomHelper
     {
-        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         #region public methods
 
@@ -75,27 +76,7 @@ namespace LCT.PackageIdentifier
             };
 
             CommonHelper.ProjectSummaryLink = bomKpiData.ProjectSummaryLink;
-            CommonHelper.WriteToConsoleTable(printList, printTimingList);
-        }
-        public void WriteInternalComponentsListToKpi(List<Component> internalComponents)
-        {
-            const string Name = "Name";
-            const string Version = "Version";
-
-            if (internalComponents?.Count > 0)
-            {
-                Logger.Logger.Log(null, Level.Alert, "* Internal Components Identified which will not be sent for clearing:", null);
-                Logger.Logger.Log(null, Level.Alert, $"{"=",5}{string.Join("", Enumerable.Repeat("=", 98)),5}", null);
-                Logger.Logger.Log(null, Level.Alert, $"{"|",5}{Name,-45} {"|",5} {Version,35} {"|",10}", null);
-                Logger.Logger.Log(null, Level.Alert, $"{"=",5}{string.Join("", Enumerable.Repeat("=", 98)),5}", null);
-
-                foreach (var item in internalComponents)
-                {
-                    Logger.Logger.Log(null, Level.Alert, $"{"|",5}{item.Name,-45} {"|",5} {item.Version,35} {"|",10}", null);
-                    Logger.Logger.Log(null, Level.Alert, $"{"-",5}{string.Join("", Enumerable.Repeat("-", 98)),5}", null);
-                }
-                Logger.Info("\n");
-            }
+            LoggerHelper.WriteToConsoleTable(printList, printTimingList, bomKpiData.ProjectSummaryLink, Dataconstant.Identifier);
         }
         public static void NamingConventionOfSPDXFile(string filepath, CommonAppSettings appSettings)
         {
@@ -147,7 +128,7 @@ namespace LCT.PackageIdentifier
                     Logger.Error($"Naming Convention Error: The certificate file(s) for the SPDX document '{filename}' are missing. Please ensure that .pem files are named in the format '{filename}.pem'.");
                 }
             }
-        }
+        }        
 
         private static void ValidateFoundFiles(string filepath, string filename, Dictionary<string, string> foundFiles)
         {

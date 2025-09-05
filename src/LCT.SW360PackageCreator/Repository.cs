@@ -4,6 +4,7 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using LCT.Common;
 using LCT.Common.Constants;
 using LCT.SW360PackageCreator.Interfaces;
 using log4net;
@@ -20,7 +21,7 @@ namespace LCT.SW360PackageCreator
     public class Repository : IRepository
     {
 
-        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         readonly List<string> m_RepoUrlList = new List<string>()
             {
                 "github.com",

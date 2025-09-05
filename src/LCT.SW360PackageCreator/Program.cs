@@ -8,6 +8,8 @@ using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Common.ComplianceValidator;
 using LCT.Common.Constants;
+using LCT.Common.Interface;
+using LCT.Common.Logging;
 using LCT.Common.Model;
 using LCT.Facade;
 using LCT.Facade.Interfaces;
@@ -16,6 +18,7 @@ using LCT.Services.Interface;
 using LCT.SW360PackageCreator.Interfaces;
 using log4net;
 using log4net.Core;
+using NuGet.Protocol.Plugins;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -60,35 +63,22 @@ namespace LCT.SW360PackageCreator
             ISw360ProjectService sw360ProjectService = Getsw360ProjectServiceObject(appSettings, out ISW360ApicommunicationFacade sW360ApicommunicationFacade);
             ProjectReleases projectReleases = new ProjectReleases();
 
-            string FolderPath = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.ComponentCreatorLog, m_Verbose);
-            Logger.Logger.Log(null, Level.Debug, $"log manager initiated folder path: {FolderPath}", null);
+            string _ = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.ComponentCreatorLog, m_Verbose);
             Console.OutputEncoding = System.Text.Encoding.UTF8;
-            settingsManager.CheckRequiredArgsToRun(appSettings, "Creator");
+            settingsManager.CheckRequiredArgsToRun(appSettings, Dataconstant.Creator);
             int isValid = await CreatorValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
 
             if (isValid == -1)
             {
                 environmentHelper.CallEnvironmentExit(-1);
             }
-
-            Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Package creator >>>>>====================", null);
-            Logger.Logger.Log(null, Level.Notice, $"\nStart of Package creator execution : {DateTime.Now}", null);
+            LoggerHelper.SpectreConsoleInitialMessage("Package creator");
 
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Alert, $"Package creator is running in TEST mode \n", null);
             var bomFilePath = Path.Combine(appSettings.Directory.OutputFolder, appSettings.SW360.ProjectName + "_" + FileConstant.BomFileName);
-            Logger.Logger.Log(null, Level.Notice, $"Input parameters used in Package Creator:\n\t" +
-              $"CaToolVersion\t\t --> {caToolInformation.CatoolVersion}\n\t" +
-              $"CaToolRunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
-              $"BomFilePath\t\t --> {bomFilePath}\n\t" +
-              $"SW360Url\t\t --> {appSettings.SW360.URL}\n\t" +
-              $"SW360AuthTokenType\t --> {appSettings.SW360.AuthTokenType}\n\t" +
-              $"SW360ProjectName\t --> {appSettings.SW360.ProjectName}\n\t" +
-              $"SW360ProjectID\t\t --> {appSettings.SW360.ProjectID}\n\t" +
-              $"FossologyURL\t\t --> {appSettings.SW360.Fossology.URL}\n\t" +
-              $"EnableFossTrigger\t --> {appSettings.SW360.Fossology.EnableTrigger}\n\t" +
-              $"IgnoreDevDependency\t --> {appSettings.SW360.IgnoreDevDependency}\n\t" +
-              $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t", null);
+            ListofPerametersForCli listofPerameters = new ListofPerametersForCli();
+            LoggerHelper.LogInputParameters(caToolInformation,appSettings,listofPerameters,exeType: Dataconstant.Creator, bomFilePath: bomFilePath);
 
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);
