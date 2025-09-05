@@ -8,11 +8,13 @@ using CycloneDX.Models;
 using LCT.Common.Constants;
 using LCT.Common.Model;
 using log4net;
+using log4net.Appender;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using File = System.IO.File;
 
@@ -1064,7 +1066,77 @@ namespace LCT.Common.UTest
             // Should have added one property (internal) to the existing empty list
             Assert.AreEqual(1, processedComponent.Properties.Count);
         }
+        [Test]
+        public void LogDuplicateComponentsByPurlId_LogsExpectedOutput_MemoryAppender()
+        {
+            // Arrange
+            var components = new List<Components>
+            {
+                new Components { Name = "CompA", Version = "1.0", ComponentId = "cid1" },
+                new Components { Name = "CompB", Version = "2.0", ComponentId = "cid2" }
+            };
+            string sw360Url = "http://sw360";
 
+            // Set up MemoryAppender
+            var memoryAppender = new MemoryAppender();
+            var loggerField = typeof(CommonHelper).GetField("Logger", BindingFlags.Static | BindingFlags.NonPublic);
+            var logger = (ILog)loggerField.GetValue(null);
+
+            // Attach the appender to the logger's repository
+            var log = LogManager.GetLogger(typeof(CommonHelper));
+            ((log4net.Repository.Hierarchy.Logger)log.Logger).AddAppender(memoryAppender);
+
+            // Act
+            var logMethod = typeof(CommonHelper).GetMethod("LogDuplicateComponentsByPurlId", BindingFlags.Static | BindingFlags.NonPublic);
+            Assert.IsNotNull(logMethod, "LogDuplicateComponentsByPurlId method not found in CommonHelper.");
+            logMethod.Invoke(null, new object[] { components, sw360Url });
+
+            // Get log events
+            var events = memoryAppender.GetEvents();
+            var messages = events.Select(e => e.RenderedMessage).ToList();
+
+            // Assert
+            Assert.IsTrue(messages.Any(m => m.Contains("not created in SW360 due to Invalid Purl ids")), "Missing expected summary log.");
+            Assert.IsTrue(messages.Any(m => m.Contains("Component Name already exists in SW360")), "Missing expected warning log.");
+            Assert.IsTrue(messages.Any(m => m.Contains("CompA")), "Missing CompA in log.");
+            Assert.IsTrue(messages.Any(m => m.Contains("CompB")), "Missing CompB in log.");
+            Assert.IsTrue(messages.Any(m => m.Contains("http://sw360/group/guest/components/-/component/detail/cid1")), "Missing CompA URL in log.");
+            Assert.IsTrue(messages.Any(m => m.Contains("http://sw360/group/guest/components/-/component/detail/cid2")), "Missing CompB URL in log.");
+
+            // Clean up
+            ((log4net.Repository.Hierarchy.Logger)log.Logger).RemoveAppender(memoryAppender);
+        }
+
+        [Test]
+        public void LogDuplicateComponentsByPurlId_DoesNothing_WhenListIsEmpty_MemoryAppender()
+        {
+            // Arrange
+            var components = new List<Components>();
+            string sw360Url = "http://sw360";
+
+            // Set up MemoryAppender
+            var memoryAppender = new MemoryAppender();
+            var loggerField = typeof(CommonHelper).GetField("Logger", BindingFlags.Static | BindingFlags.NonPublic);
+            var logger = (ILog)loggerField.GetValue(null);
+
+            // Attach the appender to the logger's repository
+            var log = LogManager.GetLogger(typeof(CommonHelper));
+            ((log4net.Repository.Hierarchy.Logger)log.Logger).AddAppender(memoryAppender);
+
+            // Act
+            var logMethod = typeof(CommonHelper).GetMethod("LogDuplicateComponentsByPurlId", BindingFlags.Static | BindingFlags.NonPublic);
+            Assert.IsNotNull(logMethod, "LogDuplicateComponentsByPurlId method not found in CommonHelper.");
+            logMethod.Invoke(null, new object[] { components, sw360Url });
+
+            // Get log events
+            var events = memoryAppender.GetEvents();
+
+            // Assert
+            Assert.IsTrue(events.Length == 0 || events.All(e => string.IsNullOrWhiteSpace(e.RenderedMessage)), "No logs should be written when the list is empty.");
+
+            // Clean up
+            ((log4net.Repository.Hierarchy.Logger)log.Logger).RemoveAppender(memoryAppender);
+        }
 
         #region SetComponentPropertiesAndHashes Tests
 
