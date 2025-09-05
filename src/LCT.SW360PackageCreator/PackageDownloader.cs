@@ -27,6 +27,8 @@ namespace LCT.SW360PackageCreator
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly List<DownloadedSourceInfo> m_downloadedSourceInfos = new List<DownloadedSourceInfo>();
         private const string Source = "source";
+        private static readonly string[] WindowsLineSeparators = ["\r\n"];
+        private static readonly string[] UnixLineSeparators = ["\n"];
 
         public async Task<string> DownloadPackage(ComparisonBomData component, string localPathforDownload)
         {
@@ -147,11 +149,11 @@ namespace LCT.SW360PackageCreator
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                return result.StdOut.Split(new[] { "\r\n" }, StringSplitOptions.None);
+                return result.StdOut.Split(WindowsLineSeparators, StringSplitOptions.None);
             }
             else
             {
-                return result.StdOut.Split(new[] { "\n" }, StringSplitOptions.None);
+                return result.StdOut.Split(UnixLineSeparators, StringSplitOptions.None);
             }
         }
         private static string GetBaseVersion(string version)
