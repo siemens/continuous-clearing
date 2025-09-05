@@ -97,15 +97,7 @@ namespace LCT.SW360PackageCreator
             string correctVersion = string.Empty;
             Result result = ListTagsOfComponent(component);
 
-            string[] taglist;
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                taglist = result?.StdOut?.Split("\r\n") ?? Array.Empty<string>();
-            }
-            else
-            {
-                taglist = result?.StdOut?.Split("\n") ?? Array.Empty<string>();
-            }
+            string[] taglist = GetTagListFromResult(result);
             string baseVersion = GetBaseVersion(component.Version);
 
             foreach (string item in taglist)
@@ -145,8 +137,23 @@ namespace LCT.SW360PackageCreator
             }
             Logger.Debug($"componentName - given version:{component.Version}, correctVersion:{correctVersion}");
             return correctVersion;
-        }       
-        
+        }
+        private static string[] GetTagListFromResult(Result result)
+        {
+            if (result == null || string.IsNullOrEmpty(result.StdOut))
+            {
+                return [];
+            }
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                return result.StdOut.Split(new[] { "\r\n" }, StringSplitOptions.None);
+            }
+            else
+            {
+                return result.StdOut.Split(new[] { "\n" }, StringSplitOptions.None);
+            }
+        }
         private static string GetBaseVersion(string version)
         {
             try
