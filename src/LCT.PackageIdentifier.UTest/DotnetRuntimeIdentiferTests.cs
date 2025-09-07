@@ -86,6 +86,49 @@ namespace LCT.PackageIdentifier.UTest
         }
 
         [Test]
+        public void IdentifyRuntime_ReturnsError_WhenProjectContainsInvalidMSBuildContent()
+        {
+            // Create a directory with valid assets file but invalid csproj
+            string invalidBuildDir = Path.Combine(_testDir, "InvalidBuild");
+            System.IO.Directory.CreateDirectory(invalidBuildDir);
+            string assetsFile = Path.Combine(invalidBuildDir, "project.assets.json");
+            string invalidCsproj = Path.Combine(invalidBuildDir, "Invalid.csproj");
+
+            // Copy the real assets file but modify it to point to our invalid project
+            string json = File.ReadAllText(_assetsFilePath);
+            json = json.Replace(
+                    "\"projectPath\": \"\"",
+                    $"\"projectPath\": \"{invalidCsproj.Replace("\\", "\\\\")}\"");
+
+            File.WriteAllText(assetsFile, json);
+
+            // Create a csproj file with invalid MSBuild syntax
+            File.WriteAllText(invalidCsproj,
+                "<Project Sdk=\"Microsoft.NET.Sdk\">\n" +
+                "  <PropertyGroup>\n" +
+                "    <TargetFramework>net8.0</TargetFramework>\n" +
+                "    <InvalidProperty><<>>ThisIsInvalid</InvalidProperty>\n" + // Invalid XML syntax
+                "  </PropertyGroup>\n" +
+                "</Project>");
+
+            var testAppSettings = new CommonAppSettings
+            {
+                Directory = new LCT.Common.Directory()
+                {
+                    InputFolder = invalidBuildDir
+                }
+            };
+
+            var result = _identifier.IdentifyRuntime(testAppSettings);
+
+            Assert.IsFalse(string.IsNullOrEmpty(result.ErrorMessage));
+            Assert.That(result.ErrorMessage + result.ErrorDetails, Does.Contain("Error"));
+
+            // Clean up
+            System.IO.Directory.Delete(invalidBuildDir, true);
+        }
+
+        [Test]
         public void IdentifyRuntime_ReturnsValidRuntimeInfo_WhenAssetsFilePresent()
         {
             // Create a copy of the original assets file

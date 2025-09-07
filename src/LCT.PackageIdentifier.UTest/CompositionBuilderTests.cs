@@ -208,5 +208,176 @@ namespace LCT.PackageIdentifier.UTest
             Assert.IsTrue(identifiers.Any(i => i.Contains("PackageA@1.0.0")));
             Assert.IsTrue(identifiers.Any(i => i.Contains("PackageB@2.0.0-beta")));
         }
+
+        [Test]
+        public void CreateRuntimeComponentIdentifier_WithMatchingFrameworkReference_UsesTargetingPackVersion()
+        {
+            // Arrange
+            var frameworkMoniker = "net6.0";
+            _runtimeInfo.FrameworkReferences = new List<FrameworkReferenceInfo>
+            {
+                new FrameworkReferenceInfo
+                {
+                    TargetFramework = "net6.0",
+                    Name = "Microsoft.NETCore.App",
+                    TargetingPackVersion = "9.9.9"
+                }
+            };
+            var builder = new CompositionBuilder(_config);
+            typeof(CompositionBuilder)
+                .GetField("_runtimeInfo", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                .SetValue(builder, _runtimeInfo);
+
+            // Act
+            var identifier = builder.GetType()
+                .GetMethod("CreateRuntimeComponentIdentifier", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                .Invoke(builder, new object[] { frameworkMoniker }) as string;
+
+            // Assert
+            Assert.IsNotNull(identifier);
+            Assert.IsTrue(identifier.Contains("pkg:nuget/test-runtime@9.9.9"));
+        }
+
+        [Test]
+        public void CreateRuntimeComponentIdentifier_FrameworkReferenceListIsNull_FallsBackToExtractFrameworkVersion()
+        {
+            // Arrange
+            var frameworkMoniker = "net5.0";
+            _runtimeInfo.FrameworkReferences = null;
+            var builder = new CompositionBuilder(_config);
+            typeof(CompositionBuilder)
+                .GetField("_runtimeInfo", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                .SetValue(builder, _runtimeInfo);
+
+            // Act
+            var identifier = builder.GetType()
+                .GetMethod("CreateRuntimeComponentIdentifier", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                .Invoke(builder, new object[] { frameworkMoniker }) as string;
+
+            // Assert
+            Assert.IsNotNull(identifier);
+            Assert.IsTrue(identifier.Contains("pkg:nuget/test-runtime@5.0.0"));
+        }
+
+        [Test]
+        public void CreateRuntimeComponentIdentifier_FrameworkReferenceListEmpty_FallsBackToExtractFrameworkVersion()
+        {
+            // Arrange
+            var frameworkMoniker = "net7.0";
+            _runtimeInfo.FrameworkReferences = new List<FrameworkReferenceInfo>();
+            var builder = new CompositionBuilder(_config);
+            typeof(CompositionBuilder)
+                .GetField("_runtimeInfo", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                .SetValue(builder, _runtimeInfo);
+
+            // Act
+            var identifier = builder.GetType()
+                .GetMethod("CreateRuntimeComponentIdentifier", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                .Invoke(builder, new object[] { frameworkMoniker }) as string;
+
+            // Assert
+            Assert.IsNotNull(identifier);
+            Assert.IsTrue(identifier.Contains("pkg:nuget/test-runtime@7.0.0"));
+        }
+
+        [Test]
+        public void CreateRuntimeComponentIdentifier_MultipleFrameworkReferences_OnlyFirstMatchUsed()
+        {
+            // Arrange
+            var frameworkMoniker = "net8.0";
+            _runtimeInfo.FrameworkReferences = new List<FrameworkReferenceInfo>
+            {
+                new FrameworkReferenceInfo { TargetFramework = "net5.0", TargetingPackVersion = "5.0.0" },
+                new FrameworkReferenceInfo { TargetFramework = "net8.0", TargetingPackVersion = "8.8.8" },
+                new FrameworkReferenceInfo { TargetFramework = "net8.0", TargetingPackVersion = "8.0.0" }
+            };
+            var builder = new CompositionBuilder(_config);
+            typeof(CompositionBuilder)
+                .GetField("_runtimeInfo", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                .SetValue(builder, _runtimeInfo);
+
+            // Act
+            var identifier = builder.GetType()
+                .GetMethod("CreateRuntimeComponentIdentifier", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                .Invoke(builder, new object[] { frameworkMoniker }) as string;
+
+            // Assert
+            Assert.IsNotNull(identifier);
+            Assert.IsTrue(identifier.Contains("pkg:nuget/test-runtime@8.8.8"));
+        }
+
+        [Test]
+        public void CreateRuntimeComponentIdentifier_TargetFrameworkCaseInsensitiveMatch()
+        {
+            // Arrange
+            var frameworkMoniker = "NeT6.0";
+            _runtimeInfo.FrameworkReferences = new List<FrameworkReferenceInfo>
+            {
+                new FrameworkReferenceInfo { TargetFramework = "net6.0", TargetingPackVersion = "6.6.6" }
+            };
+            var builder = new CompositionBuilder(_config);
+            typeof(CompositionBuilder)
+                .GetField("_runtimeInfo", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                .SetValue(builder, _runtimeInfo);
+
+            // Act
+            var identifier = builder.GetType()
+                .GetMethod("CreateRuntimeComponentIdentifier", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                .Invoke(builder, new object[] { frameworkMoniker }) as string;
+
+            // Assert
+            Assert.IsNotNull(identifier);
+            Assert.IsTrue(identifier.Contains("pkg:nuget/test-runtime@6.6.6"));
+        }
+
+        [Test]
+        public void CreateRuntimeComponentIdentifier_TargetingPackVersionIsNull_FallsBackToExtractFrameworkVersion()
+        {
+            // Arrange
+            var frameworkMoniker = "net9.0";
+            _runtimeInfo.FrameworkReferences = new List<FrameworkReferenceInfo>
+            {
+                new FrameworkReferenceInfo { TargetFramework = "net9.0", TargetingPackVersion = null }
+            };
+            var builder = new CompositionBuilder(_config);
+            typeof(CompositionBuilder)
+                .GetField("_runtimeInfo", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                .SetValue(builder, _runtimeInfo);
+
+            // Act
+            var identifier = builder.GetType()
+                .GetMethod("CreateRuntimeComponentIdentifier", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                .Invoke(builder, new object[] { frameworkMoniker }) as string;
+
+            // Assert
+            Assert.IsNotNull(identifier);
+            // Should fallback to ExtractFrameworkVersion
+            Assert.IsTrue(identifier.Contains("pkg:nuget/test-runtime"));
+        }
+
+        [Test]
+        public void CreateRuntimeComponentIdentifier_FrameworkMonikerIsNullOrEmpty_UsesDefaultVersion()
+        {
+            // Arrange
+            _runtimeInfo.FrameworkReferences = null;
+            var builder = new CompositionBuilder(_config);
+            typeof(CompositionBuilder)
+                .GetField("_runtimeInfo", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                .SetValue(builder, _runtimeInfo);
+
+            // Act
+            var identifierNull = builder.GetType()
+                .GetMethod("CreateRuntimeComponentIdentifier", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                .Invoke(builder, new object[] { null }) as string;
+            var identifierEmpty = builder.GetType()
+                .GetMethod("CreateRuntimeComponentIdentifier", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                .Invoke(builder, new object[] { string.Empty }) as string;
+
+            // Assert
+            Assert.IsNotNull(identifierNull);
+            Assert.IsNotNull(identifierEmpty);
+            Assert.IsTrue(identifierNull.Contains("pkg:nuget/test-runtime@1.0.0"));
+            Assert.IsTrue(identifierEmpty.Contains("pkg:nuget/test-runtime@1.0.0"));
+        }
     }
 }
