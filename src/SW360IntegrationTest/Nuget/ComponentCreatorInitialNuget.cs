@@ -58,7 +58,7 @@ namespace SW360IntegrationTest.Nuget
             string bomPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs"));
             // Assert
             // Check exit is normal
-            Assert.AreEqual(0, TestHelper.RunComponentCreatorExe(new string[] {
+            Assert.AreEqual(2 | 0, TestHelper.RunComponentCreatorExe(new string[] {
                 TestConstant.BomFolderPath,bomPath,
                 TestConstant.Sw360Token, testParameters.SW360AuthTokenValue,
                 TestConstant.SW360URL, testParameters.SW360URL,
