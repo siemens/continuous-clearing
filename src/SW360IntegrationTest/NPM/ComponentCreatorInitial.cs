@@ -56,8 +56,7 @@ namespace SW360IntegrationTest.NPM
             string bomPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs"));
 
             // Assert
-            // Check return with warning code 2
-            Assert.AreEqual(0, TestHelper.RunComponentCreatorExe(new string[] {
+                Assert.AreEqual(0, TestHelper.RunComponentCreatorExe(new string[] {
                 TestConstant.BomFolderPath,bomPath,
                 TestConstant.Sw360Token, testParameters.SW360AuthTokenValue,
                 TestConstant.SW360URL, testParameters.SW360URL,
