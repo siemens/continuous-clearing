@@ -29,7 +29,6 @@ namespace LCT.PackageIdentifier
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
-        private static readonly char[] SplitChars = { '/', '@' };
         private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
         #region public methods
@@ -80,7 +79,6 @@ namespace LCT.PackageIdentifier
 
         public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
-            // get the  component list from Jfrog for given repo + internal repo
             string[] repoList = CommonHelper.GetRepoList(appSettings);
             List<AqlResult> aqlResultList = await bomhelper.GetCargoListOfComponentsFromRepo(repoList, jFrogService);
             Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
@@ -224,7 +222,7 @@ namespace LCT.PackageIdentifier
                 {
                     listOfTemplateBomfilePaths.Add(filepath);
                 }
-                if (filepath.ToLower().EndsWith("cargo.lock"))
+                if (filepath.ToLower().EndsWith(FileConstant.CargoLockFile))
                 {
                     Logger.Debug($"ParsingInputFileForBOM():FileName: " + filepath);
                     var components = GetPackagesFromCargoLockFile(filepath, ref dependencies);
@@ -281,21 +279,151 @@ namespace LCT.PackageIdentifier
         {
             Logger.Debug($"[GetPackagesFromCargoLockFile] Start processing Cargo.lock: {filePath}");
 
-            // 1. Identify all packages from Cargo.lock
             List<Component> cargoPackages = GetAllPackagesFromCargoLock(filePath, out var keyValuePair, out var packageVersionLookup);
 
-            // 2. Build the dependency list
-            GetCargoRefDetailsFromDependencyText(keyValuePair, dependencies, cargoPackages, packageVersionLookup);
+            string tomlPath = Path.Combine(Path.GetDirectoryName(filePath)!, FileConstant.CargoTomlFile);
+            if (!File.Exists(tomlPath))
+            {
+                Logger.Warn($"Cargo.toml file not found at path: {tomlPath}. Direct and Dev dependencies will not be identified.");
+                GetCargoRefDetailsFromDependencyText(keyValuePair, dependencies, cargoPackages, packageVersionLookup, new HashSet<(string, string)>());
+                Logger.Debug("[GetPackagesFromCargoLockFile] Finished processing Cargo.lock (without Cargo.toml).");
+                return cargoPackages;
+            }
 
-            // 3. Identify dev dependencies and add property
-            string cargoTomlPath = Path.Combine(Path.GetDirectoryName(filePath)!, "Cargo.toml");
-            var devDependencies = GetDevDependenciesFromToml(cargoTomlPath);
-            MarkDevDependencies(cargoPackages, devDependencies);
+            var (directDepsDict, devDepsDict, buildDepsDict) = ParseCrateDependenciesWithWorkspaceVersions(tomlPath, tomlPath);
+
+            var directDeps = new HashSet<(string, string)>();
+            var devDeps = new HashSet<(string, string)>();
+            var buildDeps = new HashSet<(string, string)>();
+            foreach (var pkg in cargoPackages)
+            {
+                if (directDepsDict.TryGetValue(pkg.Name, out var ver) && ver == pkg.Version)
+                    directDeps.Add((pkg.Name, pkg.Version));
+                if (devDepsDict.TryGetValue(pkg.Name, out var ver2) && ver2 == pkg.Version)
+                    devDeps.Add((pkg.Name, pkg.Version));
+                if (buildDepsDict.TryGetValue(pkg.Name, out var ver3) && ver3 == pkg.Version)
+                    buildDeps.Add((pkg.Name, pkg.Version));
+            }
+
+            GetCargoRefDetailsFromDependencyText(keyValuePair, dependencies, cargoPackages, packageVersionLookup, directDeps);
+            MarkDevAndBuildDependenciesAccurately(cargoPackages, directDeps, devDeps, buildDeps, dependencies);
 
             Logger.Debug("[GetPackagesFromCargoLockFile] Finished processing Cargo.lock.");
             return cargoPackages;
         }
+        private static (Dictionary<string, string> directDeps,Dictionary<string, string> devDeps,Dictionary<string, string> buildDeps) ParseCrateDependenciesWithWorkspaceVersions(string crateTomlPath, string workspaceTomlPath)
+        {
+            var directDeps = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            var devDeps = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            var buildDeps = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            var workspaceVersions = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
+            // 1. Parse [workspace.dependencies] for version lookup
+            if (File.Exists(workspaceTomlPath))
+            {
+                using var reader = new StreamReader(workspaceTomlPath);
+                TomlTable wsTable = TOML.Parse(reader);
+                if (wsTable.HasKey("workspace") && wsTable["workspace"] is TomlTable workspaceTable)
+                {
+                    if (workspaceTable.HasKey("dependencies") && workspaceTable["dependencies"] is TomlTable wsDepsTable)
+                    {
+                        foreach (var key in wsDepsTable.Keys)
+                        {
+                            var depNode = wsDepsTable[key];
+                            string version;
+                            if (depNode is TomlTable depTable && depTable.HasKey("version"))
+                                version = depTable["version"].ToString();
+                            else
+                                version = depNode.ToString();
+
+                            workspaceVersions[key] = version;
+                        }
+                    }
+                }
+            }
+
+            if (File.Exists(crateTomlPath))
+            {
+                using var reader = new StreamReader(crateTomlPath);
+                TomlTable crateTable = TOML.Parse(reader);
+                static string GetVersion(TomlNode node)
+                {
+                    if (node is TomlTable tbl && tbl.HasKey("version"))
+                        return tbl["version"].ToString();
+                    return node.ToString();
+                }
+
+                if (crateTable.HasKey("dependencies") && crateTable["dependencies"] is TomlTable depsTable)
+                {
+                    foreach (var key in depsTable.Keys)
+                    {
+                        if (workspaceVersions.TryGetValue(key, out var wsVersion))
+                            directDeps[key] = wsVersion;
+                        else
+                            directDeps[key] = GetVersion(depsTable[key]);
+                    }
+                }
+                if (crateTable.HasKey("dev-dependencies") && crateTable["dev-dependencies"] is TomlTable devDepsTable)
+                {
+                    foreach (var key in devDepsTable.Keys)
+                    {
+                        if (workspaceVersions.TryGetValue(key, out var wsVersion))
+                            devDeps[key] = wsVersion;
+                        else
+                            devDeps[key] = GetVersion(devDepsTable[key]);
+                    }
+                }
+                if (crateTable.HasKey("build-dependencies") && crateTable["build-dependencies"] is TomlTable buildDepsTable)
+                {
+                    foreach (var key in buildDepsTable.Keys)
+                    {
+                        if (workspaceVersions.TryGetValue(key, out var wsVersion))
+                            buildDeps[key] = wsVersion;
+                        else
+                            buildDeps[key] = GetVersion(buildDepsTable[key]);
+                    }
+                }
+            }
+
+            return (directDeps, devDeps, buildDeps);
+        }
+        private static void MarkDevAndBuildDependenciesAccurately(List<Component> cargoPackages,HashSet<(string, string)> directDeps,HashSet<(string, string)> devDeps,HashSet<(string, string)> buildDeps,List<Dependency> allDependencies)
+        {
+            // 1. Build a map from package name to Dependency object
+            var depMap = allDependencies.ToDictionary(d => d.Ref, d => d);
+
+            // 2. Find all packages reachable from direct dependencies (transitive closure)
+            var usedByDirect = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            void Traverse(string depRef)
+            {
+                if (!usedByDirect.Add(depRef)) return; // already visited
+                if (depMap.TryGetValue(depRef, out var dep) && dep.Dependencies != null)
+                {
+                    foreach (var sub in dep.Dependencies)
+                        Traverse(sub.Ref);
+                }
+            }
+
+            foreach (var direct in cargoPackages.Where(c => directDeps.Contains((c.Name, c.Version))))
+                Traverse(direct.Purl);
+
+            // 3. Mark dev/build dependencies only if NOT used by direct dependencies
+            foreach (var component in cargoPackages)
+            {
+                bool isDirect = directDeps.Contains((component.Name, component.Version));
+                bool isDev = devDeps.Contains((component.Name, component.Version)) && !usedByDirect.Contains(component.Purl);
+                bool isBuild = buildDeps.Contains((component.Name, component.Version)) && !usedByDirect.Contains(component.Purl);
+                var properties = component.Properties ??= new List<Property>();
+                CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
+                    Dataconstant.Cdx_IsDevelopment, isDev || isBuild ? "true" : "false");
+                component.Properties = properties;
+                if (isDev || isBuild)
+                {                    
+                    BomCreator.bomKpiData.DevDependentComponents++;
+                }
+            }
+        }
         private static List<Component> GetAllPackagesFromCargoLock(
             string filePath,
             out List<KeyValuePair<string, TomlNode>> keyValuePair,
@@ -339,32 +467,7 @@ namespace LCT.PackageIdentifier
             Logger.Debug($"[GetAllPackagesFromCargoLock()] Total packages parsed from Cargo.lock: {packageCount}");
             return cargoPackages;
         }
-
-        private static void MarkDevDependencies(List<Component> cargoPackages, List<string> devDependencies)
-        {
-            foreach (var component in cargoPackages)
-            {
-                if (devDependencies.Contains(component.Name))
-                {
-                    component.Properties ??= new List<Property>();
-                    component.Properties.Add(new Property
-                    {
-                        Name = Dataconstant.Cdx_IsDevelopment,
-                        Value = "true"
-                    });
-                    BomCreator.bomKpiData.DevDependentComponents++;
-                }
-                else
-                {
-                    component.Properties ??= new List<Property>();
-                    component.Properties.Add(new Property
-                    {
-                        Name = Dataconstant.Cdx_IsDevelopment,
-                        Value = "false"
-                    });
-                }
-            }
-        }
+        
         public static void AddSiemensDirectProperty(ref Bom bom)
         {
             List<string> cargoDirectDependencies = new List<string>();
@@ -387,53 +490,44 @@ namespace LCT.PackageIdentifier
 
             bom.Components = bomComponentsList;
         }
-        private static List<string> GetDevDependenciesFromToml(string tomlFilePath)
-        {
-            var devDeps = new List<string>();
-            if (!File.Exists(tomlFilePath))
-            {
-                Logger.Warn($"Cargo.toml file not found at path: {tomlFilePath}. Dev dependencies will not be identified.");
-                return devDeps;
-            }
 
-            using (var reader = new StreamReader(tomlFilePath))
-            {
-                TomlTable tomlTable = TOML.Parse(reader);
-                if (tomlTable.HasKey("dev-dependencies"))
-                {
-                    var devDepsTable = tomlTable["dev-dependencies"] as TomlTable;
-                    if (devDepsTable != null)
-                    {
-                        foreach (var key in devDepsTable.Keys)
-                        {
-                            devDeps.Add(key);
-                        }
-                    }
-                }
-            }
-            return devDeps;
-        }
         private static void GetCargoRefDetailsFromDependencyText(
-            List<KeyValuePair<string, TomlNode>> keyValues,
-            List<Dependency> dependencies,
-            List<Component> cargoPackages,
-            Dictionary<string, string> packageVersionLookup)
+     List<KeyValuePair<string, TomlNode>> keyValues,
+     List<Dependency> dependencies,
+     List<Component> cargoPackages,
+     Dictionary<string, string> packageVersionLookup,
+     HashSet<(string, string)> directDeps)
         {
             foreach (var node in keyValues)
             {
+                // Extract the package name and version from the PURL
+                string packageName = "";
+                string packageVersion = "";
+                var purlParts = node.Key.Split('/');
+                if (purlParts.Length > 1)
+                {
+                    var nameAndVersion = purlParts[^1].Split('@');
+                    if (nameAndVersion.Length > 0)
+                        packageName = nameAndVersion[0];
+                    if (nameAndVersion.Length > 1)
+                        packageVersion = nameAndVersion[1];
+                }
+
+                // Only add if this is a direct dependency (by name and version)
+                if (!directDeps.Contains((packageName, packageVersion)))
+                    continue;
+
                 var dep = node.Value["dependencies"];
                 List<Dependency> subDependencies = new();
                 if (dep != null && dep.ChildrenCount > 0)
                 {
                     foreach (var dependency in dep)
                     {
-                        // Each dependency is a string like: "name version (source)" or just "name"
                         string depStr = dependency.ToString();
                         var parts = depStr.Split(' ', StringSplitOptions.RemoveEmptyEntries);
                         string depName = parts[0];
                         string depVersion = parts.Length > 1 ? parts[1] : null;
 
-                        // If version is not present, try to get it from the lookup
                         if (string.IsNullOrEmpty(depVersion) && packageVersionLookup.TryGetValue(depName, out var foundVersion))
                         {
                             depVersion = foundVersion;
