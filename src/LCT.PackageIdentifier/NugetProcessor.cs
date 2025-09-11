@@ -367,13 +367,17 @@ namespace LCT.PackageIdentifier
 
             // If project type is CHOCO, then get the component list from CHOCO internal repo
             // Since CHOCO repo also contains NUGET packages 
-            if (appSettings?.ProjectType != null && appSettings.ProjectType.Equals("CHOCO", StringComparison.InvariantCultureIgnoreCase))
+            if (appSettings == null)
+            {
+                throw new ArgumentNullException(nameof(appSettings), "appSettings cannot be null.");
+            }
+
+            if (appSettings.ProjectType != null && appSettings.ProjectType.Equals("CHOCO", StringComparison.InvariantCultureIgnoreCase))
             {
                 aqlResultList = await bomhelper.GetListOfComponentsFromRepo(appSettings.Choco.Artifactory.InternalRepos, jFrogService);
             }
             else
             {
-                // For NUGET project type, get the component list from NUGET internal repo
                 aqlResultList = await bomhelper.GetListOfComponentsFromRepo(appSettings.Nuget.Artifactory.InternalRepos, jFrogService);
             }
             var inputIterationList = componentData.comparisonBOMData;
