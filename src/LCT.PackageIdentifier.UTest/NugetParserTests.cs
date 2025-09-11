@@ -1388,6 +1388,18 @@ namespace LCT.PackageIdentifier.UTest
 
             Assert.AreEqual(0, bom.Dependencies.Count);
         }
+        [Test]
+        public void IdentificationOfInternalComponents_NullAppSettings_ThrowsArgumentNullException()
+        {
+            // Arrange
+            var nugetProcessor = new NugetProcessor(_cycloneDXBomParser, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser);
+            var componentData = new ComponentIdentification();
+            IJFrogService jfrogService = new Mock<IJFrogService>().Object;
+            IBomHelper bomHelper = new Mock<IBomHelper>().Object;
 
+            // Act & Assert
+            Assert.ThrowsAsync<ArgumentNullException>(async () =>
+                await nugetProcessor.IdentificationOfInternalComponents(componentData, null, jfrogService, bomHelper));
+        }
     }
 }

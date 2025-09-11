@@ -107,6 +107,113 @@ namespace LCT.SW360PackageCreator.UTest
             // Assert
             Assert.IsTrue(result);
             Assert.AreEqual(expectedPath, parameters[2]);
-        }
+            }
+        
+
+         [Test]
+         public void Download_ReturnsEmptyString_WhenTaggedVersionIsEmpty()
+         {
+                // Arrange
+                var packageDownloader = new PackageDownloader();
+                var component = new ComparisonBomData { Name = "test", Version = "invalid" }; // invalid version to force GetCorrectVersion to return empty
+                var method = typeof(PackageDownloader).GetMethod("Download", BindingFlags.NonPublic | BindingFlags.Instance);
+
+                // Act
+                var result = (string)method.Invoke(packageDownloader, new object[] { component, "/tmp/" });
+
+                // Assert
+                Assert.That(result, Is.EqualTo(string.Empty));
+         }
+
+         [Test]
+         public void Download_ReturnsEmptyString_WhenCreateDirectoryThrows()
+            {
+                // Arrange
+                var packageDownloader = new PackageDownloader();
+                var component = new ComparisonBomData
+                {
+                    Name = "test",
+                    Version = "1.0.0",
+                    SourceUrl = "https://github.com/example/repo"
+                };
+                // Set up m_downloadedSourceInfos to ensure CheckIfAlreadyDownloaded returns false
+                var field = typeof(PackageDownloader).GetField("m_downloadedSourceInfos", BindingFlags.NonPublic | BindingFlags.Instance);
+                field.SetValue(packageDownloader, new List<DownloadedSourceInfo>());
+
+                // Patch Directory.CreateDirectory to throw (simulate with a non-writable path)
+                var method = typeof(PackageDownloader).GetMethod("Download", BindingFlags.NonPublic | BindingFlags.Instance);
+                var unwritablePath = "/root/shouldfail/";
+
+                // Act
+                var result = (string)method.Invoke(packageDownloader, new object[] { component, unwritablePath });
+
+                // Assert
+                Assert.That(result, Is.EqualTo(string.Empty));
+         }
+
+         [Test]
+         public void GetBaseVersion_ReturnsMajorMinor_WhenBuildIsZeroAndRevisionMinusOne()
+         {
+                // Arrange
+                var method = typeof(PackageDownloader).GetMethod("GetBaseVersion", BindingFlags.NonPublic | BindingFlags.Static);
+
+                // Act
+                var result = (string)method.Invoke(null, new object[] { "1.2.0" });
+
+                // Assert
+                Assert.That(result, Is.EqualTo("1.2"));
+         }
+
+          [Test]
+         public void GetBaseVersion_ReturnsInput_WhenFormatIsInvalid()
+         {
+                // Arrange
+                var method = typeof(PackageDownloader).GetMethod("GetBaseVersion", BindingFlags.NonPublic | BindingFlags.Static);
+
+                // Act
+                var result = (string)method.Invoke(null, new object[] { "notaversion" });
+
+                // Assert
+                Assert.That(result, Is.EqualTo("notaversion"));
+         }
+
+         [Test]
+         public void GetGitCloneCommands_ReturnsExpectedCommands()
+         {
+                // Arrange
+                var method = typeof(PackageDownloader).GetMethod("GetGitCloneCommands", BindingFlags.NonPublic | BindingFlags.Static);
+                var component = new ComparisonBomData { DownloadUrl = "https://github.com/example/repo" };
+                var tag = "v1.0.0";
+                var path = "/tmp/file.tgz";
+
+                // Act
+                var result = (List<string>)method.Invoke(null, new object[] { component, tag, path });
+
+                // Assert
+                Assert.That(result, Has.Count.GreaterThan(0));
+                Assert.That(result[0], Does.Contain("init"));
+         }
+
+         [Test]
+         public void CheckIfAlreadyDownloaded_NoMatch_ReturnsFalse()
+         {
+                // Arrange
+                var packageDownloader = new PackageDownloader();
+                var component = new ComparisonBomData { DownloadUrl = "https://github.com/example/repo" };
+                var tagVersion = "v1.0.0";
+                var field = typeof(PackageDownloader).GetField("m_downloadedSourceInfos", BindingFlags.NonPublic | BindingFlags.Instance);
+                field.SetValue(packageDownloader, new List<DownloadedSourceInfo>()); // empty list
+
+                var method = typeof(PackageDownloader).GetMethod("CheckIfAlreadyDownloaded", BindingFlags.NonPublic | BindingFlags.Instance);
+                object[] parameters = { component, tagVersion, null };
+
+                // Act
+                var result = (bool)method.Invoke(packageDownloader, parameters);
+
+                // Assert
+                Assert.IsFalse(result);
+         }
+
     }
+    
 }
