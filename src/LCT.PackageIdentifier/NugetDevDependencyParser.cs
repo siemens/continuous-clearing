@@ -14,6 +14,7 @@ using NuGet.Packaging.Core;
 using NuGet.ProjectModel;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -31,9 +32,18 @@ namespace LCT.PackageIdentifier
         private static readonly List<string> s_nugetDirectDependencies = new List<string>();
         public static IReadOnlyList<string> NugetDirectDependencies => s_nugetDirectDependencies;
 
+        /// <summary>
+        /// Private constructor for singleton pattern implementation.
+        /// Registers MSBuild defaults if not already registered.
+        /// Excluded from code coverage as it's trivial and not directly testable.
+        /// </summary>
+        [ExcludeFromCodeCoverage]
         private NugetDevDependencyParser()
         {
-            MSBuildLocator.RegisterDefaults();
+            if (!MSBuildLocator.IsRegistered)
+            {
+                MSBuildLocator.RegisterDefaults();
+            }
         }
 
         public static NugetDevDependencyParser Instance

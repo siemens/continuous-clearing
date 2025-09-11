@@ -46,15 +46,17 @@ namespace LCT.PackageIdentifier
 
         private readonly IFrameworkPackages _frameworkPackages;
         private readonly ICompositionBuilder _compositionBuilder;
+        private readonly IRuntimeIdentifier _runtimeIdentifier;
 
         public static Jfrog jfrog { get; set; } = new Jfrog();
         public static SW360 sw360 { get; set; } = new SW360();
-        public BomCreator(ICycloneDXBomParser cycloneDXBomParser, IFrameworkPackages frameworkPackages, ICompositionBuilder compositionBuilder, ISpdxBomParser spdxBomParser)
+        public BomCreator(ICycloneDXBomParser cycloneDXBomParser, IFrameworkPackages frameworkPackages, ICompositionBuilder compositionBuilder, ISpdxBomParser spdxBomParser, IRuntimeIdentifier runtimeIdentifier)
         {
             CycloneDXBomParser = cycloneDXBomParser;
             _frameworkPackages = frameworkPackages;
             _compositionBuilder = compositionBuilder;
             SpdxBomParser = spdxBomParser;
+            _runtimeIdentifier = runtimeIdentifier;
         }
 
         public async Task GenerateBom(CommonAppSettings appSettings,
@@ -162,7 +164,7 @@ namespace LCT.PackageIdentifier
                     parser = new NpmProcessor(CycloneDXBomParser, SpdxBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 case "NUGET":
-                    parser = new NugetProcessor(CycloneDXBomParser, _frameworkPackages, _compositionBuilder, SpdxBomParser);
+                    parser = new NugetProcessor(CycloneDXBomParser, _frameworkPackages, _compositionBuilder, SpdxBomParser, _runtimeIdentifier);
                     return await ComponentIdentification(appSettings, parser);
                 case "MAVEN":
                     parser = new MavenProcessor(CycloneDXBomParser, SpdxBomParser);
