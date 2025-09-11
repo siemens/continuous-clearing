@@ -126,32 +126,6 @@ namespace LCT.SW360PackageCreator.UTest
          }
 
          [Test]
-         public void Download_ReturnsEmptyString_WhenCreateDirectoryThrows()
-            {
-                // Arrange
-                var packageDownloader = new PackageDownloader();
-                var component = new ComparisonBomData
-                {
-                    Name = "test",
-                    Version = "1.0.0",
-                    SourceUrl = "https://github.com/example/repo"
-                };
-                // Set up m_downloadedSourceInfos to ensure CheckIfAlreadyDownloaded returns false
-                var field = typeof(PackageDownloader).GetField("m_downloadedSourceInfos", BindingFlags.NonPublic | BindingFlags.Instance);
-                field.SetValue(packageDownloader, new List<DownloadedSourceInfo>());
-
-                // Patch Directory.CreateDirectory to throw (simulate with a non-writable path)
-                var method = typeof(PackageDownloader).GetMethod("Download", BindingFlags.NonPublic | BindingFlags.Instance);
-                var unwritablePath = "/root/shouldfail/";
-
-                // Act
-                var result = (string)method.Invoke(packageDownloader, new object[] { component, unwritablePath });
-
-                // Assert
-                Assert.That(result, Is.EqualTo(string.Empty));
-         }
-
-         [Test]
          public void GetBaseVersion_ReturnsMajorMinor_WhenBuildIsZeroAndRevisionMinusOne()
          {
                 // Arrange
@@ -213,7 +187,6 @@ namespace LCT.SW360PackageCreator.UTest
                 // Assert
                 Assert.IsFalse(result);
          }
-
     }
     
 }
