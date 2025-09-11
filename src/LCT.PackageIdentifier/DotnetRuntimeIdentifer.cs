@@ -69,33 +69,14 @@ namespace LCT.PackageIdentifier
         {
             var info = new RuntimeInfo();
 
-            try
+            // Find and filter assets files
+            var assetsFiles = FindAssetFiles(appSettings, info);
+            if (!string.IsNullOrEmpty(info.ErrorMessage))
             {
-                // Find and filter assets files
-                var assetsFiles = FindAssetFiles(appSettings, info);
-                if (!string.IsNullOrEmpty(info.ErrorMessage))
-                    return info;
-
-                return ProcessAssetFiles(assetsFiles);
+                WriteDetailLog(info);
+                return info;
             }
-            catch (DirectoryNotFoundException ex)
-            {
-                info.ErrorMessage = "Directory not found";
-                info.ErrorDetails = $"The specified directory '{appSettings.Directory?.InputFolder}' was not found. Error: {ex.Message}";
-            }
-            catch (FileNotFoundException ex)
-            {
-                info.ErrorMessage = "File not found";
-                info.ErrorDetails = $"A required file could not be found. Error: {ex.Message}";
-            }
-            catch (Microsoft.Build.Exceptions.InvalidProjectFileException ex)
-            {
-                info.ErrorMessage = "Invalid project file";
-                info.ErrorDetails = $"Error parsing project file: {ex.Message}";
-            }
-
-            WriteDetailLog(info);
-            return info;
+            return ProcessAssetFiles(assetsFiles);
         }
 
         /// <summary>

@@ -232,5 +232,61 @@ namespace LCT.PackageIdentifier.UTest
             Assert.IsNull(result);
             File.Delete(filePath);
         }
+
+        [TestCase(false, false, false, false, "Warning: 'SelfContained' property could not be parsed as a boolean. Its evaluated value is unexpected.")]
+        [TestCase(true, true, false, true, "'SelfContained' property is explicitly set to 'true'.")]
+        [TestCase(true, false, true, true, "'SelfContained' property implicitly defaulted to 'true' because 'RuntimeIdentifier(s)' is specified for an executable project.")]
+        [TestCase(true, false, false, true, "'SelfContained' property implicitly defaulted to 'true' (uncommon without RID, check SDK defaults).")]
+        [TestCase(false, true, false, true, "'SelfContained' property is explicitly set to 'false'.")]
+        [TestCase(false, false, false, true, "'SelfContained' property implicitly defaulted to 'false' (no explicit setting and no RuntimeIdentifier, or not an executable).")]
+        public void SetSelfContainedReason_SetsExpectedReason(
+            bool isSelfContained,
+            bool selfContainedExplicitlySet,
+            bool hasRuntimeIdentifier,
+            bool selfContainedValueParsed,
+            string expectedReason)
+        {
+            var info = new RuntimeInfo();
+            var method = typeof(DotnetRuntimeIdentifer).GetMethod(
+                "SetSelfContainedReason",
+                BindingFlags.NonPublic | BindingFlags.Static);
+            method.Invoke(null, new object[] { info, isSelfContained, selfContainedExplicitlySet, hasRuntimeIdentifier, selfContainedValueParsed });
+            Assert.AreEqual(expectedReason, info.SelfContainedReason);
+        }
+
+        [Test]
+        public void IdentifyRuntime_ReturnsError_WhenProjectFileIsInvalid()
+        {
+            // Arrange: create a directory and a valid assets file pointing to an invalid csproj
+            string invalidBuildDir = Path.Combine(_testDir, "InvalidProjectFile");
+            System.IO.Directory.CreateDirectory(invalidBuildDir);
+            string assetsFile = Path.Combine(invalidBuildDir, "project.assets.json");
+            string invalidCsproj = Path.Combine(invalidBuildDir, "InvalidProjectFile.csproj");
+
+            // Write a minimal assets file referencing the invalid csproj
+            string assetsJson = "{\n  \"version\": 3,\n  \"project\": {\n    \"restore\": {\n      \"projectPath\": \"" + invalidCsproj.Replace("\\", "\\\\") + "\"\n    }\n  }\n}";
+            File.WriteAllText(assetsFile, assetsJson);
+
+            // Write an invalid csproj file (invalid XML)
+            File.WriteAllText(invalidCsproj, "<Project><Invalid></Project>");
+
+            var appSettings = new CommonAppSettings
+            {
+                Directory = new LCT.Common.Directory()
+                {
+                    InputFolder = invalidBuildDir
+                }
+            };
+
+            // Act
+            var result = _identifier.IdentifyRuntime(appSettings);
+
+            // Assert
+            Assert.IsFalse(string.IsNullOrEmpty(result.ErrorMessage));
+            Assert.That(result.ErrorMessage, Does.Contain("Error loading project file"));
+
+            // Clean up
+            System.IO.Directory.Delete(invalidBuildDir, true);
+        }
     }
 }
