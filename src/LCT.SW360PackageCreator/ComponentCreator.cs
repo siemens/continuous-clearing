@@ -216,6 +216,9 @@ namespace LCT.SW360PackageCreator
                     componentsData = alpComponentData;
                     componentsData.ProjectType = projectType;
                     break;
+                case "CARGO":
+                    componentsData.SourceUrl = await UrlHelper.GetSourceUrlForCargoPackage(name, version);
+                    break;
                 default:
                     break;
             }
