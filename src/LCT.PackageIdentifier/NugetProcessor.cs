@@ -379,7 +379,7 @@ namespace LCT.PackageIdentifier
                 throw new ArgumentNullException(nameof(bomhelper), "bomhelper cannot be null.");
         }
 
-        private async Task<ComponentIdentification> IdentificationOfInternalComponentsAsync(
+        private static async Task<ComponentIdentification> IdentificationOfInternalComponentsAsync(
         ComponentIdentification componentData, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
             List<AqlResult> aqlResultList;
