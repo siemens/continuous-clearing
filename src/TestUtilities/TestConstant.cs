@@ -71,6 +71,11 @@ namespace TestUtilities
         public const string JfrogConanDevDestRepoName = "--Conan:DevDepRepo ";
         public const string JfrogDebianInternalRepo = "--Debian:Artifactory:InternalRepos:0";
 
+        public const string JfrogChocoThirdPartyDestRepoName = "--Choco:Artifactory:ThirdPartyRepos:0:Name";
+        public const string JfrogChocoInternalRepo = "--Choco:Artifactory:InternalRepos:0";
+        public const string JfrogChocoInternalDestRepoName = "--Choco:ReleaseRepo ";
+        public const string JfrogChocoDevDestRepoName = "--Choco:DevDepRepo ";
+
         public const string NuspecMode = "--NuspecMode";
         public const string JFrogApiURL = "--JFrog:URL";
         public const string DryRun = "--JFrog:DryRun";
