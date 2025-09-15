@@ -58,7 +58,7 @@ namespace LCT.Common.Constants
         public static readonly string[] Nuget_DeploymentType_DetectionTags = ["SelfContained"];
         public const string backUpKey = "Backup";
         public const string SPDXFileExtension = ".spdx.sbom.json";
-        public const string CargoLockFile = "cargo.lock";
-        public const string CargoTomlFile = "Cargo.toml";
+        public const string CargoFileExtension = "metadata.json";
+        
     }
 }
