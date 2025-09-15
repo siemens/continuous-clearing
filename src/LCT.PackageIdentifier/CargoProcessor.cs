@@ -193,7 +193,10 @@ namespace LCT.PackageIdentifier
             string nameVerison = string.Empty;
             nameVerison = aqlResultList.FirstOrDefault(x => x.Properties.Any(p => p.Key == "crate.name" && p.Value == name) && x.Properties.Any(p => p.Key == "crate.version" && p.Value == version))?.Name ?? string.Empty;
 
-            if (string.IsNullOrEmpty(nameVerison)) { nameVerison = Dataconstant.PackageNameNotFoundInJfrog; }
+            if (string.IsNullOrEmpty(nameVerison)) 
+            { 
+                nameVerison = Dataconstant.PackageNameNotFoundInJfrog;
+            }
             return nameVerison;
         }
         private static string GetJfrogRepoPath(AqlResult aqlResult)
@@ -300,13 +303,16 @@ namespace LCT.PackageIdentifier
                 ParseCargoPackagesExcluding(packageDetails, components, idToComponent, idToPurl, excludeIds);
                 AnalyzeCargoDependencyKindsExcluding(packageDetails, idToPurl, purlToDevKinds, idToComponent, dependencies, excludeIds);
                 MarkCargoDevelopmentProperties(components, purlToDevKinds);
+    
             }
             catch (FileNotFoundException ex)
             {
+                Logger.Error("Exception in reading cargo metadata json file", ex);
                 Logger.Debug($"GetPackagesFromCargoMetadataJson: File not found: {metadataJsonPath}", ex);
             }
             catch (JsonException ex)
             {
+                Logger.Error("Exception in reading cargo metadata json file", ex);
                 Logger.Debug($"GetPackagesFromCargoMetadataJson: JSON deserialization error in file: {metadataJsonPath}", ex);
             }
             
@@ -461,24 +467,6 @@ namespace LCT.PackageIdentifier
 
             return false;
         }
-        
-
-        public static string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component, out string jfrogRepoPath)
-        {
-            string jfrogcomponentPath = $"{component.Name}/{component.Version}";
-            jfrogRepoPath = Dataconstant.JfrogRepoPathNotFound;
-            var cargoPackagePath = aqlResultList.FirstOrDefault(x => x.Path.Contains(jfrogcomponentPath) && x.Name.Contains("package.tgz"));
-            if (cargoPackagePath != null)
-            {
-                jfrogRepoPath = $"{cargoPackagePath.Repo}/{cargoPackagePath.Path}/{cargoPackagePath.Name};";
-            }
-            var aqllist = aqlResultList.FindAll(x => x.Properties.Any(p => p.Key == "crate.name" && p.Value == component.Name) && x.Properties.Any(p => p.Key == "crate.version" && p.Value == component.Version));
-
-            string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqllist);
-
-            return repoName;
-        }
-
         private static List<Component> GetExcludedComponentsList(List<Component> componentsForBOM)
         {
             List<Component> components = new List<Component>();
