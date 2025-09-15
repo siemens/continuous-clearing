@@ -451,7 +451,7 @@ namespace LCT.SW360PackageCreator
             else if (!string.IsNullOrEmpty(item.FossologyUploadId) && string.IsNullOrEmpty(item.FossologyLink))
             {
                 fossologyUpload = true;
-                Logger.Logger.Log(null, Level.Notice, $"\tInitiating FOSSology process for: Release : Name - {formattedName} , version - {item.Version}", null);
+                LoggerHelper.WriteFossologyProcessInitializeMessage(formattedName, item);
                 await UpdateFossologyLinkAndStatus(item, sw360CreatorService, appSettings, formattedName, item.FossologyUploadId, "🔗 Fossology upload ID and URL successfully updated in SW360 for release");
             }
             return fossologyUpload;
