@@ -6,8 +6,11 @@
 
 using LCT.Common.Model;
 using LCT.SW360PackageCreator.Interfaces;
+using LCT.SW360PackageCreator.Model;
 using NUnit.Framework;
+using System;
 using System.IO;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace LCT.SW360PackageCreator.UTest
@@ -70,6 +73,81 @@ namespace LCT.SW360PackageCreator.UTest
             //Assert
             Assert.That(string.IsNullOrEmpty(path));
         }
+        [TestCase]
+        public void CheckIfAlreadyDownloaded_ReturnsTrue_WhenEntryExists()
+        {
+            // Arrange
+            var downloader = new PackageDownloader();
+            var component = new ComparisonBomData
+            {
+                DownloadUrl = "https://repo.url"
+            };
+            string tagVersion = "v3.6.0";
 
-    }      
+            // Add a DownloadedSourceInfo to the private list
+            var field = typeof(PackageDownloader).GetField("m_downloadedSourceInfos", BindingFlags.NonPublic | BindingFlags.Instance);
+            var list = (System.Collections.IList)field.GetValue(downloader);
+            list.Add(new DownloadedSourceInfo
+            {
+                TaggedVersion = tagVersion,
+                SourceRepoUrl = component.DownloadUrl,
+                DownloadedPath = "/tmp/downloaded/file"
+            });
+
+            // Act
+            var method = typeof(PackageDownloader).GetMethod("CheckIfAlreadyDownloaded", BindingFlags.NonPublic | BindingFlags.Instance);
+            object[] parameters = { component, tagVersion, null };
+            bool result = (bool)method.Invoke(downloader, parameters);
+
+            // Assert
+            Assert.IsTrue(result);
+            Assert.AreEqual("/tmp/downloaded/file", parameters[2]);
+        }
+
+        [TestCase]
+        public void CheckIfAlreadyDownloaded_ReturnsFalse_WhenEntryDoesNotExist()
+        {
+            // Arrange
+            var downloader = new PackageDownloader();
+            var component = new ComparisonBomData
+            {
+                DownloadUrl = "https://repo.url"
+            };
+            string tagVersion = "v3.6.0";
+
+            // Act
+            var method = typeof(PackageDownloader).GetMethod("CheckIfAlreadyDownloaded", BindingFlags.NonPublic | BindingFlags.Instance);
+            object[] parameters = { component, tagVersion, null };
+            bool result = (bool)method.Invoke(downloader, parameters);
+
+            // Assert
+            Assert.IsFalse(result);
+            Assert.AreEqual(string.Empty, parameters[2]);
+        }
+        [TestCase]
+        public void Download_ReturnsEmptyString_WhenUnauthorizedAccessExceptionThrown()
+        {
+            // Arrange
+            var downloader = new PackageDownloader();
+            var component = new ComparisonBomData
+            {
+                Name = "core-js",
+                Version = "3.6.0",
+                DownloadUrl = "https://repo.url",
+                SourceUrl = "https://repo.url/core-js"
+            };
+            string unauthorizedPath = "/";
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                unauthorizedPath = "C:\\Windows\\System32\\";
+
+            var method = typeof(PackageDownloader).GetMethod("Download", BindingFlags.NonPublic | BindingFlags.Instance);
+
+            // Act
+            object[] parameters = { component, unauthorizedPath };
+            string result = (string)method.Invoke(downloader, parameters);
+
+            // Assert
+            Assert.AreEqual(string.Empty, result);
+        }
+    }
 }

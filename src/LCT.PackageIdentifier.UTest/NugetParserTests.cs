@@ -1387,5 +1387,68 @@ namespace LCT.PackageIdentifier.UTest
 
             Assert.AreEqual(0, bom.Dependencies.Count);
         }
+        [Test]
+        public void ValidateIdentificationOfInternalComponentsParameters_ThrowsArgumentNullException_WhenAppSettingsIsNull()
+        {
+            var componentData = new ComponentIdentification();
+            var mockJfrogService = new Mock<IJFrogService>();
+            var mockBomHelper = new Mock<IBomHelper>();
+
+            var ex = Assert.Throws<TargetInvocationException>(() =>
+                typeof(NugetProcessor)
+                    .GetMethod("ValidateIdentificationOfInternalComponentsParameters", BindingFlags.NonPublic | BindingFlags.Static)
+                    .Invoke(null, new object[] { componentData, null, mockJfrogService.Object, mockBomHelper.Object })
+            );
+            Assert.That(ex.InnerException, Is.TypeOf<ArgumentNullException>());
+            Assert.That(ex.InnerException.Message, Does.Contain("appSettings cannot be null."));
+        }
+
+        [Test]
+        public void ValidateIdentificationOfInternalComponentsParameters_ThrowsArgumentNullException_WhenComponentDataIsNull()
+        {
+            var appSettings = new CommonAppSettings();
+            var mockJfrogService = new Mock<IJFrogService>();
+            var mockBomHelper = new Mock<IBomHelper>();
+
+            var ex = Assert.Throws<TargetInvocationException>(() =>
+                typeof(NugetProcessor)
+                    .GetMethod("ValidateIdentificationOfInternalComponentsParameters", BindingFlags.NonPublic | BindingFlags.Static)
+                    .Invoke(null, new object[] { null, appSettings, mockJfrogService.Object, mockBomHelper.Object })
+            );
+            Assert.That(ex.InnerException, Is.TypeOf<ArgumentNullException>());
+            Assert.That(ex.InnerException.Message, Does.Contain("componentData cannot be null."));
+        }
+
+        [Test]
+        public void ValidateIdentificationOfInternalComponentsParameters_ThrowsArgumentNullException_WhenJFrogServiceIsNull()
+        {
+            var appSettings = new CommonAppSettings();
+            var componentData = new ComponentIdentification();
+            var mockBomHelper = new Mock<IBomHelper>();
+
+            var ex = Assert.Throws<TargetInvocationException>(() =>
+                typeof(NugetProcessor)
+                    .GetMethod("ValidateIdentificationOfInternalComponentsParameters", BindingFlags.NonPublic | BindingFlags.Static)
+                    .Invoke(null, new object[] { componentData, appSettings, null, mockBomHelper.Object })
+            );
+            Assert.That(ex.InnerException, Is.TypeOf<ArgumentNullException>());
+            Assert.That(ex.InnerException.Message, Does.Contain("jFrogService cannot be null."));
+        }
+
+        [Test]
+        public void ValidateIdentificationOfInternalComponentsParameters_ThrowsArgumentNullException_WhenBomHelperIsNull()
+        {
+            var appSettings = new CommonAppSettings();
+            var componentData = new ComponentIdentification();
+            var mockJfrogService = new Mock<IJFrogService>();
+
+            var ex = Assert.Throws<TargetInvocationException>(() =>
+                typeof(NugetProcessor)
+                    .GetMethod("ValidateIdentificationOfInternalComponentsParameters", BindingFlags.NonPublic | BindingFlags.Static)
+                    .Invoke(null, new object[] { componentData, appSettings, mockJfrogService.Object, null })
+            );
+            Assert.That(ex.InnerException, Is.TypeOf<ArgumentNullException>());
+            Assert.That(ex.InnerException.Message, Does.Contain("bomhelper cannot be null."));
+        }
     }
 }
