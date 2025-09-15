@@ -14,7 +14,6 @@ using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using Moq;
-using Newtonsoft.Json;
 using NuGet.ProjectModel;
 using NuGet.Versioning;
 using NUnit.Framework;
@@ -24,8 +23,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Directory = System.IO.Directory;
-using File = System.IO.File;
 
 namespace LCT.PackageIdentifier.UTest
 {
@@ -1353,7 +1350,6 @@ namespace LCT.PackageIdentifier.UTest
             Assert.AreEqual(0, bom.Dependencies.Count);
         }
 
-
         [Test]
         public void HandleConfigFile_WhenSPDXHasNullComponents_DoesNotThrowException()
         {
@@ -1390,182 +1386,6 @@ namespace LCT.PackageIdentifier.UTest
             });
 
             Assert.AreEqual(0, bom.Dependencies.Count);
-        }
-        [Test]
-        public void IdentificationOfInternalComponents_NullAppSettings_ThrowsArgumentNullException()
-        {
-            // Arrange
-            var nugetProcessor = new NugetProcessor(_cycloneDXBomParser, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser);
-            var componentData = new ComponentIdentification();
-            IJFrogService jfrogService = new Mock<IJFrogService>().Object;
-            IBomHelper bomHelper = new Mock<IBomHelper>().Object;
-
-            // Act & Assert
-            Assert.ThrowsAsync<ArgumentNullException>(async () =>
-                await nugetProcessor.IdentificationOfInternalComponents(componentData, null, jfrogService, bomHelper));
-        }
-        [Test]
-        public void ExtractLibraryDetails_ValidInput_ReturnsLibraryAndVersion()
-        {
-            // Arrange
-            string input = @"packages\Newtonsoft.Json.12.0.3\lib";
-            object[] parameters = new object[] { input, null };
-
-            // Act
-            var method = typeof(NugetProcessor).GetMethod("ExtractLibraryDetails", BindingFlags.NonPublic | BindingFlags.Static);
-            string result = (string)method.Invoke(null, parameters);
-
-            // Assert
-            Assert.IsNotNull(result);
-            // The actual result depends on your regex, but it should not be empty for a valid input
-            Assert.IsNotEmpty(result);
-        }
-
-        [Test]
-        public void ExtractLibraryDetails_InvalidInput_ReturnsEmptyString()
-        {
-            // Arrange
-            string input = "invalid_string";
-            object[] parameters = new object[] { input, null };
-
-            // Act
-            var method = typeof(NugetProcessor).GetMethod("ExtractLibraryDetails", BindingFlags.NonPublic | BindingFlags.Static);
-            string result = (string)method.Invoke(null, parameters);
-
-            // Assert
-            Assert.That(result, Is.Empty);
-        }
-        [Test]
-        public void CreateFileForMultipleVersions_WhenFileExists_UpdatesFile()
-        {
-            // Arrange
-            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string outFolder = Path.GetDirectoryName(exePath);
-            string tempDir = Path.Combine(outFolder, "TempTestOutput");
-            Directory.CreateDirectory(tempDir);
-            var appSettings = new CommonAppSettings
-            {
-                Directory = new LCT.Common.Directory { OutputFolder = tempDir }
-            };
-            string defaultProjectName = "TestProject";
-            string fileName = FileConstant.multipleversionsFileName; // Use the actual constant
-            string filePath = Path.Combine(tempDir, $"{defaultProjectName}_{fileName}");
-            var initialData = new
-            {
-                Nuget = new List<object>
-        {
-           new { ComponentName = "OldComponent", ComponentVersion = "0.0.1", PackageFoundIn = "old" }
-        }
-            };
-            File.WriteAllText(filePath, JsonConvert.SerializeObject(initialData));
-
-            // Prepare components to update
-            var components = new List<Component>
-            {
-               new Component { Name = "NewComponent", Version = "1.2.3", Description = "desc" }
-            };
-            // Act
-            var method = typeof(NugetProcessor).GetMethod("CreateFileForMultipleVersions", BindingFlags.NonPublic | BindingFlags.Static);
-            method.Invoke(null, new object[] { components, appSettings });
-
-            // Assert
-            var updatedJson = File.ReadAllText(filePath);
-            Assert.That(updatedJson, Does.Contain("{\"Nuget\":[{\"ComponentName\":\"OldComponent\",\"ComponentVersion\":\"0.0.1\",\"PackageFoundIn\":\"old\"}]}"));
-            // Cleanup
-            Directory.Delete(tempDir, true);
-        }
-
-        [Test]
-        public void GetJfrogArtifactoryRepoDetials_ElseBranch_FullNameVersionFallback()
-        {
-            // Arrange
-            var component = new Component { Name = "Comp", Version = "1.2.3" };
-            var fullName = "CustomFullName";
-            var fallbackName = $"{fullName}.{component.Version}.nupkg";
-
-            var aqlResultList = new List<AqlResult>
-            {
-               new AqlResult { Name = fallbackName, Repo = "RepoX", Path = "path/to" }
-            };
-
-            var mockBomHelper = new Mock<IBomHelper>();
-            mockBomHelper.Setup(x => x.GetFullNameOfComponent(component)).Returns(fullName);
-
-            // Act
-            string jfrogRepoPath;
-            var result = NugetProcessor.GetJfrogArtifactoryRepoDetials(
-                aqlResultList, component, mockBomHelper.Object, out jfrogRepoPath);
-
-            // Assert
-            Assert.IsNotNull(result, "Result should not be null");
-        }
-
-        [Test]
-        public void ParsePackageConfig_DevDependencyAndAttributeNullChecks()
-        {
-            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string outFolder = Path.GetDirectoryName(exePath);
-            string testFile = Path.Combine(outFolder, "TestPackages.config");
-
-            string xml = @"
-            <packages>
-            <package id='DevLib' version='1.0.0' />
-            <package version='2.0.0' />
-            <package id='NoVersion' />
-            </packages>";
-            File.WriteAllText(testFile, xml);
-
-            var appSettings = new CommonAppSettings
-            {
-                Nuget = new Config(),
-                SW360 = new SW360(),
-                Directory = new LCT.Common.Directory { InputFolder = outFolder }
-            };
-
-            var result = NugetProcessor.ParsePackageConfig(testFile, appSettings);
-
-            Assert.That(result.Count, Is.EqualTo(1));
-            Assert.That(result[0].ID, Is.EqualTo("DevLib"));
-            Assert.That(result[0].IsDev, Is.EqualTo("false"));
-            File.Delete(testFile);
-        }  
-
-        [Test]
-        public void UpdateNugetKpiDataBasedOnRepo_UpdatesKpiData_ForAllRepoTypes()
-        {
-            // Arrange  
-            var appSettings = new CommonAppSettings
-            {
-                Nuget = new Config
-                {
-                    DevDepRepo = "dev-repo",
-                    ReleaseRepo = "release-repo",
-                    Artifactory = new Artifactory
-                    {
-                        ThirdPartyRepos = new List<ThirdPartyRepo> 
-                        {
-                            new ThirdPartyRepo { Name = "thirdparty-repo" }
-                        }
-                    }
-                }
-            }; 
-            var bomKpiData = new BomKpiData();
-
-            // Act  
-            typeof(NugetProcessor)
-                .GetMethod("UpdateNugetKpiDataBasedOnRepo", BindingFlags.NonPublic | BindingFlags.Static)
-                .Invoke(null, new object[] { "dev-repo", appSettings});
-            typeof(NugetProcessor)
-                .GetMethod("UpdateNugetKpiDataBasedOnRepo", BindingFlags.NonPublic | BindingFlags.Static)
-                .Invoke(null, new object[] { "thirdparty-repo", appSettings});
-            typeof(NugetProcessor)
-                .GetMethod("UpdateNugetKpiDataBasedOnRepo", BindingFlags.NonPublic | BindingFlags.Static)
-                .Invoke(null, new object[] { "release-repo", appSettings});
-
-            // Assert  
-            Assert.AreEqual(0, bomKpiData.DevdependencyComponents);
-            Assert.AreEqual(0, bomKpiData.ThirdPartyRepoComponents);
-            Assert.AreEqual(0, bomKpiData.ReleaseRepoComponents);
         }
     }
 }

@@ -187,6 +187,7 @@ namespace LCT.PackageIdentifier.UTest
         [TestCase("POETRY", "Poetry.lock,*.cdx.json", "package,Test", "Poetry-Test")]
         [TestCase("CONAN", "conan.lock,*.cdx.json", "package,Test", "Conan-Test")]
         [TestCase("ALPINE", "*.cdx.json", "package,Test", "Alpine-Test")]
+        [TestCase("CHOCO", "*.choco.config", "package,Test", "Choco-Test")]
         public void DisplayIncludeFiles_ValidProjectType_ReturnsIncludeFiles(string projectType, string expectedInclude, string expectedExclude, string expectedRepos)
         {
             SetupAppSettings(projectType, expectedInclude, expectedExclude, expectedRepos);
@@ -201,6 +202,7 @@ namespace LCT.PackageIdentifier.UTest
         [TestCase("POETRY", "Poetry.lock,*.cdx.json", "package,Test", "Poetry-Test")]
         [TestCase("CONAN", "conan.lock,*.cdx.json", "package,Test", "Conan-Test")]
         [TestCase("ALPINE", "*.cdx.json", "package,Test", "Alpine-Test")]
+        [TestCase("CHOCO", "*.choco.config", "package,Test", "Choco-Test")]
         public void DisplayExcludeFiles_ValidProjectType_ReturnsExcludeFiles(string projectType, string expectedInclude, string expectedExclude, string expectedRepos)
         {
             SetupAppSettings(projectType, expectedInclude, expectedExclude, expectedRepos);
@@ -215,6 +217,7 @@ namespace LCT.PackageIdentifier.UTest
         [TestCase("POETRY", "Poetry.lock,*.cdx.json", "package,Test", "Poetry-Test")]
         [TestCase("CONAN", "conan.lock,*.cdx.json", "package,Test", "Conan-Test")]
         [TestCase("ALPINE", "*.cdx.json", "package,Test", "Alpine-Test")]
+        [TestCase("CHOCO", "*.choco.config", "package,Test", "Choco-Test")]
         public void GetInternalRepolist_ValidProjectType_ReturnsInternalRepos(string projectType, string expectedInclude, string expectedExclude, string expectedRepos)
         {
             SetupAppSettings(projectType, expectedInclude, expectedExclude, expectedRepos);
@@ -366,6 +369,9 @@ namespace LCT.PackageIdentifier.UTest
                     break;
                 case "ALPINE":
                     appSettings.Alpine = new Config { Include = includeList, Exclude = excludeList, Artifactory = new Artifactory { InternalRepos = repoList } };
+                    break;
+                case "CHOCO":
+                    appSettings.Choco = new Config { Include = includeList, Exclude = excludeList, Artifactory = new Artifactory { InternalRepos = repoList } };
                     break;
             }
         }
