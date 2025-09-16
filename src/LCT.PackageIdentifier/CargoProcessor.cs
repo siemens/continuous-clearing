@@ -1,4 +1,10 @@
-﻿using CycloneDX.Models;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2025 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+
+using CycloneDX.Models;
 using LCT.APICommunications;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
@@ -33,7 +39,6 @@ namespace LCT.PackageIdentifier
         {
             List<Component> componentsForBOM;
             Bom bom = new Bom();
-            int totalUnsupportedComponentsIdentified = 0;
             ParsingInputFileForBOM(appSettings, ref bom);
             componentsForBOM = bom.Components;
 
@@ -42,7 +47,7 @@ namespace LCT.PackageIdentifier
 
             bom.Components = componentsForBOM;
             bom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(bom.Components, bom.Dependencies);
-            totalUnsupportedComponentsIdentified = ListUnsupportedComponentsForBom.Components.Count;
+            int totalUnsupportedComponentsIdentified = ListUnsupportedComponentsForBom.Components.Count;
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += ListUnsupportedComponentsForBom.Components.Count;
             ListUnsupportedComponentsForBom.Components = ListUnsupportedComponentsForBom.Components.Distinct(new ComponentEqualityComparer()).ToList();
             BomCreator.bomKpiData.DuplicateComponents += totalUnsupportedComponentsIdentified - ListUnsupportedComponentsForBom.Components.Count;
@@ -222,13 +227,13 @@ namespace LCT.PackageIdentifier
                 {
                     listOfTemplateBomfilePaths.Add(filepath);
                 }
-                if (filepath.Contains(FileConstant.CargoFileExtension, StringComparison.OrdinalIgnoreCase))
+                if (filepath.EndsWith(FileConstant.CargoFileExtension, StringComparison.OrdinalIgnoreCase))
                 {
                     List<Component> components=new List<Component>();
                     List<Dependency> deps = new List<Dependency>();
                     Logger.Debug($"ParsingInputFileForBOM():Found metadata.json: " + filepath);
                     GetPackagesFromCargoMetadataJson(filepath, components, deps);
-                    AddingIdentifierType(components, "PackageFile");
+                    AddingIdentifierType(components);
                     componentsForBOM.AddRange(components);
                     dependencies.AddRange(deps);
                 }
@@ -303,7 +308,7 @@ namespace LCT.PackageIdentifier
                 ParseCargoPackagesExcluding(packageDetails, components, idToComponent, idToPurl, excludeIds);
                 AnalyzeCargoDependencyKindsExcluding(packageDetails, idToPurl, purlToDevKinds, idToComponent, dependencies, excludeIds);
                 MarkCargoDevelopmentProperties(components, purlToDevKinds);
-    
+               
             }
             catch (FileNotFoundException ex)
             {
@@ -486,31 +491,17 @@ namespace LCT.PackageIdentifier
             return components;
         }
 
-        private static void AddingIdentifierType(List<Component> components, string identifiedBy)
+        private static void AddingIdentifierType(List<Component> components)
         {
             foreach (var component in components)
             {
                 component.Properties ??= new List<Property>();
 
-                if (identifiedBy == "PackageFile")
-                {
-                    var properties = component.Properties;
-                    CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
-                        Dataconstant.Cdx_IdentifierType,
-                        Dataconstant.Discovered);
-                    component.Properties = properties;
-                }
-                else
-                {
-                    var properties = component.Properties;
-                    CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
-                        Dataconstant.Cdx_IsDevelopment,
-                        "false");
-                    CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
-                        Dataconstant.Cdx_IdentifierType,
-                        Dataconstant.ManullayAdded);
-                    component.Properties = properties;
-                }
+                var properties = component.Properties;
+                CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
+                    Dataconstant.Cdx_IdentifierType,
+                    Dataconstant.Discovered);
+                component.Properties = properties;
             }
         }
 
@@ -533,10 +524,8 @@ namespace LCT.PackageIdentifier
         {
             foreach (var component in componentsForBOM)
             {
-                // Initialize properties list if null, otherwise keep existing properties
                 component.Properties ??= new List<Property>();
                 var properties = component.Properties;
-                // Use helper method to safely add properties without duplicates
                 CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
                     Dataconstant.Cdx_IsDevelopment,
                     "false");
