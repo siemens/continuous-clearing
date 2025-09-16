@@ -16,7 +16,6 @@ using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using log4net;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -30,7 +29,7 @@ namespace LCT.PackageIdentifier
 {
 
     /// <summary>
-    /// Parses the Conan Packages
+    /// Parses the Conan Packages (dep.json format)
     /// </summary>
     public class ConanProcessor(ICycloneDXBomParser cycloneDXBomParser, ISpdxBomParser spdxBomParser) : CycloneDXBomParser, IParser
     {
@@ -38,11 +37,8 @@ namespace LCT.PackageIdentifier
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
-        private static readonly char[] SplitChars = { '/', '@' };
         private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
 
-        #endregion
-        #region constructor
         #endregion
 
         #region public methods
@@ -109,18 +105,6 @@ namespace LCT.PackageIdentifier
             }
 
             return modifiedBOM;
-        }
-
-        public static bool IsDevDependency(ConanPackage component, List<string> buildNodeIds, ref int noOfDevDependent)
-        {
-            var isDev = false;
-            if (buildNodeIds != null && buildNodeIds.Contains(component.Id))
-            {
-                isDev = true;
-                noOfDevDependent++;
-            }
-
-            return isDev;
         }
 
         #endregion
@@ -230,6 +214,7 @@ namespace LCT.PackageIdentifier
                 Logger.Warn($"\nTotal Multiple versions detected {conanComponents.Count} and details can be found at {filePath}\n");
             }
         }
+        
         private void ParsingInputFileForBOM(CommonAppSettings appSettings, ref Bom bom)
         {
             List<string> configFiles;
@@ -237,16 +222,17 @@ namespace LCT.PackageIdentifier
             List<Component> componentsForBOM = new List<Component>();
             configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Conan);
             List<string> listOfTemplateBomfilePaths = new List<string>();
+            
             foreach (string filepath in configFiles)
             {
                 if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     listOfTemplateBomfilePaths.Add(filepath);
                 }
-                if (filepath.ToLower().EndsWith("conan.lock"))
+                if (filepath.ToLower().EndsWith("dep.json"))
                 {
                     Logger.Debug($"ParsingInputFileForBOM():FileName: " + filepath);
-                    var components = ParsePackageLockJson(filepath, ref dependencies);
+                    var components = ParseDepJson(filepath, ref dependencies);
                     AddingIdentifierType(components, "PackageFile");
                     componentsForBOM.AddRange(components);
                 }
@@ -277,7 +263,7 @@ namespace LCT.PackageIdentifier
             int initialCount = componentsForBOM.Count;
             GetDistinctComponentList(ref componentsForBOM);
             BomCreator.bomKpiData.DuplicateComponents = initialCount - componentsForBOM.Count;
-            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = componentsForBOM.Count;
+            
             bom.Components = componentsForBOM;
 
             if (bom.Dependencies != null)
@@ -295,7 +281,7 @@ namespace LCT.PackageIdentifier
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
         }
 
-        private static List<Component> ParsePackageLockJson(string filepath, ref List<Dependency> dependencies)
+        private static List<Component> ParseDepJson(string filepath, ref List<Dependency> dependencies)
         {
             List<Component> lstComponentForBOM = new List<Component>();
             int noOfDevDependent = 0;
@@ -303,196 +289,151 @@ namespace LCT.PackageIdentifier
             try
             {
                 string jsonContent = File.ReadAllText(filepath);
-                var jsonDeserialized = JObject.Parse(jsonContent);
-                var nodes = jsonDeserialized["graph_lock"]["nodes"];
-
-                List<ConanPackage> nodePackages = new List<ConanPackage>();
-                foreach (var node in nodes)
+                var depJson = JsonConvert.DeserializeObject<ConanDepJson>(jsonContent);
+                
+                if (depJson?.Graph?.Nodes == null)
                 {
-                    string nodeId = ((JProperty)node).Name;
-                    var conanPackage = JsonConvert.DeserializeObject<ConanPackage>(((JProperty)node).Value.ToString());
-                    conanPackage.Id = nodeId;
-                    nodePackages.Add(conanPackage);
+                    Logger.Warn($"No nodes found in dep.json file: {filepath}");
+                    return lstComponentForBOM;
                 }
 
-                GetPackagesForBom(ref lstComponentForBOM, ref noOfDevDependent, nodePackages);
-
-                GetDependecyDetails(lstComponentForBOM, nodePackages, dependencies);
+                var nodePackages = depJson.Graph.Nodes.ToList();
+                
+                GetPackagesForBom(ref lstComponentForBOM, ref noOfDevDependent, nodePackages, depJson.Graph.Root);
+                GetDependencyDetails(lstComponentForBOM, nodePackages, dependencies);
 
                 BomCreator.bomKpiData.DevDependentComponents += noOfDevDependent;
             }
             catch (JsonReaderException ex)
             {
                 Environment.ExitCode = -1;
-                Logger.Error($"ParsePackageFile():", ex);
+                Logger.Error($"ParseDepJson(): Failed to parse JSON", ex);
             }
             catch (IOException ex)
             {
                 Environment.ExitCode = -1;
-                Logger.Error($"ParsePackageFile():", ex);
+                Logger.Error($"ParseDepJson(): IO Error", ex);
             }
             catch (SecurityException ex)
             {
                 Environment.ExitCode = -1;
-                Logger.Error($"ParsePackageFile():", ex);
+                Logger.Error($"ParseDepJson(): Security Error", ex);
             }
 
             return lstComponentForBOM;
         }
 
-        private static void GetDependecyDetails(List<Component> componentsForBOM, List<ConanPackage> nodePackages, List<Dependency> dependencies)
+        private static void GetPackagesForBom(ref List<Component> lstComponentForBOM, ref int noOfDevDependent, 
+            List<KeyValuePair<string, ConanPackage>> nodePackages, Dictionary<string, string> rootNodes)
         {
-            foreach (Component component in componentsForBOM)
+            // Get root node IDs to determine direct dependencies (from root node "0" dependencies)
+            var rootNode = nodePackages.FirstOrDefault(n => n.Key == "0");
+            var directDependencyIds = new List<string>();
+            
+            if (rootNode.Value?.Dependencies != null)
             {
-                var node = nodePackages.Find(x => x.Reference.Contains($"{component.Name}/{component.Version}"));
-                var dependencyNodes = new List<ConanPackage>();
-                if (node.Dependencies != null && node.Dependencies.Count > 0)
-                {
-                    dependencyNodes.AddRange(nodePackages.Where(x => node.Dependencies.Contains(x.Id)).ToList());
-                }
-                if (node.DevDependencies != null && node.DevDependencies.Count > 0)
-                {
-                    dependencyNodes.AddRange(nodePackages.Where(x => node.DevDependencies.Contains(x.Id)).ToList());
-                }
-                var dependency = new Dependency();
-                var subDependencies = componentsForBOM.Where(x => dependencyNodes.Exists(y => y.Reference.Contains($"{x.Name}/{x.Version}")))
-                                        .Select(x => new Dependency { Ref = x.Purl }).ToList();
-
-                dependency.Ref = component.Purl;
-                dependency.Dependencies = subDependencies;
-
-                if (subDependencies.Count > 0)
-                {
-                    dependencies.Add(dependency);
-                }
+                directDependencyIds.AddRange(rootNode.Value.Dependencies.Keys);
             }
-        }
 
-        private static void GetPackagesForBom(ref List<Component> lstComponentForBOM, ref int noOfDevDependent, List<ConanPackage> nodePackages)
-        {
-            ValidateRootNode(nodePackages);
-
-            List<string> directDependencies = GetDirectDependencies(nodePackages);
-
-            // Ignoring the root node as it is the package information node and we are anyways considering all
-            // nodes in the lock file.
-            foreach (var component in nodePackages.Skip(1))
+            foreach (var node in nodePackages)
             {
-                BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += 1;
-                Property isdev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
+                var nodeId = node.Key;
+                var package = node.Value;
+                
+                // Skip root consumer node (usually "0") - this is the project itself, not a dependency
+                if (nodeId == "0")
+                    continue;
 
-                if (string.IsNullOrEmpty(component.Reference))
+                // Skip nodes without name or version (these are not real components)
+                if (string.IsNullOrEmpty(package.Name) || string.IsNullOrEmpty(package.Version))
                 {
-                    BomCreator.bomKpiData.ComponentsinPackageLockJsonFile--;
                     continue;
                 }
 
-                Component components = new Component();
+                BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += 1;
 
-                // dev components are not ignored and added as a part of SBOM   
-                var buildNodeIds = GetBuildNodeIds(nodePackages);
-                if (IsDevDependency(component, buildNodeIds, ref noOfDevDependent))
+                Component component = new Component();
+                Property isdev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
+
+                // Determine if this is a development dependency using Conan logic
+                if (IsDevDependency(package, ref noOfDevDependent))
                 {
                     isdev.Value = "true";
                 }
 
-                string packageName = Convert.ToString(component.Reference);
-
-                if (packageName.Contains('/'))
-                {
-                    components.Name = packageName.Split(SplitChars)[0];
-                    components.Version = packageName.Split(SplitChars)[1];
-                }
-                else
-                {
-                    components.Name = packageName;
-                }
+                component.Name = package.Name;
+                component.Version = package.Version;
 
                 Property siemensFileName = new Property()
                 {
                     Name = Dataconstant.Cdx_Siemensfilename,
-                    Value = component.Reference
+                    Value = $"{package.Name}/{package.Version}"
                 };
-                var isDirect = directDependencies.Contains(component.Id) ? "true" : "false";
+
+                // Determine if this is a direct dependency from the root node
+                var isDirect = directDependencyIds.Contains(nodeId) ? "true" : "false";
                 Property siemensDirect = new Property()
                 {
                     Name = Dataconstant.Cdx_SiemensDirect,
                     Value = isDirect
                 };
 
-                components.Type = Component.Classification.Library;
-                components.Purl = $"{ApiConstant.ConanExternalID}{components.Name}@{components.Version}";
-                components.BomRef = $"{ApiConstant.ConanExternalID}{components.Name}@{components.Version}";
-                components.Properties = new List<Property>();
-                components.Properties.Add(isdev);
-                components.Properties.Add(siemensDirect);
-                components.Properties.Add(siemensFileName);
-                lstComponentForBOM.Add(components);
+                component.Type = Component.Classification.Library;
+                component.Purl = $"{ApiConstant.ConanExternalID}{component.Name}@{component.Version}";
+                component.BomRef = $"{ApiConstant.ConanExternalID}{component.Name}@{component.Version}";
+                component.Properties = new List<Property>();
+                component.Properties.Add(isdev);
+                component.Properties.Add(siemensDirect);
+                component.Properties.Add(siemensFileName);
+                lstComponentForBOM.Add(component);
             }
         }
 
-        private static List<string> GetBuildNodeIds(List<ConanPackage> nodePackages)
+        private static bool IsDevDependency(ConanPackage package, ref int noOfDevDependent)
         {
-            return nodePackages
-                    .Where(y => y.DevDependencies != null)
-                    .SelectMany(y => y.DevDependencies)
-                    .ToList();
-        }
-        private static void ValidateRootNode(List<ConanPackage> nodePackages)
-        {
-            var rootNode = nodePackages.FirstOrDefault();
-            if (rootNode != null && (rootNode.Dependencies.Count == 0 || rootNode.Dependencies == null))
+            // Development dependencies are those with context="build" or run=true AND build=true
+            bool isDev = package.Context == "build" || (package.Run == true && package.Build == true);
+            
+            if (isDev)
             {
-                throw new ArgumentNullException(nameof(nodePackages), "Dependency(requires) node name details not present in the root node.");
+                noOfDevDependent++;
             }
-        }
-        private static List<string> GetDirectDependencies(List<ConanPackage> nodePackages)
-        {
-            List<string> directDependencies = new List<string>();
-            ConanPackage package = nodePackages.FirstOrDefault(x => x.Id == "0");
 
-            if (package != null)
+            return isDev;
+        }
+
+        private static void GetDependencyDetails(List<Component> componentsForBOM, 
+            List<KeyValuePair<string, ConanPackage>> nodePackages, List<Dependency> dependencies)
+        {
+            foreach (Component component in componentsForBOM)
             {
-                if (package.Dependencies != null)
+                var node = nodePackages.FirstOrDefault(x => x.Value.Name == component.Name && x.Value.Version == component.Version);
+                
+                if (node.Value?.Dependencies == null || node.Value.Dependencies.Count == 0)
+                    continue;
+
+                var subDependencies = new List<Dependency>();
+
+                foreach (var dep in node.Value.Dependencies)
                 {
-                    directDependencies.AddRange(package.Dependencies);
+                    var dependentNode = nodePackages.FirstOrDefault(x => x.Key == dep.Key);
+                    if (dependentNode.Value != null && !string.IsNullOrEmpty(dependentNode.Value.Name))
+                    {
+                        string depPurl = $"{ApiConstant.ConanExternalID}{dependentNode.Value.Name}@{dependentNode.Value.Version}";
+                        subDependencies.Add(new Dependency { Ref = depPurl });
+                    }
                 }
 
-                if (package.DevDependencies != null)
+                if (subDependencies.Count > 0)
                 {
-                    directDependencies.AddRange(package.DevDependencies);
+                    var dependency = new Dependency()
+                    {
+                        Ref = component.Purl,
+                        Dependencies = subDependencies
+                    };
+                    dependencies.Add(dependency);
                 }
             }
-
-            return directDependencies;
-        }
-        private static bool IsInternalConanComponent(List<AqlResult> aqlResultList, Component component)
-        {
-            string jfrogcomponentPath = $"{component.Name}/{component.Version}";
-            if (aqlResultList.Exists(
-                x => x.Path.Contains(jfrogcomponentPath, StringComparison.OrdinalIgnoreCase)))
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        public static string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component, out string jfrogRepoPath)
-        {
-            string jfrogcomponentPath = $"{component.Name}/{component.Version}";
-            jfrogRepoPath = Dataconstant.JfrogRepoPathNotFound;
-            var conanPackagePath = aqlResultList.FirstOrDefault(x => x.Path.Contains(jfrogcomponentPath) && x.Name.Contains("package.tgz"));
-            if (conanPackagePath != null)
-            {
-                jfrogRepoPath = $"{conanPackagePath.Repo}/{conanPackagePath.Path}/{conanPackagePath.Name};";
-            }
-            var aqllist = aqlResultList.FindAll(x => x.Path.Contains(
-                jfrogcomponentPath, StringComparison.OrdinalIgnoreCase));
-
-            string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqllist);
-
-            return repoName;
         }
 
         private static List<Component> GetExcludedComponentsList(List<Component> componentsForBOM)
@@ -575,6 +516,34 @@ namespace LCT.PackageIdentifier
             }
         }
 
+        private static bool IsInternalConanComponent(List<AqlResult> aqlResultList, Component component)
+        {
+            string jfrogcomponentPath = $"{component.Name}/{component.Version}";
+            if (aqlResultList.Exists(
+                x => x.Path.Contains(jfrogcomponentPath, StringComparison.OrdinalIgnoreCase)))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public static string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component, out string jfrogRepoPath)
+        {
+            string jfrogcomponentPath = $"{component.Name}/{component.Version}";
+            jfrogRepoPath = Dataconstant.JfrogRepoPathNotFound;
+            var conanPackagePath = aqlResultList.FirstOrDefault(x => x.Path.Contains(jfrogcomponentPath) && x.Name.Contains("package.tgz"));
+            if (conanPackagePath != null)
+            {
+                jfrogRepoPath = $"{conanPackagePath.Repo}/{conanPackagePath.Path}/{conanPackagePath.Name};";
+            }
+            var aqllist = aqlResultList.FindAll(x => x.Path.Contains(
+                jfrogcomponentPath, StringComparison.OrdinalIgnoreCase));
+
+            string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqllist);
+
+            return repoName;
+        }
         #endregion
     }
 }

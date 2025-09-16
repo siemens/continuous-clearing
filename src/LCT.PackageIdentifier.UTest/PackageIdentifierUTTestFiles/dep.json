@@ -1,0 +1,4636 @@
+{
+    "graph": {
+        "nodes": {
+            "0": {
+                "ref": "graphics/1.0",
+                "id": "0",
+                "recipe": "Consumer",
+                "package_id": "e306aff0e3a777ecaf95e894b0aa7d5a526fb059",
+                "prev": null,
+                "rrev": null,
+                "rrev_timestamp": null,
+                "prev_timestamp": null,
+                "remote": null,
+                "binary_remote": null,
+                "build_id": null,
+                "binary": null,
+                "invalid_build": false,
+                "info_invalid": null,
+                "name": "graphics",
+                "user": null,
+                "channel": null,
+                "url": null,
+                "license": null,
+                "author": null,
+                "description": null,
+                "homepage": null,
+                "build_policy": null,
+                "upload_policy": null,
+                "revision_mode": "hash",
+                "provides": null,
+                "deprecated": null,
+                "win_bash": null,
+                "win_bash_run": null,
+                "default_options": {
+                    "shared": false,
+                    "fPIC": true
+                },
+                "options_description": null,
+                "version": "1.0",
+                "topics": null,
+                "package_type": "static-library",
+                "languages": [],
+                "settings": {
+                    "os": "Linux",
+                    "arch": "x86_64",
+                    "compiler": "gcc",
+                    "compiler.cppstd": "gnu14",
+                    "compiler.libcxx": "libstdc++11",
+                    "compiler.version": "10",
+                    "build_type": "Release"
+                },
+                "options": {
+                    "fPIC": "True",
+                    "shared": "False"
+                },
+                "options_definitions": {
+                    "shared": [
+                        "True",
+                        "False"
+                    ],
+                    "fPIC": [
+                        "True",
+                        "False"
+                    ]
+                },
+                "generators": [],
+                "python_requires": null,
+                "system_requires": {},
+                "recipe_folder": "/workspaces/cpp-2/examples2/ci/game/graphics",
+                "source_folder": null,
+                "build_folder": null,
+                "generators_folder": null,
+                "package_folder": null,
+                "immutable_package_folder": null,
+                "cpp_info": {
+                    "root": {
+                        "includedirs": [
+                            "include"
+                        ],
+                        "srcdirs": null,
+                        "libdirs": [
+                            "lib"
+                        ],
+                        "resdirs": null,
+                        "bindirs": [
+                            "bin"
+                        ],
+                        "builddirs": null,
+                        "frameworkdirs": null,
+                        "system_libs": null,
+                        "frameworks": null,
+                        "libs": null,
+                        "defines": null,
+                        "cflags": null,
+                        "cxxflags": null,
+                        "sharedlinkflags": null,
+                        "exelinkflags": null,
+                        "objects": null,
+                        "sources": null,
+                        "sysroot": null,
+                        "requires": null,
+                        "properties": null,
+                        "exe": null,
+                        "type": null,
+                        "location": null,
+                        "link_location": null,
+                        "languages": null
+                    }
+                },
+                "conf_info": {},
+                "label": "conanfile.py (graphics/1.0)",
+                "info": {
+                    "settings": {
+                        "os": "Linux",
+                        "arch": "x86_64",
+                        "compiler": "gcc",
+                        "compiler.cppstd": "gnu14",
+                        "compiler.libcxx": "libstdc++11",
+                        "compiler.version": "10",
+                        "build_type": "Release"
+                    },
+                    "options": {
+                        "fPIC": "True",
+                        "shared": "False"
+                    },
+                    "requires": [
+                        "libcurl/8.15.Z",
+                        "openssl/3.5.Z",
+                        "zlib/1.3.Z"
+                    ]
+                },
+                "vendor": false,
+                "dependencies": {
+                    "1": {
+                        "ref": "libcurl/8.15.0",
+                        "require": "libcurl/[>=8.15.0 <8.16.0]",
+                        "run": false,
+                        "libs": true,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": true,
+                        "build": false,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": true,
+                        "package_id_mode": "minor_mode",
+                        "visible": true
+                    },
+                    "2": {
+                        "ref": "openssl/3.5.2",
+                        "require": "openssl/3.5.2",
+                        "run": false,
+                        "libs": true,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": false,
+                        "build": false,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": false,
+                        "package_id_mode": "minor_mode",
+                        "visible": true
+                    },
+                    "3": {
+                        "ref": "zlib/1.3.1",
+                        "require": "zlib/1.3.1",
+                        "run": false,
+                        "libs": true,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": false,
+                        "build": false,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": false,
+                        "package_id_mode": "minor_mode",
+                        "visible": true
+                    },
+                    "23": {
+                        "ref": "zlib/1.3.1",
+                        "require": "zlib/1.3.1",
+                        "run": true,
+                        "libs": false,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": true,
+                        "build": true,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": false,
+                        "package_id_mode": null,
+                        "visible": false
+                    }
+                },
+                "context": "host",
+                "test": false
+            },
+            "1": {
+                "ref": "libcurl/8.15.0#f94d17d44efcc8d467e3bdd7e694a892",
+                "id": "1",
+                "recipe": "Cache",
+                "package_id": "96dea8c84a29d237c4c3fcca1611c0642cc4f938",
+                "prev": null,
+                "rrev": "f94d17d44efcc8d467e3bdd7e694a892",
+                "rrev_timestamp": 1755694467.056,
+                "prev_timestamp": null,
+                "remote": null,
+                "binary_remote": null,
+                "build_id": null,
+                "binary": "Missing",
+                "invalid_build": false,
+                "info_invalid": null,
+                "name": "libcurl",
+                "user": null,
+                "channel": null,
+                "url": "https://github.com/conan-io/conan-center-index",
+                "license": "curl",
+                "author": null,
+                "description": "command line tool and library for transferring data with URLs",
+                "homepage": "https://curl.se",
+                "build_policy": null,
+                "upload_policy": null,
+                "revision_mode": "hash",
+                "provides": null,
+                "deprecated": null,
+                "win_bash": null,
+                "win_bash_run": null,
+                "default_options": {
+                    "shared": false,
+                    "fPIC": true,
+                    "build_executable": false,
+                    "with_ssl": "openssl",
+                    "with_dict": true,
+                    "with_file": true,
+                    "with_ftp": true,
+                    "with_gopher": true,
+                    "with_http": true,
+                    "with_imap": true,
+                    "with_ldap": false,
+                    "with_mqtt": true,
+                    "with_pop3": true,
+                    "with_rtsp": true,
+                    "with_smb": true,
+                    "with_smtp": true,
+                    "with_telnet": true,
+                    "with_tftp": true,
+                    "with_libssh2": false,
+                    "with_libidn": false,
+                    "with_librtmp": false,
+                    "with_libgsasl": false,
+                    "with_libpsl": false,
+                    "with_largemaxwritesize": false,
+                    "with_nghttp2": false,
+                    "with_zlib": true,
+                    "with_brotli": false,
+                    "with_zstd": false,
+                    "with_c_ares": false,
+                    "with_threaded_resolver": true,
+                    "with_proxy": true,
+                    "with_crypto_auth": true,
+                    "with_ntlm": true,
+                    "with_ntlm_wb": true,
+                    "with_cookies": true,
+                    "with_ipv6": true,
+                    "with_docs": false,
+                    "with_misc_docs": false,
+                    "with_verbose_debug": true,
+                    "with_symbol_hiding": false,
+                    "with_unix_sockets": true,
+                    "with_verbose_strings": true,
+                    "with_ca_bundle": "auto",
+                    "with_ca_path": "auto",
+                    "with_ca_fallback": false,
+                    "with_form_api": true,
+                    "with_websockets": true
+                },
+                "options_description": null,
+                "version": "8.15.0",
+                "topics": [
+                    "curl",
+                    "data-transfer",
+                    "ftp",
+                    "gopher",
+                    "http",
+                    "imap",
+                    "ldap",
+                    "mqtt",
+                    "pop3",
+                    "rtmp",
+                    "rtsp",
+                    "scp",
+                    "sftp",
+                    "smb",
+                    "smtp",
+                    "telnet",
+                    "tftp"
+                ],
+                "package_type": "static-library",
+                "languages": [],
+                "settings": {
+                    "os": "Linux",
+                    "arch": "x86_64",
+                    "compiler": "gcc",
+                    "compiler.version": "10",
+                    "build_type": "Release"
+                },
+                "options": {
+                    "build_executable": "False",
+                    "fPIC": "True",
+                    "shared": "False",
+                    "with_brotli": "False",
+                    "with_c_ares": "False",
+                    "with_ca_bundle": "auto",
+                    "with_ca_fallback": "False",
+                    "with_ca_path": "auto",
+                    "with_cookies": "True",
+                    "with_crypto_auth": "True",
+                    "with_dict": "True",
+                    "with_docs": "False",
+                    "with_file": "True",
+                    "with_form_api": "True",
+                    "with_ftp": "True",
+                    "with_gopher": "True",
+                    "with_http": "True",
+                    "with_imap": "True",
+                    "with_ipv6": "True",
+                    "with_largemaxwritesize": "False",
+                    "with_ldap": "False",
+                    "with_libgsasl": "False",
+                    "with_libidn": "False",
+                    "with_libpsl": "False",
+                    "with_librtmp": "False",
+                    "with_libssh2": "False",
+                    "with_misc_docs": "False",
+                    "with_mqtt": "True",
+                    "with_nghttp2": "False",
+                    "with_ntlm": "True",
+                    "with_ntlm_wb": "True",
+                    "with_pop3": "True",
+                    "with_proxy": "True",
+                    "with_rtsp": "True",
+                    "with_smb": "True",
+                    "with_smtp": "True",
+                    "with_ssl": "openssl",
+                    "with_symbol_hiding": "False",
+                    "with_telnet": "True",
+                    "with_tftp": "True",
+                    "with_threaded_resolver": "True",
+                    "with_unix_sockets": "True",
+                    "with_verbose_debug": "True",
+                    "with_verbose_strings": "True",
+                    "with_websockets": "True",
+                    "with_zlib": "True",
+                    "with_zstd": "False"
+                },
+                "options_definitions": {
+                    "shared": [
+                        "True",
+                        "False"
+                    ],
+                    "fPIC": [
+                        "True",
+                        "False"
+                    ],
+                    "build_executable": [
+                        "True",
+                        "False"
+                    ],
+                    "with_ssl": [
+                        "False",
+                        "openssl",
+                        "wolfssl",
+                        "schannel",
+                        "darwinssl",
+                        "mbedtls",
+                        "libressl"
+                    ],
+                    "with_file": [
+                        "True",
+                        "False"
+                    ],
+                    "with_ftp": [
+                        "True",
+                        "False"
+                    ],
+                    "with_http": [
+                        "True",
+                        "False"
+                    ],
+                    "with_ldap": [
+                        "True",
+                        "False"
+                    ],
+                    "with_rtsp": [
+                        "True",
+                        "False"
+                    ],
+                    "with_dict": [
+                        "True",
+                        "False"
+                    ],
+                    "with_telnet": [
+                        "True",
+                        "False"
+                    ],
+                    "with_tftp": [
+                        "True",
+                        "False"
+                    ],
+                    "with_pop3": [
+                        "True",
+                        "False"
+                    ],
+                    "with_imap": [
+                        "True",
+                        "False"
+                    ],
+                    "with_smb": [
+                        "True",
+                        "False"
+                    ],
+                    "with_smtp": [
+                        "True",
+                        "False"
+                    ],
+                    "with_gopher": [
+                        "True",
+                        "False"
+                    ],
+                    "with_mqtt": [
+                        "True",
+                        "False"
+                    ],
+                    "with_libssh2": [
+                        "True",
+                        "False"
+                    ],
+                    "with_libidn": [
+                        "True",
+                        "False"
+                    ],
+                    "with_librtmp": [
+                        "True",
+                        "False"
+                    ],
+                    "with_libgsasl": [
+                        "True",
+                        "False"
+                    ],
+                    "with_libpsl": [
+                        "True",
+                        "False"
+                    ],
+                    "with_largemaxwritesize": [
+                        "True",
+                        "False"
+                    ],
+                    "with_nghttp2": [
+                        "True",
+                        "False"
+                    ],
+                    "with_zlib": [
+                        "True",
+                        "False"
+                    ],
+                    "with_brotli": [
+                        "True",
+                        "False"
+                    ],
+                    "with_zstd": [
+                        "True",
+                        "False"
+                    ],
+                    "with_c_ares": [
+                        "True",
+                        "False"
+                    ],
+                    "with_threaded_resolver": [
+                        "True",
+                        "False"
+                    ],
+                    "with_proxy": [
+                        "True",
+                        "False"
+                    ],
+                    "with_crypto_auth": [
+                        "True",
+                        "False"
+                    ],
+                    "with_ntlm": [
+                        "True",
+                        "False"
+                    ],
+                    "with_ntlm_wb": [
+                        "True",
+                        "False"
+                    ],
+                    "with_cookies": [
+                        "True",
+                        "False"
+                    ],
+                    "with_ipv6": [
+                        "True",
+                        "False"
+                    ],
+                    "with_docs": [
+                        "True",
+                        "False"
+                    ],
+                    "with_misc_docs": [
+                        "True",
+                        "False"
+                    ],
+                    "with_verbose_debug": [
+                        "True",
+                        "False"
+                    ],
+                    "with_symbol_hiding": [
+                        "True",
+                        "False"
+                    ],
+                    "with_unix_sockets": [
+                        "True",
+                        "False"
+                    ],
+                    "with_verbose_strings": [
+                        "True",
+                        "False"
+                    ],
+                    "with_ca_bundle": [
+                        "False",
+                        "auto",
+                        "ANY"
+                    ],
+                    "with_ca_path": [
+                        "False",
+                        "auto",
+                        "ANY"
+                    ],
+                    "with_ca_fallback": [
+                        "True",
+                        "False"
+                    ],
+                    "with_form_api": [
+                        "True",
+                        "False"
+                    ],
+                    "with_websockets": [
+                        "True",
+                        "False"
+                    ]
+                },
+                "generators": [],
+                "python_requires": null,
+                "system_requires": {},
+                "recipe_folder": "/workspaces/cpp-2/examples2/ci/game/.conan2/p/libcuf2bbbf69bb371/e",
+                "source_folder": null,
+                "build_folder": null,
+                "generators_folder": null,
+                "package_folder": null,
+                "immutable_package_folder": null,
+                "cpp_info": {
+                    "root": {
+                        "includedirs": [
+                            "include"
+                        ],
+                        "srcdirs": null,
+                        "libdirs": [
+                            "lib"
+                        ],
+                        "resdirs": null,
+                        "bindirs": [
+                            "bin"
+                        ],
+                        "builddirs": null,
+                        "frameworkdirs": null,
+                        "system_libs": null,
+                        "frameworks": null,
+                        "libs": null,
+                        "defines": null,
+                        "cflags": null,
+                        "cxxflags": null,
+                        "sharedlinkflags": null,
+                        "exelinkflags": null,
+                        "objects": null,
+                        "sources": null,
+                        "sysroot": null,
+                        "requires": null,
+                        "properties": null,
+                        "exe": null,
+                        "type": null,
+                        "location": null,
+                        "link_location": null,
+                        "languages": null
+                    }
+                },
+                "conf_info": {},
+                "label": "libcurl/8.15.0",
+                "info": {
+                    "settings": {
+                        "os": "Linux",
+                        "arch": "x86_64",
+                        "compiler": "gcc",
+                        "compiler.version": "10",
+                        "build_type": "Release"
+                    },
+                    "options": {
+                        "build_executable": "False",
+                        "fPIC": "True",
+                        "shared": "False",
+                        "with_brotli": "False",
+                        "with_c_ares": "False",
+                        "with_ca_bundle": "auto",
+                        "with_ca_fallback": "False",
+                        "with_ca_path": "auto",
+                        "with_cookies": "True",
+                        "with_crypto_auth": "True",
+                        "with_dict": "True",
+                        "with_docs": "False",
+                        "with_file": "True",
+                        "with_form_api": "True",
+                        "with_ftp": "True",
+                        "with_gopher": "True",
+                        "with_http": "True",
+                        "with_imap": "True",
+                        "with_ipv6": "True",
+                        "with_largemaxwritesize": "False",
+                        "with_ldap": "False",
+                        "with_libgsasl": "False",
+                        "with_libidn": "False",
+                        "with_libpsl": "False",
+                        "with_librtmp": "False",
+                        "with_libssh2": "False",
+                        "with_misc_docs": "False",
+                        "with_mqtt": "True",
+                        "with_nghttp2": "False",
+                        "with_ntlm": "True",
+                        "with_ntlm_wb": "True",
+                        "with_pop3": "True",
+                        "with_proxy": "True",
+                        "with_rtsp": "True",
+                        "with_smb": "True",
+                        "with_smtp": "True",
+                        "with_ssl": "openssl",
+                        "with_symbol_hiding": "False",
+                        "with_telnet": "True",
+                        "with_tftp": "True",
+                        "with_threaded_resolver": "True",
+                        "with_unix_sockets": "True",
+                        "with_verbose_debug": "True",
+                        "with_verbose_strings": "True",
+                        "with_websockets": "True",
+                        "with_zlib": "True",
+                        "with_zstd": "False"
+                    },
+                    "requires": [
+                        "openssl/3.5.Z",
+                        "zlib/1.3.Z"
+                    ]
+                },
+                "vendor": false,
+                "conandata": {
+                    "sources": {
+                        "8.15.0": {
+                            "sha256": "6cd0a8a5b126ddfda61c94dc2c3fc53481ba7a35461cf7c5ab66aa9d6775b609",
+                            "url": [
+                                "https://curl.se/download/curl-8.15.0.tar.xz",
+                                "https://github.com/curl/curl/releases/download/curl-8_15_0/curl-8.15.0.tar.xz"
+                            ]
+                        }
+                    }
+                },
+                "dependencies": {
+                    "2": {
+                        "ref": "openssl/3.5.2",
+                        "require": "openssl/[>=1.1 <4]",
+                        "run": false,
+                        "libs": true,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": true,
+                        "build": false,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": true,
+                        "package_id_mode": "minor_mode",
+                        "visible": true
+                    },
+                    "3": {
+                        "ref": "zlib/1.3.1",
+                        "require": "zlib/[>=1.2.11 <2]",
+                        "run": false,
+                        "libs": true,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": true,
+                        "build": false,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": true,
+                        "package_id_mode": "minor_mode",
+                        "visible": true
+                    },
+                    "4": {
+                        "ref": "libtool/2.4.7",
+                        "require": "libtool/2.4.7",
+                        "run": true,
+                        "libs": false,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": true,
+                        "build": true,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": false,
+                        "package_id_mode": null,
+                        "visible": false
+                    },
+                    "5": {
+                        "ref": "automake/1.16.5",
+                        "require": "automake/1.16.5",
+                        "run": true,
+                        "libs": false,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": false,
+                        "build": true,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": false,
+                        "package_id_mode": null,
+                        "visible": false
+                    },
+                    "6": {
+                        "ref": "autoconf/2.71",
+                        "require": "autoconf/2.71",
+                        "run": true,
+                        "libs": false,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": false,
+                        "build": true,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": false,
+                        "package_id_mode": null,
+                        "visible": false
+                    },
+                    "7": {
+                        "ref": "m4/1.4.19",
+                        "require": "m4/1.4.19",
+                        "run": true,
+                        "libs": false,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": false,
+                        "build": true,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": false,
+                        "package_id_mode": null,
+                        "visible": false
+                    },
+                    "20": {
+                        "ref": "pkgconf/2.2.0",
+                        "require": "pkgconf/[>=2.2 <3]",
+                        "run": true,
+                        "libs": false,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": true,
+                        "build": true,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": false,
+                        "package_id_mode": null,
+                        "visible": false
+                    }
+                },
+                "context": "host",
+                "test": false
+            },
+            "2": {
+                "ref": "openssl/3.5.2#0c5a5e15ae569f45dff57adcf1770cf7",
+                "id": "2",
+                "recipe": "Cache",
+                "package_id": "593ccef3e720bb8d2a3d0874da4ffcace6ff69a4",
+                "prev": null,
+                "rrev": "0c5a5e15ae569f45dff57adcf1770cf7",
+                "rrev_timestamp": 1754407017.477,
+                "prev_timestamp": null,
+                "remote": null,
+                "binary_remote": null,
+                "build_id": null,
+                "binary": "Missing",
+                "invalid_build": false,
+                "info_invalid": null,
+                "name": "openssl",
+                "user": null,
+                "channel": null,
+                "url": "https://github.com/conan-io/conan-center-index",
+                "license": "Apache-2.0",
+                "author": null,
+                "description": "A toolkit for the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols",
+                "homepage": "https://github.com/openssl/openssl",
+                "build_policy": null,
+                "upload_policy": null,
+                "revision_mode": "hash",
+                "provides": null,
+                "deprecated": null,
+                "win_bash": null,
+                "win_bash_run": null,
+                "default_options": {
+                    "shared": false,
+                    "fPIC": true,
+                    "enable_weak_ssl_ciphers": false,
+                    "386": false,
+                    "capieng_dialog": false,
+                    "enable_capieng": false,
+                    "enable_trace": false,
+                    "no_aria": false,
+                    "no_apps": false,
+                    "no_autoload_config": false,
+                    "no_asm": false,
+                    "no_async": false,
+                    "no_blake2": false,
+                    "no_bf": false,
+                    "no_camellia": false,
+                    "no_chacha": false,
+                    "no_cms": false,
+                    "no_comp": false,
+                    "no_ct": false,
+                    "no_cast": false,
+                    "no_deprecated": false,
+                    "no_des": false,
+                    "no_dgram": false,
+                    "no_dh": false,
+                    "no_dsa": false,
+                    "no_dso": false,
+                    "no_ec": false,
+                    "no_ecdh": false,
+                    "no_ecdsa": false,
+                    "no_engine": false,
+                    "no_filenames": false,
+                    "no_fips": false,
+                    "no_gost": false,
+                    "no_idea": false,
+                    "no_legacy": false,
+                    "no_md2": true,
+                    "no_md4": false,
+                    "no_mdc2": false,
+                    "no_module": false,
+                    "no_ocsp": false,
+                    "no_pinshared": false,
+                    "no_rc2": false,
+                    "no_rc4": false,
+                    "no_rc5": false,
+                    "no_rfc3779": false,
+                    "no_rmd160": false,
+                    "no_sm2": false,
+                    "no_sm3": false,
+                    "no_sm4": false,
+                    "no_srp": false,
+                    "no_srtp": false,
+                    "no_sse2": false,
+                    "no_ssl": false,
+                    "no_stdio": false,
+                    "no_seed": false,
+                    "no_sock": false,
+                    "no_ssl3": false,
+                    "no_threads": false,
+                    "no_tls1": false,
+                    "no_ts": false,
+                    "no_whirlpool": false,
+                    "no_zlib": false,
+                    "openssldir": null,
+                    "tls_security_level": null
+                },
+                "options_description": null,
+                "version": "3.5.2",
+                "topics": [
+                    "ssl",
+                    "tls",
+                    "encryption",
+                    "security"
+                ],
+                "package_type": "static-library",
+                "languages": [],
+                "settings": {
+                    "os": "Linux",
+                    "arch": "x86_64",
+                    "compiler": "gcc",
+                    "compiler.version": "10",
+                    "build_type": "Release"
+                },
+                "options": {
+                    "386": "False",
+                    "enable_trace": "False",
+                    "enable_weak_ssl_ciphers": "False",
+                    "fPIC": "True",
+                    "no_apps": "False",
+                    "no_aria": "False",
+                    "no_asm": "False",
+                    "no_async": "False",
+                    "no_autoload_config": "False",
+                    "no_bf": "False",
+                    "no_blake2": "False",
+                    "no_camellia": "False",
+                    "no_cast": "False",
+                    "no_chacha": "False",
+                    "no_cms": "False",
+                    "no_comp": "False",
+                    "no_ct": "False",
+                    "no_deprecated": "False",
+                    "no_des": "False",
+                    "no_dgram": "False",
+                    "no_dh": "False",
+                    "no_dsa": "False",
+                    "no_dso": "False",
+                    "no_ec": "False",
+                    "no_ecdh": "False",
+                    "no_ecdsa": "False",
+                    "no_engine": "False",
+                    "no_filenames": "False",
+                    "no_fips": "False",
+                    "no_gost": "False",
+                    "no_idea": "False",
+                    "no_legacy": "False",
+                    "no_md2": "True",
+                    "no_md4": "False",
+                    "no_mdc2": "False",
+                    "no_module": "False",
+                    "no_ocsp": "False",
+                    "no_pinshared": "False",
+                    "no_rc2": "False",
+                    "no_rc4": "False",
+                    "no_rc5": "False",
+                    "no_rfc3779": "False",
+                    "no_rmd160": "False",
+                    "no_seed": "False",
+                    "no_sm2": "False",
+                    "no_sm3": "False",
+                    "no_sm4": "False",
+                    "no_sock": "False",
+                    "no_srp": "False",
+                    "no_srtp": "False",
+                    "no_sse2": "False",
+                    "no_ssl": "False",
+                    "no_ssl3": "False",
+                    "no_stdio": "False",
+                    "no_threads": "False",
+                    "no_tls1": "False",
+                    "no_ts": "False",
+                    "no_whirlpool": "False",
+                    "no_zlib": "False",
+                    "openssldir": null,
+                    "shared": "False",
+                    "tls_security_level": null
+                },
+                "options_definitions": {
+                    "shared": [
+                        "True",
+                        "False"
+                    ],
+                    "fPIC": [
+                        "True",
+                        "False"
+                    ],
+                    "enable_weak_ssl_ciphers": [
+                        "True",
+                        "False"
+                    ],
+                    "386": [
+                        "True",
+                        "False"
+                    ],
+                    "enable_trace": [
+                        "True",
+                        "False"
+                    ],
+                    "no_aria": [
+                        "True",
+                        "False"
+                    ],
+                    "no_apps": [
+                        "True",
+                        "False"
+                    ],
+                    "no_autoload_config": [
+                        "True",
+                        "False"
+                    ],
+                    "no_asm": [
+                        "True",
+                        "False"
+                    ],
+                    "no_async": [
+                        "True",
+                        "False"
+                    ],
+                    "no_blake2": [
+                        "True",
+                        "False"
+                    ],
+                    "no_bf": [
+                        "True",
+                        "False"
+                    ],
+                    "no_camellia": [
+                        "True",
+                        "False"
+                    ],
+                    "no_chacha": [
+                        "True",
+                        "False"
+                    ],
+                    "no_cms": [
+                        "True",
+                        "False"
+                    ],
+                    "no_comp": [
+                        "True",
+                        "False"
+                    ],
+                    "no_ct": [
+                        "True",
+                        "False"
+                    ],
+                    "no_cast": [
+                        "True",
+                        "False"
+                    ],
+                    "no_deprecated": [
+                        "True",
+                        "False"
+                    ],
+                    "no_des": [
+                        "True",
+                        "False"
+                    ],
+                    "no_dgram": [
+                        "True",
+                        "False"
+                    ],
+                    "no_dh": [
+                        "True",
+                        "False"
+                    ],
+                    "no_dsa": [
+                        "True",
+                        "False"
+                    ],
+                    "no_dso": [
+                        "True",
+                        "False"
+                    ],
+                    "no_ec": [
+                        "True",
+                        "False"
+                    ],
+                    "no_ecdh": [
+                        "True",
+                        "False"
+                    ],
+                    "no_ecdsa": [
+                        "True",
+                        "False"
+                    ],
+                    "no_engine": [
+                        "True",
+                        "False"
+                    ],
+                    "no_filenames": [
+                        "True",
+                        "False"
+                    ],
+                    "no_fips": [
+                        "True",
+                        "False"
+                    ],
+                    "no_gost": [
+                        "True",
+                        "False"
+                    ],
+                    "no_idea": [
+                        "True",
+                        "False"
+                    ],
+                    "no_legacy": [
+                        "True",
+                        "False"
+                    ],
+                    "no_md2": [
+                        "True",
+                        "False"
+                    ],
+                    "no_md4": [
+                        "True",
+                        "False"
+                    ],
+                    "no_mdc2": [
+                        "True",
+                        "False"
+                    ],
+                    "no_module": [
+                        "True",
+                        "False"
+                    ],
+                    "no_ocsp": [
+                        "True",
+                        "False"
+                    ],
+                    "no_pinshared": [
+                        "True",
+                        "False"
+                    ],
+                    "no_rc2": [
+                        "True",
+                        "False"
+                    ],
+                    "no_rc4": [
+                        "True",
+                        "False"
+                    ],
+                    "no_rc5": [
+                        "True",
+                        "False"
+                    ],
+                    "no_rfc3779": [
+                        "True",
+                        "False"
+                    ],
+                    "no_rmd160": [
+                        "True",
+                        "False"
+                    ],
+                    "no_sm2": [
+                        "True",
+                        "False"
+                    ],
+                    "no_sm3": [
+                        "True",
+                        "False"
+                    ],
+                    "no_sm4": [
+                        "True",
+                        "False"
+                    ],
+                    "no_srp": [
+                        "True",
+                        "False"
+                    ],
+                    "no_srtp": [
+                        "True",
+                        "False"
+                    ],
+                    "no_sse2": [
+                        "True",
+                        "False"
+                    ],
+                    "no_ssl": [
+                        "True",
+                        "False"
+                    ],
+                    "no_stdio": [
+                        "True",
+                        "False"
+                    ],
+                    "no_seed": [
+                        "True",
+                        "False"
+                    ],
+                    "no_sock": [
+                        "True",
+                        "False"
+                    ],
+                    "no_ssl3": [
+                        "True",
+                        "False"
+                    ],
+                    "no_threads": [
+                        "True",
+                        "False"
+                    ],
+                    "no_tls1": [
+                        "True",
+                        "False"
+                    ],
+                    "no_ts": [
+                        "True",
+                        "False"
+                    ],
+                    "no_whirlpool": [
+                        "True",
+                        "False"
+                    ],
+                    "no_zlib": [
+                        "True",
+                        "False"
+                    ],
+                    "openssldir": [
+                        null,
+                        "ANY"
+                    ],
+                    "tls_security_level": [
+                        null,
+                        "0",
+                        "1",
+                        "2",
+                        "3",
+                        "4",
+                        "5"
+                    ]
+                },
+                "generators": [],
+                "python_requires": null,
+                "system_requires": {},
+                "recipe_folder": "/workspaces/cpp-2/examples2/ci/game/.conan2/p/opens7d42025f55bad/e",
+                "source_folder": null,
+                "build_folder": null,
+                "generators_folder": null,
+                "package_folder": null,
+                "immutable_package_folder": null,
+                "cpp_info": {
+                    "root": {
+                        "includedirs": [
+                            "include"
+                        ],
+                        "srcdirs": null,
+                        "libdirs": [
+                            "lib"
+                        ],
+                        "resdirs": null,
+                        "bindirs": [
+                            "bin"
+                        ],
+                        "builddirs": null,
+                        "frameworkdirs": null,
+                        "system_libs": null,
+                        "frameworks": null,
+                        "libs": null,
+                        "defines": null,
+                        "cflags": null,
+                        "cxxflags": null,
+                        "sharedlinkflags": null,
+                        "exelinkflags": null,
+                        "objects": null,
+                        "sources": null,
+                        "sysroot": null,
+                        "requires": null,
+                        "properties": null,
+                        "exe": null,
+                        "type": null,
+                        "location": null,
+                        "link_location": null,
+                        "languages": null
+                    }
+                },
+                "conf_info": {},
+                "label": "openssl/3.5.2",
+                "info": {
+                    "settings": {
+                        "os": "Linux",
+                        "arch": "x86_64",
+                        "compiler": "gcc",
+                        "compiler.version": "10",
+                        "build_type": "Release"
+                    },
+                    "options": {
+                        "386": "False",
+                        "enable_trace": "False",
+                        "enable_weak_ssl_ciphers": "False",
+                        "fPIC": "True",
+                        "no_apps": "False",
+                        "no_aria": "False",
+                        "no_asm": "False",
+                        "no_async": "False",
+                        "no_autoload_config": "False",
+                        "no_bf": "False",
+                        "no_blake2": "False",
+                        "no_camellia": "False",
+                        "no_cast": "False",
+                        "no_chacha": "False",
+                        "no_cms": "False",
+                        "no_comp": "False",
+                        "no_ct": "False",
+                        "no_deprecated": "False",
+                        "no_des": "False",
+                        "no_dgram": "False",
+                        "no_dh": "False",
+                        "no_dsa": "False",
+                        "no_dso": "False",
+                        "no_ec": "False",
+                        "no_ecdh": "False",
+                        "no_ecdsa": "False",
+                        "no_engine": "False",
+                        "no_filenames": "False",
+                        "no_fips": "False",
+                        "no_gost": "False",
+                        "no_idea": "False",
+                        "no_legacy": "False",
+                        "no_md2": "True",
+                        "no_md4": "False",
+                        "no_mdc2": "False",
+                        "no_module": "False",
+                        "no_ocsp": "False",
+                        "no_pinshared": "False",
+                        "no_rc2": "False",
+                        "no_rc4": "False",
+                        "no_rc5": "False",
+                        "no_rfc3779": "False",
+                        "no_rmd160": "False",
+                        "no_seed": "False",
+                        "no_sm2": "False",
+                        "no_sm3": "False",
+                        "no_sm4": "False",
+                        "no_sock": "False",
+                        "no_srp": "False",
+                        "no_srtp": "False",
+                        "no_sse2": "False",
+                        "no_ssl": "False",
+                        "no_ssl3": "False",
+                        "no_stdio": "False",
+                        "no_threads": "False",
+                        "no_tls1": "False",
+                        "no_ts": "False",
+                        "no_whirlpool": "False",
+                        "no_zlib": "False",
+                        "openssldir": null,
+                        "shared": "False",
+                        "tls_security_level": null
+                    },
+                    "requires": [
+                        "zlib/1.3.Z"
+                    ]
+                },
+                "vendor": false,
+                "conandata": {
+                    "sources": {
+                        "3.5.2": {
+                            "sha256": "c53a47e5e441c930c3928cf7bf6fb00e5d129b630e0aa873b08258656e7345ec",
+                            "url": "https://github.com/openssl/openssl/releases/download/openssl-3.5.2/openssl-3.5.2.tar.gz"
+                        }
+                    }
+                },
+                "dependencies": {
+                    "3": {
+                        "ref": "zlib/1.3.1",
+                        "require": "zlib/[>=1.2.11 <2]",
+                        "run": false,
+                        "libs": true,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": true,
+                        "build": false,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": true,
+                        "package_id_mode": "minor_mode",
+                        "visible": true
+                    }
+                },
+                "context": "host",
+                "test": false
+            },
+            "3": {
+                "ref": "zlib/1.3.1#b8bc2603263cf7eccbd6e17e66b0ed76",
+                "id": "3",
+                "recipe": "Cache",
+                "package_id": "3f0cbc1394cb3fd9f3473d67001da1a496fb5b26",
+                "prev": null,
+                "rrev": "b8bc2603263cf7eccbd6e17e66b0ed76",
+                "rrev_timestamp": 1733936244.862,
+                "prev_timestamp": null,
+                "remote": null,
+                "binary_remote": null,
+                "build_id": null,
+                "binary": "Missing",
+                "invalid_build": false,
+                "info_invalid": null,
+                "name": "zlib",
+                "user": null,
+                "channel": null,
+                "url": "https://github.com/conan-io/conan-center-index",
+                "license": "Zlib",
+                "author": null,
+                "description": "A Massively Spiffy Yet Delicately Unobtrusive Compression Library (Also Free, Not to Mention Unencumbered by Patents)",
+                "homepage": "https://zlib.net",
+                "build_policy": null,
+                "upload_policy": null,
+                "revision_mode": "hash",
+                "provides": null,
+                "deprecated": null,
+                "win_bash": null,
+                "win_bash_run": null,
+                "default_options": {
+                    "shared": false,
+                    "fPIC": true
+                },
+                "options_description": null,
+                "version": "1.3.1",
+                "topics": [
+                    "zlib",
+                    "compression"
+                ],
+                "package_type": "static-library",
+                "languages": [],
+                "settings": {
+                    "os": "Linux",
+                    "arch": "x86_64",
+                    "compiler": "gcc",
+                    "compiler.version": "10",
+                    "build_type": "Release"
+                },
+                "options": {
+                    "fPIC": "True",
+                    "shared": "False"
+                },
+                "options_definitions": {
+                    "shared": [
+                        "True",
+                        "False"
+                    ],
+                    "fPIC": [
+                        "True",
+                        "False"
+                    ]
+                },
+                "generators": [],
+                "python_requires": null,
+                "system_requires": {},
+                "recipe_folder": "/workspaces/cpp-2/examples2/ci/game/.conan2/p/zlib204752602052d/e",
+                "source_folder": null,
+                "build_folder": null,
+                "generators_folder": null,
+                "package_folder": null,
+                "immutable_package_folder": null,
+                "cpp_info": {
+                    "root": {
+                        "includedirs": [
+                            "include"
+                        ],
+                        "srcdirs": null,
+                        "libdirs": [
+                            "lib"
+                        ],
+                        "resdirs": null,
+                        "bindirs": [
+                            "bin"
+                        ],
+                        "builddirs": null,
+                        "frameworkdirs": null,
+                        "system_libs": null,
+                        "frameworks": null,
+                        "libs": null,
+                        "defines": null,
+                        "cflags": null,
+                        "cxxflags": null,
+                        "sharedlinkflags": null,
+                        "exelinkflags": null,
+                        "objects": null,
+                        "sources": null,
+                        "sysroot": null,
+                        "requires": null,
+                        "properties": null,
+                        "exe": null,
+                        "type": null,
+                        "location": null,
+                        "link_location": null,
+                        "languages": null
+                    }
+                },
+                "conf_info": {},
+                "label": "zlib/1.3.1",
+                "info": {
+                    "settings": {
+                        "os": "Linux",
+                        "arch": "x86_64",
+                        "compiler": "gcc",
+                        "compiler.version": "10",
+                        "build_type": "Release"
+                    },
+                    "options": {
+                        "fPIC": "True",
+                        "shared": "False"
+                    }
+                },
+                "vendor": false,
+                "conandata": {
+                    "patches": {
+                        "1.3.1": [
+                            {
+                                "patch_description": "separate static/shared builds, disable debug suffix",
+                                "patch_file": "patches/1.3.1/0001-fix-cmake.patch",
+                                "patch_type": "conan"
+                            }
+                        ]
+                    },
+                    "sources": {
+                        "1.3.1": {
+                            "sha256": "9a93b2b7dfdac77ceba5a558a580e74667dd6fede4585b91eefb60f03b72df23",
+                            "url": [
+                                "https://zlib.net/fossils/zlib-1.3.1.tar.gz",
+                                "https://github.com/madler/zlib/releases/download/v1.3.1/zlib-1.3.1.tar.gz"
+                            ]
+                        }
+                    }
+                },
+                "dependencies": {},
+                "context": "host",
+                "test": false
+            },
+            "4": {
+                "ref": "libtool/2.4.7#14e7739cc128bc1623d2ed318008e47e",
+                "id": "4",
+                "recipe": "Cache",
+                "package_id": "3f0cbc1394cb3fd9f3473d67001da1a496fb5b26",
+                "prev": null,
+                "rrev": "14e7739cc128bc1623d2ed318008e47e",
+                "rrev_timestamp": 1755679003.847,
+                "prev_timestamp": null,
+                "remote": null,
+                "binary_remote": null,
+                "build_id": null,
+                "binary": "Skip",
+                "invalid_build": false,
+                "info_invalid": null,
+                "name": "libtool",
+                "user": null,
+                "channel": null,
+                "url": "https://github.com/conan-io/conan-center-index",
+                "license": [
+                    "GPL-2.0-or-later",
+                    "GPL-3.0-or-later"
+                ],
+                "author": null,
+                "description": "GNU libtool is a generic library support script. ",
+                "homepage": "https://www.gnu.org/software/libtool/",
+                "build_policy": null,
+                "upload_policy": null,
+                "revision_mode": "hash",
+                "provides": null,
+                "deprecated": null,
+                "win_bash": null,
+                "win_bash_run": null,
+                "default_options": {
+                    "shared": false,
+                    "fPIC": true
+                },
+                "options_description": null,
+                "version": "2.4.7",
+                "topics": [
+                    "configure",
+                    "library",
+                    "shared",
+                    "static"
+                ],
+                "package_type": "static-library",
+                "languages": [
+                    "C"
+                ],
+                "settings": {
+                    "os": "Linux",
+                    "arch": "x86_64",
+                    "compiler": "gcc",
+                    "compiler.version": "10",
+                    "build_type": "Release"
+                },
+                "options": {
+                    "fPIC": "True",
+                    "shared": "False"
+                },
+                "options_definitions": {
+                    "shared": [
+                        "True",
+                        "False"
+                    ],
+                    "fPIC": [
+                        "True",
+                        "False"
+                    ]
+                },
+                "generators": [],
+                "python_requires": null,
+                "system_requires": {},
+                "recipe_folder": "/workspaces/cpp-2/examples2/ci/game/.conan2/p/libtoe7b0abcabe307/e",
+                "source_folder": null,
+                "build_folder": null,
+                "generators_folder": null,
+                "package_folder": null,
+                "immutable_package_folder": null,
+                "cpp_info": {
+                    "root": {
+                        "includedirs": [
+                            "include"
+                        ],
+                        "srcdirs": null,
+                        "libdirs": [
+                            "lib"
+                        ],
+                        "resdirs": null,
+                        "bindirs": [
+                            "bin"
+                        ],
+                        "builddirs": null,
+                        "frameworkdirs": null,
+                        "system_libs": null,
+                        "frameworks": null,
+                        "libs": null,
+                        "defines": null,
+                        "cflags": null,
+                        "cxxflags": null,
+                        "sharedlinkflags": null,
+                        "exelinkflags": null,
+                        "objects": null,
+                        "sources": null,
+                        "sysroot": null,
+                        "requires": null,
+                        "properties": null,
+                        "exe": null,
+                        "type": null,
+                        "location": null,
+                        "link_location": null,
+                        "languages": null
+                    }
+                },
+                "conf_info": {},
+                "label": "libtool/2.4.7",
+                "info": {
+                    "settings": {
+                        "os": "Linux",
+                        "arch": "x86_64",
+                        "compiler": "gcc",
+                        "compiler.version": "10",
+                        "build_type": "Release"
+                    },
+                    "options": {
+                        "fPIC": "True",
+                        "shared": "False"
+                    }
+                },
+                "vendor": false,
+                "conandata": {
+                    "patches": {
+                        "2.4.7": [
+                            {
+                                "patch_description": "Make libtool relocatable",
+                                "patch_file": "patches/2.4.7-0001-libtool-relocatable.patch",
+                                "patch_type": "portability"
+                            }
+                        ]
+                    },
+                    "sources": {
+                        "2.4.7": {
+                            "sha256": "04e96c2404ea70c590c546eba4202a4e12722c640016c12b9b2f1ce3d481e9a8",
+                            "url": [
+                                "https://ftpmirror.gnu.org/libtool/libtool-2.4.7.tar.gz",
+                                "https://www.mirrorservice.org/sites/ftp.gnu.org/gnu/libtool/libtool-2.4.7.tar.gz",
+                                "https://ftp.gnu.org/gnu/libtool/libtool-2.4.7.tar.gz"
+                            ]
+                        }
+                    }
+                },
+                "dependencies": {
+                    "5": {
+                        "ref": "automake/1.16.5",
+                        "require": "automake/1.16.5",
+                        "run": true,
+                        "libs": false,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": true,
+                        "build": false,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": false,
+                        "package_id_mode": null,
+                        "visible": true
+                    },
+                    "6": {
+                        "ref": "autoconf/2.71",
+                        "require": "autoconf/2.71",
+                        "run": true,
+                        "libs": false,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": false,
+                        "build": false,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": false,
+                        "package_id_mode": null,
+                        "visible": true
+                    },
+                    "7": {
+                        "ref": "m4/1.4.19",
+                        "require": "m4/1.4.19",
+                        "run": true,
+                        "libs": false,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": false,
+                        "build": false,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": false,
+                        "package_id_mode": null,
+                        "visible": true
+                    },
+                    "12": {
+                        "ref": "automake/1.16.5",
+                        "require": "automake/1.16.5",
+                        "run": true,
+                        "libs": false,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": true,
+                        "build": true,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": false,
+                        "package_id_mode": null,
+                        "visible": false
+                    },
+                    "13": {
+                        "ref": "autoconf/2.71",
+                        "require": "autoconf/2.71",
+                        "run": true,
+                        "libs": false,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": false,
+                        "build": true,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": false,
+                        "package_id_mode": null,
+                        "visible": false
+                    },
+                    "14": {
+                        "ref": "m4/1.4.19",
+                        "require": "m4/1.4.19",
+                        "run": true,
+                        "libs": false,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": true,
+                        "build": true,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": false,
+                        "package_id_mode": null,
+                        "visible": false
+                    },
+                    "19": {
+                        "ref": "gnu-config/cci.20210814",
+                        "require": "gnu-config/cci.20210814",
+                        "run": true,
+                        "libs": false,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": true,
+                        "build": true,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": false,
+                        "package_id_mode": null,
+                        "visible": false
+                    }
+                },
+                "context": "build",
+                "test": false
+            },
+            "5": {
+                "ref": "automake/1.16.5#b91b7c384c3deaa9d535be02da14d04f",
+                "id": "5",
+                "recipe": "Cache",
+                "package_id": "9a4eb3c8701508aa9458b1a73d0633783ecc2270",
+                "prev": "3900d45338583e35ffd24fa26fd9e682",
+                "rrev": "b91b7c384c3deaa9d535be02da14d04f",
+                "rrev_timestamp": 1755524470.56,
+                "prev_timestamp": 1755524532.914,
+                "remote": null,
+                "binary_remote": "conancenter",
+                "build_id": null,
+                "binary": "Skip",
+                "invalid_build": false,
+                "info_invalid": null,
+                "name": "automake",
+                "user": null,
+                "channel": null,
+                "url": "https://github.com/conan-io/conan-center-index",
+                "license": [
+                    "GPL-2.0-or-later",
+                    "GPL-3.0-or-later"
+                ],
+                "author": null,
+                "description": "Automake is a tool for automatically generating Makefile.in files compliant with the GNU Coding Standards.",
+                "homepage": "https://www.gnu.org/software/automake/",
+                "build_policy": null,
+                "upload_policy": null,
+                "revision_mode": "hash",
+                "provides": null,
+                "deprecated": null,
+                "win_bash": null,
+                "win_bash_run": null,
+                "default_options": null,
+                "options_description": null,
+                "version": "1.16.5",
+                "topics": [
+                    "autotools",
+                    "configure",
+                    "build"
+                ],
+                "package_type": "application",
+                "languages": [],
+                "settings": {
+                    "os": "Linux",
+                    "arch": "x86_64",
+                    "compiler": "gcc",
+                    "compiler.version": "10",
+                    "build_type": "Release"
+                },
+                "options": {},
+                "options_definitions": {},
+                "generators": [],
+                "python_requires": null,
+                "system_requires": {},
+                "recipe_folder": "/workspaces/cpp-2/examples2/ci/game/.conan2/p/automc33ba5c0bcb5c/e",
+                "source_folder": null,
+                "build_folder": null,
+                "generators_folder": null,
+                "package_folder": null,
+                "immutable_package_folder": null,
+                "cpp_info": {
+                    "root": {
+                        "includedirs": [
+                            "include"
+                        ],
+                        "srcdirs": null,
+                        "libdirs": [
+                            "lib"
+                        ],
+                        "resdirs": null,
+                        "bindirs": [
+                            "bin"
+                        ],
+                        "builddirs": null,
+                        "frameworkdirs": null,
+                        "system_libs": null,
+                        "frameworks": null,
+                        "libs": null,
+                        "defines": null,
+                        "cflags": null,
+                        "cxxflags": null,
+                        "sharedlinkflags": null,
+                        "exelinkflags": null,
+                        "objects": null,
+                        "sources": null,
+                        "sysroot": null,
+                        "requires": null,
+                        "properties": null,
+                        "exe": null,
+                        "type": null,
+                        "location": null,
+                        "link_location": null,
+                        "languages": null
+                    }
+                },
+                "conf_info": {},
+                "label": "automake/1.16.5",
+                "info": {
+                    "settings": {
+                        "os": "Linux"
+                    }
+                },
+                "vendor": false,
+                "conandata": {
+                    "patches": {
+                        "1.16.5": [
+                            {
+                                "patch_file": "patches/0001-help2man-no-discard-stderr-1.16.5.patch"
+                            },
+                            {
+                                "patch_file": "patches/0002-no-perl-path-in-shebang-1.16.5.patch"
+                            },
+                            {
+                                "patch_file": "patches/0003-relocatable-automake-1.16.5.patch"
+                            }
+                        ]
+                    },
+                    "sources": {
+                        "1.16.5": {
+                            "sha256": "07bd24ad08a64bc17250ce09ec56e921d6343903943e99ccf63bbf0705e34605",
+                            "url": [
+                                "https://ftpmirror.gnu.org/gnu/automake/automake-1.16.5.tar.gz",
+                                "https://www.mirrorservice.org/sites/ftp.gnu.org/gnu/automake/automake-1.16.5.tar.gz",
+                                "https://ftp.gnu.org/gnu/automake/automake-1.16.5.tar.gz"
+                            ]
+                        }
+                    }
+                },
+                "dependencies": {
+                    "6": {
+                        "ref": "autoconf/2.71",
+                        "require": "autoconf/2.71",
+                        "run": true,
+                        "libs": false,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": true,
+                        "build": false,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": false,
+                        "package_id_mode": null,
+                        "visible": true
+                    },
+                    "7": {
+                        "ref": "m4/1.4.19",
+                        "require": "m4/1.4.19",
+                        "run": true,
+                        "libs": false,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": false,
+                        "build": false,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": false,
+                        "package_id_mode": null,
+                        "visible": true
+                    },
+                    "9": {
+                        "ref": "autoconf/2.71",
+                        "require": "autoconf/2.71",
+                        "run": true,
+                        "libs": false,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": true,
+                        "build": true,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": false,
+                        "package_id_mode": null,
+                        "visible": false
+                    },
+                    "10": {
+                        "ref": "m4/1.4.19",
+                        "require": "m4/1.4.19",
+                        "run": true,
+                        "libs": false,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": false,
+                        "build": true,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": false,
+                        "package_id_mode": null,
+                        "visible": false
+                    }
+                },
+                "context": "build",
+                "test": false
+            },
+            "6": {
+                "ref": "autoconf/2.71#51077f068e61700d65bb05541ea1e4b0",
+                "id": "6",
+                "recipe": "Cache",
+                "package_id": "9a4eb3c8701508aa9458b1a73d0633783ecc2270",
+                "prev": "99b6797cbca3d7afa20648b3e5edd9da",
+                "rrev": "51077f068e61700d65bb05541ea1e4b0",
+                "rrev_timestamp": 1731054366.86,
+                "prev_timestamp": 1731054457.259,
+                "remote": null,
+                "binary_remote": "conancenter",
+                "build_id": null,
+                "binary": "Skip",
+                "invalid_build": false,
+                "info_invalid": null,
+                "name": "autoconf",
+                "user": null,
+                "channel": null,
+                "url": "https://github.com/conan-io/conan-center-index",
+                "license": [
+                    "GPL-2.0-or-later",
+                    "GPL-3.0-or-later"
+                ],
+                "author": null,
+                "description": "Autoconf is an extensible package of M4 macros that produce shell scripts to automatically configure software source code packages",
+                "homepage": "https://www.gnu.org/software/autoconf/",
+                "build_policy": null,
+                "upload_policy": null,
+                "revision_mode": "hash",
+                "provides": null,
+                "deprecated": null,
+                "win_bash": null,
+                "win_bash_run": null,
+                "default_options": null,
+                "options_description": null,
+                "version": "2.71",
+                "topics": [
+                    "configure",
+                    "build"
+                ],
+                "package_type": "application",
+                "languages": [],
+                "settings": {
+                    "os": "Linux",
+                    "arch": "x86_64",
+                    "compiler": "gcc",
+                    "compiler.cppstd": "gnu14",
+                    "compiler.libcxx": "libstdc++11",
+                    "compiler.version": "10",
+                    "build_type": "Release"
+                },
+                "options": {},
+                "options_definitions": {},
+                "generators": [],
+                "python_requires": null,
+                "system_requires": {},
+                "recipe_folder": "/workspaces/cpp-2/examples2/ci/game/.conan2/p/autoc8866aef2bd628/e",
+                "source_folder": null,
+                "build_folder": null,
+                "generators_folder": null,
+                "package_folder": null,
+                "immutable_package_folder": null,
+                "cpp_info": {
+                    "root": {
+                        "includedirs": [
+                            "include"
+                        ],
+                        "srcdirs": null,
+                        "libdirs": [
+                            "lib"
+                        ],
+                        "resdirs": null,
+                        "bindirs": [
+                            "bin"
+                        ],
+                        "builddirs": null,
+                        "frameworkdirs": null,
+                        "system_libs": null,
+                        "frameworks": null,
+                        "libs": null,
+                        "defines": null,
+                        "cflags": null,
+                        "cxxflags": null,
+                        "sharedlinkflags": null,
+                        "exelinkflags": null,
+                        "objects": null,
+                        "sources": null,
+                        "sysroot": null,
+                        "requires": null,
+                        "properties": null,
+                        "exe": null,
+                        "type": null,
+                        "location": null,
+                        "link_location": null,
+                        "languages": null
+                    }
+                },
+                "conf_info": {},
+                "label": "autoconf/2.71",
+                "info": {
+                    "settings": {
+                        "os": "Linux"
+                    }
+                },
+                "vendor": false,
+                "conandata": {
+                    "patches": {
+                        "2.71": [
+                            {
+                                "patch_description": "Replace instances where absolute paths are embedded the generated files",
+                                "patch_file": "patches/2.71-0001-relocatable-autoconf.patch",
+                                "patch_type": "conan"
+                            },
+                            {
+                                "patch_description": "Avoid build machine's perl path to be embedded the generated files",
+                                "patch_file": "patches/2.71-0002-no-perl-path-in-shebang.patch",
+                                "patch_type": "conan"
+                            },
+                            {
+                                "patch_description": "Disable man regeneration",
+                                "patch_file": "patches/2.71-0003-disable-man-regeneration.patch",
+                                "patch_type": "conan"
+                            }
+                        ]
+                    },
+                    "sources": {
+                        "2.71": {
+                            "sha256": "f14c83cfebcc9427f2c3cea7258bd90df972d92eb26752da4ddad81c87a0faa4",
+                            "url": [
+                                "https://ftpmirror.gnu.org/autoconf/autoconf-2.71.tar.xz",
+                                "https://ftp.gnu.org/gnu/autoconf/autoconf-2.71.tar.xz"
+                            ]
+                        }
+                    }
+                },
+                "dependencies": {
+                    "7": {
+                        "ref": "m4/1.4.19",
+                        "require": "m4/1.4.19",
+                        "run": true,
+                        "libs": false,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": true,
+                        "build": false,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": false,
+                        "package_id_mode": null,
+                        "visible": true
+                    },
+                    "8": {
+                        "ref": "m4/1.4.19",
+                        "require": "m4/1.4.19",
+                        "run": true,
+                        "libs": false,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": true,
+                        "build": true,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": false,
+                        "package_id_mode": null,
+                        "visible": false
+                    }
+                },
+                "context": "build",
+                "test": false
+            },
+            "7": {
+                "ref": "m4/1.4.19#b38ced39a01e31fef5435bc634461fd2",
+                "id": "7",
+                "recipe": "Cache",
+                "package_id": "3593751651824fb813502c69c971267624ced41a",
+                "prev": "cd8019a4f9b70880d548f7cc26569604",
+                "rrev": "b38ced39a01e31fef5435bc634461fd2",
+                "rrev_timestamp": 1700758725.451,
+                "prev_timestamp": 1700759976.449,
+                "remote": null,
+                "binary_remote": "conancenter",
+                "build_id": null,
+                "binary": "Skip",
+                "invalid_build": false,
+                "info_invalid": null,
+                "name": "m4",
+                "user": null,
+                "channel": null,
+                "url": "https://github.com/conan-io/conan-center-index",
+                "license": "GPL-3.0-only",
+                "author": null,
+                "description": "GNU M4 is an implementation of the traditional Unix macro processor",
+                "homepage": "https://www.gnu.org/software/m4/",
+                "build_policy": null,
+                "upload_policy": null,
+                "revision_mode": "hash",
+                "provides": null,
+                "deprecated": null,
+                "win_bash": null,
+                "win_bash_run": null,
+                "default_options": null,
+                "options_description": null,
+                "version": "1.4.19",
+                "topics": [
+                    "macro",
+                    "preprocessor"
+                ],
+                "package_type": "application",
+                "languages": [],
+                "settings": {
+                    "os": "Linux",
+                    "arch": "x86_64",
+                    "compiler": "gcc",
+                    "compiler.cppstd": "gnu14",
+                    "compiler.libcxx": "libstdc++11",
+                    "compiler.version": "10",
+                    "build_type": "Release"
+                },
+                "options": {},
+                "options_definitions": {},
+                "generators": [],
+                "python_requires": null,
+                "system_requires": {},
+                "recipe_folder": "/workspaces/cpp-2/examples2/ci/game/.conan2/p/m4512cc8aabbc4c/e",
+                "source_folder": null,
+                "build_folder": null,
+                "generators_folder": null,
+                "package_folder": null,
+                "immutable_package_folder": null,
+                "cpp_info": {
+                    "root": {
+                        "includedirs": [
+                            "include"
+                        ],
+                        "srcdirs": null,
+                        "libdirs": [
+                            "lib"
+                        ],
+                        "resdirs": null,
+                        "bindirs": [
+                            "bin"
+                        ],
+                        "builddirs": null,
+                        "frameworkdirs": null,
+                        "system_libs": null,
+                        "frameworks": null,
+                        "libs": null,
+                        "defines": null,
+                        "cflags": null,
+                        "cxxflags": null,
+                        "sharedlinkflags": null,
+                        "exelinkflags": null,
+                        "objects": null,
+                        "sources": null,
+                        "sysroot": null,
+                        "requires": null,
+                        "properties": null,
+                        "exe": null,
+                        "type": null,
+                        "location": null,
+                        "link_location": null,
+                        "languages": null
+                    }
+                },
+                "conf_info": {},
+                "label": "m4/1.4.19",
+                "info": {
+                    "settings": {
+                        "os": "Linux",
+                        "arch": "x86_64",
+                        "build_type": "Release"
+                    }
+                },
+                "vendor": false,
+                "conandata": {
+                    "patches": {
+                        "1.4.19": [
+                            {
+                                "patch_file": "patches/1.4.19-0001-open-files-in-binary-mode.patch"
+                            },
+                            {
+                                "patch_file": "patches/1.4.19-0002-ar-lib.patch"
+                            },
+                            {
+                                "patch_file": "patches/1.4.19-0003-msvc-debug-assertion.patch"
+                            },
+                            {
+                                "patch_file": "patches/1.4.19-0004-disable-hardening-in-source.patch"
+                            }
+                        ]
+                    },
+                    "sources": {
+                        "1.4.19": {
+                            "sha256": "63aede5c6d33b6d9b13511cd0be2cac046f2e70fd0a07aa9573a04a82783af96",
+                            "url": [
+                                "https://ftp.gnu.org/gnu/m4/m4-1.4.19.tar.xz",
+                                "https://ftpmirror.gnu.org/gnu/m4/m4-1.4.19.tar.xz"
+                            ]
+                        }
+                    }
+                },
+                "dependencies": {},
+                "context": "build",
+                "test": false
+            },
+            "8": {
+                "ref": "m4/1.4.19#b38ced39a01e31fef5435bc634461fd2",
+                "id": "8",
+                "recipe": "Cache",
+                "package_id": "3593751651824fb813502c69c971267624ced41a",
+                "prev": "cd8019a4f9b70880d548f7cc26569604",
+                "rrev": "b38ced39a01e31fef5435bc634461fd2",
+                "rrev_timestamp": 1700758725.451,
+                "prev_timestamp": 1700759976.449,
+                "remote": null,
+                "binary_remote": "conancenter",
+                "build_id": null,
+                "binary": "Skip",
+                "invalid_build": false,
+                "info_invalid": null,
+                "name": "m4",
+                "user": null,
+                "channel": null,
+                "url": "https://github.com/conan-io/conan-center-index",
+                "license": "GPL-3.0-only",
+                "author": null,
+                "description": "GNU M4 is an implementation of the traditional Unix macro processor",
+                "homepage": "https://www.gnu.org/software/m4/",
+                "build_policy": null,
+                "upload_policy": null,
+                "revision_mode": "hash",
+                "provides": null,
+                "deprecated": null,
+                "win_bash": null,
+                "win_bash_run": null,
+                "default_options": null,
+                "options_description": null,
+                "version": "1.4.19",
+                "topics": [
+                    "macro",
+                    "preprocessor"
+                ],
+                "package_type": "application",
+                "languages": [],
+                "settings": {
+                    "os": "Linux",
+                    "arch": "x86_64",
+                    "compiler": "gcc",
+                    "compiler.cppstd": "gnu14",
+                    "compiler.libcxx": "libstdc++11",
+                    "compiler.version": "10",
+                    "build_type": "Release"
+                },
+                "options": {},
+                "options_definitions": {},
+                "generators": [],
+                "python_requires": null,
+                "system_requires": {},
+                "recipe_folder": "/workspaces/cpp-2/examples2/ci/game/.conan2/p/m4512cc8aabbc4c/e",
+                "source_folder": null,
+                "build_folder": null,
+                "generators_folder": null,
+                "package_folder": null,
+                "immutable_package_folder": null,
+                "cpp_info": {
+                    "root": {
+                        "includedirs": [
+                            "include"
+                        ],
+                        "srcdirs": null,
+                        "libdirs": [
+                            "lib"
+                        ],
+                        "resdirs": null,
+                        "bindirs": [
+                            "bin"
+                        ],
+                        "builddirs": null,
+                        "frameworkdirs": null,
+                        "system_libs": null,
+                        "frameworks": null,
+                        "libs": null,
+                        "defines": null,
+                        "cflags": null,
+                        "cxxflags": null,
+                        "sharedlinkflags": null,
+                        "exelinkflags": null,
+                        "objects": null,
+                        "sources": null,
+                        "sysroot": null,
+                        "requires": null,
+                        "properties": null,
+                        "exe": null,
+                        "type": null,
+                        "location": null,
+                        "link_location": null,
+                        "languages": null
+                    }
+                },
+                "conf_info": {},
+                "label": "m4/1.4.19",
+                "info": {
+                    "settings": {
+                        "os": "Linux",
+                        "arch": "x86_64",
+                        "build_type": "Release"
+                    }
+                },
+                "vendor": false,
+                "conandata": {
+                    "patches": {
+                        "1.4.19": [
+                            {
+                                "patch_file": "patches/1.4.19-0001-open-files-in-binary-mode.patch"
+                            },
+                            {
+                                "patch_file": "patches/1.4.19-0002-ar-lib.patch"
+                            },
+                            {
+                                "patch_file": "patches/1.4.19-0003-msvc-debug-assertion.patch"
+                            },
+                            {
+                                "patch_file": "patches/1.4.19-0004-disable-hardening-in-source.patch"
+                            }
+                        ]
+                    },
+                    "sources": {
+                        "1.4.19": {
+                            "sha256": "63aede5c6d33b6d9b13511cd0be2cac046f2e70fd0a07aa9573a04a82783af96",
+                            "url": [
+                                "https://ftp.gnu.org/gnu/m4/m4-1.4.19.tar.xz",
+                                "https://ftpmirror.gnu.org/gnu/m4/m4-1.4.19.tar.xz"
+                            ]
+                        }
+                    }
+                },
+                "dependencies": {},
+                "context": "build",
+                "test": false
+            },
+            "9": {
+                "ref": "autoconf/2.71#51077f068e61700d65bb05541ea1e4b0",
+                "id": "9",
+                "recipe": "Cache",
+                "package_id": "9a4eb3c8701508aa9458b1a73d0633783ecc2270",
+                "prev": "99b6797cbca3d7afa20648b3e5edd9da",
+                "rrev": "51077f068e61700d65bb05541ea1e4b0",
+                "rrev_timestamp": 1731054366.86,
+                "prev_timestamp": 1731054457.259,
+                "remote": null,
+                "binary_remote": "conancenter",
+                "build_id": null,
+                "binary": "Skip",
+                "invalid_build": false,
+                "info_invalid": null,
+                "name": "autoconf",
+                "user": null,
+                "channel": null,
+                "url": "https://github.com/conan-io/conan-center-index",
+                "license": [
+                    "GPL-2.0-or-later",
+                    "GPL-3.0-or-later"
+                ],
+                "author": null,
+                "description": "Autoconf is an extensible package of M4 macros that produce shell scripts to automatically configure software source code packages",
+                "homepage": "https://www.gnu.org/software/autoconf/",
+                "build_policy": null,
+                "upload_policy": null,
+                "revision_mode": "hash",
+                "provides": null,
+                "deprecated": null,
+                "win_bash": null,
+                "win_bash_run": null,
+                "default_options": null,
+                "options_description": null,
+                "version": "2.71",
+                "topics": [
+                    "configure",
+                    "build"
+                ],
+                "package_type": "application",
+                "languages": [],
+                "settings": {
+                    "os": "Linux",
+                    "arch": "x86_64",
+                    "compiler": "gcc",
+                    "compiler.cppstd": "gnu14",
+                    "compiler.libcxx": "libstdc++11",
+                    "compiler.version": "10",
+                    "build_type": "Release"
+                },
+                "options": {},
+                "options_definitions": {},
+                "generators": [],
+                "python_requires": null,
+                "system_requires": {},
+                "recipe_folder": "/workspaces/cpp-2/examples2/ci/game/.conan2/p/autoc8866aef2bd628/e",
+                "source_folder": null,
+                "build_folder": null,
+                "generators_folder": null,
+                "package_folder": null,
+                "immutable_package_folder": null,
+                "cpp_info": {
+                    "root": {
+                        "includedirs": [
+                            "include"
+                        ],
+                        "srcdirs": null,
+                        "libdirs": [
+                            "lib"
+                        ],
+                        "resdirs": null,
+                        "bindirs": [
+                            "bin"
+                        ],
+                        "builddirs": null,
+                        "frameworkdirs": null,
+                        "system_libs": null,
+                        "frameworks": null,
+                        "libs": null,
+                        "defines": null,
+                        "cflags": null,
+                        "cxxflags": null,
+                        "sharedlinkflags": null,
+                        "exelinkflags": null,
+                        "objects": null,
+                        "sources": null,
+                        "sysroot": null,
+                        "requires": null,
+                        "properties": null,
+                        "exe": null,
+                        "type": null,
+                        "location": null,
+                        "link_location": null,
+                        "languages": null
+                    }
+                },
+                "conf_info": {},
+                "label": "autoconf/2.71",
+                "info": {
+                    "settings": {
+                        "os": "Linux"
+                    }
+                },
+                "vendor": false,
+                "conandata": {
+                    "patches": {
+                        "2.71": [
+                            {
+                                "patch_description": "Replace instances where absolute paths are embedded the generated files",
+                                "patch_file": "patches/2.71-0001-relocatable-autoconf.patch",
+                                "patch_type": "conan"
+                            },
+                            {
+                                "patch_description": "Avoid build machine's perl path to be embedded the generated files",
+                                "patch_file": "patches/2.71-0002-no-perl-path-in-shebang.patch",
+                                "patch_type": "conan"
+                            },
+                            {
+                                "patch_description": "Disable man regeneration",
+                                "patch_file": "patches/2.71-0003-disable-man-regeneration.patch",
+                                "patch_type": "conan"
+                            }
+                        ]
+                    },
+                    "sources": {
+                        "2.71": {
+                            "sha256": "f14c83cfebcc9427f2c3cea7258bd90df972d92eb26752da4ddad81c87a0faa4",
+                            "url": [
+                                "https://ftpmirror.gnu.org/autoconf/autoconf-2.71.tar.xz",
+                                "https://ftp.gnu.org/gnu/autoconf/autoconf-2.71.tar.xz"
+                            ]
+                        }
+                    }
+                },
+                "dependencies": {
+                    "10": {
+                        "ref": "m4/1.4.19",
+                        "require": "m4/1.4.19",
+                        "run": true,
+                        "libs": false,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": true,
+                        "build": false,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": false,
+                        "package_id_mode": null,
+                        "visible": true
+                    },
+                    "11": {
+                        "ref": "m4/1.4.19",
+                        "require": "m4/1.4.19",
+                        "run": true,
+                        "libs": false,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": true,
+                        "build": true,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": false,
+                        "package_id_mode": null,
+                        "visible": false
+                    }
+                },
+                "context": "build",
+                "test": false
+            },
+            "10": {
+                "ref": "m4/1.4.19#b38ced39a01e31fef5435bc634461fd2",
+                "id": "10",
+                "recipe": "Cache",
+                "package_id": "3593751651824fb813502c69c971267624ced41a",
+                "prev": "cd8019a4f9b70880d548f7cc26569604",
+                "rrev": "b38ced39a01e31fef5435bc634461fd2",
+                "rrev_timestamp": 1700758725.451,
+                "prev_timestamp": 1700759976.449,
+                "remote": null,
+                "binary_remote": "conancenter",
+                "build_id": null,
+                "binary": "Skip",
+                "invalid_build": false,
+                "info_invalid": null,
+                "name": "m4",
+                "user": null,
+                "channel": null,
+                "url": "https://github.com/conan-io/conan-center-index",
+                "license": "GPL-3.0-only",
+                "author": null,
+                "description": "GNU M4 is an implementation of the traditional Unix macro processor",
+                "homepage": "https://www.gnu.org/software/m4/",
+                "build_policy": null,
+                "upload_policy": null,
+                "revision_mode": "hash",
+                "provides": null,
+                "deprecated": null,
+                "win_bash": null,
+                "win_bash_run": null,
+                "default_options": null,
+                "options_description": null,
+                "version": "1.4.19",
+                "topics": [
+                    "macro",
+                    "preprocessor"
+                ],
+                "package_type": "application",
+                "languages": [],
+                "settings": {
+                    "os": "Linux",
+                    "arch": "x86_64",
+                    "compiler": "gcc",
+                    "compiler.cppstd": "gnu14",
+                    "compiler.libcxx": "libstdc++11",
+                    "compiler.version": "10",
+                    "build_type": "Release"
+                },
+                "options": {},
+                "options_definitions": {},
+                "generators": [],
+                "python_requires": null,
+                "system_requires": {},
+                "recipe_folder": "/workspaces/cpp-2/examples2/ci/game/.conan2/p/m4512cc8aabbc4c/e",
+                "source_folder": null,
+                "build_folder": null,
+                "generators_folder": null,
+                "package_folder": null,
+                "immutable_package_folder": null,
+                "cpp_info": {
+                    "root": {
+                        "includedirs": [
+                            "include"
+                        ],
+                        "srcdirs": null,
+                        "libdirs": [
+                            "lib"
+                        ],
+                        "resdirs": null,
+                        "bindirs": [
+                            "bin"
+                        ],
+                        "builddirs": null,
+                        "frameworkdirs": null,
+                        "system_libs": null,
+                        "frameworks": null,
+                        "libs": null,
+                        "defines": null,
+                        "cflags": null,
+                        "cxxflags": null,
+                        "sharedlinkflags": null,
+                        "exelinkflags": null,
+                        "objects": null,
+                        "sources": null,
+                        "sysroot": null,
+                        "requires": null,
+                        "properties": null,
+                        "exe": null,
+                        "type": null,
+                        "location": null,
+                        "link_location": null,
+                        "languages": null
+                    }
+                },
+                "conf_info": {},
+                "label": "m4/1.4.19",
+                "info": {
+                    "settings": {
+                        "os": "Linux",
+                        "arch": "x86_64",
+                        "build_type": "Release"
+                    }
+                },
+                "vendor": false,
+                "conandata": {
+                    "patches": {
+                        "1.4.19": [
+                            {
+                                "patch_file": "patches/1.4.19-0001-open-files-in-binary-mode.patch"
+                            },
+                            {
+                                "patch_file": "patches/1.4.19-0002-ar-lib.patch"
+                            },
+                            {
+                                "patch_file": "patches/1.4.19-0003-msvc-debug-assertion.patch"
+                            },
+                            {
+                                "patch_file": "patches/1.4.19-0004-disable-hardening-in-source.patch"
+                            }
+                        ]
+                    },
+                    "sources": {
+                        "1.4.19": {
+                            "sha256": "63aede5c6d33b6d9b13511cd0be2cac046f2e70fd0a07aa9573a04a82783af96",
+                            "url": [
+                                "https://ftp.gnu.org/gnu/m4/m4-1.4.19.tar.xz",
+                                "https://ftpmirror.gnu.org/gnu/m4/m4-1.4.19.tar.xz"
+                            ]
+                        }
+                    }
+                },
+                "dependencies": {},
+                "context": "build",
+                "test": false
+            },
+            "11": {
+                "ref": "m4/1.4.19#b38ced39a01e31fef5435bc634461fd2",
+                "id": "11",
+                "recipe": "Cache",
+                "package_id": "3593751651824fb813502c69c971267624ced41a",
+                "prev": "cd8019a4f9b70880d548f7cc26569604",
+                "rrev": "b38ced39a01e31fef5435bc634461fd2",
+                "rrev_timestamp": 1700758725.451,
+                "prev_timestamp": 1700759976.449,
+                "remote": null,
+                "binary_remote": "conancenter",
+                "build_id": null,
+                "binary": "Skip",
+                "invalid_build": false,
+                "info_invalid": null,
+                "name": "m4",
+                "user": null,
+                "channel": null,
+                "url": "https://github.com/conan-io/conan-center-index",
+                "license": "GPL-3.0-only",
+                "author": null,
+                "description": "GNU M4 is an implementation of the traditional Unix macro processor",
+                "homepage": "https://www.gnu.org/software/m4/",
+                "build_policy": null,
+                "upload_policy": null,
+                "revision_mode": "hash",
+                "provides": null,
+                "deprecated": null,
+                "win_bash": null,
+                "win_bash_run": null,
+                "default_options": null,
+                "options_description": null,
+                "version": "1.4.19",
+                "topics": [
+                    "macro",
+                    "preprocessor"
+                ],
+                "package_type": "application",
+                "languages": [],
+                "settings": {
+                    "os": "Linux",
+                    "arch": "x86_64",
+                    "compiler": "gcc",
+                    "compiler.cppstd": "gnu14",
+                    "compiler.libcxx": "libstdc++11",
+                    "compiler.version": "10",
+                    "build_type": "Release"
+                },
+                "options": {},
+                "options_definitions": {},
+                "generators": [],
+                "python_requires": null,
+                "system_requires": {},
+                "recipe_folder": "/workspaces/cpp-2/examples2/ci/game/.conan2/p/m4512cc8aabbc4c/e",
+                "source_folder": null,
+                "build_folder": null,
+                "generators_folder": null,
+                "package_folder": null,
+                "immutable_package_folder": null,
+                "cpp_info": {
+                    "root": {
+                        "includedirs": [
+                            "include"
+                        ],
+                        "srcdirs": null,
+                        "libdirs": [
+                            "lib"
+                        ],
+                        "resdirs": null,
+                        "bindirs": [
+                            "bin"
+                        ],
+                        "builddirs": null,
+                        "frameworkdirs": null,
+                        "system_libs": null,
+                        "frameworks": null,
+                        "libs": null,
+                        "defines": null,
+                        "cflags": null,
+                        "cxxflags": null,
+                        "sharedlinkflags": null,
+                        "exelinkflags": null,
+                        "objects": null,
+                        "sources": null,
+                        "sysroot": null,
+                        "requires": null,
+                        "properties": null,
+                        "exe": null,
+                        "type": null,
+                        "location": null,
+                        "link_location": null,
+                        "languages": null
+                    }
+                },
+                "conf_info": {},
+                "label": "m4/1.4.19",
+                "info": {
+                    "settings": {
+                        "os": "Linux",
+                        "arch": "x86_64",
+                        "build_type": "Release"
+                    }
+                },
+                "vendor": false,
+                "conandata": {
+                    "patches": {
+                        "1.4.19": [
+                            {
+                                "patch_file": "patches/1.4.19-0001-open-files-in-binary-mode.patch"
+                            },
+                            {
+                                "patch_file": "patches/1.4.19-0002-ar-lib.patch"
+                            },
+                            {
+                                "patch_file": "patches/1.4.19-0003-msvc-debug-assertion.patch"
+                            },
+                            {
+                                "patch_file": "patches/1.4.19-0004-disable-hardening-in-source.patch"
+                            }
+                        ]
+                    },
+                    "sources": {
+                        "1.4.19": {
+                            "sha256": "63aede5c6d33b6d9b13511cd0be2cac046f2e70fd0a07aa9573a04a82783af96",
+                            "url": [
+                                "https://ftp.gnu.org/gnu/m4/m4-1.4.19.tar.xz",
+                                "https://ftpmirror.gnu.org/gnu/m4/m4-1.4.19.tar.xz"
+                            ]
+                        }
+                    }
+                },
+                "dependencies": {},
+                "context": "build",
+                "test": false
+            },
+            "12": {
+                "ref": "automake/1.16.5#b91b7c384c3deaa9d535be02da14d04f",
+                "id": "12",
+                "recipe": "Cache",
+                "package_id": "9a4eb3c8701508aa9458b1a73d0633783ecc2270",
+                "prev": "3900d45338583e35ffd24fa26fd9e682",
+                "rrev": "b91b7c384c3deaa9d535be02da14d04f",
+                "rrev_timestamp": 1755524470.56,
+                "prev_timestamp": 1755524532.914,
+                "remote": null,
+                "binary_remote": "conancenter",
+                "build_id": null,
+                "binary": "Skip",
+                "invalid_build": false,
+                "info_invalid": null,
+                "name": "automake",
+                "user": null,
+                "channel": null,
+                "url": "https://github.com/conan-io/conan-center-index",
+                "license": [
+                    "GPL-2.0-or-later",
+                    "GPL-3.0-or-later"
+                ],
+                "author": null,
+                "description": "Automake is a tool for automatically generating Makefile.in files compliant with the GNU Coding Standards.",
+                "homepage": "https://www.gnu.org/software/automake/",
+                "build_policy": null,
+                "upload_policy": null,
+                "revision_mode": "hash",
+                "provides": null,
+                "deprecated": null,
+                "win_bash": null,
+                "win_bash_run": null,
+                "default_options": null,
+                "options_description": null,
+                "version": "1.16.5",
+                "topics": [
+                    "autotools",
+                    "configure",
+                    "build"
+                ],
+                "package_type": "application",
+                "languages": [],
+                "settings": {
+                    "os": "Linux",
+                    "arch": "x86_64",
+                    "compiler": "gcc",
+                    "compiler.version": "10",
+                    "build_type": "Release"
+                },
+                "options": {},
+                "options_definitions": {},
+                "generators": [],
+                "python_requires": null,
+                "system_requires": {},
+                "recipe_folder": "/workspaces/cpp-2/examples2/ci/game/.conan2/p/automc33ba5c0bcb5c/e",
+                "source_folder": null,
+                "build_folder": null,
+                "generators_folder": null,
+                "package_folder": null,
+                "immutable_package_folder": null,
+                "cpp_info": {
+                    "root": {
+                        "includedirs": [
+                            "include"
+                        ],
+                        "srcdirs": null,
+                        "libdirs": [
+                            "lib"
+                        ],
+                        "resdirs": null,
+                        "bindirs": [
+                            "bin"
+                        ],
+                        "builddirs": null,
+                        "frameworkdirs": null,
+                        "system_libs": null,
+                        "frameworks": null,
+                        "libs": null,
+                        "defines": null,
+                        "cflags": null,
+                        "cxxflags": null,
+                        "sharedlinkflags": null,
+                        "exelinkflags": null,
+                        "objects": null,
+                        "sources": null,
+                        "sysroot": null,
+                        "requires": null,
+                        "properties": null,
+                        "exe": null,
+                        "type": null,
+                        "location": null,
+                        "link_location": null,
+                        "languages": null
+                    }
+                },
+                "conf_info": {},
+                "label": "automake/1.16.5",
+                "info": {
+                    "settings": {
+                        "os": "Linux"
+                    }
+                },
+                "vendor": false,
+                "conandata": {
+                    "patches": {
+                        "1.16.5": [
+                            {
+                                "patch_file": "patches/0001-help2man-no-discard-stderr-1.16.5.patch"
+                            },
+                            {
+                                "patch_file": "patches/0002-no-perl-path-in-shebang-1.16.5.patch"
+                            },
+                            {
+                                "patch_file": "patches/0003-relocatable-automake-1.16.5.patch"
+                            }
+                        ]
+                    },
+                    "sources": {
+                        "1.16.5": {
+                            "sha256": "07bd24ad08a64bc17250ce09ec56e921d6343903943e99ccf63bbf0705e34605",
+                            "url": [
+                                "https://ftpmirror.gnu.org/gnu/automake/automake-1.16.5.tar.gz",
+                                "https://www.mirrorservice.org/sites/ftp.gnu.org/gnu/automake/automake-1.16.5.tar.gz",
+                                "https://ftp.gnu.org/gnu/automake/automake-1.16.5.tar.gz"
+                            ]
+                        }
+                    }
+                },
+                "dependencies": {
+                    "13": {
+                        "ref": "autoconf/2.71",
+                        "require": "autoconf/2.71",
+                        "run": true,
+                        "libs": false,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": true,
+                        "build": false,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": false,
+                        "package_id_mode": null,
+                        "visible": true
+                    },
+                    "14": {
+                        "ref": "m4/1.4.19",
+                        "require": "m4/1.4.19",
+                        "run": true,
+                        "libs": false,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": false,
+                        "build": false,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": false,
+                        "package_id_mode": null,
+                        "visible": true
+                    },
+                    "16": {
+                        "ref": "autoconf/2.71",
+                        "require": "autoconf/2.71",
+                        "run": true,
+                        "libs": false,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": true,
+                        "build": true,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": false,
+                        "package_id_mode": null,
+                        "visible": false
+                    },
+                    "17": {
+                        "ref": "m4/1.4.19",
+                        "require": "m4/1.4.19",
+                        "run": true,
+                        "libs": false,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": false,
+                        "build": true,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": false,
+                        "package_id_mode": null,
+                        "visible": false
+                    }
+                },
+                "context": "build",
+                "test": false
+            },
+            "13": {
+                "ref": "autoconf/2.71#51077f068e61700d65bb05541ea1e4b0",
+                "id": "13",
+                "recipe": "Cache",
+                "package_id": "9a4eb3c8701508aa9458b1a73d0633783ecc2270",
+                "prev": "99b6797cbca3d7afa20648b3e5edd9da",
+                "rrev": "51077f068e61700d65bb05541ea1e4b0",
+                "rrev_timestamp": 1731054366.86,
+                "prev_timestamp": 1731054457.259,
+                "remote": null,
+                "binary_remote": "conancenter",
+                "build_id": null,
+                "binary": "Skip",
+                "invalid_build": false,
+                "info_invalid": null,
+                "name": "autoconf",
+                "user": null,
+                "channel": null,
+                "url": "https://github.com/conan-io/conan-center-index",
+                "license": [
+                    "GPL-2.0-or-later",
+                    "GPL-3.0-or-later"
+                ],
+                "author": null,
+                "description": "Autoconf is an extensible package of M4 macros that produce shell scripts to automatically configure software source code packages",
+                "homepage": "https://www.gnu.org/software/autoconf/",
+                "build_policy": null,
+                "upload_policy": null,
+                "revision_mode": "hash",
+                "provides": null,
+                "deprecated": null,
+                "win_bash": null,
+                "win_bash_run": null,
+                "default_options": null,
+                "options_description": null,
+                "version": "2.71",
+                "topics": [
+                    "configure",
+                    "build"
+                ],
+                "package_type": "application",
+                "languages": [],
+                "settings": {
+                    "os": "Linux",
+                    "arch": "x86_64",
+                    "compiler": "gcc",
+                    "compiler.cppstd": "gnu14",
+                    "compiler.libcxx": "libstdc++11",
+                    "compiler.version": "10",
+                    "build_type": "Release"
+                },
+                "options": {},
+                "options_definitions": {},
+                "generators": [],
+                "python_requires": null,
+                "system_requires": {},
+                "recipe_folder": "/workspaces/cpp-2/examples2/ci/game/.conan2/p/autoc8866aef2bd628/e",
+                "source_folder": null,
+                "build_folder": null,
+                "generators_folder": null,
+                "package_folder": null,
+                "immutable_package_folder": null,
+                "cpp_info": {
+                    "root": {
+                        "includedirs": [
+                            "include"
+                        ],
+                        "srcdirs": null,
+                        "libdirs": [
+                            "lib"
+                        ],
+                        "resdirs": null,
+                        "bindirs": [
+                            "bin"
+                        ],
+                        "builddirs": null,
+                        "frameworkdirs": null,
+                        "system_libs": null,
+                        "frameworks": null,
+                        "libs": null,
+                        "defines": null,
+                        "cflags": null,
+                        "cxxflags": null,
+                        "sharedlinkflags": null,
+                        "exelinkflags": null,
+                        "objects": null,
+                        "sources": null,
+                        "sysroot": null,
+                        "requires": null,
+                        "properties": null,
+                        "exe": null,
+                        "type": null,
+                        "location": null,
+                        "link_location": null,
+                        "languages": null
+                    }
+                },
+                "conf_info": {},
+                "label": "autoconf/2.71",
+                "info": {
+                    "settings": {
+                        "os": "Linux"
+                    }
+                },
+                "vendor": false,
+                "conandata": {
+                    "patches": {
+                        "2.71": [
+                            {
+                                "patch_description": "Replace instances where absolute paths are embedded the generated files",
+                                "patch_file": "patches/2.71-0001-relocatable-autoconf.patch",
+                                "patch_type": "conan"
+                            },
+                            {
+                                "patch_description": "Avoid build machine's perl path to be embedded the generated files",
+                                "patch_file": "patches/2.71-0002-no-perl-path-in-shebang.patch",
+                                "patch_type": "conan"
+                            },
+                            {
+                                "patch_description": "Disable man regeneration",
+                                "patch_file": "patches/2.71-0003-disable-man-regeneration.patch",
+                                "patch_type": "conan"
+                            }
+                        ]
+                    },
+                    "sources": {
+                        "2.71": {
+                            "sha256": "f14c83cfebcc9427f2c3cea7258bd90df972d92eb26752da4ddad81c87a0faa4",
+                            "url": [
+                                "https://ftpmirror.gnu.org/autoconf/autoconf-2.71.tar.xz",
+                                "https://ftp.gnu.org/gnu/autoconf/autoconf-2.71.tar.xz"
+                            ]
+                        }
+                    }
+                },
+                "dependencies": {
+                    "14": {
+                        "ref": "m4/1.4.19",
+                        "require": "m4/1.4.19",
+                        "run": true,
+                        "libs": false,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": true,
+                        "build": false,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": false,
+                        "package_id_mode": null,
+                        "visible": true
+                    },
+                    "15": {
+                        "ref": "m4/1.4.19",
+                        "require": "m4/1.4.19",
+                        "run": true,
+                        "libs": false,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": true,
+                        "build": true,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": false,
+                        "package_id_mode": null,
+                        "visible": false
+                    }
+                },
+                "context": "build",
+                "test": false
+            },
+            "14": {
+                "ref": "m4/1.4.19#b38ced39a01e31fef5435bc634461fd2",
+                "id": "14",
+                "recipe": "Cache",
+                "package_id": "3593751651824fb813502c69c971267624ced41a",
+                "prev": "cd8019a4f9b70880d548f7cc26569604",
+                "rrev": "b38ced39a01e31fef5435bc634461fd2",
+                "rrev_timestamp": 1700758725.451,
+                "prev_timestamp": 1700759976.449,
+                "remote": null,
+                "binary_remote": "conancenter",
+                "build_id": null,
+                "binary": "Skip",
+                "invalid_build": false,
+                "info_invalid": null,
+                "name": "m4",
+                "user": null,
+                "channel": null,
+                "url": "https://github.com/conan-io/conan-center-index",
+                "license": "GPL-3.0-only",
+                "author": null,
+                "description": "GNU M4 is an implementation of the traditional Unix macro processor",
+                "homepage": "https://www.gnu.org/software/m4/",
+                "build_policy": null,
+                "upload_policy": null,
+                "revision_mode": "hash",
+                "provides": null,
+                "deprecated": null,
+                "win_bash": null,
+                "win_bash_run": null,
+                "default_options": null,
+                "options_description": null,
+                "version": "1.4.19",
+                "topics": [
+                    "macro",
+                    "preprocessor"
+                ],
+                "package_type": "application",
+                "languages": [],
+                "settings": {
+                    "os": "Linux",
+                    "arch": "x86_64",
+                    "compiler": "gcc",
+                    "compiler.cppstd": "gnu14",
+                    "compiler.libcxx": "libstdc++11",
+                    "compiler.version": "10",
+                    "build_type": "Release"
+                },
+                "options": {},
+                "options_definitions": {},
+                "generators": [],
+                "python_requires": null,
+                "system_requires": {},
+                "recipe_folder": "/workspaces/cpp-2/examples2/ci/game/.conan2/p/m4512cc8aabbc4c/e",
+                "source_folder": null,
+                "build_folder": null,
+                "generators_folder": null,
+                "package_folder": null,
+                "immutable_package_folder": null,
+                "cpp_info": {
+                    "root": {
+                        "includedirs": [
+                            "include"
+                        ],
+                        "srcdirs": null,
+                        "libdirs": [
+                            "lib"
+                        ],
+                        "resdirs": null,
+                        "bindirs": [
+                            "bin"
+                        ],
+                        "builddirs": null,
+                        "frameworkdirs": null,
+                        "system_libs": null,
+                        "frameworks": null,
+                        "libs": null,
+                        "defines": null,
+                        "cflags": null,
+                        "cxxflags": null,
+                        "sharedlinkflags": null,
+                        "exelinkflags": null,
+                        "objects": null,
+                        "sources": null,
+                        "sysroot": null,
+                        "requires": null,
+                        "properties": null,
+                        "exe": null,
+                        "type": null,
+                        "location": null,
+                        "link_location": null,
+                        "languages": null
+                    }
+                },
+                "conf_info": {},
+                "label": "m4/1.4.19",
+                "info": {
+                    "settings": {
+                        "os": "Linux",
+                        "arch": "x86_64",
+                        "build_type": "Release"
+                    }
+                },
+                "vendor": false,
+                "conandata": {
+                    "patches": {
+                        "1.4.19": [
+                            {
+                                "patch_file": "patches/1.4.19-0001-open-files-in-binary-mode.patch"
+                            },
+                            {
+                                "patch_file": "patches/1.4.19-0002-ar-lib.patch"
+                            },
+                            {
+                                "patch_file": "patches/1.4.19-0003-msvc-debug-assertion.patch"
+                            },
+                            {
+                                "patch_file": "patches/1.4.19-0004-disable-hardening-in-source.patch"
+                            }
+                        ]
+                    },
+                    "sources": {
+                        "1.4.19": {
+                            "sha256": "63aede5c6d33b6d9b13511cd0be2cac046f2e70fd0a07aa9573a04a82783af96",
+                            "url": [
+                                "https://ftp.gnu.org/gnu/m4/m4-1.4.19.tar.xz",
+                                "https://ftpmirror.gnu.org/gnu/m4/m4-1.4.19.tar.xz"
+                            ]
+                        }
+                    }
+                },
+                "dependencies": {},
+                "context": "build",
+                "test": false
+            },
+            "15": {
+                "ref": "m4/1.4.19#b38ced39a01e31fef5435bc634461fd2",
+                "id": "15",
+                "recipe": "Cache",
+                "package_id": "3593751651824fb813502c69c971267624ced41a",
+                "prev": "cd8019a4f9b70880d548f7cc26569604",
+                "rrev": "b38ced39a01e31fef5435bc634461fd2",
+                "rrev_timestamp": 1700758725.451,
+                "prev_timestamp": 1700759976.449,
+                "remote": null,
+                "binary_remote": "conancenter",
+                "build_id": null,
+                "binary": "Skip",
+                "invalid_build": false,
+                "info_invalid": null,
+                "name": "m4",
+                "user": null,
+                "channel": null,
+                "url": "https://github.com/conan-io/conan-center-index",
+                "license": "GPL-3.0-only",
+                "author": null,
+                "description": "GNU M4 is an implementation of the traditional Unix macro processor",
+                "homepage": "https://www.gnu.org/software/m4/",
+                "build_policy": null,
+                "upload_policy": null,
+                "revision_mode": "hash",
+                "provides": null,
+                "deprecated": null,
+                "win_bash": null,
+                "win_bash_run": null,
+                "default_options": null,
+                "options_description": null,
+                "version": "1.4.19",
+                "topics": [
+                    "macro",
+                    "preprocessor"
+                ],
+                "package_type": "application",
+                "languages": [],
+                "settings": {
+                    "os": "Linux",
+                    "arch": "x86_64",
+                    "compiler": "gcc",
+                    "compiler.cppstd": "gnu14",
+                    "compiler.libcxx": "libstdc++11",
+                    "compiler.version": "10",
+                    "build_type": "Release"
+                },
+                "options": {},
+                "options_definitions": {},
+                "generators": [],
+                "python_requires": null,
+                "system_requires": {},
+                "recipe_folder": "/workspaces/cpp-2/examples2/ci/game/.conan2/p/m4512cc8aabbc4c/e",
+                "source_folder": null,
+                "build_folder": null,
+                "generators_folder": null,
+                "package_folder": null,
+                "immutable_package_folder": null,
+                "cpp_info": {
+                    "root": {
+                        "includedirs": [
+                            "include"
+                        ],
+                        "srcdirs": null,
+                        "libdirs": [
+                            "lib"
+                        ],
+                        "resdirs": null,
+                        "bindirs": [
+                            "bin"
+                        ],
+                        "builddirs": null,
+                        "frameworkdirs": null,
+                        "system_libs": null,
+                        "frameworks": null,
+                        "libs": null,
+                        "defines": null,
+                        "cflags": null,
+                        "cxxflags": null,
+                        "sharedlinkflags": null,
+                        "exelinkflags": null,
+                        "objects": null,
+                        "sources": null,
+                        "sysroot": null,
+                        "requires": null,
+                        "properties": null,
+                        "exe": null,
+                        "type": null,
+                        "location": null,
+                        "link_location": null,
+                        "languages": null
+                    }
+                },
+                "conf_info": {},
+                "label": "m4/1.4.19",
+                "info": {
+                    "settings": {
+                        "os": "Linux",
+                        "arch": "x86_64",
+                        "build_type": "Release"
+                    }
+                },
+                "vendor": false,
+                "conandata": {
+                    "patches": {
+                        "1.4.19": [
+                            {
+                                "patch_file": "patches/1.4.19-0001-open-files-in-binary-mode.patch"
+                            },
+                            {
+                                "patch_file": "patches/1.4.19-0002-ar-lib.patch"
+                            },
+                            {
+                                "patch_file": "patches/1.4.19-0003-msvc-debug-assertion.patch"
+                            },
+                            {
+                                "patch_file": "patches/1.4.19-0004-disable-hardening-in-source.patch"
+                            }
+                        ]
+                    },
+                    "sources": {
+                        "1.4.19": {
+                            "sha256": "63aede5c6d33b6d9b13511cd0be2cac046f2e70fd0a07aa9573a04a82783af96",
+                            "url": [
+                                "https://ftp.gnu.org/gnu/m4/m4-1.4.19.tar.xz",
+                                "https://ftpmirror.gnu.org/gnu/m4/m4-1.4.19.tar.xz"
+                            ]
+                        }
+                    }
+                },
+                "dependencies": {},
+                "context": "build",
+                "test": false
+            },
+            "16": {
+                "ref": "autoconf/2.71#51077f068e61700d65bb05541ea1e4b0",
+                "id": "16",
+                "recipe": "Cache",
+                "package_id": "9a4eb3c8701508aa9458b1a73d0633783ecc2270",
+                "prev": "99b6797cbca3d7afa20648b3e5edd9da",
+                "rrev": "51077f068e61700d65bb05541ea1e4b0",
+                "rrev_timestamp": 1731054366.86,
+                "prev_timestamp": 1731054457.259,
+                "remote": null,
+                "binary_remote": "conancenter",
+                "build_id": null,
+                "binary": "Skip",
+                "invalid_build": false,
+                "info_invalid": null,
+                "name": "autoconf",
+                "user": null,
+                "channel": null,
+                "url": "https://github.com/conan-io/conan-center-index",
+                "license": [
+                    "GPL-2.0-or-later",
+                    "GPL-3.0-or-later"
+                ],
+                "author": null,
+                "description": "Autoconf is an extensible package of M4 macros that produce shell scripts to automatically configure software source code packages",
+                "homepage": "https://www.gnu.org/software/autoconf/",
+                "build_policy": null,
+                "upload_policy": null,
+                "revision_mode": "hash",
+                "provides": null,
+                "deprecated": null,
+                "win_bash": null,
+                "win_bash_run": null,
+                "default_options": null,
+                "options_description": null,
+                "version": "2.71",
+                "topics": [
+                    "configure",
+                    "build"
+                ],
+                "package_type": "application",
+                "languages": [],
+                "settings": {
+                    "os": "Linux",
+                    "arch": "x86_64",
+                    "compiler": "gcc",
+                    "compiler.cppstd": "gnu14",
+                    "compiler.libcxx": "libstdc++11",
+                    "compiler.version": "10",
+                    "build_type": "Release"
+                },
+                "options": {},
+                "options_definitions": {},
+                "generators": [],
+                "python_requires": null,
+                "system_requires": {},
+                "recipe_folder": "/workspaces/cpp-2/examples2/ci/game/.conan2/p/autoc8866aef2bd628/e",
+                "source_folder": null,
+                "build_folder": null,
+                "generators_folder": null,
+                "package_folder": null,
+                "immutable_package_folder": null,
+                "cpp_info": {
+                    "root": {
+                        "includedirs": [
+                            "include"
+                        ],
+                        "srcdirs": null,
+                        "libdirs": [
+                            "lib"
+                        ],
+                        "resdirs": null,
+                        "bindirs": [
+                            "bin"
+                        ],
+                        "builddirs": null,
+                        "frameworkdirs": null,
+                        "system_libs": null,
+                        "frameworks": null,
+                        "libs": null,
+                        "defines": null,
+                        "cflags": null,
+                        "cxxflags": null,
+                        "sharedlinkflags": null,
+                        "exelinkflags": null,
+                        "objects": null,
+                        "sources": null,
+                        "sysroot": null,
+                        "requires": null,
+                        "properties": null,
+                        "exe": null,
+                        "type": null,
+                        "location": null,
+                        "link_location": null,
+                        "languages": null
+                    }
+                },
+                "conf_info": {},
+                "label": "autoconf/2.71",
+                "info": {
+                    "settings": {
+                        "os": "Linux"
+                    }
+                },
+                "vendor": false,
+                "conandata": {
+                    "patches": {
+                        "2.71": [
+                            {
+                                "patch_description": "Replace instances where absolute paths are embedded the generated files",
+                                "patch_file": "patches/2.71-0001-relocatable-autoconf.patch",
+                                "patch_type": "conan"
+                            },
+                            {
+                                "patch_description": "Avoid build machine's perl path to be embedded the generated files",
+                                "patch_file": "patches/2.71-0002-no-perl-path-in-shebang.patch",
+                                "patch_type": "conan"
+                            },
+                            {
+                                "patch_description": "Disable man regeneration",
+                                "patch_file": "patches/2.71-0003-disable-man-regeneration.patch",
+                                "patch_type": "conan"
+                            }
+                        ]
+                    },
+                    "sources": {
+                        "2.71": {
+                            "sha256": "f14c83cfebcc9427f2c3cea7258bd90df972d92eb26752da4ddad81c87a0faa4",
+                            "url": [
+                                "https://ftpmirror.gnu.org/autoconf/autoconf-2.71.tar.xz",
+                                "https://ftp.gnu.org/gnu/autoconf/autoconf-2.71.tar.xz"
+                            ]
+                        }
+                    }
+                },
+                "dependencies": {
+                    "17": {
+                        "ref": "m4/1.4.19",
+                        "require": "m4/1.4.19",
+                        "run": true,
+                        "libs": false,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": true,
+                        "build": false,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": false,
+                        "package_id_mode": null,
+                        "visible": true
+                    },
+                    "18": {
+                        "ref": "m4/1.4.19",
+                        "require": "m4/1.4.19",
+                        "run": true,
+                        "libs": false,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": true,
+                        "build": true,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": false,
+                        "package_id_mode": null,
+                        "visible": false
+                    }
+                },
+                "context": "build",
+                "test": false
+            },
+            "17": {
+                "ref": "m4/1.4.19#b38ced39a01e31fef5435bc634461fd2",
+                "id": "17",
+                "recipe": "Cache",
+                "package_id": "3593751651824fb813502c69c971267624ced41a",
+                "prev": "cd8019a4f9b70880d548f7cc26569604",
+                "rrev": "b38ced39a01e31fef5435bc634461fd2",
+                "rrev_timestamp": 1700758725.451,
+                "prev_timestamp": 1700759976.449,
+                "remote": null,
+                "binary_remote": "conancenter",
+                "build_id": null,
+                "binary": "Skip",
+                "invalid_build": false,
+                "info_invalid": null,
+                "name": "m4",
+                "user": null,
+                "channel": null,
+                "url": "https://github.com/conan-io/conan-center-index",
+                "license": "GPL-3.0-only",
+                "author": null,
+                "description": "GNU M4 is an implementation of the traditional Unix macro processor",
+                "homepage": "https://www.gnu.org/software/m4/",
+                "build_policy": null,
+                "upload_policy": null,
+                "revision_mode": "hash",
+                "provides": null,
+                "deprecated": null,
+                "win_bash": null,
+                "win_bash_run": null,
+                "default_options": null,
+                "options_description": null,
+                "version": "1.4.19",
+                "topics": [
+                    "macro",
+                    "preprocessor"
+                ],
+                "package_type": "application",
+                "languages": [],
+                "settings": {
+                    "os": "Linux",
+                    "arch": "x86_64",
+                    "compiler": "gcc",
+                    "compiler.cppstd": "gnu14",
+                    "compiler.libcxx": "libstdc++11",
+                    "compiler.version": "10",
+                    "build_type": "Release"
+                },
+                "options": {},
+                "options_definitions": {},
+                "generators": [],
+                "python_requires": null,
+                "system_requires": {},
+                "recipe_folder": "/workspaces/cpp-2/examples2/ci/game/.conan2/p/m4512cc8aabbc4c/e",
+                "source_folder": null,
+                "build_folder": null,
+                "generators_folder": null,
+                "package_folder": null,
+                "immutable_package_folder": null,
+                "cpp_info": {
+                    "root": {
+                        "includedirs": [
+                            "include"
+                        ],
+                        "srcdirs": null,
+                        "libdirs": [
+                            "lib"
+                        ],
+                        "resdirs": null,
+                        "bindirs": [
+                            "bin"
+                        ],
+                        "builddirs": null,
+                        "frameworkdirs": null,
+                        "system_libs": null,
+                        "frameworks": null,
+                        "libs": null,
+                        "defines": null,
+                        "cflags": null,
+                        "cxxflags": null,
+                        "sharedlinkflags": null,
+                        "exelinkflags": null,
+                        "objects": null,
+                        "sources": null,
+                        "sysroot": null,
+                        "requires": null,
+                        "properties": null,
+                        "exe": null,
+                        "type": null,
+                        "location": null,
+                        "link_location": null,
+                        "languages": null
+                    }
+                },
+                "conf_info": {},
+                "label": "m4/1.4.19",
+                "info": {
+                    "settings": {
+                        "os": "Linux",
+                        "arch": "x86_64",
+                        "build_type": "Release"
+                    }
+                },
+                "vendor": false,
+                "conandata": {
+                    "patches": {
+                        "1.4.19": [
+                            {
+                                "patch_file": "patches/1.4.19-0001-open-files-in-binary-mode.patch"
+                            },
+                            {
+                                "patch_file": "patches/1.4.19-0002-ar-lib.patch"
+                            },
+                            {
+                                "patch_file": "patches/1.4.19-0003-msvc-debug-assertion.patch"
+                            },
+                            {
+                                "patch_file": "patches/1.4.19-0004-disable-hardening-in-source.patch"
+                            }
+                        ]
+                    },
+                    "sources": {
+                        "1.4.19": {
+                            "sha256": "63aede5c6d33b6d9b13511cd0be2cac046f2e70fd0a07aa9573a04a82783af96",
+                            "url": [
+                                "https://ftp.gnu.org/gnu/m4/m4-1.4.19.tar.xz",
+                                "https://ftpmirror.gnu.org/gnu/m4/m4-1.4.19.tar.xz"
+                            ]
+                        }
+                    }
+                },
+                "dependencies": {},
+                "context": "build",
+                "test": false
+            },
+            "18": {
+                "ref": "m4/1.4.19#b38ced39a01e31fef5435bc634461fd2",
+                "id": "18",
+                "recipe": "Cache",
+                "package_id": "3593751651824fb813502c69c971267624ced41a",
+                "prev": "cd8019a4f9b70880d548f7cc26569604",
+                "rrev": "b38ced39a01e31fef5435bc634461fd2",
+                "rrev_timestamp": 1700758725.451,
+                "prev_timestamp": 1700759976.449,
+                "remote": null,
+                "binary_remote": "conancenter",
+                "build_id": null,
+                "binary": "Skip",
+                "invalid_build": false,
+                "info_invalid": null,
+                "name": "m4",
+                "user": null,
+                "channel": null,
+                "url": "https://github.com/conan-io/conan-center-index",
+                "license": "GPL-3.0-only",
+                "author": null,
+                "description": "GNU M4 is an implementation of the traditional Unix macro processor",
+                "homepage": "https://www.gnu.org/software/m4/",
+                "build_policy": null,
+                "upload_policy": null,
+                "revision_mode": "hash",
+                "provides": null,
+                "deprecated": null,
+                "win_bash": null,
+                "win_bash_run": null,
+                "default_options": null,
+                "options_description": null,
+                "version": "1.4.19",
+                "topics": [
+                    "macro",
+                    "preprocessor"
+                ],
+                "package_type": "application",
+                "languages": [],
+                "settings": {
+                    "os": "Linux",
+                    "arch": "x86_64",
+                    "compiler": "gcc",
+                    "compiler.cppstd": "gnu14",
+                    "compiler.libcxx": "libstdc++11",
+                    "compiler.version": "10",
+                    "build_type": "Release"
+                },
+                "options": {},
+                "options_definitions": {},
+                "generators": [],
+                "python_requires": null,
+                "system_requires": {},
+                "recipe_folder": "/workspaces/cpp-2/examples2/ci/game/.conan2/p/m4512cc8aabbc4c/e",
+                "source_folder": null,
+                "build_folder": null,
+                "generators_folder": null,
+                "package_folder": null,
+                "immutable_package_folder": null,
+                "cpp_info": {
+                    "root": {
+                        "includedirs": [
+                            "include"
+                        ],
+                        "srcdirs": null,
+                        "libdirs": [
+                            "lib"
+                        ],
+                        "resdirs": null,
+                        "bindirs": [
+                            "bin"
+                        ],
+                        "builddirs": null,
+                        "frameworkdirs": null,
+                        "system_libs": null,
+                        "frameworks": null,
+                        "libs": null,
+                        "defines": null,
+                        "cflags": null,
+                        "cxxflags": null,
+                        "sharedlinkflags": null,
+                        "exelinkflags": null,
+                        "objects": null,
+                        "sources": null,
+                        "sysroot": null,
+                        "requires": null,
+                        "properties": null,
+                        "exe": null,
+                        "type": null,
+                        "location": null,
+                        "link_location": null,
+                        "languages": null
+                    }
+                },
+                "conf_info": {},
+                "label": "m4/1.4.19",
+                "info": {
+                    "settings": {
+                        "os": "Linux",
+                        "arch": "x86_64",
+                        "build_type": "Release"
+                    }
+                },
+                "vendor": false,
+                "conandata": {
+                    "patches": {
+                        "1.4.19": [
+                            {
+                                "patch_file": "patches/1.4.19-0001-open-files-in-binary-mode.patch"
+                            },
+                            {
+                                "patch_file": "patches/1.4.19-0002-ar-lib.patch"
+                            },
+                            {
+                                "patch_file": "patches/1.4.19-0003-msvc-debug-assertion.patch"
+                            },
+                            {
+                                "patch_file": "patches/1.4.19-0004-disable-hardening-in-source.patch"
+                            }
+                        ]
+                    },
+                    "sources": {
+                        "1.4.19": {
+                            "sha256": "63aede5c6d33b6d9b13511cd0be2cac046f2e70fd0a07aa9573a04a82783af96",
+                            "url": [
+                                "https://ftp.gnu.org/gnu/m4/m4-1.4.19.tar.xz",
+                                "https://ftpmirror.gnu.org/gnu/m4/m4-1.4.19.tar.xz"
+                            ]
+                        }
+                    }
+                },
+                "dependencies": {},
+                "context": "build",
+                "test": false
+            },
+            "19": {
+                "ref": "gnu-config/cci.20210814#69fde734e1a46fd1655b4af46ab40945",
+                "id": "19",
+                "recipe": "Cache",
+                "package_id": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+                "prev": "22618e30bd9e326eb95e824dc90cc860",
+                "rrev": "69fde734e1a46fd1655b4af46ab40945",
+                "rrev_timestamp": 1746203214.947,
+                "prev_timestamp": 1746203274.054,
+                "remote": null,
+                "binary_remote": "conancenter",
+                "build_id": null,
+                "binary": "Skip",
+                "invalid_build": false,
+                "info_invalid": null,
+                "name": "gnu-config",
+                "user": null,
+                "channel": null,
+                "url": "https://github.com/conan-io/conan-center-index",
+                "license": [
+                    "GPL-3.0-or-later",
+                    "autoconf-special-exception"
+                ],
+                "author": null,
+                "description": "The GNU config.guess and config.sub scripts",
+                "homepage": "https://savannah.gnu.org/projects/config/",
+                "build_policy": null,
+                "upload_policy": null,
+                "revision_mode": "hash",
+                "provides": null,
+                "deprecated": null,
+                "win_bash": null,
+                "win_bash_run": null,
+                "default_options": null,
+                "options_description": null,
+                "version": "cci.20210814",
+                "topics": [
+                    "gnu",
+                    "config",
+                    "autotools",
+                    "canonical",
+                    "host",
+                    "build",
+                    "target",
+                    "triplet"
+                ],
+                "package_type": "build-scripts",
+                "languages": [],
+                "settings": {},
+                "options": {},
+                "options_definitions": {},
+                "generators": [],
+                "python_requires": null,
+                "system_requires": {},
+                "recipe_folder": "/workspaces/cpp-2/examples2/ci/game/.conan2/p/gnu-c268c65ee26dc7/e",
+                "source_folder": null,
+                "build_folder": null,
+                "generators_folder": null,
+                "package_folder": null,
+                "immutable_package_folder": null,
+                "cpp_info": {
+                    "root": {
+                        "includedirs": [
+                            "include"
+                        ],
+                        "srcdirs": null,
+                        "libdirs": [
+                            "lib"
+                        ],
+                        "resdirs": null,
+                        "bindirs": [
+                            "bin"
+                        ],
+                        "builddirs": null,
+                        "frameworkdirs": null,
+                        "system_libs": null,
+                        "frameworks": null,
+                        "libs": null,
+                        "defines": null,
+                        "cflags": null,
+                        "cxxflags": null,
+                        "sharedlinkflags": null,
+                        "exelinkflags": null,
+                        "objects": null,
+                        "sources": null,
+                        "sysroot": null,
+                        "requires": null,
+                        "properties": null,
+                        "exe": null,
+                        "type": null,
+                        "location": null,
+                        "link_location": null,
+                        "languages": null
+                    }
+                },
+                "conf_info": {},
+                "label": "gnu-config/cci.20210814",
+                "info": {},
+                "vendor": false,
+                "conandata": {
+                    "patches": {
+                        "cci.20210814": [
+                            {
+                                "patch_description": "add support to tvOS",
+                                "patch_file": "patches/cci.20210814-0001-tvos-support.patch",
+                                "patch_type": "portability"
+                            }
+                        ]
+                    },
+                    "sources": {
+                        "cci.20210814": {
+                            "sha256": "302e5e7f3c4996976c58efde8b2f28f71d51357e784330eeed738e129300dc33",
+                            "url": "http://git.savannah.gnu.org/cgit/config.git/snapshot/config-191bcb948f7191c36eefe634336f5fc5c0c4c2be.tar.gz"
+                        }
+                    }
+                },
+                "dependencies": {},
+                "context": "build",
+                "test": false
+            },
+            "20": {
+                "ref": "pkgconf/2.2.0#4ac315b50ef734072b00ff3aacbf52bf",
+                "id": "20",
+                "recipe": "Cache",
+                "package_id": "c0b621fd4b3199fe05075171573398833dba85f4",
+                "prev": "35e5163b1cf42becef616e6b7873202e",
+                "rrev": "4ac315b50ef734072b00ff3aacbf52bf",
+                "rrev_timestamp": 1755505628.021,
+                "prev_timestamp": 1755505692.229,
+                "remote": null,
+                "binary_remote": "conancenter",
+                "build_id": null,
+                "binary": "Skip",
+                "invalid_build": false,
+                "info_invalid": null,
+                "name": "pkgconf",
+                "user": null,
+                "channel": null,
+                "url": "https://github.com/conan-io/conan-center-index",
+                "license": "ISC",
+                "author": null,
+                "description": "package compiler and linker metadata toolkit",
+                "homepage": "https://git.sr.ht/~kaniini/pkgconf",
+                "build_policy": null,
+                "upload_policy": null,
+                "revision_mode": "hash",
+                "provides": null,
+                "deprecated": null,
+                "win_bash": null,
+                "win_bash_run": null,
+                "default_options": {
+                    "shared": false,
+                    "fPIC": true,
+                    "enable_lib": false
+                },
+                "options_description": null,
+                "version": "2.2.0",
+                "topics": [
+                    "build",
+                    "configuration"
+                ],
+                "package_type": "application",
+                "languages": [],
+                "settings": {
+                    "os": "Linux",
+                    "arch": "x86_64",
+                    "compiler": "gcc",
+                    "compiler.version": "10",
+                    "build_type": "Release"
+                },
+                "options": {
+                    "enable_lib": "False"
+                },
+                "options_definitions": {
+                    "enable_lib": [
+                        "True",
+                        "False"
+                    ]
+                },
+                "generators": [],
+                "python_requires": null,
+                "system_requires": {},
+                "recipe_folder": "/workspaces/cpp-2/examples2/ci/game/.conan2/p/pkgcoab306a552f3bb/e",
+                "source_folder": null,
+                "build_folder": null,
+                "generators_folder": null,
+                "package_folder": null,
+                "immutable_package_folder": null,
+                "cpp_info": {
+                    "root": {
+                        "includedirs": [
+                            "include"
+                        ],
+                        "srcdirs": null,
+                        "libdirs": [
+                            "lib"
+                        ],
+                        "resdirs": null,
+                        "bindirs": [
+                            "bin"
+                        ],
+                        "builddirs": null,
+                        "frameworkdirs": null,
+                        "system_libs": null,
+                        "frameworks": null,
+                        "libs": null,
+                        "defines": null,
+                        "cflags": null,
+                        "cxxflags": null,
+                        "sharedlinkflags": null,
+                        "exelinkflags": null,
+                        "objects": null,
+                        "sources": null,
+                        "sysroot": null,
+                        "requires": null,
+                        "properties": null,
+                        "exe": null,
+                        "type": null,
+                        "location": null,
+                        "link_location": null,
+                        "languages": null
+                    }
+                },
+                "conf_info": {},
+                "label": "pkgconf/2.2.0",
+                "info": {
+                    "settings": {
+                        "os": "Linux",
+                        "arch": "x86_64",
+                        "build_type": "Release"
+                    },
+                    "options": {
+                        "enable_lib": "False"
+                    }
+                },
+                "vendor": false,
+                "conandata": {
+                    "patches": {
+                        "2.2.0": [
+                            {
+                                "patch_file": "patches/2.2.0-0001-PKG_CONF_PATH-allow-colon+semicolon-separator.patch"
+                            }
+                        ]
+                    },
+                    "sources": {
+                        "2.2.0": {
+                            "sha256": "b06ff63a83536aa8c2f6422fa80ad45e4833f590266feb14eaddfe1d4c853c69",
+                            "url": "https://distfiles.ariadne.space/pkgconf/pkgconf-2.2.0.tar.xz"
+                        }
+                    }
+                },
+                "dependencies": {
+                    "21": {
+                        "ref": "meson/1.8.2",
+                        "require": "meson/[>=1.2.2 <2]",
+                        "run": true,
+                        "libs": false,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": true,
+                        "build": true,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": false,
+                        "package_id_mode": null,
+                        "visible": false
+                    },
+                    "22": {
+                        "ref": "ninja/1.13.1",
+                        "require": "ninja/1.13.1",
+                        "run": true,
+                        "libs": false,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": false,
+                        "build": true,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": false,
+                        "package_id_mode": null,
+                        "visible": false
+                    }
+                },
+                "context": "build",
+                "test": false
+            },
+            "21": {
+                "ref": "meson/1.8.2#996f3893995475dbe96a0dce6503b0c8",
+                "id": "21",
+                "recipe": "Cache",
+                "package_id": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+                "prev": "4bc04da65e30aac060f4c7aedf23be78",
+                "rrev": "996f3893995475dbe96a0dce6503b0c8",
+                "rrev_timestamp": 1749715090.803,
+                "prev_timestamp": 1749715186.492,
+                "remote": null,
+                "binary_remote": "conancenter",
+                "build_id": null,
+                "binary": "Skip",
+                "invalid_build": false,
+                "info_invalid": null,
+                "name": "meson",
+                "user": null,
+                "channel": null,
+                "url": "https://github.com/conan-io/conan-center-index",
+                "license": "Apache-2.0",
+                "author": null,
+                "description": "a project to create the best possible next-generation build system",
+                "homepage": "https://github.com/mesonbuild/meson",
+                "build_policy": null,
+                "upload_policy": null,
+                "revision_mode": "hash",
+                "provides": null,
+                "deprecated": null,
+                "win_bash": null,
+                "win_bash_run": null,
+                "default_options": null,
+                "options_description": null,
+                "version": "1.8.2",
+                "topics": [
+                    "mesonbuild",
+                    "build-system"
+                ],
+                "package_type": "application",
+                "languages": [],
+                "settings": {},
+                "options": {},
+                "options_definitions": {},
+                "generators": [],
+                "python_requires": null,
+                "system_requires": {},
+                "recipe_folder": "/workspaces/cpp-2/examples2/ci/game/.conan2/p/mesonc7ba9052dec15/e",
+                "source_folder": null,
+                "build_folder": null,
+                "generators_folder": null,
+                "package_folder": null,
+                "immutable_package_folder": null,
+                "cpp_info": {
+                    "root": {
+                        "includedirs": [
+                            "include"
+                        ],
+                        "srcdirs": null,
+                        "libdirs": [
+                            "lib"
+                        ],
+                        "resdirs": null,
+                        "bindirs": [
+                            "bin"
+                        ],
+                        "builddirs": null,
+                        "frameworkdirs": null,
+                        "system_libs": null,
+                        "frameworks": null,
+                        "libs": null,
+                        "defines": null,
+                        "cflags": null,
+                        "cxxflags": null,
+                        "sharedlinkflags": null,
+                        "exelinkflags": null,
+                        "objects": null,
+                        "sources": null,
+                        "sysroot": null,
+                        "requires": null,
+                        "properties": null,
+                        "exe": null,
+                        "type": null,
+                        "location": null,
+                        "link_location": null,
+                        "languages": null
+                    }
+                },
+                "conf_info": {},
+                "label": "meson/1.8.2",
+                "info": {},
+                "vendor": false,
+                "conandata": {
+                    "sources": {
+                        "1.8.2": {
+                            "sha256": "6b878fb0f6f0318cbd54e13539f89a1a8305791668e8e93ffd59d82722888dac",
+                            "url": "https://github.com/mesonbuild/meson/archive/1.8.2.tar.gz"
+                        }
+                    }
+                },
+                "dependencies": {
+                    "22": {
+                        "ref": "ninja/1.13.1",
+                        "require": "ninja/[>=1.10.2 <2]",
+                        "run": true,
+                        "libs": false,
+                        "skip": false,
+                        "test": false,
+                        "force": false,
+                        "direct": true,
+                        "build": false,
+                        "transitive_headers": null,
+                        "transitive_libs": null,
+                        "headers": false,
+                        "package_id_mode": null,
+                        "visible": true
+                    }
+                },
+                "context": "build",
+                "test": false
+            },
+            "22": {
+                "ref": "ninja/1.13.1#294f8721dbcde145674f7ba44994700e",
+                "id": "22",
+                "recipe": "Cache",
+                "package_id": "3593751651824fb813502c69c971267624ced41a",
+                "prev": "6411b2345296c61c302bf2a6501bb5d9",
+                "rrev": "294f8721dbcde145674f7ba44994700e",
+                "rrev_timestamp": 1753400352.374,
+                "prev_timestamp": 1753400426.762,
+                "remote": null,
+                "binary_remote": "conancenter",
+                "build_id": null,
+                "binary": "Skip",
+                "invalid_build": false,
+                "info_invalid": null,
+                "name": "ninja",
+                "user": null,
+                "channel": null,
+                "url": "https://github.com/conan-io/conan-center-index",
+                "license": "Apache-2.0",
+                "author": null,
+                "description": "Ninja is a small build system with a focus on speed",
+                "homepage": "https://github.com/ninja-build/ninja",
+                "build_policy": null,
+                "upload_policy": null,
+                "revision_mode": "hash",
+                "provides": null,
+                "deprecated": null,
+                "win_bash": null,
+                "win_bash_run": null,
+                "default_options": null,
+                "options_description": null,
+                "version": "1.13.1",
+                "topics": [
+                    "ninja",
+                    "build"
+                ],
+                "package_type": "application",
+                "languages": [],
+                "settings": {
+                    "os": "Linux",
+                    "arch": "x86_64",
+                    "compiler": "gcc",
+                    "compiler.cppstd": "gnu14",
+                    "compiler.libcxx": "libstdc++11",
+                    "compiler.version": "10",
+                    "build_type": "Release"
+                },
+                "options": {},
+                "options_definitions": {},
+                "generators": [],
+                "python_requires": null,
+                "system_requires": {},
+                "recipe_folder": "/workspaces/cpp-2/examples2/ci/game/.conan2/p/ninja9b834eeed06df/e",
+                "source_folder": null,
+                "build_folder": null,
+                "generators_folder": null,
+                "package_folder": null,
+                "immutable_package_folder": null,
+                "cpp_info": {
+                    "root": {
+                        "includedirs": [
+                            "include"
+                        ],
+                        "srcdirs": null,
+                        "libdirs": [
+                            "lib"
+                        ],
+                        "resdirs": null,
+                        "bindirs": [
+                            "bin"
+                        ],
+                        "builddirs": null,
+                        "frameworkdirs": null,
+                        "system_libs": null,
+                        "frameworks": null,
+                        "libs": null,
+                        "defines": null,
+                        "cflags": null,
+                        "cxxflags": null,
+                        "sharedlinkflags": null,
+                        "exelinkflags": null,
+                        "objects": null,
+                        "sources": null,
+                        "sysroot": null,
+                        "requires": null,
+                        "properties": null,
+                        "exe": null,
+                        "type": null,
+                        "location": null,
+                        "link_location": null,
+                        "languages": null
+                    }
+                },
+                "conf_info": {},
+                "label": "ninja/1.13.1",
+                "info": {
+                    "settings": {
+                        "os": "Linux",
+                        "arch": "x86_64",
+                        "build_type": "Release"
+                    }
+                },
+                "vendor": false,
+                "conandata": {
+                    "sources": {
+                        "1.13.1": {
+                            "sha256": "f0055ad0369bf2e372955ba55128d000cfcc21777057806015b45e4accbebf23",
+                            "url": "https://github.com/ninja-build/ninja/archive/v1.13.1.tar.gz"
+                        }
+                    }
+                },
+                "dependencies": {},
+                "context": "build",
+                "test": false
+            },
+            "23": {
+                "ref": "zlib/1.3.1#b8bc2603263cf7eccbd6e17e66b0ed76",
+                "id": "23",
+                "recipe": "Cache",
+                "package_id": "3f0cbc1394cb3fd9f3473d67001da1a496fb5b26",
+                "prev": null,
+                "rrev": "b8bc2603263cf7eccbd6e17e66b0ed76",
+                "rrev_timestamp": 1733936244.862,
+                "prev_timestamp": null,
+                "remote": null,
+                "binary_remote": null,
+                "build_id": null,
+                "binary": "Missing",
+                "invalid_build": false,
+                "info_invalid": null,
+                "name": "zlib",
+                "user": null,
+                "channel": null,
+                "url": "https://github.com/conan-io/conan-center-index",
+                "license": "Zlib",
+                "author": null,
+                "description": "A Massively Spiffy Yet Delicately Unobtrusive Compression Library (Also Free, Not to Mention Unencumbered by Patents)",
+                "homepage": "https://zlib.net",
+                "build_policy": null,
+                "upload_policy": null,
+                "revision_mode": "hash",
+                "provides": null,
+                "deprecated": null,
+                "win_bash": null,
+                "win_bash_run": null,
+                "default_options": {
+                    "shared": false,
+                    "fPIC": true
+                },
+                "options_description": null,
+                "version": "1.3.1",
+                "topics": [
+                    "zlib",
+                    "compression"
+                ],
+                "package_type": "static-library",
+                "languages": [],
+                "settings": {
+                    "os": "Linux",
+                    "arch": "x86_64",
+                    "compiler": "gcc",
+                    "compiler.version": "10",
+                    "build_type": "Release"
+                },
+                "options": {
+                    "fPIC": "True",
+                    "shared": "False"
+                },
+                "options_definitions": {
+                    "shared": [
+                        "True",
+                        "False"
+                    ],
+                    "fPIC": [
+                        "True",
+                        "False"
+                    ]
+                },
+                "generators": [],
+                "python_requires": null,
+                "system_requires": {},
+                "recipe_folder": "/workspaces/cpp-2/examples2/ci/game/.conan2/p/zlib204752602052d/e",
+                "source_folder": null,
+                "build_folder": null,
+                "generators_folder": null,
+                "package_folder": null,
+                "immutable_package_folder": null,
+                "cpp_info": {
+                    "root": {
+                        "includedirs": [
+                            "include"
+                        ],
+                        "srcdirs": null,
+                        "libdirs": [
+                            "lib"
+                        ],
+                        "resdirs": null,
+                        "bindirs": [
+                            "bin"
+                        ],
+                        "builddirs": null,
+                        "frameworkdirs": null,
+                        "system_libs": null,
+                        "frameworks": null,
+                        "libs": null,
+                        "defines": null,
+                        "cflags": null,
+                        "cxxflags": null,
+                        "sharedlinkflags": null,
+                        "exelinkflags": null,
+                        "objects": null,
+                        "sources": null,
+                        "sysroot": null,
+                        "requires": null,
+                        "properties": null,
+                        "exe": null,
+                        "type": null,
+                        "location": null,
+                        "link_location": null,
+                        "languages": null
+                    }
+                },
+                "conf_info": {},
+                "label": "zlib/1.3.1",
+                "info": {
+                    "settings": {
+                        "os": "Linux",
+                        "arch": "x86_64",
+                        "compiler": "gcc",
+                        "compiler.version": "10",
+                        "build_type": "Release"
+                    },
+                    "options": {
+                        "fPIC": "True",
+                        "shared": "False"
+                    }
+                },
+                "vendor": false,
+                "conandata": {
+                    "patches": {
+                        "1.3.1": [
+                            {
+                                "patch_description": "separate static/shared builds, disable debug suffix",
+                                "patch_file": "patches/1.3.1/0001-fix-cmake.patch",
+                                "patch_type": "conan"
+                            }
+                        ]
+                    },
+                    "sources": {
+                        "1.3.1": {
+                            "sha256": "9a93b2b7dfdac77ceba5a558a580e74667dd6fede4585b91eefb60f03b72df23",
+                            "url": [
+                                "https://zlib.net/fossils/zlib-1.3.1.tar.gz",
+                                "https://github.com/madler/zlib/releases/download/v1.3.1/zlib-1.3.1.tar.gz"
+                            ]
+                        }
+                    }
+                },
+                "dependencies": {},
+                "context": "build",
+                "test": false
+            }
+        },
+        "root": {
+            "0": "graphics/1.0"
+        },
+        "overrides": {},
+        "resolved_ranges": {},
+        "replaced_requires": {},
+        "error": null
+    }
+}
