@@ -198,6 +198,23 @@ namespace LCT.APICommunications
 
                 return query.ToString();
             }
+            else if (component.ComponentType.Equals("Cargo", StringComparison.InvariantCultureIgnoreCase))
+            {
+                // Build the AQL query for Cargo components
+                StringBuilder query = new();
+                query.Append("items.find({");
+                query.Append("\"$and\": [");
+                query.Append($"{{ \"repo\":{{ \"$eq\": \"{component.SrcRepoName}\" }} }},");
+                query.Append("{ \"$or\":[");
+                query.Append($"{{ \"@carte.name\":{{ \"$eq\": \"{component.Name}\" }} }} ,");
+                query.Append($"{{ \"@crate.name\":{{ \"$eq\": \"{component.Name.ToLowerInvariant()}\" }} }}");
+                query.Append("] },");
+                query.Append($"{{ \"@crate.version\":{{\"$eq\": \"{component.Version}\" }} }}");
+                query.Append(']');
+                query.Append("}).include(\"repo\", \"path\", \"name\").limit(1)");
+
+                return query.ToString();
+            }
             else
             {
                 var queryList = new List<string>()

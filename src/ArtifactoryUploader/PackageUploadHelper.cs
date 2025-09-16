@@ -138,6 +138,11 @@ namespace LCT.ArtifactoryUploader
                 ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
                 displayPackagesInfo.JfrogNotFoundPackagesDebian.Add(components);
             }
+            else if (item.ComponentType == "CARGO")
+            {
+                ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
+                displayPackagesInfo.JfrogNotFoundPackagesCargo.Add(components);
+            }
 
         }
 
@@ -174,13 +179,17 @@ namespace LCT.ArtifactoryUploader
                 ComponentsToArtifactory components = await GetPackageinfo(item, operationType, responseMessage, dryRunSuffix);
                 displayPackagesInfo.JfrogFoundPackagesDebian.Add(components);
             }
+            else if (item.ComponentType == "CARGO")
+            {
+                ComponentsToArtifactory components = await GetPackageinfo(item, operationType, responseMessage, dryRunSuffix);
+                displayPackagesInfo.JfrogFoundPackagesCargo.Add(components);
+            }
 
         }
         private static async Task SucessfullPackagesAsync(ComponentsToArtifactory item, DisplayPackagesInfo displayPackagesInfo)
         {
             if (item.ComponentType == "NPM")
             {
-
                 ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
                 displayPackagesInfo.SuccessfullPackagesNpm.Add(components);
             }
@@ -209,7 +218,11 @@ namespace LCT.ArtifactoryUploader
                 ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
                 displayPackagesInfo.SuccessfullPackagesDebian.Add(components);
             }
-
+            else if (item.ComponentType == "CARGO")
+            {
+                ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
+                displayPackagesInfo.SuccessfullPackagesCargo.Add(components);
+            }
         }
 
 
@@ -319,6 +332,10 @@ namespace LCT.ArtifactoryUploader
             if (package.ComponentType.Equals("CONAN", StringComparison.OrdinalIgnoreCase))
             {
                 packageNameEXtension = "package.tgz";
+            }
+            if (package.ComponentType.Equals("CARGO", StringComparison.OrdinalIgnoreCase))
+            {
+                packageNameEXtension = ApiConstant.CargoExtension;
             }
 
             return packageNameEXtension;
