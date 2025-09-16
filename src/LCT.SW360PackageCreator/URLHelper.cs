@@ -445,16 +445,11 @@ namespace LCT.SW360PackageCreator
                     var jObj = JObject.Parse(json);
                     var versionToken = jObj["version"];
                     var repository = versionToken?["repository"];
-                    var homepage = versionToken?["homepage"];
 
                     if (repository != null && repository.Type != JTokenType.Null && !string.IsNullOrWhiteSpace(repository.ToString()))
                     {
                         repositoryUrl = repository.ToString();
-                    }
-                    else if (homepage != null && homepage.Type != JTokenType.Null && !string.IsNullOrWhiteSpace(homepage.ToString()))
-                    {
-                        repositoryUrl = homepage.ToString();
-                    }
+                    }                   
                     else
                     {
                         repositoryUrl = "";

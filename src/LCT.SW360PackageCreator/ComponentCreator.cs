@@ -87,9 +87,24 @@ namespace LCT.SW360PackageCreator
                     componentsData.Version = item.Version;
                     componentsData.ComponentExternalId = item.Purl.Substring(0, item.Purl.IndexOf('@'));
                     componentsData.ReleaseExternalId = item.Purl;
-
-                    Components component = await GetSourceUrl(componentsData.Name, componentsData.Version, componentsData.ProjectType, item.BomRef);
-                    componentsData.SourceUrl = component.SourceUrl;
+                    Components component = new Components();
+                    if (componentsData.ProjectType.Equals("CARGO", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        var extRef = item.ExternalReferences?.Find(val => val.Type == ExternalReference.ExternalReferenceType.Distribution);                        
+                        componentsData.SourceUrl = !string.IsNullOrWhiteSpace(extRef?.Url)
+                            ? extRef.Url
+                            : "";
+                        if (string.IsNullOrEmpty(componentsData.SourceUrl))
+                        {
+                            component = await GetSourceUrl(componentsData.Name, componentsData.Version, componentsData.ProjectType, item.BomRef);
+                            componentsData.SourceUrl = component.SourceUrl;
+                        }
+                    }
+                    else
+                    {
+                        component = await GetSourceUrl(componentsData.Name, componentsData.Version, componentsData.ProjectType, item.BomRef);
+                        componentsData.SourceUrl = component.SourceUrl;
+                    }                       
 
                     if (componentsData.ProjectType.Equals("ALPINE", StringComparison.InvariantCultureIgnoreCase))
                     {
