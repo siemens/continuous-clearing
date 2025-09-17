@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:3302f260-b4e8-4e7c-86e2-a772ced53a64",
+  "serialNumber": "urn:uuid:cd5c365d-13f8-4513-b469-8a68723f6be9",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-09-16T06:37:20Z",
+    "timestamp": "2025-09-17T07:44:48Z",
     "tools": {
       "components": [
         {
@@ -60,6 +60,53 @@
         {
           "name": "internal:siemens:clearing:siemens:direct",
           "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "cargo"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:cargo/adler@1.0.2",
+      "name": "adler",
+      "version": "1.0.2",
+      "purl": "pkg:cargo/adler@1.0.2",
+      "externalReferences": [
+        {
+          "url": "https://github.com/jonas-schievink/adler.git",
+          "type": "distribution"
+        }
+      ],
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
         },
         {
           "name": "internal:siemens:clearing:is-internal",
@@ -192,7 +239,7 @@
       "properties": [
         {
           "name": "internal:siemens:clearing:development",
-          "value": "true"
+          "value": "false"
         },
         {
           "name": "internal:siemens:clearing:identifier-type",
@@ -317,9 +364,194 @@
           "value": "Jfrog repo path not found"
         }
       ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:cargo/axum-extra@0.9.3",
+      "name": "axum-extra",
+      "version": "0.9.3",
+      "purl": "pkg:cargo/axum-extra@0.9.3",
+      "externalReferences": [
+        {
+          "url": "https://github.com/tokio-rs/axum",
+          "type": "distribution"
+        }
+      ],
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "cargo"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:cargo/axum-macros@0.4.1",
+      "name": "axum-macros",
+      "version": "0.4.1",
+      "purl": "pkg:cargo/axum-macros@0.4.1",
+      "externalReferences": [
+        {
+          "url": "https://github.com/tokio-rs/axum",
+          "type": "distribution"
+        }
+      ],
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "cargo"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:cargo/backtrace@0.3.71",
+      "name": "backtrace",
+      "version": "0.3.71",
+      "purl": "pkg:cargo/backtrace@0.3.71",
+      "externalReferences": [
+        {
+          "url": "https://github.com/rust-lang/backtrace-rs",
+          "type": "distribution"
+        }
+      ],
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "cargo"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
     }
   ],
-  "dependencies": [],
+  "dependencies": [
+    {
+      "ref": "pkg:cargo/addr2line@0.21.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:cargo/aho-corasick@1.1.3",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:cargo/async-trait@0.1.80",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:cargo/axum@0.7.5",
+      "dependsOn": [
+        "pkg:cargo/async-trait@0.1.80",
+        "pkg:cargo/axum-core@0.4.3"
+      ]
+    },
+    {
+      "ref": "pkg:cargo/axum-core@0.4.3",
+      "dependsOn": [
+        "pkg:cargo/async-trait@0.1.80"
+      ]
+    },
+    {
+      "ref": "pkg:cargo/axum-extra@0.9.3",
+      "dependsOn": [
+        "pkg:cargo/axum@0.7.5",
+        "pkg:cargo/axum-core@0.4.3",
+        "pkg:cargo/axum-macros@0.4.1"
+      ]
+    },
+    {
+      "ref": "pkg:cargo/axum-macros@0.4.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:cargo/backtrace@0.3.71",
+      "dependsOn": [
+        "pkg:cargo/addr2line@0.21.0"
+      ]
+    }
+  ],
   "compositions": [],
   "definitions": {
     "standards": [

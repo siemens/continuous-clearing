@@ -12,11 +12,11 @@
     "Enable": false,
     "ApplicationInsightInstrumentKey": "" //From Application Insight to enable Telemetry
   },
-  
+
   "Directory": {
     "InputFolder": "/PathToInputDirectory", //Input File path. For Docker run set as /mnt/Input
     "OutputFolder": "/PathToOutputDirectory" //Output Bom Folder path. For Docker run set as /mnt/Output    
-  }, 
+  },
   "Npm": {
     "Include": [
       "p*-lock.json",
@@ -194,5 +194,31 @@
     },
     "ReleaseRepo": "<Insert Conan Release RepoName>",
     "DevDepRepo": "<Insert Conan DevDep RepoName>"
+  },
+  "Cargo": {
+    "Include": [
+      "*.metadata.json",
+      "*.cdx.json"
+    ],
+    "Exclude": [],
+    "Artifactory": {
+      "ThirdPartyRepos": [
+        {
+          "Name": "<Insert Cargo 3rd party Repo Name>",
+          "Upload": true
+        }
+      ],
+      "InternalRepos": [
+        "<Insert Cargo Internal Repo Names>"
+      ],
+      "DevRepos": [
+        "<Insert Cargo Dev Repo Name>"
+      ],
+      "RemoteRepos": [
+        "<Insert Cargo Remote Repo Name>"
+      ]
+    },
+    "ReleaseRepo": "<Insert Cargo Release RepoName>",
+    "DevDepRepo": "<Insert Cargo DevDep RepoName>"
   }
 }
