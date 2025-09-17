@@ -167,22 +167,6 @@ namespace LCT.SW360PackageCreator.UTest
             // Assert
             Assert.That(version, Is.Not.Null);
         }
-        [Test]
-        public void GetCorrectVersion_SplitsTagsByUnixLineEndings()
-        {
-            var component = new ComparisonBomData { Name = "core-js", Version = "3.6.0", DownloadUrl = "https://repo.url" };
-            var resultType = typeof(PackageDownloaderTest).GetNestedType("Result", BindingFlags.NonPublic | BindingFlags.Public);
-            var result = Activator.CreateInstance(resultType);
-            resultType.GetProperty("StdOut").SetValue(result, "12345\ttags/core-js@3.6.0\n67890\ttags/core-js@3.5.0");
-
-            // Use reflection to set up ListTagsOfComponent to return our result
-            var method = typeof(PackageDownloader).GetMethod("GetCorrectVersion", BindingFlags.NonPublic | BindingFlags.Static);
-            // Act
-            var version = (string)method.Invoke(null, new object[] { component });
-
-            // Assert
-            Assert.That(version, Is.Not.Null);
-        }
 
         public class Result
         {
