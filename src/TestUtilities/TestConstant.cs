@@ -13,11 +13,13 @@ namespace TestUtilities
     {
         private static readonly TestParam s_testParamObj = new TestParam();
         private static readonly TestParamNuget s_testParamObjnuget = new TestParamNuget();
+        private static readonly TestParamCargo s_testParamObjcargo = new TestParamCargo();
 
         public static readonly string Sw360ComponentApi = $"{s_testParamObj.SW360URL}/resource/api/components";
         public static readonly string Sw360ReleaseApi = $"{s_testParamObj.SW360URL}/resource/api/releases";
         public static readonly string JfrogApi = $"{s_testParamObj.JfrogApi}/api/storage/{s_testParamObj.ThirdPartyDestinationRepoName}";
         public static readonly string JfrogApiNuget = $"{s_testParamObjnuget.JfrogApi}/api/storage/{s_testParamObjnuget.ThirdPartyDestinationRepoName}";
+        public static readonly string JfrogApiCargo = $"{s_testParamObjcargo.JfrogApi}/api/storage/{s_testParamObjcargo.ThirdPartyDestinationRepoName}";
 
 
 
@@ -59,6 +61,11 @@ namespace TestUtilities
         public const string JfrogNugetInternalRepo = "--Nuget:Artifactory:InternalRepos:0";
         public const string JfrogNugetInternalDestRepoName = "--Nuget:ReleaseRepo ";
         public const string JfrogNugetDevDestRepoName = "--Nuget:DevDepRepo ";
+
+        public const string JfrogCargoThirdPartyDestRepoName = "--Cargo:Artifactory:ThirdPartyRepos:0:Name";
+        public const string JfrogCargoInternalRepo = "--Cargo:Artifactory:InternalRepos:0";
+        public const string JfrogCargoInternalDestRepoName = "--Cargo:ReleaseRepo ";
+        public const string JfrogCargoDevDestRepoName = "--Cargo:DevDepRepo ";
 
         public const string JfrogPythonThirdPartyDestRepoName = "--Poetry:Artifactory:ThirdPartyRepos:0:Name";
         public const string JfrogPoetryInternalRepo = "--Poetry:Artifactory:InternalRepos:0";

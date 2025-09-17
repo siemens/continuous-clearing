@@ -41,7 +41,7 @@ namespace TestUtilities
             // Capture and print the output in real-time
             proc.OutputDataReceived += (sender, e) => { if (!string.IsNullOrEmpty(e.Data)) Console.WriteLine("[STDOUT] " + e.Data); };
             proc.ErrorDataReceived += (sender, e) => { if (!string.IsNullOrEmpty(e.Data)) Console.WriteLine("[STDERR] " + e.Data); };
-
+            
             proc.Start();
 
             // Start reading the output asynchronously
