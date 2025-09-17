@@ -11,6 +11,7 @@ using NUnit.Framework;
 using System;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace LCT.SW360PackageCreator.UTest
@@ -148,6 +149,46 @@ namespace LCT.SW360PackageCreator.UTest
 
             // Assert
             Assert.AreEqual(string.Empty, result);
+        }
+        [Test]
+        public void GetCorrectVersion_SplitsTagsByWindowsLineEndings()
+        {
+            // Arrange
+            var component = new ComparisonBomData { Name = "core-js", Version = "3.6.0", DownloadUrl = "https://repo.url" };
+            var resultType = typeof(PackageDownloaderTest).GetNestedType("Result", BindingFlags.NonPublic | BindingFlags.Public);
+
+            var result = Activator.CreateInstance(resultType);
+            resultType.GetProperty("StdOut").SetValue(result, "12345\ttags/core-js@3.6.0\r\n67890\ttags/core-js@3.5.0");
+            var method = typeof(PackageDownloader).GetMethod("GetCorrectVersion", BindingFlags.NonPublic | BindingFlags.Static);
+
+            // Act
+            var version = (string)method.Invoke(null, new object[] { component });
+
+            // Assert
+            Assert.That(version, Is.Not.Null);
+        }
+        [Test]
+        public void GetCorrectVersion_SplitsTagsByUnixLineEndings()
+        {
+            var component = new ComparisonBomData { Name = "core-js", Version = "3.6.0", DownloadUrl = "https://repo.url" };
+            var resultType = typeof(PackageDownloaderTest).GetNestedType("Result", BindingFlags.NonPublic | BindingFlags.Public);
+            var result = Activator.CreateInstance(resultType);
+            resultType.GetProperty("StdOut").SetValue(result, "12345\ttags/core-js@3.6.0\n67890\ttags/core-js@3.5.0");
+
+            // Use reflection to set up ListTagsOfComponent to return our result
+            var method = typeof(PackageDownloader).GetMethod("GetCorrectVersion", BindingFlags.NonPublic | BindingFlags.Static);
+            // Act
+            var version = (string)method.Invoke(null, new object[] { component });
+
+            // Assert
+            Assert.That(version, Is.Not.Null);
+        }
+
+        public class Result
+        {
+            public string StdOut { get; set; }
+            public string StdErr { get; set; }
+            public int ExitCode { get; set; }
         }
     }
 }
