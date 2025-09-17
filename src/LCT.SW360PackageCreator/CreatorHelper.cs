@@ -115,6 +115,10 @@ namespace LCT.SW360PackageCreator
             {
                 downloadPath = await GetAttachmentUrlList(component, localPathforDownload);
             }
+            else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CARGO"]))
+            {
+                downloadPath = await DownloadCargoSource(component, localPathforDownload);
+            }
             else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["ALPINE"]))
             {
                 if (!string.IsNullOrEmpty(component.SourceUrl))
@@ -133,7 +137,29 @@ namespace LCT.SW360PackageCreator
 
             return downloadPath;
         }
+        private async Task<string> DownloadCargoSource(ComparisonBomData component, string localPathforDownload)
+        {
+            if (!string.IsNullOrEmpty(component.DownloadUrl) && component.DownloadUrl.EndsWith("download", StringComparison.OrdinalIgnoreCase))
+            {
+                string fileName = $"{component.Name}-{component.Version}.crate";
+                string downloadFilePath = Path.Combine(localPathforDownload, fileName);
 
+                string? directoryPath = Path.GetDirectoryName(downloadFilePath);
+                if (!string.IsNullOrEmpty(directoryPath))
+                    Directory.CreateDirectory(directoryPath);
+
+                Uri uri = new Uri(component.DownloadUrl);
+                await UrlHelper.DownloadFileAsync(uri, downloadFilePath);
+
+                string tarGzFilePath = Path.Combine(localPathforDownload, $"{component.Name}-{component.Version}-{SOURCE}.tar.gz");
+                if (File.Exists(tarGzFilePath))
+                    File.Delete(tarGzFilePath);
+
+                File.Move(downloadFilePath, tarGzFilePath);
+                return tarGzFilePath;
+            }
+            return await _packageDownloderList["NPM"].DownloadPackage(component, localPathforDownload);
+        }
         private static async Task DownloadDependencyList(ComparisonBomData component)
         {
             string localPathforDownload = $"{Path.GetTempPath()}ClearingTool\\DownloadedFiles/";
@@ -244,6 +270,10 @@ namespace LCT.SW360PackageCreator
                 else if (!string.IsNullOrEmpty(item.ReleaseExternalId) && item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["MAVEN"]))
                 {
                     mapper.DownloadUrl = GetMavenDownloadUrl(mapper, item, releasesInfo);
+                }
+                else if (!string.IsNullOrEmpty(item.ReleaseExternalId) && item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CARGO"]))
+                {
+                    mapper.DownloadUrl = GetCargoComponentDownloadUrl(mapper, item, repo, releasesInfo);
                 }
                 else if (!string.IsNullOrEmpty(item.ReleaseExternalId) && IsOtherPackageType(item))
                 {
@@ -596,7 +626,24 @@ namespace LCT.SW360PackageCreator
 
             return Dataconstant.NotAvailable;
         }
+        public static string GetCargoComponentDownloadUrl(ComparisonBomData mapper, Components item, IRepository repo, ReleasesInfo releasesInfo)
+        {
+            string sourceUrl = mapper.SourceUrl;
 
+            if (mapper.ReleaseStatus.Equals(Dataconstant.Available) && !string.IsNullOrEmpty(releasesInfo?.SourceCodeDownloadUrl))
+            {
+                return releasesInfo.SourceCodeDownloadUrl;
+            }
+
+            if (!string.IsNullOrEmpty(sourceUrl) &&
+                (sourceUrl.EndsWith(".git", StringComparison.OrdinalIgnoreCase) ||
+                 sourceUrl.EndsWith("download", StringComparison.OrdinalIgnoreCase)))
+            {
+                return sourceUrl;
+            }
+
+            return repo.FormGitCloneUrl(sourceUrl, item.Name, item.Version);
+        }
         public static string GetComponentDownloadUrl(ComparisonBomData mapper, Components item, IRepository repo, ReleasesInfo releasesInfo)
         {
 

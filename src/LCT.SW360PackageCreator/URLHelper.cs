@@ -444,11 +444,12 @@ namespace LCT.SW360PackageCreator
                     var json = await response.Content.ReadAsStringAsync();
                     var jObj = JObject.Parse(json);
                     var versionToken = jObj["version"];
-                    var repository = versionToken?["repository"];
+                    var dlPath = versionToken?["dl_path"];
 
-                    if (repository != null && repository.Type != JTokenType.Null && !string.IsNullOrWhiteSpace(repository.ToString()))
+                    if (dlPath != null && dlPath.Type != JTokenType.Null && !string.IsNullOrWhiteSpace(dlPath.ToString()))
                     {
-                        repositoryUrl = repository.ToString();
+                        repositoryUrl = dlPath.ToString();
+                        repositoryUrl = $"{CommonAppSettings.SourceDownloadurlForCargo}{repositoryUrl}";
                     }                   
                     else
                     {

@@ -29,6 +29,7 @@ namespace LCT.Common
         public static string AlpineAportsGitURL { get; set; } = $"https://gitlab.alpinelinux.org/alpine/aports.git";
 
         public static string SourceUrlForCargo { get; set; } = $"https://crates.io/api/v1/crates/";
+        public static string SourceDownloadurlForCargo { get; set; } = $"https://crates.io";
         private string m_ProjectType;
         public CommonAppSettings()
         {
