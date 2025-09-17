@@ -339,8 +339,8 @@ namespace LCT.PackageIdentifier
             {
                 var nodeId = node.Key;
                 var package = node.Value;
-                
-                // Skip root consumer node (usually "0") - this is the project itself, not a dependency
+
+                // Skip root consumer node (usually "0") - this is the project itself, not a dependency, in dep.json file "recipe": "Consumer"
                 if (nodeId == "0")
                     continue;
 
