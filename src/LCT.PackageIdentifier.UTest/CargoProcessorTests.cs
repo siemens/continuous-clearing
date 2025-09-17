@@ -9,6 +9,7 @@ using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
 using Moq;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -30,6 +31,10 @@ namespace LCT.PackageIdentifier.UTest
         {
             if (!System.IO.Directory.Exists(TestFolder))
                 System.IO.Directory.CreateDirectory(TestFolder);
+
+            var dummyFilePath = System.IO.Path.Combine(TestFolder, "dummy.cargo");
+            if (!System.IO.File.Exists(dummyFilePath))
+                System.IO.File.WriteAllText(dummyFilePath, "{}"); // Minimal valid JSON or content
 
             _mockJFrogService = new Mock<IJFrogService>();
             _mockBomHelper = new Mock<IBomHelper>();
@@ -197,7 +202,7 @@ namespace LCT.PackageIdentifier.UTest
         {
             return new CommonAppSettings
             {
-                //Directory = new LCT.Common.Model.Directory { InputFolder = TestFolder },
+                Directory = new LCT.Common.Model.Directory { InputFolder = TestFolder },
                 Cargo = new Config
                 {
                     Artifactory = new Artifactory
@@ -206,7 +211,8 @@ namespace LCT.PackageIdentifier.UTest
                         ThirdPartyRepos = new List<ThirdPartyRepo> { new ThirdPartyRepo { Name = "repo1", Upload = true } }
                     },
                     DevDepRepo = "dev-repo",
-                    ReleaseRepo = "release-repo"
+                    ReleaseRepo = "release-repo",
+                    Exclude = Array.Empty<string>()
                 },
                 ProjectType = "CARGO"
             };
