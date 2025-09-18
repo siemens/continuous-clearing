@@ -53,7 +53,6 @@ namespace LCT.PackageIdentifier.UTest
         [Test]
         public void GetDetailsforManuallyAddedComp_CoversMethod()
         {
-            // Arrange: Create a list of components
             var components = new List<Component>
     {
         new Component
@@ -65,13 +64,11 @@ namespace LCT.PackageIdentifier.UTest
         }
     };
 
-            // Use reflection to invoke the private static method
             var method = typeof(CargoProcessor).GetMethod("GetDetailsforManuallyAddedComp", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
             Assert.NotNull(method, "Could not find GetDetailsforManuallyAddedComp method via reflection.");
 
             method.Invoke(null, new object[] { components });
 
-            // Assert: Check that the expected properties were added
             var propNames = components[0].Properties.Select(p => p.Name).ToList();
             Assert.Contains(Dataconstant.Cdx_IsDevelopment, propNames);
             Assert.Contains(Dataconstant.Cdx_IdentifierType, propNames);
