@@ -297,7 +297,7 @@ namespace LCT.PackageIdentifier
         {
             try
             {
-                using (var dsa = DSA.Create())
+                using (var dsa = DSA.Create()) //NOSONAR
                 {
                     dsa.ImportSubjectPublicKeyInfo(publicKeyBytes, out _);
                     if (dsa.VerifyData(data, signature, HashAlgorithmName.SHA256))

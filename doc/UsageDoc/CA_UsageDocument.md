@@ -208,6 +208,22 @@ Users have the flexibility to generate a basic SBOM even if connections to SW360
       After successful execution, output.sbom.cdx.json (*CycloneDX.json*) file will be created in specified directory
 
       Resulted output.sbom.cdx.json file will be having the list of installed packages  and the same file will be used as  an input to Continuous clearing tool - Package identifier via the input directory parameter. The remaining process is same as other project types.
+    
+  * **Project Type :** **Choco**
+    
+     **Overview**
+     The ChocoProcessor is a component designed to scan and process Chocolatey (choco.config) package configuration files. It generates a CycloneDX-compatible Bill of Materials (BOM) for use in software composition analysis and compliance workflows. This processor is part of a broader system that also supports other package types such as NuGet and NPM.
+    
+     **What You Need**
+      •	Input Folder: A directory containing one or more valid **choco.config** files.
+      •	Configuration: Application settings must specify the correct input folder and enable Chocolatey processing.
+      •	Dependencies: The system must have all required libraries and configuration for CycloneDX, logging, and helper utilities.
+
+    **Notes**
+      •	No Dependency Extraction: The current implementation does not extract or include dependencies for Chocolatey packages.
+      •	Automatic Tagging: All Chocolatey components are marked as SiemensDirect by default.
+      •	Logging: Debug and process information is logged using the system’s logging configuration.
+  
 ## SPDX v2.3 Support
 
 The Package Identifier supports importing both supported and unsupported SPDX SBoMs and processes them correctly for inclusion in workflows.
