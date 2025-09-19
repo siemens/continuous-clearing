@@ -57,11 +57,7 @@ namespace LCT.PackageIdentifier
 
             // No dependencies for now
             bom.Dependencies = new List<Dependency>();
-
-            if (bom != null)
-            {
-                AddSiemensDirectProperty(ref bom);
-            }
+            AddSiemensDirectProperty(ref bom);
             AddSiemensDirectProperty(ref ListUnsupportedComponentsForBom);
 
             unSupportedBomList.Components = ListUnsupportedComponentsForBom.Components;
@@ -84,7 +80,7 @@ namespace LCT.PackageIdentifier
             foreach (var component in bomComponentsList)
             {
                 // setting SiemensDirect property to true by default for choco packages
-                string siemensDirectValue = "true";
+                const string siemensDirectValue = "true";
 
                 component.Properties ??= new List<Property>();
                 var properties = component.Properties;

@@ -360,30 +360,44 @@ namespace LCT.PackageIdentifier
         }
 
         public async Task<ComponentIdentification> IdentificationOfInternalComponents(
-            ComponentIdentification componentData, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
+        ComponentIdentification componentData, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
-            // get the component list from Jfrog for given repo
+            ValidateIdentificationOfInternalComponentsParameters(componentData, appSettings, jFrogService, bomhelper);
+            return await IdentificationOfInternalComponentsAsync(componentData, appSettings, jFrogService, bomhelper);
+        }
+
+        private static void ValidateIdentificationOfInternalComponentsParameters(
+        ComponentIdentification componentData, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
+        {
+            if (appSettings == null)
+                throw new ArgumentNullException(nameof(appSettings), "appSettings cannot be null.");
+            if (componentData == null)
+                throw new ArgumentNullException(nameof(componentData), "componentData cannot be null.");
+            if (jFrogService == null)
+                throw new ArgumentNullException(nameof(jFrogService), "jFrogService cannot be null.");
+            if (bomhelper == null)
+                throw new ArgumentNullException(nameof(bomhelper), "bomhelper cannot be null.");
+        }
+
+        private static async Task<ComponentIdentification> IdentificationOfInternalComponentsAsync(
+        ComponentIdentification componentData, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
+        {
             List<AqlResult> aqlResultList;
 
-            // If project type is CHOCO, then get the component list from CHOCO internal repo
-            // Since CHOCO repo also contains NUGET packages 
-            if (appSettings?.ProjectType != null && appSettings.ProjectType.Equals("CHOCO", StringComparison.InvariantCultureIgnoreCase))
+            if (appSettings.ProjectType != null && appSettings.ProjectType.Equals("CHOCO", StringComparison.InvariantCultureIgnoreCase))
             {
                 aqlResultList = await bomhelper.GetListOfComponentsFromRepo(appSettings.Choco.Artifactory.InternalRepos, jFrogService);
             }
             else
             {
-                // For NUGET project type, get the component list from NUGET internal repo
                 aqlResultList = await bomhelper.GetListOfComponentsFromRepo(appSettings.Nuget.Artifactory.InternalRepos, jFrogService);
             }
             var inputIterationList = componentData.comparisonBOMData;
 
-            // Use the common helper method
             var (processedComponents, internalComponents) = CommonHelper.ProcessInternalComponentIdentification(
                 inputIterationList,
                 component => IsInternalNugetComponent(aqlResultList, component, bomhelper));
 
-            // update the comparison bom data
             componentData.comparisonBOMData = processedComponents;
             componentData.internalComponents = internalComponents;
 

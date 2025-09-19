@@ -1,0 +1,870 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:97b0f84a-7977-41f5-8304-af708da85fa0",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2025-09-09T05:51:21Z",
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "supplier": {
+            "name": "Siemens AG"
+          },
+          "name": "Clearing Automation Tool",
+          "version": "8.2.0",
+          "externalReferences": [
+            {
+              "url": "https://github.com/siemens/continuous-clearing",
+              "type": "website"
+            }
+          ]
+        }
+      ]
+    },
+    "component": {
+      "type": "application",
+      "name": "Test",
+      "version": "1.0"
+    },
+    "properties": [
+      {
+        "name": "siemens:profile",
+        "value": "clearing"
+      }
+    ]
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/tep-testrunner@8.4.6",
+      "name": "tep-testrunner",
+      "version": "8.4.6",
+      "hashes": [
+        {
+          "alg": "MD5",
+          "content": "90061253da99adad16da764db97924d4"
+        },
+        {
+          "alg": "SHA-1",
+          "content": "99889ea208e30ef31758560c2a09b97aebe3e377"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "3a1926350ea41122829485a45a60953dc43a0731ad59023b4666e250796dc693"
+        }
+      ],
+      "purl": "pkg:nuget/tep-testrunner@8.4.6",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "energy_choco-release-nuget-egll"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Choco"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "tep-testrunner.8.4.6.nupkg"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "energy_choco-release-nuget-egll/tep-testrunner.8.4.6.nupkg"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/tep-testrunner-plugin-electricalsockets@8.3.3",
+      "name": "tep-testrunner-plugin-electricalsockets",
+      "version": "8.3.3",
+      "hashes": [
+        {
+          "alg": "MD5",
+          "content": "fdea25b72e54ed585ca2ff55cdc99c69"
+        },
+        {
+          "alg": "SHA-1",
+          "content": "c7f2beea308def5b795bdb6fce8e0ad845fe7c4d"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "cff06ca0e88badde075509ca55d023b8ab6c0308f3d170dab2ee5fe1cda93356"
+        }
+      ],
+      "purl": "pkg:nuget/tep-testrunner-plugin-electricalsockets@8.3.3",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "energy_choco-release-nuget-egll"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Choco"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "tep-testrunner-plugin-electricalsockets.8.3.3.nupkg"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "energy_choco-release-nuget-egll/tep-testrunner-plugin-electricalsockets.8.3.3.nupkg"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/tep-testrunner-plugin-occ@8.6.4",
+      "name": "tep-testrunner-plugin-occ",
+      "version": "8.6.4",
+      "hashes": [
+        {
+          "alg": "MD5",
+          "content": "66c687d52bc9c87b6aee1b991102a035"
+        },
+        {
+          "alg": "SHA-1",
+          "content": "f71d733de70ae5e1bc8aa55b52746fcfe244345e"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "f7c8cd1b2d7702e31c015acad11ae03abd356ab6e2d8b7c27b3a511c8e23c047"
+        }
+      ],
+      "purl": "pkg:nuget/tep-testrunner-plugin-occ@8.6.4",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "energy_choco-release-nuget-egll"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Choco"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "tep-testrunner-plugin-occ.8.6.4.nupkg"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "energy_choco-release-nuget-egll/tep-testrunner-plugin-occ.8.6.4.nupkg"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/tep-testrunner-plugin-pytest@8.1.5",
+      "name": "tep-testrunner-plugin-pytest",
+      "version": "8.1.5",
+      "hashes": [
+        {
+          "alg": "MD5",
+          "content": "615b4fdda4b5e4f32238e8b85da8a99a"
+        },
+        {
+          "alg": "SHA-1",
+          "content": "f69ff7cc8d930d87b9006a8d6e876034b4313a94"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "a4a81d138539243106479e66cb813a923e799bfa9bfd89ea5a27d2ffbe583b1c"
+        }
+      ],
+      "purl": "pkg:nuget/tep-testrunner-plugin-pytest@8.1.5",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "energy_choco-release-nuget-egll"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Choco"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "tep-testrunner-plugin-pytest.8.1.5.nupkg"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "energy_choco-release-nuget-egll/tep-testrunner-plugin-pytest.8.1.5.nupkg"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/tep-testrunner-plugin-siprotec5@8.17.0",
+      "name": "tep-testrunner-plugin-siprotec5",
+      "version": "8.17.0",
+      "hashes": [
+        {
+          "alg": "MD5",
+          "content": "3a831be78f65a05a73a8d1cc03724915"
+        },
+        {
+          "alg": "SHA-1",
+          "content": "29615f568f54c14466e508c37f92976da161de4e"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "da29d8bbc65a1f521d50b281b53860cf8b09905439139f1a7a1b13dc6e69eac4"
+        }
+      ],
+      "purl": "pkg:nuget/tep-testrunner-plugin-siprotec5@8.17.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "energy_choco-release-nuget-egll"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Choco"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "tep-testrunner-plugin-siprotec5.8.17.0.nupkg"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "energy_choco-release-nuget-egll/tep-testrunner-plugin-siprotec5.8.17.0.nupkg"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/tep-testrunner-plugin-unigrid@0.1.3",
+      "name": "tep-testrunner-plugin-unigrid",
+      "version": "0.1.3",
+      "hashes": [
+        {
+          "alg": "MD5",
+          "content": "770d7e9641d7dfcdea00ff4c4d13f09c"
+        },
+        {
+          "alg": "SHA-1",
+          "content": "1df6812ace90f2f922c161f53e08c1f5a89c622c"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "9c744f9e3fbc2f618cedf132d325583f87a12a4a9d01b60c26de6fb56eeab1f8"
+        }
+      ],
+      "purl": "pkg:nuget/tep-testrunner-plugin-unigrid@0.1.3",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "energy_choco-release-nuget-egll"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Choco"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "tep-testrunner-plugin-unigrid.0.1.3.nupkg"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "energy_choco-release-nuget-egll/tep-testrunner-plugin-unigrid.0.1.3.nupkg"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/tep-testrunner-plugin-vstest@8.1.1",
+      "name": "tep-testrunner-plugin-vstest",
+      "version": "8.1.1",
+      "hashes": [
+        {
+          "alg": "MD5",
+          "content": "43d4c674754c15d1b9deb70fb2a64fc3"
+        },
+        {
+          "alg": "SHA-1",
+          "content": "bc839da060fd27b641a4a41c19621665cb4781c5"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "6bf20ab27d811c73f7b492d700ca0ec000dac370f6299bbc56373472baf0ee14"
+        }
+      ],
+      "purl": "pkg:nuget/tep-testrunner-plugin-vstest@8.1.1",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "energy_choco-release-nuget-egll"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Choco"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "tep-testrunner-plugin-vstest.8.1.1.nupkg"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "energy_choco-release-nuget-egll/tep-testrunner-plugin-vstest.8.1.1.nupkg"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/sip5-cfgtools-sipcc@10.0.3",
+      "name": "sip5-cfgtools-sipcc",
+      "version": "10.0.3",
+      "hashes": [
+        {
+          "alg": "MD5",
+          "content": "618bc640d9037f03b5dbc43f2113eb1f"
+        },
+        {
+          "alg": "SHA-1",
+          "content": "ed7e3a00c9667897e2313f407d42266c354a2045"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "20dc9ec115740a53eb0c5d7d025e484c19a318a1c2d88dc26358f990891cb376"
+        }
+      ],
+      "purl": "pkg:nuget/sip5-cfgtools-sipcc@10.0.3",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "energy_choco-dev-nuget-egll"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Choco"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "sip5-cfgtools-sipcc.10.0.3.nupkg"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "energy_choco-dev-nuget-egll/sip5-cfgtools-sipcc.10.0.3.nupkg"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/sip5-dla@10.0.19",
+      "name": "sip5-dla",
+      "version": "10.0.19",
+      "hashes": [
+        {
+          "alg": "MD5",
+          "content": "b0345a33b3083ba39aca78ef78349833"
+        },
+        {
+          "alg": "SHA-1",
+          "content": "38cd9085b827d063c35d7d1564a76903602e8139"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "4fddf4f27b086bb1c9e77d2df1d1d4d8141301c0ff6a60acc884ef51a82bc845"
+        }
+      ],
+      "purl": "pkg:nuget/sip5-dla@10.0.19",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "energy_choco-release-nuget-egll"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Choco"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "sip5-dla.10.0.19.nupkg"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "energy_choco-release-nuget-egll/sip5-dla.10.0.19.nupkg"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/om-testmodules@4.40.9-b344160-Adaptions183",
+      "name": "om-testmodules",
+      "version": "4.40.9-b344160-Adaptions183",
+      "purl": "pkg:nuget/om-testmodules@4.40.9-b344160-Adaptions183",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Choco"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": ""
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/om-testmodules@4.31.40",
+      "name": "om-testmodules",
+      "version": "4.31.40",
+      "hashes": [
+        {
+          "alg": "MD5",
+          "content": "cecf54f88bcf7f65c03d1b6b9d819d3d"
+        },
+        {
+          "alg": "SHA-1",
+          "content": "67f8dee67de8d5221dcbe53ddb2aae640abef85e"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "8974e5f9e6dc7e8a4a0dd7128096a21b5ddad6759a09eabdfc21dced84c71837"
+        }
+      ],
+      "purl": "pkg:nuget/om-testmodules@4.31.40",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "energy_choco-release-nuget-egll"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Choco"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "om-testmodules.4.31.40.nupkg"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "energy_choco-release-nuget-egll/om-testmodules.4.31.40.nupkg"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/cmengine-rest-server@2.1.0",
+      "name": "cmengine-rest-server",
+      "version": "2.1.0",
+      "hashes": [
+        {
+          "alg": "MD5",
+          "content": "81d19d8183da58bbbe32cd5718723488"
+        },
+        {
+          "alg": "SHA-1",
+          "content": "ccc1b07fe0f8c2301cef1a2dc8123928cfd810d3"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "dfe70bd2ff409ea3f94fef617e34a2b8252c37198e526915ad1c6be99707004f"
+        }
+      ],
+      "purl": "pkg:nuget/cmengine-rest-server@2.1.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "energy_choco-release-nuget-egll"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Choco"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "cmengine-rest-server.2.1.0.nupkg"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "energy_choco-release-nuget-egll/cmengine-rest-server.2.1.0.nupkg"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/om-testprograms-en@1.52.0",
+      "name": "om-testprograms-en",
+      "version": "1.52.0",
+      "hashes": [
+        {
+          "alg": "MD5",
+          "content": "10daa710992b4cbd89ffee5ece53d6bb"
+        },
+        {
+          "alg": "SHA-1",
+          "content": "f0eae8f733e0f0212aea1ee0aa4a59709ddbc596"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "8fd74829859a023ba34a4f328dd2dad2fe63c8bbcc08c7e2d723e56831b2dc83"
+        }
+      ],
+      "purl": "pkg:nuget/om-testprograms-en@1.52.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "energy_choco-release-nuget-egll"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Choco"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "om-testprograms-en.1.52.0.nupkg"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "energy_choco-release-nuget-egll/om-testprograms-en.1.52.0.nupkg"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/digsi5-copy-server@10.0.197",
+      "name": "digsi5-copy-server",
+      "version": "10.0.197",
+      "hashes": [
+        {
+          "alg": "MD5",
+          "content": "9a848abff185cc4c32436b266c534ab1"
+        },
+        {
+          "alg": "SHA-1",
+          "content": "7daef2b9067b552ed132ea9205bafd29c196867c"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "b3ce1d762857659f18b6f613a81bb3baa35e79715ccc8c927a35137df2c1006f"
+        }
+      ],
+      "purl": "pkg:nuget/digsi5-copy-server@10.0.197",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "energy_choco-dev-nuget-egll"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Choco"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "digsi5-copy-server.10.0.197.nupkg"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "energy_choco-dev-nuget-egll/digsi5-copy-server.10.0.197.nupkg"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/digsi5-copy-server@9.90.314",
+      "name": "digsi5-copy-server",
+      "version": "9.90.314",
+      "hashes": [
+        {
+          "alg": "MD5",
+          "content": "c436f18c2dc7853d8d87280eb7d12ea6"
+        },
+        {
+          "alg": "SHA-1",
+          "content": "b1fef5fa96b9a27062f376b3525789ac5af5da0a"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "88333e618950fb6244e6fd960be947481ef18ae33230053c771e5f12835186fc"
+        }
+      ],
+      "purl": "pkg:nuget/digsi5-copy-server@9.90.314",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "energy_choco-dev-nuget-egll"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Choco"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "digsi5-copy-server.9.90.314.nupkg"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "energy_choco-dev-nuget-egll/digsi5-copy-server.9.90.314.nupkg"
+        }
+      ]
+    }
+  ],
+  "dependencies": [],
+  "compositions": [],
+  "definitions": {
+    "standards": [
+      {
+        "bom-ref": "standard-bom",
+        "name": "Standard BOM",
+        "version": "3.0.0",
+        "description": "The Standard for Software Bills of Materials in Siemens",
+        "owner": "Siemens AG",
+        "externalReferences": [
+          {
+            "url": "https://sbom.siemens.io/",
+            "type": "website"
+          }
+        ]
+      }
+    ]
+  }
+}
