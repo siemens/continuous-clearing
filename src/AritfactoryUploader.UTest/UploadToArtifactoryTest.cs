@@ -605,4 +605,112 @@ namespace AritfactoryUploader.UTest
             return componentLists;
         }
     }
+// ...existing code...
+
+[TestFixture]
+public class GetArtifactoryRepoNameTests
+{
+    [Test]
+    public void GetArtifactoryRepoName_PyPiComponent_MatchesNameAndVersion_ReturnsAqlResult()
+    {
+        // Arrange
+        var component = new Component
+        {
+            Purl = "pkg:pypi/example-package@1.0.0",
+            Name = "example-package",
+            Version = "1.0.0"
+        };
+        var aqlResultList = new List<AqlResult>
+        {
+            new AqlResult
+            {
+                Properties = new List<AqlProperty>
+                {
+                    new AqlProperty { Key = "pypi.normalized.name", Value = "example-package" },
+                    new AqlProperty { Key = "pypi.version", Value = "1.0.0" }
+                }
+            }
+        };
+
+        // Act
+        var result = typeof(UploadToArtifactory)
+            .GetMethod("GetArtifactoryRepoName", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+            .Invoke(null, new object[] { aqlResultList, component }) as AqlResult;
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.AreEqual("example-package", result.Properties[0].Value);
+        Assert.AreEqual("1.0.0", result.Properties[1].Value);
+    }
+
+    [Test]
+    public void GetArtifactoryRepoName_NpmComponent_MatchesNameAndVersion_ReturnsAqlResult()
+    {
+        // Arrange
+        var component = new Component
+        {
+            Purl = "pkg:npm/example-npm@2.0.0",
+            Name = "example-npm",
+            Version = "2.0.0"
+        };
+        var aqlResultList = new List<AqlResult>
+        {
+            new AqlResult
+            {
+                Properties = new List<AqlProperty>
+                {
+                    new AqlProperty { Key = "npm.name", Value = "example-npm" },
+                    new AqlProperty { Key = "npm.version", Value = "2.0.0" }
+                }
+            }
+        };
+
+        // Act
+        var result = typeof(UploadToArtifactory)
+            .GetMethod("GetArtifactoryRepoName", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+            .Invoke(null, new object[] { aqlResultList, component }) as AqlResult;
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.AreEqual("example-npm", result.Properties[0].Value);
+        Assert.AreEqual("2.0.0", result.Properties[1].Value);
+    }
+
+    [Test]
+    public void GetArtifactoryRepoName_CargoComponent_MatchesNameAndVersion_ReturnsAqlResult()
+    {
+        // Arrange
+        var component = new Component
+        {
+            Purl = "pkg:cargo/example-cargo@3.0.0",
+            Name = "example-cargo",
+            Version = "3.0.0"
+        };
+        var aqlResultList = new List<AqlResult>
+        {
+            new AqlResult
+            {
+                Properties = new List<AqlProperty>
+                {
+                    new AqlProperty { Key = "crate.name", Value = "example-cargo" },
+                    new AqlProperty { Key = "crate.version", Value = "3.0.0" }
+                }
+            }
+        };
+
+        // Act
+        var result = typeof(UploadToArtifactory)
+            .GetMethod("GetArtifactoryRepoName", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+            .Invoke(null, new object[] { aqlResultList, component }) as AqlResult;
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.AreEqual("example-cargo", result.Properties[0].Value);
+        Assert.AreEqual("3.0.0", result.Properties[1].Value);
+    }
+
+    
+}
+
+
 }
