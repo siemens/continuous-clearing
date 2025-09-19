@@ -196,9 +196,9 @@ Users have the flexibility to generate a basic SBOM even if connections to SW360
     * Input file repository should contain **conan.lock** file.
    
   * **Project Type :** **Cargo**
-
-    *  Run the command given below by replacing the place holder values (i.e., path to input image directory, path to input directory and file name of the Debian         image to be cleared) with actual values.
-
+ 
+    *  Run the command given below (i.e., To generate a metadata file for your project, run the following command in your project directory (where your                Cargo.toml is located)) .
+ 
      **Example**: cargo metadata --format-version 1 > cargo.metadata.json
          After successful execution, *.metadata.json file will be created in specified directory .
     
