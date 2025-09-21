@@ -191,6 +191,73 @@ namespace LCT.PackageIdentifier.UTest
             Assert.IsTrue(bom.Components[0].Properties.Any(p => p.Name == Dataconstant.Cdx_SiemensDirect));
         }
 
+        [Test]
+        public void GetExcludedComponentsList_ExcludesInvalidComponents()
+        {
+            var components = new List<Component>
+    {
+        new Component { Name = "Valid", Version = "1.0", Purl = "pkg:cargo/Valid@1.0" },
+        new Component { Name = "", Version = "1.0", Purl = "pkg:cargo/Invalid@1.0" }
+    };
+            var method = typeof(CargoProcessor).GetMethod("GetExcludedComponentsList", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            var result = (List<Component>)method.Invoke(null, new object[] { components });
+
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual("Valid", result[0].Name);
+        }
+
+        [Test]
+        public void AddingIdentifierType_SetsDiscoveredProperty()
+        {
+            var components = new List<Component>
+    {
+        new Component { Name = "Comp", Version = "1.0", Purl = "pkg:cargo/Comp@1.0" }
+    };
+            var method = typeof(CargoProcessor).GetMethod("AddingIdentifierType", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            method.Invoke(null, new object[] { components });
+
+            Assert.IsTrue(components[0].Properties.Any(p => p.Name == Dataconstant.Cdx_IdentifierType));
+            Assert.AreEqual(Dataconstant.Discovered, components[0].Properties.First(p => p.Name == Dataconstant.Cdx_IdentifierType).Value);
+        }
+
+        [Test]
+        public void GetArtifactoryRepoName_ReturnsNotFoundInRepo_WhenNoMatch()
+        {
+            var aqlResultList = new List<AqlResult>();
+            var component = new Component { Name = "Test", Version = "1.0" };
+            var bomHelper = new Mock<IBomHelper>();
+            string jfrogPackageName, jfrogRepoPath;
+            var method = typeof(CargoProcessor).GetMethod("GetArtifactoryRepoName", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            var repoName = (string)method.Invoke(null, new object[] { aqlResultList, component, bomHelper.Object, null, null });
+
+            Assert.AreEqual("Not Found in JFrogRepo", repoName);
+        }
+
+        [Test]
+        public void GetJfrogNameOfCargoComponent_ReturnsPackageNameNotFoundInJfrog_WhenNoMatch()
+        {
+            var aqlResultList = new List<AqlResult>();
+            var method = typeof(CargoProcessor).GetMethod("GetJfrogNameOfCargoComponent", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            var nameVersion = (string)method.Invoke(null, new object[] { "Test", "1.0", aqlResultList });
+
+            Assert.AreEqual(Dataconstant.PackageNameNotFoundInJfrog, nameVersion);
+        }
+
+        [Test]
+        public void GetJfrogRepoPath_ReturnsRepoAndName_WhenPathIsEmpty()
+        {
+            var aqlResult = new AqlResult { Repo = "repo", Name = "name", Path = "" };
+            var method = typeof(CargoProcessor).GetMethod("GetJfrogRepoPath", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            var path = (string)method.Invoke(null, new object[] { aqlResult });
+
+            Assert.AreEqual("repo/name", path);
+        }
+
         private static CommonAppSettings CreateTestAppSettings()
         {
             return new CommonAppSettings
