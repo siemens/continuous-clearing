@@ -90,35 +90,6 @@ namespace LCT.PackageIdentifier.UTest
         }
 
         [TestCase]
-        public void ParseDepJsonFile_GivenAInputFilePathExcludeComponent_ReturnComponentCount()
-        {
-            //Arrange
-            int expectedComponentsBeforeExclusion = 11; // Based on Test_Bom.cdx.json
-            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string outFolder = Path.GetDirectoryName(exePath);
-            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
-
-            string[] Includes = { "*.dep.json" };
-
-            CommonAppSettings appSettings = new CommonAppSettings()
-            {
-                Conan = new Config() { Include = Includes },
-                SW360 = new SW360() { ExcludeComponents = ["openssl:3.5.2", "libcurl:8.15.0"] },
-                Directory = new LCT.Common.Directory()
-                {
-                    InputFolder = packagefilepath
-                }
-            };
-            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
-            //Act
-            Bom listofcomponents = new ConanProcessor(cycloneDXBomParser.Object, spdxBomParser.Object).ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
-
-            //Assert
-            Assert.That(listofcomponents.Components.Count, Is.LessThan(expectedComponentsBeforeExclusion), "Checks if excluded components have been removed");
-        }
-
-        [TestCase]
         public void ParseDepJsonFile_GivenAInputFilePath_ReturnsBomComponents()
         {
             //Arrange

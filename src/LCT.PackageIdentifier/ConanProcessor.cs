@@ -283,7 +283,7 @@ namespace LCT.PackageIdentifier
 
         private static List<Component> ParseDepJson(string filepath, ref List<Dependency> dependencies)
         {
-            List<Component> lstComponentForBOM = new List<Component>();
+            List<Component> StartingComponentForBOM = new List<Component>();
             int noOfDevDependent = 0;
 
             try
@@ -294,13 +294,13 @@ namespace LCT.PackageIdentifier
                 if (depJson?.Graph?.Nodes == null)
                 {
                     Logger.Warn($"No nodes found in dep.json file: {filepath}");
-                    return lstComponentForBOM;
+                    return StartingComponentForBOM;
                 }
 
                 var nodePackages = depJson.Graph.Nodes.ToList();
                 
-                GetPackagesForBom(ref lstComponentForBOM, ref noOfDevDependent, nodePackages, depJson.Graph.Root);
-                GetDependencyDetails(lstComponentForBOM, nodePackages, dependencies);
+                GetPackagesForBom(ref StartingComponentForBOM, ref noOfDevDependent, nodePackages, depJson.Graph.Root);
+                GetDependencyDetails(StartingComponentForBOM, nodePackages, dependencies);
 
                 BomCreator.bomKpiData.DevDependentComponents += noOfDevDependent;
             }
@@ -320,10 +320,10 @@ namespace LCT.PackageIdentifier
                 Logger.Error($"ParseDepJson(): Security Error", ex);
             }
 
-            return lstComponentForBOM;
+            return StartingComponentForBOM;
         }
 
-        private static void GetPackagesForBom(ref List<Component> lstComponentForBOM, ref int noOfDevDependent, 
+        private static void GetPackagesForBom(ref List<Component> StartingComponentForBOM, ref int noOfDevDependent, 
             List<KeyValuePair<string, ConanPackage>> nodePackages, Dictionary<string, string> rootNodes)
         {
             // Get root node to determine direct dependencies
@@ -387,7 +387,7 @@ namespace LCT.PackageIdentifier
                 component.Properties.Add(isdev);
                 component.Properties.Add(siemensDirect);
                 component.Properties.Add(siemensFileName);
-                lstComponentForBOM.Add(component);
+                StartingComponentForBOM.Add(component);
             }
         }
 
