@@ -436,9 +436,9 @@ namespace LCT.SW360PackageCreator
             string repositoryUrl = string.Empty;
             try
             {
-                using var httpClient = new HttpClient();
-                httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("ContinuousClearing");
-                var response = await httpClient.GetAsync(downLoadUrl);
+                using var localHttpClient = new HttpClient();
+                localHttpClient.DefaultRequestHeaders.UserAgent.ParseAdd("ContinuousClearing");
+                var response = await localHttpClient.GetAsync(downLoadUrl);
                 if (response.IsSuccessStatusCode)
                 {
                     var json = await response.Content.ReadAsStringAsync();

@@ -144,7 +144,7 @@ namespace LCT.SW360PackageCreator
                 string fileName = $"{component.Name}-{component.Version}.crate";
                 string downloadFilePath = Path.Combine(localPathforDownload, fileName);
 
-                string? directoryPath = Path.GetDirectoryName(downloadFilePath);
+                string directoryPath = Path.GetDirectoryName(downloadFilePath);
                 if (!string.IsNullOrEmpty(directoryPath))
                     Directory.CreateDirectory(directoryPath);
 

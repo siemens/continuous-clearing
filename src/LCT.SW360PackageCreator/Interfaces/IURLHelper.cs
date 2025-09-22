@@ -72,6 +72,6 @@ namespace LCT.SW360PackageCreator.Interfaces
         /// <param name="componenVersion"></param>
         /// <param name="bomRef"></param>
         /// <returns>string</returns>
-        Task<string> GetSourceUrlForCargoPackage(string componentName, string componenVersion);
+        Task<string> GetSourceUrlForCargoPackage(string componentName, string componentVersion);
     }
 }
