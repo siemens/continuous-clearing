@@ -310,7 +310,7 @@ namespace LCT.PackageIdentifier
                 return cycloneDXBomParser.ParseCycloneDXBom(filePath);
             }
         }
-        public static List<Component> GetExcludedComponentsList(List<Component> componentsForBOM, string purlPrefix)
+        public static List<Component> GetExcludedComponentsList(List<Component> componentsForBOM, string purlPrefix, string projectType)
         {
             List<Component> components = new List<Component>();
             foreach (Component componentsInfo in componentsForBOM)
@@ -321,12 +321,12 @@ namespace LCT.PackageIdentifier
                     componentsInfo.Purl.Contains(purlPrefix))
                 {
                     components.Add(componentsInfo);
-                    Logger.Debug($"GetExcludedComponentsList():ValidComponent For {purlPrefix} : Component Details : {componentsInfo.Name} @ {componentsInfo.Version} @ {componentsInfo.Purl}");
+                    Logger.Debug($"GetExcludedComponentsList():ValidComponent For {projectType} : Component Details : {componentsInfo.Name} @ {componentsInfo.Version} @ {componentsInfo.Purl}");
                 }
                 else
                 {
                     BomCreator.bomKpiData.ComponentsExcluded++;
-                    Logger.Debug($"GetExcludedComponentsList():InvalidComponent For {purlPrefix} : Component Details : {componentsInfo.Name} @ {componentsInfo.Version} @ {componentsInfo.Purl}");
+                    Logger.Debug($"GetExcludedComponentsList():InvalidComponent For {projectType} : Component Details : {componentsInfo.Name} @ {componentsInfo.Version} @ {componentsInfo.Purl}");
                 }
             }
             return components;
