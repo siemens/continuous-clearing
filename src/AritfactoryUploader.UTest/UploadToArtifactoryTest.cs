@@ -599,6 +599,7 @@ namespace AritfactoryUploader.UTest
                 Purl = "pkg:deb/adduser@11.9.3",
                 Properties = new List<Property>()
             };
+
             comp4.Properties.Add(propinternal);
             comp4.Properties.Add(prop3);
             componentLists.Add(comp4);
