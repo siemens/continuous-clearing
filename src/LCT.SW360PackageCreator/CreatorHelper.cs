@@ -432,7 +432,7 @@ namespace LCT.SW360PackageCreator
         {
             CreatorKpiData creatorKpiData = new CreatorKpiData
             {
-                ComponentsReadFromComparisonBOM = updatedCompareBomData.Count,
+                ComponentsReadFromComparisonBOM = ComponentCreator.TotalComponentsFromPackageIdentifier,
                 TotalDuplicateAndInValidComponents = ComponentCreator.TotalComponentsFromPackageIdentifier >= updatedCompareBomData.Count ?
                 ComponentCreator.TotalComponentsFromPackageIdentifier - updatedCompareBomData.Count : 0
             };

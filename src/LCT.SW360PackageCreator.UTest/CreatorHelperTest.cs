@@ -88,6 +88,54 @@ namespace LCT.SW360PackageCreator.UTest
             //Assert
             Assert.That(attachmentUrlList.ContainsKey("SOURCE"));
         }
+        [Test]
+        public async Task DownloadReleaseAttachmentSource_ForCargoPackage_ReturnSuccess()
+        {
+            // Arrange
+            var lstComparisonBomData = new ComparisonBomData()
+            {
+                Name = "adler",
+                Version = "1.0.2",
+                ReleaseExternalId = "pkg:cargo/adler@1.0.2",
+                SourceUrl = "https://github.com/jonas-schievink/adler.git",
+                DownloadUrl = "https://github.com/jonas-schievink/adler.git"
+            };
+            IDictionary<string, IPackageDownloader> _packageDownloderList = new Dictionary<string, IPackageDownloader>
+    {        
+        { "NPM", new PackageDownloader() }
+    };
+            var creatorHelper = new CreatorHelper(_packageDownloderList);
+
+            // Act
+            var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(lstComparisonBomData);
+
+            // Assert
+            Assert.That(attachmentUrlList.ContainsKey("SOURCE"));
+        }
+        [Test]
+        public async Task DownloadReleaseAttachmentSource_ForCargoDownloadPackage_ReturnSuccess()
+        {
+            // Arrange
+            var lstComparisonBomData = new ComparisonBomData()
+            {
+                Name = "encoding-index-japanese",
+                Version = "1.20141219.5",
+                ReleaseExternalId = "pkg:cargo/encoding-index-japanese@1.20141219.5",
+                SourceUrl = "https://crates.io/api/v1/crates/encoding-index-japanese/1.20141219.5/download",
+                DownloadUrl = "https://crates.io/api/v1/crates/encoding-index-japanese/1.20141219.5/download"
+            };
+            IDictionary<string, IPackageDownloader> _packageDownloderList = new Dictionary<string, IPackageDownloader>
+    {
+        { "NPM", new PackageDownloader() }
+    };
+            var creatorHelper = new CreatorHelper(_packageDownloderList);
+
+            // Act
+            var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(lstComparisonBomData);
+
+            // Assert
+            Assert.That(attachmentUrlList.ContainsKey("SOURCE"));
+        }
 
         [Test]
         public void Test_WriteCreatorKpiDataToConsole()

@@ -238,7 +238,7 @@ namespace LCT.SW360PackageCreator
                     componentsData.ProjectType = projectType;
                     break;
                 case "CARGO":
-                    componentsData.SourceUrl = await UrlHelper.GetSourceUrlForCargoPackage(name, version);
+                    componentsData.SourceUrl = await UrlHelper.Instance.GetSourceUrlForCargoPackage(name, version);
                     break;
                 default:
                     break;

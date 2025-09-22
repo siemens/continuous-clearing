@@ -65,5 +65,13 @@ namespace LCT.SW360PackageCreator.Interfaces
         /// <param name="bomRef"></param>
         /// <returns>string</returns>
         Task<Components> GetSourceUrlForAlpinePackage(string componentName, string componenVersion, string bomRef);
+        /// <summary>
+        /// Gets the SourceUrl For Cargo Package
+        /// </summary>
+        /// <param name="componentName"></param>
+        /// <param name="componenVersion"></param>
+        /// <param name="bomRef"></param>
+        /// <returns>string</returns>
+        Task<string> GetSourceUrlForCargoPackage(string componentName, string componenVersion);
     }
 }
