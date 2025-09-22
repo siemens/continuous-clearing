@@ -54,7 +54,7 @@ namespace LCT.PackageIdentifier
             ParsingInputFileForBOM(appSettings, ref bom);
             componentsForBOM = bom.Components;
 
-            componentsForBOM = BomHelper.GetExcludedComponentsList(componentsForBOM, Dataconstant.PurlCheck()["CONAN"]);
+            componentsForBOM = BomHelper.GetExcludedComponentsList(componentsForBOM, Dataconstant.PurlCheck()["CONAN"], appSettings?.ProjectType);
             componentsForBOM = componentsForBOM.Distinct(new ComponentEqualityComparer()).ToList();
 
             var componentsWithMultipleVersions = componentsForBOM.GroupBy(s => s.Name)
