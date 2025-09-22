@@ -50,23 +50,21 @@ namespace LCT.PackageIdentifier.Model
         [JsonProperty("require")]
         public string Require { get; set; }
         [JsonProperty("run")]
-        public bool Run { get; set; }
+        public bool? Run { get; set; }
         [JsonProperty("libs")]
-        public bool Libs { get; set; }
+        public bool? Libs { get; set; }
         [JsonProperty("skip")]
-        public bool Skip { get; set; }
+        public bool? Skip { get; set; }
         [JsonProperty("test")]
-        public bool Test { get; set; }
+        public bool? Test { get; set; }
         [JsonProperty("force")]
-        public bool Force { get; set; }
+        public bool? Force { get; set; }
         [JsonProperty("direct")]
-        public bool Direct { get; set; }
+        public bool? Direct { get; set; }
         [JsonProperty("build")]
-        public bool Build { get; set; }
-        [JsonProperty("headers")]
-        public bool Headers { get; set; }
-        [JsonProperty("visible")]
-        public bool Visible { get; set; }
+        public bool? Build { get; set; }
+        [JsonProperty("transitive_headers")]
+        public object TransitiveHeaders { get; set; }
     }
 
     [ExcludeFromCodeCoverage]

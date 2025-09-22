@@ -326,21 +326,15 @@ namespace LCT.PackageIdentifier
         private static void GetPackagesForBom(ref List<Component> lstComponentForBOM, ref int noOfDevDependent, 
             List<KeyValuePair<string, ConanPackage>> nodePackages, Dictionary<string, string> rootNodes)
         {
-            // Get root node IDs to determine direct dependencies (from root node "0" dependencies)
+            // Get root node to determine direct dependencies
             var rootNode = nodePackages.FirstOrDefault(n => n.Key == "0");
-            var directDependencyIds = new List<string>();
             
-            if (rootNode.Value?.Dependencies != null)
-            {
-                directDependencyIds.AddRange(rootNode.Value.Dependencies.Keys);
-            }
-
             foreach (var node in nodePackages)
             {
                 var nodeId = node.Key;
                 var package = node.Value;
 
-                // Skip root consumer node (usually "0") - this is the project itself, not a dependency, in dep.json file "recipe": "Consumer"
+                // Skip root consumer node (usually "0") - this is the project itself, not a dependency
                 if (nodeId == "0")
                     continue;
 
@@ -370,12 +364,20 @@ namespace LCT.PackageIdentifier
                     Value = $"{package.Name}/{package.Version}"
                 };
 
-                // Determine if this is a direct dependency from the root node
-                var isDirect = directDependencyIds.Contains(nodeId) ? "true" : "false";
+                // Determine if this is a direct dependency by checking the "direct" property 
+                // in the root node's dependency relationship
+                bool isDirect = false;
+                if (rootNode.Value?.Dependencies != null && rootNode.Value.Dependencies.ContainsKey(nodeId))
+                {
+                    // Use the "direct" property from the dependency relationship in the root node
+                    var depInfo = rootNode.Value.Dependencies[nodeId];
+                    isDirect = depInfo.Direct == true;
+                }
+
                 Property siemensDirect = new Property()
                 {
                     Name = Dataconstant.Cdx_SiemensDirect,
-                    Value = isDirect
+                    Value = isDirect ? "true" : "false"
                 };
 
                 component.Type = Component.Classification.Library;
@@ -502,10 +504,8 @@ namespace LCT.PackageIdentifier
         {
             foreach (var component in componentsForBOM)
             {
-                // Initialize properties list if null, otherwise keep existing properties
                 component.Properties ??= new List<Property>();
                 var properties = component.Properties;
-                // Use helper method to safely add properties without duplicates
                 CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
                     Dataconstant.Cdx_IsDevelopment,
                     "false");
