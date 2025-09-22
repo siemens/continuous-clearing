@@ -310,7 +310,57 @@ namespace LCT.PackageIdentifier
                 return cycloneDXBomParser.ParseCycloneDXBom(filePath);
             }
         }
+        public static List<Component> GetExcludedComponentsList(List<Component> componentsForBOM, string purlPrefix)
+        {
+            List<Component> components = new List<Component>();
+            foreach (Component componentsInfo in componentsForBOM)
+            {
+                if (!string.IsNullOrEmpty(componentsInfo.Name) &&
+                    !string.IsNullOrEmpty(componentsInfo.Version) &&
+                    !string.IsNullOrEmpty(componentsInfo.Purl) &&
+                    componentsInfo.Purl.Contains(purlPrefix))
+                {
+                    components.Add(componentsInfo);
+                    Logger.Debug($"GetExcludedComponentsList():ValidComponent For {purlPrefix} : Component Details : {componentsInfo.Name} @ {componentsInfo.Version} @ {componentsInfo.Purl}");
+                }
+                else
+                {
+                    BomCreator.bomKpiData.ComponentsExcluded++;
+                    Logger.Debug($"GetExcludedComponentsList():InvalidComponent For {purlPrefix} : Component Details : {componentsInfo.Name} @ {componentsInfo.Version} @ {componentsInfo.Purl}");
+                }
+            }
+            return components;
+        }
+        public static void GetDistinctComponentList(ref List<Component> listofComponents)
+        {
+            int initialCount = listofComponents.Count;
+            listofComponents = listofComponents.GroupBy(x => new { x.Name, x.Version, x.Purl }).Select(y => y.First()).ToList();
 
+            if (listofComponents.Count != initialCount)
+                BomCreator.bomKpiData.DuplicateComponents = initialCount - listofComponents.Count;
+        }
+
+        public static Bom RemoveExcludedComponents(CommonAppSettings appSettings, Bom cycloneDXBOM)
+        {
+            return CommonHelper.RemoveExcludedComponentsFromBom(appSettings, cycloneDXBOM,
+                noOfExcludedComponents => BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents);
+        }
+
+        public static void GetDetailsforManuallyAddedComp(List<Component> componentsForBOM)
+        {
+            foreach (var component in componentsForBOM)
+            {
+                component.Properties ??= new List<Property>();
+                var properties = component.Properties;
+                CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
+                    Dataconstant.Cdx_IsDevelopment,
+                    "false");
+                CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
+                    Dataconstant.Cdx_IdentifierType,
+                    Dataconstant.ManullayAdded);
+                component.Properties = properties;
+            }
+        }
         #endregion
     }
 }

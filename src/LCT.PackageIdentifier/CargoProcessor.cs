@@ -43,7 +43,7 @@ namespace LCT.PackageIdentifier
             ParsingInputFileForBOM(appSettings, ref bom);
             componentsForBOM = bom.Components;
 
-            componentsForBOM = GetExcludedComponentsList(componentsForBOM);
+            componentsForBOM = BomHelper.GetExcludedComponentsList(componentsForBOM, Dataconstant.PurlCheck()["CARGO"]);
             componentsForBOM = componentsForBOM.Distinct(new ComponentEqualityComparer()).ToList();           
 
             bom.Components = componentsForBOM;
@@ -255,7 +255,7 @@ namespace LCT.PackageIdentifier
                     Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
                     bom = _cycloneDXBomParser.ParseCycloneDXBom(filepath);
                     CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
-                    GetDetailsforManuallyAddedComp(bom.Components);
+                    BomHelper.GetDetailsforManuallyAddedComp(bom.Components);
                     if (bom.Components != null)
                     {
                         AddSiemensDirectProperty(ref bom);
@@ -265,7 +265,7 @@ namespace LCT.PackageIdentifier
             }
 
             int initialCount = componentsForBOM.Count;
-            GetDistinctComponentList(ref componentsForBOM);
+            BomHelper.GetDistinctComponentList(ref componentsForBOM);
             BomCreator.bomKpiData.DuplicateComponents = initialCount - componentsForBOM.Count;
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = componentsForBOM.Count;
             bom.Components = componentsForBOM;
@@ -281,7 +281,7 @@ namespace LCT.PackageIdentifier
             string templateFilePath = SbomTemplate.GetFilePathForTemplate(listOfTemplateBomfilePaths);
             SbomTemplate.ProcessTemplateFile(templateFilePath, _cycloneDXBomParser, bom.Components, appSettings.ProjectType);
 
-            bom = RemoveExcludedComponents(appSettings, bom);
+            bom = BomHelper.RemoveExcludedComponents(appSettings, bom);
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
         }
        
@@ -380,7 +380,13 @@ namespace LCT.PackageIdentifier
             }
         }
 
-        private static void AnalyzeCargoDependencyKindsExcluding(CargoPackageDetails packageDetails,Dictionary<string, string> idToPurl,Dictionary<string, List<string>> purlToDevKinds,Dictionary<string, Component> idToComponent,List<Dependency> dependencies,List<string> excludeIds)
+        private static void AnalyzeCargoDependencyKindsExcluding(
+    CargoPackageDetails packageDetails,
+    Dictionary<string, string> idToPurl,
+    Dictionary<string, List<string>> purlToDevKinds,
+    Dictionary<string, Component> idToComponent,
+    List<Dependency> dependencies,
+    List<string> excludeIds)
         {
             var resolve = packageDetails.ResolveInfo;
             if (resolve?.Nodes == null)
@@ -388,39 +394,69 @@ namespace LCT.PackageIdentifier
 
             foreach (var node in resolve.Nodes)
             {
-                string parentId = node.Id;
-                if (string.IsNullOrEmpty(parentId) || excludeIds.Contains(parentId))
+                if (ShouldSkipNode(node, excludeIds))
                     continue;
-               
-                if (node.Deps != null)
+
+                ProcessNodeDeps(node, idToPurl, purlToDevKinds);
+
+                AddCycloneDXDependencyExcluding(node, idToComponent, node.Id, dependencies, excludeIds);
+            }
+        }
+
+        private static bool ShouldSkipNode(CargoPackageDetails.Node node, List<string> excludeIds)
+        {
+            return string.IsNullOrEmpty(node?.Id) || excludeIds.Contains(node.Id);
+        }
+
+        private static void ProcessNodeDeps(
+            CargoPackageDetails.Node node,
+            Dictionary<string, string> idToPurl,
+            Dictionary<string, List<string>> purlToDevKinds)
+        {
+            if (node.Deps == null)
+                return;
+
+            foreach (var dep in node.Deps)
+            {
+                if (!IsValidDep(dep, idToPurl, out var depPurl))
+                    continue;
+
+                var kindList = GetOrCreateKindList(depPurl, purlToDevKinds);
+
+                AddDepKinds(dep, kindList);
+            }
+        }
+
+        private static bool IsValidDep(CargoPackageDetails.Dep dep, Dictionary<string, string> idToPurl, out string depPurl)
+        {
+            depPurl = null;
+            if (dep == null || string.IsNullOrEmpty(dep.Pkg))
+                return false;
+            return idToPurl.TryGetValue(dep.Pkg, out depPurl);
+        }
+
+        private static List<string> GetOrCreateKindList(string depPurl, Dictionary<string, List<string>> purlToDevKinds)
+        {
+            if (!purlToDevKinds.TryGetValue(depPurl, out var kindList))
+            {
+                kindList = new List<string>();
+                purlToDevKinds[depPurl] = kindList;
+            }
+            return kindList;
+        }
+
+        private static void AddDepKinds(CargoPackageDetails.Dep dep, List<string> kindList)
+        {
+            if (dep.DepKinds != null && dep.DepKinds.Count > 0)
+            {
+                foreach (var kind in dep.DepKinds)
                 {
-                    foreach (var dep in node.Deps)
-                    {
-                        if (dep == null || string.IsNullOrEmpty(dep.Pkg))
-                            continue;
-                        if (!idToPurl.TryGetValue(dep.Pkg, out var depPurl))
-                            continue;
-                        if (!purlToDevKinds.TryGetValue(depPurl, out var kindList))
-                        {
-                            kindList = new List<string>();
-                            purlToDevKinds[depPurl] = kindList;
-                        }
-
-                        if (dep.DepKinds != null && dep.DepKinds.Count > 0)
-                        {
-                            foreach (var kind in dep.DepKinds)
-                            {
-                                kindList.Add(kind?.Kind);
-                            }
-                        }
-                        else
-                        {
-                            kindList.Add(null);
-                        }
-                    }
+                    kindList.Add(kind?.Kind);
                 }
-
-                AddCycloneDXDependencyExcluding(node, idToComponent, parentId, dependencies, excludeIds);
+            }
+            else
+            {
+                kindList.Add(null);
             }
         }
 
@@ -497,25 +533,7 @@ namespace LCT.PackageIdentifier
             }
 
             return false;
-        }
-        private static List<Component> GetExcludedComponentsList(List<Component> componentsForBOM)
-        {
-            List<Component> components = new List<Component>();
-            foreach (Component componentsInfo in componentsForBOM)
-            {
-                if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["CARGO"]))
-                {
-                    components.Add(componentsInfo);
-                    Logger.Debug($"GetExcludedComponentsList():ValidComponent For CARGO : Component Details : {componentsInfo.Name} @ {componentsInfo.Version} @ {componentsInfo.Purl}");
-                }
-                else
-                {
-                    BomCreator.bomKpiData.ComponentsExcluded++;
-                    Logger.Debug($"GetExcludedComponentsList():InvalidComponent For CARGO : Component Details : {componentsInfo.Name} @ {componentsInfo.Version} @ {componentsInfo.Purl}");
-                }
-            }
-            return components;
-        }
+        }       
 
         private static void AddingIdentifierType(List<Component> components)
         {
