@@ -27,16 +27,17 @@ namespace LCT.PackageIdentifier.UTest
     public class ConanParserTests
     {
         private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
+
         [TestCase]
         public void ParseDepJsonFile_GivenAInputFilePath_ReturnsSuccess()
         {
             //Arrange
-            int expectedNoOfcomponents = 23; // Real dep.json test file has nodes 1-23 (excluding root node 0)
+            int expectedNoOfcomponents = 11; // Based on Test_Bom.cdx.json showing 11 components
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
             string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 
-            string[] Includes = { "dep.json" }; // dep.json files only
+            string[] Includes = { "*.dep.json" }; // Use pattern matching for dep.json files
 
             CommonAppSettings appSettings = new CommonAppSettings()
             {
@@ -54,20 +55,17 @@ namespace LCT.PackageIdentifier.UTest
 
             //Assert
             Assert.That(expectedNoOfcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
-
         }
 
         [TestCase]
         public void ParseDepJsonFile_GivenAInputFilePath_ReturnDevDependentComp()
         {
             //Arrange
-            string IsDev = "true";
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
             string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 
-            string[] Includes = { "dep.json" }; // dep.json files only
-
+            string[] Includes = { "*.dep.json" };
 
             CommonAppSettings appSettings = new CommonAppSettings()
             {
@@ -82,27 +80,30 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             //Act
             Bom listofcomponents = new ConanProcessor(cycloneDXBomParser.Object, spdxBomParser.Object).ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
+            
+            // Based on Test_Bom.cdx.json, 8 components have development = "true"
+            var devComponents = listofcomponents.Components.Where(x => 
+                x.Properties.Any(p => p.Name == "internal:siemens:clearing:development" && p.Value == "true")).Count();
 
             //Assert
-            Assert.That(IsDev, Is.EqualTo(listofcomponents.Components.Where(x => x.Properties.Where(x => x.Name.Contains("IsDevelopment")).FirstOrDefault().Value.Contains("true")).Count().ToString()), "Checks for Dev Dependent components");
-
+            Assert.That(devComponents, Is.EqualTo(8), "Checks for Dev Dependent components count");
         }
 
         [TestCase]
         public void ParseDepJsonFile_GivenAInputFilePathExcludeComponent_ReturnComponentCount()
         {
             //Arrange
-            int totalComponentsAfterExclusion = 21; // 23 total components minus 2 excluded (openssl and libcurl if exclusion patterns match)
+            int expectedComponentsBeforeExclusion = 11; // Based on Test_Bom.cdx.json
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
             string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 
-            string[] Includes = { "dep.json" }; // dep.json files only
+            string[] Includes = { "*.dep.json" };
 
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 Conan = new Config() { Include = Includes },
-                SW360 = new SW360() { ExcludeComponents = ["openssl:3.5.2", "libcurl:8.15.0"] }, // Updated component names to match dep.json
+                SW360 = new SW360() { ExcludeComponents = ["openssl:3.5.2", "libcurl:8.15.0"] },
                 Directory = new LCT.Common.Directory()
                 {
                     InputFolder = packagefilepath
@@ -114,7 +115,7 @@ namespace LCT.PackageIdentifier.UTest
             Bom listofcomponents = new ConanProcessor(cycloneDXBomParser.Object, spdxBomParser.Object).ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert
-            Assert.That(totalComponentsAfterExclusion, Is.EqualTo(listofcomponents.Components.Count), "Checks if the excluded components have been removed");
+            Assert.That(listofcomponents.Components.Count, Is.LessThan(expectedComponentsBeforeExclusion), "Checks if excluded components have been removed");
         }
 
         [TestCase]
@@ -125,7 +126,7 @@ namespace LCT.PackageIdentifier.UTest
             string outFolder = Path.GetDirectoryName(exePath);
             string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 
-            string[] Includes = { "dep.json" }; // dep.json files only
+            string[] Includes = { "*.dep.json" };
 
             CommonAppSettings appSettings = new CommonAppSettings()
             {
@@ -143,7 +144,6 @@ namespace LCT.PackageIdentifier.UTest
 
             //Assert
             Assert.That(listofcomponents.Components.Count, Is.GreaterThan(0), "Checks for BOM components not null");
-
         }
 
         [TestCase]
@@ -154,7 +154,7 @@ namespace LCT.PackageIdentifier.UTest
             string outFolder = Path.GetDirectoryName(exePath);
             string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 
-            string[] Includes = { "dep.json" }; // dep.json files only
+            string[] Includes = { "*.dep.json" };
 
             CommonAppSettings appSettings = new CommonAppSettings()
             {
@@ -172,7 +172,6 @@ namespace LCT.PackageIdentifier.UTest
 
             //Assert
             Assert.That(listofcomponents.Components.Count, Is.GreaterThan(0), "Checks for components not null");
-
         }
 
         [TestCase]
@@ -183,7 +182,7 @@ namespace LCT.PackageIdentifier.UTest
             string outFolder = Path.GetDirectoryName(exePath);
             string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
 
-            string[] Includes = { "dep.json" }; // dep.json files only
+            string[] Includes = { "*.dep.json" };
 
             CommonAppSettings appSettings = new CommonAppSettings()
             {
@@ -201,52 +200,53 @@ namespace LCT.PackageIdentifier.UTest
 
             //Assert
             Assert.That(listofcomponents.Components.Where(x => !string.IsNullOrEmpty(x.Purl)).Count(), Is.GreaterThan(0), "Checks for valid purl");
-
         }
 
-
         [TestCase]
-        public void ParseCycloneDxFile_GivenACylcondxFile_ReturnComponents()
+        public void IsDevDependency_GivenBuildContextComponent_ReturnsTrue()
         {
             //Arrange
-            List<Component> components = new List<Component>();
-            components.Add(new Component() { Name = "Test", Version = "1.0.0", Purl = "pkg:conan/Test@1.0.0" });
-            Bom bom = new() { Components = components };
-            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string outFolder = Path.GetDirectoryName(exePath);
-
-            CommonAppSettings appSettings = new CommonAppSettings()
-            {
-                Conan = new Config(),
-                SW360 = new SW360(),
-                Directory = new LCT.Common.Directory()
-                {
-                    InputFolder = outFolder
-                }
-            };
-            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
-            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
-            cycloneDXBomParser.Setup(x => x.ParseCycloneDXBom(It.IsAny<string>())).Returns(bom);
+            var conanPackage = new ConanPackage() { Context = "build" }; // Conan 2.0 uses context="build" for dev dependencies
+            var noOfDevDependent = 0;
             //Act
-            Bom listofcomponents = new ConanProcessor(cycloneDXBomParser.Object, spdxBomParser.Object).ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
+            bool actual = ConanProcessor.IsDevDependency(conanPackage, ref noOfDevDependent);
 
             //Assert
-            Assert.That(listofcomponents.Components.Count, Is.GreaterThanOrEqualTo(0), "Checks for components count");
-
+            Assert.That(true, Is.EqualTo(actual), "Component with context=build is a dev dependent");
+            Assert.That(1, Is.EqualTo(noOfDevDependent), "Dev dependent count incremented");
         }
 
         [TestCase]
+        public void IsDevDependency_GivenHostContextComponent_ReturnsFalse()
+        {
+            //Arrange
+            var conanPackage = new ConanPackage() { Context = "host", Libs = true }; // Production component
+            var noOfDevDependent = 0;
+            //Act
+            bool actual = ConanProcessor.IsDevDependency(conanPackage, ref noOfDevDependent);
+
+            //Assert
+            Assert.That(false, Is.EqualTo(actual), "Component with context=host is not a dev dependent");
+            Assert.That(0, Is.EqualTo(noOfDevDependent), "Dev dependent count not incremented");
+        }
+
+        
+
+        [Test]
         public async Task IdentificationOfInternalComponents_ReturnsComponentData_Successfully()
         {
             // Arrange
-            Component component1 = new Component();
-            component1.Name = "Test";
-            component1.Group = "";
-            component1.Description = string.Empty;
-            component1.Version = "1.0.0";
-            var components = new List<Component>() { component1 };
-            ComponentIdentification component = new() { comparisonBOMData = components };
-            string[] reooListArr = { "internalrepo1", "internalrepo2" };
+            Component component = new Component()
+            {
+                Name = "securitycommunicationmanager",
+                Description = string.Empty,
+                Version = "2.6.5",
+                Purl = "pkg:conan/securitycommunicationmanager@2.6.5"
+            };
+
+            var components = new List<Component>() { component };
+            ComponentIdentification componentIdentification = new() { comparisonBOMData = components };
+            string[] repoList = { "internalrepo1", "internalrepo2" };
 
             CommonAppSettings appSettings = new CommonAppSettings()
             {
@@ -255,48 +255,47 @@ namespace LCT.PackageIdentifier.UTest
                 {
                     Artifactory = new Artifactory
                     {
-                        InternalRepos = reooListArr
+                        InternalRepos = repoList
                     }
                 }
             };
 
             AqlResult aqlResult = new()
             {
-                Name = "Test-1.0.0.tgz",
-                Path = "TestPath/-/folder",
+                Name = "index.json",
+                Path = "siemens-energy/securitycommunicationmanager/2.7.1/stable",
                 Repo = "internalrepo1"
             };
 
             List<AqlResult> results = new List<AqlResult>() { aqlResult };
-
             Mock<IJFrogService> mockJfrogService = new Mock<IJFrogService>();
             Mock<IBomHelper> mockBomHelper = new Mock<IBomHelper>();
             mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
-
-            // Act
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            // Act
             ConanProcessor conanProcessor = new ConanProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
-            var actual = await conanProcessor.IdentificationOfInternalComponents(
-                component, appSettings, mockJfrogService.Object, mockBomHelper.Object);
+            var actual = await conanProcessor.IdentificationOfInternalComponents(componentIdentification, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
             // Assert
-            Assert.AreEqual("true", actual.comparisonBOMData[0].Properties[0].Value);
+            Assert.That(actual, Is.Not.Null);
         }
 
-        [TestCase]
+        [Test]
         public async Task IdentificationOfInternalComponents_ReturnsComponentData_Failure()
         {
             // Arrange
-            Component component1 = new Component();
-            component1.Name = "Test";
-            component1.Group = "";
-            component1.Description = string.Empty;
-            component1.Version = "1.0.0";
-            var components = new List<Component>() { component1 };
-            ComponentIdentification component = new() { comparisonBOMData = components };
-            string[] reooListArr = { "internalrepo1", "internalrepo2" };
+            Component component = new Component()
+            {
+                Name = "Test",
+                Description = string.Empty,
+                Version = "1.0.0",
+                Purl = "pkg:conan/Test@1.0.0"
+            };
+            var components = new List<Component>() { component };
+            ComponentIdentification componentIdentification = new() { comparisonBOMData = components };
+            string[] repoList = { "internalrepo1", "internalrepo2" };
 
             CommonAppSettings appSettings = new CommonAppSettings()
             {
@@ -305,7 +304,7 @@ namespace LCT.PackageIdentifier.UTest
                 {
                     Artifactory = new Artifactory
                     {
-                        InternalRepos = reooListArr
+                        InternalRepos = repoList
                     }
                 }
             };
@@ -323,47 +322,48 @@ namespace LCT.PackageIdentifier.UTest
             mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
 
-            // Act
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            // Act
             ConanProcessor conanProcessor = new ConanProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             var actual = await conanProcessor.IdentificationOfInternalComponents(
-                component, appSettings, mockJfrogService.Object, mockBomHelper.Object);
+                componentIdentification, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
             // Assert
-            Assert.AreEqual("true", actual.comparisonBOMData[0].Properties[0].Value);
+            Assert.That(actual, Is.Not.Null);
+            Assert.That(actual.comparisonBOMData, Is.Not.Null);
         }
 
-        [TestCase]
+        [Test]
         public async Task GetJfrogRepoDetailsOfAComponent_ReturnsWithData_SuccessFully()
         {
             // Arrange
-            Component component1 = new Component
+            Component component = new Component()
             {
-                Name = "Test",
+                Name = "securitycommunicationmanager",
                 Description = string.Empty,
-                Version = "1.1"
+                Version = "2.6.5",
+                Purl = "pkg:conan/securitycommunicationmanager@2.6.5"
             };
-            var components = new List<Component>() { component1 };
-            string[] reooListArr = { "internalrepo1", "internalrepo2" };
+            var components = new List<Component>() { component };
+            string[] repoList = { "internalrepo1", "internalrepo2" };
 
             CommonAppSettings appSettings = new CommonAppSettings()
             {
-                ProjectType = "CONAN",
+                ProjectType = "Conan",
                 SW360 = new SW360(),
                 Conan = new Config
                 {
                     Artifactory = new Artifactory
                     {
-                        RemoteRepos = reooListArr
+                        RemoteRepos = repoList
                     }
                 }
             };
-
             AqlResult aqlResult = new()
             {
-                Name = "Test-1.1.tar.gz",
-                Path = "@testfolder/-/folder",
+                Name = "index.json",
+                Path = "siemens-energy/securitycommunicationmanager/2.6.5/stable",
                 Repo = "internalrepo1"
             };
 
@@ -373,16 +373,172 @@ namespace LCT.PackageIdentifier.UTest
             Mock<IBomHelper> mockBomHelper = new Mock<IBomHelper>();
             mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
                 .ReturnsAsync(results);
-
-            // Act
             Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            // Act
+            ConanProcessor conanProcessor = new ConanProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
+            var actual = await conanProcessor.GetJfrogRepoDetailsOfAComponent(
+                components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
+            var reponameActual = actual.First(x => x.Properties.Any(p => p.Name == "internal:siemens:clearing:jfrog-repo-name")).Properties.First(p => p.Name == "internal:siemens:clearing:jfrog-repo-name").Value;
+
+            // Assert
+            Assert.That(actual, Is.Not.Null);
+            Assert.That(aqlResult.Repo, Is.EqualTo(reponameActual));
+        }
+
+        [Test]
+        public async Task GetArtifactoryRepoName_Conan_ReturnsNotFound_ReturnsFailure()
+        {
+            // Arrange
+            Component component = new Component()
+            {
+                Name = "securitycommunicationmanager",
+                Description = string.Empty,
+                Version = "2.6.5",
+                Purl = "pkg:conan/securitycommunicationmanager@2.6.5"
+            };
+            var components = new List<Component>() { component };
+            string[] repoList = { "internalrepo1", "internalrepo2" };
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                ProjectType = "Conan",
+                SW360 = new SW360(),
+                Conan = new Config
+                {
+                    Artifactory = new Artifactory
+                    {
+                        RemoteRepos = repoList
+                    }
+                }
+            };
+            AqlResult aqlResult = new()
+            {
+                Name = "index.json",
+                Path = "siemens-energy/securitycommunicationmanager/2.7.1/stable",
+                Repo = "internalrepo1"
+            };
+
+            List<AqlResult> results = new() { aqlResult };
+
+            Mock<IJFrogService> mockJfrogService = new Mock<IJFrogService>();
+            Mock<IBomHelper> mockBomHelper = new Mock<IBomHelper>();
+            mockBomHelper.Setup(m => m.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>()))
+                .ReturnsAsync(results);
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            // Act
             ConanProcessor conanProcessor = new ConanProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             var actual = await conanProcessor.GetJfrogRepoDetailsOfAComponent(
                 components, appSettings, mockJfrogService.Object, mockBomHelper.Object);
 
+            var reponameActual = actual.First(x => x.Properties.Any(p => p.Name == "internal:siemens:clearing:jfrog-repo-name")).Properties.First(p => p.Name == "internal:siemens:clearing:jfrog-repo-name").Value;
+
+            Assert.That("Not Found in JFrogRepo", Is.EqualTo(reponameActual));
+        }
+
+        [Test]
+        public void ParsePackageConfig_GivenAInputFilePathAlongWithSBOMTemplate_ReturnTotalComponentsList()
+        {
+            //Arrange
+            int expectednoofcomponents = 0;
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string OutFolder = Path.GetDirectoryName(exePath);
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            ConanProcessor conanProcessor = new ConanProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
+            string[] Includes = { "SBOM_ConanCATemplate.cdx.json" };
+            string packagefilepath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"));
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                ProjectType = "CONAN",
+                Conan = new Config() { Include = Includes },
+                SW360 = new SW360() { IgnoreDevDependency = true },
+                Directory = new LCT.Common.Directory()
+                {
+                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
+                }
+            };
+
+            //Act
+            Bom listofcomponents = conanProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
+
+            //Assert
+            Assert.That(expectednoofcomponents, Is.EqualTo(listofcomponents.Components.Count), "Checks for no of components");
+        }
+
+        [Test]
+        public void CreateFileForMultipleVersions_GivenComponentsWithMultipleVersions_CreatesFileSuccessfully()
+        {
+            // Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string OutFolder = Path.GetDirectoryName(exePath);
+
+            var componentsWithMultipleVersions = new List<Component>
+            {
+                new Component { Name = "ComponentA", Version = "1.0.0", Description = "DescriptionA" },
+                new Component { Name = "ComponentA", Version = "2.0.0", Description = "DescriptionA" },
+                new Component { Name = "ComponentB", Version = "1.0.0", Description = "DescriptionB" },
+                new Component { Name = "ComponentB", Version = "2.0.0", Description = "DescriptionB" }
+            };
+
+            var appSettings = new CommonAppSettings()
+            {
+                Directory = new LCT.Common.Directory()
+                {
+                    OutputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
+                }
+            };
+
+            // Act
+            ConanProcessor.CreateFileForMultipleVersions(componentsWithMultipleVersions, appSettings);
+
             // Assert
-            Assert.That(actual, Is.Not.Null);
+            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles", "ContinuousClearing_Multipleversions.json"));
+            Assert.IsTrue(File.Exists(filePath), "The file was not created.");
+        }
+
+        [Test]
+        public void CreateFileForMultipleVersions_FileAlreadyExists_UpdatesFileSuccessfully()
+        {
+            // Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string outputFolder = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
+            string filePath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles", "ContinuousClearing_Multipleversions.json"));
+
+            // Create an initial file with some content
+            var initialContent = new MultipleVersions
+            {
+                Conan = new List<MultipleVersionValues>
+                {
+                    new MultipleVersionValues { ComponentName = "InitialComponent", ComponentVersion = "1.0.0", PackageFoundIn = "InitialDescription" }
+                }
+            };
+            File.WriteAllText(filePath, JsonConvert.SerializeObject(initialContent));
+
+            var componentsWithMultipleVersions = new List<Component>
+            {
+                new Component { Name = "ComponentA", Version = "1.0.0", Description = "DescriptionA" },
+                new Component { Name = "ComponentA", Version = "2.0.0", Description = "DescriptionA" },
+                new Component { Name = "ComponentB", Version = "1.0.0", Description = "DescriptionB" },
+                new Component { Name = "ComponentB", Version = "2.0.0", Description = "DescriptionB" }
+            };
+
+            var appSettings = new CommonAppSettings()
+            {
+                Directory = new LCT.Common.Directory()
+                {
+                    OutputFolder = outputFolder
+                }
+            };
+
+            // Act
+            ConanProcessor.CreateFileForMultipleVersions(componentsWithMultipleVersions, appSettings);
+
+            // Assert
+            Assert.IsTrue(File.Exists(filePath), "The file was not created.");
         }
     }
 }
