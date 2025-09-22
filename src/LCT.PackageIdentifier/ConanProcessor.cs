@@ -391,10 +391,10 @@ namespace LCT.PackageIdentifier
             }
         }
 
-        private static bool IsDevDependency(ConanPackage package, ref int noOfDevDependent)
+        public static bool IsDevDependency(ConanPackage package, ref int noOfDevDependent)
         {
-            // Development dependencies are those with context="build" or run=true AND build=true
-            bool isDev = package.Context == "build" || (package.Run == true && package.Build == true);
+            // For Conan 2.0, dev dependencies are identified by context = "build"
+            bool isDev = package.Context == "build";
             
             if (isDev)
             {
