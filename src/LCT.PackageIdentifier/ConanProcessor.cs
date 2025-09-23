@@ -299,7 +299,7 @@ namespace LCT.PackageIdentifier
 
                 var nodePackages = depJson.Graph.Nodes.ToList();
                 
-                GetPackagesForBom(ref StartingComponentForBOM, ref noOfDevDependent, nodePackages, depJson.Graph.Root);
+                GetPackagesForBom(ref StartingComponentForBOM, ref noOfDevDependent, nodePackages);
                 GetDependencyDetails(StartingComponentForBOM, nodePackages, dependencies);
 
                 BomCreator.bomKpiData.DevDependentComponents += noOfDevDependent;
@@ -324,7 +324,7 @@ namespace LCT.PackageIdentifier
         }
 
         private static void GetPackagesForBom(ref List<Component> StartingComponentForBOM, ref int noOfDevDependent, 
-            List<KeyValuePair<string, ConanPackage>> nodePackages, Dictionary<string, string> rootNodes)
+            List<KeyValuePair<string, ConanPackage>> nodePackages)
         {
             // Get root node to determine direct dependencies
             var rootNode = nodePackages.FirstOrDefault(n => n.Key == "0");
@@ -367,10 +367,9 @@ namespace LCT.PackageIdentifier
                 // Determine if this is a direct dependency by checking the "direct" property 
                 // in the root node's dependency relationship
                 bool isDirect = false;
-                if (rootNode.Value?.Dependencies != null && rootNode.Value.Dependencies.ContainsKey(nodeId))
+                if (rootNode.Value?.Dependencies != null && rootNode.Value.Dependencies.TryGetValue(nodeId, out var depInfo))
                 {
                     // Use the "direct" property from the dependency relationship in the root node
-                    var depInfo = rootNode.Value.Dependencies[nodeId];
                     isDirect = depInfo.Direct == true;
                 }
 
