@@ -75,14 +75,18 @@ namespace LCT.SW360PackageCreator
             return compressedFilePath;
         }
         private static string GetSourceRepositoryUrl(ComparisonBomData component, string tag)
-        {            
+        {
             if (!string.IsNullOrEmpty(component.SourceUrl) && component.SourceUrl.Contains("github.com", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(tag))
             {
-                string repoUrl =component.SourceUrl;
+                string repoUrl = component.SourceUrl;
                 repoUrl = repoUrl.TrimEnd('/');
+                if (repoUrl.EndsWith(".git", StringComparison.OrdinalIgnoreCase))
+                {
+                    repoUrl = repoUrl[..^4];
+                }
                 string encodedTag = Uri.EscapeDataString(tag);
                 return $"{repoUrl}/tree/{encodedTag}";
-            }            
+            }
             return component.DownloadUrl;
         }
         private static string SanitizeFileName(string name)
