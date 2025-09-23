@@ -438,9 +438,7 @@ namespace LCT.PackageIdentifier
                 return;
 
             foreach (var node in resolve.Nodes)
-            {
-                if (ShouldSkipNode(node, excludeIds))
-                    continue;
+            {              
 
                 ProcessNodeDeps(node, idToPurl, purlToDevKinds);
 
@@ -448,10 +446,6 @@ namespace LCT.PackageIdentifier
             }
         }
 
-        private static bool ShouldSkipNode(CargoPackageDetails.Node node, List<string> excludeIds)
-        {
-            return string.IsNullOrEmpty(node?.Id) || excludeIds.Contains(node.Id);
-        }
 
         private static void ProcessNodeDeps(
             CargoPackageDetails.Node node,
