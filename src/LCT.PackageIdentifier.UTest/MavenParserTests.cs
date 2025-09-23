@@ -403,8 +403,102 @@ namespace LCT.PackageIdentifier.UTest
             Assert.That(actual, Is.Not.Null);
         }
 
-       
-        
+        [Test]
+        public void DevDependencyIdentificationLogic_ReturnsCountOfDevDependentcomponents_SuccessFully()
+        {
+            //Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string filepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles", "MavenDevDependency", "WithDev"));
+            string[] Includes = { "*.cdx.json" };
+            string[] Excludes = { "lol" };
+            BomCreator.bomKpiData.DevDependentComponents = 0;
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                ProjectType = "MAVEN",
+                Maven = new Config() { Include = Includes, Exclude = Excludes },
+                SW360 = new SW360() { IgnoreDevDependency = true },
+                Directory = new LCT.Common.Directory()
+                {
+                    InputFolder = filepath
+                }
+            };
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            MavenProcessor MavenProcessor = new MavenProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
+
+            //Act
+            MavenProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
+
+            //Assert
+            Assert.That(BomCreator.bomKpiData.DevDependentComponents, Is.EqualTo(6), "Returns the count of components");
+
+        }
+        [Test]
+        public void DevDependencyIdentificationLogic_ReturnsCountOfComponents_WithoutDevdependency()
+        {
+            //Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string filepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles", "MavenDevDependency", "WithOneInputFile"));
+            string[] Includes = { "*.cdx.json" };
+            string[] Excludes = { "lol" };
+            BomCreator.bomKpiData.DevDependentComponents = 0;
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                ProjectType = "MAVEN",
+                Maven = new Config() { Include = Includes, Exclude = Excludes },
+                SW360 = new SW360() { IgnoreDevDependency = true },
+                Directory = new LCT.Common.Directory()
+                {
+                    InputFolder = filepath
+                }
+            };
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            MavenProcessor MavenProcessor = new MavenProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
+
+            //Act
+            MavenProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
+
+            //Assert
+            Assert.That(BomCreator.bomKpiData.DevDependentComponents, Is.EqualTo(0), "Returns the count of components");
+
+        }
+
+        [Test]
+        public void ParsePackageFile_GivenAInputFilePathAlongWithSBOMTemplate_ReturnTotalComponentsList()
+        {
+            //Arrange
+            int expectednoofcomponents = 1;
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string filepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
+            string[] Includes = { "CycloneDX_Maven.cdx.json", "SBOMTemplate_Maven.cdx.json", "SBOM_MavenCATemplate.cdx.json" };
+            string[] Excludes = { "lol" };
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                ProjectType = "MAVEN",
+                Maven = new Config() { Include = Includes, Exclude = Excludes },
+                SW360 = new SW360() { IgnoreDevDependency = true },
+                Directory = new LCT.Common.Directory()
+                {
+                    InputFolder = filepath,
+
+                }
+            };
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            MavenProcessor MavenProcessor = new MavenProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
+
+            //Act
+            Bom bom = MavenProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
+
+            //Assert
+            Assert.That(expectednoofcomponents, Is.EqualTo(bom.Components.Count), "Checks for no of components");
+
+        }
 
         [Test]
         public void ParsePackageFile_GivenAInputFilePathAlongWithSBOMTemplate_ReturnUpdatedComponents()
