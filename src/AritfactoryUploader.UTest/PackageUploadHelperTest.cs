@@ -49,6 +49,7 @@ namespace AritfactoryUploader.UTest
         [TestCase("DEBIAN", ".deb")]
         [TestCase("POETRY", ".whl")]
         [TestCase("CONAN", "package.tgz")]
+        [TestCase("CARGO", ".crate")]
         public void GetPkgeNameExtensionBasedOnComponentType_GivenType_ReturnsPkgNameExtension(string type, string extension)
         {
             // Arrange
@@ -212,6 +213,7 @@ namespace AritfactoryUploader.UTest
         [TestCase("POETRY")]
         [TestCase("CONAN")]
         [TestCase("DEBIAN")]
+        [TestCase("CARGO")]
         public async Task JfrogNotFoundPackagesAsync_CoversAllScenarios(string compType)
         {
             // Arrange
@@ -224,6 +226,7 @@ namespace AritfactoryUploader.UTest
             displayPackagesInfo.JfrogNotFoundPackagesPython = new List<ComponentsToArtifactory>();
             displayPackagesInfo.JfrogNotFoundPackagesConan = new List<ComponentsToArtifactory>();
             displayPackagesInfo.JfrogNotFoundPackagesDebian = new List<ComponentsToArtifactory>();
+            displayPackagesInfo.JfrogNotFoundPackagesCargo = new List<ComponentsToArtifactory>();
 
             // Act
             await PackageUploadHelper.JfrogNotFoundPackagesAsync(item, displayPackagesInfo);
@@ -259,6 +262,11 @@ namespace AritfactoryUploader.UTest
                 Assert.AreEqual(1, displayPackagesInfo.JfrogNotFoundPackagesDebian.Count);
                 Assert.That(displayPackagesInfo.JfrogNotFoundPackagesDebian[0], Is.Not.Null);
             }
+            else if (item.ComponentType == "CARGO")
+            {
+                Assert.AreEqual(1, displayPackagesInfo.JfrogNotFoundPackagesCargo.Count);
+                Assert.That(displayPackagesInfo.JfrogNotFoundPackagesCargo[0], Is.Not.Null);
+            }
         }
 
         [Test]
@@ -268,6 +276,7 @@ namespace AritfactoryUploader.UTest
         [TestCase("POETRY")]
         [TestCase("CONAN")]
         [TestCase("DEBIAN")]
+        [TestCase("CARGO")]
         public async Task JfrogFoundPackagesAsync_CoversAllScenarios(string compType)
         {
             // Arrange
@@ -280,6 +289,7 @@ namespace AritfactoryUploader.UTest
             displayPackagesInfo.JfrogFoundPackagesPython = new List<ComponentsToArtifactory>();
             displayPackagesInfo.JfrogFoundPackagesConan = new List<ComponentsToArtifactory>();
             displayPackagesInfo.JfrogFoundPackagesDebian = new List<ComponentsToArtifactory>();
+            displayPackagesInfo.JfrogFoundPackagesCargo = new List<ComponentsToArtifactory>();
             var operationType = "operationType";
             var responseMessage = new HttpResponseMessage();
             var dryRunSuffix = "dryRunSuffix";
@@ -318,6 +328,234 @@ namespace AritfactoryUploader.UTest
                 Assert.AreEqual(1, displayPackagesInfo.JfrogFoundPackagesDebian.Count);
                 Assert.That(displayPackagesInfo.JfrogFoundPackagesDebian[0], Is.Not.Null);
             }
+            else if (item.ComponentType == "CARGO")
+            {
+                Assert.AreEqual(1, displayPackagesInfo.JfrogFoundPackagesCargo.Count);
+                Assert.That(displayPackagesInfo.JfrogFoundPackagesCargo[0], Is.Not.Null);
+            }
+        }
+
+        [Test]
+        public async Task JfrogNotFoundPackagesAsync_CargoComponent_AddsToCargoNotFoundList()
+        {
+            // Arrange
+            var cargoItem = new ComponentsToArtifactory
+            {
+                ComponentType = "CARGO",
+                Name = "serde",
+                Version = "1.0.150",
+                Purl = "pkg:cargo/serde@1.0.150",
+                SrcRepoName = "cargo-src-repo",
+                DestRepoName = "cargo-dest-repo",
+                PackageType = PackageType.ClearedThirdParty
+            };
+            var displayPackagesInfo = new DisplayPackagesInfo();
+            displayPackagesInfo.JfrogNotFoundPackagesCargo = new List<ComponentsToArtifactory>();
+
+            // Act
+            await PackageUploadHelper.JfrogNotFoundPackagesAsync(cargoItem, displayPackagesInfo);
+
+            // Assert
+            Assert.AreEqual(1, displayPackagesInfo.JfrogNotFoundPackagesCargo.Count);
+            var addedComponent = displayPackagesInfo.JfrogNotFoundPackagesCargo[0];
+            Assert.AreEqual("serde", addedComponent.Name);
+            Assert.AreEqual("1.0.150", addedComponent.Version);
+            Assert.AreEqual("pkg:cargo/serde@1.0.150", addedComponent.Purl);
+            Assert.AreEqual("cargo-src-repo", addedComponent.SrcRepoName);
+            Assert.AreEqual(PackageType.ClearedThirdParty, addedComponent.PackageType);
+        }
+
+        [Test]
+        public async Task JfrogFoundPackagesAsync_CargoComponent_AddsToCargoFoundList()
+        {
+            // Arrange
+            var cargoItem = new ComponentsToArtifactory
+            {
+                ComponentType = "CARGO",
+                Name = "tokio",
+                Version = "1.23.0",
+                Purl = "pkg:cargo/tokio@1.23.0",
+                SrcRepoName = "cargo-src-repo",
+                DestRepoName = "cargo-dest-repo",
+                Token = "test-token",
+                CopyPackageApiUrl = "https://test.api.url",
+                PackageName = "tokio-1.23.0.crate",
+                PackageType = PackageType.ClearedThirdParty
+            };
+            var displayPackagesInfo = new DisplayPackagesInfo();
+            displayPackagesInfo.JfrogFoundPackagesCargo = new List<ComponentsToArtifactory>();
+            var operationType = "copy";
+            var responseMessage = new HttpResponseMessage(System.Net.HttpStatusCode.OK);
+            var dryRunSuffix = "";
+
+            // Act
+            await PackageUploadHelper.JfrogFoundPackagesAsync(cargoItem, displayPackagesInfo, operationType, responseMessage, dryRunSuffix);
+
+            // Assert
+            Assert.AreEqual(1, displayPackagesInfo.JfrogFoundPackagesCargo.Count);
+            var addedComponent = displayPackagesInfo.JfrogFoundPackagesCargo[0];
+            Assert.AreEqual("tokio", addedComponent.Name);
+            Assert.AreEqual("1.23.0", addedComponent.Version);
+            Assert.AreEqual("pkg:cargo/tokio@1.23.0", addedComponent.Purl);
+            Assert.AreEqual("cargo-src-repo", addedComponent.SrcRepoName);
+            Assert.AreEqual("cargo-dest-repo", addedComponent.DestRepoName);
+            Assert.AreEqual("copy", addedComponent.OperationType);
+            Assert.AreEqual(responseMessage, addedComponent.ResponseMessage);
+            Assert.AreEqual("test-token", addedComponent.Token);
+            Assert.AreEqual("tokio-1.23.0.crate", addedComponent.PackageName);
+            Assert.AreEqual(PackageType.ClearedThirdParty, addedComponent.PackageType);
+        }
+
+        [Test]
+        public void GetPackageNameExtensionBasedOnComponentType_CargoComponent_ReturnsCorrectExtension()
+        {
+            // Arrange
+            var cargoPackage = new ComponentsToArtifactory
+            {
+                ComponentType = "CARGO"
+            };
+
+            // Act
+            var extension = PackageUploadHelper.GetPackageNameExtensionBasedOnComponentType(cargoPackage);
+
+            // Assert
+            Assert.AreEqual(".crate", extension);
+        }
+
+        [Test]
+        public void GetPackageNameExtensionBasedOnComponentType_CargoComponentCaseInsensitive_ReturnsCorrectExtension()
+        {
+            // Arrange
+            var cargoPackage = new ComponentsToArtifactory
+            {
+                ComponentType = "cargo" // lowercase
+            };
+
+            // Act
+            var extension = PackageUploadHelper.GetPackageNameExtensionBasedOnComponentType(cargoPackage);
+
+            // Assert
+            Assert.AreEqual(".crate", extension);
+        }
+
+        [Test]
+        public void JfrogNotFoundPackagesAsync_CargoComponentWithNullDisplayInfo_ThrowsNullReferenceException()
+        {
+            // Arrange
+            var cargoItem = new ComponentsToArtifactory
+            {
+                ComponentType = "CARGO",
+                Name = "regex",
+                Version = "1.7.0"
+            };
+
+            // Act & Assert
+            Assert.ThrowsAsync<System.NullReferenceException>(async () =>
+                await PackageUploadHelper.JfrogNotFoundPackagesAsync(cargoItem, null));
+        }
+
+        [Test]
+        public void JfrogFoundPackagesAsync_CargoComponentWithNullDisplayInfo_ThrowsNullReferenceException()
+        {
+            // Arrange
+            var cargoItem = new ComponentsToArtifactory
+            {
+                ComponentType = "CARGO",
+                Name = "clap",
+                Version = "4.0.0"
+            };
+            var operationType = "move";
+            var responseMessage = new HttpResponseMessage(System.Net.HttpStatusCode.OK);
+            var dryRunSuffix = "";
+
+            // Act & Assert
+            Assert.ThrowsAsync<System.NullReferenceException>(async () =>
+                await PackageUploadHelper.JfrogFoundPackagesAsync(cargoItem, null, operationType, responseMessage, dryRunSuffix));
+        }
+
+        [Test]
+        public async Task JfrogFoundPackagesAsync_CargoComponentWithNullResponseMessage_StillAddsToList()
+        {
+            // Arrange
+            var cargoItem = new ComponentsToArtifactory
+            {
+                ComponentType = "CARGO",
+                Name = "rand",
+                Version = "0.8.5"
+            };
+            var displayPackagesInfo = new DisplayPackagesInfo();
+            displayPackagesInfo.JfrogFoundPackagesCargo = new List<ComponentsToArtifactory>();
+            var operationType = "copy";
+            HttpResponseMessage responseMessage = null;
+            var dryRunSuffix = "dry-run";
+
+            // Act
+            await PackageUploadHelper.JfrogFoundPackagesAsync(cargoItem, displayPackagesInfo, operationType, responseMessage, dryRunSuffix);
+
+            // Assert
+            Assert.AreEqual(1, displayPackagesInfo.JfrogFoundPackagesCargo.Count);
+            var addedComponent = displayPackagesInfo.JfrogFoundPackagesCargo[0];
+            Assert.AreEqual("rand", addedComponent.Name);
+            Assert.AreEqual("0.8.5", addedComponent.Version);
+            Assert.AreEqual("copy", addedComponent.OperationType);
+            Assert.IsNull(addedComponent.ResponseMessage);
+            Assert.AreEqual("dry-run", addedComponent.DryRunSuffix);
+        }
+
+        [Test]
+        public async Task JfrogNotFoundPackagesAsync_CargoComponentWithEmptyName_AddsComponentWithEmptyName()
+        {
+            // Arrange
+            var cargoItem = new ComponentsToArtifactory
+            {
+                ComponentType = "CARGO",
+                Name = "",
+                Version = "1.0.0",
+                Purl = "pkg:cargo/@1.0.0"
+            };
+            var displayPackagesInfo = new DisplayPackagesInfo();
+            displayPackagesInfo.JfrogNotFoundPackagesCargo = new List<ComponentsToArtifactory>();
+
+            // Act
+            await PackageUploadHelper.JfrogNotFoundPackagesAsync(cargoItem, displayPackagesInfo);
+
+            // Assert
+            Assert.AreEqual(1, displayPackagesInfo.JfrogNotFoundPackagesCargo.Count);
+            var addedComponent = displayPackagesInfo.JfrogNotFoundPackagesCargo[0];
+            Assert.AreEqual("", addedComponent.Name);
+            Assert.AreEqual("1.0.0", addedComponent.Version);
+        }
+
+        [Test]
+        public async Task JfrogFoundPackagesAsync_CargoComponentMultipleCalls_AddsMultipleComponents()
+        {
+            // Arrange
+            var cargoItem1 = new ComponentsToArtifactory
+            {
+                ComponentType = "CARGO",
+                Name = "serde",
+                Version = "1.0.150"
+            };
+            var cargoItem2 = new ComponentsToArtifactory
+            {
+                ComponentType = "CARGO",
+                Name = "tokio",
+                Version = "1.23.0"
+            };
+            var displayPackagesInfo = new DisplayPackagesInfo();
+            displayPackagesInfo.JfrogFoundPackagesCargo = new List<ComponentsToArtifactory>();
+            var operationType = "move";
+            var responseMessage = new HttpResponseMessage(System.Net.HttpStatusCode.OK);
+            var dryRunSuffix = "";
+
+            // Act
+            await PackageUploadHelper.JfrogFoundPackagesAsync(cargoItem1, displayPackagesInfo, operationType, responseMessage, dryRunSuffix);
+            await PackageUploadHelper.JfrogFoundPackagesAsync(cargoItem2, displayPackagesInfo, operationType, responseMessage, dryRunSuffix);
+
+            // Assert
+            Assert.AreEqual(2, displayPackagesInfo.JfrogFoundPackagesCargo.Count);
+            Assert.AreEqual("serde", displayPackagesInfo.JfrogFoundPackagesCargo[0].Name);
+            Assert.AreEqual("tokio", displayPackagesInfo.JfrogFoundPackagesCargo[1].Name);
         }
 
 
