@@ -14,7 +14,7 @@
     - [Option 1: Docker Container Image](#option-1-docker-container-image)
     - [Option 2: NuGet Package](#option-2-nuget-package)
 - [Demo project after consuming the package](#demo-project-after-consuming-the-package)
--  [Continuous Clearing Tool Execution](#continuous-clearing-tool-execution)
+- [Continuous Clearing Tool Execution](#continuous-clearing-tool-execution)
     - [Overview](#overview)
     - [**Prerequisite for Continuous Clearing Tool execution**](#prerequisite-for-continuous-clearing-tool-execution)
     - [**Configuring the Continuous Clearing Tool**](#configuring-the-continuous-clearing-tool)
@@ -48,7 +48,7 @@
     - [Binary Template Specific Parameters](#binary-template-specific-parameters)
     - [Docker Template Specific Parameters](#docker-template-specific-parameters)
 - [Troubleshoot](#troubleshoot)
-- [Component Compliance Guidance](#component-compliance-guidance)
+ - [Component Compliance Guidance](#component-compliance-guidance)
   - [General](#general)
 - [Manual Update](#manual-update)
 - [Bug or Enhancements](#bug-or-enhancements)
@@ -204,6 +204,8 @@ Users have the flexibility to generate a basic SBOM even if connections to SW360
   conan graph info . -f json > dep.json 
     
     * file name should end with dep.json as appSettings.json is configured to pick files with .dep.json suffix
+    
+    *  user can change the file pattern if required in the app settings
 
   * **Project Type :**  **Debian & Alpine**
 
