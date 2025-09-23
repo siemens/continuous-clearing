@@ -97,6 +97,22 @@ namespace LCT.APICommunications
             HttpContent httpContent = new StringContent(aqlQueryToBody);
             return await httpClient.PostAsync(uri, httpContent);
         }
+        public async Task<HttpResponseMessage> GetCargoComponentDataByRepo(string repoName)
+        {
+            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
+            TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
+            httpClient.Timeout = timeOutInSec;
+
+            StringBuilder query = new();
+            query.Append("items.find({\"repo\":\"");
+            query.Append($"{repoName}");
+            query.Append("\"}).include(\"repo\", \"path\", \"name\",\"@crate.name\",\"@crate.version\", \"actual_sha1\",\"actual_md5\",\"sha256\")");
+
+            string aqlQueryToBody = query.ToString();
+            string uri = $"{DomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}";
+            HttpContent httpContent = new StringContent(aqlQueryToBody);
+            return await httpClient.PostAsync(uri, httpContent);
+        }
 
         /// <summary>
         /// Gets the package information in the repo, via the name or path
@@ -177,6 +193,23 @@ namespace LCT.APICommunications
                 query.Append($"{{ \"@nuget.id\":{{ \"$eq\": \"{component.Name.ToLowerInvariant()}\" }} }}");
                 query.Append("] },");
                 query.Append($"{{ \"@nuget.version\":{{\"$eq\": \"{component.Version}\" }} }}");
+                query.Append(']');
+                query.Append("}).include(\"repo\", \"path\", \"name\").limit(1)");
+
+                return query.ToString();
+            }
+            else if (component.ComponentType.Equals("Cargo", StringComparison.InvariantCultureIgnoreCase))
+            {
+                // Build the AQL query for Cargo components
+                StringBuilder query = new();
+                query.Append("items.find({");
+                query.Append("\"$and\": [");
+                query.Append($"{{ \"repo\":{{ \"$eq\": \"{component.SrcRepoName}\" }} }},");
+                query.Append("{ \"$or\":[");
+                query.Append($"{{ \"@carte.name\":{{ \"$eq\": \"{component.Name}\" }} }} ,");
+                query.Append($"{{ \"@crate.name\":{{ \"$eq\": \"{component.Name.ToLowerInvariant()}\" }} }}");
+                query.Append("] },");
+                query.Append($"{{ \"@crate.version\":{{\"$eq\": \"{component.Version}\" }} }}");
                 query.Append(']');
                 query.Append("}).include(\"repo\", \"path\", \"name\").limit(1)");
 

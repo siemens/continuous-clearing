@@ -128,7 +128,38 @@ namespace LCT.Services
 
             return aqlResult;
         }
+        public async Task<IList<AqlResult>> GetCargoComponentDataByRepo(string repoName)
+        {
+            HttpResponseMessage httpResponseMessage = null;
+            IList<AqlResult> aqlResult = new List<AqlResult>();
 
+            try
+            {
+                httpResponseMessage = await m_JFrogApiCommunicationFacade.GetCargoComponentDataByRepo(repoName);
+                if (httpResponseMessage == null || !httpResponseMessage.IsSuccessStatusCode)
+                {
+                    return new List<AqlResult>();
+                }
+
+                string stringData = httpResponseMessage.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
+                var aqlResponse = JsonConvert.DeserializeObject<AqlResponse>(stringData);
+                aqlResult = aqlResponse?.Results ?? new List<AqlResult>();
+            }
+            catch (HttpRequestException httpException)
+            {
+                Logger.Debug(httpException);
+            }
+            catch (InvalidOperationException invalidOperationExcep)
+            {
+                Logger.Debug(invalidOperationExcep);
+            }
+            catch (TaskCanceledException taskCancelledException)
+            {
+                Logger.Debug(taskCancelledException);
+            }
+
+            return aqlResult;
+        }
 
 #nullable enable
         public async Task<AqlResult?> GetPackageInfo(ComponentsToArtifactory component)
