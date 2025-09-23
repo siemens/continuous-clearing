@@ -51,7 +51,7 @@ namespace LCT.SW360PackageCreator
             }
 
             string sourceUrl = component.SourceUrl.TrimEndOfString("/");
-            string fileName = CommonHelper.GetSubstringOfLastOccurance(sourceUrl, "/");
+            string fileName = CommonHelper.GetFileNameForSourceCode(sourceUrl,component);
             string safeTaggedVersion = SanitizeFileName(taggedVersion);
             string cloneFolderName = $"{fileName}-{safeTaggedVersion}";
             string compressedFilePath = $"{downloadPath}{fileName}-{safeTaggedVersion}-{Source}";

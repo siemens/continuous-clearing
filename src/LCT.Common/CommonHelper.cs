@@ -653,10 +653,7 @@ namespace LCT.Common
                 }
             }
         }
-        public static Component CreateComponentWithProperties(
-    string name,
-    string version,
-    string releaseExternalId)
+        public static Component CreateComponentWithProperties(string name,string version,string releaseExternalId)
         {
             Component component = new Component
             {
@@ -667,6 +664,18 @@ namespace LCT.Common
                 Type = Component.Classification.Library
             };
             return component;
+        }
+
+        public static string GetFileNameForSourceCode(string sourceUrl, ComparisonBomData component)
+        {
+            if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CARGO"]))
+            {
+                return component.Name;
+            }
+            else
+            {
+                return GetSubstringOfLastOccurance(sourceUrl, "/");
+            }
         }
         #endregion
     }
