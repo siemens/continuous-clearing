@@ -197,7 +197,9 @@ Users have the flexibility to generate a basic SBOM even if connections to SW360
    
   * **Project Type :** **Cargo**
  
-    *  Run the command given below (i.e., To generate a metadata file for your project, run the following command in your project directory (where your                Cargo.toml is located)) .
+    * Run the command given below (i.e., To generate a metadata file for your project, run the following command in your project directory (where your Cargo.toml is located)) .
+
+    * For creating metadata.json file you can use the format version 1.
  
      **Example**: cargo metadata --format-version 1 > cargo.metadata.json
          After successful execution, *.metadata.json file will be created in specified directory .

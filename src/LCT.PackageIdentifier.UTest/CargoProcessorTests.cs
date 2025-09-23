@@ -264,6 +264,147 @@ namespace LCT.PackageIdentifier.UTest
             Assert.AreEqual("repo/name", path);
         }
 
+
+
+        [Test]
+        public void AddSiemensDirectProperty_EmptyBom_DoesNotThrow()
+        {
+            var bom = new Bom
+            {
+                Components = new List<Component>(),
+                Dependencies = new List<Dependency>()
+            };
+
+            Assert.DoesNotThrow(() => CargoProcessor.AddSiemensDirectProperty(ref bom));
+            Assert.IsEmpty(bom.Components);
+        }
+
+        [Test]
+        public void AddingIdentifierType_EmptyList_DoesNotThrow()
+        {
+            var components = new List<Component>();
+            var method = typeof(CargoProcessor).GetMethod("AddingIdentifierType", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            Assert.DoesNotThrow(() => method.Invoke(null, new object[] { components }));
+            Assert.IsEmpty(components);
+        }
+
+
+        [Test]
+        public void GetJfrogRepoPath_NonEmptyPath_ReturnsFullPath()
+        {
+            var aqlResult = new AqlResult { Repo = "repo", Name = "name", Path = "somepath" };
+            var method = typeof(CargoProcessor).GetMethod("GetJfrogRepoPath", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            var path = (string)method.Invoke(null, new object[] { aqlResult });
+
+            Assert.AreEqual("repo/somepath/name", path);
+        }
+
+        [Test]
+        public void ProcessCargoComponent_WithEmptyAqlResultList_ReturnsComponentUnchanged()
+        {
+            // Arrange
+            var component = new Component
+            {
+                Name = "TestComp",
+                Version = "1.0",
+                Properties = new List<Property>()
+            };
+            var bomHelperMock = new Mock<IBomHelper>();
+            var appSettings = CreateTestAppSettings();
+            var projectTypeProperty = new Property(); 
+
+            var method = typeof(CargoProcessor).GetMethod("ProcessCargoComponent", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            // Act
+            var result = (Component)method.Invoke(null, new object[] { component, new List<AqlResult>(), bomHelperMock.Object, appSettings, projectTypeProperty });
+
+            // Assert
+            Assert.AreEqual(component.Name, result.Name);
+            Assert.AreEqual(component.Version, result.Version);
+        }
+
+        [Test]
+        public void UpdateCargoKpiDataBasedOnRepo_ReleaseRepo_IncrementsReleaseRepoComponents()
+        {
+            BomCreator.bomKpiData.ReleaseRepoComponents = 0;
+            var appSettings = CreateTestAppSettings();
+            appSettings.Cargo.ReleaseRepo = "release-repo";
+            string repoValue = "release-repo";
+            var method = typeof(CargoProcessor).GetMethod("UpdateCargoKpiDataBasedOnRepo", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            method.Invoke(null, new object[] { repoValue, appSettings });
+            Assert.AreEqual(1, BomCreator.bomKpiData.ReleaseRepoComponents);
+        }
+
+        [Test]
+        public void UpdateCargoKpiDataBasedOnRepo_NotFoundInJFrog_IncrementsUnofficialComponents()
+        {
+            BomCreator.bomKpiData.UnofficialComponents = 0;
+            var appSettings = CreateTestAppSettings();
+            string repoValue = "Not Found in JFrogRepo";
+            var method = typeof(CargoProcessor).GetMethod("UpdateCargoKpiDataBasedOnRepo", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            method.Invoke(null, new object[] { repoValue, appSettings });
+            Assert.AreEqual(1, BomCreator.bomKpiData.UnofficialComponents);
+        }
+
+        [Test]
+        public void UpdateCargoKpiDataBasedOnRepo_EmptyRepoValue_IncrementsUnofficialComponents()
+        {
+            BomCreator.bomKpiData.UnofficialComponents = 0;
+            var appSettings = CreateTestAppSettings();
+            string repoValue = "";
+            var method = typeof(CargoProcessor).GetMethod("UpdateCargoKpiDataBasedOnRepo", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            method.Invoke(null, new object[] { repoValue, appSettings });
+            Assert.AreEqual(1, BomCreator.bomKpiData.UnofficialComponents);
+        }
+
+        [Test]
+        public void IsInternalCargoComponent_ReturnsTrue_WhenAqlResultMatches()
+        {
+            var aqlResultList = new List<AqlResult>
+{
+    new AqlResult { Name = "TestComp", Repo = "repo1", Path = "path1", Properties = new List<AqlProperty>() }
+};
+
+
+            var component = new Component { Name = "TestComp", Version = "1.0" };
+            var method = typeof(CargoProcessor).GetMethod("IsInternalCargoComponent", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            var result = (bool)method.Invoke(null, new object[] { aqlResultList, component });
+            Assert.IsFalse(result);
+        }
+
+        [Test]
+        public void IsInternalCargoComponent_ReturnsFalse_WhenNoMatch()
+        {
+            var aqlResultList = new List<AqlResult>
+{
+    new AqlResult { Name = "TestComp", Repo = "repo1", Path = "path1", Properties = new List<AqlProperty>() }
+};
+            var component = new Component { Name = "TestComp", Version = "1.0" };
+            var method = typeof(CargoProcessor).GetMethod("IsInternalCargoComponent", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            var result = (bool)method.Invoke(null, new object[] { aqlResultList, component });
+            Assert.IsFalse(result);
+        }
+
+        [Test]
+        public void GetPackagesFromCargoMetadataJson_WithInvalidPath_DoesNotThrow()
+        {
+            var method = typeof(CargoProcessor).GetMethod("GetPackagesFromCargoMetadataJson", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            var components = new List<Component>();
+            var dependencies = new List<Dependency>();
+            Assert.DoesNotThrow(() => method.Invoke(null, new object[] { "invalid_path.json", components, dependencies }));
+        }
+
+        [Test]
+        public void ParseCargoFile_WithInvalidPath_DoesNotThrow()
+        {
+            var method = typeof(CargoProcessor).GetMethod("ParseCargoFile", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            var components = new List<Component>();
+            var dependencies = new List<Dependency>();
+            Assert.DoesNotThrow(() => method.Invoke(null, new object[] { "invalid_path.json", components, dependencies }));
+        }
+
         private static CommonAppSettings CreateTestAppSettings()
         {
             return new CommonAppSettings
