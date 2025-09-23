@@ -197,7 +197,7 @@ Users have the flexibility to generate a basic SBOM even if connections to SW360
     
   * **Project Type :** **Choco**
 
-    * Input file repository should contain **choco.config** file.
+   * Input file repository should contain **choco.config** / ** *.choco.config ** file.
 
   * **Project Type :**  **Debian & Alpine**
 

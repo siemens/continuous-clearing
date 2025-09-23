@@ -87,7 +87,7 @@ namespace LCT.PackageIdentifier.Tests
             Assert.IsNotNull(result);
             Assert.IsNotNull(result.Components);
             Assert.GreaterOrEqual(result.Components.Count, 1);
-            Assert.IsTrue(result.Components.Any(c => c.Name == "om-testmodules"));
+            Assert.IsTrue(result.Components.Any(c => c.Name == "googlechrome"));
             Assert.IsNotNull(result.Dependencies);
             Assert.AreEqual(0, result.Dependencies.Count);
         }
