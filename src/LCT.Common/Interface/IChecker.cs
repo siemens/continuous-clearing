@@ -4,15 +4,19 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using CycloneDX.Models;
-using LCT.PackageIdentifier.Model;
-using NuGet.Versioning;
+using LCT.Common.ComplianceValidator;
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace LCT.PackageIdentifier.Interface
+namespace LCT.Common.Interface
 {
-    public interface ICompositionBuilder
+    public interface IChecker : IPrintRecommendation, IPrintWarning
     {
-        void AddCompositionsToBom(Bom bom, Dictionary<string, Dictionary<string, NuGetVersion>> frameworkPackages, RuntimeInfo runtimeInfo);
+        Task<ComplianceSettingsModel> LoadSettingsAsync(string jsonFilePath);
+
+        bool Check(ComplianceSettingsModel settings, Object data);
+
+        List<string> GetResults();
     }
 }
