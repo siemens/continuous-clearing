@@ -147,7 +147,7 @@ namespace SW360IntegrationTest.NPM
                 new AuthenticationHeaderValue(TestConstant.TestSw360TokenType, TestConstant.TestSw360TokenValue);
             string expectedname = "rxjs";
             string expectedversion = "6.5.4";
-            string expecteddownloadurl = "https://github.com/reactivex/rxjs.git";
+            string expecteddownloadurl = "https://github.com/reactivex/rxjs/tree/6.5.4";
             string expectedexternalid = "pkg:npm/rxjs@6.5.4";
             string expectedclearingState = "NEW_CLEARING";
             //url formation for retrieving component details
