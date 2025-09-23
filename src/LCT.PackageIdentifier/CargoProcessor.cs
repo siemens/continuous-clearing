@@ -345,7 +345,7 @@ namespace LCT.PackageIdentifier
 
                 var idToComponent = new Dictionary<string, Component>();
                 var idToPurl = new Dictionary<string, string>();
-                var purlToDevKinds = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);                
+                var purlToDevDependencyKinds = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);                
                 
                 var excludeIds = (packageDetails.Workspace_members ?? Enumerable.Empty<string>())
                     .Concat(packageDetails.Workspace_default_members ?? Enumerable.Empty<string>())
@@ -353,8 +353,8 @@ namespace LCT.PackageIdentifier
                     .ToList();
 
                 ParseCargoPackagesExcluding(packageDetails, components, idToComponent, idToPurl, excludeIds);
-                AnalyzeCargoDependencyKindsExcluding(packageDetails, idToPurl, purlToDevKinds, idToComponent, dependencies, excludeIds);
-                MarkCargoDevelopmentProperties(components, purlToDevKinds);
+                AnalyzeCargoDependencyKindsExcluding(packageDetails, idToPurl, purlToDevDependencyKinds, idToComponent, dependencies, excludeIds);
+                MarkCargoDevelopmentProperties(components, purlToDevDependencyKinds);
                 AddDirectDependencyProperty(packageDetails, components, idToPurl);
                 
             }
@@ -372,7 +372,7 @@ namespace LCT.PackageIdentifier
         }
         public static void AddDirectDependencyProperty(CargoPackageDetails packageDetails, List<Component> components, Dictionary<string, string> idToPurl)
         {
-            var directDepPurls = new List<string>();
+            var directDependencyPurls = new List<string>();
             if (packageDetails.ResolveInfo?.Root != null)
             {
                 var rootNode = packageDetails.ResolveInfo.Nodes?.FirstOrDefault(n => n.Id == packageDetails.ResolveInfo.Root);
@@ -382,16 +382,16 @@ namespace LCT.PackageIdentifier
                     {
                         if (idToPurl.TryGetValue(depId, out var depPurl))
                         {
-                            directDepPurls.Add(depPurl);
+                            directDependencyPurls.Add(depPurl);
                         }
                     }
                 }
             }
-            directDepPurls = [.. directDepPurls.Distinct()];
+            directDependencyPurls = [.. directDependencyPurls.Distinct()];
             foreach (var component in components)
             {
                 component.Properties ??= new List<Property>();
-                bool isDirect = directDepPurls.Contains(component.Purl);
+                bool isDirect = directDependencyPurls.Contains(component.Purl);
                 var properties = component.Properties;
                 // Add or update the property
                 CommonHelper.RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_SiemensDirect, isDirect ? "true" : "false");
@@ -428,7 +428,7 @@ namespace LCT.PackageIdentifier
         private static void AnalyzeCargoDependencyKindsExcluding(
     CargoPackageDetails packageDetails,
     Dictionary<string, string> idToPurl,
-    Dictionary<string, List<string>> purlToDevKinds,
+    Dictionary<string, List<string>> purlToDevDependencyKinds,
     Dictionary<string, Component> idToComponent,
     List<Dependency> dependencies,
     List<string> excludeIds)
@@ -438,25 +438,19 @@ namespace LCT.PackageIdentifier
                 return;
 
             foreach (var node in resolve.Nodes)
-            {
-                if (ShouldSkipNode(node, excludeIds))
-                    continue;
+            {              
 
-                ProcessNodeDeps(node, idToPurl, purlToDevKinds);
+                ProcessNodeDeps(node, idToPurl, purlToDevDependencyKinds);
 
                 AddCycloneDXDependencyExcluding(node, idToComponent, node.Id, dependencies, excludeIds);
             }
         }
 
-        private static bool ShouldSkipNode(CargoPackageDetails.Node node, List<string> excludeIds)
-        {
-            return string.IsNullOrEmpty(node?.Id) || excludeIds.Contains(node.Id);
-        }
 
         private static void ProcessNodeDeps(
             CargoPackageDetails.Node node,
             Dictionary<string, string> idToPurl,
-            Dictionary<string, List<string>> purlToDevKinds)
+            Dictionary<string, List<string>> purlToDevDependencyKinds)
         {
             if (node.Deps == null)
                 return;
@@ -466,9 +460,9 @@ namespace LCT.PackageIdentifier
                 if (!IsValidDep(dep, idToPurl, out var depPurl))
                     continue;
 
-                var kindList = GetOrCreateKindList(depPurl, purlToDevKinds);
+                var dependencyKindList = GetOrCreateKindList(depPurl, purlToDevDependencyKinds);
 
-                AddDepKinds(dep, kindList);
+                AddDepKinds(dep, dependencyKindList);
             }
         }
 
@@ -480,28 +474,28 @@ namespace LCT.PackageIdentifier
             return idToPurl.TryGetValue(dep.Pkg, out depPurl);
         }
 
-        private static List<string> GetOrCreateKindList(string depPurl, Dictionary<string, List<string>> purlToDevKinds)
+        private static List<string> GetOrCreateKindList(string depPurl, Dictionary<string, List<string>> purlToDevDependencyKinds)
         {
-            if (!purlToDevKinds.TryGetValue(depPurl, out var kindList))
+            if (!purlToDevDependencyKinds.TryGetValue(depPurl, out var dependencyKindList))
             {
-                kindList = new List<string>();
-                purlToDevKinds[depPurl] = kindList;
+                dependencyKindList = new List<string>();
+                purlToDevDependencyKinds[depPurl] = dependencyKindList;
             }
-            return kindList;
+            return dependencyKindList;
         }
 
-        private static void AddDepKinds(CargoPackageDetails.Dep dep, List<string> kindList)
+        private static void AddDepKinds(CargoPackageDetails.Dep dep, List<string> dependencyKindList)
         {
             if (dep.DepKinds != null && dep.DepKinds.Count > 0)
             {
                 foreach (var kind in dep.DepKinds)
                 {
-                    kindList.Add(kind?.Kind);
+                    dependencyKindList.Add(kind?.Kind);
                 }
             }
             else
             {
-                kindList.Add(null);
+                dependencyKindList.Add(null);
             }
         }
 
