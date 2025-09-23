@@ -1,0 +1,1170 @@
+﻿{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:85eb2f99-4655-4192-a6e0-dedd2b2aaff1",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2025-09-23T06:42:24Z",
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "supplier": {
+            "name": "Siemens AG"
+          },
+          "name": "Clearing Automation Tool",
+          "version": "8.2.0",
+          "externalReferences": [
+            {
+              "url": "https://github.com/siemens/continuous-clearing",
+              "type": "website"
+            }
+          ]
+        }
+      ]
+    },
+    "component": {
+      "type": "application",
+      "name": "Test",
+      "version": "1.0"
+    },
+    "properties": [
+      {
+        "name": "siemens:profile",
+        "value": "clearing"
+      }
+    ]
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "pkg:cargo/anstyle@1.0.11",
+      "name": "anstyle",
+      "version": "1.0.11",
+      "purl": "pkg:cargo/anstyle@1.0.11",
+      "externalReferences": [
+        {
+          "url": "https://github.com/rust-cli/anstyle.git",
+          "type": "distribution"
+        }
+      ],
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "cargo"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:cargo/cc@1.2.38",
+      "name": "cc",
+      "version": "1.2.38",
+      "purl": "pkg:cargo/cc@1.2.38",
+      "externalReferences": [
+        {
+          "url": "https://github.com/rust-lang/cc-rs",
+          "type": "distribution"
+        }
+      ],
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "cargo"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:cargo/cfg-if@1.0.3",
+      "name": "cfg-if",
+      "version": "1.0.3",
+      "purl": "pkg:cargo/cfg-if@1.0.3",
+      "externalReferences": [
+        {
+          "url": "https://github.com/rust-lang/cfg-if",
+          "type": "distribution"
+        }
+      ],
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "cargo"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:cargo/downcast@0.11.0",
+      "name": "downcast",
+      "version": "0.11.0",
+      "purl": "pkg:cargo/downcast@0.11.0",
+      "externalReferences": [
+        {
+          "url": "https://github.com/fkoep/downcast-rs",
+          "type": "distribution"
+        }
+      ],
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "cargo"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:cargo/find-msvc-tools@0.1.2",
+      "name": "find-msvc-tools",
+      "version": "0.1.2",
+      "purl": "pkg:cargo/find-msvc-tools@0.1.2",
+      "externalReferences": [
+        {
+          "url": "https://github.com/rust-lang/cc-rs",
+          "type": "distribution"
+        }
+      ],
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "cargo"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:cargo/fragile@2.0.1",
+      "name": "fragile",
+      "version": "2.0.1",
+      "purl": "pkg:cargo/fragile@2.0.1",
+      "externalReferences": [
+        {
+          "url": "https://github.com/mitsuhiko/fragile",
+          "type": "distribution"
+        }
+      ],
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "cargo"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:cargo/lazy_static@1.5.0",
+      "name": "lazy_static",
+      "version": "1.5.0",
+      "purl": "pkg:cargo/lazy_static@1.5.0",
+      "externalReferences": [
+        {
+          "url": "https://github.com/rust-lang-nursery/lazy-static.rs",
+          "type": "distribution"
+        }
+      ],
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "cargo"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:cargo/mockall@0.12.1",
+      "name": "mockall",
+      "version": "0.12.1",
+      "purl": "pkg:cargo/mockall@0.12.1",
+      "externalReferences": [
+        {
+          "url": "https://github.com/asomers/mockall",
+          "type": "distribution"
+        }
+      ],
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "cargo"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:cargo/mockall_derive@0.12.1",
+      "name": "mockall_derive",
+      "version": "0.12.1",
+      "purl": "pkg:cargo/mockall_derive@0.12.1",
+      "externalReferences": [
+        {
+          "url": "https://github.com/asomers/mockall",
+          "type": "distribution"
+        }
+      ],
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "cargo"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:cargo/predicates@3.1.3",
+      "name": "predicates",
+      "version": "3.1.3",
+      "purl": "pkg:cargo/predicates@3.1.3",
+      "externalReferences": [
+        {
+          "url": "https://github.com/assert-rs/predicates-rs",
+          "type": "distribution"
+        }
+      ],
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "cargo"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:cargo/predicates-core@1.0.9",
+      "name": "predicates-core",
+      "version": "1.0.9",
+      "purl": "pkg:cargo/predicates-core@1.0.9",
+      "externalReferences": [
+        {
+          "url": "https://github.com/assert-rs/predicates-rs/tree/master/crates/core",
+          "type": "distribution"
+        }
+      ],
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "cargo"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:cargo/predicates-tree@1.0.12",
+      "name": "predicates-tree",
+      "version": "1.0.12",
+      "purl": "pkg:cargo/predicates-tree@1.0.12",
+      "externalReferences": [
+        {
+          "url": "https://github.com/assert-rs/predicates-rs/tree/master/crates/tree",
+          "type": "distribution"
+        }
+      ],
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "cargo"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:cargo/proc-macro2@1.0.101",
+      "name": "proc-macro2",
+      "version": "1.0.101",
+      "purl": "pkg:cargo/proc-macro2@1.0.101",
+      "externalReferences": [
+        {
+          "url": "https://github.com/dtolnay/proc-macro2",
+          "type": "distribution"
+        }
+      ],
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "cargo"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:cargo/quote@1.0.40",
+      "name": "quote",
+      "version": "1.0.40",
+      "purl": "pkg:cargo/quote@1.0.40",
+      "externalReferences": [
+        {
+          "url": "https://github.com/dtolnay/quote",
+          "type": "distribution"
+        }
+      ],
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "cargo"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:cargo/serde@1.0.226",
+      "name": "serde",
+      "version": "1.0.226",
+      "purl": "pkg:cargo/serde@1.0.226",
+      "externalReferences": [
+        {
+          "url": "https://github.com/serde-rs/serde",
+          "type": "distribution"
+        }
+      ],
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "cargo"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:cargo/serde_core@1.0.226",
+      "name": "serde_core",
+      "version": "1.0.226",
+      "purl": "pkg:cargo/serde_core@1.0.226",
+      "externalReferences": [
+        {
+          "url": "https://github.com/serde-rs/serde",
+          "type": "distribution"
+        }
+      ],
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "cargo"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:cargo/serde_derive@1.0.226",
+      "name": "serde_derive",
+      "version": "1.0.226",
+      "purl": "pkg:cargo/serde_derive@1.0.226",
+      "externalReferences": [
+        {
+          "url": "https://github.com/serde-rs/serde",
+          "type": "distribution"
+        }
+      ],
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "cargo"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:cargo/shlex@1.3.0",
+      "name": "shlex",
+      "version": "1.3.0",
+      "purl": "pkg:cargo/shlex@1.3.0",
+      "externalReferences": [
+        {
+          "url": "https://github.com/comex/rust-shlex",
+          "type": "distribution"
+        }
+      ],
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "cargo"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:cargo/syn@2.0.106",
+      "name": "syn",
+      "version": "2.0.106",
+      "purl": "pkg:cargo/syn@2.0.106",
+      "externalReferences": [
+        {
+          "url": "https://github.com/dtolnay/syn",
+          "type": "distribution"
+        }
+      ],
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "cargo"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:cargo/termtree@0.5.1",
+      "name": "termtree",
+      "version": "0.5.1",
+      "purl": "pkg:cargo/termtree@0.5.1",
+      "externalReferences": [
+        {
+          "url": "https://github.com/rust-cli/termtree",
+          "type": "distribution"
+        }
+      ],
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "cargo"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:cargo/unicode-ident@1.0.19",
+      "name": "unicode-ident",
+      "version": "1.0.19",
+      "purl": "pkg:cargo/unicode-ident@1.0.19",
+      "externalReferences": [
+        {
+          "url": "https://github.com/dtolnay/unicode-ident",
+          "type": "distribution"
+        }
+      ],
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "cargo"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "pkg:cargo/anstyle@1.0.11",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:cargo/cc@1.2.38",
+      "dependsOn": [
+        "pkg:cargo/find-msvc-tools@0.1.2",
+        "pkg:cargo/shlex@1.3.0"
+      ]
+    },
+    {
+      "ref": "pkg:cargo/cfg-if@1.0.3",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:cargo/downcast@0.11.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:cargo/find-msvc-tools@0.1.2",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:cargo/fragile@2.0.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:cargo/lazy_static@1.5.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:cargo/mockall@0.12.1",
+      "dependsOn": [
+        "pkg:cargo/cfg-if@1.0.3",
+        "pkg:cargo/downcast@0.11.0",
+        "pkg:cargo/fragile@2.0.1",
+        "pkg:cargo/lazy_static@1.5.0",
+        "pkg:cargo/mockall_derive@0.12.1",
+        "pkg:cargo/predicates@3.1.3",
+        "pkg:cargo/predicates-tree@1.0.12"
+      ]
+    },
+    {
+      "ref": "pkg:cargo/mockall_derive@0.12.1",
+      "dependsOn": [
+        "pkg:cargo/cfg-if@1.0.3",
+        "pkg:cargo/proc-macro2@1.0.101",
+        "pkg:cargo/quote@1.0.40",
+        "pkg:cargo/syn@2.0.106"
+      ]
+    },
+    {
+      "ref": "pkg:cargo/predicates@3.1.3",
+      "dependsOn": [
+        "pkg:cargo/anstyle@1.0.11",
+        "pkg:cargo/predicates-core@1.0.9"
+      ]
+    },
+    {
+      "ref": "pkg:cargo/predicates-core@1.0.9",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:cargo/predicates-tree@1.0.12",
+      "dependsOn": [
+        "pkg:cargo/predicates-core@1.0.9",
+        "pkg:cargo/termtree@0.5.1"
+      ]
+    },
+    {
+      "ref": "pkg:cargo/proc-macro2@1.0.101",
+      "dependsOn": [
+        "pkg:cargo/unicode-ident@1.0.19"
+      ]
+    },
+    {
+      "ref": "pkg:cargo/quote@1.0.40",
+      "dependsOn": [
+        "pkg:cargo/proc-macro2@1.0.101"
+      ]
+    },
+    {
+      "ref": "pkg:cargo/serde@1.0.226",
+      "dependsOn": [
+        "pkg:cargo/serde_core@1.0.226",
+        "pkg:cargo/serde_derive@1.0.226"
+      ]
+    },
+    {
+      "ref": "pkg:cargo/serde_core@1.0.226",
+      "dependsOn": [
+        "pkg:cargo/serde_derive@1.0.226"
+      ]
+    },
+    {
+      "ref": "pkg:cargo/serde_derive@1.0.226",
+      "dependsOn": [
+        "pkg:cargo/proc-macro2@1.0.101",
+        "pkg:cargo/quote@1.0.40",
+        "pkg:cargo/syn@2.0.106"
+      ]
+    },
+    {
+      "ref": "pkg:cargo/shlex@1.3.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:cargo/syn@2.0.106",
+      "dependsOn": [
+        "pkg:cargo/proc-macro2@1.0.101",
+        "pkg:cargo/quote@1.0.40",
+        "pkg:cargo/unicode-ident@1.0.19"
+      ]
+    },
+    {
+      "ref": "pkg:cargo/termtree@0.5.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:cargo/unicode-ident@1.0.19",
+      "dependsOn": []
+    }
+  ],
+  "compositions": [],
+  "definitions": {
+    "standards": [
+      {
+        "bom-ref": "standard-bom",
+        "name": "Standard BOM",
+        "version": "3.0.0",
+        "description": "The Standard for Software Bills of Materials in Siemens",
+        "owner": "Siemens AG",
+        "externalReferences": [
+          {
+            "url": "https://sbom.siemens.io/",
+            "type": "website"
+          }
+        ]
+      }
+    ]
+  }
+}
