@@ -113,7 +113,7 @@ namespace SW360IntegrationTest.Conan
                 new AuthenticationHeaderValue(TestConstant.TestSw360TokenType, TestConstant.TestSw360TokenValue);
 
             //url formation for retrieving component details
-            string url = TestConstant.Sw360ComponentApi + TestConstant.componentNameUrl + "rapidjson";
+            string url = TestConstant.Sw360ComponentApi + TestConstant.componentNameUrl + "libcurl";
             string responseBody = await httpClient.GetStringAsync(url); //GET request
             var responseData = JsonConvert.DeserializeObject<ComponentsModel>(responseBody);
             //Assert
