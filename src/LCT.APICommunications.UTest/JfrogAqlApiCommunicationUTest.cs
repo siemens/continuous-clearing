@@ -222,6 +222,18 @@ namespace LCT.APICommunications.UTest
             Assert.That(query, Is.EqualTo(expectedQuery));
         }
 
+        [Test]
+        public void JfrogAqlApiCommunication_GetCargoComponentDataByRepo_ReturnsInvalidOperationException()
+        {
+            // Arrange
+            ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials();
+            string invalidDomainName = ""; // Invalid domain name
+            int timeout = 30; // Timeout in seconds
+            string invalidRepoName = "invalid-npm-repo"; // Invalid repo name
 
+            JfrogAqlApiCommunication jfrogApiCommunication = new JfrogAqlApiCommunication(invalidDomainName, repoCredentials, timeout);
+
+
+        }
     }
 }
