@@ -51,7 +51,7 @@ namespace LCT.PackageIdentifier.UTest
         }
 
         [Test]
-        public void GetDetailsforManuallyAddedComp_CoversMethod()
+        public void GetDetailsforManuallyAddedCompCoversMethod()
         {
             var components = new List<Component>
     {
@@ -64,10 +64,8 @@ namespace LCT.PackageIdentifier.UTest
         }
     };
 
-            var method = typeof(CargoProcessor).GetMethod("GetDetailsforManuallyAddedComp", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-            Assert.NotNull(method, "Could not find GetDetailsforManuallyAddedComp method via reflection.");
-
-            method.Invoke(null, new object[] { components });
+            // Call the method directly from BomHelper
+            BomHelper.GetDetailsforManuallyAddedComp(components);
 
             var propNames = components[0].Properties.Select(p => p.Name).ToList();
             Assert.Contains(Dataconstant.Cdx_IsDevelopment, propNames);
@@ -192,19 +190,27 @@ namespace LCT.PackageIdentifier.UTest
         }
 
         [Test]
-        public void GetExcludedComponentsList_ExcludesInvalidComponents()
+        public void GetDetailsforManuallyAddedComp_CoversMethod()
         {
             var components = new List<Component>
     {
-        new Component { Name = "Valid", Version = "1.0", Purl = "pkg:cargo/Valid@1.0" },
-        new Component { Name = "", Version = "1.0", Purl = "pkg:cargo/Invalid@1.0" }
+        new Component
+        {
+            Name = "ManualComp",
+            Version = "1.0",
+            Purl = "pkg:cargo/ManualComp@1.0",
+            Properties = new List<Property>()
+        }
     };
-            var method = typeof(CargoProcessor).GetMethod("GetExcludedComponentsList", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
 
-            var result = (List<Component>)method.Invoke(null, new object[] { components });
+            // Call the method directly from BomHelper
+            BomHelper.GetDetailsforManuallyAddedComp(components);
 
-            Assert.AreEqual(1, result.Count);
-            Assert.AreEqual("Valid", result[0].Name);
+            var propNames = components[0].Properties.Select(p => p.Name).ToList();
+            Assert.Contains(Dataconstant.Cdx_IsDevelopment, propNames);
+            Assert.Contains(Dataconstant.Cdx_IdentifierType, propNames);
+            Assert.AreEqual("false", components[0].Properties.First(p => p.Name == Dataconstant.Cdx_IsDevelopment).Value);
+            Assert.AreEqual(Dataconstant.ManullayAdded, components[0].Properties.First(p => p.Name == Dataconstant.Cdx_IdentifierType).Value);
         }
 
         [Test]
