@@ -32,6 +32,9 @@
 		<None Update="PackageCreatorTestFiles\Maven\CCTComparisonBOMMavenUpdated.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
+		<None Update="PackageIdentifierTestFiles\Cargo\CCTLocalBOMCargoSpdxSbom.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 		<None Update="PackageIdentifierTestFiles\CCTLocalBOMTemplateNugetInitial.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>

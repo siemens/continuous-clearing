@@ -680,7 +680,3 @@ namespace LCT.Common
         #endregion
     }
 }
-
-
-
-

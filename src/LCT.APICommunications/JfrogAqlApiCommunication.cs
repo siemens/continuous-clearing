@@ -44,6 +44,25 @@ namespace LCT.APICommunications
             return await httpClient.GetAsync(url);
         }
 
+        private async Task<HttpResponseMessage> GetComponentDataByRepo(string repoName, string includeFields)
+        {
+            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
+            TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
+            httpClient.Timeout = timeOutInSec;
+
+            StringBuilder query = new();
+            query.Append("items.find({\"repo\":\"");
+            query.Append($"{repoName}");
+            query.Append("\"}).include(");
+            query.Append($"{includeFields}");
+            query.Append(')');
+
+            string aqlQueryToBody = query.ToString();
+            string uri = $"{DomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}";
+            HttpContent httpContent = new StringContent(aqlQueryToBody);
+            return await httpClient.PostAsync(uri, httpContent);
+        }
+
         /// <summary>
         /// Gets the Internal Component Data By Repo name
         /// </summary>
@@ -51,67 +70,19 @@ namespace LCT.APICommunications
         /// <returns></returns>
         public async Task<HttpResponseMessage> GetInternalComponentDataByRepo(string repoName)
         {
-            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-            TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
-            httpClient.Timeout = timeOutInSec;
-
-            StringBuilder query = new();
-            query.Append("items.find({\"repo\":\"");
-            query.Append($"{repoName}");
-            query.Append("\"}).include(\"repo\", \"path\", \"name\", \"actual_sha1\",\"actual_md5\",\"sha256\")");
-
-            string aqlQueryToBody = query.ToString();
-            string uri = $"{DomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}";
-            HttpContent httpContent = new StringContent(aqlQueryToBody);
-            return await httpClient.PostAsync(uri, httpContent);
+            return await GetComponentDataByRepo(repoName, "\"repo\", \"path\", \"name\", \"actual_sha1\",\"actual_md5\",\"sha256\"");
         }
         public async Task<HttpResponseMessage> GetNpmComponentDataByRepo(string repoName)
         {
-            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-            TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
-            httpClient.Timeout = timeOutInSec;
-
-            StringBuilder query = new();
-            query.Append("items.find({\"repo\":\"");
-            query.Append($"{repoName}");
-            query.Append("\"}).include(\"repo\", \"path\", \"name\",\"@npm.name\",\"@npm.version\", \"actual_sha1\",\"actual_md5\",\"sha256\")");
-
-            string aqlQueryToBody = query.ToString();
-            string uri = $"{DomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}";
-            HttpContent httpContent = new StringContent(aqlQueryToBody);
-            return await httpClient.PostAsync(uri, httpContent);
+            return await GetComponentDataByRepo(repoName, "\"repo\", \"path\", \"name\",\"@npm.name\",\"@npm.version\", \"actual_sha1\",\"actual_md5\",\"sha256\"");
         }
         public async Task<HttpResponseMessage> GetPypiComponentDataByRepo(string repoName)
         {
-            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-            TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
-            httpClient.Timeout = timeOutInSec;
-
-            StringBuilder query = new();
-            query.Append("items.find({\"repo\":\"");
-            query.Append($"{repoName}");
-            query.Append("\"}).include(\"repo\", \"path\", \"name\",\"@pypi.normalized.name\",\"@pypi.version\", \"actual_sha1\",\"actual_md5\",\"sha256\")");
-
-            string aqlQueryToBody = query.ToString();
-            string uri = $"{DomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}";
-            HttpContent httpContent = new StringContent(aqlQueryToBody);
-            return await httpClient.PostAsync(uri, httpContent);
+            return await GetComponentDataByRepo(repoName, "\"repo\", \"path\", \"name\",\"@pypi.normalized.name\",\"@pypi.version\", \"actual_sha1\",\"actual_md5\",\"sha256\"");
         }
         public async Task<HttpResponseMessage> GetCargoComponentDataByRepo(string repoName)
         {
-            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-            TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
-            httpClient.Timeout = timeOutInSec;
-
-            StringBuilder query = new();
-            query.Append("items.find({\"repo\":\"");
-            query.Append($"{repoName}");
-            query.Append("\"}).include(\"repo\", \"path\", \"name\",\"@crate.name\",\"@crate.version\", \"actual_sha1\",\"actual_md5\",\"sha256\")");
-
-            string aqlQueryToBody = query.ToString();
-            string uri = $"{DomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}";
-            HttpContent httpContent = new StringContent(aqlQueryToBody);
-            return await httpClient.PostAsync(uri, httpContent);
+            return await GetComponentDataByRepo(repoName, "\"repo\", \"path\", \"name\",\"@crate.name\",\"@crate.version\", \"actual_sha1\",\"actual_md5\",\"sha256\"");
         }
 
         /// <summary>
@@ -219,8 +190,6 @@ namespace LCT.APICommunications
                 query.Append($"items.find({{{string.Join(", ", queryList)}}}).include(\"repo\", \"path\", \"name\").limit(1)");
                 return query.ToString();
             }
-
-
 
         }
 
