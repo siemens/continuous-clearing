@@ -665,18 +665,7 @@ namespace LCT.Common
             };
             return component;
         }
-
-        public static string GetFileNameForSourceCode(string sourceUrl, ComparisonBomData component)
-        {
-            if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CARGO"]))
-            {
-                return component.Name;
-            }
-            else
-            {
-                return GetSubstringOfLastOccurance(sourceUrl, "/");
-            }
-        }
+       
         #endregion
     }
 }

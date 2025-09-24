@@ -138,9 +138,9 @@ namespace LCT.SW360PackageCreator
 
             return downloadPath;
         }
-        private async Task<string> DownloadCargoSource(ComparisonBomData component, string localPathforDownload)
+        private static async Task<string> DownloadCargoSource(ComparisonBomData component, string localPathforDownload)
         {
-            if (!string.IsNullOrEmpty(component.DownloadUrl) && component.DownloadUrl.EndsWith("download", StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrEmpty(component.DownloadUrl))
             {
                 string fileName = $"{component.Name}-{component.Version}.crate";
                 string downloadFilePath = Path.Combine(localPathforDownload, fileName);
@@ -151,15 +151,16 @@ namespace LCT.SW360PackageCreator
 
                 Uri uri = new Uri(component.DownloadUrl);
                 await UrlHelper.DownloadFileAsync(uri, downloadFilePath);
-
-                string tarGzFilePath = Path.Combine(localPathforDownload, $"{component.Name}-{component.Version}-{SOURCE}.tar.gz");
-                if (File.Exists(tarGzFilePath))
-                    File.Delete(tarGzFilePath);
-
-                File.Move(downloadFilePath, tarGzFilePath);
-                return tarGzFilePath;
+                if (downloadFilePath.EndsWith(FileConstant.CrateFileExtension))
+                {
+                    string tarfile = Path.ChangeExtension(downloadFilePath, FileConstant.TargzFileExtension);
+                    File.Copy(downloadFilePath, tarfile, true);
+                    downloadFilePath = tarfile;
+                }
+               
+                return downloadFilePath;
             }
-            return await _packageDownloderList["NPM"].DownloadPackage(component, localPathforDownload);
+            return "";
         }
         private static async Task DownloadDependencyList(ComparisonBomData component)
         {

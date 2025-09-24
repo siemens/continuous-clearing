@@ -51,7 +51,7 @@ namespace LCT.SW360PackageCreator
             }
 
             string sourceUrl = component.SourceUrl.TrimEndOfString("/");
-            string fileName = CommonHelper.GetFileNameForSourceCode(sourceUrl,component);
+            string fileName = CommonHelper.GetSubstringOfLastOccurance(sourceUrl, "/");
             string safeTaggedVersion = SanitizeFileName(taggedVersion);
             string cloneFolderName = $"{fileName}-{safeTaggedVersion}";
             string compressedFilePath = $"{downloadPath}{fileName}-{safeTaggedVersion}-{Source}";
@@ -80,10 +80,6 @@ namespace LCT.SW360PackageCreator
             {
                 string repoUrl = component.SourceUrl;
                 repoUrl = repoUrl.TrimEnd('/');
-                if (repoUrl.EndsWith(".git", StringComparison.OrdinalIgnoreCase))
-                {
-                    repoUrl = repoUrl[..^4];
-                }
                 string encodedTag = Uri.EscapeDataString(tag);
                 return $"{repoUrl}/tree/{encodedTag}";
             }
