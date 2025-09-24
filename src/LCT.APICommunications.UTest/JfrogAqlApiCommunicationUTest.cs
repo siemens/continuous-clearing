@@ -233,7 +233,8 @@ namespace LCT.APICommunications.UTest
 
             JfrogAqlApiCommunication jfrogApiCommunication = new JfrogAqlApiCommunication(invalidDomainName, repoCredentials, timeout);
 
-
+            // Act & Assert
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApiCommunication.GetCargoComponentDataByRepo(invalidRepoName));
         }
     }
 }
