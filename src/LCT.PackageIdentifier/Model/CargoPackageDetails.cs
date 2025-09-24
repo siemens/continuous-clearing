@@ -1,12 +1,15 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2025 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+
+using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LCT.PackageIdentifier.Model
 {
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class CargoPackageDetails
     {
         [JsonProperty("packages")]
@@ -18,6 +21,8 @@ namespace LCT.PackageIdentifier.Model
         public List<string> Workspace_members { get; set; }
         [JsonProperty("workspace_default_members")]
         public List<string> Workspace_default_members { get; set; }
+        
+        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public class Dep
         {
             [JsonProperty("name")]
@@ -30,6 +35,7 @@ namespace LCT.PackageIdentifier.Model
             public List<DepKind> DepKinds { get; set; }
         }
 
+        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public class DepKind
         {
             [JsonProperty("kind")]
@@ -38,7 +44,7 @@ namespace LCT.PackageIdentifier.Model
             [JsonProperty("target")]
             public string Target { get; set; }
         }
-
+        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public class Node
         {
             [JsonProperty("id")]
@@ -53,7 +59,7 @@ namespace LCT.PackageIdentifier.Model
             [JsonProperty("features")]
             public List<string> Features { get; set; }
         }
-
+        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public class Package
         {
             [JsonProperty("name")]
@@ -116,7 +122,7 @@ namespace LCT.PackageIdentifier.Model
             [JsonProperty("rust_version")]
             public string RustVersion { get; set; }
         }
-
+        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public class Resolve
         {
             [JsonProperty("nodes")]

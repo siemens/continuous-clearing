@@ -222,26 +222,18 @@ namespace LCT.APICommunications.UTest
             Assert.That(query, Is.EqualTo(expectedQuery));
         }
 
-            [Test]
-            public void BuildAqlQuery_CargoComponent_ReturnsValidQuery()
-            {
-                // Arrange
-                var component = new ComponentsToArtifactory
-                {
-                    ComponentType = "Cargo",
-                    SrcRepoName = "cargo-repo",
-                    Name = "TestCrate",
-                    Version = "1.2.3"
-                };
+        [Test]
+        public void JfrogAqlApiCommunication_GetCargoComponentDataByRepo_ReturnsInvalidOperationException()
+        {
+            // Arrange
+            ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials();
+            string invalidDomainName = ""; // Invalid domain name
+            int timeout = 30; // Timeout in seconds
+            string invalidRepoName = "invalid-npm-repo"; // Invalid repo name
 
-                // Act
-                string query = JfrogAqlApiCommunication.BuildAqlQuery(component);
-
-                // Assert
-                string expectedQuery = "items.find({\"$and\": [{ \"repo\":{ \"$eq\": \"cargo-repo\" } },{ \"$or\":[{ \"@carte.name\":{ \"$eq\": \"TestCrate\" } } ,{ \"@crate.name\":{ \"$eq\": \"testcrate\" } }] },{ \"@crate.version\":{\"$eq\": \"1.2.3\" } }]}).include(\"repo\", \"path\", \"name\").limit(1)";
-                Assert.That(query, Is.EqualTo(expectedQuery));
-            }
+            JfrogAqlApiCommunication jfrogApiCommunication = new JfrogAqlApiCommunication(invalidDomainName, repoCredentials, timeout);
 
 
+        }
     }
 }

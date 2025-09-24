@@ -36,5 +36,5 @@ namespace LCT.PackageIdentifier.Model
         public string PackageUrl { get; set; }
         public string SourceUrl { get; set; }
         public string DownloadUrl { get; set; }
-    }
+    }    
 }

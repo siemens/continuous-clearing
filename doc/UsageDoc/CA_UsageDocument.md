@@ -48,6 +48,8 @@
     - [Binary Template Specific Parameters](#binary-template-specific-parameters)
     - [Docker Template Specific Parameters](#docker-template-specific-parameters)
 - [Troubleshoot](#troubleshoot)
+  - [Component Compliance Guidance](#component-compliance-guidance)
+  - [General](#general)
 - [Manual Update](#manual-update)
 - [Bug or Enhancements](#bug-or-enhancements)
 - [Glossary of Terms](#glossary-of-terms)
@@ -57,7 +59,7 @@
 
 
 # Introduction
-Welcome to the Continuous Clearing Tool, your automated solution for streamlining the SW360 clearing process. Designed with Project Managers and Developers in mind, this tool efficiently manages third-party components across various platforms, including NPM, NuGet, Maven, Python, Conan, Alpine, and Debian.
+Welcome to the Continuous Clearing Tool, your automated solution for streamlining the SW360 clearing process. Designed with Project Managers and Developers in mind, this tool efficiently manages third-party components across various platforms, including NPM, NuGet, Maven, Python, Conan, Cargo, Alpine, and Debian.
 
 ## Key Features
 - **Automated Scanning and Identification**: The tool automatically scans and identifies third-party components in your projects.
@@ -75,17 +77,17 @@ Simply integrate the Continuous Clearing Tool into your project workflow to expe
 
 # Continuous Clearing Tool workflow diagram
 * Package Identifier
-  * [NPM/NUGET/MAVEN/PYTHON/CONAN](../usagedocimg/packageIdentifiernpmnuget.PNG)
+  * [NPM/NUGET/MAVEN/PYTHON/CONAN/CARGO](../usagedocimg/packageIdentifiernpmnuget.PNG)
   * [Debian/Alpine](../usagedocimg/packageIdentifierdebianalpine.PNG)
   * [BasicSBOM](../usagedocimg/PackageidentifierBasicSBOMflowdiagram.png)
  
 * SW360 Package Creator
-  * [NPM/NUGET/MAVEN/PYTHON/CONAN](../usagedocimg/packageCreatirnpmnuget.PNG)
+  * [NPM/NUGET/MAVEN/PYTHON/CONAN/CARGO](../usagedocimg/packageCreatirnpmnuget.PNG)
   * [Debian](../usagedocimg/packagecreatordebian.PNG)
   * [Alpine](../usagedocimg/ComponentcreaterforAlpine.PNG)
 
 * Artifactory Uploader
-  * [NPM/NUGET/MAVEN/PYTHON/CONAN](../usagedocimg/artifactoryuploader.PNG)
+  * [NPM/NUGET/MAVEN/PYTHON/CONAN?CARGO](../usagedocimg/artifactoryuploader.PNG)
 
 # Prerequisite
 To ensure a smooth operation of the Continuous Clearing Tool, please follow these prerequisites:
@@ -194,6 +196,17 @@ Users have the flexibility to generate a basic SBOM even if connections to SW360
   * **Project Type :** **Conan**
 
     * Input file repository should contain **conan.lock** file.
+   
+  * **Project Type :** **Cargo**
+ 
+    * Run the command given below (i.e., To generate a metadata file for your project, run the following command in your project directory (where your Cargo.toml is located)) .
+
+    * For creating metadata.json file you can use the format version 1.
+ 
+     **Example**: cargo metadata --format-version 1 > cargo.metadata.json
+         After successful execution, *.metadata.json file will be created in specified directory .
+    
+         Resulted cargo.metadata.json file will be having the list of installed packages  and the same file will be used as  an input to Continuous clearing tool -    Package identifier via the input directory parameter. The remaining process is same as other project types.
 
   * **Project Type :**  **Debian & Alpine**
 
@@ -252,7 +265,7 @@ Description for the settings in appSettings.json file
 | S.No | Argument Name                             | Description                                                   | Mandatory | Example                                                                  |
 | ---- | ----------------------------------------- | ------------------------------------------------------------- | --------------- | ------------------------------------------------------------------------ |
 | 1    | TimeOut                                   | Timeout in seconds                                            | No              | 400                                                                      |
-| 2    | ProjectType                               | Type of the project                                           | Yes             | `Nuget`, `NPM`, `Poetry`, `Conan`, `Alpine`, `Debian`, `Maven`                         |
+| 2    | ProjectType                               | Type of the project                                           | Yes             | `Nuget`, `NPM`, `Poetry`, `Conan`, `Alpine`, `Debian`, `Maven`, `Cargo`                      |
 | 3    | MultipleProjectType                       | Whether multiple project types are supported                  | No              | `False`                                                                    |
 | 4    | Telemetry.Enable                          | Enable telemetry                                              | No              | `False`                                                                    |
 | 5    | Telemetry.ApplicationInsightsConnectionString | Application Insights instrumentation key                      | No              | `123-456-789-123-123`                                                     |
@@ -549,6 +562,27 @@ Both templates share common parameters with some implementation-specific differe
 | `branchName_powerUser` | string | '' | GitHub branch to build the Docker image from |:x:|
 
 # Troubleshoot
+
+## Component Compliance Guidance
+
+### Purpose
+
+To uphold our commitment to robust security, licensing adherence, and architectural best practices, the CC Tool has been enhanced to provide proactive guidance on third-party component usage. This feature aims to help development teams identify and address potential compliance considerations early in the project lifecycle, thereby reducing the need for compliance exceptions and streamlining the component selection process.
+
+### Functionality
+
+The Tool includes an intelligent scanning capability for projects. Specifically, when the tool detects the inclusion of certain components that may have specific compliance implications (e.g., those requiring particular scrutiny due to licensing, security, or architectural considerations, such as components based on Chromium), it will:
+
+1. Issue a Warning: A clear warning message will be displayed, indicating the presence of the identified component.
+2. Suggest Alternatives: Alongside the warning, the tool will provide a curated list of recommended alternative components. These alternatives have been vetted to align with our compliance standards and offer similar functionality, enabling teams to easily pivot to approved solutions.
+
+Ex: How to handle Chromium or CEFSharp software packages? 
+
+When you have CEF Sharp packages then automatically you use the Chromium Embedded Framework which includes automatically the binary full Chromium component.
+The automation will add automatically the CEF Sharp component but you have to add the Chromium component manually to your SW360 project.
+To decide which version is used you can check this mapping table https://bitbucket.org/chromiumembedded/cef/wiki/BranchesAndBuilding
+
+## General
 
 1. In case your pipeline takes a lot of time to run(more than 1 hour) when there are many components. It is advisable to increase the pipeline timeout and set it to a minimum of 1 hr.
 
