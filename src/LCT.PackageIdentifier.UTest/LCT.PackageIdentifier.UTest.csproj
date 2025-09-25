@@ -64,6 +64,9 @@
 		<None Update="PackageIdentifierUTTestFiles\AlpineSourceDetails_Cyclonedx.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
+		<None Update="PackageIdentifierUTTestFiles\choco.config">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 		<None Update="PackageIdentifierUTTestFiles\conan.lock">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
