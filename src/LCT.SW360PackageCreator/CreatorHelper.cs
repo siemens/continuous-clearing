@@ -273,10 +273,6 @@ namespace LCT.SW360PackageCreator
                 {
                     mapper.DownloadUrl = GetMavenDownloadUrl(mapper, item, releasesInfo);
                 }
-                else if (!string.IsNullOrEmpty(item.ReleaseExternalId) && item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CARGO"]))
-                {
-                    mapper.DownloadUrl = GetCargoComponentDownloadUrl(mapper, item, repo, releasesInfo);
-                }
                 else if (!string.IsNullOrEmpty(item.ReleaseExternalId) && IsOtherPackageType(item))
                 {
                     mapper.DownloadUrl = mapper.SourceUrl;
@@ -307,7 +303,8 @@ namespace LCT.SW360PackageCreator
         {
             return item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["POETRY"]) ||
                    item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CONAN"]) ||
-                   item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["ALPINE"]);
+                   item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["ALPINE"]) ||
+                   item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CARGO"]);
         }
 
         private void SetMapperStatus(ComparisonBomData mapper, ReleasesInfo releasesInfo)
@@ -627,25 +624,7 @@ namespace LCT.SW360PackageCreator
             }
 
             return Dataconstant.NotAvailable;
-        }
-        public static string GetCargoComponentDownloadUrl(ComparisonBomData mapper, Components item, IRepository repo, ReleasesInfo releasesInfo)
-        {
-            string sourceUrl = mapper.SourceUrl;
-
-            if (mapper.ReleaseStatus.Equals(Dataconstant.Available) && !string.IsNullOrEmpty(releasesInfo?.SourceCodeDownloadUrl))
-            {
-                return releasesInfo.SourceCodeDownloadUrl;
-            }
-
-            if (!string.IsNullOrEmpty(sourceUrl) &&
-                (sourceUrl.EndsWith(".git", StringComparison.OrdinalIgnoreCase) ||
-                 sourceUrl.EndsWith("download", StringComparison.OrdinalIgnoreCase)))
-            {
-                return sourceUrl;
-            }
-
-            return repo.FormGitCloneUrl(sourceUrl, item.Name, item.Version);
-        }
+        }       
         public static string GetComponentDownloadUrl(ComparisonBomData mapper, Components item, IRepository repo, ReleasesInfo releasesInfo)
         {
 
