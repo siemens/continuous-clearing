@@ -6,10 +6,12 @@
 
 using LCT.Common.Constants;
 using LCT.Common.Model;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Reflection;
 
 namespace LCT.Common
 {
@@ -147,6 +149,8 @@ namespace LCT.Common
     }
     public class Directory
     {
+        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
         private string m_InputFolder;
         private string m_OutputFolder;
         private string m_LogFolder;
@@ -159,16 +163,23 @@ namespace LCT.Common
             }
             set
             {
-                if (!AppDomain.CurrentDomain.FriendlyName.Contains("SW360PackageCreator") &&
-                    !AppDomain.CurrentDomain.FriendlyName.Contains("ArtifactoryUploader"))
+                try
                 {
-                    var folderAction = new FolderAction();
-                    folderAction.ValidateFolderPath(value);
-                    m_InputFolder = value;
+                    if (!AppDomain.CurrentDomain.FriendlyName.Contains("SW360PackageCreator") &&
+                    !AppDomain.CurrentDomain.FriendlyName.Contains("ArtifactoryUploader"))
+                    {
+                        var folderAction = new FolderAction();
+                        folderAction.ValidateFolderPath(value);
+                        m_InputFolder = value;
+                    }
+                }
+                catch (DirectoryNotFoundException)
+                {
+                    Logger.Error($"Input file folder not found : {value}");
+                    environmentHelper.CallEnvironmentExit(-1);
                 }
             }
         }
-
         public string OutputFolder
         {
             get

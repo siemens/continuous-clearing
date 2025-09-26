@@ -110,6 +110,8 @@ namespace LCT.SW360PackageCreator
             else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["POETRY"]))
             {
                 downloadPath = await GetAttachmentUrlList(component, localPathforDownload);
+                downloadPath = ConvertZipToTarGzIfNeeded(downloadPath);
+
             }
             else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CONAN"]))
             {
@@ -133,7 +135,18 @@ namespace LCT.SW360PackageCreator
 
             return downloadPath;
         }
-
+        private static string ConvertZipToTarGzIfNeeded(string filePath)
+        {
+            if (string.IsNullOrEmpty(filePath))
+                return filePath;
+            if (filePath.EndsWith(FileConstant.ZipFileExtension, StringComparison.OrdinalIgnoreCase))
+            {
+                string tarGzFilePath = Path.ChangeExtension(filePath, FileConstant.TargzFileExtension);
+                File.Copy(filePath, tarGzFilePath, true);
+                return tarGzFilePath;
+            }
+            return filePath;
+        }
         private static async Task DownloadDependencyList(ComparisonBomData component)
         {
             string localPathforDownload = $"{Path.GetTempPath()}ClearingTool\\DownloadedFiles/";
