@@ -343,43 +343,38 @@ namespace LCT.ArtifactoryUploader
                       .Value?
                       .ToUpperInvariant();
 
-            if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "NPM")
-            {
+            string projectType = GetPropertyValue(Dataconstant.Cdx_ProjectType);
+            ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
+            AddUnknownComponentToDisplayList(projectType, components, displayPackagesInfo);
+        }
 
-                ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
-                displayPackagesInfo.UnknownPackagesNpm.Add(components);
-            }
-            else if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "NUGET")
+        // Helper to reduce code duplication for adding unknown components to display lists
+        private static void AddUnknownComponentToDisplayList(string projectType, ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo)
+        {
+            switch (projectType)
             {
-                ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
-                displayPackagesInfo.UnknownPackagesNuget.Add(components);
+                case "NPM":
+                    displayPackagesInfo.UnknownPackagesNpm.Add(component);
+                    break;
+                case "NUGET":
+                    displayPackagesInfo.UnknownPackagesNuget.Add(component);
+                    break;
+                case "MAVEN":
+                    displayPackagesInfo.UnknownPackagesMaven.Add(component);
+                    break;
+                case "POETRY":
+                    displayPackagesInfo.UnknownPackagesPython.Add(component);
+                    break;
+                case "CONAN":
+                    displayPackagesInfo.UnknownPackagesConan.Add(component);
+                    break;
+                case "DEBIAN":
+                    displayPackagesInfo.UnknownPackagesDebian.Add(component);
+                    break;
+                case "CARGO":
+                    displayPackagesInfo.UnknownPackagesCargo.Add(component);
+                    break;
             }
-            else if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "MAVEN")
-            {
-                ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
-                displayPackagesInfo.UnknownPackagesMaven.Add(components);
-            }
-            else if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "POETRY")
-            {
-                ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
-                displayPackagesInfo.UnknownPackagesPython.Add(components);
-            }
-            else if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "CONAN")
-            {
-                ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
-                displayPackagesInfo.UnknownPackagesConan.Add(components);
-            }
-            else if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "DEBIAN")
-            {
-                ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
-                displayPackagesInfo.UnknownPackagesDebian.Add(components);
-            }
-            else if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "CARGO")
-            {
-                ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
-                displayPackagesInfo.UnknownPackagesCargo.Add(components);
-            }
-
         }
 
         private static Task<ComponentsToArtifactory> GetUnknownPackageinfo(Component item)
