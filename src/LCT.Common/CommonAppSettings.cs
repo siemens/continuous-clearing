@@ -5,6 +5,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using LCT.Common.Constants;
+using LCT.Common.Interface;
 using LCT.Common.Model;
 using log4net;
 using System;
@@ -70,12 +71,14 @@ namespace LCT.Common
             }
 
         }
-    }    
+    }
+    [ExcludeFromCodeCoverage]
     public class Telemetry
     {
         public bool Enable { get; set; } = true;
         public string ApplicationInsightsConnectionString { get; set; }
     }
+    [ExcludeFromCodeCoverage]
     public class SW360
     {
         private string m_URL;
@@ -102,6 +105,7 @@ namespace LCT.Common
         }
 
     }
+    [ExcludeFromCodeCoverage]
     public class Fossology
     {
         private string m_FOSSURL;
@@ -146,13 +150,15 @@ namespace LCT.Common
 
         public bool DryRun { get; set; } = false;
     }
-    public class Directory
+    public class Directory(IEnvironmentHelper envHelper)
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
+        private readonly IEnvironmentHelper environmentHelper = envHelper;
         private string m_InputFolder;
         private string m_OutputFolder;
         private string m_LogFolder;
+
+        public Directory() : this(new EnvironmentHelper()) { }
 
         public string InputFolder
         {
