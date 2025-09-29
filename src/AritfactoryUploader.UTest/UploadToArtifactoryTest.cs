@@ -232,7 +232,7 @@ namespace AritfactoryUploader.UTest
             //Act
             List<ComponentsToArtifactory> uploadList = await UploadToArtifactory.GetComponentsToBeUploadedToArtifactory(componentLists, commonAppSettings, displayPackagesInfo);
             // Assert
-            Assert.That(4, Is.EqualTo(uploadList.Count), "Checks for 2  no of components to upload");
+            Assert.That(4, Is.EqualTo(uploadList.Count), "Checks for 4  no of components to upload");
             Assert.That("com/github/ulisesbocchio/jasypt-spring-boot-starter/3.0.5", Is.EqualTo(uploadList[3].Path),"checks for path of maven component");
         }
         [Test]
@@ -333,7 +333,7 @@ namespace AritfactoryUploader.UTest
             List<ComponentsToArtifactory> uploadList = await UploadToArtifactory.GetComponentsToBeUploadedToArtifactory(componentLists, commonAppSettings, displayPackagesInfo);
 
             // Assert
-            Assert.That(5, Is.EqualTo(uploadList.Count), "Checks for 3 no of components to upload");
+            Assert.That(5, Is.EqualTo(uploadList.Count), "Checks for 5 no of components to upload");
         }
         [Test]
         public async Task GetSrcRepoDetailsForPyPiOrConanPackages_WhenPypiRepoExists_ReturnsArtifactoryRepoName()

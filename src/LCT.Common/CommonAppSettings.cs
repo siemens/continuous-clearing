@@ -70,14 +70,12 @@ namespace LCT.Common
             }
 
         }
-    }
-    [ExcludeFromCodeCoverage]
+    }    
     public class Telemetry
     {
         public bool Enable { get; set; } = true;
         public string ApplicationInsightsConnectionString { get; set; }
     }
-    [ExcludeFromCodeCoverage]
     public class SW360
     {
         private string m_URL;
@@ -104,7 +102,6 @@ namespace LCT.Common
         }
 
     }
-    [ExcludeFromCodeCoverage]
     public class Fossology
     {
         private string m_FOSSURL;
@@ -128,7 +125,6 @@ namespace LCT.Common
         }
         public bool EnableTrigger { get; set; }
     }
-    [ExcludeFromCodeCoverage]
     public class Jfrog
     {
         private string m_Token;
@@ -150,7 +146,6 @@ namespace LCT.Common
 
         public bool DryRun { get; set; } = false;
     }
-    [ExcludeFromCodeCoverage]
     public class Directory
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
