@@ -39,6 +39,9 @@ namespace LCT.ArtifactoryUploader
             foreach (var item in comparisonBomData)
             {
                 var packageType = GetPackageType(item);
+                var componentType = GetComponentType(item);
+                NormalizeGroupForMaven(item, componentType);
+
                 if (packageType != PackageType.Unknown)
                 {
                     AqlResult aqlResult = await GetSrcRepoDetailsForComponent(item);
@@ -68,7 +71,7 @@ namespace LCT.ArtifactoryUploader
                         components.PypiOrNpmCompName = string.Empty;
                     }
 
-                    components.Path = GetPackagePath(components, aqlResult,item);
+                    components.Path = GetPackagePath(components, aqlResult);
                     components.CopyPackageApiUrl = GetCopyURL(components);
                     components.MovePackageApiUrl = GetMoveURL(components);
                     components.JfrogPackageName = GetJfrogPackageName(components);
@@ -84,6 +87,13 @@ namespace LCT.ArtifactoryUploader
             }
             Logger.Debug("Ending GetComponentsToBeUploadedToArtifactory() method");
             return componentsToBeUploaded;
+        }
+        private static void NormalizeGroupForMaven(Component item, string componentType)
+        {
+            if (componentType == "MAVEN" && !string.IsNullOrEmpty(item.Group))
+            {
+                item.Group = item.Group.Replace('.', '/');
+            }
         }
         private static string GetComponentType(Component item)
         {
@@ -178,7 +188,7 @@ namespace LCT.ArtifactoryUploader
             return string.Empty;
         }
 
-        private static string GetPackagePath(ComponentsToArtifactory component, AqlResult aqlResult,Component item)
+        private static string GetPackagePath(ComponentsToArtifactory component, AqlResult aqlResult)
         {
             switch (component.ComponentType)
             {
@@ -207,9 +217,7 @@ namespace LCT.ArtifactoryUploader
                     }
 
                 case "MAVEN":
-                    string groupWithSlash = !string.IsNullOrEmpty(item.Group) ? item.Group.Replace('.', '/') : string.Empty;
-                    string mavenPath= !string.IsNullOrEmpty(groupWithSlash) ? $"{groupWithSlash}/{item.Name}" : item.Name;
-                    return $"{mavenPath}/{component.Version}";
+                    return $"{component.Name}/{component.Version}";
 
                 case "DEBIAN":
                     return $"pool/main/{component.Name[0]}/{component.Name}";
@@ -233,8 +241,8 @@ namespace LCT.ArtifactoryUploader
             }
             else if (component.ComponentType == "MAVEN")
             {
-                url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.Path}" +
-               $"?to=/{component.DestRepoName}/{component.Path}";
+                url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.Name}/{component.Version}" +
+               $"?to=/{component.DestRepoName}/{component.Name}/{component.Version}";
             }
             else if (component.ComponentType == "POETRY")
             {
@@ -276,8 +284,8 @@ namespace LCT.ArtifactoryUploader
             }
             else if (component.ComponentType == "MAVEN")
             {
-                url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.Path}" +
-               $"?to=/{component.DestRepoName}/{component.Path}";
+                url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.Name}/{component.Version}" +
+               $"?to=/{component.DestRepoName}/{component.Name}/{component.Version}";
             }
             else if (component.ComponentType == "POETRY")
             {
