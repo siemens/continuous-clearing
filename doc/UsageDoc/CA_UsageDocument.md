@@ -208,6 +208,14 @@ Users have the flexibility to generate a basic SBOM even if connections to SW360
       After successful execution, output.sbom.cdx.json (*CycloneDX.json*) file will be created in specified directory
 
       Resulted output.sbom.cdx.json file will be having the list of installed packages  and the same file will be used as  an input to Continuous clearing tool - Package identifier via the input directory parameter. The remaining process is same as other project types.
+
+  * **Project Type :** **Choco (Chocolatey)**
+
+    * Choco packages are now supported and handled just like NuGet packages.
+    * Set `ProjectType` to `CHOCO` in your configuration or command line.
+    * Input file repository should contain your Choco `.nupkg` files.
+    * Choco packages will be uploaded to the configured NuGet/Choco repositories in Artifactory.
+    * No extra configuration is needed—just include your Choco packages as you would with other supported types.
 ## SPDX v2.3 Support
 
 The Package Identifier supports importing both supported and unsupported SPDX SBoMs and processes them correctly for inclusion in workflows.
