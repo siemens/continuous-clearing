@@ -20,7 +20,7 @@ namespace LCT.PackageIdentifier
     /// The ChocoProcessor class for parsing choco.config files
     /// </summary>
     public class ChocoProcessor(ICycloneDXBomParser cycloneDXBomParser,
-                         ISpdxBomParser spdxBomParser) : NugetProcessor(cycloneDXBomParser, null, null, spdxBomParser)
+                         ISpdxBomParser spdxBomParser) : NugetProcessor(cycloneDXBomParser, null, null, spdxBomParser, null)
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
