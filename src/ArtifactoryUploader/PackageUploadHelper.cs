@@ -113,7 +113,7 @@ namespace LCT.ArtifactoryUploader
                 ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
                 displayPackagesInfo.JfrogNotFoundPackagesNpm.Add(components);
             }
-            else if (item.ComponentType == "NUGET")
+            else if (item.ComponentType == "NUGET" || item.ComponentType == "CHOCO")
             {
                 ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
                 displayPackagesInfo.JfrogNotFoundPackagesNuget.Add(components);
@@ -149,7 +149,7 @@ namespace LCT.ArtifactoryUploader
                 ComponentsToArtifactory components = await GetPackageinfo(item, operationType, responseMessage, dryRunSuffix);
                 displayPackagesInfo.JfrogFoundPackagesNpm.Add(components);
             }
-            else if (item.ComponentType == "NUGET")
+            else if (item.ComponentType == "NUGET" || item.ComponentType == "CHOCO")
             {
                 ComponentsToArtifactory components = await GetPackageinfo(item, operationType, responseMessage, dryRunSuffix);
                 displayPackagesInfo.JfrogFoundPackagesNuget.Add(components);
@@ -184,7 +184,12 @@ namespace LCT.ArtifactoryUploader
                 ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
                 displayPackagesInfo.SuccessfullPackagesNpm.Add(components);
             }
-            else if (item.ComponentType == "NUGET")
+            if (item.ComponentType == "NPM")
+            {
+                ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
+                displayPackagesInfo.SuccessfullPackagesNpm.Add(components);
+            }
+            else if (item.ComponentType == "NUGET" || item.ComponentType == "CHOCO")
             {
                 ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
                 displayPackagesInfo.SuccessfullPackagesNuget.Add(components);
@@ -209,10 +214,9 @@ namespace LCT.ArtifactoryUploader
                 ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
                 displayPackagesInfo.SuccessfullPackagesDebian.Add(components);
             }
-
         }
 
-
+        // Properly wrap UploadingThePackages as a method
         public static async Task UploadingThePackages(List<ComponentsToArtifactory> componentsToUpload, int timeout, DisplayPackagesInfo displayPackagesInfo)
         {
             Logger.Debug("Starting UploadingThePackages() method");
@@ -300,7 +304,7 @@ namespace LCT.ArtifactoryUploader
             {
                 packageNameEXtension = ".tgz";
             }
-            if (package.ComponentType.Equals("NUGET", StringComparison.OrdinalIgnoreCase))
+            if (package.ComponentType.Equals("NUGET", StringComparison.OrdinalIgnoreCase) || package.ComponentType.Equals("CHOCO", StringComparison.OrdinalIgnoreCase))
             {
                 packageNameEXtension = ".nupkg";
             }
