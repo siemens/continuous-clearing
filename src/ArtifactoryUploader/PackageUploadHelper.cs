@@ -125,65 +125,103 @@ namespace LCT.ArtifactoryUploader
         // Helper to reduce code duplication for adding components to display lists
         private static void AddComponentToDisplayList(string componentType, ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound = false, bool success = false)
         {
-            switch (componentType?.ToUpperInvariant())
+            if (string.IsNullOrWhiteSpace(componentType))
+                return;
+
+            switch (componentType.ToUpperInvariant())
             {
                 case "NPM":
-                    if (notFound)
-                        displayPackagesInfo.JfrogNotFoundPackagesNpm.Add(component);
-                    else if (success)
-                        displayPackagesInfo.SuccessfullPackagesNpm.Add(component);
-                    else
-                        displayPackagesInfo.JfrogFoundPackagesNpm.Add(component);
+                    AddToNpmList(component, displayPackagesInfo, notFound, success);
                     break;
                 case "NUGET":
-                    if (notFound)
-                        displayPackagesInfo.JfrogNotFoundPackagesNuget.Add(component);
-                    else if (success)
-                        displayPackagesInfo.SuccessfullPackagesNuget.Add(component);
-                    else
-                        displayPackagesInfo.JfrogFoundPackagesNuget.Add(component);
+                    AddToNugetList(component, displayPackagesInfo, notFound, success);
                     break;
                 case "MAVEN":
-                    if (notFound)
-                        displayPackagesInfo.JfrogNotFoundPackagesMaven.Add(component);
-                    else if (success)
-                        displayPackagesInfo.SuccessfullPackagesMaven.Add(component);
-                    else
-                        displayPackagesInfo.JfrogFoundPackagesMaven.Add(component);
+                    AddToMavenList(component, displayPackagesInfo, notFound, success);
                     break;
                 case "POETRY":
-                    if (notFound)
-                        displayPackagesInfo.JfrogNotFoundPackagesPython.Add(component);
-                    else if (success)
-                        displayPackagesInfo.SuccessfullPackagesPython.Add(component);
-                    else
-                        displayPackagesInfo.JfrogFoundPackagesPython.Add(component);
+                    AddToPoetryList(component, displayPackagesInfo, notFound, success);
                     break;
                 case "CONAN":
-                    if (notFound)
-                        displayPackagesInfo.JfrogNotFoundPackagesConan.Add(component);
-                    else if (success)
-                        displayPackagesInfo.SuccessfullPackagesConan.Add(component);
-                    else
-                        displayPackagesInfo.JfrogFoundPackagesConan.Add(component);
+                    AddToConanList(component, displayPackagesInfo, notFound, success);
                     break;
                 case "DEBIAN":
-                    if (notFound)
-                        displayPackagesInfo.JfrogNotFoundPackagesDebian.Add(component);
-                    else if (success)
-                        displayPackagesInfo.SuccessfullPackagesDebian.Add(component);
-                    else
-                        displayPackagesInfo.JfrogFoundPackagesDebian.Add(component);
+                    AddToDebianList(component, displayPackagesInfo, notFound, success);
                     break;
                 case "CARGO":
-                    if (notFound)
-                        displayPackagesInfo.JfrogNotFoundPackagesCargo.Add(component);
-                    else if (success)
-                        displayPackagesInfo.SuccessfullPackagesCargo.Add(component);
-                    else
-                        displayPackagesInfo.JfrogFoundPackagesCargo.Add(component);
+                    AddToCargoList(component, displayPackagesInfo, notFound, success);
                     break;
             }
+        }
+
+        private static void AddToNpmList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success)
+        {
+            if (notFound)
+                displayPackagesInfo.JfrogNotFoundPackagesNpm.Add(component);
+            else if (success)
+                displayPackagesInfo.SuccessfullPackagesNpm.Add(component);
+            else
+                displayPackagesInfo.JfrogFoundPackagesNpm.Add(component);
+        }
+
+        private static void AddToNugetList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success)
+        {
+            if (notFound)
+                displayPackagesInfo.JfrogNotFoundPackagesNuget.Add(component);
+            else if (success)
+                displayPackagesInfo.SuccessfullPackagesNuget.Add(component);
+            else
+                displayPackagesInfo.JfrogFoundPackagesNuget.Add(component);
+        }
+
+        private static void AddToMavenList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success)
+        {
+            if (notFound)
+                displayPackagesInfo.JfrogNotFoundPackagesMaven.Add(component);
+            else if (success)
+                displayPackagesInfo.SuccessfullPackagesMaven.Add(component);
+            else
+                displayPackagesInfo.JfrogFoundPackagesMaven.Add(component);
+        }
+
+        private static void AddToPoetryList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success)
+        {
+            if (notFound)
+                displayPackagesInfo.JfrogNotFoundPackagesPython.Add(component);
+            else if (success)
+                displayPackagesInfo.SuccessfullPackagesPython.Add(component);
+            else
+                displayPackagesInfo.JfrogFoundPackagesPython.Add(component);
+        }
+
+        private static void AddToConanList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success)
+        {
+            if (notFound)
+                displayPackagesInfo.JfrogNotFoundPackagesConan.Add(component);
+            else if (success)
+                displayPackagesInfo.SuccessfullPackagesConan.Add(component);
+            else
+                displayPackagesInfo.JfrogFoundPackagesConan.Add(component);
+        }
+
+        private static void AddToDebianList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success)
+        {
+            if (notFound)
+                displayPackagesInfo.JfrogNotFoundPackagesDebian.Add(component);
+            else if (success)
+                displayPackagesInfo.SuccessfullPackagesDebian.Add(component);
+            else
+                displayPackagesInfo.JfrogFoundPackagesDebian.Add(component);
+        }
+
+        private static void AddToCargoList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success)
+        {
+            if (notFound)
+                displayPackagesInfo.JfrogNotFoundPackagesCargo.Add(component);
+            else if (success)
+                displayPackagesInfo.SuccessfullPackagesCargo.Add(component);
+            else
+                displayPackagesInfo.JfrogFoundPackagesCargo.Add(component);
         }
 
 
