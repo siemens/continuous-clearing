@@ -124,9 +124,9 @@ namespace LCT.PackageIdentifier
 
             component.Properties ??= new List<Property>();
             var properties = component.Properties;
-            CommonHelper.RemoveDuplicateAndAddProperty(ref properties, artifactoryrepo?.Name, artifactoryrepo?.Value);
+            CommonHelper.RemoveDuplicateAndAddProperty(ref properties, artifactoryrepo.Name, artifactoryrepo.Value);
             CommonHelper.RemoveDuplicateAndAddProperty(ref properties, projectType?.Name, projectType?.Value);
-            CommonHelper.RemoveDuplicateAndAddProperty(ref properties, jfrogRepoPathProperty?.Name, jfrogRepoPathProperty?.Value);
+            CommonHelper.RemoveDuplicateAndAddProperty(ref properties, jfrogRepoPathProperty.Name, jfrogRepoPathProperty.Value);
             component.Properties = properties;
             component.Description = null;
 
