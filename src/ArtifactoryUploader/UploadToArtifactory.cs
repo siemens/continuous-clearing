@@ -511,7 +511,7 @@ namespace LCT.ArtifactoryUploader
             {
                 return aqlResultList.Find(x => x.Properties != null &&
                                        x.Properties.Any(p => p.Key == "npm.name" && p.Value == jfrogpackageName) &&
-                                       x.Properties.Any(p => p.Key == "npm.version" && p.Value == component.Version)); ;
+                                       x.Properties.Any(p => p.Key == "npm.version" && p.Value == component.Version));
             }
             else if (component.Purl.Contains("cargo", StringComparison.OrdinalIgnoreCase))
             {
