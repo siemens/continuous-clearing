@@ -171,7 +171,6 @@
   },
   "Conan": {
     "Include": [
-      "conan.lock",
       "*.dep.json",
       "*.cdx.json"
     ],

@@ -48,7 +48,7 @@
     - [Binary Template Specific Parameters](#binary-template-specific-parameters)
     - [Docker Template Specific Parameters](#docker-template-specific-parameters)
 - [Troubleshoot](#troubleshoot)
- - [Component Compliance Guidance](#component-compliance-guidance)
+  - [Component Compliance Guidance](#component-compliance-guidance)
   - [General](#general)
 - [Manual Update](#manual-update)
 - [Bug or Enhancements](#bug-or-enhancements)
@@ -198,12 +198,12 @@ Users have the flexibility to generate a basic SBOM even if connections to SW360
 
     * **Note** :Only Conan v2 is supported.
     
-    * If you previously used `conan.lock` files with Conan v1, you now need to generate `dep.json` files using the `conan graph info`.
+    * If you previously used `conan.lock` files with Conan v1, you now need to generate `*.dep.json` files using the `conan graph info`.
     
-    * To generate the required dependency graph file for Conan v2 projects, run the following command in your project directory:    ```
-  conan graph info . -f json > dep.json 
+    * To generate the required dependency graph file for Conan v2 projects, run the following command in your project directory where conanfile.py is present:    ```
+  conan graph info . -f json > conan.dep.json 
     
-    * file name should end with dep.json as appSettings.json is configured to pick files with .dep.json suffix
+    * file name should end with dep.json as appSettings.json is configured to pick files with *.dep.json suffix
     
     *  user can change the file pattern if required in the app settings
 

@@ -122,14 +122,12 @@ namespace LCT.PackageIdentifier
 
             UpdateBomKpiData(appSettings, artifactoryrepo.Value);
 
-            if (component.Properties?.Count == null || component.Properties?.Count <= 0)
-            {
-                component.Properties = new List<Property>();
-            }
-
-            component.Properties.Add(artifactoryrepo);
-            component.Properties.Add(projectType);
-            component.Properties.Add(jfrogRepoPathProperty);
+            component.Properties ??= new List<Property>();
+            var properties = component.Properties;
+            CommonHelper.RemoveDuplicateAndAddProperty(ref properties, artifactoryrepo?.Name, artifactoryrepo?.Value);
+            CommonHelper.RemoveDuplicateAndAddProperty(ref properties, projectType?.Name, projectType?.Value);
+            CommonHelper.RemoveDuplicateAndAddProperty(ref properties, jfrogRepoPathProperty?.Name, jfrogRepoPathProperty?.Value);
+            component.Properties = properties;
             component.Description = null;
 
             if (hashes != null)
@@ -229,7 +227,7 @@ namespace LCT.PackageIdentifier
                 {
                     listOfTemplateBomfilePaths.Add(filepath);
                 }
-                if (filepath.ToLower().EndsWith("dep.json"))
+                if (filepath.ToLower().EndsWith(FileConstant.ConanFileExtension))
                 {
                     Logger.Debug($"ParsingInputFileForBOM():FileName: " + filepath);
                     var components = ParseDepJson(filepath, ref dependencies);
@@ -261,6 +259,7 @@ namespace LCT.PackageIdentifier
             }
 
             int initialCount = componentsForBOM.Count;
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = componentsForBOM.Count;
             GetDistinctComponentList(ref componentsForBOM);
             BomCreator.bomKpiData.DuplicateComponents = initialCount - componentsForBOM.Count;
             
