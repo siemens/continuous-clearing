@@ -309,9 +309,10 @@ namespace LCT.PackageIdentifier
             CommonAppSettings appSettings)
         {
             int initialCount = componentsForBOM.Count;
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = componentsForBOM.Count;
             BomHelper.GetDistinctComponentList(ref componentsForBOM);
             BomCreator.bomKpiData.DuplicateComponents = initialCount - componentsForBOM.Count;
-            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = componentsForBOM.Count;
+            
             bom.Components = componentsForBOM;
 
             if (bom.Dependencies != null)
