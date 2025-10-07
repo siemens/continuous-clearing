@@ -432,7 +432,7 @@ namespace LCT.SW360PackageCreator
        
         public async Task<string> GetSourceUrlForCargoPackage(string componentName, string componentVersion)
         {
-            string downLoadUrl = $"{CommonAppSettings.SourceUrlForCargo}{componentName}{Dataconstant.ForwardSlash}{componentVersion}";
+            string downLoadUrl = $"{CommonAppSettings.SourceBaseUrlForCargo}{Dataconstant.ForwardSlash}{CommonAppSettings.SourceUrlForCargo}{componentName}{Dataconstant.ForwardSlash}{componentVersion}";
             string repositoryUrl = string.Empty;
             try
             {
@@ -449,7 +449,7 @@ namespace LCT.SW360PackageCreator
                     if (dlPath != null && dlPath.Type != JTokenType.Null && !string.IsNullOrWhiteSpace(dlPath.ToString()))
                     {
                         repositoryUrl = dlPath.ToString();
-                        repositoryUrl = $"{CommonAppSettings.SourceDownloadurlForCargo}{repositoryUrl}";
+                        repositoryUrl = $"{CommonAppSettings.SourceBaseUrlForCargo}{repositoryUrl}";
                     }                   
                     else
                     {
