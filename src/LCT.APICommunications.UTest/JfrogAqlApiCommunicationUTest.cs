@@ -139,7 +139,7 @@ namespace LCT.APICommunications.UTest
             string query = JfrogAqlApiCommunication.BuildAqlQuery(component);
 
             // Assert
-            string expectedQuery = "items.find({\"$and\": [{ \"repo\":{ \"$eq\": \"nuget-repo\" } },{ \"$or\":[{ \"@nuget.id\":{ \"$eq\": \"TestPackage\" } } ,{ \"@nuget.id\":{ \"$eq\": \"testpackage\" } }] },{ \"@nuget.version\":{\"$eq\": \"1.0.0\" } }]}).include(\"repo\", \"path\", \"name\").limit(1)";
+            string expectedQuery = "items.find({\"$and\": [{ \"repo\":{ \"$eq\": \"nuget-repo\" } },{ \"$or\":[{ \"@nuget.id\":{ \"$eq\": \"TestPackage\" } },{ \"@nuget.id\":{ \"$eq\": \"testpackage\" } }]},{ \"@nuget.version\":{\"$eq\": \"1.0.0\" } }]}).include(\"repo\", \"path\", \"name\").limit(1)";
             Assert.That(query, Is.EqualTo(expectedQuery));
         }
 
