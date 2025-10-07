@@ -37,6 +37,7 @@ namespace LCT.APICommunications
         public const string DebianExtension = ".debian";
         public const string MavenExtension = "-sources.jar";
         public const string PythonExtension = ".whl";
+        public const string CargoExtension = ".crate";
         public const string PackageInfoApi = "/api/storage/";
         public const string CopyPackageApi = "/api/copy/";
         public const string MovePackageApi = "/api/move/";
@@ -76,6 +77,5 @@ namespace LCT.APICommunications
         public const string ArtifactoryRepoName = "ArtifactoryRepoName";
         public const string JfrogArtifactoryApiSearchAql = $"/api/search/aql";
         public static readonly List<int> APIRetryIntervals = [5, 10, 30]; // in seconds
-        public const string CargoExtension = ".crate";
     }
 }
