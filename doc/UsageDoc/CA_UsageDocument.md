@@ -59,7 +59,7 @@
 
 
 # Introduction
-Welcome to the Continuous Clearing Tool, your automated solution for streamlining the SW360 clearing process. Designed with Project Managers and Developers in mind, this tool efficiently manages third-party components across various platforms, including NPM, NuGet, Maven, Python, Conan, Alpine, and Debian.
+Welcome to the Continuous Clearing Tool, your automated solution for streamlining the SW360 clearing process. Designed with Project Managers and Developers in mind, this tool efficiently manages third-party components across various platforms, including NPM, NuGet, Maven, Python, Conan, Choco, Alpine, and Debian.
 
 ## Key Features
 - **Automated Scanning and Identification**: The tool automatically scans and identifies third-party components in your projects.
@@ -196,6 +196,10 @@ Users have the flexibility to generate a basic SBOM even if connections to SW360
   * **Project Type :** **Conan**
 
     * Input file repository should contain **conan.lock** file.
+    
+  * **Project Type :** **Choco**
+
+   * Input file repository should contain **choco.config** / ** *.choco.config ** file.
 
   * **Project Type :**  **Debian & Alpine**
 
@@ -218,6 +222,7 @@ Users have the flexibility to generate a basic SBOM even if connections to SW360
     * Input file repository should contain your Choco `.nupkg` files.
     * Choco packages will be uploaded to the configured NuGet/Choco repositories in Artifactory.
     * No extra configuration is needed—just include your Choco packages as you would with other supported types.
+  
 ## SPDX v2.3 Support
 
 The Package Identifier supports importing both supported and unsupported SPDX SBoMs and processes them correctly for inclusion in workflows.
@@ -262,7 +267,7 @@ Description for the settings in appSettings.json file
 | S.No | Argument Name                             | Description                                                   | Mandatory | Example                                                                  |
 | ---- | ----------------------------------------- | ------------------------------------------------------------- | --------------- | ------------------------------------------------------------------------ |
 | 1    | TimeOut                                   | Timeout in seconds                                            | No              | 400                                                                      |
-| 2    | ProjectType                               | Type of the project                                           | Yes             | `Nuget`, `NPM`, `Poetry`, `Conan`, `Alpine`, `Debian`, `Maven`                         |
+| 2    | ProjectType                               | Type of the project                                           | Yes             | `Nuget`, `NPM`, `Poetry`, `Conan`,`Choco`, `Alpine`, `Debian`, `Maven`                         |
 | 3    | MultipleProjectType                       | Whether multiple project types are supported                  | No              | `False`                                                                    |
 | 4    | Telemetry.Enable                          | Enable telemetry                                              | No              | `False`                                                                    |
 | 5    | Telemetry.ApplicationInsightsConnectionString | Application Insights instrumentation key                      | No              | `123-456-789-123-123`                                                     |

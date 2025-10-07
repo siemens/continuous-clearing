@@ -14,6 +14,7 @@ using LCT.Common.Model;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.PackageIdentifier.Model.NugetModel;
+using LCT.Services;
 using LCT.Services.Interface;
 using log4net;
 using Newtonsoft.Json;
@@ -362,14 +363,32 @@ namespace LCT.PackageIdentifier
         }
 
         public async Task<ComponentIdentification> IdentificationOfInternalComponents(
-            ComponentIdentification componentData, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
+        ComponentIdentification componentData, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
+        {
+            ValidateIdentificationOfInternalComponentsParameters(componentData, appSettings, jFrogService, bomhelper);
+            return await IdentificationOfInternalComponentsAsync(componentData, appSettings, jFrogService, bomhelper);
+        }
+
+        private static void ValidateIdentificationOfInternalComponentsParameters(
+        ComponentIdentification componentData, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
+        {
+            if (appSettings == null)
+                throw new ArgumentNullException(nameof(appSettings), "appSettings cannot be null.");
+            if (componentData == null)
+                throw new ArgumentNullException(nameof(componentData), "componentData cannot be null.");
+            if (jFrogService == null)
+                throw new ArgumentNullException(nameof(jFrogService), "jFrogService cannot be null.");
+            if (bomhelper == null)
+                throw new ArgumentNullException(nameof(bomhelper), "bomhelper cannot be null.");
+        }
+
+        private static async Task<ComponentIdentification> IdentificationOfInternalComponentsAsync(
+        ComponentIdentification componentData, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
             // get the component list from Jfrog for given repo
             List<AqlResult> aqlResultList;
 
-            // If project type is CHOCO, then get the component list from CHOCO internal repo
-            // Since CHOCO repo also contains NUGET packages 
-            if (appSettings?.ProjectType != null && appSettings.ProjectType.Equals("CHOCO", StringComparison.InvariantCultureIgnoreCase))
+            if (appSettings.ProjectType != null && appSettings.ProjectType.Equals("CHOCO", StringComparison.InvariantCultureIgnoreCase))
             {
                 aqlResultList = await bomhelper.GetListOfComponentsFromRepo(appSettings.Choco.Artifactory.InternalRepos, jFrogService);
             }
