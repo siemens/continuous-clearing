@@ -1,0 +1,509 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:b5218f7b-ad64-4c12-8a44-b5d9c892c3e6",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2025-09-17T06:05:56Z",
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "supplier": {
+            "name": "Siemens AG"
+          },
+          "name": "Clearing Automation Tool",
+          "version": "8.2.0",
+          "externalReferences": [
+            {
+              "url": "https://github.com/siemens/continuous-clearing",
+              "type": "website"
+            }
+          ]
+        }
+      ]
+    },
+    "component": {
+      "type": "application",
+      "name": "Continuous-clearing_npm",
+      "version": "Test"
+    },
+    "properties": [
+      {
+        "name": "siemens:profile",
+        "value": "clearing"
+      }
+    ]
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "pkg:cargo/addr2line@0.21.0",
+      "name": "addr2line",
+      "version": "0.21.0",
+      "purl": "pkg:cargo/addr2line@0.21.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:spdx-file-name",
+          "value": "siprotec.spdx.sbom.json"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "SPDXImport"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "cargo"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:cargo/adler@1.0.2",
+      "name": "adler",
+      "version": "1.0.2",
+      "purl": "pkg:cargo/adler@1.0.2",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:spdx-file-name",
+          "value": "siprotec.spdx.sbom.json"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "SPDXImport"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "cargo"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:cargo/aho-corasick@1.1.3",
+      "name": "aho-corasick",
+      "version": "1.1.3",
+      "purl": "pkg:cargo/aho-corasick@1.1.3",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:spdx-file-name",
+          "value": "siprotec.spdx.sbom.json"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "SPDXImport"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "cargo"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:cargo/async-trait@0.1.80",
+      "name": "async-trait",
+      "version": "0.1.80",
+      "purl": "pkg:cargo/async-trait@0.1.80",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:spdx-file-name",
+          "value": "siprotec.spdx.sbom.json"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "SPDXImport"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "cargo"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:cargo/autocfg@1.2.0",
+      "name": "autocfg",
+      "version": "1.2.0",
+      "purl": "pkg:cargo/autocfg@1.2.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:spdx-file-name",
+          "value": "siprotec.spdx.sbom.json"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "SPDXImport"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "cargo"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:cargo/axum@0.7.5",
+      "name": "axum",
+      "version": "0.7.5",
+      "purl": "pkg:cargo/axum@0.7.5",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:spdx-file-name",
+          "value": "siprotec.spdx.sbom.json"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "SPDXImport"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "cargo"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:cargo/axum-core@0.4.3",
+      "name": "axum-core",
+      "version": "0.4.3",
+      "purl": "pkg:cargo/axum-core@0.4.3",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:spdx-file-name",
+          "value": "siprotec.spdx.sbom.json"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "SPDXImport"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "cargo"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:cargo/axum-extra@0.9.3",
+      "name": "axum-extra",
+      "version": "0.9.3",
+      "purl": "pkg:cargo/axum-extra@0.9.3",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:spdx-file-name",
+          "value": "siprotec.spdx.sbom.json"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "SPDXImport"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "cargo"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:cargo/axum-macros@0.4.1",
+      "name": "axum-macros",
+      "version": "0.4.1",
+      "purl": "pkg:cargo/axum-macros@0.4.1",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:spdx-file-name",
+          "value": "siprotec.spdx.sbom.json"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "SPDXImport"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "cargo"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:cargo/backtrace@0.3.71",
+      "name": "backtrace",
+      "version": "0.3.71",
+      "purl": "pkg:cargo/backtrace@0.3.71",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:spdx-file-name",
+          "value": "siprotec.spdx.sbom.json"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "SPDXImport"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "cargo"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    }
+  ],
+  "dependencies": [],
+  "compositions": [],
+  "definitions": {
+    "standards": [
+      {
+        "bom-ref": "standard-bom",
+        "name": "Standard BOM",
+        "version": "3.0.0",
+        "description": "The Standard for Software Bills of Materials in Siemens",
+        "owner": "Siemens AG",
+        "externalReferences": [
+          {
+            "url": "https://sbom.siemens.io/",
+            "type": "website"
+          }
+        ]
+      }
+    ]
+  }
+}
