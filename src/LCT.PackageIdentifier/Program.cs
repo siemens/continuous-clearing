@@ -75,6 +75,7 @@ namespace LCT.PackageIdentifier
             services.AddTransient<ISpdxBomParser, SpdxBomParser>();
             services.AddTransient<Program>();
             services.AddScoped<ICompositionBuilder, CompositionBuilder>();
+            services.AddScoped<IRuntimeIdentifier, DotnetRuntimeIdentifer>();
         }
 
         public async Task Run(string[] args)

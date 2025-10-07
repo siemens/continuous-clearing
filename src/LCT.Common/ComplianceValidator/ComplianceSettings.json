@@ -1,0 +1,21 @@
+﻿{
+  "complianceExceptionComponents": [
+    {
+      "id": "cef",
+      "name": "Chromium Embedded Framework",
+      "description": "Framework for embedding Chromium-based browsers",
+      "purl": [
+        "pkg:nuget/CefSharp.Common.NETCore",
+        "pkg:nuget/CefSharp.Common",
+        "pkg:nuget/CefSharp.WinForms.NETCore",
+        "pkg:nuget/CefSharp.WinForms",
+        "pkg:nuget/chromiumembeddedframework.runtime.win-x64",
+        "pkg:nuget/chromiumembeddedframework.runtime.win-x86"
+      ],
+      "complianceInstructions": {
+        "warningMessage": "Component 'Chromium Embedded Framework' source code must be manually uploaded",
+        "recommendation": "Use Microsoft Edge WebView2 as a modern alternative to Chromium dependencies. For further details, refer to the Wiki at: https://github.com/siemens/continuous-clearing/wiki#component-compliance-guidance."
+      }
+    }
+  ]
+}
