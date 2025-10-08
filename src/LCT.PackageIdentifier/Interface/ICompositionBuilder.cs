@@ -5,6 +5,7 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using LCT.PackageIdentifier.Model;
 using NuGet.Versioning;
 using System.Collections.Generic;
 
@@ -12,6 +13,6 @@ namespace LCT.PackageIdentifier.Interface
 {
     public interface ICompositionBuilder
     {
-        void AddCompositionsToBom(Bom bom, Dictionary<string, Dictionary<string, NuGetVersion>> frameworkPackages);
+        void AddCompositionsToBom(Bom bom, Dictionary<string, Dictionary<string, NuGetVersion>> frameworkPackages, RuntimeInfo runtimeInfo);
     }
 }
