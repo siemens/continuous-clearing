@@ -10,7 +10,6 @@ using LCT.Common.Model;
 using LCT.SW360PackageCreator.Interfaces;
 using LCT.SW360PackageCreator.Model;
 using log4net;
-using Markdig.Extensions.TaskLists;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
