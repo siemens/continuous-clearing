@@ -2,7 +2,9 @@
 using LCT.APICommunications.Model;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -120,7 +122,44 @@ namespace SW360IntegrationTest.Conan
             Assert.IsTrue(responseData.Embedded.Sw360components.Count == 1);
 
         }
+        [Test, Order(4)]
+        public async Task ReleaseCreation__AfterSuccessfulExeRun_ReturnsClearingStateAsNewClearing()
+        {
+            //Setting the httpclient
+            var httpClient = new HttpClient() { };
+            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue(testParameters.SW360AuthTokenType, testParameters.SW360AuthTokenValue);
+            string expectedname = "rapidjson";
+            string expectedversion = "1.1.0";
+            string expecteddownloadurl = "https://github.com/Tencent/rapidjson/archive/v1.1.0.tar.gz";
+            string expectedexternalid = "pkg:conan/rapidjson@1.1.0";
+            //url formation for retrieving component details
+            string url = TestConstant.Sw360ReleaseApi + TestConstant.componentNameUrl + "rapidjson";
+            string responseBody = await httpClient.GetStringAsync(url);//GET method         
+            var responseData = JsonConvert.DeserializeObject<ReleaseIdOfComponent>(responseBody);
+            string urlofreleaseid = responseData.Embedded.Sw360Releases[0].Links.Self.Href;
+            string responseForRelease = await httpClient.GetStringAsync(urlofreleaseid);//GET method for fetching the release details
+            var responseDataForRelease = JsonConvert.DeserializeObject<Releases>(responseForRelease);
 
+            string name = responseDataForRelease.Name;
+            string version = responseDataForRelease.Version;
+            string downloadurl = responseDataForRelease.SourceDownloadurl;
+            string externalid = responseDataForRelease.ExternalIds.Package_Url;
+            string releaseLink = responseDataForRelease.Links.Self.Href;
+            string releaseResponseBody = await httpClient.GetStringAsync(releaseLink);//GET method
+            var releasesInfo = JsonConvert.DeserializeObject<ReleasesInfo>(releaseResponseBody);
+
+            var releaseAttachments = releasesInfo?.Embedded?.Sw360attachments ?? new List<Sw360Attachments>();
+            bool AttachmentFound = releaseAttachments.Any(x => x.AttachmentType.Equals("SOURCE"));
+
+            //Assert
+            Assert.IsTrue(AttachmentFound, "Expected a SOURCE attachment to be present in the release.");
+            Assert.AreEqual(expectedname, name, "Test Project Name");
+            Assert.AreEqual(expectedversion, version, "Test Project  Version");
+            Assert.AreEqual(expecteddownloadurl, downloadurl, "Test download Url of Entity Framework");
+            Assert.AreEqual(expectedexternalid, externalid, "Test component external id");
+        }
         private string CCTComparisonBomTestFile { get; set; }
         private string OutFolder { get; set; }
     }

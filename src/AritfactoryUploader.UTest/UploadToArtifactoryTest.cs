@@ -28,7 +28,7 @@ namespace AritfactoryUploader.UTest
         [Test]
         [TestCase("NPM", "?to=/destination-repo//")]
         [TestCase("NUGET", "source-repo/package-name.1.0.0.nupkg?to=/destination-repo/package-name.1.0.0.nupkg")]
-        [TestCase("MAVEN", "source-repo/package-name/1.0.0?to=/destination-repo/package-name/1.0.0")]
+        [TestCase("MAVEN", "source-repo/?to=/destination-repo/")]
         [TestCase("CONAN", "source-repo/?to=/destination-repo/")]
         [TestCase("POETRY", "?to=/destination-repo/")]
         [TestCase("DEBIAN", "source-repo//package-name_1.0.0*?to=/destination-repo//package-name_1.0.0*")]
@@ -152,7 +152,7 @@ namespace AritfactoryUploader.UTest
         [Test]
         [TestCase("NPM", "?to=/destination-repo//")]
         [TestCase("NUGET", "source-repo/package-name.1.0.0.nupkg?to=/destination-repo/package-name.1.0.0.nupkg")]
-        [TestCase("MAVEN", "source-repo/package-name/1.0.0?to=/destination-repo/package-name/1.0.0")]
+        [TestCase("MAVEN", "source-repo/?to=/destination-repo/")]
         [TestCase("CONAN", "source-repo/?to=/destination-repo/")]
         [TestCase("POETRY", "?to=/destination-repo/")]
         [TestCase("DEBIAN", "source-repo//package-name_1.0.0*?to=/destination-repo//package-name_1.0.0*")]
@@ -217,12 +217,23 @@ namespace AritfactoryUploader.UTest
                     }
                 }
             };
+            commonAppSettings.Maven = new Config()
+            {
+                Artifactory = new Artifactory()
+                {
+                    ThirdPartyRepos = new List<ThirdPartyRepo>()
+                    {
+                        new() { Name = "maven-test" }
+                    }
+                }
+            };
             commonAppSettings.Directory.LogFolder = outFolder;
 
             //Act
             List<ComponentsToArtifactory> uploadList = await UploadToArtifactory.GetComponentsToBeUploadedToArtifactory(componentLists, commonAppSettings, displayPackagesInfo);
             // Assert
-            Assert.That(3, Is.EqualTo(uploadList.Count), "Checks for 2  no of components to upload");
+            Assert.That(4, Is.EqualTo(uploadList.Count), "Checks for 4  no of components to upload");
+            Assert.That("com/github/ulisesbocchio/jasypt-spring-boot-starter/3.0.5", Is.EqualTo(uploadList[3].Path),"checks for path of maven component");
         }
         [Test]
         public async Task GetComponentsToBeUploadedToArtifactory_GivenNotApprovedComponentList_ReturnsUploadList()
@@ -305,6 +316,16 @@ namespace AritfactoryUploader.UTest
                     }
                 }
             };
+            commonAppSettings.Maven = new Config()
+            {
+                Artifactory = new Artifactory()
+                {
+                    ThirdPartyRepos = new List<ThirdPartyRepo>()
+                    {
+                        new() { Name = "maven-test" }
+                    }
+                }
+            };
             commonAppSettings.Directory.LogFolder = outFolder;
 
 
@@ -312,7 +333,7 @@ namespace AritfactoryUploader.UTest
             List<ComponentsToArtifactory> uploadList = await UploadToArtifactory.GetComponentsToBeUploadedToArtifactory(componentLists, commonAppSettings, displayPackagesInfo);
 
             // Assert
-            Assert.That(4, Is.EqualTo(uploadList.Count), "Checks for 3 no of components to upload");
+            Assert.That(5, Is.EqualTo(uploadList.Count), "Checks for 5 no of components to upload");
         }
         [Test]
         public async Task GetSrcRepoDetailsForPyPiOrConanPackages_WhenPypiRepoExists_ReturnsArtifactoryRepoName()
@@ -602,6 +623,23 @@ namespace AritfactoryUploader.UTest
             comp4.Properties.Add(propinternal);
             comp4.Properties.Add(prop3);
             componentLists.Add(comp4);
+
+            Property prop4 = new Property
+            {
+                Name = Dataconstant.Cdx_ClearingState,
+                Value = "APPROVED"
+            };
+            Component comp5 = new Component
+            {
+                Name = "jasypt-spring-boot-starter",
+                Version = "3.0.5",
+                Purl = "pkg:maven/com.github.ulisesbocchio/jasypt-spring-boot-starter@3.0.5",
+                Group= "com.github.ulisesbocchio",
+                Properties = new List<Property>()
+            };
+            comp5.Properties.Add(propinternal);
+            comp5.Properties.Add(prop4);
+            componentLists.Add(comp5);
             return componentLists;
         }
     }

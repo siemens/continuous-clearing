@@ -9,7 +9,9 @@ using CycloneDX.Models;
 using LCT.APICommunications.Model;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -163,8 +165,15 @@ namespace SW360IntegrationTest.NPM
             string downloadurl = responseDataForRelease.SourceDownloadurl;
             string clearingState = responseDataForRelease.ClearingState;
             string externalid = responseDataForRelease.ExternalIds.Package_Url;
+            string releaseLink = responseDataForRelease.Links.Self.Href;
+            string releaseResponseBody = await httpClient.GetStringAsync(releaseLink);//GET method
+            var releasesInfo = JsonConvert.DeserializeObject<ReleasesInfo>(releaseResponseBody);
+
+            var releaseAttachments = releasesInfo?.Embedded?.Sw360attachments ?? new List<Sw360Attachments>();
+            bool AttachmentFound = releaseAttachments.Any(x => x.AttachmentType.Equals("SOURCE"));
 
             //Assert
+            Assert.IsTrue(AttachmentFound, "Expected a SOURCE attachment to be present in the release.");
             if (responseData.Embedded.Sw360Releases.Count > 0)
             {
                 //In Case Multiple Releases found just checking for Name & other details.
