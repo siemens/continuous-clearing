@@ -33,6 +33,12 @@ namespace LCT.Facade.Interfaces
         /// <param name="repoName">repoName</param>
         /// <returns>HttpResponseMessage</returns>
         Task<HttpResponseMessage> GetPypiComponentDataByRepo(string repoName);
+        /// <summary>
+        /// Gets the Internal Component Data By Repo Name
+        /// </summary>
+        /// <param name="repoName">repoName</param>
+        /// <returns>HttpResponseMessage</returns>
+        Task<HttpResponseMessage> GetCargoComponentDataByRepo(string repoName);
 
 
         /// <summary>

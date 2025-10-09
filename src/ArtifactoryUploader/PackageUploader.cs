@@ -106,8 +106,10 @@ namespace LCT.ArtifactoryUploader
                     { "MAVEN", appSettings.Maven },
                     { "DEBIAN", appSettings.Debian },
                     { "POETRY", appSettings.Poetry },
-                    { "CONAN", appSettings.Conan }
-                };
+                    { "CONAN", appSettings.Conan },
+                    { "CARGO", appSettings.Cargo }
+                }
+            ;
 
                 if (projectConfigMap.TryGetValue(projectType, out var config))
                 {

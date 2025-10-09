@@ -9,6 +9,7 @@ using CycloneDX.Models;
 using LCT.APICommunications.Model;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -148,7 +149,7 @@ namespace SW360IntegrationTest.Nuget
                 new AuthenticationHeaderValue(testParameters.SW360AuthTokenType, testParameters.SW360AuthTokenValue);
             string expectedname = "Newtonsoft.Json";
             string expectedversion = "12.0.3";
-            string expecteddownloadurl = "https://github.com/JamesNK/Newtonsoft.Json.git";
+            string expecteddownloadurl = "https://github.com/JamesNK/Newtonsoft.Json/tree/12.0.3";
             string expectedexternalid = "pkg:nuget/Newtonsoft.Json@12.0.3";
             //url formation for retrieving component details
             string url = TestConstant.Sw360ReleaseApi + TestConstant.componentNameUrl + "Newtonsoft.Json";
@@ -164,7 +165,15 @@ namespace SW360IntegrationTest.Nuget
             string clearingState = responseDataForRelease.ClearingState;
             string externalid = responseDataForRelease.ExternalIds.Package_Url;
 
+            string releaseLink = responseDataForRelease.Links.Self.Href;
+            string releaseResponseBody = await httpClient.GetStringAsync(releaseLink);//GET method
+            var releasesInfo = JsonConvert.DeserializeObject<ReleasesInfo>(releaseResponseBody);
+
+            var releaseAttachments = releasesInfo?.Embedded?.Sw360attachments ?? new List<Sw360Attachments>();
+            bool AttachmentFound = releaseAttachments.Any(x => x.AttachmentType.Equals("SOURCE"));
+
             //Assert
+            Assert.IsTrue(AttachmentFound, "Expected a SOURCE attachment to be present in the release.");
             Assert.AreEqual(expectedname, name, "Test Project Name");
             Assert.AreEqual(expectedversion, version, "Test Project  Version");
             Assert.AreEqual(expecteddownloadurl, downloadurl, "Test download Url of Entity Framework");

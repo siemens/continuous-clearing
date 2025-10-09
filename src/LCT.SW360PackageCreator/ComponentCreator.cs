@@ -87,7 +87,6 @@ namespace LCT.SW360PackageCreator
                     componentsData.Version = item.Version;
                     componentsData.ComponentExternalId = item.Purl.Substring(0, item.Purl.IndexOf('@'));
                     componentsData.ReleaseExternalId = item.Purl;
-
                     Components component = await GetSourceUrl(componentsData.Name, componentsData.Version, componentsData.ProjectType, item.BomRef);
                     componentsData.SourceUrl = component.SourceUrl;
 
@@ -108,7 +107,7 @@ namespace LCT.SW360PackageCreator
 
             return lstOfBomDataToBeCompared;
         }
-
+        
         private void UpdateToLocalBomFile(Components componentsData, string currName, string currVersion)
         {
             Component currBom;
@@ -215,6 +214,9 @@ namespace LCT.SW360PackageCreator
                     Components alpComponentData = await UrlHelper.Instance.GetSourceUrlForAlpinePackage(name, version, bomRef);
                     componentsData = alpComponentData;
                     componentsData.ProjectType = projectType;
+                    break;
+                case "CARGO":
+                    componentsData.SourceUrl = await UrlHelper.Instance.GetSourceUrlForCargoPackage(name, version);
                     break;
                 default:
                     break;
@@ -656,7 +658,7 @@ namespace LCT.SW360PackageCreator
             }
             else
             {
-                if (!string.IsNullOrEmpty(item.ReleaseID) && (!string.IsNullOrEmpty(item.DownloadUrl) || item.DownloadUrl.Equals(Dataconstant.DownloadUrlNotFound)))
+                if (!string.IsNullOrEmpty(item.ReleaseID) && !string.IsNullOrEmpty(item.DownloadUrl) && item.DownloadUrl != Dataconstant.DownloadUrlNotFound)
                 {
                     await TriggeringFossologyUploadAndUpdateAdditionalData(item, sw360CreatorService, appSettings);
                 }
