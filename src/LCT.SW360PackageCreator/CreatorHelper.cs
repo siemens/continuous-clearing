@@ -160,11 +160,11 @@ namespace LCT.SW360PackageCreator
                     File.Copy(downloadFilePath, tarfile, true);
                     downloadFilePath = tarfile;
                 }
-               
+
                 return downloadFilePath;
             }
             return "";
-
+        }
         private static string ConvertZipToTarGzIfNeeded(string filePath)
         {
             if (string.IsNullOrEmpty(filePath))
@@ -176,7 +176,6 @@ namespace LCT.SW360PackageCreator
                 return tarGzFilePath;
             }
             return filePath;
-
         }
         private static async Task DownloadDependencyList(ComparisonBomData component)
         {
