@@ -59,5 +59,8 @@ namespace LCT.Common.Constants
         public const string backUpKey = "Backup";
         public const string SPDXFileExtension = ".spdx.sbom.json";
         public const string ConanFileExtension = ".dep.json";
+        public const string CargoFileExtension = "metadata.json";
+        public const string CrateFileExtension = ".crate";
+
     }
 }

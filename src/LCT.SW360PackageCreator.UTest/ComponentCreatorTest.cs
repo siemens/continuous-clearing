@@ -705,7 +705,57 @@ namespace LCT.SW360PackageCreator.UTest
             //Assert
             Assert.That(list.Count == 1);
         }
+        [Test]
+        public async Task CycloneDxBomParser_PassingFilePath_DoesntExcludeCargoDevDependentComponent()
+        {
+            //Arrange
 
+            List<Property> properties = new List<Property>();
+            properties.Add(new Property()
+            {
+                Name = "internal:siemens:clearing:project-type",
+                Value = "CARGO"
+            });
+            properties.Add(new Property()
+            {
+                Name = "internal:siemens:clearing:development",
+                Value = "false"
+            });
+
+
+
+            Bom bom = new Bom();
+            bom.Components = new List<Component>()
+                {
+                    new Component() { Name = "adler",Version="1.0.2",Group="",Purl="pkg:cargo/adler@1.0.2",Properties = properties }
+                };
+
+
+            CommonAppSettings commonAppSettings = new CommonAppSettings()
+            {
+                SW360 = new SW360() { IgnoreDevDependency = false, ProjectName = "Test" },
+                Directory = new Common.Directory()
+                {
+                    OutputFolder = @"\Output"
+                }
+            };
+
+            List<ComparisonBomData> comparisonBomData = new List<ComparisonBomData>();
+            comparisonBomData.Add(new ComparisonBomData());
+            var sw360Service = new Mock<ISW360Service>();
+            var creatorHelper = new Mock<ICreatorHelper>();
+            var parser = new Mock<ICycloneDXBomParser>();
+            parser.Setup(x => x.ParseCycloneDXBom(It.IsAny<string>())).Returns(bom);
+            creatorHelper.Setup(x => x.SetContentsForComparisonBOM(It.IsAny<List<Components>>(), sw360Service.Object)).ReturnsAsync(comparisonBomData);
+            var cycloneDXBomParser = new ComponentCreator();
+
+            //Act
+            var list = await cycloneDXBomParser.CycloneDxBomParser(commonAppSettings, sw360Service.Object, parser.Object, creatorHelper.Object);
+
+
+            //Assert
+            Assert.That(list.Count == 1);
+        }
         [Test]
         public async Task CycloneDxBomParser_Alpine_Component_Passing_ReturnsSuccess()
         {

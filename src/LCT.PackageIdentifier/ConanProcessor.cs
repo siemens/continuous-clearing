@@ -50,7 +50,7 @@ namespace LCT.PackageIdentifier
             ParsingInputFileForBOM(appSettings, ref bom);
             componentsForBOM = bom.Components;
 
-            componentsForBOM = GetExcludedComponentsList(componentsForBOM);
+            componentsForBOM = BomHelper.GetExcludedComponentsList(componentsForBOM, Dataconstant.PurlCheck()["CONAN"], appSettings?.ProjectType);
             componentsForBOM = componentsForBOM.Distinct(new ComponentEqualityComparer()).ToList();
 
             var componentsWithMultipleVersions = componentsForBOM.GroupBy(s => s.Name)
@@ -253,14 +253,14 @@ namespace LCT.PackageIdentifier
                     Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
                     bom = _cycloneDXBomParser.ParseCycloneDXBom(filepath);
                     CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
-                    GetDetailsforManuallyAddedComp(bom.Components);
+                    BomHelper.GetDetailsforManuallyAddedComp(bom.Components);
                     componentsForBOM.AddRange(bom.Components);
                 }
             }
 
             int initialCount = componentsForBOM.Count;
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = componentsForBOM.Count;
-            GetDistinctComponentList(ref componentsForBOM);
+            BomHelper.GetDistinctComponentList(ref componentsForBOM);
             BomCreator.bomKpiData.DuplicateComponents = initialCount - componentsForBOM.Count;
             
             bom.Components = componentsForBOM;
@@ -276,7 +276,7 @@ namespace LCT.PackageIdentifier
             string templateFilePath = SbomTemplate.GetFilePathForTemplate(listOfTemplateBomfilePaths);
             SbomTemplate.ProcessTemplateFile(templateFilePath, _cycloneDXBomParser, bom.Components, appSettings.ProjectType);
 
-            bom = RemoveExcludedComponents(appSettings, bom);
+            bom = BomHelper.RemoveExcludedComponents(appSettings, bom);
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
         }
 

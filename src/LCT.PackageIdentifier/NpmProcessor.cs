@@ -57,7 +57,7 @@ namespace LCT.PackageIdentifier
             ParsingInputFileForBOM(appSettings, ref componentsForBOM, ref bom, ref dependencies);
             totalComponentsIdentified = componentsForBOM.Count;
             totalUnsupportedComponentsIdentified = ListUnsupportedComponentsForBom.Components.Count;
-            componentsForBOM = GetExcludedComponentsList(componentsForBOM);
+            componentsForBOM = BomHelper.GetExcludedComponentsList(componentsForBOM, Dataconstant.PurlCheck()["NPM"],appSettings?.ProjectType);
             componentsForBOM = componentsForBOM.Distinct(new ComponentEqualityComparer()).ToList();
             ListUnsupportedComponentsForBom.Components = ListUnsupportedComponentsForBom.Components.Distinct(new ComponentEqualityComparer()).ToList();
             BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - componentsForBOM.Count;
@@ -697,25 +697,7 @@ namespace LCT.PackageIdentifier
 
             return $"{aqlResult.Repo}/{aqlResult.Path}/{aqlResult.Name}";
         }
-
-        private static List<Component> GetExcludedComponentsList(List<Component> componentsForBOM)
-        {
-            List<Component> components = new List<Component>();
-            foreach (Component componentsInfo in componentsForBOM)
-            {
-                if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["NPM"]))
-                {
-                    components.Add(componentsInfo);
-                    Logger.Debug($"GetExcludedComponentsList():ValidComponent For NPM : Component Details : {componentsInfo.Name} @ {componentsInfo.Version} @ {componentsInfo.Purl}");
-                }
-                else
-                {
-                    BomCreator.bomKpiData.ComponentsExcluded++;
-                    Logger.Debug($"GetExcludedComponentsList():InvalidComponent For NPM : Component Details : {componentsInfo.Name} @ {componentsInfo.Version} @ {componentsInfo.Purl}");
-                }
-            }
-            return components;
-        }
+               
 
         private static void AddingIdentifierType(List<Component> components, string identifiedBy, string filePath)
         {
