@@ -878,7 +878,7 @@ namespace LCT.SW360PackageCreator
                 {
                     var url = fileinfo["url"];
 
-                    if (!string.IsNullOrEmpty(url.ToString()) && url.ToString().EndsWith(FileConstant.TargzFileExtension))
+                    if (!string.IsNullOrEmpty(url.ToString()) && (url.ToString().EndsWith(FileConstant.TargzFileExtension) || url.ToString().EndsWith(FileConstant.ZipFileExtension)))
                     {
                         SourceURL = url.ToString();
                     }

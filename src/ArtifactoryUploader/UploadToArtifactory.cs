@@ -13,6 +13,7 @@ using LCT.APICommunications.Model.AQL;
 using LCT.ArtifactoryUploader.Model;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Model;
 using LCT.Services.Interface;
 using log4net;
 using System;
@@ -38,12 +39,13 @@ namespace LCT.ArtifactoryUploader
             foreach (var item in comparisonBomData)
             {
                 var packageType = GetPackageType(item);
+                
                 if (packageType != PackageType.Unknown)
                 {
                     AqlResult aqlResult = await GetSrcRepoDetailsForComponent(item);
                     ComponentsToArtifactory components = new ComponentsToArtifactory()
                     {
-                        Name = !string.IsNullOrEmpty(item.Group) ? $"{item.Group}/{item.Name}" : item.Name,
+                        Name = !string.IsNullOrEmpty(item.Group) ? $"{item.Group}/{item.Name}" : item.Name,                        
                         PackageName = item.Name,
                         Version = item.Version,
                         Purl = item.Purl,
@@ -67,7 +69,7 @@ namespace LCT.ArtifactoryUploader
                         components.PypiOrNpmCompName = string.Empty;
                     }
 
-                    components.Path = GetPackagePath(components, aqlResult);
+                    components.Path = GetPackagePath(components, aqlResult, item);
                     components.CopyPackageApiUrl = GetCopyURL(components);
                     components.MovePackageApiUrl = GetMoveURL(components);
                     components.JfrogPackageName = GetJfrogPackageName(components);
@@ -84,6 +86,7 @@ namespace LCT.ArtifactoryUploader
             Logger.Debug("Ending GetComponentsToBeUploadedToArtifactory() method");
             return componentsToBeUploaded;
         }
+        
         private static string GetComponentType(Component item)
         {
 
@@ -187,7 +190,7 @@ namespace LCT.ArtifactoryUploader
             return string.Empty;
         }
 
-        private static string GetPackagePath(ComponentsToArtifactory component, AqlResult aqlResult)
+        private static string GetPackagePath(ComponentsToArtifactory component, AqlResult aqlResult, Component item)
         {
             switch (component.ComponentType)
             {
@@ -216,7 +219,9 @@ namespace LCT.ArtifactoryUploader
                     }
 
                 case "MAVEN":
-                    return $"{component.Name}/{component.Version}";
+                    string groupWithSlash = !string.IsNullOrEmpty(item.Group) ? item.Group.Replace('.', '/') : string.Empty;
+                    string mavenPath = !string.IsNullOrEmpty(groupWithSlash) ? $"{groupWithSlash}/{item.Name}" : item.Name;
+                    return $"{mavenPath}/{component.Version}";
 
                 case "DEBIAN":
                     return $"pool/main/{component.Name[0]}/{component.Name}";
@@ -240,8 +245,8 @@ namespace LCT.ArtifactoryUploader
             }
             else if (component.ComponentType == "MAVEN")
             {
-                url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.Name}/{component.Version}" +
-               $"?to=/{component.DestRepoName}/{component.Name}/{component.Version}";
+                url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.Path}" +
+               $"?to=/{component.DestRepoName}/{component.Path}";
             }
             else if (component.ComponentType == "POETRY")
             {
@@ -289,8 +294,8 @@ namespace LCT.ArtifactoryUploader
             }
             else if (component.ComponentType == "MAVEN")
             {
-                url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.Name}/{component.Version}" +
-               $"?to=/{component.DestRepoName}/{component.Name}/{component.Version}";
+                url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.Path}" +
+               $"?to=/{component.DestRepoName}/{component.Path}";
             }
             else if (component.ComponentType == "POETRY")
             {
