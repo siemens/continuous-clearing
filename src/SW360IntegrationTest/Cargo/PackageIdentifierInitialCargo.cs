@@ -11,6 +11,7 @@ using CycloneDX.Models;
 
 namespace SW360IntegrationTest.Cargo
 {
+    [TestFixture, Order(43)]
     public class PackageIdentifierInitialCargo
     {
         private string CCTLocalBomTestFile { get; set; }

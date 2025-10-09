@@ -148,7 +148,7 @@ namespace SW360IntegrationTest.Nuget
                 new AuthenticationHeaderValue(testParameters.SW360AuthTokenType, testParameters.SW360AuthTokenValue);
             string expectedname = "Newtonsoft.Json";
             string expectedversion = "12.0.3";
-            string expecteddownloadurl = "https://github.com/JamesNK/Newtonsoft.Json.git";
+            string expecteddownloadurl = "https://github.com/JamesNK/Newtonsoft.Json/tree/12.0.3";
             string expectedexternalid = "pkg:nuget/Newtonsoft.Json@12.0.3";
             //url formation for retrieving component details
             string url = TestConstant.Sw360ReleaseApi + TestConstant.componentNameUrl + "Newtonsoft.Json";

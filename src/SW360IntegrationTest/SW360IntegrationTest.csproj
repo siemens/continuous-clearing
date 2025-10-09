@@ -29,6 +29,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<None Update="PackageCreatorTestFiles\Cargo\CCTComparisonBOMCargoInitial.json">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 		<None Update="PackageCreatorTestFiles\Maven\CCTComparisonBOMMavenUpdated.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>

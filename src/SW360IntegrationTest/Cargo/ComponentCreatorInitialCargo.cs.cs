@@ -1,11 +1,4 @@
-// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2025 Siemens AG
-//
-//  SPDX-License-Identifier: MIT
-
-// -------------------------------------------------------------------------------------------------------------------- 
-
-using CycloneDX.Models;
+﻿using CycloneDX.Models;
 using LCT.APICommunications.Model;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -15,23 +8,23 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using TestUtilities;
 
-namespace SW360IntegrationTest.NPM
+namespace SW360IntegrationTest.Cargo
 {
-    [TestFixture, Order(5)]
-    public class ComponentCreatorInitial
+    [TestFixture, Order(45)]
+    public class ComponentCreatorInitialCargo
     {
-        private static readonly TestParam testParameters = new TestParam();
+        private static readonly TestParamCargo testParameters = new TestParamCargo();
 
         [SetUp]
         public void Setup()
         {
             OutFolder = TestHelper.OutFolder;
-            CCTComparisonBomTestFile = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "src", "SW360IntegrationTest", "PackageCreatorTestFiles", "Npm", "CCTComparisonBOMNpmInitial.json"));
+            CCTComparisonBomTestFile = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "src", "SW360IntegrationTest", "PackageCreatorTestFiles", "Cargo", "CCTComparisonBOMCargoInitial.json"));
 
             if (!TestHelper.BOMCreated)
             {
                 OutFolder = TestHelper.OutFolder;
-                string packagjsonPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles", "SystemTest1stIterationData", "Npm"));
+                string packagjsonPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles", "SystemTest1stIterationData", "Cargo"));
                 string bomPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs"));
                 TestHelper.RunBOMCreatorExe(new string[]{
                 TestConstant.PackageFilePath, packagjsonPath,
@@ -42,36 +35,37 @@ namespace SW360IntegrationTest.NPM
                 TestConstant.SW360ProjectID, testParameters.SW360ProjectID,
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
-                TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
-                TestConstant.JfrogNpmInternalRepo,"Npm-test",
+                TestConstant.JfrogCargoInternalRepo,"Cargo-test",
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
-                TestConstant.ProjectType, "NPM",
-                TestConstant.Mode,""});
+                TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
+                TestConstant.ProjectType, "Cargo",
+                TestConstant.Mode,""
+                });
             }
         }
-
         [Test, Order(1)]
-        public void TestComponentCreatorExe()
+        public void TestComponentCreatorExe_Cargo()
         {
             string bomPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs"));
-
             // Assert
-            // Check return with warning code 2
-            Assert.AreEqual(2 | 0, TestHelper.RunComponentCreatorExe(new string[] {
+            // Check exit is normal
+            Assert.AreEqual(0, TestHelper.RunComponentCreatorExe(new string[] {
                 TestConstant.BomFolderPath,bomPath,
                 TestConstant.Sw360Token, testParameters.SW360AuthTokenValue,
                 TestConstant.SW360URL, testParameters.SW360URL,
                 TestConstant.SW360AuthTokenType, testParameters.SW360AuthTokenType,
                 TestConstant.SW360ProjectID, testParameters.SW360ProjectID,
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
+                TestConstant.FossologyURL, testParameters.FossUrl,
                 TestConstant.EnableFossologyTrigger,testParameters.FossologyTrigger,
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
-                TestConstant.FossologyURL,testParameters.FossUrl }), "Test to run Package Creator EXE execution");
+                TestConstant.Mode,""
+            }),
+                "Test to run Package Creator EXE execution");
         }
 
-
         [Test, Order(2)]
-        public void TestComparisionBOMUpdation()
+        public void TestComparisionBOMUpdation_Cargo()
         {
             bool filecheck = false;
 
@@ -100,30 +94,27 @@ namespace SW360IntegrationTest.NPM
                             Assert.AreEqual(item.Version, component.Version);
                             Assert.AreEqual(item.BomRef, component.BomRef);
                             Assert.AreEqual(item.Purl, component.Purl);
-                            Assert.AreEqual(item.Properties.Count, component.Properties.Count);
                         }
                     }
+
                 }
 
             }
-
-
-
             Assert.IsTrue(filecheck, "CycloneDx BOM not exist");
         }
 
         [Test, Order(3)]
-        public async Task TestComponentCreation()
+        public async Task ComponentCreation_AfterSuccessfulExeRun_ReturnsSuccess()
         {
             //Setting the httpclient
             var httpClient = new HttpClient() { };
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue(TestConstant.TestSw360TokenType, TestConstant.TestSw360TokenValue);
+                new AuthenticationHeaderValue(testParameters.SW360AuthTokenType, testParameters.SW360AuthTokenValue);
             string expectedcomponentType = "OSS";
-            string expectedname = "rxjs";
+            string expectedname = "anstyle";
             //url formation for retrieving component details
-            string url = TestConstant.Sw360ComponentApi + TestConstant.componentNameUrl + "rxjs";
+            string url = TestConstant.Sw360ComponentApi + TestConstant.componentNameUrl + "anstyle";
             string responseBody = await httpClient.GetStringAsync(url); //GET request
             var responseData = JsonConvert.DeserializeObject<ComponentsModel>(responseBody);
             string name = responseData.Embedded.Sw360components[0].Name;
@@ -133,25 +124,24 @@ namespace SW360IntegrationTest.NPM
             string componentType = hrefData.ComponentType;
 
             //Assert
-            Assert.AreEqual(expectedname, name);
-            Assert.AreEqual(expectedcomponentType, componentType);
+            Assert.AreEqual(expectedname, name, "Test if the component name is correct");
+            Assert.AreEqual(expectedcomponentType, componentType, "Test if the component version is correct");
         }
 
         [Test, Order(4)]
-        public async Task TestReleaseCreation_ClearingStateAsNewClearing()
+        public async Task ReleaseCreation__AfterSuccessfulExeRun_ReturnsClearingStateAsNewClearing()
         {
             //Setting the httpclient
             var httpClient = new HttpClient() { };
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue(TestConstant.TestSw360TokenType, TestConstant.TestSw360TokenValue);
-            string expectedname = "rxjs";
-            string expectedversion = "6.5.4";
-            string expecteddownloadurl = "https://github.com/reactivex/rxjs/tree/6.5.4";
-            string expectedexternalid = "pkg:npm/rxjs@6.5.4";
-            string expectedclearingState = "NEW_CLEARING";
+                new AuthenticationHeaderValue(testParameters.SW360AuthTokenType, testParameters.SW360AuthTokenValue);
+            string expectedname = "anstyle";
+            string expectedversion = "1.0.11";
+            string expecteddownloadurl = "https://crates.io/api/v1/crates/anstyle/1.0.11/download";
+            string expectedexternalid = "pkg:cargo/anstyle@1.0.11";
             //url formation for retrieving component details
-            string url = TestConstant.Sw360ReleaseApi + TestConstant.componentNameUrl + "rxjs";
+            string url = TestConstant.Sw360ReleaseApi + TestConstant.componentNameUrl + "anstyle";
             string responseBody = await httpClient.GetStringAsync(url);//GET method         
             var responseData = JsonConvert.DeserializeObject<ReleaseIdOfComponent>(responseBody);
             string urlofreleaseid = responseData.Embedded.Sw360Releases[0].Links.Self.Href;
@@ -161,33 +151,15 @@ namespace SW360IntegrationTest.NPM
             string name = responseDataForRelease.Name;
             string version = responseDataForRelease.Version;
             string downloadurl = responseDataForRelease.SourceDownloadurl;
-            string clearingState = responseDataForRelease.ClearingState;
             string externalid = responseDataForRelease.ExternalIds.Package_Url;
 
             //Assert
-            if (responseData.Embedded.Sw360Releases.Count > 0)
-            {
-                //In Case Multiple Releases found just checking for Name & other details.
-                Assert.AreEqual(expectedname, name, "Test Project Name");
-                Assert.AreEqual(expecteddownloadurl, downloadurl, "Test download Url of rxjs");
-                Assert.AreEqual(expectedclearingState, clearingState);
-            }
-            else
-            {
-                Assert.AreEqual(expectedname, name, "Test Project Name");
-                Assert.AreEqual(expectedversion, version, "Test Project  Version");
-                Assert.AreEqual(expecteddownloadurl, downloadurl, "Test download Url of rxjs");
-                Assert.AreEqual(expectedexternalid, externalid, "Test component external id");
-                Assert.AreEqual(expectedclearingState, clearingState);
-            }
+            Assert.AreEqual(expectedname, name, "Test Project Name");
+            Assert.AreEqual(expectedversion, version, "Test Project  Version");
+            Assert.AreEqual(expecteddownloadurl, downloadurl, "Test download Url of Entity Framework");
+            Assert.AreEqual(expectedexternalid, externalid, "Test component external id");
         }
 
-
-        [TearDown]
-        public void TearDown()
-        {
-            // implement here
-        }
 
         private string CCTComparisonBomTestFile { get; set; }
         private string OutFolder { get; set; }

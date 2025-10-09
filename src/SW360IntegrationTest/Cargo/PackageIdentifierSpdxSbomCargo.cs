@@ -11,6 +11,7 @@ using CycloneDX.Models;
 
 namespace SW360IntegrationTest.Cargo
 {
+    [TestFixture, Order(44)]
     public class PackageIdentifierSpdxSbomCargo
     {
 

@@ -423,8 +423,56 @@ namespace LCT.SW360PackageCreator
 
             return GithubUrl;
         }
+        /// <summary>
+        /// Gets the Source URL for CARGO Packages
+        /// </summary>
+        /// <param name="componentName"></param>
+        /// <param name="componentVersion"></param>
+        /// <returns>string</returns>
+       
+        public async Task<string> GetSourceUrlForCargoPackage(string componentName, string componentVersion)
+        {
+            string downLoadUrl = $"{CommonAppSettings.SourceBaseUrlForCargo}{Dataconstant.ForwardSlash}{CommonAppSettings.SourceUrlForCargo}{componentName}{Dataconstant.ForwardSlash}{componentVersion}";
+            string repositoryUrl = string.Empty;
+            try
+            {
+                using var localHttpClient = new HttpClient();
+                localHttpClient.DefaultRequestHeaders.UserAgent.ParseAdd("ContinuousClearing");
+                var response = await localHttpClient.GetAsync(downLoadUrl);
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    var jObj = JObject.Parse(json);
+                    var versionToken = jObj["version"];
+                    var dlPath = versionToken?["dl_path"];
 
-
+                    if (dlPath != null && dlPath.Type != JTokenType.Null && !string.IsNullOrWhiteSpace(dlPath.ToString()))
+                    {
+                        repositoryUrl = dlPath.ToString();
+                        repositoryUrl = $"{CommonAppSettings.SourceBaseUrlForCargo}{repositoryUrl}";
+                    }                   
+                    else
+                    {
+                        repositoryUrl = "";
+                        Logger.Warn($"Identification of SRC url failed for {componentName}, " +
+                            $"Exclude if it is an internal component or manually update the SRC url");
+                    }
+                }
+                else
+                {
+                    Logger.Warn($"Identification of SRC url failed for {componentName}, " +
+                        $"Exclude if it is an internal component or manually update the SRC url");
+                    Logger.Debug($"GetSourceUrlForCargoPackage(): HTTP Status: {response.StatusCode} for URL: {downLoadUrl}");
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                Logger.Debug($"GetSourceUrlForCargoPackage()", ex);
+                Logger.Warn($"Identification of SRC url failed for {componentName}, " +
+                    $"Exclude if it is an internal component or manually update the SRC url");
+            }
+            return repositoryUrl;
+        }
         /// <summary>
         /// Gets the Source URL for CONAN Packages
         /// </summary>
