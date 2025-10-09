@@ -656,7 +656,7 @@ namespace LCT.SW360PackageCreator
             }
             else
             {
-                if (!string.IsNullOrEmpty(item.ReleaseID) && (!string.IsNullOrEmpty(item.DownloadUrl) || item.DownloadUrl.Equals(Dataconstant.DownloadUrlNotFound)))
+                if (!string.IsNullOrEmpty(item.ReleaseID) && !string.IsNullOrEmpty(item.DownloadUrl) && item.DownloadUrl != Dataconstant.DownloadUrlNotFound)
                 {
                     await TriggeringFossologyUploadAndUpdateAdditionalData(item, sw360CreatorService, appSettings);
                 }
