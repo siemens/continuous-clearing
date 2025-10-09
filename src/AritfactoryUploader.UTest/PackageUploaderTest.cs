@@ -37,7 +37,6 @@ namespace AritfactoryUploader.UTest
 
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            //string comparisonBOMPath = outFolder + @"\ArtifactoryUTTestFiles\CyclonedxBom.json";
 
             CommonAppSettings commonAppSettings = new CommonAppSettings();
             commonAppSettings.Directory = new LCT.Common.Directory()
@@ -84,7 +83,7 @@ namespace AritfactoryUploader.UTest
 
             Program.UploaderStopWatch = new Stopwatch();
             Program.UploaderStopWatch.Start();
-            Thread.Sleep(10);
+            await Task.Delay(10);
             Program.UploaderStopWatch.Stop();
             //Act
             await PackageUploader.UploadPackageToArtifactory(commonAppSettings);
@@ -132,7 +131,6 @@ namespace AritfactoryUploader.UTest
                 Exclude = []
             };
 
-            //commonAppSettings.Conan.Artifactory.ThirdPartyRepos.Add(new ThirdPartyRepo() { Name = "conan-test" });
             commonAppSettings.TimeOut = 100;
 
             commonAppSettings.Conan = new Config()
