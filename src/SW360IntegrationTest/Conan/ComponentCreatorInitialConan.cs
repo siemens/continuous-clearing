@@ -130,12 +130,12 @@ namespace SW360IntegrationTest.Conan
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue(testParameters.SW360AuthTokenType, testParameters.SW360AuthTokenValue);
-            string expectedname = "rapidjson";
-            string expectedversion = "1.1.0";
-            string expecteddownloadurl = "https://github.com/Tencent/rapidjson/archive/v1.1.0.tar.gz";
-            string expectedexternalid = "pkg:conan/rapidjson@1.1.0";
+            string expectedname = "libcurl";
+            string expectedversion = "8.15.0";
+            string expecteddownloadurl = "https://curl.se/download/curl-8.15.0.tar.xz";
+            string expectedexternalid = "pkg:conan/libcurl@8.15.0";
             //url formation for retrieving component details
-            string url = TestConstant.Sw360ReleaseApi + TestConstant.componentNameUrl + "rapidjson";
+            string url = TestConstant.Sw360ReleaseApi + TestConstant.componentNameUrl + "libcurl";
             string responseBody = await httpClient.GetStringAsync(url);//GET method         
             var responseData = JsonConvert.DeserializeObject<ReleaseIdOfComponent>(responseBody);
             string urlofreleaseid = responseData.Embedded.Sw360Releases[0].Links.Self.Href;
