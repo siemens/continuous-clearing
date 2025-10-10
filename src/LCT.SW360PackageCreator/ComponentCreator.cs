@@ -613,11 +613,7 @@ namespace LCT.SW360PackageCreator
                     string attachmentApiUrl = sw360CreatorService.AttachSourcesToReleasesCreated(releaseId, attachmentUrlList, item);
                     item.ReleaseAttachmentLink = attachmentApiUrl;
                     item.DownloadUrl = !attachmentUrlList.ContainsKey("SOURCE") ? Dataconstant.DownloadUrlNotFound : item.DownloadUrl;
-                }
-                else
-                {
-                    item.DownloadUrl = !attachmentUrlList.ContainsKey("SOURCE") ? Dataconstant.DownloadUrlNotFound : item.DownloadUrl;
-                }
+                }                
             }
         }
         public static Task GetUploadIdWhenReleaseExists(ComparisonBomData item, ReleasesInfo releasesInfo = null, CommonAppSettings appSettings = null)
