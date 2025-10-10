@@ -629,7 +629,7 @@ namespace LCT.SW360PackageCreator
             // Removes common components
             sourceNotAvailable.RemoveAll(src => lstReleaseNotCreated.Any(rls => src.Name == rls.Name && src.Version == rls.Version));
 
-            CommonHelper.WriteComponentsWithoutDownloadURLToKpi(sourceNotAvailable, lstReleaseNotCreated, appSetting.SW360.URL,DuplicateComponentsByPurlId);
+            LoggerHelper.WriteComponentsWithoutDownloadURLToKpi(sourceNotAvailable, lstReleaseNotCreated, appSetting.SW360.URL,DuplicateComponentsByPurlId);
         }
 
         private static string GetComponentAvailabilityStatus(List<Components> componentsAvailable, Components component)

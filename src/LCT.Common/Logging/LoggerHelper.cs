@@ -42,7 +42,7 @@ namespace LCT.Common.Logging
                 WriteFallback(fallbackMessage, fallbackType);
             }
         }
-        public static void WriteComponentsWithoutDownloadURLByUseingSpectreToKpi(List<ComparisonBomData> componentInfo, List<Components> lstReleaseNotCreated, string sw360URL)
+        public static void WriteComponentsWithoutDownloadURLByUseingSpectreToKpi(List<ComparisonBomData> componentInfo, List<Components> lstReleaseNotCreated, string sw360URL, List<Components> duplicateComponentsByPurlId)
         {
             if (componentInfo.Count > 0 || lstReleaseNotCreated.Count > 0)
             {
@@ -52,6 +52,7 @@ namespace LCT.Common.Logging
 
                     DisplayComponentsWithoutUrl(componentInfo, sw360URL);
                     DisplayNotCreatedComponents(lstReleaseNotCreated);
+                    DisplayDuplicateComponentsByPurlId(duplicateComponentsByPurlId, sw360URL);
 
                     var environmentHelper = new EnvironmentHelper();
                     environmentHelper.CallEnvironmentExit(2);
@@ -59,7 +60,45 @@ namespace LCT.Common.Logging
                 }, "Components Without Download URL", "Alert");
             }
         }
+        private static void DisplayDuplicateComponentsByPurlId(List<Components> duplicateComponents, string sw360URL)
+        {
+            if (duplicateComponents == null || duplicateComponents.Count == 0)
+                return;
 
+            WriteLine();
+            WriteInfoWithMarkup("[yellow]* Components or releases not created due to invalid PurlIds in SW360 ExternalID field[/]");
+            WriteInfoWithMarkup("[yellow]  Component name exists in SW360 with a different package type PurlId. Manually update the component details.[/]");
+            WriteLine();
+
+            int consoleWidth = GetConsoleWidth(6, 200);
+
+            var table = new Table()
+                .BorderColor(Color.Yellow)
+                .Border(TableBorder.Rounded)
+                .Title("[yellow]Invalid / Duplicate Components (PurlId Mismatch)[/]")
+                .Width(Math.Min(consoleWidth, 200))
+                .Expand();
+
+            table.AddColumn(new TableColumn("[green]Name[/]").Width(45));
+            table.AddColumn(new TableColumn("[blue]Version[/]").Width(25));
+            table.AddColumn(new TableColumn("[cyan]SW360 Component URL[/]").Width(120));
+
+            foreach (var item in duplicateComponents)
+            {
+                string name = string.IsNullOrWhiteSpace(item.Name) ? "N/A" : item.Name;
+                string version = string.IsNullOrWhiteSpace(item.Version) ? "N/A" : item.Version;
+                string link = CommonHelper.Sw360ComponentURL(sw360URL, item.ComponentId);
+
+                table.AddRow(
+                    $"[white]{Markup.Escape(name)}[/]",
+                    $"[white]{Markup.Escape(version)}[/]",
+                    $"[cyan]{Markup.Escape(link)}[/]"
+                );
+            }
+
+            AnsiConsole.Write(table);
+            WriteLine();
+        }
         private static void DisplayComponentsWithoutUrl(List<ComparisonBomData> componentInfo, string sw360URL)
         {
             if (componentInfo.Count <= 0) return;
@@ -115,7 +154,7 @@ namespace LCT.Common.Logging
         {
             foreach (var item in componentInfo)
             {
-                string link = Sw360URL(sw360URL, item.ReleaseID);
+                string link = CommonHelper.Sw360URL(sw360URL, item.ReleaseID);
                 table.AddRow(
                     Markup.Escape(item.Name),
                     Markup.Escape(item.Version),
@@ -206,23 +245,19 @@ namespace LCT.Common.Logging
                 Logger.Info("\n");
             }
         }
-        private static string Sw360URL(string sw360Env, string releaseId)
-        {
-            string sw360URL = $"{sw360Env}{"/group/guest/components/-/component/release/detailRelease/"}{releaseId}";
-            return sw360URL;
-        }
-        public static void WriteComponentsWithoutDownloadURLToKpi(List<ComparisonBomData> componentInfo, List<Components> lstReleaseNotCreated, string sw360URL)
+        
+        public static void WriteComponentsWithoutDownloadURLToKpi(List<ComparisonBomData> componentInfo, List<Components> lstReleaseNotCreated, string sw360URL, List<Components> DuplicateComponentsByPurlId)
         {
             if (LoggerFactory.UseSpectreConsole)
             {
-                WriteComponentsWithoutDownloadURLByUseingSpectreToKpi(componentInfo, lstReleaseNotCreated, sw360URL);
+                WriteComponentsWithoutDownloadURLByUseingSpectreToKpi(componentInfo, lstReleaseNotCreated, sw360URL, DuplicateComponentsByPurlId);
                 return;
             }
 
             const string Name = "Name";
             const string Version = "Version";
             const string URL = "SW360 Release URL";
-            if (componentInfo.Count > 0 || lstReleaseNotCreated.Count > 0)
+            if (componentInfo.Count > 0 || lstReleaseNotCreated.Count > 0 || DuplicateComponentsByPurlId.Count > 0)
             {
                 Logger.Logger.Log(null, Level.Alert, "Action Item required by the user:\n", null);
                 EnvironmentHelper environmentHelper = new EnvironmentHelper();
@@ -240,7 +275,7 @@ namespace LCT.Common.Logging
 
                 foreach (var item in componentInfo)
                 {
-                    string Link = Sw360URL(sw360URL, item.ReleaseID);
+                    string Link = CommonHelper.Sw360URL(sw360URL, item.ReleaseID);
                     Logger.Logger.Log(null, Level.Alert, $"{"|",5}{item.Name,-45} {"|",5} {item.Version,25} {"|",5} {Link,-120} {"|",-5}", null);
                     Logger.Logger.Log(null, Level.Alert, $"{"-",5}{string.Join("", Enumerable.Repeat("-", 206)),5}", null);
                 }
@@ -263,6 +298,7 @@ namespace LCT.Common.Logging
                 }
                 Logger.Info("\n");
             }
+            LogDuplicateComponentsByPurlId(DuplicateComponentsByPurlId, sw360URL);
         }
         public static void DisplayAllSettings(List<Component> componentsInBOM, CommonAppSettings appSettings)
         {
@@ -281,21 +317,28 @@ namespace LCT.Common.Logging
 
         private static List<string> GetProjectTypes(List<Component> componentsInBOM)
         {
+            if (componentsInBOM == null || componentsInBOM.Count == 0)
+                return new List<string>();
+
             return [.. componentsInBOM
-                .Select(item => item.Properties.First(x => x.Name == Dataconstant.Cdx_ProjectType).Value)
-                .Distinct()];
+                .Select(c => c.Properties?
+                    .FirstOrDefault(p => p.Name == Dataconstant.Cdx_ProjectType)?.Value)
+                .Where(v => !string.IsNullOrWhiteSpace(v))
+                .Select(CommonHelper.CanonicalizeProjectType)
+                .Distinct(StringComparer.OrdinalIgnoreCase)];
         }
 
         private static Dictionary<string, Config> CreateProjectConfigMap(CommonAppSettings appSettings)
         {
             return new Dictionary<string, Config>(StringComparer.OrdinalIgnoreCase)
     {
-        { "NPM", appSettings.Npm },
-        { "NUGET", appSettings.Nuget },
-        { "MAVEN", appSettings.Maven },
-        { "DEBIAN", appSettings.Debian },
-        { "POETRY", appSettings.Poetry },
-        { "CONAN", appSettings.Conan }
+        { "npm", appSettings.Npm },
+        { "NuGet", appSettings.Nuget },
+        { "Maven", appSettings.Maven },
+        { "Debian", appSettings.Debian },
+        { "Poetry", appSettings.Poetry },
+        { "Cargo",appSettings.Cargo },
+        { "Conan", appSettings.Conan }
     };
         }
 
@@ -842,13 +885,12 @@ namespace LCT.Common.Logging
                 int maxValue = printData.Values.Count != 0 ? printData.Values.Max() : 0;
 
                 var table = CreateSummaryTable(consoleWidth);
-                AddSummaryRows(table, printData, exeType, maxValue, barMaxWidth, KpiNames);
+                AddSummaryRows(table, printData, maxValue, barMaxWidth, KpiNames);
 
                 table.AddEmptyRow();
                 AnsiConsole.Write(table);
 
                 WriteLine();
-                //WriteLegendTable(exeType, consoleWidth);
 
                 WriteTimingData(printTimingData);
             }, "Package Summary Table", "Panel");
@@ -880,19 +922,11 @@ namespace LCT.Common.Logging
         private static void AddSummaryRows(
             Table table,
             Dictionary<string, int> printData,
-            string exeType,
             int maxValue,
             int barMaxWidth, KpiNames KpiNames)
         {
-            //var legendColorMap = LegendMappings.GetLegendColorMap(exeType);
-            //var tableKeyToLegend = LegendMappings.GetTableKeyToLegend(exeType);
-
             foreach (var item in printData)
-            {
-                //string legendLabel = GetLegendLabel(item.Key, tableKeyToLegend, legendColorMap);
-                //string color = legendLabel != null && legendColorMap.TryGetValue(legendLabel, out var mappedColor)
-                //    ? mappedColor
-                //    : GetColorForItem(item.Key, item.Value);
+            {               
                 string color = GetColorForItem(item.Key, item.Value, KpiNames);
                 int barWidth = maxValue > 0 ? (int)((double)item.Value / maxValue * barMaxWidth) : 0;
                 string visualBar = barWidth > 0 ? new string('█', barWidth) : "";
@@ -920,72 +954,92 @@ namespace LCT.Common.Logging
             }
             WriteLine();
         }
-       
+
         private static string GetColorForItem(string key, int value, KpiNames kpiNames)
-        {           
-            if (key.Equals(kpiNames.ComponentsInInputFile) || key.Equals(kpiNames.ComponentsInBOM) || key.Equals(kpiNames.ComponentsFromBOM))
+        {
+            if (string.IsNullOrWhiteSpace(key) || kpiNames == null)
+                return "green";
+
+            var errorGroup = new[]
+            {
+                kpiNames.ComponentsInInputFile,
+                kpiNames.ComponentsInBOM,
+                kpiNames.ComponentsFromBOM
+            };
+            var warningGroup = new[]
+            {
+                kpiNames.PackagesNotPresentInOfficialRepo,
+                kpiNames.ComponentsNotUploadedInFOSSology,
+                kpiNames.PackagesInNotApprovedState,
+                kpiNames.ReleasesWithoutSourceDownloadURL
+            };
+            
+            var infoGroup = new[]
+            {
+                kpiNames.ReleasesNotCreatedInSW360,
+                kpiNames.ComponentsWithoutPackageURL,
+                kpiNames.ComponentsWithoutSourceAndPackageURL,
+                kpiNames.PackagesNotCopiedToSipartyRepo,
+                kpiNames.PackagesNotCopiedToSipartyDevDepRepo,
+                kpiNames.PackagesNotActionedDueToError,
+                kpiNames.PackagesNotExistingInRepository,
+                kpiNames.PackagesNotMovedToRepo
+            };
+
+            var cyanGroup = new[]
+            {
+                kpiNames.TotalDuplicateAndInValidComponents,
+                kpiNames.PackagesPresentIn3rdPartyRepo,
+                kpiNames.PackagesPresentInDevDepRepo,
+                kpiNames.PackagesPresentInReleaseRepo,
+                kpiNames.DevelopmentComponents,
+                kpiNames.BundledComponents,
+                kpiNames.InvalidComponentsExcluded,
+                kpiNames.DuplicateComponents,
+                kpiNames.ManuallyExcludedSw360,
+                kpiNames.InternalComponents
+            };
+
+            var alwaysGreen = new[]
+            {
+                kpiNames.ReleasesCreatedInSW360,
+                kpiNames.ComponentsUploadedInFOSSology,
+                kpiNames.ReleasesExistsInSW360,
+                kpiNames.ReleasesWithSourceDownloadURL,
+                kpiNames.ComponentsAddedFromSBOMTemplate,
+                kpiNames.ComponentsOverWrittenFromSBOMTemplate,
+                kpiNames.PackagesInApprovedState,
+                kpiNames.PackagesCopiedToSipartyRepo,
+                kpiNames.PackagesCopiedToSipartyDevDepRepo,
+                kpiNames.PackagesMovedToRepo,
+                kpiNames.ComponentsFromTheSPDXImportedAsBaselineEntries
+            };
+
+            bool Is(string candidate) => !string.IsNullOrEmpty(candidate) && key.Equals(candidate, StringComparison.Ordinal);
+
+            if (errorGroup.Any(Is))
                 return value == 0 ? "red" : "green";
 
-            if (key.Equals(kpiNames.PackagesNotPresentInOfficialRepo) ||
-                key.Equals(kpiNames.ComponentsNotUploadedInFOSSology) ||
-                key.Equals(kpiNames.PackagesInNotApprovedState) ||
-                key.Equals(kpiNames.ReleasesWithoutSourceDownloadURL))
+            if (warningGroup.Any(Is))
                 return value == 0 ? "green" : "yellow";
 
-            if (key.Equals(kpiNames.PackagesNotPresentInOfficialRepo) ||
-                key.Equals(kpiNames.ReleasesNotCreatedInSW360) ||
-                key.Equals(kpiNames.ComponentsWithoutPackageURL) ||
-                key.Equals(kpiNames.ComponentsWithoutSourceAndPackageURL) ||
-                key.Equals(kpiNames.PackagesNotCopiedToSipartyRepo) ||
-                key.Equals(kpiNames.PackagesNotCopiedToSipartyDevDepRepo) ||
-                key.Equals(kpiNames.PackagesNotActionedDueToError) ||
-                key.Equals(kpiNames.PackagesNotExistingInRepository) ||
-                key.Equals(kpiNames.PackagesNotMovedToRepo) ||
-                key.Equals(kpiNames.ReleasesWithoutSourceDownloadURL))
+            if (infoGroup.Any(Is))
                 return value == 0 ? "green" : "red";
 
-            if (key.Equals(kpiNames.TotalDuplicateAndInValidComponents) ||
-                key.Equals(kpiNames.PackagesPresentIn3rdPartyRepo) ||
-                key.Equals(kpiNames.PackagesPresentInDevDepRepo) ||
-                key.Equals(kpiNames.PackagesPresentInReleaseRepo) ||
-                key.Equals(kpiNames.DevelopmentComponents) ||
-                key.Equals(kpiNames.BundledComponents)||
-                key.Equals(kpiNames.InvalidComponentsExcluded) ||
-                key.Equals(kpiNames.DuplicateComponents) ||
-                key.Equals(kpiNames.ManuallyExcludedSw360)||
-                key.Equals(kpiNames.InternalComponents))
-            {
+            if (cyanGroup.Any(Is))
                 return "cyan";
-            } 
-            
-            if (key.Equals(kpiNames.ReleasesCreatedInSW360) ||
-                key.Equals(kpiNames.ComponentsUploadedInFOSSology) ||
-                key.Equals(kpiNames.ReleasesExistsInSW360) ||
-                key.Equals(kpiNames.ReleasesWithSourceDownloadURL) ||
-                key.Equals(kpiNames.ComponentsAddedFromSBOMTemplate) ||
-                key.Equals(kpiNames.ComponentsAddedFromSBOMTemplate) ||
-                key.Equals(kpiNames.ComponentsOverWrittenFromSBOMTemplate) ||
-                key.Equals(kpiNames.PackagesInApprovedState) ||
-                key.Equals(kpiNames.PackagesCopiedToSipartyRepo) ||
-                key.Equals(kpiNames.PackagesCopiedToSipartyDevDepRepo) ||
-                key.Equals(kpiNames.PackagesMovedToRepo) ||
-                key.Equals(kpiNames.ComponentsFromTheSPDXImportedAsBaselineEntries))
-            {
-                return "green";
-            }
 
-            // 4. Cached / rotating colors for anything else
-            if (_colorCache.TryGetValue(key, out string cachedColor))
-            {
-                return cachedColor;
-            }
+            if (alwaysGreen.Any(Is))
+                return "green";
+
+            if (_colorCache.TryGetValue(key, out var cached))
+                return cached;
 
             var colors = new[] { "green" };
-            string assignedColor = colors[_colorIndex % colors.Length];
-            _colorCache[key] = assignedColor;
+            var assigned = colors[_colorIndex % colors.Length];
+            _colorCache[key] = assigned;
             _colorIndex++;
-
-            return assignedColor;
+            return assigned;
         }
         public static void WriteInternalComponentsTableInCli(List<Component> internalComponents)
         {
@@ -1187,6 +1241,36 @@ namespace LCT.Common.Logging
             {
                 Logger.Info($"{message}{version}");
             }
+        }       
+        private static void LogDuplicateComponentsByPurlId(List<Components> duplicateComponents, string sw360URL)
+        {
+            if (duplicateComponents.Count > 0)
+            {
+                Logger.Logger.Log(null, Level.Alert, "* List of components or releases not created in SW360 due to Invalid Purl ids found in Components ExternalID field in sw360", null);
+                Logger.Logger.Log(null, Level.Alert, "  Component Name already exists in SW360 with a different package type PurlId. Manually update the component details.", null);
+
+                const int nameWidth = 45;
+                const int versionWidth = 25;
+                const int urlWidth = 120;
+                const int totalWidth = nameWidth + versionWidth + urlWidth + 10;
+
+                string border = new string('=', totalWidth);
+                string separator = new string('-', totalWidth);
+
+                Logger.Logger.Log(null, Level.Alert, border, null);
+                Logger.Logger.Log(null, Level.Alert, string.Format("| {0,-45} | {1,-25} | {2,-120} |", "Name", "Version", "SW360 Component URL"), null);
+                Logger.Logger.Log(null, Level.Alert, border, null);
+
+                foreach (var item in duplicateComponents)
+                {
+                    string link = CommonHelper.Sw360ComponentURL(sw360URL, item.ComponentId);
+                    Logger.Logger.Log(null, Level.Alert, string.Format("| {0,-45} | {1,-25} | {2,-120} |", item.Name, item.Version, link), null);
+                    Logger.Logger.Log(null, Level.Alert, separator, null);
+                }
+
+                Logger.Info("\n");
+            }
         }
+
     }
 }

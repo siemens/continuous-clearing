@@ -280,7 +280,7 @@ namespace LCT.SW360PackageCreator
             ISw360CreatorService sw360CreatorService, List<ComparisonBomData> componentsToBoms,
             string sw360Url, CommonAppSettings appSettings)
         {
-            Logger.Logger.Log(null, Level.Notice, $"No of Unique and Valid components read from Comparison BOM = {componentsToBoms.Count} ", null);
+            Logger.Logger.Log(null, Level.Notice, $"No of Unique and Valid components read from BOM = {componentsToBoms.Count} ", null);
 
             try
             {
@@ -612,6 +612,10 @@ namespace LCT.SW360PackageCreator
                 {
                     string attachmentApiUrl = sw360CreatorService.AttachSourcesToReleasesCreated(releaseId, attachmentUrlList, item);
                     item.ReleaseAttachmentLink = attachmentApiUrl;
+                    item.DownloadUrl = !attachmentUrlList.ContainsKey("SOURCE") ? Dataconstant.DownloadUrlNotFound : item.DownloadUrl;
+                }
+                else
+                {
                     item.DownloadUrl = !attachmentUrlList.ContainsKey("SOURCE") ? Dataconstant.DownloadUrlNotFound : item.DownloadUrl;
                 }
             }

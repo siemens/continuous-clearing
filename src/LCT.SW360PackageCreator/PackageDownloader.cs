@@ -190,6 +190,7 @@ namespace LCT.SW360PackageCreator
 
         private static Result ListTagsOfComponent(ComparisonBomData component)
         {
+            component.DownloadUrl = "https://github.com/holepunchto/bare-os#readme";
             string gitCommand = $"ls-remote --tags {component.DownloadUrl}";
             Logger.Debug($"GetCorrectVersion():{component.Name}@{component.Version} --> {gitCommand}");
 

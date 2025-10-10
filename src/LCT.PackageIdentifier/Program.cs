@@ -90,6 +90,7 @@ namespace LCT.PackageIdentifier
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
             CommonHelper.DefaultLogFolderInitialisation(FileConstant.BomCreatorLog, m_Verbose);
             CommonAppSettings appSettings = _settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
+            appSettings.ProjectType = CommonHelper.CanonicalizeProjectType(appSettings.ProjectType);
             ProjectReleases projectReleases = new ProjectReleases();
             string _ = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.BomCreatorLog, m_Verbose);
             Console.OutputEncoding = System.Text.Encoding.UTF8;

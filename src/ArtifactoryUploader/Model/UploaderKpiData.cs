@@ -39,17 +39,11 @@ namespace LCT.ArtifactoryUploader.Model
         [DisplayName(@"Time taken by Artifactory Uploader")]
         public double TimeTakenByArtifactoryUploader { get; set; }
 
-        //[DisplayName(@"Packages to be Copied to Siparty DevDep Repo")]
-        //public int DevPackagesToBeUploaded { get; set; }
-
         [DisplayName(@"Packages Copied to Siparty DevDep Repo")]
         public int DevPackagesUploaded { get; set; }
 
         [DisplayName(@"Packages Not Copied to Siparty DevDep Repo")]
         public int DevPackagesNotUploadedToJfrog { get; set; }
-
-        //[DisplayName(@"Packages to be Moved")]
-        //public int InternalPackagesToBeUploaded { get; set; }
 
         [DisplayName(@"Packages Moved to Repo")]
         public int InternalPackagesUploaded { get; set; }

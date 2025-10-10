@@ -8,7 +8,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 
-namespace LCT.Common.Tests.Logging
+namespace LCT.Common.UTest
 {
     [TestFixture]
     public class LoggerHelperTests
@@ -237,10 +237,10 @@ namespace LCT.Common.Tests.Logging
                 new Components { Name = "CompB", Version = "2.0" }
             };
             Assert.DoesNotThrow(() =>
-                LoggerHelper.WriteComponentsWithoutDownloadURLByUseingSpectreToKpi(componentInfo, lstReleaseNotCreated, "http://sw360/")
+                LoggerHelper.WriteComponentsWithoutDownloadURLByUseingSpectreToKpi(componentInfo, lstReleaseNotCreated, "http://sw360/", lstReleaseNotCreated)
             );
             Assert.DoesNotThrow(() =>
-                LoggerHelper.WriteComponentsWithoutDownloadURLByUseingSpectreToKpi(new List<ComparisonBomData>(), new List<Components>(), "http://sw360/")
+                LoggerHelper.WriteComponentsWithoutDownloadURLByUseingSpectreToKpi(new List<ComparisonBomData>(), new List<Components>(), "http://sw360/",lstReleaseNotCreated)
             );
         }
 
@@ -288,19 +288,12 @@ namespace LCT.Common.Tests.Logging
             };
             LoggerFactory.UseSpectreConsole = false;
             Assert.DoesNotThrow(() =>
-                LoggerHelper.WriteComponentsWithoutDownloadURLToKpi(componentInfo, lstReleaseNotCreated, "http://sw360/")
+                LoggerHelper.WriteComponentsWithoutDownloadURLToKpi(componentInfo, lstReleaseNotCreated, "http://sw360/", lstReleaseNotCreated)
             );
             Assert.DoesNotThrow(() =>
-                LoggerHelper.WriteComponentsWithoutDownloadURLToKpi(new List<ComparisonBomData>(), new List<Components>(), "http://sw360/")
+                LoggerHelper.WriteComponentsWithoutDownloadURLToKpi(new List<ComparisonBomData>(), new List<Components>(), "http://sw360/", lstReleaseNotCreated)
             );
         }
-
-        [Test]
-        public void Sw360URL_ReturnsExpectedFormat()
-        {
-            var method = typeof(LoggerHelper).GetMethod("Sw360URL", BindingFlags.NonPublic | BindingFlags.Static);
-            string url = (string)method.Invoke(null, new object[] { "http://sw360", "rel1" });
-            Assert.That(url, Does.Contain("rel1"));
-        }
+        
     }
 }

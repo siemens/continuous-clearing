@@ -3,7 +3,7 @@ using LCT.Common;
 using System.Reflection;
 using log4net;
 
-namespace LCT.Common.Tests.Logging
+namespace LCT.Common.UTest
 {
     [TestFixture]
     public class LoggerFactoryTests
