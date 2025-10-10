@@ -15,22 +15,22 @@ namespace LCT.SW360PackageCreator.Model
     [ExcludeFromCodeCoverage]
     public class CreatorKpiData
     {
-        [DisplayName(@"Components read from Comparison BOM")]
+        [DisplayName(@"Components from BOM")]
         public int ComponentsReadFromComparisonBOM { get; set; }
 
-        [DisplayName(@"Components or releases created newly in SW360")]
+        [DisplayName(@"Releases created in SW360")]
         public int ComponentsOrReleasesCreatedNewlyInSw360 { get; set; }
 
-        [DisplayName(@"Components or releases exists in SW360")]
+        [DisplayName(@"Releases exists in SW360")]
         public int ComponentsOrReleasesExistingInSw360 { get; set; }
 
-        [DisplayName(@"Components without source download URL")]
+        [DisplayName(@"Releases Without source download URL")]
         public int ComponentsWithoutSourceDownloadUrl { get; set; }
 
-        [DisplayName(@"Components with source download URL")]
+        [DisplayName(@"Releases with source download URL")]
         public int ComponentsWithSourceDownloadUrl { get; set; }
 
-        [DisplayName(@"Components or releases not created in SW360")]
+        [DisplayName(@"Releases not created in SW360")]
         public int ComponentsOrReleasesNotCreatedInSw360 { get; set; }
 
         [DisplayName(@"Time taken by ComponentCreator")]

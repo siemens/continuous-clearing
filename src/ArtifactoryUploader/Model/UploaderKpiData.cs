@@ -15,7 +15,7 @@ namespace LCT.ArtifactoryUploader.Model
     [ExcludeFromCodeCoverage]
     public class UploaderKpiData
     {
-        [DisplayName(@"Components in Comparison BOM")]
+        [DisplayName(@"Components in BOM")]
         public int ComponentInComparisonBOM { get; set; }
 
         [DisplayName(@"Packages in Not Approved State")]
@@ -39,22 +39,22 @@ namespace LCT.ArtifactoryUploader.Model
         [DisplayName(@"Time taken by Artifactory Uploader")]
         public double TimeTakenByArtifactoryUploader { get; set; }
 
-        [DisplayName(@"Development Packages to be Copied to Siparty DevDep Repo")]
-        public int DevPackagesToBeUploaded { get; set; }
+        //[DisplayName(@"Packages to be Copied to Siparty DevDep Repo")]
+        //public int DevPackagesToBeUploaded { get; set; }
 
-        [DisplayName(@"Development Packages Copied to Siparty DevDep Repo")]
+        [DisplayName(@"Packages Copied to Siparty DevDep Repo")]
         public int DevPackagesUploaded { get; set; }
 
-        [DisplayName(@"Development Packages Not Copied to Siparty DevDep Repo")]
+        [DisplayName(@"Packages Not Copied to Siparty DevDep Repo")]
         public int DevPackagesNotUploadedToJfrog { get; set; }
 
-        [DisplayName(@"Internal Packages to be Moved")]
-        public int InternalPackagesToBeUploaded { get; set; }
+        //[DisplayName(@"Packages to be Moved")]
+        //public int InternalPackagesToBeUploaded { get; set; }
 
-        [DisplayName(@"Internal Packages Moved to Repo")]
+        [DisplayName(@"Packages Moved to Repo")]
         public int InternalPackagesUploaded { get; set; }
 
-        [DisplayName(@"Internal Packages Not Moved to Repo")]
+        [DisplayName(@"Packages Not Moved to Repo")]
         public int InternalPackagesNotUploadedToJfrog { get; set; }
 
     }

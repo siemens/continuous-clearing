@@ -16,6 +16,7 @@ using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
 using LCT.Common.Logging;
+using LCT.Common.Model;
 using LCT.Services.Interface;
 using log4net;
 using Newtonsoft.Json;
@@ -26,6 +27,7 @@ using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
+using File = System.IO.File;
 
 namespace LCT.ArtifactoryUploader
 {
@@ -344,44 +346,33 @@ namespace LCT.ArtifactoryUploader
 
         public static void WriteCreatorKpiDataToConsole(UploaderKpiData uploaderKpiData)
         {
+            KpiNames uploaderKpiNames = IdentifyKpiNames(uploaderKpiData);
             Dictionary<string, int> printList = new Dictionary<string, int>()
             {
-                {CommonHelper.Convert(uploaderKpiData,nameof(uploaderKpiData.ComponentInComparisonBOM)),
-                    uploaderKpiData.ComponentInComparisonBOM },
-                {CommonHelper.Convert(uploaderKpiData,nameof(uploaderKpiData.ComponentNotApproved)),
-                    uploaderKpiData.ComponentNotApproved },
-                {CommonHelper.Convert(uploaderKpiData,nameof(uploaderKpiData.PackagesToBeUploaded)),
-                    uploaderKpiData.PackagesToBeUploaded },
+                {uploaderKpiNames.ComponentsInBOM,uploaderKpiData.ComponentInComparisonBOM },
+                {uploaderKpiNames.PackagesInNotApprovedState,uploaderKpiData.ComponentNotApproved },
+                {uploaderKpiNames.PackagesInApprovedState,uploaderKpiData.PackagesToBeUploaded },
+                {uploaderKpiNames.PackagesCopiedToSipartyRepo,uploaderKpiData.PackagesUploadedToJfrog },
 
-                {CommonHelper.Convert(uploaderKpiData,nameof(uploaderKpiData.PackagesUploadedToJfrog)),
-                    uploaderKpiData.PackagesUploadedToJfrog },
+                {uploaderKpiNames.PackagesNotCopiedToSipartyRepo,uploaderKpiData.PackagesNotUploadedToJfrog},
 
-                { CommonHelper.Convert(uploaderKpiData,nameof(uploaderKpiData.PackagesNotUploadedToJfrog)),
-                    uploaderKpiData.PackagesNotUploadedToJfrog},
+                //{CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.DevPackagesToBeUploaded)),
+                //    uploaderKpiData.DevPackagesToBeUploaded},
 
-                {CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.DevPackagesToBeUploaded)),
-                    uploaderKpiData.DevPackagesToBeUploaded},
+                {uploaderKpiNames.PackagesCopiedToSipartyDevDepRepo,uploaderKpiData.DevPackagesUploaded},
 
-                {CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.DevPackagesUploaded)),
-                    uploaderKpiData.DevPackagesUploaded},
+                {uploaderKpiNames.PackagesNotCopiedToSipartyDevDepRepo,uploaderKpiData.DevPackagesNotUploadedToJfrog},
 
-                {CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.DevPackagesNotUploadedToJfrog)),
-                    uploaderKpiData.DevPackagesNotUploadedToJfrog},
+                //{CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.InternalPackagesToBeUploaded)),
+                //    uploaderKpiData.InternalPackagesToBeUploaded},
 
-                {CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.InternalPackagesToBeUploaded)),
-                    uploaderKpiData.InternalPackagesToBeUploaded},
+                {uploaderKpiNames.PackagesMovedToRepo,uploaderKpiData.InternalPackagesUploaded},
 
-                {CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.InternalPackagesUploaded)),
-                    uploaderKpiData.InternalPackagesUploaded},
+                {uploaderKpiNames.PackagesNotMovedToRepo,uploaderKpiData.InternalPackagesNotUploadedToJfrog},
 
-                {CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.InternalPackagesNotUploadedToJfrog)),
-                    uploaderKpiData.InternalPackagesNotUploadedToJfrog},
+                {uploaderKpiNames.PackagesNotExistingInRepository,uploaderKpiData.PackagesNotExistingInRemoteCache},
 
-                { CommonHelper.Convert(uploaderKpiData,nameof(uploaderKpiData.PackagesNotExistingInRemoteCache)),
-                    uploaderKpiData.PackagesNotExistingInRemoteCache},
-
-                {CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.PackagesNotUploadedDueToError)),
-                    uploaderKpiData.PackagesNotUploadedDueToError}
+                {uploaderKpiNames.PackagesNotActionedDueToError,uploaderKpiData.PackagesNotUploadedDueToError}
             };
 
             Dictionary<string, double> printTimingList = new Dictionary<string, double>()
@@ -389,9 +380,25 @@ namespace LCT.ArtifactoryUploader
                 { "Artifactory Uploader",uploaderKpiData.TimeTakenByArtifactoryUploader }
             };
 
-            LoggerHelper.WriteToConsoleTable(printList, printTimingList, "", Dataconstant.Uploader);
+            LoggerHelper.WriteToConsoleTable(printList, printTimingList, "", Dataconstant.Uploader,uploaderKpiNames);
         }
-
+        private static KpiNames IdentifyKpiNames(UploaderKpiData uploaderKpiData)
+        {
+            KpiNames uploaderKpiNames = new KpiNames();
+            uploaderKpiNames.ComponentsInBOM = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.ComponentInComparisonBOM));
+            uploaderKpiNames.PackagesInNotApprovedState = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.ComponentNotApproved));
+            uploaderKpiNames.PackagesInApprovedState = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.PackagesToBeUploaded));
+            uploaderKpiNames.PackagesCopiedToSipartyRepo = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.PackagesUploadedToJfrog));
+            uploaderKpiNames.PackagesNotCopiedToSipartyRepo = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.PackagesNotUploadedToJfrog));
+            uploaderKpiNames.PackagesNotExistingInRepository = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.PackagesNotExistingInRemoteCache));
+            uploaderKpiNames.PackagesNotActionedDueToError = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.PackagesNotUploadedDueToError));
+            uploaderKpiNames.PackagesCopiedToSipartyDevDepRepo = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.DevPackagesUploaded));
+            uploaderKpiNames.PackagesNotCopiedToSipartyDevDepRepo = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.DevPackagesNotUploadedToJfrog));
+            uploaderKpiNames.PackagesMovedToRepo = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.InternalPackagesUploaded));
+            uploaderKpiNames.PackagesNotMovedToRepo = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.InternalPackagesNotUploadedToJfrog));
+           
+            return uploaderKpiNames;
+        }
         private static void IncrementCountersBasedOnPackageType(UploaderKpiData uploaderKpiData, PackageType packageType, bool isSuccess)
         {
             // Define a dictionary to map package types to counters

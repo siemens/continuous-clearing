@@ -26,6 +26,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Security.Policy;
 using System.Threading.Tasks;
 using Directory = System.IO.Directory;
 using File = System.IO.File;
@@ -206,7 +207,7 @@ namespace LCT.SW360PackageCreator
         public async Task<List<ComparisonBomData>> SetContentsForComparisonBOM(List<Components> lstComponentForBOM, ISW360Service sw360Service)
         {
             Logger.Debug($"SetContentsForComparisonBOM():Start");
-            Logger.Logger.Log(null, Level.Notice, $"Collecting comparison BOM Data...", null);
+            Logger.Logger.Log(null, Level.Notice, $"Collecting BOM Data...", null);
             componentsAvailableInSw360 = await sw360Service.GetAvailableReleasesInSw360(lstComponentForBOM);
 
             //Checking components count before getting status of individual comp details
@@ -513,40 +514,30 @@ namespace LCT.SW360PackageCreator
         public void WriteCreatorKpiDataToConsole(CreatorKpiData creatorKpiData)
         {
             Logger.Warn("Todo: Default component type is OSS. User is expected to manually change the component type from OSS to COTS.");
+            KpiNames createrKpiNames = IdentifyKpiNames(creatorKpiData);
             Dictionary<string, int> printList = new Dictionary<string, int>()
             {
-                {CommonHelper.Convert(creatorKpiData,nameof(creatorKpiData.ComponentsReadFromComparisonBOM)),
-                    creatorKpiData.ComponentsReadFromComparisonBOM },
+                {createrKpiNames.ComponentsFromBOM,creatorKpiData.ComponentsReadFromComparisonBOM },
 
-                { CommonHelper.Convert(creatorKpiData,nameof(creatorKpiData.ComponentsOrReleasesCreatedNewlyInSw360)),
-                    creatorKpiData.ComponentsOrReleasesCreatedNewlyInSw360},
+                { createrKpiNames.ReleasesCreatedInSW360,creatorKpiData.ComponentsOrReleasesCreatedNewlyInSw360},
 
-                { CommonHelper.Convert(creatorKpiData,nameof(creatorKpiData.ComponentsOrReleasesExistingInSw360)),
-                    creatorKpiData.ComponentsOrReleasesExistingInSw360},
+                { createrKpiNames.ReleasesExistsInSW360,creatorKpiData.ComponentsOrReleasesExistingInSw360},
 
-                {CommonHelper.Convert(creatorKpiData, nameof(creatorKpiData.ComponentsOrReleasesNotCreatedInSw360)),
-                    creatorKpiData.ComponentsOrReleasesNotCreatedInSw360},
+                {createrKpiNames.ReleasesNotCreatedInSW360,creatorKpiData.ComponentsOrReleasesNotCreatedInSw360},
 
-                { CommonHelper.Convert(creatorKpiData,nameof(creatorKpiData.ComponentsWithoutSourceDownloadUrl)),
-                    creatorKpiData.ComponentsWithoutSourceDownloadUrl},
+                { createrKpiNames.ReleasesWithoutSourceDownloadURL,creatorKpiData.ComponentsWithoutSourceDownloadUrl},
 
-                { CommonHelper.Convert(creatorKpiData,nameof(creatorKpiData.ComponentsWithSourceDownloadUrl)),
-                    creatorKpiData.ComponentsWithSourceDownloadUrl},
+                { createrKpiNames.ReleasesWithSourceDownloadURL,creatorKpiData.ComponentsWithSourceDownloadUrl},
 
-                {CommonHelper.Convert(creatorKpiData,nameof(creatorKpiData.ComponentsWithoutPackageUrl)),
-                    creatorKpiData.ComponentsWithoutPackageUrl},
+                {createrKpiNames.ComponentsWithoutPackageURL,creatorKpiData.ComponentsWithoutPackageUrl},
 
-                {CommonHelper.Convert(creatorKpiData,nameof(creatorKpiData.ComponentsWithoutSourceAndPackageUrl)),
-                    creatorKpiData.ComponentsWithoutSourceAndPackageUrl},
+                {createrKpiNames.ComponentsWithoutSourceAndPackageURL,creatorKpiData.ComponentsWithoutSourceAndPackageUrl},
 
-                {CommonHelper.Convert(creatorKpiData,nameof(creatorKpiData.ComponentsUploadedInFossology)),
-                    creatorKpiData.ComponentsUploadedInFossology},
+                {createrKpiNames.ComponentsUploadedInFOSSology,creatorKpiData.ComponentsUploadedInFossology},
 
-                {CommonHelper.Convert(creatorKpiData,nameof(creatorKpiData.ComponentsNotUploadedInFossology)),
-                    creatorKpiData.ComponentsNotUploadedInFossology},
+                {createrKpiNames.ComponentsNotUploadedInFOSSology,creatorKpiData.ComponentsNotUploadedInFossology},
 
-                {CommonHelper.Convert(creatorKpiData,nameof(creatorKpiData.TotalDuplicateAndInValidComponents)),
-                    creatorKpiData.TotalDuplicateAndInValidComponents}
+                {createrKpiNames.TotalDuplicateAndInValidComponents,creatorKpiData.TotalDuplicateAndInValidComponents}
             };
 
             Dictionary<string, double> printTimingList = new Dictionary<string, double>()
@@ -554,7 +545,25 @@ namespace LCT.SW360PackageCreator
                 { "ComponentCreator",creatorKpiData.TimeTakenByComponentCreator }
             };
 
-            LoggerHelper.WriteToConsoleTable(printList, printTimingList,"", Dataconstant.Creator);
+            LoggerHelper.WriteToConsoleTable(printList, printTimingList,"", Dataconstant.Creator, createrKpiNames);
+        }
+        private static KpiNames IdentifyKpiNames(CreatorKpiData creatorKpiData)
+        {
+            KpiNames createrKpiNames = new KpiNames();
+            createrKpiNames.ComponentsFromBOM = CommonHelper.Convert(creatorKpiData, nameof(creatorKpiData.ComponentsReadFromComparisonBOM));
+            createrKpiNames.ReleasesCreatedInSW360 = CommonHelper.Convert(creatorKpiData, nameof(creatorKpiData.ComponentsOrReleasesCreatedNewlyInSw360));
+            createrKpiNames.ReleasesExistsInSW360 = CommonHelper.Convert(creatorKpiData, nameof(creatorKpiData.ComponentsOrReleasesExistingInSw360));
+            createrKpiNames.ReleasesNotCreatedInSW360 = CommonHelper.Convert(creatorKpiData, nameof(creatorKpiData.ComponentsOrReleasesNotCreatedInSw360));
+            createrKpiNames.ReleasesWithSourceDownloadURL = CommonHelper.Convert(creatorKpiData, nameof(creatorKpiData.ComponentsWithSourceDownloadUrl));
+            createrKpiNames.ReleasesWithoutSourceDownloadURL = CommonHelper.Convert(creatorKpiData, nameof(creatorKpiData.ComponentsWithoutSourceDownloadUrl));
+            createrKpiNames.ComponentsWithoutSourceAndPackageURL = CommonHelper.Convert(creatorKpiData, nameof(creatorKpiData.ComponentsWithoutSourceAndPackageUrl));
+            createrKpiNames.TotalDuplicateAndInValidComponents = CommonHelper.Convert(creatorKpiData, nameof(creatorKpiData.TotalDuplicateAndInValidComponents));
+            createrKpiNames.ComponentsNotUploadedInFOSSology = CommonHelper.Convert(creatorKpiData, nameof(creatorKpiData.ComponentsNotUploadedInFossology));
+            createrKpiNames.ComponentsUploadedInFOSSology = CommonHelper.Convert(creatorKpiData, nameof(creatorKpiData.ComponentsUploadedInFossology));
+            createrKpiNames.ComponentsWithoutPackageURL = CommonHelper.Convert(creatorKpiData, nameof(creatorKpiData.ComponentsWithoutPackageUrl));
+
+
+            return createrKpiNames;
         }
 
         public void WriteSourceNotFoundListToConsole(List<ComparisonBomData> comparisionBomDataList, CommonAppSettings appSetting)
@@ -668,5 +677,6 @@ namespace LCT.SW360PackageCreator
 
             return releasesInfo;
         }
+       
     }
 }

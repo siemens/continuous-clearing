@@ -107,6 +107,8 @@ namespace LCT.Common.Tests.Logging
         [Test]
         public void WriteToConsoleTable_CoversAllBranches()
         {
+            KpiNames kpiNames = new KpiNames();
+            
             var printData = new Dictionary<string, int>
             {
                 { "Feature1", 10 },
@@ -120,13 +122,14 @@ namespace LCT.Common.Tests.Logging
             };
             LoggerFactory.UseSpectreConsole = false;
             Assert.DoesNotThrow(() =>
-                LoggerHelper.WriteToConsoleTable(printData, printTimingData, "http://summary.link", "TestExeType")
+                LoggerHelper.WriteToConsoleTable(printData, printTimingData, "http://summary.link", "TestExeType",kpiNames)
             );
         }
 
         [Test]
         public void WriteToSpectreConsoleTable_CoversAllBranches()
         {
+            KpiNames kpiNames = new KpiNames();
             var printData = new Dictionary<string, int>
             {
                 { "Feature1", 10 },
@@ -139,20 +142,10 @@ namespace LCT.Common.Tests.Logging
                 { "Operation2", 65.0 }
             };
             Assert.DoesNotThrow(() =>
-                LoggerHelper.WriteToSpectreConsoleTable(printData, printTimingData, "http://summary.link", "TestExeType")
+                LoggerHelper.WriteToSpectreConsoleTable(printData, printTimingData, "http://summary.link", "TestExeType", kpiNames)
             );
         }
-
-        [Test]
-        public void GetColorForItem_CoversAllBranches()
-        {
-            var method = typeof(LoggerHelper).GetMethod("GetColorForItem", BindingFlags.NonPublic | BindingFlags.Static);
-            Assert.AreEqual("red", method.Invoke(null, new object[] { "Packages Not Uploaded Due To Error", 1 }));
-            Assert.AreEqual("green", method.Invoke(null, new object[] { "Packages Not Uploaded Due To Error", 0 }));
-            Assert.AreEqual("red", method.Invoke(null, new object[] { "Packages Not Existing in Remote Cache", 2 }));
-            Assert.AreEqual("green", method.Invoke(null, new object[] { "Packages Not Existing in Remote Cache", 0 }));
-            Assert.That(method.Invoke(null, new object[] { "FeatureX", 5 }), Is.Not.Null);
-        }
+        
 
         [Test]
         public void WriteInternalComponentsTableInCli_CoversBothBranches()

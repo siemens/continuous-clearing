@@ -732,7 +732,7 @@ namespace LCT.Common.Logging
 
                 // Write centered header and bottom border
                 AnsiConsole.MarkupLine($"[bold white]{Markup.Escape(centeredText)}[/]");
-                AnsiConsole.MarkupLine($"[yellow]{bottomBorder}[/]");
+                AnsiConsole.MarkupLine($"[bold white]{bottomBorder}[/]");
             }, title, "Header");
         }
         public static void WriteHeader(string title)
@@ -776,11 +776,11 @@ namespace LCT.Common.Logging
                     break;
             }
         }
-        public static void WriteToConsoleTable(Dictionary<string, int> printData, Dictionary<string, double> printTimingData, string ProjectSummaryLink,string exeType)
+        public static void WriteToConsoleTable(Dictionary<string, int> printData, Dictionary<string, double> printTimingData, string ProjectSummaryLink, string exeType, KpiNames KpiNames)
         {
             if (LoggerFactory.UseSpectreConsole)
             {
-                WriteToSpectreConsoleTable(printData, printTimingData, ProjectSummaryLink,exeType);
+                WriteToSpectreConsoleTable(printData, printTimingData, ProjectSummaryLink, exeType, KpiNames);
                 return;
             }
 
@@ -830,7 +830,7 @@ namespace LCT.Common.Logging
     Dictionary<string, int> printData,
     Dictionary<string, double> printTimingData,
     string ProjectSummaryLink,
-    string exeType)
+    string exeType, KpiNames KpiNames)
         {
             SafeSpectreAction(() =>
             {
@@ -842,13 +842,13 @@ namespace LCT.Common.Logging
                 int maxValue = printData.Values.Count != 0 ? printData.Values.Max() : 0;
 
                 var table = CreateSummaryTable(consoleWidth);
-                AddSummaryRows(table, printData, exeType, maxValue, barMaxWidth);
+                AddSummaryRows(table, printData, exeType, maxValue, barMaxWidth, KpiNames);
 
                 table.AddEmptyRow();
                 AnsiConsole.Write(table);
 
                 WriteLine();
-                WriteLegendTable(exeType, consoleWidth);
+                //WriteLegendTable(exeType, consoleWidth);
 
                 WriteTimingData(printTimingData);
             }, "Package Summary Table", "Panel");
@@ -882,18 +882,18 @@ namespace LCT.Common.Logging
             Dictionary<string, int> printData,
             string exeType,
             int maxValue,
-            int barMaxWidth)
+            int barMaxWidth, KpiNames KpiNames)
         {
-            var legendColorMap = LegendMappings.GetLegendColorMap(exeType);
-            var tableKeyToLegend = LegendMappings.GetTableKeyToLegend(exeType);
+            //var legendColorMap = LegendMappings.GetLegendColorMap(exeType);
+            //var tableKeyToLegend = LegendMappings.GetTableKeyToLegend(exeType);
 
             foreach (var item in printData)
             {
-                string legendLabel = GetLegendLabel(item.Key, tableKeyToLegend, legendColorMap);
-                string color = legendLabel != null && legendColorMap.TryGetValue(legendLabel, out var mappedColor)
-                    ? mappedColor
-                    : GetColorForItem(item.Key, item.Value);
-
+                //string legendLabel = GetLegendLabel(item.Key, tableKeyToLegend, legendColorMap);
+                //string color = legendLabel != null && legendColorMap.TryGetValue(legendLabel, out var mappedColor)
+                //    ? mappedColor
+                //    : GetColorForItem(item.Key, item.Value);
+                string color = GetColorForItem(item.Key, item.Value, KpiNames);
                 int barWidth = maxValue > 0 ? (int)((double)item.Value / maxValue * barMaxWidth) : 0;
                 string visualBar = barWidth > 0 ? new string('█', barWidth) : "";
 
@@ -905,21 +905,7 @@ namespace LCT.Common.Logging
             }
         }
 
-        private static void WriteLegendTable(string exeType, int consoleWidth)
-        {
-            var legendRow = LegendMappings.GetLegendRow(exeType);
-            var legendTable = new Table()
-                .BorderColor(Color.White)
-                .Border(TableBorder.None)
-                .Width(Math.Min(consoleWidth, 200));
-
-            foreach (var _ in legendRow)
-                legendTable.AddColumn(new TableColumn("").Width(33));
-            legendTable.AddRow(legendRow);
-
-            AnsiConsole.Write(legendTable);
-            WriteLine();
-        }
+       
 
         private static void WriteTimingData(Dictionary<string, double> printTimingData)
         {
@@ -934,41 +920,67 @@ namespace LCT.Common.Logging
             }
             WriteLine();
         }
-        private static string GetLegendLabel(
-            string key,
-            (string[] Patterns, string LegendLabel)[] tableKeyToLegend,
-            Dictionary<string, string> legendColorMap)
-        {
-            foreach (var (patterns, legendLabel) in tableKeyToLegend)
+       
+        private static string GetColorForItem(string key, int value, KpiNames kpiNames)
+        {           
+            if (key.Equals(kpiNames.ComponentsInInputFile) || key.Equals(kpiNames.ComponentsInBOM) || key.Equals(kpiNames.ComponentsFromBOM))
+                return value == 0 ? "red" : "green";
+
+            if (key.Equals(kpiNames.PackagesNotPresentInOfficialRepo) ||
+                key.Equals(kpiNames.ComponentsNotUploadedInFOSSology) ||
+                key.Equals(kpiNames.PackagesInNotApprovedState) ||
+                key.Equals(kpiNames.ReleasesWithoutSourceDownloadURL))
+                return value == 0 ? "green" : "yellow";
+
+            if (key.Equals(kpiNames.PackagesNotPresentInOfficialRepo) ||
+                key.Equals(kpiNames.ReleasesNotCreatedInSW360) ||
+                key.Equals(kpiNames.ComponentsWithoutPackageURL) ||
+                key.Equals(kpiNames.ComponentsWithoutSourceAndPackageURL) ||
+                key.Equals(kpiNames.PackagesNotCopiedToSipartyRepo) ||
+                key.Equals(kpiNames.PackagesNotCopiedToSipartyDevDepRepo) ||
+                key.Equals(kpiNames.PackagesNotActionedDueToError) ||
+                key.Equals(kpiNames.PackagesNotExistingInRepository) ||
+                key.Equals(kpiNames.PackagesNotMovedToRepo) ||
+                key.Equals(kpiNames.ReleasesWithoutSourceDownloadURL))
+                return value == 0 ? "green" : "red";
+
+            if (key.Equals(kpiNames.TotalDuplicateAndInValidComponents) ||
+                key.Equals(kpiNames.PackagesPresentIn3rdPartyRepo) ||
+                key.Equals(kpiNames.PackagesPresentInDevDepRepo) ||
+                key.Equals(kpiNames.PackagesPresentInReleaseRepo) ||
+                key.Equals(kpiNames.DevelopmentComponents) ||
+                key.Equals(kpiNames.BundledComponents)||
+                key.Equals(kpiNames.InvalidComponentsExcluded) ||
+                key.Equals(kpiNames.DuplicateComponents) ||
+                key.Equals(kpiNames.ManuallyExcludedSw360)||
+                key.Equals(kpiNames.InternalComponents))
             {
-                foreach (var pattern in patterns)
-                {
-                    if (key.Contains(pattern, StringComparison.OrdinalIgnoreCase))
-                        return legendLabel;
-                }
-            }
-            foreach (var legendLabel in legendColorMap.Keys)
+                return "cyan";
+            } 
+            
+            if (key.Equals(kpiNames.ReleasesCreatedInSW360) ||
+                key.Equals(kpiNames.ComponentsUploadedInFOSSology) ||
+                key.Equals(kpiNames.ReleasesExistsInSW360) ||
+                key.Equals(kpiNames.ReleasesWithSourceDownloadURL) ||
+                key.Equals(kpiNames.ComponentsAddedFromSBOMTemplate) ||
+                key.Equals(kpiNames.ComponentsAddedFromSBOMTemplate) ||
+                key.Equals(kpiNames.ComponentsOverWrittenFromSBOMTemplate) ||
+                key.Equals(kpiNames.PackagesInApprovedState) ||
+                key.Equals(kpiNames.PackagesCopiedToSipartyRepo) ||
+                key.Equals(kpiNames.PackagesCopiedToSipartyDevDepRepo) ||
+                key.Equals(kpiNames.PackagesMovedToRepo) ||
+                key.Equals(kpiNames.ComponentsFromTheSPDXImportedAsBaselineEntries))
             {
-                if (key.Contains(legendLabel, StringComparison.OrdinalIgnoreCase))
-                    return legendLabel;
-            }
-            return null;
-        }
-        private static string GetColorForItem(string key, int value)
-        {
-            if (key == "Packages Not Uploaded Due To Error" ||
-                key == "Packages Not Existing in Remote Cache")
-            {
-                return value > 0 ? "red" : "green";
+                return "green";
             }
 
+            // 4. Cached / rotating colors for anything else
             if (_colorCache.TryGetValue(key, out string cachedColor))
             {
                 return cachedColor;
             }
 
-            var colors = new[] { "blue", "magenta", "yellow", "cyan", "teal", "purple"};
-
+            var colors = new[] { "green" };
             string assignedColor = colors[_colorIndex % colors.Length];
             _colorCache[key] = assignedColor;
             _colorIndex++;
@@ -1163,6 +1175,17 @@ namespace LCT.Common.Logging
             else
             {
                 Logger.Logger.Log(null, Level.Info, $"\n{message} : Name - {formattedName}, version - {item.Version}", null);
+            }
+        }
+        public static void MSBuildVersionDisplay(string message,string version)
+        {
+            if (LoggerFactory.UseSpectreConsole)
+            {
+                WriteInfoWithMarkup($"[white]{message} [/][green]{version}[/]");
+            }
+            else
+            {
+                Logger.Info($"{message}{version}");
             }
         }
     }

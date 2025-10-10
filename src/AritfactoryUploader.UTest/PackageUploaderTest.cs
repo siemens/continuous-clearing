@@ -91,8 +91,6 @@ namespace AritfactoryUploader.UTest
 
             // Assert
             Assert.That(0, Is.EqualTo(PackageUploader.uploaderKpiData.PackagesToBeUploaded), "Checks for no of cleared third party components");
-            Assert.That(4, Is.EqualTo(PackageUploader.uploaderKpiData.DevPackagesToBeUploaded), "Checks for no of development components");
-            Assert.That(0, Is.EqualTo(PackageUploader.uploaderKpiData.InternalPackagesToBeUploaded), "Checks for no of internal components");
             Assert.That(6, Is.EqualTo(PackageUploader.uploaderKpiData.ComponentInComparisonBOM), "Checks for no of components in BOM");
             Assert.That(0, Is.EqualTo(PackageUploader.uploaderKpiData.PackagesNotExistingInRemoteCache), "Checks for no of components not present in remote cache");
             Assert.That(3, Is.EqualTo(PackageUploader.uploaderKpiData.PackagesNotUploadedDueToError), "Checks for no of components not uploaded due to error");
