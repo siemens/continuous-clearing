@@ -22,24 +22,28 @@ namespace LCT.ArtifactoryUploader.Model
         public List<ComponentsToArtifactory> UnknownPackagesPython { get; set; }
         public List<ComponentsToArtifactory> UnknownPackagesDebian { get; set; }
         public List<ComponentsToArtifactory> UnknownPackagesMaven { get; set; }
+        public List<ComponentsToArtifactory> UnknownPackagesCargo { get; set; }
         public List<ComponentsToArtifactory> JfrogNotFoundPackagesNpm { get; set; }
         public List<ComponentsToArtifactory> JfrogNotFoundPackagesNuget { get; set; }
         public List<ComponentsToArtifactory> JfrogNotFoundPackagesConan { get; set; }
         public List<ComponentsToArtifactory> JfrogNotFoundPackagesPython { get; set; }
         public List<ComponentsToArtifactory> JfrogNotFoundPackagesDebian { get; set; }
         public List<ComponentsToArtifactory> JfrogNotFoundPackagesMaven { get; set; }
+        public List<ComponentsToArtifactory> JfrogNotFoundPackagesCargo { get; set; }
         public List<ComponentsToArtifactory> JfrogFoundPackagesNpm { get; set; }
         public List<ComponentsToArtifactory> JfrogFoundPackagesNuget { get; set; }
         public List<ComponentsToArtifactory> JfrogFoundPackagesConan { get; set; }
         public List<ComponentsToArtifactory> JfrogFoundPackagesPython { get; set; }
         public List<ComponentsToArtifactory> JfrogFoundPackagesDebian { get; set; }
         public List<ComponentsToArtifactory> JfrogFoundPackagesMaven { get; set; }
+        public List<ComponentsToArtifactory> JfrogFoundPackagesCargo { get; set; }
         public List<ComponentsToArtifactory> SuccessfullPackagesNpm { get; set; }
         public List<ComponentsToArtifactory> SuccessfullPackagesNuget { get; set; }
         public List<ComponentsToArtifactory> SuccessfullPackagesConan { get; set; }
         public List<ComponentsToArtifactory> SuccessfullPackagesPython { get; set; }
         public List<ComponentsToArtifactory> SuccessfullPackagesDebian { get; set; }
         public List<ComponentsToArtifactory> SuccessfullPackagesMaven { get; set; }
+        public List<ComponentsToArtifactory> SuccessfullPackagesCargo { get; set; }
 
     }
     public class ProjectResponse
@@ -56,7 +60,8 @@ namespace LCT.ArtifactoryUploader.Model
         public List<JsonComponents> Debian { get; set; }
         [JsonProperty("maven")]
         public List<JsonComponents> Maven { get; set; }
-
+        [JsonProperty("cargo")]
+        public List<JsonComponents> Cargo { get; set; }
     }
 
     public class JsonComponents

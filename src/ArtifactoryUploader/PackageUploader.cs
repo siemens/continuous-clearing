@@ -84,6 +84,8 @@ namespace LCT.ArtifactoryUploader
                 environmentHelper.CallEnvironmentExit(2);
                 Logger.Debug("Setting ExitCode to 2");
             }
-        }        
+
+        }
+
     }
 }

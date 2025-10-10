@@ -42,6 +42,7 @@ namespace LCT.SW360PackageCreator
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly List<Components> lstReleaseNotCreated = new List<Components>();
         List<Components> componentsAvailableInSw360 = new List<Components>();
+        List<Components> DuplicateComponentsByPurlId = new List<Components>();
         private const string SOURCE = "SOURCE";
         private readonly IDictionary<string, IPackageDownloader> _packageDownloderList = packageDownloderList;
 
@@ -112,10 +113,16 @@ namespace LCT.SW360PackageCreator
             else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["POETRY"]))
             {
                 downloadPath = await GetAttachmentUrlList(component, localPathforDownload);
+                downloadPath = ConvertZipToTarGzIfNeeded(downloadPath);
+
             }
             else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CONAN"]))
             {
                 downloadPath = await GetAttachmentUrlList(component, localPathforDownload);
+            }
+            else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CARGO"]))
+            {
+                downloadPath = await DownloadCargoSource(component, localPathforDownload);
             }
             else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["ALPINE"]))
             {
@@ -136,6 +143,42 @@ namespace LCT.SW360PackageCreator
             return downloadPath;
         }
 
+        private static async Task<string> DownloadCargoSource(ComparisonBomData component, string localPathforDownload)
+        {
+            if (!string.IsNullOrEmpty(component.DownloadUrl))
+            {
+                string fileName = $"{component.Name}-{component.Version}.crate";
+                string downloadFilePath = Path.Combine(localPathforDownload, fileName);
+
+                string directoryPath = Path.GetDirectoryName(downloadFilePath);
+                if (!string.IsNullOrEmpty(directoryPath))
+                    Directory.CreateDirectory(directoryPath);
+
+                Uri uri = new Uri(component.DownloadUrl);
+                await UrlHelper.DownloadFileAsync(uri, downloadFilePath);
+                if (downloadFilePath.EndsWith(FileConstant.CrateFileExtension))
+                {
+                    string tarfile = Path.ChangeExtension(downloadFilePath, FileConstant.TargzFileExtension);
+                    File.Copy(downloadFilePath, tarfile, true);
+                    downloadFilePath = tarfile;
+                }
+
+                return downloadFilePath;
+            }
+            return "";
+        }
+        private static string ConvertZipToTarGzIfNeeded(string filePath)
+        {
+            if (string.IsNullOrEmpty(filePath))
+                return filePath;
+            if (filePath.EndsWith(FileConstant.ZipFileExtension, StringComparison.OrdinalIgnoreCase))
+            {
+                string tarGzFilePath = Path.ChangeExtension(filePath, FileConstant.TargzFileExtension);
+                File.Copy(filePath, tarGzFilePath, true);
+                return tarGzFilePath;
+            }
+            return filePath;
+        }
         private static async Task DownloadDependencyList(ComparisonBomData component)
         {
             string localPathforDownload = $"{Path.GetTempPath()}ClearingTool\\DownloadedFiles/";
@@ -209,7 +252,7 @@ namespace LCT.SW360PackageCreator
             Logger.Debug($"SetContentsForComparisonBOM():Start");
             Logger.Logger.Log(null, Level.Notice, $"Collecting BOM Data...", null);
             componentsAvailableInSw360 = await sw360Service.GetAvailableReleasesInSw360(lstComponentForBOM);
-
+            DuplicateComponentsByPurlId = sw360Service.GetDuplicateComponentsByPurlId();
             //Checking components count before getting status of individual comp details
             List<ComparisonBomData> comparisonBomData = await GetComparisionBomItems(lstComponentForBOM, sw360Service);
 
@@ -277,7 +320,8 @@ namespace LCT.SW360PackageCreator
         {
             return item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["POETRY"]) ||
                    item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CONAN"]) ||
-                   item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["ALPINE"]);
+                   item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["ALPINE"]) ||
+                   item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CARGO"]);
         }
 
         private void SetMapperStatus(ComparisonBomData mapper, ReleasesInfo releasesInfo)
@@ -403,7 +447,7 @@ namespace LCT.SW360PackageCreator
         {
             CreatorKpiData creatorKpiData = new CreatorKpiData
             {
-                ComponentsReadFromComparisonBOM = updatedCompareBomData.Count,
+                ComponentsReadFromComparisonBOM = ComponentCreator.TotalComponentsFromPackageIdentifier,
                 TotalDuplicateAndInValidComponents = ComponentCreator.TotalComponentsFromPackageIdentifier >= updatedCompareBomData.Count ?
                 ComponentCreator.TotalComponentsFromPackageIdentifier - updatedCompareBomData.Count : 0
             };
@@ -585,7 +629,7 @@ namespace LCT.SW360PackageCreator
             // Removes common components
             sourceNotAvailable.RemoveAll(src => lstReleaseNotCreated.Any(rls => src.Name == rls.Name && src.Version == rls.Version));
 
-            LoggerHelper.WriteComponentsWithoutDownloadURLToKpi(sourceNotAvailable, lstReleaseNotCreated, appSetting.SW360.URL);
+            CommonHelper.WriteComponentsWithoutDownloadURLToKpi(sourceNotAvailable, lstReleaseNotCreated, appSetting.SW360.URL,DuplicateComponentsByPurlId);
         }
 
         private static string GetComponentAvailabilityStatus(List<Components> componentsAvailable, Components component)
@@ -604,8 +648,7 @@ namespace LCT.SW360PackageCreator
             }
 
             return Dataconstant.NotAvailable;
-        }
-
+        }       
         public static string GetComponentDownloadUrl(ComparisonBomData mapper, Components item, IRepository repo, ReleasesInfo releasesInfo)
         {
 

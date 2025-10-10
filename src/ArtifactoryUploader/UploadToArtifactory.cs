@@ -13,6 +13,7 @@ using LCT.APICommunications.Model.AQL;
 using LCT.ArtifactoryUploader.Model;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Model;
 using LCT.Services.Interface;
 using log4net;
 using System;
@@ -38,12 +39,13 @@ namespace LCT.ArtifactoryUploader
             foreach (var item in comparisonBomData)
             {
                 var packageType = GetPackageType(item);
+                
                 if (packageType != PackageType.Unknown)
                 {
                     AqlResult aqlResult = await GetSrcRepoDetailsForComponent(item);
                     ComponentsToArtifactory components = new ComponentsToArtifactory()
                     {
-                        Name = !string.IsNullOrEmpty(item.Group) ? $"{item.Group}/{item.Name}" : item.Name,
+                        Name = !string.IsNullOrEmpty(item.Group) ? $"{item.Group}/{item.Name}" : item.Name,                        
                         PackageName = item.Name,
                         Version = item.Version,
                         Purl = item.Purl,
@@ -67,7 +69,7 @@ namespace LCT.ArtifactoryUploader
                         components.PypiOrNpmCompName = string.Empty;
                     }
 
-                    components.Path = GetPackagePath(components, aqlResult);
+                    components.Path = GetPackagePath(components, aqlResult, item);
                     components.CopyPackageApiUrl = GetCopyURL(components);
                     components.MovePackageApiUrl = GetMoveURL(components);
                     components.JfrogPackageName = GetJfrogPackageName(components);
@@ -84,6 +86,7 @@ namespace LCT.ArtifactoryUploader
             Logger.Debug("Ending GetComponentsToBeUploadedToArtifactory() method");
             return componentsToBeUploaded;
         }
+        
         private static string GetComponentType(Component item)
         {
 
@@ -110,6 +113,10 @@ namespace LCT.ArtifactoryUploader
             else if (item.Purl.Contains("pkg:deb/debian", StringComparison.OrdinalIgnoreCase))
             {
                 return "DEBIAN";
+            }
+            else if (item.Purl.Contains("cargo", StringComparison.OrdinalIgnoreCase))
+            {
+                return "CARGO";
             }
             else
             {
@@ -144,6 +151,10 @@ namespace LCT.ArtifactoryUploader
             {
                 jfrogRepPath = $"{component.DestRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*";
             }
+            else if (component.ComponentType == "CARGO")
+            {
+                jfrogRepPath = $"{component.DestRepoName}/{component.Name}.{component.Version}{ApiConstant.CargoExtension}";
+            }
             else
             {
                 // Do nothing
@@ -171,13 +182,15 @@ namespace LCT.ArtifactoryUploader
                         return GetRepoName(packageType, appSettings.Conan.ReleaseRepo, appSettings.Conan.DevDepRepo, appSettings.Conan.Artifactory.ThirdPartyRepos.FirstOrDefault(x => x.Upload)?.Name);
                     case "debian":
                         return GetRepoName(packageType, appSettings.Debian.ReleaseRepo, appSettings.Debian.DevDepRepo, appSettings.Debian.Artifactory.ThirdPartyRepos.FirstOrDefault(x => x.Upload)?.Name);
+                    case "cargo":
+                        return GetRepoName(packageType, appSettings.Cargo.ReleaseRepo, appSettings.Cargo.DevDepRepo, appSettings.Cargo.Artifactory.ThirdPartyRepos.FirstOrDefault(x => x.Upload)?.Name);
                 }
             }
 
             return string.Empty;
         }
 
-        private static string GetPackagePath(ComponentsToArtifactory component, AqlResult aqlResult)
+        private static string GetPackagePath(ComponentsToArtifactory component, AqlResult aqlResult, Component item)
         {
             switch (component.ComponentType)
             {
@@ -206,7 +219,9 @@ namespace LCT.ArtifactoryUploader
                     }
 
                 case "MAVEN":
-                    return $"{component.Name}/{component.Version}";
+                    string groupWithSlash = !string.IsNullOrEmpty(item.Group) ? item.Group.Replace('.', '/') : string.Empty;
+                    string mavenPath = !string.IsNullOrEmpty(groupWithSlash) ? $"{groupWithSlash}/{item.Name}" : item.Name;
+                    return $"{mavenPath}/{component.Version}";
 
                 case "DEBIAN":
                     return $"pool/main/{component.Name[0]}/{component.Name}";
@@ -230,8 +245,8 @@ namespace LCT.ArtifactoryUploader
             }
             else if (component.ComponentType == "MAVEN")
             {
-                url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.Name}/{component.Version}" +
-               $"?to=/{component.DestRepoName}/{component.Name}/{component.Version}";
+                url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.Path}" +
+               $"?to=/{component.DestRepoName}/{component.Path}";
             }
             else if (component.ComponentType == "POETRY")
             {
@@ -249,6 +264,12 @@ namespace LCT.ArtifactoryUploader
             {
                 url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*" +
                            $"?to=/{component.DestRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*";
+            }
+            else if (component.ComponentType == "CARGO")
+            {
+                //Copy to Destination Repo, not keeping the folder structure intact
+                url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoPathWithFullName}" +
+               $"?to=/{component.DestRepoName}/{component.PypiOrNpmCompName}";
             }
             else
             {
@@ -273,8 +294,8 @@ namespace LCT.ArtifactoryUploader
             }
             else if (component.ComponentType == "MAVEN")
             {
-                url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.Name}/{component.Version}" +
-               $"?to=/{component.DestRepoName}/{component.Name}/{component.Version}";
+                url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.Path}" +
+               $"?to=/{component.DestRepoName}/{component.Path}";
             }
             else if (component.ComponentType == "POETRY")
             {
@@ -293,6 +314,12 @@ namespace LCT.ArtifactoryUploader
                 url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*" +
                           $"?to=/{component.DestRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*";
             }
+            else if (component.ComponentType == "CARGO")
+            {
+                //Move to Destination Repo, not keeping the folder structure intact
+                url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoPathWithFullName}" +
+               $"?to=/{component.DestRepoName}/{component.PypiOrNpmCompName}";
+            }
             else
             {
                 // Do nothing
@@ -307,6 +334,7 @@ namespace LCT.ArtifactoryUploader
                 "NPM" => component.PypiOrNpmCompName,
                 "NUGET" => $"{component.PackageName}.{component.Version}{ApiConstant.NugetExtension}",
                 "DEBIAN" => $"{component.PackageName}_{component.Version.Replace(ApiConstant.DebianExtension, "") + "*"}",
+                "CARGO" => $"{component.PackageName}.{component.Version}{ApiConstant.CargoExtension}",
                 "POETRY" => component.PypiOrNpmCompName,
                 _ => string.Empty,
             };
@@ -320,38 +348,38 @@ namespace LCT.ArtifactoryUploader
                       .Value?
                       .ToUpperInvariant();
 
-            if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "NPM")
-            {
+            string projectType = GetPropertyValue(Dataconstant.Cdx_ProjectType);
+            ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
+            AddUnknownComponentToDisplayList(projectType, components, displayPackagesInfo);
+        }
 
-                ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
-                displayPackagesInfo.UnknownPackagesNpm.Add(components);
-            }
-            else if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "NUGET")
+        // Helper to reduce code duplication for adding unknown components to display lists
+        private static void AddUnknownComponentToDisplayList(string projectType, ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo)
+        {
+            switch (projectType)
             {
-                ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
-                displayPackagesInfo.UnknownPackagesNuget.Add(components);
+                case "NPM":
+                    displayPackagesInfo.UnknownPackagesNpm.Add(component);
+                    break;
+                case "NUGET":
+                    displayPackagesInfo.UnknownPackagesNuget.Add(component);
+                    break;
+                case "MAVEN":
+                    displayPackagesInfo.UnknownPackagesMaven.Add(component);
+                    break;
+                case "POETRY":
+                    displayPackagesInfo.UnknownPackagesPython.Add(component);
+                    break;
+                case "CONAN":
+                    displayPackagesInfo.UnknownPackagesConan.Add(component);
+                    break;
+                case "DEBIAN":
+                    displayPackagesInfo.UnknownPackagesDebian.Add(component);
+                    break;
+                case "CARGO":
+                    displayPackagesInfo.UnknownPackagesCargo.Add(component);
+                    break;
             }
-            else if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "MAVEN")
-            {
-                ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
-                displayPackagesInfo.UnknownPackagesMaven.Add(components);
-            }
-            else if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "POETRY")
-            {
-                ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
-                displayPackagesInfo.UnknownPackagesPython.Add(components);
-            }
-            else if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "CONAN")
-            {
-                ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
-                displayPackagesInfo.UnknownPackagesConan.Add(components);
-            }
-            else if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "DEBIAN")
-            {
-                ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
-                displayPackagesInfo.UnknownPackagesDebian.Add(components);
-            }
-
         }
 
         private static Task<ComponentsToArtifactory> GetUnknownPackageinfo(Component item)
@@ -402,17 +430,27 @@ namespace LCT.ArtifactoryUploader
             }
             else if (item.Purl.Contains("npm", StringComparison.OrdinalIgnoreCase))
             {
-                var aqlResultList = await GetNpmListOfComponentsFromRepo(new string[] { item.Properties.Find(x => x.Name == Dataconstant.Cdx_ArtifactoryRepoName)?.Value }, JFrogService);
+                var aqlResultList = await GetPackageTypeBased_ListOfComponentsFromRepo(new string[] { item.Properties.Find(x => x.Name == Dataconstant.Cdx_ArtifactoryRepoName)?.Value }, JFrogService, "npm");
 
                 if (aqlResultList.Count > 0)
                 {
-                    return GetNpmArtifactoryRepoName(aqlResultList, item);
+                    return GetArtifactoryRepoName(aqlResultList, item);
+                }
+            }
+            else if (item.Purl.Contains("cargo", StringComparison.OrdinalIgnoreCase))
+            {
+                var aqlResultList = await GetPackageTypeBased_ListOfComponentsFromRepo(new string[] { item.Properties.Find(x => x.Name == Dataconstant.Cdx_ArtifactoryRepoName)?.Value }, JFrogService, "cargo");
+
+                if (aqlResultList.Count > 0)
+                {
+                    return GetArtifactoryRepoName(aqlResultList, item);
                 }
             }
 
             return null;
         }
-        public static async Task<List<AqlResult>> GetNpmListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService)
+
+        public static async Task<List<AqlResult>> GetPackageTypeBased_ListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService, string packageType)
         {
             var aqlResultList = new List<AqlResult>();
             if (repoList != null && repoList.Length > 0)
@@ -425,14 +463,24 @@ namespace LCT.ArtifactoryUploader
                     }
                     else
                     {
-                        var componentRepoData = await jFrogService.GetNpmComponentDataByRepo(repo) ?? new List<AqlResult>();
-                        repoCache[repo] = componentRepoData;
-                        aqlResultList.AddRange(componentRepoData);
+                        if (packageType == "npm")
+                        {
+                            var componentRepoData = await jFrogService.GetNpmComponentDataByRepo(repo) ?? new List<AqlResult>();
+                            repoCache[repo] = componentRepoData;
+                            aqlResultList.AddRange(componentRepoData);
+                        }
+                        else if (packageType == "cargo")
+                        {
+                            var componentRepoData = await jFrogService.GetCargoComponentDataByRepo(repo) ?? new List<AqlResult>();
+                            repoCache[repo] = componentRepoData;
+                            aqlResultList.AddRange(componentRepoData);
+                        }
                     }
                 }
             }
             return aqlResultList;
         }
+
         public static async Task<List<AqlResult>> GetListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService)
         {
             var aqlResultList = new List<AqlResult>();
@@ -454,21 +502,31 @@ namespace LCT.ArtifactoryUploader
             }
             return aqlResultList;
         }
+
         private static AqlResult GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component)
         {
             string jfrogpackageName = GetFullNameOfComponent(component);
-            return aqlResultList.Find(x => x.Properties != null &&
-                                  x.Properties.Any(p => p.Key == "pypi.normalized.name" && p.Value == jfrogpackageName) &&
-                                  x.Properties.Any(p => p.Key == "pypi.version" && p.Value == component.Version));
+            if (component.Purl.Contains("pypi", StringComparison.OrdinalIgnoreCase))
+            {
+                return aqlResultList.Find(x => x.Properties != null &&
+                                      x.Properties.Any(p => p.Key == "pypi.normalized.name" && p.Value == jfrogpackageName) &&
+                                      x.Properties.Any(p => p.Key == "pypi.version" && p.Value == component.Version));
+            }
+            else if (component.Purl.Contains("npm", StringComparison.OrdinalIgnoreCase))
+            {
+                return aqlResultList.Find(x => x.Properties != null &&
+                                       x.Properties.Any(p => p.Key == "npm.name" && p.Value == jfrogpackageName) &&
+                                       x.Properties.Any(p => p.Key == "npm.version" && p.Value == component.Version));
+            }
+            else if (component.Purl.Contains("cargo", StringComparison.OrdinalIgnoreCase))
+            {
+                return aqlResultList.Find(x => x.Properties != null &&
+                                       x.Properties.Any(p => p.Key == "crate.name" && p.Value == jfrogpackageName) &&
+                                       x.Properties.Any(p => p.Key == "crate.version" && p.Value == component.Version));
+            }
+            return new AqlResult();
         }
 
-        private static AqlResult GetNpmArtifactoryRepoName(List<AqlResult> aqlResultList, Component component)
-        {
-            string jfrogpackageName = GetFullNameOfComponent(component);
-            return aqlResultList.Find(x => x.Properties != null &&
-                                   x.Properties.Any(p => p.Key == "npm.name" && p.Value == jfrogpackageName) &&
-                                   x.Properties.Any(p => p.Key == "npm.version" && p.Value == component.Version));
-        }
         private static string GetFullNameOfComponent(Component item)
         {
             if (!string.IsNullOrEmpty(item.Group))

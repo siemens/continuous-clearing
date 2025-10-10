@@ -42,6 +42,7 @@ namespace LCT.Services
         private readonly ISW360ApicommunicationFacade m_SW360ApiCommunicationFacade;
         private readonly ISW360CommonService m_SW360CommonService;
         private static List<Components> availableComponentList = new List<Components>();
+        private static readonly List<Components> InvalidComponentsIdentifiedByPurlId = new List<Components>();
         public Sw360Service(ISW360ApicommunicationFacade sw360ApiCommunicationFacade, IEnvironmentHelper _environmentHelper)
         {
             m_SW360ApiCommunicationFacade = sw360ApiCommunicationFacade;
@@ -53,6 +54,10 @@ namespace LCT.Services
             m_SW360ApiCommunicationFacade = sw360ApiCommunicationFacade;
             m_SW360CommonService = sw360CommonService;
             environmentHelper = _environmentHelper;
+        }
+        public List<Components> GetDuplicateComponentsByPurlId()
+        {
+            return InvalidComponentsIdentifiedByPurlId;
         }
 
         public async Task<List<Components>> GetAvailableReleasesInSw360(List<Components> listOfComponentsToBom)
@@ -309,7 +314,7 @@ namespace LCT.Services
             foreach (Components component in listOfComponentsToBom)
             {
                 if (await CheckReleaseExistenceByExternalId(component) ||
-                       CheckAvailabilityByNameAndVersion(sw360Releases, component))
+                       CheckAvailabilityByNameAndVersion(sw360Releases, component, sw360ComponentList))
                 {
                     Logger.Debug($"GetAvailableComponenentsList():  Release Exist : Release name - {component.Name}, version - {component.Version}");
                 }
@@ -323,38 +328,130 @@ namespace LCT.Services
                     // Do Nothing or to be implemented
                 }
             }
-
+            RemoveInvalidComponentsByPurlId(listOfComponentsToBom);
             return availableComponentList;
         }
-
-        private static bool CheckAvailabilityByNameAndVersion(IList<Sw360Releases> sw360Releases, Components component)
+        private static void RemoveInvalidComponentsByPurlId(List<Components> components)
         {
-            //checking for release existance with name and version
-            bool isReleaseAvailable = false;
-            Sw360Releases sw360Release =
-                sw360Releases.FirstOrDefault(x => x.Name?.Trim().ToLowerInvariant() == component?.Name?.Trim().ToLowerInvariant()
+            if (InvalidComponentsIdentifiedByPurlId.Count == 0)
+                return;
+
+            components.RemoveAll(component =>
+                InvalidComponentsIdentifiedByPurlId.Any(invalid =>
+                    invalid.Name?.Trim().Equals(component.Name?.Trim(), StringComparison.OrdinalIgnoreCase) == true &&
+                    invalid.Version?.Trim().Equals(component.Version?.Trim(), StringComparison.OrdinalIgnoreCase) == true &&
+                    invalid.ReleaseExternalId?.Equals(component.ReleaseExternalId) == true
+                ));
+        }
+        private static bool CheckAvailabilityByNameAndVersion(IList<Sw360Releases> sw360Releases, Components component, IList<Sw360Components> sw360ComponentList)
+        {
+            Logger.Debug($"CheckAvailabilityByNameAndVersion(): Starting check for component '{component?.Name}' version '{component?.Version}'");
+
+            var sw360Release = FindMatchingRelease(sw360Releases, component);
+            if (sw360Release == null)
+            {
+                return false;
+            }
+
+            var sw360Component = FindMatchingComponent(sw360ComponentList, component);
+            if (sw360Component == null)
+            {
+                return false;
+            }
+
+            return ValidateAndProcessComponent(sw360Release, sw360Component, component);
+        }
+
+        private static Sw360Releases FindMatchingRelease(IList<Sw360Releases> sw360Releases, Components component)
+        {
+            // Find regular version match
+            var sw360Release = sw360Releases.FirstOrDefault(x =>
+                x.Name?.Trim().ToLowerInvariant() == component?.Name?.Trim().ToLowerInvariant()
                 && x.Version?.Trim().ToLowerInvariant() == component?.Version?.Trim().ToLowerInvariant());
 
+            // Check for Debian specific version if needed
             if (sw360Release == null && component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
             {
                 string debianVersion = $"{component?.Version?.Trim().ToLowerInvariant() ?? string.Empty}.debian";
-                sw360Release = sw360Releases.FirstOrDefault(x => x.Name?.Trim().ToLowerInvariant() == component?.Name?.Trim().ToLowerInvariant()
-                && x.Version?.Trim().ToLowerInvariant() == debianVersion);
+                sw360Release = sw360Releases.FirstOrDefault(x =>
+                    x.Name?.Trim().ToLowerInvariant() == component?.Name?.Trim().ToLowerInvariant()
+                    && x.Version?.Trim().ToLowerInvariant() == debianVersion);
             }
 
-            if (sw360Release != null)
+            return sw360Release;
+        }
+
+        private static Sw360Components FindMatchingComponent(IList<Sw360Components> sw360ComponentList, Components component)
+        {
+            return sw360ComponentList.FirstOrDefault(x =>
+                x.Name?.Trim().ToLowerInvariant() == component?.Name?.Trim().ToLowerInvariant());
+        }
+
+        private static bool ValidateAndProcessComponent(Sw360Releases sw360Release, Sw360Components sw360Component, Components component)
+        {
+            if (string.IsNullOrEmpty(sw360Component?.ExternalIds?.Package_Url)
+                && string.IsNullOrEmpty(sw360Component?.ExternalIds?.Purl_Id))
             {
-                availableComponentList.Add(new Components()
-                {
-                    Name = sw360Release.Name,
-                    Version = sw360Release.Version,
-                    ReleaseLink = sw360Release.Links?.Self?.Href,
-                    ReleaseExternalId = component.ReleaseExternalId,
-                    ComponentExternalId = component.ComponentExternalId
-                });
-                isReleaseAvailable = true;
+                AddToAvailableList(sw360Release, component);
+                return true;
             }
-            return isReleaseAvailable;
+
+            Logger.Debug($"GetAvailableComponenentsList(): Component Name - {component.Name}, Version - {component.Version} " +
+                        $"validating Externalids list - {sw360Component.ExternalIds?.Package_Url},{sw360Component.ExternalIds?.Purl_Id}");
+
+            if (!ValidateProjectTypePurl(sw360Component, component))
+            {
+                return false;
+            }
+
+            AddToAvailableList(sw360Release, component);
+            return true;
+        }
+
+        private static bool ValidateProjectTypePurl(Sw360Components sw360Component, Components component)
+        {
+            if (string.IsNullOrEmpty(component?.ProjectType)
+                || !Dataconstant.PurlCheck().TryGetValue(component.ProjectType.ToUpperInvariant(), out string projectPurlCheckId))
+            {
+                return false;
+            }
+
+            Logger.Debug($"GetAvailableComponenentsList(): Validating with PURL ID: {projectPurlCheckId}");
+
+            bool hasMatchingExternalId = sw360Component.ExternalIds.Package_Url?.Contains(projectPurlCheckId, StringComparison.OrdinalIgnoreCase) == true
+                || sw360Component.ExternalIds.Purl_Id?.Contains(projectPurlCheckId, StringComparison.OrdinalIgnoreCase) == true;
+
+            if (!hasMatchingExternalId)
+            {
+                HandleMismatchedPurlId(sw360Component, component);
+                return false;
+            }
+
+            Logger.Debug($"GetAvailableComponenentsList(): Component Name'{component.Name}' PURL check ID matched with SW360 component PURL ID");
+            return true;
+        }
+
+        private static void HandleMismatchedPurlId(Sw360Components sw360Component, Components component)
+        {
+            Logger.Debug($"GetAvailableComponenentsList(): Component Name '{component.Name}' PURL ID mismatched with SW360 component PURL ID");
+            Logger.Warn($"Component Name '{component.Name}' already exists in SW360 with different package type PURL ID. Skipping this component.");
+
+            component.InvalidComponentByPurlId = true;
+            component.ComponentLink = sw360Component.Links?.Self?.Href;
+            component.ComponentId = CommonHelper.GetSubstringOfLastOccurance(component.ComponentLink, "/");
+            InvalidComponentsIdentifiedByPurlId.Add(component);
+        }
+
+        private static void AddToAvailableList(Sw360Releases sw360Release, Components component)
+        {
+            availableComponentList.Add(new Components
+            {
+                Name = sw360Release.Name,
+                Version = sw360Release.Version,
+                ReleaseLink = sw360Release.Links?.Self?.Href,
+                ReleaseExternalId = component.ReleaseExternalId,
+                ComponentExternalId = component.ComponentExternalId
+            });
         }
 
         private async Task<IList<Sw360Components>> GetAvailableComponenentsListFromSw360()

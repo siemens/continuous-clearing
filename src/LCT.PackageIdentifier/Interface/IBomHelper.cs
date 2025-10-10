@@ -24,6 +24,7 @@ namespace LCT.PackageIdentifier.Interface
         public Task<List<AqlResult>> GetListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService);
         public Task<List<AqlResult>> GetNpmListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService);
         public Task<List<AqlResult>> GetPypiListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService);
+        public Task<List<AqlResult>> GetCargoListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService);
 
     }
 }
