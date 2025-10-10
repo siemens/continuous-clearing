@@ -314,6 +314,7 @@ namespace LCT.PackageIdentifier
             identifierKpiNames.ComponentsWithSourceURL = CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ComponentsWithSourceURL));
 
             return identifierKpiNames;
+        }
 
         public static List<Component> GetExcludedComponentsList(List<Component> componentsForBOM, string purlPrefix, string projectType)
         {
