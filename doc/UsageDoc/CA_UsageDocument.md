@@ -194,8 +194,18 @@ Users have the flexibility to generate a basic SBOM even if connections to SW360
     * Input file repository should contain **poetry.lock** file.
 
   * **Project Type :** **Conan**
+    * Input file repository should contain ***.dep.json** file.
 
-    * Input file repository should contain **conan.lock** file.
+    * **Note** :Only Conan v2 is supported.
+    
+    * If you previously used `conan.lock` files with Conan v1, you now need to generate `*.dep.json` files using the `conan graph info`.
+    
+    * To generate the required dependency graph file for Conan v2 projects, run the following command in your project directory where conanfile.py is present:    ```
+  conan graph info . -f json > conan.dep.json 
+    
+    * file name should end with dep.json as appSettings.json is configured to pick files with *.dep.json suffix
+    
+    *  user can change the file pattern if required in the app settings
    
   * **Project Type :** **Cargo**
  
@@ -249,6 +259,7 @@ example.spdx.sbom.json.pem # Public certificate file
 1. The system automatically detects SPDX SBOM files in the input directory
 2. For each SBOM file, it locates corresponding `.sig` and `.pem` files
 3. Performs signature verification using the public certificate
+
 
 ### **Configuring the Continuous Clearing Tool**
 
