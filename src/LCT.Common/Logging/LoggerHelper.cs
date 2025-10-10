@@ -948,24 +948,16 @@ namespace LCT.Common.Logging
                 key.Equals(kpiNames.PackagesPresentIn3rdPartyRepo) ||
                 key.Equals(kpiNames.PackagesPresentInDevDepRepo) ||
                 key.Equals(kpiNames.PackagesPresentInReleaseRepo) ||
+                key.Equals(kpiNames.DevelopmentComponents) ||
+                key.Equals(kpiNames.BundledComponents)||
+                key.Equals(kpiNames.InvalidComponentsExcluded) ||
+                key.Equals(kpiNames.DuplicateComponents) ||
+                key.Equals(kpiNames.ManuallyExcludedSw360)||
                 key.Equals(kpiNames.InternalComponents))
             {
                 return "cyan";
-            }
-
-            if (key.Equals(kpiNames.DevelopmentComponents) ||
-                key.Equals(kpiNames.BundledComponents))
-            {
-                return "violet";
-            }
-
-            if (key.Equals(kpiNames.InvalidComponentsExcluded) ||
-                key.Equals(kpiNames.DuplicateComponents) ||
-                key.Equals(kpiNames.ManuallyExcludedSw360))
-            {
-                return "blue";
-            }
-
+            } 
+            
             if (key.Equals(kpiNames.ReleasesCreatedInSW360) ||
                 key.Equals(kpiNames.ComponentsUploadedInFOSSology) ||
                 key.Equals(kpiNames.ReleasesExistsInSW360) ||
