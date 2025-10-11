@@ -15,18 +15,18 @@ BOM generated from the Continuous Clearing Tool will have all the dependencies i
 
 ## Supported Ecosystems 
 - Javascript (npm)
-- Dotnet (nuget)
+- Dotnet (NuGet)
 - Debian
 - Alpine
 - Maven (jar)
-- Python (poetry, requiremens.txt)
+- Python (Poetry, requiremens.txt)
 
 ## Workflow
 
 ![image.png](../usagedocimg/WF.png)
 
 ## Use Cases:
-1. Package identifier Should read all 1st and 3rd components of package type (NPM,NUGET,DEBIAN,ALPINE,PYPI & MAVEN)  
+1. Package identifier Should read all 1st and 3rd components of package type (npm,NuGet,Debian,Alpine,PyPi,Cargo & Maven)  
    -   Read SBOM supplied from customer.
    - [ ]         SBOM needs to be in specified CycloneDX format.
    - [ ]     At least all the dependencies should be included in SBOM, further CA Tool needs 
@@ -42,9 +42,9 @@ BOM generated from the Continuous Clearing Tool will have all the dependencies i
       - [ ]         Internal/External will be classified from JFrog repository.
       - [ ]      Discovered/manually added will be identified from SBOM template.
        - [ ]              DevDependent or not will be added based on the input files.
-         - [ ] 	   For NPM,NUGET & MAVEN will find it from source input files.
-         - [ ] 	   For PYPI package type will install poetry for finding Dev components.
-         - [ ] 	   For DEBIAN it's not there as of now.
+         - [ ] 	   For npm,NuGet & Maven will find it from source input files.
+         - [ ] 	   For PyPi package type will install poetry for finding Dev components.
+         - [ ] 	   For Debian it's not there as of now.
       
 
 2. Package Creator should read SBOM produced from package identifier
