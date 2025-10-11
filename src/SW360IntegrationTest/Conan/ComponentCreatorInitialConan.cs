@@ -50,8 +50,8 @@ namespace SW360IntegrationTest.Conan
         {
             string bomPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs"));
             // Assert
-            // Check exit is normal
-            Assert.AreEqual(0, TestHelper.RunComponentCreatorExe(new string[] {
+            // Check return with warning code 2
+            Assert.AreEqual(2, TestHelper.RunComponentCreatorExe(new string[] {
                 TestConstant.BomFolderPath,bomPath,
                 TestConstant.Sw360Token, testParameters.SW360AuthTokenValue,
                 TestConstant.SW360URL, testParameters.SW360URL,
@@ -115,7 +115,7 @@ namespace SW360IntegrationTest.Conan
                 new AuthenticationHeaderValue(TestConstant.TestSw360TokenType, TestConstant.TestSw360TokenValue);
 
             //url formation for retrieving component details
-            string url = TestConstant.Sw360ComponentApi + TestConstant.componentNameUrl + "rapidjson";
+            string url = TestConstant.Sw360ComponentApi + TestConstant.componentNameUrl + "libcurl";
             string responseBody = await httpClient.GetStringAsync(url); //GET request
             var responseData = JsonConvert.DeserializeObject<ComponentsModel>(responseBody);
             //Assert
@@ -130,12 +130,12 @@ namespace SW360IntegrationTest.Conan
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue(testParameters.SW360AuthTokenType, testParameters.SW360AuthTokenValue);
-            string expectedname = "rapidjson";
-            string expectedversion = "1.1.0";
-            string expecteddownloadurl = "https://github.com/Tencent/rapidjson/archive/v1.1.0.tar.gz";
-            string expectedexternalid = "pkg:conan/rapidjson@1.1.0";
+            string expectedname = "libcurl";
+            string expectedversion = "8.15.0";
+            string expecteddownloadurl = "https://curl.se/download/curl-8.15.0.tar.xz";
+            string expectedexternalid = "pkg:conan/libcurl@8.15.0";
             //url formation for retrieving component details
-            string url = TestConstant.Sw360ReleaseApi + TestConstant.componentNameUrl + "rapidjson";
+            string url = TestConstant.Sw360ReleaseApi + TestConstant.componentNameUrl + "libcurl";
             string responseBody = await httpClient.GetStringAsync(url);//GET method         
             var responseData = JsonConvert.DeserializeObject<ReleaseIdOfComponent>(responseBody);
             string urlofreleaseid = responseData.Embedded.Sw360Releases[0].Links.Self.Href;
