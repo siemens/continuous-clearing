@@ -6,8 +6,10 @@ using log4net;
 using Spectre.Console;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security;
 using System.Security.AccessControl;
 using System.Text;
 using Level = log4net.Core.Level;
@@ -17,9 +19,8 @@ namespace LCT.Common.Logging
     public static class LoggerHelper
     {
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        // Added: environment-aware console fields
+       
         private static IAnsiConsole _console;
-        private static AnsiConsoleSettings _settings;
         private static readonly object _consoleLock = new();
 
         private static IAnsiConsole ConsoleInstance
@@ -31,18 +32,16 @@ namespace LCT.Common.Logging
                 {
                     if (_console == null)
                     {
-                        _settings = BuildAnsiConsoleSettings();
-                        _console = AnsiConsole.Create(_settings);
+                        var settings = BuildAnsiConsoleSettings();
+                        _console = AnsiConsole.Create(settings);
                     }
                 }
                 return _console;
             }
         }
 
-        // Central place to build settings (env overrides + defaults + environment type)
         private static AnsiConsoleSettings BuildAnsiConsoleSettings()
         {
-            // Detect runtime environment once
             EnvironmentType envType = RuntimeEnvironment.GetEnvironment();
 
             var ansi = GetAnsiSupport(envType);
@@ -52,45 +51,26 @@ namespace LCT.Common.Logging
             {
                 Ansi = ansi,
                 ColorSystem = colorSystem,
-                Out = AnsiConsole.Profile.Out,     // preserve existing output stream
+                Out = AnsiConsole.Profile.Out,   
                 Interactive = InteractionSupport.No
             };
-
             return settings;
         }
 
-        // Public reconfiguration hook (optional)
-        public static void ReconfigureConsole(Action<AnsiConsoleSettings> customize = null)
-        {
-            lock (_consoleLock)
-            {
-                _settings = BuildAnsiConsoleSettings();
-                customize?.Invoke(_settings);
-                _console = AnsiConsole.Create(_settings);
-            }
-        }
+       
 
         private static AnsiSupport GetAnsiSupport(EnvironmentType envType)
         {
-            // Respect NO_COLOR first
             if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("NO_COLOR")))
                 return AnsiSupport.No;
 
-            // FORCE_ANSI always wins
             var force = Environment.GetEnvironmentVariable("FORCE_ANSI");
             if (string.Equals(force, "1", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(force, "true", StringComparison.OrdinalIgnoreCase))
                 return AnsiSupport.Yes;
 
-            // CI nuances
-            bool isCi =
-                envType == EnvironmentType.AzurePipeline ||
-                envType == EnvironmentType.AzureRelease ||
-                envType == EnvironmentType.GitLab;
-
-            if (isCi)
-            {
-                // In CI allow ANSI only if explicitly enabled or redirection override present
+            if (envType == EnvironmentType.AzurePipeline)
+            {              
                 var redirectFlag = Environment.GetEnvironmentVariable("DOTNET_SYSTEM_CONSOLE_ALLOW_ANSI_COLOR_REDIRECTION");
                 if (string.Equals(redirectFlag, "1") ||
                     string.Equals(redirectFlag, "true", StringComparison.OrdinalIgnoreCase))
@@ -98,11 +78,8 @@ namespace LCT.Common.Logging
 
                 return AnsiSupport.No;
             }
-
-            // Local developer terminal: enable
             if (Console.IsOutputRedirected)
             {
-                // When redirected locally, only allow if override set
                 var redirectFlag = Environment.GetEnvironmentVariable("DOTNET_SYSTEM_CONSOLE_ALLOW_ANSI_COLOR_REDIRECTION");
                 return string.Equals(redirectFlag, "1") ? AnsiSupport.Yes : AnsiSupport.No;
             }
@@ -125,9 +102,7 @@ namespace LCT.Common.Logging
                 };
             }
 
-            // CI: keep it conservative (Standard) unless FORCE_ANSI set with explicit SPECTRE_COLOR
-            if (envType == EnvironmentType.AzurePipeline ||
-                envType == EnvironmentType.AzureRelease )
+            if (envType == EnvironmentType.AzurePipeline)
             {
                 return ColorSystemSupport.Standard;
             }
@@ -147,15 +122,29 @@ namespace LCT.Common.Logging
 
         private static int GetConsoleWidth(int subtract = 0, int fallback = 120)
         {
+            if (subtract < 0) subtract = 0;
+           
+            if (Console.IsOutputRedirected)
+                return fallback;
+
             try
             {
-                return Console.WindowWidth > 0 ? Console.WindowWidth - subtract : fallback;
+                int width = Console.WindowWidth;        
+                if (width <= 0) return fallback;
+
+                int adjusted = width - subtract;
+                return adjusted > 0 ? adjusted : fallback;
             }
-            catch
-            {
-                // Some CI environments throw
-                return fallback;
-            }
+            catch (Exception ex) when (
+                ex is InvalidOperationException ||
+                ex is PlatformNotSupportedException ||
+                ex is System.IO.IOException ||
+                ex is SecurityException )
+            {                
+                Logger.Debug($"SafeSpectreAction suppressed exception: {ex.GetType().Name} - {ex.Message}");
+            }          
+
+            return fallback;
         }
 
         public static void SafeSpectreAction(Action spectreAction, string fallbackMessage, string fallbackType = "Info")
