@@ -15,7 +15,7 @@ namespace LCT.SW360PackageCreator.Model
     [ExcludeFromCodeCoverage]
     public class CreatorKpiData
     {
-        [DisplayName(@"Components from BOM")]
+        [DisplayName(@"Components from BoM")]
         public int ComponentsReadFromComparisonBOM { get; set; }
 
         [DisplayName(@"Releases created in SW360")]

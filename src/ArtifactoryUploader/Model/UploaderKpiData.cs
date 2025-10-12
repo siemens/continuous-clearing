@@ -15,7 +15,7 @@ namespace LCT.ArtifactoryUploader.Model
     [ExcludeFromCodeCoverage]
     public class UploaderKpiData
     {
-        [DisplayName(@"Components in BOM")]
+        [DisplayName(@"Components in BoM")]
         public int ComponentInComparisonBOM { get; set; }
 
         [DisplayName(@"Packages in Not Approved State")]

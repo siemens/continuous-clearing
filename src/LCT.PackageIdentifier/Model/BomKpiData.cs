@@ -55,7 +55,7 @@ namespace LCT.PackageIdentifier.Model
         [DisplayName(@"Components With SourceURL")]
         public int ComponentsWithSourceURL { get; set; }
 
-        [DisplayName(@"Components in BOM")]
+        [DisplayName(@"Components in BoM")]
         public int ComponentsInComparisonBOM { get; set; }
 
         [DisplayName(@"Time taken by BOM Creator")]

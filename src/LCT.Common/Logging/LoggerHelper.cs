@@ -1,6 +1,7 @@
 ﻿using CycloneDX.Models;
 using LCT.Common.Constants;
 using LCT.Common.Model;
+using LCT.Common.Runtime;
 using log4net;
 using Spectre.Console;
 using System;
@@ -16,12 +17,145 @@ namespace LCT.Common.Logging
     public static class LoggerHelper
     {
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        // Added: environment-aware console fields
+        private static IAnsiConsole _console;
+        private static AnsiConsoleSettings _settings;
+        private static readonly object _consoleLock = new();
+
+        private static IAnsiConsole ConsoleInstance
+        {
+            get
+            {
+                if (_console != null) return _console;
+                lock (_consoleLock)
+                {
+                    if (_console == null)
+                    {
+                        _settings = BuildAnsiConsoleSettings();
+                        _console = AnsiConsole.Create(_settings);
+                    }
+                }
+                return _console;
+            }
+        }
+
+        // Central place to build settings (env overrides + defaults + environment type)
+        private static AnsiConsoleSettings BuildAnsiConsoleSettings()
+        {
+            // Detect runtime environment once
+            EnvironmentType envType = RuntimeEnvironment.GetEnvironment();
+
+            var ansi = GetAnsiSupport(envType);
+            var colorSystem = GetColorSystem(envType);
+
+            var settings = new AnsiConsoleSettings
+            {
+                Ansi = ansi,
+                ColorSystem = colorSystem,
+                Out = AnsiConsole.Profile.Out,     // preserve existing output stream
+                Interactive = InteractionSupport.No
+            };
+
+            return settings;
+        }
+
+        // Public reconfiguration hook (optional)
+        public static void ReconfigureConsole(Action<AnsiConsoleSettings> customize = null)
+        {
+            lock (_consoleLock)
+            {
+                _settings = BuildAnsiConsoleSettings();
+                customize?.Invoke(_settings);
+                _console = AnsiConsole.Create(_settings);
+            }
+        }
+
+        private static AnsiSupport GetAnsiSupport(EnvironmentType envType)
+        {
+            // Respect NO_COLOR first
+            if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("NO_COLOR")))
+                return AnsiSupport.No;
+
+            // FORCE_ANSI always wins
+            var force = Environment.GetEnvironmentVariable("FORCE_ANSI");
+            if (string.Equals(force, "1", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(force, "true", StringComparison.OrdinalIgnoreCase))
+                return AnsiSupport.Yes;
+
+            // CI nuances
+            bool isCi =
+                envType == EnvironmentType.AzurePipeline ||
+                envType == EnvironmentType.AzureRelease ||
+                envType == EnvironmentType.GitLab;
+
+            if (isCi)
+            {
+                // In CI allow ANSI only if explicitly enabled or redirection override present
+                var redirectFlag = Environment.GetEnvironmentVariable("DOTNET_SYSTEM_CONSOLE_ALLOW_ANSI_COLOR_REDIRECTION");
+                if (string.Equals(redirectFlag, "1") ||
+                    string.Equals(redirectFlag, "true", StringComparison.OrdinalIgnoreCase))
+                    return AnsiSupport.Yes;
+
+                return AnsiSupport.No;
+            }
+
+            // Local developer terminal: enable
+            if (Console.IsOutputRedirected)
+            {
+                // When redirected locally, only allow if override set
+                var redirectFlag = Environment.GetEnvironmentVariable("DOTNET_SYSTEM_CONSOLE_ALLOW_ANSI_COLOR_REDIRECTION");
+                return string.Equals(redirectFlag, "1") ? AnsiSupport.Yes : AnsiSupport.No;
+            }
+
+            return AnsiSupport.Yes;
+        }
+
+        private static ColorSystemSupport GetColorSystem(EnvironmentType envType)
+        {
+            // User override
+            var env = Environment.GetEnvironmentVariable("SPECTRE_COLOR");
+            if (!string.IsNullOrEmpty(env))
+            {
+                return env.ToLowerInvariant() switch
+                {
+                    "standard" => ColorSystemSupport.Standard,
+                    "256" => ColorSystemSupport.EightBit,
+                    "truecolor" or "24bit" => ColorSystemSupport.TrueColor,
+                    _ => ColorSystemSupport.Standard
+                };
+            }
+
+            // CI: keep it conservative (Standard) unless FORCE_ANSI set with explicit SPECTRE_COLOR
+            if (envType == EnvironmentType.AzurePipeline ||
+                envType == EnvironmentType.AzureRelease )
+            {
+                return ColorSystemSupport.Standard;
+            }
+
+            // Richer color locally
+            return ColorSystemSupport.TrueColor;
+        }
+
+        // Wrapper helper so existing code only changes AnsiConsole.* to ConsoleInstance.*
+        private static void ConsoleWrite(Action<IAnsiConsole> writeAction)
+        {
+            writeAction(ConsoleInstance);
+        }
+
         private static readonly Dictionary<string, string> _colorCache = new Dictionary<string, string>();
         private static int _colorIndex = 0;
 
         private static int GetConsoleWidth(int subtract = 0, int fallback = 120)
         {
-            return Console.WindowWidth > 0 ? Console.WindowWidth - subtract : fallback;
+            try
+            {
+                return Console.WindowWidth > 0 ? Console.WindowWidth - subtract : fallback;
+            }
+            catch
+            {
+                // Some CI environments throw
+                return fallback;
+            }
         }
 
         public static void SafeSpectreAction(Action spectreAction, string fallbackMessage, string fallbackType = "Info")
@@ -40,6 +174,7 @@ namespace LCT.Common.Logging
             )
             {
                 WriteFallback(fallbackMessage, fallbackType);
+                Logger.Debug($"SafeSpectreAction suppressed exception: {ex.GetType().Name} - {ex.Message}");
             }
         }
         public static void WriteComponentsWithoutDownloadURLByUseingSpectreToKpi(List<ComparisonBomData> componentInfo, List<Components> lstReleaseNotCreated, string sw360URL, List<Components> duplicateComponentsByPurlId)
@@ -96,7 +231,7 @@ namespace LCT.Common.Logging
                 );
             }
 
-            AnsiConsole.Write(table);
+            ConsoleWrite(c => c.Write(table));
             WriteLine();
         }
         private static void DisplayComponentsWithoutUrl(List<ComparisonBomData> componentInfo, string sw360URL)
@@ -111,7 +246,7 @@ namespace LCT.Common.Logging
             var table = CreateComponentTable(true);
             PopulateComponentInfoTable(table, componentInfo, sw360URL);
 
-            AnsiConsole.Write(table);
+            ConsoleInstance.Write(table);
             WriteLine();
         }
 
@@ -127,7 +262,7 @@ namespace LCT.Common.Logging
             var table = CreateComponentTable(false);
             PopulateNotCreatedComponentsTable(table, lstReleaseNotCreated);
 
-            AnsiConsole.Write(table);
+            ConsoleInstance.Write(table);
             WriteLine();
         }
 
@@ -208,7 +343,7 @@ namespace LCT.Common.Logging
                         );
                     }
 
-                    AnsiConsole.Write(table);
+                    ConsoleInstance.Write(table);
                     WriteLine();
 
                     EnvironmentHelper environmentHelper = new EnvironmentHelper();
@@ -760,7 +895,7 @@ namespace LCT.Common.Logging
                     panel.Header = new PanelHeader($"[{headerStyle}]{Markup.Escape(title)}[/]");
                 }
 
-                AnsiConsole.Write(panel);
+                ConsoleWrite(c => c.Write(panel));
             }, content, title ?? "Panel");
         }
         public static void WriteSummaryHeader(string title)
@@ -774,8 +909,12 @@ namespace LCT.Common.Logging
                 var bottomBorder = new string('═', consoleWidth); // Double line border character
 
                 // Write centered header and bottom border
-                AnsiConsole.MarkupLine($"[bold white]{Markup.Escape(centeredText)}[/]");
-                AnsiConsole.MarkupLine($"[bold white]{bottomBorder}[/]");
+
+                ConsoleWrite(c =>
+                {
+                    c.MarkupLine($"[bold white]{Markup.Escape(centeredText)}[/]");
+                    c.MarkupLine($"[bold white]{bottomBorder}[/]");
+                });
             }, title, "Header");
         }
         public static void WriteHeader(string title)
@@ -786,7 +925,7 @@ namespace LCT.Common.Logging
                 var consoleWidth = GetConsoleWidth(0, 120);
                 var padding = (consoleWidth - title.Length) / 2;
                 var centeredText = title.PadLeft(padding + title.Length).PadRight(consoleWidth);
-                AnsiConsole.MarkupLine($"[bold white]{Markup.Escape(centeredText)}[/]");
+                ConsoleInstance.MarkupLine($"[bold white]{Markup.Escape(centeredText)}[/]");
             }, title, "Header");
         }
 
@@ -888,7 +1027,7 @@ namespace LCT.Common.Logging
                 AddSummaryRows(table, printData, maxValue, barMaxWidth, KpiNames);
 
                 table.AddEmptyRow();
-                AnsiConsole.Write(table);
+                ConsoleInstance.Write(table);
 
                 WriteLine();
 
@@ -984,21 +1123,7 @@ namespace LCT.Common.Logging
                 kpiNames.PackagesNotActionedDueToError,
                 kpiNames.PackagesNotExistingInRepository,
                 kpiNames.PackagesNotMovedToRepo
-            };
-
-            var cyanGroup = new[]
-            {
-                kpiNames.TotalDuplicateAndInValidComponents,
-                kpiNames.PackagesPresentIn3rdPartyRepo,
-                kpiNames.PackagesPresentInDevDepRepo,
-                kpiNames.PackagesPresentInReleaseRepo,
-                kpiNames.DevelopmentComponents,
-                kpiNames.BundledComponents,
-                kpiNames.InvalidComponentsExcluded,
-                kpiNames.DuplicateComponents,
-                kpiNames.ManuallyExcludedSw360,
-                kpiNames.InternalComponents
-            };
+            };            
 
             var alwaysGreen = new[]
             {
@@ -1012,7 +1137,17 @@ namespace LCT.Common.Logging
                 kpiNames.PackagesCopiedToSipartyRepo,
                 kpiNames.PackagesCopiedToSipartyDevDepRepo,
                 kpiNames.PackagesMovedToRepo,
-                kpiNames.ComponentsFromTheSPDXImportedAsBaselineEntries
+                kpiNames.ComponentsFromTheSPDXImportedAsBaselineEntries,
+                kpiNames.TotalDuplicateAndInValidComponents,
+                kpiNames.PackagesPresentIn3rdPartyRepo,
+                kpiNames.PackagesPresentInDevDepRepo,
+                kpiNames.PackagesPresentInReleaseRepo,
+                kpiNames.DevelopmentComponents,
+                kpiNames.BundledComponents,
+                kpiNames.InvalidComponentsExcluded,
+                kpiNames.DuplicateComponents,
+                kpiNames.ManuallyExcludedSw360,
+                kpiNames.InternalComponents
             };
 
             bool Is(string candidate) => !string.IsNullOrEmpty(candidate) && key.Equals(candidate, StringComparison.Ordinal);
@@ -1025,10 +1160,7 @@ namespace LCT.Common.Logging
 
             if (infoGroup.Any(Is))
                 return value == 0 ? "green" : "red";
-
-            if (cyanGroup.Any(Is))
-                return "cyan";
-
+            
             if (alwaysGreen.Any(Is))
                 return "green";
 
@@ -1085,7 +1217,7 @@ namespace LCT.Common.Logging
                         );
                     }
 
-                    AnsiConsole.Write(table);
+                    ConsoleInstance.Write(table);
                     WriteLine();
                 }, "* Internal Components Identified which will not be sent for clearing:", "Alert");
             }
@@ -1166,12 +1298,12 @@ namespace LCT.Common.Logging
 
         public static void WriteLine()
         {
-            SafeSpectreAction(() => AnsiConsole.WriteLine(), "", "Info");
+            SafeSpectreAction(() => ConsoleWrite(c => c.WriteLine()), "", "Info");
         }
 
         public static void WriteInfoWithMarkup(string message)
         {
-            SafeSpectreAction(() => AnsiConsole.MarkupLine(message), message, "Info");
+            SafeSpectreAction(() => ConsoleWrite(c => c.MarkupLine(message)), message, "Info");
         }
         public static void WriteFossologyProcessInitializeMessage(string formattedName, ComparisonBomData item)
         {
