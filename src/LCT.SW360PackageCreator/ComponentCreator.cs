@@ -604,8 +604,9 @@ namespace LCT.SW360PackageCreator
                 if (attachmentUrlList != null && attachmentUrlList.Count > 0)
                 {
                     if (string.IsNullOrEmpty(releasesInfo.SourceCodeDownloadUrl))
+                    {
                         await sw360CreatorService.UpdateSourceCodeDownloadURLForExistingRelease(item, attachmentUrlList, releaseId);
-                    
+                    }
                     string attachmentApiUrl = sw360CreatorService.AttachSourcesToReleasesCreated(releaseId, attachmentUrlList, item);
                     item.ReleaseAttachmentLink = attachmentApiUrl;
                     item.DownloadUrl = !attachmentUrlList.ContainsKey("SOURCE") ? Dataconstant.DownloadUrlNotFound : item.DownloadUrl;
