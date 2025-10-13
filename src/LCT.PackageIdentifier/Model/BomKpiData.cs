@@ -49,7 +49,7 @@ namespace LCT.PackageIdentifier.Model
         [DisplayName(@"Invalid Components Excluded")]
         public int ComponentsExcluded { get; set; }
 
-        [DisplayName(@"Manually Excluded Sw360")]
+        [DisplayName(@"Manually Excluded SW360")]
         public int ComponentsExcludedSW360 { get; set; }
 
         [DisplayName(@"Components With SourceURL")]
@@ -58,7 +58,7 @@ namespace LCT.PackageIdentifier.Model
         [DisplayName(@"Components in BoM")]
         public int ComponentsInComparisonBOM { get; set; }
 
-        [DisplayName(@"Time taken by BOM Creator")]
+        [DisplayName(@"Time taken by BoM Creator")]
         public double TimeTakenByBomCreator { get; set; }
 
         [DisplayName(@"Components Added From SBOM Template")]

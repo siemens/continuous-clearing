@@ -1,4 +1,10 @@
-﻿using CycloneDX.Models;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2025 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+
+using CycloneDX.Models;
 using LCT.Common.Constants;
 using LCT.Common.Model;
 using LCT.Common.Runtime;
@@ -640,8 +646,6 @@ namespace LCT.Common.Logging
             content
                 .Append($"[green]-[/] [cyan]SW360Url[/]\n")
                 .Append($"  └──➤ {appSettings.SW360.URL}\n\n")
-                .Append($"[green]-[/] [cyan]SW360AuthTokenType[/]\n")
-                .Append($"  └──➤ {appSettings.SW360.AuthTokenType}\n\n")
                 .Append($"[green]-[/] [cyan]SW360ProjectName[/]\n")
                 .Append($"  └──➤ {appSettings.SW360.ProjectName}\n\n")
                 .Append($"[green]-[/] [cyan]SW360ProjectID[/]\n")
@@ -735,8 +739,6 @@ namespace LCT.Common.Logging
                 .Append($"  └──➤ {WrapPath(bomFilePath, maxPathLength)}\n\n")
                 .Append($"[green]-[/] [cyan]SW360Url[/]\n")
                 .Append($"  └──➤ {appSettings.SW360.URL}\n\n")
-                .Append($"[green]-[/] [cyan]SW360AuthTokenType[/]\n")
-                .Append($"  └──➤ {appSettings.SW360.AuthTokenType}\n\n")
                 .Append($"[green]-[/] [cyan]SW360ProjectName[/]\n")
                 .Append($"  └──➤ {appSettings.SW360.ProjectName}\n\n")
                 .Append($"[green]-[/] [cyan]SW360ProjectID[/]\n")
@@ -790,7 +792,6 @@ namespace LCT.Common.Logging
                 if (appSettings.SW360 != null)
                 {
                     logMessage += $"SW360Url\t\t --> {appSettings.SW360.URL}\n\t" +
-                              $"SW360AuthTokenType\t --> {appSettings.SW360.AuthTokenType}\n\t" +
                               $"SW360ProjectName\t --> {appSettings.SW360.ProjectName}\n\t" +
                               $"SW360ProjectID\t\t --> {appSettings.SW360.ProjectID}\n\t" +
                               $"ExcludeComponents\t --> {listofPerameters.ExcludeComponents}\n\t";
@@ -814,7 +815,6 @@ namespace LCT.Common.Logging
                               $"CaToolRunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
                               $"BomFilePath\t\t --> {bomFilePath}\n\t" +
                               $"SW360Url\t\t --> {appSettings.SW360.URL}\n\t" +
-                              $"SW360AuthTokenType\t --> {appSettings.SW360.AuthTokenType}\n\t" +
                               $"SW360ProjectName\t --> {appSettings.SW360.ProjectName}\n\t" +
                               $"SW360ProjectID\t\t --> {appSettings.SW360.ProjectID}\n\t" +
                               $"FossologyURL\t\t --> {appSettings.SW360.Fossology.URL}\n\t" +
