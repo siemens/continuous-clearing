@@ -64,6 +64,10 @@ namespace LCT.SW360PackageCreator
 
             foreach (Component item in components)
             {
+                if (IsChocoComponent(item))
+                {
+                    continue;
+                }
                 Components componentsData = new Components();
 
                 string currName = item.Name;
@@ -731,5 +735,32 @@ namespace LCT.SW360PackageCreator
             s_kpiData.TimeTakenByComponentCreator = kpiData.TimeTakenByComponentCreator;
         }
 
+        public void PrintChocoSummaryAndActions(List<Component> allComponents, CreatorKpiData kpiData)
+        {
+            var chocoComponents = allComponents.Where(IsChocoComponent).ToList();
+
+            Logger.Logger.Log(null, Level.Notice, "Action Item required by the user:\n", null);
+            Logger.Logger.Log(null, Level.Notice, "* Updating the source download URL is not supported for the choco package. If the user wants to modify it, it must be done manually.", null);
+
+            Logger.Logger.Log(null, Level.Notice, "===============================================================================================================================================================================================================", null);
+            Logger.Logger.Log(null, Level.Notice, "|Name                                              |                   Version     |", null);
+            Logger.Logger.Log(null, Level.Notice, "===============================================================================================================================================================================================================", null);
+
+            foreach (var item in chocoComponents)
+            {
+                Logger.Logger.Log(null, Level.Notice, $"|{item.Name,-50}|{item.Version,25}|", null);
+                Logger.Logger.Log(null, Level.Notice, "---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------", null);
+            }
+        }
+
+        public static bool IsChocoComponent(Component component)
+        {
+            if (component.Properties == null)
+                return false;
+
+            return component.Properties.Any(p =>
+                string.Equals(p.Name, "internal:siemens:clearing:project-type", StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(p.Value, "Choco", StringComparison.OrdinalIgnoreCase));
+        }
     }
 }

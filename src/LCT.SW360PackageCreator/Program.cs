@@ -13,6 +13,7 @@ using LCT.Facade.Interfaces;
 using LCT.Services;
 using LCT.Services.Interface;
 using LCT.SW360PackageCreator.Interfaces;
+using LCT.SW360PackageCreator.Model;
 using log4net;
 using log4net.Core;
 using System;
@@ -20,6 +21,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -98,15 +100,41 @@ namespace LCT.SW360PackageCreator
                 if (await CreatorValidator.FossologyUrlValidation(appSettings, client, environmentHelper))
                     await CreatorValidator.TriggerFossologyValidation(appSettings, sW360ApicommunicationFacade, environmentHelper);
             }
-            await InitiatePackageCreatorProcess(appSettings, sw360ProjectService, sW360ApicommunicationFacade);
-            // Initialize telemetry with CATool version and instrumentation key only if Telemetry is enabled in appsettings
-            if (appSettings.Telemetry.Enable)
-            {
-                TelemetryHelper telemetryHelper = new TelemetryHelper(appSettings);
-                telemetryHelper.StartTelemetry(caToolInformation.CatoolVersion, ComponentCreator.KpiData, TelemetryConstant.CreatorKpiData);
-            }
-            Logger.Logger.Log(null, Level.Notice, $"End of Package Creator execution: {DateTime.Now}\n", null);
 
+            // Add initialization and parsing before Choco logic
+            ComponentCreator componentCreator = new ComponentCreator();
+            ICycloneDXBomParser cycloneDXBomParser = new CycloneDXBomParser();
+            ISW360Service sw360Service = new Sw360Service(sW360ApicommunicationFacade, new SW360CommonService(sW360ApicommunicationFacade), environmentHelper);
+            ICreatorHelper creatorHelper = new CreatorHelper(new Dictionary<string, IPackageDownloader>());
+
+            List<ComparisonBomData> parsedBomData = await componentCreator.CycloneDxBomParser(appSettings, sw360Service, cycloneDXBomParser, creatorHelper);
+
+            var bom = cycloneDXBomParser.ParseCycloneDXBom(bomFilePath);
+            var allComponents = bom?.Components ?? new List<CycloneDX.Models.Component>();
+
+            bool hasChoco = allComponents.Any(ComponentCreator.IsChocoComponent);
+            ISW360CommonService sw360CommonService = new SW360CommonService(sW360ApicommunicationFacade);
+            ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sW360ApicommunicationFacade, sw360CommonService);
+
+            if (hasChoco)
+            {
+                // For Choco, skip SW360 creation, but use the same KPI table logic:
+                CreatorKpiData kpiData = creatorHelper.GetCreatorKpiData(componentCreator.UpdatedCompareBomData);
+                creatorHelper.WriteCreatorKpiDataToConsole(kpiData);
+                componentCreator.PrintChocoSummaryAndActions(allComponents, kpiData);
+            }
+            else
+            {                                                                                                                               
+                await componentCreator.CreateComponentInSw360(appSettings, sw360CreatorService, sw360Service,
+                     sw360ProjectService, new FileOperations(), creatorHelper, parsedBomData);
+
+                if (appSettings.Telemetry.Enable)
+                {
+                    TelemetryHelper telemetryHelper = new TelemetryHelper(appSettings);
+                    telemetryHelper.StartTelemetry(caToolInformation.CatoolVersion, ComponentCreator.KpiData, TelemetryConstant.CreatorKpiData);
+                }
+                Logger.Logger.Log(null, Level.Notice, $"End of Package Creator execution: {DateTime.Now}\n", null);
+            }
             // publish logs and bom file to pipeline artifact
             PipelineArtifactUploader.UploadArtifacts();
         }
