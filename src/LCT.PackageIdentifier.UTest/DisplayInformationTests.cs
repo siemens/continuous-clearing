@@ -4,7 +4,6 @@ using log4net.Appender;
 using log4net.Config;
 using NUnit.Framework;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace LCT.PackageIdentifier.UTest
@@ -21,7 +20,7 @@ namespace LCT.PackageIdentifier.UTest
         {
             appSettings = new CommonAppSettings();
         }
-        
+
         [TestCase("NPM", "p*-lock.json,*.cdx.json", "node_modules,Test", "Npm-Test")]
         [TestCase("NUGET", "p*-lock.json,*.cdx.json", "package,Test", "Nuget-Test")]
         [TestCase("MAVEN", "*.cdx.json", "package,Test", "Maven-Test")]

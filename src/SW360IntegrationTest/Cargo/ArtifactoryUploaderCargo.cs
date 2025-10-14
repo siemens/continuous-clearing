@@ -7,7 +7,6 @@
 using CycloneDX.Models;
 using NUnit.Framework;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using TestUtilities;
@@ -48,14 +47,14 @@ namespace SW360IntegrationTest.Cargo
         {
             OutFolder = TestHelper.OutFolder;
             string comparisonBOMPath = Path.GetFullPath(Path.Join(OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles", "ArtifactoryUploaderTestData", "Cargo", "Test_Bom.cdx.json"));
-            
+
             // Ensure the test BOM file exists; if it's missing in CI, skip this test to avoid false failures
             if (!File.Exists(comparisonBOMPath))
             {
                 Assert.Ignore($"Test BOM file not found at {comparisonBOMPath} - skipping integration assertion in CI environment");
                 return;
             }
-            
+
             ComponentJsonParsor expected = new ComponentJsonParsor();
             expected.Read(comparisonBOMPath);
 
@@ -67,16 +66,16 @@ namespace SW360IntegrationTest.Cargo
             foreach (var item in expected.Components)
             {
                 Component components = item;
-                if (components.Properties != null && components.Properties.Count > 3 && 
+                if (components.Properties != null && components.Properties.Count > 3 &&
                     components.Properties[3].Name.Contains("ApprovedStatus"))
                 {
                     foundApprovedComponent = true;
                     // Assert - Check that approved components have the correct repository name  
-                    Assert.AreEqual("cargo-test", components.Properties[1].Value, 
+                    Assert.AreEqual("cargo-test", components.Properties[1].Value,
                         "Cargo component should have correct repository identifier");
                 }
             }
-            
+
             Assert.IsTrue(foundApprovedComponent, "Should find at least one component with approval status for validation");
         }
 

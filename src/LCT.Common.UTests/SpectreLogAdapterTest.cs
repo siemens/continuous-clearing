@@ -1,8 +1,12 @@
-﻿using NUnit.Framework;
-using Moq;
-using LCT.Common;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2025 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+
 using log4net;
-using log4net.Core;
+using Moq;
+using NUnit.Framework;
 using System;
 using System.Globalization;
 

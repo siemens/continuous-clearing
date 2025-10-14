@@ -164,12 +164,12 @@ namespace SW360IntegrationTest.Maven
             string downloadurl = responseDataForRelease.SourceDownloadurl;
             string clearingState = responseDataForRelease.ClearingState;
             string externalid = responseDataForRelease.ExternalIds.Package_Url;
-            string releaseLink=responseDataForRelease.Links.Self.Href;
+            string releaseLink = responseDataForRelease.Links.Self.Href;
             string releaseResponseBody = await httpClient.GetStringAsync(releaseLink);//GET method
             var releasesInfo = JsonConvert.DeserializeObject<ReleasesInfo>(releaseResponseBody);
 
             var releaseAttachments = releasesInfo?.Embedded?.Sw360attachments ?? new List<Sw360Attachments>();
-            bool AttachmentFound=releaseAttachments.Any(x => x.AttachmentType.Equals("SOURCE"));
+            bool AttachmentFound = releaseAttachments.Any(x => x.AttachmentType.Equals("SOURCE"));
 
             //Assert
             Assert.IsTrue(AttachmentFound, "Expected a SOURCE attachment to be present in the release.");

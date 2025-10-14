@@ -41,7 +41,7 @@ namespace LCT.PackageIdentifier
             }
             // Log the Registered MSBuild version and path
             var instance = MSBuildLocator.QueryVisualStudioInstances().FirstOrDefault();
-            LoggerHelper.MSBuildVersionDisplay("MSBuild Registered Version:",$"{instance?.Version}");
+            LoggerHelper.MSBuildVersionDisplay("MSBuild Registered Version:", $"{instance?.Version}");
             Logger.Debug($"MSBuild Registered Version: {instance?.Version}");
             Logger.Debug($"MSBuild Registered Path: {instance?.MSBuildPath}");
         }

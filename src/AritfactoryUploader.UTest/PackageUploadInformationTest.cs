@@ -235,7 +235,7 @@ namespace AritfactoryUploader.UTest
             }
 
             // Act
-            var method = typeof(PackageUploadInformation).GetMethod("GetNotApprovedCargoPackages", 
+            var method = typeof(PackageUploadInformation).GetMethod("GetNotApprovedCargoPackages",
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
             method.Invoke(null, new object[] { unknownPackages, projectResponse, mockFileOperations.Object, filepath, filename });
 
@@ -279,7 +279,7 @@ namespace AritfactoryUploader.UTest
             File.WriteAllText(filename, json);
 
             // Act
-            var method = typeof(PackageUploadInformation).GetMethod("GetNotApprovedCargoPackages", 
+            var method = typeof(PackageUploadInformation).GetMethod("GetNotApprovedCargoPackages",
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
             method.Invoke(null, new object[] { unknownPackages, projectResponse, mockFileOperations.Object, filepath, filename });
 
@@ -317,7 +317,7 @@ namespace AritfactoryUploader.UTest
             }
 
             // Act
-            var method = typeof(PackageUploadInformation).GetMethod("GetNotApprovedCargoPackages", 
+            var method = typeof(PackageUploadInformation).GetMethod("GetNotApprovedCargoPackages",
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
             method.Invoke(null, new object[] { unknownPackages, projectResponse, mockFileOperations.Object, filepath, filename });
 
@@ -349,7 +349,7 @@ namespace AritfactoryUploader.UTest
             File.WriteAllText(filename, json);
 
             // Act
-            var method = typeof(PackageUploadInformation).GetMethod("GetNotApprovedCargoPackages", 
+            var method = typeof(PackageUploadInformation).GetMethod("GetNotApprovedCargoPackages",
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
             method.Invoke(null, new object[] { unknownPackages, projectResponse, mockFileOperations.Object, filepath, filename });
 
@@ -383,7 +383,7 @@ namespace AritfactoryUploader.UTest
             }
 
             // Act
-            var method = typeof(PackageUploadInformation).GetMethod("GetNotApprovedCargoPackages", 
+            var method = typeof(PackageUploadInformation).GetMethod("GetNotApprovedCargoPackages",
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
             method.Invoke(null, new object[] { unknownPackages, projectResponse, mockFileOperations.Object, filepath, filename });
 
@@ -418,7 +418,7 @@ namespace AritfactoryUploader.UTest
             }
 
             // Act
-            var method = typeof(PackageUploadInformation).GetMethod("GetNotApprovedCargoPackages", 
+            var method = typeof(PackageUploadInformation).GetMethod("GetNotApprovedCargoPackages",
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
             method.Invoke(null, new object[] { unknownPackages, projectResponse, mockFileOperations.Object, filepath, filename });
 
@@ -452,11 +452,11 @@ namespace AritfactoryUploader.UTest
             File.WriteAllText(filename, "{ invalid json content");
 
             // Act & Assert
-            var method = typeof(PackageUploadInformation).GetMethod("GetNotApprovedCargoPackages", 
+            var method = typeof(PackageUploadInformation).GetMethod("GetNotApprovedCargoPackages",
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-            
+
             // Should throw JsonReaderException
-            Assert.Throws<System.Reflection.TargetInvocationException>(() => 
+            Assert.Throws<System.Reflection.TargetInvocationException>(() =>
                 method.Invoke(null, new object[] { unknownPackages, projectResponse, mockFileOperations.Object, filepath, filename }));
 
             // Cleanup

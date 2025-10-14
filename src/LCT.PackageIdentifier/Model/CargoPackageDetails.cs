@@ -21,7 +21,7 @@ namespace LCT.PackageIdentifier.Model
         public List<string> Workspace_members { get; set; }
         [JsonProperty("workspace_default_members")]
         public List<string> Workspace_default_members { get; set; }
-        
+
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public class Dep
         {

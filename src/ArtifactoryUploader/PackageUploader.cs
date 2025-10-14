@@ -11,7 +11,6 @@ using LCT.ArtifactoryUploader.Model;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Logging;
-using LCT.Common.Model;
 using log4net;
 using System;
 using System.Collections.Generic;
@@ -19,7 +18,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Level = log4net.Core.Level;
 
 namespace LCT.ArtifactoryUploader
 {
@@ -47,7 +45,7 @@ namespace LCT.ArtifactoryUploader
             //Uploading the component to artifactory
 
             uploaderKpiData.PackagesToBeUploaded = m_ComponentsToBeUploaded.Count(x => x.PackageType == PackageType.ClearedThirdParty);
-            
+
             await PackageUploadHelper.UploadingThePackages(m_ComponentsToBeUploaded, appSettings.TimeOut, displayPackagesInfo);
 
             //Display packages information 

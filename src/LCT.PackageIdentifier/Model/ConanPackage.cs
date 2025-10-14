@@ -43,11 +43,11 @@ namespace LCT.PackageIdentifier.Model
 
         [JsonProperty("dependencies")]
         public Dictionary<string, ConanDependency> Dependencies { get; set; } = new Dictionary<string, ConanDependency>();
-        
+
         // Helper properties to make code more readable
         public bool IsRuntimeDependency => Context == "host" && Libs == true && Visible == true && Run == false;
         public bool IsDevDependency => Context == "build" || (Run == true && Build == true);
-        
+
         public bool IsDirectDependency(string nodeId)
         {
             return Dependencies?.ContainsKey(nodeId) == true && Dependencies[nodeId].Direct == true;

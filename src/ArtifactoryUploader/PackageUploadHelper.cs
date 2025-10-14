@@ -22,7 +22,6 @@ using log4net;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
@@ -374,7 +373,7 @@ namespace LCT.ArtifactoryUploader
 
                 {uploaderKpiNames.PackagesCopiedToSipartyDevDepRepo,uploaderKpiData.DevPackagesUploaded},
 
-                {uploaderKpiNames.PackagesNotCopiedToSipartyDevDepRepo,uploaderKpiData.DevPackagesNotUploadedToJfrog},                
+                {uploaderKpiNames.PackagesNotCopiedToSipartyDevDepRepo,uploaderKpiData.DevPackagesNotUploadedToJfrog},
 
                 {uploaderKpiNames.PackagesMovedToRepo,uploaderKpiData.InternalPackagesUploaded},
 
@@ -390,7 +389,7 @@ namespace LCT.ArtifactoryUploader
                 { "Artifactory Uploader",uploaderKpiData.TimeTakenByArtifactoryUploader }
             };
 
-            LoggerHelper.WriteToConsoleTable(printList, printTimingList, "", Dataconstant.Uploader,uploaderKpiNames);
+            LoggerHelper.WriteToConsoleTable(printList, printTimingList, "", Dataconstant.Uploader, uploaderKpiNames);
         }
         private static KpiNames IdentifyKpiNames(UploaderKpiData uploaderKpiData)
         {
@@ -406,7 +405,7 @@ namespace LCT.ArtifactoryUploader
             uploaderKpiNames.PackagesNotCopiedToSipartyDevDepRepo = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.DevPackagesNotUploadedToJfrog));
             uploaderKpiNames.PackagesMovedToRepo = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.InternalPackagesUploaded));
             uploaderKpiNames.PackagesNotMovedToRepo = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.InternalPackagesNotUploadedToJfrog));
-           
+
             return uploaderKpiNames;
         }
         private static void IncrementCountersBasedOnPackageType(UploaderKpiData uploaderKpiData, PackageType packageType, bool isSuccess)

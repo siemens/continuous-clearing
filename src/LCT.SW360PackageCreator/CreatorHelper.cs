@@ -26,7 +26,6 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Security.Policy;
 using System.Threading.Tasks;
 using Directory = System.IO.Directory;
 using File = System.IO.File;
@@ -589,7 +588,7 @@ namespace LCT.SW360PackageCreator
                 { "ComponentCreator",creatorKpiData.TimeTakenByComponentCreator }
             };
 
-            LoggerHelper.WriteToConsoleTable(printList, printTimingList,"", Dataconstant.Creator, createrKpiNames);
+            LoggerHelper.WriteToConsoleTable(printList, printTimingList, "", Dataconstant.Creator, createrKpiNames);
         }
         private static KpiNames IdentifyKpiNames(CreatorKpiData creatorKpiData)
         {
@@ -629,7 +628,7 @@ namespace LCT.SW360PackageCreator
             // Removes common components
             sourceNotAvailable.RemoveAll(src => lstReleaseNotCreated.Any(rls => src.Name == rls.Name && src.Version == rls.Version));
 
-            LoggerHelper.WriteComponentsWithoutDownloadURLToKpi(sourceNotAvailable, lstReleaseNotCreated, appSetting.SW360.URL,DuplicateComponentsByPurlId);
+            LoggerHelper.WriteComponentsWithoutDownloadURLToKpi(sourceNotAvailable, lstReleaseNotCreated, appSetting.SW360.URL, DuplicateComponentsByPurlId);
         }
 
         private static string GetComponentAvailabilityStatus(List<Components> componentsAvailable, Components component)
@@ -648,7 +647,7 @@ namespace LCT.SW360PackageCreator
             }
 
             return Dataconstant.NotAvailable;
-        }       
+        }
         public static string GetComponentDownloadUrl(ComparisonBomData mapper, Components item, IRepository repo, ReleasesInfo releasesInfo)
         {
 
@@ -720,6 +719,6 @@ namespace LCT.SW360PackageCreator
 
             return releasesInfo;
         }
-       
+
     }
 }

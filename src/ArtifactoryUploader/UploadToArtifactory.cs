@@ -13,7 +13,6 @@ using LCT.APICommunications.Model.AQL;
 using LCT.ArtifactoryUploader.Model;
 using LCT.Common;
 using LCT.Common.Constants;
-using LCT.Common.Model;
 using LCT.Services.Interface;
 using log4net;
 using System;
@@ -39,13 +38,13 @@ namespace LCT.ArtifactoryUploader
             foreach (var item in comparisonBomData)
             {
                 var packageType = GetPackageType(item);
-                
+
                 if (packageType != PackageType.Unknown)
                 {
                     AqlResult aqlResult = await GetSrcRepoDetailsForComponent(item);
                     ComponentsToArtifactory components = new ComponentsToArtifactory()
                     {
-                        Name = !string.IsNullOrEmpty(item.Group) ? $"{item.Group}/{item.Name}" : item.Name,                        
+                        Name = !string.IsNullOrEmpty(item.Group) ? $"{item.Group}/{item.Name}" : item.Name,
                         PackageName = item.Name,
                         Version = item.Version,
                         Purl = item.Purl,
@@ -86,7 +85,7 @@ namespace LCT.ArtifactoryUploader
             Logger.Debug("Ending GetComponentsToBeUploadedToArtifactory() method");
             return componentsToBeUploaded;
         }
-        
+
         private static string GetComponentType(Component item)
         {
 

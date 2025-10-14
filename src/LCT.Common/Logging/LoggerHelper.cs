@@ -12,11 +12,9 @@ using log4net;
 using Spectre.Console;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security;
-using System.Security.AccessControl;
 using System.Text;
 using Level = log4net.Core.Level;
 
@@ -25,7 +23,7 @@ namespace LCT.Common.Logging
     public static class LoggerHelper
     {
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-       
+
         private static IAnsiConsole _console;
         private static readonly object _consoleLock = new();
 
@@ -57,13 +55,13 @@ namespace LCT.Common.Logging
             {
                 Ansi = ansi,
                 ColorSystem = colorSystem,
-                Out = AnsiConsole.Profile.Out,   
+                Out = AnsiConsole.Profile.Out,
                 Interactive = InteractionSupport.No
             };
             return settings;
         }
 
-       
+
 
         private static AnsiSupport GetAnsiSupport(EnvironmentType envType)
         {
@@ -76,7 +74,7 @@ namespace LCT.Common.Logging
                 return AnsiSupport.Yes;
 
             if (envType == EnvironmentType.AzurePipeline)
-            {              
+            {
                 var redirectFlag = Environment.GetEnvironmentVariable("DOTNET_SYSTEM_CONSOLE_ALLOW_ANSI_COLOR_REDIRECTION");
                 if (string.Equals(redirectFlag, "1") ||
                     string.Equals(redirectFlag, "true", StringComparison.OrdinalIgnoreCase))
@@ -129,13 +127,13 @@ namespace LCT.Common.Logging
         private static int GetConsoleWidth(int subtract = 0, int fallback = 120)
         {
             if (subtract < 0) subtract = 0;
-           
+
             if (Console.IsOutputRedirected)
                 return fallback;
 
             try
             {
-                int width = Console.WindowWidth;        
+                int width = Console.WindowWidth;
                 if (width <= 0) return fallback;
 
                 int adjusted = width - subtract;
@@ -145,10 +143,10 @@ namespace LCT.Common.Logging
                 ex is InvalidOperationException ||
                 ex is PlatformNotSupportedException ||
                 ex is System.IO.IOException ||
-                ex is SecurityException )
-            {                
+                ex is SecurityException)
+            {
                 Logger.Debug($"SafeSpectreAction suppressed exception: {ex.GetType().Name} - {ex.Message}");
-            }          
+            }
 
             return fallback;
         }
@@ -375,7 +373,7 @@ namespace LCT.Common.Logging
                 Logger.Info("\n");
             }
         }
-        
+
         public static void WriteComponentsWithoutDownloadURLToKpi(List<ComparisonBomData> componentInfo, List<Components> lstReleaseNotCreated, string sw360URL, List<Components> DuplicateComponentsByPurlId)
         {
             if (LoggerFactory.UseSpectreConsole)
@@ -1054,7 +1052,7 @@ namespace LCT.Common.Logging
             int barMaxWidth, KpiNames KpiNames)
         {
             foreach (var item in printData)
-            {               
+            {
                 string color = GetColorForItem(item.Key, item.Value, KpiNames);
                 int barWidth = maxValue > 0 ? (int)((double)item.Value / maxValue * barMaxWidth) : 0;
                 string visualBar = barWidth > 0 ? new string('█', barWidth) : "";
@@ -1067,7 +1065,7 @@ namespace LCT.Common.Logging
             }
         }
 
-       
+
 
         private static void WriteTimingData(Dictionary<string, double> printTimingData)
         {
@@ -1101,7 +1099,7 @@ namespace LCT.Common.Logging
                 kpiNames.PackagesInNotApprovedState,
                 kpiNames.ReleasesWithoutSourceDownloadURL
             };
-            
+
             var infoGroup = new[]
             {
                 kpiNames.ReleasesNotCreatedInSW360,
@@ -1112,7 +1110,7 @@ namespace LCT.Common.Logging
                 kpiNames.PackagesNotActionedDueToError,
                 kpiNames.PackagesNotExistingInRepository,
                 kpiNames.PackagesNotMovedToRepo
-            };            
+            };
 
             var alwaysGreen = new[]
             {
@@ -1149,7 +1147,7 @@ namespace LCT.Common.Logging
 
             if (infoGroup.Any(Is))
                 return value == 0 ? "green" : "red";
-            
+
             if (alwaysGreen.Any(Is))
                 return "green";
 
@@ -1352,7 +1350,7 @@ namespace LCT.Common.Logging
                 Logger.Logger.Log(null, Level.Info, $"\n{message} : Name - {formattedName}, version - {item.Version}", null);
             }
         }
-        public static void MSBuildVersionDisplay(string message,string version)
+        public static void MSBuildVersionDisplay(string message, string version)
         {
             if (LoggerFactory.UseSpectreConsole)
             {
@@ -1362,7 +1360,7 @@ namespace LCT.Common.Logging
             {
                 Logger.Info($"{message}{version}");
             }
-        }       
+        }
         private static void LogDuplicateComponentsByPurlId(List<Components> duplicateComponents, string sw360URL)
         {
             if (duplicateComponents.Count > 0)

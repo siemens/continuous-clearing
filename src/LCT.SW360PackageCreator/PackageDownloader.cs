@@ -66,12 +66,12 @@ namespace LCT.SW360PackageCreator
             {
                 Logger.Debug($"DownloadSourceCodeUsingGitClone():{ex}");
                 return downloadedPackageName;
-            }           
+            }
             Result result = CloneSource(component, downloadPath, taggedVersion, compressedFilePath);
 
             Logger.Debug($"DownloadSourceCodeUsingGitClone:Release Name : {component.Name}@{component.Version}, stdout:{result?.StdOut}, npm pack stdErr:{result?.StdErr}");
             m_downloadedSourceInfos.Add(new DownloadedSourceInfo() { Name = component.Name, Version = component.Version, DownloadedPath = compressedFilePath, SourceRepoUrl = component.DownloadUrl, TaggedVersion = taggedVersion });
-            component.DownloadUrl = GetSourceRepositoryUrl(component,taggedVersion);
+            component.DownloadUrl = GetSourceRepositoryUrl(component, taggedVersion);
             return compressedFilePath;
         }
         private static string GetSourceRepositoryUrl(ComparisonBomData component, string tag)

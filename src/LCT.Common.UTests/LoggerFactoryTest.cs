@@ -1,7 +1,12 @@
-﻿using NUnit.Framework;
-using LCT.Common;
-using System.Reflection;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2025 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+
 using log4net;
+using NUnit.Framework;
+using System.Reflection;
 
 namespace LCT.Common.UTest
 {

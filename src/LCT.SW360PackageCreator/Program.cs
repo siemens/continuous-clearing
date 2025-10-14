@@ -8,7 +8,6 @@ using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Common.ComplianceValidator;
 using LCT.Common.Constants;
-using LCT.Common.Interface;
 using LCT.Common.Logging;
 using LCT.Common.Model;
 using LCT.Facade;
@@ -18,7 +17,6 @@ using LCT.Services.Interface;
 using LCT.SW360PackageCreator.Interfaces;
 using log4net;
 using log4net.Core;
-using NuGet.Protocol.Plugins;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -78,7 +76,7 @@ namespace LCT.SW360PackageCreator
                 Logger.Logger.Log(null, Level.Alert, $"Package creator is running in TEST mode \n", null);
             var bomFilePath = Path.Combine(appSettings.Directory.OutputFolder, appSettings.SW360.ProjectName + "_" + FileConstant.BomFileName);
             ListofPerametersForCli listofPerameters = new ListofPerametersForCli();
-            LoggerHelper.LogInputParameters(caToolInformation,appSettings,listofPerameters,exeType: Dataconstant.Creator, bomFilePath: bomFilePath);
+            LoggerHelper.LogInputParameters(caToolInformation, appSettings, listofPerameters, exeType: Dataconstant.Creator, bomFilePath: bomFilePath);
 
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);

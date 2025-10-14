@@ -104,7 +104,7 @@ namespace LCT.SW360PackageCreator.UTest
                 DownloadUrl = "https://github.com/jonas-schievink/adler.git"
             };
             IDictionary<string, IPackageDownloader> _packageDownloderList = new Dictionary<string, IPackageDownloader>
-    {        
+    {
         { "NPM", new PackageDownloader() }
     };
             var creatorHelper = new CreatorHelper(_packageDownloderList);

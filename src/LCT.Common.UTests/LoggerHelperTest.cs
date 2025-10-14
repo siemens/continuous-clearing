@@ -1,12 +1,17 @@
-﻿using NUnit.Framework;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2025 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+
+using CycloneDX.Models;
 using LCT.Common.Logging;
 using LCT.Common.Model;
-using CycloneDX.Models;
-using System.Collections.Generic;
+using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Text;
 
 namespace LCT.Common.UTest
 {
@@ -108,7 +113,7 @@ namespace LCT.Common.UTest
         public void WriteToConsoleTable_CoversAllBranches()
         {
             KpiNames kpiNames = new KpiNames();
-            
+
             var printData = new Dictionary<string, int>
             {
                 { "Feature1", 10 },
@@ -122,7 +127,7 @@ namespace LCT.Common.UTest
             };
             LoggerFactory.UseSpectreConsole = false;
             Assert.DoesNotThrow(() =>
-                LoggerHelper.WriteToConsoleTable(printData, printTimingData, "http://summary.link", "TestExeType",kpiNames)
+                LoggerHelper.WriteToConsoleTable(printData, printTimingData, "http://summary.link", "TestExeType", kpiNames)
             );
         }
 
@@ -145,7 +150,7 @@ namespace LCT.Common.UTest
                 LoggerHelper.WriteToSpectreConsoleTable(printData, printTimingData, "http://summary.link", "TestExeType", kpiNames)
             );
         }
-        
+
 
         [Test]
         public void WriteInternalComponentsTableInCli_CoversBothBranches()
@@ -240,7 +245,7 @@ namespace LCT.Common.UTest
                 LoggerHelper.WriteComponentsWithoutDownloadURLByUseingSpectreToKpi(componentInfo, lstReleaseNotCreated, "http://sw360/", lstReleaseNotCreated)
             );
             Assert.DoesNotThrow(() =>
-                LoggerHelper.WriteComponentsWithoutDownloadURLByUseingSpectreToKpi(new List<ComparisonBomData>(), new List<Components>(), "http://sw360/",lstReleaseNotCreated)
+                LoggerHelper.WriteComponentsWithoutDownloadURLByUseingSpectreToKpi(new List<ComparisonBomData>(), new List<Components>(), "http://sw360/", lstReleaseNotCreated)
             );
         }
 
@@ -294,6 +299,6 @@ namespace LCT.Common.UTest
                 LoggerHelper.WriteComponentsWithoutDownloadURLToKpi(new List<ComparisonBomData>(), new List<Components>(), "http://sw360/", lstReleaseNotCreated)
             );
         }
-        
+
     }
 }

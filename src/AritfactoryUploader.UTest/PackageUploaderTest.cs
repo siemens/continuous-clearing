@@ -5,13 +5,11 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using ArtifactoryUploader;
-using CycloneDX.Models;
 using LCT.APICommunications;
 using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
 using LCT.ArtifactoryUploader;
 using LCT.Common;
-using LCT.Common.Constants;
 using LCT.Common.Model;
 using LCT.Facade;
 using LCT.Facade.Interfaces;
@@ -21,7 +19,6 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
 using UnitTestUtilities;
 
