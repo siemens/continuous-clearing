@@ -1,3 +1,9 @@
+// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2025 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+
 using CycloneDX.Models;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;

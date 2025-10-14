@@ -1,4 +1,10 @@
-﻿using LCT.Common.Interface;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2025 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+
+using LCT.Common.Interface;
 using Moq;
 using NUnit.Framework;
 using System.IO;
