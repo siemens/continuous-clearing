@@ -59,7 +59,7 @@
 
 
 # Introduction
-Welcome to the Continuous Clearing Tool, your automated solution for streamlining the SW360 clearing process. Designed with Project Managers and Developers in mind, this tool efficiently manages third-party components across various platforms, including NPM, NuGet, Maven, Python, Conan, Alpine, and Debian.
+Welcome to the Continuous Clearing Tool, your automated solution for streamlining the SW360 clearing process. Designed with Project Managers and Developers in mind, this tool efficiently manages third-party components across various platforms, including npm, NuGet, Maven, Python, Conan, Cargo, Alpine, and Debian.
 
 ## Key Features
 - **Automated Scanning and Identification**: The tool automatically scans and identifies third-party components in your projects.
@@ -77,17 +77,17 @@ Simply integrate the Continuous Clearing Tool into your project workflow to expe
 
 # Continuous Clearing Tool workflow diagram
 * Package Identifier
-  * [NPM/NUGET/MAVEN/PYTHON/CONAN](../usagedocimg/packageIdentifiernpmnuget.PNG)
+  * [npm/NuGet/Maven/Python/Conan/Cargo](../usagedocimg/packageIdentifiernpmnuget.PNG)
   * [Debian/Alpine](../usagedocimg/packageIdentifierdebianalpine.PNG)
   * [BasicSBOM](../usagedocimg/PackageidentifierBasicSBOMflowdiagram.png)
  
 * SW360 Package Creator
-  * [NPM/NUGET/MAVEN/PYTHON/CONAN](../usagedocimg/packageCreatirnpmnuget.PNG)
+  * [npm/NuGet/Maven/Python/Conan/Cargo](../usagedocimg/packageCreatirnpmnuget.PNG)
   * [Debian](../usagedocimg/packagecreatordebian.PNG)
   * [Alpine](../usagedocimg/ComponentcreaterforAlpine.PNG)
 
 * Artifactory Uploader
-  * [NPM/NUGET/MAVEN/PYTHON/CONAN](../usagedocimg/artifactoryuploader.PNG)
+  * [npm/NuGet/Maven/Python/Conan/Cargo](../usagedocimg/artifactoryuploader.PNG)
 
 # Prerequisite
 To ensure a smooth operation of the Continuous Clearing Tool, please follow these prerequisites:
@@ -161,12 +161,12 @@ Users have the flexibility to generate a basic SBOM even if connections to SW360
 ### **Prerequisite for Continuous Clearing Tool execution**
 * Input files according to project type
 
-  * **Project Type :** **NPM**
+  * **Project Type :** **npm**
 
     * Input file repository should contain **package-lock.json** file. If not present do an npm install.
       ![folderpic](../usagedocimg/npminstall.PNG)
 
-  * **Project Type :** **Nuget**
+  * **Project Type :** **NuGet**
 
     * .Net core/.Net standard type project's input file repository should contain **project.assets.json** file. If not present do a dotnet restore.
 
@@ -194,8 +194,29 @@ Users have the flexibility to generate a basic SBOM even if connections to SW360
     * Input file repository should contain **poetry.lock** file.
 
   * **Project Type :** **Conan**
+    * Input file repository should contain ***.dep.json** file.
 
-    * Input file repository should contain **conan.lock** file.
+    * **Note** :Only Conan v2 is supported.
+    
+    * If you previously used `conan.lock` files with Conan v1, you now need to generate `*.dep.json` files using the `conan graph info`.
+    
+    * To generate the required dependency graph file for Conan v2 projects, run the following command in your project directory where conanfile.py is present:    ```
+  conan graph info . -f json > conan.dep.json 
+    
+    * file name should end with dep.json as appSettings.json is configured to pick files with *.dep.json suffix
+    
+    *  user can change the file pattern if required in the app settings
+   
+  * **Project Type :** **Cargo**
+ 
+    * Run the command given below (i.e., To generate a metadata file for your project, run the following command in your project directory (where your Cargo.toml is located)) .
+
+    * For creating metadata.json file you can use the format version 1.
+ 
+     **Example**: cargo metadata --format-version 1 > cargo.metadata.json
+         After successful execution, *.metadata.json file will be created in specified directory .
+    
+         Resulted cargo.metadata.json file will be having the list of installed packages  and the same file will be used as  an input to Continuous clearing tool -    Package identifier via the input directory parameter. The remaining process is same as other project types.
 
   * **Project Type :**  **Debian & Alpine**
 
@@ -239,6 +260,7 @@ example.spdx.sbom.json.pem # Public certificate file
 2. For each SBOM file, it locates corresponding `.sig` and `.pem` files
 3. Performs signature verification using the public certificate
 
+
 ### **Configuring the Continuous Clearing Tool**
 
 Arguments can be provided to the tool in two ways :
@@ -254,7 +276,7 @@ Description for the settings in appSettings.json file
 | S.No | Argument Name                             | Description                                                   | Mandatory | Example                                                                  |
 | ---- | ----------------------------------------- | ------------------------------------------------------------- | --------------- | ------------------------------------------------------------------------ |
 | 1    | TimeOut                                   | Timeout in seconds                                            | No              | 400                                                                      |
-| 2    | ProjectType                               | Type of the project                                           | Yes             | `Nuget`, `NPM`, `Poetry`, `Conan`, `Alpine`, `Debian`, `Maven`                         |
+| 2    | ProjectType                               | Type of the project                                           | Yes             | `NuGet`, `npm`, `Poetry`, `Conan`, `Alpine`, `Debian`, `Maven`, `Cargo`                      |
 | 3    | MultipleProjectType                       | Whether multiple project types are supported                  | No              | `False`                                                                    |
 | 4    | Telemetry.Enable                          | Enable telemetry                                              | No              | `False`                                                                    |
 | 5    | Telemetry.ApplicationInsightsConnectionString | Application Insights instrumentation key                      | No              | `123-456-789-123-123`                                                     |
@@ -396,19 +418,19 @@ When the JFrogDryRun is set to False, it indicates a shift towards deployment in
 
 # How to handle multiple project types in same project
 
-Incase your project has both NPM/Nuget or other components it can be handled by merely running then Package Identifier dll multiple times and generating a sinle SBOM.
+Incase your project has both npm/NuGet or other components it can be handled by merely running then Package Identifier dll multiple times and generating a sinle SBOM.
 
 ### Example Steps for Execution:
 
-1. Run the Package Identifier dll with "**ProjectType**" set as "**NPM**".
+1. Run the Package Identifier dll with "**ProjectType**" set as "**npm**".
 
 2. A cycloneDX  BOM will be generated in the output directory path that you have provided.
 
-3. Next run the Package Identifier dll with "**ProjectType**" set as "**NUGET**". In this run make sure that along with the usual arguments you also provide and additional argument "**--MultipleProjectType**" as True.
+3. Next run the Package Identifier dll with "**ProjectType**" set as "**NuGet**". In this run make sure that along with the usual arguments you also provide and additional argument "**--MultipleProjectType**" as True.
 
 Note: Do not change the output directories during the multiple runs as the tool automatically picks up the previosly generated SBOM and combines it.
 
-4. Once this is done after the dll run you can find that the components from the first run for "**NPM**" and the components from second run for "**NUGET**" will be merged into one BOM file
+4. Once this is done after the dll run you can find that the components from the first run for "**npm**" and the components from second run for "**NuGet**" will be merged into one BOM file
 
 5. The remaining steps for the package creator and artifactory uploader remains the same.
 
@@ -455,7 +477,7 @@ The sample default app settings file is located at templates\sample-default-app-
     sw360ProjectId: '$(sw360ProjectID)'
     sw360ProjectName: 'My Project'
     projectDefinitions:
-    - projectType: 'nuget'
+    - projectType: 'NuGet'
       inputFolder: $(Build.SourcesDirectory)/src
       exclude: 'Test'
     outputFolder: '$(Build.SourcesDirectory)/output'
@@ -485,7 +507,7 @@ The `projectDefinitions` parameter accepts an array of objects with project-spec
 ```yaml
 
 projectDefinitions:
-- projectType: 'nuget'               # Mandatory - Project type (nuget, debian, npm, etc.)
+- projectType: 'NuGet'               # Mandatory - Project type (NuGet, Debian, npm, etc.)
   inputFolder: '/path/to/input'      # Mandatory - Folder containing project files
   exclude: 'Test;Temp'               # Optional - semicolon-separated exclusion list
 
@@ -496,7 +518,7 @@ For Docker/image-based scanning, additional parameters are available:
 ```yaml
 
 projectDefinitions:
-- projectType: 'debian' # Mandatory - Project type (nuget, debian, npm, etc.)
+- projectType: 'Debian' # Mandatory - Project type (NuGet, Debian, npm, etc.)
   inputFolder: '/path/to/input' # Mandatory - Folder containing project files
   imageName: 'debian'                # Mandatory - Only if you want to run against an image on the machine
   imageVersion: 'bookworm-slim'      # Optional  - Version of the Docker image, by default will use the latest image tag

@@ -4,6 +4,8 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+// Ignore Spelling: Canonicalize
+
 using CycloneDX.Models;
 using LCT.Common.Constants;
 using LCT.Common.Model;
@@ -27,7 +29,7 @@ namespace LCT.Common
     /// </summary>
     public static class CommonHelper
     {
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly char[] InvalidProjectNameChars = new char[] { '/', '\\', '.' };
         public static string ProjectSummaryLink { get; set; }
         public static string DefaultLogPath { get; set; }
@@ -111,120 +113,7 @@ namespace LCT.Common
                 throw new ArgumentException($"Invalid value for {name} - {value}");
             }
         }
-
-        public static void WriteToConsoleTable(Dictionary<string, int> printData, Dictionary<string, double> printTimingData)
-        {
-            const string Count = "Count";
-            const string Feature = "Feature";
-            const string TimeTakenBy = "Time Taken By";
-            Logger.Info("\n");
-            Logger.Info("Summary :\n");
-            if (!string.IsNullOrWhiteSpace(ProjectSummaryLink)) { Logger.Info($"{ProjectSummaryLink}"); }
-            Logger.Info($"{"=",5}{string.Join("", Enumerable.Repeat("=", 88)),5}");
-            Logger.Info($"{"|",5}{Feature,-70} {"|",5} {Count,5} {"|",5}");
-            Logger.Info($"{"=",5}{string.Join("", Enumerable.Repeat("=", 88)),5}");
-            foreach (var item in printData)
-            {
-                if (item.Key == "Packages Not Uploaded Due To Error" || item.Key == "Packages Not Existing in Remote Cache")
-                {
-                    if (item.Value > 0)
-                    {
-                        Logger.Error($"{"|",5}{item.Key,-70} {"|",5} {item.Value,5} {"|",5}");
-                        Logger.Error($"{"-",5}{string.Join("", Enumerable.Repeat("-", 88)),5}");
-                    }
-                    else
-                    {
-                        Logger.Info($"{"|",5}{item.Key,-70} {"|",5} {item.Value,5} {"|",5}");
-                        Logger.Info($"{"-",5}{string.Join("", Enumerable.Repeat("-", 88)),5}");
-                    }
-                }
-                else
-                {
-
-                    Logger.Info($"{"|",5}{item.Key,-70} {"|",5} {item.Value,5} {"|",5}");
-                    Logger.Info($"{"-",5}{string.Join("", Enumerable.Repeat("-", 88)),5}");
-                }
-
-            }
-
-            foreach (var item in printTimingData)
-            {
-                Logger.Info($"\n{TimeTakenBy,8} {item.Key,-5} {":",1} {item.Value,8} s\n");
-            }
-        }
-
-        public static void WriteComponentsWithoutDownloadURLToKpi(List<ComparisonBomData> componentInfo, List<Components> lstReleaseNotCreated, string sw360URL)
-        {
-            const string Name = "Name";
-            const string Version = "Version";
-            const string URL = "SW360 Release URL";
-            if (componentInfo.Count > 0 || lstReleaseNotCreated.Count > 0)
-            {
-                Logger.Logger.Log(null, Level.Alert, "Action Item required by the user:\n", null);
-                EnvironmentHelper environmentHelper = new EnvironmentHelper();
-                environmentHelper.CallEnvironmentExit(2);
-            }
-
-            if (componentInfo.Count > 0)
-            {
-                Logger.Logger.Log(null, Level.Alert, "* List of components without source download URL :", null);
-                Logger.Logger.Log(null, Level.Alert, " Update the source download URL & Upload the source code manually if the SRC attachment is missing for the component", null);
-
-                Logger.Logger.Log(null, Level.Alert, $"{"=",5}{string.Join("", Enumerable.Repeat("=", 206)),5}", null);
-                Logger.Logger.Log(null, Level.Alert, $"{"|",5}{Name,-45} {"|",5} {Version,25} {"|",5}  {URL,-120}  {"|",-4}", null);
-                Logger.Logger.Log(null, Level.Alert, $"{"=",5}{string.Join("", Enumerable.Repeat("=", 206)),5}", null);
-
-                foreach (var item in componentInfo)
-                {
-                    string Link = Sw360URL(sw360URL, item.ReleaseID);
-                    Logger.Logger.Log(null, Level.Alert, $"{"|",5}{item.Name,-45} {"|",5} {item.Version,25} {"|",5} {Link,-120} {"|",-5}", null);
-                    Logger.Logger.Log(null, Level.Alert, $"{"-",5}{string.Join("", Enumerable.Repeat("-", 206)),5}", null);
-                }
-
-                Logger.Info("\n");
-            }
-
-            if (lstReleaseNotCreated.Count > 0)
-            {
-                Logger.Logger.Log(null, Level.Alert, "* List of components or releases not created in SW360 :", null);
-                Logger.Logger.Log(null, Level.Alert, "  There could be network/SW360/FOSSology server problem. Check and Re-Run the pipeline.Check the logs for more details", null);
-                Logger.Logger.Log(null, Level.Alert, $"{"=",5}{string.Join("", Enumerable.Repeat("=", 86)),5}", null);
-                Logger.Logger.Log(null, Level.Alert, $"{"|",5}{Name,45} {"|",5} {Version,25} {"|",8}", null);
-                Logger.Logger.Log(null, Level.Alert, $"{"=",5}{string.Join("", Enumerable.Repeat("=", 86)),5}", null);
-
-                foreach (var item in lstReleaseNotCreated)
-                {
-                    Logger.Logger.Log(null, Level.Alert, $"{"|",5}{item.Name,-45} {"|",5} {item.Version,25} {"|",8}", null);
-                    Logger.Logger.Log(null, Level.Alert, $"{"-",5}{string.Join("", Enumerable.Repeat("-", 86)),5}", null);
-                }
-                Logger.Info("\n");
-            }
-        }
-
-        public static void WriteComponentsNotLinkedListInConsole(List<Components> components)
-        {
-            const string Name = "Name";
-            const string Version = "Version";
-
-            if (components.Count > 0)
-            {
-                EnvironmentHelper environmentHelper = new EnvironmentHelper();
-                environmentHelper.CallEnvironmentExit(2);
-                Logger.Logger.Log(null, Level.Alert, "* Components Not linked to project :", null);
-                Logger.Logger.Log(null, Level.Alert, " Can be linked manually OR Check the Logs AND RE-Run", null);
-                Logger.Logger.Log(null, Level.Alert, $"{"=",5}{string.Join("", Enumerable.Repeat("=", 98)),5}", null);
-                Logger.Logger.Log(null, Level.Alert, $"{"|",5}{Name,-45} {"|",5} {Version,35} {"|",10}", null);
-                Logger.Logger.Log(null, Level.Alert, $"{"=",5}{string.Join("", Enumerable.Repeat("=", 98)),5}", null);
-
-                foreach (var item in components)
-                {
-                    Logger.Logger.Log(null, Level.Alert, $"{"|",5}{item.Name,-45} {"|",5} {item.Version,35} {"|",10}", null);
-                    Logger.Logger.Log(null, Level.Alert, $"{"-",5}{string.Join("", Enumerable.Repeat("-", 98)),5}", null);
-                }
-                Logger.Info("\n");
-            }
-        }
-
+        
         public static bool ComponentPropertyCheck(Component component, string constant)
         {
             if (component.Properties == null)
@@ -280,7 +169,8 @@ namespace LCT.Common
         { "NUGET", () => appSettings.Nuget },
         { "POETRY", () => appSettings.Poetry },
         { "DEBIAN", () => appSettings.Debian },
-        { "MAVEN", () => appSettings.Maven }
+        { "MAVEN", () => appSettings.Maven },
+        { "CARGO", () => appSettings.Cargo }
     };
             if (projectTypeMappings.TryGetValue(appSettings.ProjectType.ToUpperInvariant(), out var getConfig))
             {
@@ -552,19 +442,23 @@ namespace LCT.Common
             properties.RemoveAll(p => p.Name == propertyName);
             properties.Add(new Property { Name = propertyName, Value = propertyValue });
         }
+        public static string Sw360URL(string sw360Env, string releaseId)
+        {
+            string sw360URL = $"{sw360Env}{"/group/guest/components/-/component/release/detailRelease/"}{releaseId}";
+            return sw360URL;
+        }
+        public static string Sw360ComponentURL(string sw360Env, string componentId)
+        {
+            string sw360URL = $"{sw360Env}{"/group/guest/components/-/component/detail/"}{componentId}";
+            return sw360URL;
+        }
         #endregion
 
         #region private
         private static string WildcardToRegex(string wildcard)
         {
             return "^" + Regex.Escape(wildcard).Replace("\\*", ".*") + "$";
-        }
-
-        private static string Sw360URL(string sw360Env, string releaseId)
-        {
-            string sw360URL = $"{sw360Env}{"/group/guest/components/-/component/release/detailRelease/"}{releaseId}";
-            return sw360URL;
-        }
+        }       
 
         private static void AddExcludedComponentsPropertyFromPurl(List<Component> ComponentList, List<string> ExcludedComponentsFromPurl, ref int noOfExcludedComponents)
         {
@@ -616,10 +510,7 @@ namespace LCT.Common
                 }
             }
         }
-        public static Component CreateComponentWithProperties(
-    string name,
-    string version,
-    string releaseExternalId)
+        public static Component CreateComponentWithProperties(string name,string version,string releaseExternalId)
         {
             Component component = new Component
             {
@@ -630,6 +521,24 @@ namespace LCT.Common
                 Type = Component.Classification.Library
             };
             return component;
+        }
+        public static string CanonicalizeProjectType(string projectType)
+        {
+            if (string.IsNullOrWhiteSpace(projectType))
+                return projectType;
+
+            return projectType.Trim().ToUpperInvariant() switch
+            {
+                "POETRY" => "Poetry",
+                "CARGO" => "Cargo",
+                "CONAN" => "Conan",
+                "DEBIAN" => "Debian",
+                "MAVEN" => "Maven",
+                "NPM" => "npm",
+                "NUGET" => "NuGet",
+                "ALPINE" => "Alpine",
+                _ => projectType.Trim(),
+            };
         }
         #endregion
     }

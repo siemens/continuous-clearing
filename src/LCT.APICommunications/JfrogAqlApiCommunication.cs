@@ -44,6 +44,23 @@ namespace LCT.APICommunications
             return await httpClient.GetAsync(url);
         }
 
+        private async Task<HttpResponseMessage> GetComponentDataByRepo(string repoName, string includeFields)
+        {
+            string aqlQueryToBody = BuildSimpleAqlQuery(repoName, includeFields);
+            string uri = $"{DomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}";
+            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
+            TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
+            httpClient.Timeout = timeOutInSec;
+            HttpContent httpContent = new StringContent(aqlQueryToBody);
+            return await httpClient.PostAsync(uri, httpContent);
+        }
+
+        private static string BuildSimpleAqlQuery(string repoName, string includeFields)
+        {
+            // Helper to build simple AQL queries for repo and include fields
+            return $"items.find({{\"repo\":\"{repoName}\"}}).include({includeFields})";
+        }
+
         /// <summary>
         /// Gets the Internal Component Data By Repo name
         /// </summary>
@@ -51,51 +68,19 @@ namespace LCT.APICommunications
         /// <returns></returns>
         public async Task<HttpResponseMessage> GetInternalComponentDataByRepo(string repoName)
         {
-            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-            TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
-            httpClient.Timeout = timeOutInSec;
-
-            StringBuilder query = new();
-            query.Append("items.find({\"repo\":\"");
-            query.Append($"{repoName}");
-            query.Append("\"}).include(\"repo\", \"path\", \"name\", \"actual_sha1\",\"actual_md5\",\"sha256\")");
-
-            string aqlQueryToBody = query.ToString();
-            string uri = $"{DomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}";
-            HttpContent httpContent = new StringContent(aqlQueryToBody);
-            return await httpClient.PostAsync(uri, httpContent);
+            return await GetComponentDataByRepo(repoName, "\"repo\", \"path\", \"name\", \"actual_sha1\",\"actual_md5\",\"sha256\"");
         }
         public async Task<HttpResponseMessage> GetNpmComponentDataByRepo(string repoName)
         {
-            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-            TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
-            httpClient.Timeout = timeOutInSec;
-
-            StringBuilder query = new();
-            query.Append("items.find({\"repo\":\"");
-            query.Append($"{repoName}");
-            query.Append("\"}).include(\"repo\", \"path\", \"name\",\"@npm.name\",\"@npm.version\", \"actual_sha1\",\"actual_md5\",\"sha256\")");
-
-            string aqlQueryToBody = query.ToString();
-            string uri = $"{DomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}";
-            HttpContent httpContent = new StringContent(aqlQueryToBody);
-            return await httpClient.PostAsync(uri, httpContent);
+            return await GetComponentDataByRepo(repoName, "\"repo\", \"path\", \"name\",\"@npm.name\",\"@npm.version\", \"actual_sha1\",\"actual_md5\",\"sha256\"");
         }
         public async Task<HttpResponseMessage> GetPypiComponentDataByRepo(string repoName)
         {
-            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-            TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
-            httpClient.Timeout = timeOutInSec;
-
-            StringBuilder query = new();
-            query.Append("items.find({\"repo\":\"");
-            query.Append($"{repoName}");
-            query.Append("\"}).include(\"repo\", \"path\", \"name\",\"@pypi.normalized.name\",\"@pypi.version\", \"actual_sha1\",\"actual_md5\",\"sha256\")");
-
-            string aqlQueryToBody = query.ToString();
-            string uri = $"{DomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}";
-            HttpContent httpContent = new StringContent(aqlQueryToBody);
-            return await httpClient.PostAsync(uri, httpContent);
+            return await GetComponentDataByRepo(repoName, "\"repo\", \"path\", \"name\",\"@pypi.normalized.name\",\"@pypi.version\", \"actual_sha1\",\"actual_md5\",\"sha256\"");
+        }
+        public async Task<HttpResponseMessage> GetCargoComponentDataByRepo(string repoName)
+        {
+            return await GetComponentDataByRepo(repoName, "\"repo\", \"path\", \"name\",\"@crate.name\",\"@crate.version\", \"actual_sha1\",\"actual_md5\",\"sha256\"");
         }
 
         /// <summary>
@@ -135,77 +120,55 @@ namespace LCT.APICommunications
 
         public static string BuildAqlQuery(ComponentsToArtifactory component)
         {
-
+            // Use a single helper for repeated AQL query construction
             if (component.ComponentType.Equals("NPM", StringComparison.InvariantCultureIgnoreCase))
             {
-                var queryList = new List<string>
-        {
-            $"\"repo\":{{\"$eq\":\"{component.SrcRepoName}\"}}",
-            $"\"@npm.name\":{{\"$eq\":\"{component.Name}\"}}",
-            $"\"@npm.version\":{{\"$eq\":\"{component.Version}\"}}"
-        };
-
-                // Build the AQL query string
-                StringBuilder query = new();
-                query.Append($"items.find({{{string.Join(", ", queryList)}}}).include(\"repo\", \"path\", \"name\")");
-                return query.ToString();
+                return BuildAqlQueryWithFields(component.SrcRepoName, new[] { ("@npm.name", component.Name), ("@npm.version", component.Version) });
             }
             else if (component.ComponentType.Equals("Python", StringComparison.InvariantCultureIgnoreCase))
             {
-                var queryList = new List<string>
-        {
-            $"\"repo\":{{\"$eq\":\"{component.SrcRepoName}\"}}",
-            $"\"@pypi.normalized.name\":{{\"$eq\":\"{component.Name}\"}}",
-            $"\"@pypi.version\":{{\"$eq\":\"{component.Version}\"}}"
-        };
-
-                // Build the AQL query string
-                StringBuilder query = new();
-                query.Append($"items.find({{{string.Join(", ", queryList)}}}).include(\"repo\", \"path\", \"name\")");
-
-                return query.ToString();
+                return BuildAqlQueryWithFields(component.SrcRepoName, new[] { ("@pypi.normalized.name", component.Name), ("@pypi.version", component.Version) });
             }
             else if (component.ComponentType.Equals("Nuget", StringComparison.InvariantCultureIgnoreCase))
             {
-                // Build the AQL query for NuGet components
-                StringBuilder query = new();
-                query.Append("items.find({");
-                query.Append("\"$and\": [");
-                query.Append($"{{ \"repo\":{{ \"$eq\": \"{component.SrcRepoName}\" }} }},");
-                query.Append("{ \"$or\":[");
-                query.Append($"{{ \"@nuget.id\":{{ \"$eq\": \"{component.Name}\" }} }} ,");
-                query.Append($"{{ \"@nuget.id\":{{ \"$eq\": \"{component.Name.ToLowerInvariant()}\" }} }}");
-                query.Append("] },");
-                query.Append($"{{ \"@nuget.version\":{{\"$eq\": \"{component.Version}\" }} }}");
-                query.Append(']');
-                query.Append("}).include(\"repo\", \"path\", \"name\").limit(1)");
-
-                return query.ToString();
+                // NuGet: $and for repo, $or for id (case), and version
+                return $"items.find({{\"$and\": [{{ \"repo\":{{ \"$eq\": \"{component.SrcRepoName}\" }} }},{{ \"$or\":[{{ \"@nuget.id\":{{ \"$eq\": \"{component.Name}\" }} }},{{ \"@nuget.id\":{{ \"$eq\": \"{component.Name.ToLowerInvariant()}\" }} }}]}},{{ \"@nuget.version\":{{\"$eq\": \"{component.Version}\" }} }}]}}).include(\"repo\", \"path\", \"name\").limit(1)";
+            }
+            else if (component.ComponentType.Equals("Cargo", StringComparison.InvariantCultureIgnoreCase))
+            {
+                // Cargo: $and for repo, $or for name, and version
+                return $"items.find({{\"$and\": [{{ \"repo\":{{ \"$eq\": \"{component.SrcRepoName}\" }} }},{{ \"$or\":[{{ \"@crate.name\":{{ \"$eq\": \"{component.Name}\" }} }},{{ \"@crate.name\":{{ \"$eq\": \"{component.Name.ToLowerInvariant()}\" }} }}]}},{{ \"@crate.version\":{{\"$eq\": \"{component.Version}\" }} }}]}}).include(\"repo\", \"path\", \"name\").limit(1)";
             }
             else
             {
                 var queryList = new List<string>()
-            {
-                $"\"repo\":{{\"$eq\":\"{component.SrcRepoName}\"}}"
-            };
-
+                {
+                    $"\"repo\":{{\"$eq\":\"{component.SrcRepoName}\"}}"
+                };
                 if (!string.IsNullOrEmpty(component.Path))
                 {
-                    queryList.Add($"\"path\":{{\"$match\":\"{component.Path}\"}}");
+                    queryList.Add($"\"path\":{{\"$match\":\"{component.Path}\"}}"
+                    );
                 }
-
                 if (!string.IsNullOrEmpty(component.JfrogPackageName))
                 {
-                    queryList.Add($"\"name\":{{\"$match\":\"{component.JfrogPackageName}\"}}");
+                    queryList.Add($"\"name\":{{\"$match\":\"{component.JfrogPackageName}\"}}"
+                    );
                 }
-
-                StringBuilder query = new();
-                query.Append($"items.find({{{string.Join(", ", queryList)}}}).include(\"repo\", \"path\", \"name\").limit(1)");
-                return query.ToString();
+                return $"items.find({{{string.Join(", ", queryList)}}}).include(\"repo\", \"path\", \"name\").limit(1)";
             }
+        }
 
-
-
+        // Helper for NPM/Python AQL query
+        private static string BuildAqlQueryWithFields(string repoName, (string field, string value)[] fields)
+        {
+            var queryList = new List<string> { $"\"repo\":{{\"$eq\":\"{repoName}\"}}" };
+            foreach (var (field, value) in fields)
+            {
+                queryList.Add($"\"{field}\":{{\"$eq\":\"{value}\"}}"
+                );
+            }
+            return $"items.find({{{string.Join(", ", queryList)}}}).include(\"repo\", \"path\", \"name\")";
         }
 
         private async Task<HttpResponseMessage> ExecuteSearchAqlAsync(string uri, HttpContent httpContent)

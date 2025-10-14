@@ -64,6 +64,15 @@ namespace LCT.Facade
         {
             return await m_jfrogAqlApiCommunication.GetPypiComponentDataByRepo(repoName);
         }
+        /// <summary>
+        /// Gets the Internal Component Data By Repo Name
+        /// </summary>
+        /// <param name="repoName">repoName</param>
+        /// <returns>HttpResponseMessage</returns>
+        public async Task<HttpResponseMessage> GetCargoComponentDataByRepo(string repoName)
+        {
+            return await m_jfrogAqlApiCommunication.GetCargoComponentDataByRepo(repoName);
+        }
 
         /// <summary>
         /// Gets the package information in the repo, via the name or path
