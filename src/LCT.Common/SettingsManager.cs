@@ -6,7 +6,6 @@
 
 using LCT.Common.Interface;
 using log4net;
-using log4net.Core;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;

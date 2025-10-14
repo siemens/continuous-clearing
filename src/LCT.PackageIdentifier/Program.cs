@@ -109,7 +109,7 @@ namespace LCT.PackageIdentifier
             {
                 await ValidateAppsettingsFile(appSettings, projectReleases);
             }
-            
+
             var listParameters = new ListofPerametersForCli
             {
                 InternalRepoList = DisplayInformation.GetInternalRepolist(appSettings),
@@ -118,7 +118,7 @@ namespace LCT.PackageIdentifier
                 ExcludeComponents = DisplayInformation.DisplayExcludeComponents(appSettings)
             };
             LoggerHelper.LogInputParameters(caToolInformation, appSettings, listParameters, Dataconstant.Identifier);
-            
+
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);
 

@@ -146,7 +146,7 @@ namespace LCT.SW360PackageCreator.UTest
         public async Task GetSourceUrlForCargoPackage_NonExistentPackage_ReturnsEmptyString()
         {
             // Arrange
-            var urlHelper = new UrlHelper();            
+            var urlHelper = new UrlHelper();
             string componentName = "this-package-does-not-exist-xyz";
             string componentVersion = "0.0.0";
 

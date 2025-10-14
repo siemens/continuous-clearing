@@ -1,8 +1,6 @@
-﻿using NUnit.Framework;
+﻿using log4net;
 using Moq;
-using LCT.Common;
-using log4net;
-using log4net.Core;
+using NUnit.Framework;
 using System;
 using System.Globalization;
 

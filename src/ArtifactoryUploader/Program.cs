@@ -53,7 +53,7 @@ namespace ArtifactoryUploader
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             string _ = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.ArtifactoryUploaderLog, m_Verbose);
-           
+
             settingsManager.CheckRequiredArgsToRun(appSettings, Dataconstant.Uploader);
             string bomFilePath = GetBomFilePath(appSettings);
             LoggerHelper.SpectreConsoleInitialMessage("Artifactory Uploader");

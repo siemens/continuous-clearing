@@ -14,8 +14,8 @@ using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Security;
-using Level = log4net.Core.Level;
 using Directory = System.IO.Directory;
+using Level = log4net.Core.Level;
 
 namespace LCT.APICommunications
 {
@@ -90,7 +90,7 @@ namespace LCT.APICommunications
                     HttpWebResponse httpResponse = (HttpWebResponse)response;
                     HandleAcceptedStatus(httpResponse, comparisonBomData);
                     using StreamReader reader = new StreamReader(response.GetResponseStream());
-                    reader.ReadToEnd();                    
+                    reader.ReadToEnd();
                 }
             }
             catch (UriFormatException ex)

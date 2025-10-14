@@ -80,9 +80,9 @@ namespace LCT.PackageIdentifier.UTest
             Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             //Act
             Bom listofcomponents = new ConanProcessor(cycloneDXBomParser.Object, spdxBomParser.Object).ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
-            
+
             // Based on Test_Bom.cdx.json, 8 components have development = "true"
-            var devComponents = listofcomponents.Components.Where(x => 
+            var devComponents = listofcomponents.Components.Where(x =>
                 x.Properties.Any(p => p.Name == "internal:siemens:clearing:development" && p.Value == "true")).Count();
 
             //Assert
@@ -201,7 +201,7 @@ namespace LCT.PackageIdentifier.UTest
             Assert.That(0, Is.EqualTo(noOfDevDependent), "Dev dependent count not incremented");
         }
 
-        
+
 
         [Test]
         public async Task IdentificationOfInternalComponents_ReturnsComponentData_Successfully()

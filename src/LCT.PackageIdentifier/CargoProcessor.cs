@@ -10,7 +10,6 @@ using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
-using LCT.Common.Model;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
@@ -44,7 +43,7 @@ namespace LCT.PackageIdentifier
             componentsForBOM = bom.Components;
 
             componentsForBOM = BomHelper.GetExcludedComponentsList(componentsForBOM, Dataconstant.PurlCheck()["CARGO"], appSettings?.ProjectType);
-            componentsForBOM = componentsForBOM.Distinct(new ComponentEqualityComparer()).ToList();           
+            componentsForBOM = componentsForBOM.Distinct(new ComponentEqualityComparer()).ToList();
 
             bom.Components = componentsForBOM;
             bom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(bom.Components, bom.Dependencies);
@@ -52,7 +51,7 @@ namespace LCT.PackageIdentifier
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += ListUnsupportedComponentsForBom.Components.Count;
             ListUnsupportedComponentsForBom.Components = ListUnsupportedComponentsForBom.Components.Distinct(new ComponentEqualityComparer()).ToList();
             BomCreator.bomKpiData.DuplicateComponents += totalUnsupportedComponentsIdentified - ListUnsupportedComponentsForBom.Components.Count;
-            ListUnsupportedComponentsForBom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(ListUnsupportedComponentsForBom.Components, ListUnsupportedComponentsForBom.Dependencies);           
+            ListUnsupportedComponentsForBom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(ListUnsupportedComponentsForBom.Components, ListUnsupportedComponentsForBom.Dependencies);
             AddSiemensDirectProperty(ref ListUnsupportedComponentsForBom);
             unSupportedBomList.Components = ListUnsupportedComponentsForBom.Components;
             unSupportedBomList.Dependencies = ListUnsupportedComponentsForBom.Dependencies;
@@ -195,8 +194,8 @@ namespace LCT.PackageIdentifier
             string nameVerison = string.Empty;
             nameVerison = aqlResultList.FirstOrDefault(x => x.Properties.Any(p => p.Key == "crate.name" && p.Value == name) && x.Properties.Any(p => p.Key == "crate.version" && p.Value == version))?.Name ?? string.Empty;
 
-            if (string.IsNullOrEmpty(nameVerison)) 
-            { 
+            if (string.IsNullOrEmpty(nameVerison))
+            {
                 nameVerison = Dataconstant.PackageNameNotFoundInJfrog;
             }
             return nameVerison;
@@ -312,7 +311,7 @@ namespace LCT.PackageIdentifier
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = componentsForBOM.Count;
             BomHelper.GetDistinctComponentList(ref componentsForBOM);
             BomCreator.bomKpiData.DuplicateComponents = initialCount - componentsForBOM.Count;
-            
+
             bom.Components = componentsForBOM;
 
             if (bom.Dependencies != null)
@@ -346,8 +345,8 @@ namespace LCT.PackageIdentifier
 
                 var idToComponent = new Dictionary<string, Component>();
                 var idToPurl = new Dictionary<string, string>();
-                var purlToDevDependencyKinds = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);                
-                
+                var purlToDevDependencyKinds = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+
                 var excludeIds = (packageDetails.Workspace_members ?? Enumerable.Empty<string>())
                     .Concat(packageDetails.Workspace_default_members ?? Enumerable.Empty<string>())
                     .Distinct(StringComparer.OrdinalIgnoreCase)
@@ -357,7 +356,7 @@ namespace LCT.PackageIdentifier
                 AnalyzeCargoDependencyKindsExcluding(packageDetails, idToPurl, purlToDevDependencyKinds, idToComponent, dependencies, excludeIds);
                 MarkCargoDevelopmentProperties(components, purlToDevDependencyKinds);
                 AddDirectDependencyProperty(packageDetails, components, idToPurl);
-                
+
             }
             catch (FileNotFoundException ex)
             {
@@ -369,7 +368,7 @@ namespace LCT.PackageIdentifier
                 Logger.Error("Exception in reading cargo metadata json file", ex);
                 Logger.Debug($"GetPackagesFromCargoMetadataJson: JSON deserialization error in file: {metadataJsonPath}", ex);
             }
-            
+
         }
         public static void AddDirectDependencyProperty(CargoPackageDetails packageDetails, List<Component> components, Dictionary<string, string> idToPurl)
         {
@@ -399,7 +398,7 @@ namespace LCT.PackageIdentifier
                 component.Properties = properties;
             }
         }
-        private static void ParseCargoPackagesExcluding(CargoPackageDetails packageDetails,List<Component> components,Dictionary<string, Component> idToComponent,Dictionary<string, string> idToPurl,List<string> excludeIds)
+        private static void ParseCargoPackagesExcluding(CargoPackageDetails packageDetails, List<Component> components, Dictionary<string, Component> idToComponent, Dictionary<string, string> idToPurl, List<string> excludeIds)
         {
             if (packageDetails.Packages == null)
                 return;
@@ -439,7 +438,7 @@ namespace LCT.PackageIdentifier
                 return;
 
             foreach (var node in resolve.Nodes)
-            {              
+            {
 
                 ProcessNodeDeps(node, idToPurl, purlToDevDependencyKinds);
 
@@ -500,8 +499,8 @@ namespace LCT.PackageIdentifier
             }
         }
 
-        private static void AddCycloneDXDependencyExcluding(CargoPackageDetails.Node node,Dictionary<string, Component> idToComponent,string parentId,List<Dependency> dependencies,List<string> excludeIds)
-        {           
+        private static void AddCycloneDXDependencyExcluding(CargoPackageDetails.Node node, Dictionary<string, Component> idToComponent, string parentId, List<Dependency> dependencies, List<string> excludeIds)
+        {
 
             var depIds = node.Dependencies ?? new List<string>();
             var subDeps = depIds
@@ -573,7 +572,7 @@ namespace LCT.PackageIdentifier
             }
 
             return false;
-        }       
+        }
 
         private static void AddingIdentifierType(List<Component> components)
         {
@@ -588,7 +587,7 @@ namespace LCT.PackageIdentifier
                 component.Properties = properties;
             }
         }
-       
+
         public static void AddSiemensDirectProperty(ref Bom bom)
         {
             List<string> cargoDirectDependencies = new List<string>();

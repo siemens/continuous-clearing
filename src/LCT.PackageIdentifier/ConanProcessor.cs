@@ -212,7 +212,7 @@ namespace LCT.PackageIdentifier
                 Logger.Warn($"\nTotal Multiple versions detected {conanComponents.Count} and details can be found at {filePath}\n");
             }
         }
-        
+
         private void ParsingInputFileForBOM(CommonAppSettings appSettings, ref Bom bom)
         {
             List<string> configFiles;
@@ -220,7 +220,7 @@ namespace LCT.PackageIdentifier
             List<Component> componentsForBOM = new List<Component>();
             configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Conan);
             List<string> listOfTemplateBomfilePaths = new List<string>();
-            
+
             foreach (string filepath in configFiles)
             {
                 if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
@@ -262,7 +262,7 @@ namespace LCT.PackageIdentifier
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = componentsForBOM.Count;
             BomHelper.GetDistinctComponentList(ref componentsForBOM);
             BomCreator.bomKpiData.DuplicateComponents = initialCount - componentsForBOM.Count;
-            
+
             bom.Components = componentsForBOM;
 
             if (bom.Dependencies != null)
@@ -289,7 +289,7 @@ namespace LCT.PackageIdentifier
             {
                 string jsonContent = File.ReadAllText(filepath);
                 var depJson = JsonConvert.DeserializeObject<ConanDepJson>(jsonContent);
-                
+
                 if (depJson?.Graph?.Nodes == null)
                 {
                     Logger.Warn($"No nodes found in dep.json file: {filepath}");
@@ -297,7 +297,7 @@ namespace LCT.PackageIdentifier
                 }
 
                 var nodePackages = depJson.Graph.Nodes.ToList();
-                
+
                 GetPackagesForBom(ref StartingComponentForBOM, ref noOfDevDependent, nodePackages);
                 GetDependencyDetails(StartingComponentForBOM, nodePackages, dependencies);
 
@@ -322,12 +322,12 @@ namespace LCT.PackageIdentifier
             return StartingComponentForBOM;
         }
 
-        private static void GetPackagesForBom(ref List<Component> StartingComponentForBOM, ref int noOfDevDependent, 
+        private static void GetPackagesForBom(ref List<Component> StartingComponentForBOM, ref int noOfDevDependent,
             List<KeyValuePair<string, ConanPackage>> nodePackages)
         {
             // Get root node to determine direct dependencies
             var rootNode = nodePackages.FirstOrDefault(n => n.Key == "0");
-            
+
             foreach (var node in nodePackages)
             {
                 var nodeId = node.Key;
@@ -393,7 +393,7 @@ namespace LCT.PackageIdentifier
         {
             // For Conan 2.0, dev dependencies are identified by context = "build"
             bool isDev = package.Context == "build";
-            
+
             if (isDev)
             {
                 noOfDevDependent++;
@@ -402,13 +402,13 @@ namespace LCT.PackageIdentifier
             return isDev;
         }
 
-        private static void GetDependencyDetails(List<Component> componentsForBOM, 
+        private static void GetDependencyDetails(List<Component> componentsForBOM,
             List<KeyValuePair<string, ConanPackage>> nodePackages, List<Dependency> dependencies)
         {
             foreach (Component component in componentsForBOM)
             {
                 var node = nodePackages.FirstOrDefault(x => x.Value.Name == component.Name && x.Value.Version == component.Version);
-                
+
                 if (node.Value?.Dependencies == null || node.Value.Dependencies.Count == 0)
                     continue;
 

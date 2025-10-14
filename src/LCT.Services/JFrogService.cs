@@ -84,7 +84,7 @@ namespace LCT.Services
         {
             return await GetComponentDataByRepo(m_JFrogApiCommunicationFacade.GetCargoComponentDataByRepo, repoName);
         }
-        
+
 #nullable enable
         public async Task<AqlResult?> GetPackageInfo(ComponentsToArtifactory component)
         {

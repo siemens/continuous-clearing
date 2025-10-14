@@ -1,8 +1,5 @@
 ﻿using LCT.Common;
-using LCT.Common.Logging;
-using LCT.Common.Model;
 using log4net;
-using log4net.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -115,7 +112,7 @@ namespace LCT.PackageIdentifier
             }
 
             return listOfInternalRepoList;
-        }        
+        }
         public static void LogBomGenerationWarnings(CommonAppSettings appSettings)
         {
             if (appSettings.SW360 == null && appSettings.Jfrog == null)

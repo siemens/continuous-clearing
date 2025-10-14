@@ -57,7 +57,7 @@ namespace LCT.PackageIdentifier
             ParsingInputFileForBOM(appSettings, ref componentsForBOM, ref bom, ref dependencies);
             totalComponentsIdentified = componentsForBOM.Count;
             totalUnsupportedComponentsIdentified = ListUnsupportedComponentsForBom.Components.Count;
-            componentsForBOM = BomHelper.GetExcludedComponentsList(componentsForBOM, Dataconstant.PurlCheck()["NPM"],appSettings?.ProjectType);
+            componentsForBOM = BomHelper.GetExcludedComponentsList(componentsForBOM, Dataconstant.PurlCheck()["NPM"], appSettings?.ProjectType);
             componentsForBOM = componentsForBOM.Distinct(new ComponentEqualityComparer()).ToList();
             ListUnsupportedComponentsForBom.Components = ListUnsupportedComponentsForBom.Components.Distinct(new ComponentEqualityComparer()).ToList();
             BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - componentsForBOM.Count;
@@ -697,7 +697,7 @@ namespace LCT.PackageIdentifier
 
             return $"{aqlResult.Repo}/{aqlResult.Path}/{aqlResult.Name}";
         }
-               
+
 
         private static void AddingIdentifierType(List<Component> components, string identifiedBy, string filePath)
         {

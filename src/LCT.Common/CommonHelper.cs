@@ -20,7 +20,6 @@ using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using File = System.IO.File;
-using Level = log4net.Core.Level;
 
 namespace LCT.Common
 {
@@ -113,7 +112,7 @@ namespace LCT.Common
                 throw new ArgumentException($"Invalid value for {name} - {value}");
             }
         }
-        
+
         public static bool ComponentPropertyCheck(Component component, string constant)
         {
             if (component.Properties == null)
@@ -458,7 +457,7 @@ namespace LCT.Common
         private static string WildcardToRegex(string wildcard)
         {
             return "^" + Regex.Escape(wildcard).Replace("\\*", ".*") + "$";
-        }       
+        }
 
         private static void AddExcludedComponentsPropertyFromPurl(List<Component> ComponentList, List<string> ExcludedComponentsFromPurl, ref int noOfExcludedComponents)
         {
@@ -510,7 +509,7 @@ namespace LCT.Common
                 }
             }
         }
-        public static Component CreateComponentWithProperties(string name,string version,string releaseExternalId)
+        public static Component CreateComponentWithProperties(string name, string version, string releaseExternalId)
         {
             Component component = new Component
             {

@@ -367,7 +367,7 @@ namespace AritfactoryUploader.UTest
             List<ComponentsToArtifactory> uploadList = await UploadToArtifactory.GetComponentsToBeUploadedToArtifactory(componentLists, commonAppSettings, displayPackagesInfo);
             // Assert
             Assert.That(4, Is.EqualTo(uploadList.Count), "Checks for 4  no of components to upload");
-            Assert.That("com/github/ulisesbocchio/jasypt-spring-boot-starter/3.0.5", Is.EqualTo(uploadList[3].Path),"checks for path of maven component");
+            Assert.That("com/github/ulisesbocchio/jasypt-spring-boot-starter/3.0.5", Is.EqualTo(uploadList[3].Path), "checks for path of maven component");
         }
         [Test]
         public async Task GetComponentsToBeUploadedToArtifactory_GivenNotApprovedComponentList_ReturnsUploadList()
@@ -784,7 +784,7 @@ namespace AritfactoryUploader.UTest
                 Name = "jasypt-spring-boot-starter",
                 Version = "3.0.5",
                 Purl = "pkg:maven/com.github.ulisesbocchio/jasypt-spring-boot-starter@3.0.5",
-                Group= "com.github.ulisesbocchio",
+                Group = "com.github.ulisesbocchio",
                 Properties = new List<Property>()
             };
             comp5.Properties.Add(propinternal);
@@ -793,22 +793,22 @@ namespace AritfactoryUploader.UTest
             return componentLists;
         }
     }
-// ...existing code...
+    // ...existing code...
 
-[TestFixture]
-public class GetArtifactoryRepoNameTests
-{
-    [Test]
-    public void GetArtifactoryRepoName_PyPiComponent_MatchesNameAndVersion_ReturnsAqlResult()
+    [TestFixture]
+    public class GetArtifactoryRepoNameTests
     {
-        // Arrange
-        var component = new Component
+        [Test]
+        public void GetArtifactoryRepoName_PyPiComponent_MatchesNameAndVersion_ReturnsAqlResult()
         {
-            Purl = "pkg:pypi/example-package@1.0.0",
-            Name = "example-package",
-            Version = "1.0.0"
-        };
-        var aqlResultList = new List<AqlResult>
+            // Arrange
+            var component = new Component
+            {
+                Purl = "pkg:pypi/example-package@1.0.0",
+                Name = "example-package",
+                Version = "1.0.0"
+            };
+            var aqlResultList = new List<AqlResult>
         {
             new AqlResult
             {
@@ -820,28 +820,28 @@ public class GetArtifactoryRepoNameTests
             }
         };
 
-        // Act
-        var result = typeof(UploadToArtifactory)
-            .GetMethod("GetArtifactoryRepoName", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
-            .Invoke(null, new object[] { aqlResultList, component }) as AqlResult;
+            // Act
+            var result = typeof(UploadToArtifactory)
+                .GetMethod("GetArtifactoryRepoName", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+                .Invoke(null, new object[] { aqlResultList, component }) as AqlResult;
 
-        // Assert
-        Assert.IsNotNull(result);
-        Assert.AreEqual("example-package", result.Properties[0].Value);
-        Assert.AreEqual("1.0.0", result.Properties[1].Value);
-    }
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("example-package", result.Properties[0].Value);
+            Assert.AreEqual("1.0.0", result.Properties[1].Value);
+        }
 
-    [Test]
-    public void GetArtifactoryRepoName_NpmComponent_MatchesNameAndVersion_ReturnsAqlResult()
-    {
-        // Arrange
-        var component = new Component
+        [Test]
+        public void GetArtifactoryRepoName_NpmComponent_MatchesNameAndVersion_ReturnsAqlResult()
         {
-            Purl = "pkg:npm/example-npm@2.0.0",
-            Name = "example-npm",
-            Version = "2.0.0"
-        };
-        var aqlResultList = new List<AqlResult>
+            // Arrange
+            var component = new Component
+            {
+                Purl = "pkg:npm/example-npm@2.0.0",
+                Name = "example-npm",
+                Version = "2.0.0"
+            };
+            var aqlResultList = new List<AqlResult>
         {
             new AqlResult
             {
@@ -853,28 +853,28 @@ public class GetArtifactoryRepoNameTests
             }
         };
 
-        // Act
-        var result = typeof(UploadToArtifactory)
-            .GetMethod("GetArtifactoryRepoName", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
-            .Invoke(null, new object[] { aqlResultList, component }) as AqlResult;
+            // Act
+            var result = typeof(UploadToArtifactory)
+                .GetMethod("GetArtifactoryRepoName", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+                .Invoke(null, new object[] { aqlResultList, component }) as AqlResult;
 
-        // Assert
-        Assert.IsNotNull(result);
-        Assert.AreEqual("example-npm", result.Properties[0].Value);
-        Assert.AreEqual("2.0.0", result.Properties[1].Value);
-    }
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("example-npm", result.Properties[0].Value);
+            Assert.AreEqual("2.0.0", result.Properties[1].Value);
+        }
 
-    [Test]
-    public void GetArtifactoryRepoName_CargoComponent_MatchesNameAndVersion_ReturnsAqlResult()
-    {
-        // Arrange
-        var component = new Component
+        [Test]
+        public void GetArtifactoryRepoName_CargoComponent_MatchesNameAndVersion_ReturnsAqlResult()
         {
-            Purl = "pkg:cargo/example-cargo@3.0.0",
-            Name = "example-cargo",
-            Version = "3.0.0"
-        };
-        var aqlResultList = new List<AqlResult>
+            // Arrange
+            var component = new Component
+            {
+                Purl = "pkg:cargo/example-cargo@3.0.0",
+                Name = "example-cargo",
+                Version = "3.0.0"
+            };
+            var aqlResultList = new List<AqlResult>
         {
             new AqlResult
             {
@@ -886,74 +886,74 @@ public class GetArtifactoryRepoNameTests
             }
         };
 
-        // Act
-        var result = typeof(UploadToArtifactory)
-            .GetMethod("GetArtifactoryRepoName", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
-            .Invoke(null, new object[] { aqlResultList, component }) as AqlResult;
+            // Act
+            var result = typeof(UploadToArtifactory)
+                .GetMethod("GetArtifactoryRepoName", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+                .Invoke(null, new object[] { aqlResultList, component }) as AqlResult;
 
-        // Assert
-        Assert.IsNotNull(result);
-        Assert.AreEqual("example-cargo", result.Properties[0].Value);
-        Assert.AreEqual("3.0.0", result.Properties[1].Value);
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("example-cargo", result.Properties[0].Value);
+            Assert.AreEqual("3.0.0", result.Properties[1].Value);
+        }
     }
-}
 
-[TestFixture]
-public class GetComponentsToBeUploadedToArtifactoryTests
-{
-    [Test]
-    public async Task GetComponentsToBeUploadedToArtifactory_CargoComponent_ReturnsCorrectComponentType()
+    [TestFixture]
+    public class GetComponentsToBeUploadedToArtifactoryTests
     {
-        // Arrange
-        var cargoComponent = new Component
+        [Test]
+        public async Task GetComponentsToBeUploadedToArtifactory_CargoComponent_ReturnsCorrectComponentType()
         {
-            Name = "my-cargo-crate",
-            Version = "1.0.0",
-            Purl = "pkg:cargo/my-cargo-crate@1.0.0",
-            Properties = new List<Property>
+            // Arrange
+            var cargoComponent = new Component
+            {
+                Name = "my-cargo-crate",
+                Version = "1.0.0",
+                Purl = "pkg:cargo/my-cargo-crate@1.0.0",
+                Properties = new List<Property>
             {
                 new Property { Name = Dataconstant.Cdx_ClearingState, Value = "APPROVED" },
                 new Property { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = "cargo-src-repo" }
             }
-        };
+            };
 
-        var comparisonBomData = new List<Component> { cargoComponent };
-        var appSettings = new CommonAppSettings
-        {
-            Jfrog = new Jfrog { DryRun = false, URL = "https://jfrog.example.com", Token = "test-token" },
-            Cargo = new Config
+            var comparisonBomData = new List<Component> { cargoComponent };
+            var appSettings = new CommonAppSettings
             {
-                ReleaseRepo = "cargo-release",
-                DevDepRepo = "cargo-dev",
-                Artifactory = new Artifactory
+                Jfrog = new Jfrog { DryRun = false, URL = "https://jfrog.example.com", Token = "test-token" },
+                Cargo = new Config
                 {
-                    ThirdPartyRepos = new List<ThirdPartyRepo>
+                    ReleaseRepo = "cargo-release",
+                    DevDepRepo = "cargo-dev",
+                    Artifactory = new Artifactory
+                    {
+                        ThirdPartyRepos = new List<ThirdPartyRepo>
                     {
                         new ThirdPartyRepo { Name = "cargo-third-party", Upload = true }
                     }
+                    }
                 }
-            }
-        };
-        var displayPackagesInfo = new DisplayPackagesInfo();
+            };
+            var displayPackagesInfo = new DisplayPackagesInfo();
 
-        // Mock JFrog service
-        var mockJFrogService = new Mock<IJFrogService>();
-        mockJFrogService.Setup(x => x.GetCargoComponentDataByRepo(It.IsAny<string>()))
-                       .ReturnsAsync(new List<AqlResult>());
-        UploadToArtifactory.JFrogService = mockJFrogService.Object;
+            // Mock JFrog service
+            var mockJFrogService = new Mock<IJFrogService>();
+            mockJFrogService.Setup(x => x.GetCargoComponentDataByRepo(It.IsAny<string>()))
+                           .ReturnsAsync(new List<AqlResult>());
+            UploadToArtifactory.JFrogService = mockJFrogService.Object;
 
-        // Act
-        var result = await UploadToArtifactory.GetComponentsToBeUploadedToArtifactory(comparisonBomData, appSettings, displayPackagesInfo);
+            // Act
+            var result = await UploadToArtifactory.GetComponentsToBeUploadedToArtifactory(comparisonBomData, appSettings, displayPackagesInfo);
 
-        // Assert
-        Assert.AreEqual(1, result.Count);
-        Assert.AreEqual("CARGO", result[0].ComponentType);
-        Assert.AreEqual("my-cargo-crate", result[0].Name);
-        Assert.AreEqual("1.0.0", result[0].Version);
-        Assert.AreEqual("pkg:cargo/my-cargo-crate@1.0.0", result[0].Purl);
-        Assert.AreEqual("cargo-third-party", result[0].DestRepoName);
-        Assert.IsTrue(result[0].JfrogRepoPath.Contains("my-cargo-crate.1.0.0.crate"));
+            // Assert
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual("CARGO", result[0].ComponentType);
+            Assert.AreEqual("my-cargo-crate", result[0].Name);
+            Assert.AreEqual("1.0.0", result[0].Version);
+            Assert.AreEqual("pkg:cargo/my-cargo-crate@1.0.0", result[0].Purl);
+            Assert.AreEqual("cargo-third-party", result[0].DestRepoName);
+            Assert.IsTrue(result[0].JfrogRepoPath.Contains("my-cargo-crate.1.0.0.crate"));
+        }
     }
-}
 
 }

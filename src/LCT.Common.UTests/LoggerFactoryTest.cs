@@ -1,7 +1,6 @@
-﻿using NUnit.Framework;
-using LCT.Common;
+﻿using log4net;
+using NUnit.Framework;
 using System.Reflection;
-using log4net;
 
 namespace LCT.Common.UTest
 {

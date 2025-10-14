@@ -108,7 +108,7 @@ namespace LCT.SW360PackageCreator
 
             return lstOfBomDataToBeCompared;
         }
-        
+
         private void UpdateToLocalBomFile(Components componentsData, string currName, string currVersion)
         {
             Component currBom;
@@ -393,7 +393,7 @@ namespace LCT.SW360PackageCreator
 
                 if (!fossologyUpload)
                 {
-                    LoggerHelper.WriteFossologyProcessInitializeMessage(formattedName,item);                    
+                    LoggerHelper.WriteFossologyProcessInitializeMessage(formattedName, item);
                     string uploadId;
                     uploadId = await TriggerFossologyProcess(item, sw360CreatorService, appSettings);
 
@@ -417,7 +417,7 @@ namespace LCT.SW360PackageCreator
         {
             if (item.ComponentStatus == Dataconstant.Available && item.ReleaseStatus == Dataconstant.NotAvailable)
             {
-                LoggerHelper.WriteComponentStatusMessage("Creating Release ",item);
+                LoggerHelper.WriteComponentStatusMessage("Creating Release ", item);
                 var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(item);
 
                 if (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]) && !attachmentUrlList.ContainsKey("SOURCE"))
@@ -557,7 +557,7 @@ namespace LCT.SW360PackageCreator
 
             if (uploadStatus)
             {
-                LoggerHelper.WriteFossologySucessStatusMessage(logPrefix,formattedName,item);
+                LoggerHelper.WriteFossologySucessStatusMessage(logPrefix, formattedName, item);
                 item.FossologyUploadStatus = Dataconstant.Uploaded;
             }
             else
@@ -604,7 +604,7 @@ namespace LCT.SW360PackageCreator
             if (item.ApprovedStatus == Dataconstant.NewClearing && !AreAttachmentsPresent(releasesInfo))
             {
                 var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(item);
-                
+
                 if (attachmentUrlList != null && attachmentUrlList.Count > 0)
                 {
                     if (string.IsNullOrEmpty(releasesInfo.SourceCodeDownloadUrl))
@@ -614,7 +614,7 @@ namespace LCT.SW360PackageCreator
                     string attachmentApiUrl = sw360CreatorService.AttachSourcesToReleasesCreated(releaseId, attachmentUrlList, item);
                     item.ReleaseAttachmentLink = attachmentApiUrl;
                     item.DownloadUrl = !attachmentUrlList.ContainsKey("SOURCE") ? Dataconstant.DownloadUrlNotFound : item.DownloadUrl;
-               
+
                 }
                 else
                 {

@@ -5,16 +5,10 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.Common.Logging;
-using LCT.Common.Model;
 using log4net;
 using log4net.Core;
-using log4net.Repository;
-using Spectre.Console;
 using System;
-using System.Collections.Generic;
-using System.Drawing;
 using System.Globalization;
-using Color = Spectre.Console.Color;
 
 namespace LCT.Common
 {
@@ -185,7 +179,7 @@ namespace LCT.Common
         {
             _logger.Log(null, Level.Error, string.Format(provider, format, args), null);
         }
-        
+
         #endregion
 
         #region Fatal Methods
@@ -225,5 +219,5 @@ namespace LCT.Common
         }
         #endregion
     }
-    
+
 }

@@ -20,7 +20,6 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Text;
-using System.Xml.Linq;
 
 namespace LCT.ArtifactoryUploader
 {
@@ -124,7 +123,7 @@ namespace LCT.ArtifactoryUploader
 
             if (LoggerFactory.UseSpectreConsole)
             {
-                DisplayWithSpectreConsole(unknownPackages, JfrogNotFoundPackages, SucessfullPackages, JfrogFoundPackages, name,filePath);
+                DisplayWithSpectreConsole(unknownPackages, JfrogNotFoundPackages, SucessfullPackages, JfrogFoundPackages, name, filePath);
             }
             else
             {
@@ -142,12 +141,12 @@ namespace LCT.ArtifactoryUploader
             List<ComponentsToArtifactory> JfrogNotFoundPackages,
             List<ComponentsToArtifactory> SucessfullPackages,
             List<ComponentsToArtifactory> JfrogFoundPackages,
-            string name,string filepath)
+            string name, string filepath)
         {
             LoggerHelper.SafeSpectreAction(() =>
             {
                 var content = new StringBuilder($"[green]{name}[/]\n\n");
-                AppendPackageContent(content, unknownPackages, JfrogFoundPackages, JfrogNotFoundPackages, SucessfullPackages,name,filepath);
+                AppendPackageContent(content, unknownPackages, JfrogFoundPackages, JfrogNotFoundPackages, SucessfullPackages, name, filepath);
 
                 LoggerHelper.WriteStyledPanel(content.ToString().TrimEnd(), "", "blue", "yellow");
                 LoggerHelper.WriteLine();
@@ -159,15 +158,15 @@ namespace LCT.ArtifactoryUploader
             List<ComponentsToArtifactory> unknownPackages,
             List<ComponentsToArtifactory> JfrogFoundPackages,
             List<ComponentsToArtifactory> JfrogNotFoundPackages,
-            List<ComponentsToArtifactory> SucessfullPackages,string name,string filePath)
+            List<ComponentsToArtifactory> SucessfullPackages, string name, string filePath)
         {
-            AppendUnknownPackages(content, unknownPackages, name,filePath);
+            AppendUnknownPackages(content, unknownPackages, name, filePath);
             AppendJfrogFoundPackages(content, JfrogFoundPackages);
             AppendJfrogNotFoundPackages(content, JfrogNotFoundPackages);
             AppendSuccessfulPackages(content, SucessfullPackages);
         }
 
-        private static void AppendUnknownPackages(StringBuilder content, List<ComponentsToArtifactory> packages,string name,string filepath)
+        private static void AppendUnknownPackages(StringBuilder content, List<ComponentsToArtifactory> packages, string name, string filepath)
         {
             var filename = Path.Combine(filepath, $"Artifactory_{FileConstant.artifactoryReportNotApproved}");
             if (packages?.Count > 0)
@@ -568,8 +567,8 @@ namespace LCT.ArtifactoryUploader
                 }
                 fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
             }
-           WarningMessageForNoPackages(filename);
-        }       
+            WarningMessageForNoPackages(filename);
+        }
 
     }
 }

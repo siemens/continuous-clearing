@@ -1,12 +1,13 @@
-﻿using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TestUtilities;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2025 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+
+// -------------------------------------------------------------------------------------------------------------------- 
 using CycloneDX.Models;
+using NUnit.Framework;
+using System.IO;
+using TestUtilities;
 
 
 namespace SW360IntegrationTest.Cargo

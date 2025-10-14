@@ -5,11 +5,11 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using LCT.PackageIdentifier.Model;
 using NuGet.Versioning;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Linq;
-using LCT.PackageIdentifier.Model;
 
 namespace LCT.PackageIdentifier.UTest
 {

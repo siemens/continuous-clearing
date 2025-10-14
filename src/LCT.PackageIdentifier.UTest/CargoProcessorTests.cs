@@ -313,7 +313,7 @@ namespace LCT.PackageIdentifier.UTest
             };
             var bomHelperMock = new Mock<IBomHelper>();
             var appSettings = CreateTestAppSettings();
-            var projectTypeProperty = new Property(); 
+            var projectTypeProperty = new Property();
 
             var method = typeof(CargoProcessor).GetMethod("ProcessCargoComponent", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
 

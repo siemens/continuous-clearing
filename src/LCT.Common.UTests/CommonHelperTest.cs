@@ -6,15 +6,12 @@
 
 using CycloneDX.Models;
 using LCT.Common.Constants;
-using LCT.Common.Model;
 using log4net;
-using log4net.Appender;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using File = System.IO.File;
 
@@ -75,7 +72,7 @@ namespace LCT.Common.UTest
             // Assert
             Assert.IsNotEmpty(result);
         }
-        
+
         [Test]
         public void RemoveExcludedComponents_PassingList_ReturnSuccess()
         {
@@ -1110,7 +1107,7 @@ namespace LCT.Common.UTest
                     _ = CommonHelper.CanonicalizeProjectType(v);
             });
         }
-       
+
 
         [Test]
         public void Sw360URL_DoesNotModifyInputs()
