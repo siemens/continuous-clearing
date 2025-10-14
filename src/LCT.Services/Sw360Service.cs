@@ -38,7 +38,7 @@ namespace LCT.Services
         public static Stopwatch Sw360ServiceStopWatch { get; set; }
         private readonly IEnvironmentHelper environmentHelper;
 
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ISW360ApicommunicationFacade m_SW360ApiCommunicationFacade;
         private readonly ISW360CommonService m_SW360CommonService;
         private static List<Components> availableComponentList = new List<Components>();

@@ -38,7 +38,7 @@ namespace LCT.SW360PackageCreator
     /// </summary>
     public partial class UrlHelper : IUrlHelper, IDisposable
     {
-        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly HttpClient httpClient = new HttpClient();
         public static string GithubUrl { get; set; } = string.Empty;
         public static UrlHelper Instance { get; } = new UrlHelper();

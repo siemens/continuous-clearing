@@ -10,19 +10,23 @@ using LCT.ArtifactoryUploader.Model;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
+using LCT.Common.Logging;
 using log4net;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Text;
+using System.Xml.Linq;
 
 namespace LCT.ArtifactoryUploader
 {
     public static class PackageUploadInformation
     {
-        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static DisplayPackagesInfo GetComponentsToBePackages()
         {
             DisplayPackagesInfo displayPackagesInfo = new DisplayPackagesInfo();
@@ -96,8 +100,8 @@ namespace LCT.ArtifactoryUploader
         {
             string localPathforartifactory = ArtfactoryUploader.GettPathForArtifactoryUpload();
 
-            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesNpm, displayPackagesInfo.JfrogNotFoundPackagesNpm, displayPackagesInfo.SuccessfullPackagesNpm, displayPackagesInfo.JfrogFoundPackagesNpm, "Npm", localPathforartifactory);
-            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesNuget, displayPackagesInfo.JfrogNotFoundPackagesNuget, displayPackagesInfo.SuccessfullPackagesNuget, displayPackagesInfo.JfrogFoundPackagesNuget, "Nuget", localPathforartifactory);
+            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesNpm, displayPackagesInfo.JfrogNotFoundPackagesNpm, displayPackagesInfo.SuccessfullPackagesNpm, displayPackagesInfo.JfrogFoundPackagesNpm, "npm", localPathforartifactory);
+            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesNuget, displayPackagesInfo.JfrogNotFoundPackagesNuget, displayPackagesInfo.SuccessfullPackagesNuget, displayPackagesInfo.JfrogFoundPackagesNuget, "NuGet", localPathforartifactory);
             DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesMaven, displayPackagesInfo.JfrogNotFoundPackagesMaven, displayPackagesInfo.SuccessfullPackagesMaven, displayPackagesInfo.JfrogFoundPackagesMaven, "Maven", localPathforartifactory);
             DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesConan, displayPackagesInfo.JfrogNotFoundPackagesConan, displayPackagesInfo.SuccessfullPackagesConan, displayPackagesInfo.JfrogFoundPackagesConan, "Conan", localPathforartifactory);
             DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesPython, displayPackagesInfo.JfrogNotFoundPackagesPython, displayPackagesInfo.SuccessfullPackagesPython, displayPackagesInfo.JfrogFoundPackagesPython, "Poetry", localPathforartifactory);
@@ -105,17 +109,145 @@ namespace LCT.ArtifactoryUploader
             DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesCargo, displayPackagesInfo.JfrogNotFoundPackagesCargo, displayPackagesInfo.SuccessfullPackagesCargo, displayPackagesInfo.JfrogFoundPackagesCargo, "Cargo", localPathforartifactory);
 
         }
-        private static void DisplaySortedForeachComponents(List<ComponentsToArtifactory> unknownPackages, List<ComponentsToArtifactory> JfrogNotFoundPackages, List<ComponentsToArtifactory> SucessfullPackages, List<ComponentsToArtifactory> JfrogFoundPackages, string name, string filename)
+        private static void DisplaySortedForeachComponents(
+    List<ComponentsToArtifactory> unknownPackages,
+    List<ComponentsToArtifactory> JfrogNotFoundPackages,
+    List<ComponentsToArtifactory> SucessfullPackages,
+    List<ComponentsToArtifactory> JfrogFoundPackages,
+    string name,
+    string filePath)
         {
-            if (unknownPackages.Count != 0 || JfrogNotFoundPackages.Count != 0 || SucessfullPackages.Count != 0 || JfrogFoundPackages.Count != 0)
+            if (!HasAnyPackages(unknownPackages, JfrogNotFoundPackages, SucessfullPackages, JfrogFoundPackages))
             {
-                Logger.Info("\n" + name + ":\n");
-                DisplayErrorForUnknownPackages(unknownPackages, name, filename);
-                DisplayErrorForJfrogFoundPackages(JfrogFoundPackages);
-                DisplayErrorForJfrogPackages(JfrogNotFoundPackages);
-                DisplayErrorForSucessfullPackages(SucessfullPackages);
+                return;
             }
 
+            if (LoggerFactory.UseSpectreConsole)
+            {
+                DisplayWithSpectreConsole(unknownPackages, JfrogNotFoundPackages, SucessfullPackages, JfrogFoundPackages, name,filePath);
+            }
+            else
+            {
+                DisplayWithLogger(unknownPackages, JfrogNotFoundPackages, SucessfullPackages, JfrogFoundPackages, name, filePath);
+            }
+        }
+
+        private static bool HasAnyPackages(params List<ComponentsToArtifactory>[] packageLists)
+        {
+            return packageLists.Any(list => list?.Count > 0);
+        }
+
+        private static void DisplayWithSpectreConsole(
+            List<ComponentsToArtifactory> unknownPackages,
+            List<ComponentsToArtifactory> JfrogNotFoundPackages,
+            List<ComponentsToArtifactory> SucessfullPackages,
+            List<ComponentsToArtifactory> JfrogFoundPackages,
+            string name,string filepath)
+        {
+            LoggerHelper.SafeSpectreAction(() =>
+            {
+                var content = new StringBuilder($"[green]{name}[/]\n\n");
+                AppendPackageContent(content, unknownPackages, JfrogFoundPackages, JfrogNotFoundPackages, SucessfullPackages,name,filepath);
+
+                LoggerHelper.WriteStyledPanel(content.ToString().TrimEnd(), "", "blue", "yellow");
+                LoggerHelper.WriteLine();
+            }, $"Display {name} Package Information", "Info");
+        }
+
+        private static void AppendPackageContent(
+            StringBuilder content,
+            List<ComponentsToArtifactory> unknownPackages,
+            List<ComponentsToArtifactory> JfrogFoundPackages,
+            List<ComponentsToArtifactory> JfrogNotFoundPackages,
+            List<ComponentsToArtifactory> SucessfullPackages,string name,string filePath)
+        {
+            AppendUnknownPackages(content, unknownPackages, name,filePath);
+            AppendJfrogFoundPackages(content, JfrogFoundPackages);
+            AppendJfrogNotFoundPackages(content, JfrogNotFoundPackages);
+            AppendSuccessfulPackages(content, SucessfullPackages);
+        }
+
+        private static void AppendUnknownPackages(StringBuilder content, List<ComponentsToArtifactory> packages,string name,string filepath)
+        {
+            var filename = Path.Combine(filepath, $"Artifactory_{FileConstant.artifactoryReportNotApproved}");
+            if (packages?.Count > 0)
+            {
+                content.AppendLine($"[yellow]Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}[/]\n");
+                DisplayErrorForUnknownPackages(packages, name, filepath);
+            }
+        }
+
+        private static void AppendJfrogFoundPackages(StringBuilder content, List<ComponentsToArtifactory> packages)
+        {
+            if (packages?.Count > 0)
+            {
+                content.AppendLine();
+                foreach (var package in packages)
+                {
+                    content.AppendLine(FormatJfrogFoundPackage(package));
+                }
+                content.AppendLine();
+            }
+        }
+
+        private static string FormatJfrogFoundPackage(ComponentsToArtifactory package)
+        {
+            if (package.ResponseMessage.ReasonPhrase == ApiConstant.ErrorInUpload)
+            {
+                return $"❌ [white]{package.Name}[/]-[cyan]{package.Version}[/] " +
+                       $"[red]{package.OperationType} Failed![/] " +
+                       $"[yellow]{package.SrcRepoName}[/] [white]⟶ [/] [yellow]{package.DestRepoName}[/]";
+            }
+
+            if (package.ResponseMessage.ReasonPhrase == ApiConstant.PackageNotFound)
+            {
+                return $"❌ Package [white]{package.Name}[/]-[cyan]{package.Version}[/] not found in [yellow]{package.SrcRepoName}[/],[red] Upload Failed!![/]";
+            }
+
+            return $"✓ [green]Successful{package.DryRunSuffix}[/] " +
+                   $"[cyan]{package.OperationType}[/] " +
+                   $"[white]{package.Name}[/]-[cyan]{package.Version}[/] " +
+                   $"from [yellow]{package.SrcRepoName}[/] [white]⟶ [/] [yellow]{package.DestRepoName}[/]";
+        }
+
+        private static void AppendJfrogNotFoundPackages(StringBuilder content, List<ComponentsToArtifactory> packages)
+        {
+            if (packages?.Count > 0)
+            {
+                content.AppendLine();
+                foreach (var package in packages)
+                {
+                    content.AppendLine($"⚠ [white]{package.Name}[/]-[cyan]{package.Version}[/] [yellow]is not found in jfrog[/]");
+                }
+                content.AppendLine();
+            }
+        }
+
+        private static void AppendSuccessfulPackages(StringBuilder content, List<ComponentsToArtifactory> packages)
+        {
+            if (packages?.Count > 0)
+            {
+                content.AppendLine();
+                foreach (var package in packages)
+                {
+                    content.AppendLine($"✓ [white]{package.Name}[/]-[cyan]{package.Version}[/] [green]is already uploaded[/]");
+                }
+            }
+        }
+
+        private static void DisplayWithLogger(
+            List<ComponentsToArtifactory> unknownPackages,
+            List<ComponentsToArtifactory> JfrogNotFoundPackages,
+            List<ComponentsToArtifactory> SucessfullPackages,
+            List<ComponentsToArtifactory> JfrogFoundPackages,
+            string name,
+            string filePath)
+        {
+            Logger.Info($"\n{name}:\n");
+            DisplayErrorForUnknownPackages(unknownPackages, name, filePath);
+            DisplayErrorForJfrogFoundPackages(JfrogFoundPackages);
+            DisplayErrorForJfrogPackages(JfrogNotFoundPackages);
+            DisplayErrorForSucessfullPackages(SucessfullPackages);
         }
         public static void DisplayErrorForJfrogFoundPackages(List<ComponentsToArtifactory> JfrogFoundPackages)
         {
@@ -175,6 +307,11 @@ namespace LCT.ArtifactoryUploader
 
             }
         }
+        private static void WarningMessageForNoPackages(string filename)
+        {
+            if (!LoggerFactory.UseSpectreConsole)
+                Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n");
+        }
         private static void DisplayErrorForUnknownPackages(List<ComponentsToArtifactory> unknownPackages, string name, string filepath)
         {
             ProjectResponse projectResponse = new ProjectResponse();
@@ -230,8 +367,7 @@ namespace LCT.ArtifactoryUploader
                 }
                 fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
             }
-            Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n");
-
+            WarningMessageForNoPackages(filename);
         }
         private static void GetNotApprovedNugetPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
         {
@@ -262,7 +398,7 @@ namespace LCT.ArtifactoryUploader
                 }
                 fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
             }
-            Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n");
+            WarningMessageForNoPackages(filename);
         }
 
         private static void GetNotApprovedCargoPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
@@ -294,7 +430,7 @@ namespace LCT.ArtifactoryUploader
                 }
                 fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
             }
-            Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n");
+            WarningMessageForNoPackages(filename);
         }
 
         private static void GetNotApprovedConanPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
@@ -329,7 +465,7 @@ namespace LCT.ArtifactoryUploader
                 }
                 fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
             }
-            Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n");
+            WarningMessageForNoPackages(filename);
 
         }
         private static void GetNotApprovedPythonPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
@@ -364,7 +500,7 @@ namespace LCT.ArtifactoryUploader
                 }
                 fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
             }
-            Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n");
+            WarningMessageForNoPackages(filename);
         }
         public static void GetNotApprovedDebianPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
         {
@@ -398,7 +534,7 @@ namespace LCT.ArtifactoryUploader
                 }
                 fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
             }
-            Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n");
+            WarningMessageForNoPackages(filename);
         }
         private static void GetNotApprovedMavenPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
         {
@@ -432,8 +568,8 @@ namespace LCT.ArtifactoryUploader
                 }
                 fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
             }
-            Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n");
-        }
+           WarningMessageForNoPackages(filename);
+        }       
 
     }
 }

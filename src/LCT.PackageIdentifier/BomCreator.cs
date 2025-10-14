@@ -9,6 +9,7 @@ using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
+using LCT.Common.Logging;
 using LCT.Common.Model;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
@@ -36,7 +37,7 @@ namespace LCT.PackageIdentifier
     /// </summary>
     public class BomCreator : IBomCreator
     {
-        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public readonly static BomKpiData bomKpiData = new();
         ComponentIdentification componentData;
         private readonly ICycloneDXBomParser CycloneDXBomParser;
@@ -117,8 +118,7 @@ namespace LCT.PackageIdentifier
 
             if (appSettings.Jfrog != null)
             {
-                //Writes internal component ist to kpi
-                bomHelper.WriteInternalComponentsListToKpi(componentData.internalComponents);
+                LoggerHelper.WriteInternalComponentsTableInCli(componentData.internalComponents);
             }
 
             Logger.Debug($"GenerateBom():End");
@@ -252,20 +252,20 @@ namespace LCT.PackageIdentifier
                 {
                     if (response.IsSuccessStatusCode)
                     {
-                        Logger.Logger.Log(null, Level.Info, $"JFrog Connection was successfull!!", null);
+                        LoggerHelper.JfrogConnectionInfoDisplayForCli();
                         return true;
                     }
                     else if (response.StatusCode == HttpStatusCode.Unauthorized)
                     {
-                        Logger.Logger.Log(null, Level.Error, $"Check the JFrog token validity/permission..", null);
+                        Logger.Error($"Check the JFrog token validity/permission..");
                     }
                     else if (response.StatusCode == HttpStatusCode.NotFound)
                     {
-                        Logger.Logger.Log(null, Level.Error, $"Check the provided JFrog server details..", null);
+                        Logger.Error($"Check the provided JFrog server details..");
                     }
                     else
                     {
-                        Logger.Logger.Log(null, Level.Error, $"JFrog Connection was not successfull check the server status.", null);
+                        Logger.Error($"JFrog Connection was not successfull check the server status.");
                     }
                 }
                 return false;

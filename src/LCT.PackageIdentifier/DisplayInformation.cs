@@ -1,4 +1,5 @@
 ﻿using LCT.Common;
+using LCT.Common.Logging;
 using LCT.Common.Model;
 using log4net;
 using log4net.Core;
@@ -11,7 +12,7 @@ namespace LCT.PackageIdentifier
 {
     public static class DisplayInformation
     {
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static string DisplayIncludeFiles(CommonAppSettings appSettings)
         {
             string totalString = string.Empty;
@@ -114,50 +115,20 @@ namespace LCT.PackageIdentifier
             }
 
             return listOfInternalRepoList;
-        }
-        public static void LogInputParameters(CatoolInfo caToolInformation, CommonAppSettings appSettings, string listOfInternalRepoList, string listOfInclude, string listOfExclude, string listOfExcludeComponents)
-        {
-            var logMessage = $"Input Parameters used in Package Identifier:\n\t" +
-                $"CaToolVersion\t\t --> {caToolInformation.CatoolVersion}\n\t" +
-                $"CaToolRunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
-                $"PackageFilePath\t\t --> {appSettings.Directory.InputFolder}\n\t" +
-                $"BomFolderPath\t\t --> {appSettings.Directory.OutputFolder}\n\t";
-
-            if (appSettings.SW360 != null)
-            {
-                logMessage += $"SW360Url\t\t --> {appSettings.SW360.URL}\n\t" +
-                          $"SW360AuthTokenType\t --> {appSettings.SW360.AuthTokenType}\n\t" +
-                          $"SW360ProjectName\t --> {appSettings.SW360.ProjectName}\n\t" +
-                          $"SW360ProjectID\t\t --> {appSettings.SW360.ProjectID}\n\t" +
-                          $"ExcludeComponents\t --> {listOfExcludeComponents}\n\t";
-            }
-            if (appSettings.Jfrog != null)
-            {
-                logMessage += $"InternalRepoList\t --> {listOfInternalRepoList}\n\t";
-            }
-
-
-            logMessage += $"ProjectType\t\t --> {appSettings.ProjectType}\n\t" +
-                          $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t" +
-                          $"Include\t\t\t --> {listOfInclude}\n\t" +
-                          $"Exclude\t\t\t --> {listOfExclude}\n";
-
-
-            Logger.Logger.Log(null, Level.Notice, logMessage, null);
-        }
+        }        
         public static void LogBomGenerationWarnings(CommonAppSettings appSettings)
         {
             if (appSettings.SW360 == null && appSettings.Jfrog == null)
             {
-                Logger.Logger.Log(null, Level.Warn, $"CycloneDX Bom file generated without using SW360 and Jfrog details.", null);
+                Logger.Warn($"CycloneDX Bom file generated without using SW360 and Jfrog details.");
             }
             else if (appSettings.SW360 == null)
             {
-                Logger.Logger.Log(null, Level.Warn, $"CycloneDX Bom file generated without using SW360 details.", null);
+                Logger.Warn($"CycloneDX Bom file generated without using SW360 details.");
             }
             else if (appSettings.Jfrog == null)
             {
-                Logger.Logger.Log(null, Level.Warn, $"CycloneDX Bom file generated without using Jfrog details.", null);
+                Logger.Warn($"CycloneDX Bom file generated without using Jfrog details.");
             }
         }
     }

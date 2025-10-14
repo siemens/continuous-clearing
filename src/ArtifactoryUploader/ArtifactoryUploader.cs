@@ -9,6 +9,7 @@ using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.AQL;
 using LCT.ArtifactoryUploader.Model;
+using LCT.Common;
 using LCT.Services.Interface;
 using log4net;
 using System;
@@ -17,13 +18,14 @@ using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
+using Directory = System.IO.Directory;
 
 namespace LCT.ArtifactoryUploader
 {
     public static class ArtfactoryUploader
     {
         //ConfigurationAttribute
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static IJFrogService JFrogService { get; set; }
         public static IJFrogApiCommunication JFrogApiCommInstance { get; set; }
 

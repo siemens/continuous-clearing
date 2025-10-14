@@ -10,6 +10,7 @@ using LCT.APICommunications.Model;
 using LCT.ArtifactoryUploader.Model;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Logging;
 using LCT.Common.Model;
 using log4net;
 using System;
@@ -27,7 +28,7 @@ namespace LCT.ArtifactoryUploader
     /// </summary>
     public static class PackageUploader
     {
-        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static readonly UploaderKpiData uploaderKpiData = new UploaderKpiData();
         private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
 
@@ -37,7 +38,7 @@ namespace LCT.ArtifactoryUploader
             var bomFilePath = Path.Combine(appSettings.Directory.OutputFolder, appSettings.SW360.ProjectName + "_" + FileConstant.BomFileName);
             Bom m_ComponentsInBOM = PackageUploadHelper.GetComponentListFromComparisonBOM(bomFilePath, environmentHelper);
 
-            DisplayAllSettings(m_ComponentsInBOM.Components, appSettings);
+            LoggerHelper.DisplayAllSettings(m_ComponentsInBOM.Components, appSettings);
             uploaderKpiData.ComponentInComparisonBOM = m_ComponentsInBOM.Components.Count;
 
             DisplayPackagesInfo displayPackagesInfo = PackageUploadInformation.GetComponentsToBePackages();
@@ -46,9 +47,7 @@ namespace LCT.ArtifactoryUploader
             //Uploading the component to artifactory
 
             uploaderKpiData.PackagesToBeUploaded = m_ComponentsToBeUploaded.Count(x => x.PackageType == PackageType.ClearedThirdParty);
-            uploaderKpiData.DevPackagesToBeUploaded = m_ComponentsToBeUploaded.Count(x => x.PackageType == PackageType.Development);
-            uploaderKpiData.InternalPackagesToBeUploaded = m_ComponentsToBeUploaded.Count(x => x.PackageType == PackageType.Internal);
-
+            
             await PackageUploadHelper.UploadingThePackages(m_ComponentsToBeUploaded, appSettings.TimeOut, displayPackagesInfo);
 
             //Display packages information 
@@ -83,81 +82,8 @@ namespace LCT.ArtifactoryUploader
                 environmentHelper.CallEnvironmentExit(2);
                 Logger.Debug("Setting ExitCode to 2");
             }
-        }
-        public static void DisplayAllSettings(List<Component> componentsInBOM, CommonAppSettings appSettings)
-        {
-            Logger.Info("Current Application Settings:");
 
-            // Get distinct project types from the BOM components
-            var projectTypes = componentsInBOM
-                .Select(item => item.Properties.First(x => x.Name == Dataconstant.Cdx_ProjectType).Value)
-                .Distinct()
-                .ToList();
-
-            foreach (var projectType in projectTypes)
-            {
-                Logger.Info($"{projectType}:\n\t");
-
-                // Use a dictionary to map project types to their configurations for cleaner logic
-                var projectConfigMap = new Dictionary<string, Config>(StringComparer.OrdinalIgnoreCase)
-                {
-                    { "NPM", appSettings.Npm },
-                    { "NUGET", appSettings.Nuget },
-                    { "MAVEN", appSettings.Maven },
-                    { "DEBIAN", appSettings.Debian },
-                    { "POETRY", appSettings.Poetry },
-                    { "CONAN", appSettings.Conan },
-                    { "CARGO", appSettings.Cargo }
-                }
-            ;
-
-                if (projectConfigMap.TryGetValue(projectType, out var config))
-                {
-                    DisplayPackageSettings(config);
-                }
-                else
-                {
-                    Logger.ErrorFormat("DisplayAllSettings(): Invalid ProjectType - {0}", projectType);
-                }
-            }
         }
 
-        private static void DisplayPackageSettings(Config project)
-        {
-            if (project == null)
-            {
-                Logger.Warn("DisplayPackageSettings(): Config is null.");
-                return;
-            }
-
-            // Build Include, Exclude, and ThirdPartyRepoName strings safely
-            string includeList = !string.IsNullOrEmpty(project.Include?.FirstOrDefault())
-                ? string.Join(", ", project.Include)
-                : Dataconstant.NotConfigured;
-
-            string excludeList = !string.IsNullOrEmpty(project.Exclude?.FirstOrDefault())
-                ? string.Join(", ", project.Exclude)
-                : Dataconstant.NotConfigured;
-
-            string devDepRepoName = !string.IsNullOrEmpty(project.DevDepRepo)
-                ? project.DevDepRepo
-                : Dataconstant.NotConfigured;
-
-            string releaseRepoName = !string.IsNullOrEmpty(project.ReleaseRepo)
-                ? project.ReleaseRepo
-                : Dataconstant.NotConfigured;
-
-            string thirdPartyRepoName = project.Artifactory?.ThirdPartyRepos?
-                .FirstOrDefault(repo => repo.Upload)?.Name ?? Dataconstant.NotConfigured;
-
-            // Log the settings for the project
-            Logger.Logger.Log(null, Level.Notice,
-                $"\tDEVDEP_REPO_NAME:\t{devDepRepoName}\n" +
-                $"\tTHIRD_PARTY_REPO_NAME:\t{thirdPartyRepoName}\n" +
-                $"\tRELEASE_REPO_NAME:\t{releaseRepoName}\n" +
-                $"\tConfig:\n" +
-                $"\t\tExclude:\t\t{excludeList}\n" +
-                $"\t\tInclude:\t\t{includeList}\n", null);
-        }
     }
 }

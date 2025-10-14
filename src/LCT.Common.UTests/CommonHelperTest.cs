@@ -75,21 +75,7 @@ namespace LCT.Common.UTest
             // Assert
             Assert.IsNotEmpty(result);
         }
-
-        [Test]
-        public void WriteComponentsNotLinkedListInConsole_PassingList_ReturnSuccess()
-        {
-            //Arrange
-            List<Components> ComponentsNotLinked = new List<Components>();
-            ComponentsNotLinked.Add(new Components());
-
-            //Act
-            CommonHelper.WriteComponentsNotLinkedListInConsole(ComponentsNotLinked);
-
-            //Assert
-            Assert.Pass();
-        }
-
+        
         [Test]
         public void RemoveExcludedComponents_PassingList_ReturnSuccess()
         {
@@ -1066,78 +1052,113 @@ namespace LCT.Common.UTest
             // Should have added one property (internal) to the existing empty list
             Assert.AreEqual(1, processedComponent.Properties.Count);
         }
+        [TestCase(null, null, TestName = "CanonicalizeProjectType_Null_ReturnsNull")]
+        [TestCase("", "", TestName = "CanonicalizeProjectType_Empty_ReturnsEmpty")]
+        [TestCase("   ", "   ", TestName = "CanonicalizeProjectType_Whitespace_ReturnsWhitespaceUnchanged")]
+        [TestCase("Poetry", "Poetry")]
+        [TestCase("poetry", "Poetry")]
+        [TestCase("POETRY", "Poetry")]
+        [TestCase("  poetry  ", "Poetry")]
+        [TestCase("Cargo", "Cargo")]
+        [TestCase("cArGo", "Cargo")]
+        [TestCase("CONAN", "Conan")]
+        [TestCase("conan", "Conan")]
+        [TestCase("Debian", "Debian")]
+        [TestCase("debian", "Debian")]
+        [TestCase("MAVEN", "Maven")]
+        [TestCase("maven", "Maven")]
+        [TestCase("npm", "npm")]
+        [TestCase("NPM", "npm")]
+        [TestCase("NuGet", "NuGet")]
+        [TestCase("nuget", "NuGet")]
+        [TestCase("Nuget", "NuGet")]
+        [TestCase("ALPINE", "Alpine")]
+        [TestCase("alpine", "Alpine")]
+        [TestCase("  ALPINE  ", "Alpine")]
+        [TestCase("UnknownType", "UnknownType")]
+        [TestCase("  CustomType  ", "CustomType", TestName = "CanonicalizeProjectType_UnknownTrimmed")]
+        public void CanonicalizeProjectType_ReturnsExpectedValue(string input, string expected)
+        {
+            // Act
+            var result = CommonHelper.CanonicalizeProjectType(input);
+
+            // Assert
+            Assert.AreEqual(expected, result);
+        }
+
         [Test]
-        public void LogDuplicateComponentsByPurlId_LogsExpectedOutput_MemoryAppender()
+        public void CanonicalizeProjectType_DoesNotThrow_ForAllSupportedVariants()
         {
             // Arrange
-            var components = new List<Components>
+            var variants = new[]
             {
-                new Components { Name = "CompA", Version = "1.0", ComponentId = "cid1" },
-                new Components { Name = "CompB", Version = "2.0", ComponentId = "cid2" }
+                "Poetry","poetry","POETRY",
+                "Cargo","cArGo",
+                "Conan","CONAN",
+                "Debian","debian",
+                "Maven","MAVEN",
+                "npm","NPM",
+                "NuGet","nuget","Nuget",
+                "Alpine","ALPINE"," alpine ",
+                "UnknownType","  AnotherType  ", null, "", "   "
             };
-            string sw360Url = "http://sw360";
 
-            // Set up MemoryAppender
-            var memoryAppender = new MemoryAppender();
-            var loggerField = typeof(CommonHelper).GetField("Logger", BindingFlags.Static | BindingFlags.NonPublic);
-            var logger = (ILog)loggerField.GetValue(null);
+            // Act & Assert
+            Assert.DoesNotThrow(() =>
+            {
+                foreach (var v in variants)
+                    _ = CommonHelper.CanonicalizeProjectType(v);
+            });
+        }
+       
 
-            // Attach the appender to the logger's repository
-            var log = LogManager.GetLogger(typeof(CommonHelper));
-            ((log4net.Repository.Hierarchy.Logger)log.Logger).AddAppender(memoryAppender);
+        [Test]
+        public void Sw360URL_DoesNotModifyInputs()
+        {
+            var env = "https://sta.sw360.com";
+            var releaseId = "rel123";
+            var originalEnv = env;
+            var originalId = releaseId;
 
-            // Act
-            var logMethod = typeof(CommonHelper).GetMethod("LogDuplicateComponentsByPurlId", BindingFlags.Static | BindingFlags.NonPublic);
-            Assert.IsNotNull(logMethod, "LogDuplicateComponentsByPurlId method not found in CommonHelper.");
-            logMethod.Invoke(null, new object[] { components, sw360Url });
+            var result = CommonHelper.Sw360URL(env, releaseId);
 
-            // Get log events
-            var events = memoryAppender.GetEvents();
-            var messages = events.Select(e => e.RenderedMessage).ToList();
-
-            // Assert
-            Assert.IsTrue(messages.Any(m => m.Contains("not created in SW360 due to Invalid Purl ids")), "Missing expected summary log.");
-            Assert.IsTrue(messages.Any(m => m.Contains("Component Name already exists in SW360")), "Missing expected warning log.");
-            Assert.IsTrue(messages.Any(m => m.Contains("CompA")), "Missing CompA in log.");
-            Assert.IsTrue(messages.Any(m => m.Contains("CompB")), "Missing CompB in log.");
-            Assert.IsTrue(messages.Any(m => m.Contains("http://sw360/group/guest/components/-/component/detail/cid1")), "Missing CompA URL in log.");
-            Assert.IsTrue(messages.Any(m => m.Contains("http://sw360/group/guest/components/-/component/detail/cid2")), "Missing CompB URL in log.");
-
-            // Clean up
-            ((log4net.Repository.Hierarchy.Logger)log.Logger).RemoveAppender(memoryAppender);
+            Assert.IsTrue(result.EndsWith(originalId));
+            Assert.AreEqual(originalEnv, env);
+            Assert.AreEqual(originalId, releaseId);
         }
 
         [Test]
-        public void LogDuplicateComponentsByPurlId_DoesNothing_WhenListIsEmpty_MemoryAppender()
+        public void Sw360ComponentURL_DoesNotModifyInputs()
         {
-            // Arrange
-            var components = new List<Components>();
-            string sw360Url = "http://sw360";
+            var env = "https://sta.sw360.com";
+            var componentId = "c789";
+            var originalEnv = env;
+            var originalId = componentId;
 
-            // Set up MemoryAppender
-            var memoryAppender = new MemoryAppender();
-            var loggerField = typeof(CommonHelper).GetField("Logger", BindingFlags.Static | BindingFlags.NonPublic);
-            var logger = (ILog)loggerField.GetValue(null);
+            var result = CommonHelper.Sw360ComponentURL(env, componentId);
 
-            // Attach the appender to the logger's repository
-            var log = LogManager.GetLogger(typeof(CommonHelper));
-            ((log4net.Repository.Hierarchy.Logger)log.Logger).AddAppender(memoryAppender);
-
-            // Act
-            var logMethod = typeof(CommonHelper).GetMethod("LogDuplicateComponentsByPurlId", BindingFlags.Static | BindingFlags.NonPublic);
-            Assert.IsNotNull(logMethod, "LogDuplicateComponentsByPurlId method not found in CommonHelper.");
-            logMethod.Invoke(null, new object[] { components, sw360Url });
-
-            // Get log events
-            var events = memoryAppender.GetEvents();
-
-            // Assert
-            Assert.IsTrue(events.Length == 0 || events.All(e => string.IsNullOrWhiteSpace(e.RenderedMessage)), "No logs should be written when the list is empty.");
-
-            // Clean up
-            ((log4net.Repository.Hierarchy.Logger)log.Logger).RemoveAppender(memoryAppender);
+            Assert.IsTrue(result.EndsWith(originalId));
+            Assert.AreEqual(originalEnv, env);
+            Assert.AreEqual(originalId, componentId);
         }
 
+        [Test]
+        public void Sw360URL_DoubleSlashOccursWhenEnvEndsWithSlash()
+        {
+            var env = "https://stage.sw360.siemens.com/";
+            var id = "R1";
+            var result = CommonHelper.Sw360URL(env, id);
+            StringAssert.Contains("//group/guest/components", result);
+        }
+
+        [Test]
+        public void Sw360ComponentURL_DoubleSlashOccursWhenEnvEndsWithSlash()
+        {
+            var env = "https://stage.sw360.siemens.com/";
+            var id = "C1";
+            var result = CommonHelper.Sw360ComponentURL(env, id);
+            StringAssert.Contains("//group/guest/components", result);
+        }
         #region SetComponentPropertiesAndHashes Tests
 
         [Test]
