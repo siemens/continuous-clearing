@@ -372,15 +372,9 @@ namespace LCT.ArtifactoryUploader
 
                 {uploaderKpiNames.PackagesNotCopiedToSipartyRepo,uploaderKpiData.PackagesNotUploadedToJfrog},
 
-                //{CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.DevPackagesToBeUploaded)),
-                //    uploaderKpiData.DevPackagesToBeUploaded},
-
                 {uploaderKpiNames.PackagesCopiedToSipartyDevDepRepo,uploaderKpiData.DevPackagesUploaded},
 
-                {uploaderKpiNames.PackagesNotCopiedToSipartyDevDepRepo,uploaderKpiData.DevPackagesNotUploadedToJfrog},
-
-                //{CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.InternalPackagesToBeUploaded)),
-                //    uploaderKpiData.InternalPackagesToBeUploaded},
+                {uploaderKpiNames.PackagesNotCopiedToSipartyDevDepRepo,uploaderKpiData.DevPackagesNotUploadedToJfrog},                
 
                 {uploaderKpiNames.PackagesMovedToRepo,uploaderKpiData.InternalPackagesUploaded},
 

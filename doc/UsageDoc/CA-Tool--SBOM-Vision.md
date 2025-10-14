@@ -43,7 +43,7 @@ BOM generated from the Continuous Clearing Tool will have all the dependencies i
       - [ ]      Discovered/manually added will be identified from SBOM template.
        - [ ]              DevDependent or not will be added based on the input files.
          - [ ] 	   For npm,NuGet & Maven will find it from source input files.
-         - [ ] 	   For PyPi package type will install poetry for finding Dev components.
+         - [ ] 	   For Python package type will install poetry for finding Dev components.
          - [ ] 	   For Debian it's not there as of now.
       
 
