@@ -83,7 +83,7 @@ namespace LCT.PackageIdentifier
         public static List<NugetPackage> ParsePackageConfig(string packagesFilePath, CommonAppSettings appSettings)
         {
             List<NugetPackage> nugetPackages = new List<NugetPackage>();
-            
+
             try
             {
                 List<ReferenceDetails> referenceList = Parsecsproj(appSettings);
