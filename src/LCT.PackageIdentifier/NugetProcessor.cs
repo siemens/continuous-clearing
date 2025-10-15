@@ -83,7 +83,7 @@ namespace LCT.PackageIdentifier
         public static List<NugetPackage> ParsePackageConfig(string packagesFilePath, CommonAppSettings appSettings)
         {
             List<NugetPackage> nugetPackages = new List<NugetPackage>();
-            string isDev = "false";
+            
             try
             {
                 List<ReferenceDetails> referenceList = Parsecsproj(appSettings);
@@ -92,6 +92,7 @@ namespace LCT.PackageIdentifier
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += nodes.Count();
                 foreach (XElement element in nodes)
                 {
+                    string isDev = "false";
                     XAttribute idAttribute = element.Attribute("id");
                     XAttribute versionAttribute = element.Attribute("version");
                     XAttribute devDependencyAttribute = element.Attribute("developmentDependency");
