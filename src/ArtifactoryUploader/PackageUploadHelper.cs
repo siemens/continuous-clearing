@@ -180,12 +180,6 @@ namespace LCT.ArtifactoryUploader
         {
             if (item.ComponentType == "NPM")
             {
-
-                ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                displayPackagesInfo.SuccessfullPackagesNpm.Add(components);
-            }
-            if (item.ComponentType == "NPM")
-            {
                 ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
                 displayPackagesInfo.SuccessfullPackagesNpm.Add(components);
             }

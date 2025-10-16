@@ -32,10 +32,8 @@ namespace LCT.ArtifactoryUploader
             Logger.Debug("Starting UploadPackageToArtifactory method");
             string operationType = component.PackageType == PackageType.ClearedThirdParty
                 || component.PackageType == PackageType.Development ? "copy" : "move";
-            // Choco: treat as NuGet for move/copy logic
             if (component.ComponentType == "CHOCO")
             {
-                // Choco internal packages should be moved from dev to release
                 if (component.PackageType == PackageType.Internal)
                 {
                     operationType = "move";

@@ -17,6 +17,11 @@
 - [Continuous Clearing Tool Execution](#continuous-clearing-tool-execution)
     - [Overview](#overview)
     - [**Prerequisite for Continuous Clearing Tool execution**](#prerequisite-for-continuous-clearing-tool-execution)
+  - [SPDX v2.3 Support](#spdx-v23-support)
+    - [File Naming Convention](#file-naming-convention)
+  - [SPDX SBOM Signature Validator](#spdx-sbom-signature-validator)
+    - [File Naming Convention](#file-naming-convention-1)
+    - [Validation Process](#validation-process)
     - [**Configuring the Continuous Clearing Tool**](#configuring-the-continuous-clearing-tool)
       - [**Method 1 - Only AppSettings**](#method-1---only-appsettings)
     - [Below rows repeat for each supported package type.](#below-rows-repeat-for-each-supported-package-type)
@@ -49,6 +54,8 @@
     - [Docker Template Specific Parameters](#docker-template-specific-parameters)
 - [Troubleshoot](#troubleshoot)
   - [Component Compliance Guidance](#component-compliance-guidance)
+    - [Purpose](#purpose)
+    - [Functionality](#functionality)
   - [General](#general)
 - [Manual Update](#manual-update)
 - [Bug or Enhancements](#bug-or-enhancements)
@@ -196,10 +203,6 @@ Users have the flexibility to generate a basic SBOM even if connections to SW360
   * **Project Type :** **Conan**
 
     * Input file repository should contain **conan.lock** file.
-    
-  * **Project Type :** **Choco**
-
-   * Input file repository should contain **choco.config** / ** *.choco.config ** file.
 
   * **Project Type :**  **Debian & Alpine**
 
