@@ -51,7 +51,6 @@ namespace LCT.SW360PackageCreator
                 m_Verbose = true;
 
             SettingsManager settingsManager = new SettingsManager();
-            // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
             CommonHelper.DefaultLogFolderInitialisation(FileConstant.ComponentCreatorLog, m_Verbose);
@@ -76,6 +75,7 @@ namespace LCT.SW360PackageCreator
 
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Alert, $"Package creator is running in TEST mode \n", null);
+
             var bomFilePath = Path.Combine(appSettings.Directory.OutputFolder, appSettings.SW360.ProjectName + "_" + FileConstant.BomFileName);
             Logger.Logger.Log(null, Level.Notice, $"Input parameters used in Package Creator:\n\t" +
               $"CaToolVersion\t\t --> {caToolInformation.CatoolVersion}\n\t" +
@@ -93,7 +93,7 @@ namespace LCT.SW360PackageCreator
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);
 
-            //Validate Fossology Url
+            // Validate Fossology Url
             if (appSettings.SW360.Fossology.EnableTrigger && !appSettings.IsTestMode)
             {
                 HttpClient client = new HttpClient();
@@ -101,32 +101,39 @@ namespace LCT.SW360PackageCreator
                     await CreatorValidator.TriggerFossologyValidation(appSettings, sW360ApicommunicationFacade, environmentHelper);
             }
 
-            // Add initialization and parsing before Choco logic
-            ComponentCreator componentCreator = new ComponentCreator();
+            // Initialize helpers and parse BOM
             ICycloneDXBomParser cycloneDXBomParser = new CycloneDXBomParser();
+            ComponentCreator componentCreator = new ComponentCreator();
             ISW360Service sw360Service = new Sw360Service(sW360ApicommunicationFacade, new SW360CommonService(sW360ApicommunicationFacade), environmentHelper);
             ICreatorHelper creatorHelper = new CreatorHelper(new Dictionary<string, IPackageDownloader>());
-
             List<ComparisonBomData> parsedBomData = await componentCreator.CycloneDxBomParser(appSettings, sw360Service, cycloneDXBomParser, creatorHelper);
 
             var bom = cycloneDXBomParser.ParseCycloneDXBom(bomFilePath);
             var allComponents = bom?.Components ?? new List<CycloneDX.Models.Component>();
 
-            bool hasChoco = allComponents.Any(ComponentCreator.IsChocoComponent);
-            ISW360CommonService sw360CommonService = new SW360CommonService(sW360ApicommunicationFacade);
-            ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sW360ApicommunicationFacade, sw360CommonService);
+            var chocoComponents = allComponents.Where(ComponentCreator.IsChocoComponent).ToList();
+            var nonChocoComponents = allComponents.Where(c => !ComponentCreator.IsChocoComponent(c)).ToList();
 
-            if (hasChoco)
+            if (chocoComponents.Any())
             {
-                // For Choco, skip SW360 creation, but use the same KPI table logic:
                 CreatorKpiData kpiData = creatorHelper.GetCreatorKpiData(componentCreator.UpdatedCompareBomData);
                 creatorHelper.WriteCreatorKpiDataToConsole(kpiData);
-                componentCreator.PrintChocoSummaryAndActions(allComponents, kpiData);
+                componentCreator.PrintChocoSummaryAndActions(chocoComponents, kpiData);
             }
-            else
-            {                                                                                                                               
+
+            // Continue SW360 creation for non-Choco components
+            if (nonChocoComponents.Any())
+            {
+                ISW360CommonService sw360CommonService = new SW360CommonService(sW360ApicommunicationFacade);
+                ISw360CreatorService sw360CreatorService = new Sw360CreatorService(sW360ApicommunicationFacade, sw360CommonService);
+
+                // Filter parsedBomData to only non-Choco components
+                var filteredBomData = parsedBomData
+                    .Where(d => !chocoComponents.Any(c => c.Name == d.Name && c.Version == d.Version))
+                    .ToList();
+
                 await componentCreator.CreateComponentInSw360(appSettings, sw360CreatorService, sw360Service,
-                     sw360ProjectService, new FileOperations(), creatorHelper, parsedBomData);
+                     sw360ProjectService, new FileOperations(), creatorHelper, filteredBomData);
 
                 if (appSettings.Telemetry.Enable)
                 {
@@ -135,11 +142,10 @@ namespace LCT.SW360PackageCreator
                 }
                 Logger.Logger.Log(null, Level.Notice, $"End of Package Creator execution: {DateTime.Now}\n", null);
             }
+
             // publish logs and bom file to pipeline artifact
             PipelineArtifactUploader.UploadArtifacts();
         }
-
-
         private static CatoolInfo GetCatoolVersionFromProjectfile()
         {
             CatoolInfo catoolInfo = new CatoolInfo();

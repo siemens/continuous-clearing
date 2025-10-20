@@ -739,18 +739,28 @@ namespace LCT.SW360PackageCreator
         {
             var chocoComponents = allComponents.Where(IsChocoComponent).ToList();
 
-            Logger.Logger.Log(null, Level.Notice, "Action Item required by the user:\n", null);
-            Logger.Logger.Log(null, Level.Notice, "* Updating the source download URL is not supported for the choco package. If the user wants to modify it, it must be done manually.", null);
-
-            Logger.Logger.Log(null, Level.Notice, "===============================================================================================================================================================================================================", null);
-            Logger.Logger.Log(null, Level.Notice, "|Name                                              |                   Version     |", null);
-            Logger.Logger.Log(null, Level.Notice, "===============================================================================================================================================================================================================", null);
+            var lines = new List<string>
+            {
+            "Action Item required by the user:\n",
+            "* Updating the source download URL is not supported for the choco package. If the user wants to modify   it, it must be done manually.",
+          "===============================================================================================================================================================================================================",
+            "|Name                                              |                   Version     |",
+          "==============================================================================================================================================================================================================="
+            };
 
             foreach (var item in chocoComponents)
             {
-                Logger.Logger.Log(null, Level.Notice, $"|{item.Name,-50}|{item.Version,25}|", null);
-                Logger.Logger.Log(null, Level.Notice, "---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------", null);
+                lines.Add($"|{item.Name,-50}|{item.Version,25}|");
+                lines.Add("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
             }
+
+            var previousColor = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            foreach (var line in lines)
+            {
+                Console.WriteLine(line);
+            }
+            Console.ForegroundColor = previousColor;
         }
 
         public static bool IsChocoComponent(Component component)
