@@ -95,6 +95,10 @@ namespace LCT.ArtifactoryUploader
             {
                 return "NUGET";
             }
+            else if (item.Purl.Contains("choco", StringComparison.OrdinalIgnoreCase))
+            {
+                return "CHOCO";
+            }
             else if (item.Purl.Contains("maven", StringComparison.OrdinalIgnoreCase))
             {
                 return "MAVEN";
@@ -110,10 +114,6 @@ namespace LCT.ArtifactoryUploader
             else if (item.Purl.Contains("pkg:deb/debian", StringComparison.OrdinalIgnoreCase))
             {
                 return "DEBIAN";
-            }
-            else
-            {
-                // Do nothing
             }
             return string.Empty;
         }
@@ -163,6 +163,8 @@ namespace LCT.ArtifactoryUploader
                         return GetRepoName(packageType, appSettings.Npm.ReleaseRepo, appSettings.Npm.DevDepRepo, appSettings.Npm.Artifactory.ThirdPartyRepos.FirstOrDefault(x => x.Upload)?.Name);
                     case "nuget":
                         return GetRepoName(packageType, appSettings.Nuget.ReleaseRepo, appSettings.Nuget.DevDepRepo, appSettings.Nuget.Artifactory.ThirdPartyRepos.FirstOrDefault(x => x.Upload)?.Name);
+                    case "choco":
+                        return GetRepoName(packageType, appSettings.Choco.ReleaseRepo, appSettings.Choco.DevDepRepo, appSettings.Choco.Artifactory.ThirdPartyRepos.FirstOrDefault(x => x.Upload)?.Name);
                     case "maven":
                         return GetRepoName(packageType, appSettings.Maven.ReleaseRepo, appSettings.Maven.DevDepRepo, appSettings.Maven.Artifactory.ThirdPartyRepos.FirstOrDefault(x => x.Upload)?.Name);
                     case "poetry":
@@ -173,7 +175,6 @@ namespace LCT.ArtifactoryUploader
                         return GetRepoName(packageType, appSettings.Debian.ReleaseRepo, appSettings.Debian.DevDepRepo, appSettings.Debian.Artifactory.ThirdPartyRepos.FirstOrDefault(x => x.Upload)?.Name);
                 }
             }
-
             return string.Empty;
         }
 
@@ -227,6 +228,12 @@ namespace LCT.ArtifactoryUploader
             {
                 url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.PackageName}.{component.Version}" +
                $"{ApiConstant.NugetExtension}?to=/{component.DestRepoName}/{component.Name}.{component.Version}{ApiConstant.NugetExtension}";
+            }
+            else if (component.ComponentType == "CHOCO")
+            {
+                // Choco package copy URL (similar to NuGet)
+                url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.PackageName}.{component.Version}.nupkg" +
+               $"?to=/{component.DestRepoName}/{component.Name}.{component.Version}.nupkg";
             }
             else if (component.ComponentType == "MAVEN")
             {

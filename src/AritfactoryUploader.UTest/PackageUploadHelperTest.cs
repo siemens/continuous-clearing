@@ -49,6 +49,7 @@ namespace AritfactoryUploader.UTest
         [TestCase("DEBIAN", ".deb")]
         [TestCase("POETRY", ".whl")]
         [TestCase("CONAN", "package.tgz")]
+    [TestCase("CHOCO", ".nupkg")]
         public void GetPkgeNameExtensionBasedOnComponentType_GivenType_ReturnsPkgNameExtension(string type, string extension)
         {
             // Arrange
@@ -212,6 +213,7 @@ namespace AritfactoryUploader.UTest
         [TestCase("POETRY")]
         [TestCase("CONAN")]
         [TestCase("DEBIAN")]
+    [TestCase("CHOCO")]
         public async Task JfrogNotFoundPackagesAsync_CoversAllScenarios(string compType)
         {
             // Arrange
@@ -234,7 +236,7 @@ namespace AritfactoryUploader.UTest
                 Assert.AreEqual(1, displayPackagesInfo.JfrogNotFoundPackagesNpm.Count);
                 Assert.That(displayPackagesInfo.JfrogNotFoundPackagesNpm[0], Is.Not.Null);
             }
-            else if (item.ComponentType == "NUGET")
+            else if (item.ComponentType == "NUGET" || item.ComponentType == "CHOCO")
             {
                 Assert.AreEqual(1, displayPackagesInfo.JfrogNotFoundPackagesNuget.Count);
                 Assert.That(displayPackagesInfo.JfrogNotFoundPackagesNuget[0], Is.Not.Null);
@@ -268,6 +270,7 @@ namespace AritfactoryUploader.UTest
         [TestCase("POETRY")]
         [TestCase("CONAN")]
         [TestCase("DEBIAN")]
+    [TestCase("CHOCO")]
         public async Task JfrogFoundPackagesAsync_CoversAllScenarios(string compType)
         {
             // Arrange
@@ -293,7 +296,7 @@ namespace AritfactoryUploader.UTest
                 Assert.AreEqual(1, displayPackagesInfo.JfrogFoundPackagesNpm.Count);
                 Assert.That(displayPackagesInfo.JfrogFoundPackagesNpm[0], Is.Not.Null);
             }
-            else if (item.ComponentType == "NUGET")
+            else if (item.ComponentType == "NUGET" || item.ComponentType == "CHOCO")
             {
                 Assert.AreEqual(1, displayPackagesInfo.JfrogFoundPackagesNuget.Count);
                 Assert.That(displayPackagesInfo.JfrogFoundPackagesNuget[0], Is.Not.Null);

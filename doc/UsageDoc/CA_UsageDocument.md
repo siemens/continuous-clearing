@@ -17,6 +17,11 @@
 - [Continuous Clearing Tool Execution](#continuous-clearing-tool-execution)
     - [Overview](#overview)
     - [**Prerequisite for Continuous Clearing Tool execution**](#prerequisite-for-continuous-clearing-tool-execution)
+  - [SPDX v2.3 Support](#spdx-v23-support)
+    - [File Naming Convention](#file-naming-convention)
+  - [SPDX SBOM Signature Validator](#spdx-sbom-signature-validator)
+    - [File Naming Convention](#file-naming-convention-1)
+    - [Validation Process](#validation-process)
     - [**Configuring the Continuous Clearing Tool**](#configuring-the-continuous-clearing-tool)
       - [**Method 1 - Only AppSettings**](#method-1---only-appsettings)
     - [Below rows repeat for each supported package type.](#below-rows-repeat-for-each-supported-package-type)
@@ -49,6 +54,8 @@
     - [Docker Template Specific Parameters](#docker-template-specific-parameters)
 - [Troubleshoot](#troubleshoot)
   - [Component Compliance Guidance](#component-compliance-guidance)
+    - [Purpose](#purpose)
+    - [Functionality](#functionality)
   - [General](#general)
 - [Manual Update](#manual-update)
 - [Bug or Enhancements](#bug-or-enhancements)
@@ -196,10 +203,6 @@ Users have the flexibility to generate a basic SBOM even if connections to SW360
   * **Project Type :** **Conan**
 
     * Input file repository should contain **conan.lock** file.
-    
-  * **Project Type :** **Choco**
-
-   * Input file repository should contain **choco.config** / ** *.choco.config ** file.
 
   * **Project Type :**  **Debian & Alpine**
 
@@ -215,6 +218,13 @@ Users have the flexibility to generate a basic SBOM even if connections to SW360
 
       Resulted output.sbom.cdx.json file will be having the list of installed packages  and the same file will be used as  an input to Continuous clearing tool - Package identifier via the input directory parameter. The remaining process is same as other project types.
 
+  * **Project Type :** **Choco (Chocolatey)**
+
+    * Choco packages are now supported and handled just like NuGet packages.
+    * Set `ProjectType` to `CHOCO` in your configuration or command line.
+    * Input file repository should contain your Choco `.nupkg` files.
+    * Choco packages will be uploaded to the configured NuGet/Choco repositories in Artifactory.
+    * No extra configuration is needed—just include your Choco packages as you would with other supported types.
   
 ## SPDX v2.3 Support
 

@@ -32,6 +32,17 @@ namespace LCT.ArtifactoryUploader
             Logger.Debug("Starting UploadPackageToArtifactory method");
             string operationType = component.PackageType == PackageType.ClearedThirdParty
                 || component.PackageType == PackageType.Development ? "copy" : "move";
+            if (component.ComponentType == "CHOCO")
+            {
+                if (component.PackageType == PackageType.Internal)
+                {
+                    operationType = "move";
+                }
+                else
+                {
+                    operationType = "copy";
+                }
+            }
             string dryRunSuffix = component.DryRun ? " dry-run" : "";
             HttpResponseMessage responsemessage = new HttpResponseMessage();
             try
@@ -50,8 +61,14 @@ namespace LCT.ArtifactoryUploader
                 // Perform Copy or Move operation
                 responsemessage = component.PackageType switch
                 {
-                    PackageType.ClearedThirdParty or PackageType.Development => await JFrogApiCommInstance.CopyFromRemoteRepo(component),
-                    PackageType.Internal => await JFrogApiCommInstance.MoveFromRepo(component),
+                    PackageType.ClearedThirdParty or PackageType.Development =>
+                        (component.ComponentType == "CHOCO"
+                            ? await JFrogApiCommInstance.CopyFromRemoteRepo(component)
+                            : await JFrogApiCommInstance.CopyFromRemoteRepo(component)),
+                    PackageType.Internal =>
+                        (component.ComponentType == "CHOCO"
+                            ? await JFrogApiCommInstance.MoveFromRepo(component)
+                            : await JFrogApiCommInstance.MoveFromRepo(component)),
                     _ => new HttpResponseMessage(HttpStatusCode.NotFound)
                 };
 
