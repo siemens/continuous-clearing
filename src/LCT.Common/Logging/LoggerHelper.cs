@@ -74,31 +74,7 @@ namespace LCT.Common.Logging
                 Interactive = InteractionSupport.No
             };
             return settings;
-        }        
-
-        private static AnsiSupport GetAnsiSupport(EnvironmentType envType)
-        {
-            if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("NO_COLOR")))
-                return AnsiSupport.No;
-
-            var force = Environment.GetEnvironmentVariable("FORCE_ANSI");
-            if (string.Equals(force, "1", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(force, "true", StringComparison.OrdinalIgnoreCase))
-                return AnsiSupport.Yes;
-            
-            if (envType == EnvironmentType.AzurePipeline || envType == EnvironmentType.AzureRelease)
-            {
-                return AnsiSupport.Yes;
-            }
-            if (Console.IsOutputRedirected)
-            {
-                var redirectFlag = Environment.GetEnvironmentVariable("DOTNET_SYSTEM_CONSOLE_ALLOW_ANSI_COLOR_REDIRECTION");
-                return string.Equals(redirectFlag, "1") ? AnsiSupport.Yes : AnsiSupport.No;
-            }
-
-            return AnsiSupport.Yes;
-        }
-
+        } 
         private static ColorSystemSupport GetColorSystem(EnvironmentType envType)
         {
             // User override
@@ -131,34 +107,7 @@ namespace LCT.Common.Logging
 
         private static readonly Dictionary<string, string> _colorCache = new Dictionary<string, string>();
         private static int _colorIndex = 0;
-
-        //private static int GetConsoleWidth(int subtract = 0, int fallback = 120)
-        //{
-        //    if (subtract < 0) subtract = 0;
-
-        //    if (Console.IsOutputRedirected)
-        //        return fallback;
-
-        //    try
-        //    {
-        //        int width = Console.WindowWidth;
-        //        if (width <= 0) return fallback;
-
-        //        int adjusted = width - subtract;
-        //        return adjusted > 0 ? adjusted : fallback;
-        //    }
-        //    catch (Exception ex) when (
-        //        ex is InvalidOperationException ||
-        //        ex is PlatformNotSupportedException ||
-        //        ex is System.IO.IOException ||
-        //        ex is SecurityException)
-        //    {
-        //        Logger.Debug($"SafeSpectreAction suppressed exception: {ex.GetType().Name} - {ex.Message}");
-        //    }
-
-        //    return fallback;
-        //}
-
+               
         public static void SafeSpectreAction(Action spectreAction, string fallbackMessage, string fallbackType = "Info")
         {
             try
@@ -677,8 +626,7 @@ namespace LCT.Common.Logging
         private static string GenerateIdentifierContent(CatoolInfo caToolInformation, CommonAppSettings appSettings,
             ListofPerametersForCli listofPerameters)
         {
-            int consoleWidth = GetConsoleWidth();
-            int maxPathLength = Math.Max(60, consoleWidth - 20);
+            int maxPathLength = GetPathWrapWidth();
             var content = new StringBuilder();
 
             content
@@ -707,8 +655,7 @@ namespace LCT.Common.Logging
 
         private static string GenerateCreatorContent(CatoolInfo caToolInformation, CommonAppSettings appSettings, string bomFilePath)
         {
-            int consoleWidth = GetConsoleWidth();
-            int maxPathLength = Math.Max(60, consoleWidth - 20);
+            int maxPathLength = GetPathWrapWidth();
             var content = new StringBuilder();
 
             content
@@ -723,8 +670,7 @@ namespace LCT.Common.Logging
 
         private static string GenerateUploaderContent(CatoolInfo caToolInformation, CommonAppSettings appSettings, string bomFilePath)
         {
-            int consoleWidth = GetConsoleWidth();
-            int maxPathLength = Math.Max(60, consoleWidth - 20);
+            int maxPathLength = GetPathWrapWidth();
             var content = new StringBuilder();
 
             content
@@ -1403,6 +1349,25 @@ namespace LCT.Common.Logging
 
                 Logger.Info("\n");
             }
+        }
+        private static int GetPathWrapWidth(int reserved = 20, int min = 40, int max = 240)
+        {
+            if (reserved < 0) reserved = 0;
+
+            // Explicit override
+            if (int.TryParse(Environment.GetEnvironmentVariable("LOG_PATH_WRAP"), out var overrideWidth) &&
+                overrideWidth >= min)
+            {
+                return Math.Min(overrideWidth, max);
+            }
+
+            int consoleWidth = GetConsoleWidth();
+            int candidate = consoleWidth - reserved;
+
+            if (candidate < min) candidate = min;
+            if (candidate > max) candidate = max;
+
+            return candidate;
         }
 
     }
