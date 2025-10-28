@@ -38,12 +38,36 @@ namespace LCT.Common.Logging
                     {
                         var settings = BuildAnsiConsoleSettings();
                         _console = AnsiConsole.Create(settings);
+                        _console.Profile.Width = GetAutoConsoleWidth(); 
+                        _console.Profile.Capabilities.Ansi = true;
+                        _console.Profile.Capabilities.Links = false;
+                        _console.Profile.Capabilities.Interactive = false;
                     }
                 }
                 return _console;
             }
         }
-
+        private static int GetAutoConsoleWidth()
+        {
+            try
+            {
+                // 1. Try to get real console width (works locally)
+                int width = Console.WindowWidth;
+                // 2. If running in Azure or CI, force a sensible default
+                if (width <= 0 || width < 100)
+                {
+                    // Use larger width for long lines
+                    width = 160;
+                }
+                // 3. Limit upper bound to prevent too wide formatting
+                return Math.Min(width, 240);
+            }
+            catch
+            {
+                // Console.WindowWidth can throw in CI, so safely return a fallback
+                return 160;
+            }
+        }
         private static AnsiConsoleSettings BuildAnsiConsoleSettings()
         {
             EnvironmentType envType = RuntimeEnvironment.GetEnvironment();
