@@ -38,46 +38,37 @@ namespace LCT.Common.Logging
                     {
                         var settings = BuildAnsiConsoleSettings();
                         _console = AnsiConsole.Create(settings);
-                        _console.Profile.Width = GetAutoConsoleWidth(); 
+                        _console.Profile.Width = GetConsoleWidth(); 
                         _console.Profile.Capabilities.Ansi = true;
-                        _console.Profile.Capabilities.Links = false;
-                        _console.Profile.Capabilities.Interactive = false;
                     }
                 }
                 return _console;
             }
         }
-        private static int GetAutoConsoleWidth()
-        {
-            try
-            {
-                // 1. Try to get real console width (works locally)
-                int width = Console.WindowWidth;
-                // 2. If running in Azure or CI, force a sensible default
-                if (width <= 0 || width < 100)
-                {
-                    // Use larger width for long lines
-                    width = 160;
-                }
-                // 3. Limit upper bound to prevent too wide formatting
-                return Math.Min(width, 240);
-            }
-            catch
-            {
-                // Console.WindowWidth can throw in CI, so safely return a fallback
-                return 160;
-            }
-        }
+        private static int GetConsoleWidth()
+       {
+           try
+           {
+               int width = Console.IsOutputRedirected ? 160 : Console.WindowWidth;
+               if (width < 100) width = 160;   
+               if (width > 240) width = 240;   
+               return width;
+           }
+           catch
+           {
+               return 160;
+           }
+       }
         private static AnsiConsoleSettings BuildAnsiConsoleSettings()
         {
             EnvironmentType envType = RuntimeEnvironment.GetEnvironment();
 
-            var ansi = GetAnsiSupport(envType);
+            //var ansi = GetAnsiSupport(envType);
             var colorSystem = GetColorSystem(envType);
 
             var settings = new AnsiConsoleSettings
             {
-                Ansi = ansi,
+                Ansi = AnsiSupport.Yes,
                 ColorSystem = colorSystem,
                 Out = AnsiConsole.Profile.Out,
                 Interactive = InteractionSupport.No
@@ -141,32 +132,32 @@ namespace LCT.Common.Logging
         private static readonly Dictionary<string, string> _colorCache = new Dictionary<string, string>();
         private static int _colorIndex = 0;
 
-        private static int GetConsoleWidth(int subtract = 0, int fallback = 120)
-        {
-            if (subtract < 0) subtract = 0;
+        //private static int GetConsoleWidth(int subtract = 0, int fallback = 120)
+        //{
+        //    if (subtract < 0) subtract = 0;
 
-            if (Console.IsOutputRedirected)
-                return fallback;
+        //    if (Console.IsOutputRedirected)
+        //        return fallback;
 
-            try
-            {
-                int width = Console.WindowWidth;
-                if (width <= 0) return fallback;
+        //    try
+        //    {
+        //        int width = Console.WindowWidth;
+        //        if (width <= 0) return fallback;
 
-                int adjusted = width - subtract;
-                return adjusted > 0 ? adjusted : fallback;
-            }
-            catch (Exception ex) when (
-                ex is InvalidOperationException ||
-                ex is PlatformNotSupportedException ||
-                ex is System.IO.IOException ||
-                ex is SecurityException)
-            {
-                Logger.Debug($"SafeSpectreAction suppressed exception: {ex.GetType().Name} - {ex.Message}");
-            }
+        //        int adjusted = width - subtract;
+        //        return adjusted > 0 ? adjusted : fallback;
+        //    }
+        //    catch (Exception ex) when (
+        //        ex is InvalidOperationException ||
+        //        ex is PlatformNotSupportedException ||
+        //        ex is System.IO.IOException ||
+        //        ex is SecurityException)
+        //    {
+        //        Logger.Debug($"SafeSpectreAction suppressed exception: {ex.GetType().Name} - {ex.Message}");
+        //    }
 
-            return fallback;
-        }
+        //    return fallback;
+        //}
 
         public static void SafeSpectreAction(Action spectreAction, string fallbackMessage, string fallbackType = "Info")
         {
@@ -215,7 +206,7 @@ namespace LCT.Common.Logging
             WriteInfoWithMarkup("[yellow]  Component name exists in SW360 with a different package type PurlId. Manually update the component details.[/]");
             WriteLine();
 
-            int consoleWidth = GetConsoleWidth(6, 200);
+            int consoleWidth = GetConsoleWidth();
 
             var table = new Table()
                 .BorderColor(Color.Yellow)
@@ -281,7 +272,7 @@ namespace LCT.Common.Logging
             var table = new Table()
                 .BorderColor(Color.Yellow)
                 .Border(TableBorder.Rounded)
-                .Width(Math.Min(GetConsoleWidth(6, 120), includeUrl ? 200 : 120));
+                .Width(Math.Min(GetConsoleWidth(), includeUrl ? 200 : 120));
 
             table.AddColumn(new TableColumn("[green]Name[/]").Width(45));
             table.AddColumn(new TableColumn("[blue]Version[/]").Width(25));
@@ -329,7 +320,7 @@ namespace LCT.Common.Logging
                     WriteInfoWithMarkup("[yellow] Can be linked manually OR Check the Logs AND RE-Run[/]");
                     WriteLine();
 
-                    int consoleWidth = GetConsoleWidth(6, 120);
+                    int consoleWidth = GetConsoleWidth();
 
                     var table = new Table()
                         .BorderColor(Color.Yellow)
@@ -686,7 +677,7 @@ namespace LCT.Common.Logging
         private static string GenerateIdentifierContent(CatoolInfo caToolInformation, CommonAppSettings appSettings,
             ListofPerametersForCli listofPerameters)
         {
-            int consoleWidth = GetConsoleWidth(10, 110);
+            int consoleWidth = GetConsoleWidth();
             int maxPathLength = Math.Max(60, consoleWidth - 20);
             var content = new StringBuilder();
 
@@ -716,7 +707,7 @@ namespace LCT.Common.Logging
 
         private static string GenerateCreatorContent(CatoolInfo caToolInformation, CommonAppSettings appSettings, string bomFilePath)
         {
-            int consoleWidth = GetConsoleWidth(10, 110);
+            int consoleWidth = GetConsoleWidth();
             int maxPathLength = Math.Max(60, consoleWidth - 20);
             var content = new StringBuilder();
 
@@ -732,7 +723,7 @@ namespace LCT.Common.Logging
 
         private static string GenerateUploaderContent(CatoolInfo caToolInformation, CommonAppSettings appSettings, string bomFilePath)
         {
-            int consoleWidth = GetConsoleWidth(10, 110);
+            int consoleWidth = GetConsoleWidth();
             int maxPathLength = Math.Max(60, consoleWidth - 20);
             var content = new StringBuilder();
 
@@ -883,7 +874,7 @@ namespace LCT.Common.Logging
             SafeSpectreAction(() =>
             {
                 // Use the full current console width (fallback if unavailable)
-                int consoleWidth = GetConsoleWidth(0, 120);
+                int consoleWidth = GetConsoleWidth();
 
                 // Safety bounds: never smaller than 20, cap if an extremely wide terminal (>300)
                 int panelWidth = Math.Clamp(consoleWidth, 20, 300);
@@ -913,7 +904,7 @@ namespace LCT.Common.Logging
             SafeSpectreAction(() =>
             {
                 WriteLine(); // Add a new line before the header
-                var consoleWidth = GetConsoleWidth(0, 120);
+                var consoleWidth = GetConsoleWidth();
                 var padding = (consoleWidth - title.Length) / 2;
                 var centeredText = title.PadLeft(padding + title.Length).PadRight(consoleWidth);
                 var bottomBorder = new string('═', consoleWidth); // Double line border character
@@ -932,7 +923,7 @@ namespace LCT.Common.Logging
             SafeSpectreAction(() =>
             {
                 WriteLine(); // Add a new line before the header
-                var consoleWidth = GetConsoleWidth(0, 120);
+                var consoleWidth = GetConsoleWidth();
                 var padding = (consoleWidth - title.Length) / 2;
                 var centeredText = title.PadLeft(padding + title.Length).PadRight(consoleWidth);
                 ConsoleInstance.MarkupLine($"[bold white]{Markup.Escape(centeredText)}[/]");
@@ -1029,7 +1020,7 @@ namespace LCT.Common.Logging
                 WriteSummaryHeader("SUMMARY");
                 WriteProjectSummary(ProjectSummaryLink);
 
-                int consoleWidth = GetConsoleWidth(6, 120);
+                int consoleWidth = GetConsoleWidth();
                 int barMaxWidth = Math.Max(20, 40);
                 int maxValue = printData.Values.Count != 0 ? printData.Values.Max() : 0;
 
@@ -1205,7 +1196,7 @@ namespace LCT.Common.Logging
                     WriteInfoWithMarkup("[yellow bold]* Internal Components Identified which will not be sent for clearing:[/]");
                     WriteLine();
 
-                    int consoleWidth = GetConsoleWidth(6, 120);
+                    int consoleWidth = GetConsoleWidth();
 
                     var table = new Table()
                         .BorderColor(Color.Yellow)
