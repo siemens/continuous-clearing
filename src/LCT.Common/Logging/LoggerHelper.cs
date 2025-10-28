@@ -59,9 +59,7 @@ namespace LCT.Common.Logging
                 Interactive = InteractionSupport.No
             };
             return settings;
-        }
-
-
+        }        
 
         private static AnsiSupport GetAnsiSupport(EnvironmentType envType)
         {
@@ -72,15 +70,10 @@ namespace LCT.Common.Logging
             if (string.Equals(force, "1", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(force, "true", StringComparison.OrdinalIgnoreCase))
                 return AnsiSupport.Yes;
-
-            if (envType == EnvironmentType.AzurePipeline)
+            
+            if (envType == EnvironmentType.AzurePipeline || envType == EnvironmentType.AzureRelease)
             {
-                var redirectFlag = Environment.GetEnvironmentVariable("DOTNET_SYSTEM_CONSOLE_ALLOW_ANSI_COLOR_REDIRECTION");
-                if (string.Equals(redirectFlag, "1") ||
-                    string.Equals(redirectFlag, "true", StringComparison.OrdinalIgnoreCase))
-                    return AnsiSupport.Yes;
-
-                return AnsiSupport.No;
+                return AnsiSupport.Yes;
             }
             if (Console.IsOutputRedirected)
             {
@@ -865,21 +858,27 @@ namespace LCT.Common.Logging
         {
             SafeSpectreAction(() =>
             {
-                int consoleWidth = GetConsoleWidth(4, 120);
-                int panelWidth = Math.Min(consoleWidth, 150);
+                // Use the full current console width (fallback if unavailable)
+                int consoleWidth = GetConsoleWidth(0, 120);
 
-                var panel = new Panel(content)
+                // Safety bounds: never smaller than 20, cap if an extremely wide terminal (>300)
+                int panelWidth = Math.Clamp(consoleWidth, 20, 300);
+
+                // Optional: normalize line endings and trim trailing spaces
+                string normalizedContent = content?.Replace("\r\n", "\n").TrimEnd() ?? string.Empty;
+
+                var panel = new Panel(normalizedContent)
                 {
                     Border = BoxBorder.Rounded,
                     BorderStyle = Style.Parse(borderStyle),
                     Padding = new Padding(1, 0, 1, 0),
                     Width = panelWidth,
-                    Expand = false
+                    Expand = true // Allow full-width expansion
                 };
 
                 if (!string.IsNullOrEmpty(title))
                 {
-                    panel.Header = new PanelHeader($"[{headerStyle}]{Markup.Escape(title)}[/]");
+                    panel.Header = new PanelHeader($"[{headerStyle}]{Markup.Escape(title)}[/]", Justify.Center);
                 }
 
                 ConsoleWrite(c => c.Write(panel));
