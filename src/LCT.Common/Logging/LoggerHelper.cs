@@ -48,12 +48,10 @@ namespace LCT.Common.Logging
         {
             try
             {
-                int width = Console.WindowWidth;
-                if (width <= 0 || width < 100)
-                {
-                    width = 160;
-                }
-                return Math.Min(width, 240);
+                int width = Console.IsOutputRedirected ? 160 : Console.WindowWidth;
+                if (width < 100) width = 160;
+                if (width > 240) width = 240;
+                return width;
             }
             catch
             {
@@ -821,27 +819,21 @@ namespace LCT.Common.Logging
         {
             SafeSpectreAction(() =>
             {
-                // Use the full current console width (fallback if unavailable)
                 int consoleWidth = GetAutoConsoleWidth();
+                int panelWidth = Math.Min(consoleWidth, 150);
 
-                // Safety bounds: never smaller than 20, cap if an extremely wide terminal (>300)
-                int panelWidth = Math.Clamp(consoleWidth, 20, 300);
-
-                // Optional: normalize line endings and trim trailing spaces
-                string normalizedContent = content?.Replace("\r\n", "\n").TrimEnd() ?? string.Empty;
-
-                var panel = new Panel(normalizedContent)
+                var panel = new Panel(content)
                 {
                     Border = BoxBorder.Rounded,
                     BorderStyle = Style.Parse(borderStyle),
                     Padding = new Padding(1, 0, 1, 0),
                     Width = panelWidth,
-                    Expand = true // Allow full-width expansion
+                    Expand = true
                 };
 
                 if (!string.IsNullOrEmpty(title))
                 {
-                    panel.Header = new PanelHeader($"[{headerStyle}]{Markup.Escape(title)}[/]", Justify.Center);
+                    panel.Header = new PanelHeader($"[{headerStyle}]{Markup.Escape(title)}[/]");
                 }
 
                 ConsoleWrite(c => c.Write(panel));
