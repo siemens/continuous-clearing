@@ -241,10 +241,11 @@ namespace LCT.Common.Logging
             foreach (var item in componentInfo)
             {
                 string link = CommonHelper.Sw360URL(sw360URL, item.ReleaseID);
+                string clickableLink = $"[link={link}]{link}[/link]";
                 table.AddRow(
                     Markup.Escape(item.Name),
                     Markup.Escape(item.Version),
-                    Markup.Escape(link)
+                    clickableLink
                 );
             }
         }
