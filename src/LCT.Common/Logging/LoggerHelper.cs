@@ -26,7 +26,7 @@ namespace LCT.Common.Logging
         private static IAnsiConsole _console;
         private static readonly object _consoleLock = new();
 
-        private static IAnsiConsole ConsoleInstance
+        public static IAnsiConsole ConsoleInstance
         {
             get
             {
@@ -107,14 +107,7 @@ namespace LCT.Common.Logging
         }
 
         private static readonly Dictionary<string, string> _colorCache = new Dictionary<string, string>();
-        private static int _colorIndex = 0;
-        public static void InitializeConsole()
-        {
-            if (LoggerFactory.UseSpectreConsole)
-            {
-                _ = ConsoleInstance;
-            }
-        }
+        private static int _colorIndex = 0;       
 
         public static void SafeSpectreAction(Action spectreAction, string fallbackMessage, string fallbackType = "Info")
         {

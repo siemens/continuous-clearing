@@ -50,7 +50,6 @@ namespace ArtifactoryUploader
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             Log4Net.CatoolCurrentDirectory = System.IO.Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
             CommonHelper.DefaultLogFolderInitialisation(FileConstant.ArtifactoryUploaderLog, m_Verbose);
-            LoggerHelper.InitializeConsole();
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             string _ = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.ArtifactoryUploaderLog, m_Verbose);

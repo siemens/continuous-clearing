@@ -10,7 +10,7 @@ using NUnit.Framework;
 using System;
 using System.Globalization;
 
-namespace LCT.Common.UTests
+namespace LCT.Common.UTest
 {
     [TestFixture]
     public class SpectreLogAdapterTests

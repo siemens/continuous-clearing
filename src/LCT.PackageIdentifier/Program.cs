@@ -89,7 +89,6 @@ namespace LCT.PackageIdentifier
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
             CommonHelper.DefaultLogFolderInitialisation(FileConstant.BomCreatorLog, m_Verbose);
-            LoggerHelper.InitializeConsole();
             CommonAppSettings appSettings = _settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
             appSettings.ProjectType = CommonHelper.CanonicalizeProjectType(appSettings.ProjectType);
             ProjectReleases projectReleases = new ProjectReleases();

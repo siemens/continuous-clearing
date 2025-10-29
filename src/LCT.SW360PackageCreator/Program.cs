@@ -56,7 +56,6 @@ namespace LCT.SW360PackageCreator
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
             CommonHelper.DefaultLogFolderInitialisation(FileConstant.ComponentCreatorLog, m_Verbose);
-            LoggerHelper.InitializeConsole();
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
 
             ISw360ProjectService sw360ProjectService = Getsw360ProjectServiceObject(appSettings, out ISW360ApicommunicationFacade sW360ApicommunicationFacade);
