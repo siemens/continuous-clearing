@@ -78,9 +78,6 @@ namespace LCT.SW360PackageCreator
             ListofPerametersForCli listofPerameters = new ListofPerametersForCli();
             LoggerHelper.LogInputParameters(caToolInformation, appSettings, listofPerameters, exeType: Dataconstant.Creator, bomFilePath: bomFilePath);
 
-            if (appSettings.IsTestMode)
-                Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);
-
             //Validate Fossology Url
             if (appSettings.SW360.Fossology.EnableTrigger && !appSettings.IsTestMode)
             {

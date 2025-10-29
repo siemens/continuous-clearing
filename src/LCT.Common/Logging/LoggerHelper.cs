@@ -713,6 +713,12 @@ namespace LCT.Common.Logging
                 .Append($"  └──> {appSettings.SW360.IgnoreDevDependency}\n\n")
                 .Append($"[green]-[/] [cyan]LogFolderPath[/]\n")
                 .Append($"  └──> {WrapPath(Log4Net.CatoolLogPath, maxPathLength)}\n\n");
+            if (appSettings.IsTestMode)
+            {
+                content
+                    .Append($"[green]-[/] [cyan]Mode[/]\n")
+                    .Append($"  └──> {appSettings.Mode}\n\n");
+            }
         }
 
 
@@ -775,17 +781,24 @@ namespace LCT.Common.Logging
             }
             else if (exeType == Dataconstant.Creator)
             {
-                Logger.Logger.Log(null, Level.Notice, $"Input parameters used in Package Creator:\n\t" +
-                              $"CaToolVersion\t\t --> {caToolInformation.CatoolVersion}\n\t" +
-                              $"CaToolRunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
-                              $"BomFilePath\t\t --> {bomFilePath}\n\t" +
-                              $"SW360Url\t\t --> {appSettings.SW360.URL}\n\t" +
-                              $"SW360ProjectName\t --> {appSettings.SW360.ProjectName}\n\t" +
-                              $"SW360ProjectID\t\t --> {appSettings.SW360.ProjectID}\n\t" +
-                              $"FossologyURL\t\t --> {appSettings.SW360.Fossology.URL}\n\t" +
-                              $"EnableFossTrigger\t --> {appSettings.SW360.Fossology.EnableTrigger}\n\t" +
-                              $"IgnoreDevDependency\t --> {appSettings.SW360.IgnoreDevDependency}\n\t" +
-                              $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t", null);
+                var creatorMessage =
+                    $"Input parameters used in Package Creator:\n\t" +
+                    $"CaToolVersion\t\t --> {caToolInformation.CatoolVersion}\n\t" +
+                    $"CaToolRunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
+                    $"BomFilePath\t\t --> {bomFilePath}\n\t" +
+                    $"SW360Url\t\t --> {appSettings.SW360.URL}\n\t" +
+                    $"SW360ProjectName\t --> {appSettings.SW360.ProjectName}\n\t" +
+                    $"SW360ProjectID\t\t --> {appSettings.SW360.ProjectID}\n\t" +
+                    $"FossologyURL\t\t --> {appSettings.SW360.Fossology.URL}\n\t" +
+                    $"EnableFossTrigger\t --> {appSettings.SW360.Fossology.EnableTrigger}\n\t" +
+                    $"IgnoreDevDependency\t --> {appSettings.SW360.IgnoreDevDependency}\n\t";
+
+                if (appSettings.IsTestMode)
+                {
+                    creatorMessage += $"Mode\t\t --> {appSettings.Mode}\n\t";
+                }
+                creatorMessage += $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t";
+                Logger.Logger.Log(null, Level.Notice, creatorMessage, null);
             }
             else if (exeType == Dataconstant.Uploader)
             {
