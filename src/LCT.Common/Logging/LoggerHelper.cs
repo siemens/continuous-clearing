@@ -14,7 +14,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Security;
 using System.Text;
 using Level = log4net.Core.Level;
 
@@ -38,7 +37,7 @@ namespace LCT.Common.Logging
                     {
                         var settings = BuildAnsiConsoleSettings();
                         _console = AnsiConsole.Create(settings);
-                        _console.Profile.Width = GetAutoConsoleWidth(); 
+                        _console.Profile.Width = GetAutoConsoleWidth();
                         _console.Profile.Capabilities.Ansi = true;
                     }
                 }
@@ -75,7 +74,7 @@ namespace LCT.Common.Logging
                 Interactive = InteractionSupport.No
             };
             return settings;
-        } 
+        }
         private static ColorSystemSupport GetColorSystem(EnvironmentType envType)
         {
             // User override
@@ -106,7 +105,7 @@ namespace LCT.Common.Logging
 
         private static readonly Dictionary<string, string> _colorCache = new Dictionary<string, string>();
         private static int _colorIndex = 0;
-                
+
 
         public static void SafeSpectreAction(Action spectreAction, string fallbackMessage, string fallbackType = "Info")
         {
@@ -581,18 +580,18 @@ namespace LCT.Common.Logging
         {
             content
                 .Append($"[green]-[/] [cyan]PackageFilePath[/]\n")
-                .Append($"  └──➤ {WrapPath(appSettings.Directory.InputFolder, maxPathLength)}\n\n")
+                .Append($"  └──> {WrapPath(appSettings.Directory.InputFolder, maxPathLength)}\n\n")
                 .Append($"[green]-[/] [cyan]BomFolderPath[/]\n")
-                .Append($"  └──➤ {WrapPath(appSettings.Directory.OutputFolder, maxPathLength)}\n\n");
+                .Append($"  └──> {WrapPath(appSettings.Directory.OutputFolder, maxPathLength)}\n\n");
         }
 
         private static void AppendBasicInfo(StringBuilder content, CatoolInfo caToolInformation, int maxPathLength)
         {
             content
                 .Append($"[green]-[/] [cyan]CaToolVersion[/]\n")
-                .Append($"  └──✅ {caToolInformation.CatoolVersion}\n\n")
+                .Append($"  └──> {caToolInformation.CatoolVersion}\n\n")
                 .Append($"[green]-[/] [cyan]CaToolRunningPath[/]\n")
-                .Append($"  └──➤ {WrapPath(caToolInformation.CatoolRunningLocation, maxPathLength)}\n\n");
+                .Append($"  └──> {WrapPath(caToolInformation.CatoolRunningLocation, maxPathLength)}\n\n");
         }
 
         private static void AppendSw360Info(StringBuilder content, CommonAppSettings appSettings,
@@ -600,13 +599,13 @@ namespace LCT.Common.Logging
         {
             content
                 .Append($"[green]-[/] [cyan]SW360Url[/]\n")
-                .Append($"  └──➤ {appSettings.SW360.URL}\n\n")
+                .Append($"  └──> {appSettings.SW360.URL}\n\n")
                 .Append($"[green]-[/] [cyan]SW360ProjectName[/]\n")
-                .Append($"  └──➤ {appSettings.SW360.ProjectName}\n\n")
+                .Append($"  └──> {appSettings.SW360.ProjectName}\n\n")
                 .Append($"[green]-[/] [cyan]SW360ProjectID[/]\n")
-                .Append($"  └──➤ {appSettings.SW360.ProjectID}\n\n")
+                .Append($"  └──> {appSettings.SW360.ProjectID}\n\n")
                 .Append($"[green]-[/] [cyan]ExcludeComponents[/]\n")
-                .Append($"  └──➤ {WrapPath(string.IsNullOrEmpty(listofPerameters.ExcludeComponents) ? "None" : listofPerameters.ExcludeComponents, maxPathLength)}\n\n");
+                .Append($"  └──> {WrapPath(string.IsNullOrEmpty(listofPerameters.ExcludeComponents) ? "None" : listofPerameters.ExcludeComponents, maxPathLength)}\n\n");
         }
 
         private static void AppendCommonInfo(StringBuilder content, CommonAppSettings appSettings,
@@ -614,13 +613,13 @@ namespace LCT.Common.Logging
         {
             content
                 .Append($"[green]-[/] [cyan]ProjectType[/]\n")
-                .Append($"  └──➤ {appSettings.ProjectType}\n\n")
+                .Append($"  └──> {appSettings.ProjectType}\n\n")
                 .Append($"[green]-[/] [cyan]LogFolderPath[/]\n")
-                .Append($"  └──➤ {WrapPath(Log4Net.CatoolLogPath, maxPathLength)}\n\n")
+                .Append($"  └──> {WrapPath(Log4Net.CatoolLogPath, maxPathLength)}\n\n")
                 .Append($"[green]-[/] [cyan]Include[/]\n")
-                .Append($"  └──➤ {WrapPath(string.IsNullOrEmpty(listofPerameters.Include) ? "None" : listofPerameters.Include, maxPathLength)}\n\n")
+                .Append($"  └──> {WrapPath(string.IsNullOrEmpty(listofPerameters.Include) ? "None" : listofPerameters.Include, maxPathLength)}\n\n")
                 .Append($"[green]-[/] [cyan]Exclude[/]\n")
-                .Append($"  └──➤ {WrapPath(string.IsNullOrEmpty(listofPerameters.Exclude) ? "None" : listofPerameters.Exclude, maxPathLength)}");
+                .Append($"  └──> {WrapPath(string.IsNullOrEmpty(listofPerameters.Exclude) ? "None" : listofPerameters.Exclude, maxPathLength)}");
         }
 
         private static string GenerateIdentifierContent(CatoolInfo caToolInformation, CommonAppSettings appSettings,
@@ -646,7 +645,7 @@ namespace LCT.Common.Logging
             {
                 content
                     .Append($"[green]-[/] [cyan]InternalRepoList[/]\n")
-                    .Append($"  └──➤ {WrapPath(string.IsNullOrEmpty(listofPerameters.InternalRepoList) ? "None" : listofPerameters.InternalRepoList, maxPathLength)}\n\n");
+                    .Append($"  └──> {WrapPath(string.IsNullOrEmpty(listofPerameters.InternalRepoList) ? "None" : listofPerameters.InternalRepoList, maxPathLength)}\n\n");
             }
 
             AppendCommonInfo(content, appSettings, listofPerameters, maxPathLength);
@@ -691,21 +690,21 @@ namespace LCT.Common.Logging
         {
             content
                 .Append($"[green]-[/] [cyan]BomFilePath[/]\n")
-                .Append($"  └──➤ {WrapPath(bomFilePath, maxPathLength)}\n\n")
+                .Append($"  └──> {WrapPath(bomFilePath, maxPathLength)}\n\n")
                 .Append($"[green]-[/] [cyan]SW360Url[/]\n")
-                .Append($"  └──➤ {appSettings.SW360.URL}\n\n")
+                .Append($"  └──> {appSettings.SW360.URL}\n\n")
                 .Append($"[green]-[/] [cyan]SW360ProjectName[/]\n")
-                .Append($"  └──➤ {appSettings.SW360.ProjectName}\n\n")
+                .Append($"  └──> {appSettings.SW360.ProjectName}\n\n")
                 .Append($"[green]-[/] [cyan]SW360ProjectID[/]\n")
-                .Append($"  └──➤ {appSettings.SW360.ProjectID}\n\n")
+                .Append($"  └──> {appSettings.SW360.ProjectID}\n\n")
                 .Append($"[green]-[/] [cyan]FossologyURL[/]\n")
-                .Append($"  └──➤ {appSettings.SW360.Fossology.URL}\n\n")
+                .Append($"  └──> {appSettings.SW360.Fossology.URL}\n\n")
                 .Append($"[green]-[/] [cyan]EnableFossTrigger[/]\n")
-                .Append($"  └──➤ {appSettings.SW360.Fossology.EnableTrigger}\n\n")
+                .Append($"  └──> {appSettings.SW360.Fossology.EnableTrigger}\n\n")
                 .Append($"[green]-[/] [cyan]IgnoreDevDependency[/]\n")
-                .Append($"  └──➤ {appSettings.SW360.IgnoreDevDependency}\n\n")
+                .Append($"  └──> {appSettings.SW360.IgnoreDevDependency}\n\n")
                 .Append($"[green]-[/] [cyan]LogFolderPath[/]\n")
-                .Append($"  └──➤ {WrapPath(Log4Net.CatoolLogPath, maxPathLength)}\n\n");
+                .Append($"  └──> {WrapPath(Log4Net.CatoolLogPath, maxPathLength)}\n\n");
         }
 
 
@@ -714,13 +713,13 @@ namespace LCT.Common.Logging
         {
             content
                 .Append($"[green]-[/] [cyan]BomFilePath[/]\n")
-                .Append($"  └──➤ {WrapPath(bomFilePath, maxPathLength)}\n\n")
+                .Append($"  └──> {WrapPath(bomFilePath, maxPathLength)}\n\n")
                 .Append($"[green]-[/] [cyan]JFrogUrl[/]\n")
-                .Append($"  └──➤ {appSettings.Jfrog.URL}\n\n")
+                .Append($"  └──> {appSettings.Jfrog.URL}\n\n")
                 .Append($"[green]-[/] [cyan]Dry-run[/]\n")
-                .Append($"  └──➤ {appSettings.Jfrog.DryRun}\n\n")
+                .Append($"  └──> {appSettings.Jfrog.DryRun}\n\n")
                 .Append($"[green]-[/] [cyan]LogFolderPath[/]\n")
-                .Append($"  └──➤ {WrapPath(Log4Net.CatoolLogPath, maxPathLength)}\n\n");
+                .Append($"  └──> {WrapPath(Log4Net.CatoolLogPath, maxPathLength)}\n\n");
         }
         public static void LogInputParameters(CatoolInfo caToolInformation, CommonAppSettings appSettings, ListofPerametersForCli listofPerameters, string exeType = null, string bomFilePath = null)
         {
