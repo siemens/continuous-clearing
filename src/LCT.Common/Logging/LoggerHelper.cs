@@ -49,14 +49,9 @@ namespace LCT.Common.Logging
 
             try
             {
-                if (Console.IsOutputRedirected)
-                    return 120;
-
-                int width = Console.WindowWidth;
-
-                if (width <= 0) return 160;
-                if (width < 100) return 160;
-                if (width > 240) return 240;
+                int width = Console.IsOutputRedirected ? 160 : Console.WindowWidth;
+                if (width < 100) width = 160;
+                if (width > 240) width = 240;
                 return width;
             }
             catch (InvalidOperationException ex)
