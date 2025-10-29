@@ -95,8 +95,8 @@ namespace LCT.ArtifactoryUploader
             var packageInfo = await TryGetPackageInfo(component);
 
 
-            // Handle DEBIAN package name mismatch
-            if (component.ComponentType == "DEBIAN" && packageInfo != null && packageInfo.Name != component.JfrogPackageName)
+            // Handle DEBIAN or NUGET package name mismatch
+            if ((component.ComponentType == "DEBIAN" || component.ComponentType == "NUGET") && packageInfo != null && packageInfo.Name != component.JfrogPackageName)
             {
                 component.CopyPackageApiUrl = component.CopyPackageApiUrl.Replace(component.JfrogPackageName, packageInfo.Name);
             }
