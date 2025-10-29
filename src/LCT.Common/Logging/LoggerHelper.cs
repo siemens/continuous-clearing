@@ -54,24 +54,14 @@ namespace LCT.Common.Logging
                 if (width > 240) width = 240;
                 return width;
             }
-            catch (InvalidOperationException ex)
+            catch (Exception ex) when (
+                 ex is InvalidOperationException ||
+                 ex is System.IO.IOException ||
+                 ex is PlatformNotSupportedException)
             {
-                Logger.Debug($"GetAutoConsoleWidth(): InvalidOperationException - {ex.Message}");
+                Logger.Debug($"GetAutoConsoleWidth(): fallback due to {ex.GetType().Name} - {ex.Message}");
+                return 160;
             }
-            catch (System.IO.IOException ex)
-            {
-                Logger.Debug($"GetAutoConsoleWidth(): IOException - {ex.Message}");
-            }
-            catch (PlatformNotSupportedException ex)
-            {
-                Logger.Debug($"GetAutoConsoleWidth(): PlatformNotSupportedException - {ex.Message}");
-            }
-            catch (System.Security.SecurityException ex)
-            {
-                Logger.Debug($"GetAutoConsoleWidth(): SecurityException - {ex.Message}");
-            }
-
-            return 160;
         }
         private static AnsiConsoleSettings BuildAnsiConsoleSettings()
         {
@@ -118,7 +108,13 @@ namespace LCT.Common.Logging
 
         private static readonly Dictionary<string, string> _colorCache = new Dictionary<string, string>();
         private static int _colorIndex = 0;
-
+        public static void InitializeConsole()
+        {
+            if (LoggerFactory.UseSpectreConsole)
+            {
+                _ = ConsoleInstance;
+            }
+        }
 
         public static void SafeSpectreAction(Action spectreAction, string fallbackMessage, string fallbackType = "Info")
         {
