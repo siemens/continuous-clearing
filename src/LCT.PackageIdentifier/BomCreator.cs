@@ -72,8 +72,7 @@ namespace LCT.PackageIdentifier
             sw360 = appSettings.SW360;
             // Calls package parser
             listOfComponentsToBom = await CallPackageParser(appSettings);
-            Logger.Logger.Log(null, Level.Notice, $"No of components added to BOM after removing bundled & excluded components " +
-                $"= {listOfComponentsToBom.Components.Count}", null);
+            Logger.Logger.Log(null, Level.Notice, $"No of components added to BOM after removing bundled & excluded components= {listOfComponentsToBom.Components.Count}", null);
 
             bomKpiData.ComponentsInComparisonBOM = listOfComponentsToBom.Components.Count;
             //Get project details for metadata properties
