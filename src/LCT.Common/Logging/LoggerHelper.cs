@@ -49,7 +49,7 @@ namespace LCT.Common.Logging
 
             try
             {
-                int width = Console.IsOutputRedirected ? 160 : Console.WindowWidth;
+                int width = Console.IsOutputRedirected ? 200 : Console.WindowWidth;
                 if (width < 100) width = 160;
                 if (width > 240) width = 240;
                 return width;
@@ -60,7 +60,7 @@ namespace LCT.Common.Logging
                  ex is PlatformNotSupportedException)
             {
                 Logger.Debug($"GetAutoConsoleWidth(): fallback due to {ex.GetType().Name} - {ex.Message}");
-                return 160;
+                return 200;
             }
         }
         private static AnsiConsoleSettings BuildAnsiConsoleSettings()
@@ -222,30 +222,33 @@ namespace LCT.Common.Logging
             var table = new Table()
                 .BorderColor(Color.Yellow)
                 .Border(TableBorder.Rounded)
-                .Width(Math.Min(GetAutoConsoleWidth(), includeUrl ? 200 : 120));
+                .Expand();
 
-            table.AddColumn(new TableColumn("[green]Name[/]").Width(45));
-            table.AddColumn(new TableColumn("[blue]Version[/]").Width(25));
-
+            int totalWidth = Math.Max(160, GetAutoConsoleWidth());
+            int nameWidth = 40;
+            int versionWidth = 20;
+            int linkWidth = includeUrl ? totalWidth - (nameWidth + versionWidth + 10) : 0;
+            table.AddColumn(new TableColumn("[green]Name[/]").Width(nameWidth).NoWrap());
+            table.AddColumn(new TableColumn("[blue]Version[/]").Width(versionWidth).NoWrap());
             if (includeUrl)
             {
-                table.AddColumn(new TableColumn("[cyan]SW360 Release URL[/]").Width(120));
-                table.Expand();
+                table.AddColumn(new TableColumn("[cyan]SW360 Release URL[/]")
+                    .Width(linkWidth)
+                    .NoWrap());
             }
-
             return table;
         }
+
 
         private static void PopulateComponentInfoTable(Table table, List<ComparisonBomData> componentInfo, string sw360URL)
         {
             foreach (var item in componentInfo)
             {
                 string link = CommonHelper.Sw360URL(sw360URL, item.ReleaseID);
-                string clickableLink = $"[link={link}]{link}[/link]";
                 table.AddRow(
                     Markup.Escape(item.Name),
                     Markup.Escape(item.Version),
-                    clickableLink
+                    Markup.Escape(link)
                 );
             }
         }
