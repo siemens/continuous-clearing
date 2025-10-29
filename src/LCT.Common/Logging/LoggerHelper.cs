@@ -45,18 +45,38 @@ namespace LCT.Common.Logging
             }
         }
         private static int GetAutoConsoleWidth()
-        {
+        {           
+
             try
             {
-                int width = Console.IsOutputRedirected ? 160 : Console.WindowWidth;
-                if (width < 100) width = 160;
-                if (width > 240) width = 240;
+                if (Console.IsOutputRedirected)
+                    return 120;
+
+                int width = Console.WindowWidth;
+
+                if (width <= 0) return 160;
+                if (width < 100) return 160;
+                if (width > 240) return 240;
                 return width;
             }
-            catch
+            catch (InvalidOperationException ex)
             {
-                return 160;
+                Logger.Debug($"GetAutoConsoleWidth(): InvalidOperationException - {ex.Message}");
             }
+            catch (System.IO.IOException ex)
+            {
+                Logger.Debug($"GetAutoConsoleWidth(): IOException - {ex.Message}");
+            }
+            catch (PlatformNotSupportedException ex)
+            {
+                Logger.Debug($"GetAutoConsoleWidth(): PlatformNotSupportedException - {ex.Message}");
+            }
+            catch (System.Security.SecurityException ex)
+            {
+                Logger.Debug($"GetAutoConsoleWidth(): SecurityException - {ex.Message}");
+            }
+
+            return 160;
         }
         private static AnsiConsoleSettings BuildAnsiConsoleSettings()
         {
@@ -645,6 +665,12 @@ namespace LCT.Common.Logging
                     .Append($"[green]-[/] [cyan]InternalRepoList[/]\n")
                     .Append($"  └──> {WrapPath(string.IsNullOrEmpty(listofPerameters.InternalRepoList) ? "None" : listofPerameters.InternalRepoList, maxPathLength)}\n\n");
             }
+            if (appSettings.IsTestMode)
+            {
+                content
+                    .Append($"[green]-[/] [cyan]Mode[/]\n")
+                    .Append($"  └──> {appSettings.Mode}\n\n");
+            }
 
             AppendCommonInfo(content, appSettings, listofPerameters, maxPathLength);
 
@@ -752,7 +778,10 @@ namespace LCT.Common.Logging
                 {
                     logMessage += $"InternalRepoList\t --> {listofPerameters.InternalRepoList}\n\t";
                 }
-
+                if (appSettings.IsTestMode)
+                {
+                    logMessage += $"Mode\t --> {appSettings.Mode}\n\t";
+                }
                 logMessage += $"ProjectType\t\t --> {appSettings.ProjectType}\n\t" +
                               $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t" +
                               $"Include\t\t\t --> {listofPerameters.Include}\n\t" +

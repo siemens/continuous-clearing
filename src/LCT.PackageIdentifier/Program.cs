@@ -119,9 +119,6 @@ namespace LCT.PackageIdentifier
             };
             LoggerHelper.LogInputParameters(caToolInformation, appSettings, listParameters, Dataconstant.Identifier);
 
-            if (appSettings.IsTestMode)
-                Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);
-
             _bomCreator.JFrogService = GetJfrogService(appSettings);
             _bomCreator.BomHelper = new BomHelper();
 
