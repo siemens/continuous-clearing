@@ -469,11 +469,11 @@ namespace LCT.Common.Logging
         {
             content
                 .AppendLine($"  [cyan]DEVDEP_REPO_NAME[/]")
-                .AppendLine($"  └──➤ {(!string.IsNullOrEmpty(config.DevDepRepo) ? config.DevDepRepo : Dataconstant.NotConfigured)}\n")
+                .AppendLine($"  └──> {(!string.IsNullOrEmpty(config.DevDepRepo) ? config.DevDepRepo : Dataconstant.NotConfigured)}\n")
                 .AppendLine($"  [cyan]THIRD_PARTY_REPO_NAME[/]")
-                .AppendLine($"  └──➤ {GetThirdPartyRepoName(config)}\n")
+                .AppendLine($"  └──> {GetThirdPartyRepoName(config)}\n")
                 .AppendLine($"  [cyan]RELEASE_REPO_NAME[/]")
-                .AppendLine($"  └──➤ {(!string.IsNullOrEmpty(config.ReleaseRepo) ? config.ReleaseRepo : Dataconstant.NotConfigured)}\n")
+                .AppendLine($"  └──> {(!string.IsNullOrEmpty(config.ReleaseRepo) ? config.ReleaseRepo : Dataconstant.NotConfigured)}\n")
                 .AppendLine($"  [cyan]Config[/]");
         }
 
@@ -490,9 +490,9 @@ namespace LCT.Common.Logging
 
             content
                 .AppendLine($"  ├──[white]Include[/]")
-                .AppendLine($"  │   └──➤ {includeList}")
+                .AppendLine($"  │   └──> {includeList}")
                 .AppendLine($"  └──[white]Exclude[/]")
-                .AppendLine($"      └──➤ {excludeList}\n");
+                .AppendLine($"      └──> {excludeList}\n");
         }
 
         private static string GetFormattedList(string[] items)
