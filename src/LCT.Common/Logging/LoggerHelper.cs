@@ -829,13 +829,12 @@ namespace LCT.Common.Logging
             else if (exeType == Dataconstant.Uploader)
             {
                 Logger.Logger.Log(null, Level.Info, $"Input Parameters used in Artifactory Uploader:\n\t", null);
-                Logger.Logger.Log(null, Level.Notice, $"\tBomFilePath:\t\t {bomFilePath}\n\t" +
+                Logger.Logger.Log(null, Level.Notice, $"\tBoM FilePath:\t\t {bomFilePath}\n\t" +
                     $"CaTool Version\t\t {caToolInformation.CatoolVersion}\n\t" +
                     $"CaTool RunningPath\t {caToolInformation.CatoolRunningLocation}\n\t" +
-                    $"JFrog Url:\t\t {appSettings.Jfrog.URL}\n\t" +
+                    $"JFrogUrl:\t\t {appSettings.Jfrog.URL}\n\t" +
                     $"Dry-run:\t\t {appSettings.Jfrog.DryRun}\n\t" +
                     $"Log FolderPath:\t\t {Log4Net.CatoolLogPath}\n", null);
-
             }
         }
         public static string WrapPath(string path, int maxLength = 80, string prefix = "        ")

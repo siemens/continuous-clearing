@@ -356,17 +356,17 @@ namespace LCT.Common.UTest
 
             // Assert
             string expectedLogMessage = $"Input Parameters used in Package Identifier:\n\t" +
-                $"CaToolVersion\t\t --> {caToolInformation.CatoolVersion}\n\t" +
-                $"CaToolRunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
-                $"PackageFilePath\t\t --> {appSettings.Directory.InputFolder}\n\t" +
-                $"BomFolderPath\t\t --> {appSettings.Directory.OutputFolder}\n\t" +
+                $"CaTool Version\t\t --> {caToolInformation.CatoolVersion}\n\t" +
+                $"CaTool RunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
+                $"Package FilePath\t\t --> {appSettings.Directory.InputFolder}\n\t" +
+                $"BoM FolderPath\t\t --> {appSettings.Directory.OutputFolder}\n\t" +
                 $"SW360Url\t\t --> {appSettings.SW360.URL}\n\t" +
-                $"SW360ProjectName\t --> {appSettings.SW360.ProjectName}\n\t" +
-                $"SW360ProjectID\t\t --> {appSettings.SW360.ProjectID}\n\t" +
-                $"ExcludeComponents\t --> {listOfExcludeComponents}\n\t" +
+                $"SW360 ProjectName\t --> {appSettings.SW360.ProjectName}\n\t" +
+                $"SW360 ProjectID\t\t --> {appSettings.SW360.ProjectID}\n\t" +
+                $"Exclude Components\t --> {listOfExcludeComponents}\n\t" +
                 $"Mode\t --> {appSettings.Mode}\n\t" +
                 $"ProjectType\t\t --> {appSettings.ProjectType}\n\t" +
-                $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t" +
+                $"Log FolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t" +
                 $"Include\t\t\t --> {listOfInclude}\n\t" +
                 $"Exclude\t\t\t --> {listOfExclude}\n";
             LoggerFactory.UseSpectreConsole = true;
@@ -415,12 +415,12 @@ namespace LCT.Common.UTest
 
             // Assert
             string expectedLogMessage = $"Input Parameters used in Package Identifier:\n\t" +
-                $"CaToolVersion\t\t --> {caToolInformation.CatoolVersion}\n\t" +
-                $"CaToolRunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
-                $"PackageFilePath\t\t --> {appSettings.Directory.InputFolder}\n\t" +
-                $"BomFolderPath\t\t --> {appSettings.Directory.OutputFolder}\n\t" +
+                $"CaTool Version\t\t --> {caToolInformation.CatoolVersion}\n\t" +
+                $"CaTool RunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
+                $"Package FilePath\t\t --> {appSettings.Directory.InputFolder}\n\t" +
+                $"BoM FolderPath\t\t --> {appSettings.Directory.OutputFolder}\n\t" +
                 $"ProjectType\t\t --> {appSettings.ProjectType}\n\t" +
-                $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t" +
+                $"Log FolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t" +
                 $"Include\t\t\t --> {listOfInclude}\n\t" +
                 $"Exclude\t\t\t --> {listOfExclude}\n";
             LoggerFactory.UseSpectreConsole = true;
@@ -469,13 +469,13 @@ namespace LCT.Common.UTest
 
             // Assert
             string expectedLogMessage = $"Input Parameters used in Package Identifier:\n\t" +
-                $"CaToolVersion\t\t --> {caToolInformation.CatoolVersion}\n\t" +
-                $"CaToolRunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
-                $"PackageFilePath\t\t --> {appSettings.Directory.InputFolder}\n\t" +
-                $"BomFolderPath\t\t --> {appSettings.Directory.OutputFolder}\n\t" +
+                $"CaTool Version\t\t --> {caToolInformation.CatoolVersion}\n\t" +
+                $"CaTool RunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
+                $"Package FilePath\t\t --> {appSettings.Directory.InputFolder}\n\t" +
+                $"BoM FolderPath\t\t --> {appSettings.Directory.OutputFolder}\n\t" +
                 $"InternalRepoList\t --> {listOfInternalRepoList}\n\t" +
                 $"ProjectType\t\t --> {appSettings.ProjectType}\n\t" +
-                $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t" +
+                $"Log FolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t" +
                 $"Include\t\t\t --> {listOfInclude}\n\t" +
                 $"Exclude\t\t\t --> {listOfExclude}\n";
             LoggerFactory.UseSpectreConsole = true;
@@ -521,17 +521,17 @@ namespace LCT.Common.UTest
 
             string expected =
                 $"Input parameters used in Package Creator:\n\t" +
-                $"CaToolVersion\t\t --> {catool.CatoolVersion}\n\t" +
-                $"CaToolRunningPath\t --> {catool.CatoolRunningLocation}\n\t" +
-                $"BomFilePath\t\t --> {bomFilePath}\n\t" +
+                $"CaTool Version\t\t --> {catool.CatoolVersion}\n\t" +
+                $"CaTool RunningPath\t --> {catool.CatoolRunningLocation}\n\t" +
+                $"BoM FilePath\t\t --> {bomFilePath}\n\t" +
                 $"SW360Url\t\t --> {appSettings.SW360.URL}\n\t" +
-                $"SW360ProjectName\t --> {appSettings.SW360.ProjectName}\n\t" +
-                $"SW360ProjectID\t\t --> {appSettings.SW360.ProjectID}\n\t" +
+                $"SW360 ProjectName\t --> {appSettings.SW360.ProjectName}\n\t" +
+                $"SW360 ProjectID\t\t --> {appSettings.SW360.ProjectID}\n\t" +
                 $"FossologyURL\t\t --> {appSettings.SW360.Fossology.URL}\n\t" +
-                $"EnableFossTrigger\t --> {appSettings.SW360.Fossology.EnableTrigger}\n\t" +
+                $"Enable FossTrigger\t --> {appSettings.SW360.Fossology.EnableTrigger}\n\t" +
                 $"IgnoreDevDependency\t --> {appSettings.SW360.IgnoreDevDependency}\n\t" +
                 $"Mode\t\t --> {appSettings.Mode}\n\t" +
-                $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t";
+                $"Log FolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t";
 
             Assert.AreEqual(expected, notice.RenderedMessage);
         }
@@ -567,12 +567,12 @@ namespace LCT.Common.UTest
             Assert.IsNotNull(detail, "Uploader detail notice log not found.");
 
             string expectedDetail =
-                $"\tBomFilePath:\t\t {bomFilePath}\n\t" +
-                $"CaToolVersion\t\t {catool.CatoolVersion}\n\t" +
-                $"CaToolRunningPath\t {catool.CatoolRunningLocation}\n\t" +
+                $"\tBoM FilePath:\t\t {bomFilePath}\n\t" +
+                $"CaTool Version\t\t {catool.CatoolVersion}\n\t" +
+                $"CaTool RunningPath\t {catool.CatoolRunningLocation}\n\t" +
                 $"JFrogUrl:\t\t {appSettings.Jfrog.URL}\n\t" +
                 $"Dry-run:\t\t {appSettings.Jfrog.DryRun}\n\t" +
-                $"LogFolderPath:\t\t {Log4Net.CatoolLogPath}\n";
+                $"Log FolderPath:\t\t {Log4Net.CatoolLogPath}\n";
 
             Assert.AreEqual(expectedDetail, detail.RenderedMessage);
         }
