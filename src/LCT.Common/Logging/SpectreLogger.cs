@@ -45,10 +45,10 @@ namespace LCT.Common.Logging
                     fileLogger.Debug(message, exception);
                     break;
                 case "WARN":
-                    fileLogger.Warn(message, exception);
+                    fileLogger.Warn($" {message}", exception);
                     break;
                 case "ERROR":
-                    fileLogger.Error(message, exception);
+                    fileLogger.Error($" {message}", exception);
                     break;
                 case "FATAL":
                     fileLogger.Fatal(message, exception);

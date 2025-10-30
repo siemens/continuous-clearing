@@ -130,7 +130,7 @@ namespace LCT.Common.Logging
         }
         public static void WriteComponentsWithoutDownloadURLByUseingSpectreToKpi(List<ComparisonBomData> componentInfo, List<Components> lstReleaseNotCreated, string sw360URL, List<Components> duplicateComponentsByPurlId)
         {
-            if (componentInfo.Count > 0 || lstReleaseNotCreated.Count > 0)
+            if (componentInfo.Count > 0 || lstReleaseNotCreated.Count > 0 || duplicateComponentsByPurlId.Count > 0)
             {
                 SafeSpectreAction(() =>
                 {
@@ -157,7 +157,7 @@ namespace LCT.Common.Logging
             WriteLine();
 
             int totalWidth = Math.Max(160, GetAutoConsoleWidth());
-            const int nameWidth = 40;
+            const int nameWidth = 50;
             const int versionWidth = 20;
             int urlWidth = totalWidth - (nameWidth + versionWidth + 10);
             if (urlWidth < 60) urlWidth = 60;
@@ -738,12 +738,12 @@ namespace LCT.Common.Logging
                 .Append($"[green]-[/] [cyan]Ignore Dev Dependency[/]\n")
                 .Append($"  └──> {appSettings.SW360.IgnoreDevDependency}\n\n")
                 .Append($"[green]-[/] [cyan]Log FolderPath[/]\n")
-                .Append($"  └──> {WrapPath(Log4Net.CatoolLogPath, maxPathLength)}\n\n");
+                .Append($"  └──> {WrapPath(Log4Net.CatoolLogPath, maxPathLength)}");
             if (appSettings.IsTestMode)
             {
                 content
-                    .Append($"[green]-[/] [cyan]Mode[/]\n")
-                    .Append($"  └──> {appSettings.Mode}\n");
+                    .Append($"\n[green]-[/] [cyan]Mode[/]")
+                    .Append($"  └──> {appSettings.Mode}");
             }
         }
 
@@ -759,7 +759,7 @@ namespace LCT.Common.Logging
                 .Append($"[green]-[/] [cyan]Dry-run[/]\n")
                 .Append($"  └──> {appSettings.Jfrog.DryRun}\n\n")
                 .Append($"[green]-[/] [cyan]Log FolderPath[/]\n")
-                .Append($"  └──> {WrapPath(Log4Net.CatoolLogPath, maxPathLength)}\n\n");
+                .Append($"  └──> {WrapPath(Log4Net.CatoolLogPath, maxPathLength)}");
         }
         public static void LogInputParameters(CatoolInfo caToolInformation, CommonAppSettings appSettings, ListofPerametersForCli listofPerameters, string exeType = null, string bomFilePath = null)
         {

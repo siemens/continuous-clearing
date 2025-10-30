@@ -37,7 +37,7 @@ namespace LCT.SW360PackageCreator
     {
         private static bool m_Verbose = false;
         public static Stopwatch CreatorStopWatch { get; set; }
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
         private static List<ComparisonBomData> parsedBomData;
 
@@ -71,7 +71,7 @@ namespace LCT.SW360PackageCreator
                 environmentHelper.CallEnvironmentExit(-1);
             }
             LoggerHelper.SpectreConsoleInitialMessage("Package creator");
-
+            
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Alert, $"Package creator is running in TEST mode \n", null);
             var bomFilePath = Path.Combine(appSettings.Directory.OutputFolder, appSettings.SW360.ProjectName + "_" + FileConstant.BomFileName);
