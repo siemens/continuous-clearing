@@ -89,7 +89,7 @@ namespace LCT.Common.UTest
         {
             var msg = "warn";
             _adapter.Warn(msg);
-            _mockFileLogger.Verify(x => x.Warn($" {msg}"), Times.Once);
+            _mockFileLogger.Verify(x => x.Warn(msg), Times.Once);
         }
 
         [Test]
@@ -98,7 +98,7 @@ namespace LCT.Common.UTest
             var msg = "warn";
             var ex = new Exception("ex");
             _adapter.Warn(msg, ex);
-            _mockFileLogger.Verify(x => x.Warn($" {msg}"), Times.Once);
+            _mockFileLogger.Verify(x => x.Warn(msg), Times.Once);
         }
 
         [Test]

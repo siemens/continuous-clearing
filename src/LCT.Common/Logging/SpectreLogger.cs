@@ -41,14 +41,14 @@ namespace LCT.Common.Logging
                     fileLogger.Info(message, exception);
                     break;
                 case "NOTICE":
-                    LoggerHelper.ConsoleInstance.MarkupLine($"[white] {message}[/]");
+                    LoggerHelper.ConsoleInstance.MarkupLine($"[white]{message}[/]");
                     fileLogger.Debug(message, exception);
                     break;
                 case "WARN":
-                    fileLogger.Warn($" {message}", exception);
+                    fileLogger.Warn(message, exception);
                     break;
                 case "ERROR":
-                    fileLogger.Error($" {message}", exception);
+                    fileLogger.Error(message, exception);
                     break;
                 case "FATAL":
                     fileLogger.Fatal(message, exception);

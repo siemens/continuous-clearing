@@ -110,12 +110,12 @@ namespace LCT.Common
         #region Warn Methods
         public void Warn(object message)
         {
-            _fileLogger.Warn($" {message}");
+            _fileLogger.Warn(message);
         }
 
         public void Warn(object message, Exception exception)
         {
-            _fileLogger.Warn($" {message}");
+            _fileLogger.Warn(message);
         }
 
         public void WarnFormat(string format, params object[] args)
