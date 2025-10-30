@@ -117,15 +117,15 @@ namespace LCT.PackageIdentifier
         {
             if (appSettings.SW360 == null && appSettings.Jfrog == null)
             {
-                Logger.Warn($"CycloneDX Bom file generated without using SW360 and Jfrog details.");
+                Logger.Warn($"CycloneDX BoM file generated without using SW360 and JFrog details.");
             }
             else if (appSettings.SW360 == null)
             {
-                Logger.Warn($"CycloneDX Bom file generated without using SW360 details.");
+                Logger.Warn($"CycloneDX BoM file generated without using SW360 details.");
             }
             else if (appSettings.Jfrog == null)
             {
-                Logger.Warn($"CycloneDX Bom file generated without using Jfrog details.");
+                Logger.Warn($"CycloneDX BoM file generated without using JFrog details.");
             }
         }
     }

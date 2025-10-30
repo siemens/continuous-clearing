@@ -24,13 +24,13 @@ namespace LCT.PackageIdentifier.Model
         [DisplayName(@"Development Components")]
         public int DevDependentComponents { get; set; }
 
-        [DisplayName(@"Bundled components")]
+        [DisplayName(@"Bundled Components")]
         public int BundledComponents { get; set; }
 
         [DisplayName(@"Duplicate Components")]
         public int DuplicateComponents { get; set; }
 
-        [DisplayName(@"Internal components")]
+        [DisplayName(@"Internal Components")]
         public int InternalComponents { get; set; }
 
         [DisplayName(@"Packages present in 3rd party repo(s)")]
@@ -61,10 +61,10 @@ namespace LCT.PackageIdentifier.Model
         [DisplayName(@"Time taken by BoM Creator")]
         public double TimeTakenByBomCreator { get; set; }
 
-        [DisplayName(@"Components Added From SBOM Template")]
+        [DisplayName(@"Components Added From SBoM Template")]
         public int ComponentsinSBOMTemplateFile { get; set; }
 
-        [DisplayName(@"Components overwritten from SBOM Template")]
+        [DisplayName(@"Components overwritten from SBoM Template")]
         public int ComponentsUpdatedFromSBOMTemplateFile { get; set; }
         [DisplayName(@"Components from the SPDX imported as baseline entries")]
         public int UnsupportedComponentsFromSpdxFile { get; set; }

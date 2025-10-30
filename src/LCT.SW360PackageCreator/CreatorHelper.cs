@@ -249,7 +249,7 @@ namespace LCT.SW360PackageCreator
         public async Task<List<ComparisonBomData>> SetContentsForComparisonBOM(List<Components> lstComponentForBOM, ISW360Service sw360Service)
         {
             Logger.Debug($"SetContentsForComparisonBOM():Start");
-            Logger.Logger.Log(null, Level.Notice, $"Collecting BOM Data...", null);
+            Logger.Logger.Log(null, Level.Notice, $"Collecting BoM Data...", null);
             componentsAvailableInSw360 = await sw360Service.GetAvailableReleasesInSw360(lstComponentForBOM);
             DuplicateComponentsByPurlId = sw360Service.GetDuplicateComponentsByPurlId();
             //Checking components count before getting status of individual comp details
