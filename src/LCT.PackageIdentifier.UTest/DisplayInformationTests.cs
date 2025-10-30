@@ -126,7 +126,7 @@ namespace LCT.PackageIdentifier.UTest
             var logEvents = memoryAppender.GetEvents();
             Assert.IsNotEmpty(logEvents);
             var logMessage = logEvents.First().RenderedMessage;
-            Assert.AreEqual("CycloneDX Bom file generated without using SW360 and Jfrog details.", logMessage);
+            Assert.AreEqual("CycloneDX BoM file generated without using SW360 and JFrog details.", logMessage);
         }
 
         [Test]
@@ -144,7 +144,7 @@ namespace LCT.PackageIdentifier.UTest
             var logEvents = memoryAppender.GetEvents();
             Assert.IsNotEmpty(logEvents);
             var logMessage = logEvents.First().RenderedMessage;
-            Assert.AreEqual("CycloneDX Bom file generated without using SW360 details.", logMessage);
+            Assert.AreEqual("CycloneDX BoM file generated without using SW360 details.", logMessage);
         }
 
         [Test]
@@ -162,7 +162,7 @@ namespace LCT.PackageIdentifier.UTest
             var logEvents = memoryAppender.GetEvents();
             Assert.IsNotEmpty(logEvents);
             var logMessage = logEvents.First().RenderedMessage;
-            Assert.AreEqual("CycloneDX Bom file generated without using Jfrog details.", logMessage);
+            Assert.AreEqual("CycloneDX BoM file generated without using JFrog details.", logMessage);
         }
 
         [Test]
