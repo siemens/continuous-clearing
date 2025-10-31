@@ -71,7 +71,7 @@ namespace LCT.SW360PackageCreator
                 environmentHelper.CallEnvironmentExit(-1);
             }
             LoggerHelper.SpectreConsoleInitialMessage("Package creator");
-            
+
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Alert, $"Package creator is running in TEST mode \n", null);
             var bomFilePath = Path.Combine(appSettings.Directory.OutputFolder, appSettings.SW360.ProjectName + "_" + FileConstant.BomFileName);
