@@ -588,7 +588,7 @@ namespace LCT.Common.Logging
                     Expand = false
                 };
 
-                ConsoleWrite(c => c.Write(new Padder(panel, new Padding(1, 0, 0, 0))));
+                ConsoleWrite(c => c.Write(panel));
             }, "Input Parameters", "Panel");
         }
 
@@ -913,11 +913,9 @@ namespace LCT.Common.Logging
         {
             SafeSpectreAction(() =>
             {
-                WriteLine(); // Add a new line before the header
-                var consoleWidth = GetAutoConsoleWidth();
-                var padding = (consoleWidth - title.Length) / 2;
-                var centeredText = title.PadLeft(padding + title.Length).PadRight(consoleWidth);
-                ConsoleInstance.MarkupLine($"[bold white]{Markup.Escape(centeredText)}[/]");
+                WriteLine();                 
+                ConsoleInstance.MarkupLine($"[bold white]{Markup.Escape(title)}[/]");
+                ConsoleInstance.WriteLine();
             }, title, "Header");
         }
 
