@@ -913,7 +913,7 @@ namespace LCT.Common.Logging
         {
             SafeSpectreAction(() =>
             {
-                WriteLine();                 
+                ConsoleInstance.WriteLine();
                 ConsoleInstance.MarkupLine($"[bold white]{Markup.Escape(title)}[/]");
                 ConsoleInstance.WriteLine();
             }, title, "Header");
