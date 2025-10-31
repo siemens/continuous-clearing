@@ -76,13 +76,10 @@ namespace LCT.SW360PackageCreator
                 ServicePointManager.Expect100Continue = true;
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
                 Logger.Debug($"DownloadReleaseAttachmentSource()-Name-{component.Name},version-{component.Version},localPathforDownload-{localPathforDownload}");
-
-                if (string.IsNullOrEmpty(component.SourceUrl) || component.SourceUrl.Equals(Dataconstant.SourceUrlNotFound))
-                    Logger.Warn($"Source URL is not Found for {component.Name}-{component.Version}");
+                LogSourceAndDownloadUrlWarnings(component);
 
                 if (component.DownloadUrl.Equals(Dataconstant.DownloadUrlNotFound))
                 {
-                    Logger.Warn($"Source file is not attached,Release source Download Url is not Found for {component.Name}-{component.Version}");
                     Logger.Debug($"DownloadReleaseAttachmentSource():Source file is not attached,Release source Download Url is not Found for {component.Name}-{component.Version}");
                 }
                 else
@@ -718,6 +715,32 @@ namespace LCT.SW360PackageCreator
             }
 
             return releasesInfo;
+        }
+        private static void LogSourceAndDownloadUrlWarnings(ComparisonBomData component)
+        {
+            bool isSourceUrlMissing = string.IsNullOrEmpty(component.SourceUrl) ||
+                                      component.SourceUrl.Equals(Dataconstant.SourceUrlNotFound, StringComparison.Ordinal);
+
+            bool isDownloadUrlMissing = string.Equals(component.DownloadUrl, Dataconstant.DownloadUrlNotFound, StringComparison.Ordinal);
+
+            if (isSourceUrlMissing && isDownloadUrlMissing)
+            {
+                Logger.Warn($"  └── Source URL AND Release source Download URL are not found (source file not attached) for {component.Name}-{component.Version}");
+                Logger.Debug($"LogSourceAndDownloadUrlWarnings(): Both SourceUrl and DownloadUrl not found for {component.Name}-{component.Version}");
+            }
+            else
+            {
+                if (isSourceUrlMissing)
+                {
+                    Logger.Warn($"  └── Source URL is not found for {component.Name}-{component.Version}");
+                    Logger.Debug($"LogSourceAndDownloadUrlWarnings():SourceUrl not found for {component.Name}-{component.Version}");
+                }
+                else if (isDownloadUrlMissing)
+                {
+                    Logger.Warn($"  └── Source file is not attached,Release source Download Url is not Found for {component.Name}-{component.Version}");
+                }
+            }
+
         }
 
     }

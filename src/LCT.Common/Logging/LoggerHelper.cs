@@ -1079,7 +1079,7 @@ namespace LCT.Common.Logging
             WriteLine();
             foreach (var item in printTimingData)
             {
-                string timeFormatted = item.Value.ToString("F3");
+                string timeFormatted = item.Value.ToString();
                 WriteInfoWithMarkup($"[white]Time Taken By {item.Key} : [/][green]{timeFormatted}[/][white] s[/]");
             }
             WriteLine();

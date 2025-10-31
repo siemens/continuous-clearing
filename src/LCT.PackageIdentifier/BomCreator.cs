@@ -102,7 +102,7 @@ namespace LCT.PackageIdentifier
             // Writes Kpi data 
             Program.BomStopWatch?.Stop();
             bomKpiData.TimeTakenByBomCreator = Program.BomStopWatch == null ? 0 :
-              TimeSpan.FromMilliseconds(Program.BomStopWatch.ElapsedMilliseconds).TotalSeconds;
+                (int)Program.BomStopWatch.Elapsed.TotalSeconds;
             fileOperations.WriteContentToFile(bomKpiData, appSettings.Directory.OutputFolder,
                 FileConstant.BomKpiDataFileName, defaultProjectName);
             if (appSettings.SW360 != null)
