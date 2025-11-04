@@ -9,6 +9,7 @@ using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
+using LCT.Common.Logging;
 using LCT.Common.Model;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
@@ -36,7 +37,7 @@ namespace LCT.PackageIdentifier
     /// </summary>
     public class BomCreator : IBomCreator
     {
-        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public readonly static BomKpiData bomKpiData = new();
         ComponentIdentification componentData;
         private readonly ICycloneDXBomParser CycloneDXBomParser;
@@ -71,7 +72,7 @@ namespace LCT.PackageIdentifier
             sw360 = appSettings.SW360;
             // Calls package parser
             listOfComponentsToBom = await CallPackageParser(appSettings);
-            Logger.Logger.Log(null, Level.Notice, $"No of components added to BOM after removing bundled & excluded components " +
+            Logger.Logger.Log(null, Level.Notice, $"No of components added to BoM after removing bundled & excluded components " +
                 $"= {listOfComponentsToBom.Components.Count}", null);
 
             bomKpiData.ComponentsInComparisonBOM = listOfComponentsToBom.Components.Count;
@@ -91,9 +92,9 @@ namespace LCT.PackageIdentifier
 
             string defaultProjectName = CommonIdentiferHelper.GetDefaultProjectName(appSettings);
             // Writes Comparison Bom
-            Logger.Logger.Log(null, Level.Notice, $"Writing CycloneDX BOM..", null);
+            Logger.Logger.Log(null, Level.Notice, $"Writing CycloneDX BoM..", null);
             WritecontentsToBOM(appSettings, bomKpiData, listOfComponentsToBom, defaultProjectName);
-            Logger.Logger.Log(null, Level.Notice, $"Writing CycloneDX BOM completed", null);
+            Logger.Logger.Log(null, Level.Notice, $"Writing CycloneDX BoM completed", null);
 
             // Log warnings based on appSettings
             DisplayInformation.LogBomGenerationWarnings(appSettings);
@@ -101,7 +102,7 @@ namespace LCT.PackageIdentifier
             // Writes Kpi data 
             Program.BomStopWatch?.Stop();
             bomKpiData.TimeTakenByBomCreator = Program.BomStopWatch == null ? 0 :
-              TimeSpan.FromMilliseconds(Program.BomStopWatch.ElapsedMilliseconds).TotalSeconds;
+                (int)Program.BomStopWatch.Elapsed.TotalSeconds;
             fileOperations.WriteContentToFile(bomKpiData, appSettings.Directory.OutputFolder,
                 FileConstant.BomKpiDataFileName, defaultProjectName);
             if (appSettings.SW360 != null)
@@ -117,8 +118,7 @@ namespace LCT.PackageIdentifier
 
             if (appSettings.Jfrog != null)
             {
-                //Writes internal component ist to kpi
-                bomHelper.WriteInternalComponentsListToKpi(componentData.internalComponents);
+                LoggerHelper.WriteInternalComponentsTableInCli(componentData.internalComponents);
             }
 
             Logger.Debug($"GenerateBom():End");
@@ -180,6 +180,9 @@ namespace LCT.PackageIdentifier
                     return await ComponentIdentification(appSettings, parser);
                 case "CONAN":
                     parser = new ConanProcessor(CycloneDXBomParser, SpdxBomParser);
+                    return await ComponentIdentification(appSettings, parser);
+                case "CARGO":
+                    parser = new CargoProcessor(CycloneDXBomParser, SpdxBomParser);
                     return await ComponentIdentification(appSettings, parser);
                 case "CHOCO":
                     parser = new ChocoProcessor(CycloneDXBomParser, SpdxBomParser);
@@ -252,20 +255,20 @@ namespace LCT.PackageIdentifier
                 {
                     if (response.IsSuccessStatusCode)
                     {
-                        Logger.Logger.Log(null, Level.Info, $"JFrog Connection was successfull!!", null);
+                        LoggerHelper.JfrogConnectionInfoDisplayForCli();
                         return true;
                     }
                     else if (response.StatusCode == HttpStatusCode.Unauthorized)
                     {
-                        Logger.Logger.Log(null, Level.Error, $"Check the JFrog token validity/permission..", null);
+                        Logger.Error($"Check the JFrog token validity/permission..");
                     }
                     else if (response.StatusCode == HttpStatusCode.NotFound)
                     {
-                        Logger.Logger.Log(null, Level.Error, $"Check the provided JFrog server details..", null);
+                        Logger.Error($"Check the provided JFrog server details..");
                     }
                     else
                     {
-                        Logger.Logger.Log(null, Level.Error, $"JFrog Connection was not successfull check the server status.", null);
+                        Logger.Error($"JFrog Connection was not successfull check the server status.");
                     }
                 }
                 return false;

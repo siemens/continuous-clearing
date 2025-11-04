@@ -37,6 +37,7 @@ namespace LCT.APICommunications
         public const string DebianExtension = ".debian";
         public const string MavenExtension = "-sources.jar";
         public const string PythonExtension = ".whl";
+        public const string CargoExtension = ".crate";
         public const string PackageInfoApi = "/api/storage/";
         public const string CopyPackageApi = "/api/copy/";
         public const string MovePackageApi = "/api/move/";

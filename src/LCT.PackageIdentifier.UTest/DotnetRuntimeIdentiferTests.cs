@@ -4,11 +4,11 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using NUnit.Framework;
-using LCT.PackageIdentifier.Model;
 using LCT.Common;
+using LCT.PackageIdentifier.Model;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Locator;
+using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;

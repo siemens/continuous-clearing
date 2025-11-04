@@ -87,6 +87,16 @@ namespace AritfactoryUploader.UTest
                             StatusCode = HttpStatusCode.OK
                         }
                     }
+                },
+                JfrogFoundPackagesCargo = new List<ComponentsToArtifactory>()
+                {
+                    new ComponentsToArtifactory()
+                    {
+                        ResponseMessage = new HttpResponseMessage()
+                        {
+                            StatusCode = HttpStatusCode.OK
+                        }
+                    }
                 }
             };
 
@@ -94,7 +104,7 @@ namespace AritfactoryUploader.UTest
             List<ComponentsToArtifactory> uploadedPackages = PackageUploadInformation.GetUploadePackageDetails(displayPackagesInfo);
 
             // Assert
-            Assert.AreEqual(6, uploadedPackages.Count);
+            Assert.AreEqual(7, uploadedPackages.Count);
         }
         [Test]
         public void GetNotApprovedDebianPackages_CoversAllScenarios()
@@ -199,6 +209,255 @@ namespace AritfactoryUploader.UTest
                 pr.Debian[1].Name == "Package2" &&
                 pr.Debian[1].Version == "2.0.0"
             ), filepath, FileConstant.artifactoryReportNotApproved, "Artifactory"), Times.Once);
+
+            // Cleanup
+            File.Delete(filename);
+        }
+
+        [Test]
+        public void GetNotApprovedCargoPackages_FileDoesNotExist_ShouldCreateNewCargoComponents()
+        {
+            // Arrange
+            var unknownPackages = new List<ComponentsToArtifactory>
+            {
+                new ComponentsToArtifactory { Name = "serde", Version = "1.0.150" },
+                new ComponentsToArtifactory { Name = "tokio", Version = "1.23.0" }
+            };
+            var projectResponse = new ProjectResponse();
+            var mockFileOperations = new Mock<IFileOperations>();
+            var filepath = Path.GetTempPath();
+            var filename = Path.Combine(filepath, "nonexistent_cargo_file.json");
+
+            // Ensure file doesn't exist
+            if (File.Exists(filename))
+            {
+                File.Delete(filename);
+            }
+
+            // Act
+            var method = typeof(PackageUploadInformation).GetMethod("GetNotApprovedCargoPackages",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            method.Invoke(null, new object[] { unknownPackages, projectResponse, mockFileOperations.Object, filepath, filename });
+
+            // Assert
+            mockFileOperations.Verify(m => m.WriteContentToReportNotApprovedFile(It.Is<ProjectResponse>(pr =>
+                pr.Cargo != null &&
+                pr.Cargo.Count == 2 &&
+                pr.Cargo[0].Name == "serde" &&
+                pr.Cargo[0].Version == "1.0.150" &&
+                pr.Cargo[1].Name == "tokio" &&
+                pr.Cargo[1].Version == "1.23.0"
+            ), filepath, FileConstant.artifactoryReportNotApproved, "Artifactory"), Times.Once);
+        }
+
+        [Test]
+        public void GetNotApprovedCargoPackages_FileExists_ShouldUpdateCargoComponents()
+        {
+            // Arrange
+            var unknownPackages = new List<ComponentsToArtifactory>
+            {
+                new ComponentsToArtifactory { Name = "clap", Version = "4.0.0" },
+                new ComponentsToArtifactory { Name = "regex", Version = "1.7.0" }
+            };
+            var projectResponse = new ProjectResponse();
+            var mockFileOperations = new Mock<IFileOperations>();
+            var filepath = Path.GetTempPath();
+            var filename = Path.Combine(filepath, $"test_cargo_{FileConstant.artifactoryReportNotApproved}");
+
+            var existingProjectResponse = new ProjectResponse
+            {
+                Cargo = new List<JsonComponents>
+                {
+                    new JsonComponents { Name = "ExistingCargoPackage", Version = "1.0.0" }
+                },
+                Npm = new List<JsonComponents>
+                {
+                    new JsonComponents { Name = "ExistingNpmPackage", Version = "2.0.0" }
+                }
+            };
+            var json = JsonConvert.SerializeObject(existingProjectResponse);
+            File.WriteAllText(filename, json);
+
+            // Act
+            var method = typeof(PackageUploadInformation).GetMethod("GetNotApprovedCargoPackages",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            method.Invoke(null, new object[] { unknownPackages, projectResponse, mockFileOperations.Object, filepath, filename });
+
+            // Assert
+            mockFileOperations.Verify(m => m.WriteContentToReportNotApprovedFile(It.Is<ProjectResponse>(pr =>
+                pr.Cargo != null &&
+                pr.Cargo.Count == 2 &&
+                pr.Cargo[0].Name == "clap" &&
+                pr.Cargo[0].Version == "4.0.0" &&
+                pr.Cargo[1].Name == "regex" &&
+                pr.Cargo[1].Version == "1.7.0" &&
+                pr.Npm != null &&  // Verify existing data is preserved
+                pr.Npm.Count == 1 &&
+                pr.Npm[0].Name == "ExistingNpmPackage"
+            ), filepath, FileConstant.artifactoryReportNotApproved, "Artifactory"), Times.Once);
+
+            // Cleanup
+            File.Delete(filename);
+        }
+
+        [Test]
+        public void GetNotApprovedCargoPackages_EmptyUnknownPackages_FileDoesNotExist_ShouldCreateEmptyCargoList()
+        {
+            // Arrange
+            var unknownPackages = new List<ComponentsToArtifactory>();
+            var projectResponse = new ProjectResponse();
+            var mockFileOperations = new Mock<IFileOperations>();
+            var filepath = Path.GetTempPath();
+            var filename = Path.Combine(filepath, "empty_cargo_file.json");
+
+            // Ensure file doesn't exist
+            if (File.Exists(filename))
+            {
+                File.Delete(filename);
+            }
+
+            // Act
+            var method = typeof(PackageUploadInformation).GetMethod("GetNotApprovedCargoPackages",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            method.Invoke(null, new object[] { unknownPackages, projectResponse, mockFileOperations.Object, filepath, filename });
+
+            // Assert
+            mockFileOperations.Verify(m => m.WriteContentToReportNotApprovedFile(It.Is<ProjectResponse>(pr =>
+                pr.Cargo != null &&
+                pr.Cargo.Count == 0
+            ), filepath, FileConstant.artifactoryReportNotApproved, "Artifactory"), Times.Once);
+        }
+
+        [Test]
+        public void GetNotApprovedCargoPackages_EmptyUnknownPackages_FileExists_ShouldUpdateWithEmptyCargoList()
+        {
+            // Arrange
+            var unknownPackages = new List<ComponentsToArtifactory>();
+            var projectResponse = new ProjectResponse();
+            var mockFileOperations = new Mock<IFileOperations>();
+            var filepath = Path.GetTempPath();
+            var filename = Path.Combine(filepath, $"empty_existing_cargo_{FileConstant.artifactoryReportNotApproved}");
+
+            var existingProjectResponse = new ProjectResponse
+            {
+                Cargo = new List<JsonComponents>
+                {
+                    new JsonComponents { Name = "WillBeReplaced", Version = "1.0.0" }
+                }
+            };
+            var json = JsonConvert.SerializeObject(existingProjectResponse);
+            File.WriteAllText(filename, json);
+
+            // Act
+            var method = typeof(PackageUploadInformation).GetMethod("GetNotApprovedCargoPackages",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            method.Invoke(null, new object[] { unknownPackages, projectResponse, mockFileOperations.Object, filepath, filename });
+
+            // Assert
+            mockFileOperations.Verify(m => m.WriteContentToReportNotApprovedFile(It.Is<ProjectResponse>(pr =>
+                pr.Cargo != null &&
+                pr.Cargo.Count == 0  // Should be empty since unknownPackages was empty
+            ), filepath, FileConstant.artifactoryReportNotApproved, "Artifactory"), Times.Once);
+
+            // Cleanup
+            File.Delete(filename);
+        }
+
+        [Test]
+        public void GetNotApprovedCargoPackages_SinglePackage_FileDoesNotExist_ShouldCreateSingleCargoComponent()
+        {
+            // Arrange
+            var unknownPackages = new List<ComponentsToArtifactory>
+            {
+                new ComponentsToArtifactory { Name = "rand", Version = "0.8.5" }
+            };
+            var projectResponse = new ProjectResponse();
+            var mockFileOperations = new Mock<IFileOperations>();
+            var filepath = Path.GetTempPath();
+            var filename = Path.Combine(filepath, "single_cargo_file.json");
+
+            // Ensure file doesn't exist
+            if (File.Exists(filename))
+            {
+                File.Delete(filename);
+            }
+
+            // Act
+            var method = typeof(PackageUploadInformation).GetMethod("GetNotApprovedCargoPackages",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            method.Invoke(null, new object[] { unknownPackages, projectResponse, mockFileOperations.Object, filepath, filename });
+
+            // Assert
+            mockFileOperations.Verify(m => m.WriteContentToReportNotApprovedFile(It.Is<ProjectResponse>(pr =>
+                pr.Cargo != null &&
+                pr.Cargo.Count == 1 &&
+                pr.Cargo[0].Name == "rand" &&
+                pr.Cargo[0].Version == "0.8.5"
+            ), filepath, FileConstant.artifactoryReportNotApproved, "Artifactory"), Times.Once);
+        }
+
+        [Test]
+        public void GetNotApprovedCargoPackages_PackagesWithEmptyNameAndVersion_ShouldHandleGracefully()
+        {
+            // Arrange
+            var unknownPackages = new List<ComponentsToArtifactory>
+            {
+                new ComponentsToArtifactory { Name = "", Version = "" },
+                new ComponentsToArtifactory { Name = null, Version = null },
+                new ComponentsToArtifactory { Name = "valid-package", Version = "1.0.0" }
+            };
+            var projectResponse = new ProjectResponse();
+            var mockFileOperations = new Mock<IFileOperations>();
+            var filepath = Path.GetTempPath();
+            var filename = Path.Combine(filepath, "edge_case_cargo_file.json");
+
+            // Ensure file doesn't exist
+            if (File.Exists(filename))
+            {
+                File.Delete(filename);
+            }
+
+            // Act
+            var method = typeof(PackageUploadInformation).GetMethod("GetNotApprovedCargoPackages",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            method.Invoke(null, new object[] { unknownPackages, projectResponse, mockFileOperations.Object, filepath, filename });
+
+            // Assert
+            mockFileOperations.Verify(m => m.WriteContentToReportNotApprovedFile(It.Is<ProjectResponse>(pr =>
+                pr.Cargo != null &&
+                pr.Cargo.Count == 3 &&
+                pr.Cargo[0].Name == "" &&
+                pr.Cargo[0].Version == "" &&
+                pr.Cargo[1].Name == null &&
+                pr.Cargo[1].Version == null &&
+                pr.Cargo[2].Name == "valid-package" &&
+                pr.Cargo[2].Version == "1.0.0"
+            ), filepath, FileConstant.artifactoryReportNotApproved, "Artifactory"), Times.Once);
+        }
+
+        [Test]
+        public void GetNotApprovedCargoPackages_FileExistsWithInvalidJson_ShouldHandleJsonException()
+        {
+            // Arrange
+            var unknownPackages = new List<ComponentsToArtifactory>
+            {
+                new ComponentsToArtifactory { Name = "serde", Version = "1.0.150" }
+            };
+            var projectResponse = new ProjectResponse();
+            var mockFileOperations = new Mock<IFileOperations>();
+            var filepath = Path.GetTempPath();
+            var filename = Path.Combine(filepath, $"invalid_json_cargo_{FileConstant.artifactoryReportNotApproved}");
+
+            // Create a file with invalid JSON
+            File.WriteAllText(filename, "{ invalid json content");
+
+            // Act & Assert
+            var method = typeof(PackageUploadInformation).GetMethod("GetNotApprovedCargoPackages",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            // Should throw JsonReaderException
+            Assert.Throws<System.Reflection.TargetInvocationException>(() =>
+                method.Invoke(null, new object[] { unknownPackages, projectResponse, mockFileOperations.Object, filepath, filename }));
 
             // Cleanup
             File.Delete(filename);

@@ -6,7 +6,6 @@
 
 using CycloneDX.Models;
 using LCT.Common.Constants;
-using LCT.Common.Model;
 using log4net;
 using NUnit.Framework;
 using System;
@@ -72,20 +71,6 @@ namespace LCT.Common.UTest
 
             // Assert
             Assert.IsNotEmpty(result);
-        }
-
-        [Test]
-        public void WriteComponentsNotLinkedListInConsole_PassingList_ReturnSuccess()
-        {
-            //Arrange
-            List<Components> ComponentsNotLinked = new List<Components>();
-            ComponentsNotLinked.Add(new Components());
-
-            //Act
-            CommonHelper.WriteComponentsNotLinkedListInConsole(ComponentsNotLinked);
-
-            //Assert
-            Assert.Pass();
         }
 
         [Test]
@@ -1064,8 +1049,113 @@ namespace LCT.Common.UTest
             // Should have added one property (internal) to the existing empty list
             Assert.AreEqual(1, processedComponent.Properties.Count);
         }
+        [TestCase(null, null, TestName = "CanonicalizeProjectType_Null_ReturnsNull")]
+        [TestCase("", "", TestName = "CanonicalizeProjectType_Empty_ReturnsEmpty")]
+        [TestCase("   ", "   ", TestName = "CanonicalizeProjectType_Whitespace_ReturnsWhitespaceUnchanged")]
+        [TestCase("Poetry", "Poetry")]
+        [TestCase("poetry", "Poetry")]
+        [TestCase("POETRY", "Poetry")]
+        [TestCase("  poetry  ", "Poetry")]
+        [TestCase("Cargo", "Cargo")]
+        [TestCase("cArGo", "Cargo")]
+        [TestCase("CONAN", "Conan")]
+        [TestCase("conan", "Conan")]
+        [TestCase("Debian", "Debian")]
+        [TestCase("debian", "Debian")]
+        [TestCase("MAVEN", "Maven")]
+        [TestCase("maven", "Maven")]
+        [TestCase("npm", "npm")]
+        [TestCase("NPM", "npm")]
+        [TestCase("NuGet", "NuGet")]
+        [TestCase("nuget", "NuGet")]
+        [TestCase("Nuget", "NuGet")]
+        [TestCase("ALPINE", "Alpine")]
+        [TestCase("alpine", "Alpine")]
+        [TestCase("  ALPINE  ", "Alpine")]
+        [TestCase("UnknownType", "UnknownType")]
+        [TestCase("  CustomType  ", "CustomType", TestName = "CanonicalizeProjectType_UnknownTrimmed")]
+        public void CanonicalizeProjectType_ReturnsExpectedValue(string input, string expected)
+        {
+            // Act
+            var result = CommonHelper.CanonicalizeProjectType(input);
+
+            // Assert
+            Assert.AreEqual(expected, result);
+        }
+
+        [Test]
+        public void CanonicalizeProjectType_DoesNotThrow_ForAllSupportedVariants()
+        {
+            // Arrange
+            var variants = new[]
+            {
+                "Poetry","poetry","POETRY",
+                "Cargo","cArGo",
+                "Conan","CONAN",
+                "Debian","debian",
+                "Maven","MAVEN",
+                "npm","NPM",
+                "NuGet","nuget","Nuget",
+                "Alpine","ALPINE"," alpine ",
+                "UnknownType","  AnotherType  ", null, "", "   "
+            };
+
+            // Act & Assert
+            Assert.DoesNotThrow(() =>
+            {
+                foreach (var v in variants)
+                    _ = CommonHelper.CanonicalizeProjectType(v);
+            });
+        }
 
 
+        [Test]
+        public void Sw360URL_DoesNotModifyInputs()
+        {
+            var env = "https://sta.sw360.com";
+            var releaseId = "rel123";
+            var originalEnv = env;
+            var originalId = releaseId;
+
+            var result = CommonHelper.Sw360URL(env, releaseId);
+
+            Assert.IsTrue(result.EndsWith(originalId));
+            Assert.AreEqual(originalEnv, env);
+            Assert.AreEqual(originalId, releaseId);
+        }
+
+        [Test]
+        public void Sw360ComponentURL_DoesNotModifyInputs()
+        {
+            var env = "https://sta.sw360.com";
+            var componentId = "c789";
+            var originalEnv = env;
+            var originalId = componentId;
+
+            var result = CommonHelper.Sw360ComponentURL(env, componentId);
+
+            Assert.IsTrue(result.EndsWith(originalId));
+            Assert.AreEqual(originalEnv, env);
+            Assert.AreEqual(originalId, componentId);
+        }
+
+        [Test]
+        public void Sw360URL_DoubleSlashOccursWhenEnvEndsWithSlash()
+        {
+            var env = "https://stage.sw360.siemens.com/";
+            var id = "R1";
+            var result = CommonHelper.Sw360URL(env, id);
+            StringAssert.Contains("//group/guest/components", result);
+        }
+
+        [Test]
+        public void Sw360ComponentURL_DoubleSlashOccursWhenEnvEndsWithSlash()
+        {
+            var env = "https://stage.sw360.siemens.com/";
+            var id = "C1";
+            var result = CommonHelper.Sw360ComponentURL(env, id);
+            StringAssert.Contains("//group/guest/components", result);
+        }
         #region SetComponentPropertiesAndHashes Tests
 
         [Test]

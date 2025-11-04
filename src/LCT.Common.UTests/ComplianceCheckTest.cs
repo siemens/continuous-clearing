@@ -4,7 +4,6 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using File = System.IO.File;
 using LCT.Common.ComplianceValidator;
 using LCT.Common.Model;
 using NUnit.Framework;
@@ -12,8 +11,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
+using File = System.IO.File;
 
-namespace LCT.Common.Tests.ComplianceValidator
+namespace LCT.Common.UTest
 {
     [TestFixture]
     public class ComplianceCheckTests

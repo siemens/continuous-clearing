@@ -37,7 +37,7 @@ namespace LCT.PackageIdentifier
 {
     public partial class NugetProcessor(ICycloneDXBomParser cycloneDXBomParser, IFrameworkPackages frameworkPackages, ICompositionBuilder compositionBuilder, ISpdxBomParser spdxBomParser, IRuntimeIdentifier runtimeIdentifier) : CycloneDXBomParser, IParser
     {
-        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
@@ -84,7 +84,7 @@ namespace LCT.PackageIdentifier
         public static List<NugetPackage> ParsePackageConfig(string packagesFilePath, CommonAppSettings appSettings)
         {
             List<NugetPackage> nugetPackages = new List<NugetPackage>();
-            string isDev = "false";
+
             try
             {
                 List<ReferenceDetails> referenceList = Parsecsproj(appSettings);
@@ -93,6 +93,7 @@ namespace LCT.PackageIdentifier
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += nodes.Count();
                 foreach (XElement element in nodes)
                 {
+                    string isDev = "false";
                     XAttribute idAttribute = element.Attribute("id");
                     XAttribute versionAttribute = element.Attribute("version");
                     XAttribute devDependencyAttribute = element.Attribute("developmentDependency");

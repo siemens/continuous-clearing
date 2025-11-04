@@ -10,6 +10,8 @@ using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
+using LCT.Common.Logging;
+using LCT.Common.Model;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.Services.Interface;
@@ -23,7 +25,6 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using Level = log4net.Core.Level;
 
 namespace LCT.PackageIdentifier
 {
@@ -32,7 +33,7 @@ namespace LCT.PackageIdentifier
     /// </summary>
     public class BomHelper : IBomHelper
     {
-        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         #region public methods
 
@@ -44,58 +45,39 @@ namespace LCT.PackageIdentifier
 
         public void WriteBomKpiDataToConsole(BomKpiData bomKpiData)
         {
+            KpiNames identifierKpiNames = IdentifyKpiNames(bomKpiData);
             Dictionary<string, int> printList = new Dictionary<string, int>()
     {
-        {CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ComponentsinPackageLockJsonFile)), bomKpiData.ComponentsinPackageLockJsonFile },
-        {CommonHelper.Convert(bomKpiData, nameof(bomKpiData.DevDependentComponents)), bomKpiData.DevDependentComponents},
-        {CommonHelper.Convert(bomKpiData, nameof(bomKpiData.BundledComponents)), bomKpiData.BundledComponents},
-        {CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ComponentsExcluded)), bomKpiData.ComponentsExcluded},
-        {CommonHelper.Convert(bomKpiData, nameof(bomKpiData.DuplicateComponents)), bomKpiData.DuplicateComponents}
+        {identifierKpiNames.ComponentsInInputFile, bomKpiData.ComponentsinPackageLockJsonFile },
+        {identifierKpiNames.DevelopmentComponents, bomKpiData.DevDependentComponents},
+        {identifierKpiNames.BundledComponents, bomKpiData.BundledComponents},
+        {identifierKpiNames.InvalidComponentsExcluded, bomKpiData.ComponentsExcluded},
+        {identifierKpiNames.DuplicateComponents, bomKpiData.DuplicateComponents}
 
     };
             if (BomCreator.sw360 != null)
             {
-                printList.Add(CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ComponentsExcludedSW360)), bomKpiData.ComponentsExcludedSW360);
+                printList.Add(identifierKpiNames.ManuallyExcludedSw360, bomKpiData.ComponentsExcludedSW360);
             }
             if (BomCreator.jfrog != null)
             {
-                printList.Add(CommonHelper.Convert(bomKpiData, nameof(bomKpiData.InternalComponents)), bomKpiData.InternalComponents);
-                printList.Add(CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ThirdPartyRepoComponents)), bomKpiData.ThirdPartyRepoComponents);
-                printList.Add(CommonHelper.Convert(bomKpiData, nameof(bomKpiData.DevdependencyComponents)), bomKpiData.DevdependencyComponents);
-                printList.Add(CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ReleaseRepoComponents)), bomKpiData.ReleaseRepoComponents);
-                printList.Add(CommonHelper.Convert(bomKpiData, nameof(bomKpiData.UnofficialComponents)), bomKpiData.UnofficialComponents);
+                printList.Add(identifierKpiNames.InternalComponents, bomKpiData.InternalComponents);
+                printList.Add(identifierKpiNames.PackagesPresentIn3rdPartyRepo, bomKpiData.ThirdPartyRepoComponents);
+                printList.Add(identifierKpiNames.PackagesPresentInDevDepRepo, bomKpiData.DevdependencyComponents);
+                printList.Add(identifierKpiNames.PackagesPresentInReleaseRepo, bomKpiData.ReleaseRepoComponents);
+                printList.Add(identifierKpiNames.PackagesNotPresentInOfficialRepo, bomKpiData.UnofficialComponents);
             }
-            printList.Add(CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ComponentsinSBOMTemplateFile)), bomKpiData.ComponentsinSBOMTemplateFile);
-            printList.Add(CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ComponentsUpdatedFromSBOMTemplateFile)), bomKpiData.ComponentsUpdatedFromSBOMTemplateFile);
-            printList.Add(CommonHelper.Convert(bomKpiData, nameof(bomKpiData.UnsupportedComponentsFromSpdxFile)), bomKpiData.UnsupportedComponentsFromSpdxFile);
-            printList.Add(CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ComponentsInComparisonBOM)), bomKpiData.ComponentsInComparisonBOM);
+            printList.Add(identifierKpiNames.ComponentsAddedFromSBOMTemplate, bomKpiData.ComponentsinSBOMTemplateFile);
+            printList.Add(identifierKpiNames.ComponentsOverWrittenFromSBOMTemplate, bomKpiData.ComponentsUpdatedFromSBOMTemplateFile);
+            printList.Add(identifierKpiNames.ComponentsFromTheSPDXImportedAsBaselineEntries, bomKpiData.UnsupportedComponentsFromSpdxFile);
+            printList.Add(identifierKpiNames.ComponentsInBOM, bomKpiData.ComponentsInComparisonBOM);
             Dictionary<string, double> printTimingList = new Dictionary<string, double>()
             {
                 { "PackageIdentifier",bomKpiData.TimeTakenByBomCreator }
             };
 
             CommonHelper.ProjectSummaryLink = bomKpiData.ProjectSummaryLink;
-            CommonHelper.WriteToConsoleTable(printList, printTimingList);
-        }
-        public void WriteInternalComponentsListToKpi(List<Component> internalComponents)
-        {
-            const string Name = "Name";
-            const string Version = "Version";
-
-            if (internalComponents?.Count > 0)
-            {
-                Logger.Logger.Log(null, Level.Alert, "* Internal Components Identified which will not be sent for clearing:", null);
-                Logger.Logger.Log(null, Level.Alert, $"{"=",5}{string.Join("", Enumerable.Repeat("=", 98)),5}", null);
-                Logger.Logger.Log(null, Level.Alert, $"{"|",5}{Name,-45} {"|",5} {Version,35} {"|",10}", null);
-                Logger.Logger.Log(null, Level.Alert, $"{"=",5}{string.Join("", Enumerable.Repeat("=", 98)),5}", null);
-
-                foreach (var item in internalComponents)
-                {
-                    Logger.Logger.Log(null, Level.Alert, $"{"|",5}{item.Name,-45} {"|",5} {item.Version,35} {"|",10}", null);
-                    Logger.Logger.Log(null, Level.Alert, $"{"-",5}{string.Join("", Enumerable.Repeat("-", 98)),5}", null);
-                }
-                Logger.Info("\n");
-            }
+            LoggerHelper.WriteToConsoleTable(printList, printTimingList, bomKpiData.ProjectSummaryLink, Dataconstant.Identifier, identifierKpiNames);
         }
         public static void NamingConventionOfSPDXFile(string filepath, CommonAppSettings appSettings)
         {
@@ -123,7 +105,7 @@ namespace LCT.PackageIdentifier
             foreach (var related in relatedExtensions)
             {
                 string relatedFile = Path.Combine(inputFolder, related);
-                if (File.Exists(relatedFile))
+                if (System.IO.File.Exists(relatedFile))
                 {
                     foundFiles[related] = relatedFile;
                 }
@@ -266,6 +248,20 @@ namespace LCT.PackageIdentifier
 
             return aqlResultList;
         }
+        public async Task<List<AqlResult>> GetCargoListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService)
+        {
+            List<AqlResult> aqlResultList = new();
+            if (repoList != null && repoList.Length > 0)
+            {
+                foreach (var repo in repoList)
+                {
+                    var componentRepoData = await jFrogService.GetCargoComponentDataByRepo(repo) ?? new List<AqlResult>();
+                    aqlResultList.AddRange(componentRepoData);
+                }
+            }
+
+            return aqlResultList;
+        }
         public async Task<List<AqlResult>> GetPypiListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService)
         {
             List<AqlResult> aqlResultList = new();
@@ -296,7 +292,81 @@ namespace LCT.PackageIdentifier
                 return cycloneDXBomParser.ParseCycloneDXBom(filePath);
             }
         }
+        private static KpiNames IdentifyKpiNames(BomKpiData bomKpiData)
+        {
+            KpiNames identifierKpiNames = new KpiNames();
+            identifierKpiNames.ComponentsInInputFile = CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ComponentsinPackageLockJsonFile));
+            identifierKpiNames.DevelopmentComponents = CommonHelper.Convert(bomKpiData, nameof(bomKpiData.DevDependentComponents));
+            identifierKpiNames.BundledComponents = CommonHelper.Convert(bomKpiData, nameof(bomKpiData.BundledComponents));
+            identifierKpiNames.InvalidComponentsExcluded = CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ComponentsExcluded));
+            identifierKpiNames.DuplicateComponents = CommonHelper.Convert(bomKpiData, nameof(bomKpiData.DuplicateComponents));
+            identifierKpiNames.ManuallyExcludedSw360 = CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ComponentsExcludedSW360));
+            identifierKpiNames.InternalComponents = CommonHelper.Convert(bomKpiData, nameof(bomKpiData.InternalComponents));
+            identifierKpiNames.PackagesPresentIn3rdPartyRepo = CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ThirdPartyRepoComponents));
+            identifierKpiNames.PackagesPresentInDevDepRepo = CommonHelper.Convert(bomKpiData, nameof(bomKpiData.DevdependencyComponents));
+            identifierKpiNames.PackagesPresentInReleaseRepo = CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ReleaseRepoComponents));
+            identifierKpiNames.PackagesNotPresentInOfficialRepo = CommonHelper.Convert(bomKpiData, nameof(bomKpiData.UnofficialComponents));
+            identifierKpiNames.ComponentsAddedFromSBOMTemplate = CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ComponentsinSBOMTemplateFile));
+            identifierKpiNames.ComponentsOverWrittenFromSBOMTemplate = CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ComponentsUpdatedFromSBOMTemplateFile));
+            identifierKpiNames.ComponentsFromTheSPDXImportedAsBaselineEntries = CommonHelper.Convert(bomKpiData, nameof(bomKpiData.UnsupportedComponentsFromSpdxFile));
+            identifierKpiNames.ComponentsInBOM = CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ComponentsInComparisonBOM));
+            identifierKpiNames.ComponentsWithSourceURL = CommonHelper.Convert(bomKpiData, nameof(bomKpiData.ComponentsWithSourceURL));
 
+            return identifierKpiNames;
+        }
+
+        public static List<Component> GetExcludedComponentsList(List<Component> componentsForBOM, string purlPrefix, string projectType)
+        {
+            List<Component> components = new List<Component>();
+            foreach (Component componentsInfo in componentsForBOM)
+            {
+                if (!string.IsNullOrEmpty(componentsInfo.Name) &&
+                    !string.IsNullOrEmpty(componentsInfo.Version) &&
+                    !string.IsNullOrEmpty(componentsInfo.Purl) &&
+                    componentsInfo.Purl.Contains(purlPrefix))
+                {
+                    components.Add(componentsInfo);
+                    Logger.Debug($"GetExcludedComponentsList():ValidComponent For {projectType} : Component Details : {componentsInfo.Name} @ {componentsInfo.Version} @ {componentsInfo.Purl}");
+                }
+                else
+                {
+                    BomCreator.bomKpiData.ComponentsExcluded++;
+                    Logger.Debug($"GetExcludedComponentsList():InvalidComponent For {projectType} : Component Details : {componentsInfo.Name} @ {componentsInfo.Version} @ {componentsInfo.Purl}");
+                }
+            }
+            return components;
+        }
+        public static void GetDistinctComponentList(ref List<Component> listofComponents)
+        {
+            int initialCount = listofComponents.Count;
+            listofComponents = listofComponents.GroupBy(x => new { x.Name, x.Version, x.Purl }).Select(y => y.First()).ToList();
+
+            if (listofComponents.Count != initialCount)
+                BomCreator.bomKpiData.DuplicateComponents = initialCount - listofComponents.Count;
+
+        }
+
+        public static Bom RemoveExcludedComponents(CommonAppSettings appSettings, Bom cycloneDXBOM)
+        {
+            return CommonHelper.RemoveExcludedComponentsFromBom(appSettings, cycloneDXBOM,
+                noOfExcludedComponents => BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents);
+        }
+
+        public static void GetDetailsforManuallyAddedComp(List<Component> componentsForBOM)
+        {
+            foreach (var component in componentsForBOM)
+            {
+                component.Properties ??= new List<Property>();
+                var properties = component.Properties;
+                CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
+                    Dataconstant.Cdx_IsDevelopment,
+                    "false");
+                CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
+                    Dataconstant.Cdx_IdentifierType,
+                    Dataconstant.ManullayAdded);
+                component.Properties = properties;
+            }
+        }
         #endregion
     }
 }

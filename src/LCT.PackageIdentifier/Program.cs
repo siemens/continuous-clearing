@@ -12,6 +12,7 @@ using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
+using LCT.Common.Logging;
 using LCT.Common.Model;
 using LCT.Facade;
 using LCT.Facade.Interfaces;
@@ -40,7 +41,8 @@ namespace LCT.PackageIdentifier
         private bool m_Verbose = false;
 
         public static Stopwatch BomStopWatch { get; set; }
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
         private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
 
         private readonly ISettingsManager _settingsManager;
@@ -88,14 +90,12 @@ namespace LCT.PackageIdentifier
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
             CommonHelper.DefaultLogFolderInitialisation(FileConstant.BomCreatorLog, m_Verbose);
             CommonAppSettings appSettings = _settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
+            appSettings.ProjectType = CommonHelper.CanonicalizeProjectType(appSettings.ProjectType);
             ProjectReleases projectReleases = new ProjectReleases();
             string _ = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.BomCreatorLog, m_Verbose);
-
-            _settingsManager.CheckRequiredArgsToRun(appSettings, "Identifer");
-
-            Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Package Identifier >>>>>====================", null);
-            Logger.Logger.Log(null, Level.Notice, $"\nStart of Package Identifier execution: {DateTime.Now}", null);
-
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            _settingsManager.CheckRequiredArgsToRun(appSettings, Dataconstant.Identifier);
+            LoggerHelper.SpectreConsoleInitialMessage("Package Identifier");
             if (appSettings.ProjectType.Equals("ALPINE", StringComparison.InvariantCultureIgnoreCase))
             {
                 Logger.Error($"\nPlease note that the Alpine feature is currently in preview state. This means it's available for testing and evaluation purposes. While functional, it may not yet include all planned features and could encounter occasional issues. Your feedback during this preview phase is appreciated as we work towards its official release. Thank you for exploring Alpine with us.");
@@ -109,15 +109,15 @@ namespace LCT.PackageIdentifier
             {
                 await ValidateAppsettingsFile(appSettings, projectReleases);
             }
-            string listOfInclude = DisplayInformation.DisplayIncludeFiles(appSettings);
-            string listOfExclude = DisplayInformation.DisplayExcludeFiles(appSettings);
-            string listOfExcludeComponents = DisplayInformation.DisplayExcludeComponents(appSettings);
-            string listOfInternalRepoList = DisplayInformation.GetInternalRepolist(appSettings);
 
-            DisplayInformation.LogInputParameters(caToolInformation, appSettings, listOfInternalRepoList, listOfInclude, listOfExclude, listOfExcludeComponents);
-
-            if (appSettings.IsTestMode)
-                Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);
+            var listParameters = new ListofPerametersForCli
+            {
+                InternalRepoList = DisplayInformation.GetInternalRepolist(appSettings),
+                Include = DisplayInformation.DisplayIncludeFiles(appSettings),
+                Exclude = DisplayInformation.DisplayExcludeFiles(appSettings),
+                ExcludeComponents = DisplayInformation.DisplayExcludeComponents(appSettings)
+            };
+            LoggerHelper.LogInputParameters(caToolInformation, appSettings, listParameters, Dataconstant.Identifier);
 
             _bomCreator.JFrogService = GetJfrogService(appSettings);
             _bomCreator.BomHelper = new BomHelper();

@@ -16,6 +16,7 @@ using LCT.SW360PackageCreator.Interfaces;
 using LCT.SW360PackageCreator.Model;
 using Moq;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -23,6 +24,8 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Directory = System.IO.Directory;
+using File = System.IO.File;
 
 namespace LCT.SW360PackageCreator.UTest
 {
@@ -86,6 +89,54 @@ namespace LCT.SW360PackageCreator.UTest
             var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(lstComparisonBomData);
 
             //Assert
+            Assert.That(attachmentUrlList.ContainsKey("SOURCE"));
+        }
+        [Test]
+        public async Task DownloadReleaseAttachmentSource_ForCargoPackage_ReturnSuccess()
+        {
+            // Arrange
+            var lstComparisonBomData = new ComparisonBomData()
+            {
+                Name = "adler",
+                Version = "1.0.2",
+                ReleaseExternalId = "pkg:cargo/adler@1.0.2",
+                SourceUrl = "https://github.com/jonas-schievink/adler.git",
+                DownloadUrl = "https://github.com/jonas-schievink/adler.git"
+            };
+            IDictionary<string, IPackageDownloader> _packageDownloderList = new Dictionary<string, IPackageDownloader>
+    {
+        { "NPM", new PackageDownloader() }
+    };
+            var creatorHelper = new CreatorHelper(_packageDownloderList);
+
+            // Act
+            var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(lstComparisonBomData);
+
+            // Assert
+            Assert.That(attachmentUrlList.ContainsKey("SOURCE"));
+        }
+        [Test]
+        public async Task DownloadReleaseAttachmentSource_ForCargoDownloadPackage_ReturnSuccess()
+        {
+            // Arrange
+            var lstComparisonBomData = new ComparisonBomData()
+            {
+                Name = "encoding-index-japanese",
+                Version = "1.20141219.5",
+                ReleaseExternalId = "pkg:cargo/encoding-index-japanese@1.20141219.5",
+                SourceUrl = "https://crates.io/api/v1/crates/encoding-index-japanese/1.20141219.5/download",
+                DownloadUrl = "https://crates.io/api/v1/crates/encoding-index-japanese/1.20141219.5/download"
+            };
+            IDictionary<string, IPackageDownloader> _packageDownloderList = new Dictionary<string, IPackageDownloader>
+    {
+        { "NPM", new PackageDownloader() }
+    };
+            var creatorHelper = new CreatorHelper(_packageDownloderList);
+
+            // Act
+            var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(lstComparisonBomData);
+
+            // Assert
             Assert.That(attachmentUrlList.ContainsKey("SOURCE"));
         }
 
@@ -760,6 +811,34 @@ namespace LCT.SW360PackageCreator.UTest
             // Assert
             Assert.IsTrue(attachmentUrlList.ContainsKey("SOURCE"));
             Assert.AreEqual($"{localPathforDownload}{component.Name}-{component.Version}-sources.jar", attachmentUrlList["SOURCE"]);
+        }
+        [Test]
+        public void ConvertZipToTarGzIfNeeded_WhenZipFileExists_CreatesTarGzAndReturnsPath()
+        {
+            // Arrange
+            string tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            Directory.CreateDirectory(tempDir);
+            string zipFileName = "testfile.zip";
+            string zipFilePath = Path.Combine(tempDir, zipFileName);
+            string tarGzFilePath = Path.ChangeExtension(zipFilePath, FileConstant.TargzFileExtension);
+
+            // Create a dummy zip file
+            File.WriteAllText(zipFilePath, "dummy content");
+
+            // Act
+            string resultPath = typeof(CreatorHelper)
+                .GetMethod("ConvertZipToTarGzIfNeeded", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+                .Invoke(null, new object[] { zipFilePath }) as string;
+
+            // Assert
+            Assert.AreEqual(tarGzFilePath, resultPath, "Returned path should be the .tar.gz file path.");
+            Assert.IsTrue(File.Exists(tarGzFilePath), ".tar.gz file should be created.");
+            Assert.IsTrue(File.Exists(zipFilePath), ".zip file should still exist.");
+
+            // Cleanup
+            File.Delete(zipFilePath);
+            File.Delete(tarGzFilePath);
+            Directory.Delete(tempDir);
         }
     }
 }

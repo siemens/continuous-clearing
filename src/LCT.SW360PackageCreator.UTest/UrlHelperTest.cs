@@ -111,6 +111,51 @@ namespace LCT.SW360PackageCreator.UTest
 
             Assert.That(sourceUrl, Is.EqualTo("https://github.com/angular/angular-cli/"));
         }
+        [Test]
+        public async Task GetSourceUrlForCargoPackage_ValidPackage_ReturnsDownloadUrl()
+        {
+            // Arrange
+            var urlHelper = new UrlHelper();
+            string componentName = "encoding-index-japanese";
+            string componentVersion = "1.20141219.5";
+
+            // Act
+            var result = await urlHelper.GetSourceUrlForCargoPackage(componentName, componentVersion);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsNotEmpty(result);
+            Assert.IsTrue(result.StartsWith("https://crates.io"));
+        }
+
+        [Test]
+        public async Task GetSourceUrlForCargoPackage_InvalidPackage_ReturnsEmptyString()
+        {
+            // Arrange
+            var urlHelper = new UrlHelper();
+            string componentName = "nonexistent-package-xyz";
+            string componentVersion = "0.0.1";
+
+            // Act
+            var result = await urlHelper.GetSourceUrlForCargoPackage(componentName, componentVersion);
+
+            // Assert
+            Assert.IsTrue(string.IsNullOrEmpty(result));
+        }
+        [Test]
+        public async Task GetSourceUrlForCargoPackage_NonExistentPackage_ReturnsEmptyString()
+        {
+            // Arrange
+            var urlHelper = new UrlHelper();
+            string componentName = "this-package-does-not-exist-xyz";
+            string componentVersion = "0.0.0";
+
+            // Act
+            var result = await urlHelper.GetSourceUrlForCargoPackage(componentName, componentVersion);
+
+            // Assert
+            Assert.IsTrue(string.IsNullOrEmpty(result));
+        }
 
         [TestCase("CefSharp.Common", "100.0.140")]
         public async Task GetSourceUrlForNugetPackage_ProvidedPackageDetails_ReturnsValidSourceURL(string componentName, string version)

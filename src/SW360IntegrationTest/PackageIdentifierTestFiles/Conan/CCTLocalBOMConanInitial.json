@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:167dc9b4-dd8d-4f55-926a-c0f96cabf035",
+  "serialNumber": "urn:uuid:90fe2d50-5e15-412b-a632-5d5ebf514305",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-05-26T04:19:21Z",
+    "timestamp": "2025-09-22T10:05:45Z",
     "tools": {
       "components": [
         {
@@ -13,7 +13,7 @@
             "name": "Siemens AG"
           },
           "name": "Clearing Automation Tool",
-          "version": "8.0.0",
+          "version": "8.2.0",
           "externalReferences": [
             {
               "url": "https://github.com/siemens/continuous-clearing",
@@ -25,8 +25,8 @@
     },
     "component": {
       "type": "application",
-      "name": "continuous-clearing",
-      "version": "v9.0.x"
+      "name": "Test",
+      "version": "1.0"
     },
     "properties": [
       {
@@ -38,10 +38,24 @@
   "components": [
     {
       "type": "library",
-      "bom-ref": "pkg:conan/rapidjson@1.1.0",
-      "name": "rapidjson",
-      "version": "1.1.0",
-      "purl": "pkg:conan/rapidjson@1.1.0",
+      "bom-ref": "pkg:conan/mathlib@3.0",
+      "name": "mathlib",
+      "version": "3.0",
+      "hashes": [
+        {
+          "alg": "MD5",
+          "content": "c9e4c47adf705646dc132a1bc987e15d"
+        },
+        {
+          "alg": "SHA-1",
+          "content": "5cea33a816d458fe0b0cd11c42fa2d694f0b73fe"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "582e641f15cd12496f295878bb20df21aa0b0e8bcf36e61ed03934ba49f9759e"
+        }
+      ],
+      "purl": "pkg:conan/mathlib@3.0",
       "properties": [
         {
           "name": "internal:siemens:clearing:development",
@@ -53,7 +67,417 @@
         },
         {
           "name": "internal:siemens:clearing:siemens:filename",
-          "value": "rapidjson/1.1.0@siemens-energy/stable#6d624490b731387491675eebeff7ab66"
+          "value": "mathlib/3.0"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "energy-dev-conan2-egll"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Conan"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "energy-dev-conan2-egll/_/mathlib/3.0/_/0/package/82ef5eac51c38971dea2fd342dd55ddf2ddfbbc3/0/conan_package.tgz;"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:conan/openssl@3.5.2",
+      "name": "openssl",
+      "version": "3.5.2",
+      "purl": "pkg:conan/openssl@3.5.2",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "openssl/3.5.2"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Conan"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:conan/zlib@1.3.1",
+      "name": "zlib",
+      "version": "1.3.1",
+      "purl": "pkg:conan/zlib@1.3.1",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "zlib/1.3.1"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Conan"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:conan/libtool@2.4.7",
+      "name": "libtool",
+      "version": "2.4.7",
+      "purl": "pkg:conan/libtool@2.4.7",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "libtool/2.4.7"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Conan"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:conan/automake@1.16.5",
+      "name": "automake",
+      "version": "1.16.5",
+      "purl": "pkg:conan/automake@1.16.5",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "automake/1.16.5"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Conan"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:conan/autoconf@2.71",
+      "name": "autoconf",
+      "version": "2.71",
+      "purl": "pkg:conan/autoconf@2.71",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "autoconf/2.71"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Conan"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:conan/m4@1.4.19",
+      "name": "m4",
+      "version": "1.4.19",
+      "purl": "pkg:conan/m4@1.4.19",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "m4/1.4.19"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Conan"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:conan/gnu-config@cci.20210814",
+      "name": "gnu-config",
+      "version": "cci.20210814",
+      "purl": "pkg:conan/gnu-config@cci.20210814",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "gnu-config/cci.20210814"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Conan"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:conan/pkgconf@2.2.0",
+      "name": "pkgconf",
+      "version": "2.2.0",
+      "purl": "pkg:conan/pkgconf@2.2.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "pkgconf/2.2.0"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Conan"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:conan/meson@1.8.2",
+      "name": "meson",
+      "version": "1.8.2",
+      "purl": "pkg:conan/meson@1.8.2",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "meson/1.8.2"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Conan"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:conan/ninja@1.13.1",
+      "name": "ninja",
+      "version": "1.13.1",
+      "purl": "pkg:conan/ninja@1.13.1",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "ninja/1.13.1"
         },
         {
           "name": "internal:siemens:clearing:identifier-type",
@@ -78,7 +502,68 @@
       ]
     }
   ],
-  "dependencies": [],
+  "dependencies": [
+    {
+      "ref": "pkg:conan/mathlib@3.0",
+      "dependsOn": [
+        "pkg:conan/openssl@3.5.2",
+        "pkg:conan/zlib@1.3.1",
+        "pkg:conan/libtool@2.4.7",
+        "pkg:conan/automake@1.16.5",
+        "pkg:conan/autoconf@2.71",
+        "pkg:conan/m4@1.4.19",
+        "pkg:conan/pkgconf@2.2.0"
+      ]
+    },
+    {
+      "ref": "pkg:conan/openssl@3.5.2",
+      "dependsOn": [
+        "pkg:conan/zlib@1.3.1"
+      ]
+    },
+    {
+      "ref": "pkg:conan/libtool@2.4.7",
+      "dependsOn": [
+        "pkg:conan/automake@1.16.5",
+        "pkg:conan/autoconf@2.71",
+        "pkg:conan/m4@1.4.19",
+        "pkg:conan/automake@1.16.5",
+        "pkg:conan/autoconf@2.71",
+        "pkg:conan/m4@1.4.19",
+        "pkg:conan/gnu-config@cci.20210814"
+      ]
+    },
+    {
+      "ref": "pkg:conan/automake@1.16.5",
+      "dependsOn": [
+        "pkg:conan/autoconf@2.71",
+        "pkg:conan/m4@1.4.19",
+        "pkg:conan/autoconf@2.71",
+        "pkg:conan/m4@1.4.19"
+      ]
+    },
+    {
+      "ref": "pkg:conan/autoconf@2.71",
+      "dependsOn": [
+        "pkg:conan/m4@1.4.19",
+        "pkg:conan/m4@1.4.19"
+      ]
+    },
+    {
+      "ref": "pkg:conan/pkgconf@2.2.0",
+      "dependsOn": [
+        "pkg:conan/meson@1.8.2",
+        "pkg:conan/ninja@1.13.1"
+      ]
+    },
+    {
+      "ref": "pkg:conan/meson@1.8.2",
+      "dependsOn": [
+        "pkg:conan/ninja@1.13.1"
+      ]
+    }
+  ],
+  "compositions": [],
   "definitions": {
     "standards": [
       {
