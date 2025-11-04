@@ -231,7 +231,7 @@ namespace LCT.SW360PackageCreator
         {
             string sw360Url = appSettings.SW360.URL;
             string bomGenerationPath = appSettings.Directory.OutputFolder;
-            Logger.Debug($"Bom Generation Path - {bomGenerationPath}");
+            Logger.Debug($"BoM Generation Path - {bomGenerationPath}");
 
             // create component in sw360
             await CreateComponent(creatorHelper, sw360CreatorService, parsedBomData, sw360Url, appSettings);
@@ -280,7 +280,7 @@ namespace LCT.SW360PackageCreator
             ISw360CreatorService sw360CreatorService, List<ComparisonBomData> componentsToBoms,
             string sw360Url, CommonAppSettings appSettings)
         {
-            Logger.Logger.Log(null, Level.Notice, $"No of Unique and Valid components read from BOM = {componentsToBoms.Count} ", null);
+            Logger.Logger.Log(null, Level.Notice, $"No of Unique and Valid components read from BoM = {componentsToBoms.Count} ", null);
 
             try
             {

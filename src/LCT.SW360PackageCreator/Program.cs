@@ -37,7 +37,7 @@ namespace LCT.SW360PackageCreator
     {
         private static bool m_Verbose = false;
         public static Stopwatch CreatorStopWatch { get; set; }
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
         private static List<ComparisonBomData> parsedBomData;
 
@@ -77,9 +77,6 @@ namespace LCT.SW360PackageCreator
             var bomFilePath = Path.Combine(appSettings.Directory.OutputFolder, appSettings.SW360.ProjectName + "_" + FileConstant.BomFileName);
             ListofPerametersForCli listofPerameters = new ListofPerametersForCli();
             LoggerHelper.LogInputParameters(caToolInformation, appSettings, listofPerameters, exeType: Dataconstant.Creator, bomFilePath: bomFilePath);
-
-            if (appSettings.IsTestMode)
-                Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);
 
             //Validate Fossology Url
             if (appSettings.SW360.Fossology.EnableTrigger && !appSettings.IsTestMode)

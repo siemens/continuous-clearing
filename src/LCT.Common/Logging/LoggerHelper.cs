@@ -14,7 +14,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Security;
 using System.Text;
 using Level = log4net.Core.Level;
 
@@ -27,7 +26,7 @@ namespace LCT.Common.Logging
         private static IAnsiConsole _console;
         private static readonly object _consoleLock = new();
 
-        private static IAnsiConsole ConsoleInstance
+        public static IAnsiConsole ConsoleInstance
         {
             get
             {
@@ -38,59 +37,47 @@ namespace LCT.Common.Logging
                     {
                         var settings = BuildAnsiConsoleSettings();
                         _console = AnsiConsole.Create(settings);
+                        _console.Profile.Width = GetAutoConsoleWidth();
+                        _console.Profile.Capabilities.Ansi = true;
                     }
                 }
                 return _console;
             }
         }
+        private static int GetAutoConsoleWidth()
+        {           
 
+            try
+            {
+                int width = Console.IsOutputRedirected ? 200 : Console.WindowWidth;
+                if (width < 100) width = 160;
+                if (width > 240) width = 240;
+                return width;
+            }
+            catch (Exception ex) when (
+                 ex is InvalidOperationException ||
+                 ex is System.IO.IOException ||
+                 ex is PlatformNotSupportedException)
+            {
+                Logger.Debug($"GetAutoConsoleWidth(): fallback due to {ex.GetType().Name} - {ex.Message}");
+                return 200;
+            }
+        }
         private static AnsiConsoleSettings BuildAnsiConsoleSettings()
         {
             EnvironmentType envType = RuntimeEnvironment.GetEnvironment();
 
-            var ansi = GetAnsiSupport(envType);
             var colorSystem = GetColorSystem(envType);
 
             var settings = new AnsiConsoleSettings
             {
-                Ansi = ansi,
+                Ansi = AnsiSupport.Yes,
                 ColorSystem = colorSystem,
                 Out = AnsiConsole.Profile.Out,
                 Interactive = InteractionSupport.No
             };
             return settings;
         }
-
-
-
-        private static AnsiSupport GetAnsiSupport(EnvironmentType envType)
-        {
-            if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("NO_COLOR")))
-                return AnsiSupport.No;
-
-            var force = Environment.GetEnvironmentVariable("FORCE_ANSI");
-            if (string.Equals(force, "1", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(force, "true", StringComparison.OrdinalIgnoreCase))
-                return AnsiSupport.Yes;
-
-            if (envType == EnvironmentType.AzurePipeline)
-            {
-                var redirectFlag = Environment.GetEnvironmentVariable("DOTNET_SYSTEM_CONSOLE_ALLOW_ANSI_COLOR_REDIRECTION");
-                if (string.Equals(redirectFlag, "1") ||
-                    string.Equals(redirectFlag, "true", StringComparison.OrdinalIgnoreCase))
-                    return AnsiSupport.Yes;
-
-                return AnsiSupport.No;
-            }
-            if (Console.IsOutputRedirected)
-            {
-                var redirectFlag = Environment.GetEnvironmentVariable("DOTNET_SYSTEM_CONSOLE_ALLOW_ANSI_COLOR_REDIRECTION");
-                return string.Equals(redirectFlag, "1") ? AnsiSupport.Yes : AnsiSupport.No;
-            }
-
-            return AnsiSupport.Yes;
-        }
-
         private static ColorSystemSupport GetColorSystem(EnvironmentType envType)
         {
             // User override
@@ -110,8 +97,6 @@ namespace LCT.Common.Logging
             {
                 return ColorSystemSupport.Standard;
             }
-
-            // Richer color locally
             return ColorSystemSupport.TrueColor;
         }
 
@@ -122,34 +107,7 @@ namespace LCT.Common.Logging
         }
 
         private static readonly Dictionary<string, string> _colorCache = new Dictionary<string, string>();
-        private static int _colorIndex = 0;
-
-        private static int GetConsoleWidth(int subtract = 0, int fallback = 120)
-        {
-            if (subtract < 0) subtract = 0;
-
-            if (Console.IsOutputRedirected)
-                return fallback;
-
-            try
-            {
-                int width = Console.WindowWidth;
-                if (width <= 0) return fallback;
-
-                int adjusted = width - subtract;
-                return adjusted > 0 ? adjusted : fallback;
-            }
-            catch (Exception ex) when (
-                ex is InvalidOperationException ||
-                ex is PlatformNotSupportedException ||
-                ex is System.IO.IOException ||
-                ex is SecurityException)
-            {
-                Logger.Debug($"SafeSpectreAction suppressed exception: {ex.GetType().Name} - {ex.Message}");
-            }
-
-            return fallback;
-        }
+        private static int _colorIndex = 0;       
 
         public static void SafeSpectreAction(Action spectreAction, string fallbackMessage, string fallbackType = "Info")
         {
@@ -172,7 +130,7 @@ namespace LCT.Common.Logging
         }
         public static void WriteComponentsWithoutDownloadURLByUseingSpectreToKpi(List<ComparisonBomData> componentInfo, List<Components> lstReleaseNotCreated, string sw360URL, List<Components> duplicateComponentsByPurlId)
         {
-            if (componentInfo.Count > 0 || lstReleaseNotCreated.Count > 0)
+            if (componentInfo.Count > 0 || lstReleaseNotCreated.Count > 0 || duplicateComponentsByPurlId.Count > 0)
             {
                 SafeSpectreAction(() =>
                 {
@@ -198,18 +156,21 @@ namespace LCT.Common.Logging
             WriteInfoWithMarkup("[yellow]  Component name exists in SW360 with a different package type PurlId. Manually update the component details.[/]");
             WriteLine();
 
-            int consoleWidth = GetConsoleWidth(6, 200);
+            int totalWidth = Math.Max(160, GetAutoConsoleWidth());
+            const int nameWidth = 50;
+            const int versionWidth = 20;
+            int urlWidth = totalWidth - (nameWidth + versionWidth + 10);
+            if (urlWidth < 60) urlWidth = 60;
 
             var table = new Table()
                 .BorderColor(Color.Yellow)
                 .Border(TableBorder.Rounded)
                 .Title("[yellow]Invalid / Duplicate Components (PurlId Mismatch)[/]")
-                .Width(Math.Min(consoleWidth, 200))
                 .Expand();
 
-            table.AddColumn(new TableColumn("[green]Name[/]").Width(45));
-            table.AddColumn(new TableColumn("[blue]Version[/]").Width(25));
-            table.AddColumn(new TableColumn("[cyan]SW360 Component URL[/]").Width(120));
+            table.AddColumn(new TableColumn("[green]Name[/]").Width(nameWidth).NoWrap());
+            table.AddColumn(new TableColumn("[blue]Version[/]").Width(versionWidth).NoWrap());
+            table.AddColumn(new TableColumn("[cyan]SW360 Component URL[/]").Width(urlWidth).NoWrap());
 
             foreach (var item in duplicateComponents)
             {
@@ -224,7 +185,7 @@ namespace LCT.Common.Logging
                 );
             }
 
-            ConsoleWrite(c => c.Write(table));
+            ConsoleInstance.Write(table);
             WriteLine();
         }
         private static void DisplayComponentsWithoutUrl(List<ComparisonBomData> componentInfo, string sw360URL)
@@ -264,19 +225,23 @@ namespace LCT.Common.Logging
             var table = new Table()
                 .BorderColor(Color.Yellow)
                 .Border(TableBorder.Rounded)
-                .Width(Math.Min(GetConsoleWidth(6, 120), includeUrl ? 200 : 120));
+                .Expand();
 
-            table.AddColumn(new TableColumn("[green]Name[/]").Width(45));
-            table.AddColumn(new TableColumn("[blue]Version[/]").Width(25));
-
+            int totalWidth = Math.Max(160, GetAutoConsoleWidth());
+            const int nameWidth = 50;
+            const int versionWidth = 20;
+            int linkWidth = includeUrl ? totalWidth - (nameWidth + versionWidth + 10) : 0;
+            table.AddColumn(new TableColumn("[green]Name[/]").Width(nameWidth).NoWrap());
+            table.AddColumn(new TableColumn("[blue]Version[/]").Width(versionWidth).NoWrap());
             if (includeUrl)
             {
-                table.AddColumn(new TableColumn("[cyan]SW360 Release URL[/]").Width(120));
-                table.Expand();
+                table.AddColumn(new TableColumn("[cyan]SW360 Release URL[/]")
+                    .Width(linkWidth)
+                    .NoWrap());
             }
-
             return table;
         }
+
 
         private static void PopulateComponentInfoTable(Table table, List<ComparisonBomData> componentInfo, string sw360URL)
         {
@@ -312,7 +277,7 @@ namespace LCT.Common.Logging
                     WriteInfoWithMarkup("[yellow] Can be linked manually OR Check the Logs AND RE-Run[/]");
                     WriteLine();
 
-                    int consoleWidth = GetConsoleWidth(6, 120);
+                    int consoleWidth = GetAutoConsoleWidth();
 
                     var table = new Table()
                         .BorderColor(Color.Yellow)
@@ -513,11 +478,11 @@ namespace LCT.Common.Logging
         {
             content
                 .AppendLine($"  [cyan]DEVDEP_REPO_NAME[/]")
-                .AppendLine($"  └──➤ {(!string.IsNullOrEmpty(config.DevDepRepo) ? config.DevDepRepo : Dataconstant.NotConfigured)}\n")
+                .AppendLine($"  └──> {(!string.IsNullOrEmpty(config.DevDepRepo) ? config.DevDepRepo : Dataconstant.NotConfigured)}\n")
                 .AppendLine($"  [cyan]THIRD_PARTY_REPO_NAME[/]")
-                .AppendLine($"  └──➤ {GetThirdPartyRepoName(config)}\n")
+                .AppendLine($"  └──> {GetThirdPartyRepoName(config)}\n")
                 .AppendLine($"  [cyan]RELEASE_REPO_NAME[/]")
-                .AppendLine($"  └──➤ {(!string.IsNullOrEmpty(config.ReleaseRepo) ? config.ReleaseRepo : Dataconstant.NotConfigured)}\n")
+                .AppendLine($"  └──> {(!string.IsNullOrEmpty(config.ReleaseRepo) ? config.ReleaseRepo : Dataconstant.NotConfigured)}\n")
                 .AppendLine($"  [cyan]Config[/]");
         }
 
@@ -534,9 +499,9 @@ namespace LCT.Common.Logging
 
             content
                 .AppendLine($"  ├──[white]Include[/]")
-                .AppendLine($"  │   └──➤ {includeList}")
+                .AppendLine($"  │   └──> {includeList}")
                 .AppendLine($"  └──[white]Exclude[/]")
-                .AppendLine($"      └──➤ {excludeList}\n");
+                .AppendLine($"      └──> {excludeList}\n");
         }
 
         private static string GetFormattedList(string[] items)
@@ -605,7 +570,26 @@ namespace LCT.Common.Logging
     ListofPerametersForCli listofPerameters, string exeType, string bomFilePath)
         {
             string content = GenerateContentByExeType(caToolInformation, appSettings, listofPerameters, exeType, bomFilePath);
-            WriteStyledPanel(content);
+            InitialDataPanel(content);            
+        }
+        public static void InitialDataPanel(string content)
+        {
+            SafeSpectreAction(() =>
+            {
+                int consoleWidth = GetAutoConsoleWidth();
+                int panelWidth = Math.Min(consoleWidth, 120);
+
+                var panel = new Panel(content)
+                {
+                    Border = BoxBorder.Rounded,
+                    BorderStyle = Style.Parse("white"),
+                    Padding = new Padding(1, 0, 1, 0),
+                    Width = panelWidth,
+                    Expand = false
+                };
+
+                ConsoleWrite(c => c.Write(panel));
+            }, "Input Parameters", "Panel");
         }
 
         private static string GenerateContentByExeType(CatoolInfo caToolInformation, CommonAppSettings appSettings,
@@ -623,33 +607,33 @@ namespace LCT.Common.Logging
         private static void AppendDirectoryInfo(StringBuilder content, CommonAppSettings appSettings, int maxPathLength)
         {
             content
-                .Append($"[green]-[/] [cyan]PackageFilePath[/]\n")
-                .Append($"  └──➤ {WrapPath(appSettings.Directory.InputFolder, maxPathLength)}\n\n")
-                .Append($"[green]-[/] [cyan]BomFolderPath[/]\n")
-                .Append($"  └──➤ {WrapPath(appSettings.Directory.OutputFolder, maxPathLength)}\n\n");
+                .Append($"[green]-[/] [cyan]Package FilePath[/]\n")
+                .Append($"  └──> {WrapPath(appSettings.Directory.InputFolder, maxPathLength)}\n\n")
+                .Append($"[green]-[/] [cyan]BoM FolderPath[/]\n")
+                .Append($"  └──> {WrapPath(appSettings.Directory.OutputFolder, maxPathLength)}\n\n");
         }
 
         private static void AppendBasicInfo(StringBuilder content, CatoolInfo caToolInformation, int maxPathLength)
         {
             content
-                .Append($"[green]-[/] [cyan]CaToolVersion[/]\n")
-                .Append($"  └──✅ {caToolInformation.CatoolVersion}\n\n")
-                .Append($"[green]-[/] [cyan]CaToolRunningPath[/]\n")
-                .Append($"  └──➤ {WrapPath(caToolInformation.CatoolRunningLocation, maxPathLength)}\n\n");
+                .Append($"[green]-[/] [cyan]CaTool Version[/]\n")
+                .Append($"  └──> {caToolInformation.CatoolVersion}\n\n")
+                .Append($"[green]-[/] [cyan]CaTool RunningPath[/]\n")
+                .Append($"  └──> {WrapPath(caToolInformation.CatoolRunningLocation, maxPathLength)}\n\n");
         }
 
         private static void AppendSw360Info(StringBuilder content, CommonAppSettings appSettings,
             ListofPerametersForCli listofPerameters, int maxPathLength)
         {
             content
-                .Append($"[green]-[/] [cyan]SW360Url[/]\n")
-                .Append($"  └──➤ {appSettings.SW360.URL}\n\n")
-                .Append($"[green]-[/] [cyan]SW360ProjectName[/]\n")
-                .Append($"  └──➤ {appSettings.SW360.ProjectName}\n\n")
-                .Append($"[green]-[/] [cyan]SW360ProjectID[/]\n")
-                .Append($"  └──➤ {appSettings.SW360.ProjectID}\n\n")
-                .Append($"[green]-[/] [cyan]ExcludeComponents[/]\n")
-                .Append($"  └──➤ {WrapPath(string.IsNullOrEmpty(listofPerameters.ExcludeComponents) ? "None" : listofPerameters.ExcludeComponents, maxPathLength)}\n\n");
+                .Append($"[green]-[/] [cyan]Sw360Url[/]\n")
+                .Append($"  └──> {appSettings.SW360.URL}\n\n")
+                .Append($"[green]-[/] [cyan]Sw360 ProjectName[/]\n")
+                .Append($"  └──> {appSettings.SW360.ProjectName}\n\n")
+                .Append($"[green]-[/] [cyan]Sw360 ProjectID[/]\n")
+                .Append($"  └──> {appSettings.SW360.ProjectID}\n\n")
+                .Append($"[green]-[/] [cyan]Exclude Components[/]\n")
+                .Append($"  └──> {WrapPath(string.IsNullOrEmpty(listofPerameters.ExcludeComponents) ? "None" : listofPerameters.ExcludeComponents, maxPathLength)}\n\n");
         }
 
         private static void AppendCommonInfo(StringBuilder content, CommonAppSettings appSettings,
@@ -657,19 +641,19 @@ namespace LCT.Common.Logging
         {
             content
                 .Append($"[green]-[/] [cyan]ProjectType[/]\n")
-                .Append($"  └──➤ {appSettings.ProjectType}\n\n")
-                .Append($"[green]-[/] [cyan]LogFolderPath[/]\n")
-                .Append($"  └──➤ {WrapPath(Log4Net.CatoolLogPath, maxPathLength)}\n\n")
+                .Append($"  └──> {appSettings.ProjectType}\n\n")
+                .Append($"[green]-[/] [cyan]Log FolderPath[/]\n")
+                .Append($"  └──> {WrapPath(Log4Net.CatoolLogPath, maxPathLength)}\n\n")
                 .Append($"[green]-[/] [cyan]Include[/]\n")
-                .Append($"  └──➤ {WrapPath(string.IsNullOrEmpty(listofPerameters.Include) ? "None" : listofPerameters.Include, maxPathLength)}\n\n")
+                .Append($"  └──> {WrapPath(string.IsNullOrEmpty(listofPerameters.Include) ? "None" : listofPerameters.Include, maxPathLength)}\n\n")
                 .Append($"[green]-[/] [cyan]Exclude[/]\n")
-                .Append($"  └──➤ {WrapPath(string.IsNullOrEmpty(listofPerameters.Exclude) ? "None" : listofPerameters.Exclude, maxPathLength)}");
+                .Append($"  └──> {WrapPath(string.IsNullOrEmpty(listofPerameters.Exclude) ? "None" : listofPerameters.Exclude, maxPathLength)}");
         }
 
         private static string GenerateIdentifierContent(CatoolInfo caToolInformation, CommonAppSettings appSettings,
             ListofPerametersForCli listofPerameters)
         {
-            int consoleWidth = GetConsoleWidth(10, 110);
+            int consoleWidth = GetAutoConsoleWidth();
             int maxPathLength = Math.Max(60, consoleWidth - 20);
             var content = new StringBuilder();
 
@@ -689,7 +673,13 @@ namespace LCT.Common.Logging
             {
                 content
                     .Append($"[green]-[/] [cyan]InternalRepoList[/]\n")
-                    .Append($"  └──➤ {WrapPath(string.IsNullOrEmpty(listofPerameters.InternalRepoList) ? "None" : listofPerameters.InternalRepoList, maxPathLength)}\n\n");
+                    .Append($"  └──> {WrapPath(string.IsNullOrEmpty(listofPerameters.InternalRepoList) ? "None" : listofPerameters.InternalRepoList, maxPathLength)}\n\n");
+            }
+            if (appSettings.IsTestMode)
+            {
+                content
+                    .Append($"[green]-[/] [cyan]Mode[/]\n")
+                    .Append($"  └──> {appSettings.Mode}\n\n");
             }
 
             AppendCommonInfo(content, appSettings, listofPerameters, maxPathLength);
@@ -699,7 +689,7 @@ namespace LCT.Common.Logging
 
         private static string GenerateCreatorContent(CatoolInfo caToolInformation, CommonAppSettings appSettings, string bomFilePath)
         {
-            int consoleWidth = GetConsoleWidth(10, 110);
+            int consoleWidth = GetAutoConsoleWidth();
             int maxPathLength = Math.Max(60, consoleWidth - 20);
             var content = new StringBuilder();
 
@@ -715,7 +705,7 @@ namespace LCT.Common.Logging
 
         private static string GenerateUploaderContent(CatoolInfo caToolInformation, CommonAppSettings appSettings, string bomFilePath)
         {
-            int consoleWidth = GetConsoleWidth(10, 110);
+            int consoleWidth = GetAutoConsoleWidth();
             int maxPathLength = Math.Max(60, consoleWidth - 20);
             var content = new StringBuilder();
 
@@ -733,22 +723,28 @@ namespace LCT.Common.Logging
     string bomFilePath, int maxPathLength)
         {
             content
-                .Append($"[green]-[/] [cyan]BomFilePath[/]\n")
-                .Append($"  └──➤ {WrapPath(bomFilePath, maxPathLength)}\n\n")
-                .Append($"[green]-[/] [cyan]SW360Url[/]\n")
-                .Append($"  └──➤ {appSettings.SW360.URL}\n\n")
-                .Append($"[green]-[/] [cyan]SW360ProjectName[/]\n")
-                .Append($"  └──➤ {appSettings.SW360.ProjectName}\n\n")
-                .Append($"[green]-[/] [cyan]SW360ProjectID[/]\n")
-                .Append($"  └──➤ {appSettings.SW360.ProjectID}\n\n")
-                .Append($"[green]-[/] [cyan]FossologyURL[/]\n")
-                .Append($"  └──➤ {appSettings.SW360.Fossology.URL}\n\n")
-                .Append($"[green]-[/] [cyan]EnableFossTrigger[/]\n")
-                .Append($"  └──➤ {appSettings.SW360.Fossology.EnableTrigger}\n\n")
-                .Append($"[green]-[/] [cyan]IgnoreDevDependency[/]\n")
-                .Append($"  └──➤ {appSettings.SW360.IgnoreDevDependency}\n\n")
-                .Append($"[green]-[/] [cyan]LogFolderPath[/]\n")
-                .Append($"  └──➤ {WrapPath(Log4Net.CatoolLogPath, maxPathLength)}\n\n");
+                .Append($"[green]-[/] [cyan]BoM FilePath[/]\n")
+                .Append($"  └──> {WrapPath(bomFilePath, maxPathLength)}\n\n")
+                .Append($"[green]-[/] [cyan]Sw360 Url[/]\n")
+                .Append($"  └──> {appSettings.SW360.URL}\n\n")
+                .Append($"[green]-[/] [cyan]Sw360 ProjectName[/]\n")
+                .Append($"  └──> {appSettings.SW360.ProjectName}\n\n")
+                .Append($"[green]-[/] [cyan]Sw360 ProjectID[/]\n")
+                .Append($"  └──> {appSettings.SW360.ProjectID}\n\n")
+                .Append($"[green]-[/] [cyan]Fossology URL[/]\n")
+                .Append($"  └──> {appSettings.SW360.Fossology.URL}\n\n")
+                .Append($"[green]-[/] [cyan]Enable FossTrigger[/]\n")
+                .Append($"  └──> {appSettings.SW360.Fossology.EnableTrigger}\n\n")
+                .Append($"[green]-[/] [cyan]Ignore Dev Dependency[/]\n")
+                .Append($"  └──> {appSettings.SW360.IgnoreDevDependency}\n\n")
+                .Append($"[green]-[/] [cyan]Log FolderPath[/]\n")
+                .Append($"  └──> {WrapPath(Log4Net.CatoolLogPath, maxPathLength)}");
+            if (appSettings.IsTestMode)
+            {
+                content
+                    .Append($"\n[green]-[/] [cyan]Mode[/]")
+                    .Append($"  └──> {appSettings.Mode}");
+            }
         }
 
 
@@ -756,14 +752,14 @@ namespace LCT.Common.Logging
     string bomFilePath, int maxPathLength)
         {
             content
-                .Append($"[green]-[/] [cyan]BomFilePath[/]\n")
-                .Append($"  └──➤ {WrapPath(bomFilePath, maxPathLength)}\n\n")
-                .Append($"[green]-[/] [cyan]JFrogUrl[/]\n")
-                .Append($"  └──➤ {appSettings.Jfrog.URL}\n\n")
+                .Append($"[green]-[/] [cyan]BoM FilePath[/]\n")
+                .Append($"  └──> {WrapPath(bomFilePath, maxPathLength)}\n\n")
+                .Append($"[green]-[/] [cyan]JFrog Url[/]\n")
+                .Append($"  └──> {appSettings.Jfrog.URL}\n\n")
                 .Append($"[green]-[/] [cyan]Dry-run[/]\n")
-                .Append($"  └──➤ {appSettings.Jfrog.DryRun}\n\n")
-                .Append($"[green]-[/] [cyan]LogFolderPath[/]\n")
-                .Append($"  └──➤ {WrapPath(Log4Net.CatoolLogPath, maxPathLength)}\n\n");
+                .Append($"  └──> {appSettings.Jfrog.DryRun}\n\n")
+                .Append($"[green]-[/] [cyan]Log FolderPath[/]\n")
+                .Append($"  └──> {WrapPath(Log4Net.CatoolLogPath, maxPathLength)}");
         }
         public static void LogInputParameters(CatoolInfo caToolInformation, CommonAppSettings appSettings, ListofPerametersForCli listofPerameters, string exeType = null, string bomFilePath = null)
         {
@@ -782,25 +778,28 @@ namespace LCT.Common.Logging
             if (exeType == Dataconstant.Identifier)
             {
                 var logMessage = $"Input Parameters used in Package Identifier:\n\t" +
-                $"CaToolVersion\t\t --> {caToolInformation.CatoolVersion}\n\t" +
-                $"CaToolRunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
-                $"PackageFilePath\t\t --> {appSettings.Directory.InputFolder}\n\t" +
-                $"BomFolderPath\t\t --> {appSettings.Directory.OutputFolder}\n\t";
+                $"CaTool Version\t\t --> {caToolInformation.CatoolVersion}\n\t" +
+                $"CaTool RunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
+                $"Package FilePath\t\t --> {appSettings.Directory.InputFolder}\n\t" +
+                $"BoM FolderPath\t\t --> {appSettings.Directory.OutputFolder}\n\t";
 
                 if (appSettings.SW360 != null)
                 {
                     logMessage += $"SW360Url\t\t --> {appSettings.SW360.URL}\n\t" +
-                              $"SW360ProjectName\t --> {appSettings.SW360.ProjectName}\n\t" +
-                              $"SW360ProjectID\t\t --> {appSettings.SW360.ProjectID}\n\t" +
-                              $"ExcludeComponents\t --> {listofPerameters.ExcludeComponents}\n\t";
+                              $"SW360 ProjectName\t --> {appSettings.SW360.ProjectName}\n\t" +
+                              $"SW360 ProjectID\t\t --> {appSettings.SW360.ProjectID}\n\t" +
+                              $"Exclude Components\t --> {listofPerameters.ExcludeComponents}\n\t";
                 }
                 if (appSettings.Jfrog != null)
                 {
                     logMessage += $"InternalRepoList\t --> {listofPerameters.InternalRepoList}\n\t";
                 }
-
+                if (appSettings.IsTestMode)
+                {
+                    logMessage += $"Mode\t --> {appSettings.Mode}\n\t";
+                }
                 logMessage += $"ProjectType\t\t --> {appSettings.ProjectType}\n\t" +
-                              $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t" +
+                              $"Log FolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t" +
                               $"Include\t\t\t --> {listofPerameters.Include}\n\t" +
                               $"Exclude\t\t\t --> {listofPerameters.Exclude}\n";
 
@@ -808,28 +807,34 @@ namespace LCT.Common.Logging
             }
             else if (exeType == Dataconstant.Creator)
             {
-                Logger.Logger.Log(null, Level.Notice, $"Input parameters used in Package Creator:\n\t" +
-                              $"CaToolVersion\t\t --> {caToolInformation.CatoolVersion}\n\t" +
-                              $"CaToolRunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
-                              $"BomFilePath\t\t --> {bomFilePath}\n\t" +
-                              $"SW360Url\t\t --> {appSettings.SW360.URL}\n\t" +
-                              $"SW360ProjectName\t --> {appSettings.SW360.ProjectName}\n\t" +
-                              $"SW360ProjectID\t\t --> {appSettings.SW360.ProjectID}\n\t" +
-                              $"FossologyURL\t\t --> {appSettings.SW360.Fossology.URL}\n\t" +
-                              $"EnableFossTrigger\t --> {appSettings.SW360.Fossology.EnableTrigger}\n\t" +
-                              $"IgnoreDevDependency\t --> {appSettings.SW360.IgnoreDevDependency}\n\t" +
-                              $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t", null);
+                var creatorMessage =
+                    $"Input parameters used in Package Creator:\n\t" +
+                    $"CaTool Version\t\t --> {caToolInformation.CatoolVersion}\n\t" +
+                    $"CaTool RunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
+                    $"BoM FilePath\t\t --> {bomFilePath}\n\t" +
+                    $"SW360Url\t\t --> {appSettings.SW360.URL}\n\t" +
+                    $"SW360 ProjectName\t --> {appSettings.SW360.ProjectName}\n\t" +
+                    $"SW360 ProjectID\t\t --> {appSettings.SW360.ProjectID}\n\t" +
+                    $"FossologyURL\t\t --> {appSettings.SW360.Fossology.URL}\n\t" +
+                    $"Enable FossTrigger\t --> {appSettings.SW360.Fossology.EnableTrigger}\n\t" +
+                    $"IgnoreDevDependency\t --> {appSettings.SW360.IgnoreDevDependency}\n\t";
+
+                if (appSettings.IsTestMode)
+                {
+                    creatorMessage += $"Mode\t\t --> {appSettings.Mode}\n\t";
+                }
+                creatorMessage += $"Log FolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t";
+                Logger.Logger.Log(null, Level.Notice, creatorMessage, null);
             }
             else if (exeType == Dataconstant.Uploader)
             {
                 Logger.Logger.Log(null, Level.Info, $"Input Parameters used in Artifactory Uploader:\n\t", null);
-                Logger.Logger.Log(null, Level.Notice, $"\tBomFilePath:\t\t {bomFilePath}\n\t" +
-                    $"CaToolVersion\t\t {caToolInformation.CatoolVersion}\n\t" +
-                    $"CaToolRunningPath\t {caToolInformation.CatoolRunningLocation}\n\t" +
+                Logger.Logger.Log(null, Level.Notice, $"\tBoM FilePath:\t\t {bomFilePath}\n\t" +
+                    $"CaTool Version\t\t {caToolInformation.CatoolVersion}\n\t" +
+                    $"CaTool RunningPath\t {caToolInformation.CatoolRunningLocation}\n\t" +
                     $"JFrogUrl:\t\t {appSettings.Jfrog.URL}\n\t" +
                     $"Dry-run:\t\t {appSettings.Jfrog.DryRun}\n\t" +
-                    $"LogFolderPath:\t\t {Log4Net.CatoolLogPath}\n", null);
-
+                    $"Log FolderPath:\t\t {Log4Net.CatoolLogPath}\n", null);
             }
         }
         public static string WrapPath(string path, int maxLength = 80, string prefix = "        ")
@@ -864,8 +869,8 @@ namespace LCT.Common.Logging
         public static void WriteStyledPanel(string content, string title = null, string borderStyle = "white", string headerStyle = "yellow")
         {
             SafeSpectreAction(() =>
-            {
-                int consoleWidth = GetConsoleWidth(4, 120);
+            {                
+                int consoleWidth = GetAutoConsoleWidth();
                 int panelWidth = Math.Min(consoleWidth, 150);
 
                 var panel = new Panel(content)
@@ -874,7 +879,7 @@ namespace LCT.Common.Logging
                     BorderStyle = Style.Parse(borderStyle),
                     Padding = new Padding(1, 0, 1, 0),
                     Width = panelWidth,
-                    Expand = false
+                    Expand = true
                 };
 
                 if (!string.IsNullOrEmpty(title))
@@ -890,7 +895,7 @@ namespace LCT.Common.Logging
             SafeSpectreAction(() =>
             {
                 WriteLine(); // Add a new line before the header
-                var consoleWidth = GetConsoleWidth(0, 120);
+                var consoleWidth = GetAutoConsoleWidth();
                 var padding = (consoleWidth - title.Length) / 2;
                 var centeredText = title.PadLeft(padding + title.Length).PadRight(consoleWidth);
                 var bottomBorder = new string('═', consoleWidth); // Double line border character
@@ -908,11 +913,9 @@ namespace LCT.Common.Logging
         {
             SafeSpectreAction(() =>
             {
-                WriteLine(); // Add a new line before the header
-                var consoleWidth = GetConsoleWidth(0, 120);
-                var padding = (consoleWidth - title.Length) / 2;
-                var centeredText = title.PadLeft(padding + title.Length).PadRight(consoleWidth);
-                ConsoleInstance.MarkupLine($"[bold white]{Markup.Escape(centeredText)}[/]");
+                ConsoleInstance.WriteLine();
+                ConsoleInstance.MarkupLine($"[bold white]{Markup.Escape(title)}[/]");
+                ConsoleInstance.WriteLine();
             }, title, "Header");
         }
 
@@ -1006,14 +1009,13 @@ namespace LCT.Common.Logging
                 WriteSummaryHeader("SUMMARY");
                 WriteProjectSummary(ProjectSummaryLink);
 
-                int consoleWidth = GetConsoleWidth(6, 120);
+                int consoleWidth = GetAutoConsoleWidth();
                 int barMaxWidth = Math.Max(20, 40);
                 int maxValue = printData.Values.Count != 0 ? printData.Values.Max() : 0;
 
                 var table = CreateSummaryTable(consoleWidth);
                 AddSummaryRows(table, printData, maxValue, barMaxWidth, KpiNames);
 
-                table.AddEmptyRow();
                 ConsoleInstance.Write(table);
 
                 WriteLine();
@@ -1075,7 +1077,7 @@ namespace LCT.Common.Logging
             WriteLine();
             foreach (var item in printTimingData)
             {
-                string timeFormatted = item.Value.ToString("F3");
+                string timeFormatted = item.Value.ToString();
                 WriteInfoWithMarkup($"[white]Time Taken By {item.Key} : [/][green]{timeFormatted}[/][white] s[/]");
             }
             WriteLine();
@@ -1097,7 +1099,8 @@ namespace LCT.Common.Logging
                 kpiNames.PackagesNotPresentInOfficialRepo,
                 kpiNames.ComponentsNotUploadedInFOSSology,
                 kpiNames.PackagesInNotApprovedState,
-                kpiNames.ReleasesWithoutSourceDownloadURL
+                kpiNames.ReleasesWithoutSourceDownloadURL,
+                kpiNames.TotalDuplicateAndInValidComponents,
             };
 
             var infoGroup = new[]
@@ -1124,8 +1127,7 @@ namespace LCT.Common.Logging
                 kpiNames.PackagesCopiedToSipartyRepo,
                 kpiNames.PackagesCopiedToSipartyDevDepRepo,
                 kpiNames.PackagesMovedToRepo,
-                kpiNames.ComponentsFromTheSPDXImportedAsBaselineEntries,
-                kpiNames.TotalDuplicateAndInValidComponents,
+                kpiNames.ComponentsFromTheSPDXImportedAsBaselineEntries,                
                 kpiNames.PackagesPresentIn3rdPartyRepo,
                 kpiNames.PackagesPresentInDevDepRepo,
                 kpiNames.PackagesPresentInReleaseRepo,
@@ -1182,7 +1184,7 @@ namespace LCT.Common.Logging
                     WriteInfoWithMarkup("[yellow bold]* Internal Components Identified which will not be sent for clearing:[/]");
                     WriteLine();
 
-                    int consoleWidth = GetConsoleWidth(6, 120);
+                    int consoleWidth = GetAutoConsoleWidth();
 
                     var table = new Table()
                         .BorderColor(Color.Yellow)

@@ -41,7 +41,7 @@ namespace LCT.Common.Logging
                     fileLogger.Info(message, exception);
                     break;
                 case "NOTICE":
-                    AnsiConsole.MarkupLine($"[white] {message}[/]");
+                    LoggerHelper.ConsoleInstance.MarkupLine($"[white]{message}[/]");
                     fileLogger.Debug(message, exception);
                     break;
                 case "WARN":

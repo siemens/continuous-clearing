@@ -72,7 +72,7 @@ namespace LCT.PackageIdentifier
             sw360 = appSettings.SW360;
             // Calls package parser
             listOfComponentsToBom = await CallPackageParser(appSettings);
-            Logger.Logger.Log(null, Level.Notice, $"No of components added to BOM after removing bundled & excluded components " +
+            Logger.Logger.Log(null, Level.Notice, $"No of components added to BoM after removing bundled & excluded components " +
                 $"= {listOfComponentsToBom.Components.Count}", null);
 
             bomKpiData.ComponentsInComparisonBOM = listOfComponentsToBom.Components.Count;
@@ -92,9 +92,9 @@ namespace LCT.PackageIdentifier
 
             string defaultProjectName = CommonIdentiferHelper.GetDefaultProjectName(appSettings);
             // Writes Comparison Bom
-            Logger.Logger.Log(null, Level.Notice, $"Writing CycloneDX BOM..", null);
+            Logger.Logger.Log(null, Level.Notice, $"Writing CycloneDX BoM..", null);
             WritecontentsToBOM(appSettings, bomKpiData, listOfComponentsToBom, defaultProjectName);
-            Logger.Logger.Log(null, Level.Notice, $"Writing CycloneDX BOM completed", null);
+            Logger.Logger.Log(null, Level.Notice, $"Writing CycloneDX BoM completed", null);
 
             // Log warnings based on appSettings
             DisplayInformation.LogBomGenerationWarnings(appSettings);
@@ -102,7 +102,7 @@ namespace LCT.PackageIdentifier
             // Writes Kpi data 
             Program.BomStopWatch?.Stop();
             bomKpiData.TimeTakenByBomCreator = Program.BomStopWatch == null ? 0 :
-              TimeSpan.FromMilliseconds(Program.BomStopWatch.ElapsedMilliseconds).TotalSeconds;
+                (int)Program.BomStopWatch.Elapsed.TotalSeconds;
             fileOperations.WriteContentToFile(bomKpiData, appSettings.Directory.OutputFolder,
                 FileConstant.BomKpiDataFileName, defaultProjectName);
             if (appSettings.SW360 != null)

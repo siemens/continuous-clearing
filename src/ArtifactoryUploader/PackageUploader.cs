@@ -69,7 +69,7 @@ namespace LCT.ArtifactoryUploader
             // write KPI info to console table 
             if (Program.UploaderStopWatch != null)
                 uploaderKpiData.TimeTakenByArtifactoryUploader =
-                TimeSpan.FromMilliseconds(Program.UploaderStopWatch.ElapsedMilliseconds).TotalSeconds;
+                (int)Program.UploaderStopWatch.Elapsed.TotalSeconds;
             PackageUploadHelper.WriteCreatorKpiDataToConsole(uploaderKpiData);
 
             Logger.Debug($"UploadPackageToArtifactory():End");

@@ -13,7 +13,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using File = System.IO.File;
 
-namespace LCT.Common.Tests.ComplianceValidator
+namespace LCT.Common.UTest
 {
     [TestFixture]
     public class ComplianceCheckTests
