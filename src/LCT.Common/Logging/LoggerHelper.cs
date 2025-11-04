@@ -45,7 +45,7 @@ namespace LCT.Common.Logging
             }
         }
         private static int GetAutoConsoleWidth()
-        {           
+        {
 
             try
             {
@@ -107,7 +107,7 @@ namespace LCT.Common.Logging
         }
 
         private static readonly Dictionary<string, string> _colorCache = new Dictionary<string, string>();
-        private static int _colorIndex = 0;       
+        private static int _colorIndex = 0;
 
         public static void SafeSpectreAction(Action spectreAction, string fallbackMessage, string fallbackType = "Info")
         {
@@ -570,7 +570,7 @@ namespace LCT.Common.Logging
     ListofPerametersForCli listofPerameters, string exeType, string bomFilePath)
         {
             string content = GenerateContentByExeType(caToolInformation, appSettings, listofPerameters, exeType, bomFilePath);
-            InitialDataPanel(content);            
+            InitialDataPanel(content);
         }
         public static void InitialDataPanel(string content)
         {
@@ -869,7 +869,7 @@ namespace LCT.Common.Logging
         public static void WriteStyledPanel(string content, string title = null, string borderStyle = "white", string headerStyle = "yellow")
         {
             SafeSpectreAction(() =>
-            {                
+            {
                 int consoleWidth = GetAutoConsoleWidth();
                 int panelWidth = Math.Min(consoleWidth, 150);
 
@@ -1127,7 +1127,7 @@ namespace LCT.Common.Logging
                 kpiNames.PackagesCopiedToSipartyRepo,
                 kpiNames.PackagesCopiedToSipartyDevDepRepo,
                 kpiNames.PackagesMovedToRepo,
-                kpiNames.ComponentsFromTheSPDXImportedAsBaselineEntries,                
+                kpiNames.ComponentsFromTheSPDXImportedAsBaselineEntries,
                 kpiNames.PackagesPresentIn3rdPartyRepo,
                 kpiNames.PackagesPresentInDevDepRepo,
                 kpiNames.PackagesPresentInReleaseRepo,
