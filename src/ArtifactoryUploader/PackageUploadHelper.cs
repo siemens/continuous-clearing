@@ -136,6 +136,7 @@ namespace LCT.ArtifactoryUploader
                     AddToNpmList(component, displayPackagesInfo, notFound, success);
                     break;
                 case "NUGET":
+                case "CHOCO":
                     AddToNugetList(component, displayPackagesInfo, notFound, success);
                     break;
                 case "MAVEN":
