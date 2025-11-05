@@ -169,7 +169,7 @@ namespace LCT.Common
         { "POETRY", () => appSettings.Poetry },
         { "DEBIAN", () => appSettings.Debian },
         { "MAVEN", () => appSettings.Maven },
-        { "CARGO", () => appSettings.Cargo }
+        { "CARGO", () => appSettings.Cargo },
         { "CHOCO", () => appSettings.Choco }
     };
             if (projectTypeMappings.TryGetValue(appSettings.ProjectType.ToUpperInvariant(), out var getConfig))
