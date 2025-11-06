@@ -88,13 +88,13 @@ namespace LCT.Services
                     Environment.ExitCode = -1;
                     Logger.Debug($"CreateComponent():Component Name -{componentInfo.Name}- " +
                    $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
-                    Logger.Error($" └── CreateComponent():Component Name -{componentInfo.Name}- " +
+                    Logger.Error($"   └── CreateComponent():Component Name -{componentInfo.Name}- " +
                         $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
                 }
             }
             catch (HttpRequestException e)
             {
-                Logger.Error($" └── CreateComponent():", e);
+                Logger.Error($"   └── CreateComponent():", e);
                 Environment.ExitCode = -1;
                 componentCreateStatus.IsCreated = false;
                 componentCreateStatus.ReleaseStatus.IsCreated = false;
@@ -183,7 +183,7 @@ namespace LCT.Services
                     Environment.ExitCode = -1;
                     Logger.Debug($"CreateReleaseForComponent():Component Name -{componentInfo.Name}{componentInfo.Version}- " +
                    $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
-                    Logger.Error($" └── CreateReleaseForComponent():Component Name -{componentInfo.Name}{componentInfo.Version}- " +
+                    Logger.Error($"   └── CreateReleaseForComponent():Component Name -{componentInfo.Name}{componentInfo.Version}- " +
                         $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
                 }
 
@@ -221,7 +221,7 @@ namespace LCT.Services
             }
             if (string.IsNullOrEmpty(releaseId))
             {
-                Logger.Warn($" └── Release id not found for the Component - {name}-{version}");
+                Logger.Warn($"   └── Release id not found for the Component - {name}-{version}");
             }
             return releaseId ?? string.Empty;
         }
@@ -599,7 +599,7 @@ namespace LCT.Services
                 string responseContent = await updateResponse.Content.ReadAsStringAsync();
                 if (responseContent.Contains(Dataconstant.ModerationRequestMessage, StringComparison.OrdinalIgnoreCase))
                 {
-                    Logger.Logger.Log(null, Level.Warn, $"Moderation request is created while updating the SourceDownloadURL in SW360. Please request {cbomData.ReleaseCreatedBy} or the license clearing team to approve the moderation request.", null);
+                    Logger.Logger.Log(null, Level.Warn, $"   └── Moderation request is created while updating the SourceDownloadURL in SW360. Please request {cbomData.ReleaseCreatedBy} or the license clearing team to approve the moderation request.", null);
                     return false;
                 }
                 else
