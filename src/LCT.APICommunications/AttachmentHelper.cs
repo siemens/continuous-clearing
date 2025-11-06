@@ -95,11 +95,11 @@ namespace LCT.APICommunications
             }
             catch (UriFormatException ex)
             {
-                Logger.Error($"AttachComponentSourceToSW360:", ex);
+                Logger.Error($" └── AttachComponentSourceToSW360:", ex);
             }
             catch (SecurityException ex)
             {
-                Logger.Error($"AttachComponentSourceToSW360:", ex);
+                Logger.Error($" └── AttachComponentSourceToSW360:", ex);
             }
             catch (WebException webex)
             {
@@ -117,7 +117,7 @@ namespace LCT.APICommunications
             }
             catch (IOException ex)
             {
-                Logger.Error($"AttachComponentSourceToSW360:Failed attach source for release = {attachReport.ReleaseId}");
+                Logger.Error($" └── AttachComponentSourceToSW360:Failed attach source for release = {attachReport.ReleaseId}");
                 Logger.Debug($"AttachComponentSourceToSW360:", ex);
             }
             return releaseAttachementApi;
@@ -162,7 +162,7 @@ namespace LCT.APICommunications
         {
             if (httpResponse.StatusCode == HttpStatusCode.Accepted)
             {
-                Logger.Logger.Log(null, Level.Warn, $"Moderation request is created while uploading source code in SW360. Please request {component.ReleaseCreatedBy} or the license clearing team to approve the moderation request.", null);
+                Logger.Logger.Log(null, Level.Warn, $" └── Moderation request is created while uploading source code in SW360. Please request {component.ReleaseCreatedBy} or the license clearing team to approve the moderation request.", null);
             }
             else
             {

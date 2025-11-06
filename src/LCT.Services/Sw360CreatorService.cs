@@ -183,7 +183,7 @@ namespace LCT.Services
                     Environment.ExitCode = -1;
                     Logger.Debug($"CreateReleaseForComponent():Component Name -{componentInfo.Name}{componentInfo.Version}- " +
                    $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
-                    Logger.Error($"CreateReleaseForComponent():Component Name -{componentInfo.Name}{componentInfo.Version}- " +
+                    Logger.Error($" └── CreateReleaseForComponent():Component Name -{componentInfo.Name}{componentInfo.Version}- " +
                         $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
                 }
 
@@ -221,7 +221,7 @@ namespace LCT.Services
             }
             if (string.IsNullOrEmpty(releaseId))
             {
-                Logger.Warn($"Release id not found for the Component - {name}-{version}");
+                Logger.Warn($" └── Release id not found for the Component - {name}-{version}");
             }
             return releaseId ?? string.Empty;
         }
