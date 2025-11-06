@@ -88,13 +88,13 @@ namespace LCT.Services
                     Environment.ExitCode = -1;
                     Logger.Debug($"CreateComponent():Component Name -{componentInfo.Name}- " +
                    $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
-                    Logger.Error($"CreateComponent():Component Name -{componentInfo.Name}- " +
+                    Logger.Error($" └── CreateComponent():Component Name -{componentInfo.Name}- " +
                         $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
                 }
             }
             catch (HttpRequestException e)
             {
-                Logger.Error($"CreateComponent():", e);
+                Logger.Error($" └── CreateComponent():", e);
                 Environment.ExitCode = -1;
                 componentCreateStatus.IsCreated = false;
                 componentCreateStatus.ReleaseStatus.IsCreated = false;

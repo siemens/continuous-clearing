@@ -111,7 +111,7 @@ namespace LCT.APICommunications
                         StreamReader reader = new StreamReader(respStream);
                         string text = reader.ReadToEnd();
                         Logger.Debug($"Web exception: {text}", webex);
-                        Logger.Warn($"Web exception: {text}", webex);
+                        Logger.Warn($" └── Web exception: {text}", webex);
                     }
                 }
             }
